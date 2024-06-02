@@ -108,7 +108,6 @@ public class ExecutorApi extends RestBehavior {
     @GetMapping(value = "/api/agent/{platform}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public @ResponseBody byte[] getAgent(@PathVariable String platform) throws IOException {
         InputStream in = getClass().getResourceAsStream("/agents/obas-" + platform);
-        System.out.println(in);
         if (in != null) {
             return IOUtils.toByteArray(in);
         }

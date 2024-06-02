@@ -2,6 +2,7 @@ package io.openbas.executors.tanium.service;
 
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Inject;
 import io.openbas.database.model.Injector;
 import io.openbas.executors.tanium.client.TaniumExecutorClient;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
@@ -31,7 +32,8 @@ public class TaniumExecutorContextService {
         this.taniumExecutorClient = taniumExecutorClient;
     }
 
-    public void launchExecutorSubprocess(@NotNull final Injector injector, @NotNull final Asset asset) {
+    public void launchExecutorSubprocess(@NotNull final Inject inject, @NotNull final Asset asset) {
+        Injector injector = inject.getInjectorContract().getInjector();
         Endpoint.PLATFORM_TYPE platform = Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform(): null;
         if( platform == null ) {
             throw new RuntimeException("Unsupported platform: " + platform);
