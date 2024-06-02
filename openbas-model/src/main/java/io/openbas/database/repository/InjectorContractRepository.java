@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Injector;
 import io.openbas.database.model.InjectorContract;
+import io.openbas.database.model.Payload;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
@@ -20,4 +21,7 @@ public interface InjectorContractRepository extends
 
   @NotNull
   List<InjectorContract> findInjectorContractsByInjector(@NotNull Injector injector);
+
+  @NotNull
+  Optional<InjectorContract> findByInjectorAndPayload(@NotNull Injector injector, @NotNull Payload payload);
 }

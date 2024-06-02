@@ -20,7 +20,8 @@ public class LadeInjector {
                     false,
                     "cyber-range",
                     null,
-                    null
+                    null,
+                    false
             );
         } catch (Exception e) {
             throw new RuntimeException(e);

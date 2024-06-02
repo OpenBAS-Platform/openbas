@@ -81,6 +81,10 @@ public class CalderaExecutor extends Injector {
             execution.addTrace(traceError("Found 0 asset to execute the ability on (likely this inject does not have any target or the targeted asset is inactive and has been purged)"));
         }
         String contract = inject.getInjectorContract().getId();
+        if( inject.getInjectorContract().getPayload() != null ) {
+            // This is a payload, need to create the ability on the fly
+
+        }
         assets.forEach((asset, aBoolean) -> {
             try {
                 Endpoint executionEndpoint = this.findAndRegisterAssetForExecution(injection.getInjection().getInject(), asset);

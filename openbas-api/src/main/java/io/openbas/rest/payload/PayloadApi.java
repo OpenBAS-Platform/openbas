@@ -1,12 +1,16 @@
 package io.openbas.rest.payload;
 
+import io.openbas.database.model.Command;
+import io.openbas.database.model.Executable;
 import io.openbas.database.model.Payload;
+import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.PayloadRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
+import io.openbas.integrations.PayloadService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -23,6 +27,7 @@ import java.time.Instant;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
@@ -32,6 +37,8 @@ public class PayloadApi extends RestBehavior {
 
     private PayloadRepository payloadRepository;
     private TagRepository tagRepository;
+    private PayloadService payloadService;
+    private AttackPatternRepository attackPatternRepository;
 
     @Autowired
     public void setPayloadRepository(PayloadRepository payloadRepository) {
@@ -41,6 +48,16 @@ public class PayloadApi extends RestBehavior {
     @Autowired
     public void setTagRepository(TagRepository tagRepository) {
         this.tagRepository = tagRepository;
+    }
+
+    @Autowired
+    public void setPayloadService(PayloadService payloadService) {
+        this.payloadService = payloadService;
+    }
+
+    @Autowired
+    public void setAttackPatternRepository(AttackPatternRepository attackPatternRepository) {
+        this.attackPatternRepository = attackPatternRepository;
     }
 
     @GetMapping("/api/payloads")
@@ -67,10 +84,26 @@ public class PayloadApi extends RestBehavior {
     @PreAuthorize("isPlanner()")
     @Transactional(rollbackOn = Exception.class)
     public Payload createPayload(@Valid @RequestBody PayloadCreateInput input) {
-        Payload payload = new Payload();
-        payload.setUpdateAttributes(input);
-        payload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-        return payloadRepository.save(payload);
+        switch (input.getType()) {
+            case "Command":
+                Command commandPayload = new Command();
+                commandPayload.setUpdateAttributes(input);
+                commandPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
+                commandPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+                commandPayload = payloadRepository.save(commandPayload);
+                this.payloadService.updateInjectorContractsForPayload(commandPayload);
+                return commandPayload;
+            case "Executable":
+                Executable executablePayload = new Executable();
+                executablePayload.setUpdateAttributes(input);
+                executablePayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
+                executablePayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+                executablePayload = payloadRepository.save(executablePayload);
+                this.payloadService.updateInjectorContractsForPayload(executablePayload);
+                return executablePayload;
+            default:
+                throw new UnsupportedOperationException("Payload type " + input.getType() + " is not supported");
+        }
     }
 
     @PutMapping("/api/payloads/{payloadId}")
@@ -81,9 +114,12 @@ public class PayloadApi extends RestBehavior {
             @Valid @RequestBody PayloadUpdateInput input) {
         Payload payload = this.payloadRepository.findById(payloadId).orElseThrow(ElementNotFoundException::new);
         payload.setUpdateAttributes(input);
+        payload.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         payload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         payload.setUpdatedAt(Instant.now());
-        return payloadRepository.save(payload);
+        payload = payloadRepository.save(payload);
+        this.payloadService.updateInjectorContractsForPayload(payload);
+        return payload;
     }
 
     @Secured(ROLE_ADMIN)

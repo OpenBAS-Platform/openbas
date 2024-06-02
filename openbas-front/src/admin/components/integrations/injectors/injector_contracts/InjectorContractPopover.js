@@ -5,7 +5,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconBu
 import { MoreVert } from '@mui/icons-material';
 import InjectorContractForm from './InjectorContractForm';
 import { useFormatter } from '../../../../../components/i18n';
-import { attackPatternsOptions } from '../../../../../utils/Option';
+import { attackPatternOptions } from '../../../../../utils/Option';
 import Transition from '../../../../../components/common/Transition';
 import { deleteInjectorContract, updateInjectorContract, updateInjectorContractMapping } from '../../../../../actions/InjectorContracts';
 import InjectorContractCustomForm from './InjectorContractCustomForm';
@@ -83,7 +83,7 @@ const InjectorContractPopover = ({ injectorContract, killChainPhasesMap, attackP
     dispatch(deleteInjectorContract(injectorContract.injector_contract_id));
     handleCloseDelete();
   };
-  const injectorContractAttackPatterns = attackPatternsOptions(injectorContract.injector_contract_attack_patterns, attackPatternsMap, killChainPhasesMap);
+  const injectorContractAttackPatterns = attackPatternOptions(injectorContract.injector_contract_attack_patterns, attackPatternsMap, killChainPhasesMap);
   let initialValues = null;
   if (injectorContract.injector_contract_custom) {
     initialValues = R.pipe(

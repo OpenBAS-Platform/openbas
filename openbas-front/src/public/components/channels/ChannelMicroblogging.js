@@ -84,7 +84,7 @@ const ChannelMicroblogging = ({ channelReader }) => {
       </Typography>
       {articles.length === 0 && (
         <div style={{ marginTop: 150 }}>
-          <Empty message={t('No channel pressure entry in this channel yet.')} />
+          <Empty message={t('No media pressure entry in this channel yet.')} />
         </div>
       )}
       {articles.map((article) => {

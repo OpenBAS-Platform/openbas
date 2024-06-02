@@ -327,14 +327,14 @@ const i18n = {
       'Remove Filigran logos': 'Retirer les logos Filigran',
       Contextual: 'Contextuelle',
       'Send email': 'Envoyer le mail',
-      'Add documents in this channel pressure':
+      'Add documents in this media pressure':
         'Ajouter des documents à cette pression médiatique',
       'Expect teams to read the article(s)':
         'Les équipes doivent lire le(s) article(s)',
-      'Add channel pressure': 'Ajouter de la pression médiatique',
+      'Add media pressure': 'Ajouter de la pression médiatique',
       'Remove from the media pressure': 'Supprimer de la pression médiatique',
       'Raw request data': 'Données brutes de la requête',
-      'Channel pressure to publish': 'Pression médiatique à publier',
+      'Media pressure to publish': 'Pression médiatique à publier',
       'Form request data': 'Données de formulaire de la requête',
       Key: 'Clé',
       Headers: 'En-têtes',
@@ -392,7 +392,6 @@ const i18n = {
       Controls: 'Contrôles',
       'Lessons learned': 'Expérience',
       Planning: 'Planification',
-      'Channel pressure': 'Pression médiatique',
       Comchecks: 'Vérifications',
       Dryruns: 'Simulations',
       'Messages header': 'En-tête des messages',
@@ -442,7 +441,7 @@ const i18n = {
       Failure: 'Echec',
       Expired: 'Expiré',
       Anonymized: 'Anonymisé',
-      'No channel pressure entry in this channel yet.':
+      'No media pressure entry in this channel yet.':
         'Encore aucune entrée de pression médiatique dans ce média.',
       'Your communication check is': 'Votre test de communication est',
       successful: 'un succès',
@@ -525,8 +524,8 @@ const i18n = {
       'Change logo': 'Changer le logo',
       'Scheduled / in use': 'Planifié / utilisé',
       'Not used in the context': 'Pas utilisé dans ce contexte',
-      'Update the channel pressure': 'Modifier la pression médiatique',
-      'Do you want to delete this channel pressure?':
+      'Update the media pressure': 'Modifier la pression médiatique',
+      'Do you want to delete this media pressure?':
         'Souhaitez-vous supprimer cette pression médiatique ?',
       'Do you want to delete this challenge?':
         'Souhaitez-vous supprimer ce challenge ?',
@@ -534,7 +533,7 @@ const i18n = {
         "Souhaitez-vous supprimer cette catégorie de retour d'expérience ?",
       'Update the lessons learned category':
         "Modifier une catégorie de retour d'expérience",
-      'Create a new channel pressure': 'Créer une nouvelle pression médiatique',
+      'Create a new media pressure': 'Créer une nouvelle pression médiatique',
       'Create a new lessons learned question':
         "Créer une nouvelle question de retour d'expérience",
       'Collaborative lessons learned': "Retour d'expérience collaboratif",
@@ -595,7 +594,7 @@ const i18n = {
       'Challenges to publish': 'Challenges à publier',
       'Add challenge in this inject': 'Ajouter des challenges à ce stimuli',
       'Add challenges': 'Ajouter des challenges',
-      'Do you want to remove this channel pressure from the inject?':
+      'Do you want to remove this media pressure from the inject?':
         'Souhaitez-vous retirer cette pression médiatique de ce stimuli ?',
       'Do you want to remove this challenge from the inject?':
         'Souhaitez-vous retirer ce challenge de ce stimuli ?',

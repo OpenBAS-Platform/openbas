@@ -16,8 +16,7 @@ public class ContractConfig {
   private final String color_dark;
   private final String color_light;
 
-  public ContractConfig(String type, Map<SupportedLanguage, String> label, String color_dark, String color_light,
-      String icon, boolean expose) {
+  public ContractConfig(String type, Map<SupportedLanguage, String> label, String color_dark, String color_light, String icon, boolean expose) {
     this.type = type;
     this.expose = expose;
     this.color_dark = color_dark;

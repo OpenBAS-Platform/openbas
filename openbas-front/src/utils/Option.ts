@@ -34,7 +34,19 @@ export const tagOptions = (
     }) as Option,
   );
 
-export const attackPatternsOptions = (
+export const platformOptions = (
+  platform_ids: string[] | undefined,
+) => (platform_ids ?? [])
+  .map(
+    (platformId) => {
+      return {
+        id: platformId,
+        label: platformId,
+      };
+    },
+  );
+
+export const attackPatternOptions = (
   attack_pattern_ids: string[] | undefined,
   attackPatternsMap: Record<string, AttackPattern>,
   killChainPhasesMap: Record<string, KillChainPhase>,
@@ -52,7 +64,7 @@ export const attackPatternsOptions = (
     },
   );
 
-export const killChainPhasesOptions = (
+export const killChainPhaseOptions = (
   kill_chain_phase_ids: string[] | undefined,
   killChainPhasesMap: Record<string, KillChainPhase>,
 ) => (kill_chain_phase_ids ?? [])

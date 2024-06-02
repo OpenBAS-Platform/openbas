@@ -63,7 +63,7 @@ public class ChannelContract extends Contractor {
         // Choices are contextual to a specific exercise.
         String messageBody = """
                     Dear player,<br /><br />
-                    New channel pressure entries have been published.<br /><br />
+                    New media pressure entries have been published.<br /><br />
                     <#list articles as article>
                         - <a href="${article.uri}">${article.name}</a><br />
                     </#list>
@@ -88,7 +88,7 @@ public class ChannelContract extends Contractor {
                 .optional(expectationsField)
                 // Emailing zone
                 .optional(emailingField)
-                .mandatory(textField("subject", "Subject", "New channel pressure entries published for ${user.email}",
+                .mandatory(textField("subject", "Subject", "New media pressure entries published for ${user.email}",
                         List.of(emailingField)))
                 .mandatory(richTextareaField("body", "Body", messageBody,
                         List.of(emailingField)))
@@ -96,7 +96,7 @@ public class ChannelContract extends Contractor {
                         List.of(emailingField)))
                 .build();
         Contract publishArticle = executableContract(contractConfig,
-                CHANNEL_PUBLISH, Map.of(en, "Publish channel pressure", fr, "Publier de la pression médiatique"), publishInstance, List.of(Endpoint.PLATFORM_TYPE.Internal.name()), false);
+                CHANNEL_PUBLISH, Map.of(en, "Publish a media pressure", fr, "Publier de la pression médiatique"), publishInstance, List.of(Endpoint.PLATFORM_TYPE.Internal.name()), false);
         // Adding generated variables
         publishArticle.addVariable(variable(VARIABLE_ARTICLES, "List of articles published by the injection", VariableType.Object, Multiple, List.of(
                 variable(VARIABLE_ARTICLE + ".id", "Id of the article in the platform", VariableType.String, One),

@@ -20,7 +20,8 @@ public class ChallengeInjector {
                     false,
                     "capture-the-flag",
                     null,
-                    null
+                    null,
+                    false
             );
         } catch (Exception e) {
             throw new RuntimeException(e);

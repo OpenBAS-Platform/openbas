@@ -65,12 +65,14 @@ interface ItemStatusProps {
 const computeStatusStyle = (status: string | undefined | null) => {
   switch (status) {
     case 'FAILED':
+    case 'Failed':
     case 'Not Prevented':
     case 'Not Detected':
       return inlineStyles.red;
+    case 'SUCCESS':
+    case 'Success':
     case 'Prevented':
     case 'Detected':
-    case 'SUCCESS':
       return inlineStyles.green;
     default:
       return inlineStyles.blueGrey;

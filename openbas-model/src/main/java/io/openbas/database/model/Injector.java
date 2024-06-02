@@ -70,6 +70,11 @@ public class Injector implements Base {
     private Map<String, String> executorClearCommands = new HashMap<>();
 
     @Getter
+    @Column(name = "injector_payloads")
+    @JsonProperty("injector_payloads")
+    private boolean payloads = false;
+
+    @Getter
     @Column(name = "injector_created_at")
     @JsonProperty("injector_created_at")
     private Instant createdAt = now();

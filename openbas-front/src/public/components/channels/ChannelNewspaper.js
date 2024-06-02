@@ -105,7 +105,7 @@ const ChannelNewspaper = ({ channelReader }) => {
       </Typography>
       {!firstArticle && (
         <div style={{ marginTop: 150 }}>
-          <Empty message={t('No channel pressure entry in this channel yet.')} />
+          <Empty message={t('No media pressure entry in this channel yet.')} />
         </div>
       )}
       <Grid container={true} spacing={3} style={{ marginTop: 10 }}>

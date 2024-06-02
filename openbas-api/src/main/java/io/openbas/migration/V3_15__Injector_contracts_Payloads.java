@@ -8,11 +8,14 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V3_11__Assets extends BaseJavaMigration {
+public class V3_15__Injector_contracts_Payloads extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
-    select.execute("ALTER TABLE assets ADD column asset_process_name varchar(255);");  }
+    // Purge
+    select.execute("ALTER TABLE injectors_contracts ADD column injector_contract_payload varchar(255) constraint injector_contract_payload_fk references payloads on delete cascade;");
+    select.execute("CREATE UNIQUE INDEX injector_contract_payload_unique on injectors_contracts (injector_contract_payload, injector_id);");
+  }
 }

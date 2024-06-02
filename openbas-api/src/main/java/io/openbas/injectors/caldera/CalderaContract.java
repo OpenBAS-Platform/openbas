@@ -73,8 +73,7 @@ public class CalderaContract extends Contractor {
 
     private ContractSelect obfuscatorField() {
         List<Obfuscator> obfuscators = this.injectorCalderaService.obfuscators();
-        Map<String, String> obfuscatorChoices = obfuscators.stream()
-                .collect(Collectors.toMap(Obfuscator::getName, Obfuscator::getName));
+        Map<String, String> obfuscatorChoices = obfuscators.stream().collect(Collectors.toMap(Obfuscator::getName, Obfuscator::getName));
         return selectFieldWithDefault(
                 "obfuscator",
                 "Obfuscators",
@@ -94,19 +93,14 @@ public class CalderaContract extends Contractor {
         detectionExpectation.setType(DETECTION);
         detectionExpectation.setName("Expect inject to be detected");
         detectionExpectation.setScore(0);
-
-        return expectationsField(
-                "expectations", "Expectations", List.of(preventionExpectation, detectionExpectation)
-        );
+        return expectationsField("expectations", "Expectations", List.of(preventionExpectation, detectionExpectation));
     }
 
     private List<Contract> abilityContracts(@NotNull final ContractConfig contractConfig) {
         // Fields
         ContractSelect obfuscatorField = obfuscatorField();
         ContractAsset assetField = assetField("assets", "Assets", Multiple);
-        ContractAssetGroup assetGroupField = assetGroupField("assetgroups", "Asset groups",
-                Multiple);
-        // Expectations
+        ContractAssetGroup assetGroupField = assetGroupField("assetgroups", "Asset groups", Multiple);
         ContractExpectations expectationsField = expectations();
 
         List<Ability> abilities = this.injectorCalderaService.abilities();

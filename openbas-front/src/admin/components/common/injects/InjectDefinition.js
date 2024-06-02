@@ -1198,7 +1198,7 @@ class InjectDefinition extends Component {
           {hasArticles && (
             <>
               <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams || hasAssets || hasAssetGroups ? 20 : 0 }}>
-                {t('Channel pressure to publish')}
+                {t('Media pressure to publish')}
               </Typography>
               <List>
                 {sortedArticles.map((article) => (

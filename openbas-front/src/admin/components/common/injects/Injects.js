@@ -489,6 +489,7 @@ const Injects = (props) => {
                           status={inject.inject_ready ? inject.inject_enabled : false}
                           label={injectStatus}
                           variant="inList"
+                          tooltip={injectStatus}
                         />
                       </div>
                       <div

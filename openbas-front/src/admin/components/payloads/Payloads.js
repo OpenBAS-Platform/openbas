@@ -3,19 +3,21 @@ import { useDispatch } from 'react-redux';
 import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { SubscriptionsOutlined } from '@mui/icons-material';
-import { searchPayloads } from '../../../../actions/Payload';
+import { searchPayloads } from '../../../actions/Payload';
 import CreatePayload from './CreatePayload';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { useHelper } from '../../../../store';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
+import { useHelper } from '../../../store';
 import PayloadPopover from './PayloadPopover';
-import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
-import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
-import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
-import { initSorting } from '../../../../components/common/pagination/Page';
-import { useFormatter } from '../../../../components/i18n';
-import Breadcrumbs from '../../../../components/Breadcrumbs';
-import { fetchTags } from '../../../../actions/Tag';
-import ItemTags from '../../../../components/ItemTags';
+import { fetchKillChainPhases } from '../../../actions/KillChainPhase';
+import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
+import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
+import { initSorting } from '../../../components/common/pagination/Page';
+import { useFormatter } from '../../../components/i18n';
+import Breadcrumbs from '../../../components/Breadcrumbs';
+import { fetchTags } from '../../../actions/Tag';
+import ItemTags from '../../../components/ItemTags';
+import { fetchAttackPatterns } from '../../../actions/AttackPattern';
+import PlatformIcon from '../../../components/PlatformIcon';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -26,6 +28,10 @@ const useStyles = makeStyles(() => ({
   item: {
     paddingLeft: 10,
     height: 50,
+  },
+  bodyItems: {
+    display: 'flex',
+    alignItems: 'center',
   },
   bodyItem: {
     fontSize: 13,
@@ -41,7 +47,7 @@ const useStyles = makeStyles(() => ({
     float: 'left',
     textTransform: 'uppercase',
     borderRadius: 4,
-    marginRight: 10,
+    width: 150,
   },
 }));
 
@@ -53,6 +59,10 @@ const inlineStyles = {
   payload_name: {
     width: '20%',
   },
+  payload_platforms: {
+    width: '10%',
+    cursor: 'default',
+  },
   payload_description: {
     width: '20%',
   },
@@ -60,10 +70,10 @@ const inlineStyles = {
     width: '20%',
   },
   payload_created_at: {
-    width: '12%',
+    width: '10%',
   },
   payload_updated_at: {
-    width: '12%',
+    width: '10%',
   },
 };
 
@@ -72,11 +82,14 @@ const Payloads = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t, nsdt } = useFormatter();
-  const { tagsMap } = useHelper((helper) => ({
+  const { tagsMap, attackPatternsMap, killChainPhasesMap } = useHelper((helper) => ({
+    attackPatternsMap: helper.getAttackPatternsMap(),
+    killChainPhasesMap: helper.getKillChainPhasesMap(),
     tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchTags());
+    dispatch(fetchAttackPatterns());
     dispatch(fetchKillChainPhases());
   });
 
@@ -84,6 +97,7 @@ const Payloads = () => {
   const headers = [
     { field: 'payload_type', label: 'Type', isSortable: false },
     { field: 'payload_name', label: 'Name', isSortable: true },
+    { field: 'payload_platforms', label: 'Platforms', isSortable: true },
     { field: 'payload_description', label: 'Description', isSortable: true },
     { field: 'payload_tags', label: 'Tags', isSortable: true },
     { field: 'payload_created_at', label: 'Created', isSortable: true },
@@ -158,7 +172,7 @@ const Payloads = () => {
             </ListItemIcon>
             <ListItemText
               primary={
-                <>
+                <div className={classes.bodyItems}>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.payload_type}
@@ -166,7 +180,6 @@ const Payloads = () => {
                     <Chip
                       variant="outlined"
                       classes={{ root: classes.chipInList }}
-                      style={{ width: 200 }}
                       color="primary"
                       label={t(payload.payload_type)}
                     />
@@ -176,6 +189,14 @@ const Payloads = () => {
                     style={inlineStyles.payload_name}
                   >
                     {payload.payload_name}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.payload_platforms}
+                  >
+                    {payload.payload_platforms?.map(
+                      (platform) => <PlatformIcon key={platform} platform={platform} tooltip={true} width={20} marginRight={10} />,
+                    )}
                   </div>
                   <div
                     className={classes.bodyItem}
@@ -204,12 +225,14 @@ const Payloads = () => {
                   >
                     {nsdt(payload.payload_updated_at)}
                   </div>
-                </>
+                </div>
               }
             />
             <ListItemSecondaryAction>
               <PayloadPopover
                 tagsMap={tagsMap}
+                attackPatternsMap={attackPatternsMap}
+                killChainPhasesMap={killChainPhasesMap}
                 payload={payload}
                 onUpdate={(result) => setPayloads(payloads.map((a) => (a.payload_id !== result.payload_id ? a : result)))}
                 onDelete={(result) => setPayloads(payloads.filter((a) => (a.payload_id !== result)))}

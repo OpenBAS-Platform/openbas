@@ -489,7 +489,6 @@ const LeftBar = () => {
             [
               { type: 'Document', link: '/admin/components/documents', label: 'Documents', icon: <DescriptionOutlined fontSize="small" /> },
               { type: 'Variable', link: '/admin/components/variables', label: 'Custom variables', icon: <AttachMoneyOutlined fontSize="small" />, disabled: true },
-              { type: 'Payload', link: '/admin/components/payloads', label: 'Payloads', icon: <SubscriptionsOutlined fontSize="small" /> },
               { type: 'Persona', link: '/admin/components/personas', label: 'Personas', icon: <DramaMasks fontSize="small" />, disabled: true },
               { type: 'Channel', link: '/admin/components/channels', label: 'Channels', icon: <PostOutline fontSize="small" /> },
               { type: 'Challenge', link: '/admin/components/challenges', label: 'Challenges', icon: <RowingOutlined fontSize="small" /> },
@@ -541,6 +540,25 @@ const LeftBar = () => {
                 )}
               </MenuItem>
             </span>
+          </StyledTooltip>
+          <StyledTooltip title={!navOpen && t('Payloads')} placement="right">
+            <MenuItem
+              component={Link}
+              to="/admin/payloads"
+              selected={location.pathname === '/admin/payloads'}
+              dense={true}
+              classes={{ root: classes.menuItem }}
+            >
+              <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
+                <SubscriptionsOutlined />
+              </ListItemIcon>
+              {navOpen && (
+                <ListItemText
+                  classes={{ primary: classes.menuItemText }}
+                  primary={t('Payloads')}
+                />
+              )}
+            </MenuItem>
           </StyledTooltip>
           <StyledTooltip title={!navOpen && t('Mitigations')} placement="right">
             <MenuItem

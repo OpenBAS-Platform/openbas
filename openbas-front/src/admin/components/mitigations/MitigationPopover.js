@@ -8,7 +8,7 @@ import MitigationForm from './MitigationForm';
 import { useFormatter } from '../../../components/i18n';
 import Transition from '../../../components/common/Transition';
 import Drawer from '../../../components/common/Drawer';
-import { attackPatternsOptions } from '../../../utils/Option';
+import { attackPatternOptions } from '../../../utils/Option';
 
 const MitigationPopover = ({ mitigation, attackPatternsMap, killChainPhasesMap, onUpdate, onDelete }) => {
   const [openDelete, setOpenDelete] = useState(false);
@@ -54,7 +54,7 @@ const MitigationPopover = ({ mitigation, attackPatternsMap, killChainPhasesMap, 
     );
     handleCloseDelete();
   };
-  const mitigationAttackPatterns = attackPatternsOptions(mitigation.mitigation_attack_patterns, attackPatternsMap, killChainPhasesMap);
+  const mitigationAttackPatterns = attackPatternOptions(mitigation.mitigation_attack_patterns, attackPatternsMap, killChainPhasesMap);
   const initialValues = R.pipe(
     R.pick([
       'mitigation_external_id',

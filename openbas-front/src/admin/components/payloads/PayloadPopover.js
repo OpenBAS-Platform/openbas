@@ -3,14 +3,14 @@ import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { deletePayload, updatePayload } from '../../../../actions/Payload';
+import { deletePayload, updatePayload } from '../../../actions/Payload';
 import PayloadForm from './PayloadForm';
-import { useFormatter } from '../../../../components/i18n';
-import { tagOptions } from '../../../../utils/Option';
-import Transition from '../../../../components/common/Transition';
-import Drawer from '../../../../components/common/Drawer';
+import { useFormatter } from '../../../components/i18n';
+import { attackPatternOptions, platformOptions, tagOptions } from '../../../utils/Option';
+import Transition from '../../../components/common/Transition';
+import Drawer from '../../../components/common/Drawer';
 
-const PayloadPopover = ({ payload, tagsMap, onUpdate, onDelete }) => {
+const PayloadPopover = ({ payload, tagsMap, attackPatternsMap, killChainPhasesMap, onUpdate, onDelete }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -28,7 +28,9 @@ const PayloadPopover = ({ payload, tagsMap, onUpdate, onDelete }) => {
   const handleCloseEdit = () => setOpenEdit(false);
   const onSubmitEdit = (data) => {
     const inputValues = R.pipe(
+      R.assoc('payload_platforms', R.pluck('id', data.payload_platforms)),
       R.assoc('payload_tags', R.pluck('id', data.payload_tags)),
+      R.assoc('payload_attack_patterns', R.pluck('id', data.payload_attack_patterns)),
     )(data);
     return dispatch(updatePayload(payload.payload_id, inputValues)).then((result) => {
       if (onUpdate) {
@@ -54,14 +56,20 @@ const PayloadPopover = ({ payload, tagsMap, onUpdate, onDelete }) => {
     );
     handleCloseDelete();
   };
+  const payloadAttackPatterns = attackPatternOptions(payload.payload_attack_patterns, attackPatternsMap, killChainPhasesMap);
   const payloadTags = tagOptions(payload.payload_tags, tagsMap);
+  const payloadPlatforms = platformOptions(payload.payload_platforms);
   const initialValues = R.pipe(
     R.pick([
-      'payload_type',
       'payload_name',
       'payload_description',
-      'payload_content',
+      'payload_cleanup_executor',
+      'payload_cleanup_command',
+      'command_executor',
+      'command_content',
     ]),
+    R.assoc('payload_platforms', payloadPlatforms),
+    R.assoc('payload_attack_patterns', payloadAttackPatterns),
     R.assoc('payload_tags', payloadTags),
   )(payload);
   return (
@@ -105,6 +113,7 @@ const PayloadPopover = ({ payload, tagsMap, onUpdate, onDelete }) => {
           editing={true}
           onSubmit={onSubmitEdit}
           handleClose={handleCloseEdit}
+          type={payload.payload_type}
         />
       </Drawer>
     </>

@@ -26,16 +26,13 @@ public class CalderaResultCollector {
     private final ThreadPoolTaskScheduler taskScheduler;
     private final InjectRepository injectRepository;
     private final InjectStatusRepository injectStatusRepository;
-    private final InjectExpectationService injectExpectationService;
     private final CalderaInjectorService calderaService;
-    private final CalderaInjectorConfig calderaInjectorConfig;
-    private final EndpointService endpointService;
 
     @PostConstruct
     public void init() {
         // If enabled, scheduled every X seconds
         if (this.config.isEnable()) {
-            CalderaResultCollectorService service = new CalderaResultCollectorService(this.injectRepository, this.injectStatusRepository, this.injectExpectationService, this.calderaService, this.calderaInjectorConfig, this.endpointService);
+            CalderaResultCollectorService service = new CalderaResultCollectorService(this.injectRepository, this.injectStatusRepository, this.calderaService);
             this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(60));
         }
     }

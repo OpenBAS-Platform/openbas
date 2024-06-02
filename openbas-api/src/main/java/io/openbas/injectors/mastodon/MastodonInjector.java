@@ -20,7 +20,8 @@ public class MastodonInjector {
                     false,
                     "social-media",
                     null,
-                    null
+                    null,
+                    false
             );
         } catch (Exception e) {
             throw new RuntimeException(e);

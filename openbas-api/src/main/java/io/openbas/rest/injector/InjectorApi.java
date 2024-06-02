@@ -123,7 +123,8 @@ public class InjectorApi extends RestBehavior {
             Boolean customContracts,
             String category,
             Map<String, String> executorCommands,
-            Map<String, String> executorClearCommands) {
+            Map<String, String> executorClearCommands,
+            Boolean payloads) {
         injector.setUpdatedAt(Instant.now());
         injector.setType(type);
         injector.setName(name);
@@ -132,6 +133,7 @@ public class InjectorApi extends RestBehavior {
         injector.setCategory(category);
         injector.setExecutorCommands(executorCommands);
         injector.setExecutorClearCommands(executorClearCommands);
+        injector.setPayloads(payloads);
         List<String> existing = new ArrayList<>();
         List<String> toDeletes = new ArrayList<>();
         injector.getContracts().forEach(contract -> {
@@ -174,7 +176,8 @@ public class InjectorApi extends RestBehavior {
                 input.getCustomContracts(),
                 input.getCategory(),
                 input.getExecutorCommands(),
-                input.getExecutorClearCommands()
+                input.getExecutorClearCommands(),
+                input.getPayloads()
         );
     }
 
@@ -231,7 +234,8 @@ public class InjectorApi extends RestBehavior {
                         input.getCustomContracts(),
                         input.getCategory(),
                         input.getExecutorCommands(),
-                        input.getExecutorClearCommands()
+                        input.getExecutorClearCommands(),
+                        input.getPayloads()
                 );
             } else {
                 // save the injector
@@ -244,6 +248,7 @@ public class InjectorApi extends RestBehavior {
                 newInjector.setCustomContracts(input.getCustomContracts());
                 newInjector.setExecutorCommands(input.getExecutorCommands());
                 newInjector.setExecutorClearCommands(input.getExecutorClearCommands());
+                newInjector.setPayloads(input.getPayloads());
                 Injector savedInjector = injectorRepository.save(newInjector);
                 // Save the contracts
                 List<InjectorContract> injectorContracts = input.getContracts().stream()
