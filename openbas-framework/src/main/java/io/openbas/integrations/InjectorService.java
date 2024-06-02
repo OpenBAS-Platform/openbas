@@ -125,7 +125,7 @@ public class InjectorService {
                         throw new RuntimeException(e);
                     }
                     toUpdates.add(contract);
-                } else if( !contract.getCustom() ) {
+                } else if( !contract.getCustom() && contract.getPayload() == null ) {
                     toDeletes.add(contract.getId());
                 }
             });

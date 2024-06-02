@@ -1937,32 +1937,46 @@ export interface Payload {
 }
 
 export interface PayloadArgument {
+  default_value: string;
   description?: string;
   key: string;
   type: string;
-  value: string;
 }
 
 export interface PayloadCreateInput {
+  command_content?: string;
+  command_executor?: string;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: string[];
+  payload_cleanup_command?: string;
+  payload_cleanup_executor?: string;
   payload_description?: string;
   payload_name: string;
+  payload_platforms?: string[];
+  payload_prerequisites?: PayloadPrerequisite[];
   payload_tags?: string[];
   payload_type: string;
 }
 
 export interface PayloadPrerequisite {
-  checkCommand?: string;
+  check_command?: string;
   description?: string;
   executor: string;
-  getCommand: string;
+  get_command: string;
 }
 
 export interface PayloadUpdateInput {
-  payload_content: string;
+  command_content?: string;
+  command_executor?: string;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: string[];
+  payload_cleanup_command?: string;
+  payload_cleanup_executor?: string;
   payload_description?: string;
   payload_name: string;
+  payload_platforms?: string[];
+  payload_prerequisites?: PayloadPrerequisite[];
   payload_tags?: string[];
-  payload_type: string;
 }
 
 export interface PlatformSettings {

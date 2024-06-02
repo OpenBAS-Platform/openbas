@@ -67,6 +67,8 @@ const PayloadPopover = ({ payload, tagsMap, attackPatternsMap, killChainPhasesMa
       'payload_cleanup_command',
       'command_executor',
       'command_content',
+      'payload_arguments',
+      'payload_prerequisites',
     ]),
     R.assoc('payload_platforms', payloadPlatforms),
     R.assoc('payload_attack_patterns', payloadAttackPatterns),

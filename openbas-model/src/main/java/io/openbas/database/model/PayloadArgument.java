@@ -1,22 +1,27 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
-@Builder
+@Getter
+@Setter
 public class PayloadArgument {
-
   @NotBlank
-  private String key;
-
-  private String description;
-
-  @NotBlank
-  private String value;
-
-  @NotBlank
+  @JsonProperty("type")
   private String type;
 
+  @NotBlank
+  @JsonProperty("key")
+  private String key;
+
+  @NotBlank
+  @JsonProperty("default_value")
+  private String defaultValue;
+
+  @JsonProperty("description")
+  private String description;
 }

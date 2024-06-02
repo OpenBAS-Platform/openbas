@@ -17,6 +17,9 @@ public class Executable extends Payload {
 
   public static final String EXECUTABLE_TYPE = "Executable";
 
+  @JsonProperty("payload_type")
+  private String type = EXECUTABLE_TYPE;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "executable_file")
   @JsonSerialize(using = MonoIdDeserializer.class)

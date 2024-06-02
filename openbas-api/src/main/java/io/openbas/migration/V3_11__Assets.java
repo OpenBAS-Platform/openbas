@@ -10,9 +10,10 @@ import java.sql.Statement;
 @Component
 public class V3_11__Assets extends BaseJavaMigration {
 
-  @Override
-  public void migrate(Context context) throws Exception {
-    Connection connection = context.getConnection();
-    Statement select = connection.createStatement();
-    select.execute("ALTER TABLE assets ADD column asset_process_name varchar(255);");  }
+    @Override
+    public void migrate(Context context) throws Exception {
+        Connection connection = context.getConnection();
+        Statement select = connection.createStatement();
+        select.execute("ALTER TABLE assets ADD column asset_process_name varchar(255);");
+    }
 }

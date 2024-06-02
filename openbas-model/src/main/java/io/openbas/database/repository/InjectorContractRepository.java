@@ -23,5 +23,5 @@ public interface InjectorContractRepository extends
   List<InjectorContract> findInjectorContractsByInjector(@NotNull Injector injector);
 
   @NotNull
-  Optional<InjectorContract> findByInjectorAndPayload(@NotNull Injector injector, @NotNull Payload payload);
+  Optional<InjectorContract> findInjectorContractByInjectorAndPayload(@NotNull Injector injector, @NotNull Payload payload);
 }

@@ -20,6 +20,9 @@ public class Command extends Payload {
 
   public static final String COMMAND_TYPE = "Command";
 
+  @JsonProperty("payload_type")
+  private String type = COMMAND_TYPE;
+
   @Queryable(filterable = true, sortable = true)
   @Column(name = "command_executor")
   @JsonProperty("command_executor")

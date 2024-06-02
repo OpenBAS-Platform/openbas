@@ -1,6 +1,8 @@
 package io.openbas.rest.payload.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.database.model.PayloadArgument;
+import io.openbas.database.model.PayloadPrerequisite;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +30,12 @@ public class PayloadUpdateInput {
 
     @JsonProperty("command_content")
     private String content;
+
+    @JsonProperty("payload_arguments")
+    private List<PayloadArgument> arguments;
+
+    @JsonProperty("payload_prerequisites")
+    private List<PayloadPrerequisite> prerequisites;
 
     @JsonProperty("payload_cleanup_executor")
     private String cleanupExecutor;
