@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V3_12__Add_array_union_agg_method extends BaseJavaMigration {
+public class V3_16__Add_array_union_agg_method extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
