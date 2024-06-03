@@ -97,7 +97,7 @@ const MarkDownField: React.FC<Props> = ({
             disabled,
           }}
           preview={isEdit ? 'edit' : 'preview'}
-          onChange={(value) => onChange(value || '')}
+          onChange={(val) => onChange(val || '')}
           commands={[
             writeCommand,
             previewCommand,
