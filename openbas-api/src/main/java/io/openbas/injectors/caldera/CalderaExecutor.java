@@ -83,7 +83,7 @@ public class CalderaExecutor extends Injector {
         String contract = inject.getInjectorContract().getId();
         if( inject.getInjectorContract().getPayload() != null ) {
             // This is a payload, need to create the ability on the fly
-
+            
         }
         assets.forEach((asset, aBoolean) -> {
             try {
