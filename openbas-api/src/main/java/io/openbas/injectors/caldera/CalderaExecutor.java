@@ -9,6 +9,7 @@ import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.Injector;
+import io.openbas.injectors.caldera.client.model.Ability;
 import io.openbas.injectors.caldera.client.model.Agent;
 import io.openbas.injectors.caldera.client.model.ExploitResult;
 import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
@@ -80,10 +81,17 @@ public class CalderaExecutor extends Injector {
         if (assets.isEmpty()) {
             execution.addTrace(traceError("Found 0 asset to execute the ability on (likely this inject does not have any target or the targeted asset is inactive and has been purged)"));
         }
-        String contract = inject.getInjectorContract().getId();
+        String contract;
         if( inject.getInjectorContract().getPayload() != null ) {
             // This is a payload, need to create the ability on the fly
-            
+            List<Ability> abilities = calderaService.abilities().stream().filter(ability -> ability.getName().equals(inject.getInjectorContract().getPayload().getId())).toList();
+            if( !abilities.isEmpty() ) {
+              calderaService.deleteAbility(abilities.getFirst());
+            }
+            Ability abilityToExecute = calderaService.createAbility(inject.getInjectorContract().getPayload());
+            contract = abilityToExecute.getAbility_id();
+        } else {
+            contract = inject.getInjectorContract().getId();
         }
         assets.forEach((asset, aBoolean) -> {
             try {

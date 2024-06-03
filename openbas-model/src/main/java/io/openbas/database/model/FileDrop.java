@@ -17,11 +17,14 @@ public class FileDrop extends Payload {
 
   public static final String FILE_DROP_TYPE = "FileDrop";
 
+  @JsonProperty("payload_type")
+  private String type = FILE_DROP_TYPE;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "file_drop_file")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("file_drop_file")
-  private Document file;
+  private Document fileDropFile;
 
   public FileDrop() {
 

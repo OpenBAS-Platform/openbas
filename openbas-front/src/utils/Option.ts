@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import countriesJson from '../static/geo/countries.json';
-import type { AttackPattern, Exercise, KillChainPhase, Organization, Scenario, Tag } from './api-types';
+import type { AttackPattern, Exercise, KillChainPhase, Organization, Scenario, Tag, Document } from './api-types';
 
 interface Countries {
   features: [{
@@ -19,6 +19,19 @@ export interface Option {
   label: string;
   color?: string;
 }
+
+export const documentOptions = (
+  document_ids: string[] | undefined,
+  documentsMap: Record<string, Document>,
+) => (document_ids ?? [])
+  .map((documentId) => documentsMap[documentId])
+  .filter((documentItem) => documentItem !== undefined)
+  .map(
+    (documentItem) => ({
+      id: documentItem.document_id,
+      label: documentItem.document_name,
+    }) as Option,
+  );
 
 export const tagOptions = (
   tag_ids: string[] | undefined,

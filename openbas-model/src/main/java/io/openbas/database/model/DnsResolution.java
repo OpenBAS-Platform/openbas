@@ -20,6 +20,9 @@ public class DnsResolution extends Payload {
 
   public static final String DNS_RESOLUTION_TYPE = "DnsResolution";
 
+  @JsonProperty("payload_type")
+  private String type = DNS_RESOLUTION_TYPE;
+
   @Queryable(filterable = true, sortable = true)
   @Column(name = "dns_resolution_hostname")
   @JsonProperty("dns_resolution_hostname")

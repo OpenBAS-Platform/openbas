@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Injector;
 import io.openbas.injectors.caldera.client.model.Ability;
 import io.openbas.injectors.caldera.client.model.Agent;
 import io.openbas.injectors.caldera.client.model.Result;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +50,27 @@ public class CalderaInjectorClient {
             String jsonResponse = this.get(this.config.getRestApiV2Url() + ABILITIES_URI);
             return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
             });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Ability createAbility(Map<String, Object> body) {
+        try {
+            String jsonResponse = this.post(
+                    this.config.getRestApiV2Url() + ABILITIES_URI,
+                    body
+            );
+            return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteAbility(Ability ability) {
+        try {
+            this.delete(this.config.getRestApiV2Url() + ABILITIES_URI + "/" + ability.getAbility_id());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
