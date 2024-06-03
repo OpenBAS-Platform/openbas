@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Injector;
 import io.openbas.injectors.caldera.client.model.Ability;
 import io.openbas.injectors.caldera.client.model.Agent;
 import io.openbas.injectors.caldera.client.model.Result;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +50,27 @@ public class CalderaInjectorClient {
             String jsonResponse = this.get(this.config.getRestApiV2Url() + ABILITIES_URI);
             return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
             });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Ability createAbility(Map<String, Object> body) {
+        try {
+            String jsonResponse = this.post(
+                    this.config.getRestApiV2Url() + ABILITIES_URI,
+                    body
+            );
+            return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteAbility(Ability ability) {
+        try {
+            this.delete(this.config.getRestApiV2Url() + ABILITIES_URI + "/" + ability.getAbility_id());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -141,7 +164,7 @@ public class CalderaInjectorClient {
 
     public Result results(@NotBlank final String linkId) {
         try {
-            Map<String, String> body = new HashMap<>();
+            Map<String, Object> body = new HashMap<>();
             body.put("index", RESULT_INDEX);
             body.put("link_id", linkId);
             String jsonResponse = this.post(this.config.getRestApiV1Url(), body);
@@ -159,12 +182,15 @@ public class CalderaInjectorClient {
     public String exploit(
             @NotBlank final String obfuscator,
             @NotBlank final String paw,
-            @NotBlank final String abilityId) {
+            @NotBlank final String abilityId,
+            final List<Map<String, String>> additionalFields
+    ) {
         try {
-            Map<String, String> body = new HashMap<>();
+            Map<String, Object> body = new HashMap<>();
             body.put("obfuscator", obfuscator);
             body.put("paw", paw);
             body.put("ability_id", abilityId);
+            body.put("facts", additionalFields);
             return this.post(
                     this.config.getPluginAccessApiUrl() + EXPLOIT_URI,
                     body
@@ -192,7 +218,7 @@ public class CalderaInjectorClient {
 
     private String post(
             @NotBlank final String url,
-            @NotNull final Map<String, String> body) throws IOException {
+            @NotNull final Map<String, Object> body) throws IOException {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost = new HttpPost(url);
             // Headers

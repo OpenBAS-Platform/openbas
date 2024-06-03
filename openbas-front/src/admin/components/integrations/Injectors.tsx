@@ -2,7 +2,7 @@ import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Link } from 'react-router-dom';
 import { Card, CardActionArea, CardContent, Chip, Grid, Tooltip, Typography } from '@mui/material';
-import { AutoModeOutlined } from '@mui/icons-material';
+import { AutoModeOutlined, SubscriptionsOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
@@ -57,6 +57,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     position: 'absolute',
     top: 10,
     right: 10,
+  },
+  payload: {
+    position: 'absolute',
+    top: 10,
   },
 }));
 
@@ -152,7 +156,12 @@ const Injectors = () => {
                     </div>
                     {injector.injector_custom_contracts && <div className={classes.customizable}>
                       <Tooltip title={t('Supporting adding new contracts')}>
-                        <AutoModeOutlined />
+                        <AutoModeOutlined color="success" />
+                      </Tooltip>
+                    </div>}
+                    {injector.injector_payloads && <div className={classes.payload} style={{ right: injector.injector_custom_contracts ? 40 : 10 }}>
+                      <Tooltip title={t('Supporting payloads')}>
+                        <SubscriptionsOutlined color="success" />
                       </Tooltip>
                     </div>}
                   </CardContent>

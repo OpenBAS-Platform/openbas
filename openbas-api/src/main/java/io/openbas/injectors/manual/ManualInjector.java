@@ -20,7 +20,8 @@ public class ManualInjector {
                     true,
                     "generic",
                     null,
-                    null
+                    null,
+                    false
             );
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -75,8 +75,7 @@ public class ScenarioApi {
 
   @PostMapping("/api/scenarios/search")
   public Page<RawPaginationScenario> scenarios(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return this.scenarioService.scenarios(searchPaginationInput)
-        .map(RawPaginationScenario::new);
+    return this.scenarioService.scenarios(searchPaginationInput);
   }
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}")

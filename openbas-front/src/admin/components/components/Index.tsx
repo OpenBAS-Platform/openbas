@@ -8,7 +8,6 @@ import NotFound from '../../../components/NotFound';
 const IndexChannel = lazy(() => import('./channels/Index'));
 const Channels = lazy(() => import('./channels/Channels'));
 const Documents = lazy(() => import('./documents/Documents'));
-const Payloads = lazy(() => import('./payloads/Payloads'));
 const Challenges = lazy(() => import('./challenges/Challenges'));
 
 const useStyles = makeStyles(() => ({
@@ -25,7 +24,6 @@ const Index = () => {
         <Routes>
           <Route path="" element={<Navigate to="documents" replace={true} />} />
           <Route path="documents" element={errorWrapper(Documents)()} />
-          <Route path="payloads" element={errorWrapper(Payloads)()} />
           <Route path="channels" element={errorWrapper(Channels)()} />
           <Route path="channels/:channelId/*" element={errorWrapper(IndexChannel)()} />
           <Route path="challenges" element={errorWrapper(Challenges)()} />

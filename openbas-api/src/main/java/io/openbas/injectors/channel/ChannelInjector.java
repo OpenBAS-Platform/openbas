@@ -20,7 +20,8 @@ public class ChannelInjector {
                     false,
                     "media-pressure",
                     null,
-                    null
+                    null,
+                    false
             );
         } catch (Exception e) {
             throw new RuntimeException(e);

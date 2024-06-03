@@ -31,7 +31,7 @@ const styles = () => ({
     float: 'left',
     textTransform: 'uppercase',
     borderRadius: 4,
-    width: 100,
+    width: 140,
   },
 });
 

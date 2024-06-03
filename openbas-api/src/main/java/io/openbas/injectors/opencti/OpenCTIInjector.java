@@ -20,7 +20,8 @@ public class OpenCTIInjector {
                     true,
                     "incident-response",
                     null,
-                    null
+                    null,
+                    false
             );
         } catch (Exception e) {
             throw new RuntimeException(e);

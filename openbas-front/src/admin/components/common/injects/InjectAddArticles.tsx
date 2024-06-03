@@ -127,7 +127,7 @@ const InjectAddArticles: FunctionComponent<Props> = ({
           <ControlPointOutlined color="primary" />
         </ListItemIcon>
         <ListItemText
-          primary={t('Add channel pressure')}
+          primary={t('Add media pressure')}
           classes={{ primary: classes.text }}
         />
       </ListItem>

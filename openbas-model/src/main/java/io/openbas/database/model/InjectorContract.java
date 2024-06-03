@@ -11,6 +11,7 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.converter.ContentConverter;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
+import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -66,6 +67,11 @@ public class InjectorContract implements Base {
     @Column(name = "injector_contract_platforms", columnDefinition = "text[]")
     @JsonProperty("injector_contract_platforms")
     private String[] platforms = new String[0];
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "injector_contract_payload")
+    @JsonProperty("injector_contract_payload")
+    private Payload payload;
 
     @Column(name = "injector_contract_created_at")
     @JsonProperty("injector_contract_created_at")

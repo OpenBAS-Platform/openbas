@@ -2,7 +2,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { makeStyles, useTheme } from '@mui/styles';
-import { Chip, Slide } from '@mui/material';
+import { Chip, Slide, Tooltip } from '@mui/material';
 import { hexToRGB } from '../utils/Colors';
 import { useFormatter } from './i18n';
 import { useHelper } from '../store';
@@ -67,17 +67,18 @@ const ItemTags = (props) => {
       {orderedTags.length > 0 ? (
         R.map(
           (tag) => (
-            <Chip
-              key={tag.tag_id}
-              variant="outlined"
-              classes={{ root: style }}
-              label={truncate(tag.tag_name, 10)}
-              style={{
-                color: tag.tag_color,
-                borderColor: tag.tag_color,
-                backgroundColor: hexToRGB(tag.tag_color),
-              }}
-            />
+            <Tooltip key={tag.tag_id} title={tag.tag_name}>
+              <Chip
+                variant="outlined"
+                classes={{ root: style }}
+                label={truncate(tag.tag_name, 15)}
+                style={{
+                  color: tag.tag_color,
+                  borderColor: tag.tag_color,
+                  backgroundColor: hexToRGB(tag.tag_color),
+                }}
+              />
+            </Tooltip>
           ),
           R.take(limit, orderedTags),
         )

@@ -20,7 +20,8 @@ public class EmailInjector {
                     false,
                     "communication",
                     null,
-                    null
+                    null,
+                    false
             );
         } catch (Exception e) {
             throw new RuntimeException(e);

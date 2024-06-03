@@ -104,9 +104,9 @@ public class CalderaExecutorClient {
             }
             Map<String, Object> body = new HashMap<>();
             body.put("name", "caldera-subprocessor-" + injector.getName());
-            body.put("tactic", "initial-access");
-            body.put("technique_id", "T1133");
-            body.put("technique_name", "External Remote Services");
+            body.put("tactic", "openbas");
+            body.put("technique_id", "openbas");
+            body.put("technique_name", "openbas");
             body.put("executors", executors);
             String jsonResponse = this.post(
                     this.config.getRestApiV2Url() + ABILITIES_URI,
@@ -146,9 +146,9 @@ public class CalderaExecutorClient {
             }
             Map<String, Object> body = new HashMap<>();
             body.put("name", "caldera-clear-" + injector.getName());
-            body.put("tactic", "initial-access");
-            body.put("technique_id", "T1133");
-            body.put("technique_name", "External Remote Services");
+            body.put("tactic", "openbas");
+            body.put("technique_id", "openbas");
+            body.put("technique_name", "openbas");
             body.put("executors", executors);
             String jsonResponse = this.post(
                     this.config.getRestApiV2Url() + ABILITIES_URI,

@@ -38,6 +38,9 @@ public class InjectorCreateInput {
     @JsonProperty("injector_executor_clear_commands")
     private Map<String, String> executorClearCommands;
 
+    @JsonProperty("injector_payloads")
+    private Boolean payloads = false;
+
     public String getId() {
         return id;
     }
@@ -100,5 +103,13 @@ public class InjectorCreateInput {
 
     public void setExecutorClearCommands(Map<String, String> executorClearCommands) {
         this.executorClearCommands = executorClearCommands;
+    }
+
+    public Boolean getPayloads() {
+        return payloads;
+    }
+
+    public void setPayloads(Boolean payloads) {
+        this.payloads = payloads;
     }
 }

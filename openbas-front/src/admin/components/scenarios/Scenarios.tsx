@@ -116,7 +116,7 @@ const Scenarios = () => {
     { field: 'scenario_category', label: 'Category', isSortable: true },
     { field: 'scenario_recurrence', label: 'Status', isSortable: true },
     { field: 'scenario_platforms', label: 'Platforms', isSortable: false },
-    { field: 'scenario_tags', label: 'Tags', isSortable: true },
+    { field: 'scenario_tags', label: 'Tags', isSortable: false },
     { field: 'scenario_updated_at', label: 'Updated', isSortable: true },
   ];
 

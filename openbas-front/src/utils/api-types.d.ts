@@ -1130,6 +1130,7 @@ export interface Injector {
   injector_external?: boolean;
   injector_id: string;
   injector_name: string;
+  injector_payloads?: boolean;
   injector_type: string;
   /** @format date-time */
   injector_updated_at?: string;
@@ -1159,6 +1160,7 @@ export interface InjectorContract {
   injector_contract_labels?: Record<string, string>;
   injector_contract_manual?: boolean;
   injector_contract_needs_executor?: boolean;
+  injector_contract_payload?: Payload;
   injector_contract_platforms?: string[];
   /** @format date-time */
   injector_contract_updated_at?: string;
@@ -1211,6 +1213,7 @@ export interface InjectorCreateInput {
   injector_executor_commands?: Record<string, string>;
   injector_id: string;
   injector_name: string;
+  injector_payloads?: boolean;
   injector_type: string;
 }
 
@@ -1226,6 +1229,7 @@ export interface InjectorUpdateInput {
   injector_executor_clear_commands?: Record<string, string>;
   injector_executor_commands?: Record<string, string>;
   injector_name: string;
+  injector_payloads?: boolean;
 }
 
 export type JsonNode = object;
@@ -1913,12 +1917,17 @@ export interface Pause {
 }
 
 export interface Payload {
-  payload_content?: string;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: AttackPattern[];
+  payload_cleanup_command?: string;
+  payload_cleanup_executor?: string;
   /** @format date-time */
   payload_created_at?: string;
   payload_description?: string;
   payload_id: string;
   payload_name: string;
+  payload_platforms?: string[];
+  payload_prerequisites?: PayloadPrerequisite[];
   /** @uniqueItems true */
   payload_tags?: Tag[];
   payload_type?: string;
@@ -1927,20 +1936,47 @@ export interface Payload {
   updateAttributes?: object;
 }
 
+export interface PayloadArgument {
+  default_value: string;
+  description?: string;
+  key: string;
+  type: string;
+}
+
 export interface PayloadCreateInput {
-  payload_content: string;
+  command_content?: string;
+  command_executor?: string;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: string[];
+  payload_cleanup_command?: string;
+  payload_cleanup_executor?: string;
   payload_description?: string;
   payload_name: string;
+  payload_platforms?: string[];
+  payload_prerequisites?: PayloadPrerequisite[];
   payload_tags?: string[];
   payload_type: string;
 }
 
+export interface PayloadPrerequisite {
+  check_command?: string;
+  description?: string;
+  executor: string;
+  get_command: string;
+}
+
 export interface PayloadUpdateInput {
-  payload_content: string;
+  command_content?: string;
+  command_executor?: string;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: string[];
+  payload_cleanup_command?: string;
+  payload_cleanup_executor?: string;
   payload_description?: string;
   payload_name: string;
+  payload_platforms?: string[];
+  payload_prerequisites?: PayloadPrerequisite[];
   payload_tags?: string[];
-  payload_type: string;
 }
 
 export interface PlatformSettings {

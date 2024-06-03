@@ -1,5 +1,7 @@
 package io.openbas.injectors.caldera.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import io.openbas.database.model.*;
 import io.openbas.injectors.caldera.client.CalderaInjectorClient;
 import io.openbas.injectors.caldera.client.model.*;
 import io.openbas.injectors.caldera.model.Obfuscator;
@@ -7,8 +9,10 @@ import io.openbas.injectors.caldera.model.ResultStatus;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
@@ -32,13 +36,56 @@ public class CalderaInjectorService {
     public String exploit(
             @NotBlank final String obfuscator,
             @NotBlank final String paw,
-            @NotBlank final String abilityId) {
-        return this.client.exploit(obfuscator, paw, abilityId);
+            @NotBlank final String abilityId,
+            final List<Map<String, String>> additionalFields
+    ) {
+        return this.client.exploit(obfuscator, paw, abilityId, additionalFields);
     }
 
     public List<Obfuscator> obfuscators() {
         return this.client.obfuscators();
     }
+
+    public void deleteAbility(Ability ability) {
+        this.client.deleteAbility(ability);
+    }
+
+    public Ability createAbility(Payload payload) {
+        List<Map<String, String>> executors = new ArrayList<>();
+        switch (payload.getType()) {
+            case "Command":
+                Command payloadCommand = (Command) Hibernate.unproxy(payload);
+                Arrays.stream(payloadCommand.getPlatforms()).forEach(platform -> {
+                    Map<String, String> executor = new HashMap<>();
+                    executor.put("platform", platform.equalsIgnoreCase("macos") ? "darwin" : platform.toLowerCase());
+                    executor.put("name", payloadCommand.getExecutor().equals("bash") ? "sh" : payloadCommand.getExecutor());
+                    executor.put("command", payloadCommand.getContent());
+                    executors.add(executor);
+                });
+                break;
+            case "DnsResolution":
+                DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
+                Arrays.stream(payloadDnsResolution.getPlatforms()).forEach(platform -> {
+                    Map<String, String> executor = new HashMap<>();
+                    executor.put("platform", platform.equals(Endpoint.PLATFORM_TYPE.MacOS.name()) ? "darwin" : platform.toLowerCase());
+                    executor.put("name", platform.equals(Endpoint.PLATFORM_TYPE.Windows.name()) ? "cmd" : "sh");
+                    executor.put("command", "nslookup " + payloadDnsResolution.getHostname());
+                    executors.add(executor);
+                });
+                break;
+            default:
+                throw new UnsupportedOperationException("Payload type " + payload.getType() + " is not supported");
+        }
+        Map<String, Object> body = new HashMap<>();
+        body.put("name", payload.getId());
+        body.put("tactic", "openbas");
+        body.put("technique_id", "openbas");
+        body.put("technique_name", "openbas");
+        body.put("executors", executors);
+        return this.client.createAbility(body);
+    }
+
+    // -- AGENTS --
 
     public List<Agent> agents() {
         try {

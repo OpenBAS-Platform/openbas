@@ -6,7 +6,7 @@ import { MoreVert } from '@mui/icons-material';
 import { deleteAttackPattern, updateAttackPattern } from '../../../../actions/AttackPattern';
 import AttackPatternForm from './AttackPatternForm';
 import { useFormatter } from '../../../../components/i18n';
-import { killChainPhasesOptions } from '../../../../utils/Option';
+import { killChainPhaseOptions } from '../../../../utils/Option';
 import Transition from '../../../../components/common/Transition';
 import Drawer from '../../../../components/common/Drawer';
 
@@ -54,7 +54,7 @@ const AttackPatternPopover = ({ attackPattern, killChainPhasesMap, onUpdate, onD
     );
     handleCloseDelete();
   };
-  const attackPatternKillChainPhases = killChainPhasesOptions(attackPattern.attack_pattern_kill_chain_phases, killChainPhasesMap);
+  const attackPatternKillChainPhases = killChainPhaseOptions(attackPattern.attack_pattern_kill_chain_phases, killChainPhasesMap);
   const initialValues = R.pipe(
     R.pick([
       'attack_pattern_external_id',

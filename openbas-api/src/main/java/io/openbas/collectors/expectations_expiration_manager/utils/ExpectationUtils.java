@@ -21,7 +21,7 @@ public class ExpectationUtils {
         ? "Not detected"
         : PREVENTION.equals(expectationType)
             ? "Not prevented"
-            : "Failed";
+            : "FAILED";
   }
 
 }

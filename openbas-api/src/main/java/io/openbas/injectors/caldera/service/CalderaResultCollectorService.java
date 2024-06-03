@@ -29,26 +29,17 @@ public class CalderaResultCollectorService implements Runnable {
 
     private final InjectRepository injectRepository;
     private final InjectStatusRepository injectStatusRepository;
-    private final InjectExpectationService injectExpectationService;
     private final CalderaInjectorService calderaService;
-    private final CalderaInjectorConfig calderaInjectorConfig;
-    private final EndpointService endpointService;
 
     @Autowired
     public CalderaResultCollectorService(
             InjectRepository injectRepository,
             InjectStatusRepository injectStatusRepository,
-            InjectExpectationService injectExpectationService,
-            CalderaInjectorService calderaService,
-            CalderaInjectorConfig calderaInjectorConfig,
-            EndpointService endpointService
+            CalderaInjectorService calderaService
     ) {
         this.injectRepository = injectRepository;
         this.injectStatusRepository = injectStatusRepository;
-        this.injectExpectationService = injectExpectationService;
         this.calderaService = calderaService;
-        this.calderaInjectorConfig = calderaInjectorConfig;
-        this.endpointService = endpointService;
     }
 
     @Override
@@ -74,7 +65,7 @@ public class CalderaResultCollectorService implements Runnable {
                         log.log(Level.INFO, "Trying to get result for " + linkId);
                         resultStatus = this.calderaService.results(linkId);
                     } catch (Exception e) {
-                        injectStatus.getTraces().add(traceError("Cannot get result for linkID " + linkId + ", injection has failed"));
+                        injectStatus.getTraces().add(traceMaybePrevented("Cannot get result for linkID " + linkId + ", injection has failed"));
                         log.log(Level.INFO, "Cannot get result for linkID " + linkId + ", injection has failed");
                         resultStatus.setFail(true);
                         completedActions.add(resultStatus);
@@ -82,7 +73,7 @@ public class CalderaResultCollectorService implements Runnable {
                     }
                     if (resultStatus.getPaw() == null) {
                         if (injectStatus.getTrackingSentDate().isBefore(Instant.now().minus(EXPIRATION_TIME / 60, ChronoUnit.MINUTES))) {
-                            injectStatus.getTraces().add(traceError("Cannot get result for linkID " + linkId + ", injection has failed"));
+                            injectStatus.getTraces().add(traceMaybePrevented("Cannot get result for linkID " + linkId + ", injection has failed"));
                             log.log(Level.INFO, "Cannot get result for linkID " + linkId + ", injection has failed");
                             resultStatus.setFail(true);
                             completedActions.add(resultStatus);
@@ -93,11 +84,7 @@ public class CalderaResultCollectorService implements Runnable {
                             completedActions.add(resultStatus);
                             if (resultStatus.isFail()) {
                                 injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalError() + 1);
-                                if (resultStatus.getContent().contains("denied")) {
-                                    injectStatus.getTraces().add(traceMaybePrevented("Failed result for linkID " + linkId + " (" + resultStatus.getContent() + ")"));
-                                } else {
-                                    injectStatus.getTraces().add(traceError("Failed result for linkID " + linkId + " (" + resultStatus.getContent() + ")"));
-                                }
+                                injectStatus.getTraces().add(traceMaybePrevented("Failed result for linkID " + linkId + " (" + resultStatus.getContent() + ")"));
                             } else {
                                 injectStatus.setTrackingTotalSuccess(injectStatus.getTrackingTotalSuccess() + 1);
                                 injectStatus.getTraces().add(traceSuccess("Success result for linkID " + linkId + " (" + resultStatus.getContent() + ")"));
@@ -107,7 +94,7 @@ public class CalderaResultCollectorService implements Runnable {
                                 finalExecutionTime = resultStatus.getFinish();
                             }
                         } else if (injectStatus.getTrackingSentDate().isBefore(Instant.now().minus(5L, ChronoUnit.MINUTES))) {
-                            injectStatus.getTraces().add(traceError("Timeout on linkID " + linkId + ", injection has failed"));
+                            injectStatus.getTraces().add(traceMaybePrevented("Timeout on linkID " + linkId + ", injection has failed"));
                             log.log(Level.INFO, "Timeout on linkID " + linkId + ", injection has failed");
                             resultStatus.setFail(true);
                             completedActions.add(resultStatus);

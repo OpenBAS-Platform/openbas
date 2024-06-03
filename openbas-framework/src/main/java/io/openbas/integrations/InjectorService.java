@@ -41,6 +41,8 @@ public class InjectorService {
 
     private AttackPatternRepository attackPatternRepository;
 
+    private PayloadService payloadService;
+
     @Resource
     public void setFileService(FileService fileService) {
         this.fileService = fileService;
@@ -61,8 +63,13 @@ public class InjectorService {
         this.injectorContractRepository = injectorContractRepository;
     }
 
+    @Autowired
+    public void setPayloadService(PayloadService payloadService) {
+        this.payloadService = payloadService;
+    }
+
     @Transactional
-    public void register(String id, String name, Contractor contractor, Boolean isCustomizable, String category, Map<String, String> executorCommands, Map<String, String> executorClearCommands) throws Exception {
+    public void register(String id, String name, Contractor contractor, Boolean isCustomizable, String category, Map<String, String> executorCommands, Map<String, String> executorClearCommands, Boolean isPayloads) throws Exception {
         if(!contractor.isExpose()) {
             return;
         }
@@ -88,6 +95,7 @@ public class InjectorService {
             injector.setCategory(category);
             injector.setExecutorCommands(executorCommands);
             injector.setExecutorClearCommands(executorClearCommands);
+            injector.setPayloads(isPayloads);
             injector.setUpdatedAt(Instant.now());
             List<String> existing = new ArrayList<>();
             List<InjectorContract> toUpdates = new ArrayList<>();
@@ -117,7 +125,7 @@ public class InjectorService {
                         throw new RuntimeException(e);
                     }
                     toUpdates.add(contract);
-                } else if( !contract.getCustom() ) {
+                } else if( !contract.getCustom() && contract.getPayload() == null ) {
                     toDeletes.add(contract.getId());
                 }
             });
@@ -150,6 +158,9 @@ public class InjectorService {
             injectorContractRepository.saveAll(toCreates);
             injectorContractRepository.saveAll(toUpdates);
             injectorRepository.save(injector);
+            if( injector.isPayloads() ) {
+                this.payloadService.updateInjectorContractsForInjector(injector);
+            }
         } else {
             // save the injector
             Injector newInjector = new Injector();
@@ -157,9 +168,14 @@ public class InjectorService {
             newInjector.setName(name);
             newInjector.setType(contractor.getType());
             newInjector.setCategory(category);
+            newInjector.setCustomContracts(isCustomizable);
             newInjector.setExecutorCommands(executorCommands);
             newInjector.setExecutorClearCommands(executorClearCommands);
+            newInjector.setPayloads(isPayloads);
             Injector savedInjector = injectorRepository.save(newInjector);
+            if( savedInjector.isPayloads() ) {
+                this.payloadService.updateInjectorContractsForInjector(savedInjector);
+            }
             // Save the contracts
             List<InjectorContract> injectorContracts = contracts.stream().map(in -> {
                 InjectorContract injectorContract = new InjectorContract();

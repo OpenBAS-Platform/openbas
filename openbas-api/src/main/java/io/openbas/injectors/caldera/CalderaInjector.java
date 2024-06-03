@@ -37,7 +37,8 @@ public class CalderaInjector {
                     false,
                     "simulation-agent",
                     executorCommands,
-                    executorClearCommands
+                    executorClearCommands,
+                    true
             );
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error creating Caldera injector (" + e.getMessage() + ")" + "\n" + Arrays.toString(e.getStackTrace()));
