@@ -1,4 +1,4 @@
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
 import * as R from 'ramda';
 import { Link } from 'react-router-dom';
 import { KeyboardArrowRight, HubOutlined } from '@mui/icons-material';
@@ -169,8 +169,10 @@ const ExerciseList: FunctionComponent<Props> = ({
             />
           </div>
           <div className={classes.actionsButton}>
-            <ExportButton totalElements={sortedExercises.length} exportProps={exportProps} />
-            <ImportUploaderExercise color={'primary'} />
+            <ToggleButtonGroup value='fake' exclusive={true}>
+              <ExportButton totalElements={sortedExercises.length} exportProps={exportProps} />
+              <ImportUploaderExercise color={'primary'} />
+            </ToggleButtonGroup>
           </div>
         </div>
       )}
