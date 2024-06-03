@@ -20,7 +20,7 @@ public class Executable extends Payload {
   @JsonProperty("payload_type")
   private String type = EXECUTABLE_TYPE;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "executable_file")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("executable_file")

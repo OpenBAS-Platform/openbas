@@ -263,6 +263,9 @@ public class Inject implements Base, Injection {
     @JsonProperty("inject_ready")
     public boolean isReady() {
         InjectorContract injectorContract = getInjectorContract();
+        if( injectorContract == null ) {
+            return false;
+        }
         ObjectNode content = getContent();
         if (getContent() == null) {
             return false;
@@ -404,19 +407,18 @@ public class Inject implements Base, Injection {
 
     @JsonProperty("inject_kill_chain_phases")
     public List<KillChainPhase> getKillChainPhases() {
-        return this.getInjectorContract().getAttackPatterns().stream()
-                .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream()).distinct().toList();
+        return this.getInjectorContract() != null ? this.getInjectorContract().getAttackPatterns().stream()
+                .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream()).distinct().toList() : new ArrayList<>();
     }
 
     @JsonProperty("inject_attack_patterns")
     public List<AttackPattern> getAttackPatterns() {
-        return this.getInjectorContract().getAttackPatterns();
+    return this.getInjectorContract() != null ? this.getInjectorContract().getAttackPatterns() : new ArrayList<>();
     }
 
     @JsonProperty("inject_type")
-    @NotNull
     private String getType() {
-        return this.getInjectorContract().getInjector().getType();
+        return this.getInjectorContract() != null ? this.getInjectorContract().getInjector().getType() : null;
     }
 
     @JsonIgnore

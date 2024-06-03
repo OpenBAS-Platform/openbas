@@ -1,8 +1,22 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
+import { HelpOutlined } from '@mui/icons-material';
 import CustomTooltip from '../../../../components/CustomTooltip';
 
 const iconSelector = (type, variant, fontSize, done, disabled) => {
+  if (!type) {
+    return (
+      <HelpOutlined
+        style={{
+          marginTop: variant === 'list' ? 5 : 0,
+          width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
+          height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
+          borderRadius: 4,
+          filter: `brightness(${disabled ? '30%' : '100%'})`,
+        }}
+      />
+    );
+  }
   return (
     <img
       src={`/api/images/injectors/${type}`}

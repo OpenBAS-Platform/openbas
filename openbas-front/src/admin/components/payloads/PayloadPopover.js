@@ -31,6 +31,8 @@ const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, kil
       R.assoc('payload_platforms', R.pluck('id', data.payload_platforms)),
       R.assoc('payload_tags', R.pluck('id', data.payload_tags)),
       R.assoc('payload_attack_patterns', R.pluck('id', data.payload_attack_patterns)),
+      R.assoc('executable_file', data.executable_file?.id),
+      R.assoc('file_drop_file', data.file_drop_file?.id),
     )(data);
     return dispatch(updatePayload(payload.payload_id, inputValues)).then((result) => {
       if (onUpdate) {
@@ -59,7 +61,8 @@ const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, kil
   const payloadAttackPatterns = attackPatternOptions(payload.payload_attack_patterns, attackPatternsMap, killChainPhasesMap);
   const payloadTags = tagOptions(payload.payload_tags, tagsMap);
   const payloadPlatforms = platformOptions(payload.payload_platforms);
-  const payloadFiles = documentOptions(payload.executable_file ? [payload.executable_file] : [], documentsMap);
+  const payloadExecutableFiles = documentOptions(payload.executable_file ? [payload.executable_file] : [], documentsMap);
+  const payloadDropFiles = documentOptions(payload.file_drop_file ? [payload.file_drop_file] : [], documentsMap);
   const initialValues = R.pipe(
     R.pick([
       'payload_name',
@@ -75,7 +78,8 @@ const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, kil
     R.assoc('payload_platforms', payloadPlatforms),
     R.assoc('payload_attack_patterns', payloadAttackPatterns),
     R.assoc('payload_tags', payloadTags),
-    R.assoc('executable_file', R.head(payloadFiles)),
+    R.assoc('executable_file', R.head(payloadExecutableFiles)),
+    R.assoc('file_drop_file', R.head(payloadDropFiles)),
   )(payload);
   return (
     <>

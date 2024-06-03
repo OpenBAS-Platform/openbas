@@ -44,6 +44,7 @@ class CreatePayload extends Component {
       R.assoc('payload_tags', R.pluck('id', data.payload_tags)),
       R.assoc('payload_attack_patterns', R.pluck('id', data.payload_attack_patterns)),
       R.assoc('executable_file', data.executable_file?.id),
+      R.assoc('file_drop_file', data.file_drop_file?.id),
     )(data);
     return this.props
       .addPayload(inputValues)
@@ -99,6 +100,7 @@ class CreatePayload extends Component {
         <ListItemButton
           divider={true}
           onClick={this.handleSelectType.bind(this, 'NetworkTraffic')}
+          disabled={true}
         >
           <ListItemIcon color="primary">
             <LanConnect color="primary" />

@@ -113,7 +113,7 @@ public class PayloadApi extends RestBehavior {
                 fileDropPayload.setUpdateAttributes(input);
                 fileDropPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
                 fileDropPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-                fileDropPayload.setFileDropFile(documentRepository.findById(input.getExecutableFile()).orElseThrow());
+                fileDropPayload.setFileDropFile(documentRepository.findById(input.getFileDropFile()).orElseThrow());
                 fileDropPayload = payloadRepository.save(fileDropPayload);
                 this.payloadService.updateInjectorContractsForPayload(fileDropPayload);
                 return fileDropPayload;
@@ -158,12 +158,14 @@ public class PayloadApi extends RestBehavior {
             case "Executable":
                 Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
                 payloadExecutable.setUpdateAttributes(input);
+                payloadExecutable.setExecutableFile(documentRepository.findById(input.getExecutableFile()).orElseThrow());
                 payloadExecutable = payloadRepository.save(payloadExecutable);
                 this.payloadService.updateInjectorContractsForPayload(payloadExecutable);
                 return payloadExecutable;
             case "FileDrop":
                 FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
                 payloadFileDrop.setUpdateAttributes(input);
+                payloadFileDrop.setFileDropFile(documentRepository.findById(input.getFileDropFile()).orElseThrow());
                 payloadFileDrop = payloadRepository.save(payloadFileDrop);
                 this.payloadService.updateInjectorContractsForPayload(payloadFileDrop);
                 return payloadFileDrop;
