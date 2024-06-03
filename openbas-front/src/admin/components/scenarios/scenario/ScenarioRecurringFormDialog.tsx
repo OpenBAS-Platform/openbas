@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Stack, Switch } from '@mui/material';
-import { DateTimePicker, TimePicker } from '@mui/x-date-pickers';
+import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -164,7 +164,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
               control={control}
               name="startDate"
               render={({ field, fieldState }) => (
-                <DateTimePicker
+                <DatePicker
                   views={['year', 'month', 'day']}
                   value={fd(field.value)}
                   minDate={new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()}
@@ -279,7 +279,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                 control={control}
                 name="endDate"
                 render={({ field, fieldState }) => (
-                  <DateTimePicker
+                  <DatePicker
                     views={['year', 'month', 'day']}
                     value={fd(field.value || null)}
                     minDate={new Date(new Date().setUTCHours(24, 0, 0, 0)).toISOString()}
