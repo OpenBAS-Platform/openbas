@@ -46,6 +46,7 @@ const styles = () => ({
   paper: {
     margin: '0 auto',
     marginBottom: 20,
+    padding: 10,
     textAlign: 'center',
     maxWidth: 500,
   },
