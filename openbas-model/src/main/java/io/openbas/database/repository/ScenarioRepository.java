@@ -15,7 +15,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ScenarioRepository extends CrudRepository<Scenario, String>,
@@ -67,6 +66,15 @@ public interface ScenarioRepository extends CrudRepository<Scenario, String>,
           "LEFT JOIN scenarios_tags sct ON sct.scenario_id = sce.scenario_id " +
           "GROUP BY sce.scenario_id", nativeQuery = true)
   List<RawScenario> rawAll();
+
+  @Query(value = "SELECT sce.scenario_id, " +
+          "coalesce(array_agg(inj.inject_id) FILTER (WHERE inj.inject_id IS NOT NULL), '{}') as scenario_injects " +
+          "FROM scenarios sce " +
+          "LEFT JOIN scenarios_exercises se ON se.scenario_id = sce.scenario_id " +
+          "LEFT JOIN injects inj ON inj.inject_exercise = se.exercise_id " +
+          "WHERE sce.scenario_id IN :ids " +
+          "GROUP BY sce.scenario_id", nativeQuery = true)
+  List<RawScenario> rawInjectsFromScenarios(@Param("ids") List<String> ids);
 
   // -- PAGINATION --
 
