@@ -3,12 +3,7 @@ import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
 import { Button } from '@mui/material';
 import MarkDownField from '../../../../components/fields/MarkDownField';
 import { useFormatter } from '../../../../components/i18n';
-
-interface PolicyInput {
-  platform_login_message: string;
-  platform_consent_message: string;
-  platform_consent_confirm_text: string;
-}
+import type { PolicyInput } from '../../../../utils/api-types';
 
 interface Props {
   onSubmit: SubmitHandler<PolicyInput>;

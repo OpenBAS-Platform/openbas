@@ -3,6 +3,10 @@ import * as Constants from '../constants/ActionTypes';
 import * as schema from './Schema';
 import { getReferential, postReferential, putReferential, simpleCall } from '../utils/Action';
 
+export const fetchPlatformParameters = () => (dispatch) => {
+  return getReferential(schema.platformParameters, '/api/settings')(dispatch);
+};
+
 export const updatePlatformParameters = (data) => (dispatch) => {
   return putReferential(
     schema.platformParameters,
@@ -33,10 +37,6 @@ export const updatePlatformWhitemarkParameters = (data) => (dispatch) => {
     '/api/settings/platform_whitemark',
     data,
   )(dispatch);
-};
-
-export const fetchPlatformParameters = () => (dispatch) => {
-  return getReferential(schema.platformParameters, '/api/settings')(dispatch);
 };
 
 export const updatePlatformLightParameters = (data) => (dispatch) => {

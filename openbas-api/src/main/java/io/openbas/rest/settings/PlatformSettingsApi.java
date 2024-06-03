@@ -1,364 +1,73 @@
 package io.openbas.rest.settings;
 
-import io.openbas.config.OpenBASConfig;
-import io.openbas.config.OpenBASPrincipal;
-import io.openbas.config.RabbitmqConfig;
-import io.openbas.database.model.Setting;
-import io.openbas.database.model.SettingKeys.SectionEnum;
-import io.openbas.database.model.Theme;
-import io.openbas.database.repository.SettingRepository;
-import io.openbas.executors.caldera.config.CalderaExecutorConfig;
-import io.openbas.helper.RabbitMQHelper;
-import io.openbas.injectors.opencti.config.OpenCTIConfig;
+import static io.openbas.database.model.User.ROLE_ADMIN;
+
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.settings.form.PolicyInput;
 import io.openbas.rest.settings.form.SettingsEnterpriseEditionUpdateInput;
 import io.openbas.rest.settings.form.SettingsPlatformWhitemarkUpdateInput;
 import io.openbas.rest.settings.form.SettingsUpdateInput;
 import io.openbas.rest.settings.form.ThemeInput;
-import io.openbas.rest.settings.response.OAuthProvider;
 import io.openbas.rest.settings.response.PlatformSettings;
-import io.openbas.rest.stream.ai.AiConfig;
-import jakarta.annotation.Resource;
+import io.openbas.service.PlatformSettingsService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
-import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.Environment;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.model.SettingKeys.*;
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static java.util.Optional.ofNullable;
-
-
+@RequestMapping("/api/settings")
 @RestController
 public class PlatformSettingsApi extends RestBehavior {
 
-    private ApplicationContext context;
-    private Environment env;
-    private SettingRepository settingRepository;
-    private OpenCTIConfig openCTIConfig;
-    private AiConfig aiConfig;
-    private CalderaExecutorConfig calderaExecutorConfig;
+  private PlatformSettingsService platformSettingsService;
 
-    @Resource
-    private OpenBASConfig openBASConfig;
-    @Resource
-    private RabbitmqConfig rabbitmqConfig;
+  @Autowired
+  public void setPlatformSettingsService(PlatformSettingsService platformSettingsService) {
+    this.platformSettingsService = platformSettingsService;
+  }
 
-    @Autowired
-    public void setOpenCTIConfig(OpenCTIConfig openCTIConfig) {
-        this.openCTIConfig = openCTIConfig;
-    }
+  @GetMapping()
+  public PlatformSettings settings() {
+    return platformSettingsService.findSettings();
+  }
 
-    @Autowired
-    public void setAiConfig(AiConfig aiConfig) {
-        this.aiConfig = aiConfig;
-    }
+  @Secured(ROLE_ADMIN)
+  @PutMapping()
+  public PlatformSettings updateBasicConfigurationSettings(@Valid @RequestBody SettingsUpdateInput input) {
+    return platformSettingsService.updateBasicConfigurationSettings(input);
+  }
 
-    @Autowired
-    public void setCalderaExecutorConfig(CalderaExecutorConfig calderaExecutorConfig) {
-        this.calderaExecutorConfig = calderaExecutorConfig;
-    }
+  @Secured(ROLE_ADMIN)
+  @PutMapping("/enterprise_edition")
+  public PlatformSettings updateSettingsEnterpriseEdition(@Valid @RequestBody SettingsEnterpriseEditionUpdateInput input) {
+    return platformSettingsService.updateSettingsEnterpriseEdition(input);
+  }
 
-    @Autowired
-    public void setSettingRepository(SettingRepository settingRepository) {
-        this.settingRepository = settingRepository;
-    }
+  @Secured(ROLE_ADMIN)
+  @PutMapping("/platform_whitemark")
+  public PlatformSettings updateSettingsPlatformWhitemark(@Valid @RequestBody SettingsPlatformWhitemarkUpdateInput input) {
+    return platformSettingsService.updateSettingsPlatformWhitemark(input);
+  }
 
-    @Autowired
-    public void setEnv(Environment env) {
-        this.env = env;
-    }
+  @Secured(ROLE_ADMIN)
+  @PutMapping("/theme/light")
+  public PlatformSettings updateThemeLight(@Valid @RequestBody ThemeInput input) {
+    return platformSettingsService.updateThemeLight(input);
+  }
 
-    @Autowired
-    public void setContext(ApplicationContext context) {
-        this.context = context;
-    }
+  @Secured(ROLE_ADMIN)
+  @PutMapping("/theme/dark")
+  public PlatformSettings updateThemeDark(@Valid @RequestBody ThemeInput input) {
+    return platformSettingsService.updateThemeDark(input);
+  }
 
-    private List<OAuthProvider> buildOpenIdProviders() {
-        if (!this.openBASConfig.isAuthOpenidEnable()) {
-            return new ArrayList<>();
-        }
-        try {
-            OAuth2ClientProperties properties = this.context.getBean(OAuth2ClientProperties.class);
-            Map<String, OAuth2ClientProperties.Registration> providers = properties.getRegistration();
-            return providers.entrySet().stream()
-                    .map(entry -> {
-                        String uri = "/oauth2/authorization/" + entry.getKey();
-                        String clientName = env.getProperty("openex.provider." + entry.getKey() + ".login");
-                        // In case of missing name configuration, generate a generic name
-                        if (clientName == null) {
-                            clientName = "Login with " + entry.getKey();
-                        }
-                        return new OAuthProvider(entry.getKey(), uri, clientName);
-                    })
-                    .toList();
-        } catch (Exception e) {
-            // No provider defined in the configuration
-            return new ArrayList<>();
-        }
-    }
-
-    private Map<String, Setting> mapOfSettings(SectionEnum section) {
-        return fromIterable(this.settingRepository.findAllBySection(section)).stream().collect(
-                Collectors.toMap(Setting::getKey, Function.identity()));
-    }
-
-    private String getValueFromMapOfSettings(@NotBlank final SectionEnum section, @NotBlank final String key) {
-        return Optional.ofNullable(mapOfSettings(section).get(key)).map(Setting::getValue).orElse(null);
-    }
-
-    private List<OAuthProvider> buildSaml2Providers() {
-        if (!this.openBASConfig.isAuthSaml2Enable()) {
-            return new ArrayList<>();
-        }
-        try {
-            Saml2RelyingPartyProperties properties = this.context.getBean(Saml2RelyingPartyProperties.class);
-            Map<String, Saml2RelyingPartyProperties.Registration> providers = properties.getRegistration();
-            return providers.entrySet().stream()
-                    .map(entry -> {
-                        String uri = "/saml2/authenticate/" + entry.getKey();
-                        String clientName = env.getProperty("openex.provider." + entry.getKey() + ".login");
-                        // In case of missing name configuration, generate a generic name
-                        if (clientName == null) {
-                            clientName = "Login with " + entry.getKey();
-                        }
-                        return new OAuthProvider(entry.getKey(), uri, clientName);
-                    })
-                    .toList();
-        } catch (Exception e) {
-            // No provider defined in the configuration
-            return new ArrayList<>();
-        }
-    }
-
-    private Setting resolveFromMap(SectionEnum section, String themeKey, String value) {
-        Map<String, Setting> dbSettings = mapOfSettings(section);
-        Optional<Setting> optionalSetting = ofNullable(dbSettings.get(themeKey));
-        if (optionalSetting.isPresent()) {
-            Setting updateSetting = optionalSetting.get();
-            updateSetting.setValue(value);
-            return updateSetting;
-        }
-        return new Setting(themeKey, section, value);
-    }
-
-    @GetMapping("/api/settings")
-    public PlatformSettings settings() {
-        // Get setting from database
-        Map<String, Setting> dbSettings = mapOfSettings(SectionEnum.CONFIGURATION);
-        PlatformSettings platformSettings = new PlatformSettings();
-
-        // Build anonymous settings
-        platformSettings.setPlatformOpenIdProviders(buildOpenIdProviders());
-        platformSettings.setPlatformSaml2Providers(buildSaml2Providers());
-        platformSettings.setAuthOpenidEnable(openBASConfig.isAuthOpenidEnable());
-        platformSettings.setAuthSaml2Enable(openBASConfig.isAuthSaml2Enable());
-        platformSettings.setAuthLocalEnable(openBASConfig.isAuthLocalEnable());
-        platformSettings.setPlatformTheme(
-                ofNullable(dbSettings.get(DEFAULT_THEME.key())).map(Setting::getValue).orElse(DEFAULT_THEME.defaultValue())
-        );
-        platformSettings.setPlatformLang(
-                ofNullable(dbSettings.get(DEFAULT_LANG.key())).map(Setting::getValue).orElse(DEFAULT_LANG.defaultValue())
-        );
-
-        // Build authenticated user settings
-        OpenBASPrincipal user = currentUser();
-        if (user != null) {
-            platformSettings.setPlatformEnterpriseEdition(
-                    ofNullable(dbSettings.get(PLATFORM_ENTERPRISE_EDITION.key())).map(Setting::getValue).orElse(PLATFORM_ENTERPRISE_EDITION.defaultValue())
-            );
-            platformSettings.setPlatformWhitemark(
-                ofNullable(dbSettings.get(PLATFORM_WHITEMARK.key())).map(Setting::getValue).orElse(PLATFORM_WHITEMARK.defaultValue())
-            );
-            platformSettings.setMapTileServerLight(openBASConfig.getMapTileServerLight());
-            platformSettings.setMapTileServerDark(openBASConfig.getMapTileServerDark());
-            platformSettings.setPlatformName(
-                    ofNullable(dbSettings.get(PLATFORM_NAME.key())).map(Setting::getValue).orElse(PLATFORM_NAME.defaultValue())
-            );
-            platformSettings.setPlatformBaseUrl(openBASConfig.getBaseUrl());
-            platformSettings.setXtmOpenctiEnable(openCTIConfig.getEnable());
-            platformSettings.setXtmOpenctiUrl(openCTIConfig.getUrl());
-            platformSettings.setAiEnabled(aiConfig.isEnabled());
-            platformSettings.setAiHasToken(!aiConfig.getToken().isBlank());
-            platformSettings.setAiType(aiConfig.getType());
-            platformSettings.setAiModel(aiConfig.getModel());
-            platformSettings.setExecutorCalderaEnable(calderaExecutorConfig.isEnable());
-            platformSettings.setExecutorCalderaPublicUrl(calderaExecutorConfig.getPublicUrl());
-            platformSettings.setExecutorTaniumEnable(false);
-
-            // Build admin settings
-            if (user.isAdmin()) {
-                platformSettings.setPlatformVersion(openBASConfig.getVersion());
-                platformSettings.setPostgreVersion(settingRepository.getServerVersion());
-                platformSettings.setJavaVersion(Runtime.version().toString());
-                platformSettings.setRabbitMQVersion(RabbitMQHelper.getRabbitMQVersion(rabbitmqConfig));
-            }
-        }
-
-        // THEME
-        ThemeInput themeLight = new ThemeInput();
-        themeLight.setBackgroundColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.BACKGROUND_COLOR.key()));
-        themeLight.setPaperColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"light." + Theme.THEME_KEYS.PAPER_COLOR.key()));
-        themeLight.setNavigationColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"light." + Theme.THEME_KEYS.NAVIGATION_COLOR.key()));
-        themeLight.setPrimaryColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"light." + Theme.THEME_KEYS.PRIMARY_COLOR.key()));
-        themeLight.setSecondaryColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"light." + Theme.THEME_KEYS.SECONDARY_COLOR.key()));
-        themeLight.setAccentColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"light." + Theme.THEME_KEYS.ACCENT_COLOR.key()));
-        themeLight.setLogoUrl(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"light." + Theme.THEME_KEYS.LOGO_URL.key()));
-        themeLight.setLogoLoginUrl(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"light." + Theme.THEME_KEYS.LOGO_LOGIN_URL.key()));
-        themeLight.setLogoUrlCollapsed(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"light." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED.key()));
-        platformSettings.setThemeLight(themeLight);
-
-        ThemeInput themeDark = new ThemeInput();
-        themeDark.setBackgroundColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.BACKGROUND_COLOR.key()));
-        themeDark.setPaperColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.PAPER_COLOR.key()));
-        themeDark.setNavigationColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.NAVIGATION_COLOR.key()));
-        themeDark.setPrimaryColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.PRIMARY_COLOR.key()));
-        themeDark.setSecondaryColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.SECONDARY_COLOR.key()));
-        themeDark.setAccentColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.ACCENT_COLOR.key()));
-        themeDark.setLogoUrl(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.LOGO_URL.key()));
-        themeDark.setLogoLoginUrl(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.LOGO_LOGIN_URL.key()));
-        themeDark.setLogoUrlCollapsed(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED.key()));
-        platformSettings.setThemeDark(themeDark);
-
-        return platformSettings;
-    }
-
-    @Secured(ROLE_ADMIN)
-    @PutMapping("/api/settings")
-    public PlatformSettings updateSettings(@Valid @RequestBody SettingsUpdateInput input) {
-        List<Setting> settingsToSave = new ArrayList<>();
-        settingsToSave.add(resolveFromMap(SectionEnum.CONFIGURATION, PLATFORM_NAME.key(), input.getName()));
-        settingsToSave.add(resolveFromMap(SectionEnum.CONFIGURATION, DEFAULT_THEME.key(), input.getTheme()));
-        settingsToSave.add(resolveFromMap(SectionEnum.CONFIGURATION, DEFAULT_LANG.key(), input.getLang()));
-        settingRepository.saveAll(settingsToSave);
-        return settings();
-    }
-
-    @Secured(ROLE_ADMIN)
-    @PutMapping("/api/settings/enterprise_edition")
-    public PlatformSettings updateSettingsEnterpriseEdition(@Valid @RequestBody SettingsEnterpriseEditionUpdateInput input) {
-        List<Setting> settingsToSave = new ArrayList<>();
-        settingsToSave.add(resolveFromMap(SectionEnum.CONFIGURATION, PLATFORM_ENTERPRISE_EDITION.key(), input.getEnterpriseEdition()));
-        settingRepository.saveAll(settingsToSave);
-        return settings();
-    }
-
-    @Secured(ROLE_ADMIN)
-    @PutMapping("/api/settings/platform_whitemark")
-    public PlatformSettings updateSettingsPlatformWhitemark(@Valid @RequestBody SettingsPlatformWhitemarkUpdateInput input) {
-        List<Setting> settingsToSave = new ArrayList<>();
-        settingsToSave.add(resolveFromMap(SectionEnum.CONFIGURATION, PLATFORM_WHITEMARK.key(), input.getPlatformWhitemark()));
-        settingRepository.saveAll(settingsToSave);
-        return settings();
-    }
-
-    @Secured(ROLE_ADMIN)
-    @PutMapping("/api/settings/theme/light")
-    public PlatformSettings updateThemeLight(@Valid @RequestBody ThemeInput input) {
-        List<Setting> settingsToSave = new ArrayList<>();
-        settingsToSave.add(
-                resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.BACKGROUND_COLOR.key(), input.getBackgroundColor()));
-        settingsToSave.add(
-                resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.PAPER_COLOR.key(), input.getPaperColor()));
-        settingsToSave.add(
-                resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.NAVIGATION_COLOR.key(), input.getNavigationColor()));
-        settingsToSave.add(
-                resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.PRIMARY_COLOR.key(), input.getPrimaryColor()));
-        settingsToSave.add(
-                resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.SECONDARY_COLOR.key(), input.getSecondaryColor()));
-        settingsToSave.add(
-                resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.ACCENT_COLOR.key(), input.getAccentColor()));
-        settingsToSave.add(resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.LOGO_URL.key(), input.getLogoUrl()));
-        settingsToSave.add(
-                resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED.key(), input.getLogoUrlCollapsed()));
-        settingsToSave.add(
-                resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.LOGO_LOGIN_URL.key(), input.getLogoLoginUrl()));
-
-        List<Setting> update = new ArrayList<>();
-        List<Setting> delete = new ArrayList<>();
-        settingsToSave.forEach(setting -> {
-            if (StringUtils.hasText(setting.getValue())) {
-                update.add(setting);
-            } else if (StringUtils.hasText(setting.getId())) {
-                delete.add(setting);
-            }
-        });
-
-        settingRepository.deleteAllById(delete.stream().map(Setting::getId).toList());
-        settingRepository.saveAll(update);
-        return settings();
-    }
-
-    @Secured(ROLE_ADMIN)
-    @PutMapping("/api/settings/theme/dark")
-    public PlatformSettings updateThemeDark(@Valid @RequestBody ThemeInput input) {
-        List<Setting> settingsToSave = new ArrayList<>();
-        settingsToSave.add(
-                resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.BACKGROUND_COLOR.key(), input.getBackgroundColor()));
-        settingsToSave.add(resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.PAPER_COLOR.key(), input.getPaperColor()));
-        settingsToSave.add(
-                resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.NAVIGATION_COLOR.key(), input.getNavigationColor()));
-        settingsToSave.add(
-                resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.PRIMARY_COLOR.key(), input.getPrimaryColor()));
-        settingsToSave.add(
-                resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.SECONDARY_COLOR.key(), input.getSecondaryColor()));
-        settingsToSave.add(
-                resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.ACCENT_COLOR.key(), input.getAccentColor()));
-        settingsToSave.add(resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.LOGO_URL.key(), input.getLogoUrl()));
-        settingsToSave.add(
-                resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED.key(), input.getLogoUrlCollapsed()));
-        settingsToSave.add(
-                resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.LOGO_LOGIN_URL.key(), input.getLogoLoginUrl()));
-
-        List<Setting> update = new ArrayList<>();
-        List<Setting> delete = new ArrayList<>();
-        settingsToSave.forEach(setting -> {
-            if (StringUtils.hasText(setting.getValue())) {
-                update.add(setting);
-            } else if (StringUtils.hasText(setting.getId())) {
-                delete.add(setting);
-            }
-        });
-
-        settingRepository.deleteAllById(delete.stream().map(Setting::getId).toList());
-        settingRepository.saveAll(update);
-        return settings();
-    }
-
-    @Secured(ROLE_ADMIN)
-    @GetMapping("/api/settings/policies")
-    public PlatformSettings policies() {
-        settingRepository.findAllBySection(SectionEnum.POLICY);
-        return settings();
-    }
-
-    @Secured(ROLE_ADMIN)
-    @PutMapping("/api/settings/policies")
-    public PlatformSettings updateSettingsPolicies(@Valid @RequestBody PolicyInput input) {
-        List<Setting> settingsToSave = new ArrayList<>();
-        settingsToSave.add(resolveFromMap(SectionEnum.POLICY, PLATFORM_LOGIN_MESSAGE.key(), input.getLoginMessage()));
-        settingsToSave.add(resolveFromMap(SectionEnum.POLICY, PLATFORM_CONSENT_MESSAGE.key(), input.getConsentMessage()));
-        settingsToSave.add(resolveFromMap(SectionEnum.POLICY, PLATFORM_CONSENT_CONFIRM_TEXT.key(), input.getConsentConfirmText()));
-        settingRepository.saveAll(settingsToSave);
-        return settings();
-    }
+  @Secured(ROLE_ADMIN)
+  @PutMapping("/policies")
+  public PlatformSettings updateSettingsPolicies(@Valid @RequestBody PolicyInput input) {
+    return platformSettingsService.updateSettingsPolicies(input);
+  }
 }

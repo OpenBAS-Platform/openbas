@@ -22,7 +22,6 @@ export interface LoggedHelper {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logged: () => any;
   getMe: () => User;
-  getSettings: () => PlatformSettings;
   getPlatformSettings: () => PlatformSettings;
 }
 

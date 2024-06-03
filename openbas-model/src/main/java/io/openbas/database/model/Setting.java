@@ -39,9 +39,9 @@ public class Setting implements Base {
     @JsonProperty("setting_value")
     private String value;
 
-    public Setting(String key, SectionEnum section, String value) {
-        this.key = key;
+    public Setting(SectionEnum section, String key, String value) {
         this.section = section;
+        this.key = key;
         this.value = value;
     }
 

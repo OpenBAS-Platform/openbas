@@ -1,6 +1,7 @@
 package io.openbas.rest.settings.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.rest.settings.form.PolicyInput;
 import io.openbas.rest.settings.form.ThemeInput;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -101,5 +102,9 @@ public class PlatformSettings {
   @JsonProperty("platform_dark_theme")
   private ThemeInput themeDark;
 
+  // POLICIES
+
+  @JsonProperty("platform_policies")
+  private PolicyInput policies;
 
 }

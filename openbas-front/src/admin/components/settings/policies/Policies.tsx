@@ -5,9 +5,12 @@ import { useFormatter } from '../../../../components/i18n';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import SecurityMenu from '../SecurityMenu';
 import PolicyForm from './PolicyForm';
-import type { PolicyInput } from '../../../../utils/api-types';
-import { updatePlatformPolicies } from '../../../../actions/Application';
+import type { PlatformSettings, PolicyInput } from '../../../../utils/api-types';
+import { fetchPlatformParameters, updatePlatformPolicies } from '../../../../actions/Application';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { useHelper } from '../../../../store';
+import type { LoggedHelper } from '../../../../actions/helper';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -22,10 +25,23 @@ const useStyles = makeStyles(() => ({
     borderRadius: 6,
   },
 }));
+
 const Policies: FunctionComponent = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
+  const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({
+    settings: helper.getPlatformSettings(),
+  }));
+  useDataLoader(() => {
+    dispatch(fetchPlatformParameters());
+  });
+
+  const initialValues = {
+    platform_login_message: settings.platform_policies?.platform_login_message || '',
+    platform_consent_message: settings.platform_policies?.platform_consent_message || '',
+    platform_consent_confirm_text: settings.platform_policies?.platform_consent_confirm_text || '',
+  };
 
   const onUpdate = (data: PolicyInput) => {
     dispatch(updatePlatformPolicies(data));
@@ -44,7 +60,7 @@ const Policies: FunctionComponent = () => {
           {t('Login messages')}
         </Typography>
         <Paper classes={{ root: classes.paper }} variant="outlined">
-          <PolicyForm onSubmit={onUpdate}></PolicyForm>
+          <PolicyForm onSubmit={onUpdate} initialValues={initialValues}></PolicyForm>
         </Paper>
       </Grid>
     </div>

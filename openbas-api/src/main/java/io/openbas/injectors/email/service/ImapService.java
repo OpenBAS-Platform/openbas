@@ -273,7 +273,7 @@ public class ImapService {
         Optional<Setting> state = settingRepository.findByKey(inboxKey);
         Setting currentState = state.orElse(null);
         if (currentState == null) {
-            currentState = settingRepository.save(new Setting(inboxKey, SectionEnum.CONFIGURATION, "0"));
+            currentState = settingRepository.save(new Setting(SectionEnum.CONFIGURATION, inboxKey, "0"));
         }
         int startMessageNumber = parseInt(currentState.getValue());
         int messageCount = inbox.getMessageCount();
