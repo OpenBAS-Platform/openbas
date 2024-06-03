@@ -7,7 +7,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_12__Add_column_section_into_settings extends BaseJavaMigration {
+public class V3_16__Add_column_section_into_settings extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
