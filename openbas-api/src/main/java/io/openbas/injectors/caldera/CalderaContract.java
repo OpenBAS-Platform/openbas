@@ -103,7 +103,7 @@ public class CalderaContract extends Contractor {
         ContractAssetGroup assetGroupField = assetGroupField("assetgroups", "Asset groups", Multiple);
         ContractExpectations expectationsField = expectations();
 
-        List<Ability> abilities = this.injectorCalderaService.abilities();
+        List<Ability> abilities = this.injectorCalderaService.abilities().stream().filter(ability -> !ability.getTactic().equals("openbas")).toList();
         // Build contracts
         return abilities.stream().map((ability -> {
             ContractDef builder = contractBuilder();

@@ -24,7 +24,7 @@ public class Executable extends Payload {
   @JoinColumn(name = "executable_file")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("executable_file")
-  private Document file;
+  private Document executableFile;
 
   public Executable() {
 

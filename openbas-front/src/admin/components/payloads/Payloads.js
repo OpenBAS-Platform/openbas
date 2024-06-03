@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { SubscriptionsOutlined } from '@mui/icons-material';
 import { searchPayloads } from '../../../actions/Payload';
 import CreatePayload from './CreatePayload';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
@@ -18,6 +17,8 @@ import { fetchTags } from '../../../actions/Tag';
 import ItemTags from '../../../components/ItemTags';
 import { fetchAttackPatterns } from '../../../actions/AttackPattern';
 import PlatformIcon from '../../../components/PlatformIcon';
+import { fetchDocuments } from '../../../actions/Document';
+import PayloadIcon from '../../../components/PayloadIcon';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -82,12 +83,14 @@ const Payloads = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t, nsdt } = useFormatter();
-  const { tagsMap, attackPatternsMap, killChainPhasesMap } = useHelper((helper) => ({
+  const { documentsMap, tagsMap, attackPatternsMap, killChainPhasesMap } = useHelper((helper) => ({
+    documentsMap: helper.getDocumentsMap(),
     attackPatternsMap: helper.getAttackPatternsMap(),
     killChainPhasesMap: helper.getKillChainPhasesMap(),
     tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
+    dispatch(fetchDocuments());
     dispatch(fetchTags());
     dispatch(fetchAttackPatterns());
     dispatch(fetchKillChainPhases());
@@ -168,7 +171,7 @@ const Payloads = () => {
             divider={true}
           >
             <ListItemIcon>
-              <SubscriptionsOutlined color="primary" />
+              <PayloadIcon payloadType={payload.payload_type} />
             </ListItemIcon>
             <ListItemText
               primary={
@@ -231,6 +234,7 @@ const Payloads = () => {
             <ListItemSecondaryAction>
               <PayloadPopover
                 tagsMap={tagsMap}
+                documentsMap={documentsMap}
                 attackPatternsMap={attackPatternsMap}
                 killChainPhasesMap={killChainPhasesMap}
                 payload={payload}

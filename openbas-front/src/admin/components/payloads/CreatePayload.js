@@ -4,8 +4,8 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Fab, List, ListItemButton, ListItemIcon, ListItemText, Step, StepLabel, Stepper } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import { Add } from '@mui/icons-material';
-import { Console } from 'mdi-material-ui';
+import { Add, DnsOutlined } from '@mui/icons-material';
+import { ApplicationCogOutline, Console, FileImportOutline, LanConnect } from 'mdi-material-ui';
 import { addPayload } from '../../../actions/Payload';
 import PayloadForm from './PayloadForm';
 import inject18n from '../../../components/i18n';
@@ -43,6 +43,7 @@ class CreatePayload extends Component {
       R.assoc('payload_platforms', R.pluck('id', data.payload_platforms)),
       R.assoc('payload_tags', R.pluck('id', data.payload_tags)),
       R.assoc('payload_attack_patterns', R.pluck('id', data.payload_attack_patterns)),
+      R.assoc('executable_file', data.executable_file?.id),
     )(data);
     return this.props
       .addPayload(inputValues)
@@ -67,6 +68,42 @@ class CreatePayload extends Component {
             <Console color="primary" />
           </ListItemIcon>
           <ListItemText primary={t('Command Line')} />
+        </ListItemButton>
+        <ListItemButton
+          divider={true}
+          onClick={this.handleSelectType.bind(this, 'Executable')}
+        >
+          <ListItemIcon color="primary">
+            <ApplicationCogOutline color="primary" />
+          </ListItemIcon>
+          <ListItemText primary={t('Executable')} />
+        </ListItemButton>
+        <ListItemButton
+          divider={true}
+          onClick={this.handleSelectType.bind(this, 'FileDrop')}
+        >
+          <ListItemIcon color="primary">
+            <FileImportOutline color="primary" />
+          </ListItemIcon>
+          <ListItemText primary={t('File Drop')} />
+        </ListItemButton>
+        <ListItemButton
+          divider={true}
+          onClick={this.handleSelectType.bind(this, 'DnsResolution')}
+        >
+          <ListItemIcon color="primary">
+            <DnsOutlined color="primary" />
+          </ListItemIcon>
+          <ListItemText primary={t('DNS Resolution')} />
+        </ListItemButton>
+        <ListItemButton
+          divider={true}
+          onClick={this.handleSelectType.bind(this, 'NetworkTraffic')}
+        >
+          <ListItemIcon color="primary">
+            <LanConnect color="primary" />
+          </ListItemIcon>
+          <ListItemText primary={t('Network Traffic')} />
         </ListItemButton>
       </List>
     );

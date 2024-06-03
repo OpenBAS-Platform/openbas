@@ -6,11 +6,11 @@ import { MoreVert } from '@mui/icons-material';
 import { deletePayload, updatePayload } from '../../../actions/Payload';
 import PayloadForm from './PayloadForm';
 import { useFormatter } from '../../../components/i18n';
-import { attackPatternOptions, platformOptions, tagOptions } from '../../../utils/Option';
+import { attackPatternOptions, documentOptions, platformOptions, tagOptions } from '../../../utils/Option';
 import Transition from '../../../components/common/Transition';
 import Drawer from '../../../components/common/Drawer';
 
-const PayloadPopover = ({ payload, tagsMap, attackPatternsMap, killChainPhasesMap, onUpdate, onDelete }) => {
+const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, killChainPhasesMap, onUpdate, onDelete }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -59,6 +59,7 @@ const PayloadPopover = ({ payload, tagsMap, attackPatternsMap, killChainPhasesMa
   const payloadAttackPatterns = attackPatternOptions(payload.payload_attack_patterns, attackPatternsMap, killChainPhasesMap);
   const payloadTags = tagOptions(payload.payload_tags, tagsMap);
   const payloadPlatforms = platformOptions(payload.payload_platforms);
+  const payloadFiles = documentOptions(payload.executable_file ? [payload.executable_file] : [], documentsMap);
   const initialValues = R.pipe(
     R.pick([
       'payload_name',
@@ -67,12 +68,14 @@ const PayloadPopover = ({ payload, tagsMap, attackPatternsMap, killChainPhasesMa
       'payload_cleanup_command',
       'command_executor',
       'command_content',
+      'dns_resolution_hostname',
       'payload_arguments',
       'payload_prerequisites',
     ]),
     R.assoc('payload_platforms', payloadPlatforms),
     R.assoc('payload_attack_patterns', payloadAttackPatterns),
     R.assoc('payload_tags', payloadTags),
+    R.assoc('executable_file', R.head(payloadFiles)),
   )(payload);
   return (
     <>

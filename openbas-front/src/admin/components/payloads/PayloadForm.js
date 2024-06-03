@@ -12,6 +12,7 @@ import TagField from '../../../components/TagField';
 import PlatformField from '../../../components/PlatformField';
 import OldSelectField from '../../../components/fields/OldSelectField';
 import AttackPatternField from '../../../components/AttackPatternField';
+import DocumentField from '../../../components/DocumentField';
 
 const useStyles = makeStyles(() => ({
   tuple: {
@@ -31,6 +32,9 @@ const PayloadForm = (props) => {
     switch (type) {
       case 'Command':
         requiredFields.push(...['command_executor', 'command_content']);
+        break;
+      case 'Executable':
+        requiredFields.push(...['executable_file']);
         break;
       default:
         // do nothing
@@ -111,6 +115,25 @@ const PayloadForm = (props) => {
               label={t('Command')}
               style={{ marginTop: 20 }}
               helperText={t('To put arguments in the command line, use #{argument_key}')}
+            />
+          </>
+          )}
+          {type === 'Executable' && (
+          <>
+            <DocumentField
+              name="executable_file"
+              label={t('Executable file')}
+              style={{ marginTop: 20 }}
+            />
+          </>
+          )}
+          {type === 'DnsResolution' && (
+          <>
+            <OldTextField
+              name="dns_resolution_hostname"
+              fullWidth={true}
+              label={t('Hostname')}
+              style={{ marginTop: 20 }}
             />
           </>
           )}
@@ -238,7 +261,7 @@ const PayloadForm = (props) => {
                           <MenuItem value="psh">
                             {t('PowerShell')}
                           </MenuItem>
-                          <MenuItem value="dos">
+                          <MenuItem value="cmd">
                             {t('Command Prompt')}
                           </MenuItem>
                           <MenuItem value="bash">

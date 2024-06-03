@@ -35,6 +35,15 @@ public class PayloadCreateInput {
     @JsonProperty("command_content")
     private String content;
 
+    @JsonProperty("executable_file")
+    private String executableFile;
+
+    @JsonProperty("file_drop_file")
+    private String fileDropFile;
+
+    @JsonProperty("dns_resolution_hostname")
+    private String hostname;
+
     @JsonProperty("payload_arguments")
     private List<PayloadArgument> arguments;
 
