@@ -2,8 +2,8 @@ package io.openbas.rest.team;
 
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Organization;
-import io.openbas.database.model.SimplerTeam;
 import io.openbas.database.model.Team;
+import io.openbas.database.model.TeamSimple;
 import io.openbas.database.model.User;
 import io.openbas.database.raw.RawPaginationTeam;
 import io.openbas.database.raw.RawTeam;
@@ -100,7 +100,7 @@ public class TeamApi extends RestBehavior {
 
     @GetMapping("/api/teams")
     @PreAuthorize("isObserver()")
-    public Iterable<SimplerTeam> getTeams() {
+    public Iterable<TeamSimple> getTeams() {
         List<RawTeam> teams;
         OpenBASPrincipal currentUser = currentUser();
         if (currentUser.isAdmin()) {

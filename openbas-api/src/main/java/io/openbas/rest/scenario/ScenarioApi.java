@@ -1,8 +1,8 @@
 package io.openbas.rest.scenario;
 
 import io.openbas.database.model.Scenario;
-import io.openbas.database.model.SimplerTeam;
 import io.openbas.database.model.Team;
+import io.openbas.database.model.TeamSimple;
 import io.openbas.database.model.User;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.repository.*;
@@ -199,7 +199,7 @@ public class ScenarioApi {
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/teams")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
-  public Iterable<SimplerTeam> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {
+  public Iterable<TeamSimple> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {
     return TeamHelper.rawTeamToSimplerTeam(teamRepository.rawTeamByScenarioId(scenarioId),
             injectExpectationRepository,communicationRepository, exerciseTeamUserRepository, scenarioRepository);
   }

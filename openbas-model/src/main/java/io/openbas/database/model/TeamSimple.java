@@ -17,7 +17,7 @@ import static java.time.Instant.now;
 
 @Setter
 @Getter
-public class SimplerTeam {
+public class TeamSimple {
     @JsonProperty("team_id")
     @NotBlank
     private String id;
@@ -138,7 +138,7 @@ public class SimplerTeam {
                 .size();
     }
 
-    public SimplerTeam(RawTeam raw) {
+    public TeamSimple(RawTeam raw) {
         super();
         this.id = raw.getTeam_id();
         this.scenarios = raw.getTeam_scenarios();

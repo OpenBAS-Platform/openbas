@@ -15,11 +15,11 @@ import java.util.stream.Collectors;
 
 public class TeamHelper {
 
-    public static List<SimplerTeam> rawTeamToSimplerTeam(List<RawTeam> teams,
-                                                         InjectExpectationRepository injectExpectationRepository,
-                                                         CommunicationRepository communicationRepository,
-                                                         ExerciseTeamUserRepository exerciseTeamUserRepository,
-                                                         ScenarioRepository scenarioRepository) {
+    public static List<TeamSimple> rawTeamToSimplerTeam(List<RawTeam> teams,
+                                                        InjectExpectationRepository injectExpectationRepository,
+                                                        CommunicationRepository communicationRepository,
+                                                        ExerciseTeamUserRepository exerciseTeamUserRepository,
+                                                        ScenarioRepository scenarioRepository) {
         // Getting a map of inject expectations
         Map<String, RawInjectExpectation> mapInjectExpectation = injectExpectationRepository.rawByIds(
                         teams.stream().flatMap(rawTeam -> rawTeam.getTeam_expectations().stream()).toList()
@@ -46,10 +46,10 @@ public class TeamHelper {
         // Then, for all the raw teams, we will create a simpler team object and then send it back to the front
         return teams.stream().map(rawTeam -> {
             // We create the simpler team object using the raw one
-            SimplerTeam simplerTeam = new SimplerTeam(rawTeam);
+            TeamSimple teamSimple = new TeamSimple(rawTeam);
 
             // We set the inject expectations
-            simplerTeam.setInjectExpectations(
+            teamSimple.setInjectExpectations(
                     rawTeam.getTeam_expectations().stream().map(
                             expectation -> {
                                 // We set the inject expectation using the map we generated earlier
@@ -72,7 +72,7 @@ public class TeamHelper {
 
             // We set the communications using the map we generated earlier
             // This object has content, content_html and attachments ignored because WE DON'T WANT THE FULL EXTENT
-            simplerTeam.setCommunications(
+            teamSimple.setCommunications(
                     rawTeam.getTeam_communications().stream().map(communicationId -> {
                         RawCommunication raw = mapCommunication.get(communicationId);
                         Communication communication = new Communication();
@@ -103,7 +103,7 @@ public class TeamHelper {
             // We set the tuple of exercise/user/team
             List<RawExerciseTeamUser> exerciseTeamUsers = mapExerciseTeamUser.get(rawTeam);
             if(exerciseTeamUsers != null) {
-                simplerTeam.setExerciseTeamUsers(exerciseTeamUsers.stream().map(
+                teamSimple.setExerciseTeamUsers(exerciseTeamUsers.stream().map(
                         rawExerciseTeamUser -> {
                             ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
                             exerciseTeamUser.setTeam(new Team());
@@ -118,11 +118,11 @@ public class TeamHelper {
             }
 
             // We set the injects linked to the scenarios
-            simplerTeam.setScenariosInjects(rawTeam.getTeam_scenarios().stream().flatMap(
+            teamSimple.setScenariosInjects(rawTeam.getTeam_scenarios().stream().flatMap(
                     scenario -> mapInjectsByScenarioIds.get(scenario).stream()
             ).collect(Collectors.toSet()));
 
-            return simplerTeam;
+            return teamSimple;
         }).collect(Collectors.toList());
     }
 }

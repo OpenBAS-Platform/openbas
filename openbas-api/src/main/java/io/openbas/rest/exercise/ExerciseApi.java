@@ -363,7 +363,7 @@ public class ExerciseApi extends RestBehavior {
   // region teams
   @GetMapping("/api/exercises/{exerciseId}/teams")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Iterable<SimplerTeam> getExerciseTeams(@PathVariable String exerciseId) {
+  public Iterable<TeamSimple> getExerciseTeams(@PathVariable String exerciseId) {
     return TeamHelper.rawTeamToSimplerTeam(teamRepository.rawTeamByExerciseId(exerciseId),
             injectExpectationRepository,communicationRepository, exerciseTeamUserRepository, scenarioRepository);
   }
