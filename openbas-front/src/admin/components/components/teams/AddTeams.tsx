@@ -113,7 +113,7 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
           setKeyword('');
           setTeamIds([]);
         }}
-        fullWidth={true}
+        fullWidth
         maxWidth="lg"
         PaperProps={{
           elevation: 1,
@@ -125,16 +125,16 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
       >
         <DialogTitle>{t('Add teams')}</DialogTitle>
         <DialogContent>
-          <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
-            <Grid item={true} xs={8}>
-              <Grid container={true} spacing={3}>
-                <Grid item={true} xs={6}>
+          <Grid container spacing={3} style={{ marginTop: -15 }}>
+            <Grid item xs={8}>
+              <Grid container spacing={3}>
+                <Grid item xs={6}>
                   <SearchFilter
                     onChange={(value?: string) => setKeyword(value || '')}
-                    fullWidth={true}
+                    fullWidth
                   />
                 </Grid>
-                <Grid item={true} xs={6}>
+                <Grid item xs={6}>
                   <TagsFilter
                     onAddTag={(value: Option) => {
                       if (value) {
@@ -143,7 +143,7 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
                     }}
                     onClearTag={() => setTags([])}
                     currentTags={tags}
-                    fullWidth={true}
+                    fullWidth
                   />
                 </Grid>
               </Grid>
@@ -155,9 +155,9 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
                     <ListItem
                       key={team.team_id}
                       disabled={disabled}
-                      button={true}
-                      divider={true}
-                      dense={true}
+                      button
+                      divider
+                      dense
                       onClick={() => setTeamIds([...teamIds, team.team_id])}
                     >
                       <ListItemIcon>
@@ -172,12 +172,12 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
                   );
                 })}
                 <CreateTeam
-                  inline={true}
+                  inline
                   onCreate={(team) => setTeamIds([...teamIds, team.team_id])}
                 />
               </List>
             </Grid>
-            <Grid item={true} xs={4}>
+            <Grid item xs={4}>
               <Box className={classes.box}>
                 {teamIds.map((teamId) => {
                   const team = teamsMap[teamId];
@@ -186,7 +186,7 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
                     <Chip
                       key={teamId}
                       onDelete={() => {
-                        setTeamIds(teamIds.splice(teamIds.indexOf(teamId), 1));
+                        setTeamIds(teamIds.filter((id) => id !== teamId));
                       }}
                       label={truncate(team.team_name, 22)}
                       avatar={<Avatar src={teamGravatar} sx={{ height: '32px', width: '32px' }} />}

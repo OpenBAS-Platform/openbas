@@ -157,8 +157,8 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
           ref: drawerRef,
         }}
       >
-        <Grid container={true} spacing={3}>
-          <Grid item={true} xs={7} style={{ paddingTop: 30 }}>
+        <Grid container spacing={3}>
+          <Grid item xs={7} style={{ paddingTop: 30 }}>
             <PaginationComponent
               fetch={searchInjectorContracts}
               searchPaginationInput={searchPaginationInput}
@@ -167,7 +167,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
               availableFilters={['injector_contract_kill_chain_phases', 'injector_contract_attack_patterns']}
               helpers={helpers}
               filterGroup={filterGroup}
-              disablePagination={true}
+              disablePagination
               attackPatterns={attackPatterns}
             />
             <List>
@@ -182,7 +182,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
                 return (
                   <ListItemButton
                     key={contract.injector_contract_id}
-                    divider={true}
+                    divider
                     onClick={() => selectContract(index)}
                     selected={selectedContract === index}
                     disabled={(selectedContract !== null && selectedContract !== index)}
@@ -226,7 +226,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
               })}
             </List>
           </Grid>
-          <Grid item={true} xs={5} style={{ paddingTop: 10 }}>
+          <Grid item xs={5} style={{ paddingTop: 10 }}>
             <CreateInjectDetails
               drawerRef={drawerRef}
               contractId={selectedContract !== null ? contracts[selectedContract].injector_contract_id : null}

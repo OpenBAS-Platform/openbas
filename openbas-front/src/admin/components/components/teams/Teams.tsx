@@ -52,7 +52,7 @@ const useStyles = makeStyles(() => ({
 
 const inlineStyles: Record<string, CSSProperties> = {
   team_name: {
-    width: '20%',
+    width: '25%',
   },
   team_description: {
     width: '25%',
@@ -63,11 +63,8 @@ const inlineStyles: Record<string, CSSProperties> = {
   team_tags: {
     width: '20%',
   },
-  team_contextual: {
-    width: '10%',
-  },
   team_updated_at: {
-    width: '12%',
+    width: '20%',
   },
 };
 
@@ -98,7 +95,6 @@ const Teams = () => {
     { field: 'team_description', label: 'Description', isSortable: true },
     { field: 'team_users_number', label: 'Players', isSortable: true },
     { field: 'team_tags', label: 'Tags', isSortable: true },
-    { field: 'team_contextual', label: 'Contextual', isSortable: true },
     { field: 'team_updated_at', label: 'Updated', isSortable: true },
   ];
 
@@ -173,9 +169,6 @@ const Teams = () => {
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.team_tags}>
                     <ItemTags variant="list" tags={team.team_tags} />
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.team_contextual}>
-                    {team.team_contextual ? <CheckCircleOutlined fontSize="small" /> : '-'}
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.team_updated_at}>
                     {nsdt(team.team_updated_at)}

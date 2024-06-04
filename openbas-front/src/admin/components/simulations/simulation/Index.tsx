@@ -154,11 +154,11 @@ const Index = () => {
     dispatch(fetchExercise(exerciseId));
   });
 
+  const exerciseInjectContext = injectContextForExercise(exercise);
+
   if (!exercise) {
     return <Loader />;
   }
-
-  const exerciseInjectContext = injectContextForExercise(exercise);
   return (
     <InjectContext.Provider value={exerciseInjectContext}>
       <IndexComponent exercise={exercise} />

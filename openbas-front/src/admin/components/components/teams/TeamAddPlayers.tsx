@@ -122,7 +122,7 @@ const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
           setKeyword('');
           setUsersIds([]);
         }}
-        fullWidth={true}
+        fullWidth
         maxWidth="lg"
         PaperProps={{
           elevation: 1,
@@ -134,16 +134,16 @@ const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
       >
         <DialogTitle>{t('Add players in this team')}</DialogTitle>
         <DialogContent>
-          <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
-            <Grid item={true} xs={8}>
-              <Grid container={true} spacing={3}>
-                <Grid item={true} xs={6}>
+          <Grid container spacing={3} style={{ marginTop: -15 }}>
+            <Grid item xs={8}>
+              <Grid container spacing={3}>
+                <Grid item xs={6}>
                   <SearchFilter
                     onChange={(value?: string) => setKeyword(value || '')}
-                    fullWidth={true}
+                    fullWidth
                   />
                 </Grid>
-                <Grid item={true} xs={6}>
+                <Grid item xs={6}>
                   <TagsFilter
                     onAddTag={(value: Option) => {
                       if (value) {
@@ -152,7 +152,7 @@ const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
                     }}
                     onClearTag={() => setTags([])}
                     currentTags={tags}
-                    fullWidth={true}
+                    fullWidth
                   />
                 </Grid>
               </Grid>
@@ -164,9 +164,9 @@ const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
                     <ListItem
                       key={user.user_id}
                       disabled={disabled}
-                      button={true}
-                      divider={true}
-                      dense={true}
+                      button
+                      divider
+                      dense
                       onClick={() => setUsersIds([...usersIds, user.user_id])}
                     >
                       <ListItemIcon>
@@ -181,12 +181,12 @@ const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
                   );
                 })}
                 <CreatePlayer
-                  inline={true}
+                  inline
                   onCreate={(user) => setUsersIds([...usersIds, user.user_id])}
                 />
               </List>
             </Grid>
-            <Grid item={true} xs={4}>
+            <Grid item xs={4}>
               <Box className={classes.box}>
                 {usersIds.map((userId) => {
                   const user = usersMap[userId];

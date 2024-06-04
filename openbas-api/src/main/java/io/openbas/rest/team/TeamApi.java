@@ -37,6 +37,8 @@ import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.time.Instant.now;
 
 @RestController
@@ -160,11 +162,11 @@ public class TeamApi extends RestBehavior {
     @PreAuthorize("isPlanner()")
     @Transactional(rollbackOn = Exception.class)
     public Team createTeam(@Valid @RequestBody TeamCreateInput input) {
-        if (input.getContextual() && input.getExerciseIds().toArray().length > 1) {
+        if (TRUE.equals(input.getContextual()) && input.getExerciseIds().toArray().length > 1) {
             throw new UnsupportedOperationException("Contextual team can only be associated to one exercise");
         }
         Optional<Team> existingTeam = teamRepository.findByName(input.getName());
-        if (existingTeam.isPresent() && !input.getContextual()) {
+        if (existingTeam.isPresent() && FALSE.equals(input.getContextual())) {
             throw new UnsupportedOperationException("Global teams (non contextual) cannot have the same name (already exists)");
         }
         Team team = new Team();

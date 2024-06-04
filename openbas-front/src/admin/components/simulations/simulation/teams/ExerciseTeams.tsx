@@ -97,7 +97,7 @@ const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
   };
   return (
     <TeamContext.Provider value={teamContextForExercise(exerciseId, exerciseTeamsUsers)}>
-      <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
+      <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
         {t('Teams')}
       </Typography>
       {permissions.canWrite && <AddTeams addedTeamIds={teamIds} onAddTeams={onAddTeams} />}
