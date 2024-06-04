@@ -128,16 +128,6 @@ public class TeamSimple {
     @JsonProperty("team_communications")
     List<Communication> communications = new ArrayList<>();
 
-    public long getUsersNumberInExercise(String exerciseId) {
-        return exerciseId == null ?
-            0:
-            getExerciseTeamUsers()
-                .stream()
-                .filter(exerciseTeamUser -> exerciseTeamUser.getExercise().getId().equals(exerciseId))
-                .toList()
-                .size();
-    }
-
     public TeamSimple(RawTeam raw) {
         super();
         this.id = raw.getTeam_id();
