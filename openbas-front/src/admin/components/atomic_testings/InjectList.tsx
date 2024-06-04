@@ -97,7 +97,14 @@ const InjectList: FunctionComponent<Props> = ({
       label: 'Type',
       isSortable: true,
       value: (injectDto: InjectResultDTO) => {
-        return (<InjectorContract variant="list" label={tPick(injectDto.inject_injector_contract.injector_contract_labels)} />);
+        if (injectDto.inject_injector_contract) {
+          return (
+            <InjectorContract variant="list"
+              label={tPick(injectDto.inject_injector_contract.injector_contract_labels)}
+            />
+          );
+        }
+        return <span />;
       },
     },
     {
@@ -183,7 +190,7 @@ const InjectList: FunctionComponent<Props> = ({
             >
               <ListItemIcon>
                 <InjectIcon
-                  tooltip={t(injectDto.inject_type)}
+                  tooltip={injectDto.inject_type ? t(injectDto.inject_type) : t('Unknown')}
                   type={injectDto.inject_type}
                   variant="list"
                 />

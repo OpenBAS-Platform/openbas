@@ -1,6 +1,7 @@
 package io.openbas.injectors.caldera.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import io.openbas.config.OpenBASAdminConfig;
+import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.injectors.caldera.client.CalderaInjectorClient;
 import io.openbas.injectors.caldera.client.model.*;
@@ -12,10 +13,10 @@ import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
 import static org.springframework.util.StringUtils.hasText;
@@ -26,6 +27,8 @@ import static org.springframework.util.StringUtils.hasText;
 public class CalderaInjectorService {
 
     private final CalderaInjectorClient client;
+    private final OpenBASConfig openBASConfig;
+    private final OpenBASAdminConfig openBASAdminConfig;
 
     // -- ABILITIES --
 
@@ -51,25 +54,61 @@ public class CalderaInjectorService {
     }
 
     public Ability createAbility(Payload payload) {
-        List<Map<String, String>> executors = new ArrayList<>();
+        List<Map<String, Object>> executors = new ArrayList<>();
+        List<String> cleanupCommands = new ArrayList<>();
+        if( payload.getCleanupCommand() != null ) {
+            cleanupCommands.add(payload.getCleanupCommand());
+        }
         switch (payload.getType()) {
             case "Command":
                 Command payloadCommand = (Command) Hibernate.unproxy(payload);
                 Arrays.stream(payloadCommand.getPlatforms()).forEach(platform -> {
-                    Map<String, String> executor = new HashMap<>();
+                    Map<String, Object> executor = new HashMap<>();
                     executor.put("platform", platform.equalsIgnoreCase("macos") ? "darwin" : platform.toLowerCase());
                     executor.put("name", payloadCommand.getExecutor().equals("bash") ? "sh" : payloadCommand.getExecutor());
                     executor.put("command", payloadCommand.getContent());
+                    executor.put("cleanup", cleanupCommands);
+                    executors.add(executor);
+                });
+                break;
+            case "Executable":
+                Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
+                Arrays.stream(payloadExecutable.getPlatforms()).forEach(platform -> {
+                    Map<String, Object> executor = new HashMap<>();
+                    executor.put("platform", platform.equalsIgnoreCase("macos") ? "darwin" : platform.toLowerCase());
+                    executor.put("name", platform.equals(Endpoint.PLATFORM_TYPE.Windows.name()) ? "psh" : "sh");
+                    String windowsCommand = "Invoke-WebRequest -Method GET -Uri " + openBASConfig.getBaseUrl() + "/api/documents/" + payloadExecutable.getExecutableFile().getId() + "/file -Headers @{'Authorization' = 'Bearer " + openBASAdminConfig.getToken() + "'} -OutFile " + payloadExecutable.getExecutableFile().getName() + "; " + payloadExecutable.getExecutableFile().getName() + ";";
+                    String unixCommand = "curl -H \"Authorization: Bearer " + openBASAdminConfig.getToken() + "\" " + openBASConfig.getBaseUrl() + "/api/documents/" + payloadExecutable.getExecutableFile().getId() + "/file -o " + payloadExecutable.getExecutableFile().getName() + ";./" + payloadExecutable.getExecutableFile().getName() + ";";
+                    executor.put("command", platform.equals(Endpoint.PLATFORM_TYPE.Windows.name()) ? windowsCommand : unixCommand);
+                    executor.put("cleanup", cleanupCommands);
+                    executors.add(executor);
+                });
+                break;
+            case "FileDrop":
+                FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
+                Arrays.stream(payloadFileDrop.getPlatforms()).forEach(platform -> {
+                    Map<String, Object> executor = new HashMap<>();
+                    executor.put("platform", platform.equalsIgnoreCase("macos") ? "darwin" : platform.toLowerCase());
+                    executor.put("name", platform.equals(Endpoint.PLATFORM_TYPE.Windows.name()) ? "psh" : "sh");
+                    String windowsCommand = "Invoke-WebRequest -Method GET -Uri " + openBASConfig.getBaseUrl() + "/api/documents/" + payloadFileDrop.getFileDropFile().getId() + "/file -Headers @{'Authorization' = 'Bearer " + openBASAdminConfig.getToken() + "'} -OutFile " + payloadFileDrop.getFileDropFile().getName();
+                    String unixCommand = "curl -H \"Authorization: Bearer " + openBASAdminConfig.getToken() + "\" " + openBASConfig.getBaseUrl() + "/api/documents/" + payloadFileDrop.getFileDropFile().getId() + "/file -o " + payloadFileDrop.getFileDropFile().getName();
+                    executor.put("command", platform.equals(Endpoint.PLATFORM_TYPE.Windows.name()) ? windowsCommand : unixCommand);
+                    executor.put("cleanup", cleanupCommands);
                     executors.add(executor);
                 });
                 break;
             case "DnsResolution":
                 DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
                 Arrays.stream(payloadDnsResolution.getPlatforms()).forEach(platform -> {
-                    Map<String, String> executor = new HashMap<>();
+                    Map<String, Object> executor = new HashMap<>();
                     executor.put("platform", platform.equals(Endpoint.PLATFORM_TYPE.MacOS.name()) ? "darwin" : platform.toLowerCase());
-                    executor.put("name", platform.equals(Endpoint.PLATFORM_TYPE.Windows.name()) ? "cmd" : "sh");
-                    executor.put("command", "nslookup " + payloadDnsResolution.getHostname());
+                    executor.put("name", platform.equals(Endpoint.PLATFORM_TYPE.Windows.name()) ? "psh" : "sh");
+                    AtomicReference<String> command = new AtomicReference<>("");
+                    Arrays.stream(payloadDnsResolution.getHostname().split("\\r?\\n")).forEach(s -> {
+                        command.set(command + "nslookup " + s + ";");
+                    });
+                    executor.put("command", command.get());
+                    executor.put("cleanup", cleanupCommands);
                     executors.add(executor);
                 });
                 break;

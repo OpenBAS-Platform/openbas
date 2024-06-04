@@ -47,6 +47,9 @@ public class OpenBASConfig {
   @JsonProperty("default_reply_to")
   private String defaultReplyTo;
 
+  @JsonProperty("admin_token")
+  private String adminToken;
+
   @JsonIgnore
   private String cookieName = "openbas_token";
 

@@ -20,7 +20,7 @@ public class FileDrop extends Payload {
   @JsonProperty("payload_type")
   private String type = FILE_DROP_TYPE;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "file_drop_file")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("file_drop_file")

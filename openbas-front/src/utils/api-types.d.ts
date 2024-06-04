@@ -898,7 +898,7 @@ export interface Inject {
   inject_tags?: Tag[];
   inject_teams?: Team[];
   inject_title?: string;
-  inject_type: string;
+  inject_type?: string;
   /** @format date-time */
   inject_updated_at?: string;
   inject_user?: User;
@@ -1946,6 +1946,9 @@ export interface PayloadArgument {
 export interface PayloadCreateInput {
   command_content?: string;
   command_executor?: string;
+  dns_resolution_hostname?: string;
+  executable_file?: string;
+  file_drop_file?: string;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
   payload_cleanup_command?: string;
@@ -1968,6 +1971,9 @@ export interface PayloadPrerequisite {
 export interface PayloadUpdateInput {
   command_content?: string;
   command_executor?: string;
+  dns_resolution_hostname?: string;
+  executable_file?: string;
+  file_drop_file?: string;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
   payload_cleanup_command?: string;
@@ -2129,9 +2135,11 @@ export interface RawPaginationScenario {
   scenario_category?: string;
   scenario_id?: string;
   scenario_name?: string;
+  /** @uniqueItems true */
   scenario_platforms?: string[];
   scenario_recurrence?: string;
   scenario_severity?: string;
+  /** @uniqueItems true */
   scenario_tags?: string[];
   /** @format date-time */
   scenario_updated_at?: string;

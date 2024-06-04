@@ -97,7 +97,7 @@ const PayloadForm = (props) => {
               <MenuItem value="psh">
                 {t('PowerShell')}
               </MenuItem>
-              <MenuItem value="dos">
+              <MenuItem value="cmd">
                 {t('Command Prompt')}
               </MenuItem>
               <MenuItem value="bash">
@@ -127,13 +127,25 @@ const PayloadForm = (props) => {
             />
           </>
           )}
+          {type === 'FileDrop' && (
+          <>
+            <DocumentField
+              name="file_drop_file"
+              label={t('File to drop')}
+              style={{ marginTop: 20 }}
+            />
+          </>
+          )}
           {type === 'DnsResolution' && (
           <>
             <OldTextField
               name="dns_resolution_hostname"
-              fullWidth={true}
               label={t('Hostname')}
               style={{ marginTop: 20 }}
+              multiline={true}
+              fullWidth={true}
+              rows={3}
+              helperText={t('One hostname by line')}
             />
           </>
           )}
@@ -321,7 +333,7 @@ const PayloadForm = (props) => {
             <MenuItem value="psh">
               {t('PowerShell')}
             </MenuItem>
-            <MenuItem value="dos">
+            <MenuItem value="cmd">
               {t('Command Prompt')}
             </MenuItem>
             <MenuItem value="bash">
