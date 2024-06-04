@@ -2,14 +2,14 @@ package io.openbas.rest.scenario;
 
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Team;
+import io.openbas.database.model.TeamSimple;
 import io.openbas.database.model.User;
 import io.openbas.database.raw.RawPaginationScenario;
-import io.openbas.database.repository.TagRepository;
-import io.openbas.database.repository.TeamRepository;
-import io.openbas.database.repository.UserRepository;
+import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
+import io.openbas.rest.helper.TeamHelper;
 import io.openbas.rest.scenario.form.*;
 import io.openbas.service.ImportService;
 import io.openbas.service.ScenarioService;
@@ -48,6 +48,10 @@ public class ScenarioApi {
 
   private TeamRepository teamRepository;
   private UserRepository userRepository;
+  private InjectExpectationRepository injectExpectationRepository;
+  private CommunicationRepository communicationRepository;
+  private ExerciseTeamUserRepository exerciseTeamUserRepository;
+  private ScenarioRepository scenarioRepository;
 
   @Autowired
   public void setTeamRepository(TeamRepository teamRepository) {
@@ -57,6 +61,26 @@ public class ScenarioApi {
   @Autowired
   public void setUserRepository(UserRepository userRepository) {
     this.userRepository = userRepository;
+  }
+
+  @Autowired
+  public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
+    this.injectExpectationRepository = injectExpectationRepository;
+  }
+
+  @Autowired
+  public void setCommunicationRepository(CommunicationRepository communicationRepository) {
+    this.communicationRepository = communicationRepository;
+  }
+
+  @Autowired
+  public void setExerciseTeamUserRepository(ExerciseTeamUserRepository exerciseTeamUserRepository) {
+    this.exerciseTeamUserRepository = exerciseTeamUserRepository;
+  }
+
+  @Autowired
+  public void setScenarioRepository(ScenarioRepository scenarioRepository) {
+    this.scenarioRepository = scenarioRepository;
   }
 
   @PostMapping(SCENARIO_URI)
@@ -175,9 +199,9 @@ public class ScenarioApi {
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/teams")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
-  public Iterable<Team> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    return scenario.getTeams();
+  public Iterable<TeamSimple> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {
+    return TeamHelper.rawTeamToSimplerTeam(teamRepository.rawTeamByScenarioId(scenarioId),
+            injectExpectationRepository,communicationRepository, exerciseTeamUserRepository, scenarioRepository);
   }
 
   @Transactional(rollbackOn = Exception.class)

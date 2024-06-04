@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.ExerciseTeamUser;
 import io.openbas.database.model.ExerciseTeamUserId;
+import io.openbas.database.raw.RawExerciseTeamUser;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -10,6 +11,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -32,4 +34,7 @@ public interface ExerciseTeamUserRepository extends CrudRepository<ExerciseTeamU
     void addExerciseTeamUser(@Param("exerciseId") String exerciseId,
                       @Param("teamId") String teamId,
                       @Param("userId") String userId);
+
+    @Query(value = "SELECT * FROM exercises_teams_users WHERE team_id IN :ids ;", nativeQuery = true)
+    List<RawExerciseTeamUser> rawByTeamIds(@Param("ids") List<String> ids);
 }

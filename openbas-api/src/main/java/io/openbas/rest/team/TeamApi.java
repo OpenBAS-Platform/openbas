@@ -3,11 +3,14 @@ package io.openbas.rest.team;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Organization;
 import io.openbas.database.model.Team;
+import io.openbas.database.model.TeamSimple;
 import io.openbas.database.model.User;
 import io.openbas.database.raw.RawPaginationTeam;
+import io.openbas.database.raw.RawTeam;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.rest.helper.TeamHelper;
 import io.openbas.rest.team.form.TeamCreateInput;
 import io.openbas.rest.team.form.TeamUpdateInput;
 import io.openbas.rest.team.form.UpdateUsersTeamInput;
@@ -34,6 +37,8 @@ import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.time.Instant.now;
 
 @RestController
@@ -43,9 +48,12 @@ public class TeamApi extends RestBehavior {
     private ExerciseRepository exerciseRepository;
     private ScenarioRepository scenarioRepository;
     private TeamRepository teamRepository;
+    private CommunicationRepository communicationRepository;
+    private InjectExpectationRepository injectExpectationRepository;
     private UserRepository userRepository;
     private OrganizationRepository organizationRepository;
     private TagRepository tagRepository;
+    private ExerciseTeamUserRepository exerciseTeamUserRepository;
 
     @Autowired
     public void setExerciseRepository(ExerciseRepository exerciseRepository) {
@@ -73,26 +81,45 @@ public class TeamApi extends RestBehavior {
     }
 
     @Autowired
+    public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
+        this.injectExpectationRepository = injectExpectationRepository;
+    }
+
+    @Autowired
+    public void setCommunicationRepository(CommunicationRepository communicationRepository) {
+        this.communicationRepository = communicationRepository;
+    }
+
+    @Autowired
+    public void setExerciseTeamUserRepository(ExerciseTeamUserRepository exerciseTeamUserRepository) {
+        this.exerciseTeamUserRepository = exerciseTeamUserRepository;
+    }
+
+    @Autowired
     public void setTagRepository(TagRepository tagRepository) {
         this.tagRepository = tagRepository;
     }
 
     @GetMapping("/api/teams")
     @PreAuthorize("isObserver()")
-    public Iterable<Team> getTeams() {
-        List<Team> teams;
+    public Iterable<TeamSimple> getTeams() {
+        List<RawTeam> teams;
         OpenBASPrincipal currentUser = currentUser();
         if (currentUser.isAdmin()) {
-            teams = fromIterable(teamRepository.findAll());
+            //We get all the teams as raw
+            teams = fromIterable(teamRepository.rawTeams());
         } else {
+            //We get the teams that are linked to the oragnizations we are part of
             User local = userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
             List<String> organizationIds = local.getGroups().stream()
                     .flatMap(group -> group.getOrganizations().stream())
                     .map(Organization::getId)
                     .toList();
-            teams = teamRepository.teamsAccessibleFromOrganizations(organizationIds);
+            teams = teamRepository.rawTeamsAccessibleFromOrganization(organizationIds);
         }
-        return teams;
+
+        return TeamHelper.rawTeamToSimplerTeam(teams, injectExpectationRepository, communicationRepository,
+                exerciseTeamUserRepository, scenarioRepository);
     }
 
     @PostMapping("/api/teams/search")
@@ -102,20 +129,20 @@ public class TeamApi extends RestBehavior {
         OpenBASPrincipal currentUser = currentUser();
         if (currentUser.isAdmin()) {
             teamsFunction = (Specification<Team> specification, Pageable pageable) -> this.teamRepository
-                .findAll(contextual(false).and(specification), pageable);
+                    .findAll(contextual(false).and(specification), pageable);
         } else {
             User local = this.userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
             List<String> organizationIds = local.getGroups().stream()
-                .flatMap(group -> group.getOrganizations().stream())
-                .map(Organization::getId)
-                .toList();
+                    .flatMap(group -> group.getOrganizations().stream())
+                    .map(Organization::getId)
+                    .toList();
             teamsFunction = (Specification<Team> specification, Pageable pageable) -> this.teamRepository
-                .findAll(contextual(false).and(teamsAccessibleFromOrganizations(organizationIds).and(specification)), pageable);
+                    .findAll(contextual(false).and(teamsAccessibleFromOrganizations(organizationIds).and(specification)), pageable);
         }
         return buildPaginationJPA(
-            teamsFunction,
-            searchPaginationInput,
-            Team.class
+                teamsFunction,
+                searchPaginationInput,
+                Team.class
         ).map(RawPaginationTeam::new);
     }
 
@@ -135,11 +162,11 @@ public class TeamApi extends RestBehavior {
     @PreAuthorize("isPlanner()")
     @Transactional(rollbackOn = Exception.class)
     public Team createTeam(@Valid @RequestBody TeamCreateInput input) {
-        if (input.getContextual() && input.getExerciseIds().toArray().length > 1) {
+        if (TRUE.equals(input.getContextual()) && input.getExerciseIds().toArray().length > 1) {
             throw new UnsupportedOperationException("Contextual team can only be associated to one exercise");
         }
         Optional<Team> existingTeam = teamRepository.findByName(input.getName());
-        if (existingTeam.isPresent() && !input.getContextual()) {
+        if (existingTeam.isPresent() && FALSE.equals(input.getContextual())) {
             throw new UnsupportedOperationException("Global teams (non contextual) cannot have the same name (already exists)");
         }
         Team team = new Team();

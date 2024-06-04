@@ -376,7 +376,7 @@ const CreateInjectDetails = ({
                     handleClose={handleClose}
                     tagsMap={tagsMap}
                     permissions={permissions}
-                    teamsFromExerciseOrScenario={teams}
+                    teamsFromExerciseOrScenario={teams?.filter((team) => !team.team_contextual) ?? []}
                     articlesFromExerciseOrScenario={[]}
                     variablesFromExerciseOrScenario={[]}
                     onCreateInject={onCreateInject}

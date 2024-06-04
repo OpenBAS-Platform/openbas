@@ -182,10 +182,11 @@ const Index = () => {
     dispatch(fetchScenario(scenarioId));
   });
 
+  const scenarioInjectContext = injectContextForScenario(scenario);
+
   if (!scenario) {
     return <Loader />;
   }
-  const scenarioInjectContext = injectContextForScenario(scenario);
   return (
     <InjectContext.Provider value={scenarioInjectContext}>
       <IndexScenarioComponent scenario={scenario} />

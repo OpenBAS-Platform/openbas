@@ -15,6 +15,7 @@ import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.exercise.form.*;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.rest.helper.TeamHelper;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.service.*;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
@@ -41,11 +42,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.*;
-import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -107,6 +106,8 @@ public class ExerciseApi extends RestBehavior {
   private InjectExpectationRepository injectExpectationRepository;
   private AssetGroupRepository assetGroupRepository;
   private AssetRepository assetRepository;
+  private ScenarioRepository scenarioRepository;
+  private CommunicationRepository communicationRepository;
   // endregion
 
   // region services
@@ -167,6 +168,16 @@ public class ExerciseApi extends RestBehavior {
   @Autowired
   public void setUserRepository(UserRepository userRepository) {
     this.userRepository = userRepository;
+  }
+
+  @Autowired
+  public void setCommunicationRepository(CommunicationRepository communicationRepository) {
+    this.communicationRepository = communicationRepository;
+  }
+
+  @Autowired
+  public void setScenarioRepository(ScenarioRepository scenarioRepository) {
+    this.scenarioRepository = scenarioRepository;
   }
 
   @Autowired
@@ -352,9 +363,9 @@ public class ExerciseApi extends RestBehavior {
   // region teams
   @GetMapping("/api/exercises/{exerciseId}/teams")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Iterable<Team> getExerciseTeams(@PathVariable String exerciseId) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    return exercise.getTeams();
+  public Iterable<TeamSimple> getExerciseTeams(@PathVariable String exerciseId) {
+    return TeamHelper.rawTeamToSimplerTeam(teamRepository.rawTeamByExerciseId(exerciseId),
+            injectExpectationRepository,communicationRepository, exerciseTeamUserRepository, scenarioRepository);
   }
 
   @Transactional(rollbackOn = Exception.class)

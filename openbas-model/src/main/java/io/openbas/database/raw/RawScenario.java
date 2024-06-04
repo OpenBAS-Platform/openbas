@@ -8,5 +8,6 @@ public interface RawScenario {
     public String getScenario_name();
     public String getScenario_subtitle();
     public Set<String> getScenario_tags();
+    public Set<String> getScenario_injects();
 
 }
