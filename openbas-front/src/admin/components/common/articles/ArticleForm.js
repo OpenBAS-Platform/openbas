@@ -207,7 +207,7 @@ const ArticleForm = ({
               multiple={false}
               options={sortedChannels}
               renderOption={(renderProps, option) => (
-                <Box component="li" {...renderProps}>
+                <Box component="li" {...renderProps} key={option.id}>
                   <div className={classes.icon}>
                     <ChannelIcon type={option.type} />
                   </div>

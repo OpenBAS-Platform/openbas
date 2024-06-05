@@ -62,7 +62,7 @@ const TagsFilter = (props) => {
         }}
         isOptionEqualToValue={(option, value) => value === undefined || value === '' || option.id === value.id}
         renderOption={(p, option) => (
-          <Box component="li" {...p}>
+          <Box component="li" {...p} key={option.id}>
             <div className={classes.icon} style={{ color: option.color }}>
               <LabelOutlined />
             </div>

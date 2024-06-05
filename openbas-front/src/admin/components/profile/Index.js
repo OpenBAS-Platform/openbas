@@ -109,7 +109,7 @@ const Index = () => {
           {t(
             'The OpenBAS API relies on the REST standard. The token must be passed into the HTTP header',
           )}{' '}
-          <strong>Authorization</strong>.
+          <strong>{t('Authorization')}</strong>.
         </Typography>
         <Typography
           variant="h4"
@@ -134,10 +134,13 @@ const Index = () => {
         >
           {t('Example')}
         </Typography>
+        {/* eslint-disable-next-line i18next/no-literal-string */}
         <pre>
           GET /api/exercises
+          {/* eslint-disable-next-line i18next/no-literal-string */}
           <br />
           Content-Type: application/json
+          {/* eslint-disable-next-line i18next/no-literal-string */}
           <br />
           Authorization: Bearer {userToken?.token_value}
         </pre>

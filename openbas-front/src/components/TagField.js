@@ -100,7 +100,7 @@ class TagField extends Component {
           openCreate={userAdmin && !disabled ? this.handleOpenTagCreation.bind(this) : null}
           onKeyDown={onKeyDown}
           renderOption={(props, option) => (
-            <Box component="li" {...props}>
+            <Box component="li" {...props} key={option.id}>
               <div className={classes.icon} style={{ color: option.color }}>
                 <LabelOutlined />
               </div>

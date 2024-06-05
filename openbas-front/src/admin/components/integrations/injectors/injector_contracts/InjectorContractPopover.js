@@ -127,7 +127,7 @@ const InjectorContractPopover = ({ injectorContract, killChainPhasesMap, attackP
       <Drawer
         open={openEdit}
         handleClose={handleCloseEdit}
-        title={t('Update the inject contract')}
+        title={t('Update the injector contract')}
       >
         {injectorContract.injector_contract_custom ? (
           <InjectorContractCustomForm

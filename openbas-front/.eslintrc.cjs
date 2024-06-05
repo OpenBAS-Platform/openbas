@@ -6,7 +6,8 @@ module.exports = {
     'plugin:import/typescript',
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:react/recommended'
+    'plugin:react/recommended',
+    'plugin:i18next/recommended'
   ],
   settings: {
     "react": {
@@ -36,7 +37,7 @@ module.exports = {
     '**/__generated__/**',
     '**/src/static/ext/**',
   ],
-  plugins: ["import-newlines", "custom-rules"],
+  plugins: ["import-newlines", "i18next", "custom-rules"],
   rules: {
     'custom-rules/classes-rule': 1,
     'no-restricted-syntax': 0,
@@ -58,7 +59,7 @@ module.exports = {
       'error', {
         patterns: [
           {
-            group: ['@mui/material/*', '!@mui/material/styles', '!@mui/material/colors', '!@mui/material/transitions'],
+            group: ['@mui/material/*', '!@mui/material/locale', '!@mui/material/styles', '!@mui/material/colors', '!@mui/material/transitions'],
             message: "Please use named import from @mui/material instead."
           },
           {

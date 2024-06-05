@@ -521,7 +521,7 @@ const Timeline = () => {
                                 && (
                                   inject.inject_status.tracking_total_execution_time / 1000
                                 ).toFixed(2)}
-                              s)
+                              {t('s')})
                             </div>
                           </div>
                         }

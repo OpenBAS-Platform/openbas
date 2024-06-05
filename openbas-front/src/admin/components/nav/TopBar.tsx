@@ -239,7 +239,7 @@ const TopBar: React.FC = () => {
                         <Badge variant="dot" color={settings.xtm_opencti_enable && settings.xtm_opencti_url ? 'success' : 'warning'}>
                           <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? octiDark : octiLight} alt="OCTI" />
                         </Badge>
-                        <div className={classes.product}>OpenCTI</div>
+                        <div className={classes.product}>{t('OpenCTI')}</div>
                       </a>
                     </Tooltip>
                   </Grid>
@@ -249,7 +249,7 @@ const TopBar: React.FC = () => {
                         <Badge variant="dot" color="success">
                           <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? obasDark : obasLight} alt="OBAS" />
                         </Badge>
-                        <div className={classes.product}>OpenBAS</div>
+                        <div className={classes.product}>{t('OpenBAS')}</div>
                       </a>
                     </Tooltip>
                   </Grid>
@@ -259,7 +259,7 @@ const TopBar: React.FC = () => {
                         <Badge variant="dot" color="info">
                           <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? oermDark : oermLight} alt="OERM" />
                         </Badge>
-                        <div className={classes.product}>OpenERM</div>
+                        <div className={classes.product}>{t('OpenERM')}</div>
                       </a>
                     </Tooltip>
                   </Grid>
@@ -269,7 +269,7 @@ const TopBar: React.FC = () => {
                         <Badge variant="dot" color="info">
                           <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? omtdDark : omtdLight} alt="OMTD" />
                         </Badge>
-                        <div className={classes.product}>OpenMTD</div>
+                        <div className={classes.product}>{t('OpenMTD')}</div>
                       </a>
                     </Tooltip>
                   </Grid>

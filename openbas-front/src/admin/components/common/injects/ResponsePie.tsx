@@ -87,7 +87,7 @@ const ResponsePie: FunctionComponent<Props> = ({
     const hasDistribution = expectationResultsByType && expectationResultsByType.distribution && expectationResultsByType.distribution.length > 0;
     const labels = hasDistribution
       ? expectationResultsByType.distribution.map((e) => `${t(e.label)} (${(((e.value!) / getTotal(expectationResultsByType.distribution!)) * 100).toFixed(1)}%)`)
-      : [t('No expectation for ') + title];
+      : [`${t('No expectation for')} ${title}`];
     let colors = [];
     if (immutable) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment

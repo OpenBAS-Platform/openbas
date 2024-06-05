@@ -1,6 +1,7 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Alert, AlertTitle } from '@mui/material';
+import { useFormatter } from './i18n';
 
 class ErrorBoundaryComponent extends React.Component {
   constructor(props) {
@@ -25,13 +26,15 @@ ErrorBoundaryComponent.propTypes = {
 };
 export const ErrorBoundary = ErrorBoundaryComponent;
 
-const SimpleError = () => (
-  <Alert severity="error">
-    <AlertTitle>Error</AlertTitle>
-    An unknown error occurred. Please contact your administrator or the OpenBAS
-    maintainers.
-  </Alert>
-);
+const SimpleError = () => {
+  const { t } = useFormatter();
+  return (
+    <Alert severity="error">
+      <AlertTitle>{t('Error')}</AlertTitle>
+      {t('An unknown error occurred. Please contact your administrator or the OpenBAS maintainers.')}
+    </Alert>
+  );
+};
 
 export const errorWrapper = (Component) => {
   // eslint-disable-next-line react/display-name

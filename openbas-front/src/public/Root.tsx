@@ -7,12 +7,12 @@ import Index from './Index';
 
 const Root = () => (
   <StyledEngineProvider injectFirst={true}>
-    <ConnectedThemeProvider>
-      <CssBaseline />
-      <ConnectedIntlProvider>
+    <ConnectedIntlProvider>
+      <ConnectedThemeProvider>
+        <CssBaseline />
         <Index />
-      </ConnectedIntlProvider>
-    </ConnectedThemeProvider>
+      </ConnectedThemeProvider>
+    </ConnectedIntlProvider>
   </StyledEngineProvider>
 );
 
