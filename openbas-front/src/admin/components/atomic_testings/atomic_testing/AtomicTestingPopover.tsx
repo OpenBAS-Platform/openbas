@@ -16,6 +16,7 @@ import type { TeamStore } from '../../../../actions/teams/Team';
 import { isNotEmptyField } from '../../../../utils/utils';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
+import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 
 interface Props {
   atomic: InjectResultDTO;
@@ -35,7 +36,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
 
   // Fetching data
   const { updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
-  const { inject, teams } = useHelper((helper: AtomicTestingHelper & TeamsHelper) => ({
+  const { inject, teams } = useHelper((helper: AtomicTestingHelper & InjectHelper & TeamsHelper) => ({
     inject: helper.getInject(atomic.inject_id),
     teams: helper.getTeams(),
   }));

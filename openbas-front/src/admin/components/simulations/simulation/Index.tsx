@@ -25,7 +25,7 @@ const Comcheck = lazy(() => import('./controls/Comcheck'));
 const Lessons = lazy(() => import('./lessons/Lessons'));
 const ExerciseDefinition = lazy(() => import('./ExerciseDefinition'));
 const Injects = lazy(() => import('./injects/ExerciseInjects'));
-const Timeline = lazy(() => import('./timeline/Timeline'));
+const Timeline = lazy(() => import('./timeline/TimelineOverview'));
 const Mails = lazy(() => import('./mails/Mails'));
 const MailsInject = lazy(() => import('./mails/Inject'));
 const Logs = lazy(() => import('./logs/Logs'));
