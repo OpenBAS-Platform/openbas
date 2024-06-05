@@ -4,6 +4,7 @@ import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
 import { Box, FormHelperText, InputLabel, Typography } from '@mui/material';
 import { ICommand } from '@uiw/react-md-editor';
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
+import { useFormatter } from '../i18n';
 
 interface Props {
   name: string;
@@ -24,6 +25,7 @@ const MarkDownField: React.FC<Props> = ({
   inInject,
   inArticle,
 }) => {
+  const { t } = useFormatter();
   const { control } = useFormContext();
   const {
     field: { onChange, value },
@@ -57,7 +59,7 @@ const MarkDownField: React.FC<Props> = ({
           border: isEdit ? '1px solid' : '',
         }}
       >
-        <Typography>Write</Typography>
+        <Typography>{t('Write')}</Typography>
       </div>
     ),
     execute: () => setIsEdit(true),
@@ -76,7 +78,7 @@ const MarkDownField: React.FC<Props> = ({
           border: !isEdit ? '1px solid' : '',
         }}
       >
-        <Typography>Preview</Typography>
+        <Typography>{t('Preview')}</Typography>
       </div>
     ),
     execute: () => setIsEdit(false),
