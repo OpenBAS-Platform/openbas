@@ -34,8 +34,8 @@ const ThemeForm: React.FC<Props> = ({
     secondary_color: '',
   },
 }) => {
-  const classes = useStyles();
   // Standard hooks
+  const classes = useStyles();
   const { t } = useFormatter();
 
   const {
@@ -43,6 +43,7 @@ const ThemeForm: React.FC<Props> = ({
     control,
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
+    reset,
   } = useForm<ThemeInput>({
     mode: 'onTouched',
     resolver: zodResolver(
@@ -60,6 +61,10 @@ const ThemeForm: React.FC<Props> = ({
     ),
     defaultValues: initialValues,
   });
+
+  React.useEffect(() => {
+    reset(initialValues);
+  }, [initialValues, reset]);
 
   return (
     <form id="themeForm" onSubmit={handleSubmit(onSubmit)}>
