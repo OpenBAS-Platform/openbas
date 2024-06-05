@@ -16,7 +16,6 @@ import io.openbas.config.OpenBASConfig;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.model.Setting;
-import io.openbas.database.model.SettingKeys.SectionEnum;
 import io.openbas.database.model.Theme;
 import io.openbas.database.repository.SettingRepository;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
@@ -155,14 +154,14 @@ public class PlatformSettingsService {
     return Optional.ofNullable(dbSettings.get(key)).map(Setting::getValue).orElse(null);
   }
 
-  private Setting resolveFromMap(Map<String, Setting> dbSettings, SectionEnum section, String themeKey, String value) {
+  private Setting resolveFromMap(Map<String, Setting> dbSettings, String themeKey, String value) {
     Optional<Setting> optionalSetting = ofNullable(dbSettings.get(themeKey));
     if (optionalSetting.isPresent()) {
       Setting updateSetting = optionalSetting.get();
       updateSetting.setValue(value);
       return updateSetting;
     }
-    return new Setting(section, themeKey, value);
+    return new Setting(themeKey, value);
   }
 
 
@@ -252,37 +251,37 @@ public class PlatformSettingsService {
   // -- UPDATE SETTINGS --
 
   public PlatformSettings updateBasicConfigurationSettings(SettingsUpdateInput input) {
-    Map<String, Setting> dbSettings = mapOfSettings(this.settingRepository.findAllBySection(SectionEnum.CONFIGURATION));
+    Map<String, Setting> dbSettings = mapOfSettings(fromIterable(this.settingRepository.findAll()));
     List<Setting> settingsToSave = new ArrayList<>();
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.CONFIGURATION, PLATFORM_NAME.key(), input.getName()));
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.CONFIGURATION, DEFAULT_THEME.key(), input.getTheme()));
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.CONFIGURATION, DEFAULT_LANG.key(), input.getLang()));
+    settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_NAME.key(), input.getName()));
+    settingsToSave.add(resolveFromMap(dbSettings, DEFAULT_THEME.key(), input.getTheme()));
+    settingsToSave.add(resolveFromMap(dbSettings, DEFAULT_LANG.key(), input.getLang()));
     settingRepository.saveAll(settingsToSave);
     return findSettings();
   }
 
   public PlatformSettings updateSettingsEnterpriseEdition(SettingsEnterpriseEditionUpdateInput input) {
-    Map<String, Setting> dbSettings = mapOfSettings(this.settingRepository.findAllBySection(SectionEnum.CONFIGURATION));
+    Map<String, Setting> dbSettings = mapOfSettings(fromIterable(this.settingRepository.findAll()));
     List<Setting> settingsToSave = new ArrayList<>();
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.CONFIGURATION, PLATFORM_ENTERPRISE_EDITION.key(), input.getEnterpriseEdition()));
+    settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_ENTERPRISE_EDITION.key(), input.getEnterpriseEdition()));
     settingRepository.saveAll(settingsToSave);
     return findSettings();
   }
 
   public PlatformSettings updateSettingsPlatformWhitemark(SettingsPlatformWhitemarkUpdateInput input) {
-    Map<String, Setting> dbSettings = mapOfSettings(this.settingRepository.findAllBySection(SectionEnum.CONFIGURATION));
+    Map<String, Setting> dbSettings = mapOfSettings(fromIterable(this.settingRepository.findAll()));
     List<Setting> settingsToSave = new ArrayList<>();
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.CONFIGURATION, PLATFORM_WHITEMARK.key(), input.getPlatformWhitemark()));
+    settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_WHITEMARK.key(), input.getPlatformWhitemark()));
     settingRepository.saveAll(settingsToSave);
     return findSettings();
   }
 
   public PlatformSettings updateSettingsPolicies(PolicyInput input) {
-    Map<String, Setting> dbSettings = mapOfSettings(this.settingRepository.findAllBySection(SectionEnum.POLICY));
+    Map<String, Setting> dbSettings = mapOfSettings(fromIterable(this.settingRepository.findAll()));
     List<Setting> settingsToSave = new ArrayList<>();
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.POLICY, PLATFORM_LOGIN_MESSAGE.key(), input.getLoginMessage()));
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.POLICY, PLATFORM_CONSENT_MESSAGE.key(), input.getConsentMessage()));
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.POLICY, PLATFORM_CONSENT_CONFIRM_TEXT.key(), input.getConsentConfirmText()));
+    settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_LOGIN_MESSAGE.key(), input.getLoginMessage()));
+    settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_CONSENT_MESSAGE.key(), input.getConsentMessage()));
+    settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_CONSENT_CONFIRM_TEXT.key(), input.getConsentConfirmText()));
     settingRepository.saveAll(settingsToSave);
     return findSettings();
   }
@@ -296,18 +295,18 @@ public class PlatformSettingsService {
   }
 
   private PlatformSettings updateTheme(ThemeInput input, String themeType) {
-    Map<String, Setting> dbSettings = mapOfSettings(this.settingRepository.findAllBySection(SectionEnum.CONFIGURATION));
+    Map<String, Setting> dbSettings = mapOfSettings(fromIterable(this.settingRepository.findAll()));
     List<Setting> settingsToSave = new ArrayList<>();
 
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.CONFIGURATION, themeType + "." + Theme.THEME_KEYS.BACKGROUND_COLOR.key(), input.getBackgroundColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.CONFIGURATION, themeType + "." + Theme.THEME_KEYS.PAPER_COLOR.key(), input.getPaperColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.CONFIGURATION, themeType + "." + Theme.THEME_KEYS.NAVIGATION_COLOR.key(), input.getNavigationColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.CONFIGURATION, themeType + "." + Theme.THEME_KEYS.PRIMARY_COLOR.key(), input.getPrimaryColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.CONFIGURATION, themeType + "." + Theme.THEME_KEYS.SECONDARY_COLOR.key(), input.getSecondaryColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.CONFIGURATION, themeType + "." + Theme.THEME_KEYS.ACCENT_COLOR.key(), input.getAccentColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.CONFIGURATION, themeType + "." + Theme.THEME_KEYS.LOGO_URL.key(), input.getLogoUrl()));
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.CONFIGURATION, themeType + "." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED.key(), input.getLogoUrlCollapsed()));
-    settingsToSave.add(resolveFromMap(dbSettings, SectionEnum.CONFIGURATION, themeType + "." + Theme.THEME_KEYS.LOGO_LOGIN_URL.key(), input.getLogoLoginUrl()));
+    settingsToSave.add(resolveFromMap(dbSettings, themeType + "." + Theme.THEME_KEYS.BACKGROUND_COLOR.key(), input.getBackgroundColor()));
+    settingsToSave.add(resolveFromMap(dbSettings, themeType + "." + Theme.THEME_KEYS.PAPER_COLOR.key(), input.getPaperColor()));
+    settingsToSave.add(resolveFromMap(dbSettings, themeType + "." + Theme.THEME_KEYS.NAVIGATION_COLOR.key(), input.getNavigationColor()));
+    settingsToSave.add(resolveFromMap(dbSettings, themeType + "." + Theme.THEME_KEYS.PRIMARY_COLOR.key(), input.getPrimaryColor()));
+    settingsToSave.add(resolveFromMap(dbSettings, themeType + "." + Theme.THEME_KEYS.SECONDARY_COLOR.key(), input.getSecondaryColor()));
+    settingsToSave.add(resolveFromMap(dbSettings, themeType + "." + Theme.THEME_KEYS.ACCENT_COLOR.key(), input.getAccentColor()));
+    settingsToSave.add(resolveFromMap(dbSettings, themeType + "." + Theme.THEME_KEYS.LOGO_URL.key(), input.getLogoUrl()));
+    settingsToSave.add(resolveFromMap(dbSettings, themeType + "." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED.key(), input.getLogoUrlCollapsed()));
+    settingsToSave.add(resolveFromMap(dbSettings, themeType + "." + Theme.THEME_KEYS.LOGO_LOGIN_URL.key(), input.getLogoLoginUrl()));
 
     List<Setting> update = new ArrayList<>();
     List<Setting> delete = new ArrayList<>();

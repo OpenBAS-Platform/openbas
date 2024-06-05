@@ -95,7 +95,7 @@ const Login = (props) => {
   const isWhitemarkEnable = parameters.platform_whitemark === 'true'
       && parameters.platform_enterprise_edition === 'true';
 
-  // POLICIES (Copy from opencti)
+  // POLICIES
   const loginMessage = parameters.platform_policies.platform_login_message;
   const consentMessage = parameters.platform_policies.platform_consent_message;
   const consentConfirmText = parameters.platform_policies.platform_consent_confirm_text

@@ -2,9 +2,6 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.database.model.SettingKeys.SectionEnum;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
@@ -30,17 +27,11 @@ public class Setting implements Base {
     @JsonProperty("setting_key")
     private String key;
 
-    @Column(name = "parameter_section")
-    @JsonProperty("setting_type")
-    @Enumerated(EnumType.STRING)
-    private SectionEnum section;
-
     @Column(name = "parameter_value")
     @JsonProperty("setting_value")
     private String value;
 
-    public Setting(SectionEnum section, String key, String value) {
-        this.section = section;
+    public Setting(String key, String value) {
         this.key = key;
         this.value = value;
     }
