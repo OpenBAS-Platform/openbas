@@ -1,5 +1,6 @@
 package io.openbas.injectors.email.service;
 
+
 import io.openbas.database.model.Communication;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Setting;
