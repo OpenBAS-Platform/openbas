@@ -310,14 +310,21 @@ public class V1_DataImporter implements Importer {
       scenario.setCategory(scenarioNode.get("scenario_category").textValue());
       scenario.setMainFocus(scenarioNode.get("scenario_main_focus").textValue());
       scenario.setSeverity(scenarioNode.get("scenario_severity").textValue());
-      scenario.setRecurrence(scenarioNode.get("scenario_recurrence").textValue());
-      String recurrenceStart = scenarioNode.get("scenario_recurrence_start").textValue();
-      if (hasText(recurrenceStart)) {
-        scenario.setRecurrenceStart(Instant.parse(recurrenceStart));
+      if (scenarioNode.get("scenario_recurrence") != null) {
+        scenario.setRecurrence(scenarioNode.get("scenario_recurrence").textValue());
       }
-      String recurrenceEnd = scenarioNode.get("scenario_recurrence_end").textValue();
-      if (hasText(recurrenceEnd)) {
-        scenario.setRecurrenceEnd(Instant.parse(recurrenceEnd));
+      if (scenarioNode.get("scenario_recurrence_start") != null) {
+        scenario.setRecurrence(scenarioNode.get("scenario_recurrence").textValue());
+        String recurrenceStart = scenarioNode.get("scenario_recurrence_start").textValue();
+        if (hasText(recurrenceStart)) {
+          scenario.setRecurrenceStart(Instant.parse(recurrenceStart));
+        }
+      }
+      if (scenarioNode.get("scenario_recurrence_end") != null) {
+        String recurrenceEnd = scenarioNode.get("scenario_recurrence_end").textValue();
+        if (hasText(recurrenceEnd)) {
+          scenario.setRecurrenceEnd(Instant.parse(recurrenceEnd));
+        }
       }
       scenario.setHeader(scenarioNode.get("scenario_message_header").textValue());
       scenario.setFooter(scenarioNode.get("scenario_message_footer").textValue());

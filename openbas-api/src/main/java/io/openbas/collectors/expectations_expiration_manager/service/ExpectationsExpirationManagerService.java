@@ -14,7 +14,6 @@ import java.util.List;
 import static io.openbas.collectors.expectations_expiration_manager.config.ExpectationsExpirationManagerConfig.PRODUCT_NAME;
 import static io.openbas.collectors.expectations_expiration_manager.utils.ExpectationUtils.computeFailedMessage;
 import static io.openbas.collectors.expectations_expiration_manager.utils.ExpectationUtils.isExpired;
-import static java.util.stream.Stream.concat;
 
 @RequiredArgsConstructor
 @Service
