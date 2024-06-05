@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
 import { Button } from '@mui/material';
 import MarkDownField from '../../../../components/fields/MarkDownField';
@@ -28,7 +28,12 @@ const PolicyForm: React.FC<Props> = ({
   const {
     handleSubmit,
     formState: { isDirty, isSubmitting },
+    reset,
   } = methods;
+
+  useEffect(() => {
+    reset(initialValues);
+  }, [initialValues, reset]);
 
   return (
     <FormProvider {...methods}>
