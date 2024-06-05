@@ -9,7 +9,7 @@ import InjectIcon from '../admin/components/common/injects/InjectIcon';
 import { splitDuration } from '../utils/Time';
 import type { TeamStore } from '../actions/teams/Team';
 import type { Theme } from './Theme';
-import { useFormatter } from "./i18n";
+import { useFormatter } from './i18n';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -86,11 +86,10 @@ const useStyles = makeStyles(() => ({
 interface Props {
   injects: Inject[],
   teams: TeamStore[],
-  teamsInjectsMap : ,
-  technicalInjectsMap,
+  exerciseId: string
 }
 
-const Timeline: FunctionComponent<Props> = ({ injects, teams }) => {
+const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
   // Standard hooks
   const classes = useStyles();
   const theme = useTheme<Theme>();
@@ -108,6 +107,9 @@ const Timeline: FunctionComponent<Props> = ({ injects, teams }) => {
     teams,
   );
   const sortedTeams = [...technicalTeams, ...sortedNativeTeams];
+
+  const techicalInjectsWithNoTeam = helper.getExerciseTechnicalInjectsWithNoTeam(exerciseId);
+  const technicalInjectsPerType = R.groupBy(R.prop('inject_type'))(techicalInjectsWithNoTeam);
   const injectsMap = { ...teamsInjectsMap, ...technicalInjectsMap };
 
   const lastInject = R.pipe(

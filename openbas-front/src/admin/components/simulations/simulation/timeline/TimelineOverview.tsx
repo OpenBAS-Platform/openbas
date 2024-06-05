@@ -73,27 +73,17 @@ const TimelineOverview = () => {
 
   const {
     exercise,
-    teams,
     injects,
+    teams,
     tagsMap,
     selectedInject,
-  } = useHelper((helper: InjectHelper & TeamsHelper & ExercisesHelper & TagHelper) => {
+  } = useHelper((helper: InjectHelper & ExercisesHelper & TagHelper) => {
     const exerciseTeams = helper.getExerciseTeams(exerciseId);
-    const injectsPerTeam = R.mergeAll(
-      exerciseTeams.map((a) => ({
-        [a.team_id]: helper.getTeamExerciseInjects(a.team_id),
-      })),
-    );
-    const techicalInjectsWithNoTeam = helper.getExerciseTechnicalInjectsWithNoTeam(exerciseId);
-    const technicalInjectsPerType = R.groupBy(R.prop('inject_type'))(techicalInjectsWithNoTeam);
     return {
       exercise: helper.getExercise(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
       teams: exerciseTeams,
-      exercisesMap: helper.getExercisesMap(),
       tagsMap: helper.getTagsMap(),
-      teamsInjectsMap: injectsPerTeam,
-      technicalInjectsMap: technicalInjectsPerType,
       selectedInject: selectedInjectId && helper.getInject(selectedInjectId),
     };
   });
