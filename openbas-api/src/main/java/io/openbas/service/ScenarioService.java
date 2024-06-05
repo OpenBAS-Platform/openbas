@@ -39,10 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -227,12 +224,17 @@ public class ScenarioService {
         .orElseThrow(() -> new ElementNotFoundException("Scenario not found"));
   }
 
-  public Scenario scenarioByExternalReference(@NotBlank final String scenarioExternalReference) {
+  @Transactional(readOnly = true)
+  public Exercise latestExerciseByExternalReference(@NotBlank final String scenarioExternalReference) {
     List<Scenario> scenarios = this.scenarioRepository.findByExternalReference(scenarioExternalReference);
-    if (!scenarios.isEmpty()) {
-      return scenarios.getFirst();
+    Optional<Exercise> latestEndedExercise = scenarios.stream()
+        .flatMap(scenario -> scenario.getExercises().stream())
+        .filter(exercise -> exercise.getEnd().isPresent())
+        .max(Comparator.comparing(exercise -> exercise.getEnd().get()));
+    if (latestEndedExercise.isPresent()) {
+      return latestEndedExercise.get();
     } else {
-      throw new ElementNotFoundException("Scenario not found");
+      throw new ElementNotFoundException("Most recent simulation not found");
     }
   }
 
