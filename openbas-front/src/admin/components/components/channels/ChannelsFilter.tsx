@@ -23,10 +23,8 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  onAddChannel: (value?: ChannelOption) => void
-  onClearChannel?: () => void
-  onRemoveChannel: (value: string) => void
-  currentChannels: ChannelOption[]
+  onChannelsChange: (value: ChannelOption[]) => void
+  onClearChannels?: () => void
   fullWidth?: boolean
 }
 
@@ -45,7 +43,8 @@ const ChannelsFilter: React.FC<Props> = (props) => {
     dispatch(fetchChannels());
   }, []);
   const channels = useHelper((helper: ChannelsHelper) => helper.getChannels());
-  const { onAddChannel, onClearChannel = () => { }, fullWidth } = props;
+  const { onChannelsChange, onClearChannels = () => { }, fullWidth } = props;
+
   const channelColor = (type?: string) => {
     switch (type) {
       case 'newspaper':
@@ -74,12 +73,14 @@ const ChannelsFilter: React.FC<Props> = (props) => {
         autoSelect={false}
         autoHighlight={true}
         size="small"
+        multiple
         options={channelsOptions}
         onChange={(event, value, reason) => {
-          // When removing, a null change is fired
-          // We handle directly the remove through the chip deletion.
-          if (value !== null) onAddChannel(value);
-          if (reason === 'clear' && fullWidth) onClearChannel();
+          if (reason === 'clear') {
+            onClearChannels();
+          } else {
+            onChannelsChange(value);
+          }
         }}
         isOptionEqualToValue={(option, value: ChannelTransformed) => value === undefined || option.id === value.id}
         renderOption={(p, option) => (
