@@ -7799,7 +7799,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-i18next@npm:^6.0.3":
+"eslint-plugin-i18next@npm:6.0.3":
   version: 6.0.3
   resolution: "eslint-plugin-i18next@npm:6.0.3"
   dependencies:
@@ -11904,7 +11904,7 @@ __metadata:
     eslint-config-airbnb-typescript: "npm:18.0.0"
     eslint-config-react-app: "npm:7.0.1"
     eslint-plugin-custom-rules: "link:packages/eslint-plugin-custom-rules"
-    eslint-plugin-i18next: "npm:^6.0.3"
+    eslint-plugin-i18next: "npm:6.0.3"
     eslint-plugin-import: "npm:2.29.1"
     eslint-plugin-import-newlines: "npm:1.4.0"
     eslint-plugin-playwright: "npm:1.5.4"
