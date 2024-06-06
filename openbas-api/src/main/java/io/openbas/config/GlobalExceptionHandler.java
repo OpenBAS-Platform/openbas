@@ -19,18 +19,4 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorMessage> handleRuntimeException(RuntimeException ex) {
-        log.severe("RuntimeException: " + ex.getMessage());
-        ErrorMessage message = new ErrorMessage("Internal server error: " + ex.getMessage());
-        return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorMessage> handleException(Exception ex) {
-        log.severe("Exception: " + ex.getMessage());
-        ErrorMessage message = new ErrorMessage("An unexpected error occurred: " + ex.getMessage());
-        return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
 }
