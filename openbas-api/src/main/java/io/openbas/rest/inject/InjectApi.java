@@ -44,6 +44,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static io.openbas.config.SessionHelper.currentUser;
@@ -53,6 +54,7 @@ import static io.openbas.helper.DatabaseHelper.resolveOptionalRelation;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.AtomicTestingUtils.getTargets;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
@@ -342,21 +344,37 @@ public class InjectApi extends RestBehavior {
         return injectRepository.save(inject);
     }
 
-    @PostMapping("/api/exercises/{exerciseId}/inject")
+    @Transactional(rollbackOn = Exception.class)
+    @PostMapping(value = EXERCISE_URI + "/{exerciseId}/inject")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public InjectStatus executeInject(@PathVariable String exerciseId,
-                                      @Valid @RequestPart("input") DirectInjectInput input,
-                                      @RequestPart("file") Optional<MultipartFile> file) {
-        Inject inject = input.toInject(injectorContractRepository.findById(input.getInjectorContract()).orElseThrow(ElementNotFoundException::new));
-        inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
-        inject.setExercise(exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new));
-        Iterable<User> users = userRepository.findAllById(input.getUserIds());
-        List<ExecutionContext> userInjectContexts = fromIterable(users).stream()
-                .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
-        ExecutableInject injection = new ExecutableInject(true, true, inject, List.of(), inject.getAssets(),
-                inject.getAssetGroups(), userInjectContexts);
+    public InjectStatus executeInject(
+        @PathVariable @NotBlank final String exerciseId,
+        @Valid @RequestPart("input") DirectInjectInput input,
+        @RequestPart("file") Optional<MultipartFile> file) {
+        Inject inject = input.toInject(
+            this.injectorContractRepository.findById(input.getInjectorContract())
+                .orElseThrow(() -> new ElementNotFoundException("Injector contract not found"))
+        );
+        inject.setUser(
+            this.userRepository.findById(currentUser().getId())
+                .orElseThrow(() -> new ElementNotFoundException("Current user not found"))
+        );
+        inject.setExercise(
+            this.exerciseRepository.findById(exerciseId)
+                .orElseThrow(() -> new ElementNotFoundException("Exercise not found"))
+        );
+        inject.setDependsDuration(0L);
+        Inject savedInject = this.injectRepository.save(inject);
+        Iterable<User> users = this.userRepository.findAllById(input.getUserIds());
+        List<ExecutionContext> userInjectContexts = fromIterable(users)
+            .stream()
+            .map(user -> this.executionContextService.executionContext(user, savedInject, "Direct execution"))
+            .collect(Collectors.toList());
+        ExecutableInject injection = new ExecutableInject(
+            true, true, savedInject, List.of(), savedInject.getAssets(),
+            savedInject.getAssetGroups(), userInjectContexts
+        );
         file.ifPresent(injection::addDirectAttachment);
-        // TODO Must be migrated to Atomic approach (Inject duplication and async tracing)
         return executor.execute(injection);
     }
 

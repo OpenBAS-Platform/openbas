@@ -88,7 +88,7 @@ const Inject = () => {
     const inputValues = {
       inject_title: 'Manual email',
       inject_description: 'Manual email',
-      inject_injector_contract: inject.inject_injector_contract,
+      inject_injector_contract: inject.inject_injector_contract.injector_contract_id,
       inject_content: {
         inReplyTo: lastCommunication.communication_message_id,
         subject: data.communication_subject,
