@@ -1,9 +1,6 @@
 package io.openbas.rest.scenario;
 
-import io.openbas.database.model.Scenario;
-import io.openbas.database.model.Team;
-import io.openbas.database.model.TeamSimple;
-import io.openbas.database.model.User;
+import io.openbas.database.model.*;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -108,11 +105,6 @@ public class ScenarioApi {
     return scenarioService.scenario(scenarioId);
   }
 
-  @GetMapping(SCENARIO_URI + "/external_reference/{externalReferenceId}")
-  public Scenario scenarioByExternalId(@PathVariable @NotBlank final String externalReferenceId) {
-    return scenarioService.scenarioByExternalReference(externalReferenceId);
-  }
-
   @PutMapping(SCENARIO_URI + "/{scenarioId}")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario updateScenario(
@@ -176,15 +168,12 @@ public class ScenarioApi {
 
   // -- SIMULATION --
 
-  // region scenarios
   @GetMapping(SCENARIO_URI + "/{scenarioId}/exercises")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<ExerciseSimple> scenarioExercises(@PathVariable @NotBlank final String scenarioId) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     return scenario.getExercises().stream().map(ExerciseSimple::fromExercise).toList();
   }
-
-  // endregion
 
   // -- TEAMS --
 
