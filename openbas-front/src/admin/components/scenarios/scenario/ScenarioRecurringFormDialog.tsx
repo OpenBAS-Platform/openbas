@@ -65,7 +65,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
     onSubmit(cron, start, end || '');
   };
 
-  const { handleSubmit, control, reset, getValues, clearErrors } = useForm<Recurrence>({
+  const { handleSubmit, control, reset, getValues, clearErrors, formState: { isSubmitting, isValid } } = useForm<Recurrence>({
     defaultValues: defaultFormValues(),
     resolver: zodResolver(
       zodImplement<Recurrence>().with({
@@ -112,7 +112,19 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
           message: t('End date need to be stricly after start date'),
           path: ['endDate'],
         },
-      ),
+      )
+        .refine(
+          (data) => {
+            if (data.startDate) {
+              return new Date(data.startDate).getTime() >= new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime();
+            }
+            return true;
+          },
+          {
+            message: t('Start date should be at least today'),
+            path: ['startDate'],
+          },
+        ),
     ),
   });
 
@@ -137,6 +149,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
     reset(defaultFormValues());
     setOpen(false);
   };
+
   return (
     <Dialog
       open={open}
@@ -169,7 +182,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                   value={fd(field.value)}
                   minDate={new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()}
                   onChange={(startDate) => {
-                    return (startDate ? field.onChange(new Date(startDate).toISOString()) : field.onChange(''));
+                    return (startDate ? field.onChange(new Date(new Date(startDate).setUTCHours(24, 0, 0, 0)).toISOString()) : field.onChange(''));
                   }}
                   onAccept={() => {
                     clearErrors('time');
@@ -307,6 +320,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
           <Button
             color="secondary"
             type="submit"
+            disabled={!isValid || isSubmitting}
           >
             {t('Save')}
           </Button>
