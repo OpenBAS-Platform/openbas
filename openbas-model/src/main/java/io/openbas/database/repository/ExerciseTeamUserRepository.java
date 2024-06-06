@@ -37,4 +37,7 @@ public interface ExerciseTeamUserRepository extends CrudRepository<ExerciseTeamU
 
     @Query(value = "SELECT * FROM exercises_teams_users WHERE team_id IN :ids ;", nativeQuery = true)
     List<RawExerciseTeamUser> rawByTeamIds(@Param("ids") List<String> ids);
+
+    @Query(value = "SELECT * FROM exercises_teams_users WHERE exercise_id IN :ids ;", nativeQuery = true)
+    List<RawExerciseTeamUser> rawByExerciseIds(@Param("ids") List<String> ids);
 }

@@ -3,6 +3,7 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openbas.database.raw.RawExerciseTeamUser;
 import io.openbas.helper.MonoIdDeserializer;
 import jakarta.persistence.*;
 
@@ -79,5 +80,16 @@ public class ExerciseTeamUser {
     @Override
     public int hashCode() {
         return Objects.hash(compositeId);
+    }
+
+    public static ExerciseTeamUser fromRawExerciseTeamUser(RawExerciseTeamUser rawExerciseTeamUser) {
+        ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
+        exerciseTeamUser.setTeam(new Team());
+        exerciseTeamUser.getTeam().setId(rawExerciseTeamUser.getTeam_id());
+        exerciseTeamUser.setExercise(new Exercise());
+        exerciseTeamUser.getExercise().setId(rawExerciseTeamUser.getExercise_id());
+        exerciseTeamUser.setUser(new User());
+        exerciseTeamUser.getUser().setId(rawExerciseTeamUser.getUser_id());
+        return exerciseTeamUser;
     }
 }
