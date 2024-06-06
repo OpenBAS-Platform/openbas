@@ -24,7 +24,7 @@ public class OpenBASExecutorContextService {
     private String computeCommand(@NotNull final Injector injector, Endpoint.PLATFORM_TYPE platform) {
         switch (platform) {
             case Endpoint.PLATFORM_TYPE.Windows -> {
-                return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Windows.name()).replace("\"#{location}\"", "$PWD.Path");
+                return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Windows.name());
             }
             case Endpoint.PLATFORM_TYPE.Linux -> {
                 return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Linux.name()).replace("\"#{location}\"", "$(pwd)");
