@@ -1089,10 +1089,6 @@ export interface InjectStatusExecution {
   execution_time?: string;
 }
 
-/**
- * Specifies the categories of targetResults for atomic testing.
- * @example "assets, asset groups, teams, players"
- */
 export interface InjectTargetWithResult {
   children?: InjectTargetWithResult[];
   expectationResultsByTypes?: ExpectationResultsByType[];

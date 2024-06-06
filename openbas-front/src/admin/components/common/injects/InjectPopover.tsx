@@ -90,8 +90,9 @@ const InjectPopover: FunctionComponent<Props> = ({
   const handleCloseEnable = () => setOpenEnable(false);
 
   const submitEnable = () => {
-    onUpdateInjectActivation(inject.inject_id, { inject_enabled: true });
-    handleCloseEnable();
+    onUpdateInjectActivation(inject.inject_id, { inject_enabled: true }).then(() => {
+      handleCloseEnable();
+    });
   };
 
   const handleOpenDisable = () => {

@@ -355,7 +355,6 @@ const Mails = () => {
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
           {sortedInjects.map((inject) => {
-            const injectContract = inject.inject_injector_contract.injector_contract_content_parsed;
             return (
               <ListItem
                 key={inject.inject_id}
@@ -368,7 +367,6 @@ const Mails = () => {
                 <ListItemIcon style={{ paddingTop: 5 }}>
                   <InjectIcon
                     tooltip={t(inject.inject_type)}
-                    config={injectContract?.config}
                     type={inject.inject_type}
                     disabled={!inject.inject_enabled}
                   />

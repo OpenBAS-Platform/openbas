@@ -186,11 +186,9 @@ const Injects = (props) => {
   // Fetching data
   const {
     tagsMap,
-    selectedInject,
   } = useHelper((helper) => {
     return {
       tagsMap: helper.getTagsMap(),
-      selectedInject: helper.getInject(selectedInjectId),
     };
   });
   const onCreateInject = async (data) => {
@@ -223,7 +221,7 @@ const Injects = (props) => {
             {setViewMode ? (
               <ToggleButtonGroup
                 size="small"
-                exclusive={true}
+                exclusive
                 style={{ float: 'right' }}
                 aria-label="Change view mode"
               >
@@ -267,7 +265,7 @@ const Injects = (props) => {
                 <Tooltip title={t('List view')}>
                   <ToggleButton
                     value='list'
-                    selected={true}
+                    selected
                     aria-label="List view mode"
                   >
                     <ReorderOutlined fontSize="small" color='inherit' />
@@ -311,7 +309,7 @@ const Injects = (props) => {
                     </Tooltip>
                   </CSVLink>
                 ) : (
-                  <IconButton size="large" disabled={true}>
+                  <IconButton size="large" disabled>
                     <FileDownloadOutlined />
                   </IconButton>
                 )}
@@ -330,7 +328,7 @@ const Injects = (props) => {
               <Checkbox
                 edge="start"
                 checked={selectAll}
-                disableRipple={true}
+                disableRipple
                 onChange={
                           typeof handleToggleSelectAll === 'function'
                           && handleToggleSelectAll.bind(this)
@@ -394,7 +392,7 @@ const Injects = (props) => {
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
           {sortedInjects.map((inject, index) => {
-            const injectContract = inject.inject_injector_contract.injector_contract_content_parsed;
+            const injectContract = inject.inject_injector_contract.convertedContent;
             const injectorContractName = tPick(injectContract?.label);
             const duration = splitDuration(inject.inject_depends_duration || 0);
             const isDisabled = !injectContract?.config.expose;
@@ -408,8 +406,8 @@ const Injects = (props) => {
               <ListItem
                 key={inject.inject_id}
                 classes={{ root: classes.item }}
-                divider={true}
-                button={true}
+                divider
+                button
                 disabled={
                   !injectContract || isDisabled || !inject.inject_enabled
                 }
@@ -429,13 +427,12 @@ const Injects = (props) => {
                           (selectAll && !(inject.inject_id in (deSelectedElements || {})))
                           || inject.inject_id in (selectedElements || {})
                       }
-                    disableRipple={true}
+                    disableRipple
                   />
                 </ListItemIcon>
                 <ListItemIcon style={{ paddingTop: 5 }}>
                   <InjectIcon
                     tooltip={t(inject.inject_type)}
-                    config={injectContract?.config}
                     type={inject.inject_type}
                     disabled={
                       !injectContract || isDisabled || !inject.inject_enabled
@@ -515,20 +512,21 @@ const Injects = (props) => {
         </List>
         {permissions.canWrite && (
           <>
-            <UpdateInject
-              open={selectedInjectId !== null}
-              handleClose={() => setSelectedInjectId(null)}
-              onUpdateInject={onUpdateInject}
-              injectorContract={selectedInject?.inject_injector_contract?.injector_contract_content_parsed}
-              inject={selectedInject}
-              teamsFromExerciseOrScenario={teams}
-              articlesFromExerciseOrScenario={articles}
-              variablesFromExerciseOrScenario={variables}
-              uriVariable={uriVariable}
-              allUsersNumber={allUsersNumber}
-              usersNumber={usersNumber}
-              teamsUsers={teamsUsers}
-            />
+            {selectedInjectId !== null
+              && <UpdateInject
+                open
+                handleClose={() => setSelectedInjectId(null)}
+                onUpdateInject={onUpdateInject}
+                injectId={selectedInjectId}
+                teamsFromExerciseOrScenario={teams}
+                articlesFromExerciseOrScenario={articles}
+                variablesFromExerciseOrScenario={variables}
+                uriVariable={uriVariable}
+                allUsersNumber={allUsersNumber}
+                usersNumber={usersNumber}
+                teamsUsers={teamsUsers}
+                 />
+            }
             <CreateInject
               title={t('Create a new inject')}
               onCreateInject={onCreateInject}

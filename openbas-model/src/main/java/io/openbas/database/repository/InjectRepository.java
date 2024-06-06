@@ -84,14 +84,6 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
   @Query(value = "insert into injects_teams (inject_id, team_id) values (:injectId, :teamId)", nativeQuery = true)
   void addTeam(@Param("injectId") String injectId, @Param("teamId") String teamId);
 
-  @Modifying
-  @Query(value = "insert into injects_assets (inject_id, asset_id) values (:injectId, :assetId)", nativeQuery = true)
-  void addAsset(@Param("injectId") String injectId, @Param("assetId") String assetId);
-
-  @Modifying
-  @Query(value = "insert into injects_asset_groups (inject_id, asset_group_id) values (:injectId, :assetGroupId)", nativeQuery = true)
-  void addAssetGroup(@Param("injectId") String injectId, @Param("assetGroupId") String assetGroupId);
-
   @Override
   @Query("select count(distinct i) from Inject i " +
       "join i.exercise as e " +
@@ -127,4 +119,19 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
           "WHERE injects.inject_id IN :ids " +
           "GROUP BY injects.inject_id, ins.status_name;", nativeQuery = true)
   List<RawInject> findRawByIds(@Param("ids")List<String> ids);
+
+  @Query(value =
+      "SELECT org.*, " +
+          "array_agg(DISTINCT org_tags.tag_id) FILTER (WHERE org_tags.tag_id IS NOT NULL) AS organization_tags, " +
+          "array_agg(DISTINCT injects.inject_id) FILTER (WHERE injects.inject_id IS NOT NULL) AS organization_injects, " +
+          "coalesce(array_length(array_agg(DISTINCT injects.inject_id) FILTER (WHERE injects.inject_id IS NOT NULL), 1), 0) AS organization_injects_number " +
+          "FROM organizations org " +
+          "LEFT JOIN organizations_tags org_tags ON org.organization_id = org_tags.organization_id " +
+          "LEFT JOIN users ON users.user_organization = org.organization_id " +
+          "LEFT JOIN users_teams ON users.user_id = users_teams.user_id " +
+          "LEFT JOIN injects_teams ON injects_teams.team_id = users_teams.team_id " +
+          "LEFT JOIN injects ON injects.inject_id = injects_teams.inject_id OR injects.inject_all_teams " +
+          "GROUP BY org.organization_id",
+      nativeQuery = true)
+  List<RawInject> rawAll();
 }

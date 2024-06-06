@@ -52,11 +52,6 @@ public class AtomicTestingApi extends RestBehavior {
         .orElseThrow(ElementNotFoundException::new);
   }
 
-  @GetMapping("/{injectId}/update")
-  public Inject findAtomicTestingForUpdate(@PathVariable String injectId) {
-    return atomicTestingService.findById(injectId).orElseThrow(ElementNotFoundException::new);
-  }
-
   @PostMapping()
   @Transactional(rollbackOn = Exception.class)
   public InjectResultDTO createAtomicTesting(@Valid @RequestBody AtomicTestingInput input) {

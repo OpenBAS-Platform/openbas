@@ -10,6 +10,7 @@ import {
   updateInjectTriggerForExercise,
 } from '../../../../actions/Inject';
 import { secondsFromToNow } from '../../../../utils/Exercise';
+import type { InjectStore } from '../../../../actions/injects/Inject';
 
 const injectContextForExercise = (exercise: ExerciseStore) => {
   const dispatch = useAppDispatch();
@@ -27,7 +28,10 @@ const injectContextForExercise = (exercise: ExerciseStore) => {
       );
       return dispatch(updateInjectTriggerForExercise(exercise.exercise_id, injectId, { inject_depends_duration: injectDependsDuration > 0 ? injectDependsDuration : 0 }));
     },
-    onUpdateInjectActivation(injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }): void {
+    onUpdateInjectActivation(injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }): Promise<{
+      result: string,
+      entities: { endpoints: Record<string, InjectStore> }
+    }> {
       return dispatch(updateInjectActivationForExercise(exercise.exercise_id, injectId, injectEnabled));
     },
     onInjectDone(injectId: Inject['inject_id']): void {
