@@ -234,7 +234,7 @@ public class ScenarioService {
     if (latestEndedExercise.isPresent()) {
       return latestEndedExercise.get();
     } else {
-      throw new ElementNotFoundException("Most recent simulation not found");
+      throw new ElementNotFoundException("Latest exercise not found");
     }
   }
 

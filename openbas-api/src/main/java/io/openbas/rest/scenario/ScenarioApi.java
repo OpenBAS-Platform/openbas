@@ -175,12 +175,6 @@ public class ScenarioApi {
     return scenario.getExercises().stream().map(ExerciseSimple::fromExercise).toList();
   }
 
-  @GetMapping(SCENARIO_URI + "/external_reference/{externalReferenceId}")
-  public ExerciseSimple latestExerciseByExternalReference(@PathVariable @NotBlank final String externalReferenceId) {
-    Exercise exercise = this.scenarioService.latestExerciseByExternalReference(externalReferenceId);
-    return ExerciseSimple.fromExercise(exercise);
-  }
-
   // -- TEAMS --
 
   @Transactional(rollbackOn = Exception.class)
