@@ -164,9 +164,9 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
             " coalesce(array_agg(art.article_id) FILTER ( WHERE art.article_id IS NOT NULL ), '{}') as exercise_articles, " +
             " coalesce(array_agg(lc.lessons_category_id) FILTER ( WHERE lc.lessons_category_id IS NOT NULL ), '{}') as exercise_lessons_categories, " +
             " coalesce(array_agg(ut.user_id) FILTER ( WHERE ut.user_id IS NOT NULL ), '{}') as exercise_users, " +
-            " count (distinct la.lessons_answer_id) as lessons_answers_numbers, " +
-            " count (distinct ut.user_id) as all_users_number, " +
-            " count (distinct logs.log_id) as logs_number " +
+            " coalesce(array_agg(la.lessons_answer_id) FILTER ( WHERE la.lessons_answer_id IS NOT NULL ), '{}') as lessons_answers, " +
+            " coalesce(array_agg(ut.user_id) FILTER ( WHERE ut.user_id IS NOT NULL ), '{}') as users, " +
+            " coalesce(array_agg(logs.log_id) FILTER ( WHERE logs.log_id IS NOT NULL ), '{}') as logs " +
             "FROM exercises ex " +
             "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id " +
             "LEFT JOIN injects ON ie.inject_id = injects.inject_id " +

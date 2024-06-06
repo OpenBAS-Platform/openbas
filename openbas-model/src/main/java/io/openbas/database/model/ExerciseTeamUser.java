@@ -90,6 +90,10 @@ public class ExerciseTeamUser {
         exerciseTeamUser.getExercise().setId(rawExerciseTeamUser.getExercise_id());
         exerciseTeamUser.setUser(new User());
         exerciseTeamUser.getUser().setId(rawExerciseTeamUser.getUser_id());
+        exerciseTeamUser.setCompositeId(new ExerciseTeamUserId());
+        exerciseTeamUser.getCompositeId().setExerciseId(rawExerciseTeamUser.getExercise_id());
+        exerciseTeamUser.getCompositeId().setTeamId(rawExerciseTeamUser.getTeam_id());
+        exerciseTeamUser.getCompositeId().setUserId(rawExerciseTeamUser.getUser_id());
         return exerciseTeamUser;
     }
 }

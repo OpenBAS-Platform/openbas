@@ -605,14 +605,16 @@ public class ExerciseApi extends RestBehavior {
     // We create objectives and fill them with evaluations
     List<Objective> objectives = rawObjectives.stream().map(rawObjective -> {
       Objective objective = new Objective();
-      objective.setEvaluations(mapEvaluationsByObjective.get(rawObjective.getObjective_id()).stream().map(
-              rawEvaluation -> {
-                Evaluation evaluation = new Evaluation();
-                evaluation.setId(rawEvaluation.getEvaluation_id());
-                evaluation.setScore(rawEvaluation.getEvaluation_score());
-                return evaluation;
-              }
-      ).toList());
+      if(mapEvaluationsByObjective.get(rawObjective.getObjective_id()) != null) {
+        objective.setEvaluations(mapEvaluationsByObjective.get(rawObjective.getObjective_id()).stream().map(
+                rawEvaluation -> {
+                  Evaluation evaluation = new Evaluation();
+                  evaluation.setId(rawEvaluation.getEvaluation_id());
+                  evaluation.setScore(rawEvaluation.getEvaluation_score());
+                  return evaluation;
+                }
+        ).toList());
+      }
       return objective;
     }).toList();
 
