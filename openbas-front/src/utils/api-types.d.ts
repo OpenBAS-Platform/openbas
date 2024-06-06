@@ -2007,6 +2007,7 @@ export interface PlatformSettings {
   platform_light_theme?: ThemeInput;
   platform_name?: string;
   platform_openid_providers?: OAuthProvider[];
+  platform_policies?: PolicyInput;
   platform_theme?: string;
   platform_version?: string;
   platform_whitemark?: string;
@@ -2042,6 +2043,12 @@ export interface PlayerInput {
   user_phone?: string;
   user_tags?: string[];
   user_teams?: string[];
+}
+
+export interface PolicyInput {
+  platform_consent_confirm_text?: string;
+  platform_consent_message?: string;
+  platform_login_message?: string;
 }
 
 export interface PropertySchemaDTO {

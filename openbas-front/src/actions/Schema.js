@@ -405,13 +405,6 @@ export const storeHelper = (state) => ({
   )),
   getTeams: () => entities('teams', state),
   getTeamsMap: () => maps('teams', state),
-  getSettings: () => {
-    return R.mergeAll(
-      Object.entries(state.referential.entities.parameters ?? {}).map(
-        ([k, v]) => ({ [k]: v.setting_value }),
-      ),
-    );
-  },
   getPlatformSettings: () => {
     return state.referential.entities.platformParameters.parameters || {};
   },

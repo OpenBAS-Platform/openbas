@@ -2,48 +2,19 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.audit.ModelBaseListener;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
 import java.util.Objects;
 
+@Data
 @Entity
 @Table(name = "parameters")
 @EntityListeners(ModelBaseListener.class)
+@NoArgsConstructor
 public class Setting implements Base {
-
-    public enum SETTING_KEYS {
-        PLATFORM_NAME("platform_name", "OpenBAS - Breach and Attack Simulation Platform"),
-        PLATFORM_ENTERPRISE_EDITION("platform_enterprise_edition", "false"),
-        PLATFORM_WHITEMARK("platform_whitemark", "false"),
-        DEFAULT_THEME("platform_theme", "dark"),
-        DEFAULT_LANG("platform_lang", "auto");
-
-        private final String key;
-        private final String defaultValue;
-
-        SETTING_KEYS(String key, String defaultValue) {
-            this.key = key;
-            this.defaultValue = defaultValue;
-        }
-
-        public String key() {
-            return key;
-        }
-
-        public String defaultValue() {
-            return defaultValue;
-        }
-    }
-
-    public Setting() {
-        // Default constructor
-    }
-
-    public Setting(String key, String value) {
-        this.key = key;
-        this.value = value;
-    }
 
     @Id
     @Column(name = "parameter_id")
@@ -60,34 +31,14 @@ public class Setting implements Base {
     @JsonProperty("setting_value")
     private String value;
 
-    @Override
-    public String getId() {
-        return id;
+    public Setting(String key, String value) {
+        this.key = key;
+        this.value = value;
     }
 
     @Override
     public boolean isUserHasAccess(User user) {
         return user.isAdmin();
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
     }
 
     @Override

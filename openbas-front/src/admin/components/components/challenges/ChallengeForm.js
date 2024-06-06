@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 import OldTextField from '../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
 import OldSelectField from '../../../../components/fields/OldSelectField';
-import MarkDownField from '../../../../components/fields/MarkDownField';
+import OldMarkDownField from '../../../../components/fields/OldMarkDownField';
 import DocumentType from '../documents/DocumentType';
 import ItemTags from '../../../../components/ItemTags';
 import DocumentPopover from '../documents/DocumentPopover';
@@ -183,7 +183,7 @@ const ChallengeForm = (props) => {
             label={t('Category')}
             style={{ marginTop: 20 }}
           />
-          <MarkDownField
+          <OldMarkDownField
             name="challenge_content"
             label={t('Content')}
             fullWidth={true}

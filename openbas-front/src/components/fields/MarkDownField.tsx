@@ -1,70 +1,130 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useController, useFormContext } from 'react-hook-form';
 import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
-import { Field, FieldInputProps, FieldMetaState } from 'react-final-form';
-import { FormHelperText, InputLabel, useTheme } from '@mui/material';
-import { useFormatter } from '../i18n';
-import type { Theme } from '../Theme';
+import { Box, FormHelperText, InputLabel, Typography } from '@mui/material';
+import { ICommand } from '@uiw/react-md-editor';
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
+import { useFormatter } from '../i18n';
 
 interface Props {
+  name: string;
   label: string;
   style: React.CSSProperties;
   disabled?: boolean;
-  input: FieldInputProps<string, HTMLElement>;
-  meta: FieldMetaState<string>;
   askAi?: boolean;
   inInject: boolean;
   inArticle?: boolean;
 }
 
-const MarkDownFieldBase: React.FC<Props> = ({
+const MarkDownField: React.FC<Props> = ({
+  name,
   label,
   style,
   disabled,
-  input: { onChange, value },
-  meta: { touched, invalid, error, submitError },
   askAi,
   inInject,
   inArticle,
 }) => {
   const { t } = useFormatter();
-  const theme = useTheme<Theme>();
+  const { control } = useFormContext();
+  const {
+    field: { onChange, value },
+    fieldState: { invalid, error },
+  } = useController({
+    name,
+    control,
+    defaultValue: '',
+  });
+  const [isEdit, setIsEdit] = useState(true);
+
+  // Commands
+  const buttonStyle = {
+    border: '1px solid',
+    borderRadius: 4,
+    padding: '4px',
+    backgroundColor: 'transparent',
+    cursor: 'pointer',
+  };
+  const writeCommand: ICommand = {
+    name: 'edit',
+    keyCommand: 'preview',
+    buttonProps: {
+      'aria-label': 'write',
+      style: { backgroundColor: 'transparent' },
+    },
+    icon: (
+      <div
+        style={{
+          ...buttonStyle,
+          border: isEdit ? '1px solid' : '',
+        }}
+      >
+        <Typography>{t('Write')}</Typography>
+      </div>
+    ),
+    execute: () => setIsEdit(true),
+  };
+  const previewCommand: ICommand = {
+    name: 'preview',
+    keyCommand: 'preview',
+    buttonProps: {
+      'aria-label': 'preview',
+      style: { backgroundColor: 'transparent' },
+    },
+    icon: (
+      <div
+        style={{
+          ...buttonStyle,
+          border: !isEdit ? '1px solid' : '',
+        }}
+      >
+        <Typography>{t('Preview')}</Typography>
+      </div>
+    ),
+    execute: () => setIsEdit(false),
+  };
+
   return (
     <div
       style={{ ...style, position: 'relative' }}
-      className={touched && invalid ? 'error' : 'main'}
-      data-color-mode={theme.palette.mode}
+      className={invalid ? 'error' : 'main'}
     >
       <InputLabel shrink={true} variant="standard">
         {label}
       </InputLabel>
-      <MDEditor
-        value={value}
-        textareaProps={{
-          disabled,
-        }}
-        preview="edit"
-        onChange={(data) => onChange(data)}
-        commands={[
-          { ...commands.title, buttonProps: { disabled } },
-          { ...commands.bold, buttonProps: { disabled } },
-          { ...commands.italic, buttonProps: { disabled } },
-          { ...commands.strikethrough, buttonProps: { disabled } },
-          { ...commands.divider },
-          { ...commands.link, buttonProps: { disabled } },
-          { ...commands.quote, buttonProps: { disabled } },
-          { ...commands.code, buttonProps: { disabled } },
-          { ...commands.image, buttonProps: { disabled } },
-          { ...commands.divider, buttonProps: { disabled } },
-          { ...commands.unorderedListCommand, buttonProps: { disabled } },
-          { ...commands.orderedListCommand, buttonProps: { disabled } },
-          { ...commands.checkedListCommand, buttonProps: { disabled } },
-        ]}
-        extraCommands={[]}
-      />
-      {touched && invalid && (
+      <Box flexGrow={1}>
+        <MDEditor
+          value={value}
+          textareaProps={{
+            disabled,
+          }}
+          preview={isEdit ? 'edit' : 'preview'}
+          onChange={(val) => onChange(val || '')}
+          commands={[
+            writeCommand,
+            previewCommand,
+            ...(isEdit ? [
+              { ...commands.title, buttonProps: { disabled } },
+              { ...commands.bold, buttonProps: { disabled } },
+              { ...commands.italic, buttonProps: { disabled } },
+              { ...commands.strikethrough, buttonProps: { disabled } },
+              { ...commands.divider },
+              { ...commands.link, buttonProps: { disabled } },
+              { ...commands.quote, buttonProps: { disabled } },
+              { ...commands.code, buttonProps: { disabled } },
+              { ...commands.image, buttonProps: { disabled } },
+              { ...commands.divider, buttonProps: { disabled } },
+              { ...commands.unorderedListCommand, buttonProps: { disabled } },
+              { ...commands.orderedListCommand, buttonProps: { disabled } },
+              { ...commands.checkedListCommand, buttonProps: { disabled } },
+            ] : []),
+          ]}
+          extraCommands={[]}
+        />
+      </Box>
+      {invalid && (
         <FormHelperText error={true}>
-          {(error && t(error)) || (submitError && t(submitError))}
+          {error?.message}
         </FormHelperText>
       )}
       {askAi && (
@@ -83,9 +143,5 @@ const MarkDownFieldBase: React.FC<Props> = ({
     </div>
   );
 };
-
-const MarkDownField = (props: Props & { name: string }) => (
-  <Field component={MarkDownFieldBase} {...props} />
-);
 
 export default MarkDownField;

@@ -13,7 +13,7 @@ import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchDocuments } from '../../../../actions/Document';
 import ChannelIcon from '../../components/channels/ChannelIcon';
-import MarkDownField from '../../../../components/fields/MarkDownField';
+import OldMarkDownField from '../../../../components/fields/OldMarkDownField';
 import DocumentType from '../../components/documents/DocumentType';
 import ItemTags from '../../../../components/ItemTags';
 import DocumentPopover from '../../components/documents/DocumentPopover';
@@ -229,7 +229,7 @@ const ArticleForm = ({
               style={{ marginTop: 20 }}
               label={t('Author')}
             />
-            <MarkDownField
+            <OldMarkDownField
               name="article_content"
               label={t('Content')}
               fullWidth
