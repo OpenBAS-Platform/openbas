@@ -1,78 +1,28 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Drawer, ListItemIcon, ListItemText, MenuItem, MenuList } from '@mui/material';
 import { GroupsOutlined, LocalPoliceOutlined, PermIdentityOutlined } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../../../components/i18n';
-import type { Theme } from '../../../components/Theme';
+import RightMenu, { RightMenuEntry } from '../../../components/common/RightMenu';
 
-const useStyles = makeStyles((theme: Theme) => ({
-  drawer: {
-    minHeight: '100vh',
-    width: 200,
-    position: 'fixed',
-    overflow: 'auto',
-    padding: 0,
-    backgroundColor: theme.palette.background.nav,
-  },
-  toolbar: theme.mixins.toolbar,
-  item: {
-    paddingTop: 10,
-    paddingBottom: 10,
-  },
-}));
-
-const DefinitionMenu: React.FC = () => {
-  const location = useLocation();
-  const classes = useStyles();
-  const { t } = useFormatter();
+const SecurityMenu: React.FC = () => {
+  const entries: RightMenuEntry[] = [
+    {
+      path: '/admin/settings/security/groups',
+      icon: () => (<GroupsOutlined />),
+      label: 'Groups',
+    },
+    {
+      path: '/admin/settings/security/users',
+      icon: () => (<PermIdentityOutlined />),
+      label: 'Users',
+    },
+    {
+      path: '/admin/settings/security/policies',
+      icon: () => (<LocalPoliceOutlined />),
+      label: 'Policies',
+    },
+  ];
   return (
-    <Drawer
-      variant="permanent"
-      anchor="right"
-      classes={{ paper: classes.drawer }}
-    >
-      <div className={classes.toolbar}/>
-      <MenuList component="nav">
-        <MenuItem
-          component={Link}
-          to='/admin/settings/security/groups'
-          selected={location.pathname === '/admin/settings/security/groups'}
-          classes={{ root: classes.item }}
-          dense={false}
-        >
-          <ListItemIcon>
-            <GroupsOutlined fontSize="medium"/>
-          </ListItemIcon>
-          <ListItemText primary={t('Groups')}/>
-        </MenuItem>
-        <MenuItem
-          component={Link}
-          to='/admin/settings/security/users'
-          selected={location.pathname === '/admin/settings/security/users'}
-          classes={{ root: classes.item }}
-          dense={false}
-        >
-          <ListItemIcon>
-            <PermIdentityOutlined fontSize="medium"/>
-          </ListItemIcon>
-          <ListItemText primary={t('Users')}/>
-        </MenuItem>
-        <MenuItem
-          component={Link}
-          to='/admin/settings/security/policies'
-          selected={location.pathname === '/admin/settings/security/policies'}
-          classes={{ root: classes.item }}
-          dense={false}
-        >
-          <ListItemIcon>
-            <LocalPoliceOutlined fontSize="medium"/>
-          </ListItemIcon>
-          <ListItemText primary={t('Policies')}/>
-        </MenuItem>
-      </MenuList>
-    </Drawer>
+    <RightMenu entries={entries} />
   );
 };
 
-export default DefinitionMenu;
+export default SecurityMenu;
