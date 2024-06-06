@@ -25,4 +25,6 @@ public interface RawInject {
 
     public String getStatus_name();
 
+    public String getInject_scenario();
+
 }

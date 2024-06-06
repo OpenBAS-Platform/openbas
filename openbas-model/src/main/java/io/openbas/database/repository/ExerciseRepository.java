@@ -163,7 +163,10 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
             " coalesce(array_agg(pauses.pause_id) FILTER ( WHERE pauses.pause_id IS NOT NULL ), '{}') as exercise_pauses, " +
             " coalesce(array_agg(art.article_id) FILTER ( WHERE art.article_id IS NOT NULL ), '{}') as exercise_articles, " +
             " coalesce(array_agg(lc.lessons_category_id) FILTER ( WHERE lc.lessons_category_id IS NOT NULL ), '{}') as exercise_lessons_categories, " +
-            " coalesce(array_agg(ut.user_id) FILTER ( WHERE ut.user_id IS NOT NULL ), '{}') as exercise_users " +
+            " coalesce(array_agg(ut.user_id) FILTER ( WHERE ut.user_id IS NOT NULL ), '{}') as exercise_users, " +
+            " count (distinct la.lessons_answer_id) as lessons_answers_numbers, " +
+            " count (distinct ut.user_id) as all_users_number, " +
+            " count (distinct logs.log_id) as logs_number " +
             "FROM exercises ex " +
             "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id " +
             "LEFT JOIN injects ON ie.inject_id = injects.inject_id " +
@@ -175,8 +178,11 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
             "LEFT JOIN exercises_documents ed ON ed.exercise_id = ex.exercise_id " +
             "LEFT JOIN articles art ON art.article_exercise = ex.exercise_id " +
             "LEFT JOIN lessons_categories lc ON lc.lessons_category_exercise = ex.exercise_id " +
+            "LEFT JOIN lessons_questions lq ON lq.lessons_question_category = lc.lessons_category_id " +
+            "LEFT JOIN lessons_answers la ON la.lessons_answer_question = lq.lessons_question_id " +
             "LEFT JOIN scenarios_exercises se ON se.exercise_id = ex.exercise_id " +
             "LEFT JOIN users_teams ut ON ext.team_id = ut.team_id " +
+            "LEFT JOIN logs ON logs.log_exercise = ex.exercise_id " +
             "WHERE ex.exercise_id = :exerciseId " +
             "GROUP BY ex.exercise_id, inj.inject_scenario, se.scenario_id ;", nativeQuery = true)
     RawExercise rawDetailsById(@Param("exerciseId") String exerciseId);

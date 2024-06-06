@@ -224,6 +224,11 @@ public class ExerciseDetails {
 
     details.setInjects(injects);
     details.setObjectives(objectives);
+    details.setLessonsAnswersNumber(exercise.getLessons_answers_numbers());
+
+    details.setAllUsersNumber(exercise.getAll_users_number());
+    details.setUsersNumber(details.getExerciseTeamUsers().stream().map(ExerciseTeamUser::getUser).distinct().count());
+    details.setLogsNumber(exercise.getLogs_number());
 
     return details;
   }

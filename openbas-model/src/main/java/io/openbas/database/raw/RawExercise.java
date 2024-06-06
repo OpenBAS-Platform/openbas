@@ -48,4 +48,7 @@ public interface RawExercise {
     Set<String> getExercise_lessons_categories();
     Set<String> getExercise_lessons_users();
     Set<String> getExercise_users();
+    long getLessons_answers_numbers();
+    long getAll_users_number();
+    long getLogs_number();
 }

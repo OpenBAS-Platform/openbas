@@ -623,6 +623,10 @@ public class ExerciseApi extends RestBehavior {
     // From the raw injects, we recreate Injects with minimal objects for calculations
     List<Inject> injects = rawInjects.stream().map(rawInject -> {
       Inject inject = new Inject();
+      if(rawInject.getInject_scenario() != null) {
+        inject.setScenario(new Scenario());
+        inject.getScenario().setId(rawInject.getInject_scenario());
+      }
       // We set the communications
       inject.setCommunications(rawInject.getInject_communications().stream().map(com -> {
         Communication communication = new Communication();

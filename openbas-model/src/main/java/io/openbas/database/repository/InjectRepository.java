@@ -104,7 +104,7 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
   @Query("select count(distinct i) from Inject i where i.createdAt < :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
 
-  @Query(value = " SELECT injects.inject_id, ins.status_name, " +
+  @Query(value = " SELECT injects.inject_id, ins.status_name, injects.inject_scenario, " +
           "coalesce(array_agg(it.team_id) FILTER ( WHERE it.team_id IS NOT NULL ), '{}') as inject_teams, " +
           "coalesce(array_agg(assets.asset_id) FILTER ( WHERE assets.asset_id IS NOT NULL ), '{}') as inject_assets, " +
           "coalesce(array_agg(iag.asset_group_id) FILTER ( WHERE iag.asset_group_id IS NOT NULL ), '{}') as inject_asset_groups, " +
