@@ -3,7 +3,8 @@ import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { Grid, Typography, Paper, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Grid, Typography, Paper, Dialog, DialogTitle, DialogContent, Button } from '@mui/material';
+import { ReplyOutlined } from '@mui/icons-material';
 import { executeInject, fetchExerciseInjects } from '../../../../../actions/Inject';
 import { useFormatter } from '../../../../../components/i18n';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
@@ -213,9 +214,8 @@ const Inject = () => {
                   communication={currentTopic}
                   communicationUsers={topicUsers}
                   isTopic={true}
-                  handleOpenReply={handleOpenReply}
                 />
-                {currentTopic.communication_communications.map(
+                {currentTopic.communication_communications.toReversed().map(
                   (communication) => {
                     const communicationUsers = communication.communication_users.map(
                       (userId) => usersMap[userId] ?? {},
@@ -226,11 +226,20 @@ const Inject = () => {
                         communication={communication}
                         communicationUsers={communicationUsers}
                         isTopic={false}
-                        handleOpenReply={handleOpenReply}
                       />
                     );
                   },
                 )}
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button
+                    variant="outlined"
+                    style={{ marginBottom: 20 }}
+                    startIcon={<ReplyOutlined />}
+                    onClick={() => handleOpenReply(currentTopic.communication_id)}
+                  >
+                    {t('Reply')}
+                  </Button>
+                </div>
               </div>
             );
           })}
