@@ -23,7 +23,6 @@ import io.openbas.service.InjectService;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.AtomicTestingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -350,7 +349,7 @@ public class InjectApi extends RestBehavior {
         return injectRepository.save(inject);
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @PostMapping(value = EXERCISE_URI + "/{exerciseId}/inject")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public InjectStatus executeInject(

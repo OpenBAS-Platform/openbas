@@ -2,9 +2,34 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { withStyles } from '@mui/styles';
-import { Button, FormControlLabel, FormGroup, IconButton, InputLabel, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Switch, Tooltip, Typography, } from '@mui/material';
+import {
+  Button,
+  FormControlLabel,
+  FormGroup,
+  IconButton,
+  InputLabel,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+  MenuItem,
+  Switch,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { connect } from 'react-redux';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, ControlPointOutlined, DeleteOutlined, EmojiEventsOutlined, GroupsOutlined, HelpOutlineOutlined, RotateLeftOutlined, } from '@mui/icons-material';
+import {
+  ArrowDropDownOutlined,
+  ArrowDropUpOutlined,
+  AttachmentOutlined,
+  ControlPointOutlined,
+  DeleteOutlined,
+  EmojiEventsOutlined,
+  GroupsOutlined,
+  HelpOutlineOutlined,
+  RotateLeftOutlined,
+} from '@mui/icons-material';
 import { FieldArray } from 'react-final-form-arrays';
 import inject18n from '../../../../components/i18n';
 import { fetchInjectTeams } from '../../../../actions/Inject';
