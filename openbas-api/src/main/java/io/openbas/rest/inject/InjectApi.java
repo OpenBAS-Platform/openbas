@@ -2,7 +2,6 @@ package io.openbas.rest.inject;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.asset.AssetGroupService;
@@ -24,7 +23,6 @@ import io.openbas.service.InjectService;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.AtomicTestingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -82,9 +80,6 @@ public class InjectApi extends RestBehavior {
     private ScenarioService scenarioService;
     private InjectService injectService;
     private AtomicTestingService atomicTestingService;
-
-    @Resource
-    protected ObjectMapper mapper;
 
     @Autowired
     public void setExecutor(Executor executor) {
