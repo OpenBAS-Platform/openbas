@@ -23,6 +23,7 @@ import CreateArticle from './CreateArticle';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
 import { ArticleContext, PermissionsContext } from '../Context';
 import Empty from '../../../../components/Empty';
+import ChannelColor from '../../../../public/components/channels/ChannelColor';
 
 const useStyles = makeStyles(() => ({
   channel: {
@@ -95,18 +96,6 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
       || channels.map((o) => o.id).includes(n.article_fullchannel.channel_id ?? ''),
     filtering.filterAndSort(fullArticles),
   );
-  const channelColor = (type: string | undefined) => {
-    switch (type) {
-      case 'newspaper':
-        return '#3f51b5';
-      case 'microblogging':
-        return '#00bcd4';
-      case 'tv':
-        return '#ff9800';
-      default:
-        return '#ef41e1';
-    }
-  };
 
   // Context
   const { previewArticleUrl } = useContext(ArticleContext);
@@ -184,7 +173,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
                   avatar={
                     <Avatar
                       sx={{
-                        bgcolor: channelColor(
+                        bgcolor: ChannelColor(
                           article.article_fullchannel?.channel_type,
                         ),
                       }}
@@ -264,10 +253,10 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
                           }
                           classes={{ root: classes.channel }}
                           style={{
-                            color: channelColor(
+                            color: ChannelColor(
                               article.article_fullchannel?.channel_type,
                             ),
-                            borderColor: channelColor(
+                            borderColor: ChannelColor(
                               article.article_fullchannel?.channel_type,
                             ),
                           }}

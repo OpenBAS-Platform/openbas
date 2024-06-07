@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
-import { Typography, Grid, Card, CardHeader, CardContent, Avatar, CardMedia, Button, Dialog, DialogTitle, DialogContent, Slide, Chip, Tooltip } from '@mui/material';
+import { Typography, Grid, Card, CardHeader, CardContent, Avatar, CardMedia, Button, Dialog, DialogTitle, DialogContent, Slide } from '@mui/material';
 import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, ShareOutlined, MoreHorizOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
 import Empty from '../../../components/Empty';
 import { useHelper } from '../../../store';
 import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
 import { useQueryParameter } from '../../../utils/Environment';
-// eslint-disable-next-line import/extensions
-import ChannelIcon from '../../../admin/components/components/channels/ChannelIcon.js';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -40,18 +38,6 @@ const ChannelNewspaper = ({ channelReader }) => {
   const [userId] = useQueryParameter(['user']);
   const [currentArticle, setCurrentArticle] = useState(null);
   const isDark = theme.palette.mode === 'dark';
-  const channelColor = (type) => {
-    switch (type) {
-      case 'newspaper':
-        return '#3f51b5';
-      case 'microblogging':
-        return '#00bcd4';
-      case 'tv':
-        return '#ff9800';
-      default:
-        return '#ef41e1';
-    }
-  };
   const {
     channel_exercise: exercise,
     channel_scenario: scenario,
@@ -85,42 +71,25 @@ const ChannelNewspaper = ({ channelReader }) => {
         <div
           style={{ margin: '0 auto', textAlign: 'center', marginBottom: 15 }}
         >
-          <Tooltip title={channel?.channel_name}>
-            <Chip
-              icon={
-                <ChannelIcon
-                  type={channel?.channel_type}
-                  variant="chip"
-                />
-                }
-              classes={{ root: classes.channel }}
-              style={{
-                color: channelColor(
-                  channel?.channel_type,
-                ),
-                borderColor: channelColor(
-                  channel?.channel_type,
-                ),
-              }}
-              variant="outlined"
-              label={channel.channel_name}
-            />
-          </Tooltip>
+          <img
+            src={`${baseUri}/documents/${logo}/file${queryParams}`}
+            className={classes.logo}
+          />
         </div>
       )}
       {channel.channel_mode !== 'logo' && (
-        <Typography
-          variant="h1"
-          style={{
-            textAlign: 'center',
-            color: isDark
-              ? channel.channel_primary_color_dark
-              : channel.channel_primary_color_light,
-            fontSize: 40,
-          }}
-        >
-          {channel.channel_name}
-        </Typography>
+      <Typography
+        variant="h1"
+        style={{
+          textAlign: 'center',
+          color: isDark
+            ? channel.channel_primary_color_dark
+            : channel.channel_primary_color_light,
+          fontSize: 40,
+        }}
+      >
+        {channel.channel_name}
+      </Typography>
       )}
       <Typography
         variant="h2"
