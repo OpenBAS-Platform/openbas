@@ -59,7 +59,7 @@ const ChannelPlayer = () => {
             color="primary"
             variant="outlined"
             component={Link}
-            to={`/admin/exercises/${exerciseId}/definition/channel`}
+            to={`/admin/exercises/${exerciseId}/definition`}
             style={{ position: 'absolute', top: 20, left: 20 }}
           >
             {t('Back to administration')}
