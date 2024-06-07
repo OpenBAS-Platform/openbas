@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Stack, Switch } from '@mui/material';
-import { DatePicker, TimePicker } from '@mui/x-date-pickers';
+import { TimePicker, DateTimePicker } from '@mui/x-date-pickers';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -103,9 +103,12 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
         },
       ).refine(
         (data) => {
-          if (data.endDate) {
-            return new Date(data.endDate).getTime() > new Date(data.startDate).getTime();
+          if (['daily', 'weekly', 'monthly'].includes(selectRecurring)) {
+            if (data.endDate) {
+              return new Date(data.endDate).getTime() > new Date(data.startDate).getTime();
+            }
           }
+
           return true;
         },
         {
@@ -177,12 +180,12 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
               control={control}
               name="startDate"
               render={({ field, fieldState }) => (
-                <DatePicker
+                <DateTimePicker
                   views={['year', 'month', 'day']}
-                  value={fd(field.value)}
+                  value={(field.value)}
                   minDate={new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()}
                   onChange={(startDate) => {
-                    return (startDate ? field.onChange(new Date(new Date(startDate).setUTCHours(24, 0, 0, 0)).toISOString()) : field.onChange(''));
+                    return (startDate ? field.onChange(new Date(startDate).toISOString()) : field.onChange(''));
                   }}
                   onAccept={() => {
                     clearErrors('time');
@@ -207,12 +210,12 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                   <FormControlLabel
                     control={
                       <Switch checked={field.value}
-                        onChange={field.onChange}
+                              onChange={field.onChange}
                       />
                     }
                     label={t('Only weekday')}
                   />)}
-                 />
+              />
             }
             {
               ['monthly'].includes(selectRecurring)
@@ -235,7 +238,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                     </Select>
                   </FormControl>
                 )}
-                 />
+              />
             }
             {
               ['weekly', 'monthly'].includes(selectRecurring)
@@ -260,7 +263,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                     </Select>
                   </FormControl>
                 )}
-                 />
+              />
             }
             <Controller
               control={control}
@@ -292,9 +295,9 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                 control={control}
                 name="endDate"
                 render={({ field, fieldState }) => (
-                  <DatePicker
+                  <DateTimePicker
                     views={['year', 'month', 'day']}
-                    value={fd(field.value || null)}
+                    value={(field.value || null)}
                     minDate={new Date(new Date().setUTCHours(24, 0, 0, 0)).toISOString()}
                     onChange={(endDate) => {
                       return (endDate ? field.onChange(new Date(new Date(endDate).setUTCHours(0, 0, 0, 0)).toISOString()) : field.onChange(''));
@@ -309,7 +312,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                     label={t('End date')}
                   />
                 )}
-                 />
+              />
             }
           </Stack>
         </DialogContent>
