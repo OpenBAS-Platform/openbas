@@ -30,7 +30,7 @@ const injectContextForExercise = (exercise: ExerciseStore) => {
     },
     onUpdateInjectActivation(injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }): Promise<{
       result: string,
-      entities: { endpoints: Record<string, InjectStore> }
+      entities: { injects: Record<string, InjectStore> }
     }> {
       return dispatch(updateInjectActivationForExercise(exercise.exercise_id, injectId, injectEnabled));
     },

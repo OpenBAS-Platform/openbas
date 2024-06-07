@@ -96,9 +96,9 @@ const Login = (props) => {
       && parameters.platform_enterprise_edition === 'true';
 
   // POLICIES
-  const loginMessage = parameters.platform_policies.platform_login_message;
-  const consentMessage = parameters.platform_policies.platform_consent_message;
-  const consentConfirmText = parameters.platform_policies.platform_consent_confirm_text
+  const loginMessage = parameters.platform_policies?.platform_login_message;
+  const consentMessage = parameters.platform_policies?.platform_consent_message;
+  const consentConfirmText = parameters.platform_policies?.platform_consent_confirm_text
     ? parameters.platform_policies.platform_consent_confirm_text
     : t('I have read and comply with the above statement');
   const isLoginMessage = isNotEmptyField(loginMessage);
