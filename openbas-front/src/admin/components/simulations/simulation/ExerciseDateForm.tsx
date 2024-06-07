@@ -47,8 +47,12 @@ const ExerciseDateForm: React.FC<Props> = ({
     console.log('switched');
   };
 
+  const submit = (/*datepicker et timepicker*/) => {
+    onSubmit({ exercise_start_date: null }); //concaténation du datePicker et du time picker
+  }
+
   return (
-    <form id="exerciseDateForm" onSubmit={handleSubmit(onSubmit)}>
+    <form id="exerciseDateForm" onSubmit={handleSubmit(submit)}>
       {/* <DateTimePicker
               name="exercise_start_date"
               label={t('Start date (optional)')}
