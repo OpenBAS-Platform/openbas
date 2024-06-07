@@ -61,6 +61,7 @@ const ExerciseDateForm: React.FC<Props> = ({
       <DatePicker
         views={['year', 'month', 'day']}
         label={t('Start date (optional)')}
+        name="date"
         minDate={new Date()}
         slotProps={{
           textField: {
@@ -73,6 +74,7 @@ const ExerciseDateForm: React.FC<Props> = ({
 
       <TimePicker
         label={t('Scheduling_time')}
+        name="time"
         openTo="hours"
         timeSteps={{ minutes: 15 }}
         skipDisabled
