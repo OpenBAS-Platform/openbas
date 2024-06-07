@@ -59,17 +59,17 @@ const useSearchAnFilter = (
     };
     const sort = R.sortWith(
       order.orderAsc
-        ? [R.ascend(R.prop(order.sortBy))]
-        : [R.descend(R.prop(order.sortBy))],
+        ? [R.ascend(R.propOr('', order.sortBy))]
+        : [R.descend(R.propOr('', order.sortBy))],
     );
     return defaultSortKey
       ? R.pipe(
         R.filter(
           (n) => tags.length === 0
-              || R.any(
-                (filter) => R.includes(filter, n[`${schema}_tags`] || []),
-                R.pluck('id', tags),
-              ),
+            || R.any(
+              (filter) => R.includes(filter, n[`${schema}_tags`] || []),
+              R.pluck('id', tags),
+            ),
         ),
         R.filter(filterByKeyword),
         sort,
