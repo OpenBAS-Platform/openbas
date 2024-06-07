@@ -8,6 +8,7 @@ import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -34,10 +35,12 @@ public class Challenge implements Base {
 
     @Column(name = "challenge_created_at")
     @JsonProperty("challenge_created_at")
+    @NotNull
     private Instant createdAt = now();
 
     @Column(name = "challenge_updated_at")
     @JsonProperty("challenge_updated_at")
+    @NotNull
     private Instant updatedAt = now();
 
     @Column(name = "challenge_name")
