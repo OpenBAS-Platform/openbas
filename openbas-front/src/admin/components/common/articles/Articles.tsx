@@ -75,14 +75,11 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
 
   // Filter and sort hook
   const [channels, setChannels] = useState<ChannelOption[]>([]);
-  const handleAddChannel = (value?: ChannelOption) => {
-    if (value) {
-      setChannels(R.uniq(R.append(value, channels)));
-    }
+  const handleChannelsChange = (value: ChannelOption[]) => {
+    setChannels(value);
   };
-  const handleRemoveChannel = (value: string) => {
-    const remainingTags = R.filter((n: ChannelOption) => n.id !== value, channels);
-    setChannels(remainingTags);
+  const handleClearChannels = () => {
+    setChannels([]);
   };
   const searchColumns = ['name', 'type', 'content'];
   const filtering = useSearchAnFilter('article', 'name', searchColumns);
@@ -112,9 +109,8 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
       )}
       {fullArticles.length > 0 && (
         <ChannelsFilter
-          onAddChannel={handleAddChannel}
-          onRemoveChannel={handleRemoveChannel}
-          currentChannels={channels}
+          onChannelsChange={handleChannelsChange}
+          onClearChannels={handleClearChannels}
         />
       )}
       <div className="clearfix" />

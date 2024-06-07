@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ElementNotFoundException.class)
-    public ResponseEntity<ErrorMessage> handleElementNotFoundException() {
-        ErrorMessage message = new ErrorMessage("Not found");
-        return new ResponseEntity<ErrorMessage>(message, HttpStatus.NOT_FOUND);
+    public ResponseEntity<ErrorMessage> handleElementNotFoundException(ElementNotFoundException ex) {
+        ErrorMessage message = new ErrorMessage("Element not found: " + ex.getMessage());
+        log.warning("ElementNotFoundException: " + ex.getMessage());
+        return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
     }
 
 }

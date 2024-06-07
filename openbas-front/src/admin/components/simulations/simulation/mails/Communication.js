@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { Avatar, Card, CardHeader, CardContent, IconButton, Button } from '@mui/material';
 import { lightBlue } from '@mui/material/colors';
-import { ExpandLess, ExpandMore, AttachFileRounded, ReplyOutlined } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, AttachFileRounded } from '@mui/icons-material';
 import parse from 'html-react-parser';
 import DOMPurify from 'dompurify';
 import { useFormatter } from '../../../../../components/i18n';
@@ -19,7 +19,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Communication = (props) => {
-  const { communication, communicationUsers, isTopic, handleOpenReply } = props;
+  const { communication, communicationUsers, isTopic } = props;
   // Standard hooks
   const [expand, setExpand] = useState(false);
   const expandContent = () => setExpand(!expand);
@@ -53,14 +53,6 @@ const Communication = (props) => {
         }
         action={
           <div style={{ display: 'flex' }}>
-            {isTopic && (
-              <IconButton
-                onClick={() => handleOpenReply(communication.communication_id)}
-                size="small"
-              >
-                <ReplyOutlined />
-              </IconButton>
-            )}
             <IconButton onClick={expandContent} size="small">
               {expand ? <ExpandLess /> : <ExpandMore />}
             </IconButton>
