@@ -109,7 +109,7 @@ public class InjectsExecutionJob implements Job {
         List<Exercise> exercises = exerciseRepository.findAllShouldBeInRunningState(now());
         exerciseRepository.saveAll(exercises.stream()
                 .peek(exercise -> {
-                    exercise.setStatus(Exercise.STATUS.RUNNING);
+                    exercise.setStatus(ExerciseStatus.RUNNING);
                     exercise.setUpdatedAt(now());
                 }).toList());
     }
@@ -119,7 +119,7 @@ public class InjectsExecutionJob implements Job {
         List<Exercise> mustBeFinishedExercises = exerciseRepository.thatMustBeFinished();
         exerciseRepository.saveAll(mustBeFinishedExercises.stream()
                 .peek(exercise -> {
-                    exercise.setStatus(Exercise.STATUS.FINISHED);
+                    exercise.setStatus(ExerciseStatus.FINISHED);
                     exercise.setEnd(now());
                     exercise.setUpdatedAt(now());
                 }).toList());

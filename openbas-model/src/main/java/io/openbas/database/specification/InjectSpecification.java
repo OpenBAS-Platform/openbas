@@ -1,12 +1,13 @@
 package io.openbas.database.specification;
 
 import io.openbas.database.model.ExecutionStatus;
-import io.openbas.database.model.Exercise;
+import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Inject;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Path;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.domain.Specification;
+
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Path;
 
 public class InjectSpecification {
 
@@ -36,7 +37,7 @@ public class InjectSpecification {
                     // cb.notEqual(root.get("type"), ManualContract.TYPE),  // notManual
                     cb.equal(root.get("enabled"), true), // isEnable
                     cb.isNotNull(exercisePath.get("start")), // fromScheduled
-                    cb.equal(exercisePath.get("status"), Exercise.STATUS.RUNNING), // fromRunningExercise
+                    cb.equal(exercisePath.get("status"), ExerciseStatus.RUNNING), // fromRunningExercise
                     cb.isNull(root.join("status", JoinType.LEFT).get("name")) // notExecuted
             );
         };

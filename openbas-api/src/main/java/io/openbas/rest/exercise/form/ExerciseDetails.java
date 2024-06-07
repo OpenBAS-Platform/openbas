@@ -34,7 +34,7 @@ public class ExerciseDetails {
 
   @JsonProperty("exercise_status")
   @Enumerated(EnumType.STRING)
-  private Exercise.STATUS status;
+  private ExerciseStatus status;
 
   @JsonProperty("exercise_subtitle")
   private String subtitle;
@@ -144,21 +144,21 @@ public class ExerciseDetails {
   public List<KillChainPhase> killChainPhases;
 
   @JsonProperty("exercise_next_possible_status")
-  private List<Exercise.STATUS> getNextPossibleStatus() {
-    if (Exercise.STATUS.CANCELED.equals(status)) {
-      return List.of(Exercise.STATUS.SCHEDULED); // Via reset
+  private List<ExerciseStatus> getNextPossibleStatus() {
+    if (ExerciseStatus.CANCELED.equals(status)) {
+      return List.of(ExerciseStatus.SCHEDULED); // Via reset
     }
-    if (Exercise.STATUS.FINISHED.equals(status)) {
-      return List.of(Exercise.STATUS.SCHEDULED); // Via reset
+    if (ExerciseStatus.FINISHED.equals(status)) {
+      return List.of(ExerciseStatus.SCHEDULED); // Via reset
     }
-    if (Exercise.STATUS.SCHEDULED.equals(status)) {
-      return List.of(Exercise.STATUS.RUNNING);
+    if (ExerciseStatus.SCHEDULED.equals(status)) {
+      return List.of(ExerciseStatus.RUNNING);
     }
-    if (Exercise.STATUS.RUNNING.equals(status)) {
-      return List.of(Exercise.STATUS.CANCELED, Exercise.STATUS.PAUSED);
+    if (ExerciseStatus.RUNNING.equals(status)) {
+      return List.of(ExerciseStatus.CANCELED, ExerciseStatus.PAUSED);
     }
-    if (Exercise.STATUS.PAUSED.equals(status)) {
-      return List.of(Exercise.STATUS.CANCELED, Exercise.STATUS.RUNNING);
+    if (ExerciseStatus.PAUSED.equals(status)) {
+      return List.of(ExerciseStatus.CANCELED, ExerciseStatus.RUNNING);
     }
     return List.of();
   }
@@ -192,7 +192,7 @@ public class ExerciseDetails {
     details.setId(exercise.getExercise_id());
     details.setName(exercise.getExercise_name());
     details.setDescription(exercise.getExercise_description());
-    details.setStatus(Exercise.STATUS.valueOf(exercise.getExercise_status()));
+    details.setStatus(ExerciseStatus.valueOf(exercise.getExercise_status()));
     details.setSubtitle(exercise.getExercise_subtitle());
     details.setCategory(exercise.getExercise_category());
     details.setMainFocus(exercise.getExercise_main_focus());

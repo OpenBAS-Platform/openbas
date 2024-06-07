@@ -3,7 +3,6 @@ package io.openbas.rest.exercise;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
-import io.openbas.database.model.Exercise.STATUS;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.*;
@@ -52,7 +51,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.model.Exercise.STATUS.*;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.ExerciseSpecification.findGrantedFor;
@@ -533,7 +531,7 @@ public class ExerciseApi extends RestBehavior {
   public Exercise updateExerciseStart(@PathVariable String exerciseId,
       @Valid @RequestBody ExerciseUpdateStartDateInput input) throws InputValidationException {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    if (!exercise.getStatus().equals(SCHEDULED)) {
+    if (!exercise.getStatus().equals(ExerciseStatus.SCHEDULED)) {
       String message = "Change date is only possible in scheduling state";
       throw new InputValidationException("exercise_start_date", message);
     }
@@ -643,7 +641,7 @@ public class ExerciseApi extends RestBehavior {
       }
       // We recreate an exercise out of the raw exercise
       Exercise exercise = new Exercise();
-      exercise.setStatus(Exercise.STATUS.valueOf(rawExercise.getExercise_status()));
+      exercise.setStatus(ExerciseStatus.valueOf(rawExercise.getExercise_status()));
       exercise.setStart(rawExercise.getExercise_start_date());
       exercise.setPauses(
               // We set the pauses as they are used for calculations
@@ -724,16 +722,16 @@ public class ExerciseApi extends RestBehavior {
   public Exercise changeExerciseStatus(
       @PathVariable String exerciseId,
       @Valid @RequestBody ExerciseUpdateStatusInput input) {
-    STATUS status = input.getStatus();
+    ExerciseStatus status = input.getStatus();
     Exercise exercise = this.exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     // Check if next status is possible
-    List<STATUS> nextPossibleStatus = exercise.nextPossibleStatus();
+    List<ExerciseStatus> nextPossibleStatus = exercise.nextPossibleStatus();
     if (!nextPossibleStatus.contains(status)) {
       throw new UnsupportedOperationException("Exercise cant support moving to status " + status.name());
     }
     // In case of rescheduled of an exercise.
-    boolean isCloseState = CANCELED.equals(exercise.getStatus()) || FINISHED.equals(exercise.getStatus());
-    if (isCloseState && SCHEDULED.equals(status)) {
+    boolean isCloseState = ExerciseStatus.CANCELED.equals(exercise.getStatus()) || ExerciseStatus.FINISHED.equals(exercise.getStatus());
+    if (isCloseState && ExerciseStatus.SCHEDULED.equals(status)) {
       exercise.setStart(null);
       exercise.setEnd(null);
       // Reset pauses
@@ -756,13 +754,13 @@ public class ExerciseApi extends RestBehavior {
       fileService.deleteDirectory(exerciseId);
     }
     // In case of manual start
-    if (SCHEDULED.equals(exercise.getStatus()) && RUNNING.equals(status)) {
+    if (ExerciseStatus.SCHEDULED.equals(exercise.getStatus()) && ExerciseStatus.RUNNING.equals(status)) {
       Instant nextMinute = now().truncatedTo(MINUTES).plus(1, MINUTES);
       exercise.setStart(nextMinute);
     }
     // If exercise move from pause to running state,
     // we log the pause date to be able to recompute inject dates.
-    if (PAUSED.equals(exercise.getStatus()) && RUNNING.equals(status)) {
+    if (ExerciseStatus.PAUSED.equals(exercise.getStatus()) && ExerciseStatus.RUNNING.equals(status)) {
       Instant lastPause = exercise.getCurrentPause().orElseThrow(ElementNotFoundException::new);
       exercise.setCurrentPause(null);
       Pause pause = new Pause();
@@ -772,11 +770,11 @@ public class ExerciseApi extends RestBehavior {
       pauseRepository.save(pause);
     }
     // If pause is asked, just set the pause date.
-    if (RUNNING.equals(exercise.getStatus()) && PAUSED.equals(status)) {
+    if (ExerciseStatus.RUNNING.equals(exercise.getStatus()) && ExerciseStatus.PAUSED.equals(status)) {
       exercise.setCurrentPause(Instant.now());
     }
     // Cancelation
-    if (RUNNING.equals(exercise.getStatus()) && CANCELED.equals(status)) {
+    if (ExerciseStatus.RUNNING.equals(exercise.getStatus()) && ExerciseStatus.CANCELED.equals(status)) {
       exercise.setEnd(now());
     }
     exercise.setUpdatedAt(now());
