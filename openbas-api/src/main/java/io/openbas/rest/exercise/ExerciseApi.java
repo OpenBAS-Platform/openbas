@@ -25,8 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -65,6 +64,7 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 
 @RestController
 @Secured(ROLE_USER)
+@RequiredArgsConstructor
 public class ExerciseApi extends RestBehavior {
 
   public static final String EXERCISE_URI = "/api/exercises";
@@ -83,210 +83,42 @@ public class ExerciseApi extends RestBehavior {
   // endregion
 
   // region repositories
-  private LogRepository logRepository;
-  private TagRepository tagRepository;
-  private UserRepository userRepository;
-  private PauseRepository pauseRepository;
-  private GrantService grantService;
-  private DocumentRepository documentRepository;
-  private ExerciseRepository exerciseRepository;
-  private TeamRepository teamRepository;
-  private ExerciseTeamUserRepository exerciseTeamUserRepository;
-  private LogRepository exerciseLogRepository;
-  private DryRunRepository dryRunRepository;
-  private DryInjectRepository dryInjectRepository;
-  private ComcheckRepository comcheckRepository;
-  private ImportService importService;
-  private LessonsCategoryRepository lessonsCategoryRepository;
-  private LessonsQuestionRepository lessonsQuestionRepository;
-  private LessonsAnswerRepository lessonsAnswerRepository;
-  private InjectStatusRepository injectStatusRepository;
-  private InjectRepository injectRepository;
-  private InjectExpectationRepository injectExpectationRepository;
-  private AssetGroupRepository assetGroupRepository;
-  private AssetRepository assetRepository;
-  private ScenarioRepository scenarioRepository;
-  private CommunicationRepository communicationRepository;
-  private ObjectiveRepository objectiveRepository;
-  private EvaluationRepository evaluationRepository;
-  private KillChainPhaseRepository killChainPhaseRepository;
-  private GrantRepository grantRepository;
+  private final LogRepository logRepository;
+  private final TagRepository tagRepository;
+  private final UserRepository userRepository;
+  private final PauseRepository pauseRepository;
+  private final GrantService grantService;
+  private final DocumentRepository documentRepository;
+  private final ExerciseRepository exerciseRepository;
+  private final TeamRepository teamRepository;
+  private final ExerciseTeamUserRepository exerciseTeamUserRepository;
+  private final LogRepository exerciseLogRepository;
+  private final DryRunRepository dryRunRepository;
+  private final DryInjectRepository dryInjectRepository;
+  private final ComcheckRepository comcheckRepository;
+  private final ImportService importService;
+  private final LessonsCategoryRepository lessonsCategoryRepository;
+  private final LessonsQuestionRepository lessonsQuestionRepository;
+  private final LessonsAnswerRepository lessonsAnswerRepository;
+  private final InjectStatusRepository injectStatusRepository;
+  private final InjectRepository injectRepository;
+  private final InjectExpectationRepository injectExpectationRepository;
+  private final AssetGroupRepository assetGroupRepository;
+  private final AssetRepository assetRepository;
+  private final ScenarioRepository scenarioRepository;
+  private final CommunicationRepository communicationRepository;
+  private final ObjectiveRepository objectiveRepository;
+  private final EvaluationRepository evaluationRepository;
+  private final KillChainPhaseRepository killChainPhaseRepository;
+  private final GrantRepository grantRepository;
   // endregion
 
   // region services
-  private DryrunService dryrunService;
-  private FileService fileService;
-  private InjectService injectService;
-  private ChallengeService challengeService;
-  private VariableService variableService;
-  // endregion
-
-  // region setters
-
-  @Autowired
-  public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
-    this.injectStatusRepository = injectStatusRepository;
-  }
-
-  @Autowired
-  public void setInjectRepository(InjectRepository injectRepository) {
-    this.injectRepository = injectRepository;
-  }
-
-  @Autowired
-  public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
-    this.injectExpectationRepository = injectExpectationRepository;
-  }
-
-  @Autowired
-  public void setAssetGroupRepository(AssetGroupRepository assetGroupRepository) {
-    this.assetGroupRepository = assetGroupRepository;
-  }
-
-  @Autowired
-  public void setAssetRepository(AssetRepository assetRepository) {
-    this.assetRepository = assetRepository;
-  }
-
-  @Autowired
-  public void setChallengeService(ChallengeService challengeService) {
-    this.challengeService = challengeService;
-  }
-
-  @Autowired
-  public void setInjectService(InjectService injectService) {
-    this.injectService = injectService;
-  }
-
-  @Autowired
-  public void setImportService(ImportService importService) {
-    this.importService = importService;
-  }
-
-  @Autowired
-  public void setLogRepository(LogRepository logRepository) {
-    this.logRepository = logRepository;
-  }
-
-  @Autowired
-  public void setUserRepository(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
-
-  @Autowired
-  public void setCommunicationRepository(CommunicationRepository communicationRepository) {
-    this.communicationRepository = communicationRepository;
-  }
-
-  @Autowired
-  public void setScenarioRepository(ScenarioRepository scenarioRepository) {
-    this.scenarioRepository = scenarioRepository;
-  }
-
-  @Autowired
-  public void setPauseRepository(PauseRepository pauseRepository) {
-    this.pauseRepository = pauseRepository;
-  }
-
-  @Autowired
-  public void setGrantService(@NotBlank final GrantService grantService) {
-    this.grantService = grantService;
-  }
-
-  @Autowired
-  public void setDryrunService(DryrunService dryrunService) {
-    this.dryrunService = dryrunService;
-  }
-
-  @Autowired
-  public void setFileService(FileService fileService) {
-    this.fileService = fileService;
-  }
-
-  @Autowired
-  public void setTagRepository(TagRepository tagRepository) {
-    this.tagRepository = tagRepository;
-  }
-
-  @Autowired
-  public void setDocumentRepository(DocumentRepository documentRepository) {
-    this.documentRepository = documentRepository;
-  }
-
-  @Autowired
-  public void setComcheckRepository(ComcheckRepository comcheckRepository) {
-    this.comcheckRepository = comcheckRepository;
-  }
-
-  @Autowired
-  public void setDryRunRepository(DryRunRepository dryRunRepository) {
-    this.dryRunRepository = dryRunRepository;
-  }
-
-  @Autowired
-  public void setDryInjectRepository(DryInjectRepository dryInjectRepository) {
-    this.dryInjectRepository = dryInjectRepository;
-  }
-
-  @Autowired
-  public void setExerciseLogRepository(LogRepository exerciseLogRepository) {
-    this.exerciseLogRepository = exerciseLogRepository;
-  }
-
-  @Autowired
-  public void setExerciseRepository(ExerciseRepository exerciseRepository) {
-    this.exerciseRepository = exerciseRepository;
-  }
-
-  @Autowired
-  public void setTeamRepository(TeamRepository teamRepository) {
-    this.teamRepository = teamRepository;
-  }
-
-  @Autowired
-  public void setExerciseTeamUserRepository(ExerciseTeamUserRepository exerciseTeamUserRepository) {
-    this.exerciseTeamUserRepository = exerciseTeamUserRepository;
-  }
-
-  @Autowired
-  public void setLessonsCategoryRepository(LessonsCategoryRepository lessonsCategoryRepository) {
-    this.lessonsCategoryRepository = lessonsCategoryRepository;
-  }
-
-  @Autowired
-  public void setLessonsQuestionRepository(LessonsQuestionRepository lessonsQuestionRepository) {
-    this.lessonsQuestionRepository = lessonsQuestionRepository;
-  }
-
-  @Autowired
-  public void setLessonsAnswerRepository(LessonsAnswerRepository lessonsAnswerRepository) {
-    this.lessonsAnswerRepository = lessonsAnswerRepository;
-  }
-
-  @Autowired
-  public void setObjectiveRepository(ObjectiveRepository objectiveRepository) {
-    this.objectiveRepository = objectiveRepository;
-  }
-
-  @Autowired
-  public void setEvaluationRepository(EvaluationRepository evaluationRepository) {
-    this.evaluationRepository = evaluationRepository;
-  }
-
-  @Autowired
-  public void setKillChainPhaseRepository(KillChainPhaseRepository killChainPhaseRepository) {
-    this.killChainPhaseRepository = killChainPhaseRepository;
-  }
-
-  @Autowired
-  public void setGrantRepository(GrantRepository grantRepository) {
-    this.grantRepository = grantRepository;
-  }
-
-  @Autowired
-  public void setVariableService(@NotNull final VariableService variableService) {
-    this.variableService = variableService;
-  }
+  private final DryrunService dryrunService;
+  private final FileService fileService;
+  private final InjectService injectService;
+  private final ChallengeService challengeService;
+  private final VariableService variableService;
   // endregion
 
   // region logs
