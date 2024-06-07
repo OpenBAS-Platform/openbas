@@ -3,10 +3,10 @@ package io.openbas.database.specification;
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
-import org.springframework.data.jpa.domain.Specification;
-
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Path;
+import jakarta.validation.constraints.NotBlank;
+import org.springframework.data.jpa.domain.Specification;
 
 public class InjectSpecification {
 
@@ -57,5 +57,9 @@ public class InjectSpecification {
                 cb.equal(root.get("status").get("name"), ExecutionStatus.QUEUING),
                 cb.notEqual(root.get("status").get("name"), ExecutionStatus.PENDING)
         );
+    }
+
+    public static Specification<Inject> fromContract(@NotBlank final String contract) {
+        return (root, query, cb) -> cb.equal(root.get("injectorContract").get("id"), contract);
     }
 }
