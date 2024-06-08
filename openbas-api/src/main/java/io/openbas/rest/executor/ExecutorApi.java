@@ -22,8 +22,10 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -34,6 +36,7 @@ public class ExecutorApi extends RestBehavior {
 
     @Value("${info.app.version:unknown}") String version;
 
+    private String JFROG_BASE = "https://filigran.jfrog.io/artifactory/openbas-agent/";
     private ExecutorRepository executorRepository;
     private EndpointService endpointService;
     private FileService fileService;
@@ -129,10 +132,18 @@ public class ExecutorApi extends RestBehavior {
         if (platform.equals("windows")) {
             filename = "openbas-agent-" + version + ".exe";
             in = getClass().getResourceAsStream("/agents/openbas/windows/" + filename);
+            if (in == null) { // Dev mode, get from artifactory
+                filename = "openbas-agent-latest.exe";
+                in = new BufferedInputStream(new URL(JFROG_BASE + filename).openStream());
+            }
         }
         if (platform.equals("linux")) {
             filename = "openbas-agent-" + version;
             in = getClass().getResourceAsStream("/agents/openbas/linux/" + filename);
+            if (in == null) { // Dev mode, get from artifactory
+                filename = "openbas-agent-latest";
+                in = new BufferedInputStream(new URL(JFROG_BASE + filename).openStream());
+            }
         }
         if (in != null) {
             HttpHeaders headers = new HttpHeaders();
@@ -155,9 +166,13 @@ public class ExecutorApi extends RestBehavior {
             InputStream in = getClass().getResourceAsStream("/agents/openbas/windows/" + filename);
             if (in != null) {
                 file = IOUtils.toByteArray(in);
+            } else { // Dev mode, get from artifactory
+                filename = "openbas-agent-installer-latest.exe";
+                in = new BufferedInputStream(new URL(JFROG_BASE + filename).openStream());
+                file = IOUtils.toByteArray(in);
             }
         }
-        // if (platform.equals("linux")) // No package needed
+        // linux - No package needed
         if (file != null) {
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
