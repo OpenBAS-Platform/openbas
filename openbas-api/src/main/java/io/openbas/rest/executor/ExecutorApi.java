@@ -1,6 +1,7 @@
 package io.openbas.rest.executor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Executor;
 import io.openbas.database.repository.ExecutorRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -9,12 +10,12 @@ import io.openbas.rest.executor.form.ExecutorUpdateInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.CacheControl;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -25,19 +26,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 
 @RestController
 public class ExecutorApi extends RestBehavior {
 
-    private ExecutorRepository executorRepository;
+    @Value("${info.app.version:unknown}") String version;
 
+    private ExecutorRepository executorRepository;
+    private EndpointService endpointService;
     private FileService fileService;
 
     @Resource
     protected ObjectMapper mapper;
+
+    @Autowired
+    public void setEndpointService(EndpointService endpointService) {
+        this.endpointService = endpointService;
+    }
 
     @Autowired
     public void setFileService(FileService fileService) {
@@ -105,12 +112,66 @@ public class ExecutorApi extends RestBehavior {
         }
     }
 
-    @GetMapping(value = "/api/agent/{platform}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public @ResponseBody byte[] getAgent(@PathVariable String platform) throws IOException {
-        InputStream in = getClass().getResourceAsStream("/agents/obas-" + platform);
+    @GetMapping(value = "/api/agent/caldera/{platform}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public @ResponseBody byte[] getCalderaAgent(@PathVariable String platform) throws IOException {
+        InputStream in = getClass().getResourceAsStream("/agents/caldera/obas-" + platform);
         if (in != null) {
             return IOUtils.toByteArray(in);
         }
         return null;
+    }
+
+    // Public API
+    @GetMapping(value = "/api/agent/executable/openbas/{platform}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentExecutable(@PathVariable String platform) throws IOException {
+        InputStream in = null;
+        String filename = null;
+        if (platform.equals("windows")) {
+            filename = "openbas-agent-" + version + ".exe";
+            in = getClass().getResourceAsStream("/agents/openbas/windows/" + filename);
+        }
+        if (platform.equals("linux")) {
+            filename = "openbas-agent-" + version;
+            in = getClass().getResourceAsStream("/agents/openbas/linux/" + filename);
+        }
+        if (in != null) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(IOUtils.toByteArray(in));
+        }
+        throw new UnsupportedOperationException("Agent " + platform + " executable not supported");
+    }
+
+    // Public API
+    @GetMapping(value = "/api/agent/package/openbas/{platform}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentPackage(@PathVariable String platform) throws IOException {
+        byte[] file = null;
+        String filename = null;
+        if (platform.equals("windows")) {
+            filename = "openbas-agent-installer-" + version + ".exe";
+            InputStream in = getClass().getResourceAsStream("/agents/openbas/windows/" + filename);
+            if (in != null) {
+                file = IOUtils.toByteArray(in);
+            }
+        }
+        // if (platform.equals("linux")) // No package needed
+        if (file != null) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(file);
+        }
+        throw new UnsupportedOperationException("Agent " + platform + " package not supported");
+    }
+
+    // Public API
+    @GetMapping(value = "/api/agent/installer/openbas/{platform}")
+    public @ResponseBody String getOpenBasAgentInstaller(@PathVariable String platform) throws IOException {
+        return this.endpointService.generateInstallCommand(platform, ".");
     }
 }

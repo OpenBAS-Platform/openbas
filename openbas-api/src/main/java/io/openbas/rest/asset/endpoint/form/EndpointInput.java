@@ -23,6 +23,9 @@ public class EndpointInput extends AssetInput {
   @JsonProperty("endpoint_hostname")
   private String hostname;
 
+  @JsonProperty("endpoint_agent_version")
+  private String agentVersion;
+
   @NotNull(message = MANDATORY_MESSAGE)
   @JsonProperty("endpoint_platform")
   private Endpoint.PLATFORM_TYPE platform;

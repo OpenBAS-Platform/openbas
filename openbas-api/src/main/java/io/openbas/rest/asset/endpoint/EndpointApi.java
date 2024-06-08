@@ -16,6 +16,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,10 +24,12 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.executors.openbas.OpenBASExecutor.OPENBAS_EXECUTOR_ID;
 import static io.openbas.helper.StreamHelper.iterableToSet;
@@ -39,6 +42,7 @@ public class EndpointApi {
 
   public static final String  ENDPOINT_URI = "/api/endpoints";
 
+  @Value("${info.app.version:unknown}") String version;
   private final EndpointService endpointService;
   private final EndpointRepository endpointRepository;
   private final ExecutorRepository executorRepository;
@@ -56,31 +60,42 @@ public class EndpointApi {
     return this.endpointService.createEndpoint(endpoint);
   }
 
+  @Secured(ROLE_ADMIN)
   @PostMapping(ENDPOINT_URI + "/register")
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
-  public Endpoint upsertEndpoint(@Valid @RequestBody final EndpointRegisterInput input) {
+  public Endpoint upsertEndpoint(@Valid @RequestBody final EndpointRegisterInput input) throws IOException {
     Optional<Endpoint> optionalEndpoint = this.endpointService.findByExternalReference(input.getExternalReference());
+    Endpoint endpoint;
     if (optionalEndpoint.isPresent()) {
-      Endpoint endpoint = optionalEndpoint.get();
+      endpoint = optionalEndpoint.get();
       endpoint.setIps(input.getIps());
       endpoint.setMacAddresses(input.getMacAddresses());
       endpoint.setHostname(input.getHostname());
       endpoint.setPlatform(input.getPlatform());
       endpoint.setName(input.getName());
+      endpoint.setAgentVersion(input.getAgentVersion());
       endpoint.setDescription(input.getDescription());
       endpoint.setLastSeen(Instant.now());
       endpoint.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
-      return this.endpointService.updateEndpoint(endpoint);
     } else {
-      Endpoint endpoint = new Endpoint();
+      endpoint = new Endpoint();
       endpoint.setUpdateAttributes(input);
       endpoint.setIps(input.getIps());
       endpoint.setPlatform(input.getPlatform());
+      endpoint.setAgentVersion(input.getAgentVersion());
       endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
       endpoint.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
-      return this.endpointService.createEndpoint(endpoint);
     }
+    Endpoint updatedEndpoint = this.endpointService.updateEndpoint(endpoint);
+    // If agent is not the same version as the platform
+    // Create an upgrade task for the agent
+    if (!updatedEndpoint.getAgentVersion().equals(version)) {
+      AssetAgentJob assetAgentJob = new AssetAgentJob();
+      assetAgentJob.setCommand(this.endpointService.generateInstallCommand(updatedEndpoint.getPlatform().name(), "#{location}"));
+      assetAgentJob.setAsset(updatedEndpoint);
+      assetAgentJobRepository.save(assetAgentJob);
+    }
+    return updatedEndpoint;
   }
 
   @GetMapping(ENDPOINT_URI + "/jobs/{endpointExternalReference}")

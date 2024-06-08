@@ -8,12 +8,13 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V3_12__AgentJobs extends BaseJavaMigration {
+public class V3_20__AgentJobs extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
+    select.execute("ALTER TABLE assets ADD column endpoint_agent_version varchar(255);");
     // Create table
     select.execute("""
           CREATE TABLE asset_agent_jobs (
