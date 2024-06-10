@@ -91,9 +91,9 @@ public class EndpointService {
     this.endpointRepository.deleteById(endpointId);
   }
 
-  public String generateInstallCommand(String platform, String location) throws IOException {
+  public String generateInstallCommand(String platform) throws IOException {
     if (platform.equalsIgnoreCase("windows")) {
-      return "Set-Location -Path \"" + location + "\"; Stop-Service -Force -Name \"OBAS Agent Service\"; Invoke-WebRequest -Uri " +
+      return "Stop-Service -Force -Name \"OBAS Agent Service\"; Invoke-WebRequest -Uri " +
               "\"" + openBASConfig.getBaseUrl() + "/api/agent/package/openbas/windows\" -OutFile \"openbas-installer.exe\"; " +
               "./openbas-installer.exe /S ~OPENBAS_URL=\"" + openBASConfig.getBaseUrl() + "\" ~ACCESS_TOKEN=\""+ adminToken + "\"; " +
               "Start-Sleep -Seconds 1.5; rm -force ./openbas-installer.exe;";

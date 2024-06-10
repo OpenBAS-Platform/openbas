@@ -187,6 +187,6 @@ public class ExecutorApi extends RestBehavior {
     // Public API
     @GetMapping(value = "/api/agent/installer/openbas/{platform}")
     public @ResponseBody String getOpenBasAgentInstaller(@PathVariable String platform) throws IOException {
-        return this.endpointService.generateInstallCommand(platform, ".");
+        return this.endpointService.generateInstallCommand(platform);
     }
 }
