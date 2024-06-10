@@ -27,10 +27,10 @@ public class OpenBASExecutorContextService {
                 return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Windows.name());
             }
             case Endpoint.PLATFORM_TYPE.Linux -> {
-                return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Linux.name()).replace("\"#{location}\"", "$(pwd)");
+                return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Linux.name());
             }
             case Endpoint.PLATFORM_TYPE.MacOS -> {
-                return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.MacOS.name()).replace("\"#{location}\"", "$(pwd)");
+                return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.MacOS.name());
             }
             default -> throw new RuntimeException("Unsupported platform: " + platform);
         }
