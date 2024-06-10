@@ -10,6 +10,9 @@ import { splitDuration } from '../utils/Time';
 import type { TeamStore } from '../actions/teams/Team';
 import type { Theme } from './Theme';
 import { useFormatter } from './i18n';
+import SearchFilter from './SearchFilter';
+import TagsFilter from '../admin/components/common/filters/TagsFilter';
+import useSearchAnFilter from '../utils/SortingFiltering';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -95,6 +98,15 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
   const theme = useTheme<Theme>();
   const { t } = useFormatter();
 
+  // Filter and sort hook
+  const searchColumns = ['title', 'description', 'content'];
+  const filtering = useSearchAnFilter(
+    'inject',
+    'depends_duration',
+    searchColumns,
+  );
+
+  // Timeline
   const technicalTeams = R.pipe(
     R.groupBy(R.prop('inject_type')),
     R.toPairs,
@@ -144,6 +156,20 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
 
   return (
     <>
+      <div style={{ float: 'left', marginRight: 10 }}>
+        <SearchFilter
+          variant="small"
+          onChange={filtering.handleSearch}
+          keyword={filtering.keyword}
+        />
+      </div>
+      <div style={{ float: 'left', marginRight: 10 }}>
+        <TagsFilter
+          onAddTag={filtering.handleAddTag}
+          onRemoveTag={filtering.handleRemoveTag}
+          currentTags={filtering.tags}
+        />
+      </div>
       <div className="clearfix"/>
       {sortedTeams.length > 0 ? (
         <div className={classes.container}>
