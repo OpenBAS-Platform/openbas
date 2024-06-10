@@ -24,6 +24,7 @@ import { fetchExerciseInjects, updateInjectForExercise } from '../../../../../ac
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
+import Timeline from '../../../../../components/Timeline';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -112,6 +113,8 @@ const TimelineOverview = () => {
   return (
     <div className={classes.root}>
       <AnimationMenu exerciseId={exerciseId}/>
+      <div className="clearfix"/>
+      <Timeline exerciseId={exerciseId} injects={injects} teams={teams}></Timeline>
       <div className="clearfix"/>
       <Grid container spacing={3} style={{ marginTop: 50, paddingBottom: 24 }}>
         <Grid container item spacing={3}>

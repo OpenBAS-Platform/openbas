@@ -25,7 +25,7 @@ const Comcheck = lazy(() => import('./controls/Comcheck'));
 const Lessons = lazy(() => import('./lessons/Lessons'));
 const ExerciseDefinition = lazy(() => import('./ExerciseDefinition'));
 const Injects = lazy(() => import('./injects/ExerciseInjects'));
-const Timeline = lazy(() => import('./timeline/TimelineOverview'));
+const TimelineOverview = lazy(() => import('./timeline/TimelineOverview'));
 const Mails = lazy(() => import('./mails/Mails'));
 const MailsInject = lazy(() => import('./mails/Inject'));
 const Logs = lazy(() => import('./logs/Logs'));
@@ -127,7 +127,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
               <Route path="definition" element={errorWrapper(ExerciseDefinition)()} />
               <Route path="injects" element={errorWrapper(Injects)()} />
               <Route path="animation" element={<Navigate to="timeline" replace={true} />} />
-              <Route path="animation/timeline" element={errorWrapper(Timeline)()} />
+              <Route path="animation/timeline" element={errorWrapper(TimelineOverview)()} />
               <Route path="animation/mails" element={errorWrapper(Mails)()} />
               <Route path="animation/mails/:injectId" element={errorWrapper(MailsInject)()} />
               <Route path="animation/logs" element={errorWrapper(Logs)()} />
