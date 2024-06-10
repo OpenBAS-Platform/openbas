@@ -14,6 +14,7 @@ import nodeTypes from './types/nodes';
 import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAutoLayout';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
 import ItemResult from '../../../../components/ItemResult';
+import InjectIcon from '../../common/injects/InjectIcon';
 
 interface Steptarget {
   label: string;
@@ -49,6 +50,7 @@ interface Props {
 
 const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   injectId,
+  injectType,
   lastExecutionStartDate,
   lastExecutionEndDate,
   target,
@@ -229,11 +231,18 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                 result.inject_expectation_results.map((collector, index) => (
                   <Grid key={index} item={true} xs={4}>
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10 }}>
-                      <img
-                        src={`/api/images/collectors/id/${collector.sourceId}`}
-                        alt={collector.sourceId}
-                        style={{ width: 20, height: 20, borderRadius: 4 }}
-                      />
+                      {collector.sourceId != null
+                        ? (<img
+                            src={`/api/images/collectors/${collector.sourceId}`}
+                            alt={collector.sourceId}
+                            style={{ width: 20, height: 20, borderRadius: 4 }}
+                           />) : (
+                             <InjectIcon
+                               tooltip={t(injectType)}
+                               type={injectType}
+                               variant="inline"
+                             />)
+                    }
                       <Typography variant="h4" style={{ margin: '2px 0 0 10px' }}>
                         {collector.sourceName}
                       </Typography>

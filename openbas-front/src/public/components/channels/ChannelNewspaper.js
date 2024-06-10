@@ -82,18 +82,18 @@ const ChannelNewspaper = ({ channelReader }) => {
         </div>
       )}
       {channel.channel_mode !== 'logo' && (
-        <Typography
-          variant="h1"
-          style={{
-            textAlign: 'center',
-            color: isDark
-              ? channel.channel_primary_color_dark
-              : channel.channel_primary_color_light,
-            fontSize: 40,
-          }}
-        >
-          {channel.channel_name}
-        </Typography>
+      <Typography
+        variant="h1"
+        style={{
+          textAlign: 'center',
+          color: isDark
+            ? channel.channel_primary_color_dark
+            : channel.channel_primary_color_light,
+          fontSize: 40,
+        }}
+      >
+        {channel.channel_name}
+      </Typography>
       )}
       <Typography
         variant="h2"

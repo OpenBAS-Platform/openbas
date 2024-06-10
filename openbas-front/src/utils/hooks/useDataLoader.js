@@ -25,7 +25,9 @@ const useDataLoader = (loader = () => {}) => {
       const current = new Date().getTime();
       if (current - lastPingDate > EVENT_PING_MAX_TIME) {
         clearInterval(autoReConnect);
-        sseClient.close();
+        if (sseClient != null) {
+          sseClient.close();
+        }
         sseConnect();
       }
     }, EVENT_TRY_DELAY);
@@ -56,7 +58,9 @@ const useDataLoader = (loader = () => {}) => {
     });
     sseClient.onerror = () => {
       clearInterval(autoReConnect);
-      sseClient.close();
+      if (sseClient != null) {
+        sseClient.close();
+      }
       const timeFromLastPingDate = new Date().getTime() - lastPingDate;
       if (timeFromLastPingDate < ERROR_30S_MAX_TIME) {
         setTimeout(sseConnect, ERROR_500MS_DELAY);// Before 30s time to retry is 500ms
