@@ -114,62 +114,62 @@ const TimelineOverview = () => {
                     const isDisabled = !inject.inject_injector_contract.injector_contract_content_parsed?.config.expose;
                     return (
                       <ListItem
-                          key={inject.inject_id}
-                          dense={true}
-                          classes={{ root: classes.item }}
-                          divider={true}
-                          button={true}
-                          disabled={isDisabled || !inject.inject_enabled}
-                          onClick={() => setSelectedInjectId(inject.inject_id)}
-                        >
-                          <ListItemIcon>
-                            <InjectIcon
-                              type={inject.inject_type}
-                              variant="inline"
-                            />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <div className={classes.bodyItems}>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={{ width: '50%' }}
-                                >
-                                  {inject.inject_title}
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={{ width: '20%' }}
-                                >
-                                  <ProgressBarCountdown
-                                    date={inject.inject_date}
-                                    paused={
-                                                exercise?.exercise_status === 'PAUSED'
-                                                || exercise?.exercise_status === 'CANCELED'
-                                            }
-                                  />
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={{
-                                    fontFamily: 'Consolas, monaco, monospace',
-                                    fontSize: 12,
-                                  }}
-                                >
-                                  {fndt(inject.inject_date)}
-                                </div>
-                              </div>
-                                  }
+                        key={inject.inject_id}
+                        dense={true}
+                        classes={{ root: classes.item }}
+                        divider={true}
+                        button={true}
+                        disabled={isDisabled || !inject.inject_enabled}
+                        onClick={() => setSelectedInjectId(inject.inject_id)}
+                      >
+                        <ListItemIcon>
+                          <InjectIcon
+                            type={inject.inject_type}
+                            variant="inline"
                           />
-                          <ListItemSecondaryAction>
-                            <InjectPopover
-                              inject={inject}
-                              tagsMap={tagsMap}
-                              setSelectedInjectId={setSelectedInjectId}
-                              isDisabled={isDisabled}
-                            />
-                          </ListItemSecondaryAction>
-                        </ListItem>
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <div className={classes.bodyItems}>
+                              <div
+                                className={classes.bodyItem}
+                                style={{ width: '50%' }}
+                              >
+                                {inject.inject_title}
+                              </div>
+                              <div
+                                className={classes.bodyItem}
+                                style={{ width: '20%' }}
+                              >
+                                <ProgressBarCountdown
+                                  date={inject.inject_date}
+                                  paused={
+                                              exercise?.exercise_status === 'PAUSED'
+                                              || exercise?.exercise_status === 'CANCELED'
+                                          }
+                                />
+                              </div>
+                              <div
+                                className={classes.bodyItem}
+                                style={{
+                                  fontFamily: 'Consolas, monaco, monospace',
+                                  fontSize: 12,
+                                }}
+                              >
+                                {fndt(inject.inject_date)}
+                              </div>
+                            </div>
+                                }
+                        />
+                        <ListItemSecondaryAction>
+                          <InjectPopover
+                            inject={inject}
+                            tagsMap={tagsMap}
+                            setSelectedInjectId={setSelectedInjectId}
+                            isDisabled={isDisabled}
+                          />
+                        </ListItemSecondaryAction>
+                      </ListItem>
                     );
                   })}
                 </List>
@@ -193,44 +193,44 @@ const TimelineOverview = () => {
                       to={`/admin/exercises/${exerciseId}/injects/${inject.inject_id}?backlabel=Animation&backuri=/admin/exercises/${exerciseId}/animation/timeline`}
                     >
                       <ListItemIcon>
-                          <InjectIcon type={inject.inject_type} variant="inline"/>
-                        </ListItemIcon>
+                        <InjectIcon type={inject.inject_type} variant="inline"/>
+                      </ListItemIcon>
                       <ListItemText
-                          primary={
-                            <div className={classes.bodyItems}>
-                              <div
-                                className={classes.bodyItem}
-                                style={{ width: '40%' }}
-                              >
-                                {inject.inject_title}
-                              </div>
-                              <div
-                                className={classes.bodyItem}
-                                style={{ width: '20%' }}
-                              >
-                                <ItemStatus
-                                  variant="inList"
-                                  label={t(inject.inject_status?.status_name)}
-                                  status={inject.inject_status?.status_name}
-                                />
-                              </div>
-                              <div
-                                className={classes.bodyItem}
-                                style={{
-                                  fontFamily: 'Consolas, monaco, monospace',
-                                  fontSize: 12,
-                                }}
-                              >
-                                {fndt(inject.inject_status?.tracking_sent_date)} (
-                                {inject.inject_status && inject.inject_status.tracking_total_execution_time && (inject.inject_status.tracking_total_execution_time / 1000).toFixed(2)}
-                                s)
-                              </div>
+                        primary={
+                          <div className={classes.bodyItems}>
+                            <div
+                              className={classes.bodyItem}
+                              style={{ width: '40%' }}
+                            >
+                              {inject.inject_title}
                             </div>
+                            <div
+                              className={classes.bodyItem}
+                              style={{ width: '20%' }}
+                            >
+                              <ItemStatus
+                                variant="inList"
+                                label={t(inject.inject_status?.status_name)}
+                                status={inject.inject_status?.status_name}
+                              />
+                            </div>
+                            <div
+                              className={classes.bodyItem}
+                              style={{
+                                fontFamily: 'Consolas, monaco, monospace',
+                                fontSize: 12,
+                              }}
+                            >
+                              {fndt(inject.inject_status?.tracking_sent_date)} (
+                              {inject.inject_status && inject.inject_status.tracking_total_execution_time && (inject.inject_status.tracking_total_execution_time / 1000).toFixed(2)}
+                              s)
+                            </div>
+                          </div>
                                 }
-                        />
+                      />
                       <ListItemSecondaryAction>
-                          <PreviewOutlined/>
-                        </ListItemSecondaryAction>
+                        <PreviewOutlined/>
+                      </ListItemSecondaryAction>
                     </ListItemButton>
                   ))}
                 </List>

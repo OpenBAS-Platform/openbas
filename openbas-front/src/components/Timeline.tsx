@@ -2,12 +2,11 @@ import React, { FunctionComponent } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { CastForEducationOutlined, CastOutlined } from '@mui/icons-material';
 import R from 'ramda';
-import type { Inject } from '../utils/api-types';
+import type { Inject, Team } from '../utils/api-types';
 import type { InjectStore } from '../actions/injects/Inject';
 import { truncate } from '../utils/String';
 import InjectIcon from '../admin/components/common/injects/InjectIcon';
 import { splitDuration } from '../utils/Time';
-import type { TeamStore } from '../actions/teams/Team';
 import type { Theme } from './Theme';
 import { useFormatter } from './i18n';
 import SearchFilter from './SearchFilter';
@@ -88,8 +87,8 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   injects: Inject[],
-  teams: TeamStore[],
-  exerciseId: string
+  teams: Team[],
+  exerciseId: string,
 }
 
 const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
@@ -107,6 +106,8 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
   );
 
   // Timeline
+
+  // SortedTemas
   const technicalTeams = R.pipe(
     R.groupBy(R.prop('inject_type')),
     R.toPairs,
@@ -120,9 +121,16 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
   );
   const sortedTeams = [...technicalTeams, ...sortedNativeTeams];
 
+  // InjectedTeams
   const techicalInjectsWithNoTeam = helper.getExerciseTechnicalInjectsWithNoTeam(exerciseId);
   const technicalInjectsPerType = R.groupBy(R.prop('inject_type'))(techicalInjectsWithNoTeam);
-  const injectsMap = { ...teamsInjectsMap, ...technicalInjectsMap };
+
+  const injectsPerTeam = R.mergeAll(
+    teams.map((a) => ({
+      [a.team_id]: helper.getTeamExerciseInjects(a.team_id),
+    })),
+  );
+  const injectsMap = { ...injectsPerTeam, ...technicalInjectsPerType };
 
   const lastInject = R.pipe(
     R.sortWith([R.descend(R.prop('inject_depends_duration'))]),
