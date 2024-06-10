@@ -22,6 +22,10 @@ const useStyles = makeStyles(() => ({
   card: {
     position: 'relative',
   },
+  logo: {
+    maxHeight: 200,
+    maxWidth: 300,
+  },
   footer: {
     width: '100%',
     position: 'absolute',
