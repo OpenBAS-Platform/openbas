@@ -115,7 +115,8 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
     R.toPairs,
     R.filter(
       (n: [string, InjectStore[]]) => !(
-        n[1][0].inject_injector_contract?.injector_contract_content_parsed?.fields?.filter((f) => f.key === 'teams').length > 0
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        n[1][0].inject_injector_contract?.injector_contract_content_parsed?.fields?.filter((f: any) => f.key === 'teams').length > 0
       ),
     ),
     R.map(
@@ -229,24 +230,24 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
                   style={{ backgroundColor: index % 2 === 0 ? grid0 : grid5 }}
                 >
                   {Object.keys(injectsGroupedByTick).map((key, i) => {
-                    const injectGroupPosition = (key * 100) / totalDuration;
+                    const injectGroupPosition = (parseFloat(key) * 100) / totalDuration;
                     return (
                       <div
-                        key={i}
-                        className={classes.injectGroup}
-                        style={{ left: `${injectGroupPosition}%` }}
-                      >
-                        {injectsGroupedByTick[key].map((inject: InjectStore) => (
-                          <InjectIcon
-                            key={inject.inject_id}
-                            type={inject.inject_type}
-                            tooltip={inject.inject_title}
-                            done={inject.inject_status !== null}
-                            disabled={!inject.inject_enabled}
-                            size="small"
-                          />
-                        ))}
-                      </div>
+                          key={i}
+                          className={classes.injectGroup}
+                          style={{ left: `${injectGroupPosition}%` }}
+                        >
+                          {injectsGroupedByTick[key].map((inject: InjectStore) => (
+                            <InjectIcon
+                                key={inject.inject_id}
+                                type={inject.inject_type}
+                                tooltip={inject.inject_title}
+                                done={inject.inject_status !== null}
+                                disabled={!inject.inject_enabled}
+                                size="small"
+                              />
+                          ))}
+                        </div>
                     );
                   })}
                 </div>
@@ -268,19 +269,19 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
                   >
                     <div className={classes.tickLabelTop}>
                       {index % 5 === 0
-                        ? `${duration.days}
+                          ? `${duration.days}
                               ${t('d')}, ${duration.hours}
                               ${t('h')}, ${duration.minutes}
                               ${t('m')}`
-                        : ''}
+                          : ''}
                     </div>
                     <div className={classes.tickLabelBottom}>
                       {index % 5 === 0
-                        ? `${duration.days}
+                          ? `${duration.days}
                               ${t('d')}, ${duration.hours}
                               ${t('h')}, ${duration.minutes}
                               ${t('m')}`
-                        : ''}
+                          : ''}
                     </div>
                   </div>
                 );
@@ -309,28 +310,28 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
                     key={tick}
                     className={classes.tick}
                     style={{
-                      left: `${index * 5}%`,
-                      height: index % 5 === 0 ? '110%' : '100%',
-                      top: index % 5 === 0 ? '-5%' : 0,
-                      borderRight: index % 5 === 0 ? grid25 : grid15,
-                    }}
+                        left: `${index * 5}%`,
+                        height: index % 5 === 0 ? '110%' : '100%',
+                        top: index % 5 === 0 ? '-5%' : 0,
+                        borderRight: index % 5 === 0 ? grid25 : grid15,
+                      }}
                   >
                     <div className={classes.tickLabelTop}>
-                      {index % 5 === 0
-                        ? `${duration.days}
+                        {index % 5 === 0
+                          ? `${duration.days}
                               ${t('d')}, ${duration.hours}
                               ${t('h')}, ${duration.minutes}
                               ${t('m')}`
-                        : ''}
-                    </div>
+                          : ''}
+                      </div>
                     <div className={classes.tickLabelBottom}>
-                      {index % 5 === 0
-                        ? `${duration.days}
+                        {index % 5 === 0
+                          ? `${duration.days}
                               ${t('d')}, ${duration.hours}
                               ${t('h')}, ${duration.minutes}
                               ${t('m')}`
-                        : ''}
-                    </div>
+                          : ''}
+                      </div>
                   </div>
                 );
               })}

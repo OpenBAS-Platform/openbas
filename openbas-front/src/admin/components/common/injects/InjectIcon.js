@@ -51,6 +51,7 @@ InjectIcon.propTypes = {
   tooltip: PropTypes.string,
   variant: PropTypes.string,
   done: PropTypes.bool,
+  disabled: PropTypes.bool,
 };
 
 export default InjectIcon;
