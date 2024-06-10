@@ -12,6 +12,8 @@ import { useFormatter } from './i18n';
 import SearchFilter from './SearchFilter';
 import TagsFilter from '../admin/components/common/filters/TagsFilter';
 import useSearchAnFilter from '../utils/SortingFiltering';
+import { useHelper } from '../store';
+import type { InjectHelper } from '../actions/injects/inject-helper';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -107,7 +109,7 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
 
   // Timeline
 
-  // SortedTemas
+  // SortedTeams
   const technicalTeams = R.pipe(
     R.groupBy(R.prop('inject_type')),
     R.toPairs,
@@ -122,14 +124,22 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
   const sortedTeams = [...technicalTeams, ...sortedNativeTeams];
 
   // InjectedTeams
-  const techicalInjectsWithNoTeam = helper.getExerciseTechnicalInjectsWithNoTeam(exerciseId);
-  const technicalInjectsPerType = R.groupBy(R.prop('inject_type'))(techicalInjectsWithNoTeam);
 
-  const injectsPerTeam = R.mergeAll(
-    teams.map((a) => ({
-      [a.team_id]: helper.getTeamExerciseInjects(a.team_id),
-    })),
-  );
+  const {
+    injectsPerTeam,
+    technicalInjectsPerType,
+  } = useHelper((helper: InjectHelper) => {
+    const techicalInjectsWithNoTeam = helper.getExerciseTechnicalInjectsWithNoTeam(exerciseId);
+    return {
+      injectsPerTeam: R.mergeAll(
+        teams.map((a) => ({
+          [a.team_id]: helper.getTeamExerciseInjects(a.team_id),
+        })),
+      ),
+      technicalInjectsPerType: R.groupBy(R.prop('inject_type'))(techicalInjectsWithNoTeam),
+    };
+  });
+
   const injectsMap = { ...injectsPerTeam, ...technicalInjectsPerType };
 
   const lastInject = R.pipe(
