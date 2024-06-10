@@ -7,6 +7,7 @@ import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.raw.RawScenario;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.ScenarioSpecification;
+import io.openbas.helper.ObjectMapperHelper;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.exports.ExerciseExportMixins;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
@@ -66,9 +67,6 @@ public class ScenarioService {
 
   @Resource
   private OpenBASConfig openBASConfig;
-
-  @Resource
-  protected ObjectMapper mapper;
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -257,6 +255,7 @@ public class ScenarioService {
       final boolean isWithVariableValues,
       HttpServletResponse response)
       throws IOException {
+    ObjectMapper objectMapper = ObjectMapperHelper.openBASJsonMapper();
     Scenario scenario = this.scenario(scenarioId);
     List<Tag> scenarioTags = new ArrayList<>();
     List<String> documentIds = new ArrayList<>();
@@ -266,40 +265,40 @@ public class ScenarioService {
     scenarioFileExport.setVersion(1);
     // Add Scenario
     scenarioFileExport.setScenario(scenario);
-    mapper.addMixIn(Scenario.class, ScenarioExportMixins.Scenario.class);
+    objectMapper.addMixIn(Scenario.class, ScenarioExportMixins.Scenario.class);
     scenarioTags.addAll(scenario.getTags());
     // Add Objectives
     scenarioFileExport.setObjectives(scenario.getObjectives());
-    mapper.addMixIn(Objective.class, ExerciseExportMixins.Objective.class);
+    objectMapper.addMixIn(Objective.class, ExerciseExportMixins.Objective.class);
     // Add Lesson Categories
     scenarioFileExport.setLessonsCategories(scenario.getLessonsCategories());
-    mapper.addMixIn(LessonsCategory.class, ExerciseExportMixins.LessonsCategory.class);
+    objectMapper.addMixIn(LessonsCategory.class, ExerciseExportMixins.LessonsCategory.class);
     // Add Lessons Questions
     List<LessonsQuestion> lessonsQuestions = scenario.getLessonsCategories()
         .stream()
         .flatMap(category -> category.getQuestions().stream())
         .toList();
     scenarioFileExport.setLessonsQuestions(lessonsQuestions);
-    mapper.addMixIn(LessonsQuestion.class, ExerciseExportMixins.LessonsQuestion.class);
+    objectMapper.addMixIn(LessonsQuestion.class, ExerciseExportMixins.LessonsQuestion.class);
     // Add Variables
     List<Variable> variables = this.variableService.variablesFromScenario(scenarioId);
     scenarioFileExport.setVariables(variables);
     if (isWithVariableValues) {
-      mapper.addMixIn(Variable.class, VariableWithValueMixin.class);
+      objectMapper.addMixIn(Variable.class, VariableWithValueMixin.class);
     } else {
-      mapper.addMixIn(Variable.class, VariableMixin.class);
+      objectMapper.addMixIn(Variable.class, VariableMixin.class);
     }
 
     // Add Documents
     scenarioFileExport.setDocuments(scenario.getDocuments());
-    mapper.addMixIn(Document.class, ExerciseExportMixins.Document.class);
+    objectMapper.addMixIn(Document.class, ExerciseExportMixins.Document.class);
     scenarioTags.addAll(scenario.getDocuments().stream().flatMap(doc -> doc.getTags().stream()).toList());
     documentIds.addAll(scenario.getDocuments().stream().map(Document::getId).toList());
 
     if (isWithTeams) {
       // Add Teams
       scenarioFileExport.setTeams(scenario.getTeams());
-      mapper.addMixIn(Team.class,
+      objectMapper.addMixIn(Team.class,
           isWithPlayers ? ExerciseExportMixins.Team.class : ExerciseExportMixins.EmptyTeam.class);
       scenarioTags.addAll(scenario.getTeams().stream().flatMap(team -> team.getTags().stream()).toList());
     }
@@ -308,7 +307,7 @@ public class ScenarioService {
       // Add players
       List<User> players = scenario.getTeams().stream().flatMap(team -> team.getUsers().stream()).distinct().toList();
       scenarioFileExport.setUsers(players);
-      mapper.addMixIn(User.class, ExerciseExportMixins.User.class);
+      objectMapper.addMixIn(User.class, ExerciseExportMixins.User.class);
       scenarioTags.addAll(players.stream().flatMap(user -> user.getTags().stream()).toList());
       // organizations
       List<Organization> organizations = players.stream()
@@ -316,22 +315,22 @@ public class ScenarioService {
           .filter(Objects::nonNull)
           .toList();
       scenarioFileExport.setOrganizations(organizations);
-      mapper.addMixIn(Organization.class, ExerciseExportMixins.Organization.class);
+      objectMapper.addMixIn(Organization.class, ExerciseExportMixins.Organization.class);
       scenarioTags.addAll(organizations.stream().flatMap(org -> org.getTags().stream()).toList());
     } else {
-      mapper.addMixIn(ExerciseFileExport.class, ScenarioExportMixins.ScenarioWithoutPlayers.class);
+      objectMapper.addMixIn(ExerciseFileExport.class, ScenarioExportMixins.ScenarioWithoutPlayers.class);
     }
 
     // Add Injects
-    mapper.addMixIn(Inject.class, ExerciseExportMixins.Inject.class);
+    objectMapper.addMixIn(Inject.class, ExerciseExportMixins.Inject.class);
     scenarioFileExport.setInjects(scenario.getInjects());
     scenarioTags.addAll(scenario.getInjects().stream().flatMap(inject -> inject.getTags().stream()).toList());
 
     // Add Articles
-    mapper.addMixIn(Article.class, ExerciseExportMixins.Article.class);
+    objectMapper.addMixIn(Article.class, ExerciseExportMixins.Article.class);
     scenarioFileExport.setArticles(scenario.getArticles());
     // Add Channels
-    mapper.addMixIn(Channel.class, ExerciseExportMixins.Channel.class);
+    objectMapper.addMixIn(Channel.class, ExerciseExportMixins.Channel.class);
     List<Channel> channels = scenario.getArticles().stream().map(Article::getChannel).distinct().toList();
     scenarioFileExport.setChannels(channels);
     documentIds.addAll(
@@ -339,7 +338,7 @@ public class ScenarioService {
     );
 
     // Add Challenges
-    mapper.addMixIn(Challenge.class, ExerciseExportMixins.Challenge.class);
+    objectMapper.addMixIn(Challenge.class, ExerciseExportMixins.Challenge.class);
     List<Challenge> challenges = fromIterable(this.challengeService.getScenarioChallenges(scenario));
     scenarioFileExport.setChallenges(challenges);
     scenarioTags.addAll(challenges.stream().flatMap(challenge -> challenge.getTags().stream()).toList());
@@ -348,7 +347,7 @@ public class ScenarioService {
 
     // Tags
     scenarioFileExport.setTags(scenarioTags.stream().distinct().toList());
-    mapper.addMixIn(Tag.class, ExerciseExportMixins.Tag.class);
+    objectMapper.addMixIn(Tag.class, ExerciseExportMixins.Tag.class);
 
     // Build the response
     String infos = "(" +
@@ -366,7 +365,7 @@ public class ScenarioService {
     ZipEntry zipEntry = new ZipEntry(scenario.getName() + ".json");
     zipEntry.setComment(EXPORT_ENTRY_SCENARIO);
     zipExport.putNextEntry(zipEntry);
-    zipExport.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(scenarioFileExport));
+    zipExport.write(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(scenarioFileExport));
     zipExport.closeEntry();
     // Add the documents
     documentIds.stream().distinct().forEach(docId -> {
