@@ -236,7 +236,7 @@ const TimelineOverview = () => {
                             >
                               {fndt(inject.inject_status?.tracking_sent_date)} (
                               {inject.inject_status && inject.inject_status.tracking_total_execution_time && (inject.inject_status.tracking_total_execution_time / 1000).toFixed(2)}
-                              s)
+                              {t('s')})
                             </div>
                           </div>
                                 }
