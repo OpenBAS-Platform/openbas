@@ -110,12 +110,21 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
   // Timeline
 
   // SortedTeams
-  const technicalTeams = R.pipe(
+  const technicalTeams: Team[] = R.pipe(
     R.groupBy(R.prop('inject_type')),
     R.toPairs,
-    R.filter((n: InjectStore) => !(n[1][0].inject_injector_contract?.injector_contract_content_parsed?.fields?.filter((f) => f.key === 'teams').length > 0)),
-    R.map((n: InjectStore) => ({ team_id: n[0], team_name: n[0] })),
-  )(injects);
+    R.filter(
+      (n: [string, InjectStore[]]) => !(
+        n[1][0].inject_injector_contract?.injector_contract_content_parsed?.fields?.filter((f) => f.key === 'teams').length > 0
+      ),
+    ),
+    R.map(
+      (n: [string, InjectStore[]]) => ({
+        team_id: n[0],
+        team_name: n[0],
+      }),
+    ),
+  )(injects as Inject[]);
 
   const sortedNativeTeams = R.sortWith(
     [R.ascend(R.prop('team_name'))],
