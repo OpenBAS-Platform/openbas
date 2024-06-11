@@ -16,7 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import static io.openbas.database.model.InjectStatusExecution.traceError;
@@ -37,6 +39,10 @@ public class OvhSmsExecutor extends Injector {
     if (users.isEmpty()) {
       throw new UnsupportedOperationException("Sms needs at least one user");
     }
+
+    //We check that at least one user receive the sms before to create expectations
+    AtomicBoolean isSmsReceived = new AtomicBoolean(false);
+
     users.stream().parallel().forEach(context -> {
       ProtectUser user = context.getUser();
       String phone = user.getPhone();
@@ -47,6 +53,7 @@ public class OvhSmsExecutor extends Injector {
       } else {
         try {
           String callResult = smsService.sendSms(context, phone, smsMessage);
+          isSmsReceived.set(true);
           String message = "Sms sent to " + email + " through " + phone + " (" + callResult + ")";
           execution.addTrace(traceSuccess(message));
         } catch (Exception e) {
@@ -54,14 +61,17 @@ public class OvhSmsExecutor extends Injector {
         }
       }
     });
-    List<Expectation> expectations = content.getExpectations()
-            .stream()
-            .flatMap((entry) -> switch (entry.getType()) {
-              case MANUAL ->
-                      Stream.of((Expectation) new ManualExpectation(entry.getScore(), entry.getName(), entry.getDescription()));
-              default -> Stream.of();
-            })
-            .toList();
-    return new ExecutionProcess(false, expectations);
+    if (isSmsReceived.get()) {
+      List<Expectation> expectations = content.getExpectations()
+              .stream()
+              .flatMap(entry -> switch (entry.getType()) {
+                case MANUAL ->
+                        Stream.of((Expectation) new ManualExpectation(entry.getScore(), entry.getName(), entry.getDescription()));
+                default -> Stream.of();
+              })
+              .toList();
+      return new ExecutionProcess(false, expectations);
+    }
+    return new ExecutionProcess(false, Collections.emptyList());
   }
 }
