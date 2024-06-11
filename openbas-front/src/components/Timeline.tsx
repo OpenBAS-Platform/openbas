@@ -107,7 +107,23 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
     searchColumns,
   );
 
-  // Timeline
+  // Retrieve data
+  const {
+    injectsPerTeam,
+    technicalInjectsPerType,
+  } = useHelper((helper: InjectHelper) => {
+    const techicalInjectsWithNoTeam = helper.getExerciseTechnicalInjectsWithNoTeam(exerciseId);
+    return {
+      injectsPerTeam: R.mergeAll(
+        teams.map((a) => ({
+          [a.team_id]: helper.getTeamExerciseInjects(a.team_id),
+        })),
+      ),
+      technicalInjectsPerType: R.groupBy(R.prop('inject_type'))(techicalInjectsWithNoTeam),
+    };
+  });
+
+  const injectsMap = { ...injectsPerTeam, ...technicalInjectsPerType };
 
   // SortedTeams
   const technicalTeams: Team[] = R.pipe(
@@ -133,25 +149,7 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
   );
   const sortedTeams = [...technicalTeams, ...sortedNativeTeams];
 
-  // InjectedTeams
-
-  const {
-    injectsPerTeam,
-    technicalInjectsPerType,
-  } = useHelper((helper: InjectHelper) => {
-    const techicalInjectsWithNoTeam = helper.getExerciseTechnicalInjectsWithNoTeam(exerciseId);
-    return {
-      injectsPerTeam: R.mergeAll(
-        teams.map((a) => ({
-          [a.team_id]: helper.getTeamExerciseInjects(a.team_id),
-        })),
-      ),
-      technicalInjectsPerType: R.groupBy(R.prop('inject_type'))(techicalInjectsWithNoTeam),
-    };
-  });
-
-  const injectsMap = { ...injectsPerTeam, ...technicalInjectsPerType };
-
+  // Timeline
   const lastInject = R.pipe(
     R.sortWith([R.descend(R.prop('inject_depends_duration'))]),
     R.head,
