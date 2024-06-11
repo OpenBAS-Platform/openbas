@@ -1,14 +1,13 @@
-import React, { Component } from 'react';
-import { Button, FormControlLabel, Switch } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Button, FormControlLabel, Switch, Stack } from '@mui/material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { ExerciseUpdateStartDateInput } from '../../../../utils/api-types';
 import { useFormatter } from '../../../../components/i18n';
-import { emptyFilterGroup } from '../../../../components/common/filter/FilterUtils';
-import AssetGroupForm from '../../assets/asset_groups/AssetGroupForm';
 import { zodImplement } from '../../../../utils/Zod';
+import { minutesInFuture } from '../../../../utils/Time';
 
 interface Props {
   onSubmit: SubmitHandler<ExerciseUpdateStartDateInput>;
@@ -17,73 +16,155 @@ interface Props {
   handleClose: () => void;
 }
 
+interface ExerciseStartDateAndTime {
+  date: string;
+  time: string;
+}
+
+// eslint-disable-next-line no-underscore-dangle
+const _MS_DELAY_TOO_CLOSE = 1000 * 60 * 2;
+
+const defaultFormValues = () => ({
+  date: new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString(),
+  time: minutesInFuture(5).toISOString(),
+});
+
 const ExerciseDateForm: React.FC<Props> = ({
   onSubmit,
   handleClose,
-  editing,
   initialValues,
 }) => {
   const { t } = useFormatter();
 
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors, isDirty, isSubmitting, isValid },
-  } = useForm<ExerciseUpdateStartDateInput>({
-    mode: 'onTouched',
-    /* resolver: zodResolver(
-      zodImplement<AssetGroupInput>().with({
-        asset_group_name: z.string().min(1, { message: t('Should not be empty') }),
-        asset_group_description: z.string().optional(),
-        asset_group_tags: z.string().array().optional(),
-        asset_group_dynamic_filter: z.any().optional(),
-      }),
-    ), */
-    defaultValues: initialValues,
-  });
-
-  const handleChange = () => {
-    console.log('switched');
+  const [checked, setChecked] = useState(true);
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setChecked(event.target.checked);
   };
 
-  const submit = (/*datepicker et timepicker*/) => {
-    onSubmit({ exercise_start_date: null }); //concaténation du datePicker et du time picker
-  }
+  const submit = (data: ExerciseStartDateAndTime) => {
+    if (checked) {
+      onSubmit({ exercise_start_date: '' });
+    } else {
+      const date = new Date(data.date);
+      const time = new Date(data.time);
+      date.setHours(time.getHours());
+      date.setMinutes(time.getMinutes());
+      date.setSeconds(time.getSeconds());
+      onSubmit({ exercise_start_date: date.toISOString() });
+    }
+  };
+
+  const {
+    control,
+    handleSubmit,
+    clearErrors,
+    getValues,
+    reset,
+  } = useForm<ExerciseStartDateAndTime>({
+    defaultValues: defaultFormValues(),
+    resolver: zodResolver(
+      zodImplement<ExerciseStartDateAndTime>().with({
+        date: z.string().min(1, t('Required')),
+        time: z.string().min(1, t('Required')),
+      }).refine(
+        (data) => {
+          if (data.date) {
+            return new Date(data.date).getTime() >= new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime();
+          }
+          return true;
+        },
+        {
+          message: t('Date should be at least today'),
+          path: ['date'],
+        },
+      )
+        .refine(
+          (data) => {
+            if (data.time) {
+              return new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() !== new Date(data.date).getTime()
+                || (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < new Date(data.time).getTime();
+            }
+            return true;
+          },
+          {
+            message: t('The time and start date do not match, as the time provided is either too close to the current moment or in the past'),
+            path: ['time'],
+          },
+        ),
+    ),
+  });
+
+  useEffect(() => {
+    if (initialValues?.exercise_start_date != null) {
+      reset({
+        date: initialValues.exercise_start_date,
+        time: initialValues.exercise_start_date,
+      });
+    }
+  });
 
   return (
     <form id="exerciseDateForm" onSubmit={handleSubmit(submit)}>
-      {/* <DateTimePicker
-              name="exercise_start_date"
+      <FormControlLabel
+        control={<Switch onChange={handleChange} checked={checked} />}
+        label="Manual launch"
+      />
+
+      <Stack spacing={{ xs: 2 }}>
+        <Controller
+          control={control}
+          name="date"
+          render={({ field, fieldState }) => (
+            <DatePicker
+              views={['year', 'month', 'day']}
               label={t('Start date (optional)')}
-              autoOk={true}
-              minDateTime={new Date()}
-              textFieldProps={{ variant: 'standard', fullWidth: true }}
-            /> */}
-      <FormControlLabel control={<Switch onChange={handleChange} />} label="Manual launch" />
+              disabled={checked}
+              minDate={new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()}
+              value={(field.value)}
+              onChange={(date) => {
+                return (date ? field.onChange(new Date(date).toISOString()) : field.onChange(''));
+              }}
+              onAccept={() => {
+                clearErrors('time');
+              }}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  error: !!fieldState.error,
+                  helperText: fieldState.error && fieldState.error?.message,
+                },
+              }}
+            />
+          )}
+        />
 
-      <DatePicker
-        views={['year', 'month', 'day']}
-        label={t('Start date (optional)')}
-        name="date"
-        minDate={new Date()}
-        slotProps={{
-          textField: {
-            fullWidth: true,
-            /* error: !!fieldState.error,
-            helperText: fieldState.error && fieldState.error?.message, */
-          },
-        }}
-      />
+        <Controller
+          control={control}
+          name="time"
+          render={({ field, fieldState }) => (
+            <TimePicker
+              label={t('Scheduling_time')}
+              openTo="hours"
+              timeSteps={{ minutes: 15 }}
+              skipDisabled
+              thresholdToRenderTimeInASingleColumn={100}
+              disabled={checked}
+              closeOnSelect={false}
+              value={field.value}
+              minTime={new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() === new Date(getValues('date')).getTime() ? new Date().toISOString() : null}
+              onChange={(time) => (time ? field.onChange(new Date(time).toISOString()) : field.onChange(''))}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  error: !!fieldState.error,
+                  helperText: fieldState.error && fieldState.error?.message,
+                },
+              }}
+            />
+          )}
+        />
+      </Stack>
 
-      <TimePicker
-        label={t('Scheduling_time')}
-        name="time"
-        openTo="hours"
-        timeSteps={{ minutes: 15 }}
-        skipDisabled
-        thresholdToRenderTimeInASingleColumn={100}
-      />
       <div style={{ float: 'right', marginTop: 20 }}>
         {handleClose && (
           <Button
@@ -96,9 +177,8 @@ const ExerciseDateForm: React.FC<Props> = ({
         <Button
           color="secondary"
           type="submit"
-          disabled={!isDirty || isSubmitting}
         >
-          {editing ? t('Update') : t('Create')}
+          {t('Save')}
         </Button>
       </div>
     </form>
@@ -106,87 +186,3 @@ const ExerciseDateForm: React.FC<Props> = ({
 };
 
 export default ExerciseDateForm;
-
-/*
-  extends Component {
-  render() {
-    const { t, onSubmit, initialValues, editing, handleClose } = this.props;
-    const handleChange = () => {
-      console.log('switched');
-    };
-    return (
-      <Form
-        keepDirtyOnReinitialize={true}
-        initialValues={initialValues}
-        onSubmit={onSubmit}
-        mutators={{
-          setValue: ([field, value], state, { changeValue }) => {
-            changeValue(state, field, () => value);
-          },
-        }}
-      >
-        {({ handleSubmit, submitting, pristine }) => (
-          <form id="exerciseDateForm" onSubmit={handleSubmit}>
-            <Stack spacing={{ xs: 2 }}>
-              <DateTimePicker
-              name="exercise_start_date"
-              label={t('Start date (optional)')}
-              autoOk={true}
-              minDateTime={new Date()}
-              textFieldProps={{ variant: 'standard', fullWidth: true }}
-            />
-              <FormControlLabel control={<Switch onChange={handleChange} />} label="Manual launch" />
-
-              <DatePicker
-                views={['year', 'month', 'day']}
-                label={t('Start date (optional)')}
-                minDate={new Date()}
-                slotProps={{
-                  textField: {
-                    fullWidth:
-                  },
-                }}
-              />
-
-              <TimePicker
-                label={t('Scheduling_time')}
-                openTo="hours"
-                timeSteps={{ minutes: 15 }}
-                skipDisabled
-                thresholdToRenderTimeInASingleColumn={100}
-              />
-            </Stack>
-            <div style={{ float: 'right', marginTop: 20 }}>
-              {handleClose && (
-                <Button
-                  onClick={handleClose.bind(this)}
-                  style={{ marginRight: 10 }}
-                >
-                  {t('Cancel')}
-                </Button>
-              )}
-              <Button
-                color="secondary"
-                type="submit"
-                disabled={pristine || submitting}
-              >
-                {editing ? t('Update') : t('Create')}
-              </Button>
-            </div>
-
-          </form>
-        )}
-      </Form>
-    );
-  }
-}
-
-ExerciseDateForm.propTypes = {
-  t: PropTypes.func,
-  onSubmit: PropTypes.func.isRequired,
-  handleClose: PropTypes.func,
-  editing: PropTypes.bool,
-};
-
-export default inject18n(ExerciseDateForm);
-*/

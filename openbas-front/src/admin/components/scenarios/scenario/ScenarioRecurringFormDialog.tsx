@@ -42,7 +42,7 @@ const defaultFormValues = () => ({
 });
 
 const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurring, onSelectRecurring, initialValues, open, setOpen }) => {
-  const { t, fd } = useFormatter();
+  const { t } = useFormatter();
   const submit = (data: Recurrence) => {
     const { time } = data as Omit<Recurrence, 'time'> & { time: string };
     // case day
@@ -65,7 +65,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
     onSubmit(cron, start, end || '');
   };
 
-  const { handleSubmit, control, reset, getValues, clearErrors, formState: { isSubmitting, isValid } } = useForm<Recurrence>({
+  const { handleSubmit, control, reset, getValues, clearErrors } = useForm<Recurrence>({
     defaultValues: defaultFormValues(),
     resolver: zodResolver(
       zodImplement<Recurrence>().with({
@@ -210,12 +210,12 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                   <FormControlLabel
                     control={
                       <Switch checked={field.value}
-                              onChange={field.onChange}
+                        onChange={field.onChange}
                       />
                     }
                     label={t('Only weekday')}
                   />)}
-              />
+                 />
             }
             {
               ['monthly'].includes(selectRecurring)
@@ -238,7 +238,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                     </Select>
                   </FormControl>
                 )}
-              />
+                 />
             }
             {
               ['weekly', 'monthly'].includes(selectRecurring)
@@ -263,7 +263,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                     </Select>
                   </FormControl>
                 )}
-              />
+                 />
             }
             <Controller
               control={control}
@@ -312,7 +312,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                     label={t('End date')}
                   />
                 )}
-              />
+                 />
             }
           </Stack>
         </DialogContent>
@@ -323,7 +323,6 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
           <Button
             color="secondary"
             type="submit"
-            disabled={!isValid || isSubmitting}
           >
             {t('Save')}
           </Button>

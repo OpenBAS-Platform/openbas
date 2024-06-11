@@ -33,6 +33,8 @@ const ExerciseDatePopover: React.FC<Props> = ({ exercise }) => {
         open={openEdit}
         onClose={() => setOpenEdit(false)}
         PaperProps={{ elevation: 1 }}
+        maxWidth="xs"
+        fullWidth
       >
         <DialogTitle>{t('Update the simulation')}</DialogTitle>
         <DialogContent>
