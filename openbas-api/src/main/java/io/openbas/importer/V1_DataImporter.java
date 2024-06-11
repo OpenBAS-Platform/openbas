@@ -18,11 +18,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
@@ -183,71 +181,11 @@ public class V1_DataImporter implements Importer {
     return content;
   }
 
-  private void importInjects(Map<String, Base> baseIds, String exerciseId, String scenarioId, List<JsonNode> injects) {
-    List<String> injected = new ArrayList<>();
-    injects.forEach(injectNode -> {
-      String injectId = UUID.randomUUID().toString();
-      injected.add(injectId);
-      String id = injectNode.get("inject_id").textValue();
-      String title = injectNode.get("inject_title").textValue();
-      String description = injectNode.get("inject_description").textValue();
-      String country = injectNode.get("inject_country").textValue();
-      String city = injectNode.get("inject_city").textValue();
-      String injectorContractId = null;
-      JsonNode injectContractNode = injectNode.get("inject_injector_contract");
-      if (injectContractNode != null) {
-        injectorContractId = injectContractNode.get("injector_contract_id").textValue();
-      }
-      // If contract is not know, inject can't be imported
-      String content = handleInjectContent(baseIds, injectorContractId, injectNode);
-      JsonNode dependsOnNode = injectNode.get("inject_depends_on");
-      String dependsOn = !dependsOnNode.isNull() ? baseIds.get(dependsOnNode.asText()).getId() : null;
-      Long dependsDuration = injectNode.get("inject_depends_duration").asLong();
-      boolean allTeams = injectNode.get("inject_all_teams").booleanValue();
-      if (hasText(exerciseId)) {
-        injectRepository.importSaveForExercise(injectId, title, description, country, city, injectorContractId,
-            allTeams,
-            true, exerciseId, dependsOn, dependsDuration, content);
-      } else if (hasText(scenarioId)) {
-        injectRepository.importSaveForScenario(injectId, title, description, country, city, injectorContractId,
-            allTeams,
-            true, scenarioId, dependsOn, dependsDuration, content);
-      }
-      baseIds.put(id, new BaseHolder(injectId));
-      // Tags
-      List<String> injectTagIds = resolveJsonIds(injectNode, "inject_tags");
-      injectTagIds.forEach(tagId -> {
-        String remappedId = baseIds.get(tagId).getId();
-        injectRepository.addTag(injectId, remappedId);
-      });
-      // Teams
-      List<String> injectTeamIds = resolveJsonIds(injectNode, "inject_teams");
-      injectTeamIds.forEach(teamId -> {
-        String remappedId = baseIds.get(teamId).getId();
-        injectRepository.addTeam(injectId, remappedId);
-      });
-      // Documents
-      List<JsonNode> injectDocuments = resolveJsonElements(injectNode, "inject_documents").toList();
-      injectDocuments.forEach(jsonNode -> {
-        String docId = jsonNode.get("document_id").textValue();
-        String documentId = baseIds.get(docId).getId();
-        boolean docAttached = jsonNode.get("document_attached").booleanValue();
-        injectDocumentRepository.addInjectDoc(injectId, documentId, docAttached);
-      });
-    });
-    // Looking for child of created injects
-    List<JsonNode> childInjects = injects.stream().filter(jsonNode -> {
-      String injectDependsOn = jsonNode.get("inject_depends_on").asText();
-      return injected.contains(injectDependsOn);
-    }).toList();
-    if (!childInjects.isEmpty()) {
-      importInjects(baseIds, exerciseId, scenarioId, childInjects);
-    }
-  }
-
   private Set<Tag> computeTagsCompletion(Set<Tag> existingTags, List<String> lookingIds, Map<String, Base> baseIds) {
     Set<Tag> tags = new HashSet<>(existingTags);
-    Set<Tag> tagsForOrganization = lookingIds.stream().map(baseIds::get).map(base -> (Tag) base)
+    Set<Tag> tagsForOrganization = lookingIds.stream()
+        .map(baseIds::get)
+        .map(Tag.class::cast)
         .collect(Collectors.toSet());
     tags.addAll(tagsForOrganization);
     return tags;
@@ -271,22 +209,27 @@ public class V1_DataImporter implements Importer {
     importObjectives(importNode, prefix, savedExercise, savedScenario, baseIds);
     importLessons(importNode, prefix, savedExercise, savedScenario, baseIds);
     importInjects(importNode, prefix, savedExercise, savedScenario, baseIds);
-    importVariables(importNode, prefix, savedExercise, savedScenario, baseIds);
+    importVariables(importNode, savedExercise, savedScenario, baseIds);
   }
 
   // -- TAGS --
 
   private void importTags(JsonNode importNode, String prefix, Map<String, Base> baseIds) {
-    Stream<JsonNode> tagsStream = resolveJsonElements(importNode, prefix + "tags");
-    Map<String, Tag> existingTagsByName = fromIterable(tagRepository.findAll())
-        .stream()
-        .collect(Collectors.toMap(Tag::getName, Function.identity()));
+    resolveJsonElements(importNode, prefix + "tags").forEach(nodeTag -> {
+      String id = nodeTag.get("tag_id").textValue();
+      if (baseIds.get(id) != null) {
+        // Already import
+        return;
+      }
+      String name = nodeTag.get("tag_name").textValue();
 
-    tagsStream.map(this::createTag)
-        .forEach(tag -> baseIds.put(
-            tag.getId(),
-            existingTagsByName.getOrDefault(tag.getName(), this.tagRepository.save(tag))
-            ));
+      List<Tag> existingTags = this.tagRepository.findByNameIgnoreCase(name);
+      if (!existingTags.isEmpty()) {
+        baseIds.put(id, existingTags.getFirst());
+      } else {
+        baseIds.put(id, this.tagRepository.save(createTag(nodeTag)));
+      }
+    });
   }
 
   private Tag createTag(JsonNode jsonNode) {
@@ -301,7 +244,9 @@ public class V1_DataImporter implements Importer {
 
   private Exercise importExercise(JsonNode importNode, Map<String, Base> baseIds) {
     JsonNode exerciseNode = importNode.get("exercise_information");
-    if (exerciseNode == null) return null;
+    if (exerciseNode == null) {
+      return null;
+    }
 
     Exercise exercise = new Exercise();
     exercise.setName(exerciseNode.get("exercise_name").textValue() + " (Import)");
@@ -325,7 +270,9 @@ public class V1_DataImporter implements Importer {
 
   private Scenario importScenario(JsonNode importNode, Map<String, Base> baseIds) {
     JsonNode scenarioNode = importNode.get("scenario_information");
-    if (scenarioNode == null) return null;
+    if (scenarioNode == null) {
+      return null;
+    }
 
     Scenario scenario = new Scenario();
     scenario.setName(scenarioNode.get("scenario_name").textValue() + " (Import)");
@@ -364,20 +311,22 @@ public class V1_DataImporter implements Importer {
     return scenarioService.createScenario(scenario);
   }
 
-  private void importDocuments(JsonNode importNode, String prefix, Map<String, ImportEntry> docReferences, Exercise savedExercise, Scenario savedScenario, Map<String, Base> baseIds) {
+  private void importDocuments(JsonNode importNode, String prefix, Map<String, ImportEntry> docReferences,
+      Exercise savedExercise, Scenario savedScenario, Map<String, Base> baseIds) {
     Stream<JsonNode> documentsStream = resolveJsonElements(importNode, prefix + "documents");
     documentsStream.forEach(nodeDoc -> {
-      String id = nodeDoc.get("document_id").textValue();
       String target = nodeDoc.get("document_target").textValue();
       ImportEntry entry = docReferences.get(target);
 
       if (entry != null) {
-        handleDocumentWithEntry(nodeDoc, entry, target, savedExercise, savedScenario, baseIds, id);
+        handleDocumentWithEntry(nodeDoc, entry, target, savedExercise, savedScenario, baseIds);
       }
     });
   }
 
-  private void handleDocumentWithEntry(JsonNode nodeDoc, ImportEntry entry, String target, Exercise savedExercise, Scenario savedScenario, Map<String, Base> baseIds, String id) {
+  private void handleDocumentWithEntry(
+      JsonNode nodeDoc, ImportEntry entry, String target, Exercise savedExercise,
+      Scenario savedScenario, Map<String, Base> baseIds) {
     String contentType = new MimetypesFileTypeMap().getContentType(entry.getEntry().getName());
     Optional<Document> targetDocument = this.documentRepository.findByTarget(target);
 
@@ -388,7 +337,9 @@ public class V1_DataImporter implements Importer {
     }
   }
 
-  private void updateExistingDocument(JsonNode nodeDoc, Document document, Exercise savedExercise, Scenario savedScenario, Map<String, Base> baseIds) {
+  private void updateExistingDocument(
+      JsonNode nodeDoc, Document document, Exercise savedExercise,
+      Scenario savedScenario, Map<String, Base> baseIds) {
     if (savedExercise != null) {
       document.getExercises().add(savedExercise);
     } else if (savedScenario != null) {
@@ -399,7 +350,8 @@ public class V1_DataImporter implements Importer {
     baseIds.put(nodeDoc.get("document_id").textValue(), savedDocument);
   }
 
-  private void uploadNewDocument(JsonNode nodeDoc, ImportEntry entry, String target, Exercise savedExercise, Scenario savedScenario, String contentType, Map<String, Base> baseIds) {
+  private void uploadNewDocument(JsonNode nodeDoc, ImportEntry entry, String target, Exercise savedExercise,
+      Scenario savedScenario, String contentType, Map<String, Base> baseIds) {
     try {
       this.documentService.uploadFile(target, entry.getData(), entry.getEntry().getSize(), contentType);
     } catch (Exception e) {
@@ -421,64 +373,94 @@ public class V1_DataImporter implements Importer {
     baseIds.put(nodeDoc.get("document_id").textValue(), savedDocument);
   }
 
+  // -- ORGANIZATION --
+
   private void importOrganizations(JsonNode importNode, String prefix, Map<String, Base> baseIds) {
-    if (importNode.has(prefix + "organizations")) {
-      Map<String, Organization> existingOrganizationsByName = fromIterable(organizationRepository.findAll())
-          .stream()
-          .collect(Collectors.toMap(Organization::getName, Function.identity()));
+    resolveJsonElements(importNode, prefix + "organizations")
+        .forEach(nodeOrganization -> {
+          String id = nodeOrganization.get("organization_id").textValue();
+          if (baseIds.get(id) != null) {
+            // Already import
+            return;
+          }
+          String name = nodeOrganization.get("organization_name").textValue();
 
-      resolveJsonElements(importNode, prefix + "organizations")
-          .forEach(nodeOrganization -> {
-            String id = nodeOrganization.get("organization_id").textValue();
-            String name = nodeOrganization.get("organization_name").textValue();
+          List<Organization> existingOrganizations = this.organizationRepository.findByNameIgnoreCase(name);
 
-            Organization organization = existingOrganizationsByName.getOrDefault(name, new Organization());
-            if (!hasText(organization.getId())) { // new entity
-              organization.setDescription(nodeOrganization.get("organization_description").textValue());
-            }
-            organization.setName(name);
-            organization.setTags(computeTagsCompletion(organization.getTags(), resolveJsonIds(nodeOrganization, "organization_tags"), baseIds));
-
-            baseIds.put(id, this.organizationRepository.save(organization));
-          });
-    }
+          if (!existingOrganizations.isEmpty()) {
+            baseIds.put(id, existingOrganizations.getFirst());
+          } else {
+            baseIds.put(id, this.organizationRepository.save(createOrganization(nodeOrganization, baseIds)));
+          }
+        });
   }
+
+  private Organization createOrganization(JsonNode importNode, Map<String, Base> baseIds) {
+    Organization organization = new Organization();
+    organization.setName(importNode.get("organization_name").textValue());
+    organization.setDescription(importNode.get("organization_description").textValue());
+    organization.setTags(
+        resolveJsonIds(importNode, "organization_tags")
+            .stream()
+            .map(baseIds::get)
+            .map(Tag.class::cast)
+            .collect(Collectors.toSet())
+    );
+    return organization;
+  }
+
+  // -- USERS --
 
   private void importUsers(JsonNode importNode, String prefix, Map<String, Base> baseIds) {
-    if (importNode.has(prefix + "users")) {
-      Map<String, User> existingUsersByEmail = fromIterable(userRepository.findAll())
-          .stream()
-          .collect(Collectors.toMap(User::getEmail, Function.identity()));
+    resolveJsonElements(importNode, prefix + "users")
+        .forEach(nodeUser -> {
+          String id = nodeUser.get("user_id").textValue();
+          if (baseIds.get(id) != null) {
+            // Already import
+            return;
+          }
+          String email = nodeUser.get("user_email").textValue();
 
-      resolveJsonElements(importNode, prefix + "users")
-          .forEach(nodeUser -> {
-            String id = nodeUser.get("user_id").textValue();
-            String email = nodeUser.get("user_email").textValue();
-            User user = existingUsersByEmail.getOrDefault(email, new User());
-            if (!hasText(user.getId())) { // new entity
-              user.setEmail(email);
-              user.setFirstname(nodeUser.get("user_firstname").textValue());
-              user.setLastname(nodeUser.get("user_lastname").textValue());
-              user.setLang(nodeUser.get("user_lang").textValue());
-              user.setPhone(nodeUser.get("user_phone").textValue());
-              user.setPgpKey(nodeUser.get("user_pgp_key").textValue());
-              user.setCountry(nodeUser.get("user_country").textValue());
-              user.setCity(nodeUser.get("user_city").textValue());
-              Base userOrganization = baseIds.get(nodeUser.get("user_organization").textValue());
-              if (userOrganization != null) {
-                user.setOrganization((Organization) userOrganization);
-              }
-            }
-            user.setTags(computeTagsCompletion(user.getTags(), resolveJsonIds(nodeUser, "user_tags"), baseIds));
+          User existingUser = this.userRepository.findByEmailIgnoreCase(email).orElse(null);
 
-            baseIds.put(id, this.userRepository.save(user));
-          });
-    }
+          if (existingUser != null) {
+            baseIds.put(id, existingUser);
+          } else {
+            baseIds.put(id, this.userRepository.save(createUser(nodeUser, baseIds)));
+          }
+        });
   }
 
-  private void importTeams(JsonNode importNode, String prefix, Exercise savedExercise, Scenario savedScenario, Map<String, Base> baseIds) {
-    Stream<JsonNode> teamsStream = resolveJsonElements(importNode, prefix + "teams");
-    Map<String, Team> baseTeams = handlingTeams(teamsStream, baseIds);
+  private User createUser(JsonNode jsonNode, Map<String, Base> baseIds) {
+    User user = new User();
+    user.setEmail(jsonNode.get("user_email").textValue());
+    user.setFirstname(jsonNode.get("user_firstname").textValue());
+    user.setLastname(jsonNode.get("user_lastname").textValue());
+    user.setLang(jsonNode.get("user_lang").textValue());
+    user.setPhone(jsonNode.get("user_phone").textValue());
+    user.setPgpKey(jsonNode.get("user_pgp_key").textValue());
+    user.setCountry(jsonNode.get("user_country").textValue());
+    user.setCity(jsonNode.get("user_city").textValue());
+    Base userOrganization = baseIds.get(jsonNode.get("user_organization").textValue());
+    if (userOrganization != null) {
+      user.setOrganization((Organization) userOrganization);
+    }
+    user.setTags(
+        resolveJsonIds(jsonNode, "user_tags")
+            .stream()
+            .map(baseIds::get)
+            .map(Tag.class::cast)
+            .collect(Collectors.toSet())
+    );
+    return user;
+  }
+
+  // -- TEAMS --
+
+  private void importTeams(
+      JsonNode importNode, String prefix, Exercise savedExercise, Scenario savedScenario, Map<String, Base> baseIds
+  ) {
+    Map<String, Team> baseTeams = handlingTeams(importNode, prefix, baseIds);
     baseTeams.values().forEach((team) -> {
       if (savedExercise != null) {
         team.getExercises().add(savedExercise);
@@ -490,27 +472,32 @@ public class V1_DataImporter implements Importer {
   }
 
   private Map<String, Team> handlingTeams(
-      Stream<JsonNode> teamsStream,
+      JsonNode importNode,
+      String prefix,
       Map<String, Base> baseIds) {
     Map<String, Team> baseTeams = new HashMap<>();
-    teamsStream.forEach(nodeTeam -> {
-      String teamId = nodeTeam.get("team_id").textValue();
-      String teamName = nodeTeam.get("team_name").textValue();
+
+    resolveJsonElements(importNode, prefix + "teams").forEach(nodeTeam -> {
+      String id = nodeTeam.get("team_id").textValue();
+      if (baseIds.get(id) != null) {
+        // Already import
+        return;
+      }
+      String name = nodeTeam.get("team_name").textValue();
+
       // Prevent duplication of team, based on the team name and not contextual
-      List<Team> existingTeams = teamRepository.findByNameIgnoreCase(teamName)
-          .stream()
-          .filter(t -> !t.getContextual())
-          .toList();
-      if (existingTeams.size() == 1) {
-        Team existingTeam = existingTeams.get(0);
-        baseTeams.put(teamId, existingTeam);
+      List<Team> existingTeams = this.teamRepository.findByNameIgnoreCaseAndNotContextual(name);
+
+      if (!existingTeams.isEmpty()) {
+        baseTeams.put(id, existingTeams.getFirst());
       } else {
-        Team team = new Team();
-        team.setName(nodeTeam.get("team_name").textValue());
-        team.setDescription(nodeTeam.get("team_description").textValue());
+        Team team = createTeam(nodeTeam, baseIds);
         // Tags
         List<String> teamTagIds = resolveJsonIds(nodeTeam, "team_tags");
-        Set<Tag> tagsForTeam = teamTagIds.stream().map(baseIds::get).map(base -> (Tag) base)
+        Set<Tag> tagsForTeam = teamTagIds.stream()
+            .map(baseIds::get)
+            .filter(Objects::nonNull)
+            .map(Tag.class::cast)
             .collect(Collectors.toSet());
         team.setTags(tagsForTeam);
         // Users
@@ -518,25 +505,44 @@ public class V1_DataImporter implements Importer {
         List<User> usersForTeam = teamUserIds.stream()
             .map(baseIds::get)
             .filter(Objects::nonNull)
-            .map(base -> (User) base)
+            .map(User.class::cast)
             .toList();
         team.setUsers(usersForTeam);
-        Team savedTeam = teamRepository.save(team);
-        baseTeams.put(teamId, savedTeam);
+        Team savedTeam = this.teamRepository.save(team);
+        baseTeams.put(id, savedTeam);
       }
     });
     return baseTeams;
   }
 
+  private Team createTeam(JsonNode jsonNode, Map<String, Base> baseIds) {
+    Team team = new Team();
+    team.setName(jsonNode.get("team_name").textValue());
+    team.setDescription(jsonNode.get("team_description").textValue());
+    if (jsonNode.get("team_organization") != null) {
+      Base teamOrganization = baseIds.get(jsonNode.get("team_organization").textValue());
+      if (teamOrganization != null) {
+        team.setOrganization((Organization) teamOrganization);
+      }
+    }
+    return team;
+  }
+
+  // -- CHALLENGES --
+
   private void importChallenges(JsonNode importNode, String prefix, Map<String, Base> baseIds) {
     resolveJsonElements(importNode, prefix + "challenges")
         .forEach(nodeChallenge -> {
           String id = nodeChallenge.get("challenge_id").textValue();
-          String challengeName = nodeChallenge.get("challenge_name").textValue();
+          if (baseIds.get(id) != null) {
+            // Already import
+            return;
+          }
+          String name = nodeChallenge.get("challenge_name").textValue();
 
-          List<Challenge> existingChallenges = this.challengeRepository.findByNameIgnoreCase(challengeName);
-          if (existingChallenges.size() == 1) {
-            baseIds.put(id, existingChallenges.get(0));
+          List<Challenge> existingChallenges =this.challengeRepository.findByNameIgnoreCase(name);
+          if (!existingChallenges.isEmpty()) {
+            baseIds.put(id, existingChallenges.getFirst());
           } else {
             baseIds.put(id, this.challengeRepository.save(createChallenge(nodeChallenge, baseIds)));
           }
@@ -581,15 +587,21 @@ public class V1_DataImporter implements Importer {
     return flag;
   }
 
+  // -- CHANNELS --
+
   private void importChannels(JsonNode importNode, String prefix, Map<String, Base> baseIds) {
     resolveJsonElements(importNode, prefix + "channels")
         .forEach(nodeChannel -> {
           String id = nodeChannel.get("channel_id").textValue();
+          if (baseIds.get(id) != null) {
+            // Already import
+            return;
+          }
           String channelName = nodeChannel.get("channel_name").textValue();
 
           List<Channel> existingChannels = this.channelRepository.findByNameIgnoreCase(channelName);
-          if (existingChannels.size() == 1) {
-            baseIds.put(id, existingChannels.get(0));
+          if (!existingChannels.isEmpty()) {
+            baseIds.put(id, existingChannels.getFirst());
           } else {
             baseIds.put(id, this.channelRepository.save(createChannel(nodeChannel, baseIds)));
           }
@@ -619,7 +631,8 @@ public class V1_DataImporter implements Importer {
     return channel;
   }
 
-  private void importArticles(JsonNode importNode, String prefix, Exercise savedExercise, Scenario savedScenario, Map<String, Base> baseIds) {
+  private void importArticles(JsonNode importNode, String prefix, Exercise savedExercise, Scenario savedScenario,
+      Map<String, Base> baseIds) {
     resolveJsonElements(importNode, prefix + "articles")
         .forEach(nodeArticle -> {
           String id = nodeArticle.get("article_id").textValue();
@@ -628,7 +641,8 @@ public class V1_DataImporter implements Importer {
         });
   }
 
-  private Article createArticle(JsonNode nodeArticle, Exercise savedExercise, Scenario savedScenario, Map<String, Base> baseIds) {
+  private Article createArticle(JsonNode nodeArticle, Exercise savedExercise, Scenario savedScenario,
+      Map<String, Base> baseIds) {
     Article article = new Article();
     article.setName(nodeArticle.get("article_name").textValue());
     article.setContent(nodeArticle.get("article_content").textValue());
@@ -653,7 +667,8 @@ public class V1_DataImporter implements Importer {
     return article;
   }
 
-  private void importObjectives(JsonNode importNode, String prefix, Exercise savedExercise, Scenario savedScenario, Map<String, Base> baseIds) {
+  private void importObjectives(JsonNode importNode, String prefix, Exercise savedExercise, Scenario savedScenario,
+      Map<String, Base> baseIds) {
     resolveJsonElements(importNode, prefix + "objectives")
         .forEach(nodeObjective -> {
           String id = nodeObjective.get("objective_id").textValue();
@@ -676,11 +691,13 @@ public class V1_DataImporter implements Importer {
     return objective;
   }
 
-  private void importLessons(JsonNode importNode, String prefix, Exercise savedExercise, Scenario savedScenario, Map<String, Base> baseIds) {
+  private void importLessons(JsonNode importNode, String prefix, Exercise savedExercise, Scenario savedScenario,
+      Map<String, Base> baseIds) {
     resolveJsonElements(importNode, prefix + "lessons_categories")
         .forEach(nodeLessonCategory -> {
           String id = nodeLessonCategory.get("lessonscategory_id").textValue();
-          LessonsCategory lessonsCategory = createLessonsCategory(nodeLessonCategory, savedExercise, savedScenario, baseIds);
+          LessonsCategory lessonsCategory = createLessonsCategory(nodeLessonCategory, savedExercise, savedScenario,
+              baseIds);
           baseIds.put(id, this.lessonsCategoryRepository.save(lessonsCategory));
         });
     resolveJsonElements(importNode, prefix + "lessons_questions")
@@ -691,7 +708,8 @@ public class V1_DataImporter implements Importer {
         });
   }
 
-  private LessonsCategory createLessonsCategory(JsonNode nodeLessonCategory, Exercise savedExercise, Scenario savedScenario, Map<String, Base> baseIds) {
+  private LessonsCategory createLessonsCategory(JsonNode nodeLessonCategory, Exercise savedExercise,
+      Scenario savedScenario, Map<String, Base> baseIds) {
     LessonsCategory lessonsCategory = new LessonsCategory();
     lessonsCategory.setName(nodeLessonCategory.get("lessons_category_name").textValue());
     lessonsCategory.setDescription(nodeLessonCategory.get("lessons_category_description").textValue());
@@ -717,7 +735,8 @@ public class V1_DataImporter implements Importer {
     lessonsQuestion.setContent(nodeLessonQuestion.get("lessons_question_content").textValue());
     lessonsQuestion.setExplanation(nodeLessonQuestion.get("lessons_question_explanation").textValue());
     lessonsQuestion.setOrder(nodeLessonQuestion.get("lessons_question_order").intValue());
-    lessonsQuestion.setCategory((LessonsCategory) baseIds.get(nodeLessonQuestion.get("lessons_question_category").textValue()));
+    lessonsQuestion.setCategory(
+        (LessonsCategory) baseIds.get(nodeLessonQuestion.get("lessons_question_category").textValue()));
     String categoryId = nodeLessonQuestion.get("lessons_question_category").asText();
     LessonsCategory lessonsCategory = (LessonsCategory) baseIds.get(categoryId);
     lessonsQuestion.setCategory(lessonsCategory);
@@ -725,7 +744,8 @@ public class V1_DataImporter implements Importer {
     return lessonsQuestion;
   }
 
-  private void importInjects(JsonNode importNode, String prefix, Exercise savedExercise, Scenario savedScenario, Map<String, Base> baseIds) {
+  private void importInjects(JsonNode importNode, String prefix, Exercise savedExercise, Scenario savedScenario,
+      Map<String, Base> baseIds) {
     Stream<JsonNode> injectsStream = resolveJsonElements(importNode, prefix + "injects");
     Stream<JsonNode> injectsNoParent = injectsStream.filter(jsonNode -> jsonNode.get("inject_depends_on").isNull());
 
@@ -736,7 +756,72 @@ public class V1_DataImporter implements Importer {
     }
   }
 
-  private void importVariables(JsonNode importNode, String prefix, Exercise savedExercise, Scenario savedScenario, Map<String, Base> baseIds) {
+  private void importInjects(Map<String, Base> baseIds, String exerciseId, String scenarioId, List<JsonNode> injects) {
+    List<String> injected = new ArrayList<>();
+    injects.forEach(injectNode -> {
+      String injectId = UUID.randomUUID().toString();
+      injected.add(injectId);
+      String id = injectNode.get("inject_id").textValue();
+      String title = injectNode.get("inject_title").textValue();
+      String description = injectNode.get("inject_description").textValue();
+      String country = injectNode.get("inject_country").textValue();
+      String city = injectNode.get("inject_city").textValue();
+      String injectorContractId = null;
+      JsonNode injectContractNode = injectNode.get("inject_injector_contract");
+      if (injectContractNode != null) {
+        injectorContractId = injectContractNode.get("injector_contract_id").textValue();
+      }
+      // If contract is not know, inject can't be imported
+      String content = handleInjectContent(baseIds, injectorContractId, injectNode);
+      JsonNode dependsOnNode = injectNode.get("inject_depends_on");
+      String dependsOn = !dependsOnNode.isNull() ? baseIds.get(dependsOnNode.asText()).getId() : null;
+      Long dependsDuration = injectNode.get("inject_depends_duration").asLong();
+      boolean allTeams = injectNode.get("inject_all_teams").booleanValue();
+      if (hasText(exerciseId)) {
+        injectRepository.importSaveForExercise(
+            injectId, title, description, country, city, injectorContractId, allTeams,
+            true, exerciseId, dependsOn, dependsDuration, content
+        );
+      } else if (hasText(scenarioId)) {
+        injectRepository.importSaveForScenario(
+            injectId, title, description, country, city, injectorContractId,
+            allTeams, true, scenarioId, dependsOn, dependsDuration, content
+        );
+      }
+      baseIds.put(id, new BaseHolder(injectId));
+      // Tags
+      List<String> injectTagIds = resolveJsonIds(injectNode, "inject_tags");
+      injectTagIds.forEach(tagId -> {
+        String remappedId = baseIds.get(tagId).getId();
+        injectRepository.addTag(injectId, remappedId);
+      });
+      // Teams
+      List<String> injectTeamIds = resolveJsonIds(injectNode, "inject_teams");
+      injectTeamIds.forEach(teamId -> {
+        String remappedId = baseIds.get(teamId).getId();
+        injectRepository.addTeam(injectId, remappedId);
+      });
+      // Documents
+      List<JsonNode> injectDocuments = resolveJsonElements(injectNode, "inject_documents").toList();
+      injectDocuments.forEach(jsonNode -> {
+        String docId = jsonNode.get("document_id").textValue();
+        String documentId = baseIds.get(docId).getId();
+        boolean docAttached = jsonNode.get("document_attached").booleanValue();
+        injectDocumentRepository.addInjectDoc(injectId, documentId, docAttached);
+      });
+    });
+    // Looking for child of created injects
+    List<JsonNode> childInjects = injects.stream().filter(jsonNode -> {
+      String injectDependsOn = jsonNode.get("inject_depends_on").asText();
+      return injected.contains(injectDependsOn);
+    }).toList();
+    if (!childInjects.isEmpty()) {
+      importInjects(baseIds, exerciseId, scenarioId, childInjects);
+    }
+  }
+
+  private void importVariables(JsonNode importNode, Exercise savedExercise, Scenario savedScenario,
+      Map<String, Base> baseIds) {
     Optional<Iterator<JsonNode>> variableNodesOpt = Optional.empty();
     if (ofNullable(importNode.get(EXERCISE_VARIABLES)).isPresent()) {
       variableNodesOpt = ofNullable(importNode.get(EXERCISE_VARIABLES)).map(JsonNode::elements);

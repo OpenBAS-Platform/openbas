@@ -196,7 +196,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
           initialValues={initialValues}
           handleClose={handleCloseEdit}
           onSubmit={onSubmitEdit}
-          editing={true}
+          editing
         />
       </Dialog>
       <MuiDialog
