@@ -1,17 +1,5 @@
 package io.openbas.service;
 
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.model.SettingKeys.DEFAULT_LANG;
-import static io.openbas.database.model.SettingKeys.DEFAULT_THEME;
-import static io.openbas.database.model.SettingKeys.PLATFORM_CONSENT_CONFIRM_TEXT;
-import static io.openbas.database.model.SettingKeys.PLATFORM_CONSENT_MESSAGE;
-import static io.openbas.database.model.SettingKeys.PLATFORM_ENTERPRISE_EDITION;
-import static io.openbas.database.model.SettingKeys.PLATFORM_LOGIN_MESSAGE;
-import static io.openbas.database.model.SettingKeys.PLATFORM_NAME;
-import static io.openbas.database.model.SettingKeys.PLATFORM_WHITEMARK;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static java.util.Optional.ofNullable;
-
 import io.openbas.config.OpenBASConfig;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.RabbitmqConfig;
@@ -21,22 +9,12 @@ import io.openbas.database.repository.SettingRepository;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.helper.RabbitMQHelper;
 import io.openbas.injectors.opencti.config.OpenCTIConfig;
-import io.openbas.rest.settings.form.PolicyInput;
-import io.openbas.rest.settings.form.SettingsEnterpriseEditionUpdateInput;
-import io.openbas.rest.settings.form.SettingsPlatformWhitemarkUpdateInput;
-import io.openbas.rest.settings.form.SettingsUpdateInput;
-import io.openbas.rest.settings.form.ThemeInput;
+import io.openbas.rest.settings.form.*;
 import io.openbas.rest.settings.response.OAuthProvider;
 import io.openbas.rest.settings.response.PlatformSettings;
 import io.openbas.rest.stream.ai.AiConfig;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
@@ -45,6 +23,15 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.model.SettingKeys.*;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static java.util.Optional.ofNullable;
 
 @Service
 @Log
@@ -230,6 +217,11 @@ public class PlatformSettingsService {
     policies.setConsentMessage(getValueFromMapOfSettings(dbSettings, PLATFORM_CONSENT_MESSAGE.key()));
     policies.setConsentConfirmText(getValueFromMapOfSettings(dbSettings, PLATFORM_CONSENT_CONFIRM_TEXT.key()));
     platformSettings.setPolicies(policies);
+
+    // FEATURE FLAG
+    if(!openBASConfig.getDisabledDevFeatures().isEmpty()) {
+      platformSettings.setDisabledDevFeatures(Arrays.stream(openBASConfig.getDisabledDevFeatures().split(",")).toList());
+    }
 
     return platformSettings;
   }

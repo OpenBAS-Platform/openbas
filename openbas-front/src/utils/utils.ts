@@ -1,5 +1,7 @@
 import * as R from 'ramda';
 import { MESSAGING$ } from './Environment';
+import {useHelper} from "../store";
+import {LoggedHelper} from "../actions/helper";
 
 export const export_max_size = 50000;
 
@@ -83,4 +85,11 @@ export const debounce = <T>(func: (...param: T[]) => void, timeout = 500) => {
     window.clearTimeout(timer);
     timer = window.setTimeout(func, timeout, ...args);
   };
+};
+
+export const isFeatureEnabled = (feature: string) => {
+  return useHelper((helper: LoggedHelper) => {
+    const DISABLED_FEATURE_FLAGS = helper.getPlatformSettings().disabled_dev_features ?? [];
+    return DISABLED_FEATURE_FLAGS.length === 0 || !DISABLED_FEATURE_FLAGS.includes(feature);
+  });
 };

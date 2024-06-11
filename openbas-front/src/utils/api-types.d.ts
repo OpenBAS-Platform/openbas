@@ -2015,6 +2015,7 @@ export interface PlatformSettings {
   rabbitmq_version?: string;
   xtm_opencti_enable?: boolean;
   xtm_opencti_url?: string;
+  disabled_dev_features: string[];
 }
 
 export interface PlatformStatistic {
