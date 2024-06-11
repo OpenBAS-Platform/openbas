@@ -66,12 +66,6 @@ public class ExerciseDetails {
   @JsonProperty("exercise_mails_reply_to")
   private List<String> replyTo;
 
-  @JsonProperty("exercise_logo_dark")
-  private String logoDark;
-
-  @JsonProperty("exercise_logo_light")
-  private String logoLight;
-
   @JsonProperty("exercise_lessons_anonymized")
   private boolean lessonsAnonymized;
 
@@ -205,8 +199,6 @@ public class ExerciseDetails {
     if(exercise.getExercise_reply_to() != null) {
       details.setReplyTo(exercise.getExercise_reply_to().stream().toList());
     }
-    details.setLogoDark(exercise.getExercise_logo_dark());
-    details.setLogoLight(exercise.getExercise_logo_light());
     details.setLessonsAnonymized(exercise.getExercise_lessons_anonymized());
     details.setScenario(exercise.getScenario_id());
     details.setCreateAt(exercise.getExercise_created_at());
