@@ -14,8 +14,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +28,8 @@ import static java.time.Instant.now;
 @RequiredArgsConstructor
 @Service
 public class EndpointService {
+
+  public static String JFROG_BASE = "https://filigran.jfrog.io/artifactory/openbas-agent/";
 
   @Resource
   private OpenBASConfig openBASConfig;
@@ -101,11 +105,13 @@ public class EndpointService {
     if (platform.equalsIgnoreCase("linux")) {
       String filename = "openbas-agent-installer-" + version + ".sh";
       InputStream in = getClass().getResourceAsStream("/agents/openbas/linux/" + filename);
-      if (in != null) {
-        return IOUtils.toString(in, StandardCharsets.UTF_8)
-                .replace("${OPENBAS_URL}", openBASConfig.getBaseUrl())
-                .replace("${OPENBAS_TOKEN}", adminToken);
+      if (in == null) { // Dev mode, get from artifactory
+        filename = "openbas-agent-installer-latest.sh";
+        in = new BufferedInputStream(new URL(JFROG_BASE + filename).openStream());
       }
+      return IOUtils.toString(in, StandardCharsets.UTF_8)
+              .replace("${OPENBAS_URL}", openBASConfig.getBaseUrl())
+              .replace("${OPENBAS_TOKEN}", adminToken);
     }
     throw new UnsupportedOperationException("Agent " + platform + " installer not supported");
   }

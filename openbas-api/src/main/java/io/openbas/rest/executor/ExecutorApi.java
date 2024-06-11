@@ -29,6 +29,7 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.Optional;
 
+import static io.openbas.asset.EndpointService.JFROG_BASE;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 
 @RestController
@@ -36,7 +37,6 @@ public class ExecutorApi extends RestBehavior {
 
     @Value("${info.app.version:unknown}") String version;
 
-    private String JFROG_BASE = "https://filigran.jfrog.io/artifactory/openbas-agent/";
     private ExecutorRepository executorRepository;
     private EndpointService endpointService;
     private FileService fileService;
@@ -186,7 +186,10 @@ public class ExecutorApi extends RestBehavior {
 
     // Public API
     @GetMapping(value = "/api/agent/installer/openbas/{platform}")
-    public @ResponseBody String getOpenBasAgentInstaller(@PathVariable String platform) throws IOException {
-        return this.endpointService.generateInstallCommand(platform);
+    public @ResponseBody ResponseEntity<String> getOpenBasAgentInstaller(@PathVariable String platform) throws IOException {
+        String installCommand = this.endpointService.generateInstallCommand(platform);
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(installCommand);
     }
 }
