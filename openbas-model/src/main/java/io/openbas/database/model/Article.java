@@ -7,6 +7,7 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -26,6 +27,7 @@ import static java.time.Instant.now;
 @Table(name = "articles")
 @EntityListeners(ModelBaseListener.class)
 public class Article implements Base {
+
     @Id
     @Column(name = "article_id")
     @GeneratedValue(generator = "UUID")
@@ -36,10 +38,12 @@ public class Article implements Base {
 
     @Column(name = "article_created_at")
     @JsonProperty("article_created_at")
+    @NotNull
     private Instant createdAt = now();
 
     @Column(name = "article_updated_at")
     @JsonProperty("article_updated_at")
+    @NotNull
     private Instant updatedAt = now();
 
     @Column(name = "article_name")
@@ -82,6 +86,7 @@ public class Article implements Base {
     @JoinColumn(name = "article_channel")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("article_channel")
+    @NotNull
     private Channel channel;
 
     @ManyToMany(fetch = FetchType.LAZY)

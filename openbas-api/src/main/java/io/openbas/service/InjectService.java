@@ -6,10 +6,8 @@ import io.openbas.database.model.InjectDocument;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +21,6 @@ import static java.time.Instant.now;
 public class InjectService {
 
   private final InjectRepository injectRepository;
-  private final InjectorContractRepository injectorContractRepository;
   private final InjectDocumentRepository injectDocumentRepository;
 
   public void cleanInjectsDocExercise(String exerciseId, String documentId) {
