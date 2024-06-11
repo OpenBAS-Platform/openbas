@@ -167,6 +167,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
     <ArticleContext.Provider value={articleContext}>
       <TeamContext.Provider value={teamContext}>
         <Injects
+          exerciseOrScenarioId={scenarioId}
           injects={injects}
           teams={teams}
           articles={articles}

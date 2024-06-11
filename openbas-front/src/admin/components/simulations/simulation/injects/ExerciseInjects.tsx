@@ -126,7 +126,11 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
     // @ts-expect-error
     return onToggleEntity(currentEntity, event);
   };
-  const massUpdateInjects = async (actions: { field: string, type: string, values: { value: string }[] }[]) => {
+  const massUpdateInjects = async (actions: {
+    field: string,
+    type: string,
+    values: { value: string }[]
+  }[]) => {
     const updateFields = [
       'inject_title',
       'inject_description',
@@ -151,7 +155,10 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
       const action = actions[i];
       // eslint-disable-next-line no-plusplus
       for (let j = 0; j < injectsToUpdate.length; j++) {
-        const injectToUpdate = { ...injectsToUpdate[j], inject_injector_contract: injectsToUpdate[j].inject_injector_contract.injector_contract_id };
+        const injectToUpdate = {
+          ...injectsToUpdate[j],
+          inject_injector_contract: injectsToUpdate[j].inject_injector_contract.injector_contract_id,
+        };
         switch (action.type) {
           case 'ADD':
             if (isNotEmptyField(injectToUpdate[`inject_${action.field}`])) {
@@ -189,6 +196,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
         <ArticleContext.Provider value={articleContext}>
           <TeamContext.Provider value={teamContext}>
             <Injects
+              exerciseOrScenarioId={exerciseId}
               injects={injects}
               teams={teams}
               articles={articles}
@@ -233,7 +241,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                 selected={false}
                 aria-label="List view mode"
               >
-                <ReorderOutlined fontSize="small" color="primary" />
+                <ReorderOutlined fontSize="small" color="primary"/>
               </ToggleButton>
             </Tooltip>
             <Tooltip title={t('Distribution view')}>
@@ -243,7 +251,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                 selected={true}
                 aria-label="Distribution view mode"
               >
-                <BarChartOutlined fontSize="small" color="inherit" />
+                <BarChartOutlined fontSize="small" color="inherit"/>
               </ToggleButton>
             </Tooltip>
           </ToggleButtonGroup>
@@ -254,7 +262,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                   {t('Distribution of injects by type')}
                 </Typography>
                 <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                  <InjectDistributionByType exerciseId={exerciseId} />
+                  <InjectDistributionByType exerciseId={exerciseId}/>
                 </Paper>
               </Grid>
               <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -262,7 +270,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                   {t('Distribution of injects by team')}
                 </Typography>
                 <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                  <InjectDistributionByTeam exerciseId={exerciseId} />
+                  <InjectDistributionByTeam exerciseId={exerciseId}/>
                 </Paper>
               </Grid>
               <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -270,7 +278,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                   {t('Distribution of expectations by inject type')} (%)
                 </Typography>
                 <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                  <ExerciseDistributionScoreByTeamInPercentage exerciseId={exerciseId} />
+                  <ExerciseDistributionScoreByTeamInPercentage exerciseId={exerciseId}/>
                 </Paper>
               </Grid>
               <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -278,7 +286,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                   {t('Distribution of expected total score by inject type')}
                 </Typography>
                 <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                  <ExerciseDistributionScoreOverTimeByInjectorContract exerciseId={exerciseId} />
+                  <ExerciseDistributionScoreOverTimeByInjectorContract exerciseId={exerciseId}/>
                 </Paper>
               </Grid>
               <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -286,7 +294,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                   {t('Distribution of expectations by team')}
                 </Typography>
                 <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                  <ExerciseDistributionScoreOverTimeByTeam exerciseId={exerciseId} />
+                  <ExerciseDistributionScoreOverTimeByTeam exerciseId={exerciseId}/>
                 </Paper>
               </Grid>
               <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -294,7 +302,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                   {t('Distribution of expected total score by team')}
                 </Typography>
                 <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                  <ExerciseDistributionScoreOverTimeByTeamInPercentage exerciseId={exerciseId} />
+                  <ExerciseDistributionScoreOverTimeByTeamInPercentage exerciseId={exerciseId}/>
                 </Paper>
               </Grid>
             </Grid>
