@@ -411,6 +411,7 @@ public class ExerciseApi extends RestBehavior {
 
   @GetMapping("/api/exercises/{exerciseId}")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
+  @org.springframework.transaction.annotation.Transactional(readOnly = true)
   public ExerciseDetails exercise(@PathVariable String exerciseId) {
     // We get the raw exercise
     RawExercise rawExercise = exerciseRepository.rawDetailsById(exerciseId);
