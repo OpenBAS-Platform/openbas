@@ -23,13 +23,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
-import static io.openbas.database.model.Inject.SPEED_STANDARD;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
+import static io.openbas.rest.channel.ChannelHelper.enrichArticleWithVirtualPublication;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
-import static java.util.Comparator.naturalOrder;
-import static java.util.Comparator.nullsFirst;
 
 @RestController
 public class ChannelApi extends RestBehavior {
@@ -131,36 +129,6 @@ public class ChannelApi extends RestBehavior {
     channelRepository.deleteById(channelId);
   }
 
-  private List<Article> enrichArticleWithVirtualPublication(List<Inject> injects, List<Article> articles) {
-    Instant now = Instant.now();
-    Map<String, Instant> toPublishArticleIdsMap = injects.stream()
-        .filter(inject -> inject.getInjectorContract().getId().equals(CHANNEL_PUBLISH))
-        .filter(inject -> inject.getContent() != null)
-        // TODO take into account depends_another here, depends_duration is not enough to order articles
-        .sorted(Comparator.comparing(Inject::getDependsDuration))
-        .flatMap(inject -> {
-          Instant virtualInjectDate = inject.computeInjectDate(now, SPEED_STANDARD);
-          try {
-            ChannelContent content = mapper.treeToValue(inject.getContent(), ChannelContent.class);
-            return content.getArticles().stream().map(article -> new VirtualArticle(virtualInjectDate, article));
-          } catch (JsonProcessingException e) {
-            // Invalid channel content.
-            return null;
-          }
-        })
-        .filter(Objects::nonNull)
-        .distinct()
-        .collect(Collectors.toMap(VirtualArticle::id, VirtualArticle::date));
-    return articles.stream()
-        .peek(article -> article.setVirtualPublication(toPublishArticleIdsMap.get(article.getId())))
-        .sorted(Comparator.comparing(Article::getVirtualPublication, nullsFirst(naturalOrder()))
-            .thenComparing(Article::getCreatedAt).reversed()).toList();
-  }
-
-  private Article enrichArticleWithVirtualPublication(List<Inject> injects, Article article) {
-    return enrichArticleWithVirtualPublication(injects, List.of(article)).stream().findFirst().orElseThrow(ElementNotFoundException::new);
-  }
-
   @GetMapping("/api/observer/channels/{exerciseId}/{channelId}")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public ChannelReader observerArticles(@PathVariable String exerciseId, @PathVariable String channelId) {
@@ -172,13 +140,13 @@ public class ChannelApi extends RestBehavior {
       Exercise exercise = exerciseOpt.get();
       channelReader = new ChannelReader(channel, exercise);
       List<Article> publishedArticles = exercise.getArticlesForChannel(channel);
-      List<Article> articles = enrichArticleWithVirtualPublication(exercise.getInjects(), publishedArticles);
+      List<Article> articles = enrichArticleWithVirtualPublication(exercise.getInjects(), publishedArticles, this.mapper);
       channelReader.setChannelArticles(articles);
     } else {
       Scenario scenario = this.scenarioService.scenario(exerciseId);
       channelReader = new ChannelReader(channel, scenario);
       List<Article> publishedArticles = scenario.getArticlesForChannel(channel);
-      List<Article> articles = enrichArticleWithVirtualPublication(scenario.getInjects(), publishedArticles);
+      List<Article> articles = enrichArticleWithVirtualPublication(scenario.getInjects(), publishedArticles, this.mapper);
       channelReader.setChannelArticles(articles);
     }
     return channelReader;
@@ -283,14 +251,7 @@ public class ChannelApi extends RestBehavior {
       }
     });
     savedArticle.setDocuments(finalArticleDocuments);
-    return enrichArticleWithVirtualPublication(exercise.getInjects(), savedArticle);
-  }
-
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
-  @GetMapping("/api/exercises/{exerciseId}/articles")
-  public Iterable<Article> exerciseArticles(@PathVariable String exerciseId) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    return enrichArticleWithVirtualPublication(exercise.getInjects(), exercise.getArticles());
+    return enrichArticleWithVirtualPublication(exercise.getInjects(), savedArticle, this.mapper);
   }
 
   @PreAuthorize("isExercisePlanner(#exerciseId)")
@@ -327,7 +288,7 @@ public class ChannelApi extends RestBehavior {
     });
     article.setDocuments(articleDocuments);
     Article savedArticle = articleRepository.save(article);
-    return enrichArticleWithVirtualPublication(exercise.getInjects(), savedArticle);
+    return enrichArticleWithVirtualPublication(exercise.getInjects(), savedArticle, this.mapper);
   }
 
   @PreAuthorize("isExercisePlanner(#exerciseId)")
@@ -366,14 +327,7 @@ public class ChannelApi extends RestBehavior {
       }
     });
     savedArticle.setDocuments(finalArticleDocuments);
-    return enrichArticleWithVirtualPublication(scenario.getInjects(), savedArticle);
-  }
-
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
-  @GetMapping(SCENARIO_URI + "/{scenarioId}/articles")
-  public Iterable<Article> scenarioArticles(@PathVariable @NotBlank final String scenarioId) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    return enrichArticleWithVirtualPublication(scenario.getInjects(), scenario.getArticles());
+    return enrichArticleWithVirtualPublication(scenario.getInjects(), savedArticle, this.mapper);
   }
 
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
@@ -411,7 +365,7 @@ public class ChannelApi extends RestBehavior {
     });
     article.setDocuments(articleDocuments);
     Article savedArticle = articleRepository.save(article);
-    return enrichArticleWithVirtualPublication(scenario.getInjects(), savedArticle);
+    return enrichArticleWithVirtualPublication(scenario.getInjects(), savedArticle, this.mapper);
   }
 
   @PreAuthorize("isScenarioPlanner(#scenarioId)")

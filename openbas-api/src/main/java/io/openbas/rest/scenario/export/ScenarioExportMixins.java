@@ -13,9 +13,6 @@ public class ScenarioExportMixins {
       "scenario_category",
       "scenario_main_focus",
       "scenario_severity",
-      "scenario_recurrence",
-      "scenario_recurrence_start",
-      "scenario_recurrence_end",
       "scenario_message_header",
       "scenario_message_footer",
       "scenario_mail_from",
@@ -25,7 +22,7 @@ public class ScenarioExportMixins {
   public static class Scenario {
   }
 
-  @JsonIgnoreProperties(value = {"scenarios_users", "scenarios_organizations"})
+  @JsonIgnoreProperties(value = {"scenario_users", "scenario_organizations"})
   public static class ScenarioWithoutPlayers {
   }
 
