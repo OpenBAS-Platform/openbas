@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
@@ -12,6 +14,7 @@ import java.util.Objects;
 
 import static java.time.Instant.now;
 
+@Setter
 @Entity
 @Table(name = "challenges_flags")
 @EntityListeners(ModelBaseListener.class)
@@ -30,23 +33,28 @@ public class ChallengeFlag implements Base {
     @JsonProperty("flag_id")
     private String id;
 
+    @Getter
     @Column(name = "flag_created_at")
     @JsonProperty("flag_created_at")
     private Instant createdAt = now();
 
+    @Getter
     @Column(name = "flag_updated_at")
     @JsonProperty("flag_updated_at")
     private Instant updatedAt = now();
 
+    @Getter
     @Column(name = "flag_type")
     @JsonProperty("flag_type")
     @Enumerated(EnumType.STRING)
     private FLAG_TYPE type;
 
+    @Getter
     @Column(name = "flag_value")
     @JsonProperty("flag_value")
     private String value;
 
+    @Getter
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JoinColumn(name = "flag_challenge")
@@ -63,51 +71,7 @@ public class ChallengeFlag implements Base {
         return challenge.isUserHasAccess(user);
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public FLAG_TYPE getType() {
-        return type;
-    }
-
-    public void setType(FLAG_TYPE type) {
-        this.type = type;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public Challenge getChallenge() {
-        return challenge;
-    }
-
-    public void setChallenge(Challenge challenge) {
-        this.challenge = challenge;
-    }
-
-    @Override
+  @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;

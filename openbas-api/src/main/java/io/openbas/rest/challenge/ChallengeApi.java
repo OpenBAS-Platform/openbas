@@ -12,10 +12,8 @@ import io.openbas.rest.challenge.response.ChallengesReader;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ChallengeService;
-import io.openbas.service.ScenarioService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,7 +29,6 @@ import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
 @RestController
 public class ChallengeApi extends RestBehavior {
@@ -44,7 +41,6 @@ public class ChallengeApi extends RestBehavior {
   private InjectExpectationRepository injectExpectationRepository;
   private ChallengeService challengeService;
   private UserRepository userRepository;
-  private ScenarioService scenarioService;
 
   @Autowired
   public void setUserRepository(UserRepository userRepository) {
@@ -84,11 +80,6 @@ public class ChallengeApi extends RestBehavior {
   @Autowired
   public void setExerciseRepository(ExerciseRepository exerciseRepository) {
     this.exerciseRepository = exerciseRepository;
-  }
-
-  @Autowired
-  public void setScenarioService(final ScenarioService scenarioService) {
-    this.scenarioService = scenarioService;
   }
 
   @GetMapping("/api/challenges")
@@ -143,12 +134,6 @@ public class ChallengeApi extends RestBehavior {
     return challengeRepository.save(challenge);
   }
 
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
-  @GetMapping("/api/exercises/{exerciseId}/challenges")
-  public Iterable<Challenge> exerciseChallenges(@PathVariable String exerciseId) {
-    return challengeService.getExerciseChallenges(exerciseId);
-  }
-
   @GetMapping("/api/player/challenges/{exerciseId}")
   public ChallengesReader playerChallenges(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
@@ -176,7 +161,7 @@ public class ChallengeApi extends RestBehavior {
   public ChallengesReader observerChallenges(@PathVariable String exerciseId) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     ChallengesReader challengesReader = new ChallengesReader(exercise);
-    Iterable<Challenge> challenges = exerciseChallenges(exerciseId);
+    Iterable<Challenge> challenges = challengeService.getExerciseChallenges(exerciseId);
     challengesReader.setExerciseChallenges(fromIterable(challenges).stream()
         .map(challenge -> new ChallengeInformation(challenge, null)).toList());
     return challengesReader;
@@ -243,15 +228,6 @@ public class ChallengeApi extends RestBehavior {
       });
     }
     return playerChallenges(exerciseId, userId);
-  }
-
-  // -- SCENARIOS --
-
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
-  @GetMapping(SCENARIO_URI + "/{scenarioId}/challenges")
-  public Iterable<Challenge> scenarioChallenges(@PathVariable @NotBlank final String scenarioId) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    return this.challengeService.getScenarioChallenges(scenario);
   }
 
 }
