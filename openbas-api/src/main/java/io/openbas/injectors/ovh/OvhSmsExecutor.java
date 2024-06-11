@@ -41,7 +41,7 @@ public class OvhSmsExecutor extends Injector {
     }
 
     //We check that at least one user receive the sms before to create expectations
-    AtomicBoolean isSmsReceived = new AtomicBoolean(false);
+    AtomicBoolean isSmsSent = new AtomicBoolean(false);
 
     users.stream().parallel().forEach(context -> {
       ProtectUser user = context.getUser();
@@ -53,7 +53,7 @@ public class OvhSmsExecutor extends Injector {
       } else {
         try {
           String callResult = smsService.sendSms(context, phone, smsMessage);
-          isSmsReceived.set(true);
+          isSmsSent.set(true);
           String message = "Sms sent to " + email + " through " + phone + " (" + callResult + ")";
           execution.addTrace(traceSuccess(message));
         } catch (Exception e) {
@@ -61,7 +61,7 @@ public class OvhSmsExecutor extends Injector {
         }
       }
     });
-    if (isSmsReceived.get()) {
+    if (isSmsSent.get()) {
       List<Expectation> expectations = content.getExpectations()
               .stream()
               .flatMap(entry -> switch (entry.getType()) {
