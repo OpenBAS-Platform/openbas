@@ -330,11 +330,9 @@ const Injects = (props) => {
                     </Tooltip>
                   </CSVLink>
                 ) : (
-                  <Tooltip title={t('Export this list')}>
-                    <IconButton size="medium" disabled>
-                      <FileDownloadOutlined/>
-                    </IconButton>
-                  </Tooltip>
+                  <IconButton size="medium" disabled>
+                    <FileDownloadOutlined/>
+                  </IconButton>
                 )}
               </div>
             )}
