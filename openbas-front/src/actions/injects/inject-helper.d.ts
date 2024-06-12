@@ -6,6 +6,6 @@ export interface InjectHelper {
   getExerciseInjectExpectations: (scenarioId: Scenario['scenario_id']) => InjectExpectation[];
   getExerciseTechnicalInjectsWithNoTeam: (exerciseId: Exercise['exercise_id']) => Inject[];
   getInjectsMap: () => Record<string, Inject>;
-  getInject: (atomicId: string) => Inject;
+  getInject: (injectId: Inject['inject_id']) => Inject;
   getTeamExerciseInjects: (teamId: Team['team_id']) => Inject[];
 }

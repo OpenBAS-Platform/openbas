@@ -11,7 +11,6 @@ import type { ChallengeHelper } from '../../../../../actions/helper';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { fetchScenarioInjects } from '../../../../../actions/Inject';
 import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
 import type { Inject } from '../../../../../utils/api-types';
@@ -22,6 +21,7 @@ import useEntityToggle from '../../../../../utils/hooks/useEntityToggle';
 import ToolBar from '../../../common/ToolBar';
 import { isNotEmptyField } from '../../../../../utils/utils';
 import injectContextForScenario from '../ScenarioContext';
+import { fetchScenarioInjectsSimple } from '../../../../../actions/injects/inject-action';
 
 interface Props {
 
@@ -44,7 +44,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
     },
   );
   useDataLoader(() => {
-    dispatch(fetchScenarioInjects(scenarioId));
+    dispatch(fetchScenarioInjectsSimple(scenarioId));
     dispatch(fetchScenarioTeams(scenarioId));
     dispatch(fetchVariablesForScenario(scenarioId));
   });

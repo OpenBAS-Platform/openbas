@@ -7,7 +7,7 @@ import * as R from 'ramda';
 import type { Exercise, Inject } from '../../../../../utils/api-types';
 import { ArticleContext, TeamContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import { fetchExerciseInjects, updateInjectForExercise } from '../../../../../actions/Inject';
+import { updateInjectForExercise } from '../../../../../actions/Inject';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import Injects from '../../../common/injects/Injects';
@@ -31,6 +31,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import useEntityToggle from '../../../../../utils/hooks/useEntityToggle';
 import ToolBar from '../../../common/ToolBar';
 import { isNotEmptyField } from '../../../../../utils/utils';
+import { fetchExerciseInjectsSimple } from '../../../../../actions/injects/inject-action';
 
 const useStyles = makeStyles(() => ({
   paperChart: {
@@ -64,7 +65,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
     },
   );
   useDataLoader(() => {
-    dispatch(fetchExerciseInjects(exerciseId));
+    dispatch(fetchExerciseInjectsSimple(exerciseId));
     dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchExerciseArticles(exerciseId));
     dispatch(fetchVariablesForExercise(exerciseId));

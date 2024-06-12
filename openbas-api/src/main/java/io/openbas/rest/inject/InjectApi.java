@@ -23,7 +23,6 @@ import io.openbas.service.InjectService;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.AtomicTestingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,6 +34,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -61,6 +61,8 @@ import static java.time.Instant.now;
 @Log
 @RestController
 public class InjectApi extends RestBehavior {
+
+    public static final String INJECT_URI = "/api/injects";
 
     private static final int MAX_NEXT_INJECTS = 6;
 
@@ -163,6 +165,11 @@ public class InjectApi extends RestBehavior {
 
     // -- INJECTS --
 
+    @GetMapping(INJECT_URI + "/{injectId}")
+    public Inject inject(@PathVariable @NotBlank final String injectId) {
+        return this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+    }
+
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/injects/execution/reception/{injectId}")
     public Inject InjectExecutionReception(@PathVariable String injectId,
@@ -217,7 +224,7 @@ public class InjectApi extends RestBehavior {
         return atomicTestingService.tryInject(injectId);
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @PutMapping("/api/injects/{exerciseId}/{injectId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Inject updateInject(
@@ -239,15 +246,18 @@ public class InjectApi extends RestBehavior {
 
     // -- EXERCISES --
 
-    @GetMapping("/api/exercises/{exerciseId}/injects")
+    @GetMapping(EXERCISE_URI + "/{exerciseId}/injects")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public Iterable<Inject> exerciseInjects(@PathVariable String exerciseId) {
-        return injectRepository.findAll(InjectSpecification.fromExercise(exerciseId)).stream()
-                .sorted(Inject.executionComparator).toList();
+    public Iterable<Inject> exerciseInjects(@PathVariable @NotBlank final String exerciseId) {
+        return injectRepository.findAll(InjectSpecification.fromExercise(exerciseId))
+            .stream()
+            .sorted(Inject.executionComparator)
+            .toList();
     }
 
     @PostMapping("/api/exercises/{exerciseId}/injects/search")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
+    @Transactional(readOnly = true)
     public Page<InjectResultDTO> exerciseInjects(
             @PathVariable final String exerciseId,
             @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
@@ -289,7 +299,7 @@ public class InjectApi extends RestBehavior {
 
     @PostMapping("/api/exercises/{exerciseId}/injects")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Inject createInject(@PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
         InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow(ElementNotFoundException::new);
@@ -339,7 +349,7 @@ public class InjectApi extends RestBehavior {
         return injectRepository.save(inject);
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @PostMapping(value = EXERCISE_URI + "/{exerciseId}/inject")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public InjectStatus executeInject(
@@ -373,7 +383,7 @@ public class InjectApi extends RestBehavior {
         return executor.execute(injection);
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @DeleteMapping("/api/exercises/{exerciseId}/injects/{injectId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public void deleteInject(@PathVariable String exerciseId, @PathVariable String injectId) {
@@ -402,7 +412,7 @@ public class InjectApi extends RestBehavior {
         return injectRepository.save(inject);
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @PostMapping("/api/exercises/{exerciseId}/injects/{injectId}/status")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Inject setInjectStatus(@PathVariable String exerciseId, @PathVariable String injectId,
@@ -439,7 +449,7 @@ public class InjectApi extends RestBehavior {
 
     @PostMapping(SCENARIO_URI + "/{scenarioId}/injects")
     @PreAuthorize("isScenarioPlanner(#scenarioId)")
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Inject createInjectForScenario(
             @PathVariable @NotBlank final String scenarioId,
             @Valid @RequestBody InjectInput input) {
@@ -510,7 +520,7 @@ public class InjectApi extends RestBehavior {
         return injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @PutMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
     @PreAuthorize("isScenarioPlanner(#scenarioId)")
     public Inject updateInjectForScenario(
@@ -539,7 +549,7 @@ public class InjectApi extends RestBehavior {
         return updateInjectActivation(injectId, input);
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @DeleteMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
     @PreAuthorize("isScenarioPlanner(#scenarioId)")
     public void deleteInjectForScenario(

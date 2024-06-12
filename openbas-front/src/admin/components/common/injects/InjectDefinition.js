@@ -62,6 +62,7 @@ import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
 import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
 import InjectAddAssetGroups from '../../simulations/simulation/injects/asset_groups/InjectAddAssetGroups';
 import InjectTeamsList from './teams/InjectTeamsList';
+import arraysEqual from '../../../../utils/ArrayUtils';
 
 const styles = (theme) => ({
   header: {
@@ -349,12 +350,12 @@ class InjectDefinition extends Component {
     super(props);
     this.state = {
       allTeams: props.inject.inject_all_teams,
-      teamsIds: props.inject.inject_teams,
-      assetIds: props.inject.inject_assets,
-      assetGroupIds: props.inject.inject_asset_groups,
+      teamsIds: props.inject.inject_teams || [],
+      assetIds: props.inject.inject_assets || [],
+      assetGroupIds: props.inject.inject_asset_groups || [],
       articlesIds: props.inject.inject_content?.articles || [],
       challengesIds: props.inject.inject_content?.challenges || [],
-      documents: props.inject.inject_documents,
+      documents: props.inject.inject_documents || [],
       expectations: props.inject.inject_content?.expectations || [],
       teamsSortBy: 'team_name',
       teamsOrderAsc: true,
@@ -373,6 +374,29 @@ class InjectDefinition extends Component {
     this.props.fetchChannels();
     this.props.fetchChallenges();
     this.props.setInjectDetailsState(this.state);
+  }
+
+  componentDidUpdate(prevProps) {
+    const { inject } = prevProps;
+
+    const updateStateIfChanged = (currentValue, newValue, stateKey) => {
+      if (Array.isArray(newValue) && Array.isArray(currentValue)) {
+        if (!arraysEqual(newValue, currentValue)) {
+          this.setState({ [stateKey]: newValue || [] });
+        }
+      } else if (currentValue !== newValue) {
+        this.setState({ [stateKey]: newValue });
+      }
+    };
+
+    updateStateIfChanged(inject.inject_all_teams, this.props.inject.inject_all_teams, 'allTeams');
+    updateStateIfChanged(inject.inject_teams || [], this.props.inject.inject_teams || [], 'teamsIds');
+    updateStateIfChanged(inject.inject_assets || [], this.props.inject.inject_assets || [], 'assetIds');
+    updateStateIfChanged(inject.inject_asset_groups || [], this.props.inject.inject_asset_groups || [], 'assetGroupIds');
+    updateStateIfChanged(inject.inject_content?.articles || [], this.props.inject.inject_content?.articles || [], 'articlesIds');
+    updateStateIfChanged(inject.inject_content?.challenges || [], this.props.inject.inject_content?.challenges || [], 'challengesIds');
+    updateStateIfChanged(inject.inject_documents || [], this.props.inject.inject_documents || [], 'documents');
+    updateStateIfChanged(inject.inject_content?.expectations || [], this.props.inject.inject_content?.expectations || [], 'expectations');
   }
 
   toggleAll() {

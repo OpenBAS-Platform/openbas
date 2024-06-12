@@ -2,6 +2,7 @@ import { createContext } from 'react';
 import type { ArticleStore, FullArticleStore } from '../../../actions/channels/Article';
 import type { ArticleCreateInput, ArticleUpdateInput, Inject, Team, TeamCreateInput, Variable, VariableInput } from '../../../utils/api-types';
 import type { UserStore } from '../teams/players/Player';
+import type { InjectStore } from '../../../actions/injects/Inject';
 
 export type PermissionsContextType = {
   permissions: { readOnly: boolean, canWrite: boolean, isRunning: boolean }
@@ -47,7 +48,10 @@ export type InjectContextType = {
   onAddInject: (inject: Inject) => Promise<{ result: string }>,
   onUpdateInject: (injectId: Inject['inject_id'], inject: Inject) => Promise<{ result: string }>,
   onUpdateInjectTrigger?: (injectId: Inject['inject_id']) => void,
-  onUpdateInjectActivation: (injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }) => void,
+  onUpdateInjectActivation: (injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }) => Promise<{
+    result: string,
+    entities: { injects: Record<string, InjectStore> }
+  }>,
   onInjectDone?: (injectId: Inject['inject_id']) => void,
   onDeleteInject: (injectId: Inject['inject_id']) => void,
 };
@@ -115,7 +119,11 @@ export const InjectContext = createContext<InjectContextType>({
   },
   onUpdateInjectTrigger(_injectId: Inject['inject_id']): void {
   },
-  onUpdateInjectActivation(_injectId: Inject['inject_id'], _injectEnabled: { inject_enabled: boolean }): void {
+  onUpdateInjectActivation(_injectId: Inject['inject_id'], _injectEnabled: { inject_enabled: boolean }): Promise<{
+    result: string,
+    entities: { injects: Record<string, InjectStore> }
+  }> {
+    return Promise.resolve({ result: '', entities: { injects: {} } });
   },
   onInjectDone(_injectId: Inject['inject_id']): void {
   },
