@@ -1,7 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { useParams } from 'react-router-dom';
 import * as R from 'ramda';
-import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import { ArticleContext, TeamContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
@@ -13,7 +12,7 @@ import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
-import type { Inject } from '../../../../../utils/api-types';
+import type { Inject, Scenario } from '../../../../../utils/api-types';
 import Injects from '../../../common/injects/Injects';
 import { articleContextForScenario } from '../articles/ScenarioArticles';
 import { teamContextForScenario } from '../teams/ScenarioTeams';
@@ -30,7 +29,7 @@ interface Props {
 const ScenarioInjects: FunctionComponent<Props> = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
-  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
+  const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
 
   const { injects, scenario, teams, articles, variables } = useHelper(
     (helper: InjectHelper & ScenariosHelper & ArticlesHelper & ChallengeHelper & VariablesHelper) => {

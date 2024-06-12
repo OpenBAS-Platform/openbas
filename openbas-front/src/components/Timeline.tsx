@@ -12,7 +12,6 @@ import useSearchAnFilter from '../utils/SortingFiltering';
 import { useHelper } from '../store';
 import type { InjectHelper } from '../actions/injects/inject-helper';
 import { truncate } from '../utils/String';
-import type { ScenariosHelper } from '../actions/scenarios/scenario-helper';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -102,7 +101,7 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
   const {
     injectsPerTeam,
     technicalInjectsPerType,
-  } = useHelper((helper: InjectHelper & ScenariosHelper) => {
+  } = useHelper((helper: InjectHelper) => {
     const getTechnicalInjectsWithNoTeam = () => {
       const exerciseInjects = helper.getExerciseTechnicalInjectsWithNoTeam(exerciseOrScenarioId);
       return exerciseInjects.length > 0 ? exerciseInjects : helper.getScenarioTechnicalInjectsWithNoTeam(exerciseOrScenarioId);
