@@ -77,7 +77,6 @@ const TimelineOverview = () => {
     injects,
     teams,
     tagsMap,
-    selectedInject,
   } = useHelper((helper: InjectHelper & ExercisesHelper & TagHelper) => {
     const exerciseTeams = helper.getExerciseTeams(exerciseId);
     return {
@@ -85,7 +84,6 @@ const TimelineOverview = () => {
       injects: helper.getExerciseInjects(exerciseId),
       teams: exerciseTeams,
       tagsMap: helper.getTagsMap(),
-      selectedInject: selectedInjectId && helper.getInject(selectedInjectId),
     };
   });
 
@@ -128,10 +126,10 @@ const TimelineOverview = () => {
                     return (
                       <ListItem
                         key={inject.inject_id}
-                        dense={true}
+                        dense
                         classes={{ root: classes.item }}
-                        divider={true}
-                        button={true}
+                        divider
+                        button
                         disabled={isDisabled || !inject.inject_enabled}
                         onClick={() => setSelectedInjectId(inject.inject_id)}
                       >
@@ -272,13 +270,12 @@ const TimelineOverview = () => {
           </Paper>
         </Grid>
       </Grid>
-      {selectedInject && (
+      {selectedInjectId && (
         <UpdateInject
           open={selectedInjectId !== null}
           handleClose={() => setSelectedInjectId(null)}
           onUpdateInject={onUpdateInject}
-          injectorContract={selectedInject.inject_injector_contract.injector_contract_content_parsed}
-          inject={selectedInject}
+          injectId={selectedInjectId}
           teamsFromExerciseOrScenario={teams}
           isAtomic={false}
         />
