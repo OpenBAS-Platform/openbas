@@ -4,7 +4,7 @@ import io.openbas.database.model.Exercise;
 import jakarta.persistence.criteria.Path;
 import org.springframework.data.jpa.domain.Specification;
 
-import static io.openbas.database.model.Exercise.STATUS.SCHEDULED;
+import static io.openbas.database.model.ExerciseStatus.SCHEDULED;
 
 public class ExerciseSpecification {
 

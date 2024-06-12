@@ -3,6 +3,7 @@ package io.openbas.rest.exercise.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.model.Exercise;
+import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Tag;
 import io.openbas.database.raw.RawExercise;
@@ -42,7 +43,7 @@ public class ExerciseSimple {
 
   @JsonProperty("exercise_status")
   @Enumerated(EnumType.STRING)
-  private Exercise.STATUS status;
+  private ExerciseStatus status;
 
   @JsonProperty("exercise_subtitle")
   private String subtitle;
@@ -95,7 +96,7 @@ public class ExerciseSimple {
     }
     simple.setCategory(exercise.getExercise_category());
     simple.setSubtitle(exercise.getExercise_subtitle());
-    simple.setStatus(Exercise.STATUS.valueOf(exercise.getExercise_status()));
+    simple.setStatus(ExerciseStatus.valueOf(exercise.getExercise_status()));
     simple.setStart(exercise.getExercise_start_date());
 
     // We set the ExpectationResults

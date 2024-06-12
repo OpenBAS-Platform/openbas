@@ -104,19 +104,27 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
   @Query("select count(distinct i) from Inject i where i.createdAt < :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
 
-  @Query(value = " SELECT injects.inject_id, " +
+  @Query(value = " SELECT injects.inject_id, ins.status_name, injects.inject_scenario, " +
           "coalesce(array_agg(it.team_id) FILTER ( WHERE it.team_id IS NOT NULL ), '{}') as inject_teams, " +
           "coalesce(array_agg(assets.asset_id) FILTER ( WHERE assets.asset_id IS NOT NULL ), '{}') as inject_assets, " +
           "coalesce(array_agg(iag.asset_group_id) FILTER ( WHERE iag.asset_group_id IS NOT NULL ), '{}') as inject_asset_groups, " +
-          "coalesce(array_agg(ie.inject_expectation_id) FILTER ( WHERE ie.inject_expectation_id IS NOT NULL ), '{}') as inject_expectations " +
+          "coalesce(array_agg(ie.inject_expectation_id) FILTER ( WHERE ie.inject_expectation_id IS NOT NULL ), '{}') as inject_expectations, " +
+          "coalesce(array_agg(com.communication_id) FILTER ( WHERE com.communication_id IS NOT NULL ), '{}') as inject_communications, " +
+          "coalesce(array_agg(apkcp.phase_id) FILTER ( WHERE apkcp.phase_id IS NOT NULL ), '{}') as inject_kill_chain_phases, " +
+          "coalesce(array_union_agg(injcon.injector_contract_platforms) FILTER ( WHERE injcon.injector_contract_platforms IS NOT NULL ), '{}') as inject_platforms " +
           "FROM injects " +
           "LEFT JOIN injects_teams it ON injects.inject_id = it.inject_id " +
           "LEFT JOIN injects_assets ia ON injects.inject_id = ia.inject_id " +
           "LEFT JOIN injects_asset_groups iag ON injects.inject_id = iag.inject_id " +
           "LEFT JOIN asset_groups_assets aga ON aga.asset_group_id = iag.asset_group_id " +
           "LEFT JOIN assets ON assets.asset_id = ia.asset_id OR aga.asset_id = assets.asset_id " +
+          "LEFT JOIN communications com ON com.communication_inject = injects.inject_id " +
           "LEFT JOIN injects_expectations ie ON injects.inject_id = ie.inject_id " +
+          "LEFT JOIN injectors_contracts_attack_patterns icap ON icap.injector_contract_id = injects.inject_injector_contract " +
+          "LEFT JOIN injectors_contracts injcon ON injcon.injector_contract_id = injects.inject_injector_contract " +
+          "LEFT JOIN attack_patterns_kill_chain_phases apkcp ON apkcp.attack_pattern_id = icap.attack_pattern_id " +
+          "LEFT JOIN injects_statuses ins ON ins.status_inject = injects.inject_id " +
           "WHERE injects.inject_id IN :ids " +
-          "GROUP BY injects.inject_id;", nativeQuery = true)
+          "GROUP BY injects.inject_id, ins.status_name;", nativeQuery = true)
   List<RawInject> findRawByIds(@Param("ids")List<String> ids);
 }

@@ -2,9 +2,7 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.annotation.Queryable;
@@ -15,7 +13,6 @@ import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
-import jakarta.annotation.Resource;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -335,7 +332,7 @@ public class Inject implements Base, Injection {
         }
 
         if (this.getExercise() != null) {
-            if (this.getExercise().getStatus().equals(Exercise.STATUS.CANCELED)) {
+            if (this.getExercise().getStatus().equals(ExerciseStatus.CANCELED)) {
                 return Optional.empty();
             }
             return this.getExercise()
