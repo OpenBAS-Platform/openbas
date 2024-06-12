@@ -99,6 +99,7 @@ const InjectorContractForm = (props) => {
             name="injector_contract_attack_patterns"
             label={t('Attack patterns')}
             values={values}
+            injectorContractUpdate={false}
             setFieldValue={form.mutators.setValue}
             style={{ marginTop: 20 }}
             useExternalId={!editing}

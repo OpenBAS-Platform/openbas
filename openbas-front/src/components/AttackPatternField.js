@@ -71,6 +71,7 @@ class AttackPatternField extends Component {
       attackPatterns,
       killChainPhasesMap,
       classes,
+      injectorContractUpdate,
       onKeyDown,
       style,
       label,
@@ -100,6 +101,7 @@ class AttackPatternField extends Component {
           placeholder={placeholder}
           options={attackPatternsOptions}
           style={style}
+          injectorContractUpdate={injectorContractUpdate}
           openCreate={userAdmin ? this.handleOpenAttackPatternCreation.bind(this) : null}
           onKeyDown={onKeyDown}
           renderOption={(props, option) => (

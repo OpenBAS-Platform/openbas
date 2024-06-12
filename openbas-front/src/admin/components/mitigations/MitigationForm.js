@@ -43,6 +43,7 @@ const MitigationForm = (props) => {
             name="mitigation_attack_patterns"
             label={t('Attack patterns')}
             values={values}
+            injectorContractUpdate={false}
             setFieldValue={form.mutators.setValue}
             style={{ marginTop: 20 }}
           />
