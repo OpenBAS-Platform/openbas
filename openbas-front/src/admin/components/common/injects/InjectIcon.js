@@ -23,6 +23,7 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
       alt={type}
       style={{
         marginTop: variant === 'list' ? 5 : 0,
+        padding: variant === 'timeline' ? 1 : 0,
         width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
         height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
         borderRadius: 4,

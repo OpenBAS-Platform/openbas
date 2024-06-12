@@ -237,6 +237,7 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
                             done={inject.inject_status !== null}
                             disabled={!inject.inject_enabled}
                             size="small"
+                            variant={'timeline'}
                           />
                         ))}
                       </div>
