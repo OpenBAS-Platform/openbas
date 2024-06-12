@@ -2,7 +2,6 @@ package io.openbas.asset;
 
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import io.openbas.database.repository.EndpointRepository;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
@@ -95,24 +94,27 @@ public class EndpointService {
     this.endpointRepository.deleteById(endpointId);
   }
 
+  public String getFileOrDownloadFromJfrog(String platform, String file) throws IOException {
+    String extension = switch (platform.toLowerCase()) {
+      case "windows" -> "ps1";
+      case "linux" -> "sh";
+      default -> throw new UnsupportedOperationException("");
+    };
+    String filename = file +  "-" + version + "." + extension;
+    InputStream in = getClass().getResourceAsStream("/agents/openbas/" + platform + "/" + filename);
+    if (in == null) { // Dev mode, get from artifactory
+        in = new BufferedInputStream(new URL(JFROG_BASE + file + "-latest." + extension).openStream());
+    }
+    return IOUtils.toString(in, StandardCharsets.UTF_8)
+            .replace("${OPENBAS_URL}", openBASConfig.getBaseUrl())
+            .replace("${OPENBAS_TOKEN}", adminToken);
+  }
+
   public String generateInstallCommand(String platform) throws IOException {
-    if (platform.equalsIgnoreCase("windows")) {
-      return "Stop-Service -Force -Name \"OBAS Agent Service\"; Invoke-WebRequest -Uri " +
-              "\"" + openBASConfig.getBaseUrl() + "/api/agent/package/openbas/windows\" -OutFile \"openbas-installer.exe\"; " +
-              "./openbas-installer.exe /S ~OPENBAS_URL=\"" + openBASConfig.getBaseUrl() + "\" ~ACCESS_TOKEN=\""+ adminToken + "\"; " +
-              "Start-Sleep -Seconds 1.5; rm -force ./openbas-installer.exe;";
-    }
-    if (platform.equalsIgnoreCase("linux")) {
-      String filename = "openbas-agent-installer-" + version + ".sh";
-      InputStream in = getClass().getResourceAsStream("/agents/openbas/linux/" + filename);
-      if (in == null) { // Dev mode, get from artifactory
-        filename = "openbas-agent-installer-latest.sh";
-        in = new BufferedInputStream(new URL(JFROG_BASE + filename).openStream());
-      }
-      return IOUtils.toString(in, StandardCharsets.UTF_8)
-              .replace("${OPENBAS_URL}", openBASConfig.getBaseUrl())
-              .replace("${OPENBAS_TOKEN}", adminToken);
-    }
-    throw new UnsupportedOperationException("Agent " + platform + " installer not supported");
+    return getFileOrDownloadFromJfrog(platform, "openbas-agent-installer");
+  }
+
+  public String generateUpgradeCommand(String platform) throws IOException {
+    return getFileOrDownloadFromJfrog(platform, "openbas-agent-upgrade");
   }
 }

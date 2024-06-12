@@ -90,7 +90,7 @@ public class EndpointApi {
     // If agent is not temporary and not the same version as the platform => Create an upgrade task for the agent
     if (updatedEndpoint.getParent() == null && !updatedEndpoint.getAgentVersion().equals(version)) {
       AssetAgentJob assetAgentJob = new AssetAgentJob();
-      assetAgentJob.setCommand(this.endpointService.generateInstallCommand(updatedEndpoint.getPlatform().name()));
+      assetAgentJob.setCommand(this.endpointService.generateUpgradeCommand(updatedEndpoint.getPlatform().name()));
       assetAgentJob.setAsset(updatedEndpoint);
       assetAgentJobRepository.save(assetAgentJob);
     }
