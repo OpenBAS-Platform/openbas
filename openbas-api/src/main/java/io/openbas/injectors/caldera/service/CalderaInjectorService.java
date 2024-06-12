@@ -56,7 +56,7 @@ public class CalderaInjectorService {
     public Ability createAbility(Payload payload) {
         List<Map<String, Object>> executors = new ArrayList<>();
         List<String> cleanupCommands = new ArrayList<>();
-        if( payload.getCleanupCommand() != null ) {
+        if (payload.getCleanupCommand() != null) {
             cleanupCommands.add(payload.getCleanupCommand());
         }
         switch (payload.getType()) {

@@ -283,17 +283,6 @@ const PayloadForm = (props) => {
                             {t('Sh')}
                           </MenuItem>
                         </OldSelectField>
-                        <OldSelectField
-                          variant="standard"
-                          name={`${name}.check_command`}
-                          fullWidth={true}
-                          label={t('Type')}
-                          style={{ marginRight: 20 }}
-                        >
-                          <MenuItem key="text" value="text">
-                            <ListItemText>{t('Text')}</ListItemText>
-                          </MenuItem>
-                        </OldSelectField>
                         <OldTextField
                           variant="standard"
                           name={`${name}.get_command`}
