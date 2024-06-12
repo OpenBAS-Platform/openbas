@@ -229,17 +229,30 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
                         className={classes.injectGroup}
                         style={{ left: `${injectGroupPosition}%` }}
                       >
-                        {injectsGroupedByTick[key].map((inject: InjectStore) => (
-                          <InjectIcon
-                            key={inject.inject_id}
-                            type={inject.inject_type}
-                            tooltip={inject.inject_title}
-                            done={inject.inject_status !== null}
-                            disabled={!inject.inject_enabled}
-                            size="small"
-                            variant={'timeline'}
-                          />
-                        ))}
+                        {injectsGroupedByTick[key].map((inject: InjectStore) => {
+                          const duration = splitDuration(inject.inject_depends_duration || 0);
+                          const tooltipContent = (
+                            <React.Fragment>
+                              {inject.inject_title}
+                              <br />
+                              <span style={{ display: 'block', textAlign: 'center', fontWeight: 'bold' }}>
+                                {`${duration.days} ${t('d')}, ${duration.hours} ${t('h')}, ${duration.minutes} ${t('m')}`}
+                              </span>
+                            </React.Fragment>
+                          );
+                          return (
+                            <InjectIcon
+                              key={inject.inject_id}
+                              type={inject.inject_type}
+                              tooltip={tooltipContent}
+                              done={inject.inject_status !== null}
+                              disabled={!inject.inject_enabled}
+                              size="small"
+                              variant={'timeline'}
+                            />
+                          );
+                        })
+                        }
                       </div>
                     );
                   })}
