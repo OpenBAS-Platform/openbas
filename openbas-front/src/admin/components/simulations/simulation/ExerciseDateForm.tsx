@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button, FormControlLabel, Switch, Stack } from '@mui/material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
@@ -12,7 +12,6 @@ import { minutesInFuture } from '../../../../utils/Time';
 interface Props {
   onSubmit: SubmitHandler<ExerciseUpdateStartDateInput>;
   initialValues?: ExerciseUpdateStartDateInput;
-  editing?: boolean;
   handleClose: () => void;
 }
 
@@ -24,11 +23,6 @@ interface ExerciseStartDateAndTime {
 // eslint-disable-next-line no-underscore-dangle
 const _MS_DELAY_TOO_CLOSE = 1000 * 60 * 2;
 
-const defaultFormValues = () => ({
-  date: new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString(),
-  time: minutesInFuture(5).toISOString(),
-});
-
 const ExerciseDateForm: React.FC<Props> = ({
   onSubmit,
   handleClose,
@@ -36,7 +30,17 @@ const ExerciseDateForm: React.FC<Props> = ({
 }) => {
   const { t } = useFormatter();
 
-  const [checked, setChecked] = useState(true);
+  const defaultFormValues = () => {
+    if (initialValues?.exercise_start_date) {
+      return ({ date: initialValues.exercise_start_date, time: initialValues.exercise_start_date });
+    }
+    return ({
+      date: new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString(),
+      time: minutesInFuture(5).toISOString(),
+    });
+  };
+
+  const [checked, setChecked] = useState(!initialValues?.exercise_start_date);
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked);
   };
@@ -59,7 +63,6 @@ const ExerciseDateForm: React.FC<Props> = ({
     handleSubmit,
     clearErrors,
     getValues,
-    reset,
   } = useForm<ExerciseStartDateAndTime>({
     defaultValues: defaultFormValues(),
     resolver: zodResolver(
@@ -92,15 +95,6 @@ const ExerciseDateForm: React.FC<Props> = ({
           },
         ),
     ),
-  });
-
-  useEffect(() => {
-    if (initialValues?.exercise_start_date != null) {
-      reset({
-        date: initialValues.exercise_start_date,
-        time: initialValues.exercise_start_date,
-      });
-    }
   });
 
   return (
