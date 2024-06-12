@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AppBar, Badge, Box, Grid, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import {Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { AccountCircleOutlined, AppsOutlined, ImportantDevicesOutlined, NotificationsOutlined } from '@mui/icons-material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { logout } from '../../../actions/Application';
@@ -149,6 +149,9 @@ const TopBar: React.FC = () => {
     }
   };
 
+  const [searchParams] = useSearchParams();
+  const [search] = searchParams.getAll('search');
+
   return (
     <AppBar
       position="fixed"
@@ -172,6 +175,7 @@ const TopBar: React.FC = () => {
             placeholder={`${t('Search the platform')}...`}
             fullWidth={true}
             onSubmit={onFullTextSearch}
+            keyword={search}
           />
         </div>
         <div className={classes.barRight}>

@@ -39,6 +39,8 @@ public class FullTextSearchService<T extends Base> {
 
   private Map<Class<T>, JpaSpecificationExecutor<T>> repositoryMap;
 
+  private Map<Class<T>, List<String>> searchListByClassMap ;
+
   @PostConstruct
   @SuppressWarnings("unchecked")
   public void init() {
@@ -50,6 +52,15 @@ public class FullTextSearchService<T extends Base> {
         (Class<T>) Organization.class, (JpaSpecificationExecutor<T>) this.organizationRepository,
         (Class<T>) Scenario.class, (JpaSpecificationExecutor<T>) this.scenarioRepository,
         (Class<T>) Exercise.class, (JpaSpecificationExecutor<T>) this.exerciseRepository
+    );
+
+    this.searchListByClassMap = Map.of((Class<T>) Asset.class, List.of("name", "id"),
+            (Class<T>) AssetGroup.class, List.of("name", "id"),
+            (Class<T>) User.class, List.of("email", "id"),
+            (Class<T>) Team.class, List.of("name", "id"),
+            (Class<T>) Organization.class, List.of("name", "id"),
+            (Class<T>) Scenario.class, List.of("name", "id"),
+            (Class<T>) Exercise.class, List.of("name", "id")
     );
   }
 
@@ -69,9 +80,12 @@ public class FullTextSearchService<T extends Base> {
 
     JpaSpecificationExecutor<T> repository = repositoryMap.get(clazzT);
 
+    String finalSearchTerm = getFinalSearchTerm(searchPaginationInput.getTextSearch());
+
     return buildPaginationJPA(
         repository::findAll,
         searchPaginationInput,
+        SpecificationUtils.fullTextSearch(finalSearchTerm, searchListByClassMap.get(clazzT)),
         clazzT
     ).map(this::transform);
   }
@@ -161,43 +175,20 @@ public class FullTextSearchService<T extends Base> {
     }
 
     Map<Class<T>, FullTextSearchCountResult> results = new HashMap<>();
-    String finalSearchTerm = Arrays.stream(searchTerm.split(" "))
-        .map((s) -> "(" + s + ":*)")
-        .collect(Collectors.joining(" & "));
+    String finalSearchTerm = getFinalSearchTerm(searchTerm);
 
-    // Search on assets
-    long assets = this.assetRepository.count(SpecificationUtils.fullTextSearch(finalSearchTerm, "name"));
-    results.put((Class<T>) Asset.class, new FullTextSearchCountResult(Asset.class.getSimpleName(), assets));
-
-    // Search on asset groups
-    long assetGroups = this.assetGroupRepository.count(
-        SpecificationUtils.fullTextSearch(finalSearchTerm, "name"));
-    results.put((Class<T>) AssetGroup.class, new FullTextSearchCountResult(AssetGroup.class.getSimpleName(), assetGroups));
-
-    // Search on users
-    long users = this.userRepository.count(SpecificationUtils.fullTextSearch(finalSearchTerm, "email"));
-    results.put((Class<T>) User.class, new FullTextSearchCountResult(User.class.getSimpleName(), users));
-
-    // Search on teams
-    long teams = this.teamRepository.count(SpecificationUtils.fullTextSearch(finalSearchTerm, "name"));
-    results.put((Class<T>) Team.class, new FullTextSearchCountResult(Team.class.getSimpleName(), teams));
-
-    // Search on organizations
-    long organizations = this.organizationRepository.count(
-        SpecificationUtils.fullTextSearch(finalSearchTerm, "name"));
-    results.put((Class<T>) Organization.class, new FullTextSearchCountResult(Organization.class.getSimpleName(), organizations));
-
-    // Search on scenarios
-    long scenarios = this.scenarioRepository.count(
-        SpecificationUtils.fullTextSearch(finalSearchTerm, "name"));
-    results.put((Class<T>) Scenario.class, new FullTextSearchCountResult(Scenario.class.getSimpleName(), scenarios));
-
-    // Search on simulations
-    long exercises = this.exerciseRepository.count(
-        SpecificationUtils.fullTextSearch(finalSearchTerm, "name"));
-    results.put((Class<T>) Exercise.class, new FullTextSearchCountResult(Exercise.class.getSimpleName(), exercises));
+    repositoryMap.forEach((className, repository) -> {
+      long count = repository.count(SpecificationUtils.fullTextSearch(finalSearchTerm, searchListByClassMap.get(className)));
+      results.put(className, new FullTextSearchCountResult(className.getSimpleName(), count));
+    });
 
     return results;
+  }
+
+  private static String getFinalSearchTerm(String searchTerm) {
+    return Arrays.stream(searchTerm.split(" "))
+            .map((s) -> "(" + s + ":*)")
+            .collect(Collectors.joining(" & "));
   }
 
   @AllArgsConstructor
