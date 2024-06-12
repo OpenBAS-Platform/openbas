@@ -113,7 +113,7 @@ public class InjectModelHelper {
     }
 
     if (exercise != null) {
-      if (exercise.getStatus().equals(Exercise.STATUS.CANCELED)) {
+      if (exercise.getStatus().equals(ExerciseStatus.CANCELED)) {
         return Optional.empty();
       }
       return exercise
