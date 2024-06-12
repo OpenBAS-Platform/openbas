@@ -33,7 +33,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, inje
 
   const [injectorContract, setInjectorContract] = useState(null);
   useEffect(() => {
-    if (inject.inject_injector_contract?.injector_contract_content) {
+    if (inject?.inject_injector_contract?.injector_contract_content) {
       setInjectorContract(JSON.parse(inject.inject_injector_contract?.injector_contract_content));
     }
   }, [inject]);
