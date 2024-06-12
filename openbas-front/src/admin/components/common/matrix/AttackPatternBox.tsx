@@ -57,31 +57,20 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
   const [open, setOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const results: InjectExpectationResultsByTypeStore[] = injectResult?.inject_expectation_results ?? [];
-  if (results.length < 2) {
+
+  if (dummy) {
     const content = () => (
       <div className={classes.buttonText}>
-        <Typography variant="caption" style={{ color: dummy ? theme.palette.text?.disabled : theme.palette.text?.primary }}>
+        <Typography variant="caption" style={{ color: theme.palette.text?.disabled }}>
           {attackPattern.attack_pattern_name}
         </Typography>
         <AtomicTestingResult expectations={results[0]?.results ?? []} />
       </div>
     );
-    if (goToLink) {
-      return (
-        <Button
-          key={attackPattern.attack_pattern_id}
-          className={dummy ? classes.buttonDummy : classes.button}
-          component={Link}
-          to={goToLink ?? ''}
-        >
-          {content()}
-        </Button>
-      );
-    }
     return (
       <div
         key={attackPattern.attack_pattern_id}
-        className={dummy ? classes.buttonDummy : classes.button}
+        className={classes.buttonDummy}
       >
         {content()}
       </div>
