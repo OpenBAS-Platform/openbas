@@ -15,6 +15,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.*;
@@ -192,6 +193,7 @@ public class V1_DataImporter implements Importer {
   }
 
   @Override
+  @Transactional
   public void importData(JsonNode importNode, Map<String, ImportEntry> docReferences) {
     Map<String, Base> baseIds = new HashMap<>();
     final String prefix = importNode.has("exercise_information") ? "exercise_" : "scenario_";
@@ -398,7 +400,7 @@ public class V1_DataImporter implements Importer {
   private Organization createOrganization(JsonNode importNode, Map<String, Base> baseIds) {
     Organization organization = new Organization();
     organization.setName(importNode.get("organization_name").textValue());
-    organization.setDescription(importNode.get("organization_description").textValue());
+    organization.setDescription(getNodeValue(importNode.get("organization_description")));
     organization.setTags(
         resolveJsonIds(importNode, "organization_tags")
             .stream()
@@ -436,11 +438,11 @@ public class V1_DataImporter implements Importer {
     user.setEmail(jsonNode.get("user_email").textValue());
     user.setFirstname(jsonNode.get("user_firstname").textValue());
     user.setLastname(jsonNode.get("user_lastname").textValue());
-    user.setLang(jsonNode.get("user_lang").textValue());
-    user.setPhone(jsonNode.get("user_phone").textValue());
-    user.setPgpKey(jsonNode.get("user_pgp_key").textValue());
-    user.setCountry(jsonNode.get("user_country").textValue());
-    user.setCity(jsonNode.get("user_city").textValue());
+    user.setLang(getNodeValue(jsonNode.get("user_lang")));
+    user.setPhone(getNodeValue(jsonNode.get("user_phone")));
+    user.setPgpKey(getNodeValue(jsonNode.get("user_pgp_key")));
+    user.setCountry(getNodeValue(jsonNode.get("user_country")));
+    user.setCity(getNodeValue(jsonNode.get("user_city")));
     Base userOrganization = baseIds.get(jsonNode.get("user_organization").textValue());
     if (userOrganization != null) {
       user.setOrganization((Organization) userOrganization);
@@ -841,6 +843,11 @@ public class V1_DataImporter implements Importer {
     }));
   }
 
+  private String getNodeValue(JsonNode importNode) {
+    return Optional.ofNullable(importNode)
+        .map(JsonNode::textValue)
+        .orElse(null);
+  }
 
   private static class BaseHolder implements Base {
 

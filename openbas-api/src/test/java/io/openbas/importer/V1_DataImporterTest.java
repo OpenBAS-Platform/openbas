@@ -12,6 +12,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -49,7 +50,7 @@ class V1_DataImporterTest extends IntegrationTest {
   public static final String TEAM_NAME = "Animation team";
   public static final String USER_EMAIL = "Romuald.Lemesle@openbas.io";
   public static final String ORGANIZATION_NAME = "Filigran";
-  public static final String TAG_NAME = "Crisis exercise";
+  public static final String TAG_NAME = "crisis exercise";
 
   @BeforeAll
   public void setUp() throws Exception {
@@ -60,6 +61,7 @@ class V1_DataImporterTest extends IntegrationTest {
   }
 
   @Test
+  @Transactional
   void testImportData() {
     // -- EXECUTE --
     this.importer.importData(this.importNode, Map.of());
