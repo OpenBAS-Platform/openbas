@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 import { MESSAGING$ } from './Environment';
 import { useHelper } from '../store';
-import { LoggedHelper } from '../actions/helper';
+import type { LoggedHelper } from '../actions/helper';
 
 export const export_max_size = 50000;
 
