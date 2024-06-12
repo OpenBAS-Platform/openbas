@@ -15,7 +15,6 @@ import { fetchTeams } from '../../../../actions/teams/team-actions';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import { isNotEmptyField } from '../../../../utils/utils';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
-import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 
 interface Props {
   atomic: InjectResultDTO;
