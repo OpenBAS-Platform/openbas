@@ -28,7 +28,7 @@ import static java.time.Instant.now;
 @Service
 public class EndpointService {
 
-  public static String JFROG_BASE = "https://filigran.jfrog.io/artifactory/openbas-agent/";
+  public static String JFROG_BASE = "https://filigran.jfrog.io/artifactory";
 
   @Resource
   private OpenBASConfig openBASConfig;
@@ -97,13 +97,15 @@ public class EndpointService {
   public String getFileOrDownloadFromJfrog(String platform, String file) throws IOException {
     String extension = switch (platform.toLowerCase()) {
       case "windows" -> "ps1";
-      case "linux" -> "sh";
-      default -> throw new UnsupportedOperationException("");
+      case "linux", "macos" -> "sh";
+        default -> throw new UnsupportedOperationException("");
     };
     String filename = file +  "-" + version + "." + extension;
-    InputStream in = getClass().getResourceAsStream("/agents/openbas/" + platform + "/" + filename);
+    String resourcePath = "/openbas-agent/" + platform + "/";
+    InputStream in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
     if (in == null) { // Dev mode, get from artifactory
-        in = new BufferedInputStream(new URL(JFROG_BASE + file + "-latest." + extension).openStream());
+      filename = file + "-latest." + extension;
+      in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
     }
     return IOUtils.toString(in, StandardCharsets.UTF_8)
             .replace("${OPENBAS_URL}", openBASConfig.getBaseUrl())

@@ -125,24 +125,26 @@ public class ExecutorApi extends RestBehavior {
     }
 
     // Public API
-    @GetMapping(value = "/api/agent/executable/openbas/{platform}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentExecutable(@PathVariable String platform) throws IOException {
+    @GetMapping(value = "/api/agent/executable/openbas/{platform}/{architecture}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentExecutable(@PathVariable String platform, @PathVariable String architecture) throws IOException {
         InputStream in = null;
         String filename = null;
-        if (platform.equals("windows")) {
+        if (platform.equals("windows") && architecture.equals("x86_64")) {
             filename = "openbas-agent-" + version + ".exe";
-            in = getClass().getResourceAsStream("/agents/openbas/windows/" + filename);
+            String resourcePath = "/openbas-agent/windows/x86_64/";
+            in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
             if (in == null) { // Dev mode, get from artifactory
                 filename = "openbas-agent-latest.exe";
-                in = new BufferedInputStream(new URL(JFROG_BASE + filename).openStream());
+                in = new BufferedInputStream(new URL(JFROG_BASE +  resourcePath + filename).openStream());
             }
         }
-        if (platform.equals("linux")) {
+        if (platform.equals("linux") || platform.equals("macos")) {
             filename = "openbas-agent-" + version;
-            in = getClass().getResourceAsStream("/agents/openbas/linux/" + filename);
+            String resourcePath = "/openbas-agent/" + platform + "/" + architecture + "/";
+            in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
             if (in == null) { // Dev mode, get from artifactory
                 filename = "openbas-agent-latest";
-                in = new BufferedInputStream(new URL(JFROG_BASE + filename).openStream());
+                in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
             }
         }
         if (in != null) {
@@ -157,18 +159,19 @@ public class ExecutorApi extends RestBehavior {
     }
 
     // Public API
-    @GetMapping(value = "/api/agent/package/openbas/{platform}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentPackage(@PathVariable String platform) throws IOException {
+    @GetMapping(value = "/api/agent/package/openbas/{platform}/{architecture}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentPackage(@PathVariable String platform, @PathVariable String architecture) throws IOException {
         byte[] file = null;
         String filename = null;
-        if (platform.equals("windows")) {
+        if (platform.equals("windows") && architecture.equals("x86_64")) {
             filename = "openbas-agent-installer-" + version + ".exe";
-            InputStream in = getClass().getResourceAsStream("/agents/openbas/windows/" + filename);
+            String resourcePath = "/openbas-agent/windows/x86_64/";
+            InputStream in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
             if (in != null) {
                 file = IOUtils.toByteArray(in);
             } else { // Dev mode, get from artifactory
                 filename = "openbas-agent-installer-latest.exe";
-                in = new BufferedInputStream(new URL(JFROG_BASE + filename).openStream());
+                in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
                 file = IOUtils.toByteArray(in);
             }
         }
