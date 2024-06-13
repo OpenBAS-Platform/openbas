@@ -1167,6 +1167,11 @@ export interface InjectorContract {
   updateAttributes?: object;
 }
 
+export interface InjectorContractLight {
+  injector_contract_id: string;
+  injector_contract_attack_patterns_external_id?: string[];
+}
+
 export interface InjectorContractAddInput {
   atomicTesting?: boolean;
   contract_attack_patterns_external_ids?: string[];

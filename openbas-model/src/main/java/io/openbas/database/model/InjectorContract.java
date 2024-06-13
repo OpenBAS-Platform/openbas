@@ -11,7 +11,6 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.converter.ContentConverter;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
-import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -89,7 +88,7 @@ public class InjectorContract implements Base {
     private Injector injector;
 
     @Setter
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "injectors_contracts_attack_patterns",
             joinColumns = @JoinColumn(name = "injector_contract_id"),
             inverseJoinColumns = @JoinColumn(name = "attack_pattern_id"))
