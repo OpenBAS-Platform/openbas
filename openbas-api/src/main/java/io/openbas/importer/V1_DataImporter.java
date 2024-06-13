@@ -13,6 +13,7 @@ import io.openbas.service.ScenarioService;
 import jakarta.activation.MimetypesFileTypeMap;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasText;
 
 @Component
+@Log
 public class V1_DataImporter implements Importer {
 
   // region variables
@@ -807,9 +809,13 @@ public class V1_DataImporter implements Importer {
       List<JsonNode> injectDocuments = resolveJsonElements(injectNode, "inject_documents").toList();
       injectDocuments.forEach(jsonNode -> {
         String docId = jsonNode.get("document_id").textValue();
-        String documentId = baseIds.get(docId).getId();
-        boolean docAttached = jsonNode.get("document_attached").booleanValue();
-        injectDocumentRepository.addInjectDoc(injectId, documentId, docAttached);
+        if (!hasText(docId)) {
+          String documentId = baseIds.get(docId).getId();
+          boolean docAttached = jsonNode.get("document_attached").booleanValue();
+          injectDocumentRepository.addInjectDoc(injectId, documentId, docAttached);
+        } else {
+          log.warning("Missing document in the exercise_documents property");
+        }
       });
     });
     // Looking for child of created injects
