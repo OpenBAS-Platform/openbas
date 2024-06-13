@@ -135,7 +135,7 @@ const TimelineOverview = () => {
       <div className="clearfix"/>
       <Timeline exerciseOrScenarioId={exerciseId}
         injects={sortedInjects}
-        onSelectInject={(id) => setSelectedInjectId(id)}
+        onSelectInject={(id: string) => setSelectedInjectId(id)}
         teams={teams}
       ></Timeline>
       <div className="clearfix"/>

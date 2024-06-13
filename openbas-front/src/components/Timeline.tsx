@@ -125,11 +125,8 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
     };
   });
 
-  const handleSelectInject = (id:string) => {
-    onSelectInject(id);
-  };
-
   const injectsMap = { ...injectsPerTeam, ...technicalInjectsPerType };
+
   // SortedTeams
   const technicalTeams: Team[] = R.pipe(
     R.groupBy(R.prop('inject_type')),
@@ -163,6 +160,10 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
     'depends_duration',
     searchColumns,
   );
+
+  const handleSelectInject = (id:string) => {
+    onSelectInject(id);
+  };
 
   const lastInject = R.pipe(
     R.sortWith([R.descend(R.prop('inject_depends_duration'))]),
