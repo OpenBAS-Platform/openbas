@@ -175,7 +175,9 @@ const Injects = (props) => {
   const classes = useStyles();
   const { t, tPick } = useFormatter();
   const [selectedInjectId, setSelectedInjectId] = useState(null);
-  const [showTimeline, _setShowTimeline] = useState(true);
+  const [showTimeline, _setShowTimeline] = useState(
+    localStorage.getItem('showTimeline') === 'true',
+  );
   const { permissions } = useContext(PermissionsContext);
   const injectContext = useContext(InjectContext);
 
