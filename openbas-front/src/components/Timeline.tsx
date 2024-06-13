@@ -89,9 +89,10 @@ interface Props {
   exerciseOrScenarioId: string,
   injects: Inject[],
   teams: Team[],
+  onSelectInject: (injectId: string) => void,
 }
 
-const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, teams }) => {
+const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, teams, onSelectInject }) => {
   // Standard hooks
   const classes = useStyles();
   const theme = useTheme<Theme>();
@@ -123,6 +124,10 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
       technicalInjectsPerType: R.groupBy(R.prop('inject_type'))(technicalInjectsWithNoTeam),
     };
   });
+
+  const handleSelectInject = (id:string) => {
+    onSelectInject(id);
+  };
 
   const injectsMap = { ...injectsPerTeam, ...technicalInjectsPerType };
   // SortedTeams
@@ -234,7 +239,7 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
                           const tooltipContent = (
                             <React.Fragment>
                               {inject.inject_title}
-                              <br />
+                              <br/>
                               <span style={{ display: 'block', textAlign: 'center', fontWeight: 'bold' }}>
                                 {`${duration.days} ${t('d')}, ${duration.hours} ${t('h')}, ${duration.minutes} ${t('m')}`}
                               </span>
@@ -245,6 +250,7 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
                               key={inject.inject_id}
                               type={inject.inject_type}
                               tooltip={tooltipContent}
+                              onClick={() => handleSelectInject(inject.inject_id)}
                               done={inject.inject_status !== null}
                               disabled={!inject.inject_enabled}
                               size="small"
@@ -252,7 +258,7 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
                             />
                           );
                         })
-                        }
+                       }
                       </div>
                     );
                   })}
@@ -276,17 +282,17 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
                     <div className={classes.tickLabelTop}>
                       {index % 5 === 0
                         ? `${duration.days}
-                            ${t('d')}, ${duration.hours}
-                            ${t('h')}, ${duration.minutes}
-                            ${t('m')}`
+                          ${t('d')}, ${duration.hours}
+                          ${t('h')}, ${duration.minutes}
+                          ${t('m')}`
                         : ''}
                     </div>
                     <div className={classes.tickLabelBottom}>
                       {index % 5 === 0
                         ? `${duration.days}
-                            ${t('d')}, ${duration.hours}
-                            ${t('h')}, ${duration.minutes}
-                            ${t('m')}`
+                          ${t('d')}, ${duration.hours}
+                          ${t('h')}, ${duration.minutes}
+                          ${t('m')}`
                         : ''}
                     </div>
                   </div>
@@ -325,17 +331,17 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
                     <div className={classes.tickLabelTop}>
                       {index % 5 === 0
                         ? `${duration.days}
-                            ${t('d')}, ${duration.hours}
-                            ${t('h')}, ${duration.minutes}
-                            ${t('m')}`
+                          ${t('d')}, ${duration.hours}
+                          ${t('h')}, ${duration.minutes}
+                          ${t('m')}`
                         : ''}
                     </div>
                     <div className={classes.tickLabelBottom}>
                       {index % 5 === 0
                         ? `${duration.days}
-                            ${t('d')}, ${duration.hours}
-                            ${t('h')}, ${duration.minutes}
-                            ${t('m')}`
+                          ${t('d')}, ${duration.hours}
+                          ${t('h')}, ${duration.minutes}
+                          ${t('m')}`
                         : ''}
                     </div>
                   </div>
