@@ -28,12 +28,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: '6px 0px 6px 8px',
   },
   buttonText: {
-    textAlign: 'left',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 16,
-    margin: 4,
+    padding: 4,
     width: '100%',
   },
 }));
