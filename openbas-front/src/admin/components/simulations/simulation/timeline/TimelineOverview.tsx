@@ -229,7 +229,7 @@ const TimelineOverview = () => {
                       to={`/admin/exercises/${exerciseId}/injects/${inject.inject_id}?backlabel=Animation&backuri=/admin/exercises/${exerciseId}/animation/timeline`}
                     >
                       <ListItemIcon>
-                        <InjectIcon type={inject.inject_type} variant="inline"/>
+                        <InjectIcon key={inject.inject_id} type={inject.inject_type} variant="inline"/>
                       </ListItemIcon>
                       <ListItemText
                         primary={
