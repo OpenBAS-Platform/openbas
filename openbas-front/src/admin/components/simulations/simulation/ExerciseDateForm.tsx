@@ -84,8 +84,7 @@ const ExerciseDateForm: React.FC<Props> = ({
         .refine(
           (data) => {
             if (data.time) {
-              return new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() !== new Date(data.date).getTime()
-                || (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < new Date(data.time).getTime();
+              return (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < new Date(data.time).getTime();
             }
             return true;
           },
