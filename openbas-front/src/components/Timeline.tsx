@@ -100,58 +100,62 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
 
   // Retrieve data
   const {
-    injectsPerTeam,
-    technicalInjectsPerType,
+    finalInjectsPerTeam,
+    finalInjectsPerType,
   } = useHelper((helper: InjectHelper) => {
-    const getTechnicalInjectsWithNoTeam = () => {
-      const exerciseInjects = helper.getExerciseTechnicalInjectsWithNoTeam(exerciseOrScenarioId);
-      return exerciseInjects.length > 0 ? exerciseInjects : helper.getScenarioTechnicalInjectsWithNoTeam(exerciseOrScenarioId);
-    };
-
     const getInjectsPerTeam = (teamId: string) => {
       const teamExerciseInjects = helper.getTeamExerciseInjects(teamId);
       return teamExerciseInjects.length > 0 ? teamExerciseInjects : helper.getTeamScenarioInjects(teamId);
     };
 
-    const technicalInjectsWithNoTeam = getTechnicalInjectsWithNoTeam();
+    const injectsPerTeam = R.mergeAll(
+      teams.map((a) => ({
+        [a.team_id]: getInjectsPerTeam(a.team_id),
+      })),
+    );
+
+    const getInjectsWithNoTeam = () => {
+      const exerciseInjects = helper.getExerciseTechnicalInjectsWithNoTeam(exerciseOrScenarioId);
+      return exerciseInjects.length > 0 ? exerciseInjects : helper.getScenarioTechnicalInjectsWithNoTeam(exerciseOrScenarioId);
+    };
+
+    const injectsWithNoTeam = getInjectsWithNoTeam();
+
+    // Filter injects
+    const injectsInTeams = R.flatten(R.values(injectsPerTeam)) as Inject[];
+    const filteredInjectsWithNoTeam = injectsWithNoTeam.filter(
+      (inject) => !injectsInTeams.some((teamInject) => teamInject.inject_id === inject.inject_id),
+    );
+    const injectsPerType = R.groupBy(R.prop('inject_type'), filteredInjectsWithNoTeam);
 
     return {
-      injectsPerTeam: R.mergeAll(
-        teams.map((a) => ({
-          [a.team_id]: getInjectsPerTeam(a.team_id),
-        })),
-      ),
-      technicalInjectsPerType: R.groupBy(R.prop('inject_type'))(technicalInjectsWithNoTeam),
+      finalInjectsPerTeam: injectsPerTeam,
+      finalInjectsPerType: injectsPerType,
     };
   });
 
-  const injectsMap = { ...injectsPerTeam, ...technicalInjectsPerType };
+  const injectsMap = { ...finalInjectsPerTeam, ...finalInjectsPerType };
 
-  // SortedTeams
-  const technicalTeams: Team[] = R.pipe(
-    R.groupBy(R.prop('inject_type')),
-    R.toPairs,
-    R.filter(
-      (n: [string, InjectStore[]]) => !(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        n[1][0].inject_injector_contract?.injector_contract_content_parsed?.fields?.filter((f: any) => f.key === 'teams').length > 0
-      ),
-    ),
-    R.map(
-      (n: [string, InjectStore[]]) => ({
-        team_id: n[0],
-        team_name: n[0],
-      }),
-    ),
-  )(injects as Inject[]);
+  // Sorted teams
+  const teamInjectNames = R.map((key: string) => ({
+    team_id: key,
+    team_name: key,
+  }), R.keys(injectsMap));
 
   const sortedNativeTeams = R.sortWith(
     [R.ascend(R.prop('team_name'))],
     teams,
   );
-  const sortedTeams = [...technicalTeams, ...sortedNativeTeams];
 
-  // Timeline
+  const filteredTeamInject = R.reject(
+    (teamInjectName: Team) => R.includes(
+      teamInjectName.team_id,
+      R.pluck('team_id', sortedNativeTeams),
+    ),
+    teamInjectNames,
+  );
+
+  const sortedTeams = [...filteredTeamInject, ...sortedNativeTeams];
 
   // Re utilisation of filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
@@ -197,161 +201,110 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
 
   return (
     <>
-      {sortedTeams.length > 0 ? (
-        <div className={classes.container}>
-          <div className={classes.names}>
-            {sortedTeams.map((team) => (
-              <div key={team.team_id} className={classes.lineName}>
-                <div className={classes.name}>
-                  {team.team_name.startsWith('openbas_') ? (
-                    <CastOutlined fontSize="small"/>
-                  ) : (
-                    <CastForEducationOutlined fontSize="small"/>
-                  )}
+      <div className={classes.container}>
+        <div className={classes.names}>
+          {sortedTeams.map((team) => (
+            <div key={team.team_id} className={classes.lineName}>
+              <div className={classes.name}>
+                {team.team_name.startsWith('openbas_') ? (
+                  <CastOutlined fontSize="small"/>
+                ) : (
+                  <CastForEducationOutlined fontSize="small"/>
+                )}
                         &nbsp;&nbsp;
-                  {team.team_name.startsWith('openbas_')
-                    ? t(team.team_name)
-                    : truncate(team.team_name, 20)}
-                </div>
+                {team.team_name.startsWith('openbas_')
+                  ? t(team.team_name)
+                  : truncate(team.team_name, 20)}
               </div>
-            ))}
-          </div>
-          <div className={classes.timeline}>
-            {sortedTeams.map((team, index) => {
-              const injectsGroupedByTick = byTick(
-                filtering.filterAndSort(injectsMap[team.team_id]),
-              );
+            </div>
+          ))}
+        </div>
+        <div className={classes.timeline}>
+          {sortedTeams.map((team, index) => {
+            const injectsGroupedByTick = byTick(
+              filtering.filterAndSort(injectsMap[team.team_id] ?? []),
+            );
+            return (
+              <div
+                key={team.team_id}
+                className={classes.line}
+                style={{ backgroundColor: index % 2 === 0 ? grid0 : grid5 }}
+              >
+                {Object.keys(injectsGroupedByTick).map((key, i) => {
+                  const injectGroupPosition = (parseFloat(key) * 100) / totalDuration;
+                  return (
+                    <div
+                      key={i}
+                      className={classes.injectGroup}
+                      style={{ left: `${injectGroupPosition}%` }}
+                    >
+                      {injectsGroupedByTick[key].map((inject: InjectStore) => {
+                        const duration = splitDuration(inject.inject_depends_duration || 0);
+                        const tooltipContent = (
+                          <React.Fragment>
+                            {inject.inject_title}
+                            <br/>
+                            <span style={{ display: 'block', textAlign: 'center', fontWeight: 'bold' }}>
+                              {`${duration.days} ${t('d')}, ${duration.hours} ${t('h')}, ${duration.minutes} ${t('m')}`}
+                            </span>
+                          </React.Fragment>
+                        );
+                        return (
+                          <InjectIcon
+                            key={inject.inject_id}
+                            type={inject.inject_type}
+                            tooltip={tooltipContent}
+                            onClick={() => handleSelectInject(inject.inject_id)}
+                            done={inject.inject_status !== null}
+                            disabled={!inject.inject_enabled}
+                            size="small"
+                            variant={'timeline'}
+                          />
+                        );
+                      })
+                       }
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+          <div className={classes.scale}>
+            {ticks.map((tick, index) => {
+              const duration = splitDuration(tick);
               return (
                 <div
-                  key={team.team_id}
-                  className={classes.line}
-                  style={{ backgroundColor: index % 2 === 0 ? grid0 : grid5 }}
+                  key={tick}
+                  className={classes.tick}
+                  style={{
+                    left: `${index * 5}%`,
+                    height: index % 5 === 0 ? 'calc(100% + 30px)' : '100%',
+                    top: index % 5 === 0 ? -15 : 0,
+                    borderRight: index % 5 === 0 ? grid25 : grid15,
+                  }}
                 >
-                  {Object.keys(injectsGroupedByTick).map((key, i) => {
-                    const injectGroupPosition = (parseFloat(key) * 100) / totalDuration;
-                    return (
-                      <div
-                        key={i}
-                        className={classes.injectGroup}
-                        style={{ left: `${injectGroupPosition}%` }}
-                      >
-                        {injectsGroupedByTick[key].map((inject: InjectStore) => {
-                          const duration = splitDuration(inject.inject_depends_duration || 0);
-                          const tooltipContent = (
-                            <React.Fragment>
-                              {inject.inject_title}
-                              <br/>
-                              <span style={{ display: 'block', textAlign: 'center', fontWeight: 'bold' }}>
-                                {`${duration.days} ${t('d')}, ${duration.hours} ${t('h')}, ${duration.minutes} ${t('m')}`}
-                              </span>
-                            </React.Fragment>
-                          );
-                          return (
-                            <InjectIcon
-                              key={inject.inject_id}
-                              type={inject.inject_type}
-                              tooltip={tooltipContent}
-                              onClick={() => handleSelectInject(inject.inject_id)}
-                              done={inject.inject_status !== null}
-                              disabled={!inject.inject_enabled}
-                              size="small"
-                              variant={'timeline'}
-                            />
-                          );
-                        })
-                       }
-                      </div>
-                    );
-                  })}
+                  <div className={classes.tickLabelTop}>
+                    {index % 5 === 0
+                      ? `${duration.days}
+                          ${t('d')}, ${duration.hours}
+                          ${t('h')}, ${duration.minutes}
+                          ${t('m')}`
+                      : ''}
+                  </div>
+                  <div className={classes.tickLabelBottom}>
+                    {index % 5 === 0
+                      ? `${duration.days}
+                          ${t('d')}, ${duration.hours}
+                          ${t('h')}, ${duration.minutes}
+                          ${t('m')}`
+                      : ''}
+                  </div>
                 </div>
               );
             })}
-            <div className={classes.scale}>
-              {ticks.map((tick, index) => {
-                const duration = splitDuration(tick);
-                return (
-                  <div
-                    key={tick}
-                    className={classes.tick}
-                    style={{
-                      left: `${index * 5}%`,
-                      height: index % 5 === 0 ? 'calc(100% + 30px)' : '100%',
-                      top: index % 5 === 0 ? -15 : 0,
-                      borderRight: index % 5 === 0 ? grid25 : grid15,
-                    }}
-                  >
-                    <div className={classes.tickLabelTop}>
-                      {index % 5 === 0
-                        ? `${duration.days}
-                          ${t('d')}, ${duration.hours}
-                          ${t('h')}, ${duration.minutes}
-                          ${t('m')}`
-                        : ''}
-                    </div>
-                    <div className={classes.tickLabelBottom}>
-                      {index % 5 === 0
-                        ? `${duration.days}
-                          ${t('d')}, ${duration.hours}
-                          ${t('h')}, ${duration.minutes}
-                          ${t('m')}`
-                        : ''}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           </div>
         </div>
-      ) : (
-        <div className={classes.container}>
-          <div className={classes.names}>
-            <div className={classes.lineName}>
-              <div className={classes.name}>
-                <CastForEducationOutlined fontSize="small"/>
-                    &nbsp;&nbsp;
-                {t('No team')}
-              </div>
-            </div>
-          </div>
-          <div className={classes.timeline}>
-            <div className={classes.line}> &nbsp; </div>
-            <div className={classes.scale}>
-              {ticks.map((tick, index) => {
-                const duration = splitDuration(tick);
-                return (
-                  <div
-                    key={tick}
-                    className={classes.tick}
-                    style={{
-                      left: `${index * 5}%`,
-                      height: index % 5 === 0 ? '110%' : '100%',
-                      top: index % 5 === 0 ? '-5%' : 0,
-                      borderRight: index % 5 === 0 ? grid25 : grid15,
-                    }}
-                  >
-                    <div className={classes.tickLabelTop}>
-                      {index % 5 === 0
-                        ? `${duration.days}
-                          ${t('d')}, ${duration.hours}
-                          ${t('h')}, ${duration.minutes}
-                          ${t('m')}`
-                        : ''}
-                    </div>
-                    <div className={classes.tickLabelBottom}>
-                      {index % 5 === 0
-                        ? `${duration.days}
-                          ${t('d')}, ${duration.hours}
-                          ${t('h')}, ${duration.minutes}
-                          ${t('m')}`
-                        : ''}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </>
   );
 };
