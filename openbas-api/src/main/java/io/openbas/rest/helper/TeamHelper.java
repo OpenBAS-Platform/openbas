@@ -104,16 +104,7 @@ public class TeamHelper {
             List<RawExerciseTeamUser> exerciseTeamUsers = mapExerciseTeamUser.get(rawTeam);
             if(exerciseTeamUsers != null) {
                 teamSimple.setExerciseTeamUsers(exerciseTeamUsers.stream().map(
-                        rawExerciseTeamUser -> {
-                            ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
-                            exerciseTeamUser.setTeam(new Team());
-                            exerciseTeamUser.getTeam().setId(rawExerciseTeamUser.getTeam_id());
-                            exerciseTeamUser.setExercise(new Exercise());
-                            exerciseTeamUser.getExercise().setId(rawExerciseTeamUser.getExercise_id());
-                            exerciseTeamUser.setUser(new User());
-                            exerciseTeamUser.getUser().setId(rawExerciseTeamUser.getUser_id());
-                            return exerciseTeamUser;
-                        }
+                        ExerciseTeamUser::fromRawExerciseTeamUser
                 ).collect(Collectors.toSet()));
             }
 

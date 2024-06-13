@@ -8,8 +8,6 @@ import InjectIcon from '../admin/components/common/injects/InjectIcon';
 import { splitDuration } from '../utils/Time';
 import type { Theme } from './Theme';
 import { useFormatter } from './i18n';
-import SearchFilter from './SearchFilter';
-import TagsFilter from '../admin/components/common/filters/TagsFilter';
 import useSearchAnFilter from '../utils/SortingFiltering';
 import { useHelper } from '../store';
 import type { InjectHelper } from '../actions/injects/inject-helper';
@@ -88,43 +86,45 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  exerciseId: string,
+  exerciseOrScenarioId: string,
   injects: Inject[],
   teams: Team[],
 }
 
-const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
+const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, teams }) => {
   // Standard hooks
   const classes = useStyles();
   const theme = useTheme<Theme>();
   const { t } = useFormatter();
-
-  // Filter and sort hook
-  const searchColumns = ['title', 'description', 'content'];
-  const filtering = useSearchAnFilter(
-    'inject',
-    'depends_duration',
-    searchColumns,
-  );
 
   // Retrieve data
   const {
     injectsPerTeam,
     technicalInjectsPerType,
   } = useHelper((helper: InjectHelper) => {
-    const techicalInjectsWithNoTeam = helper.getExerciseTechnicalInjectsWithNoTeam(exerciseId);
+    const getTechnicalInjectsWithNoTeam = () => {
+      const exerciseInjects = helper.getExerciseTechnicalInjectsWithNoTeam(exerciseOrScenarioId);
+      return exerciseInjects.length > 0 ? exerciseInjects : helper.getScenarioTechnicalInjectsWithNoTeam(exerciseOrScenarioId);
+    };
+
+    const getInjectsPerTeam = (teamId: string) => {
+      const teamExerciseInjects = helper.getTeamExerciseInjects(teamId);
+      return teamExerciseInjects.length > 0 ? teamExerciseInjects : helper.getTeamScenarioInjects(teamId);
+    };
+
+    const technicalInjectsWithNoTeam = getTechnicalInjectsWithNoTeam();
+
     return {
       injectsPerTeam: R.mergeAll(
         teams.map((a) => ({
-          [a.team_id]: helper.getTeamExerciseInjects(a.team_id),
+          [a.team_id]: getInjectsPerTeam(a.team_id),
         })),
       ),
-      technicalInjectsPerType: R.groupBy(R.prop('inject_type'))(techicalInjectsWithNoTeam),
+      technicalInjectsPerType: R.groupBy(R.prop('inject_type'))(technicalInjectsWithNoTeam),
     };
   });
 
   const injectsMap = { ...injectsPerTeam, ...technicalInjectsPerType };
-
   // SortedTeams
   const technicalTeams: Team[] = R.pipe(
     R.groupBy(R.prop('inject_type')),
@@ -150,6 +150,15 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
   const sortedTeams = [...technicalTeams, ...sortedNativeTeams];
 
   // Timeline
+
+  // Re utilisation of filter and sort hook
+  const searchColumns = ['title', 'description', 'content'];
+  const filtering = useSearchAnFilter(
+    'inject',
+    'depends_duration',
+    searchColumns,
+  );
+
   const lastInject = R.pipe(
     R.sortWith([R.descend(R.prop('inject_depends_duration'))]),
     R.head,
@@ -182,21 +191,6 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
 
   return (
     <>
-      <div style={{ float: 'left', marginRight: 10 }}>
-        <SearchFilter
-          variant="small"
-          onChange={filtering.handleSearch}
-          keyword={filtering.keyword}
-        />
-      </div>
-      <div style={{ float: 'left', marginRight: 10 }}>
-        <TagsFilter
-          onAddTag={filtering.handleAddTag}
-          onRemoveTag={filtering.handleRemoveTag}
-          currentTags={filtering.tags}
-        />
-      </div>
-      <div className="clearfix"/>
       {sortedTeams.length > 0 ? (
         <div className={classes.container}>
           <div className={classes.names}>
@@ -243,6 +237,7 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
                             done={inject.inject_status !== null}
                             disabled={!inject.inject_enabled}
                             size="small"
+                            variant={'timeline'}
                           />
                         ))}
                       </div>
@@ -268,17 +263,17 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
                     <div className={classes.tickLabelTop}>
                       {index % 5 === 0
                         ? `${duration.days}
-                              ${t('d')}, ${duration.hours}
-                              ${t('h')}, ${duration.minutes}
-                              ${t('m')}`
+                            ${t('d')}, ${duration.hours}
+                            ${t('h')}, ${duration.minutes}
+                            ${t('m')}`
                         : ''}
                     </div>
                     <div className={classes.tickLabelBottom}>
                       {index % 5 === 0
                         ? `${duration.days}
-                              ${t('d')}, ${duration.hours}
-                              ${t('h')}, ${duration.minutes}
-                              ${t('m')}`
+                            ${t('d')}, ${duration.hours}
+                            ${t('h')}, ${duration.minutes}
+                            ${t('m')}`
                         : ''}
                     </div>
                   </div>
@@ -317,17 +312,17 @@ const Timeline: FunctionComponent<Props> = ({ exerciseId, injects, teams }) => {
                     <div className={classes.tickLabelTop}>
                       {index % 5 === 0
                         ? `${duration.days}
-                              ${t('d')}, ${duration.hours}
-                              ${t('h')}, ${duration.minutes}
-                              ${t('m')}`
+                            ${t('d')}, ${duration.hours}
+                            ${t('h')}, ${duration.minutes}
+                            ${t('m')}`
                         : ''}
                     </div>
                     <div className={classes.tickLabelBottom}>
                       {index % 5 === 0
                         ? `${duration.days}
-                              ${t('d')}, ${duration.hours}
-                              ${t('h')}, ${duration.minutes}
-                              ${t('m')}`
+                            ${t('d')}, ${duration.hours}
+                            ${t('h')}, ${duration.minutes}
+                            ${t('m')}`
                         : ''}
                     </div>
                   </div>

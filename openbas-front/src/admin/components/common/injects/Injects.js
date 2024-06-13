@@ -20,6 +20,7 @@ import { InjectContext, PermissionsContext } from '../Context';
 import CreateInject from './CreateInject';
 import UpdateInject from './UpdateInject';
 import PlatformIcon from '../../../../components/PlatformIcon';
+import Timeline from '../../../../components/Timeline';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -153,6 +154,7 @@ const inlineStyles = {
 
 const Injects = (props) => {
   const {
+    exerciseOrScenarioId,
     injects,
     teams,
     articles,
@@ -173,6 +175,7 @@ const Injects = (props) => {
   const classes = useStyles();
   const { t, tPick } = useFormatter();
   const [selectedInjectId, setSelectedInjectId] = useState(null);
+  const [showTimeline, setShowTimeline] = useState(true);
   const { permissions } = useContext(PermissionsContext);
   const injectContext = useContext(InjectContext);
 
@@ -186,11 +189,9 @@ const Injects = (props) => {
   // Fetching data
   const {
     tagsMap,
-    selectedInject,
   } = useHelper((helper) => {
     return {
       tagsMap: helper.getTagsMap(),
-      selectedInject: helper.getInject(selectedInjectId),
     };
   });
   const onCreateInject = async (data) => {
@@ -200,6 +201,11 @@ const Injects = (props) => {
     await injectContext.onUpdateInject(selectedInjectId, data);
   };
   const sortedInjects = filtering.filterAndSort(injects);
+
+  const handleCheckboxChange = (event) => {
+    setShowTimeline(event.target.checked);
+  };
+
   // Rendering
   if (injects) {
     return (
@@ -219,11 +225,20 @@ const Injects = (props) => {
               currentTags={filtering.tags}
             />
           </div>
-          <div style={{ float: 'right' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+            <div style={{ marginRight: 10 }}>
+              <Checkbox
+                checked={showTimeline}
+                onChange={handleCheckboxChange}
+                name="showTimeline"
+                color="primary"
+              />
+              <span>{t('Show Timeline')}</span>
+            </div>
             {setViewMode ? (
               <ToggleButtonGroup
                 size="small"
-                exclusive={true}
+                exclusive
                 style={{ float: 'right' }}
                 aria-label="Change view mode"
               >
@@ -251,7 +266,9 @@ const Injects = (props) => {
                           value='download'
                           aria-label="Download"
                         >
-                          <FileDownloadOutlined fontSize="small" color="primary" />
+                          <FileDownloadOutlined fontSize="small"
+                            color="primary"
+                          />
                         </ToggleButton>
                       </Tooltip>
                     </CSVLink>
@@ -260,17 +277,19 @@ const Injects = (props) => {
                       value='download'
                       aria-label="Download"
                     >
-                      <FileDownloadOutlined fontSize="small" color="primary" />
+                      <FileDownloadOutlined fontSize="small"
+                        color="primary"
+                      />
                     </ToggleButton>
                   )}
                 </div>
                 <Tooltip title={t('List view')}>
                   <ToggleButton
                     value='list'
-                    selected={true}
+                    selected
                     aria-label="List view mode"
                   >
-                    <ReorderOutlined fontSize="small" color='inherit' />
+                    <ReorderOutlined fontSize="small" color='inherit'/>
                   </ToggleButton>
                 </Tooltip>
                 <Tooltip title={t('Distribution view')}>
@@ -279,7 +298,7 @@ const Injects = (props) => {
                     onClick={() => setViewMode('distribution')}
                     aria-label="Distribution view mode"
                   >
-                    <BarChartOutlined fontSize="small" color='primary' />
+                    <BarChartOutlined fontSize="small" color='primary'/>
                   </ToggleButton>
                 </Tooltip>
               </ToggleButtonGroup>
@@ -305,21 +324,29 @@ const Injects = (props) => {
                     filename={`${t('Injects')}.csv`}
                   >
                     <Tooltip title={t('Export this list')}>
-                      <IconButton size="large">
-                        <FileDownloadOutlined color="primary" />
+                      <IconButton size="medium">
+                        <FileDownloadOutlined color="primary"/>
                       </IconButton>
                     </Tooltip>
                   </CSVLink>
                 ) : (
-                  <IconButton size="large" disabled={true}>
-                    <FileDownloadOutlined />
+                  <IconButton size="medium" disabled>
+                    <FileDownloadOutlined/>
                   </IconButton>
                 )}
               </div>
             )}
           </div>
-          <div className="clearfix" />
+          <div className="clearfix"/>
         </div>
+        {showTimeline && (<div style={{ marginBottom: 50 }}>
+          <Timeline exerciseOrScenarioId={exerciseOrScenarioId}
+            injects={sortedInjects}
+            teams={teams}
+          ></Timeline>
+          <div className="clearfix"/>
+        </div>
+        )}
         <List>
           <ListItem
             classes={{ root: classes.itemHead }}
@@ -330,11 +357,11 @@ const Injects = (props) => {
               <Checkbox
                 edge="start"
                 checked={selectAll}
-                disableRipple={true}
+                disableRipple
                 onChange={
-                          typeof handleToggleSelectAll === 'function'
-                          && handleToggleSelectAll.bind(this)
-                      }
+                        typeof handleToggleSelectAll === 'function'
+                        && handleToggleSelectAll.bind(this)
+                    }
                 disabled={typeof handleToggleSelectAll !== 'function'}
               />
             </ListItemIcon>
@@ -389,14 +416,16 @@ const Injects = (props) => {
                     headerStyles,
                   )}
                 </>
-              }
+                  }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
           {sortedInjects.map((inject, index) => {
-            const injectContract = inject.inject_injector_contract.injector_contract_content_parsed;
+            const injectContract = inject.inject_injector_contract.convertedContent;
             const injectorContractName = tPick(injectContract?.label);
-            const duration = splitDuration(inject.inject_depends_duration || 0);
+            const duration = splitDuration(
+              inject.inject_depends_duration || 0,
+            );
             const isDisabled = !injectContract?.config.expose;
             let injectStatus = inject.inject_enabled
               ? t('Enabled')
@@ -408,11 +437,12 @@ const Injects = (props) => {
               <ListItem
                 key={inject.inject_id}
                 classes={{ root: classes.item }}
-                divider={true}
-                button={true}
+                divider
+                button
                 disabled={
-                  !injectContract || isDisabled || !inject.inject_enabled
-                }
+                          !injectContract || isDisabled
+                          || !inject.inject_enabled
+                      }
                 onClick={() => setSelectedInjectId(inject.inject_id)}
               >
                 <ListItemIcon
@@ -421,25 +451,26 @@ const Injects = (props) => {
                   onClick={(event) => (event.shiftKey
                     ? onToggleShiftEntity(index, inject, event)
                     : onToggleEntity(inject, event))
-                    }
+                        }
                 >
                   <Checkbox
                     edge="start"
                     checked={
-                          (selectAll && !(inject.inject_id in (deSelectedElements || {})))
-                          || inject.inject_id in (selectedElements || {})
-                      }
-                    disableRipple={true}
+                              (selectAll && !(inject.inject_id
+                                  in (deSelectedElements || {})))
+                              || inject.inject_id in (selectedElements || {})
+                          }
+                    disableRipple
                   />
                 </ListItemIcon>
                 <ListItemIcon style={{ paddingTop: 5 }}>
                   <InjectIcon
                     tooltip={t(inject.inject_type)}
-                    config={injectContract?.config}
                     type={inject.inject_type}
                     disabled={
-                      !injectContract || isDisabled || !inject.inject_enabled
-                    }
+                              !injectContract || isDisabled
+                              || !inject.inject_enabled
+                          }
                   />
                 </ListItemIcon>
                 <ListItemText
@@ -478,7 +509,11 @@ const Injects = (props) => {
                         style={inlineStyles.inject_platforms}
                       >
                         {inject.inject_injector_contract?.injector_contract_platforms?.map(
-                          (platform) => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
+                          (platform) => <PlatformIcon key={platform}
+                            width={20}
+                            platform={platform}
+                            marginRight={10}
+                                        />,
                         )}
                       </div>
                       <div
@@ -486,7 +521,8 @@ const Injects = (props) => {
                         style={inlineStyles.inject_enabled}
                       >
                         <ItemBoolean
-                          status={inject.inject_ready ? inject.inject_enabled : false}
+                          status={inject.inject_ready
+                            ? inject.inject_enabled : false}
                           label={injectStatus}
                           variant="inList"
                           tooltip={injectStatus}
@@ -496,10 +532,12 @@ const Injects = (props) => {
                         className={classes.bodyItem}
                         style={inlineStyles.inject_tags}
                       >
-                        <ItemTags variant="list" tags={inject.inject_tags} />
+                        <ItemTags variant="list"
+                          tags={inject.inject_tags}
+                        />
                       </div>
                     </>
-                  }
+                        }
                 />
                 <ListItemSecondaryAction>
                   <InjectPopover
@@ -515,20 +553,21 @@ const Injects = (props) => {
         </List>
         {permissions.canWrite && (
           <>
-            <UpdateInject
-              open={selectedInjectId !== null}
-              handleClose={() => setSelectedInjectId(null)}
-              onUpdateInject={onUpdateInject}
-              injectorContract={selectedInject?.inject_injector_contract?.injector_contract_content_parsed}
-              inject={selectedInject}
-              teamsFromExerciseOrScenario={teams}
-              articlesFromExerciseOrScenario={articles}
-              variablesFromExerciseOrScenario={variables}
-              uriVariable={uriVariable}
-              allUsersNumber={allUsersNumber}
-              usersNumber={usersNumber}
-              teamsUsers={teamsUsers}
-            />
+            {selectedInjectId !== null
+              && <UpdateInject
+                open
+                handleClose={() => setSelectedInjectId(null)}
+                onUpdateInject={onUpdateInject}
+                injectId={selectedInjectId}
+                teamsFromExerciseOrScenario={teams}
+                articlesFromExerciseOrScenario={articles}
+                variablesFromExerciseOrScenario={variables}
+                uriVariable={uriVariable}
+                allUsersNumber={allUsersNumber}
+                usersNumber={usersNumber}
+                teamsUsers={teamsUsers}
+                 />
+            }
             <CreateInject
               title={t('Create a new inject')}
               onCreateInject={onCreateInject}
@@ -547,7 +586,7 @@ const Injects = (props) => {
   }
   return (
     <div className={classes.container}>
-      <Loader />
+      <Loader/>
     </div>
   );
 };

@@ -3,6 +3,11 @@ import { delReferential, getReferential, postReferential, putReferential } from 
 
 // -- INJECTS --
 
+export const fetchInject = (injectId) => (dispatch) => {
+  const uri = `/api/injects/${injectId}`;
+  return getReferential(schema.inject, uri)(dispatch);
+};
+
 export const tryInject = (injectId) => (dispatch) => {
   const uri = `/api/injects/try/${injectId}`;
   return getReferential(null, uri, null)(dispatch);

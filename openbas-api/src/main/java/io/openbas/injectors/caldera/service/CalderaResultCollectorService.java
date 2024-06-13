@@ -1,12 +1,11 @@
 package io.openbas.injectors.caldera.service;
 
-import io.openbas.asset.EndpointService;
-import io.openbas.database.model.*;
+import io.openbas.database.model.ExecutionStatus;
+import io.openbas.database.model.Inject;
+import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
-import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.caldera.CalderaContract;
-import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
 import io.openbas.injectors.caldera.model.ResultStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.java.Log;

@@ -28,12 +28,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE;
-import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME;
+import static io.openbas.database.model.InjectExpectationSignature.*;
 import static io.openbas.database.model.InjectStatusExecution.*;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectation;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAssetGroup;
@@ -82,11 +82,11 @@ public class CalderaExecutor extends Injector {
             execution.addTrace(traceError("Found 0 asset to execute the ability on (likely this inject does not have any target or the targeted asset is inactive and has been purged)"));
         }
         String contract;
-        if( inject.getInjectorContract().getPayload() != null ) {
+        if (inject.getInjectorContract().getPayload() != null) {
             // This is a payload, need to create the ability on the fly
             List<Ability> abilities = calderaService.abilities().stream().filter(ability -> ability.getName().equals(inject.getInjectorContract().getPayload().getId())).toList();
-            if( !abilities.isEmpty() ) {
-              calderaService.deleteAbility(abilities.getFirst());
+            if (!abilities.isEmpty()) {
+                calderaService.deleteAbility(abilities.getFirst());
             }
             Ability abilityToExecute = calderaService.createAbility(inject.getInjectorContract().getPayload());
             contract = abilityToExecute.getAbility_id();
@@ -105,10 +105,35 @@ public class CalderaExecutor extends Injector {
                             execution.addTrace(traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
                             // Compute expectations
                             boolean isInGroup = assets.get(executionEndpoint.getParent());
-                            List<InjectExpectationSignature> injectExpectationSignatures = List.of(
-                                    InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME).value(executionEndpoint.getProcessName()).build(),
-                                    InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE).value(exploitResult.getCommand()).build()
-                            );
+                            List<InjectExpectationSignature> injectExpectationSignatures = new ArrayList<>();
+                            if (inject.getInjectorContract().getPayload() != null) {
+                                switch (inject.getInjectorContract().getPayload().getType()) {
+                                    case "Command":
+                                        injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME).value(executionEndpoint.getProcessName()).build());
+                                        injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE).value(exploitResult.getCommand()).build());
+                                        break;
+                                    case "Executable":
+                                        Executable payloadExecutable = (Executable) Hibernate.unproxy(inject.getInjectorContract().getPayload());
+                                        injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME).value(payloadExecutable.getExecutableFile().getName()).build());
+                                        // TODO File hash
+                                        break;
+                                    case "FileDrop":
+                                        FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(inject.getInjectorContract().getPayload());
+                                        injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME).value(payloadFileDrop.getFileDropFile().getName()).build());
+                                        // TODO File hash
+                                        break;
+                                    case "DnsResolution":
+                                        DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(inject.getInjectorContract().getPayload());
+                                        injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_HOSTNAME).value(payloadDnsResolution.getHostname().split("\\r?\\n")[0]).build());
+                                        break;
+                                    default:
+                                        throw new UnsupportedOperationException("Payload type " + inject.getInjectorContract().getPayload().getType() + " is not supported");
+
+                                }
+                            } else {
+                                injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME).value(executionEndpoint.getProcessName()).build());
+                                injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE).value(exploitResult.getCommand()).build());
+                            }
                             computeExpectationsForAsset(expectations, content, executionEndpoint.getParent(), isInGroup, injectExpectationSignatures);
                             execution.addTrace(traceInfo("Caldera executed the ability on asset " + asset.getName() + " using " + executionEndpoint.getProcessName() + " (paw: " + executionEndpoint.getExternalReference() + ", linkID: " + exploitResult.getLinkId() + ")"));
                         } else {

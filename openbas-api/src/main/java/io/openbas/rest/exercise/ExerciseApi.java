@@ -3,7 +3,6 @@ package io.openbas.rest.exercise;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
-import io.openbas.database.model.Exercise.STATUS;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.*;
@@ -26,8 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,11 +45,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.model.Exercise.STATUS.*;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.ExerciseSpecification.findGrantedFor;
@@ -66,6 +64,7 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 
 @RestController
 @Secured(ROLE_USER)
+@RequiredArgsConstructor
 public class ExerciseApi extends RestBehavior {
 
   public static final String EXERCISE_URI = "/api/exercises";
@@ -84,186 +83,42 @@ public class ExerciseApi extends RestBehavior {
   // endregion
 
   // region repositories
-  private LogRepository logRepository;
-  private TagRepository tagRepository;
-  private UserRepository userRepository;
-  private PauseRepository pauseRepository;
-  private GrantService grantService;
-  private DocumentRepository documentRepository;
-  private ExerciseRepository exerciseRepository;
-  private TeamRepository teamRepository;
-  private ExerciseTeamUserRepository exerciseTeamUserRepository;
-  private LogRepository exerciseLogRepository;
-  private DryRunRepository dryRunRepository;
-  private DryInjectRepository dryInjectRepository;
-  private ComcheckRepository comcheckRepository;
-  private ImportService importService;
-  private LessonsCategoryRepository lessonsCategoryRepository;
-  private LessonsQuestionRepository lessonsQuestionRepository;
-  private LessonsAnswerRepository lessonsAnswerRepository;
-  private InjectStatusRepository injectStatusRepository;
-  private InjectRepository injectRepository;
-  private InjectExpectationRepository injectExpectationRepository;
-  private AssetGroupRepository assetGroupRepository;
-  private AssetRepository assetRepository;
-  private ScenarioRepository scenarioRepository;
-  private CommunicationRepository communicationRepository;
+  private final LogRepository logRepository;
+  private final TagRepository tagRepository;
+  private final UserRepository userRepository;
+  private final PauseRepository pauseRepository;
+  private final GrantService grantService;
+  private final DocumentRepository documentRepository;
+  private final ExerciseRepository exerciseRepository;
+  private final TeamRepository teamRepository;
+  private final ExerciseTeamUserRepository exerciseTeamUserRepository;
+  private final LogRepository exerciseLogRepository;
+  private final DryRunRepository dryRunRepository;
+  private final DryInjectRepository dryInjectRepository;
+  private final ComcheckRepository comcheckRepository;
+  private final ImportService importService;
+  private final LessonsCategoryRepository lessonsCategoryRepository;
+  private final LessonsQuestionRepository lessonsQuestionRepository;
+  private final LessonsAnswerRepository lessonsAnswerRepository;
+  private final InjectStatusRepository injectStatusRepository;
+  private final InjectRepository injectRepository;
+  private final InjectExpectationRepository injectExpectationRepository;
+  private final AssetGroupRepository assetGroupRepository;
+  private final AssetRepository assetRepository;
+  private final ScenarioRepository scenarioRepository;
+  private final CommunicationRepository communicationRepository;
+  private final ObjectiveRepository objectiveRepository;
+  private final EvaluationRepository evaluationRepository;
+  private final KillChainPhaseRepository killChainPhaseRepository;
+  private final GrantRepository grantRepository;
   // endregion
 
   // region services
-  private DryrunService dryrunService;
-  private FileService fileService;
-  private InjectService injectService;
-  private ChallengeService challengeService;
-  private VariableService variableService;
-  // endregion
-
-  // region setters
-
-  @Autowired
-  public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
-    this.injectStatusRepository = injectStatusRepository;
-  }
-
-  @Autowired
-  public void setInjectRepository(InjectRepository injectRepository) {
-    this.injectRepository = injectRepository;
-  }
-
-  @Autowired
-  public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
-    this.injectExpectationRepository = injectExpectationRepository;
-  }
-
-  @Autowired
-  public void setAssetGroupRepository(AssetGroupRepository assetGroupRepository) {
-    this.assetGroupRepository = assetGroupRepository;
-  }
-
-  @Autowired
-  public void setAssetRepository(AssetRepository assetRepository) {
-    this.assetRepository = assetRepository;
-  }
-
-  @Autowired
-  public void setChallengeService(ChallengeService challengeService) {
-    this.challengeService = challengeService;
-  }
-
-  @Autowired
-  public void setInjectService(InjectService injectService) {
-    this.injectService = injectService;
-  }
-
-  @Autowired
-  public void setImportService(ImportService importService) {
-    this.importService = importService;
-  }
-
-  @Autowired
-  public void setLogRepository(LogRepository logRepository) {
-    this.logRepository = logRepository;
-  }
-
-  @Autowired
-  public void setUserRepository(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
-
-  @Autowired
-  public void setCommunicationRepository(CommunicationRepository communicationRepository) {
-    this.communicationRepository = communicationRepository;
-  }
-
-  @Autowired
-  public void setScenarioRepository(ScenarioRepository scenarioRepository) {
-    this.scenarioRepository = scenarioRepository;
-  }
-
-  @Autowired
-  public void setPauseRepository(PauseRepository pauseRepository) {
-    this.pauseRepository = pauseRepository;
-  }
-
-  @Autowired
-  public void setGrantService(@NotBlank final GrantService grantService) {
-    this.grantService = grantService;
-  }
-
-  @Autowired
-  public void setDryrunService(DryrunService dryrunService) {
-    this.dryrunService = dryrunService;
-  }
-
-  @Autowired
-  public void setFileService(FileService fileService) {
-    this.fileService = fileService;
-  }
-
-  @Autowired
-  public void setTagRepository(TagRepository tagRepository) {
-    this.tagRepository = tagRepository;
-  }
-
-  @Autowired
-  public void setDocumentRepository(DocumentRepository documentRepository) {
-    this.documentRepository = documentRepository;
-  }
-
-  @Autowired
-  public void setComcheckRepository(ComcheckRepository comcheckRepository) {
-    this.comcheckRepository = comcheckRepository;
-  }
-
-  @Autowired
-  public void setDryRunRepository(DryRunRepository dryRunRepository) {
-    this.dryRunRepository = dryRunRepository;
-  }
-
-  @Autowired
-  public void setDryInjectRepository(DryInjectRepository dryInjectRepository) {
-    this.dryInjectRepository = dryInjectRepository;
-  }
-
-  @Autowired
-  public void setExerciseLogRepository(LogRepository exerciseLogRepository) {
-    this.exerciseLogRepository = exerciseLogRepository;
-  }
-
-  @Autowired
-  public void setExerciseRepository(ExerciseRepository exerciseRepository) {
-    this.exerciseRepository = exerciseRepository;
-  }
-
-  @Autowired
-  public void setTeamRepository(TeamRepository teamRepository) {
-    this.teamRepository = teamRepository;
-  }
-
-  @Autowired
-  public void setExerciseTeamUserRepository(ExerciseTeamUserRepository exerciseTeamUserRepository) {
-    this.exerciseTeamUserRepository = exerciseTeamUserRepository;
-  }
-
-  @Autowired
-  public void setLessonsCategoryRepository(LessonsCategoryRepository lessonsCategoryRepository) {
-    this.lessonsCategoryRepository = lessonsCategoryRepository;
-  }
-
-  @Autowired
-  public void setLessonsQuestionRepository(LessonsQuestionRepository lessonsQuestionRepository) {
-    this.lessonsQuestionRepository = lessonsQuestionRepository;
-  }
-
-  @Autowired
-  public void setLessonsAnswerRepository(LessonsAnswerRepository lessonsAnswerRepository) {
-    this.lessonsAnswerRepository = lessonsAnswerRepository;
-  }
-
-  @Autowired
-  public void setVariableService(@NotNull final VariableService variableService) {
-    this.variableService = variableService;
-  }
+  private final DryrunService dryrunService;
+  private final FileService fileService;
+  private final InjectService injectService;
+  private final ChallengeService challengeService;
+  private final VariableService variableService;
   // endregion
 
   // region logs
@@ -508,7 +363,7 @@ public class ExerciseApi extends RestBehavior {
   public Exercise updateExerciseStart(@PathVariable String exerciseId,
       @Valid @RequestBody ExerciseUpdateStartDateInput input) throws InputValidationException {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    if (!exercise.getStatus().equals(SCHEDULED)) {
+    if (!exercise.getStatus().equals(ExerciseStatus.SCHEDULED)) {
       String message = "Change date is only possible in scheduling state";
       throw new InputValidationException("exercise_start_date", message);
     }
@@ -556,8 +411,101 @@ public class ExerciseApi extends RestBehavior {
 
   @GetMapping("/api/exercises/{exerciseId}")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Exercise exercise(@PathVariable String exerciseId) {
-    return exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+  @org.springframework.transaction.annotation.Transactional(readOnly = true)
+  public ExerciseDetails exercise(@PathVariable String exerciseId) {
+    // We get the raw exercise
+    RawExercise rawExercise = exerciseRepository.rawDetailsById(exerciseId);
+    // We get the injects linked to this exercise
+    List<RawInject> rawInjects = injectRepository.findRawByIds(rawExercise.getInject_ids().stream().distinct().toList());
+    // We get the tuple exercise/team/user
+    List<RawExerciseTeamUser> listRawExerciseTeamUsers = exerciseTeamUserRepository.rawByExerciseIds(List.of(exerciseId));
+    // We get the objectives of this exercise
+    List<RawObjective> rawObjectives = objectiveRepository.rawByExerciseIds(List.of(exerciseId));
+    // We make a map of the Evaluations by objective
+    Map<String, List<RawEvaluation>> mapEvaluationsByObjective = evaluationRepository.rawByObjectiveIds(rawObjectives.stream()
+            .map(RawObjective::getObjective_id).toList()).stream()
+            .collect(Collectors.groupingBy(RawEvaluation::getEvaluation_objective));
+    // We make a map of grants of users id by type of grant (Planner, Observer)
+    Map<String, List<RawGrant>> rawGrants = grantRepository.rawByExerciseIds(List.of(exerciseId)).stream().collect(Collectors.groupingBy(RawGrant::getGrant_name));
+    // We get all the kill chain phases
+    List<KillChainPhase> killChainPhase = StreamSupport.stream(
+            killChainPhaseRepository.findAllById(
+                    rawInjects.stream().flatMap(rawInject -> rawInject.getInject_kill_chain_phases().stream()).toList()
+            ).spliterator(), false).collect(Collectors.toList());
+
+    // We create objectives and fill them with evaluations
+    List<Objective> objectives = rawObjectives.stream().map(rawObjective -> {
+      Objective objective = new Objective();
+      if(mapEvaluationsByObjective.get(rawObjective.getObjective_id()) != null) {
+        objective.setEvaluations(mapEvaluationsByObjective.get(rawObjective.getObjective_id()).stream().map(
+                rawEvaluation -> {
+                  Evaluation evaluation = new Evaluation();
+                  evaluation.setId(rawEvaluation.getEvaluation_id());
+                  evaluation.setScore(rawEvaluation.getEvaluation_score());
+                  return evaluation;
+                }
+        ).toList());
+      }
+      return objective;
+    }).toList();
+
+    List<ExerciseTeamUser> listExerciseTeamUsers = listRawExerciseTeamUsers.stream().map(
+            ExerciseTeamUser::fromRawExerciseTeamUser
+    ).toList();
+
+    // From the raw injects, we recreate Injects with minimal objects for calculations
+    List<Inject> injects = rawInjects.stream().map(rawInject -> {
+      Inject inject = new Inject();
+      if(rawInject.getInject_scenario() != null) {
+        inject.setScenario(new Scenario());
+        inject.getScenario().setId(rawInject.getInject_scenario());
+      }
+      // We set the communications
+      inject.setCommunications(rawInject.getInject_communications().stream().map(com -> {
+        Communication communication = new Communication();
+        communication.setId(com);
+        return communication;
+      }).toList());
+      // We set the status too
+      if(rawInject.getStatus_name() != null) {
+        InjectStatus injectStatus = new InjectStatus();
+        injectStatus.setName(ExecutionStatus.valueOf(rawInject.getStatus_name()));
+        inject.setStatus(injectStatus);
+      }
+      // We recreate an exercise out of the raw exercise
+      Exercise exercise = new Exercise();
+      exercise.setStatus(ExerciseStatus.valueOf(rawExercise.getExercise_status()));
+      exercise.setStart(rawExercise.getExercise_start_date());
+      exercise.setPauses(
+              // We set the pauses as they are used for calculations
+              pauseRepository.rawAllForExercise(exerciseId).stream().map(rawPause -> {
+                Pause pause = new Pause();
+                pause.setExercise(new Exercise());
+                pause.getExercise().setId(exerciseId);
+                pause.setDate(rawPause.getPause_date());
+                pause.setId(rawPause.getPause_id());
+                pause.setDuration(rawPause.getPause_duration());
+                return pause;
+              }).toList()
+      );
+      exercise.setCurrentPause(rawExercise.getExercise_pause_date());
+      inject.setExercise(exercise);
+      return inject;
+    }).toList();
+
+    // We create an ExerciseDetails object and populate it
+    ExerciseDetails detail = ExerciseDetails.fromRawExercise(rawExercise, injects, listExerciseTeamUsers, objectives);
+    detail.setPlatforms(rawInjects.stream().flatMap(inject -> inject.getInject_platforms().stream()).distinct().toList());
+    detail.setCommunicationsNumber(rawInjects.stream().mapToLong(rawInject -> rawInject.getInject_communications().size()).sum());
+    detail.setKillChainPhases(killChainPhase);
+    if(rawGrants.get(Grant.GRANT_TYPE.OBSERVER.name()) != null) {
+      detail.setObservers(rawGrants.get(Grant.GRANT_TYPE.OBSERVER.name()).stream().map(RawGrant::getUser_id).collect(Collectors.toSet()));
+    }
+    if (rawGrants.get(Grant.GRANT_TYPE.PLANNER.name()) != null) {
+      detail.setPlanners(rawGrants.get(Grant.GRANT_TYPE.PLANNER.name()).stream().map(RawGrant::getUser_id).collect(Collectors.toSet()));
+    }
+
+    return detail;
   }
 
   @GetMapping("/api/exercises/{exerciseId}/results")
@@ -607,16 +555,16 @@ public class ExerciseApi extends RestBehavior {
   public Exercise changeExerciseStatus(
       @PathVariable String exerciseId,
       @Valid @RequestBody ExerciseUpdateStatusInput input) {
-    STATUS status = input.getStatus();
+    ExerciseStatus status = input.getStatus();
     Exercise exercise = this.exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     // Check if next status is possible
-    List<STATUS> nextPossibleStatus = exercise.nextPossibleStatus();
+    List<ExerciseStatus> nextPossibleStatus = exercise.nextPossibleStatus();
     if (!nextPossibleStatus.contains(status)) {
       throw new UnsupportedOperationException("Exercise cant support moving to status " + status.name());
     }
     // In case of rescheduled of an exercise.
-    boolean isCloseState = CANCELED.equals(exercise.getStatus()) || FINISHED.equals(exercise.getStatus());
-    if (isCloseState && SCHEDULED.equals(status)) {
+    boolean isCloseState = ExerciseStatus.CANCELED.equals(exercise.getStatus()) || ExerciseStatus.FINISHED.equals(exercise.getStatus());
+    if (isCloseState && ExerciseStatus.SCHEDULED.equals(status)) {
       exercise.setStart(null);
       exercise.setEnd(null);
       // Reset pauses
@@ -639,13 +587,13 @@ public class ExerciseApi extends RestBehavior {
       fileService.deleteDirectory(exerciseId);
     }
     // In case of manual start
-    if (SCHEDULED.equals(exercise.getStatus()) && RUNNING.equals(status)) {
+    if (ExerciseStatus.SCHEDULED.equals(exercise.getStatus()) && ExerciseStatus.RUNNING.equals(status)) {
       Instant nextMinute = now().truncatedTo(MINUTES).plus(1, MINUTES);
       exercise.setStart(nextMinute);
     }
     // If exercise move from pause to running state,
     // we log the pause date to be able to recompute inject dates.
-    if (PAUSED.equals(exercise.getStatus()) && RUNNING.equals(status)) {
+    if (ExerciseStatus.PAUSED.equals(exercise.getStatus()) && ExerciseStatus.RUNNING.equals(status)) {
       Instant lastPause = exercise.getCurrentPause().orElseThrow(ElementNotFoundException::new);
       exercise.setCurrentPause(null);
       Pause pause = new Pause();
@@ -655,11 +603,11 @@ public class ExerciseApi extends RestBehavior {
       pauseRepository.save(pause);
     }
     // If pause is asked, just set the pause date.
-    if (RUNNING.equals(exercise.getStatus()) && PAUSED.equals(status)) {
+    if (ExerciseStatus.RUNNING.equals(exercise.getStatus()) && ExerciseStatus.PAUSED.equals(status)) {
       exercise.setCurrentPause(Instant.now());
     }
     // Cancelation
-    if (RUNNING.equals(exercise.getStatus()) && CANCELED.equals(status)) {
+    if (ExerciseStatus.RUNNING.equals(exercise.getStatus()) && ExerciseStatus.CANCELED.equals(status)) {
       exercise.setEnd(now());
     }
     exercise.setUpdatedAt(now());

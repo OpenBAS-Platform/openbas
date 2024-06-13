@@ -1,7 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { useParams } from 'react-router-dom';
 import * as R from 'ramda';
-import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import { ArticleContext, TeamContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
@@ -11,10 +10,9 @@ import type { ChallengeHelper } from '../../../../../actions/helper';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { fetchScenarioInjects } from '../../../../../actions/Inject';
 import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
-import type { Inject } from '../../../../../utils/api-types';
+import type { Inject, Scenario } from '../../../../../utils/api-types';
 import Injects from '../../../common/injects/Injects';
 import { articleContextForScenario } from '../articles/ScenarioArticles';
 import { teamContextForScenario } from '../teams/ScenarioTeams';
@@ -22,6 +20,7 @@ import useEntityToggle from '../../../../../utils/hooks/useEntityToggle';
 import ToolBar from '../../../common/ToolBar';
 import { isNotEmptyField } from '../../../../../utils/utils';
 import injectContextForScenario from '../ScenarioContext';
+import { fetchScenarioInjectsSimple } from '../../../../../actions/injects/inject-action';
 
 interface Props {
 
@@ -30,7 +29,7 @@ interface Props {
 const ScenarioInjects: FunctionComponent<Props> = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
-  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
+  const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
 
   const { injects, scenario, teams, articles, variables } = useHelper(
     (helper: InjectHelper & ScenariosHelper & ArticlesHelper & ChallengeHelper & VariablesHelper) => {
@@ -44,7 +43,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
     },
   );
   useDataLoader(() => {
-    dispatch(fetchScenarioInjects(scenarioId));
+    dispatch(fetchScenarioInjectsSimple(scenarioId));
     dispatch(fetchScenarioTeams(scenarioId));
     dispatch(fetchVariablesForScenario(scenarioId));
   });
@@ -167,6 +166,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
     <ArticleContext.Provider value={articleContext}>
       <TeamContext.Provider value={teamContext}>
         <Injects
+          exerciseOrScenarioId={scenarioId}
           injects={injects}
           teams={teams}
           articles={articles}

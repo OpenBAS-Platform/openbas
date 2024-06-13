@@ -1002,6 +1002,24 @@ export interface InjectInput {
   inject_title?: string;
 }
 
+export interface InjectOutput {
+  /**
+   * @format int64
+   * @min 0
+   */
+  inject_depends_duration: number;
+  inject_enabled?: boolean;
+  inject_exercise?: string;
+  inject_id: string;
+  inject_injector_contract?: InjectorContract;
+  inject_ready?: boolean;
+  inject_scenario?: string;
+  /** @uniqueItems true */
+  inject_tags?: string[];
+  inject_title?: string;
+  inject_type?: string;
+}
+
 export interface InjectReceptionInput {
   /** @format int32 */
   tracking_total_count?: number;
@@ -1089,10 +1107,6 @@ export interface InjectStatusExecution {
   execution_time?: string;
 }
 
-/**
- * Specifies the categories of targetResults for atomic testing.
- * @example "assets, asset groups, teams, players"
- */
 export interface InjectTargetWithResult {
   children?: InjectTargetWithResult[];
   expectationResultsByTypes?: ExpectationResultsByType[];

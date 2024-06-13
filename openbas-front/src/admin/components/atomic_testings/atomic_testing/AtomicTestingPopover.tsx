@@ -6,7 +6,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
-import { deleteAtomicTesting, fetchAtomicTestingForUpdate, updateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import { deleteAtomicTesting, updateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import UpdateInject from '../../common/injects/UpdateInject';
@@ -14,9 +14,7 @@ import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 import { fetchTeams } from '../../../../actions/teams/team-actions';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import { isNotEmptyField } from '../../../../utils/utils';
-import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
-import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 
 interface Props {
   atomic: InjectResultDTO;
@@ -36,12 +34,10 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
 
   // Fetching data
   const { updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
-  const { inject, teams } = useHelper((helper: AtomicTestingHelper & InjectHelper & TeamsHelper) => ({
-    inject: helper.getInject(atomic.inject_id),
+  const { teams } = useHelper((helper: TeamsHelper) => ({
     teams: helper.getTeams(),
   }));
   useDataLoader(() => {
-    dispatch(fetchAtomicTestingForUpdate(atomic.inject_id));
     dispatch(fetchTeams());
   });
 
@@ -65,7 +61,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
         'inject_tags',
       ]),
     )(data);
-    updateAtomicTesting(inject.inject_id, toUpdate).then((result: { data: InjectResultDTO }) => {
+    updateAtomicTesting(atomic.inject_id, toUpdate).then((result: { data: InjectResultDTO }) => {
       updateInjectResultDto(result.data);
     });
   };
@@ -89,11 +85,10 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     <>
       <ButtonPopover entries={entries} />
       <UpdateInject
-        injectorContract={JSON.parse(atomic.inject_injector_contract.injector_contract_content)}
         open={isNotEmptyField(openEdit) ? openEdit : edition}
         handleClose={() => (setOpenEdit ? setOpenEdit(false) : setEdition(false))}
         onUpdateInject={onUpdateAtomicTesting}
-        inject={inject}
+        injectId={atomic.inject_id}
         isAtomic
         teamsFromExerciseOrScenario={teams?.filter((team: TeamStore) => !team.team_contextual) ?? []}
       />

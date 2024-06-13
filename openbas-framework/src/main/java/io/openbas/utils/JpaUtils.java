@@ -1,10 +1,7 @@
 package io.openbas.utils;
 
 import io.openbas.utils.schema.PropertySchema;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Optional;
@@ -30,6 +27,17 @@ public class JpaUtils {
     } else {
       return root.get(propertySchema.getName());
     }
+  }
+
+  public static <T, U> Expression<String[]> arrayAgg(
+      @NotNull final CriteriaBuilder cb,
+      @NotNull final Join<T, U> join) {
+    return cb.function(
+        "array_remove",
+        String[].class,
+        cb.function("array_agg", String[].class, join.get("id")),
+        cb.nullLiteral(String.class)
+    );
   }
 
 }

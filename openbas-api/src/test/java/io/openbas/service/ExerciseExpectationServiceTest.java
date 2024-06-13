@@ -16,10 +16,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.Instant;
 import java.util.List;
 
-import static io.openbas.database.model.Exercise.STATUS.SCHEDULED;
+import static io.openbas.database.model.ExerciseStatus.SCHEDULED;
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.MANUAL;
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
-import static io.openbas.injectors.email.EmailContract.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 

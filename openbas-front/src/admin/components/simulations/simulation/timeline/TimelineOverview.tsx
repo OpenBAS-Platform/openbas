@@ -3,7 +3,6 @@ import { makeStyles } from '@mui/styles';
 import { Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
 import { Link, useParams } from 'react-router-dom';
 import { PreviewOutlined } from '@mui/icons-material';
-import * as R from 'ramda';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import Empty from '../../../../../components/Empty';
@@ -25,6 +24,9 @@ import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import Timeline from '../../../../../components/Timeline';
+import SearchFilter from '../../../../../components/SearchFilter';
+import TagsFilter from '../../../common/filters/TagsFilter';
+import useSearchAnFilter from '../../../../../utils/SortingFiltering';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -77,7 +79,6 @@ const TimelineOverview = () => {
     injects,
     teams,
     tagsMap,
-    selectedInject,
   } = useHelper((helper: InjectHelper & ExercisesHelper & TagHelper) => {
     const exerciseTeams = helper.getExerciseTeams(exerciseId);
     return {
@@ -85,7 +86,6 @@ const TimelineOverview = () => {
       injects: helper.getExerciseInjects(exerciseId),
       teams: exerciseTeams,
       tagsMap: helper.getTagsMap(),
-      selectedInject: selectedInjectId && helper.getInject(selectedInjectId),
     };
   });
 
@@ -95,14 +95,19 @@ const TimelineOverview = () => {
     dispatch(fetchExerciseInjects(exerciseId));
   });
 
-  const pendingInjects = R.sortWith(
-    [R.ascend(R.prop('inject_depends_duration'))],
-    injects.filter((i: InjectStore) => i.inject_status === null),
+  // Sort
+  const searchColumns = ['title', 'description', 'content'];
+  const filtering = useSearchAnFilter(
+    'inject',
+    'depends_duration',
+    searchColumns,
   );
-  const processedInjects = R.sortWith(
-    [R.descend(R.prop('inject_depends_duration'))],
-    injects.filter((i: InjectStore) => i.inject_status !== null),
-  );
+
+  const sortedInjects = filtering.filterAndSort(injects);
+
+  const pendingInjects = filtering.filterAndSort(injects.filter((i: InjectStore) => i.inject_status === null));
+
+  const processedInjects = filtering.filterAndSort(injects.filter((i: InjectStore) => i.inject_status !== null));
 
   const onUpdateInject = async (inject: Inject) => {
     if (selectedInjectId) {
@@ -113,8 +118,24 @@ const TimelineOverview = () => {
   return (
     <div className={classes.root}>
       <AnimationMenu exerciseId={exerciseId}/>
+      <div style={{ float: 'left', marginRight: 10 }}>
+        <SearchFilter
+          variant="small"
+          onChange={filtering.handleSearch}
+          keyword={filtering.keyword}
+        />
+      </div>
+      <div style={{ float: 'left', marginRight: 10 }}>
+        <TagsFilter
+          onAddTag={filtering.handleAddTag}
+          onRemoveTag={filtering.handleRemoveTag}
+          currentTags={filtering.tags}
+        />
+      </div>
       <div className="clearfix"/>
-      <Timeline exerciseId={exerciseId} injects={injects} teams={teams}></Timeline>
+      <Timeline exerciseOrScenarioId={exerciseId} injects={sortedInjects}
+        teams={teams}
+      ></Timeline>
       <div className="clearfix"/>
       <Grid container spacing={3} style={{ marginTop: 50, paddingBottom: 24 }}>
         <Grid container item spacing={3}>
@@ -128,10 +149,10 @@ const TimelineOverview = () => {
                     return (
                       <ListItem
                         key={inject.inject_id}
-                        dense={true}
+                        dense
                         classes={{ root: classes.item }}
-                        divider={true}
-                        button={true}
+                        divider
+                        button
                         disabled={isDisabled || !inject.inject_enabled}
                         onClick={() => setSelectedInjectId(inject.inject_id)}
                       >
@@ -239,7 +260,7 @@ const TimelineOverview = () => {
                               {t('s')})
                             </div>
                           </div>
-                                }
+                              }
                       />
                       <ListItemSecondaryAction>
                         <PreviewOutlined/>
@@ -272,13 +293,12 @@ const TimelineOverview = () => {
           </Paper>
         </Grid>
       </Grid>
-      {selectedInject && (
+      {selectedInjectId && (
         <UpdateInject
           open={selectedInjectId !== null}
           handleClose={() => setSelectedInjectId(null)}
           onUpdateInject={onUpdateInject}
-          injectorContract={selectedInject.inject_injector_contract.injector_contract_content_parsed}
-          inject={selectedInject}
+          injectId={selectedInjectId}
           teamsFromExerciseOrScenario={teams}
           isAtomic={false}
         />
@@ -286,4 +306,5 @@ const TimelineOverview = () => {
     </div>
   );
 };
+
 export default TimelineOverview;

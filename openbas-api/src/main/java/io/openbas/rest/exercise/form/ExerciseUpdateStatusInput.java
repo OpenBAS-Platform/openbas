@@ -1,17 +1,17 @@
 package io.openbas.rest.exercise.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.model.Exercise;
+import io.openbas.database.model.ExerciseStatus;
 
 public class ExerciseUpdateStatusInput {
     @JsonProperty("exercise_status")
-    private Exercise.STATUS status;
+    private ExerciseStatus status;
 
-    public Exercise.STATUS getStatus() {
+    public ExerciseStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Exercise.STATUS status) {
+    public void setStatus(ExerciseStatus status) {
         this.status = status;
     }
 }

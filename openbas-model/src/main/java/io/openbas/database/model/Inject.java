@@ -2,20 +2,13 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.converter.ContentConverter;
 import io.openbas.database.raw.*;
-import io.openbas.helper.MonoIdDeserializer;
-import io.openbas.helper.MultiIdListDeserializer;
-import io.openbas.helper.MultiIdSetDeserializer;
-import io.openbas.helper.MultiModelDeserializer;
-import jakarta.annotation.Resource;
+import io.openbas.helper.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -26,14 +19,10 @@ import lombok.extern.java.Log;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.StreamSupport;
+import java.util.stream.Collectors;
 
 import static io.openbas.database.model.Endpoint.ENDPOINT_TYPE;
-import static java.time.Duration.between;
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
 
@@ -248,12 +237,11 @@ public class Inject implements Base, Injection {
 
     @JsonProperty("inject_users_number")
     public long getNumberOfTargetUsers() {
-        Exercise exercise = getExercise();
-        if (exercise == null) {
+        if (this.getExercise() == null) {
             return 0L;
         }
-        if (this.allTeams) {
-            return getExercise().usersNumber();
+        if (this.isAllTeams()) {
+            return this.getExercise().usersNumber();
         }
         return getTeams().stream()
                 .map(team -> team.getUsersNumberInExercise(getExercise().getId()))
@@ -262,87 +250,24 @@ public class Inject implements Base, Injection {
 
     @JsonProperty("inject_ready")
     public boolean isReady() {
-        InjectorContract injectorContract = getInjectorContract();
-        if( injectorContract == null ) {
-            return false;
-        }
-        ObjectNode content = getContent();
-        if (getContent() == null) {
-            return false;
-        }
-        AtomicBoolean ready = new AtomicBoolean(true);
-        ObjectNode contractContent = injectorContract.getConvertedContent();
-        List<JsonNode> contractMandatoryFields = StreamSupport.stream(contractContent.get("fields").spliterator(), false).filter(contractElement -> (contractElement.get("mandatory").asBoolean() || contractElement.get("mandatoryGroups") != null)).toList();
-        if (!contractMandatoryFields.isEmpty()) {
-            contractMandatoryFields.forEach(jsonField -> {
-                String key = jsonField.get("key").asText();
-                if (key.equals("teams")) {
-                    if (getTeams().isEmpty() && !isAllTeams()) {
-                        ready.set(false);
-                    }
-                } else if (key.equals("assets")) {
-                    if (getAssets().isEmpty() && getAssetGroups().isEmpty()) {
-                        ready.set(false);
-                    }
-                } else if (jsonField.get("type").asText().equals("text") && content.get(key) == null) {
-                    ready.set(false);
-                } else if (jsonField.get("type").asText().equals("text") && content.get(key).asText().isEmpty()) {
-                    ready.set(false);
-                }
-            });
-        }
-        return ready.get();
+        return InjectModelHelper.isReady(
+            getInjectorContract(),
+            getContent(),
+            isAllTeams(),
+            getTeams().stream().map(Team::getId).collect(Collectors.toSet()),
+            getAssets().stream().map(Asset::getId).collect(Collectors.toSet()),
+            getAssetGroups().stream().map(AssetGroup::getId).collect(Collectors.toSet())
+        );
     }
 
     @JsonIgnore
     public Instant computeInjectDate(Instant source, int speed) {
-        // Compute origin execution date
-        Optional<Inject> dependsOnInject = ofNullable(getDependsOn());
-        long duration = ofNullable(getDependsDuration()).orElse(0L) / speed;
-        Instant dependingStart = dependsOnInject
-                .map(inject -> inject.computeInjectDate(source, speed))
-                .orElse(source);
-        Instant standardExecutionDate = dependingStart.plusSeconds(duration);
-        // Compute execution dates with previous terminated pauses
-        long previousPauseDelay = 0L;
-        if (this.exercise != null) {
-            previousPauseDelay = this.exercise.getPauses().stream()
-                    .filter(pause -> pause.getDate().isBefore(standardExecutionDate))
-                    .mapToLong(pause -> pause.getDuration().orElse(0L)).sum();
-        }
-        Instant afterPausesExecutionDate = standardExecutionDate.plusSeconds(previousPauseDelay);
-        // Add current pause duration in date computation if needed
-        long currentPauseDelay = 0L;
-        if (this.exercise != null) {
-            currentPauseDelay = this.exercise.getCurrentPause()
-                    .map(last -> last.isBefore(afterPausesExecutionDate) ? between(last, now()).getSeconds() : 0L)
-                    .orElse(0L);
-        }
-        long globalPauseDelay = previousPauseDelay + currentPauseDelay;
-        long minuteAlignModulo = globalPauseDelay % 60;
-        long alignedPauseDelay = minuteAlignModulo > 0 ? globalPauseDelay + (60 - minuteAlignModulo) : globalPauseDelay;
-        return standardExecutionDate.plusSeconds(alignedPauseDelay);
+        return InjectModelHelper.computeInjectDate(source, speed, getDependsOn(), getDependsDuration(), getExercise());
     }
 
     @JsonProperty("inject_date")
     public Optional<Instant> getDate() {
-        if (this.getExercise() == null && this.getScenario() == null) {
-            return Optional.ofNullable(now().minusSeconds(30));
-        }
-
-        if (this.getScenario() != null) {
-            return Optional.empty();
-        }
-
-        if (this.getExercise() != null) {
-            if (this.getExercise().getStatus().equals(Exercise.STATUS.CANCELED)) {
-                return Optional.empty();
-            }
-            return this.getExercise()
-                    .getStart()
-                    .map(source -> computeInjectDate(source, SPEED_STANDARD));
-        }
-        return Optional.ofNullable(LocalDateTime.now().toInstant(ZoneOffset.UTC));
+        return InjectModelHelper.getDate(getExercise(), getScenario(), getDependsOn(), getDependsDuration());
     }
 
     @JsonIgnore
@@ -399,10 +324,7 @@ public class Inject implements Base, Injection {
 
     @JsonProperty("inject_sent_at")
     public Instant getSentAt() {
-        if (this.getStatus().isPresent()) {
-            return this.getStatus().orElseThrow().getTrackingSentDate();
-        }
-        return null;
+        return InjectModelHelper.getSentAt(this.getStatus());
     }
 
     @JsonProperty("inject_kill_chain_phases")

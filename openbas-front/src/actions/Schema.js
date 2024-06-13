@@ -488,4 +488,12 @@ export const storeHelper = (state) => ({
   getScenarioArticles: (id) => entities('articles', state).filter((i) => i.article_scenario === id),
   getScenarioChallenges: (id) => entities('challenges', state).filter((c) => c.challenge_scenarios.includes(id)),
   getScenarioInjects: (id) => getInjectsWithParsedInjectorContractContent(entities('injects', state).filter((i) => i.inject_scenario === id)),
+  getScenarioTechnicalInjectsWithNoTeam: (id) => {
+    return getInjectsWithParsedInjectorContractContent(
+      entities('injects', state),
+    ).filter((i) => !(i.inject_injector_contract?.injector_contract_content_parsed.fields.filter((f) => f.name === 'teams').length > 0) && i.inject_scenario === id);
+  },
+  getTeamScenarioInjects: (id) => entities('injects', state).filter((i) => (entity(id, 'teams', state) || {}).team_scenario_injects?.includes(
+    i.inject_id,
+  )),
 });

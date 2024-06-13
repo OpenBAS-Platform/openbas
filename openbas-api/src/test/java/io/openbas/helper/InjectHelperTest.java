@@ -13,9 +13,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.openbas.database.model.Exercise.STATUS.RUNNING;
+import static io.openbas.database.model.ExerciseStatus.RUNNING;
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
-import static io.openbas.injectors.email.EmailContract.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 

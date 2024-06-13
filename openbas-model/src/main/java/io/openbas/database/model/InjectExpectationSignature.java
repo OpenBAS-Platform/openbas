@@ -12,6 +12,7 @@ public class InjectExpectationSignature {
   public static final String EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME = "process_name";
   public static final String EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE = "command_line";
   public static final String EXPECTATION_SIGNATURE_TYPE_HASH = "hash";
+  public static final String EXPECTATION_SIGNATURE_TYPE_FILE_NAME = "file_name";
   public static final String EXPECTATION_SIGNATURE_TYPE_IPV4_ADDRESS = "ipv4_address";
   public static final String EXPECTATION_SIGNATURE_TYPE_IPV6_ADDRESS = "ipv6_address";
   public static final String EXPECTATION_SIGNATURE_TYPE_HOSTNAME = "hostname";

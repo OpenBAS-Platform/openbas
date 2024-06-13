@@ -28,14 +28,6 @@ import static java.util.Optional.ofNullable;
 @EntityListeners(ModelBaseListener.class)
 public class Exercise implements Base {
 
-  public enum STATUS {
-    SCHEDULED,
-    CANCELED,
-    RUNNING,
-    PAUSED,
-    FINISHED
-  }
-
   @Getter
   @Id
   @Column(name = "exercise_id")
@@ -61,7 +53,7 @@ public class Exercise implements Base {
   @Column(name = "exercise_status")
   @JsonProperty("exercise_status")
   @Enumerated(EnumType.STRING)
-  private STATUS status = STATUS.SCHEDULED;
+  private ExerciseStatus status = ExerciseStatus.SCHEDULED;
 
   @Getter
   @Column(name = "exercise_subtitle")
@@ -323,21 +315,21 @@ public class Exercise implements Base {
   }
 
   @JsonProperty("exercise_next_possible_status")
-  public List<STATUS> nextPossibleStatus() {
-    if (STATUS.CANCELED.equals(status)) {
-      return List.of(STATUS.SCHEDULED); // Via reset
+  public List<ExerciseStatus> nextPossibleStatus() {
+    if (ExerciseStatus.CANCELED.equals(status)) {
+      return List.of(ExerciseStatus.SCHEDULED); // Via reset
     }
-    if (STATUS.FINISHED.equals(status)) {
-      return List.of(STATUS.SCHEDULED); // Via reset
+    if (ExerciseStatus.FINISHED.equals(status)) {
+      return List.of(ExerciseStatus.SCHEDULED); // Via reset
     }
-    if (STATUS.SCHEDULED.equals(status)) {
-      return List.of(STATUS.RUNNING);
+    if (ExerciseStatus.SCHEDULED.equals(status)) {
+      return List.of(ExerciseStatus.RUNNING);
     }
-    if (STATUS.RUNNING.equals(status)) {
-      return List.of(STATUS.CANCELED, STATUS.PAUSED);
+    if (ExerciseStatus.RUNNING.equals(status)) {
+      return List.of(ExerciseStatus.CANCELED, ExerciseStatus.PAUSED);
     }
-    if (STATUS.PAUSED.equals(status)) {
-      return List.of(STATUS.CANCELED, STATUS.RUNNING);
+    if (ExerciseStatus.PAUSED.equals(status)) {
+      return List.of(ExerciseStatus.CANCELED, ExerciseStatus.RUNNING);
     }
     return List.of();
   }
