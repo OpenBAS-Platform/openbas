@@ -90,7 +90,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
   }));
   const sortedArticles: FullArticleStore[] = R.filter(
     (n: FullArticleStore) => channels.length === 0
-      || channels.map((o) => o.id).includes(n.article_fullchannel.channel_id ?? ''),
+      || channels.map((o) => o.id).includes(n.article_fullchannel?.channel_id ?? ''),
     filtering.filterAndSort(fullArticles),
   );
 
