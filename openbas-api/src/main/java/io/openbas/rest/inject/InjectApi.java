@@ -504,6 +504,12 @@ public class InjectApi extends RestBehavior {
                     return injectDocument;
                 }).toList();
         inject.setDocuments(injectDocuments);
+        // Linked documents directly to the exercise
+        inject.getDocuments().forEach(document -> {
+            if (!document.getDocument().getExercises().contains(scenario)) {
+                scenario.getDocuments().add(document.getDocument());
+            }
+        });
         return injectRepository.save(inject);
     }
 
