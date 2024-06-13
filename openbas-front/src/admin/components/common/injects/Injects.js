@@ -176,7 +176,10 @@ const Injects = (props) => {
   const { t, tPick } = useFormatter();
   const [selectedInjectId, setSelectedInjectId] = useState(null);
   const [showTimeline, _setShowTimeline] = useState(
-    localStorage.getItem('showTimeline') === 'true',
+    () => {
+      const storedValue = localStorage.getItem(exerciseOrScenarioId);
+      return storedValue === null ? true : storedValue === 'true';
+    },
   );
   const { permissions } = useContext(PermissionsContext);
   const injectContext = useContext(InjectContext);
@@ -203,6 +206,12 @@ const Injects = (props) => {
     await injectContext.onUpdateInject(selectedInjectId, data);
   };
   const sortedInjects = filtering.filterAndSort(injects);
+
+  const handleCheckboxChange = (event) => {
+    const { checked } = event.target;
+    setShowTimeline(checked);
+    localStorage.setItem(exerciseOrScenarioId, checked);
+  };
 
   // Rendering
   if (injects) {
