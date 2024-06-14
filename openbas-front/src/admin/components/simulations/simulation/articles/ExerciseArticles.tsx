@@ -14,7 +14,7 @@ import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 export const articleContextForExercise = (exerciseId: ExerciseStore['exercise_id']) => {
   const dispatch = useAppDispatch();
   return {
-    previewArticleUrl: (article: FullArticleStore) => `/channels/${exerciseId}/${article.article_fullchannel.channel_id}?preview=true`,
+    previewArticleUrl: (article: FullArticleStore) => `/channels/${exerciseId}/${article.article_fullchannel?.channel_id}?preview=true`,
     onAddArticle: (data: ArticleCreateInput) => dispatch(addExerciseArticle(exerciseId, data)),
     onUpdateArticle: (article: ArticleStore, data: ArticleUpdateInput) => dispatch(
       updateExerciseArticle(exerciseId, article.article_id, data),
