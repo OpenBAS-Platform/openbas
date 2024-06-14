@@ -1,20 +1,7 @@
 import React from 'react';
-import { withStyles } from '@mui/styles';
 import { Field } from 'react-final-form';
 import { TextField, IconButton, Autocomplete as MuiAutocomplete } from '@mui/material';
 import { AddOutlined } from '@mui/icons-material';
-import * as R from 'ramda';
-
-const styles = () => ({
-  iconDefault: {
-    position: 'absolute',
-    right: 35,
-  },
-  iconInjector: {
-    position: 'absolute',
-    right: 25,
-  },
-});
 
 const renderAutocomplete = ({
   label,
@@ -24,19 +11,8 @@ const renderAutocomplete = ({
   fullWidth,
   style,
   openCreate,
-  noMargin,
-  classes,
-  injectorContractUpdate,
   ...others
 }) => {
-  let top = 30;
-  if (placeholder) {
-    top = -5;
-  } else if (noMargin) {
-    top = 10;
-  } else if (injectorContractUpdate) {
-    top = 9;
-  }
   return (
     <div style={{ position: 'relative' }}>
       <MuiAutocomplete
@@ -66,19 +42,26 @@ const renderAutocomplete = ({
             style={style}
             error={touched && invalid}
             helperText={touched && error}
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {
+                    typeof openCreate === 'function' && (
+                      <IconButton
+                        onClick={() => openCreate()}
+                      >
+                        <AddOutlined />
+                      </IconButton>
+                    )
+                  }
+                  {params.InputProps.endAdornment}
+                </>
+              ),
+            }}
           />
         )}
       />
-      {typeof openCreate === 'function' && (
-        <IconButton
-          onClick={() => openCreate()}
-          edge="end"
-          className={injectorContractUpdate ? classes.iconInjector : classes.iconDefault}
-          style={{ top }}
-        >
-          <AddOutlined />
-        </IconButton>
-      )}
     </div>
   );
 };
@@ -91,4 +74,4 @@ const Autocomplete = (props) => {
   );
 };
 
-export default R.compose(withStyles(styles))(Autocomplete);
+export default Autocomplete;
