@@ -3,7 +3,9 @@ package io.openbas.rest.executor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Executor;
+import io.openbas.database.model.Token;
 import io.openbas.database.repository.ExecutorRepository;
+import io.openbas.database.repository.TokenRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.executor.form.ExecutorCreateInput;
 import io.openbas.rest.executor.form.ExecutorUpdateInput;
@@ -40,9 +42,15 @@ public class ExecutorApi extends RestBehavior {
     private ExecutorRepository executorRepository;
     private EndpointService endpointService;
     private FileService fileService;
+    private TokenRepository tokenRepository;
 
     @Resource
     protected ObjectMapper mapper;
+
+    @Autowired
+    public void setTokenRepository(TokenRepository tokenRepository) {
+        this.tokenRepository = tokenRepository;
+    }
 
     @Autowired
     public void setEndpointService(EndpointService endpointService) {
@@ -188,9 +196,13 @@ public class ExecutorApi extends RestBehavior {
     }
 
     // Public API
-    @GetMapping(value = "/api/agent/installer/openbas/{platform}")
-    public @ResponseBody ResponseEntity<String> getOpenBasAgentInstaller(@PathVariable String platform) throws IOException {
-        String installCommand = this.endpointService.generateInstallCommand(platform);
+    @GetMapping(value = "/api/agent/installer/openbas/{platform}/{token}")
+    public @ResponseBody ResponseEntity<String> getOpenBasAgentInstaller(@PathVariable String platform, @PathVariable String token) throws IOException {
+        Optional<Token> resolvedToken = tokenRepository.findByValue(token);
+        if (resolvedToken.isEmpty() || !resolvedToken.get().getUser().isAdmin()) {
+            throw new UnsupportedOperationException("Invalid token");
+        }
+        String installCommand = this.endpointService.generateInstallCommand(platform, token);
         return ResponseEntity.ok()
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(installCommand);

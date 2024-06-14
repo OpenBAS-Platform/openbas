@@ -94,7 +94,7 @@ public class EndpointService {
     this.endpointRepository.deleteById(endpointId);
   }
 
-  public String getFileOrDownloadFromJfrog(String platform, String file) throws IOException {
+  public String getFileOrDownloadFromJfrog(String platform, String file, String adminToken) throws IOException {
     String extension = switch (platform.toLowerCase()) {
       case "windows" -> "ps1";
       case "linux", "macos" -> "sh";
@@ -112,11 +112,11 @@ public class EndpointService {
             .replace("${OPENBAS_TOKEN}", adminToken);
   }
 
-  public String generateInstallCommand(String platform) throws IOException {
-    return getFileOrDownloadFromJfrog(platform, "openbas-agent-installer");
+  public String generateInstallCommand(String platform, String token) throws IOException {
+    return getFileOrDownloadFromJfrog(platform, "openbas-agent-installer", token);
   }
 
   public String generateUpgradeCommand(String platform) throws IOException {
-    return getFileOrDownloadFromJfrog(platform, "openbas-agent-upgrade");
+    return getFileOrDownloadFromJfrog(platform, "openbas-agent-upgrade", adminToken);
   }
 }
