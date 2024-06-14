@@ -85,8 +85,8 @@ public class FullTextSearchService<T extends Base> {
     return buildPaginationJPA(
         repository::findAll,
         searchPaginationInput,
-        SpecificationUtils.fullTextSearch(finalSearchTerm, searchListByClassMap.get(clazzT)),
-        clazzT
+        clazzT,
+        SpecificationUtils.fullTextSearch(finalSearchTerm, searchListByClassMap.get(clazzT))
     ).map(this::transform);
   }
 
