@@ -56,7 +56,7 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
               color="primary"
               onClick={() => setOpenChangeStatus('RUNNING')}
             >
-              {t('Start')}
+              {t('Start now')}
             </Button>
           );
         }
