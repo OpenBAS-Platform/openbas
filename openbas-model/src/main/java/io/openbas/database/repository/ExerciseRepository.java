@@ -87,7 +87,7 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
     @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score, injects.inject_title, icap.attack_pattern_id " +
             "FROM exercises " +
             "INNER JOIN injects ON exercises.exercise_id = injects.inject_exercise " +
-            "LEFT JOIN injects_expectations ie ON exercises.exercise_id = ie.exercise_id " +
+            "LEFT JOIN injects_expectations ie ON injects.inject_id = ie.exercise_id " +
             "INNER JOIN injectors_contracts ic ON injects.inject_injector_contract = ic.injector_contract_id " +
             "INNER JOIN injectors_contracts_attack_patterns icap ON ic.injector_contract_id = icap.injector_contract_id " +
             "WHERE exercises.exercise_created_at < :from ;", nativeQuery = true)
