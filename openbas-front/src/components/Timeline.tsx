@@ -201,46 +201,47 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
 
   return (
     <>
-      <div className={classes.container}>
-        <div className={classes.names}>
-          {sortedTeams.map((team) => (
-            <div key={team.team_id} className={classes.lineName}>
-              <div className={classes.name}>
-                {team.team_name.startsWith('openbas_') ? (
-                  <CastOutlined fontSize="small"/>
-                ) : (
-                  <CastForEducationOutlined fontSize="small"/>
-                )}
+      {injects.length > 0 ? (
+        <div className={classes.container}>
+          <div className={classes.names}>
+            {sortedTeams.map((team) => (
+              <div key={team.team_id} className={classes.lineName}>
+                <div className={classes.name}>
+                  {team.team_name.startsWith('openbas_') ? (
+                    <CastOutlined fontSize="small"/>
+                  ) : (
+                    <CastForEducationOutlined fontSize="small"/>
+                  )}
                         &nbsp;&nbsp;
-                {team.team_name.startsWith('openbas_')
-                  ? t(team.team_name)
-                  : truncate(team.team_name, 20)}
+                  {team.team_name.startsWith('openbas_')
+                    ? t(team.team_name)
+                    : truncate(team.team_name, 20)}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-        <div className={classes.timeline}>
-          {sortedTeams.map((team, index) => {
-            const injectsGroupedByTick = byTick(
-              filtering.filterAndSort(injectsMap[team.team_id] ?? []),
-            );
-            return (
-              <div
-                key={team.team_id}
-                className={classes.line}
-                style={{ backgroundColor: index % 2 === 0 ? grid0 : grid5 }}
-              >
-                {Object.keys(injectsGroupedByTick).map((key, i) => {
-                  const injectGroupPosition = (parseFloat(key) * 100) / totalDuration;
-                  return (
-                    <div
-                      key={i}
-                      className={classes.injectGroup}
-                      style={{ left: `${injectGroupPosition}%` }}
-                    >
-                      {injectsGroupedByTick[key].map((inject: InjectStore) => {
-                        const duration = splitDuration(inject.inject_depends_duration || 0);
-                        const tooltipContent = (
+            ))}
+          </div>
+          <div className={classes.timeline}>
+            {sortedTeams.map((team, index) => {
+              const injectsGroupedByTick = byTick(
+                filtering.filterAndSort(injectsMap[team.team_id] ?? []),
+              );
+              return (
+                <div
+                  key={team.team_id}
+                  className={classes.line}
+                  style={{ backgroundColor: index % 2 === 0 ? grid0 : grid5 }}
+                >
+                  {Object.keys(injectsGroupedByTick).map((key, i) => {
+                    const injectGroupPosition = (parseFloat(key) * 100) / totalDuration;
+                    return (
+                      <div
+                        key={i}
+                        className={classes.injectGroup}
+                        style={{ left: `${injectGroupPosition}%` }}
+                      >
+                        {injectsGroupedByTick[key].map((inject: InjectStore) => {
+                          const duration = splitDuration(inject.inject_depends_duration || 0);
+                          const tooltipContent = (
                           <React.Fragment>
                             {inject.inject_title}
                             <br/>
@@ -248,8 +249,8 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
                               {`${duration.days} ${t('d')}, ${duration.hours} ${t('h')}, ${duration.minutes} ${t('m')}`}
                             </span>
                           </React.Fragment>
-                        );
-                        return (
+                          );
+                          return (
                           <InjectIcon
                             key={inject.inject_id}
                             type={inject.inject_type}
@@ -260,51 +261,53 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
                             size="small"
                             variant={'timeline'}
                           />
-                        );
-                      })
+                          );
+                        })
                        }
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })}
-          <div className={classes.scale}>
-            {ticks.map((tick, index) => {
-              const duration = splitDuration(tick);
-              return (
-                <div
-                  key={tick}
-                  className={classes.tick}
-                  style={{
-                    left: `${index * 5}%`,
-                    height: index % 5 === 0 ? 'calc(100% + 30px)' : '100%',
-                    top: index % 5 === 0 ? -15 : 0,
-                    borderRight: index % 5 === 0 ? grid25 : grid15,
-                  }}
-                >
-                  <div className={classes.tickLabelTop}>
-                    {index % 5 === 0
-                      ? `${duration.days}
-                          ${t('d')}, ${duration.hours}
-                          ${t('h')}, ${duration.minutes}
-                          ${t('m')}`
-                      : ''}
-                  </div>
-                  <div className={classes.tickLabelBottom}>
-                    {index % 5 === 0
-                      ? `${duration.days}
-                          ${t('d')}, ${duration.hours}
-                          ${t('h')}, ${duration.minutes}
-                          ${t('m')}`
-                      : ''}
-                  </div>
+                      </div>
+                    );
+                  })}
                 </div>
               );
             })}
+            <div className={classes.scale}>
+              {ticks.map((tick, index) => {
+                const duration = splitDuration(tick);
+                return (
+                  <div
+                    key={tick}
+                    className={classes.tick}
+                    style={{
+                      left: `${index * 5}%`,
+                      height: index % 5 === 0 ? 'calc(100% + 30px)' : '100%',
+                      top: index % 5 === 0 ? -15 : 0,
+                      borderRight: index % 5 === 0 ? grid25 : grid15,
+                    }}
+                  >
+                    <div className={classes.tickLabelTop}>
+                      {index % 5 === 0
+                        ? `${duration.days}
+                          ${t('d')}, ${duration.hours}
+                          ${t('h')}, ${duration.minutes}
+                          ${t('m')}`
+                        : ''}
+                    </div>
+                    <div className={classes.tickLabelBottom}>
+                      {index % 5 === 0
+                        ? `${duration.days}
+                          ${t('d')}, ${duration.hours}
+                          ${t('h')}, ${duration.minutes}
+                          ${t('m')}`
+                        : ''}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
+      ) : null
+      }
     </>
   );
 };
