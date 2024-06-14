@@ -24,8 +24,8 @@ const ExerciseDatePopover: React.FC<Props> = ({ exercise }) => {
   return (
     <>
       <Tooltip title={(t('Modify the scheduling'))}>
-        <IconButton size="small" onClick={() => setOpenEdit(true)} style={{ marginRight: 5 }}>
-          <UpdateOutlined color="primary" />
+        <IconButton size="small" color="primary" onClick={() => setOpenEdit(true)} style={{ marginRight: 5 }} disabled={exercise.exercise_status !== 'SCHEDULED'}>
+          <UpdateOutlined />
         </IconButton>
       </Tooltip>
       <Dialog
@@ -33,12 +33,13 @@ const ExerciseDatePopover: React.FC<Props> = ({ exercise }) => {
         open={openEdit}
         onClose={() => setOpenEdit(false)}
         PaperProps={{ elevation: 1 }}
+        maxWidth="xs"
+        fullWidth
       >
         <DialogTitle>{t('Update the simulation')}</DialogTitle>
         <DialogContent>
           <ExerciseDateForm
             initialValues={initialValues}
-            editing
             onSubmit={onSubmitEdit}
             handleClose={() => setOpenEdit(false)}
           />
