@@ -233,7 +233,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10 }}>
                       {collector.sourceId != null
                         ? (<img
-                            src={`/api/images/collectors/${collector.sourceId}`}
+                            src={`/api/images/collectors/id/${collector.sourceId}`}
                             alt={collector.sourceId}
                             style={{ width: 20, height: 20, borderRadius: 4 }}
                            />) : (
