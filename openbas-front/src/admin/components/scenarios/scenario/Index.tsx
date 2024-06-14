@@ -41,7 +41,7 @@ const useStyles = makeStyles(() => ({
 const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = ({
   scenario,
 }) => {
-  const { t, nsd, ft, locale } = useFormatter();
+  const { t, nsd, ft, locale, fld } = useFormatter();
   const location = useLocation();
   const theme = useTheme<Theme>();
   const classes = useStyles();
@@ -72,7 +72,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
     }
     let sentence = '';
     if (noRepeat) {
-      sentence = `${nsd(scenario.scenario_recurrence_start)} ${t('recurrence_at')} ${ft(new Date().setUTCHours(parsedCronExpression.h, parsedCronExpression.m))}`;
+      sentence = `${fld(scenario.scenario_recurrence_start)} ${t('recurrence_at')} ${ft(new Date().setUTCHours(parsedCronExpression.h, parsedCronExpression.m))}`;
     } else {
       sentence = cronstrue.toString(cronExpression, {
         verbose: true,
