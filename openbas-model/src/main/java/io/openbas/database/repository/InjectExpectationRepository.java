@@ -67,11 +67,11 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
         @Param("assetGroupId") @NotBlank final String assetGroupId
     );
 
-    @Query(value = "SELECT team_id, asset_id, asset_group_id, inject_expectation_type, " +
-            "inject_expectation_score, inject_expectation_id, exercise_id, inject_expectation_expected_score " +
-            "FROM injects_expectations i where i.inject_expectation_id IN :ids",
-            nativeQuery = true)
-    List<RawInjectExpectation> rawByIds(
-            @Param("ids") final List<String> ids
-    );
+    @Query(value = "SELECT "
+        + "team_id, asset_id, asset_group_id, inject_expectation_type, "
+        + "inject_expectation_score, inject_expectation_id, exercise_id, inject_expectation_expected_score "
+        + "FROM injects_expectations i "
+        + "where i.inject_expectation_id IN :ids",
+        nativeQuery = true)
+    List<RawInjectExpectation> rawByIds(@Param("ids") final List<String> ids);
 }

@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.StreamSupport;
 
@@ -28,9 +27,9 @@ public class InjectModelHelper {
       InjectorContract injectorContract,
       ObjectNode content,
       boolean allTeams,
-      @NotNull final Set<String> teams,
-      @NotNull final Set<String> assets,
-      @NotNull final Set<String> assetGroups) {
+      @NotNull final List<String> teams,
+      @NotNull final List<String> assets,
+      @NotNull final List<String> assetGroups) {
     if (injectorContract == null) {
       return false;
     }
