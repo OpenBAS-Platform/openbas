@@ -46,4 +46,27 @@ public class PaginationUtils {
     return findAll.apply(filterSpecifications.and(searchSpecifications), pageable);
   }
 
+  /**
+   * Build PaginationJPA with a specified search specifications that replace the default ones
+   * @param findAll the find all method
+   * @param input the search inputs
+   * @param clazz the class that we're looking for
+   * @param specificSearchSpecification the specified
+   *                                    search specification (will replace the default ones)
+   * @return a Page of results
+   */
+  public static <T> Page<T> buildPaginationJPA(
+          @NotNull final BiFunction<Specification<T>, Pageable, Page<T>> findAll,
+          @NotNull final SearchPaginationInput input,
+          @NotNull final Class<T> clazz,
+          Specification<T> specificSearchSpecification) {
+    // Specification
+    Specification<T> filterSpecifications = computeFilterGroupJpa(input.getFilterGroup());
+
+    // Pageable
+    Pageable pageable = PageRequest.of(input.getPage(), input.getSize(), toSortJpa(input.getSorts(), clazz));
+
+    return findAll.apply(filterSpecifications.and(specificSearchSpecification), pageable);
+  }
+
 }

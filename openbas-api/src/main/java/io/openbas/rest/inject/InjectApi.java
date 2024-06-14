@@ -336,7 +336,7 @@ public class InjectApi extends RestBehavior {
         inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
         inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
         inject.setAssetGroups(fromIterable(assetGroupService.assetGroups(input.getAssetGroups())));
-    inject.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+        inject.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         List<InjectDocument> injectDocuments = input.getDocuments().stream()
                 .map(i -> {
                     InjectDocument injectDocument = new InjectDocument();
@@ -346,6 +346,12 @@ public class InjectApi extends RestBehavior {
                     return injectDocument;
                 }).toList();
         inject.setDocuments(injectDocuments);
+        // Linked documents directly to the exercise
+        inject.getDocuments().forEach(document -> {
+            if (!document.getDocument().getExercises().contains(exercise)) {
+                exercise.getDocuments().add(document.getDocument());
+            }
+        });
         return injectRepository.save(inject);
     }
 
@@ -498,6 +504,12 @@ public class InjectApi extends RestBehavior {
                     return injectDocument;
                 }).toList();
         inject.setDocuments(injectDocuments);
+        // Linked documents directly to the exercise
+        inject.getDocuments().forEach(document -> {
+            if (!document.getDocument().getExercises().contains(scenario)) {
+                scenario.getDocuments().add(document.getDocument());
+            }
+        });
         return injectRepository.save(inject);
     }
 

@@ -239,7 +239,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
                   <ExpandableMarkdown source={article.article_content ?? ''} limit={500} />
                   <div className={classes.footer}>
                     <div style={{ float: 'left' }}>
-                      <Tooltip title={article.article_fullchannel.channel_name}>
+                      <Tooltip title={article.article_fullchannel?.channel_name}>
                         <Chip
                           icon={
                             <ChannelIcon
@@ -257,7 +257,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
                             ),
                           }}
                           variant="outlined"
-                          label={article.article_fullchannel.channel_name}
+                          label={article.article_fullchannel?.channel_name}
                         />
                       </Tooltip>
                     </div>

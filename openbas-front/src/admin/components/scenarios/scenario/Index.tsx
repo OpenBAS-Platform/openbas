@@ -137,8 +137,8 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
             </Tabs>
             <div className={classes.scheduling}>
               {!cronExpression && (
-                <IconButton size="small" style={{ cursor: 'default', marginRight: 5 }} disabled={true}>
-                  <UpdateOutlined />
+                <IconButton size="small" onClick={() => setOpenScenarioRecurringFormDialog(true)} style={{ marginRight: 5 }}>
+                  <UpdateOutlined color="primary" />
                 </IconButton>
               )}
               {cronExpression && !scenario.scenario_recurrence && (

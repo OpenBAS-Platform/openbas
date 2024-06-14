@@ -800,7 +800,11 @@ public class ExerciseApi extends RestBehavior {
       importExport.setUsers(players);
       objectMapper.addMixIn(User.class, ExerciseExportMixins.User.class);
       // organizations
-      List<Organization> organizations = players.stream().map(User::getOrganization).filter(Objects::nonNull).toList();
+      List<Organization> organizations = players.stream()
+          .map(User::getOrganization)
+          .filter(Objects::nonNull)
+          .distinct()
+          .toList();
       exerciseTags.addAll(organizations.stream().flatMap(org -> org.getTags().stream()).toList());
       importExport.setOrganizations(organizations);
       objectMapper.addMixIn(Organization.class, ExerciseExportMixins.Organization.class);

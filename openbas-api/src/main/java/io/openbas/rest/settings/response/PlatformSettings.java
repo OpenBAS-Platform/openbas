@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -106,5 +107,9 @@ public class PlatformSettings {
 
   @JsonProperty("platform_policies")
   private PolicyInput policies;
+
+  // FEATURE FLAG
+  @JsonProperty("disabled_dev_features")
+  private List<String> disabledDevFeatures = new ArrayList<>();
 
 }
