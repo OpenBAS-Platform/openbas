@@ -15,7 +15,6 @@ import io.openbas.rest.team.form.TeamCreateInput;
 import io.openbas.rest.team.form.TeamUpdateInput;
 import io.openbas.rest.team.form.UpdateUsersTeamInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -124,6 +124,7 @@ public class TeamApi extends RestBehavior {
 
     @PostMapping("/api/teams/search")
     @PreAuthorize("isObserver()")
+    @Transactional(readOnly = true)
     public Page<RawPaginationTeam> teams(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
         BiFunction<Specification<Team>, Pageable, Page<Team>> teamsFunction;
         OpenBASPrincipal currentUser = currentUser();
@@ -160,7 +161,7 @@ public class TeamApi extends RestBehavior {
 
     @PostMapping("/api/teams")
     @PreAuthorize("isPlanner()")
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Team createTeam(@Valid @RequestBody TeamCreateInput input) {
         if (TRUE.equals(input.getContextual()) && input.getExerciseIds().toArray().length > 1) {
             throw new UnsupportedOperationException("Contextual team can only be associated to one exercise");
@@ -180,7 +181,7 @@ public class TeamApi extends RestBehavior {
 
     @PostMapping("/api/teams/upsert")
     @PreAuthorize("isPlanner()")
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Team upsertTeam(@Valid @RequestBody TeamCreateInput input) {
         if (input.getContextual() && input.getExerciseIds().toArray().length > 1) {
             throw new UnsupportedOperationException("Contextual team can only be associated to one exercise");

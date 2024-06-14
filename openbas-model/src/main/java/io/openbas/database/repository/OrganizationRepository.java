@@ -2,7 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Organization;
 import io.openbas.database.raw.RawOrganization;
-import jakarta.validation.constraints.NotNull;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -17,6 +17,9 @@ public interface OrganizationRepository extends CrudRepository<Organization, Str
 
     @NotNull
     Optional<Organization> findById(@NotNull String id);
+
+    @NotNull
+    List<Organization> findByNameIgnoreCase(@NotNull final String name);
 
     @Query(value =
             "SELECT org.*, " +
