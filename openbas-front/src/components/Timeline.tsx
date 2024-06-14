@@ -92,7 +92,7 @@ interface Props {
   onSelectInject: (injectId: string) => void,
 }
 
-const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, teams, onSelectInject }) => {
+const Timeline: FunctionComponent<Props> = ({ injects, teams, onSelectInject }) => {
   // Standard hooks
   const classes = useStyles();
   const theme = useTheme<Theme>();
@@ -100,8 +100,8 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
 
   // Retrieve data
   const {
+    finalInjectWithoutTeam,
     finalInjectsPerTeam,
-    finalInjectsPerType,
   } = useHelper((helper: InjectHelper) => {
     const getInjectsPerTeam = (teamId: string) => {
       const teamExerciseInjects = helper.getTeamExerciseInjects(teamId);
@@ -114,27 +114,43 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
       })),
     );
 
-    const getInjectsWithNoTeam = () => {
-      const exerciseInjects = helper.getExerciseTechnicalInjectsWithNoTeam(exerciseOrScenarioId);
-      return exerciseInjects.length > 0 ? exerciseInjects : helper.getScenarioTechnicalInjectsWithNoTeam(exerciseOrScenarioId);
-    };
+    const allInjectIds = new Set(R.values(injectsPerTeam).flat().map((inj: Inject) => inj.inject_id));
 
-    const injectsWithNoTeam = getInjectsWithNoTeam();
+    // Build map of Inject by teams
+    const injectsWithoutTeamMap = injects.reduce((acc, inject) => {
+      let keys = [];
 
-    // Filter injects
-    const injectsInTeams = R.flatten(R.values(injectsPerTeam)) as Inject[];
-    const filteredInjectsWithNoTeam = injectsWithNoTeam.filter(
-      (inject) => !injectsInTeams.some((teamInject) => teamInject.inject_id === inject.inject_id),
-    );
-    const injectsPerType = R.groupBy(R.prop('inject_type'), filteredInjectsWithNoTeam);
+      if (!allInjectIds.has(inject.inject_id)) {
+        if (
+          inject.inject_injector_contract?.convertedContent
+            && 'fields' in inject.inject_injector_contract.convertedContent
+            && inject.inject_injector_contract.convertedContent.fields.some(
+              (field: any) => field.key === 'teams',
+            )
+        ) {
+          keys = ['No teams'];
+        } else {
+          keys = [inject.inject_type];
+        }
+      }
+
+      keys?.forEach((key) => {
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+        acc[key].push(inject);
+      });
+
+      return acc;
+    }, {} as { [key: string]: Inject[] });
 
     return {
+      finalInjectWithoutTeam: injectsWithoutTeamMap,
       finalInjectsPerTeam: injectsPerTeam,
-      finalInjectsPerType: injectsPerType,
     };
   });
 
-  const injectsMap = { ...finalInjectsPerTeam, ...finalInjectsPerType };
+  const injectsMap = { ...finalInjectsPerTeam, ...finalInjectWithoutTeam };
 
   // Sorted teams
   const teamInjectNames = R.map((key: string) => ({
@@ -201,7 +217,7 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
 
   return (
     <>
-      {injects.length > 0 ? (
+      {injects ? (
         <div className={classes.container}>
           <div className={classes.names}>
             {sortedTeams.map((team) => (
@@ -242,25 +258,25 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
                         {injectsGroupedByTick[key].map((inject: InjectStore) => {
                           const duration = splitDuration(inject.inject_depends_duration || 0);
                           const tooltipContent = (
-                          <React.Fragment>
-                            {inject.inject_title}
-                            <br/>
-                            <span style={{ display: 'block', textAlign: 'center', fontWeight: 'bold' }}>
-                              {`${duration.days} ${t('d')}, ${duration.hours} ${t('h')}, ${duration.minutes} ${t('m')}`}
-                            </span>
-                          </React.Fragment>
+                            <React.Fragment>
+                              {inject.inject_title}
+                              <br/>
+                              <span style={{ display: 'block', textAlign: 'center', fontWeight: 'bold' }}>
+                                {`${duration.days} ${t('d')}, ${duration.hours} ${t('h')}, ${duration.minutes} ${t('m')}`}
+                              </span>
+                            </React.Fragment>
                           );
                           return (
-                          <InjectIcon
-                            key={inject.inject_id}
-                            type={inject.inject_type}
-                            tooltip={tooltipContent}
-                            onClick={() => handleSelectInject(inject.inject_id)}
-                            done={inject.inject_status !== null}
-                            disabled={!inject.inject_enabled}
-                            size="small"
-                            variant={'timeline'}
-                          />
+                            <InjectIcon
+                              key={inject.inject_id}
+                              type={inject.inject_type}
+                              tooltip={tooltipContent}
+                              onClick={() => handleSelectInject(inject.inject_id)}
+                              done={inject.inject_status !== null}
+                              disabled={!inject.inject_enabled}
+                              size="small"
+                              variant={'timeline'}
+                            />
                           );
                         })
                        }
