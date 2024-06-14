@@ -338,7 +338,7 @@ const Injects = (props) => {
           <div className="clearfix" />
         </div>
         {showTimeline && (<div style={{ marginBottom: 50 }}>
-          <Timeline exerciseOrScenarioId={exerciseOrScenarioId}
+          <Timeline
             injects={sortedInjects}
             onSelectInject={(id) => setSelectedInjectId(id)}
             teams={teams}

@@ -133,7 +133,7 @@ const TimelineOverview = () => {
         />
       </div>
       <div className="clearfix"/>
-      <Timeline exerciseOrScenarioId={exerciseId}
+      <Timeline
         injects={sortedInjects}
         onSelectInject={(id: string) => setSelectedInjectId(id)}
         teams={teams}
@@ -229,7 +229,7 @@ const TimelineOverview = () => {
                       to={`/admin/exercises/${exerciseId}/injects/${inject.inject_id}?backlabel=Animation&backuri=/admin/exercises/${exerciseId}/animation/timeline`}
                     >
                       <ListItemIcon>
-                        <InjectIcon key={inject.inject_id} type={inject.inject_type} variant="inline"/>
+                        <InjectIcon type={inject.inject_type} variant="inline"/>
                       </ListItemIcon>
                       <ListItemText
                         primary={
@@ -245,7 +245,6 @@ const TimelineOverview = () => {
                               style={{ width: '20%' }}
                             >
                               <ItemStatus
-                                key={inject.inject_id}
                                 variant="inList"
                                 label={t(inject.inject_status?.status_name)}
                                 status={inject.inject_status?.status_name}

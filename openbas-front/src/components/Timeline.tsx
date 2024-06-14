@@ -86,7 +86,6 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  exerciseOrScenarioId: string,
   injects: Inject[],
   teams: Team[],
   onSelectInject: (injectId: string) => void,
@@ -217,7 +216,7 @@ const Timeline: FunctionComponent<Props> = ({ injects, teams, onSelectInject }) 
 
   return (
     <>
-      {injects ? (
+      {injects.length > 0 ? (
         <div className={classes.container}>
           <div className={classes.names}>
             {sortedTeams.map((team) => (
