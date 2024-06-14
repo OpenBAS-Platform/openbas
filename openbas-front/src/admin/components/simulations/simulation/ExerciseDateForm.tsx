@@ -100,7 +100,7 @@ const ExerciseDateForm: React.FC<Props> = ({
     <form id="exerciseDateForm" onSubmit={handleSubmit(submit)}>
       <FormControlLabel
         control={<Switch onChange={handleChange} checked={checked} />}
-        label="Manual launch"
+        label={t('Manual launch')}
       />
 
       <Stack spacing={{ xs: 2 }}>

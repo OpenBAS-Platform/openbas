@@ -388,6 +388,7 @@ const i18n = {
       'Do you want to enable this team?':
         'Souhaitez-vous activer cette équipe ?',
       Trigger: 'Déclencheur',
+      'Manual launch': 'Lancement manuel',
       'Manage content': 'Gérer le contenu',
       Controls: 'Contrôles',
       'Lessons learned': 'Expérience',
