@@ -25,7 +25,6 @@ const InjectorContractForm = (props) => {
             name="injector_contract_attack_patterns"
             label={t('Attack patterns')}
             values={values}
-            injectorContractUpdate={true}
             setFieldValue={form.mutators.setValue}
           />
           <div style={{ float: 'right', marginTop: 20 }}>
