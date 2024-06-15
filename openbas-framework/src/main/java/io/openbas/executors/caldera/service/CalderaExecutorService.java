@@ -80,8 +80,12 @@ public class CalderaExecutorService implements Runnable {
         this.calderaExecutorContextService = calderaExecutorContextService;
         this.injectorService = injectorService;
         try {
-            this.executor = executorService.register(config.getId(), CALDERA_EXECUTOR_TYPE, CALDERA_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-caldera.png"), new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
-            this.calderaExecutorContextService.registerAbilities();
+            if (config.isEnable()) {
+                this.executor = executorService.register(config.getId(), CALDERA_EXECUTOR_TYPE, CALDERA_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-caldera.png"), new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
+                this.calderaExecutorContextService.registerAbilities();
+            } else {
+                executorService.remove(config.getId());
+            }
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error creating caldera executor: " + e);
         }

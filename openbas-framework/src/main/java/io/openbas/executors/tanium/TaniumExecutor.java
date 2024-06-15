@@ -29,12 +29,9 @@ public class TaniumExecutor {
 
     @PostConstruct
     public void init() {
-        // If enabled, scheduled every X seconds
+        TaniumExecutorService service = new TaniumExecutorService(this.executorService, this.client, this.config, this.taniumExecutorContextService, this.endpointService, this.injectorService);
         if (this.config.isEnable()) {
-            TaniumExecutorService service = new TaniumExecutorService(this.executorService, this.client, this.config, this.taniumExecutorContextService, this.endpointService, this.injectorService);
             this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(60));
-        } else {
-            this.executorService.remove(this.config.getId());
         }
     }
 }

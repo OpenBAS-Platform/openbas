@@ -29,12 +29,9 @@ public class CalderaExecutor {
 
     @PostConstruct
     public void init() {
-        // If enabled, scheduled every X seconds
+        CalderaExecutorService service = new CalderaExecutorService(this.executorService, this.client, this.config, this.calderaExecutorContextService, this.endpointService, this.injectorService);
         if (this.config.isEnable()) {
-            CalderaExecutorService service = new CalderaExecutorService(this.executorService, this.client, this.config, this.calderaExecutorContextService, this.endpointService, this.injectorService);
             this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(60));
-        } else {
-            this.executorService.remove(this.config.getId());
         }
     }
 }
