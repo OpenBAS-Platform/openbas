@@ -205,6 +205,7 @@ const Injects = (props) => {
   const onUpdateInject = async (data) => {
     await injectContext.onUpdateInject(selectedInjectId, data);
   };
+
   const sortedInjects = filtering.filterAndSort(injects);
 
   const handleCheckboxChange = (event) => {

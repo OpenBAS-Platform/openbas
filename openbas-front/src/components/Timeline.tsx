@@ -91,7 +91,7 @@ interface Props {
   onSelectInject: (injectId: string) => void,
 }
 
-const Timeline: FunctionComponent<Props> = ({ injects, teams, onSelectInject }) => {
+const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) => {
   // Standard hooks
   const classes = useStyles();
   const theme = useTheme<Theme>();
@@ -108,7 +108,7 @@ const Timeline: FunctionComponent<Props> = ({ injects, teams, onSelectInject }) 
     };
 
     const injectsPerTeam = R.mergeAll(
-      teams.map((a) => ({
+      teams.map((a: Team) => ({
         [a.team_id]: getInjectsPerTeam(a.team_id),
       })),
     );
@@ -116,7 +116,7 @@ const Timeline: FunctionComponent<Props> = ({ injects, teams, onSelectInject }) 
     const allInjectIds = new Set(R.values(injectsPerTeam).flat().map((inj: Inject) => inj.inject_id));
 
     // Build map of Inject by teams
-    const injectsWithoutTeamMap = injects.reduce((acc, inject) => {
+    const injectsWithoutTeamMap = injects.reduce((acc: { [x: string]: any[]; }, inject: Inject) => {
       let keys = [];
 
       if (!allInjectIds.has(inject.inject_id)) {
@@ -180,7 +180,7 @@ const Timeline: FunctionComponent<Props> = ({ injects, teams, onSelectInject }) 
     searchColumns,
   );
 
-  const handleSelectInject = (id:string) => {
+  const handleSelectInject = (id: string) => {
     onSelectInject(id);
   };
 
@@ -278,7 +278,7 @@ const Timeline: FunctionComponent<Props> = ({ injects, teams, onSelectInject }) 
                             />
                           );
                         })
-                       }
+                                }
                       </div>
                     );
                   })}
@@ -322,7 +322,7 @@ const Timeline: FunctionComponent<Props> = ({ injects, teams, onSelectInject }) 
           </div>
         </div>
       ) : null
-      }
+        }
     </>
   );
 };

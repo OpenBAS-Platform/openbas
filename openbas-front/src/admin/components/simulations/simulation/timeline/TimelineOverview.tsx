@@ -80,11 +80,10 @@ const TimelineOverview = () => {
     teams,
     tagsMap,
   } = useHelper((helper: InjectHelper & ExercisesHelper & TagHelper) => {
-    const exerciseTeams = helper.getExerciseTeams(exerciseId);
     return {
       exercise: helper.getExercise(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
-      teams: exerciseTeams,
+      teams: helper.getExerciseTeams(exerciseId),
       tagsMap: helper.getTagsMap(),
     };
   });
@@ -103,15 +102,14 @@ const TimelineOverview = () => {
     searchColumns,
   );
 
-  const sortedInjects = filtering.filterAndSort(injects);
-
   const pendingInjects = filtering.filterAndSort(injects.filter((i: InjectStore) => i.inject_status === null));
 
   const processedInjects = filtering.filterAndSort(injects.filter((i: InjectStore) => i.inject_status !== null));
 
   const onUpdateInject = async (inject: Inject) => {
     if (selectedInjectId) {
-      dispatch(updateInjectForExercise(exerciseId, selectedInjectId, inject));
+      await dispatch(updateInjectForExercise(exerciseId, selectedInjectId, inject));
+      return dispatch(fetchExerciseInjects(exerciseId));
     }
   };
 
@@ -134,9 +132,9 @@ const TimelineOverview = () => {
       </div>
       <div className="clearfix"/>
       <Timeline
-        injects={sortedInjects}
-        onSelectInject={(id: string) => setSelectedInjectId(id)}
+        injects={injects}
         teams={teams}
+        onSelectInject={(id: string) => setSelectedInjectId(id)}
       ></Timeline>
       <div className="clearfix"/>
       <Grid container spacing={3} style={{ marginTop: 50, paddingBottom: 24 }}>
