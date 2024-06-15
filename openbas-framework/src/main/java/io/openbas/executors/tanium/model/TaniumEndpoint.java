@@ -13,6 +13,7 @@ public class TaniumEndpoint {
     private String[] ipAddresses;
     private String[] macAddresses;
     private Os os;
+    private Processor processor;
     private String eidLastSeen;
 
 }

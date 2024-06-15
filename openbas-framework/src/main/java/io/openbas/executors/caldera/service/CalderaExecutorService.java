@@ -60,8 +60,8 @@ public class CalderaExecutorService implements Runnable {
 
     public static Endpoint.PLATFORM_ARCH toArch(@NotBlank final String arch) {
         return switch (arch) {
-            case "amd64" -> Endpoint.PLATFORM_ARCH.X86_64;
-            case "arm64" -> Endpoint.PLATFORM_ARCH.ARM64;
+            case "amd64" -> Endpoint.PLATFORM_ARCH.x86_64;
+            case "arm64" -> Endpoint.PLATFORM_ARCH.arm64;
             default -> throw new IllegalArgumentException("This arch is not supported : " + arch);
         };
     }

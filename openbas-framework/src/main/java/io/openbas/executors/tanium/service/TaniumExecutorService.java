@@ -57,6 +57,14 @@ public class TaniumExecutorService implements Runnable {
         };
     }
 
+    public static Endpoint.PLATFORM_ARCH toArch(@NotBlank final String arch) {
+        return switch (arch) {
+            case "x64-based PC", "x86_64" -> Endpoint.PLATFORM_ARCH.x86_64;
+            case "arm64-based PC", "arm64" -> Endpoint.PLATFORM_ARCH.arm64;
+            default -> Endpoint.PLATFORM_ARCH.Unknown;
+        };
+    }
+
     @Autowired
     public TaniumExecutorService(
             ExecutorService executorService,
@@ -121,6 +129,7 @@ public class TaniumExecutorService implements Runnable {
                     endpoint.setIps(taniumEndpoint.getIpAddresses());
                     endpoint.setHostname(taniumEndpoint.getName());
                     endpoint.setPlatform(toPlatform(taniumEndpoint.getOs().getPlatform()));
+                    endpoint.setArch(toArch(taniumEndpoint.getProcessor().getArchitecture()));
                     endpoint.setLastSeen(toInstant(taniumEndpoint.getEidLastSeen()));
                     return endpoint;
                 })
@@ -135,6 +144,7 @@ public class TaniumExecutorService implements Runnable {
         matchingExistingEndpoint.setHostname(external.getHostname());
         matchingExistingEndpoint.setExternalReference(external.getExternalReference());
         matchingExistingEndpoint.setPlatform(external.getPlatform());
+        matchingExistingEndpoint.setArch(external.getArch());
         matchingExistingEndpoint.setExecutor(this.executor);
         if ((now().toEpochMilli() - matchingExistingEndpoint.getClearedAt().toEpochMilli()) > CLEAR_TTL) {
             try {

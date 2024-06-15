@@ -14,6 +14,6 @@ public class V3_22__Endpoints extends BaseJavaMigration {
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
-    select.execute("ALTER TABLE assets ADD COLUMN endpoint_arch varchar(255) not null;");
+    select.execute("ALTER TABLE assets ADD COLUMN endpoint_arch varchar(255) not null default 'X86_64';");
   }
 }

@@ -42,6 +42,7 @@ public class TaniumExecutorClient {
                     "        macAddresses\n" +
                     "        eidLastSeen\n" +
                     "        os { platform }\n" +
+                    "        processor { architecture }\n" +
                     "      }\n" +
                     "    }\n" +
                     "  }\n" +

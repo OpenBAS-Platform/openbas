@@ -279,7 +279,7 @@ public class InjectorApi extends RestBehavior {
         }
     }
 
-    @GetMapping(value = "/api/injectors/implants/caldera/{platform}/{arch}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/api/implant/caldera/{platform}/{arch}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public @ResponseBody byte[] getCalderaAgent(@PathVariable String platform, @PathVariable String arch) throws IOException {
         InputStream in = getClass().getResourceAsStream("/implants/caldera/" + platform + "/" + arch + "/obas-implant-caldera-" + platform);
         if (in != null) {

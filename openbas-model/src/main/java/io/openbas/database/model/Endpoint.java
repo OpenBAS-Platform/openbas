@@ -23,9 +23,11 @@ public class Endpoint extends Asset {
 
   public enum PLATFORM_ARCH {
     @JsonProperty("x86_64")
-    X86_64,
+    x86_64,
     @JsonProperty("arm64")
-    ARM64,
+    arm64,
+    @JsonProperty("Unknown")
+    Unknown,
   }
 
   public enum PLATFORM_TYPE {
