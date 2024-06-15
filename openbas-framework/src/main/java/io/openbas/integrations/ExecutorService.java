@@ -62,4 +62,8 @@ public class ExecutorService {
         return executor;
     }
 
+    @Transactional
+    public void remove(String id) {
+        executorRepository.findById(id).ifPresent(executor -> executorRepository.deleteById(id));
+    }
 }

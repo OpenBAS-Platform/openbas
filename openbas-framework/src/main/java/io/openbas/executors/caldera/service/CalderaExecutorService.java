@@ -58,6 +58,14 @@ public class CalderaExecutorService implements Runnable {
         };
     }
 
+    public static Endpoint.PLATFORM_ARCH toArch(@NotBlank final String arch) {
+        return switch (arch) {
+            case "amd64" -> Endpoint.PLATFORM_ARCH.X86_64;
+            case "arm64" -> Endpoint.PLATFORM_ARCH.ARM64;
+            default -> throw new IllegalArgumentException("This arch is not supported : " + arch);
+        };
+    }
+
     @Autowired
     public CalderaExecutorService(
             ExecutorService executorService,
@@ -126,6 +134,7 @@ public class CalderaExecutorService implements Runnable {
                     endpoint.setIps(agent.getHost_ip_addrs());
                     endpoint.setHostname(agent.getHost());
                     endpoint.setPlatform(toPlatform(agent.getPlatform()));
+                    endpoint.setArch(toArch(agent.getArchitecture()));
                     endpoint.setProcessName(agent.getExe_name());
                     endpoint.setLastSeen(toInstant(agent.getLast_seen()));
                     return endpoint;
@@ -142,6 +151,7 @@ public class CalderaExecutorService implements Runnable {
         matchingExistingEndpoint.setHostname(external.getHostname());
         matchingExistingEndpoint.setProcessName(external.getProcessName());
         matchingExistingEndpoint.setPlatform(external.getPlatform());
+        matchingExistingEndpoint.setArch(external.getArch());
         matchingExistingEndpoint.setExecutor(this.executor);
         if ((now().toEpochMilli() - matchingExistingEndpoint.getClearedAt().toEpochMilli()) > CLEAR_TTL) {
             try {

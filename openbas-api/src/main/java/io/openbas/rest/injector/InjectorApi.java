@@ -25,6 +25,7 @@ import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.extern.java.Log;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.Instant;
 import java.util.*;
 
@@ -275,5 +277,14 @@ public class InjectorApi extends RestBehavior {
                 }
             }
         }
+    }
+
+    @GetMapping(value = "/api/injectors/implants/caldera/{platform}/{arch}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public @ResponseBody byte[] getCalderaAgent(@PathVariable String platform, @PathVariable String arch) throws IOException {
+        InputStream in = getClass().getResourceAsStream("/implants/caldera/" + platform + "/" + arch + "/obas-implant-caldera-" + platform);
+        if (in != null) {
+            return IOUtils.toByteArray(in);
+        }
+        return null;
     }
 }

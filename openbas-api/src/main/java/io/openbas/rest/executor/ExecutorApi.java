@@ -123,15 +123,6 @@ public class ExecutorApi extends RestBehavior {
         }
     }
 
-    @GetMapping(value = "/api/agent/caldera/{platform}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public @ResponseBody byte[] getCalderaAgent(@PathVariable String platform) throws IOException {
-        InputStream in = getClass().getResourceAsStream("/agents/caldera/obas-" + platform);
-        if (in != null) {
-            return IOUtils.toByteArray(in);
-        }
-        return null;
-    }
-
     // Public API
     @GetMapping(value = "/api/agent/executable/openbas/{platform}/{architecture}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentExecutable(@PathVariable String platform, @PathVariable String architecture) throws IOException {
@@ -199,7 +190,7 @@ public class ExecutorApi extends RestBehavior {
     @GetMapping(value = "/api/agent/installer/openbas/{platform}/{token}")
     public @ResponseBody ResponseEntity<String> getOpenBasAgentInstaller(@PathVariable String platform, @PathVariable String token) throws IOException {
         Optional<Token> resolvedToken = tokenRepository.findByValue(token);
-        if (resolvedToken.isEmpty() || !resolvedToken.get().getUser().isAdmin()) {
+        if (resolvedToken.isEmpty() ) {
             throw new UnsupportedOperationException("Invalid token");
         }
         String installCommand = this.endpointService.generateInstallCommand(platform, token);

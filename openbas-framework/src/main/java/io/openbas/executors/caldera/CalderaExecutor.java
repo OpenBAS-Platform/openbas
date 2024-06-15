@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
-@ConditionalOnProperty(prefix = "executor.caldera", name = "enable")
 @RequiredArgsConstructor
 @Service
 public class CalderaExecutor {
@@ -34,6 +33,8 @@ public class CalderaExecutor {
         if (this.config.isEnable()) {
             CalderaExecutorService service = new CalderaExecutorService(this.executorService, this.client, this.config, this.calderaExecutorContextService, this.endpointService, this.injectorService);
             this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(60));
+        } else {
+            executorService.remove(config.getId());
         }
     }
 }

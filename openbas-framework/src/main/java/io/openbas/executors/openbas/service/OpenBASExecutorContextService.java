@@ -21,16 +21,16 @@ public class OpenBASExecutorContextService {
         this.assetAgentJobRepository = assetAgentJobRepository;
     }
 
-    private String computeCommand(@NotNull final Injector injector, Endpoint.PLATFORM_TYPE platform) {
+    private String computeCommand(@NotNull final Injector injector, Endpoint.PLATFORM_TYPE platform, Endpoint.PLATFORM_ARCH arch) {
         switch (platform) {
             case Endpoint.PLATFORM_TYPE.Windows -> {
-                return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Windows.name());
+                return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Windows.name() + "." + arch.name());
             }
             case Endpoint.PLATFORM_TYPE.Linux -> {
-                return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Linux.name());
+                return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Linux.name() + "." + arch.name());
             }
             case Endpoint.PLATFORM_TYPE.MacOS -> {
-                return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.MacOS.name());
+                return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.MacOS.name() + "." + arch.name());
             }
             default -> throw new RuntimeException("Unsupported platform: " + platform);
         }
@@ -39,11 +39,12 @@ public class OpenBASExecutorContextService {
     public void launchExecutorSubprocess(@NotNull final Inject inject, @NotNull final Asset asset) {
         Injector injector = inject.getInjectorContract().getInjector();
         Endpoint.PLATFORM_TYPE platform = Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null;
+        Endpoint.PLATFORM_ARCH arch = Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getArch() : null;
         if (platform == null) {
             throw new RuntimeException("Unsupported null platform");
         }
         AssetAgentJob assetAgentJob = new AssetAgentJob();
-        assetAgentJob.setCommand(computeCommand(injector, platform));
+        assetAgentJob.setCommand(computeCommand(injector, platform, arch));
         assetAgentJob.setAsset(asset);
         assetAgentJob.setInject(inject);
         assetAgentJobRepository.save(assetAgentJob);

@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
-@ConditionalOnProperty(prefix = "executor.tanium", name = "enable")
 @RequiredArgsConstructor
 @Service
 public class TaniumExecutor {
