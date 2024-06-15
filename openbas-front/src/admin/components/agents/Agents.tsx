@@ -17,7 +17,6 @@ import {
   Select,
   Tab,
   Tabs,
-  TextField,
   Typography,
 } from '@mui/material';
 import { ArticleOutlined, ContentCopyOutlined, DownloadingOutlined, TerminalOutlined } from '@mui/icons-material';
@@ -438,15 +437,8 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
           <div style={{ marginTop: 20 }}>
               {currentSelectedExecutor.executor_type === 'openbas_caldera' && (
               <div style={{ marginTop: 20 }}>
-                <TextField
-                  label={t('Installation path')}
-                  fullWidth={true}
-                  value={agentFolder ?? platformSelector().defaultAgentFolder}
-                  onChange={(event) => setAgentFolder(event.target.value)}
-                  style={{ marginTop: 20 }}
-                />
                 {platform === 'macos' && (
-                <FormControl style={{ width: '100%', marginTop: 20 }}>
+                <FormControl style={{ width: '100%' }}>
                   <InputLabel id="arch">{t('Architecture')}</InputLabel>
                   <Select
                     labelId="arch"
@@ -454,8 +446,8 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                     onChange={(event) => setArch(event.target.value ?? 'amd64')}
                     fullWidth={true}
                   >
-                    <MenuItem value="amd64">{t('AMD64')}</MenuItem>
-                    <MenuItem value="arm64">{t('ARM64')}</MenuItem>
+                    <MenuItem value="x86_64">{t('x86_64')}</MenuItem>
+                    <MenuItem value="arm64">{t('arm64')}</MenuItem>
                   </Select>
                 </FormControl>
                 )}
@@ -502,20 +494,6 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
               )}
             {currentSelectedExecutor.executor_type === 'openbas_agent' && (
             <div style={{ marginTop: 20 }}>
-              {platform === 'macos' && (
-              <FormControl style={{ width: '100%', marginTop: 20 }}>
-                <InputLabel id="arch">{t('Architecture')}</InputLabel>
-                <Select
-                  labelId="arch"
-                  value={arch}
-                  onChange={(event) => setArch(event.target.value ?? 'amd64')}
-                  fullWidth={true}
-                >
-                  <MenuItem value="x86_64">{t('x86_64')}</MenuItem>
-                  <MenuItem value="arm64">{t('arm64')}</MenuItem>
-                </Select>
-              </FormControl>
-              )}
               <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 1 - Add antivirus exclusions')}</Typography>
               <Alert variant="outlined" severity="info">
                 {t('The agent will never execute directly any payload.')}
@@ -545,9 +523,6 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                 <p>
                   {t('You can whether directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
                 </p>
-                <Alert variant="outlined" severity="warning">
-                  {t('For the moment, the following snippet or script will not add the agent at boot. Please be sure to add it in rc.local or other files to make it persistent. We will release proper packages in the near future.')}
-                </Alert>
                 <pre style={{ margin: '20px 0 10px 0' }}>{platformAgentSelector().displayedCode}</pre>
                 <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
                   <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformAgentSelector().code)}>{t('Copy')}</Button>
