@@ -56,6 +56,7 @@ public class EndpointApi {
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(input);
     endpoint.setPlatform(input.getPlatform());
+    endpoint.setArch(input.getArch());
     endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     return this.endpointService.createEndpoint(endpoint);
   }
@@ -72,6 +73,7 @@ public class EndpointApi {
       endpoint.setMacAddresses(input.getMacAddresses());
       endpoint.setHostname(input.getHostname());
       endpoint.setPlatform(input.getPlatform());
+      endpoint.setArch(input.getArch());
       endpoint.setName(input.getName());
       endpoint.setAgentVersion(input.getAgentVersion());
       endpoint.setDescription(input.getDescription());
@@ -82,6 +84,7 @@ public class EndpointApi {
       endpoint.setUpdateAttributes(input);
       endpoint.setIps(input.getIps());
       endpoint.setPlatform(input.getPlatform());
+      endpoint.setArch(input.getArch());
       endpoint.setAgentVersion(input.getAgentVersion());
       endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
       endpoint.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
@@ -144,6 +147,7 @@ public class EndpointApi {
     Endpoint endpoint = this.endpointService.endpoint(endpointId);
     endpoint.setUpdateAttributes(input);
     endpoint.setPlatform(input.getPlatform());
+    endpoint.setArch(input.getArch());
     endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     return this.endpointService.updateEndpoint(endpoint);
   }
