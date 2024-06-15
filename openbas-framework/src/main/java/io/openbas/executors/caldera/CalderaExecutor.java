@@ -34,7 +34,7 @@ public class CalderaExecutor {
             CalderaExecutorService service = new CalderaExecutorService(this.executorService, this.client, this.config, this.calderaExecutorContextService, this.endpointService, this.injectorService);
             this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(60));
         } else {
-            executorService.remove(config.getId());
+            this.executorService.remove(this.config.getId());
         }
     }
 }
