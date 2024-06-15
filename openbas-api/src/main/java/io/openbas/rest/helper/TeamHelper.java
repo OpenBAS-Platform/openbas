@@ -115,7 +115,14 @@ public class TeamHelper {
                 getInjectTeamsIds(teamSimple.getId(),
                 rawTeam.getTeam_scenarios().stream().flatMap(
                     scenario -> mapInjectsByScenarioIds.get(scenario).stream()
-                ).toList(),
+                ).collect(Collectors.toSet()),
+                injectRepository)
+            );
+
+            // We set the injects linked to the exercises
+            teamSimple.setExercisesInjects(
+                getInjectTeamsIds(teamSimple.getId(),
+                rawTeam.getTeam_exercise_injects(),
                 injectRepository)
             );
 
@@ -123,7 +130,7 @@ public class TeamHelper {
         }).collect(Collectors.toList());
     }
 
-  private static Set<String> getInjectTeamsIds(final String teamId, List<String> injectIds, final InjectRepository injectRepository) {
+  private static Set<String> getInjectTeamsIds(final String teamId, Set<String> injectIds, final InjectRepository injectRepository) {
     return injectRepository.findRawInjectTeams(injectIds).stream().filter(i-> i.getInject_teams().contains(teamId)).map(RawInjectTeam::getInject_id).collect(Collectors.toSet());
   }
 }
