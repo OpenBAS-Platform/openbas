@@ -24,7 +24,7 @@ public class OpenBASExecutor {
         try {
             executorService.register(OPENBAS_EXECUTOR_ID, OPENBAS_EXECUTOR_TYPE, OPENBAS_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-openbas.png"), new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
         } catch (Exception e) {
-            log.log(Level.SEVERE, "Error creating Tanium executor: " + e);
+            log.log(Level.SEVERE, "Error creating OpenBAS executor: " + e);
         }
     }
 }
