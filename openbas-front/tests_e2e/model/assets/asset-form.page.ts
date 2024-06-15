@@ -22,6 +22,12 @@ class AssetFormPage {
     await this.page.getByRole('option', { name: 'Linux' }).click();
   }
 
+  async fillArchx86() {
+    const platformField = this.page.getByLabel('Architecture *');
+    await platformField.click();
+    await this.page.getByRole('option', { name: 'x86_64' }).click();
+  }
+
   getCreateButton() {
     return this.page.getByRole('button', { name: 'Create' });
   }

@@ -43,12 +43,12 @@ export interface AiResult {
 
 export interface Article {
   article_author?: string;
-  article_channel?: Channel;
+  article_channel: Channel;
   /** @format int32 */
   article_comments?: number;
   article_content?: string;
   /** @format date-time */
-  article_created_at?: string;
+  article_created_at: string;
   article_documents?: Document[];
   article_exercise?: Exercise;
   article_id: string;
@@ -60,7 +60,7 @@ export interface Article {
   /** @format int32 */
   article_shares?: number;
   /** @format date-time */
-  article_updated_at?: string;
+  article_updated_at: string;
   /** @format date-time */
   article_virtual_publication?: string;
   updateAttributes?: object;
@@ -118,6 +118,14 @@ export interface Asset {
   asset_type?: string;
   /** @format date-time */
   asset_updated_at?: string;
+  updateAttributes?: object;
+}
+
+export interface AssetAgentJob {
+  asset_agent_asset?: Asset;
+  asset_agent_command: string;
+  asset_agent_id: string;
+  asset_agent_inject?: Inject;
   updateAttributes?: object;
 }
 
@@ -204,7 +212,7 @@ export interface Challenge {
   challenge_category?: string;
   challenge_content?: string;
   /** @format date-time */
-  challenge_created_at?: string;
+  challenge_created_at: string;
   challenge_documents?: Document[];
   challenge_exercises?: string[];
   challenge_flags?: ChallengeFlag[];
@@ -218,7 +226,7 @@ export interface Challenge {
   /** @uniqueItems true */
   challenge_tags?: Tag[];
   /** @format date-time */
-  challenge_updated_at?: string;
+  challenge_updated_at: string;
   /** @format date-time */
   challenge_virtual_publication?: string;
   updateAttributes?: object;
@@ -566,8 +574,10 @@ export interface Endpoint {
   asset_type?: string;
   /** @format date-time */
   asset_updated_at?: string;
+  endpoint_agent_version?: string;
+  endpoint_arch: "x86_64" | "arm64" | "Unknown";
   endpoint_hostname?: string;
-  endpoint_ips: string[];
+  endpoint_ipsendpoint_ips: string[];
   endpoint_mac_addresses?: string[];
   endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal" | "Unknown";
   updateAttributes?: object;
@@ -579,6 +589,27 @@ export interface EndpointInput {
   asset_last_seen?: string;
   asset_name: string;
   asset_tags?: string[];
+  endpoint_agent_version?: string;
+  endpoint_arch: "x86_64" | "arm64" | "Unknown";
+  endpoint_hostname?: string;
+  /**
+   * @maxItems 2147483647
+   * @minItems 1
+   */
+  endpoint_ips: string[];
+  endpoint_mac_addresses?: string[];
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal" | "Unknown";
+}
+
+export interface EndpointRegisterInput {
+  asset_description?: string;
+  asset_external_reference: string;
+  /** @format date-time */
+  asset_last_seen?: string;
+  asset_name: string;
+  asset_tags?: string[];
+  endpoint_agent_version?: string;
+  endpoint_arch: "x86_64" | "arm64" | "Unknown";
   endpoint_hostname?: string;
   /**
    * @maxItems 2147483647
@@ -700,6 +731,71 @@ export interface ExerciseCreateInput {
   exercise_start_date?: string;
   exercise_subtitle?: string;
   exercise_tags?: string[];
+}
+
+export interface ExerciseDetails {
+  /** @format int64 */
+  exercise_all_users_number?: number;
+  /** @uniqueItems true */
+  exercise_articles?: string[];
+  exercise_category?: string;
+  /** @format int64 */
+  exercise_communications_number?: number;
+  /** @format date-time */
+  exercise_created_at?: string;
+  exercise_description?: string;
+  /** @uniqueItems true */
+  exercise_documents?: string[];
+  /** @format date-time */
+  exercise_end_date?: string;
+  exercise_id: string;
+  /** @uniqueItems true */
+  exercise_injects?: string[];
+  exercise_injects_statistics?: Record<string, number>;
+  exercise_kill_chain_phases?: KillChainPhase[];
+  exercise_lessons_anonymized?: boolean;
+  /** @format int64 */
+  exercise_lessons_answers_number?: number;
+  /** @uniqueItems true */
+  exercise_lessons_categories?: string[];
+  /** @format int64 */
+  exercise_logs_number?: number;
+  exercise_mail_from?: string;
+  exercise_mails_reply_to?: string[];
+  exercise_main_focus?: string;
+  exercise_message_footer?: string;
+  exercise_message_header?: string;
+  exercise_name: string;
+  /** @format date-time */
+  exercise_next_inject_date?: string;
+  exercise_next_possible_status?: ("SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED")[];
+  /** @uniqueItems true */
+  exercise_observers?: string[];
+  /** @uniqueItems true */
+  exercise_pauses?: string[];
+  /** @uniqueItems true */
+  exercise_planners?: string[];
+  exercise_platforms?: string[];
+  exercise_scenario?: string;
+  /** @format double */
+  exercise_score?: number;
+  exercise_severity?: string;
+  /** @format date-time */
+  exercise_start_date?: string;
+  exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
+  exercise_subtitle?: string;
+  /** @uniqueItems true */
+  exercise_tags?: string[];
+  /** @uniqueItems true */
+  exercise_teams?: string[];
+  /** @uniqueItems true */
+  exercise_teams_users?: ExerciseTeamUser[];
+  /** @format date-time */
+  exercise_updated_at?: string;
+  /** @uniqueItems true */
+  exercise_users?: string[];
+  /** @format int64 */
+  exercise_users_number?: number;
 }
 
 export interface ExerciseLessonsInput {
