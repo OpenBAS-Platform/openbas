@@ -117,7 +117,7 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
 
     // Build map of Inject by teams
     const injectsWithoutTeamMap = injects.reduce((acc: { [x: string]: any[]; }, inject: Inject) => {
-      let keys = [];
+      let keys: any[] = [];
 
       if (!allInjectIds.has(inject.inject_id)) {
         if (

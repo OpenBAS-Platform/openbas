@@ -234,6 +234,17 @@ const Injects = (props) => {
             />
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+            {sortedInjects.length > 0 && (
+            <div style={{ marginRight: 10 }}>
+              <Checkbox
+                checked={showTimeline}
+                onChange={handleCheckboxChange}
+                name="showTimeline"
+                color="primary"
+              />
+              <span>{t('Show Timeline')}</span>
+            </div>
+            )}
             {setViewMode ? (
               <ToggleButtonGroup
                 size="small"
