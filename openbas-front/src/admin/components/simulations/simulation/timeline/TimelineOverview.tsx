@@ -243,6 +243,7 @@ const TimelineOverview = () => {
                               style={{ width: '20%' }}
                             >
                               <ItemStatus
+                                key={inject.inject_id}
                                 variant="inList"
                                 label={t(inject.inject_status?.status_name)}
                                 status={inject.inject_status?.status_name}
