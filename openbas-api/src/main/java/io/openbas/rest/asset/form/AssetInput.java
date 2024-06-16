@@ -26,5 +26,4 @@ public abstract class AssetInput {
 
   @JsonProperty("asset_tags")
   private List<String> tagIds = new ArrayList<>();
-
 }

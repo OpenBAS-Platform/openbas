@@ -51,6 +51,7 @@ const EndpointPopover: React.FC<Props> = ({
     endpoint_ips,
     endpoint_mac_addresses,
     endpoint_platform,
+    endpoint_arch,
   }) => ({
     asset_name,
     asset_description,
@@ -60,6 +61,7 @@ const EndpointPopover: React.FC<Props> = ({
     endpoint_ips,
     endpoint_mac_addresses: endpoint_mac_addresses ?? [],
     endpoint_platform,
+    endpoint_arch,
   }))(endpoint);
 
   // Edition

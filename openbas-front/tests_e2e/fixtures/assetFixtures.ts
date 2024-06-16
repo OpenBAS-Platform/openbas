@@ -7,6 +7,7 @@ const fillLinuxAssetBase = async (page: Page, name: string, ip: string) => {
   await assetFormPage.fillName(name);
   await assetFormPage.fillIpAddresses(ip);
   await assetFormPage.fillPlatformLinux();
+  await assetFormPage.fillArchx86();
 };
 
 export default fillLinuxAssetBase;

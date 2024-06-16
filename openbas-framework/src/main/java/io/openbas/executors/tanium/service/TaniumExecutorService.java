@@ -57,6 +57,14 @@ public class TaniumExecutorService implements Runnable {
         };
     }
 
+    public static Endpoint.PLATFORM_ARCH toArch(@NotBlank final String arch) {
+        return switch (arch) {
+            case "x64-based PC", "x86_64" -> Endpoint.PLATFORM_ARCH.x86_64;
+            case "arm64-based PC", "arm64" -> Endpoint.PLATFORM_ARCH.arm64;
+            default -> Endpoint.PLATFORM_ARCH.Unknown;
+        };
+    }
+
     @Autowired
     public TaniumExecutorService(
             ExecutorService executorService,
@@ -71,7 +79,11 @@ public class TaniumExecutorService implements Runnable {
         this.taniumExecutorContextService = taniumExecutorContextService;
         this.injectorService = injectorService;
         try {
-            this.executor = executorService.register(config.getId(), TANIUM_EXECUTOR_TYPE, TANIUM_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-tanium.png"), new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
+            if (config.isEnable()) {
+                this.executor = executorService.register(config.getId(), TANIUM_EXECUTOR_TYPE, TANIUM_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-tanium.png"), new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
+            } else {
+                executorService.remove(config.getId());
+            }
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error creating Tanium executor: " + e);
         }
@@ -87,7 +99,7 @@ public class TaniumExecutorService implements Runnable {
             List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
             if (existingEndpoints.isEmpty()) {
                 Optional<Endpoint> endpointByExternalReference = endpointService.findByExternalReference(endpoint.getExternalReference());
-                if( endpointByExternalReference.isPresent() ) {
+                if (endpointByExternalReference.isPresent()) {
                     this.updateEndpoint(endpoint, List.of(endpointByExternalReference.get()));
                 } else {
                     this.endpointService.createEndpoint(endpoint);
@@ -99,7 +111,7 @@ public class TaniumExecutorService implements Runnable {
         List<Endpoint> inactiveEndpoints = toEndpoint(nodeEndpoints).stream().filter(endpoint -> !endpoint.getActive()).toList();
         inactiveEndpoints.forEach(endpoint -> {
             Optional<Endpoint> optionalExistingEndpoint = this.endpointService.findByExternalReference(endpoint.getExternalReference());
-            if(optionalExistingEndpoint.isPresent()) {
+            if (optionalExistingEndpoint.isPresent()) {
                 Endpoint existingEndpoint = optionalExistingEndpoint.get();
                 log.info("Found stale endpoint " + existingEndpoint.getName() + ", deleting it...");
                 this.endpointService.deleteEndpoint(existingEndpoint.getId());
@@ -121,6 +133,7 @@ public class TaniumExecutorService implements Runnable {
                     endpoint.setIps(taniumEndpoint.getIpAddresses());
                     endpoint.setHostname(taniumEndpoint.getName());
                     endpoint.setPlatform(toPlatform(taniumEndpoint.getOs().getPlatform()));
+                    endpoint.setArch(toArch(taniumEndpoint.getProcessor().getArchitecture()));
                     endpoint.setLastSeen(toInstant(taniumEndpoint.getEidLastSeen()));
                     return endpoint;
                 })
@@ -135,13 +148,14 @@ public class TaniumExecutorService implements Runnable {
         matchingExistingEndpoint.setHostname(external.getHostname());
         matchingExistingEndpoint.setExternalReference(external.getExternalReference());
         matchingExistingEndpoint.setPlatform(external.getPlatform());
+        matchingExistingEndpoint.setArch(external.getArch());
         matchingExistingEndpoint.setExecutor(this.executor);
         if ((now().toEpochMilli() - matchingExistingEndpoint.getClearedAt().toEpochMilli()) > CLEAR_TTL) {
             try {
                 log.info("Clearing endpoint " + matchingExistingEndpoint.getHostname());
                 Iterable<Injector> injectors = injectorService.injectors();
                 injectors.forEach(injector -> {
-                    if(injector.getExecutorClearCommands() != null) {
+                    if (injector.getExecutorClearCommands() != null) {
                         this.taniumExecutorContextService.launchExecutorClear(injector, matchingExistingEndpoint);
                     }
                 });

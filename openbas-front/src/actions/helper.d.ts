@@ -1,4 +1,4 @@
-import type { Challenge, Exercise, Organization, PlatformSettings, Tag, User } from '../utils/api-types';
+import type { Challenge, Exercise, Organization, PlatformSettings, Tag, Token, User } from '../utils/api-types';
 import type { ScenarioStore } from './scenarios/Scenario';
 
 export interface UserHelper {
@@ -34,4 +34,8 @@ export interface ChallengeHelper {
 
 export interface DocumentHelper {
   getDocumentsMap: () => Record<string, Document>
+}
+
+export interface MeTokensHelper {
+  getMeTokens: () => Token[]
 }

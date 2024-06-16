@@ -67,7 +67,7 @@ public class CalderaGarbageCollectorService implements Runnable {
         log.info("Running Caldera injector garbage collector on " + agents.size() + " agents");
         List<String> killedAgents = new ArrayList<>();
         agents.forEach(agent -> {
-            if (agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > KILL_TTL && (now().toEpochMilli() - Time.toInstant(agent.getLast_seen()).toEpochMilli()) < KILL_TTL) {
+            if (agent.getExe_name().contains("implant") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > KILL_TTL && (now().toEpochMilli() - Time.toInstant(agent.getLast_seen()).toEpochMilli()) < KILL_TTL) {
                 try {
                     log.info("Killing agent " + agent.getHost());
                     client.killAgent(agent);
@@ -78,7 +78,7 @@ public class CalderaGarbageCollectorService implements Runnable {
             }
         });
         agents.forEach(agent -> {
-            if (agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > DELETE_TTL && !killedAgents.contains(agent.getPaw())) {
+            if (agent.getExe_name().contains("implant") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > DELETE_TTL && !killedAgents.contains(agent.getPaw())) {
                 try {
                     log.info("Deleting agent " + agent.getHost());
                     client.deleteAgent(agent);
