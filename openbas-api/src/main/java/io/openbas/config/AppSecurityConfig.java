@@ -113,6 +113,7 @@ public class AppSecurityConfig {
                 .requestMatchers("/api/player/**").permitAll()
                 .requestMatchers("/api/settings").permitAll()
                 .requestMatchers("/api/agent/**").permitAll()
+                .requestMatchers("/api/implant/**").permitAll()
                 .requestMatchers("/api/login").permitAll()
                 .requestMatchers("/api/reset/**").permitAll()
                 .requestMatchers("/api/**").authenticated()

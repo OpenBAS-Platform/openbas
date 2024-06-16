@@ -55,8 +55,13 @@ const inlineStyles: Record<string, CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
   },
+  endpoint_arch: {
+    width: '10%',
+    display: 'flex',
+    alignItems: 'center',
+  },
   endpoint_executor: {
-    width: '20%',
+    width: '15%',
     display: 'flex',
     alignItems: 'center',
   },
@@ -93,6 +98,7 @@ const Endpoints = () => {
   const headers = [
     { field: 'asset_name', label: 'Name', isSortable: true },
     { field: 'endpoint_platform', label: 'Platform', isSortable: true },
+    { field: 'endpoint_arch', label: 'Architecture', isSortable: true },
     { field: 'endpoint_executor', label: 'Executor', isSortable: true },
     { field: 'asset_tags', label: 'Tags', isSortable: true },
     { field: 'asset_status', label: 'Status', isSortable: false },
@@ -178,6 +184,9 @@ const Endpoints = () => {
                     </div>
                     <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
                       <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10}/> {endpoint.endpoint_platform}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.endpoint_arch}>
+                      {endpoint.endpoint_arch}
                     </div>
                     <div className={classes.bodyItem} style={inlineStyles.endpoint_executor}>
                       {executor && (
