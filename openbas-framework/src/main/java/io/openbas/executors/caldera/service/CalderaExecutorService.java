@@ -97,7 +97,7 @@ public class CalderaExecutorService implements Runnable {
         // The executor only retrieve "main" agents (without the keyword "executor")
         // This is NOT a standard behaviour, this is because we are using Caldera as an executor and we should not
         // Will be replaced by the XTM agent
-        List<Agent> agents = this.client.agents().stream().filter(agent -> !agent.getExe_name().contains("executor")).toList();
+        List<Agent> agents = this.client.agents().stream().filter(agent -> !agent.getExe_name().contains("implant")).toList();
         List<Endpoint> endpoints = toEndpoint(agents).stream().filter(Asset::getActive).toList();
         log.info("Caldera executor provisioning based on " + endpoints.size() + " assets");
         endpoints.forEach(endpoint -> {

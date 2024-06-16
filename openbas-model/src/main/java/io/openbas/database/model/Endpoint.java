@@ -52,7 +52,7 @@ public class Endpoint extends Asset {
   @Ipv4OrIpv6Constraint
   @Type(StringArrayType.class)
   @Column(name = "endpoint_ips")
-  @JsonProperty("endpoint_ipsendpoint_ips")
+  @JsonProperty("endpoint_ips")
   private String[] ips;
 
   @Queryable(filterable = true, sortable = true)
