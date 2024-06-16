@@ -51,12 +51,12 @@ const EndpointForm: React.FC<Props> = ({
         asset_last_seen: z.string().datetime().optional(),
         asset_tags: z.string().array().optional(),
         endpoint_hostname: z.string().optional(),
-        endpoint_ips: z.string().ip({ message: t('Invalid Ip Address') }).array().min(1),
+        endpoint_ips: z.string().ip({ message: t('Invalid IP addresses') }).array().min(1),
         endpoint_mac_addresses: z
           .string()
           .regex(
             /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|([0-9a-fA-F]{4}.[0-9a-fA-F]{4}.[0-9a-fA-F]{4})$/,
-            t('Invalid MAC address'),
+            t('Invalid MAC addresses'),
           ).array().optional(),
         endpoint_platform: z.enum(['Linux', 'Windows', 'MacOS', 'Service', 'Generic', 'Internal']),
         endpoint_arch: z.enum(['x86_64', 'arm64', 'Unknown']),

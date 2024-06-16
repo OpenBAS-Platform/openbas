@@ -577,7 +577,7 @@ export interface Endpoint {
   endpoint_agent_version?: string;
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
   endpoint_hostname?: string;
-  endpoint_ipsendpoint_ips: string[];
+  endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
   endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal" | "Unknown";
   updateAttributes?: object;
