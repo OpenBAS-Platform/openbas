@@ -123,6 +123,7 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
     const allTeamInjectIds = new Set(R.values(injectsPerTeam).flat().map((inj: Inject) => inj.inject_id));
 
     // Build map of technical Injects or without team
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     const injectsWithoutTeamMap = injects.reduce((acc: { [x: string]: any[]; }, inject: Inject) => {
       let keys: any[] = [];
 
