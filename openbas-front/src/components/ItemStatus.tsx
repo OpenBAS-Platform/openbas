@@ -103,7 +103,7 @@ const ItemStatus: FunctionComponent<ItemStatusProps> = ({
   let finalLabel = label;
   if (isInject) {
     if (status === 'SUCCESS') {
-      finalLabel = t('INJECT EXECUTED', 'STIMULI EXECUTE');
+      finalLabel = t('INJECT EXECUTED');
     }
   }
   return (

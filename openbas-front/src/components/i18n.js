@@ -162,7 +162,7 @@ const inject18n = (WrappedComponent) => {
 
 export const useFormatter = () => {
   const intl = useIntl();
-  const translate = (message, defaultMessage) => intl.formatMessage({ id: message }, { defaultMessage });
+  const translate = (message) => intl.formatMessage({ id: message });
   const formatNumber = (number) => {
     if (number === null || number === '') {
       return '-';

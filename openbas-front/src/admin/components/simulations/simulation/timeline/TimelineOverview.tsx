@@ -245,7 +245,7 @@ const TimelineOverview = () => {
                               <ItemStatus
                                 key={inject.inject_id}
                                 variant="inList"
-                                label={t(inject.inject_status?.status_name)}
+                                label={inject.inject_status?.status_name ? t(inject.inject_status.status_name) : 'No Status'}
                                 status={inject.inject_status?.status_name}
                               />
                             </div>
