@@ -102,9 +102,16 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
     finalInjectWithoutTeam,
     finalInjectsPerTeam,
   } = useHelper((helper: InjectHelper) => {
+    const injectIdsSet = new Set(injects.map((inj: Inject) => inj.inject_id));
+
+    const filterInjects = (fromTeams: Inject[]) => {
+      return fromTeams.filter((inject: Inject) => injectIdsSet.has(inject.inject_id));
+    };
+
     const getInjectsPerTeam = (teamId: string) => {
       const teamExerciseInjects = helper.getTeamExerciseInjects(teamId);
-      return teamExerciseInjects.length > 0 ? teamExerciseInjects : helper.getTeamScenarioInjects(teamId);
+      const result = teamExerciseInjects.length > 0 ? teamExerciseInjects : helper.getTeamScenarioInjects(teamId);
+      return filterInjects(result);
     };
 
     const injectsPerTeam = R.mergeAll(
@@ -113,13 +120,13 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
       })),
     );
 
-    const allInjectIds = new Set(R.values(injectsPerTeam).flat().map((inj: Inject) => inj.inject_id));
+    const allTeamInjectIds = new Set(R.values(injectsPerTeam).flat().map((inj: Inject) => inj.inject_id));
 
-    // Build map of Inject by teams
+    // Build map of technical Injects or without team
     const injectsWithoutTeamMap = injects.reduce((acc: { [x: string]: any[]; }, inject: Inject) => {
       let keys: any[] = [];
 
-      if (!allInjectIds.has(inject.inject_id)) {
+      if (!allTeamInjectIds.has(inject.inject_id)) {
         if (
           inject.inject_injector_contract?.convertedContent
             && 'fields' in inject.inject_injector_contract.convertedContent
