@@ -232,7 +232,7 @@ const Injects = (props) => {
   // Button Popover
   const entries = [
     {
-      label: t('Export injects (.xls)'),
+      label: `${t('Export this list')} (.xls)`,
       type: 'export',
       data: exportInjects,
       filename,
@@ -446,10 +446,10 @@ const Injects = (props) => {
                         style={inlineStyles.inject_type}
                       >
                         <InjectorContract
-                            variant="list"
-                            config={injectContract?.config}
-                            label={injectorContractName}
-                          />
+                          variant="list"
+                          config={injectContract?.config}
+                          label={injectorContractName}
+                        />
                       </div>
                       <div
                         className={classes.bodyItem}
@@ -462,44 +462,44 @@ const Injects = (props) => {
                         style={inlineStyles.inject_depends_duration}
                       >
                         <Chip
-                            classes={{ root: classes.duration }}
-                            label={`${duration.days}
-                            ${t('d')}, ${duration.hours}
-                            ${t('h')}, ${duration.minutes}
-                            ${t('m')}`}
-                          />
+                          classes={{ root: classes.duration }}
+                          label={`${duration.days}
+                          ${t('d')}, ${duration.hours}
+                          ${t('h')}, ${duration.minutes}
+                          ${t('m')}`}
+                        />
                       </div>
                       <div
                         className={classes.bodyItem}
                         style={inlineStyles.inject_platforms}
                       >
                         {inject.inject_injector_contract?.injector_contract_platforms?.map(
-                            (platform) => <PlatformIcon key={platform}
-                              width={20}
-                              platform={platform}
-                              marginRight={10}
-                                          />,
-                          )}
+                          (platform) => <PlatformIcon key={platform}
+                            width={20}
+                            platform={platform}
+                            marginRight={10}
+                                        />,
+                        )}
                       </div>
                       <div
                         className={classes.bodyItem}
                         style={inlineStyles.inject_enabled}
                       >
                         <ItemBoolean
-                            status={inject.inject_ready
-                              ? inject.inject_enabled : false}
-                            label={injectStatus}
-                            variant="inList"
-                            tooltip={injectStatus}
-                          />
+                          status={inject.inject_ready
+                            ? inject.inject_enabled : false}
+                          label={injectStatus}
+                          variant="inList"
+                          tooltip={injectStatus}
+                        />
                       </div>
                       <div
                         className={classes.bodyItem}
                         style={inlineStyles.inject_tags}
                       >
                         <ItemTags variant="list"
-                            tags={inject.inject_tags}
-                          />
+                          tags={inject.inject_tags}
+                        />
                       </div>
                     </>
                         }
