@@ -1,7 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { makeStyles } from '@mui/styles';
-import { Checkbox, Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
-import { BarChartOutlined, ReorderOutlined } from '@mui/icons-material';
+import { Checkbox, Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Menu, MenuItem, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
+import { BarChartOutlined, MoreVert, ReorderOutlined } from '@mui/icons-material';
+import { CSVLink } from 'react-csv';
 import { splitDuration } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
@@ -20,7 +21,6 @@ import CreateInject from './CreateInject';
 import UpdateInject from './UpdateInject';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import Timeline from '../../../../components/Timeline';
-import ButtonPopover from '../../../../components/common/ButtonPopover';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -208,6 +208,9 @@ const Injects = (props) => {
 
   const sortedInjects = filtering.filterAndSort(injects);
 
+  // Menu
+  const [anchorEl, setAnchorEl] = useState(null);
+
   const exportInjects = exportData(
     'inject',
     [
@@ -227,21 +230,8 @@ const Injects = (props) => {
   const handleShowTimeline = () => {
     setShowTimeline(!showTimeline);
     localStorage.setItem(exerciseOrScenarioId, !showTimeline);
+    setAnchorEl(null);
   };
-
-  // Button Popover
-  const entries = [
-    {
-      label: `${t('Export this list')} (.xls)`,
-      type: 'export',
-      data: exportInjects,
-      filename,
-    },
-    {
-      label: showTimeline ? t('Hide timeline') : t('Show timeline'),
-      action: handleShowTimeline,
-    },
-  ];
 
   // Rendering
   if (injects) {
@@ -270,7 +260,27 @@ const Injects = (props) => {
           >
             {sortedInjects.length > 0 && (
               <div style={{ marginRight: 10 }}>
-                <ButtonPopover entries={entries}/>
+                <ToggleButton value="popover" size="small" onClick={(ev) => {
+                  ev.stopPropagation();
+                  setAnchorEl(ev.currentTarget);
+                }}
+                >
+                  <MoreVert fontSize="small" color="primary" />
+                </ToggleButton>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={() => setAnchorEl(null)}
+                >
+                  <MenuItem>
+                    <CSVLink style={{ color: 'inherit' }} data={exportInjects} filename={filename}>
+                      {`${t('Export this list')} (.xls)`}
+                    </CSVLink>
+                  </MenuItem>
+                  <MenuItem onClick={handleShowTimeline}>
+                    {showTimeline ? t('Hide timeline') : t('Show timeline')}
+                  </MenuItem>
+                </Menu>
               </div>
             )}
             {setViewMode ? (

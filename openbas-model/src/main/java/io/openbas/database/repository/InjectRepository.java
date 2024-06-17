@@ -4,6 +4,7 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawInject;
 import io.openbas.database.raw.RawInjectTeam;
 import java.util.Collection;
+import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -126,9 +127,9 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
       "coalesce(array_agg(it.team_id) FILTER ( WHERE it.team_id IS NOT NULL ), '{}') as inject_teams " +
       "FROM injects " +
       "LEFT JOIN injects_teams it ON injects.inject_id = it.inject_id " +
-      "WHERE injects.inject_id IN :ids " +
+      "WHERE injects.inject_id IN :ids AND it.team_id = :teamId " +
       "GROUP BY injects.inject_id", nativeQuery = true)
-  List<RawInjectTeam> findRawInjectTeams(@Param("ids") Collection<String> ids);
+  Set<RawInjectTeam> findRawInjectTeams(@Param("ids") Collection<String> ids, @Param("teamId")  String teamId);
 
   @Query(value =
       "SELECT org.*, " +

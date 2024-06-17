@@ -131,9 +131,7 @@ public class TeamHelper {
     }
 
   private static Set<String> getInjectTeamsIds(final String teamId, Set<String> injectIds, final InjectRepository injectRepository) {
-    List<RawInjectTeam> rawInjectTeams = injectRepository.findRawInjectTeams(injectIds);
-
-    // Extract inject_ids that belong to the given teamId
+    Set<RawInjectTeam> rawInjectTeams = injectRepository.findRawInjectTeams(injectIds, teamId);
     return rawInjectTeams.stream()
         .filter(rawInjectTeam -> rawInjectTeam.getInject_teams().contains(teamId))
         .map(RawInjectTeam::getInject_id)
