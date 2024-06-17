@@ -21,6 +21,7 @@ import CreateInject from './CreateInject';
 import UpdateInject from './UpdateInject';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import Timeline from '../../../../components/Timeline';
+import ButtonPopover from '../../../../components/common/ButtonPopover';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -175,7 +176,7 @@ const Injects = (props) => {
   const classes = useStyles();
   const { t, tPick } = useFormatter();
   const [selectedInjectId, setSelectedInjectId] = useState(null);
-  const [showTimeline, _setShowTimeline] = useState(
+  const [showTimeline, setShowTimeline] = useState(
     () => {
       const storedValue = localStorage.getItem(exerciseOrScenarioId);
       return storedValue === null ? true : storedValue === 'true';
@@ -208,11 +209,32 @@ const Injects = (props) => {
 
   const sortedInjects = filtering.filterAndSort(injects);
 
-  const handleCheckboxChange = (event) => {
-    const { checked } = event.target;
-    setShowTimeline(checked);
-    localStorage.setItem(exerciseOrScenarioId, checked);
+  const exportInjects = exportData(
+    'inject',
+    [
+      'inject_type',
+      'inject_title',
+      'inject_description',
+      'inject_depends_duration',
+      'inject_enabled',
+      'inject_tags',
+      'inject_content',
+    ],
+    sortedInjects,
+    tagsMap,
+  );
+  const filename = `${t('Injects')}.xls`;
+
+  const handleShowTimeline = () => {
+    setShowTimeline(!showTimeline);
+    localStorage.setItem(exerciseOrScenarioId, !showTimeline);
   };
+
+  // Button Popover
+  const entries = [
+    { label: t('Export injects (.xls)'), type: 'export', data: exportInjects, filename },
+    { label: showTimeline ? t('Hide timeline') : t('Show timeline'), action: handleShowTimeline },
+  ];
 
   // Rendering
   if (injects) {
@@ -233,17 +255,16 @@ const Injects = (props) => {
               currentTags={filtering.tags}
             />
           </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+          }}
+          >
             {sortedInjects.length > 0 && (
-            <div style={{ marginRight: 10 }}>
-              <Checkbox
-                checked={showTimeline}
-                onChange={handleCheckboxChange}
-                name="showTimeline"
-                color="primary"
-              />
-              <span>{t('Show Timeline')}</span>
-            </div>
+              <div style={{ marginRight: 10 }}>
+                <ButtonPopover entries={entries}/>
+              </div>
             )}
             {setViewMode ? (
               <ToggleButtonGroup
@@ -252,47 +273,6 @@ const Injects = (props) => {
                 style={{ float: 'right' }}
                 aria-label="Change view mode"
               >
-                <div>
-                  {sortedInjects.length > 0 ? (
-                    <CSVLink
-                      data={exportData(
-                        'inject',
-                        [
-                          'inject_type',
-                          'inject_title',
-                          'inject_description',
-                          'inject_depends_duration',
-                          'inject_enabled',
-                          'inject_tags',
-                          'inject_content',
-                        ],
-                        sortedInjects,
-                        tagsMap,
-                      )}
-                      filename={`${t('Injects')}.csv`}
-                    >
-                      <Tooltip title={t('Export this list')}>
-                        <ToggleButton
-                          value='download'
-                          aria-label="Download"
-                        >
-                          <FileDownloadOutlined fontSize="small"
-                            color="primary"
-                          />
-                        </ToggleButton>
-                      </Tooltip>
-                    </CSVLink>
-                  ) : (
-                    <ToggleButton
-                      value='download'
-                      aria-label="Download"
-                    >
-                      <FileDownloadOutlined fontSize="small"
-                        color="primary"
-                      />
-                    </ToggleButton>
-                  )}
-                </div>
                 <Tooltip title={t('List view')}>
                   <ToggleButton
                     value='list'
