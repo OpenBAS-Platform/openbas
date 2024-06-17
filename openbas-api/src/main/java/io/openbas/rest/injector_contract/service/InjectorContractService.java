@@ -12,6 +12,7 @@ import io.openbas.rest.injector_contract.form.InjectorContractAddInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateMappingInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -69,6 +70,7 @@ public class InjectorContractService {
         return injectorContractRepository.findById(id).orElseThrow(ElementNotFoundException::new);
     }
 
+    @Transactional(rollbackOn = Exception.class)
     public InjectorContract createInjectorContract(@NotNull InjectorContractAddInput input) {
         InjectorContract injectorContract = new InjectorContract();
         injectorContract.setCustom(true);

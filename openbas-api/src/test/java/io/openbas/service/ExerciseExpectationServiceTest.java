@@ -6,6 +6,7 @@ import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.Team;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,31 +50,11 @@ public class ExerciseExpectationServiceTest {
 
     @BeforeAll
     void beforeAll() {
-        Exercise exercise = new Exercise();
-        exercise.setName("Exercice name");
-        exercise.setStatus(SCHEDULED);
-        exercise.setFrom("test@test.com");
-        exercise.setReplyTos(List.of("test@test.com"));
-        exercise.setStart(Instant.now());
-        Exercise exerciseCreated = this.exerciseRepository.save(exercise);
-        Team team = new Team();
-        team.setName("test");
-        Team teamCreated = this.teamRepository.save(team);
+        Exercise exerciseCreated = getExercise();
         EXERCISE_ID = exerciseCreated.getId();
-        Inject inject = new Inject();
-        inject.setTitle("test");
-        inject.setInjectorContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
-        inject.setExercise(exerciseCreated);
-        inject.setDependsDuration(0L);
-        Inject injectCreated = this.injectRepository.save(inject);
-        InjectExpectation expectation = new InjectExpectation();
-        expectation.setInject(injectCreated);
-        expectation.setTeam(teamCreated);
-        expectation.setType(MANUAL);
-        expectation.setName(EXPECTATION_NAME);
-        expectation.setExpectedScore(10);
-        expectation.setExercise(exercise);
-        this.injectExpectationRepository.save(expectation);
+        Team teamCreated = getTeam();
+        Inject injectCreated = getInject(exerciseCreated);
+        getInjectExpectation(injectCreated, teamCreated, exerciseCreated);
     }
 
     @DisplayName("Retrieve inject expectations")
@@ -82,7 +63,7 @@ public class ExerciseExpectationServiceTest {
         List<InjectExpectation> expectations = this.exerciseExpectationService.injectExpectations(EXERCISE_ID);
         assertNotNull(expectations);
 
-        assertEquals(EXPECTATION_NAME, expectations.get(0).getName());
+        assertEquals(EXPECTATION_NAME, expectations.getFirst().getName());
     }
 
     @DisplayName("Update inject expectation")
@@ -91,7 +72,7 @@ public class ExerciseExpectationServiceTest {
         // -- PREPARE --
         List<InjectExpectation> expectations = this.exerciseExpectationService.injectExpectations(EXERCISE_ID);
         assertNotNull(expectations);
-        String id = expectations.get(0).getId();
+        String id = expectations.getFirst().getId();
 
         // -- EXECUTE --
         ExpectationUpdateInput input = new ExpectationUpdateInput();
@@ -101,5 +82,41 @@ public class ExerciseExpectationServiceTest {
         // -- ASSERT --
         assertNotNull(expectation);
         assertEquals(7, expectation.getScore());
+    }
+
+    protected Exercise getExercise() {
+        Exercise exercise = new Exercise();
+        exercise.setName("Exercice name");
+        exercise.setStatus(SCHEDULED);
+        exercise.setFrom("test@test.com");
+        exercise.setReplyTos(List.of("test@test.com"));
+        exercise.setStart(Instant.now());
+        return this.exerciseRepository.save(exercise);
+    }
+
+    private Team getTeam() {
+        Team team = new Team();
+        team.setName("test");
+        return this.teamRepository.save(team);
+    }
+
+    private Inject getInject(Exercise exerciseCreated) {
+        Inject inject = new Inject();
+        inject.setTitle("test");
+        inject.setInjectorContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+        inject.setExercise(exerciseCreated);
+        inject.setDependsDuration(0L);
+        return this.injectRepository.save(inject);
+    }
+
+    private void getInjectExpectation(Inject injectCreated, Team teamCreated, Exercise exerciseCreated) {
+        InjectExpectation expectation = new InjectExpectation();
+        expectation.setInject(injectCreated);
+        expectation.setTeam(teamCreated);
+        expectation.setType(MANUAL);
+        expectation.setName(EXPECTATION_NAME);
+        expectation.setExpectedScore(10);
+        expectation.setExercise(exerciseCreated);
+        this.injectExpectationRepository.save(expectation);
     }
 }

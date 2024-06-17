@@ -8,7 +8,6 @@ import io.openbas.rest.injector_contract.form.InjectorContractUpdateInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateMappingInput;
 import io.openbas.rest.injector_contract.service.InjectorContractService;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -41,7 +40,6 @@ public class InjectorContractApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/injector_contracts")
-    @Transactional(rollbackOn = Exception.class)
     public InjectorContract createInjectorContract(@Valid @RequestBody InjectorContractAddInput input) {
         return injectorContractService.createInjectorContract(input);
     }
