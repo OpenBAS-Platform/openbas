@@ -84,6 +84,7 @@ jobs:
       - run:
           working_directory: ~/openbas
           command: |
+            apk add git
             LATEST_VERSION=$(git describe --tags --abbrev=0)
             curl -o openbas-api/src/main/resources/agents/openbas-agent/linux/arm64/openbas-agent-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-agent/linux/arm_64/openbas-agent-${CIRCLE_TAG:-latest}
             curl -o openbas-api/src/main/resources/agents/openbas-agent/linux/x86_64/openbas-agent-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-agent/linux/x86_64/openbas-agent-${CIRCLE_TAG:-latest}
@@ -203,14 +204,14 @@ jobs:
             chmod a+x ~/.docker/cli-plugins/docker-buildx
             docker buildx install
             # Run binfmt
-            docker run --rm --privileged tonistiigi/binfmt:$LATEST_VERSION --install "$BUILDX_PLATFORMS"
+            docker run --rm --privileged tonistiigi/binfmt:latest --install "$BUILDX_PLATFORMS"
             docker buildx create --name mybuilder --use
       - run:
           name: Login
           command: echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
       - run:
           name: Build Docker image openbas/platform
-          command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openbas/platform:$LATEST_VERSION -t openbas/platform:${CIRCLE_TAG} --push .
+          command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openbas/platform:latest -t openbas/platform:${CIRCLE_TAG} --push .
           no_output_timeout: 30m
       - slack/notify:
           event: fail
@@ -259,7 +260,7 @@ jobs:
             chmod a+x ~/.docker/cli-plugins/docker-buildx
             docker buildx install
             # Run binfmt
-            docker run --rm --privileged tonistiigi/binfmt:$LATEST_VERSION --install "$BUILDX_PLATFORMS"
+            docker run --rm --privileged tonistiigi/binfmt:latest --install "$BUILDX_PLATFORMS"
             docker buildx create --name multiarch --driver docker-container --use
             docker buildx inspect --bootstrap
       - run:
