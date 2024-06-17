@@ -202,10 +202,6 @@ const Injects = (props) => {
   };
   const sortedInjects = filtering.filterAndSort(injects);
 
-  // const handleCheckboxChange = (event) => {
-  //   setShowTimeline(event.target.checked);
-  // };
-
   // Rendering
   if (injects) {
     return (
@@ -226,15 +222,6 @@ const Injects = (props) => {
             />
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-            {/* <div style={{ marginRight: 10 }}> */}
-            {/*  <Checkbox */}
-            {/*    checked={showTimeline} */}
-            {/*    onChange={handleCheckboxChange} */}
-            {/*    name="showTimeline" */}
-            {/*    color="primary" */}
-            {/*  /> */}
-            {/*  <span>{t('Show Timeline')}</span> */}
-            {/* </div> */}
             {setViewMode ? (
               <ToggleButtonGroup
                 size="small"
