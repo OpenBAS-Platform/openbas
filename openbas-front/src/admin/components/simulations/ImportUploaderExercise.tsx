@@ -15,8 +15,11 @@ const ImportUploaderExercise: React.FC<Props> = () => {
   const navigate = useNavigate();
 
   const handleUpload = async (formData: FormData) => {
-    await dispatch(importingExercise(formData));
-    navigate('/admin/exercises');
+    await dispatch(importingExercise(formData)).then((result: { [x: string]: string; }) => {
+      if (!Object.prototype.hasOwnProperty.call(result, 'FINAL_FORM/form-error')) {
+        navigate(0);
+      }
+    });
   };
 
   return (

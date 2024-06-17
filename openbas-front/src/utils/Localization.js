@@ -194,6 +194,7 @@ const i18n = {
       'Export to CSV': 'Exporter en CSV',
       Copy: 'Copier',
       Start: 'Démarrer',
+      'Start now': 'Démarrer maintenant',
       Status: 'Statut',
       Information: 'Information',
       Control: 'Contrôle',

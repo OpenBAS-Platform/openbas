@@ -244,7 +244,11 @@ export const useFormatter = () => {
     });
   };
   const time = (date) => {
-    return intl.formatTime(date);
+    return intl.formatTime(date, {
+      second: 'numeric',
+      minute: 'numeric',
+      hour: 'numeric',
+    });
   };
   const standardDate = (date) => {
     if (isNone(date)) {

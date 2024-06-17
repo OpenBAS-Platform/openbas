@@ -53,10 +53,10 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
               startIcon={<PlayArrowOutlined />}
               variant="contained"
               size="small"
-              color="success"
+              color="primary"
               onClick={() => setOpenChangeStatus('RUNNING')}
             >
-              {t('Start')}
+              {t('Start now')}
             </Button>
           );
         }

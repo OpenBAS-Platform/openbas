@@ -41,7 +41,7 @@ const useStyles = makeStyles(() => ({
 const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = ({
   scenario,
 }) => {
-  const { t, nsd, ft, locale } = useFormatter();
+  const { t, ft, locale, fld } = useFormatter();
   const location = useLocation();
   const theme = useTheme<Theme>();
   const classes = useStyles();
@@ -72,7 +72,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
     }
     let sentence = '';
     if (noRepeat) {
-      sentence = `${nsd(scenario.scenario_recurrence_start)} ${t('recurrence_at')} ${ft(new Date().setUTCHours(parsedCronExpression.h, parsedCronExpression.m))}`;
+      sentence = `${fld(scenario.scenario_recurrence_start)} ${t('recurrence_at')} ${ft(new Date().setUTCHours(parsedCronExpression.h, parsedCronExpression.m, 0))}`;
     } else {
       sentence = cronstrue.toString(cronExpression, {
         verbose: true,
@@ -80,10 +80,10 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
         locale,
       });
       if (scenario.scenario_recurrence_end) {
-        sentence += ` ${t('recurrence_from')} ${nsd(scenario.scenario_recurrence_start)}`;
-        sentence += ` ${t('recurrence_to')} ${nsd(scenario.scenario_recurrence_end)}`;
+        sentence += ` ${t('recurrence_from')} ${fld(scenario.scenario_recurrence_start)}`;
+        sentence += ` ${t('recurrence_to')} ${fld(scenario.scenario_recurrence_end)}`;
       } else {
-        sentence += ` ${t('recurrence_starting_from')} ${nsd(scenario.scenario_recurrence_start)}`;
+        sentence += ` ${t('recurrence_starting_from')} ${fld(scenario.scenario_recurrence_start)}`;
       }
     }
     return sentence;

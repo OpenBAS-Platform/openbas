@@ -175,7 +175,7 @@ const Injects = (props) => {
   const classes = useStyles();
   const { t, tPick } = useFormatter();
   const [selectedInjectId, setSelectedInjectId] = useState(null);
-  const [showTimeline, setShowTimeline] = useState(true);
+  const [showTimeline, _setShowTimeline] = useState(true);
   const { permissions } = useContext(PermissionsContext);
   const injectContext = useContext(InjectContext);
 
@@ -202,10 +202,6 @@ const Injects = (props) => {
   };
   const sortedInjects = filtering.filterAndSort(injects);
 
-  const handleCheckboxChange = (event) => {
-    setShowTimeline(event.target.checked);
-  };
-
   // Rendering
   if (injects) {
     return (
@@ -226,15 +222,6 @@ const Injects = (props) => {
             />
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-            <div style={{ marginRight: 10 }}>
-              <Checkbox
-                checked={showTimeline}
-                onChange={handleCheckboxChange}
-                name="showTimeline"
-                color="primary"
-              />
-              <span>{t('Show Timeline')}</span>
-            </div>
             {setViewMode ? (
               <ToggleButtonGroup
                 size="small"
@@ -289,7 +276,7 @@ const Injects = (props) => {
                     selected
                     aria-label="List view mode"
                   >
-                    <ReorderOutlined fontSize="small" color='inherit'/>
+                    <ReorderOutlined fontSize="small" color='inherit' />
                   </ToggleButton>
                 </Tooltip>
                 <Tooltip title={t('Distribution view')}>
@@ -298,7 +285,7 @@ const Injects = (props) => {
                     onClick={() => setViewMode('distribution')}
                     aria-label="Distribution view mode"
                   >
-                    <BarChartOutlined fontSize="small" color='primary'/>
+                    <BarChartOutlined fontSize="small" color='primary' />
                   </ToggleButton>
                 </Tooltip>
               </ToggleButtonGroup>
@@ -325,27 +312,27 @@ const Injects = (props) => {
                   >
                     <Tooltip title={t('Export this list')}>
                       <IconButton size="medium">
-                        <FileDownloadOutlined color="primary"/>
+                        <FileDownloadOutlined color="primary" />
                       </IconButton>
                     </Tooltip>
                   </CSVLink>
                 ) : (
                   <IconButton size="medium" disabled>
-                    <FileDownloadOutlined/>
+                    <FileDownloadOutlined />
                   </IconButton>
                 )}
               </div>
             )}
           </div>
-          <div className="clearfix"/>
+          <div className="clearfix" />
         </div>
         {showTimeline && (<div style={{ marginBottom: 50 }}>
           <Timeline exerciseOrScenarioId={exerciseOrScenarioId}
             injects={sortedInjects}
             teams={teams}
           ></Timeline>
-          <div className="clearfix"/>
-        </div>
+          <div className="clearfix" />
+          </div>
         )}
         <List>
           <ListItem
@@ -359,9 +346,9 @@ const Injects = (props) => {
                 checked={selectAll}
                 disableRipple
                 onChange={
-                        typeof handleToggleSelectAll === 'function'
-                        && handleToggleSelectAll.bind(this)
-                    }
+                  typeof handleToggleSelectAll === 'function'
+                  && handleToggleSelectAll.bind(this)
+                }
                 disabled={typeof handleToggleSelectAll !== 'function'}
               />
             </ListItemIcon>
@@ -416,7 +403,7 @@ const Injects = (props) => {
                     headerStyles,
                   )}
                 </>
-                  }
+              }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
@@ -440,9 +427,9 @@ const Injects = (props) => {
                 divider
                 button
                 disabled={
-                          !injectContract || isDisabled
-                          || !inject.inject_enabled
-                      }
+                  !injectContract || isDisabled
+                  || !inject.inject_enabled
+                }
                 onClick={() => setSelectedInjectId(inject.inject_id)}
               >
                 <ListItemIcon
@@ -451,15 +438,15 @@ const Injects = (props) => {
                   onClick={(event) => (event.shiftKey
                     ? onToggleShiftEntity(index, inject, event)
                     : onToggleEntity(inject, event))
-                        }
+                  }
                 >
                   <Checkbox
                     edge="start"
                     checked={
-                              (selectAll && !(inject.inject_id
-                                  in (deSelectedElements || {})))
-                              || inject.inject_id in (selectedElements || {})
-                          }
+                      (selectAll && !(inject.inject_id
+                        in (deSelectedElements || {})))
+                      || inject.inject_id in (selectedElements || {})
+                    }
                     disableRipple
                   />
                 </ListItemIcon>
@@ -468,9 +455,9 @@ const Injects = (props) => {
                     tooltip={t(inject.inject_type)}
                     type={inject.inject_type}
                     disabled={
-                              !injectContract || isDisabled
-                              || !inject.inject_enabled
-                          }
+                      !injectContract || isDisabled
+                      || !inject.inject_enabled
+                    }
                   />
                 </ListItemIcon>
                 <ListItemText
@@ -537,7 +524,7 @@ const Injects = (props) => {
                         />
                       </div>
                     </>
-                        }
+                  }
                 />
                 <ListItemSecondaryAction>
                   <InjectPopover
@@ -586,7 +573,7 @@ const Injects = (props) => {
   }
   return (
     <div className={classes.container}>
-      <Loader/>
+      <Loader />
     </div>
   );
 };
