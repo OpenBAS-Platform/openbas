@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, FormControlLabel, Switch, Stack } from '@mui/material';
+import { Button, FormControlLabel, Stack, Switch } from '@mui/material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -71,7 +71,7 @@ const ExerciseDateForm: React.FC<Props> = ({
         time: z.string().min(1, t('Required')),
       }).refine(
         (data) => {
-          if (data.date) {
+          if (!checked && data.date) {
             return new Date(data.date).getTime() >= new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime();
           }
           return true;
@@ -83,7 +83,7 @@ const ExerciseDateForm: React.FC<Props> = ({
       )
         .refine(
           (data) => {
-            if (data.time) {
+            if (!checked && data.time) {
               return (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < new Date(data.time).getTime();
             }
             return true;
