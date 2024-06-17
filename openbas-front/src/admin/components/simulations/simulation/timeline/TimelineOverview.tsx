@@ -102,6 +102,8 @@ const TimelineOverview = () => {
     searchColumns,
   );
 
+  const filteredInjects = filtering.filterAndSort(injects);
+
   const pendingInjects = filtering.filterAndSort(injects.filter((i: InjectStore) => i.inject_status === null));
 
   const processedInjects = filtering.filterAndSort(injects.filter((i: InjectStore) => i.inject_status !== null));
@@ -132,7 +134,7 @@ const TimelineOverview = () => {
       </div>
       <div className="clearfix"/>
       <Timeline
-        injects={injects}
+        injects={filteredInjects}
         teams={teams}
         onSelectInject={(id: string) => setSelectedInjectId(id)}
       ></Timeline>
