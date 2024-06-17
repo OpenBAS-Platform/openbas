@@ -131,6 +131,8 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
         if (
           inject.inject_injector_contract?.convertedContent
             && 'fields' in inject.inject_injector_contract.convertedContent
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
             && inject.inject_injector_contract.convertedContent.fields.some(
               (field: any) => field.key === 'teams',
             )
