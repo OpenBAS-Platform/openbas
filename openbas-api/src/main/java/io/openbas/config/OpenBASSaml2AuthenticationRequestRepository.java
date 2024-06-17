@@ -13,6 +13,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * This class is heavily based on
+ * <a href="https://github.com/spring-projects/spring-security/blob/main/saml2/saml2-service-provider/src/main/java/org/springframework/security/saml2/provider/service/web/HttpSessionSaml2AuthenticationRequestRepository.java">HttpSessionSaml2AuthenticationRequestRepository.java</a>
+ * The only difference is in saveAuthenticationRequest where we recreate an HttpSession and copy the attributes
+ * from the previous one. This is to prevent an issue where the session would be recreated during the callback
+ * after the authentication. To fix this issue, we recreate a new session during the save of the request and copy
+ * the attributes to the new session.
+ * FIXME : Check if we can remove this custom class when we switch to a more modern saml library
+ *
+ */
 @Component
 @Repository
 public class OpenBASSaml2AuthenticationRequestRepository implements Saml2AuthenticationRequestRepository<AbstractSaml2AuthenticationRequest> {
@@ -39,16 +49,21 @@ public class OpenBASSaml2AuthenticationRequestRepository implements Saml2Authent
             removeAuthenticationRequest(request, response);
             return;
         }
+        // Get the session
         HttpSession httpSession = request.getSession();
         Map<String, Object> attributes = new HashMap<>();
         Iterator<String> attributeIterator = httpSession.getAttributeNames().asIterator();
+        // Copy the attributes to a new list
         while (attributeIterator.hasNext()) {
             String param = attributeIterator.next();
             attributes.put(param, httpSession.getAttribute(param));
         }
+        // Invalidate the previous session to have a fresh one for the login
         httpSession.invalidate();
         HttpSession newSession = request.getSession(true);
+        // Set the former attributes into the new session
         attributes.forEach(newSession::setAttribute);
+        // Save the request into the new session for ulterior validation
         newSession.setAttribute(this.saml2AuthnRequestAttributeName, authenticationRequest);
     }
 
