@@ -13,6 +13,7 @@ public class Agent {
   private String platform;
   private String username;
   private String privilege;
+  private String architecture;
   private String[] host_ip_addrs;
   private String exe_name;
 

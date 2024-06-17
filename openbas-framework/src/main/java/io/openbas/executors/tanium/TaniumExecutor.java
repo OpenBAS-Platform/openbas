@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
-@ConditionalOnProperty(prefix = "executor.tanium", name = "enable")
 @RequiredArgsConstructor
 @Service
 public class TaniumExecutor {
@@ -30,9 +29,8 @@ public class TaniumExecutor {
 
     @PostConstruct
     public void init() {
-        // If enabled, scheduled every X seconds
+        TaniumExecutorService service = new TaniumExecutorService(this.executorService, this.client, this.config, this.taniumExecutorContextService, this.endpointService, this.injectorService);
         if (this.config.isEnable()) {
-            TaniumExecutorService service = new TaniumExecutorService(this.executorService, this.client, this.config, this.taniumExecutorContextService, this.endpointService, this.injectorService);
             this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(60));
         }
     }

@@ -7,6 +7,7 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.Injector;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.service.CalderaExecutorContextService;
+import io.openbas.executors.openbas.service.OpenBASExecutorContextService;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.executors.tanium.service.TaniumExecutorContextService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,13 @@ public class ExecutionExecutorService {
     private TaniumExecutorConfig taniumExecutorConfig;
 
     private TaniumExecutorContextService taniumExecutorContextService;
+
+    private OpenBASExecutorContextService openBASExecutorContextService;
+
+    @Autowired
+    public void setOpenBASExecutorContextService(OpenBASExecutorContextService openBASExecutorContextService) {
+        this.openBASExecutorContextService = openBASExecutorContextService;
+    }
 
     @Autowired
     public void setAssetGroupService(AssetGroupService assetGroupService) {
@@ -64,12 +72,12 @@ public class ExecutionExecutorService {
                 inject.getAssetGroups().stream().flatMap(assetGroup -> this.assetGroupService.assetsFromAssetGroup(assetGroup.getId()).stream())
         ).toList();
         assets.forEach(asset -> {
-            launchExecutorContextForAsset(inject.getInjectorContract().getInjector(), asset);
+            launchExecutorContextForAsset(inject, asset);
         });
         return executableInject;
     }
 
-    private void launchExecutorContextForAsset(Injector injector, Asset asset) {
+    private void launchExecutorContextForAsset(Inject inject, Asset asset) {
         Executor executor = asset.getExecutor();
         if (executor == null) {
             log.log(Level.SEVERE, "Cannot find the executor for the asset " + asset.getName());
@@ -79,13 +87,16 @@ public class ExecutionExecutorService {
                     if (!this.calderaExecutorConfig.isEnable()) {
                         throw new RuntimeException("Fatal error: Caldera executor is not enabled");
                     }
-                    this.calderaExecutorContextService.launchExecutorSubprocess(injector, asset);
+                    this.calderaExecutorContextService.launchExecutorSubprocess(inject, asset);
                 }
                 case "openbas_tanium" -> {
                     if (!this.taniumExecutorConfig.isEnable()) {
                         throw new RuntimeException("Fatal error: Tanium executor is not enabled");
                     }
-                    this.taniumExecutorContextService.launchExecutorSubprocess(injector, asset);
+                    this.taniumExecutorContextService.launchExecutorSubprocess(inject, asset);
+                }
+                case "openbas_agent" -> {
+                    this.openBASExecutorContextService.launchExecutorSubprocess(inject, asset);
                 }
                 default -> {
                     throw new RuntimeException("Fatal error: Unsupported executor " + executor.getType());

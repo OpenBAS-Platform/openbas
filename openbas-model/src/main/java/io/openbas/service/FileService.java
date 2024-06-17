@@ -25,7 +25,6 @@ public class FileService {
     public static final String INJECTORS_IMAGES_BASE_PATH = "/injectors/images/";
     public static final String COLLECTORS_IMAGES_BASE_PATH = "/collectors/images/";
     public static final String EXECUTORS_IMAGES_BASE_PATH = "/executors/images/";
-    public static final String AGENT_PATH = "/agents/";
     private MinioConfig minioConfig;
     private MinioClient minioClient;
 

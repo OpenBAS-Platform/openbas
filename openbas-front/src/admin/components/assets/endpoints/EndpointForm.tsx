@@ -29,6 +29,7 @@ const EndpointForm: React.FC<Props> = ({
     endpoint_ips: [],
     endpoint_mac_addresses: [],
     endpoint_platform: undefined,
+    endpoint_arch: 'x86_64',
   },
 }) => {
   // Standard hooks
@@ -50,14 +51,16 @@ const EndpointForm: React.FC<Props> = ({
         asset_last_seen: z.string().datetime().optional(),
         asset_tags: z.string().array().optional(),
         endpoint_hostname: z.string().optional(),
-        endpoint_ips: z.string().ip({ message: t('Invalid Ip Address') }).array().min(1),
+        endpoint_ips: z.string().ip({ message: t('Invalid IP addresses') }).array().min(1),
         endpoint_mac_addresses: z
           .string()
           .regex(
             /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|([0-9a-fA-F]{4}.[0-9a-fA-F]{4}.[0-9a-fA-F]{4})$/,
-            t('Invalid MAC address'),
+            t('Invalid MAC addresses'),
           ).array().optional(),
         endpoint_platform: z.enum(['Linux', 'Windows', 'MacOS', 'Service', 'Generic', 'Internal']),
+        endpoint_arch: z.enum(['x86_64', 'arm64', 'Unknown']),
+        endpoint_agent_version: z.string().optional(),
       }),
     ),
     defaultValues: initialValues,
@@ -217,6 +220,27 @@ const EndpointForm: React.FC<Props> = ({
             <MenuItem value='Linux'>{t('Linux')}</MenuItem>
             <MenuItem value='Windows'>{t('Windows')}</MenuItem>
             <MenuItem value='MacOS'>{t('MacOS')}</MenuItem>
+          </TextField>
+        )}
+      />
+      <Controller
+        control={control}
+        name="endpoint_arch"
+        render={({ field }) => (
+          <TextField
+            select
+            variant="standard"
+            fullWidth
+            value={field.value}
+            label={t('Architecture')}
+            style={{ marginTop: 20 }}
+            error={!!errors.endpoint_arch}
+            helperText={errors.endpoint_arch?.message}
+            inputProps={register('endpoint_arch')}
+            InputLabelProps={{ required: true }}
+          >
+            <MenuItem value='x86_64'>{t('x86_64')}</MenuItem>
+            <MenuItem value='arm64'>{t('arm64')}</MenuItem>
           </TextField>
         )}
       />

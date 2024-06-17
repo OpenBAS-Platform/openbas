@@ -1,6 +1,7 @@
 package io.openbas.executors.caldera.service;
 
 import io.openbas.database.model.Asset;
+import io.openbas.database.model.Inject;
 import io.openbas.database.model.Injector;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.client.model.Ability;
@@ -61,7 +62,8 @@ public class CalderaExecutorContextService {
         });
     }
 
-    public void launchExecutorSubprocess(@NotNull final Injector injector, @NotNull final Asset asset) {
+    public void launchExecutorSubprocess(@NotNull final Inject inject, @NotNull final Asset asset) {
+        Injector injector = inject.getInjectorContract().getInjector();
         if (this.injectorExecutorAbilities.containsKey(injector.getId())) {
             calderaExecutorClient.exploit("base64", asset.getExternalReference(), this.injectorExecutorAbilities.get(injector.getId()).getAbility_id());
         }

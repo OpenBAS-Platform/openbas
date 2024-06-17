@@ -58,6 +58,14 @@ public class CalderaExecutorService implements Runnable {
         };
     }
 
+    public static Endpoint.PLATFORM_ARCH toArch(@NotBlank final String arch) {
+        return switch (arch) {
+            case "amd64" -> Endpoint.PLATFORM_ARCH.x86_64;
+            case "arm64" -> Endpoint.PLATFORM_ARCH.arm64;
+            default -> throw new IllegalArgumentException("This arch is not supported : " + arch);
+        };
+    }
+
     @Autowired
     public CalderaExecutorService(
             ExecutorService executorService,
@@ -72,8 +80,12 @@ public class CalderaExecutorService implements Runnable {
         this.calderaExecutorContextService = calderaExecutorContextService;
         this.injectorService = injectorService;
         try {
-            this.executor = executorService.register(config.getId(), CALDERA_EXECUTOR_TYPE, CALDERA_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-caldera.png"), new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
-            this.calderaExecutorContextService.registerAbilities();
+            if (config.isEnable()) {
+                this.executor = executorService.register(config.getId(), CALDERA_EXECUTOR_TYPE, CALDERA_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-caldera.png"), new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
+                this.calderaExecutorContextService.registerAbilities();
+            } else {
+                executorService.remove(config.getId());
+            }
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error creating caldera executor: " + e);
         }
@@ -85,7 +97,7 @@ public class CalderaExecutorService implements Runnable {
         // The executor only retrieve "main" agents (without the keyword "executor")
         // This is NOT a standard behaviour, this is because we are using Caldera as an executor and we should not
         // Will be replaced by the XTM agent
-        List<Agent> agents = this.client.agents().stream().filter(agent -> !agent.getExe_name().contains("executor")).toList();
+        List<Agent> agents = this.client.agents().stream().filter(agent -> !agent.getExe_name().contains("implant")).toList();
         List<Endpoint> endpoints = toEndpoint(agents).stream().filter(Asset::getActive).toList();
         log.info("Caldera executor provisioning based on " + endpoints.size() + " assets");
         endpoints.forEach(endpoint -> {
@@ -126,6 +138,7 @@ public class CalderaExecutorService implements Runnable {
                     endpoint.setIps(agent.getHost_ip_addrs());
                     endpoint.setHostname(agent.getHost());
                     endpoint.setPlatform(toPlatform(agent.getPlatform()));
+                    endpoint.setArch(toArch(agent.getArchitecture()));
                     endpoint.setProcessName(agent.getExe_name());
                     endpoint.setLastSeen(toInstant(agent.getLast_seen()));
                     return endpoint;
@@ -142,6 +155,7 @@ public class CalderaExecutorService implements Runnable {
         matchingExistingEndpoint.setHostname(external.getHostname());
         matchingExistingEndpoint.setProcessName(external.getProcessName());
         matchingExistingEndpoint.setPlatform(external.getPlatform());
+        matchingExistingEndpoint.setArch(external.getArch());
         matchingExistingEndpoint.setExecutor(this.executor);
         if ((now().toEpochMilli() - matchingExistingEndpoint.getClearedAt().toEpochMilli()) > CLEAR_TTL) {
             try {
