@@ -176,6 +176,7 @@ jobs:
           at: ~/
       - run:
           command: |
+            apk add git
             LATEST_VERSION=$(git describe --tags --abbrev=0)
             curl -o openbas-api/src/main/resources/agents/openbas-agent/linux/arm64/openbas-agent-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-agent/linux/arm_64/openbas-agent-${CIRCLE_TAG:-latest}
             curl -o openbas-api/src/main/resources/agents/openbas-agent/linux/x86_64/openbas-agent-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-agent/linux/x86_64/openbas-agent-${CIRCLE_TAG:-latest}
@@ -230,6 +231,7 @@ jobs:
           at: ~/
       - run:
           command: |
+            apk add git
             LATEST_VERSION=$(git describe --tags --abbrev=0)
             curl -o openbas-api/src/main/resources/agents/openbas-agent/linux/arm64/openbas-agent-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-agent/linux/arm_64/openbas-agent-${CIRCLE_TAG:-latest}
             curl -o openbas-api/src/main/resources/agents/openbas-agent/linux/x86_64/openbas-agent-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-agent/linux/x86_64/openbas-agent-${CIRCLE_TAG:-latest}
