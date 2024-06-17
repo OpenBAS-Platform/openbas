@@ -122,6 +122,12 @@ export const fetchScenarioExercises = (scenarioId: Scenario['scenario_id']) => (
   return getReferential(schema.arrayOfExercises, uri)(dispatch);
 };
 
+export const searchScenarioExercises = (scenarioId: Scenario['scenario_id'], paginationInput: SearchPaginationInput) => {
+  const data = paginationInput;
+  const uri = `/api/scenarios/${scenarioId}/exercises/search`;
+  return simplePostCall(uri, data);
+};
+
 // -- RECURRENCE --
 
 export const updateScenarioRecurrence = (

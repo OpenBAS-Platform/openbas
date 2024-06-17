@@ -40,4 +40,28 @@ public class JpaUtils {
     );
   }
 
+  // -- FUNCTION --
+
+  public static <T, U> Expression<String[]> arrayAggOnId(
+      @NotNull final CriteriaBuilder cb,
+      @NotNull final Join<T, U> join) {
+    return cb.function(
+        "array_remove",
+        String[].class,
+        cb.function("array_agg", String[].class, join.get("id")),
+        cb.nullLiteral(String.class)
+    );
+  }
+
+  // -- JOIN --
+
+  public static <X, Y> Join<X, Y> createLeftJoin(Root<X> root, String attributeName) {
+    return root.join(attributeName, JoinType.LEFT);
+  }
+
+  public static <X, Y> Expression<String[]> createJoinArrayAggOnId(CriteriaBuilder cb, Root<X> root, String attributeName) {
+    Join<X, Y> join = createLeftJoin(root, attributeName);
+    return arrayAggOnId(cb, join);
+  }
+
 }
