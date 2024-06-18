@@ -98,7 +98,7 @@ public class CalderaExecutorService implements Runnable {
         // This is NOT a standard behaviour, this is because we are using Caldera as an executor and we should not
         // Will be replaced by the XTM agent
         List<Agent> agents = this.client.agents().stream().filter(agent -> !agent.getExe_name().contains("implant")).toList();
-        List<Endpoint> endpoints = toEndpoint(agents).stream().filter(Asset::getActive).toList();
+        List<Endpoint> endpoints = toEndpoint(agents).stream().toList();
         log.info("Caldera executor provisioning based on " + endpoints.size() + " assets");
         endpoints.forEach(endpoint -> {
             List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
@@ -119,7 +119,8 @@ public class CalderaExecutorService implements Runnable {
             if (optionalExistingEndpoint.isPresent()) {
                 Endpoint existingEndpoint = optionalExistingEndpoint.get();
                 log.info("Found stale agent " + existingEndpoint.getName() + ", deleting it...");
-                this.endpointService.deleteEndpoint(existingEndpoint.getId());
+                // No delete the endpoint for the moment
+                // this.endpointService.deleteEndpoint(existingEndpoint.getId());
                 this.client.deleteAgent(existingEndpoint);
             }
         });
