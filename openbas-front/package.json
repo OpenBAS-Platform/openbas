@@ -109,7 +109,7 @@
     "globals": "15.0.0",
     "jsdom": "24.1.0",
     "nyc": "15.1.0",
-    "swagger-typescript-api": "13.0.3",
+    "swagger-typescript-api": "13.0.6",
     "typescript": "5.4.5",
     "vite": "5.2.11",
     "vite-plugin-istanbul": "6.0.2",
