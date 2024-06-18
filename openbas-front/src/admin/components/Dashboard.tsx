@@ -222,7 +222,7 @@ const Dashboard = () => {
             exercises={exercises}
             searchPaginationInput={searchPaginationInput}
             setSearchPaginationInput={setSearchPaginationInput}
-            header={false}
+            hasHeader={false}
           />
         </Paper>
       </Grid>
