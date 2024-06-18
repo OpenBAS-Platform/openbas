@@ -93,7 +93,7 @@ public class TaniumExecutorService implements Runnable {
     public void run() {
         log.info("Running Tanium executor endpoints gathering...");
         List<NodeEndpoint> nodeEndpoints = this.client.endpoints().getData().getEndpoints().getEdges().stream().toList();
-        List<Endpoint> endpoints = toEndpoint(nodeEndpoints).stream().filter(Asset::getActive).toList();
+        List<Endpoint> endpoints = toEndpoint(nodeEndpoints).stream().toList();
         log.info("Tanium executor provisioning based on " + endpoints.size() + " assets");
         endpoints.forEach(endpoint -> {
             List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
@@ -106,15 +106,6 @@ public class TaniumExecutorService implements Runnable {
                 }
             } else {
                 this.updateEndpoint(endpoint, existingEndpoints);
-            }
-        });
-        List<Endpoint> inactiveEndpoints = toEndpoint(nodeEndpoints).stream().filter(endpoint -> !endpoint.getActive()).toList();
-        inactiveEndpoints.forEach(endpoint -> {
-            Optional<Endpoint> optionalExistingEndpoint = this.endpointService.findByExternalReference(endpoint.getExternalReference());
-            if (optionalExistingEndpoint.isPresent()) {
-                Endpoint existingEndpoint = optionalExistingEndpoint.get();
-                log.info("Found stale endpoint " + existingEndpoint.getName() + ", deleting it...");
-                this.endpointService.deleteEndpoint(existingEndpoint.getId());
             }
         });
     }
