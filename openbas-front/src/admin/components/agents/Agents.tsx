@@ -113,7 +113,7 @@ const Executors = () => {
     setSelectedExecutors(null);
     setActiveTab(null);
     setAgentFolder(null);
-    setArch('amd64');
+    setArch('x86_64');
   };
   const currentSelectedExecutor = (selectedExecutors ?? []).filter((executor) => executor.executor_type === activeTab).at(0);
   const platformSelector = () => {
@@ -443,7 +443,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                   <Select
                     labelId="arch"
                     value={arch}
-                    onChange={(event) => setArch(event.target.value ?? 'amd64')}
+                    onChange={(event) => setArch(event.target.value ?? 'x86_64')}
                     fullWidth={true}
                   >
                     <MenuItem value="x86_64">{t('x86_64')}</MenuItem>
