@@ -82,7 +82,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          working_directory: ~/openbas
+          working_directory: ~/openbas_musl
           command: |
             apk add git
             LATEST_VERSION=$(git describe --tags --abbrev=0)
