@@ -10,9 +10,9 @@ import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.rest.injector_contract.form.InjectorContractUpdateInput;
-import io.openbas.rest.mapper.form.InjectImporterInput;
+import io.openbas.rest.mapper.form.InjectImporterAddInput;
 import io.openbas.rest.mapper.form.MapperAddInput;
+import io.openbas.rest.mapper.form.MapperUpdateInput;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -65,13 +65,12 @@ public class MapperApi extends RestBehavior {
         importMapper.setId(UUID.randomUUID().toString());
 
         Map<String, InjectorContract> mapInjectorContracts = StreamSupport.stream(injectorContractRepository.findAllById(
-                mapperAddInput.getImporters().stream().map(InjectImporterInput::getInjectorContractId).toList()
+                mapperAddInput.getImporters().stream().map(InjectImporterAddInput::getInjectorContractId).toList()
             ).spliterator(), false).collect(Collectors.toMap(InjectorContract::getId, Function.identity()));
 
         mapperAddInput.getImporters().forEach(
                 injectImporterInput -> {
                     InjectImporter injectImporter = new InjectImporter();
-                    injectImporter.setId(UUID.randomUUID().toString());
                     injectImporter.setInjectorContract(mapInjectorContracts.get(injectImporterInput.getInjectorContractId()));
                     injectImporter.setImportTypeValue(injectImporterInput.getInjectTypeValue());
                     injectImporter.setRuleAttributes(new ArrayList<>());
@@ -91,9 +90,10 @@ public class MapperApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/mappers/{mapperId}")
-    public ImportMapper updateImportMapper(@PathVariable String mapperId, @Valid @RequestBody InjectorContractUpdateInput input) {
+    public ImportMapper updateImportMapper(@PathVariable String mapperId, @Valid @RequestBody MapperUpdateInput input) {
         ImportMapper importMapper = importMapperRepository.findById(UUID.fromString(mapperId)).orElseThrow(ElementNotFoundException::new);
         importMapper.setUpdateAttributes(input);
+        importMapper.setName(input.getName());
         return importMapperRepository.save(importMapper);
     }
 
