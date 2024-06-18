@@ -35,7 +35,8 @@ import static java.time.ZoneOffset.UTC;
 @Log
 @Service
 public class CalderaExecutorService implements Runnable {
-    private static final int CLEAR_TTL = 1800000;
+    private static final int CLEAR_TTL = 1800000; // 30 minutes
+    private static final int DELETE_TTL = 86400000; // 24 hours
     private static final String CALDERA_EXECUTOR_TYPE = "openbas_caldera";
     private static final String CALDERA_EXECUTOR_NAME = "Caldera";
 
@@ -98,7 +99,7 @@ public class CalderaExecutorService implements Runnable {
         // This is NOT a standard behaviour, this is because we are using Caldera as an executor and we should not
         // Will be replaced by the XTM agent
         List<Agent> agents = this.client.agents().stream().filter(agent -> !agent.getExe_name().contains("implant")).toList();
-        List<Endpoint> endpoints = toEndpoint(agents).stream().toList();
+        List<Endpoint> endpoints = toEndpoint(agents).stream().filter(Asset::getActive).toList();
         log.info("Caldera executor provisioning based on " + endpoints.size() + " assets");
         endpoints.forEach(endpoint -> {
             List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
@@ -118,10 +119,11 @@ public class CalderaExecutorService implements Runnable {
             Optional<Endpoint> optionalExistingEndpoint = this.endpointService.findByExternalReference(endpoint.getExternalReference());
             if (optionalExistingEndpoint.isPresent()) {
                 Endpoint existingEndpoint = optionalExistingEndpoint.get();
-                log.info("Found stale agent " + existingEndpoint.getName() + ", deleting it...");
-                // No delete the endpoint for the moment
-                // this.endpointService.deleteEndpoint(existingEndpoint.getId());
-                this.client.deleteAgent(existingEndpoint);
+                if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli()) > DELETE_TTL) {
+                    log.info("Found stale agent " + existingEndpoint.getName() + ", deleting it...");
+                    this.client.deleteAgent(existingEndpoint);
+                    this.endpointService.deleteEndpoint(existingEndpoint.getId());
+                }
             }
         });
     }
