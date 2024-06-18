@@ -267,7 +267,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Agents'), current: true }]} />
       <Alert variant="outlined" severity="info" style={{ marginBottom: 30 }}>
-        {t('Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable. In the near future, we will release the XTM agent with a proper packaging and certificates.')}<br /><br />
+        {t('Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable.')}<br /><br />
         {t('Learn more information about how to setup simulation agents')} <a href="https://docs.openbas.io" target="_blank" rel="noreferrer">{t('in the documentation')}</a>.
       </Alert>
       <Grid container={true} spacing={3}>
@@ -456,7 +456,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                   {t('The agent will never execute directly any payload.')}
                 </Alert>
                 <p>
-                  {t('You will need to add proper antivirus exclusion for this agent. It may not be necessary in the future with the signed XTM agent but this is generally a good practice to ensure the agent will be always available.')}
+                  {t('You will need to add proper antivirus exclusions for this agent (to ensure Caldera injects execution to work properly). It may not be necessary in the future but this is generally a good practice to ensure the agent will be always available.')}
                 </p>
                 <pre style={{ margin: '20px 0 10px 0' }}>{platformSelector().exclusions}</pre>
                 <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 2 - Install the agent')}</Typography>
@@ -499,7 +499,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                 {t('The agent will never execute directly any payload.')}
               </Alert>
               <p>
-                {t('You will need to add proper antivirus exclusion for this agent. It may not be necessary in the future with the signed XTM agent but this is generally a good practice to ensure the agent will be always available.')}
+                {t('You will need to add proper antivirus exclusions for this agent (to ensure Caldera injects execution to work properly). It may not be necessary in the future but this is generally a good practice to ensure the agent will be always available.')}
               </p>
               <pre style={{ margin: '20px 0 10px 0' }}>{platformAgentSelector().exclusions}</pre>
               <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 2 - Install the agent')}</Typography>
