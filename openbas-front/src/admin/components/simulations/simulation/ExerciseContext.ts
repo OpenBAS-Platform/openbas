@@ -16,10 +16,10 @@ const injectContextForExercise = (exercise: ExerciseStore) => {
   const dispatch = useAppDispatch();
 
   return {
-    async onAddInject(inject: Inject): Promise<{ result: string }> {
+    onAddInject(inject: Inject): Promise<{ result: string }> {
       return dispatch(addInjectForExercise(exercise.exercise_id, inject));
     },
-    async onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string }> {
+    onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string }> {
       return dispatch(updateInjectForExercise(exercise.exercise_id, injectId, inject));
     },
     onUpdateInjectTrigger(injectId: Inject['inject_id']): void {

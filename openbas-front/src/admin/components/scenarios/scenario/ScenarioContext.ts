@@ -11,7 +11,7 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
     onAddInject(inject: Inject): Promise<{ result: string }> {
       return dispatch(addInjectForScenario(scenario.scenario_id, inject));
     },
-    async onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string }> {
+    onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string }> {
       return dispatch(updateInjectForScenario(scenario.scenario_id, injectId, inject));
     },
     onUpdateInjectActivation(injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }): Promise<{
