@@ -11,29 +11,23 @@ const renderAutocomplete = ({
   fullWidth,
   style,
   openCreate,
-  noMargin,
   ...others
 }) => {
-  let top = 30;
-  if (placeholder) {
-    top = -5;
-  } else if (noMargin) {
-    top = 10;
-  }
   return (
     <div style={{ position: 'relative' }}>
       <MuiAutocomplete
         label={label}
-        selectOnFocus={true}
-        autoHighlight={true}
+        selectOnFocus
+        autoHighlight
         clearOnBlur={false}
         clearOnEscape={false}
-        onInputChange={(event, value) => {
+        disableClearable
+        onInputChange={(_event, value) => {
           if (others.freeSolo) {
             onChange(value);
           }
         }}
-        onChange={(event, value) => {
+        onChange={(_event, value) => {
           onChange(value);
         }}
         {...inputProps}
@@ -49,24 +43,32 @@ const renderAutocomplete = ({
             style={style}
             error={touched && invalid}
             helperText={touched && error}
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {
+                    typeof openCreate === 'function' && (
+                      <IconButton
+                        onClick={() => openCreate()}
+                      >
+                        <AddOutlined />
+                      </IconButton>
+                    )
+                  }
+                  {params.InputProps.endAdornment}
+                </>
+              ),
+            }}
           />
         )}
       />
-      {typeof openCreate === 'function' && (
-        <IconButton
-          onClick={() => openCreate()}
-          edge="end"
-          style={{ position: 'absolute', top, right: 35 }}
-        >
-          <AddOutlined />
-        </IconButton>
-      )}
     </div>
   );
 };
 
 /**
- * @deprecated The component use old form libnary react-final-form
+ * @deprecated The component use old form library react-final-form
  */
 const Autocomplete = (props) => {
   return (<Field name={props.name} component={renderAutocomplete} {...props} />
