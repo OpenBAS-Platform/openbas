@@ -67,14 +67,14 @@ interface Props {
   exercises: ExerciseSimpleStore[];
   searchPaginationInput: SearchPaginationInput;
   setSearchPaginationInput: (datas: SearchPaginationInput) => void;
-  header?: boolean;
+  hasHeader?: boolean;
 }
 
 const ExerciseList: FunctionComponent<Props> = ({
   exercises = [],
   searchPaginationInput,
   setSearchPaginationInput,
-  header = true,
+  hasHeader = true,
 }) => {
   // Standard hooks
   const dispatch = useAppDispatch();
@@ -128,7 +128,7 @@ const ExerciseList: FunctionComponent<Props> = ({
 
   return (
     <List>
-      {header
+      {hasHeader
         && <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
