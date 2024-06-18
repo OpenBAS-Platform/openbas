@@ -24,6 +24,7 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
       style={{
         marginTop: variant === 'list' ? 5 : 0,
         padding: variant === 'timeline' ? 1 : 0,
+        cursor: 'pointer',
         width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
         height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
         borderRadius: 4,
@@ -34,11 +35,11 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
 };
 
 const InjectIcon = (props) => {
-  const { type, size, variant, tooltip, done, disabled } = props;
+  const { type, size, variant, tooltip, done, disabled, onClick } = props;
   const fontSize = size || 'medium';
   if (tooltip) {
     return (
-      <CustomTooltip title={tooltip}>
+      <CustomTooltip title={tooltip} onClick={onClick}>
         {iconSelector(type, variant, fontSize, done, disabled)}
       </CustomTooltip>
     );
@@ -49,10 +50,11 @@ const InjectIcon = (props) => {
 InjectIcon.propTypes = {
   type: PropTypes.string,
   size: PropTypes.string,
-  tooltip: PropTypes.string,
+  tooltip: PropTypes.node,
   variant: PropTypes.string,
   done: PropTypes.bool,
   disabled: PropTypes.bool,
+  onClick: PropTypes.func,
 };
 
 export default InjectIcon;

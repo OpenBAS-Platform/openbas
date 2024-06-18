@@ -9,8 +9,6 @@ import { splitDuration } from '../utils/Time';
 import type { Theme } from './Theme';
 import { useFormatter } from './i18n';
 import useSearchAnFilter from '../utils/SortingFiltering';
-import { useHelper } from '../store';
-import type { InjectHelper } from '../actions/injects/inject-helper';
 import { truncate } from '../utils/String';
 
 const useStyles = makeStyles(() => ({
@@ -86,70 +84,83 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  exerciseOrScenarioId: string,
-  injects: Inject[],
+  injects: InjectStore[],
   teams: Team[],
+  onSelectInject: (injectId: string) => void,
 }
 
-const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, teams }) => {
+const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) => {
   // Standard hooks
   const classes = useStyles();
   const theme = useTheme<Theme>();
   const { t } = useFormatter();
 
   // Retrieve data
-  const {
-    injectsPerTeam,
-    technicalInjectsPerType,
-  } = useHelper((helper: InjectHelper) => {
-    const getTechnicalInjectsWithNoTeam = () => {
-      const exerciseInjects = helper.getExerciseTechnicalInjectsWithNoTeam(exerciseOrScenarioId);
-      return exerciseInjects.length > 0 ? exerciseInjects : helper.getScenarioTechnicalInjectsWithNoTeam(exerciseOrScenarioId);
-    };
+  const getInjectsPerTeam = (teamId: string) => {
+    return injects.filter((i) => i.inject_teams?.includes(teamId));
+  };
 
-    const getInjectsPerTeam = (teamId: string) => {
-      const teamExerciseInjects = helper.getTeamExerciseInjects(teamId);
-      return teamExerciseInjects.length > 0 ? teamExerciseInjects : helper.getTeamScenarioInjects(teamId);
-    };
+  const injectsPerTeam = R.mergeAll(
+    teams.map((a: Team) => ({
+      [a.team_id]: getInjectsPerTeam(a.team_id),
+    })),
+  );
 
-    const technicalInjectsWithNoTeam = getTechnicalInjectsWithNoTeam();
+  const allTeamInjectIds = new Set(R.values(injectsPerTeam).flat().map((inj: Inject) => inj.inject_id));
 
-    return {
-      injectsPerTeam: R.mergeAll(
-        teams.map((a) => ({
-          [a.team_id]: getInjectsPerTeam(a.team_id),
-        })),
-      ),
-      technicalInjectsPerType: R.groupBy(R.prop('inject_type'))(technicalInjectsWithNoTeam),
-    };
-  });
+  // Build map of technical Injects or without team
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const injectsWithoutTeamMap = injects.reduce((acc: { [x: string]: any[]; }, inject: InjectStore) => {
+    let keys: any[] = [];
 
-  const injectsMap = { ...injectsPerTeam, ...technicalInjectsPerType };
-  // SortedTeams
-  const technicalTeams: Team[] = R.pipe(
-    R.groupBy(R.prop('inject_type')),
-    R.toPairs,
-    R.filter(
-      (n: [string, InjectStore[]]) => !(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        n[1][0].inject_injector_contract?.injector_contract_content_parsed?.fields?.filter((f: any) => f.key === 'teams').length > 0
-      ),
-    ),
-    R.map(
-      (n: [string, InjectStore[]]) => ({
-        team_id: n[0],
-        team_name: n[0],
-      }),
-    ),
-  )(injects as Inject[]);
+    if (!allTeamInjectIds.has(inject.inject_id)) {
+      if (
+        inject.inject_injector_contract?.convertedContent
+            && 'fields' in inject.inject_injector_contract.convertedContent
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            && inject.inject_injector_contract.convertedContent.fields.some(
+              (field: any) => field.key === 'teams',
+            )
+      ) {
+        keys = ['No teams'];
+      } else {
+        keys = [inject.inject_type];
+      }
+    }
+
+    keys?.forEach((key) => {
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(inject);
+    });
+
+    return acc;
+  }, {} as { [key: string]: Inject[] });
+
+  const injectsMap = { ...injectsPerTeam, ...injectsWithoutTeamMap };
+
+  // Sorted teams
+  const teamInjectNames = R.map((key: string) => ({
+    team_id: key,
+    team_name: key,
+  }), R.keys(injectsMap));
 
   const sortedNativeTeams = R.sortWith(
     [R.ascend(R.prop('team_name'))],
     teams,
   );
-  const sortedTeams = [...technicalTeams, ...sortedNativeTeams];
 
-  // Timeline
+  const filteredTeamInject = R.reject(
+    (teamInjectName: Team) => R.includes(
+      teamInjectName.team_id,
+      R.pluck('team_id', sortedNativeTeams),
+    ),
+    teamInjectNames,
+  );
+
+  const sortedTeams = [...filteredTeamInject, ...sortedNativeTeams];
 
   // Re utilisation of filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
@@ -158,6 +169,10 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
     'depends_duration',
     searchColumns,
   );
+
+  const handleSelectInject = (id: string) => {
+    onSelectInject(id);
+  };
 
   const lastInject = R.pipe(
     R.sortWith([R.descend(R.prop('inject_depends_duration'))]),
@@ -191,7 +206,7 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
 
   return (
     <>
-      {sortedTeams.length > 0 ? (
+      {injects.length > 0 ? (
         <div className={classes.container}>
           <div className={classes.names}>
             {sortedTeams.map((team) => (
@@ -213,7 +228,7 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
           <div className={classes.timeline}>
             {sortedTeams.map((team, index) => {
               const injectsGroupedByTick = byTick(
-                filtering.filterAndSort(injectsMap[team.team_id]),
+                filtering.filterAndSort(injectsMap[team.team_id] ?? []),
               );
               return (
                 <div
@@ -229,17 +244,31 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
                         className={classes.injectGroup}
                         style={{ left: `${injectGroupPosition}%` }}
                       >
-                        {injectsGroupedByTick[key].map((inject: InjectStore) => (
-                          <InjectIcon
-                            key={inject.inject_id}
-                            type={inject.inject_type}
-                            tooltip={inject.inject_title}
-                            done={inject.inject_status !== null}
-                            disabled={!inject.inject_enabled}
-                            size="small"
-                            variant={'timeline'}
-                          />
-                        ))}
+                        {injectsGroupedByTick[key].map((inject: InjectStore) => {
+                          const duration = splitDuration(inject.inject_depends_duration || 0);
+                          const tooltipContent = (
+                            <React.Fragment>
+                              {inject.inject_title}
+                              <br/>
+                              <span style={{ display: 'block', textAlign: 'center', fontWeight: 'bold' }}>
+                                {`${duration.days} ${t('d')}, ${duration.hours} ${t('h')}, ${duration.minutes} ${t('m')}`}
+                              </span>
+                            </React.Fragment>
+                          );
+                          return (
+                            <InjectIcon
+                              key={inject.inject_id}
+                              type={inject.inject_type}
+                              tooltip={tooltipContent}
+                              onClick={() => handleSelectInject(inject.inject_id)}
+                              done={inject.inject_status !== null}
+                              disabled={!inject.inject_enabled}
+                              size="small"
+                              variant={'timeline'}
+                            />
+                          );
+                        })
+                                }
                       </div>
                     );
                   })}
@@ -263,17 +292,17 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
                     <div className={classes.tickLabelTop}>
                       {index % 5 === 0
                         ? `${duration.days}
-                            ${t('d')}, ${duration.hours}
-                            ${t('h')}, ${duration.minutes}
-                            ${t('m')}`
+                          ${t('d')}, ${duration.hours}
+                          ${t('h')}, ${duration.minutes}
+                          ${t('m')}`
                         : ''}
                     </div>
                     <div className={classes.tickLabelBottom}>
                       {index % 5 === 0
                         ? `${duration.days}
-                            ${t('d')}, ${duration.hours}
-                            ${t('h')}, ${duration.minutes}
-                            ${t('m')}`
+                          ${t('d')}, ${duration.hours}
+                          ${t('h')}, ${duration.minutes}
+                          ${t('m')}`
                         : ''}
                     </div>
                   </div>
@@ -282,56 +311,8 @@ const Timeline: FunctionComponent<Props> = ({ exerciseOrScenarioId, injects, tea
             </div>
           </div>
         </div>
-      ) : (
-        <div className={classes.container}>
-          <div className={classes.names}>
-            <div className={classes.lineName}>
-              <div className={classes.name}>
-                <CastForEducationOutlined fontSize="small"/>
-                    &nbsp;&nbsp;
-                {t('No team')}
-              </div>
-            </div>
-          </div>
-          <div className={classes.timeline}>
-            <div className={classes.line}> &nbsp; </div>
-            <div className={classes.scale}>
-              {ticks.map((tick, index) => {
-                const duration = splitDuration(tick);
-                return (
-                  <div
-                    key={tick}
-                    className={classes.tick}
-                    style={{
-                      left: `${index * 5}%`,
-                      height: index % 5 === 0 ? '110%' : '100%',
-                      top: index % 5 === 0 ? '-5%' : 0,
-                      borderRight: index % 5 === 0 ? grid25 : grid15,
-                    }}
-                  >
-                    <div className={classes.tickLabelTop}>
-                      {index % 5 === 0
-                        ? `${duration.days}
-                            ${t('d')}, ${duration.hours}
-                            ${t('h')}, ${duration.minutes}
-                            ${t('m')}`
-                        : ''}
-                    </div>
-                    <div className={classes.tickLabelBottom}>
-                      {index % 5 === 0
-                        ? `${duration.days}
-                            ${t('d')}, ${duration.hours}
-                            ${t('h')}, ${duration.minutes}
-                            ${t('m')}`
-                        : ''}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
+      ) : null
+        }
     </>
   );
 };

@@ -80,11 +80,10 @@ const TimelineOverview = () => {
     teams,
     tagsMap,
   } = useHelper((helper: InjectHelper & ExercisesHelper & TagHelper) => {
-    const exerciseTeams = helper.getExerciseTeams(exerciseId);
     return {
       exercise: helper.getExercise(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
-      teams: exerciseTeams,
+      teams: helper.getExerciseTeams(exerciseId),
       tagsMap: helper.getTagsMap(),
     };
   });
@@ -103,7 +102,7 @@ const TimelineOverview = () => {
     searchColumns,
   );
 
-  const sortedInjects = filtering.filterAndSort(injects);
+  const filteredInjects = filtering.filterAndSort(injects);
 
   const pendingInjects = filtering.filterAndSort(injects.filter((i: InjectStore) => i.inject_status === null));
 
@@ -111,7 +110,7 @@ const TimelineOverview = () => {
 
   const onUpdateInject = async (inject: Inject) => {
     if (selectedInjectId) {
-      dispatch(updateInjectForExercise(exerciseId, selectedInjectId, inject));
+      await dispatch(updateInjectForExercise(exerciseId, selectedInjectId, inject));
     }
   };
 
@@ -133,8 +132,10 @@ const TimelineOverview = () => {
         />
       </div>
       <div className="clearfix"/>
-      <Timeline exerciseOrScenarioId={exerciseId} injects={sortedInjects}
+      <Timeline
+        injects={filteredInjects}
         teams={teams}
+        onSelectInject={(id: string) => setSelectedInjectId(id)}
       ></Timeline>
       <div className="clearfix"/>
       <Grid container spacing={3} style={{ marginTop: 50, paddingBottom: 24 }}>
@@ -243,8 +244,9 @@ const TimelineOverview = () => {
                               style={{ width: '20%' }}
                             >
                               <ItemStatus
+                                key={inject.inject_id}
                                 variant="inList"
-                                label={t(inject.inject_status?.status_name)}
+                                label={inject.inject_status?.status_name ? t(inject.inject_status.status_name) : 'No Status'}
                                 status={inject.inject_status?.status_name}
                               />
                             </div>

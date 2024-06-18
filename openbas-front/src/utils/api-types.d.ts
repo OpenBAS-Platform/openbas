@@ -1148,6 +1148,8 @@ export interface InjectOutput {
   inject_scenario?: string;
   /** @uniqueItems true */
   inject_tags?: string[];
+  /** @uniqueItems true */
+  inject_teams?: string[];
   inject_title?: string;
   inject_type?: string;
 }

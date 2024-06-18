@@ -46,6 +46,7 @@ public class ScenarioApi {
   private TeamRepository teamRepository;
   private UserRepository userRepository;
   private InjectExpectationRepository injectExpectationRepository;
+  private InjectRepository injectRepository;
   private CommunicationRepository communicationRepository;
   private ExerciseTeamUserRepository exerciseTeamUserRepository;
   private ScenarioRepository scenarioRepository;
@@ -63,6 +64,11 @@ public class ScenarioApi {
   @Autowired
   public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
     this.injectExpectationRepository = injectExpectationRepository;
+  }
+
+  @Autowired
+  public void setInjectRepository(InjectRepository injectRepository) {
+    this.injectRepository = injectRepository;
   }
 
   @Autowired
@@ -190,7 +196,7 @@ public class ScenarioApi {
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<TeamSimple> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {
     return TeamHelper.rawTeamToSimplerTeam(teamRepository.rawTeamByScenarioId(scenarioId),
-            injectExpectationRepository,communicationRepository, exerciseTeamUserRepository, scenarioRepository);
+            injectExpectationRepository, injectRepository, communicationRepository, exerciseTeamUserRepository, scenarioRepository);
   }
 
   @Transactional(rollbackOn = Exception.class)

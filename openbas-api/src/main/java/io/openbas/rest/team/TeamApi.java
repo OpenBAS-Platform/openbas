@@ -50,6 +50,7 @@ public class TeamApi extends RestBehavior {
     private TeamRepository teamRepository;
     private CommunicationRepository communicationRepository;
     private InjectExpectationRepository injectExpectationRepository;
+    private InjectRepository injectRepository;
     private UserRepository userRepository;
     private OrganizationRepository organizationRepository;
     private TagRepository tagRepository;
@@ -86,6 +87,11 @@ public class TeamApi extends RestBehavior {
     }
 
     @Autowired
+    public void setInjectRepository(InjectRepository injectRepository) {
+        this.injectRepository = injectRepository;
+    }
+
+    @Autowired
     public void setCommunicationRepository(CommunicationRepository communicationRepository) {
         this.communicationRepository = communicationRepository;
     }
@@ -118,7 +124,7 @@ public class TeamApi extends RestBehavior {
             teams = teamRepository.rawTeamsAccessibleFromOrganization(organizationIds);
         }
 
-        return TeamHelper.rawTeamToSimplerTeam(teams, injectExpectationRepository, communicationRepository,
+        return TeamHelper.rawTeamToSimplerTeam(teams, injectExpectationRepository, injectRepository, communicationRepository,
                 exerciseTeamUserRepository, scenarioRepository);
     }
 
