@@ -111,7 +111,6 @@ const TimelineOverview = () => {
   const onUpdateInject = async (inject: Inject) => {
     if (selectedInjectId) {
       await dispatch(updateInjectForExercise(exerciseId, selectedInjectId, inject));
-      dispatch(fetchExerciseInjects(exerciseId));
     }
   };
 

@@ -3,19 +3,16 @@ import { addInjectForScenario, deleteInjectScenario, updateInjectActivationForSc
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { InjectStore } from '../../../../actions/injects/Inject';
-import { fetchScenarioTeams } from '../../../../actions/scenarios/scenario-actions';
 
 const injectContextForScenario = (scenario: ScenarioStore) => {
   const dispatch = useAppDispatch();
 
   return {
-    async onAddInject(inject: Inject): Promise<{ result: string }> {
-      await dispatch(addInjectForScenario(scenario.scenario_id, inject));
-      return dispatch(fetchScenarioTeams(scenario.scenario_id));
+    onAddInject(inject: Inject): Promise<{ result: string }> {
+      return dispatch(addInjectForScenario(scenario.scenario_id, inject));
     },
     async onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string }> {
-      await dispatch(updateInjectForScenario(scenario.scenario_id, injectId, inject));
-      return dispatch(fetchScenarioTeams(scenario.scenario_id));
+      return dispatch(updateInjectForScenario(scenario.scenario_id, injectId, inject));
     },
     onUpdateInjectActivation(injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }): Promise<{
       result: string,

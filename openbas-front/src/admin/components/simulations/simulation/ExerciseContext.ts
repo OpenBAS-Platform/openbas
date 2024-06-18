@@ -11,19 +11,16 @@ import {
 } from '../../../../actions/Inject';
 import { secondsFromToNow } from '../../../../utils/Exercise';
 import type { InjectStore } from '../../../../actions/injects/Inject';
-import { fetchExerciseTeams } from '../../../../actions/Exercise';
 
 const injectContextForExercise = (exercise: ExerciseStore) => {
   const dispatch = useAppDispatch();
 
   return {
     async onAddInject(inject: Inject): Promise<{ result: string }> {
-      await dispatch(addInjectForExercise(exercise.exercise_id, inject));
-      return dispatch(fetchExerciseTeams(exercise.exercise_id));
+      return dispatch(addInjectForExercise(exercise.exercise_id, inject));
     },
     async onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string }> {
-      await dispatch(updateInjectForExercise(exercise.exercise_id, injectId, inject));
-      return dispatch(fetchExerciseTeams(exercise.exercise_id));
+      return dispatch(updateInjectForExercise(exercise.exercise_id, injectId, inject));
     },
     onUpdateInjectTrigger(injectId: Inject['inject_id']): void {
       const injectDependsDuration = secondsFromToNow(

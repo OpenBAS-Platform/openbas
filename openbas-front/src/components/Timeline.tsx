@@ -9,8 +9,6 @@ import { splitDuration } from '../utils/Time';
 import type { Theme } from './Theme';
 import { useFormatter } from './i18n';
 import useSearchAnFilter from '../utils/SortingFiltering';
-import { useHelper } from '../store';
-import type { InjectHelper } from '../actions/injects/inject-helper';
 import { truncate } from '../utils/String';
 
 const useStyles = makeStyles(() => ({
@@ -86,7 +84,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  injects: Inject[],
+  injects: InjectStore[],
   teams: Team[],
   onSelectInject: (injectId: string) => void,
 }
@@ -98,68 +96,50 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
   const { t } = useFormatter();
 
   // Retrieve data
-  const {
-    finalInjectWithoutTeam,
-    finalInjectsPerTeam,
-  } = useHelper((helper: InjectHelper) => {
-    const injectIdsSet = new Set(injects.map((inj: Inject) => inj.inject_id));
+  const getInjectsPerTeam = (teamId: string) => {
+    return injects.filter((i) => i.inject_teams?.includes(teamId));
+  };
 
-    const filterInjects = (fromTeams: Inject[]) => {
-      return fromTeams.filter((inject: Inject) => injectIdsSet.has(inject.inject_id));
-    };
+  const injectsPerTeam = R.mergeAll(
+    teams.map((a: Team) => ({
+      [a.team_id]: getInjectsPerTeam(a.team_id),
+    })),
+  );
 
-    const getInjectsPerTeam = (teamId: string) => {
-      const teamExerciseInjects = helper.getTeamExerciseInjects(teamId);
-      const result = teamExerciseInjects.length > 0 ? teamExerciseInjects : helper.getTeamScenarioInjects(teamId);
-      return filterInjects(result);
-    };
+  const allTeamInjectIds = new Set(R.values(injectsPerTeam).flat().map((inj: Inject) => inj.inject_id));
 
-    const injectsPerTeam = R.mergeAll(
-      teams.map((a: Team) => ({
-        [a.team_id]: getInjectsPerTeam(a.team_id),
-      })),
-    );
+  // Build map of technical Injects or without team
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const injectsWithoutTeamMap = injects.reduce((acc: { [x: string]: any[]; }, inject: InjectStore) => {
+    let keys: any[] = [];
 
-    const allTeamInjectIds = new Set(R.values(injectsPerTeam).flat().map((inj: Inject) => inj.inject_id));
-
-    // Build map of technical Injects or without team
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    const injectsWithoutTeamMap = injects.reduce((acc: { [x: string]: any[]; }, inject: Inject) => {
-      let keys: any[] = [];
-
-      if (!allTeamInjectIds.has(inject.inject_id)) {
-        if (
-          inject.inject_injector_contract?.convertedContent
+    if (!allTeamInjectIds.has(inject.inject_id)) {
+      if (
+        inject.inject_injector_contract?.convertedContent
             && 'fields' in inject.inject_injector_contract.convertedContent
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
             && inject.inject_injector_contract.convertedContent.fields.some(
               (field: any) => field.key === 'teams',
             )
-        ) {
-          keys = ['No teams'];
-        } else {
-          keys = [inject.inject_type];
-        }
+      ) {
+        keys = ['No teams'];
+      } else {
+        keys = [inject.inject_type];
       }
+    }
 
-      keys?.forEach((key) => {
-        if (!acc[key]) {
-          acc[key] = [];
-        }
-        acc[key].push(inject);
-      });
+    keys?.forEach((key) => {
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(inject);
+    });
 
-      return acc;
-    }, {} as { [key: string]: Inject[] });
+    return acc;
+  }, {} as { [key: string]: Inject[] });
 
-    return {
-      finalInjectWithoutTeam: injectsWithoutTeamMap,
-      finalInjectsPerTeam: injectsPerTeam,
-    };
-  });
-
-  const injectsMap = { ...finalInjectsPerTeam, ...finalInjectWithoutTeam };
+  const injectsMap = { ...injectsPerTeam, ...injectsWithoutTeamMap };
 
   // Sorted teams
   const teamInjectNames = R.map((key: string) => ({
