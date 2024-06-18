@@ -177,7 +177,7 @@ const Injects = (props) => {
   const [selectedInjectId, setSelectedInjectId] = useState(null);
   const [showTimeline, setShowTimeline] = useState(
     () => {
-      const storedValue = localStorage.getItem(exerciseOrScenarioId);
+      const storedValue = localStorage.getItem(`${exerciseOrScenarioId}_injects_timeline`);
       return storedValue === null ? true : storedValue === 'true';
     },
   );
@@ -229,7 +229,7 @@ const Injects = (props) => {
 
   const handleShowTimeline = () => {
     setShowTimeline(!showTimeline);
-    localStorage.setItem(exerciseOrScenarioId, !showTimeline);
+    localStorage.setItem(`${exerciseOrScenarioId}_injects_timeline`, !showTimeline);
     setAnchorEl(null);
   };
 
