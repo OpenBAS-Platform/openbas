@@ -31,7 +31,7 @@ import static lombok.AccessLevel.NONE;
 @EntityListeners(ModelBaseListener.class)
 public class Asset implements Base {
 
-  public static final int ACTIVE_THRESHOLD = 1200000; // milliseconds
+  public static final int ACTIVE_THRESHOLD = 1800000; // 3 minutes
 
   @Id
   @Column(name = "asset_id")
