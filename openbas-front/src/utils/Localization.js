@@ -1111,6 +1111,8 @@ const i18n = {
       'Platform consent confirm text': 'Texte de confirmation du consentement à la plate-forme',
       Write: 'Ecriture',
       // Timeline
+      // -- Timeline
+      'Hide timeline': 'Cacher la chronologie',
       'Show Timeline': 'Afficher la chronologie',
       // Mapper
       'Do you want to delete this XLS mapper ?': 'Voulez-vous supprimer ce mappage XLS ?',

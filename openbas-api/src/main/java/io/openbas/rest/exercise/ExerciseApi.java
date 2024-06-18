@@ -220,7 +220,7 @@ public class ExerciseApi extends RestBehavior {
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<TeamSimple> getExerciseTeams(@PathVariable String exerciseId) {
     return TeamHelper.rawTeamToSimplerTeam(teamRepository.rawTeamByExerciseId(exerciseId),
-            injectExpectationRepository,communicationRepository, exerciseTeamUserRepository, scenarioRepository);
+            injectExpectationRepository, injectRepository, communicationRepository, exerciseTeamUserRepository, scenarioRepository);
   }
 
   @Transactional(rollbackOn = Exception.class)
