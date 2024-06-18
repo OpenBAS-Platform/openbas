@@ -26,6 +26,10 @@ public class InjectImporter implements Base {
     @UuidGenerator
     private UUID id;
 
+    @Column(name = "importer_name")
+    @JsonProperty("inject_importer_name")
+    private String name;
+
     @Column(name = "importer_import_type_value")
     @JsonProperty("inject_importer_type_value")
     private String importTypeValue;

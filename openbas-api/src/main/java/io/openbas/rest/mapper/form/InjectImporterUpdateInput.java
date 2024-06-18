@@ -29,5 +29,5 @@ public class InjectImporterUpdateInput {
     private String injectorContractId;
 
     @JsonProperty("inject_importer_rule_attributes")
-    private List<RuleAttributeAddInput> ruleAttributes;
+    private List<RuleAttributeUpdateInput> ruleAttributes;
 }
