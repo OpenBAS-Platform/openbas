@@ -11,7 +11,7 @@ import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 @Getter
 @Setter
-public class InjectImporterInput {
+public class InjectImporterAddInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("inject_importer_name")
@@ -26,5 +26,5 @@ public class InjectImporterInput {
     private String injectorContractId;
 
     @JsonProperty("inject_importer_rule_attributes")
-    private List<RuleAttributeInput> ruleAttributes;
+    private List<RuleAttributeAddInput> ruleAttributes;
 }

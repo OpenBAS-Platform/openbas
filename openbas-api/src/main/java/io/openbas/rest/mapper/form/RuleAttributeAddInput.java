@@ -9,7 +9,7 @@ import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 @Getter
 @Setter
-public class RuleAttributeInput {
+public class RuleAttributeAddInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("rule_attribute_name")

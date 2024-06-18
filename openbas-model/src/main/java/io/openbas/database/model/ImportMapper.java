@@ -36,7 +36,7 @@ public class ImportMapper implements Base {
     @JsonProperty("import_mapper_inject_type_column")
     private String injectTypeColumn;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name="importer_mapper_id", nullable = false)
     @JsonProperty("inject_importers")
     private List<InjectImporter> injectImporters = new ArrayList<>();
