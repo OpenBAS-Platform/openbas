@@ -1112,6 +1112,8 @@ export interface InjectOutput {
   inject_scenario?: string;
   /** @uniqueItems true */
   inject_tags?: string[];
+  /** @uniqueItems true */
+  inject_teams?: string[];
   inject_title?: string;
   inject_type?: string;
 }
@@ -2100,6 +2102,7 @@ export interface PlatformSettings {
   platform_saml2_providers?: OAuthProvider[];
   auth_local_enable?: boolean;
   auth_openid_enable?: boolean;
+  disabled_dev_features?: string[];
   executor_caldera_enable?: boolean;
   executor_caldera_public_url?: string;
   executor_tanium_enable?: boolean;
@@ -2125,7 +2128,6 @@ export interface PlatformSettings {
   rabbitmq_version?: string;
   xtm_opencti_enable?: boolean;
   xtm_opencti_url?: string;
-  disabled_dev_features: string[];
 }
 
 export interface PlatformStatistic {
@@ -2268,6 +2270,7 @@ export interface RawPaginationTeam {
   team_description?: string;
   team_id?: string;
   team_name?: string;
+  team_organization?: string;
   team_tags?: string[];
   /** @format date-time */
   team_updated_at?: string;

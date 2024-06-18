@@ -5,6 +5,7 @@ import io.openbas.database.raw.*;
 import io.openbas.database.repository.CommunicationRepository;
 import io.openbas.database.repository.ExerciseTeamUserRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
+import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.ScenarioRepository;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class TeamHelper {
 
     public static List<TeamSimple> rawTeamToSimplerTeam(List<RawTeam> teams,
                                                         InjectExpectationRepository injectExpectationRepository,
+                                                        InjectRepository injectRepository,
                                                         CommunicationRepository communicationRepository,
                                                         ExerciseTeamUserRepository exerciseTeamUserRepository,
                                                         ScenarioRepository scenarioRepository) {
@@ -109,11 +111,30 @@ public class TeamHelper {
             }
 
             // We set the injects linked to the scenarios
-            teamSimple.setScenariosInjects(rawTeam.getTeam_scenarios().stream().flatMap(
+            teamSimple.setScenariosInjects(
+                getInjectTeamsIds(teamSimple.getId(),
+                rawTeam.getTeam_scenarios().stream().flatMap(
                     scenario -> mapInjectsByScenarioIds.get(scenario).stream()
-            ).collect(Collectors.toSet()));
+                ).collect(Collectors.toSet()),
+                injectRepository)
+            );
 
-            return teamSimple;
+            // We set the injects linked to the exercises
+            teamSimple.setExercisesInjects(
+                getInjectTeamsIds(teamSimple.getId(),
+                rawTeam.getTeam_exercise_injects(),
+                injectRepository)
+            );
+
+          return teamSimple;
         }).collect(Collectors.toList());
     }
+
+  private static Set<String> getInjectTeamsIds(final String teamId, Set<String> injectIds, final InjectRepository injectRepository) {
+    Set<RawInject> rawInjectTeams = injectRepository.findRawInjectTeams(injectIds, teamId);
+    return rawInjectTeams.stream()
+        .map(RawInject::getInject_id)
+        .collect(Collectors.toSet());
+  }
+
 }
