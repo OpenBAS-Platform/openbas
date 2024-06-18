@@ -10,10 +10,7 @@ import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.rest.mapper.form.InjectImporterAddInput;
-import io.openbas.rest.mapper.form.InjectImporterUpdateInput;
-import io.openbas.rest.mapper.form.MapperAddInput;
-import io.openbas.rest.mapper.form.MapperUpdateInput;
+import io.openbas.rest.mapper.form.*;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -21,10 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -63,7 +57,6 @@ public class MapperApi extends RestBehavior {
         importMapper.setName(mapperAddInput.getName());
         importMapper.setInjectTypeColumn(mapperAddInput.getInjectTypeColumn());
         importMapper.setInjectImporters(new ArrayList<>());
-        importMapper.setId(UUID.randomUUID().toString());
 
         Map<String, InjectorContract> mapInjectorContracts = getMapOfInjectorContracts(
                 mapperAddInput.getImporters()
@@ -106,35 +99,68 @@ public class MapperApi extends RestBehavior {
                         .toList()
         );
 
-        // First, we remove the entities that are no longer linked to the mapper
-        importMapper.getInjectImporters().removeIf(importer -> mapperUpdateInput.getImporters().stream().anyMatch(importerInput -> importerInput.getId().equals(importer.getId())));
-
-        // Then, we
-        mapperUpdateInput.getImporters().forEach(
-                injectImporterInput -> {
-                    InjectImporter injectImporter = new InjectImporter();
-                    injectImporter.setInjectorContract(mapInjectorContracts.get(injectImporterInput.getInjectorContractId()));
-                    injectImporter.setImportTypeValue(injectImporterInput.getInjectTypeValue());
-                    injectImporter.setName(injectImporterInput.getName());
-                    injectImporter.setRuleAttributes(new ArrayList<>());
-                    if(injectImporterInput.getId() != null) {
-                        injectImporter.setId(injectImporterInput.getId());
-                    }
-                    injectImporterInput.getRuleAttributes().forEach(ruleAttributeInput -> {
-                        RuleAttribute ruleAttribute = new RuleAttribute();
-                        ruleAttribute.setColumns(ruleAttributeInput.getColumns());
-                        ruleAttribute.setName(ruleAttributeInput.getName());
-                        ruleAttribute.setDefaultValue(ruleAttributeInput.getDefaultValue());
-                        if(ruleAttributeInput.getId() != null) {
-                            ruleAttribute.setId(ruleAttributeInput.getId());
-                        }
-                        injectImporter.getRuleAttributes().add(ruleAttribute);
-                    });
-                    importMapper.getInjectImporters().add(injectImporter);
-                }
-        );
+        updateInjectImporter(mapperUpdateInput.getImporters(), importMapper.getInjectImporters(), mapInjectorContracts);
 
         return importMapperRepository.save(importMapper);
+    }
+
+    private void updateRuleAttributes(List<RuleAttributeUpdateInput> ruleAttributesInput, List<RuleAttribute> ruleAttributes) {
+        // First, we remove the entities that are no longer linked to the mapper
+        ruleAttributes.removeIf(ruleAttribute -> !ruleAttributesInput.stream().anyMatch(importerInput -> ruleAttribute.getId().equals(importerInput.getId())));
+
+        // Then we update the existing ones
+        ruleAttributes.forEach(ruleAttribute -> {
+            Optional<RuleAttributeUpdateInput> ruleAttributeInput = ruleAttributesInput.stream().filter(ruleAttributeUpdateInput -> ruleAttribute.getId().equals(ruleAttributeUpdateInput.getId())).findFirst();
+            if (!ruleAttributeInput.isPresent()) {
+                throw new ElementNotFoundException();
+            }
+            ruleAttribute.setUpdateAttributes(ruleAttributeInput.get());
+        });
+
+        // Then we add the new ones
+        ruleAttributesInput.forEach(ruleAttributeUpdateInput -> {
+            if (ruleAttributeUpdateInput.getId() == null || ruleAttributeUpdateInput.getId().isBlank()) {
+                RuleAttribute ruleAttribute = new RuleAttribute();
+                ruleAttribute.setColumns(ruleAttributeUpdateInput.getColumns());
+                ruleAttribute.setName(ruleAttributeUpdateInput.getName());
+                ruleAttribute.setDefaultValue(ruleAttributeUpdateInput.getDefaultValue());
+                ruleAttributes.add(ruleAttribute);
+            }
+        });
+    }
+
+    private void updateInjectImporter(List<InjectImporterUpdateInput> injectImportersInput, List<InjectImporter> injectImporters, Map<String, InjectorContract> mapInjectorContracts) {
+        // First, we remove the entities that are no longer linked to the mapper
+        injectImporters.removeIf(importer -> !injectImportersInput.stream().anyMatch(importerInput -> importer.getId().equals(importerInput.getId())));
+
+        // Then we update the existing ones
+        injectImporters.forEach(injectImporter -> {
+            Optional<InjectImporterUpdateInput> injectImporterInput = injectImportersInput.stream().filter(injectImporterUpdateInput -> injectImporter.getId().equals(injectImporterUpdateInput.getId())).findFirst();
+            if (!injectImporterInput.isPresent()) {
+                throw new ElementNotFoundException();
+            }
+            injectImporter.setUpdateAttributes(injectImporterInput.get());
+            updateRuleAttributes(injectImporterInput.get().getRuleAttributes(), injectImporter.getRuleAttributes());
+        });
+
+        // Then we add the new ones
+        injectImportersInput.forEach(injectImporterUpdateInput -> {
+            if (injectImporterUpdateInput.getId() == null || injectImporterUpdateInput.getId().isBlank()) {
+                InjectImporter injectImporter = new InjectImporter();
+                injectImporter.setInjectorContract(mapInjectorContracts.get(injectImporterUpdateInput.getInjectorContractId()));
+                injectImporter.setImportTypeValue(injectImporterUpdateInput.getInjectTypeValue());
+                injectImporter.setName(injectImporterUpdateInput.getName());
+                injectImporter.setRuleAttributes(new ArrayList<>());
+                injectImporterUpdateInput.getRuleAttributes().forEach(ruleAttributeInput -> {
+                    RuleAttribute ruleAttribute = new RuleAttribute();
+                    ruleAttribute.setColumns(ruleAttributeInput.getColumns());
+                    ruleAttribute.setName(ruleAttributeInput.getName());
+                    ruleAttribute.setDefaultValue(ruleAttributeInput.getDefaultValue());
+                    injectImporter.getRuleAttributes().add(ruleAttribute);
+                });
+                injectImporters.add(injectImporter);
+            }
+        });
     }
 
     @Secured(ROLE_ADMIN)
