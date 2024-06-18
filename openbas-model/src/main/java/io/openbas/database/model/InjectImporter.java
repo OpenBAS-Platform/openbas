@@ -35,7 +35,7 @@ public class InjectImporter implements Base {
     @JsonProperty("inject_importer_injector_contract")
     private InjectorContract injectorContract;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "attribute_inject_importer_id", nullable = false)
     @JsonProperty("rule_attributes")
     private List<RuleAttribute> ruleAttributes = new ArrayList<>();
