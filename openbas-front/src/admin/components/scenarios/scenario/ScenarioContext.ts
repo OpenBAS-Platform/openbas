@@ -9,8 +9,9 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
   const dispatch = useAppDispatch();
 
   return {
-    onAddInject(inject: Inject): Promise<{ result: string }> {
-      return dispatch(addInjectForScenario(scenario.scenario_id, inject));
+    async onAddInject(inject: Inject): Promise<{ result: string }> {
+      await dispatch(addInjectForScenario(scenario.scenario_id, inject));
+      return dispatch(fetchScenarioTeams(scenario.scenario_id));
     },
     async onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string }> {
       await dispatch(updateInjectForScenario(scenario.scenario_id, injectId, inject));
