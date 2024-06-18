@@ -951,6 +951,14 @@ export interface GroupUpdateUsersInput {
   group_users?: string[];
 }
 
+export interface ImportMapper {
+  import_mapper_id?: string;
+  import_mapper_inject_type_column?: string;
+  import_mapper_name: string;
+  inject_importers?: InjectImporter[];
+  updateAttributes?: object;
+}
+
 export interface Inject {
   footer?: string;
   header?: string;
@@ -1078,6 +1086,21 @@ export interface InjectExpectationUpdateInput {
   is_success: boolean;
   result: string;
   success?: boolean;
+}
+
+export interface InjectImporter {
+  inject_importer_id?: string;
+  inject_importer_injector_contract?: InjectorContract;
+  inject_importer_type_value?: string;
+  rule_attributes?: RuleAttribute[];
+  updateAttributes?: object;
+}
+
+export interface InjectImporterInput {
+  inject_importer_injector_contract_id: string;
+  inject_importer_name: string;
+  inject_importer_rule_attributes?: RuleAttributeInput[];
+  inject_importer_type_value: string;
 }
 
 export interface InjectInput {
@@ -1266,6 +1289,7 @@ export interface InjectorContract {
   injector_contract_created_at?: string;
   injector_contract_custom?: boolean;
   injector_contract_id: string;
+  injector_contract_import_available?: boolean;
   injector_contract_injector?: Injector;
   injector_contract_labels?: Record<string, string>;
   injector_contract_manual?: boolean;
@@ -1579,6 +1603,13 @@ export interface LogCreateInput {
 export interface LoginUserInput {
   login: string;
   password: string;
+}
+
+export interface MapperAddInput {
+  mapper_inject_importers?: InjectImporterInput[];
+  /** @pattern ^[A-Z]{1,2}$ */
+  mapper_inject_type_column?: string;
+  mapper_name: string;
 }
 
 export interface Mitigation {
@@ -2119,6 +2150,7 @@ export interface PlatformSettings {
   platform_saml2_providers?: OAuthProvider[];
   auth_local_enable?: boolean;
   auth_openid_enable?: boolean;
+  disabled_dev_features?: string[];
   executor_caldera_enable?: boolean;
   executor_caldera_public_url?: string;
   executor_tanium_enable?: boolean;
@@ -2144,7 +2176,6 @@ export interface PlatformSettings {
   rabbitmq_version?: string;
   xtm_opencti_enable?: boolean;
   xtm_opencti_url?: string;
-  disabled_dev_features: string[];
 }
 
 export interface PlatformStatistic {
@@ -2240,6 +2271,11 @@ export interface RawDocument {
   document_type?: string;
 }
 
+export interface RawImportMapper {
+  mapper_id?: string;
+  mapper_name?: string;
+}
+
 export interface RawPaginationAssetGroup {
   asset_group_assets?: string[];
   asset_group_description?: string;
@@ -2294,6 +2330,7 @@ export interface RawPaginationTeam {
   team_description?: string;
   team_id?: string;
   team_name?: string;
+  team_organization?: string;
   team_tags?: string[];
   /** @format date-time */
   team_updated_at?: string;
@@ -2375,6 +2412,20 @@ export interface ResultDistribution {
   label: string;
   /** @format int32 */
   value: number;
+}
+
+export interface RuleAttribute {
+  rule_attribute_columns?: string;
+  rule_attribute_default_value: string;
+  rule_attribute_id?: string;
+  rule_attribute_name: string;
+  updateAttributes?: object;
+}
+
+export interface RuleAttributeInput {
+  rule_attribute_columns: string;
+  rule_attribute_default_value?: string;
+  rule_attribute_name: string;
 }
 
 export interface Scenario {

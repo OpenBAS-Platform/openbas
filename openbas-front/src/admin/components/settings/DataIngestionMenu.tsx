@@ -5,7 +5,7 @@ import RightMenu, { RightMenuEntry } from '../../../components/common/RightMenu'
 const DataIngestionMenu = () => {
   const entries: RightMenuEntry[] = [
     {
-      path: 'admin/settings/data_ingestion/xls_formatter',
+      path: '/admin/settings/data_ingestion/xls_formatter',
       icon: () => (<TableViewOutlined />),
       label: 'Xls formatters',
     },
