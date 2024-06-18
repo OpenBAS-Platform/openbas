@@ -81,25 +81,46 @@ public class CalderaExecutorClient {
         try {
             List<Map<String, String>> executors = new ArrayList<>();
             Map<String, String> injectorExecutorCommands = injector.getExecutorCommands();
-            if (injectorExecutorCommands.containsKey(Endpoint.PLATFORM_TYPE.Windows.name())) {
+            if (injectorExecutorCommands.containsKey(Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.x86_64)) {
                 Map<String, String> executorWindows = new HashMap<>();
                 executorWindows.put("platform", "windows");
                 executorWindows.put("name", "psh");
-                executorWindows.put("command", injectorExecutorCommands.get(Endpoint.PLATFORM_TYPE.Windows.name()));
+                executorWindows.put("command", injectorExecutorCommands.get(Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.x86_64));
                 executors.add(executorWindows);
             }
-            if (injectorExecutorCommands.containsKey(Endpoint.PLATFORM_TYPE.Linux.name())) {
+            if (injectorExecutorCommands.containsKey(Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.arm64)) {
+                Map<String, String> executorWindows = new HashMap<>();
+                executorWindows.put("platform", "windows");
+                executorWindows.put("name", "psh");
+                executorWindows.put("command", injectorExecutorCommands.get(Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.arm64));
+                executors.add(executorWindows);
+            }
+            if (injectorExecutorCommands.containsKey(Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.x86_64)) {
                 Map<String, String> executorLinux = new HashMap<>();
                 executorLinux.put("platform", "linux");
                 executorLinux.put("name", "sh");
-                executorLinux.put("command", injectorExecutorCommands.get(Endpoint.PLATFORM_TYPE.Linux.name()));
+                executorLinux.put("command", injectorExecutorCommands.get(Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.x86_64));
                 executors.add(executorLinux);
             }
-            if (injectorExecutorCommands.containsKey(Endpoint.PLATFORM_TYPE.MacOS.name())) {
+            if (injectorExecutorCommands.containsKey(Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.arm64)) {
+                Map<String, String> executorLinux = new HashMap<>();
+                executorLinux.put("platform", "linux");
+                executorLinux.put("name", "sh");
+                executorLinux.put("command", injectorExecutorCommands.get(Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.arm64));
+                executors.add(executorLinux);
+            }
+            if (injectorExecutorCommands.containsKey(Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.x86_64)) {
                 Map<String, String> executorMac = new HashMap<>();
                 executorMac.put("platform", "darwin");
                 executorMac.put("name", "sh");
-                executorMac.put("command", injectorExecutorCommands.get(Endpoint.PLATFORM_TYPE.MacOS.name()));
+                executorMac.put("command", injectorExecutorCommands.get(Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.x86_64));
+                executors.add(executorMac);
+            }
+            if (injectorExecutorCommands.containsKey(Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.arm64)) {
+                Map<String, String> executorMac = new HashMap<>();
+                executorMac.put("platform", "darwin");
+                executorMac.put("name", "sh");
+                executorMac.put("command", injectorExecutorCommands.get(Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.arm64));
                 executors.add(executorMac);
             }
             Map<String, Object> body = new HashMap<>();
