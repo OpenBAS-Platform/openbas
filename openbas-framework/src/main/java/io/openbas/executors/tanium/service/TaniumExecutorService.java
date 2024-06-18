@@ -34,7 +34,8 @@ import static java.time.ZoneOffset.UTC;
 @Log
 @Service
 public class TaniumExecutorService implements Runnable {
-    private static final int CLEAR_TTL = 1800000;
+    private static final int CLEAR_TTL = 1800000; // 30 minutes
+    private static final int DELETE_TTL = 86400000; // 24 hours
     private static final String TANIUM_EXECUTOR_TYPE = "openbas_tanium";
     private static final String TANIUM_EXECUTOR_NAME = "Tanium";
 
@@ -93,7 +94,7 @@ public class TaniumExecutorService implements Runnable {
     public void run() {
         log.info("Running Tanium executor endpoints gathering...");
         List<NodeEndpoint> nodeEndpoints = this.client.endpoints().getData().getEndpoints().getEdges().stream().toList();
-        List<Endpoint> endpoints = toEndpoint(nodeEndpoints).stream().toList();
+        List<Endpoint> endpoints = toEndpoint(nodeEndpoints).stream().filter(Asset::getActive).toList();
         log.info("Tanium executor provisioning based on " + endpoints.size() + " assets");
         endpoints.forEach(endpoint -> {
             List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
@@ -106,6 +107,17 @@ public class TaniumExecutorService implements Runnable {
                 }
             } else {
                 this.updateEndpoint(endpoint, existingEndpoints);
+            }
+        });
+        List<Endpoint> inactiveEndpoints = toEndpoint(nodeEndpoints).stream().filter(endpoint -> !endpoint.getActive()).toList();
+        inactiveEndpoints.forEach(endpoint -> {
+            Optional<Endpoint> optionalExistingEndpoint = this.endpointService.findByExternalReference(endpoint.getExternalReference());
+            if (optionalExistingEndpoint.isPresent()) {
+                Endpoint existingEndpoint = optionalExistingEndpoint.get();
+                if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli()) > DELETE_TTL) {
+                    log.info("Found stale endpoint " + existingEndpoint.getName() + ", deleting it...");
+                    this.endpointService.deleteEndpoint(existingEndpoint.getId());
+                }
             }
         });
     }
