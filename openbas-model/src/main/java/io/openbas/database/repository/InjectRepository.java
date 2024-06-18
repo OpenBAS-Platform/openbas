@@ -2,7 +2,6 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawInject;
-import io.openbas.database.raw.RawInjectTeam;
 import java.util.Collection;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
@@ -129,7 +128,7 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
       "LEFT JOIN injects_teams it ON injects.inject_id = it.inject_id " +
       "WHERE injects.inject_id IN :ids AND it.team_id = :teamId " +
       "GROUP BY injects.inject_id", nativeQuery = true)
-  Set<RawInjectTeam> findRawInjectTeams(@Param("ids") Collection<String> ids, @Param("teamId")  String teamId);
+  Set<RawInject> findRawInjectTeams(@Param("ids") Collection<String> ids, @Param("teamId")  String teamId);
 
   @Query(value =
       "SELECT org.*, " +
