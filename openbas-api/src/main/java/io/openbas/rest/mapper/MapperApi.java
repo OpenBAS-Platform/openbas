@@ -11,6 +11,7 @@ import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.mapper.form.InjectImporterAddInput;
+import io.openbas.rest.mapper.form.InjectImporterUpdateInput;
 import io.openbas.rest.mapper.form.MapperAddInput;
 import io.openbas.rest.mapper.form.MapperUpdateInput;
 import jakarta.annotation.Resource;
@@ -64,15 +65,19 @@ public class MapperApi extends RestBehavior {
         importMapper.setInjectImporters(new ArrayList<>());
         importMapper.setId(UUID.randomUUID().toString());
 
-        Map<String, InjectorContract> mapInjectorContracts = StreamSupport.stream(injectorContractRepository.findAllById(
-                mapperAddInput.getImporters().stream().map(InjectImporterAddInput::getInjectorContractId).toList()
-            ).spliterator(), false).collect(Collectors.toMap(InjectorContract::getId, Function.identity()));
+        Map<String, InjectorContract> mapInjectorContracts = getMapOfInjectorContracts(
+                mapperAddInput.getImporters()
+                        .stream()
+                        .map(InjectImporterAddInput::getInjectorContractId)
+                        .toList()
+        );
 
         mapperAddInput.getImporters().forEach(
                 injectImporterInput -> {
                     InjectImporter injectImporter = new InjectImporter();
                     injectImporter.setInjectorContract(mapInjectorContracts.get(injectImporterInput.getInjectorContractId()));
                     injectImporter.setImportTypeValue(injectImporterInput.getInjectTypeValue());
+                    injectImporter.setName(injectImporterInput.getName());
                     injectImporter.setRuleAttributes(new ArrayList<>());
                     injectImporterInput.getRuleAttributes().forEach(ruleAttributeInput -> {
                         RuleAttribute ruleAttribute = new RuleAttribute();
@@ -90,10 +95,45 @@ public class MapperApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/mappers/{mapperId}")
-    public ImportMapper updateImportMapper(@PathVariable String mapperId, @Valid @RequestBody MapperUpdateInput input) {
+    public ImportMapper updateImportMapper(@PathVariable String mapperId, @Valid @RequestBody MapperUpdateInput mapperUpdateInput) {
         ImportMapper importMapper = importMapperRepository.findById(UUID.fromString(mapperId)).orElseThrow(ElementNotFoundException::new);
-        importMapper.setUpdateAttributes(input);
-        importMapper.setName(input.getName());
+        importMapper.setUpdateAttributes(mapperUpdateInput);
+
+        Map<String, InjectorContract> mapInjectorContracts = getMapOfInjectorContracts(
+                mapperUpdateInput.getImporters()
+                        .stream()
+                        .map(InjectImporterUpdateInput::getInjectorContractId)
+                        .toList()
+        );
+
+        // First, we remove the entities that are no longer linked to the mapper
+        importMapper.getInjectImporters().removeIf(importer -> mapperUpdateInput.getImporters().stream().anyMatch(importerInput -> importerInput.getId().equals(importer.getId())));
+
+        // Then, we
+        mapperUpdateInput.getImporters().forEach(
+                injectImporterInput -> {
+                    InjectImporter injectImporter = new InjectImporter();
+                    injectImporter.setInjectorContract(mapInjectorContracts.get(injectImporterInput.getInjectorContractId()));
+                    injectImporter.setImportTypeValue(injectImporterInput.getInjectTypeValue());
+                    injectImporter.setName(injectImporterInput.getName());
+                    injectImporter.setRuleAttributes(new ArrayList<>());
+                    if(injectImporterInput.getId() != null) {
+                        injectImporter.setId(injectImporterInput.getId());
+                    }
+                    injectImporterInput.getRuleAttributes().forEach(ruleAttributeInput -> {
+                        RuleAttribute ruleAttribute = new RuleAttribute();
+                        ruleAttribute.setColumns(ruleAttributeInput.getColumns());
+                        ruleAttribute.setName(ruleAttributeInput.getName());
+                        ruleAttribute.setDefaultValue(ruleAttributeInput.getDefaultValue());
+                        if(ruleAttributeInput.getId() != null) {
+                            ruleAttribute.setId(ruleAttributeInput.getId());
+                        }
+                        injectImporter.getRuleAttributes().add(ruleAttribute);
+                    });
+                    importMapper.getInjectImporters().add(injectImporter);
+                }
+        );
+
         return importMapperRepository.save(importMapper);
     }
 
@@ -101,5 +141,10 @@ public class MapperApi extends RestBehavior {
     @DeleteMapping("/api/mappers/{mapperId}")
     public void deleteImportMapper(@PathVariable String mapperId) {
         importMapperRepository.deleteById(UUID.fromString(mapperId));
+    }
+
+    public Map<String, InjectorContract> getMapOfInjectorContracts(List<String> ids) {
+        return StreamSupport.stream(injectorContractRepository.findAllById(ids).spliterator(), false)
+                .collect(Collectors.toMap(InjectorContract::getId, Function.identity()));
     }
 }
