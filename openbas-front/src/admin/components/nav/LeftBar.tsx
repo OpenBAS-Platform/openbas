@@ -511,10 +511,10 @@ const LeftBar = () => {
                   <DescriptionOutlined />
                 </ListItemIcon>
                 {navOpen && (
-                <ListItemText
-                  classes={{ primary: classes.menuItemText }}
-                  primary={t('Reports')}
-                />
+                  <ListItemText
+                    classes={{ primary: classes.menuItemText }}
+                    primary={t('Reports')}
+                  />
                 )}
               </MenuItem>
             </span>
@@ -640,6 +640,7 @@ const LeftBar = () => {
               { link: '/admin/settings', label: 'Parameters', exact: true },
               { link: '/admin/settings/security', label: 'Security' },
               { link: '/admin/settings/taxonomies', label: 'Taxonomies' },
+              { link: '/admin/settings/data_ingestion', label: 'Data ingestion' },
             ],
           )}
         </MenuList>
