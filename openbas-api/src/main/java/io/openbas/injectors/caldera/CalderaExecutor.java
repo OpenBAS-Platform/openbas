@@ -28,7 +28,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -212,6 +211,7 @@ public class CalderaExecutor extends Injector {
                         newEndpoint.setIps(assetEndpoint.getIps());
                         newEndpoint.setHostname(assetEndpoint.getHostname());
                         newEndpoint.setPlatform(assetEndpoint.getPlatform());
+                        newEndpoint.setArch(assetEndpoint.getArch());
                         newEndpoint.setExternalReference(agent.getPaw());
                         newEndpoint.setExecutor(assetEndpoint.getExecutor());
                         newEndpoint.setProcessName(agent.getExe_name());
