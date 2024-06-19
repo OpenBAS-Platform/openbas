@@ -23,36 +23,55 @@ interface PlatformIconProps {
   borderRadius?: number;
   tooltip?: boolean;
   marginRight?: number;
+  // @ts-expect-error css property type
+  position?: Property.Position;
+  top?: number
 }
 
-const renderIcon = (platform: string, width: number | undefined, borderRadius: number | undefined, marginRight: number | undefined) => {
+// @ts-expect-error css property type
+// eslint-disable-next-line max-len
+const renderIcon = (platform: string, width: number | undefined, borderRadius: number | undefined, marginRight: number | undefined, position: Property.Position | undefined, top: number | undefined) => {
   const theme = useTheme<Theme>();
   switch (platform) {
     case 'Windows':
-      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? windowsDark : windowsLight} alt="Windows" />);
+      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0, position: position ?? 'static', top: top ?? 0 }}
+        src={theme.palette.mode === 'dark' ? windowsDark : windowsLight} alt="Windows"
+              />);
     case 'Linux':
-      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? linuxDark : linuxLight} alt="Linux" />);
+      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0, position: position ?? 'static', top: top ?? 0 }}
+        src={theme.palette.mode === 'dark' ? linuxDark : linuxLight} alt="Linux"
+              />);
     case 'MacOS':
-      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? macosDark : macosLight} alt="MacOS" />);
+      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0, position: position ?? 'static', top: top ?? 0 }}
+        src={theme.palette.mode === 'dark' ? macosDark : macosLight} alt="MacOS"
+              />);
     case 'Browser':
-      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? browserDark : browserLight} alt="Browser" />);
+      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0, position: position ?? 'static', top: top ?? 0 }}
+        src={theme.palette.mode === 'dark' ? browserDark : browserLight} alt="Browser"
+              />);
     case 'Service':
-      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? serviceDark : serviceLight} alt="Service" />);
+      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0, position: position ?? 'static', top: top ?? 0 }}
+        src={theme.palette.mode === 'dark' ? serviceDark : serviceLight} alt="Service"
+              />);
     case 'Internal':
-      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? internalDark : internalLight} alt="Internal" />);
+      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0, position: position ?? 'static', top: top ?? 0 }}
+        src={theme.palette.mode === 'dark' ? internalDark : internalLight} alt="Internal"
+              />);
     default:
-      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? unknownDark : unknownLight} alt="Unknown" />);
+      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0, position: position ?? 'static', top: top ?? 0 }}
+        src={theme.palette.mode === 'dark' ? unknownDark : unknownLight} alt="Unknown"
+              />);
   }
 };
-const PlatformIcon: FunctionComponent<PlatformIconProps> = ({ platform, width, borderRadius, marginRight, tooltip = false }) => {
+const PlatformIcon: FunctionComponent<PlatformIconProps> = ({ platform, width, borderRadius, marginRight, tooltip = false, position, top }) => {
   if (tooltip) {
     return (
       <Tooltip title={platform}>
-        {renderIcon(platform, width, borderRadius, marginRight)}
+        {renderIcon(platform, width, borderRadius, marginRight, position, top)}
       </Tooltip>
     );
   }
-  return renderIcon(platform, width, borderRadius, marginRight);
+  return renderIcon(platform, width, borderRadius, marginRight, position, top);
 };
 
 export default PlatformIcon;
