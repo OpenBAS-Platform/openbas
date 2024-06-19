@@ -952,9 +952,13 @@ export interface GroupUpdateUsersInput {
 }
 
 export interface ImportMapper {
+  /** @format date-time */
+  import_mapper_created_at?: string;
   import_mapper_id?: string;
   import_mapper_inject_type_column?: string;
   import_mapper_name: string;
+  /** @format date-time */
+  import_mapper_updated_at?: string;
   inject_importers?: InjectImporter[];
   updateAttributes?: object;
 }
@@ -1956,6 +1960,25 @@ export interface PageRawPaginationDocument {
   totalPages?: number;
 }
 
+export interface PageRawPaginationImportMapper {
+  content?: RawPaginationImportMapper[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageRawPaginationPlayer {
   content?: RawPaginationPlayer[];
   empty?: boolean;
@@ -1996,25 +2019,6 @@ export interface PageRawPaginationScenario {
 
 export interface PageRawPaginationTeam {
   content?: RawPaginationTeam[];
-  empty?: boolean;
-  first?: boolean;
-  last?: boolean;
-  /** @format int32 */
-  number?: number;
-  /** @format int32 */
-  numberOfElements?: number;
-  pageable?: PageableObject;
-  /** @format int32 */
-  size?: number;
-  sort?: SortObject[];
-  /** @format int64 */
-  totalElements?: number;
-  /** @format int32 */
-  totalPages?: number;
-}
-
-export interface PageRawPaginationImportMapper {
-  content?: RawPaginationImportMapper[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -2287,11 +2291,6 @@ export interface RawDocument {
   document_type?: string;
 }
 
-export interface RawImportMapper {
-  mapper_id?: string;
-  mapper_name?: string;
-}
-
 export interface RawPaginationAssetGroup {
   asset_group_assets?: string[];
   asset_group_description?: string;
@@ -2299,13 +2298,6 @@ export interface RawPaginationAssetGroup {
   asset_group_id?: string;
   asset_group_name?: string;
   asset_group_tags?: string[];
-}
-
-export interface RawPaginationImportMapper {
-  mapper_id?: string;
-  mapper_name?: string;
-  mapper_created_at?: string;
-  mapper_updated_at?: string;
 }
 
 export interface RawPaginationDocument {
@@ -2316,6 +2308,15 @@ export interface RawPaginationDocument {
   document_scenarios?: string[];
   document_tags?: string[];
   document_type?: string;
+}
+
+export interface RawPaginationImportMapper {
+  /** @format date-time */
+  import_mapper_created_at?: string;
+  import_mapper_id?: string;
+  import_mapper_name?: string;
+  /** @format date-time */
+  import_mapper_updated_at?: string;
 }
 
 export interface RawPaginationPlayer {
