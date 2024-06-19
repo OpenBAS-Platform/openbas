@@ -105,6 +105,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   // Button Popover
   const entries: ButtonPopoverEntry[] = [
     { label: 'Update', action: handleEdit, disabled: !permissions.canWrite },
+    { label: 'Duplicate', action: handleEdit, disabled: !permissions.canWrite },
     { label: 'Export', action: handleExport },
     { label: 'Delete', action: handleDelete, disabled: !permissions.canWrite },
   ];

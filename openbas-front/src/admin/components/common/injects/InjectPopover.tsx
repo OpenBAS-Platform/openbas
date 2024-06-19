@@ -160,6 +160,9 @@ const InjectPopover: FunctionComponent<Props> = ({
         >
           {t('Update')}
         </MenuItem>
+        <MenuItem onClick={handleOpenDelete}>
+          {t('Duplicate')}
+        </MenuItem>
         {!inject.inject_status && onInjectDone && (
           <MenuItem
             onClick={handleOpenDone}
@@ -204,6 +207,26 @@ const InjectPopover: FunctionComponent<Props> = ({
           {t('Delete')}
         </MenuItem>
       </Menu>
+      <Dialog
+        TransitionComponent={Transition}
+        open={openDone}
+        onClose={handleCloseDone}
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t('Do you want to mark this inject as done?')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDone}>
+            {t('Cancel')}
+          </Button>
+          <Button color="secondary" onClick={submitDone}>
+            {t('Mark')}
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Dialog
         open={openDelete}
         TransitionComponent={Transition}

@@ -78,6 +78,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   // Button Popover
   const entries: ButtonPopoverEntry[] = [
     { label: 'Update', action: setOpenEdit ? () => setOpenEdit(true) : handleEdit },
+    { label: 'Duplicate', action: setOpenEdit ? () => setOpenEdit(true) : handleEdit },
     { label: 'Delete', action: handleDelete },
   ];
 

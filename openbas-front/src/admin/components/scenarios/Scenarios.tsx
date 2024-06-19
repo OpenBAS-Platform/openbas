@@ -1,6 +1,6 @@
 import { makeStyles } from '@mui/styles';
-import { Card, CardActionArea, CardContent, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
-import { KeyboardArrowRight, MovieFilterOutlined } from '@mui/icons-material';
+import { Card, CardActionArea, CardContent, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { MovieFilterOutlined } from '@mui/icons-material';
 import React, { CSSProperties, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames';
@@ -28,6 +28,7 @@ import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../actions/Tag';
 import { useAppDispatch } from '../../../utils/hooks';
 import usePaginationAndFilter from '../../../components/common/usePaginationAndFilter';
+import ScenarioPopover from './scenario/ScenarioPopover';
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -330,9 +331,9 @@ const Scenarios = () => {
                 </div>
               }
             />
-            <ListItemIcon classes={{ root: classes.goIcon }}>
-              <KeyboardArrowRight />
-            </ListItemIcon>
+            <ListItemSecondaryAction>
+              <ScenarioPopover scenario={scenario}/>
+            </ListItemSecondaryAction>
           </ListItemButton>
         ))}
       </List>

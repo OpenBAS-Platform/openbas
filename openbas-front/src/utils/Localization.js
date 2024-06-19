@@ -169,6 +169,7 @@ const i18n = {
       Create: 'Créer',
       Launch: 'Lancer',
       Update: 'Modifier',
+      Duplicate: 'Dupliquer',
       Delete: 'Supprimer',
       Edition: 'Edition',
       Confirmation: 'Confirmation',

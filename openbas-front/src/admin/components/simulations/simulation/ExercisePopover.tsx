@@ -141,6 +141,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   // Button Popover
   const entries: ButtonPopoverEntry[] = [
     { label: 'Update', action: handleOpenEdit, disabled: !permissions.canWriteBypassStatus },
+    { label: 'Duplicate', action: handleOpenEdit, disabled: !permissions.canWriteBypassStatus },
     { label: 'Export', action: handleOpenExport },
     { label: 'Delete', action: handleOpenDelete, disabled: !permissions.canWriteBypassStatus },
   ];

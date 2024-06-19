@@ -14,6 +14,7 @@ import PaginationComponent from '../../../components/common/pagination/Paginatio
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
 import InjectorContract from '../common/injects/InjectorContract';
 import ItemStatus from '../../../components/ItemStatus';
+import AtomicTestingPopover from "./atomic_testing/AtomicTestingPopover";
 
 const useStyles = makeStyles(() => ({
   bodyItems: {
@@ -59,7 +60,7 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '15%',
   },
   inject_targets: {
-    width: '20%',
+    width: '15%',
     cursor: 'default',
   },
   inject_expectations: {
@@ -211,7 +212,7 @@ const InjectList: FunctionComponent<Props> = ({
                 }
               />
               <ListItemIcon classes={{ root: classes.goIcon }}>
-                <KeyboardArrowRight />
+                <AtomicTestingPopover atomic={injectDto} />
               </ListItemIcon>
             </ListItemButton>
           );

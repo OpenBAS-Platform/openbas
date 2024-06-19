@@ -15,6 +15,7 @@ import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTesting
 import ItemTargets from '../../../components/ItemTargets';
 import ImportUploaderExercise from './ImportUploaderExercise';
 import ExportButton from '../../../components/common/ExportButton';
+import ExercisePopover from "./simulation/ExercisePopover";
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -290,7 +291,7 @@ const ExerciseList: FunctionComponent<Props> = ({
               }
             />
             <ListItemIcon classes={{ root: classes.goIcon }}>
-              <KeyboardArrowRight />
+              <ExercisePopover exercise={exercise} />
             </ListItemIcon>
           </ListItemButton>
         ))}
