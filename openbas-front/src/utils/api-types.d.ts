@@ -1966,6 +1966,25 @@ export interface PageRawPaginationTeam {
   totalPages?: number;
 }
 
+export interface PageRawPaginationImportMapper {
+  content?: RawPaginationImportMapper[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageTag {
   content?: Tag[];
   empty?: boolean;
@@ -2228,6 +2247,13 @@ export interface RawPaginationAssetGroup {
   asset_group_id?: string;
   asset_group_name?: string;
   asset_group_tags?: string[];
+}
+
+export interface RawPaginationImportMapper {
+  mapper_id?: string;
+  mapper_name?: string;
+  mapper_created_at?: string;
+  mapper_updated_at?: string;
 }
 
 export interface RawPaginationDocument {
