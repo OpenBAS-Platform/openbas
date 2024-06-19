@@ -42,7 +42,7 @@ public class MapperApi extends RestBehavior {
     protected ObjectMapper mapper;
 
     @Secured(ROLE_USER)
-    @GetMapping("/api/mappers")
+    @PostMapping("/api/mappers/search")
     @Transactional(rollbackOn = Exception.class)
     public Page<RawPaginationImportMapper> getImportMapper(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
         return buildPaginationJPA(
