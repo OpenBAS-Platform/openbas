@@ -35,7 +35,8 @@ import static java.time.ZoneOffset.UTC;
 @Log
 @Service
 public class CalderaExecutorService implements Runnable {
-    private static final int CLEAR_TTL = 1800000;
+    private static final int CLEAR_TTL = 1800000; // 30 minutes
+    private static final int DELETE_TTL = 86400000; // 24 hours
     private static final String CALDERA_EXECUTOR_TYPE = "openbas_caldera";
     private static final String CALDERA_EXECUTOR_NAME = "Caldera";
 
@@ -118,9 +119,11 @@ public class CalderaExecutorService implements Runnable {
             Optional<Endpoint> optionalExistingEndpoint = this.endpointService.findByExternalReference(endpoint.getExternalReference());
             if (optionalExistingEndpoint.isPresent()) {
                 Endpoint existingEndpoint = optionalExistingEndpoint.get();
-                log.info("Found stale agent " + existingEndpoint.getName() + ", deleting it...");
-                this.endpointService.deleteEndpoint(existingEndpoint.getId());
-                this.client.deleteAgent(existingEndpoint);
+                if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli()) > DELETE_TTL) {
+                    log.info("Found stale agent " + existingEndpoint.getName() + ", deleting it...");
+                    this.client.deleteAgent(existingEndpoint);
+                    this.endpointService.deleteEndpoint(existingEndpoint.getId());
+                }
             }
         });
     }

@@ -34,7 +34,8 @@ import static java.time.ZoneOffset.UTC;
 @Log
 @Service
 public class TaniumExecutorService implements Runnable {
-    private static final int CLEAR_TTL = 1800000;
+    private static final int CLEAR_TTL = 1800000; // 30 minutes
+    private static final int DELETE_TTL = 86400000; // 24 hours
     private static final String TANIUM_EXECUTOR_TYPE = "openbas_tanium";
     private static final String TANIUM_EXECUTOR_NAME = "Tanium";
 
@@ -113,8 +114,10 @@ public class TaniumExecutorService implements Runnable {
             Optional<Endpoint> optionalExistingEndpoint = this.endpointService.findByExternalReference(endpoint.getExternalReference());
             if (optionalExistingEndpoint.isPresent()) {
                 Endpoint existingEndpoint = optionalExistingEndpoint.get();
-                log.info("Found stale endpoint " + existingEndpoint.getName() + ", deleting it...");
-                this.endpointService.deleteEndpoint(existingEndpoint.getId());
+                if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli()) > DELETE_TTL) {
+                    log.info("Found stale endpoint " + existingEndpoint.getName() + ", deleting it...");
+                    this.endpointService.deleteEndpoint(existingEndpoint.getId());
+                }
             }
         });
     }

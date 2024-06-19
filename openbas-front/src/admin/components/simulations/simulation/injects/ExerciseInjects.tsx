@@ -7,7 +7,6 @@ import * as R from 'ramda';
 import type { Exercise, Inject } from '../../../../../utils/api-types';
 import { ArticleContext, TeamContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import { updateInjectForExercise } from '../../../../../actions/Inject';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import Injects from '../../../common/injects/Injects';
@@ -32,6 +31,7 @@ import useEntityToggle from '../../../../../utils/hooks/useEntityToggle';
 import ToolBar from '../../../common/ToolBar';
 import { isNotEmptyField } from '../../../../../utils/utils';
 import { fetchExerciseInjectsSimple } from '../../../../../actions/injects/inject-action';
+import injectContextForExercise from '../ExerciseContext';
 
 const useStyles = makeStyles(() => ({
   paperChart: {
@@ -74,6 +74,8 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
 
   const articleContext = articleContextForExercise(exerciseId);
   const teamContext = teamContextForExercise(exerciseId, []);
+
+  const injectContext = injectContextForExercise(exercise);
 
   const [viewMode, setViewMode] = useState('list');
   const {
@@ -168,12 +170,12 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
               injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map((n) => n.value));
             }
             // eslint-disable-next-line no-await-in-loop
-            await dispatch(updateInjectForExercise(exercise.exercise_id, injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate)));
+            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate));
             break;
           case 'REPLACE':
             injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map((n) => n.value));
             // eslint-disable-next-line no-await-in-loop
-            await dispatch(updateInjectForExercise(exercise.exercise_id, injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate)));
+            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate));
             break;
           case 'REMOVE':
             if (isNotEmptyField(injectToUpdate[`inject_${action.field}`])) {
@@ -182,7 +184,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
               injectToUpdate[`inject_${action.field}`] = [];
             }
             // eslint-disable-next-line no-await-in-loop
-            await dispatch(updateInjectForExercise(exercise.exercise_id, injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate)));
+            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate));
             break;
           default:
             return;
