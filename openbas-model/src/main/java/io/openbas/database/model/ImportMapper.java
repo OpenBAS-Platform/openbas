@@ -6,8 +6,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -40,6 +43,16 @@ public class ImportMapper implements Base {
     @JoinColumn(name="importer_mapper_id", nullable = false)
     @JsonProperty("inject_importers")
     private List<InjectImporter> injectImporters = new ArrayList<>();
+
+    @CreationTimestamp
+    @Column(name="mapper_created_at")
+    @JsonProperty("import_mapper_created_at")
+    private Instant creationDate;
+
+    @UpdateTimestamp
+    @Column(name= "mapper_updated_at")
+    @JsonProperty("import_mapper_updated_at")
+    private Instant updateDate;
 
     @Override
     public boolean equals(Object o) {
