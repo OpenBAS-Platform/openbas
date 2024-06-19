@@ -4,8 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+<<<<<<< HEAD
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+=======
+import lombok.Getter;
+import lombok.Setter;
+>>>>>>> f8ddf4990 ([backend] Adding PUT to the mappers endpoint)
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
