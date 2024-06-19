@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ScenarioExecutionJobTest {
+class ScenarioExecutionJobTest {
 
   @Autowired
   private ScenarioExecutionJob job;
@@ -49,10 +49,9 @@ public class ScenarioExecutionJobTest {
   @DisplayName("Not create simulation based on recurring scenario in one hour")
   @Test
   @Order(1)
-  public void given_cron_in_one_hour_should_not_create_simulation() throws JobExecutionException {
+  void given_cron_in_one_hour_should_not_create_simulation() throws JobExecutionException {
     // -- PREPARE --
-    Instant instant = Instant.now();
-    ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("UTC"));
+    ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"));
     int hourToStart = (zonedDateTime.getHour() + 1) % 24;
 
     Scenario scenario = getScenario();
@@ -76,10 +75,9 @@ public class ScenarioExecutionJobTest {
   @DisplayName("Create simulation based on recurring scenario now")
   @Test
   @Order(2)
-  public void given_cron_in_one_minute_should_create_simulation() throws JobExecutionException {
+  void given_cron_in_one_minute_should_create_simulation() throws JobExecutionException {
     // -- PREPARE --
-    Instant instant = Instant.now();
-    ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("UTC"));
+    ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"));
 
     Scenario scenario = getScenario();
     int minuteToStart = (zonedDateTime.getMinute() + 1) % 60;
@@ -91,14 +89,13 @@ public class ScenarioExecutionJobTest {
     this.job.execute(null);
 
     // -- ASSERT --
-    List<Exercise> createdExercises = fromIterable(
-        this.exerciseRepository.findAll())
+    List<Exercise> createdExercises = fromIterable(this.exerciseRepository.findAll())
         .stream()
         .filter(exercise -> exercise.getScenario() != null)
         .filter(exercise -> SCENARIO_ID_2.equals(exercise.getScenario().getId()))
         .toList();
     assertEquals(1, createdExercises.size());
-    Exercise createdExercise = createdExercises.get(0);
+    Exercise createdExercise = createdExercises.getFirst();
     assertNotNull(createdExercise.getStart());
 
     EXERCISE_ID = createdExercise.getId();
@@ -107,7 +104,7 @@ public class ScenarioExecutionJobTest {
   @DisplayName("Already created simulation based on recurring scenario")
   @Test
   @Order(3)
-  public void given_cron_in_one_minute_should_not_create_second_simulation() throws JobExecutionException {
+  void given_cron_in_one_minute_should_not_create_second_simulation() throws JobExecutionException {
     // -- EXECUTE --
     this.job.execute(null);
 
@@ -124,10 +121,9 @@ public class ScenarioExecutionJobTest {
   @DisplayName("Not create simulation based on end date before now")
   @Test
   @Order(4)
-  public void given_end_date_before_now_should_not_create_second_simulation() throws JobExecutionException {
+  void given_end_date_before_now_should_not_create_second_simulation() throws JobExecutionException {
     // -- PREPARE --
-    Instant instant = Instant.now();
-    ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("UTC"));
+    ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"));
 
     Scenario scenario = getScenario();
     int minuteToStart = (zonedDateTime.getMinute() + 1) % 60;
