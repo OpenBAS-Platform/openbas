@@ -5,19 +5,22 @@ import io.openbas.database.model.ImportMapper;
 import io.openbas.database.model.InjectImporter;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.RuleAttribute;
-import io.openbas.database.raw.RawImportMapper;
+import io.openbas.database.raw.RawPaginationImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.mapper.form.*;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -25,6 +28,7 @@ import java.util.stream.StreamSupport;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,8 +44,12 @@ public class MapperApi extends RestBehavior {
     @Secured(ROLE_USER)
     @GetMapping("/api/mappers")
     @Transactional(rollbackOn = Exception.class)
-    public List<RawImportMapper> getImportMapper() {
-        return importMapperRepository.findAllMinimalMappers();
+    public Page<RawPaginationImportMapper> getImportMapper(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+        return buildPaginationJPA(
+                this.importMapperRepository::findAll,
+                searchPaginationInput,
+                ImportMapper.class
+        ).map(RawPaginationImportMapper::new);
     }
 
     @Secured(ROLE_ADMIN)
@@ -91,6 +99,7 @@ public class MapperApi extends RestBehavior {
     public ImportMapper updateImportMapper(@PathVariable String mapperId, @Valid @RequestBody MapperUpdateInput mapperUpdateInput) {
         ImportMapper importMapper = importMapperRepository.findById(UUID.fromString(mapperId)).orElseThrow(ElementNotFoundException::new);
         importMapper.setUpdateAttributes(mapperUpdateInput);
+        importMapper.setUpdateDate(Instant.now());
 
         Map<String, InjectorContract> mapInjectorContracts = getMapOfInjectorContracts(
                 mapperUpdateInput.getImporters()
