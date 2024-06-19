@@ -2,6 +2,7 @@ import React, { CSSProperties, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { TableViewOutlined } from '@mui/icons-material';
+import { useSearchParams } from 'react-router-dom';
 import { useFormatter } from '../../../../components/i18n';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
@@ -9,6 +10,8 @@ import type { RawPaginationImportMapper, SearchPaginationInput } from '../../../
 import { searchMappers } from '../../../../actions/xls_formatter/xls-formatter-actions';
 import { initSorting } from '../../../../components/common/pagination/Page';
 import Empty from '../../../../components/Empty';
+import { useHelper } from '../../../../store';
+import type { UserHelper } from '../../../../actions/helper';
 import DataIngestionMenu from '../DataIngestionMenu';
 import XlsFormatterCreation from './xls_formatter/XlsFormatterCreation';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
@@ -53,6 +56,15 @@ const XlsFormatters = () => {
   const classes = useStyles();
   const { t } = useFormatter();
 
+  // Query param
+  const [searchParams] = useSearchParams();
+  const [search] = searchParams.getAll('search');
+
+  const { userAdmin } = useHelper((helper: UserHelper) => ({
+    userAdmin: helper.getMe()?.user_admin ?? false,
+  }));
+
+
   // Headers
   const headers = [
     {
@@ -69,7 +81,7 @@ const XlsFormatters = () => {
   });
 
   return (
-    <div className={classes.container}>
+    <>
       <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Data ingestion') }, { label: t('Xls formatters'), current: true }]} />
       <DataIngestionMenu />
       <PaginationComponent
@@ -102,7 +114,7 @@ const XlsFormatters = () => {
               <ListItem
                 key={mapper.import_mapper_id}
                 classes={{ root: classes.item }}
-                divider
+                divider={true}
               >
                 <ListItemIcon>
                   <TableViewOutlined color="primary" />
@@ -135,8 +147,8 @@ const XlsFormatters = () => {
         }
         {!mappers ? (<Empty message={t('No data available')} />) : null}
       </List>
-      <XlsFormatterCreation />
-    </div>
+      {userAdmin && <XlsFormatterCreation />}
+    </>
   );
 };
 
