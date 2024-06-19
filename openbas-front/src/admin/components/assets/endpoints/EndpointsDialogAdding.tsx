@@ -180,7 +180,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
                     onClick={() => addEndpoint(endpoint.asset_id)}
                   >
                     <ListItemIcon>
-                      <DevicesOtherOutlined color="primary"/>
+                      <DevicesOtherOutlined color="primary" />
                     </ListItemIcon>
                     <ListItemText
                       primary={
@@ -189,13 +189,13 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
                             {endpoint.asset_name}
                           </div>
                           <div className={classes.bodyItem} style={{ width: '20%' }}>
-                            <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} /> {endpoint.endpoint_platform}
+                            <PlatformIcon platform={endpoint.endpoint_platform} width={20} position={'relative'} marginRight={10} top={5} /> {endpoint.endpoint_platform}
                           </div>
                           <div className={classes.bodyItem} style={{ width: '35%' }}>
                             <ItemTags variant="reduced-view" tags={endpoint.asset_tags} />
                           </div>
                         </div>
-                    }
+                      }
                     />
                   </ListItemButton>
                 );
