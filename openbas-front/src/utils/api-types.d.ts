@@ -1091,15 +1091,24 @@ export interface InjectExpectationUpdateInput {
 export interface InjectImporter {
   inject_importer_id?: string;
   inject_importer_injector_contract?: InjectorContract;
+  inject_importer_name?: string;
   inject_importer_type_value?: string;
   rule_attributes?: RuleAttribute[];
   updateAttributes?: object;
 }
 
-export interface InjectImporterInput {
+export interface InjectImporterAddInput {
   inject_importer_injector_contract_id: string;
   inject_importer_name: string;
-  inject_importer_rule_attributes?: RuleAttributeInput[];
+  inject_importer_rule_attributes?: RuleAttributeAddInput[];
+  inject_importer_type_value: string;
+}
+
+export interface InjectImporterUpdateInput {
+  inject_importer_id?: string;
+  inject_importer_injector_contract_id: string;
+  inject_importer_name: string;
+  inject_importer_rule_attributes?: RuleAttributeUpdateInput[];
   inject_importer_type_value: string;
 }
 
@@ -1606,7 +1615,14 @@ export interface LoginUserInput {
 }
 
 export interface MapperAddInput {
-  mapper_inject_importers?: InjectImporterInput[];
+  mapper_inject_importers?: InjectImporterAddInput[];
+  /** @pattern ^[A-Z]{1,2}$ */
+  mapper_inject_type_column?: string;
+  mapper_name: string;
+}
+
+export interface MapperUpdateInput {
+  mapper_inject_importers?: InjectImporterUpdateInput[];
   /** @pattern ^[A-Z]{1,2}$ */
   mapper_inject_type_column?: string;
   mapper_name: string;
@@ -2422,9 +2438,16 @@ export interface RuleAttribute {
   updateAttributes?: object;
 }
 
-export interface RuleAttributeInput {
+export interface RuleAttributeAddInput {
   rule_attribute_columns: string;
   rule_attribute_default_value?: string;
+  rule_attribute_name: string;
+}
+
+export interface RuleAttributeUpdateInput {
+  rule_attribute_columns: string;
+  rule_attribute_default_value?: string;
+  rule_attribute_id?: string;
   rule_attribute_name: string;
 }
 
