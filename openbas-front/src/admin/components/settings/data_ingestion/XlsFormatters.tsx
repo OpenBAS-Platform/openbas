@@ -1,17 +1,20 @@
 import React, { CSSProperties, useState } from 'react';
 import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { TableViewOutlined } from '@mui/icons-material';
+import { useSearchParams } from 'react-router-dom';
 import { useFormatter } from '../../../../components/i18n';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
-import type { SearchPaginationInput } from '../../../../utils/api-types';
+import type { RawPaginationImportMapper, SearchPaginationInput } from '../../../../utils/api-types';
+import { searchMappers } from '../../../../actions/xls_formatter/xls-formatter-actions';
 import { initSorting } from '../../../../components/common/pagination/Page';
 import Empty from '../../../../components/Empty';
 import { useHelper } from '../../../../store';
 import type { UserHelper } from '../../../../actions/helper';
 import DataIngestionMenu from '../DataIngestionMenu';
 import XlsFormatterCreation from './xls_formatter/XlsFormatterCreation';
+import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 
 const useStyles = makeStyles(() => ({
   bodyItems: {
@@ -45,25 +48,18 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
 };
 
-interface MapperDump {
-  id: number;
-  mapper_name: string;
-  mapper_value: string;
-}
-
 const XlsFormatters = () => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
+
+  // Query param
+  const [searchParams] = useSearchParams();
+  const [search] = searchParams.getAll('search');
+
   const { userAdmin } = useHelper((helper: UserHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
-
-  const mappers: MapperDump[] = [
-    { id: 1, mapper_name: 'mapper1', mapper_value: '1' },
-    { id: 2, mapper_name: 'mapper2', mapper_value: '2' },
-    { id: 3, mapper_name: 'mapper3', mapper_value: '3' },
-  ];
 
   // Headers
   const headers = [
@@ -71,18 +67,25 @@ const XlsFormatters = () => {
       field: 'mapper_name',
       label: 'Name',
       isSortable: true,
-      value: (mapper: MapperDump) => mapper.mapper_name,
+      value: (mapper: RawPaginationImportMapper) => mapper.import_mapper_name,
     },
   ];
 
+  const [mappers, setMappers] = useState<RawPaginationImportMapper[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
-    sorts: initSorting('mapper_name'),
+    sorts: initSorting('import_mapper_name'),
+    textSearch: search,
   });
 
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Data ingestion') }, { label: t('Xls formatters'), current: true }]} />
       <DataIngestionMenu />
+      <PaginationComponent
+        fetch={searchMappers}
+        searchPaginationInput={searchPaginationInput}
+        setContent={setMappers}
+      />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -106,7 +109,7 @@ const XlsFormatters = () => {
           mappers.map((mapper) => {
             return (
               <ListItem
-                key={mapper.id}
+                key={mapper.import_mapper_id}
                 classes={{ root: classes.item }}
                 divider={true}
               >
@@ -128,14 +131,6 @@ const XlsFormatters = () => {
                     </div>
                   }
                 />
-                <ListItemSecondaryAction>
-                  {/* <EndpointPopover
-                    endpoint={{ ...endpoint, type: 'static' }}
-                    onUpdate={(result) => setEndpoints(endpoints.map((e) => (e.asset_id !== result.asset_id ? e : result)))}
-                    onDelete={(result) => setEndpoints(endpoints.filter((e) => (e.asset_id !== result)))}
-                    openEditOnInit={endpoint.asset_id === searchId}
-                  /> */}
-                </ListItemSecondaryAction>
               </ListItem>
 
             );
