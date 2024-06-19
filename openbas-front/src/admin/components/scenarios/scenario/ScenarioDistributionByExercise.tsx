@@ -76,6 +76,7 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
             'dataPoints',
             true,
             exercises.length === 0,
+            1,
           ) as ApexOptions}
           series={series}
           type="bar"
