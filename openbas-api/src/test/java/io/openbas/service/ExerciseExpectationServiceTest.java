@@ -6,7 +6,6 @@ import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.Team;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
