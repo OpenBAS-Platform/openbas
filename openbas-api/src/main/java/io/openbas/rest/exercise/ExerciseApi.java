@@ -40,11 +40,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.*;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -57,7 +55,7 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_EXERCISE;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static java.time.Duration.between;
 import static java.time.Instant.now;
 import static java.time.temporal.ChronoUnit.MINUTES;
@@ -119,6 +117,7 @@ public class ExerciseApi extends RestBehavior {
   private final InjectService injectService;
   private final ChallengeService challengeService;
   private final VariableService variableService;
+  private final ExerciseService exerciseService;
   // endregion
 
   // region logs
@@ -170,7 +169,8 @@ public class ExerciseApi extends RestBehavior {
   public Dryrun createDryrun(@PathVariable String exerciseId, @Valid @RequestBody DryrunCreateInput input) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     List<String> userIds = input.getUserIds();
-    List<User> users = userIds.isEmpty() ? List.of(userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new))
+    List<User> users = userIds.isEmpty() ? List.of(
+        userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new))
         : fromIterable(userRepository.findAllById(userIds));
     return dryrunService.provisionDryrun(exercise, users, input.getName());
   }
@@ -416,47 +416,51 @@ public class ExerciseApi extends RestBehavior {
     // We get the raw exercise
     RawExercise rawExercise = exerciseRepository.rawDetailsById(exerciseId);
     // We get the injects linked to this exercise
-    List<RawInject> rawInjects = injectRepository.findRawByIds(rawExercise.getInject_ids().stream().distinct().toList());
+    List<RawInject> rawInjects = injectRepository.findRawByIds(
+        rawExercise.getInject_ids().stream().distinct().toList());
     // We get the tuple exercise/team/user
-    List<RawExerciseTeamUser> listRawExerciseTeamUsers = exerciseTeamUserRepository.rawByExerciseIds(List.of(exerciseId));
+    List<RawExerciseTeamUser> listRawExerciseTeamUsers = exerciseTeamUserRepository.rawByExerciseIds(
+        List.of(exerciseId));
     // We get the objectives of this exercise
     List<RawObjective> rawObjectives = objectiveRepository.rawByExerciseIds(List.of(exerciseId));
     // We make a map of the Evaluations by objective
-    Map<String, List<RawEvaluation>> mapEvaluationsByObjective = evaluationRepository.rawByObjectiveIds(rawObjectives.stream()
-            .map(RawObjective::getObjective_id).toList()).stream()
-            .collect(Collectors.groupingBy(RawEvaluation::getEvaluation_objective));
+    Map<String, List<RawEvaluation>> mapEvaluationsByObjective = evaluationRepository.rawByObjectiveIds(
+            rawObjectives.stream()
+                .map(RawObjective::getObjective_id).toList()).stream()
+        .collect(Collectors.groupingBy(RawEvaluation::getEvaluation_objective));
     // We make a map of grants of users id by type of grant (Planner, Observer)
-    Map<String, List<RawGrant>> rawGrants = grantRepository.rawByExerciseIds(List.of(exerciseId)).stream().collect(Collectors.groupingBy(RawGrant::getGrant_name));
+    Map<String, List<RawGrant>> rawGrants = grantRepository.rawByExerciseIds(List.of(exerciseId)).stream()
+        .collect(Collectors.groupingBy(RawGrant::getGrant_name));
     // We get all the kill chain phases
     List<KillChainPhase> killChainPhase = StreamSupport.stream(
-            killChainPhaseRepository.findAllById(
-                    rawInjects.stream().flatMap(rawInject -> rawInject.getInject_kill_chain_phases().stream()).toList()
-            ).spliterator(), false).collect(Collectors.toList());
+        killChainPhaseRepository.findAllById(
+            rawInjects.stream().flatMap(rawInject -> rawInject.getInject_kill_chain_phases().stream()).toList()
+        ).spliterator(), false).collect(Collectors.toList());
 
     // We create objectives and fill them with evaluations
     List<Objective> objectives = rawObjectives.stream().map(rawObjective -> {
       Objective objective = new Objective();
-      if(mapEvaluationsByObjective.get(rawObjective.getObjective_id()) != null) {
+      if (mapEvaluationsByObjective.get(rawObjective.getObjective_id()) != null) {
         objective.setEvaluations(mapEvaluationsByObjective.get(rawObjective.getObjective_id()).stream().map(
-                rawEvaluation -> {
-                  Evaluation evaluation = new Evaluation();
-                  evaluation.setId(rawEvaluation.getEvaluation_id());
-                  evaluation.setScore(rawEvaluation.getEvaluation_score());
-                  return evaluation;
-                }
+            rawEvaluation -> {
+              Evaluation evaluation = new Evaluation();
+              evaluation.setId(rawEvaluation.getEvaluation_id());
+              evaluation.setScore(rawEvaluation.getEvaluation_score());
+              return evaluation;
+            }
         ).toList());
       }
       return objective;
     }).toList();
 
     List<ExerciseTeamUser> listExerciseTeamUsers = listRawExerciseTeamUsers.stream().map(
-            ExerciseTeamUser::fromRawExerciseTeamUser
+        ExerciseTeamUser::fromRawExerciseTeamUser
     ).toList();
 
     // From the raw injects, we recreate Injects with minimal objects for calculations
     List<Inject> injects = rawInjects.stream().map(rawInject -> {
       Inject inject = new Inject();
-      if(rawInject.getInject_scenario() != null) {
+      if (rawInject.getInject_scenario() != null) {
         inject.setScenario(new Scenario());
         inject.getScenario().setId(rawInject.getInject_scenario());
       }
@@ -467,7 +471,7 @@ public class ExerciseApi extends RestBehavior {
         return communication;
       }).toList());
       // We set the status too
-      if(rawInject.getStatus_name() != null) {
+      if (rawInject.getStatus_name() != null) {
         InjectStatus injectStatus = new InjectStatus();
         injectStatus.setName(ExecutionStatus.valueOf(rawInject.getStatus_name()));
         inject.setStatus(injectStatus);
@@ -477,16 +481,16 @@ public class ExerciseApi extends RestBehavior {
       exercise.setStatus(ExerciseStatus.valueOf(rawExercise.getExercise_status()));
       exercise.setStart(rawExercise.getExercise_start_date());
       exercise.setPauses(
-              // We set the pauses as they are used for calculations
-              pauseRepository.rawAllForExercise(exerciseId).stream().map(rawPause -> {
-                Pause pause = new Pause();
-                pause.setExercise(new Exercise());
-                pause.getExercise().setId(exerciseId);
-                pause.setDate(rawPause.getPause_date());
-                pause.setId(rawPause.getPause_id());
-                pause.setDuration(rawPause.getPause_duration());
-                return pause;
-              }).toList()
+          // We set the pauses as they are used for calculations
+          pauseRepository.rawAllForExercise(exerciseId).stream().map(rawPause -> {
+            Pause pause = new Pause();
+            pause.setExercise(new Exercise());
+            pause.getExercise().setId(exerciseId);
+            pause.setDate(rawPause.getPause_date());
+            pause.setId(rawPause.getPause_id());
+            pause.setDuration(rawPause.getPause_duration());
+            return pause;
+          }).toList()
       );
       exercise.setCurrentPause(rawExercise.getExercise_pause_date());
       inject.setExercise(exercise);
@@ -495,14 +499,18 @@ public class ExerciseApi extends RestBehavior {
 
     // We create an ExerciseDetails object and populate it
     ExerciseDetails detail = ExerciseDetails.fromRawExercise(rawExercise, injects, listExerciseTeamUsers, objectives);
-    detail.setPlatforms(rawInjects.stream().flatMap(inject -> inject.getInject_platforms().stream()).distinct().toList());
-    detail.setCommunicationsNumber(rawInjects.stream().mapToLong(rawInject -> rawInject.getInject_communications().size()).sum());
+    detail.setPlatforms(
+        rawInjects.stream().flatMap(inject -> inject.getInject_platforms().stream()).distinct().toList());
+    detail.setCommunicationsNumber(
+        rawInjects.stream().mapToLong(rawInject -> rawInject.getInject_communications().size()).sum());
     detail.setKillChainPhases(killChainPhase);
-    if(rawGrants.get(Grant.GRANT_TYPE.OBSERVER.name()) != null) {
-      detail.setObservers(rawGrants.get(Grant.GRANT_TYPE.OBSERVER.name()).stream().map(RawGrant::getUser_id).collect(Collectors.toSet()));
+    if (rawGrants.get(Grant.GRANT_TYPE.OBSERVER.name()) != null) {
+      detail.setObservers(rawGrants.get(Grant.GRANT_TYPE.OBSERVER.name()).stream().map(RawGrant::getUser_id)
+          .collect(Collectors.toSet()));
     }
     if (rawGrants.get(Grant.GRANT_TYPE.PLANNER.name()) != null) {
-      detail.setPlanners(rawGrants.get(Grant.GRANT_TYPE.PLANNER.name()).stream().map(RawGrant::getUser_id).collect(Collectors.toSet()));
+      detail.setPlanners(rawGrants.get(Grant.GRANT_TYPE.PLANNER.name()).stream().map(RawGrant::getUser_id)
+          .collect(Collectors.toSet()));
     }
 
     return detail;
@@ -563,7 +571,8 @@ public class ExerciseApi extends RestBehavior {
       throw new UnsupportedOperationException("Exercise cant support moving to status " + status.name());
     }
     // In case of rescheduled of an exercise.
-    boolean isCloseState = ExerciseStatus.CANCELED.equals(exercise.getStatus()) || ExerciseStatus.FINISHED.equals(exercise.getStatus());
+    boolean isCloseState =
+        ExerciseStatus.CANCELED.equals(exercise.getStatus()) || ExerciseStatus.FINISHED.equals(exercise.getStatus());
     if (isCloseState && ExerciseStatus.SCHEDULED.equals(status)) {
       exercise.setStart(null);
       exercise.setEnd(null);
@@ -617,110 +626,51 @@ public class ExerciseApi extends RestBehavior {
 
   @GetMapping("/api/exercises")
   public List<ExerciseSimple> exercises() {
-      // We get the exercises depending on whether or not we are granted
-      Iterable<RawExercise> exercises = currentUser().isAdmin() ? exerciseRepository.rawAll()
-              : exerciseRepository.rawAllGranted(currentUser().getId());
+    // We get the exercises depending on whether or not we are granted
+    Iterable<RawExercise> exercises = currentUser().isAdmin() ? exerciseRepository.rawAll()
+        : exerciseRepository.rawAllGranted(currentUser().getId());
 
-      // From the list of exercises, we get the list of the injects ids
-      List<String> listOfInjectIds = fromIterable(exercises).stream()
-              .filter(exercise -> exercise.getInject_ids() != null)
-              .flatMap(exercise -> exercise.getInject_ids().stream())
-              .distinct()
-              .toList();
+    // From the list of exercises, we get the list of the injects ids
+    List<String> listOfInjectIds = fromIterable(exercises).stream()
+        .filter(exercise -> exercise.getInject_ids() != null)
+        .flatMap(exercise -> exercise.getInject_ids().stream())
+        .distinct()
+        .toList();
 
-      // We get the injects corresponding linked to the exercises
-      List<Inject> listOfInjects = new ArrayList<>();
-      List<RawInject> listOfRawInjects = injectRepository.findRawByIds(listOfInjectIds);
+    Map<String, Inject> mapOfInjects = this.injectService.mapOfInjects(listOfInjectIds);
 
-      // From the list of injects, we get all the inject expectationsIds that we then
-      // get and put into a map with the expections ids as key
-      Map<String, RawInjectExpectation> mapOfInjectsExpectations = injectExpectationRepository.rawByIds(
-              listOfRawInjects.stream().flatMap(rawInject -> rawInject.getInject_expectations().stream()).toList()
-      ).stream().collect(Collectors.toMap(RawInjectExpectation::getInject_expectation_id, Function.identity()));
+    // Finally, for all exercices we got, we convert them to classic exercises with the injects we created
+    return fromIterable(exercises).stream().map(currentExercice -> {
+      // We make a list out of all the injects that are linked to the exercise
+      List<Inject> listOfInjectsOfExercise = new ArrayList<>();
+      if (currentExercice.getInject_ids() != null) {
+        listOfInjectsOfExercise = currentExercice.getInject_ids().stream().map(mapOfInjects::get)
+            .collect(Collectors.toList());
+      }
 
-      // We get the asset groups from the injects AND the injects expectations as those can also have asset groups
-      // We then make a map out of it for faster access
-      Map<String, RawAssetGroup> mapOfAssetGroups = assetGroupRepository
-              .rawAssetGroupByIds(
-                      Stream.concat(
-                                      mapOfInjectsExpectations.values().stream()
-                                              .map(RawInjectExpectation::getAsset_group_id)
-                                              .filter(Objects::nonNull),
-                                      listOfRawInjects.stream()
-                                              .map(RawInject::getAsset_group_id)
-                                              .filter(Objects::nonNull))
-                              .toList()).stream()
-              .collect(Collectors.toMap(RawAssetGroup::getAsset_group_id, Function.identity()));
-
-      // We get all the assets that are
-      // 1 - linked to an inject
-      // 2 - linked to an asset group linked to an inject
-      // 3 - linked to an inject expectation
-      // 4 - linked to an asset group linked to an inject expectations
-      // We then make a map out of it
-      Map<String, RawAsset> mapOfAssets = assetRepository
-              .rawByIds(listOfRawInjects.stream().flatMap(rawInject -> {
-                  return Stream.concat(Stream.concat(
-                                  rawInject.getInject_asset_groups().stream()
-                                          .flatMap(assetGroup -> mapOfAssetGroups.get(assetGroup).getAsset_ids().stream()),
-                                  rawInject.getInject_assets().stream()
-                          ), Stream.concat(
-                                  rawInject.getInject_expectations().stream()
-                                          .map(mapOfInjectsExpectations::get)
-                                          .map(RawInjectExpectation::getAsset_id),
-                                  rawInject.getInject_expectations().stream()
-                                          .map(mapOfInjectsExpectations::get)
-                                          .flatMap(injectExpectation -> injectExpectation.getAsset_group_id() != null ? mapOfAssetGroups.get(injectExpectation.getAsset_group_id()).getAsset_ids().stream() : Stream.empty()))
-                  );
-              }).filter(Objects::nonNull).toList()).stream()
-              .collect(Collectors.toMap(RawAsset::getAsset_id, Function.identity()));
-
-      // We get all the teams that are linked to an inject or an asset group
-      // Then we make a map out of it for faster access
-      Map<String, RawTeam> mapOfRawTeamsById = teamRepository.rawTeamByIds(listOfRawInjects.stream()
-              .flatMap(
-                      rawInject -> Stream.concat(
-                              rawInject.getInject_teams().stream(),
-                              rawInject.getInject_expectations().stream().map(expectationId -> mapOfInjectsExpectations.get(expectationId).getTeam_id())
-                      ).filter(Objects::nonNull)
-              ).distinct().toList()).stream().collect(Collectors.toMap(RawTeam::getTeam_id, Function.identity()));
-
-      // Once we have all of this, we create an Inject for each InjectRaw that we have using all the Raw objects we got
-      // Then we make a map out of it for faster access
-      listOfRawInjects.stream().map((inject) -> Inject.fromRawInject(inject, mapOfRawTeamsById, mapOfInjectsExpectations, mapOfAssetGroups, mapOfAssets)).forEach(listOfInjects::add);
-      Map<String, Inject> mapOfInjectsById = listOfInjects.stream().collect(Collectors.toMap(Inject::getId, Function.identity()));
-
-      // Finally, for all exercices we got, we convert them to classic exercises with the injects we created
-      return fromIterable(exercises).stream().map(currentExercice -> {
-          // We make a list out of all the injects that are linked to the exercise
-          List<Inject> listOfInjectsOfExercise = new ArrayList<>();
-          if (currentExercice.getInject_ids() != null) {
-              listOfInjectsOfExercise = currentExercice.getInject_ids().stream().map(mapOfInjectsById::get).collect(Collectors.toList());
-          }
-
-          // We create a new exercise out of the Raw object
-          return ExerciseSimple.fromRawExercise(currentExercice,
-                  listOfInjectsOfExercise);
-      }).toList();
+      // We create a new exercise out of the Raw object
+      return ExerciseSimple.fromRawExercise(currentExercice,
+          listOfInjectsOfExercise);
+    }).toList();
   }
 
-  @PostMapping("/api/exercises/search")
+  @PostMapping(EXERCISE_URI + "/search")
   public Page<ExerciseSimple> exercises(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     if (currentUser().isAdmin()) {
-      return buildPaginationJPA(
-              this.exerciseRepository::findAll,
-              searchPaginationInput,
-              Exercise.class
-      ).map(ExerciseSimple::fromExercise);
+      return buildPaginationCriteriaBuilder(
+          this.exerciseService::exercises,
+          searchPaginationInput,
+          Exercise.class
+      );
     } else {
-      return buildPaginationJPA(
-              (Specification<Exercise> specification, Pageable pageable) -> this.exerciseRepository.findAll(
-                      findGrantedFor(currentUser().getId()).and(specification),
-                      pageable
-              ),
-              searchPaginationInput,
-              Exercise.class
-      ).map(ExerciseSimple::fromExercise);
+      return buildPaginationCriteriaBuilder(
+          (Specification<Exercise> specification, Pageable pageable) -> this.exerciseService.exercises(
+              findGrantedFor(currentUser().getId()).and(specification),
+              pageable
+          ),
+          searchPaginationInput,
+          Exercise.class
+      );
     }
   }
 

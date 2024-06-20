@@ -2,11 +2,16 @@ package io.openbas.database.specification;
 
 import io.openbas.database.model.Exercise;
 import jakarta.persistence.criteria.Path;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 
 import static io.openbas.database.model.ExerciseStatus.SCHEDULED;
 
 public class ExerciseSpecification {
+
+  private ExerciseSpecification() {
+
+  }
 
   public static Specification<Exercise> recurringInstanceNotStarted() {
     return (root, query, cb) -> cb.and(
@@ -15,13 +20,17 @@ public class ExerciseSpecification {
     );
   }
 
-  public static Specification<Exercise> findGrantedFor(String userId) {
-    return (root, query, criteriaBuilder) -> {
+  public static Specification<Exercise> findGrantedFor(@NotNull final String userId) {
+    return (root, query, cb) -> {
       Path<Object> path = root
               .join("grants")
               .join("group")
               .join("users").get("id");
-      return criteriaBuilder.equal(path, userId);
+      return cb.equal(path, userId);
     };
+  }
+
+  public static Specification<Exercise> fromScenario(@NotNull final String scenarioId) {
+    return (root, query, cb) -> cb.equal(root.get("scenario").get("id"), scenarioId);
   }
 }

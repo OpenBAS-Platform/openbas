@@ -1,5 +1,5 @@
 import { Grid, Paper, Theme, Typography } from '@mui/material';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import * as R from 'ramda';
 import { ComputerOutlined, HubOutlined, MovieFilterOutlined, PersonOutlined } from '@mui/icons-material';
 import { makeStyles, useTheme } from '@mui/styles';
@@ -16,11 +16,10 @@ import ResponsePie from './common/injects/ResponsePie';
 import MitreMatrix from './common/matrix/MitreMatrix';
 import MitreMatrixDummy from './common/matrix/MitreMatrixDummy';
 import { horizontalBarsChartOptions, polarAreaChartOptions, verticalBarsChartOptions } from '../../utils/Charts';
-import { fetchExercises } from '../../actions/Exercise';
+import { fetchExercises, searchExercises } from '../../actions/Exercise';
 import type { ExercisesHelper } from '../../actions/exercises/exercise-helper';
-import type { ExerciseSimple } from '../../utils/api-types';
+import type { ExerciseSimple, SearchPaginationInput } from '../../utils/api-types';
 import { daysAgo, fillTimeSeries, getNextWeek, groupBy } from '../../utils/Time';
-import ExerciseList from './simulations/ExerciseList';
 import type { AttackPatternHelper } from '../../actions/attack_patterns/attackpattern-helper';
 import type { KillChainPhaseHelper } from '../../actions/kill_chain_phases/killchainphase-helper';
 import type { InjectorHelper } from '../../actions/injectors/injector-helper';
@@ -28,6 +27,9 @@ import { fetchKillChainPhases } from '../../actions/KillChainPhase';
 import { fetchAttackPatterns } from '../../actions/AttackPattern';
 import Empty from '../../components/Empty';
 import { attackPatternsFakeData, categoriesDataFakeData, categoriesLabelsFakeData, exercisesTimeSeriesFakeData } from '../../utils/fakeData';
+import ExerciseList from './simulations/ExerciseList';
+import type { EndpointStore } from './assets/endpoints/Endpoint';
+import { initSorting, type Page } from '../../components/common/pagination/Page';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -72,7 +74,7 @@ const Dashboard = () => {
   const dispatch = useAppDispatch();
 
   // Fetching data
-  const exercises = useHelper((helper: ExercisesHelper) => helper.getExercises());
+  const exercisesFromStore = useHelper((helper: ExercisesHelper) => helper.getExercises());
   const statistics = useHelper((helper: StatisticsHelper) => helper.getStatistics());
   useDataLoader(() => {
     dispatch(fetchKillChainPhases());
@@ -84,7 +86,7 @@ const Dashboard = () => {
     attackPatterns: helper.getAttackPatterns(),
     killChainPhasesMap: helper.getKillChainPhasesMap(),
   }));
-  const exercisesOverTime = groupBy(exercises.filter((e: ExerciseSimple) => e.exercise_start_date !== null), 'exercise_start_date', 'week');
+  const exercisesOverTime = groupBy(exercisesFromStore.filter((e: ExerciseSimple) => e.exercise_start_date !== null), 'exercise_start_date', 'week');
   const exercisesTimeSeries = fillTimeSeries(daysAgo(150), getNextWeek(), 'week', exercisesOverTime);
   const exercisesData = [
     {
@@ -95,11 +97,25 @@ const Dashboard = () => {
       })),
     },
   ];
-  const countByCategory = R.countBy((exercise: ExerciseSimple) => exercise?.exercise_category || t('Unknown'), exercises);
+  const countByCategory = R.countBy((exercise: ExerciseSimple) => exercise?.exercise_category || t('Unknown'), exercisesFromStore);
   const categoriesLabels: string[] = R.keys(countByCategory).length === 0 ? categoriesLabelsFakeData : R.keys(countByCategory);
   const categoriesData: number[] = R.values(countByCategory).length === 0 ? categoriesDataFakeData : R.values(countByCategory);
   const sortByY = R.sortWith([R.descend(R.prop('y'))]);
   const attackPatternsData = attackPatterns.length > 0 ? sortByY(attackPatternsFakeData) : [];
+
+  // Exercises
+  const [exercises, setExercises] = useState<EndpointStore[]>([]);
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+    sorts: initSorting('exercise_start_date'),
+    page: 0,
+    size: 6,
+  });
+  useEffect(() => {
+    searchExercises(searchPaginationInput).then((result: { data: Page<ExerciseSimple> }) => {
+      const { data } = result;
+      setExercises(data.content);
+    });
+  }, [searchPaginationInput]);
   return (
     <Grid container spacing={3}>
       <Grid item xs={3}>
@@ -202,7 +218,12 @@ const Dashboard = () => {
         <Typography variant="h4">{t('Last simulations')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperList }}>
           {exercises.length === 0 && <Empty message={t('No simulation in this platform yet.')} />}
-          <ExerciseList exercises={exercises} withoutSearch={true} limit={6} />
+          <ExerciseList
+            exercises={exercises}
+            searchPaginationInput={searchPaginationInput}
+            setSearchPaginationInput={setSearchPaginationInput}
+            hasHeader={false}
+          />
         </Paper>
       </Grid>
       <Grid item xs={12}>

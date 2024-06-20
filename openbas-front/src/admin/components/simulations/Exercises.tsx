@@ -1,34 +1,62 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useFormatter } from '../../../components/i18n';
-import { fetchExercises } from '../../../actions/Exercise';
 import { useHelper } from '../../../store';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import ExerciseCreation from './simulation/ExerciseCreation';
-import ExerciseList from './ExerciseList';
-import { useAppDispatch } from '../../../utils/hooks';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
 import type { UserHelper } from '../../../actions/helper';
+import ImportUploaderScenario from '../scenarios/ImportUploaderScenario';
+import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
+import { initSorting } from '../../../components/common/pagination/Page';
+import type { SearchPaginationInput } from '../../../utils/api-types';
+import type { EndpointStore } from '../assets/endpoints/Endpoint';
+import ExerciseList from './ExerciseList';
+import { searchExercises } from '../../../actions/Exercise';
 
 const Exercises = () => {
   // Standard hooks
-  const dispatch = useAppDispatch();
   const { t } = useFormatter();
 
   // Fetching data
-  const { exercises, userAdmin } = useHelper((helper: ExercisesHelper & UserHelper) => ({
-    exercises: helper.getExercises(),
+  const { userAdmin } = useHelper((helper: ExercisesHelper & UserHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
 
-  useDataLoader(() => {
-    dispatch(fetchExercises());
+  const [exercises, setExercises] = useState<EndpointStore[]>([]);
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+    sorts: initSorting('exercise_start_date'),
   });
+
+  // Export
+  const exportProps = {
+    exportType: 'exercise',
+    exportKeys: [
+      'exercise_name',
+      'exercise_subtitle',
+      'exercise_description',
+      'exercise_status',
+      'exercise_tags',
+    ],
+    exportData: exercises,
+    exportFileName: `${t('Simulations')}.csv`,
+  };
 
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Simulations'), current: true }]} />
-      <ExerciseList exercises={exercises} />
+      <PaginationComponent
+        fetch={searchExercises}
+        searchPaginationInput={searchPaginationInput}
+        setContent={setExercises}
+        exportProps={exportProps}
+      >
+        <ImportUploaderScenario />
+      </PaginationComponent>
+      <ExerciseList
+        exercises={exercises}
+        searchPaginationInput={searchPaginationInput}
+        setSearchPaginationInput={setSearchPaginationInput}
+      />
       {userAdmin && <ExerciseCreation />}
     </>
   );

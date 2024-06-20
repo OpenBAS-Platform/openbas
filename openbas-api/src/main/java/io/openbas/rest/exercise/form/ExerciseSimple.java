@@ -1,5 +1,6 @@
 package io.openbas.rest.exercise.form;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.model.Exercise;
@@ -57,6 +58,9 @@ public class ExerciseSimple {
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("exercise_tags")
   private Set<Tag> tags = new HashSet<>();
+
+  @JsonIgnore
+  private String[] injectIds;
 
   @JsonProperty("exercise_global_score")
   private List<AtomicTestingMapper.ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
