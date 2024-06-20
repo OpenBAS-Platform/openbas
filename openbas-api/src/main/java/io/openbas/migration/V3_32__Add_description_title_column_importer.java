@@ -8,12 +8,16 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V3_26__Assets_platform extends BaseJavaMigration {
+public class V3_32__Add_description_title_column_importer extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
-    select.execute("ALTER TABLE assets ALTER COLUMN endpoint_platform DROP NOT NULL;");
+    // Create table
+    select.execute("""
+             ALTER TABLE rule_attributes ADD COLUMN attribute_additional_config HSTORE;
+        """);
+
   }
 }

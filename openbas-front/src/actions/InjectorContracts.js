@@ -1,9 +1,14 @@
 import * as schema from './Schema';
-import { getReferential, putReferential, postReferential, delReferential, simplePostCall } from '../utils/Action';
+import { getReferential, putReferential, postReferential, delReferential, simplePostCall, simpleCall } from '../utils/Action';
 
 export const fetchInjectorContract = (injectorContractId) => (dispatch) => {
   const uri = `/api/injector_contracts/${injectorContractId}`;
   return getReferential(schema.injectorContract, uri)(dispatch);
+};
+
+export const directFetchInjectorContract = (injectorContractId) => {
+  const uri = `/api/injector_contracts/${injectorContractId}`;
+  return simpleCall(uri);
 };
 
 export const fetchInjectorsContracts = () => (dispatch) => {

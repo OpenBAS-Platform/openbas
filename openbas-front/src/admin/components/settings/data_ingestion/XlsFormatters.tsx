@@ -135,7 +135,7 @@ const XlsFormatters = () => {
         }
         {!mappers ? (<Empty message={t('No data available')} />) : null}
       </List>
-      <XlsFormatterCreation />
+      <XlsFormatterCreation onCreate={(result) => setMappers([result, ...mappers])} />
     </div>
   );
 };
