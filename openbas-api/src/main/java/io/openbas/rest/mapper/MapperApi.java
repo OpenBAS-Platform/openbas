@@ -59,6 +59,7 @@ public class MapperApi extends RestBehavior {
     return importMapperRepository.findById(UUID.fromString(mapperId)).orElseThrow(ElementNotFoundException::new);
   }
 
+<<<<<<< HEAD
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/mappers")
   public void createImportMapper(@RequestBody @Valid final MapperAddInput mapperAddInput) {
@@ -66,6 +67,15 @@ public class MapperApi extends RestBehavior {
     importMapper.setName(mapperAddInput.getName());
     importMapper.setInjectTypeColumn(mapperAddInput.getInjectTypeColumn());
     importMapper.setInjectImporters(new ArrayList<>());
+=======
+    @Secured(ROLE_ADMIN)
+    @PostMapping("/api/mappers")
+    public ImportMapper createImportMapper(@RequestBody @Valid final MapperAddInput mapperAddInput) {
+        ImportMapper importMapper = new ImportMapper();
+        importMapper.setName(mapperAddInput.getName());
+        importMapper.setInjectTypeColumn(mapperAddInput.getInjectTypeColumn());
+        importMapper.setInjectImporters(new ArrayList<>());
+>>>>>>> ff5a0989 ([backend] Adding additional config)
 
     Map<String, InjectorContract> mapInjectorContracts = getMapOfInjectorContracts(
         mapperAddInput.getImporters()
@@ -74,6 +84,7 @@ public class MapperApi extends RestBehavior {
             .toList()
     );
 
+<<<<<<< HEAD
     mapperAddInput.getImporters().forEach(
         injectImporterInput -> {
           InjectImporter injectImporter = new InjectImporter();
@@ -94,6 +105,29 @@ public class MapperApi extends RestBehavior {
 
     importMapperRepository.save(importMapper);
   }
+=======
+        mapperAddInput.getImporters().forEach(
+                injectImporterInput -> {
+                    InjectImporter injectImporter = new InjectImporter();
+                    injectImporter.setInjectorContract(mapInjectorContracts.get(injectImporterInput.getInjectorContractId()));
+                    injectImporter.setImportTypeValue(injectImporterInput.getInjectTypeValue());
+                    injectImporter.setName(injectImporterInput.getName());
+                    injectImporter.setRuleAttributes(new ArrayList<>());
+                    injectImporterInput.getRuleAttributes().forEach(ruleAttributeInput -> {
+                        RuleAttribute ruleAttribute = new RuleAttribute();
+                        ruleAttribute.setColumns(ruleAttributeInput.getColumns());
+                        ruleAttribute.setName(ruleAttributeInput.getName());
+                        ruleAttribute.setDefaultValue(ruleAttributeInput.getDefaultValue());
+                        ruleAttribute.setAdditionalConfig(ruleAttributeInput.getAdditionalConfig());
+                        injectImporter.getRuleAttributes().add(ruleAttribute);
+                    });
+                    importMapper.getInjectImporters().add(injectImporter);
+                }
+        );
+
+        return importMapperRepository.save(importMapper);
+    }
+>>>>>>> ff5a0989 ([backend] Adding additional config)
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/api/mappers/{mapperId}")
@@ -183,6 +217,7 @@ public class MapperApi extends RestBehavior {
     });
   }
 
+<<<<<<< HEAD
   @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/mappers/{mapperId}")
   public void deleteImportMapper(@PathVariable String mapperId) {
@@ -193,4 +228,64 @@ public class MapperApi extends RestBehavior {
     return StreamSupport.stream(injectorContractRepository.findAllById(ids).spliterator(), false)
         .collect(Collectors.toMap(InjectorContract::getId, Function.identity()));
   }
+=======
+        // Then we add the new ones
+        ruleAttributesInput.forEach(ruleAttributeUpdateInput -> {
+            if (ruleAttributeUpdateInput.getId() == null || ruleAttributeUpdateInput.getId().isBlank()) {
+                RuleAttribute ruleAttribute = new RuleAttribute();
+                ruleAttribute.setColumns(ruleAttributeUpdateInput.getColumns());
+                ruleAttribute.setName(ruleAttributeUpdateInput.getName());
+                ruleAttribute.setDefaultValue(ruleAttributeUpdateInput.getDefaultValue());
+                ruleAttribute.setAdditionalConfig(ruleAttributeUpdateInput.getAdditionalConfig());
+                ruleAttributes.add(ruleAttribute);
+            }
+        });
+    }
+
+    private void updateInjectImporter(List<InjectImporterUpdateInput> injectImportersInput, List<InjectImporter> injectImporters, Map<String, InjectorContract> mapInjectorContracts) {
+        // First, we remove the entities that are no longer linked to the mapper
+        injectImporters.removeIf(importer -> !injectImportersInput.stream().anyMatch(importerInput -> importer.getId().equals(importerInput.getId())));
+
+        // Then we update the existing ones
+        injectImporters.forEach(injectImporter -> {
+            Optional<InjectImporterUpdateInput> injectImporterInput = injectImportersInput.stream().filter(injectImporterUpdateInput -> injectImporter.getId().equals(injectImporterUpdateInput.getId())).findFirst();
+            if (!injectImporterInput.isPresent()) {
+                throw new ElementNotFoundException();
+            }
+            injectImporter.setUpdateAttributes(injectImporterInput.get());
+            updateRuleAttributes(injectImporterInput.get().getRuleAttributes(), injectImporter.getRuleAttributes());
+        });
+
+        // Then we add the new ones
+        injectImportersInput.forEach(injectImporterUpdateInput -> {
+            if (injectImporterUpdateInput.getId() == null || injectImporterUpdateInput.getId().isBlank()) {
+                InjectImporter injectImporter = new InjectImporter();
+                injectImporter.setInjectorContract(mapInjectorContracts.get(injectImporterUpdateInput.getInjectorContractId()));
+                injectImporter.setImportTypeValue(injectImporterUpdateInput.getInjectTypeValue());
+                injectImporter.setName(injectImporterUpdateInput.getName());
+                injectImporter.setRuleAttributes(new ArrayList<>());
+                injectImporterUpdateInput.getRuleAttributes().forEach(ruleAttributeInput -> {
+                    RuleAttribute ruleAttribute = new RuleAttribute();
+                    ruleAttribute.setColumns(ruleAttributeInput.getColumns());
+                    ruleAttribute.setName(ruleAttributeInput.getName());
+                    ruleAttribute.setDefaultValue(ruleAttributeInput.getDefaultValue());
+                    ruleAttribute.setAdditionalConfig(ruleAttributeInput.getAdditionalConfig());
+                    injectImporter.getRuleAttributes().add(ruleAttribute);
+                });
+                injectImporters.add(injectImporter);
+            }
+        });
+    }
+
+    @Secured(ROLE_ADMIN)
+    @DeleteMapping("/api/mappers/{mapperId}")
+    public void deleteImportMapper(@PathVariable String mapperId) {
+        importMapperRepository.deleteById(UUID.fromString(mapperId));
+    }
+
+    public Map<String, InjectorContract> getMapOfInjectorContracts(List<String> ids) {
+        return StreamSupport.stream(injectorContractRepository.findAllById(ids).spliterator(), false)
+                .collect(Collectors.toMap(InjectorContract::getId, Function.identity()));
+    }
+>>>>>>> ff5a0989 ([backend] Adding additional config)
 }
