@@ -1,5 +1,6 @@
 package io.openbas.database.repository;
 
+import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Payload;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -19,4 +20,5 @@ public interface PayloadRepository extends CrudRepository<Payload, String>, JpaS
     @Query("select p from Payload p where p.type IN :types")
     List<Payload> findByType(@Param("types") final List<String> types);
 
+    Optional<Payload> findByExternalId(@NotNull String externalId);
 }
