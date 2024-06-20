@@ -1,6 +1,6 @@
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { HubOutlined, KeyboardArrowRight } from '@mui/icons-material';
+import { HubOutlined } from '@mui/icons-material';
 import React, { CSSProperties, FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import ExerciseStatus from './simulation/ExerciseStatus';
@@ -14,9 +14,7 @@ import type { ExerciseSimple, SearchPaginationInput } from '../../../utils/api-t
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../actions/Tag';
 import { useAppDispatch } from '../../../utils/hooks';
-import ImportUploaderExercise from './ImportUploaderExercise';
-import ExportButton from '../../../components/common/ExportButton';
-import ExercisePopover from "./simulation/ExercisePopover";
+import ExercisePopover from './simulation/ExercisePopover';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -176,21 +174,11 @@ const ExerciseList: FunctionComponent<Props> = ({
             }
           />
           <ListItemIcon classes={{ root: classes.goIcon }}>
-            <KeyboardArrowRight />
+            <ExercisePopover exercise={exercise} />
           </ListItemIcon>
         </ListItemButton>
       ))}
     </List>
-                </div>
-              }
-            />
-            <ListItemIcon classes={{ root: classes.goIcon }}>
-              <ExercisePopover exercise={exercise} />
-            </ListItemIcon>
-          </ListItemButton>
-        ))}
-      </List>
-    </>
   );
 };
 
