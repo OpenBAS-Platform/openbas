@@ -1116,6 +1116,10 @@ const i18n = {
       // -- Timeline
       'Hide timeline': 'Cacher la chronologie',
       'Show Timeline': 'Afficher la chronologie',
+      // ---Xls mapper
+      'Create a xls mapper': 'Créer un mapper xls',
+      'Mapper name': 'Nom du mapper',
+      'Type column': 'Type de la colonne',
     },
     en: {
       openbas_email: 'Email',
