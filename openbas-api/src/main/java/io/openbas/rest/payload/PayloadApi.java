@@ -10,6 +10,8 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
 import io.openbas.integrations.PayloadService;
+import io.openbas.rest.payload.form.PayloadUpsertInput;
+import io.openbas.rest.team.form.TeamCreateInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -24,12 +26,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.Optional;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+import static java.time.Instant.now;
 
 @RestController
 @Secured(ROLE_USER)
@@ -148,7 +153,7 @@ public class PayloadApi extends RestBehavior {
         payload.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         payload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         payload.setUpdatedAt(Instant.now());
-        switch( payload.getType() ) {
+        switch (payload.getType()) {
             case "Command":
                 Command payloadCommand = (Command) Hibernate.unproxy(payload);
                 payloadCommand.setUpdateAttributes(input);
@@ -183,6 +188,102 @@ public class PayloadApi extends RestBehavior {
                 return payloadNetworkTraffic;
             default:
                 throw new UnsupportedOperationException("Payload type " + payload.getType() + " is not supported");
+        }
+    }
+
+    @PostMapping("/api/payloads/upsert")
+    @PreAuthorize("isPlanner()")
+    @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
+    public Payload upsertPayload(@Valid @RequestBody PayloadUpsertInput input) {
+        Optional<Payload> payload = payloadRepository.findByExternalId(input.getExternalId());
+        if (payload.isPresent()) {
+            Payload existingPayload = payload.get();
+            existingPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(input.getAttackPatternsExternalIds())));
+            existingPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+            existingPayload.setUpdatedAt(Instant.now());
+            switch (existingPayload.getType()) {
+                case "Command":
+                    Command payloadCommand = (Command) Hibernate.unproxy(payload);
+                    payloadCommand.setUpdateAttributes(input);
+                    payloadCommand = payloadRepository.save(payloadCommand);
+                    this.payloadService.updateInjectorContractsForPayload(payloadCommand);
+                    return payloadCommand;
+                case "Executable":
+                    Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
+                    payloadExecutable.setUpdateAttributes(input);
+                    payloadExecutable.setExecutableFile(documentRepository.findById(input.getExecutableFile()).orElseThrow());
+                    payloadExecutable = payloadRepository.save(payloadExecutable);
+                    this.payloadService.updateInjectorContractsForPayload(payloadExecutable);
+                    return payloadExecutable;
+                case "FileDrop":
+                    FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
+                    payloadFileDrop.setUpdateAttributes(input);
+                    payloadFileDrop.setFileDropFile(documentRepository.findById(input.getFileDropFile()).orElseThrow());
+                    payloadFileDrop = payloadRepository.save(payloadFileDrop);
+                    this.payloadService.updateInjectorContractsForPayload(payloadFileDrop);
+                    return payloadFileDrop;
+                case "DnsResolution":
+                    DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
+                    payloadDnsResolution.setUpdateAttributes(input);
+                    payloadDnsResolution = payloadRepository.save(payloadDnsResolution);
+                    this.payloadService.updateInjectorContractsForPayload(payloadDnsResolution);
+                    return payloadDnsResolution;
+                case "NetworkTraffic":
+                    NetworkTraffic payloadNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(payload);
+                    payloadNetworkTraffic.setUpdateAttributes(input);
+                    payloadNetworkTraffic = payloadRepository.save(payloadNetworkTraffic);
+                    this.payloadService.updateInjectorContractsForPayload(payloadNetworkTraffic);
+                    return payloadNetworkTraffic;
+                default:
+                    throw new UnsupportedOperationException("Payload type " + existingPayload.getType() + " is not supported");
+            }
+        } else {
+            switch (input.getType()) {
+                case "Command":
+                    Command commandPayload = new Command();
+                    commandPayload.setUpdateAttributes(input);
+                    commandPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(input.getAttackPatternsExternalIds())));
+                    commandPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+                    commandPayload = payloadRepository.save(commandPayload);
+                    this.payloadService.updateInjectorContractsForPayload(commandPayload);
+                    return commandPayload;
+                case "Executable":
+                    Executable executablePayload = new Executable();
+                    executablePayload.setUpdateAttributes(input);
+                    executablePayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(input.getAttackPatternsExternalIds())));
+                    executablePayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+                    executablePayload.setExecutableFile(documentRepository.findById(input.getExecutableFile()).orElseThrow());
+                    executablePayload = payloadRepository.save(executablePayload);
+                    this.payloadService.updateInjectorContractsForPayload(executablePayload);
+                    return executablePayload;
+                case "FileDrop":
+                    FileDrop fileDropPayload = new FileDrop();
+                    fileDropPayload.setUpdateAttributes(input);
+                    fileDropPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(input.getAttackPatternsExternalIds())));
+                    fileDropPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+                    fileDropPayload.setFileDropFile(documentRepository.findById(input.getFileDropFile()).orElseThrow());
+                    fileDropPayload = payloadRepository.save(fileDropPayload);
+                    this.payloadService.updateInjectorContractsForPayload(fileDropPayload);
+                    return fileDropPayload;
+                case "DnsResolution":
+                    DnsResolution dnsResolutionPayload = new DnsResolution();
+                    dnsResolutionPayload.setUpdateAttributes(input);
+                    dnsResolutionPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(input.getAttackPatternsExternalIds())));
+                    dnsResolutionPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+                    dnsResolutionPayload = payloadRepository.save(dnsResolutionPayload);
+                    this.payloadService.updateInjectorContractsForPayload(dnsResolutionPayload);
+                    return dnsResolutionPayload;
+                case "NetworkTraffic":
+                    NetworkTraffic networkTrafficPayload = new NetworkTraffic();
+                    networkTrafficPayload.setUpdateAttributes(input);
+                    networkTrafficPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(input.getAttackPatternsExternalIds())));
+                    networkTrafficPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+                    networkTrafficPayload = payloadRepository.save(networkTrafficPayload);
+                    this.payloadService.updateInjectorContractsForPayload(networkTrafficPayload);
+                    return networkTrafficPayload;
+                default:
+                    throw new UnsupportedOperationException("Payload type " + input.getType() + " is not supported");
+            }
         }
     }
 
