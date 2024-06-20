@@ -1,5 +1,5 @@
-import { useParams, Link } from 'react-router-dom';
-import React from 'react';
+import { Link, useParams } from 'react-router-dom';
+import React, { useState } from 'react';
 import { Avatar, Button, Chip, Grid, Paper, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { PlayArrowOutlined } from '@mui/icons-material';
@@ -13,7 +13,6 @@ import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
-import ExerciseList from '../../simulations/ExerciseList';
 import ScenarioDistributionByExercise from './ScenarioDistributionByExercise';
 import { useFormatter } from '../../../../components/i18n';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
@@ -22,10 +21,14 @@ import ItemMainFocus from '../../../../components/ItemMainFocus';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import ItemSeverity from '../../../../components/ItemSeverity';
-import type { KillChainPhase } from '../../../../utils/api-types';
-import { fetchScenarioExercises } from '../../../../actions/scenarios/scenario-actions';
+import type { KillChainPhase, SearchPaginationInput } from '../../../../utils/api-types';
+import { fetchScenarioExercises, searchScenarioExercises } from '../../../../actions/scenarios/scenario-actions';
 import type { Theme } from '../../../../components/Theme';
 import { isEmptyField } from '../../../../utils/utils';
+import type { EndpointStore } from '../../assets/endpoints/Endpoint';
+import { initSorting } from '../../../../components/common/pagination/Page';
+import ExerciseList from '../../simulations/ExerciseList';
+import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -58,25 +61,31 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
   const dispatch = useAppDispatch();
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
   // Fetching data
-  const { scenario, exercises } = useHelper((helper: ScenariosHelper & ExercisesHelper) => ({
+  const { scenario, exercises: exercisesFromStore } = useHelper((helper: ScenariosHelper & ExercisesHelper) => ({
     scenario: helper.getScenario(scenarioId),
     exercises: helper.getExercisesMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchScenarioExercises(scenarioId));
   });
-  const scenarioExercises = scenario.scenario_exercises?.map((exerciseId: string) => exercises[exerciseId]).filter((ex: ExerciseStore) => !!ex);
+  const scenarioExercises = scenario.scenario_exercises?.map((exerciseId: string) => exercisesFromStore[exerciseId]).filter((ex: ExerciseStore) => !!ex);
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
+
+  // Exercises
+  const [exercises, setExercises] = useState<EndpointStore[]>([]);
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+    sorts: initSorting('exercise_start_date'),
+  });
   return (
     <>
       <Grid
-        container={true}
+        container
         spacing={3}
         classes={{ container: classes.gridContainer }}
       >
-        <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
+        <Grid item xs={6} style={{ paddingTop: 10 }}>
           <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Typography variant="h4" gutterBottom={true}>
+            <Typography variant="h4" gutterBottom>
               {t('Information')}
             </Typography>
             <Button
@@ -92,11 +101,11 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
             </Button>
           </div>
           <Paper classes={{ root: classes.paper }} variant="outlined">
-            <Grid container={true} spacing={3}>
-              <Grid item={true} xs={12} style={{ paddingTop: 10 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Description')}
@@ -106,64 +115,64 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
                   limit={300}
                 />
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Severity')}
                 </Typography>
                 <ItemSeverity severity={scenario.scenario_severity} label={t(scenario.scenario_severity ?? 'Unknown')} />
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Category')}
                 </Typography>
                 <ItemCategory category={scenario.scenario_category} label={t(scenario.scenario_category ?? 'Unknown')} />
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Main Focus')}
                 </Typography>
                 <ItemMainFocus mainFocus={scenario.scenario_main_focus} label={t(scenario.scenario_main_focus ?? 'Unknown')} />
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Tags')}
                 </Typography>
                 <ItemTags tags={scenario.scenario_tags} limit={10} />
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Platforms')}
                 </Typography>
                 {(scenario.scenario_platforms ?? []).length === 0 ? (
-                  <PlatformIcon platform={t('No inject in this scenario')} tooltip={true} width={25} />
+                  <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
                 ) : scenario.scenario_platforms.map(
-                  (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip={true} width={25} marginRight={10} />,
+                  (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
                 )}
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Kill Chain Phases')}
@@ -182,8 +191,8 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
             </Grid>
           </Paper>
         </Grid>
-        <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
-          <Typography variant="h4" gutterBottom={true} style={{ margin: '9px 0 17px 0' }}>
+        <Grid item xs={6} style={{ paddingTop: 10 }}>
+          <Typography variant="h4" gutterBottom style={{ margin: '9px 0 17px 0' }}>
             {t('Simulations Results')}
           </Typography>
           <Paper classes={{ root: classes.paper }} variant="outlined">
@@ -196,7 +205,17 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
               {t('Simulations')}
             </Typography>
             <Paper classes={{ root: classes.paper }} variant="outlined">
-              <ExerciseList exercises={scenarioExercises} withoutSearch={true} />
+              <PaginationComponent
+                fetch={(input) => searchScenarioExercises(scenarioId, input)}
+                searchPaginationInput={searchPaginationInput}
+                setContent={setExercises}
+                searchEnable={false}
+              />
+              <ExerciseList
+                exercises={exercises}
+                searchPaginationInput={searchPaginationInput}
+                setSearchPaginationInput={setSearchPaginationInput}
+              />
             </Paper>
           </Grid>
         )}

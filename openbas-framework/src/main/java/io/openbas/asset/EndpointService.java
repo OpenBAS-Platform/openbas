@@ -101,7 +101,7 @@ public class EndpointService {
         default -> throw new UnsupportedOperationException("");
     };
     String filename = file +  "-" + version + "." + extension;
-    String resourcePath = "/openbas-agent/" + platform + "/";
+    String resourcePath = "/openbas-agent/" + platform.toLowerCase() + "/";
     InputStream in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
     if (in == null) { // Dev mode, get from artifactory
       filename = file + "-latest." + extension;

@@ -37,7 +37,7 @@ const PayloadForm = (props) => {
         requiredFields.push(...['executable_file']);
         break;
       default:
-        // do nothing
+      // do nothing
     }
     requiredFields.forEach((field) => {
       if (field === 'payload_platforms' && (!values[field] || values[field].length === 0)) {
@@ -86,68 +86,68 @@ const PayloadForm = (props) => {
             style={{ marginTop: 20 }}
           />
           {type === 'Command' && (
-          <>
-            <OldSelectField
-              variant="standard"
-              label={t('Command executor')}
-              name="command_executor"
-              fullWidth={true}
-              style={{ marginTop: 20 }}
-            >
-              <MenuItem value="psh">
-                {t('PowerShell')}
-              </MenuItem>
-              <MenuItem value="cmd">
-                {t('Command Prompt')}
-              </MenuItem>
-              <MenuItem value="bash">
-                {t('Bash')}
-              </MenuItem>
-              <MenuItem value="sh">
-                {t('Sh')}
-              </MenuItem>
-            </OldSelectField>
-            <OldTextField
-              name="command_content"
-              multiline={true}
-              fullWidth={true}
-              rows={3}
-              label={t('Command')}
-              style={{ marginTop: 20 }}
-              helperText={t('To put arguments in the command line, use #{argument_key}')}
-            />
-          </>
+            <>
+              <OldSelectField
+                variant="standard"
+                label={t('Command executor')}
+                name="command_executor"
+                fullWidth={true}
+                style={{ marginTop: 20 }}
+              >
+                <MenuItem value="psh">
+                  {t('PowerShell')}
+                </MenuItem>
+                <MenuItem value="cmd">
+                  {t('Command Prompt')}
+                </MenuItem>
+                <MenuItem value="bash">
+                  {t('Bash')}
+                </MenuItem>
+                <MenuItem value="sh">
+                  {t('Sh')}
+                </MenuItem>
+              </OldSelectField>
+              <OldTextField
+                name="command_content"
+                multiline={true}
+                fullWidth={true}
+                rows={3}
+                label={t('Command')}
+                style={{ marginTop: 20 }}
+                helperText={t('To put arguments in the command line, use #{argument_key}')}
+              />
+            </>
           )}
           {type === 'Executable' && (
-          <>
-            <DocumentField
-              name="executable_file"
-              label={t('Executable file')}
-              style={{ marginTop: 20 }}
-            />
-          </>
+            <>
+              <DocumentField
+                name="executable_file"
+                label={t('Executable file')}
+                style={{ marginTop: 20 }}
+              />
+            </>
           )}
           {type === 'FileDrop' && (
-          <>
-            <DocumentField
-              name="file_drop_file"
-              label={t('File to drop')}
-              style={{ marginTop: 20 }}
-            />
-          </>
+            <>
+              <DocumentField
+                name="file_drop_file"
+                label={t('File to drop')}
+                style={{ marginTop: 20 }}
+              />
+            </>
           )}
           {type === 'DnsResolution' && (
-          <>
-            <OldTextField
-              name="dns_resolution_hostname"
-              label={t('Hostname')}
-              style={{ marginTop: 20 }}
-              multiline={true}
-              fullWidth={true}
-              rows={3}
-              helperText={t('One hostname by line')}
-            />
-          </>
+            <>
+              <OldTextField
+                name="dns_resolution_hostname"
+                label={t('Hostname')}
+                style={{ marginTop: 20 }}
+                multiline={true}
+                fullWidth={true}
+                rows={3}
+                helperText={t('One hostname by line')}
+              />
+            </>
           )}
           <FieldArray name="payload_arguments">
             {({ fields, meta }) => (

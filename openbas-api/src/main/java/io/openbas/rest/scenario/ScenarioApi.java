@@ -1,10 +1,13 @@
 package io.openbas.rest.scenario;
 
-import io.openbas.database.model.*;
+import io.openbas.database.model.Scenario;
+import io.openbas.database.model.Team;
+import io.openbas.database.model.TeamSimple;
+import io.openbas.database.model.User;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.exercise.form.ExerciseSimple;
+import io.openbas.rest.exercise.ExerciseService;
 import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
 import io.openbas.rest.helper.TeamHelper;
 import io.openbas.rest.scenario.form.*;
@@ -100,7 +103,7 @@ public class ScenarioApi {
     return this.scenarioService.scenarios();
   }
 
-  @PostMapping("/api/scenarios/search")
+  @PostMapping(SCENARIO_URI + "/search")
   public Page<RawPaginationScenario> scenarios(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return this.scenarioService.scenarios(searchPaginationInput);
   }
@@ -170,15 +173,6 @@ public class ScenarioApi {
   @Secured(ROLE_ADMIN)
   public void importScenario(@RequestPart("file") @NotNull MultipartFile file) throws Exception {
     this.importService.handleFileImport(file);
-  }
-
-  // -- SIMULATION --
-
-  @GetMapping(SCENARIO_URI + "/{scenarioId}/exercises")
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
-  public Iterable<ExerciseSimple> scenarioExercises(@PathVariable @NotBlank final String scenarioId) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    return scenario.getExercises().stream().map(ExerciseSimple::fromExercise).toList();
   }
 
   // -- TEAMS --
