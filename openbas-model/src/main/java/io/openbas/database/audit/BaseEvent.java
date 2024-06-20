@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Base;
+import jakarta.persistence.Id;
+import java.lang.reflect.Field;
 import lombok.Getter;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -35,7 +37,12 @@ public class BaseEvent implements Cloneable {
         boolean isTargetClass = currentClass.getSuperclass().equals(Object.class);
         Class<?> baseClass = isTargetClass ? currentClass : currentClass.getSuperclass();
         String className = baseClass.getSimpleName().toLowerCase();
-        this.attributeId = className + "_id";
+        Field[] fields = baseClass.getDeclaredFields();
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(Id.class)) {
+                this.attributeId = field.getAnnotation(JsonProperty.class).value();
+            }
+        }
         this.schema = className + (className.endsWith("s") ? "es" : "s");
     }
 
