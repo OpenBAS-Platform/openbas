@@ -1,14 +1,17 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.hypersistence.utils.hibernate.type.basic.PostgreSQLHStoreType;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -40,6 +43,11 @@ public class RuleAttribute implements Base {
     @NotBlank
     @NotNull
     private String defaultValue;
+
+    @Type(PostgreSQLHStoreType.class)
+    @Column(name = "attribute_additional_config")
+    @JsonProperty("rule_attribute_additional_config")
+    private Map<String, String> additionalConfig;
 
     @Override
     public boolean equals(Object o) {
