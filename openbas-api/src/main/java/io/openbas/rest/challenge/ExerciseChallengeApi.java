@@ -1,6 +1,5 @@
 package io.openbas.rest.challenge;
 
-import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Inject;
 import io.openbas.database.repository.ChallengeRepository;
 import io.openbas.database.repository.InjectRepository;
@@ -32,7 +31,6 @@ public class ExerciseChallengeApi extends RestBehavior {
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @GetMapping(EXERCISE_URI + "/{exerciseId}/challenges")
   @Transactional(readOnly = true)
-  @LogExecutionTime
   public Iterable<ChallengeOutput> exerciseChallenges(@PathVariable @NotBlank final String exerciseId) {
     List<Inject> injects = this.injectRepository.findAll(
         InjectSpecification.fromExercise(exerciseId)
