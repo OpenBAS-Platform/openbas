@@ -90,6 +90,11 @@ public class Payload implements Base {
   @JsonProperty("payload_prerequisites")
   private List<PayloadPrerequisite> prerequisites = new ArrayList<>();
 
+  @Setter
+  @Column(name = "payload_external_id")
+  @JsonProperty("payload_external_id")
+  private String externalId;
+
   // -- TAG --
 
   @Queryable(sortable = true)
