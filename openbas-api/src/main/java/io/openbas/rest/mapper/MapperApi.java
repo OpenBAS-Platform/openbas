@@ -60,7 +60,7 @@ public class MapperApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/mappers")
-    public void createImportMapper(@RequestBody @Valid final MapperAddInput mapperAddInput) {
+    public ImportMapper createImportMapper(@RequestBody @Valid final MapperAddInput mapperAddInput) {
         ImportMapper importMapper = new ImportMapper();
         importMapper.setName(mapperAddInput.getName());
         importMapper.setInjectTypeColumn(mapperAddInput.getInjectTypeColumn());
@@ -85,13 +85,14 @@ public class MapperApi extends RestBehavior {
                         ruleAttribute.setColumns(ruleAttributeInput.getColumns());
                         ruleAttribute.setName(ruleAttributeInput.getName());
                         ruleAttribute.setDefaultValue(ruleAttributeInput.getDefaultValue());
+                        ruleAttribute.setAdditionalConfig(ruleAttributeInput.getAdditionalConfig());
                         injectImporter.getRuleAttributes().add(ruleAttribute);
                     });
                     importMapper.getInjectImporters().add(injectImporter);
                 }
         );
 
-        importMapperRepository.save(importMapper);
+        return importMapperRepository.save(importMapper);
     }
 
     @Secured(ROLE_ADMIN)
@@ -133,6 +134,7 @@ public class MapperApi extends RestBehavior {
                 ruleAttribute.setColumns(ruleAttributeUpdateInput.getColumns());
                 ruleAttribute.setName(ruleAttributeUpdateInput.getName());
                 ruleAttribute.setDefaultValue(ruleAttributeUpdateInput.getDefaultValue());
+                ruleAttribute.setAdditionalConfig(ruleAttributeUpdateInput.getAdditionalConfig());
                 ruleAttributes.add(ruleAttribute);
             }
         });
@@ -165,6 +167,7 @@ public class MapperApi extends RestBehavior {
                     ruleAttribute.setColumns(ruleAttributeInput.getColumns());
                     ruleAttribute.setName(ruleAttributeInput.getName());
                     ruleAttribute.setDefaultValue(ruleAttributeInput.getDefaultValue());
+                    ruleAttribute.setAdditionalConfig(ruleAttributeInput.getAdditionalConfig());
                     injectImporter.getRuleAttributes().add(ruleAttribute);
                 });
                 injectImporters.add(injectImporter);
