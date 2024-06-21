@@ -3,7 +3,9 @@ import { makeStyles } from '@mui/styles';
 import { Fab } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import { useFormatter } from '../../../../../components/i18n';
-import ButtonCreate from '../../../../../components/common/ButtonCreate';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import type { MapperAddInput } from '../../../../../utils/api-types';
+import { addMapper } from '../../../../../actions/xls_formatter/xls-formatter-actions';
 import Drawer from '../../../../../components/common/Drawer';
 import MapperForm from './MapperForm';
 
@@ -18,11 +20,19 @@ const useStyles = makeStyles(() => ({
 const XlsFormatterCreation = () => {
   const classes = useStyles();
   const { t } = useFormatter();
+  const dispatch = useAppDispatch();
+
   const [open, setOpen] = useState(false);
 
-  const onSubmit = () => {
-    console.log('submit');
-  };
+  const onSubmit = ((data: MapperAddInput) => {
+    dispatch(addMapper(data)).then(
+      (result: never) => {
+        return result;
+      },
+    );
+    setOpen(false);
+  });
+
   return (
     <>
       <Fab

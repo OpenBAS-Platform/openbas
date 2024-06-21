@@ -1119,7 +1119,13 @@ const i18n = {
       // ---Xls mapper
       'Create a xls mapper': 'Créer un mapper xls',
       'Mapper name': 'Nom du mapper',
-      'Type column': 'Type de la colonne',
+      'Inject type column': 'Colonne de type d\'inject',
+      'Inject importer': 'Importeur d\'inject',
+      'Inject importer name': 'Nom d\'inject importer',
+      'Inject importer type': 'Type d\'inject importer',
+      'Inject importer description': 'Description d\'inject importer',
+      'Inject importer injector contract': 'Contrat d\'inject d\'inject importer',
+      'Inject importer rules': 'Règles d\'inject importer',
     },
     en: {
       openbas_email: 'Email',
