@@ -103,6 +103,11 @@ public class InjectorContract implements Base {
     @Queryable(filterable = true)
     private boolean isAtomicTesting;
 
+    @JsonProperty("injector_contract_injector_type")
+    private String getInjectorType() {
+        return this.getInjector() != null ? this.getInjector().getType() : null;
+    }
+
     @JsonIgnore
     @Override
     public boolean isUserHasAccess(User user) {

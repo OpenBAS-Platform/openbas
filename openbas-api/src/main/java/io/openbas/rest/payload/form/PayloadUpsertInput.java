@@ -27,6 +27,9 @@ public class PayloadUpsertInput {
     @JsonProperty("payload_external_id")
     private String externalId;
 
+    @JsonProperty("payload_collector")
+    private String collector;
+
     @JsonProperty("payload_platforms")
     private String[] platforms;
 
