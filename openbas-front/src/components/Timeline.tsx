@@ -269,7 +269,8 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
                               done={inject.inject_status !== null}
                               disabled={!inject.inject_enabled}
                               size="small"
-                              variant={'timeline'}
+                              variant='timeline'
+                              tooltip={tooltipContent}
                             />
                           );
                         })
