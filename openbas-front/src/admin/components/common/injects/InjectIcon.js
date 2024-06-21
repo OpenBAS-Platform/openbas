@@ -1,42 +1,45 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { HelpOutlineOutlined } from '@mui/icons-material';
+import { DnsOutlined, HelpOutlineOutlined } from '@mui/icons-material';
+import { ApplicationCogOutline, Console, FileImportOutline, LanConnect } from 'mdi-material-ui';
 import CustomTooltip from '../../../../components/CustomTooltip';
 import { useFormatter } from '../../../../components/i18n';
 
-const iconSelector = (type, isCollector, variant, fontSize, done, disabled, onClick) => {
+const iconSelector = (type, isPayload, variant, fontSize, done, disabled, onClick) => {
+  const style = {
+    marginTop: variant === 'list' ? 5 : 0,
+    padding: variant === 'timeline' ? 1 : 0,
+    width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
+    height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
+    borderRadius: 4,
+    cursor: onClick ? 'pointer' : 'default',
+    filter: `${done ? 'filter:hue-rotate(100deg);' : `brightness(${disabled ? '30%' : '100%'})`}`,
+  };
   if (!type) {
     return (
-      <HelpOutlineOutlined
-        onClick={onClick}
-        style={{
-          marginTop: variant === 'list' ? 5 : 0,
-          width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
-          height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
-          borderRadius: 4,
-          cursor: onClick ? 'pointer' : 'default',
-          filter: `${done ? 'filter:hue-rotate(100deg);' : `brightness(${disabled ? '30%' : '100%'})`}`,
-        }}
-      />
+      <HelpOutlineOutlined onClick={onClick} style={style}/>
     );
   }
-  if (isCollector) {
-    return (
-      <img
-        onClick={onClick}
-        src={`/api/images/collectors/${type}`}
-        alt={type}
-        style={{
-          marginTop: variant === 'list' ? 5 : 0,
-          padding: variant === 'timeline' ? 1 : 0,
-          width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
-          height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
-          borderRadius: 4,
-          cursor: onClick ? 'pointer' : 'default',
-          filter: `${done ? 'filter:hue-rotate(100deg);' : `brightness(${disabled ? '30%' : '100%'})`}`,
-        }}
-      />
-    );
+  if (isPayload) {
+    if (type.startsWith('openbas_')) {
+      return (
+        <img onClick={onClick} src={`/api/images/collectors/${type}`} alt={type} style={style}/>
+      );
+    }
+    switch (type) {
+      case 'Command':
+        return <Console color="primary" onClick={onClick} style={style}/>;
+      case 'Executable':
+        return <ApplicationCogOutline color="primary" onClick={onClick} style={style} />;
+      case 'FileDrop':
+        return <FileImportOutline color="primary" onClick={onClick} style={style} />;
+      case 'DnsResolution':
+        return <DnsOutlined color="primary" onClick={onClick} style={style} />;
+      case 'NetworkTraffic':
+        return <LanConnect color="primary" onClick={onClick} style={style} />;
+      default:
+        return <HelpOutlineOutlined color="primary" onClick={onClick} style={style} />;
+    }
   }
   return (
     <img
@@ -58,11 +61,11 @@ const iconSelector = (type, isCollector, variant, fontSize, done, disabled, onCl
 
 const InjectIcon = (props) => {
   const { t } = useFormatter();
-  const { type, isCollector, size, variant, done, disabled, onClick, tooltip } = props;
+  const { type, isPayload, size, variant, done, disabled, onClick, tooltip } = props;
   const fontSize = size || 'medium';
   return (
     <CustomTooltip title={tooltip || (type ? t(type) : t('Unknown'))}>
-      {iconSelector(type, isCollector, variant, fontSize, done, disabled, onClick)}
+      {iconSelector(type, isPayload, variant, fontSize, done, disabled, onClick)}
     </CustomTooltip>
   );
 };
@@ -73,7 +76,7 @@ InjectIcon.propTypes = {
   variant: PropTypes.string,
   done: PropTypes.bool,
   disabled: PropTypes.bool,
-  isCollector: PropTypes.bool,
+  isPayload: PropTypes.bool,
   onClick: PropTypes.func,
   tooltip: PropTypes.object,
 };
