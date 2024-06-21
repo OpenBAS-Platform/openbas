@@ -20,9 +20,7 @@ import PlatformIcon from '../../../components/PlatformIcon';
 import { fetchDocuments } from '../../../actions/Document';
 import PayloadIcon from '../../../components/PayloadIcon';
 import { fetchCollectors } from '../../../actions/Collector';
-import PayloadForm from './PayloadForm';
 import Drawer from '../../../components/common/Drawer';
-import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
