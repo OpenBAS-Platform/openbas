@@ -22,7 +22,6 @@ import CreateInjectDetails from './CreateInjectDetails';
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import InjectIcon from './InjectIcon';
 import type { InjectorHelper } from '../../../../actions/injectors/injector-helper';
-import { fetchInjectors } from '../../../../actions/Injectors';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';

@@ -39,7 +39,7 @@ const Validations = () => {
   const dispatch = useDispatch();
   const { exerciseId } = useParams();
   const [tags, setTags] = useState([]);
-  const { t, fndt } = useFormatter();
+  const { fndt } = useFormatter();
   const [keyword, setKeyword] = useState('');
   const handleSearch = (value) => setKeyword(value);
   const handleAddTag = (value) => {

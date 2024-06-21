@@ -52,15 +52,16 @@ const iconSelector = (type, isCollector, variant, fontSize, done, disabled, onCl
         filter: `${done ? 'filter:hue-rotate(100deg);' : `brightness(${disabled ? '30%' : '100%'})`}`,
       }}
     />
+
   );
 };
 
 const InjectIcon = (props) => {
   const { t } = useFormatter();
-  const { type, isCollector, size, variant, done, disabled, onClick } = props;
+  const { type, isCollector, size, variant, done, disabled, onClick, tooltip } = props;
   const fontSize = size || 'medium';
   return (
-    <CustomTooltip title={type ? t(type) : t('Unknown')}>
+    <CustomTooltip title={tooltip || (type ? t(type) : t('Unknown'))}>
       {iconSelector(type, isCollector, variant, fontSize, done, disabled, onClick)}
     </CustomTooltip>
   );
@@ -74,6 +75,7 @@ InjectIcon.propTypes = {
   disabled: PropTypes.bool,
   isCollector: PropTypes.bool,
   onClick: PropTypes.func,
+  tooltip: PropTypes.object,
 };
 
 export default InjectIcon;
