@@ -28,6 +28,9 @@ public class ContentConverter implements AttributeConverter<ObjectNode, String> 
     @Override
     public ObjectNode convertToEntityAttribute(String dbData) {
         try {
+            if(dbData == null) {
+                return null;
+            }
             return mapper.readValue(dbData, ObjectNode.class);
         } catch (IOException ex) {
             // logger.error("Unexpected IOEx decoding json from database: " + dbData);
