@@ -189,10 +189,11 @@ const InjectList: FunctionComponent<Props> = ({
             >
               <ListItemIcon>
                 <InjectIcon
-                  isCollector={isNotEmptyField(injectDto.inject_injector_contract?.injector_contract_payload?.payload_collector_type)}
+                  isPayload={isNotEmptyField(injectDto.inject_injector_contract?.injector_contract_payload)}
                   type={
-                    injectDto.inject_injector_contract?.injector_contract_payload?.payload_collector_type
+                    injectDto.inject_injector_contract?.injector_contract_payload
                       ? injectDto.inject_injector_contract.injector_contract_payload.payload_collector_type
+                        || injectDto.inject_injector_contract.injector_contract_payload.payload_type
                       : injectDto.inject_type
                   }
                   variant="list"

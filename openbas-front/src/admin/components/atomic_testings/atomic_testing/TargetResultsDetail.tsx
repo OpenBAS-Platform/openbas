@@ -15,6 +15,7 @@ import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAu
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
 import ItemResult from '../../../../components/ItemResult';
 import InjectIcon from '../../common/injects/InjectIcon';
+import { isNotEmptyField } from '../../../../utils/utils';
 
 interface Steptarget {
   label: string;
@@ -41,16 +42,14 @@ const useStyles = makeStyles<Theme>(() => ({
 }));
 
 interface Props {
-  injectId: string,
-  injectType: string,
+  inject: InjectResultDTO,
   lastExecutionStartDate: string,
   lastExecutionEndDate: string,
   target: InjectTargetWithResult,
 }
 
 const TargetResultsDetailFlow: FunctionComponent<Props> = ({
-  injectId,
-  injectType,
+  inject,
   lastExecutionStartDate,
   lastExecutionEndDate,
   target,
@@ -144,7 +143,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         labelShowBg: false,
         labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
       })));
-      fetchTargetResult(injectId, target.id!, target.targetType!).then(
+      fetchTargetResult(inject.inject_id, target.id!, target.targetType!).then(
         (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
       );
       setActiveTab(0);
@@ -199,7 +198,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   };
 
   const onUpdateManualValidation = () => {
-    fetchInjectResultDto(injectId).then((result: { data: InjectResultDTO }) => {
+    fetchInjectResultDto(inject.inject_id).then((result: { data: InjectResultDTO }) => {
       updateInjectResultDto(result.data);
     });
   };
@@ -238,7 +237,16 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                           style={{ width: 20, height: 20, borderRadius: 4 }}
                         />
                       ) : (
-                        <InjectIcon type={injectType} variant="inline"/>
+                        <InjectIcon
+                          isPayload={isNotEmptyField(inject.inject_injector_contract?.injector_contract_payload)}
+                          type={
+                            inject.inject_injector_contract?.injector_contract_payload
+                              ? inject.inject_injector_contract.injector_contract_payload.payload_collector_type
+                                  || inject.inject_injector_contract.injector_contract_payload.payload_type
+                              : inject.inject_type
+                            }
+                          variant="inline"
+                        />
                       )
                     }
                       <Typography variant="h4" style={{ margin: '2px 0 0 10px' }}>

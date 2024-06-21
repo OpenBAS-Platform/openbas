@@ -1,8 +1,7 @@
-import { useParams } from 'react-router-dom';
 import React, { useContext, useEffect, useState } from 'react';
 import { Chip, Grid, List, Paper, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import type { AttackPattern, InjectResultDTO, InjectTargetWithResult, KillChainPhase } from '../../../../utils/api-types';
+import type { AttackPattern, InjectTargetWithResult, KillChainPhase } from '../../../../utils/api-types';
 import ResponsePie from '../../common/injects/ResponsePie';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
@@ -43,7 +42,6 @@ const AtomicTesting = () => {
   // Standard hooks
   const classes = useStyles();
   const { t, tPick, fldt } = useFormatter();
-  const { injectId } = useParams() as { injectId: InjectResultDTO['inject_id'] };
   const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
   const filtering = useSearchAnFilter('', 'name', ['name']);
 
@@ -101,10 +99,11 @@ const AtomicTesting = () => {
                 <div style={{ display: 'flex' }}>
                   <InjectIcon
                     variant="inline"
-                    isCollector={isNotEmptyField(injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_collector_type)}
+                    isPayload={isNotEmptyField(injectResultDto.inject_injector_contract?.injector_contract_payload)}
                     type={
-                        injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_collector_type
+                        injectResultDto.inject_injector_contract?.injector_contract_payload
                           ? injectResultDto.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                            || injectResultDto.inject_injector_contract.injector_contract_payload?.payload_type
                           : injectResultDto.inject_type
                     }
                   />
@@ -249,8 +248,7 @@ const AtomicTesting = () => {
             {selectedTarget && !!injectResultDto.inject_type && (
               <TargetResultsDetail
                 target={selectedTarget}
-                injectId={injectId}
-                injectType={injectResultDto.inject_type}
+                inject={injectResultDto}
                 lastExecutionStartDate={injectResultDto.inject_status?.tracking_sent_date || ''}
                 lastExecutionEndDate={injectResultDto.inject_status?.tracking_end_date || ''}
               />

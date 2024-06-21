@@ -259,10 +259,11 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
                           return (
                             <InjectIcon
                               key={inject.inject_id}
-                              isCollector={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload?.payload_collector_type)}
+                              isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
                               type={
-                                inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                                inject.inject_injector_contract.injector_contract_payload
                                   ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                                    || inject.inject_injector_contract.injector_contract_payload?.payload_type
                                   : inject.inject_type
                               }
                               onClick={() => handleSelectInject(inject.inject_id)}

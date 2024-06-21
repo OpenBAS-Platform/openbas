@@ -156,10 +156,11 @@ const Validations = () => {
                 <ListItem divider={true} classes={{ root: classes.item }}>
                   <ListItemIcon style={{ paddingTop: 5 }}>
                     <InjectIcon
-                      isCollector={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload?.payload_collector_type)}
+                      isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
                       type={
-                          inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                          inject.inject_injector_contract.injector_contract_payload
                             ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                              || inject.inject_injector_contract.injector_contract_payload?.payload_type
                             : inject.inject_type
                         }
                       disabled={!inject.inject_enabled}

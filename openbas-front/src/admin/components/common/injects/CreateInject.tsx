@@ -185,11 +185,12 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
                     <ListItemIcon>
                       <InjectIcon
                         type={
-                          contract.injector_contract_payload?.payload_collector_type
-                            ? contract.injector_contract_payload.payload_collector_type
+                          contract.injector_contract_payload
+                            ? contract.injector_contract_payload?.payload_collector_type
+                              || contract.injector_contract_payload?.payload_type
                             : contract.injector_contract_injector_type
                         }
-                        isCollector={isNotEmptyField(contract.injector_contract_payload?.payload_collector_type)}
+                        isPayload={isNotEmptyField(contract.injector_contract_payload)}
                       />
                     </ListItemIcon>
                     <ListItemText
