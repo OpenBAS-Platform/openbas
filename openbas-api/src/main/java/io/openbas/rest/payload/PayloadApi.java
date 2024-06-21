@@ -1,10 +1,7 @@
 package io.openbas.rest.payload;
 
 import io.openbas.database.model.*;
-import io.openbas.database.repository.AttackPatternRepository;
-import io.openbas.database.repository.DocumentRepository;
-import io.openbas.database.repository.PayloadRepository;
-import io.openbas.database.repository.TagRepository;
+import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.payload.form.PayloadCreateInput;
@@ -45,6 +42,11 @@ public class PayloadApi extends RestBehavior {
     private PayloadService payloadService;
     private AttackPatternRepository attackPatternRepository;
     private DocumentRepository documentRepository;
+    private final CollectorRepository collectorRepository;
+
+    public PayloadApi(CollectorRepository collectorRepository) {
+        this.collectorRepository = collectorRepository;
+    }
 
     @Autowired
     public void setPayloadRepository(PayloadRepository payloadRepository) {
@@ -198,38 +200,41 @@ public class PayloadApi extends RestBehavior {
         Optional<Payload> payload = payloadRepository.findByExternalId(input.getExternalId());
         if (payload.isPresent()) {
             Payload existingPayload = payload.get();
+            if( input.getCollector() != null ) {
+                existingPayload.setCollector(collectorRepository.findById(input.getCollector()).orElseThrow());
+            }
             existingPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(input.getAttackPatternsExternalIds())));
             existingPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
             existingPayload.setUpdatedAt(Instant.now());
             switch (existingPayload.getType()) {
                 case "Command":
-                    Command payloadCommand = (Command) Hibernate.unproxy(payload);
+                    Command payloadCommand = (Command) Hibernate.unproxy(existingPayload);
                     payloadCommand.setUpdateAttributes(input);
                     payloadCommand = payloadRepository.save(payloadCommand);
                     this.payloadService.updateInjectorContractsForPayload(payloadCommand);
                     return payloadCommand;
                 case "Executable":
-                    Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
+                    Executable payloadExecutable = (Executable) Hibernate.unproxy(existingPayload);
                     payloadExecutable.setUpdateAttributes(input);
                     payloadExecutable.setExecutableFile(documentRepository.findById(input.getExecutableFile()).orElseThrow());
                     payloadExecutable = payloadRepository.save(payloadExecutable);
                     this.payloadService.updateInjectorContractsForPayload(payloadExecutable);
                     return payloadExecutable;
                 case "FileDrop":
-                    FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
+                    FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(existingPayload);
                     payloadFileDrop.setUpdateAttributes(input);
                     payloadFileDrop.setFileDropFile(documentRepository.findById(input.getFileDropFile()).orElseThrow());
                     payloadFileDrop = payloadRepository.save(payloadFileDrop);
                     this.payloadService.updateInjectorContractsForPayload(payloadFileDrop);
                     return payloadFileDrop;
                 case "DnsResolution":
-                    DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
+                    DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(existingPayload);
                     payloadDnsResolution.setUpdateAttributes(input);
                     payloadDnsResolution = payloadRepository.save(payloadDnsResolution);
                     this.payloadService.updateInjectorContractsForPayload(payloadDnsResolution);
                     return payloadDnsResolution;
                 case "NetworkTraffic":
-                    NetworkTraffic payloadNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(payload);
+                    NetworkTraffic payloadNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(existingPayload);
                     payloadNetworkTraffic.setUpdateAttributes(input);
                     payloadNetworkTraffic = payloadRepository.save(payloadNetworkTraffic);
                     this.payloadService.updateInjectorContractsForPayload(payloadNetworkTraffic);
@@ -242,6 +247,9 @@ public class PayloadApi extends RestBehavior {
                 case "Command":
                     Command commandPayload = new Command();
                     commandPayload.setUpdateAttributes(input);
+                    if( input.getCollector() != null ) {
+                        commandPayload.setCollector(collectorRepository.findById(input.getCollector()).orElseThrow());
+                    }
                     commandPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(input.getAttackPatternsExternalIds())));
                     commandPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
                     commandPayload = payloadRepository.save(commandPayload);
@@ -250,6 +258,9 @@ public class PayloadApi extends RestBehavior {
                 case "Executable":
                     Executable executablePayload = new Executable();
                     executablePayload.setUpdateAttributes(input);
+                    if( input.getCollector() != null ) {
+                        executablePayload.setCollector(collectorRepository.findById(input.getCollector()).orElseThrow());
+                    }
                     executablePayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(input.getAttackPatternsExternalIds())));
                     executablePayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
                     executablePayload.setExecutableFile(documentRepository.findById(input.getExecutableFile()).orElseThrow());
@@ -259,6 +270,9 @@ public class PayloadApi extends RestBehavior {
                 case "FileDrop":
                     FileDrop fileDropPayload = new FileDrop();
                     fileDropPayload.setUpdateAttributes(input);
+                    if( input.getCollector() != null ) {
+                        fileDropPayload.setCollector(collectorRepository.findById(input.getCollector()).orElseThrow());
+                    }
                     fileDropPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(input.getAttackPatternsExternalIds())));
                     fileDropPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
                     fileDropPayload.setFileDropFile(documentRepository.findById(input.getFileDropFile()).orElseThrow());
@@ -268,6 +282,9 @@ public class PayloadApi extends RestBehavior {
                 case "DnsResolution":
                     DnsResolution dnsResolutionPayload = new DnsResolution();
                     dnsResolutionPayload.setUpdateAttributes(input);
+                    if( input.getCollector() != null ) {
+                        dnsResolutionPayload.setCollector(collectorRepository.findById(input.getCollector()).orElseThrow());
+                    }
                     dnsResolutionPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(input.getAttackPatternsExternalIds())));
                     dnsResolutionPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
                     dnsResolutionPayload = payloadRepository.save(dnsResolutionPayload);
@@ -276,6 +293,9 @@ public class PayloadApi extends RestBehavior {
                 case "NetworkTraffic":
                     NetworkTraffic networkTrafficPayload = new NetworkTraffic();
                     networkTrafficPayload.setUpdateAttributes(input);
+                    if( input.getCollector() != null ) {
+                        networkTrafficPayload.setCollector(collectorRepository.findById(input.getCollector()).orElseThrow());
+                    }
                     networkTrafficPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(input.getAttackPatternsExternalIds())));
                     networkTrafficPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
                     networkTrafficPayload = payloadRepository.save(networkTrafficPayload);

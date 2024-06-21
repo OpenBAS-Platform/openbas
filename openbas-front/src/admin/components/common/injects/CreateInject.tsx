@@ -26,6 +26,7 @@ import { fetchInjectors } from '../../../../actions/Injectors';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
+import { isNotEmptyField } from '../../../../utils/utils';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -94,16 +95,14 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
   const { t, tPick } = useFormatter();
 
   // Fetching data
-  const { attackPatterns, attackPatternsMap, injectorsMap, killChainPhasesMap } = useHelper((helper: AttackPatternHelper & KillChainPhaseHelper & InjectorHelper) => ({
+  const { attackPatterns, attackPatternsMap, killChainPhasesMap } = useHelper((helper: AttackPatternHelper & KillChainPhaseHelper & InjectorHelper) => ({
     attackPatterns: helper.getAttackPatterns(),
     attackPatternsMap: helper.getAttackPatternsMap(),
     killChainPhasesMap: helper.getKillChainPhasesMap(),
-    injectorsMap: helper.getInjectorsMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchKillChainPhases());
     dispatch(fetchAttackPatterns());
-    dispatch(fetchInjectors());
   });
 
   // Contracts
@@ -176,9 +175,6 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
                 // eslint-disable-next-line max-len
                 const contractKillChainPhase = contractAttackPatterns.map((contractAttackPattern: AttackPatternStore) => contractAttackPattern.attack_pattern_kill_chain_phases ?? []).flat().at(0);
                 const resolvedContractKillChainPhase = contractKillChainPhase && killChainPhasesMap[contractKillChainPhase];
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
-                const injector = contract.injector_contract_injector && injectorsMap[contract.injector_contract_injector];
                 return (
                   <ListItemButton
                     key={contract.injector_contract_id}
@@ -188,7 +184,14 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
                     disabled={(selectedContract !== null && selectedContract !== index)}
                   >
                     <ListItemIcon>
-                      <InjectIcon type={injector.injector_type} />
+                      <InjectIcon
+                        type={
+                          contract.injector_contract_payload?.payload_collector_type
+                            ? contract.injector_contract_payload.payload_collector_type
+                            : contract.injector_contract_injector_type
+                        }
+                        isCollector={isNotEmptyField(contract.injector_contract_payload?.payload_collector_type)}
+                      />
                     </ListItemIcon>
                     <ListItemText
                       primary={
