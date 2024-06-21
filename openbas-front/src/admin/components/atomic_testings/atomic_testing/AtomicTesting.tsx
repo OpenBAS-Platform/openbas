@@ -16,6 +16,7 @@ import InjectIcon from '../../common/injects/InjectIcon';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import Loader from '../../../../components/Loader';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
+import { isNotEmptyField } from '../../../../utils/utils';
 
 const useStyles = makeStyles(() => ({
   chip: {
@@ -97,13 +98,17 @@ const AtomicTesting = () => {
                 >
                   {t('Type')}
                 </Typography>
-                <Tooltip title={tPick(injectResultDto.inject_injector_contract.injector_contract_labels)}>
-                  <div style={{ display: 'flex' }}>
-                    <InjectIcon
-                      variant="inline"
-                      tooltip={t(injectResultDto.inject_type ?? 'Unknown')}
-                      type={injectResultDto.inject_type ?? 'Unknown'}
-                    />
+                <div style={{ display: 'flex' }}>
+                  <InjectIcon
+                    variant="inline"
+                    isCollector={isNotEmptyField(injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_collector_type)}
+                    type={
+                        injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_collector_type
+                          ? injectResultDto.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                          : injectResultDto.inject_type
+                    }
+                  />
+                  <Tooltip title={tPick(injectResultDto.inject_injector_contract.injector_contract_labels)}>
                     <div style={{
                       marginLeft: 10,
                       whiteSpace: 'nowrap',
@@ -113,8 +118,8 @@ const AtomicTesting = () => {
                     >
                       {tPick(injectResultDto.inject_injector_contract.injector_contract_labels)}
                     </div>
-                  </div>
-                </Tooltip>
+                  </Tooltip>
+                </div>
               </Grid>
               <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography

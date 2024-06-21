@@ -231,17 +231,15 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                 result.inject_expectation_results.map((collector, index) => (
                   <Grid key={index} item={true} xs={4}>
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10 }}>
-                      {collector.sourceId != null
-                        ? (<img
-                            src={`/api/images/collectors/id/${collector.sourceId}`}
-                            alt={collector.sourceId}
-                            style={{ width: 20, height: 20, borderRadius: 4 }}
-                           />) : (
-                             <InjectIcon
-                               tooltip={t(injectType)}
-                               type={injectType}
-                               variant="inline"
-                             />)
+                      {collector.sourceId != null ? (
+                        <img
+                          src={`/api/images/collectors/id/${collector.sourceId}`}
+                          alt={collector.sourceId}
+                          style={{ width: 20, height: 20, borderRadius: 4 }}
+                        />
+                      ) : (
+                        <InjectIcon type={injectType} variant="inline"/>
+                      )
                     }
                       <Typography variant="h4" style={{ margin: '2px 0 0 10px' }}>
                         {collector.sourceName}

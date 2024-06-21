@@ -125,7 +125,7 @@ public class InjectorService {
                         throw new RuntimeException(e);
                     }
                     toUpdates.add(contract);
-                } else if( !contract.getCustom() && contract.getPayload() == null ) {
+                } else if(!contract.getCustom() && (!injector.isPayloads() || contract.getPayload() == null)) {
                     toDeletes.add(contract.getId());
                 }
             });
@@ -158,9 +158,9 @@ public class InjectorService {
             injectorContractRepository.saveAll(toCreates);
             injectorContractRepository.saveAll(toUpdates);
             injectorRepository.save(injector);
-            if( injector.isPayloads() ) {
-                this.payloadService.updateInjectorContractsForInjector(injector);
-            }
+            // if( injector.isPayloads() ) {
+            //    this.payloadService.updateInjectorContractsForInjector(injector);
+            // }
         } else {
             // save the injector
             Injector newInjector = new Injector();
@@ -173,9 +173,9 @@ public class InjectorService {
             newInjector.setExecutorClearCommands(executorClearCommands);
             newInjector.setPayloads(isPayloads);
             Injector savedInjector = injectorRepository.save(newInjector);
-            if( savedInjector.isPayloads() ) {
-                this.payloadService.updateInjectorContractsForInjector(savedInjector);
-            }
+            // if( savedInjector.isPayloads() ) {
+            //    this.payloadService.updateInjectorContractsForInjector(savedInjector);
+            // }
             // Save the contracts
             List<InjectorContract> injectorContracts = contracts.stream().map(in -> {
                 InjectorContract injectorContract = new InjectorContract();

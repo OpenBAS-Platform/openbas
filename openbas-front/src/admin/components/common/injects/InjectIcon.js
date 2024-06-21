@@ -1,18 +1,39 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { HelpOutlined } from '@mui/icons-material';
+import { HelpOutlineOutlined } from '@mui/icons-material';
 import CustomTooltip from '../../../../components/CustomTooltip';
+import { useFormatter } from '../../../../components/i18n';
 
-const iconSelector = (type, variant, fontSize, done, disabled) => {
+const iconSelector = (type, isCollector, variant, fontSize, done, disabled, onClick) => {
   if (!type) {
     return (
-      <HelpOutlined
+      <HelpOutlineOutlined
+        onClick={onClick}
         style={{
           marginTop: variant === 'list' ? 5 : 0,
           width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
           height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
           borderRadius: 4,
-          filter: `brightness(${disabled ? '30%' : '100%'})`,
+          cursor: onClick ? 'pointer' : 'default',
+          filter: `${done ? 'filter:hue-rotate(100deg);' : `brightness(${disabled ? '30%' : '100%'})`}`,
+        }}
+      />
+    );
+  }
+  if (isCollector) {
+    return (
+      <img
+        onClick={onClick}
+        src={`/api/images/collectors/${type}`}
+        alt={type}
+        style={{
+          marginTop: variant === 'list' ? 5 : 0,
+          padding: variant === 'timeline' ? 1 : 0,
+          width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
+          height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
+          borderRadius: 4,
+          cursor: onClick ? 'pointer' : 'default',
+          filter: `${done ? 'filter:hue-rotate(100deg);' : `brightness(${disabled ? '30%' : '100%'})`}`,
         }}
       />
     );
@@ -28,32 +49,30 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
         width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
         height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
         borderRadius: 4,
-        filter: `brightness(${disabled ? '30%' : '100%'})`,
+        filter: `${done ? 'filter:hue-rotate(100deg);' : `brightness(${disabled ? '30%' : '100%'})`}`,
       }}
     />
   );
 };
 
 const InjectIcon = (props) => {
-  const { type, size, variant, tooltip, done, disabled, onClick } = props;
+  const { t } = useFormatter();
+  const { type, isCollector, size, variant, done, disabled, onClick } = props;
   const fontSize = size || 'medium';
-  if (tooltip) {
-    return (
-      <CustomTooltip title={tooltip} onClick={onClick}>
-        {iconSelector(type, variant, fontSize, done, disabled)}
-      </CustomTooltip>
-    );
-  }
-  return iconSelector(type, variant, fontSize, done, disabled);
+  return (
+    <CustomTooltip title={type ? t(type) : t('Unknown')}>
+      {iconSelector(type, isCollector, variant, fontSize, done, disabled, onClick)}
+    </CustomTooltip>
+  );
 };
 
 InjectIcon.propTypes = {
   type: PropTypes.string,
   size: PropTypes.string,
-  tooltip: PropTypes.node,
   variant: PropTypes.string,
   done: PropTypes.bool,
   disabled: PropTypes.bool,
+  isCollector: PropTypes.bool,
   onClick: PropTypes.func,
 };
 

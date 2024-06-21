@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as R from 'ramda';
 import * as PropTypes from 'prop-types';
-import { withStyles, withTheme } from '@mui/styles';
+import { withStyles } from '@mui/styles';
 import { Chip, Tooltip } from '@mui/material';
 import inject18n from '../../../../components/i18n';
 
@@ -27,18 +27,15 @@ const styles = () => ({
 
 class InjectorContract extends Component {
   render() {
-    const { classes, label, variant, theme } = this.props;
+    const { classes, label, variant, deleted } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
     return (
       <Tooltip title={label}>
         <Chip
+          variant="outlined"
+          color={deleted ? 'default' : 'primary'}
           classes={{ root: style }}
-          style={{
-            backgroundColor: `${theme.palette.mode === 'dark' ? '#f8f8f8' : '#070d19'}20`,
-            color: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
-            border: `1px solid ${theme.palette.mode === 'dark' ? '#f8f8f8' : '#070d19'}`,
-          }}
-          label={label}
+          label={deleted ? <i>{label}</i> : label}
         />
       </Tooltip>
     );
@@ -49,6 +46,7 @@ InjectorContract.propTypes = {
   classes: PropTypes.object.isRequired,
   variant: PropTypes.string,
   label: PropTypes.string,
+  deleted: PropTypes.bool,
 };
 
-export default R.compose(inject18n, withTheme, withStyles(styles))(InjectorContract);
+export default R.compose(inject18n, withStyles(styles))(InjectorContract);
