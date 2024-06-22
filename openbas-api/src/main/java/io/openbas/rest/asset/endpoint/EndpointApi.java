@@ -82,10 +82,7 @@ public class EndpointApi {
     } else {
       endpoint = new Endpoint();
       endpoint.setUpdateAttributes(input);
-      endpoint.setIps(input.getIps());
-      endpoint.setPlatform(input.getPlatform());
-      endpoint.setArch(input.getArch());
-      endpoint.setAgentVersion(input.getAgentVersion());
+      endpoint.setLastSeen(Instant.now());
       endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
       endpoint.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
     }
