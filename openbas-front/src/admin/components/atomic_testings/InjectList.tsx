@@ -1,8 +1,6 @@
 import React, { CSSProperties, FunctionComponent, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { KeyboardArrowRight } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
 import InjectIcon from '../common/injects/InjectIcon';
 import type { InjectResultDTO, SearchPaginationInput } from '../../../utils/api-types';
@@ -14,7 +12,8 @@ import PaginationComponent from '../../../components/common/pagination/Paginatio
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
 import InjectorContract from '../common/injects/InjectorContract';
 import ItemStatus from '../../../components/ItemStatus';
-import AtomicTestingPopover from "./atomic_testing/AtomicTestingPopover";
+import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
+import { ButtonPopoverEntry } from '../../../components/common/ButtonPopover';
 
 const useStyles = makeStyles(() => ({
   bodyItems: {
@@ -38,10 +37,6 @@ const useStyles = makeStyles(() => ({
   item: {
     paddingLeft: 10,
     height: 50,
-  },
-  goIcon: {
-    position: 'absolute',
-    right: -10,
   },
 }));
 
@@ -84,6 +79,7 @@ const InjectList: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
   const { t, fldt, tPick } = useFormatter();
+  const [openEdit, setOpenDuplicate] = useState(false);
 
   // Filter and sort hook
   const [injects, setInjects] = useState<InjectResultDTO[]>([]);
@@ -154,6 +150,13 @@ const InjectList: FunctionComponent<Props> = ({
     },
   ];
 
+  const [edition, setEdition] = useState(false);
+  const handleEdit = () => setEdition(edition);
+
+  const entries: ButtonPopoverEntry[] = [
+    { label: 'Duplicate', action: setOpenDuplicate ? () => setOpenDuplicate(true) : handleEdit },
+  ];
+
   return (
     <>
       <PaginationComponent
@@ -182,39 +185,43 @@ const InjectList: FunctionComponent<Props> = ({
         </ListItem>
         {injects.map((injectDto) => {
           return (
-            <ListItemButton
+            <ListItem
               key={injectDto.inject_id}
               classes={{ root: classes.item }}
               divider
-              component={Link}
-              to={goTo(injectDto.inject_id)}
+              secondaryAction={
+                <AtomicTestingPopover atomic={injectDto} entries={entries}/>
+              }
+              disablePadding={true}
             >
-              <ListItemIcon>
-                <InjectIcon
-                  tooltip={injectDto.inject_type ? t(injectDto.inject_type) : t('Unknown')}
-                  type={injectDto.inject_type}
-                  variant="list"
+              <ListItemButton
+                classes={{ root: classes.item }}
+                href={goTo(injectDto.inject_id)}
+              >
+                <ListItemIcon>
+                  <InjectIcon
+                    tooltip={injectDto.inject_type ? t(injectDto.inject_type) : t('Unknown')}
+                    type={injectDto.inject_type}
+                    variant="list"
+                  />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <div className={classes.bodyItems}>
+                      {headers.map((header) => (
+                        <div
+                          key={header.field}
+                          className={classes.bodyItem}
+                          style={inlineStyles[header.field]}
+                        >
+                          {header.value(injectDto)}
+                        </div>
+                      ))}
+                    </div>
+                  }
                 />
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <div className={classes.bodyItems}>
-                    {headers.map((header) => (
-                      <div
-                        key={header.field}
-                        className={classes.bodyItem}
-                        style={inlineStyles[header.field]}
-                      >
-                        {header.value(injectDto)}
-                      </div>
-                    ))}
-                  </div>
-                }
-              />
-              <ListItemIcon classes={{ root: classes.goIcon }}>
-                <AtomicTestingPopover atomic={injectDto} />
-              </ListItemIcon>
-            </ListItemButton>
+              </ListItemButton>
+            </ListItem>
           );
         })}
         {!injects ? (<Empty message={t('No data available')} />) : null}

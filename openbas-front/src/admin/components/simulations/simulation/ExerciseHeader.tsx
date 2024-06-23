@@ -16,6 +16,7 @@ import type { ExercisesHelper } from '../../../../actions/exercises/exercise-hel
 import type { Exercise as ExerciseType } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
 import type { Theme } from '../../../../components/Theme';
+import { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -196,6 +197,41 @@ const ExerciseHeader = () => {
       exercise: helper.getExercise(exerciseId),
     };
   });
+
+  // Edition
+  const [openEdit, setOpenEdit] = useState(false);
+  const handleOpenEdit = () => {
+    setOpenEdit(true);
+  };
+
+  // Duplicate
+  const [openDuplicate, setOpenDuplicate] = useState(false);
+  const handleOpenDuplicate = () => {
+    setOpenDuplicate(true);
+  };
+
+  // Deletion
+  const [openDelete, setOpenDelete] = useState(false);
+  const handleOpenDelete = () => {
+    setOpenDelete(true);
+  };
+
+  // Export
+  const [openExport, setOpenExport] = useState(false);
+  const handleOpenExport = () => {
+    setOpenExport(true);
+  };
+
+  const permissions = usePermissions(exercise.exercise_id);
+
+  // Button Popover
+  const entries: ButtonPopoverEntry[] = [
+    { label: 'Update', action: handleOpenEdit, disabled: !permissions.canWriteBypassStatus },
+    { label: 'Duplicate', action: handleOpenDuplicate, disabled: !permissions.canWriteBypassStatus },
+    { label: 'Export', action: handleOpenExport },
+    { label: 'Delete', action: handleOpenDelete, disabled: !permissions.canWriteBypassStatus },
+  ];
+
   return (
     <>
       <Tooltip title={exercise.exercise_name}>
@@ -207,7 +243,16 @@ const ExerciseHeader = () => {
       <ExerciseStatus exerciseStatus={exercise.exercise_status} exerciseStartDate={exercise.exercise_start_date} />
       <div className={classes.actions}>
         <Buttons exerciseId={exercise.exercise_id} exerciseStatus={exercise.exercise_status} exerciseName={exercise.exercise_name} />
-        <ExercisePopover exercise={exercise} />
+        <ExercisePopover
+          exercise={exercise}
+          entries={entries}
+          openEdit={openEdit}
+          openDelete={openDelete}
+          openExport={openExport}
+          setOpenEdit={setOpenEdit}
+          setOpenDelete={setOpenDelete}
+          setOpenExport={setOpenExport}
+        />
       </div>
       <div className="clearfix" />
     </>

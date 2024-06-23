@@ -19,18 +19,26 @@ import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectRes
 interface Props {
   atomic: InjectResultDTO;
   openEdit?: boolean;
+  openDelete?: boolean;
   setOpenEdit?: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenDelete?: React.Dispatch<React.SetStateAction<boolean>>;
+  entries: ButtonPopoverEntry[];
 }
 
 const AtomicTestingPopover: FunctionComponent<Props> = ({
   atomic,
+  entries,
   openEdit,
+  openDelete,
   setOpenEdit,
+  setOpenDelete,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [edition, setEdition] = useState(false);
+  const [deletion, setDeletion] = useState(false);
 
   // Fetching data
   const { updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
@@ -41,9 +49,6 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     dispatch(fetchTeams());
   });
 
-  // Edition
-  const [edition, setEdition] = useState(false);
-  const handleEdit = () => setEdition(true);
   const onUpdateAtomicTesting = async (data: Inject) => {
     const toUpdate = R.pipe(
       R.pick([
@@ -66,21 +71,14 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     });
   };
 
-  // Deletion
-  const [deletion, setDeletion] = useState(false);
-  const handleDelete = () => setDeletion(true);
   const submitDelete = () => {
     deleteAtomicTesting(atomic.inject_id).then(() => {
-      setDeletion(false);
+      if (setDeletion) {
+        setDeletion(false);
+      }
       navigate('/admin/atomic_testings');
     });
   };
-  // Button Popover
-  const entries: ButtonPopoverEntry[] = [
-    { label: 'Update', action: setOpenEdit ? () => setOpenEdit(true) : handleEdit },
-    { label: 'Duplicate', action: setOpenEdit ? () => setOpenEdit(true) : handleEdit },
-    { label: 'Delete', action: handleDelete },
-  ];
 
   return (
     <>
@@ -94,8 +92,8 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
         teamsFromExerciseOrScenario={teams?.filter((team: TeamStore) => !team.team_contextual) ?? []}
       />
       <DialogDelete
-        open={deletion}
-        handleClose={() => setDeletion(false)}
+        open={isNotEmptyField(openDelete) ? openDelete : deletion}
+        handleClose={() => (setOpenDelete ? setOpenDelete(false) : setDeletion(false))}
         handleSubmit={submitDelete}
         text={t('Do you want to delete this atomic testing ?')}
       />

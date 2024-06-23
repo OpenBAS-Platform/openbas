@@ -1,7 +1,6 @@
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { Link } from 'react-router-dom';
 import { HubOutlined } from '@mui/icons-material';
-import React, { CSSProperties, FunctionComponent } from 'react';
+import React, { CSSProperties, FunctionComponent, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import ExerciseStatus from './simulation/ExerciseStatus';
 import ItemTags from '../../../components/ItemTags';
@@ -15,6 +14,7 @@ import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../actions/Tag';
 import { useAppDispatch } from '../../../utils/hooks';
 import ExercisePopover from './simulation/ExercisePopover';
+import { ButtonPopoverEntry } from '../../../components/common/ButtonPopover';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -36,10 +36,6 @@ const useStyles = makeStyles(() => ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     paddingRight: 10,
-  },
-  goIcon: {
-    position: 'absolute',
-    right: -10,
   },
 }));
 
@@ -127,6 +123,24 @@ const ExerciseList: FunctionComponent<Props> = ({
     },
   ];
 
+  // Edition
+  const [openDuplicate, setOpenDuplicate] = useState(false);
+  const handleOpenEdit = () => {
+    setOpenDuplicate(true);
+  };
+
+  // Export
+  const [openExport, setOpenExport] = useState(false);
+  const handleOpenExport = () => {
+    setOpenExport(true);
+  };
+
+  // Button Popover
+  const entries: ButtonPopoverEntry[] = [
+    { label: 'Duplicate', action: setOpenDuplicate ? () => setOpenDuplicate(true) : handleOpenEdit },
+    { label: 'Export', action: setOpenExport ? () => setOpenExport(true) : handleOpenExport },
+  ];
+
   return (
     <List>
       {hasHeader
@@ -148,35 +162,39 @@ const ExerciseList: FunctionComponent<Props> = ({
           />
         </ListItem>}
       {exercises.map((exercise: ExerciseStore) => (
-        <ListItemButton
+        <ListItem
           key={exercise.exercise_id}
           classes={{ root: classes.item }}
-          divider
-          component={Link}
-          to={`/admin/exercises/${exercise.exercise_id}`}
+          secondaryAction={
+            <ExercisePopover exercise={exercise} entries={entries} openExport={openExport} setOpenExport={setOpenExport} />
+          }
+          disablePadding={true}
         >
-          <ListItemIcon>
-            <HubOutlined color="primary" />
-          </ListItemIcon>
-          <ListItemText
-            primary={
-              <div className={classes.bodyItems}>
-                {headers.map((header) => (
-                  <div
-                    key={header.field}
-                    className={classes.bodyItem}
-                    style={inlineStyles[header.field]}
-                  >
-                    {header.value(exercise)}
-                  </div>
-                ))}
-              </div>
-            }
-          />
-          <ListItemIcon classes={{ root: classes.goIcon }}>
-            <ExercisePopover exercise={exercise} />
-          </ListItemIcon>
-        </ListItemButton>
+          <ListItemButton
+            classes={{ root: classes.item }}
+            divider
+            href={`/admin/exercises/${exercise.exercise_id}`}
+          >
+            <ListItemIcon>
+              <HubOutlined color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                <div className={classes.bodyItems}>
+                  {headers.map((header) => (
+                    <div
+                      key={header.field}
+                      className={classes.bodyItem}
+                      style={inlineStyles[header.field]}
+                    >
+                      {header.value(exercise)}
+                    </div>
+                  ))}
+                </div>
+              }
+            />
+          </ListItemButton>
+        </ListItem>
       ))}
     </List>
   );

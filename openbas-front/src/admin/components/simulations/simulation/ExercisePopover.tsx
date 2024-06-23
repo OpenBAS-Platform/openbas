@@ -28,21 +28,36 @@ import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common
 import ExerciseUpdateForm from './ExerciseUpdateForm';
 import Drawer from '../../../../components/common/Drawer';
 import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
+import { isNotEmptyField } from '../../../../utils/utils';
 
 interface ExercisePopoverProps {
   exercise: Exercise;
+  entries: ButtonPopoverEntry[];
+  openEdit?: boolean;
+  openDelete?: boolean;
+  openExport?: boolean;
+  setOpenEdit?: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenDelete?: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenExport?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   exercise,
+  entries,
+  openEdit,
+  openDelete,
+  openExport,
+  setOpenEdit,
+  setOpenDelete,
+  setOpenExport,
 }) => {
   const { t } = useFormatter();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const [openDelete, setOpenDelete] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
-  const [openExport, setOpenExport] = useState(false);
+  const [deletion, setDeletion] = useState(false);
+  const [edition, setEdition] = useState(false);
+  const [exportation, setExportation] = useState(false);
   const [exportTeams, setExportTeams] = useState(false);
   const [exportPlayers, setExportPlayers] = useState(false);
   const [exportVariableValues, setExportVariableValues] = useState(false);
@@ -50,12 +65,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
 
   const handleChangeTab = (event: React.SyntheticEvent, value: number) => setCurrentTab(value);
 
-  // Edition
-  const handleOpenEdit = () => {
-    setOpenEdit(true);
-  };
-
-  const handleCloseEdit = () => setOpenEdit(false);
+  const handleCloseEdit = () => setEdition(false);
 
   const onSubmitEdit = (data: ExerciseUpdateInput) => {
     const input = {
@@ -90,24 +100,14 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     dispatch(updateExercise(exercise.exercise_id, exerciseInformationInput)).then(() => handleCloseEdit());
   };
 
-  // Deletion
-  const handleOpenDelete = () => {
-    setOpenDelete(true);
-  };
-
-  const handleCloseDelete = () => setOpenDelete(false);
+  const handleCloseDelete = () => setDeletion(false);
 
   const submitDelete = () => {
     dispatch(deleteExercise(exercise.exercise_id)).then(() => handleCloseDelete());
     navigate('/admin/exercises');
   };
 
-  // Export
-  const handleOpenExport = () => {
-    setOpenExport(true);
-  };
-
-  const handleCloseExport = () => setOpenExport(false);
+  const handleCloseExport = () => setExportation(false);
 
   const submitExport = () => {
     const link = document.createElement('a');
@@ -138,21 +138,13 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   };
   const permissions = usePermissions(exercise.exercise_id);
 
-  // Button Popover
-  const entries: ButtonPopoverEntry[] = [
-    { label: 'Update', action: handleOpenEdit, disabled: !permissions.canWriteBypassStatus },
-    { label: 'Duplicate', action: handleOpenEdit, disabled: !permissions.canWriteBypassStatus },
-    { label: 'Export', action: handleOpenExport },
-    { label: 'Delete', action: handleOpenDelete, disabled: !permissions.canWriteBypassStatus },
-  ];
-
   return (
     <>
       <ButtonPopover entries={entries} />
       <Dialog
-        open={openDelete}
+        open={isNotEmptyField(openDelete) ? openDelete : deletion}
         TransitionComponent={Transition}
-        onClose={handleCloseDelete}
+        onClose={() => (setOpenDelete ? setOpenDelete(false) : handleCloseDelete)}
         PaperProps={{ elevation: 1 }}
       >
         <DialogContent>
@@ -161,15 +153,15 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDelete}>{t('Cancel')}</Button>
+          <Button onClick={() => (setOpenDelete ? setOpenDelete(false) : handleCloseDelete)}>{t('Cancel')}</Button>
           <Button color="secondary" onClick={submitDelete}>
             {t('Delete')}
           </Button>
         </DialogActions>
       </Dialog>
       <Drawer
-        open={openEdit}
-        handleClose={handleCloseEdit}
+        open={isNotEmptyField(openEdit) ? openEdit : edition}
+        handleClose={() => (setOpenEdit ? setOpenEdit(false) : handleCloseEdit)}
         title={t('Update the simulation')}
       >
         <>
@@ -183,7 +175,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
             <ExerciseUpdateForm
               initialValues={initialValues}
               onSubmit={onSubmitEdit}
-              handleClose={handleCloseEdit}
+              handleClose={() => (setOpenEdit ? setOpenEdit(false) : handleCloseEdit)}
             />
           )}
           {currentTab === 1 && (
@@ -196,9 +188,9 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         </>
       </Drawer>
       <Dialog
-        open={openExport}
+        open={isNotEmptyField(openExport) ? openExport : exportation}
         TransitionComponent={Transition}
-        onClose={handleCloseExport}
+        onClose={() => (setOpenExport ? setOpenExport(false) : handleCloseExport)}
         PaperProps={{ elevation: 1 }}
       >
         <DialogTitle>{t('Export the simulation')}</DialogTitle>
@@ -254,7 +246,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
           </TableContainer>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseExport}>{t('Cancel')}</Button>
+          <Button onClick={() => (setOpenExport ? setOpenExport(false) : handleCloseExport)}>{t('Cancel')}</Button>
           <Button color="secondary" onClick={submitExport}>
             {t('Export')}
           </Button>

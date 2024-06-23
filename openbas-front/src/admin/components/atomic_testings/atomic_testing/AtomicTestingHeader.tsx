@@ -10,6 +10,7 @@ import { truncate } from '../../../../utils/String';
 import Loader from '../../../../components/Loader';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
 import type { InjectResultDTO } from '../../../../utils/api-types';
+import { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -33,6 +34,7 @@ const AtomicTestingHeader = () => {
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [availableLaunch, setAvailableLaunch] = useState(true);
+  const [openDelete, setOpenDelete] = useState(false);
 
   const submitLaunch = async () => {
     setOpen(false);
@@ -45,6 +47,12 @@ const AtomicTestingHeader = () => {
     }
     setAvailableLaunch(true);
   };
+
+  const entries: ButtonPopoverEntry[] = [
+    { label: 'Update', action: () => setOpenEdit(true) },
+    { label: 'Duplicate', action: () => setOpenEdit(true) },
+    { label: 'Delete', action: () => setOpenDelete(true) },
+  ];
 
   if (!injectResultDto) {
     return <Loader variant="inElement" />;
@@ -86,7 +94,15 @@ const AtomicTestingHeader = () => {
             {t('Launch')}
           </Button>
         )}
-        <AtomicTestingPopover atomic={injectResultDto} setOpenEdit={setOpenEdit} openEdit={openEdit} />
+
+        <AtomicTestingPopover
+          atomic={injectResultDto}
+          openEdit={openEdit}
+          openDelete={openDelete}
+          setOpenEdit={setOpenEdit}
+          setOpenDelete={setOpenDelete}
+          entries={entries}
+        />
       </div>
       <Dialog
         open={open}
