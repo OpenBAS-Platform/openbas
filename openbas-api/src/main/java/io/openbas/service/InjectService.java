@@ -1,11 +1,13 @@
 package io.openbas.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.rest.inject.output.InjectOutput;
+import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
@@ -14,6 +16,7 @@ import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +31,7 @@ import static java.time.Instant.now;
 
 @RequiredArgsConstructor
 @Service
+@Log
 public class InjectService {
 
   private final InjectRepository injectRepository;
@@ -37,49 +41,51 @@ public class InjectService {
   private final AssetGroupRepository assetGroupRepository;
   private final TeamRepository teamRepository;
 
-  @PersistenceContext
-  private EntityManager entityManager;
+    @Resource
+    protected ObjectMapper mapper;
+    @PersistenceContext
+    private EntityManager entityManager;
 
-  public void cleanInjectsDocExercise(String exerciseId, String documentId) {
-    // Delete document from all exercise injects
-    List<Inject> exerciseInjects = injectRepository.findAllForExerciseAndDoc(exerciseId, documentId);
-    List<InjectDocument> updatedInjects = exerciseInjects.stream().flatMap(inject -> {
-      @SuppressWarnings("UnnecessaryLocalVariable")
-      Stream<InjectDocument> filterDocuments = inject.getDocuments().stream()
-          .filter(document -> document.getDocument().getId().equals(documentId));
-      return filterDocuments;
-    }).toList();
-    injectDocumentRepository.deleteAll(updatedInjects);
-  }
+    public void cleanInjectsDocExercise(String exerciseId, String documentId) {
+        // Delete document from all exercise injects
+        List<Inject> exerciseInjects = injectRepository.findAllForExerciseAndDoc(exerciseId, documentId);
+        List<InjectDocument> updatedInjects = exerciseInjects.stream().flatMap(inject -> {
+            @SuppressWarnings("UnnecessaryLocalVariable")
+            Stream<InjectDocument> filterDocuments = inject.getDocuments().stream()
+                    .filter(document -> document.getDocument().getId().equals(documentId));
+            return filterDocuments;
+        }).toList();
+        injectDocumentRepository.deleteAll(updatedInjects);
+    }
 
-  public void cleanInjectsDocScenario(String scenarioId, String documentId) {
-    // Delete document from all scenario injects
-    List<Inject> scenarioInjects = injectRepository.findAllForScenarioAndDoc(scenarioId, documentId);
-    List<InjectDocument> updatedInjects = scenarioInjects.stream().flatMap(inject -> {
-      @SuppressWarnings("UnnecessaryLocalVariable")
-      Stream<InjectDocument> filterDocuments = inject.getDocuments().stream()
-          .filter(document -> document.getDocument().getId().equals(documentId));
-      return filterDocuments;
-    }).toList();
-    injectDocumentRepository.deleteAll(updatedInjects);
-  }
+    public void cleanInjectsDocScenario(String scenarioId, String documentId) {
+        // Delete document from all scenario injects
+        List<Inject> scenarioInjects = injectRepository.findAllForScenarioAndDoc(scenarioId, documentId);
+        List<InjectDocument> updatedInjects = scenarioInjects.stream().flatMap(inject -> {
+            @SuppressWarnings("UnnecessaryLocalVariable")
+            Stream<InjectDocument> filterDocuments = inject.getDocuments().stream()
+                    .filter(document -> document.getDocument().getId().equals(documentId));
+            return filterDocuments;
+        }).toList();
+        injectDocumentRepository.deleteAll(updatedInjects);
+    }
 
-  @Transactional(rollbackOn = Exception.class)
-  public Inject updateInjectStatus(String injectId, InjectUpdateStatusInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-    // build status
-    InjectStatus injectStatus = new InjectStatus();
-    injectStatus.setInject(inject);
-    injectStatus.setTrackingSentDate(now());
-    injectStatus.setName(ExecutionStatus.valueOf(input.getStatus()));
-    injectStatus.setTrackingTotalExecutionTime(0L);
-    // Save status for inject
-    inject.setStatus(injectStatus);
-    return injectRepository.save(inject);
-  }
+    @Transactional(rollbackOn = Exception.class)
+    public Inject updateInjectStatus(String injectId, InjectUpdateStatusInput input) {
+        Inject inject = injectRepository.findById(injectId).orElseThrow();
+        // build status
+        InjectStatus injectStatus = new InjectStatus();
+        injectStatus.setInject(inject);
+        injectStatus.setTrackingSentDate(now());
+        injectStatus.setName(ExecutionStatus.valueOf(input.getStatus()));
+        injectStatus.setTrackingTotalExecutionTime(0L);
+        // Save status for inject
+        inject.setStatus(injectStatus);
+        return injectRepository.save(inject);
+    }
 
-  public List<InjectOutput> injects(Specification<Inject> specification) {
-    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+    public List<InjectOutput> injects(Specification<Inject> specification) {
+        CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
     Root<Inject> injectRoot = cq.from(Inject.class);
@@ -117,23 +123,23 @@ public class InjectService {
     Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
     Expression<String[]> assetGroupIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assetGroups");
 
-    // SELECT
-    cq.multiselect(
-        injectRoot.get("id").alias("inject_id"),
-        injectRoot.get("title").alias("inject_title"),
-        injectRoot.get("enabled").alias("inject_enabled"),
-        injectRoot.get("content").alias("inject_content"),
-        injectRoot.get("allTeams").alias("inject_all_teams"),
-        injectExerciseJoin.get("id").alias("inject_exercise"),
-        injectScenarioJoin.get("id").alias("inject_scenario"),
-        injectRoot.get("dependsDuration").alias("inject_depends_duration"),
-        injectorContractJoin.alias("inject_injector_contract"),
-        tagIdsExpression.alias("inject_tags"),
-        teamIdsExpression.alias("inject_teams"),
-        assetIdsExpression.alias("inject_assets"),
-        assetGroupIdsExpression.alias("inject_asset_groups"),
-        injectorJoin.get("type").alias("inject_type")
-    ).distinct(true);
+        // SELECT
+        cq.multiselect(
+                injectRoot.get("id").alias("inject_id"),
+                injectRoot.get("title").alias("inject_title"),
+                injectRoot.get("enabled").alias("inject_enabled"),
+                injectRoot.get("content").alias("inject_content"),
+                injectRoot.get("allTeams").alias("inject_all_teams"),
+                injectExerciseJoin.get("id").alias("inject_exercise"),
+                injectScenarioJoin.get("id").alias("inject_scenario"),
+                injectRoot.get("dependsDuration").alias("inject_depends_duration"),
+                injectorContractJoin.alias("inject_injector_contract"),
+                tagIdsExpression.alias("inject_tags"),
+                teamIdsExpression.alias("inject_teams"),
+                assetIdsExpression.alias("inject_assets"),
+                assetGroupIdsExpression.alias("inject_asset_groups"),
+                injectorJoin.get("type").alias("inject_type")
+        ).distinct(true);
 
     // GROUP BY
     cq.groupBy(Arrays.asList(
