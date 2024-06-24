@@ -430,6 +430,7 @@ export const storeHelper = (state) => ({
       ...JSON.parse(i.injector_contract_content),
     });
   },
+  getInjectorContracts: () => entities('injector_contracts', state),
   // collectors
   getCollector: (id) => entity(id, 'collectors', state),
   getCollectors: () => entities('collectors', state),

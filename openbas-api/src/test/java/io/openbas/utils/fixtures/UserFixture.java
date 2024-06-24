@@ -13,7 +13,7 @@ public class UserFixture {
         return Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8().encode(rawPws);
     }
 
-    public static final String EMAIL = "user@filigran.io";
+    public static final String EMAIL = "user2@filigran.io";
 
     public static LoginUserInput.LoginUserInputBuilder getDefault() {
         return LoginUserInput.builder();
