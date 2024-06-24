@@ -54,7 +54,7 @@ const EndpointPopover: React.FC<Props> = ({
     endpoint_arch,
   }) => ({
     asset_name,
-    asset_description,
+    asset_description: asset_description ?? '',
     asset_last_seen: asset_last_seen ?? undefined,
     asset_tags,
     endpoint_hostname,
