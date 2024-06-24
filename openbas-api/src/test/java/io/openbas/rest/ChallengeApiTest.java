@@ -23,7 +23,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
-import static io.openbas.injectors.challenge.ChallengeContract.TYPE;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -35,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
-public class ChallengeApiTest {
+class ChallengeApiTest {
 
   @Autowired
   private MockMvc mvc;
