@@ -1,7 +1,6 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.annotation.Ipv4OrIpv6Constraint;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
@@ -10,7 +9,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.annotations.Type;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -52,7 +50,6 @@ public class Endpoint extends Asset {
   @Queryable(filterable = true)
   @NotEmpty
   @Ipv4OrIpv6Constraint
-  @Type(StringArrayType.class)
   @Column(name = "endpoint_ips")
   @JsonProperty("endpoint_ips")
   private String[] ips;
@@ -81,7 +78,6 @@ public class Endpoint extends Asset {
   @NotNull
   private PLATFORM_ARCH arch;
 
-  @Type(StringArrayType.class)
   @Column(name = "endpoint_mac_addresses")
   @JsonProperty("endpoint_mac_addresses")
   private String[] macAddresses;
