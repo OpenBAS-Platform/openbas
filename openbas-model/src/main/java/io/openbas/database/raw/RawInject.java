@@ -17,14 +17,14 @@ public interface RawInject {
 
     List<String> getInject_expectations();
 
-    public Set<String> getInject_communications();
+    Set<String> getInject_communications();
 
-    public Set<String> getInject_platforms();
+    Set<String> getInject_platforms();
 
-    public Set<String> getInject_kill_chain_phases();
+    Set<String> getInject_kill_chain_phases();
 
-    public String getStatus_name();
+    String getStatus_name();
 
-    public String getInject_scenario();
+    String getInject_scenario();
 
 }

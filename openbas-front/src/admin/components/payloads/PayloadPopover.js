@@ -10,7 +10,7 @@ import { attackPatternOptions, documentOptions, platformOptions, tagOptions } fr
 import Transition from '../../../components/common/Transition';
 import Drawer from '../../../components/common/Drawer';
 
-const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, killChainPhasesMap, onUpdate, onDelete }) => {
+const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, killChainPhasesMap, onUpdate, onDelete, disabled }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -83,7 +83,7 @@ const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, kil
   )(payload);
   return (
     <>
-      <IconButton color="primary" onClick={handlePopoverOpen} aria-haspopup="true" size="large">
+      <IconButton color="primary" onClick={handlePopoverOpen} aria-haspopup="true" size="large" disabled={disabled}>
         <MoreVert />
       </IconButton>
       <Menu

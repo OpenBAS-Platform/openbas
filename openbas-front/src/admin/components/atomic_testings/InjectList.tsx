@@ -14,6 +14,7 @@ import PaginationComponent from '../../../components/common/pagination/Paginatio
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
 import InjectorContract from '../common/injects/InjectorContract';
 import ItemStatus from '../../../components/ItemStatus';
+import { isNotEmptyField } from '../../../utils/utils';
 
 const useStyles = makeStyles(() => ({
   bodyItems: {
@@ -99,12 +100,10 @@ const InjectList: FunctionComponent<Props> = ({
       value: (injectDto: InjectResultDTO) => {
         if (injectDto.inject_injector_contract) {
           return (
-            <InjectorContract variant="list"
-              label={tPick(injectDto.inject_injector_contract.injector_contract_labels)}
-            />
+            <InjectorContract variant="list" label={tPick(injectDto.inject_injector_contract.injector_contract_labels)} />
           );
         }
-        return <span />;
+        return <InjectorContract variant="list" label={t('Deleted')} deleted={true} />;
       },
     },
     {
@@ -190,8 +189,13 @@ const InjectList: FunctionComponent<Props> = ({
             >
               <ListItemIcon>
                 <InjectIcon
-                  tooltip={injectDto.inject_type ? t(injectDto.inject_type) : t('Unknown')}
-                  type={injectDto.inject_type}
+                  isPayload={isNotEmptyField(injectDto.inject_injector_contract?.injector_contract_payload)}
+                  type={
+                    injectDto.inject_injector_contract?.injector_contract_payload
+                      ? injectDto.inject_injector_contract.injector_contract_payload.payload_collector_type
+                        || injectDto.inject_injector_contract.injector_contract_payload.payload_type
+                      : injectDto.inject_type
+                  }
                   variant="list"
                 />
               </ListItemIcon>

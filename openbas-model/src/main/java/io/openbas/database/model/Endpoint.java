@@ -37,6 +37,8 @@ public class Endpoint extends Asset {
     Windows,
     @JsonProperty("MacOS")
     MacOS,
+    @JsonProperty("Container")
+    Container,
     @JsonProperty("Service")
     Service,
     @JsonProperty("Generic")

@@ -1,6 +1,5 @@
 package io.openbas.rest.channel;
 
-import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Article;
 import io.openbas.database.model.Inject;
 import io.openbas.database.repository.ArticleRepository;
@@ -33,7 +32,6 @@ public class ExerciseArticleApi extends RestBehavior {
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @GetMapping(EXERCISE_URI + "/{exerciseId}/articles")
   @Transactional(readOnly = true)
-  @LogExecutionTime
   public Iterable<ArticleOutput> exerciseArticles(@PathVariable @NotBlank final String exerciseId) {
     List<Inject> injects = this.injectRepository.findAll(
         InjectSpecification.fromExercise(exerciseId)

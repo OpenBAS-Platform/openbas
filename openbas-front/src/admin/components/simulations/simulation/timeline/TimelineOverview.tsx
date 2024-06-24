@@ -27,6 +27,7 @@ import Timeline from '../../../../../components/Timeline';
 import SearchFilter from '../../../../../components/SearchFilter';
 import TagsFilter from '../../../common/filters/TagsFilter';
 import useSearchAnFilter from '../../../../../utils/SortingFiltering';
+import { isNotEmptyField } from '../../../../../utils/utils';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -159,7 +160,13 @@ const TimelineOverview = () => {
                       >
                         <ListItemIcon>
                           <InjectIcon
-                            type={inject.inject_type}
+                            isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
+                            type={
+                                inject.inject_injector_contract.injector_contract_payload
+                                  ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                                    || inject.inject_injector_contract.injector_contract_payload?.payload_type
+                                  : inject.inject_type
+                            }
                             variant="inline"
                           />
                         </ListItemIcon>
@@ -228,7 +235,16 @@ const TimelineOverview = () => {
                       to={`/admin/exercises/${exerciseId}/injects/${inject.inject_id}?backlabel=Animation&backuri=/admin/exercises/${exerciseId}/animation/timeline`}
                     >
                       <ListItemIcon>
-                        <InjectIcon type={inject.inject_type} variant="inline"/>
+                        <InjectIcon
+                          isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
+                          type={
+                              inject.inject_injector_contract.injector_contract_payload
+                                ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                                  || inject.inject_injector_contract.injector_contract_payload?.payload_type
+                                : inject.inject_type
+                            }
+                          variant="inline"
+                        />
                       </ListItemIcon>
                       <ListItemText
                         primary={

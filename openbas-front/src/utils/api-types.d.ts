@@ -579,7 +579,7 @@ export interface Endpoint {
   endpoint_hostname?: string;
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal" | "Unknown";
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
   updateAttributes?: object;
 }
 
@@ -598,7 +598,7 @@ export interface EndpointInput {
    */
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal" | "Unknown";
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
 }
 
 export interface EndpointRegisterInput {
@@ -617,7 +617,7 @@ export interface EndpointRegisterInput {
    */
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal" | "Unknown";
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
 }
 
 export interface Evaluation {
@@ -1210,7 +1210,7 @@ export interface InjectTargetWithResult {
   expectationResultsByTypes?: ExpectationResultsByType[];
   id: string;
   name?: string;
-  platformType?: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal" | "Unknown";
+  platformType?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
   targetType?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }
 
@@ -1269,6 +1269,7 @@ export interface InjectorContract {
   injector_contract_custom?: boolean;
   injector_contract_id: string;
   injector_contract_injector?: Injector;
+  injector_contract_injector_type?: string;
   injector_contract_labels?: Record<string, string>;
   injector_contract_manual?: boolean;
   injector_contract_needs_executor?: boolean;
@@ -2038,9 +2039,12 @@ export interface Payload {
   payload_attack_patterns?: AttackPattern[];
   payload_cleanup_command?: string;
   payload_cleanup_executor?: string;
+  payload_collector?: Collector;
+  payload_collector_type?: string;
   /** @format date-time */
   payload_created_at?: string;
   payload_description?: string;
+  payload_external_id?: string;
   payload_id: string;
   payload_name: string;
   payload_platforms?: string[];
@@ -2100,6 +2104,26 @@ export interface PayloadUpdateInput {
   payload_platforms?: string[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_tags?: string[];
+}
+
+export interface PayloadUpsertInput {
+  command_content?: string;
+  command_executor?: string;
+  dns_resolution_hostname?: string;
+  executable_file?: string;
+  file_drop_file?: string;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: string[];
+  payload_cleanup_command?: string;
+  payload_cleanup_executor?: string;
+  payload_collector?: string;
+  payload_description?: string;
+  payload_external_id: string;
+  payload_name: string;
+  payload_platforms?: string[];
+  payload_prerequisites?: PayloadPrerequisite[];
+  payload_tags?: string[];
+  payload_type: string;
 }
 
 export interface PlatformSettings {

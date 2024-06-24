@@ -796,14 +796,20 @@ public class V1_DataImporter implements Importer {
       // Tags
       List<String> injectTagIds = resolveJsonIds(injectNode, "inject_tags");
       injectTagIds.forEach(tagId -> {
-        String remappedId = baseIds.get(tagId).getId();
-        injectRepository.addTag(injectId, remappedId);
+        Base base = baseIds.get(tagId);
+        if (base == null || base.getId() == null) {
+          return;
+        }
+        injectRepository.addTag(injectId, base.getId());
       });
       // Teams
       List<String> injectTeamIds = resolveJsonIds(injectNode, "inject_teams");
       injectTeamIds.forEach(teamId -> {
-        String remappedId = baseIds.get(teamId).getId();
-        injectRepository.addTeam(injectId, remappedId);
+        Base base = baseIds.get(teamId);
+        if (base == null || base.getId() == null) {
+          return;
+        }
+        injectRepository.addTeam(injectId, base.getId());
       });
       // Documents
       List<JsonNode> injectDocuments = resolveJsonElements(injectNode, "inject_documents").toList();
