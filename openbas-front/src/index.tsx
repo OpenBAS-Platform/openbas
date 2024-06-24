@@ -6,6 +6,7 @@ import App from './app';
 import './static/css/index.css';
 import './static/css/CKEditorDark.css';
 import './static/css/CKEditorLight.css';
+import 'filigran-ui/theme.css';
 
 const container = document.getElementById('root');
 if (container) {

@@ -1,82 +1,32 @@
-import React, { CSSProperties, useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { DevicesOtherOutlined } from '@mui/icons-material';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { DataTable, DataTablePagination } from 'filigran-ui';
+import { ColumnDef, PaginationState, SortingState } from '@tanstack/react-table';
+import { DevicesOtherOutlined } from '@mui/icons-material';
+import { ToggleButtonGroup } from '@mui/material';
 import { useAppDispatch } from '../../../../utils/hooks';
 import EndpointCreation from './EndpointCreation';
-import EndpointPopover from './EndpointPopover';
 import { useHelper } from '../../../../store';
 import { useFormatter } from '../../../../components/i18n';
 import type { UserHelper } from '../../../../actions/helper';
 import type { EndpointStore } from './Endpoint';
-import ItemTags from '../../../../components/ItemTags';
-import AssetStatus from '../AssetStatus';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
-import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
-import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
-import { initSorting } from '../../../../components/common/pagination/Page';
-import type { SearchPaginationInput } from '../../../../utils/api-types';
-import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
-import PlatformIcon from '../../../../components/PlatformIcon';
 import type { ExecutorHelper } from '../../../../actions/executors/executor-helper';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchExecutors } from '../../../../actions/Executor';
-
-const useStyles = makeStyles(() => ({
-  itemHead: {
-    paddingLeft: 10,
-    textTransform: 'uppercase',
-    cursor: 'pointer',
-  },
-  item: {
-    paddingLeft: 10,
-    height: 50,
-  },
-  bodyItems: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  bodyItem: {
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
-  },
-}));
-
-const inlineStyles: Record<string, CSSProperties> = {
-  asset_name: {
-    width: '30%',
-  },
-  endpoint_platform: {
-    width: '15%',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  endpoint_arch: {
-    width: '10%',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  endpoint_executor: {
-    width: '15%',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  asset_tags: {
-    width: '20%',
-  },
-  asset_status: {
-    width: '15%',
-    cursor: 'default',
-  },
-};
+import PlatformIcon from '../../../../components/PlatformIcon';
+import { initSorting, type Page } from '../../../../components/common/pagination/Page';
+import ItemTags from '../../../../components/ItemTags';
+import AssetStatus from '../AssetStatus';
+import EndpointPopover from './EndpointPopover';
+import SearchFilter from '../../../../components/SearchFilter';
+import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
+import ExportButton from '../../../../components/common/ExportButton';
+import type { SearchPaginationInput } from '../../../../utils/api-types';
+import { transformSortingValueToParams } from './TableUtils';
 
 const Endpoints = () => {
   // Standard hooks
-  const classes = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
 
@@ -93,22 +43,104 @@ const Endpoints = () => {
   useDataLoader(() => {
     dispatch(fetchExecutors());
   });
-
-  // Headers
-  const headers = [
-    { field: 'asset_name', label: 'Name', isSortable: true },
-    { field: 'endpoint_platform', label: 'Platform', isSortable: true },
-    { field: 'endpoint_arch', label: 'Architecture', isSortable: true },
-    { field: 'endpoint_executor', label: 'Executor', isSortable: true },
-    { field: 'asset_tags', label: 'Tags', isSortable: true },
-    { field: 'asset_status', label: 'Status', isSortable: false },
-  ];
-
   const [endpoints, setEndpoints] = useState<EndpointStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
-    sorts: initSorting('asset_name'),
-    textSearch: search,
+
+  // Pagination hooks
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
   });
+
+  // Text Search
+  const [textSearch, setTextSearch] = React.useState(search ?? '');
+  const handleTextSearch = (value?: string) => {
+    setPagination({ ...pagination, pageIndex: 0 });
+    setTextSearch(value || '');
+  };
+
+  const columns = useMemo<ColumnDef<EndpointStore>[]>(
+    () => [
+      { id: 'icon', cell: () => <DevicesOtherOutlined color="primary" />, maxSize: 40 },
+      { id: 'asset_name', accessorKey: 'asset_name', header: 'Name' },
+      {
+        id: 'endpoint_platform',
+        accessorKey: 'endpoint_platform',
+        header: 'Platform',
+        cell: ({ row }) => <div style={{ display: 'flex' }}>
+          <PlatformIcon platform={row.getValue('endpoint_platform')} width={20} marginRight={10} />
+          {row.getValue('endpoint_platform')}
+        </div>,
+      },
+      { id: 'endpointArch', accessorKey: 'endpoint_arch', header: 'Architecture' },
+      {
+        id: 'asset_executor',
+        accessorKey: 'asset_executor',
+        header: 'Executor',
+        cell: ({ row }) => {
+          const executor = executorsMap[row.getValue('asset_executor') ?? 'Unknown'];
+          return (
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              {executor && (
+                <img
+                  src={`/api/images/executors/${executor.executor_type}`}
+                  alt={executor.executor_type}
+                  style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
+                />
+              )}
+              {executor?.executor_name ?? t('Unknown')}
+            </div>
+          );
+        },
+      },
+      {
+        id: 'asset_tags',
+        accessorKey: 'asset_tags',
+        header: 'Tags',
+        cell: ({ row }) => <ItemTags variant="list" tags={row.getValue('asset_tags')} />,
+      },
+      {
+        id: 'asset_active',
+        accessorKey: 'asset_active',
+        header: 'Status',
+        enableSorting: false,
+        cell: ({ row }) => <AssetStatus variant="list" status={row.getValue('asset_active') ? 'Active' : 'Inactive'} />,
+      },
+      {
+        id: 'popover',
+        cell: ({ row }) => <EndpointPopover
+          endpoint={{ ...row.original, type: 'static' }}
+          onUpdate={(result) => setEndpoints(endpoints.map((e) => (e.asset_id !== result.asset_id ? e : result)))}
+          onDelete={(result) => setEndpoints(endpoints.filter((e) => (e.asset_id !== result)))}
+          openEditOnInit={row.original.asset_id === searchId}
+        />,
+        maxSize: 40,
+      },
+    ],
+    [],
+  );
+
+  const [totalElements, setTotalElements] = useState(0);
+
+  const refetchData = (searchPaginationInput: Partial<SearchPaginationInput>) => {
+    const finalSearchPaginationInput = {
+      textSearch,
+      page: pagination.pageIndex,
+      size: pagination.pageSize,
+      sorts: initSorting('asset_name'),
+      ...searchPaginationInput,
+    };
+
+    searchEndpoints(finalSearchPaginationInput).then((result: { data: Page<EndpointStore> }) => {
+      const { data } = result;
+      setEndpoints(data.content);
+      setTotalElements(data.totalElements);
+    });
+  };
+
+  useEffect(() => {
+    refetchData({});
+  }, []);
 
   // Export
   const exportProps = {
@@ -127,98 +159,59 @@ const Endpoints = () => {
     exportFileName: `${t('Endpoints')}.csv`,
   };
 
+  const onSortingChange = (updater: unknown) => {
+    const newSortingValue = updater instanceof Function ? updater(sorting) : updater;
+    if (newSortingValue?.length > 0) {
+      refetchData({ sorts: [transformSortingValueToParams(newSortingValue)] });
+    }
+    setSorting(updater as SortingState);
+  };
+
+  const onPaginationChange = (updater: unknown) => {
+    setPagination((old) => {
+      const newPaginationValue = updater instanceof Function ? updater(old) : updater;
+      if (newPaginationValue) {
+        refetchData({ page: newPaginationValue.pageIndex, size: newPaginationValue.pageSize });
+      }
+      return newPaginationValue;
+    });
+  };
+
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Assets') }, { label: t('Endpoints'), current: true }]} />
-      <PaginationComponent
-        fetch={searchEndpoints}
-        searchPaginationInput={searchPaginationInput}
-        setContent={setEndpoints}
-        exportProps={exportProps}
-      />
-      <List>
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
-        >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
-              &nbsp;
-            </span>
-          </ListItemIcon>
-          <ListItemText
-            primary={
-              <SortHeadersComponent
-                headers={headers}
-                inlineStylesHeaders={inlineStyles}
-                searchPaginationInput={searchPaginationInput}
-                setSearchPaginationInput={setSearchPaginationInput}
+      <div className="p-2 dark">
+        <DataTable
+          data={endpoints}
+          columns={columns}
+          tableOptions={{
+            manualSorting: true,
+            manualPagination: true,
+            onPaginationChange,
+            onSortingChange,
+            rowCount: totalElements,
+          }}
+          tableState={{
+            pagination,
+            sorting,
+          }}
+          toolbar={
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <SearchFilter
+                variant="small"
+                onChange={handleTextSearch}
+                keyword={textSearch}
               />
-            }
-          />
-          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
-        </ListItem>
-        {endpoints.map((endpoint: EndpointStore) => {
-          const executor = executorsMap[endpoint.asset_executor ?? 'Unknown'];
-          return (
-            <ListItem
-              key={endpoint.asset_id}
-              classes={{ root: classes.item }}
-              divider={true}
-            >
-              <ListItemIcon>
-                <DevicesOtherOutlined color="primary"/>
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <div className={classes.bodyItems}>
-                    <div className={classes.bodyItem} style={inlineStyles.asset_name}>
-                      {endpoint.asset_name}
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
-                      <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10}/> {endpoint.endpoint_platform}
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.endpoint_arch}>
-                      {endpoint.endpoint_arch}
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.endpoint_executor}>
-                      {executor && (
-                      <img
-                        src={`/api/images/executors/${executor.executor_type}`}
-                        alt={executor.executor_type}
-                        style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
-                      />
-                      )}
-                      {executor?.executor_name ?? t('Unknown')}
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.asset_tags}>
-                      <ItemTags variant="list" tags={endpoint.asset_tags}/>
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.asset_status}>
-                      <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'}/>
-                    </div>
-                  </div>
-                    }
-              />
-              <ListItemSecondaryAction>
-                <EndpointPopover
-                  endpoint={{ ...endpoint, type: 'static' }}
-                  onUpdate={(result) => setEndpoints(endpoints.map((e) => (e.asset_id !== result.asset_id ? e : result)))}
-                  onDelete={(result) => setEndpoints(endpoints.filter((e) => (e.asset_id !== result)))}
-                  openEditOnInit={endpoint.asset_id === searchId}
-                />
-              </ListItemSecondaryAction>
-            </ListItem>
-          );
-        })}
-      </List>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <DataTablePagination />
+                <ToggleButtonGroup value="fake" exclusive>
+                  <ExportButton totalElements={totalElements} exportProps={exportProps} />
+                </ToggleButtonGroup>
+              </div>
+            </div>
+          }
+        />
+      </div>
       {userAdmin && <EndpointCreation onCreate={(result) => setEndpoints([result, ...endpoints])} />}
     </>
   );
