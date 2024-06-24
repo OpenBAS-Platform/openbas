@@ -1,4 +1,4 @@
-import { Drawer as DrawerMUI, IconButton, type PaperProps, Typography } from '@mui/material';
+import {Drawer as DrawerMUI, IconButton, type PaperProps, Typography} from '@mui/material';
 import React, { FunctionComponent } from 'react';
 import { Close } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
@@ -54,6 +54,7 @@ interface DrawerProps {
   | null;
   variant?: 'full' | 'half';
   PaperProps?: PaperProps
+  disableEnforceFocus?: boolean
 }
 
 const Drawer: FunctionComponent<DrawerProps> = ({
@@ -63,6 +64,7 @@ const Drawer: FunctionComponent<DrawerProps> = ({
   children,
   variant = 'half',
   PaperProps = undefined,
+  disableEnforceFocus = false,
 }) => {
   const classes = useStyles({ variant });
   let component;
@@ -82,6 +84,9 @@ const Drawer: FunctionComponent<DrawerProps> = ({
       classes={{ paper: variant === 'full' ? classes.drawerPaperFull : classes.drawerPaperHalf }}
       onClose={handleClose}
       PaperProps={PaperProps}
+      ModalProps={{
+        disableEnforceFocus: disableEnforceFocus
+      }}
     >
       <div className={variant === 'full' ? classes.headerFull : classes.header}>
         <IconButton
