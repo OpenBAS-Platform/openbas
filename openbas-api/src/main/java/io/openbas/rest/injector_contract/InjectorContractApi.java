@@ -1,8 +1,8 @@
 package io.openbas.rest.injector_contract;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.InjectorContract;
+import io.openbas.database.raw.RawInjectorsContrats;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.InjectorRepository;
@@ -13,10 +13,9 @@ import io.openbas.rest.injector_contract.form.InjectorContractAddInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateMappingInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -31,36 +30,19 @@ import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
+@RequiredArgsConstructor
 @RestController
 public class InjectorContractApi extends RestBehavior {
 
-    private AttackPatternRepository attackPatternRepository;
+    private final AttackPatternRepository attackPatternRepository;
 
-    private InjectorRepository injectorRepository;
+    private final InjectorRepository injectorRepository;
 
-    private InjectorContractRepository injectorContractRepository;
-
-    @Resource
-    protected ObjectMapper mapper;
-
-    @Autowired
-    public void setAttackPatternRepository(AttackPatternRepository attackPatternRepository) {
-        this.attackPatternRepository = attackPatternRepository;
-    }
-
-    @Autowired
-    public void setInjectorRepository(InjectorRepository injectorRepository) {
-        this.injectorRepository = injectorRepository;
-    }
-
-    @Autowired
-    public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
-        this.injectorContractRepository = injectorContractRepository;
-    }
+    private final InjectorContractRepository injectorContractRepository;
 
     @GetMapping("/api/injector_contracts")
-    public Iterable<InjectorContract> injectContracts() {
-        return injectorContractRepository.findAll();
+    public Iterable<RawInjectorsContrats> injectContracts() {
+        return injectorContractRepository.getAllRawInjectorsContracts();
     }
 
     @PostMapping("/api/injector_contracts/search")
@@ -89,8 +71,7 @@ public class InjectorContractApi extends RestBehavior {
             }
         }
         return buildPaginationJPA(
-                (Specification<InjectorContract> specification, Pageable pageable) -> this.injectorContractRepository.findAll(
-                        specification, pageable),
+                this.injectorContractRepository::findAll,
                 searchPaginationInput,
                 InjectorContract.class
         );

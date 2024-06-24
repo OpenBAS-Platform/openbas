@@ -11,7 +11,6 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.converter.ContentConverter;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
-import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

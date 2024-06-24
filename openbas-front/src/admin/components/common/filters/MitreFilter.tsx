@@ -5,7 +5,7 @@ import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
+import type { AttackPattern, InjectorContractLight, KillChainPhase } from '../../../../utils/api-types';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
@@ -14,6 +14,8 @@ import type { Theme } from '../../../../components/Theme';
 import { buildEmptyFilter } from '../../../../components/common/filter/FilterUtils';
 import { FilterHelpers } from '../../../../components/common/filter/FilterHelpers';
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
+import { fetchInjectorsContracts } from '../../../../actions/InjectorContracts';
+import type { InjectorContractHelper } from '../../../../actions/injector_contracts/injector-contract-helper';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -32,6 +34,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface KillChainPhaseComponentProps {
   killChainPhase: KillChainPhase;
   attackPatterns: AttackPattern[];
+  injectorsContratLight: InjectorContractLight[];
   helpers: FilterHelpers;
   onClick: () => void;
 }
@@ -39,15 +42,13 @@ interface KillChainPhaseComponentProps {
 const computeTechnique = (attackPatterns: AttackPattern[]) => {
   return attackPatterns.filter((attackPattern) => attackPattern.attack_pattern_external_id.indexOf('.') < 0);
 };
-const computeSubTechnique = (attackPatterns: AttackPattern[]) => {
-  return attackPatterns.filter((attackPattern) => attackPattern.attack_pattern_external_id.indexOf('.') > -1);
-};
 
 export const MITRE_FILTER_KEY = 'injector_contract_attack_patterns';
 
 const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
   killChainPhase,
   attackPatterns,
+  injectorsContratLight,
   helpers,
   onClick,
 }) => {
@@ -69,12 +70,18 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
   // Techniques
   const techniques = computeTechnique(attackPatterns);
 
-  // Sub techniques
-  const subTechniquesComponent = (attackPattern: AttackPattern) => {
-    const subTechniques = computeSubTechnique(attackPatterns)
-      .filter((a) => a.attack_pattern_external_id.includes(attackPattern.attack_pattern_external_id));
-    if (subTechniques.length > 0) {
-      return (<span>&nbsp;({subTechniques.length})</span>);
+  const computeSubTechnique = (attackPattern: AttackPattern) => {
+    return attackPatterns.filter((value) => value.attack_pattern_external_id.includes(attackPattern.attack_pattern_external_id));
+  };
+
+  const injectorsContratComponent = (attackPattern: AttackPattern) => {
+    const subTechnique = computeSubTechnique(attackPattern);
+    const externalIds = subTechnique.map((value) => value.attack_pattern_external_id);
+    externalIds.push(attackPattern.attack_pattern_external_id);
+    const injectorsContratList = injectorsContratLight
+      .filter((value) => externalIds.some((value1) => value.injector_contract_attack_patterns_external_id?.includes(value1)));
+    if (injectorsContratList.length > 0) {
+      return (<span>&nbsp;({injectorsContratList.length})</span>);
     }
     return (<></>);
   };
@@ -106,7 +113,7 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
               <Typography variant="caption">
                 {`[${attackPattern.attack_pattern_external_id}] `}
                 {attackPattern.attack_pattern_name}
-                {subTechniquesComponent(attackPattern)}
+                {injectorsContratComponent(attackPattern)}
               </Typography>
             </Button>
           ))}
@@ -129,13 +136,15 @@ const MitreFilter: FunctionComponent<MitreFilterProps> = ({
   const dispatch = useAppDispatch();
 
   // Fetching data
-  const { attackPatterns, killChainPhases } = useHelper((helper: AttackPatternHelper & KillChainPhaseHelper) => ({
+  const { attackPatterns, killChainPhases, injectorsContracts } = useHelper((helper: AttackPatternHelper & KillChainPhaseHelper & InjectorContractHelper) => ({
     attackPatterns: helper.getAttackPatterns(),
     killChainPhases: helper.getKillChainPhases(),
+    injectorsContracts: helper.getInjectorContracts(),
   }));
   useDataLoader(() => {
     dispatch(fetchKillChainPhases());
     dispatch(fetchAttackPatterns());
+    dispatch(fetchInjectorsContracts());
   });
 
   // Filters
@@ -161,6 +170,7 @@ const MitreFilter: FunctionComponent<MitreFilterProps> = ({
             key={killChainPhase.phase_id}
             killChainPhase={killChainPhase}
             attackPatterns={getAttackPatterns(killChainPhase)}
+            injectorsContratLight={injectorsContracts}
             helpers={helpers}
             onClick={onClick}
           />
