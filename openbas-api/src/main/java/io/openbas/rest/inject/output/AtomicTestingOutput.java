@@ -2,6 +2,7 @@ package io.openbas.rest.inject.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.InjectStatus;
+import io.openbas.database.model.InjectorContract;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper;
 import jakarta.validation.constraints.NotBlank;
@@ -34,6 +35,9 @@ public class AtomicTestingOutput {
 
   @JsonProperty("inject_type")
   public String injectType;
+
+  @JsonProperty("inject_injector_contract")
+  private InjectorContract injectorContract;
 
   @Getter(NONE)
   @JsonProperty("inject_status")
@@ -75,6 +79,7 @@ public class AtomicTestingOutput {
       String title,
       Instant updatedAt,
       String injectType,
+      InjectorContract injectorContract,
       InjectStatus injectStatus,
       String[] injectExpectations,
       String[] teams,
@@ -84,6 +89,7 @@ public class AtomicTestingOutput {
     this.title = title;
     this.updatedAt = updatedAt;
     this.injectType = injectType;
+    this.injectorContract = injectorContract;
     this.status = injectStatus;
     this.expectations = injectExpectations != null ? new ArrayList<>(Arrays.asList(injectExpectations)) : new ArrayList<>();
 
