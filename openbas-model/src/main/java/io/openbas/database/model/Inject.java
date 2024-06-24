@@ -475,17 +475,27 @@ public class Inject implements Base, Injection {
         // We add the assets to the inject
         ArrayList<Asset> injectAssets = new ArrayList();
         for (String injectAssetId : rawInject.getInject_assets()) {
-            if (mapOfAsset.get(injectAssetId).getAsset_type().equals("Endpoint")) {
-                Endpoint endpoint = new Endpoint(mapOfAsset.get(injectAssetId).getAsset_id(),
-                        mapOfAsset.get(injectAssetId).getAsset_type(),
-                        mapOfAsset.get(injectAssetId).getAsset_name(),
-                        Endpoint.PLATFORM_TYPE.valueOf(mapOfAsset.get(injectAssetId).getEndpoint_platform()));
+            RawAsset rawAsset = mapOfAsset.get(injectAssetId);
+
+            if (rawAsset == null) {
+                continue; // Skip to the next iteration
+            }
+
+            if ("Endpoint".equals(rawAsset.getAsset_type())) {
+                Endpoint endpoint = new Endpoint(
+                    rawAsset.getAsset_id(),
+                    rawAsset.getAsset_type(),
+                    rawAsset.getAsset_name(),
+                    Endpoint.PLATFORM_TYPE.valueOf(rawAsset.getEndpoint_platform())
+                );
                 injectAssets.add(endpoint);
             } else {
-                Asset asset = new Asset(mapOfAsset.get(injectAssetId).getAsset_id(),
-                        mapOfAsset.get(injectAssetId).getAsset_type(),
-                        mapOfAsset.get(injectAssetId).getAsset_name());
-                injectAssets.add(asset);
+                Asset newAsset = new Asset(
+                    rawAsset.getAsset_id(),
+                    rawAsset.getAsset_type(),
+                    rawAsset.getAsset_name()
+                );
+                injectAssets.add(newAsset);
             }
         }
         inject.setAssets(injectAssets);
@@ -493,28 +503,34 @@ public class Inject implements Base, Injection {
         // Add the asset groups to the inject
         ArrayList<AssetGroup> injectAssetGroups = new ArrayList();
         for (String injectAssetGroupId : rawInject.getInject_asset_groups()) {
-            AssetGroup assetGroup = new AssetGroup();
-            assetGroup.setName(mapOfAssetGroups.get(injectAssetGroupId).getAsset_group_name());
-            assetGroup.setId(mapOfAssetGroups.get(injectAssetGroupId).getAsset_group_id());
-            // We add the assets linked to the asset group
-            assetGroup.setAssets(mapOfAssetGroups.get(injectAssetGroupId).getAsset_ids().stream().map(
-                    assetId -> {
-                        if (mapOfAsset.get(assetId).getAsset_type().equals("Endpoint")) {
-                            Endpoint endpoint = new Endpoint(mapOfAsset.get(assetId).getAsset_id(),
-                                    mapOfAsset.get(assetId).getAsset_type(),
-                                    mapOfAsset.get(assetId).getAsset_name(),
-                                    Endpoint.PLATFORM_TYPE.valueOf(mapOfAsset.get(assetId).getEndpoint_platform()));
-                            return endpoint;
-                        } else {
-                            Asset asset = new Asset(mapOfAsset.get(assetId).getAsset_id(),
-                                    mapOfAsset.get(assetId).getAsset_type(),
-                                    mapOfAsset.get(assetId).getAsset_name());
-                            return asset;
+            Optional<RawAssetGroup> rawAssetGroup = Optional.ofNullable(mapOfAssetGroups.get(injectAssetGroupId));
+            rawAssetGroup.ifPresent(rag -> {
+                AssetGroup assetGroup = new AssetGroup();
+                assetGroup.setName(rag.getAsset_group_name());
+                assetGroup.setId(rag.getAsset_group_id());
+
+                // We add the assets linked to the asset group
+                assetGroup.setAssets(rag.getAsset_ids().stream()
+                    .map(assetId -> {
+                        RawAsset rawAsset = mapOfAsset.get(assetId);
+                        if (rawAsset == null) {
+                            return null;
                         }
-                    }
-            ).toList());
-            injectAssetGroups.add(assetGroup);
+
+                        if ("Endpoint".equals(rawAsset.getAsset_type())) {
+                            return new Endpoint(rawAsset.getAsset_id(), rawAsset.getAsset_type(), rawAsset.getAsset_name(),
+                                Endpoint.PLATFORM_TYPE.valueOf(rawAsset.getEndpoint_platform()));
+                        } else {
+                            return new Asset(rawAsset.getAsset_id(), rawAsset.getAsset_type(), rawAsset.getAsset_name());
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .toList()
+                );
+                injectAssetGroups.add(assetGroup);
+            });
         }
+
         inject.setAssetGroups(injectAssetGroups);
 
         return inject;
