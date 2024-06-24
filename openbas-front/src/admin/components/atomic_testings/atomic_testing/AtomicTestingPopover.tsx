@@ -1,12 +1,12 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
 import * as R from 'ramda';
 import { useNavigate } from 'react-router-dom';
-import type { Inject, InjectResultDTO } from '../../../../utils/api-types';
+import type { AtomicTestingInput, Inject, InjectResultDTO } from '../../../../utils/api-types';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
-import { deleteAtomicTesting, updateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import { createAtomicTesting, deleteAtomicTesting, updateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import UpdateInject from '../../common/injects/UpdateInject';
@@ -15,13 +15,16 @@ import { fetchTeams } from '../../../../actions/teams/team-actions';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import { isNotEmptyField } from '../../../../utils/utils';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
+import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 
 interface Props {
   atomic: InjectResultDTO;
   openEdit?: boolean;
   openDelete?: boolean;
+  openDuplicate?: boolean;
   setOpenEdit?: React.Dispatch<React.SetStateAction<boolean>>;
   setOpenDelete?: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenDuplicate?: React.Dispatch<React.SetStateAction<boolean>>;
   entries: ButtonPopoverEntry[];
 }
 
@@ -30,8 +33,10 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   entries,
   openEdit,
   openDelete,
+  openDuplicate,
   setOpenEdit,
   setOpenDelete,
+  setOpenDuplicate,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -39,6 +44,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   const navigate = useNavigate();
   const [edition, setEdition] = useState(false);
   const [deletion, setDeletion] = useState(false);
+  const [duplicate, setDuplicate] = useState(false);
 
   // Fetching data
   const { updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
@@ -80,6 +86,17 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     });
   };
 
+  const submitDuplicate = async (data: AtomicTestingInput) => {
+    const toDuplicate = R.pipe(
+      R.pick([
+        'inject_id',
+      ]),
+    )(data);
+    createAtomicTesting(toDuplicate).then((result: { data: InjectResultDTO }) => {
+      navigate(`/admin/atomic_testings/${result.data.inject_id}`);
+    });
+  };
+
   return (
     <>
       <ButtonPopover entries={entries} />
@@ -97,6 +114,12 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
         handleSubmit={submitDelete}
         text={t('Do you want to delete this atomic testing ?')}
       />
+      {/* <DialogDuplicate */}
+      {/*  open={isNotEmptyField(openDuplicate) ? openDuplicate : duplicate} */}
+      {/*  handleClose={() => (setOpenDuplicate ? setOpenDuplicate(false) : setDuplicate(false))} */}
+      {/*  handleSubmit={submitDuplicate} */}
+      {/*  text={t('Do you want to duplicate this atomic testing ?')} */}
+      {/* /> */}
     </>
   );
 };
