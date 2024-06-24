@@ -16,7 +16,7 @@ public class ScenarioExportMixins {
       "scenario_message_header",
       "scenario_message_footer",
       "scenario_mail_from",
-      "scenarios_tags",
+      "scenario_tags",
       "scenario_documents",
   })
   public static class Scenario {
