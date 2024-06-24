@@ -3,15 +3,13 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
+import jakarta.persistence.*;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.UuidGenerator;
-import org.hibernate.annotations.Type;
 
-import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +53,6 @@ public class Communication implements Base {
     @JsonProperty("communication_content_html")
     private String contentHtml;
 
-    @Type(StringArrayType.class)
     @Column(name = "communication_attachments", columnDefinition = "text[]")
     @JsonProperty("communication_attachments")
     private String[] attachments;

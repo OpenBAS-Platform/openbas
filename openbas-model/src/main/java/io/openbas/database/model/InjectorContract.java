@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLHStoreType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
@@ -63,7 +62,6 @@ public class InjectorContract implements Base {
     @JsonProperty("injector_contract_needs_executor")
     private Boolean needsExecutor = false;
 
-    @Type(StringArrayType.class)
     @Column(name = "injector_contract_platforms", columnDefinition = "text[]")
     @JsonProperty("injector_contract_platforms")
     private String[] platforms = new String[0];

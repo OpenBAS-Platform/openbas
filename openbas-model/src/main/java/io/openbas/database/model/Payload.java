@@ -65,7 +65,6 @@ public class Payload implements Base {
   @JsonProperty("payload_description")
   private String description;
 
-  @Type(StringArrayType.class)
   @Column(name = "payload_platforms", columnDefinition = "text[]")
   @JsonProperty("payload_platforms")
   private String[] platforms = new String[0];
