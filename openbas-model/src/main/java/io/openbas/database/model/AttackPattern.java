@@ -2,7 +2,6 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
@@ -10,7 +9,6 @@ import io.openbas.helper.MultiIdListDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
@@ -56,12 +54,10 @@ public class AttackPattern implements Base {
   @NotBlank
   private String externalId;
 
-  @Type(StringArrayType.class)
   @Column(name = "attack_pattern_platforms", columnDefinition = "text[]")
   @JsonProperty("attack_pattern_platforms")
   private String[] platforms = new String[0];
 
-  @Type(StringArrayType.class)
   @Column(name = "attack_pattern_permissions_required", columnDefinition = "text[]")
   @JsonProperty("attack_pattern_permissions_required")
   private String[] permissionsRequired = new String[0];

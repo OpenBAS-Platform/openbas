@@ -1,6 +1,5 @@
 package io.openbas.executors.tanium.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.Endpoint;
@@ -15,7 +14,6 @@ import io.openbas.integrations.InjectorService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.java.Log;
-import org.apache.hc.client5.http.ClientProtocolException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,10 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.logging.Level;
 
 import static java.time.Instant.now;
