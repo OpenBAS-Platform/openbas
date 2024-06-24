@@ -1,4 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ButtonCreate from '../../../components/common/ButtonCreate';
 import { useFormatter } from '../../../components/i18n';
 import { useAppDispatch } from '../../../utils/hooks';
@@ -18,6 +19,7 @@ const ScenarioCreation: FunctionComponent<Props> = ({
   // Standard hooks
   const [open, setOpen] = useState(false);
   const { t } = useFormatter();
+  const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
   const onSubmit = (data: ScenarioInput) => {
@@ -30,7 +32,7 @@ const ScenarioCreation: FunctionComponent<Props> = ({
           }
           setOpen(false);
         }
-        return result;
+        navigate(`/admin/scenarios/${result.result}`);
       },
     );
   };
