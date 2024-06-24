@@ -28,6 +28,7 @@ import { fetchTags } from '../../../actions/Tag';
 import { useAppDispatch } from '../../../utils/hooks';
 import usePaginationAndFilter from '../../../components/common/usePaginationAndFilter';
 import ScenarioPopover from './scenario/ScenarioPopover';
+import { ButtonPopoverEntry } from '../../../components/common/ButtonPopover';
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -222,6 +223,23 @@ const Scenarios = () => {
     exportFileName: `${t('Scenarios')}.csv`,
   };
 
+  // Edition
+  const [openDuplicate, setOpenDuplicate] = useState(false);
+  const handleDuplicate = () => {
+    setOpenDuplicate(true);
+  };
+
+  // Export
+  const [openExport, setOpenExport] = useState(false);
+  const handleExport = () => {
+    setOpenExport(true);
+  };
+
+  const entries: ButtonPopoverEntry[] = [
+    { label: 'Duplicate', action: handleDuplicate },
+    { label: 'Export', action: handleExport },
+  ];
+
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Scenarios'), current: true }]} />
@@ -294,7 +312,14 @@ const Scenarios = () => {
               key={scenario.scenario_id}
               classes={{ root: classes.item }}
               secondaryAction={
-                <ScenarioPopover scenario={scenario}/>
+                <ScenarioPopover
+                  scenario={scenario}
+                  entries={entries}
+                  openExport={openExport}
+                  setOpenExport={setOpenExport}
+                  openDuplicate={openDuplicate}
+                  setOpenDuplicate={setOpenDuplicate}
+                />
               }
               disablePadding={true}
             >

@@ -170,6 +170,7 @@ const i18n = {
       Launch: 'Lancer',
       Update: 'Modifier',
       Duplicate: 'Dupliquer',
+      'Do you want to duplicate the scenario?': 'Voulez-vous dupliquer ce scénario?',
       Delete: 'Supprimer',
       Edition: 'Edition',
       Confirmation: 'Confirmation',
@@ -502,6 +503,7 @@ const i18n = {
       Export: 'Exporter',
       'Export the simulation': 'Exporter cette simulation',
       'Export the scenario': 'Exporter ce scenario',
+      'Do you want to delete the scenario?': 'Voulez-vous supprimer ce scénario?',
       'Reset to default values': 'Réinitialiser les valeurs par défaut',
       Elements: 'Eléments',
       'Scenario (including attached files)':

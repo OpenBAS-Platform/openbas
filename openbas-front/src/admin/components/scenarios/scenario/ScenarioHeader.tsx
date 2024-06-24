@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Tooltip, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { PlayArrowOutlined, Stop } from '@mui/icons-material';
@@ -15,6 +15,7 @@ import { parseCron, ParsedCron } from '../../../../utils/Cron';
 import ScenarioRecurringFormDialog from './ScenarioRecurringFormDialog';
 import { truncate } from '../../../../utils/String';
 import type { Theme } from '../../../../components/Theme';
+import { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -106,6 +107,31 @@ const ScenarioHeader = ({
     setParsedCronExpression(null);
     dispatch(updateScenarioRecurrence(scenarioId, { scenario_recurrence: undefined, scenario_recurrence_start: undefined, scenario_recurrence_end: undefined }));
   };
+
+  // Deletion
+  const [openDelete, setOpenDelete] = useState(false);
+  const handleDelete = () => setOpenDelete(true);
+
+  // Edition
+  const [openEdit, setOpenEdit] = useState(false);
+  const handleEdit = () => setOpenEdit(true);
+
+  // Export
+  const [openExport, setOpenExport] = useState(false);
+  const handleExport = () => setOpenExport(true);
+
+  // Duplicate
+  const [openDuplicate, setOpenDuplicate] = useState(false);
+  const handleDuplicate = () => setOpenDuplicate(true);
+
+  // Button Popover
+  const entries: ButtonPopoverEntry[] = [
+    { label: 'Update', action: handleEdit },
+    { label: 'Duplicate', action: handleDuplicate },
+    { label: 'Export', action: handleExport },
+    { label: 'Delete', action: handleDelete },
+  ];
+
   return (
     <>
       <Tooltip title={scenario.scenario_name}>
@@ -141,7 +167,18 @@ const ScenarioHeader = ({
             {t('Launch')}
           </Button>
         )}
-        <ScenarioPopover scenario={scenario} />
+        <ScenarioPopover
+          scenario={scenario}
+          entries={entries}
+          openEdit={openEdit}
+          openDuplicate={openDuplicate}
+          openDelete={openDelete}
+          openExport={openExport}
+          setOpenExport={setOpenExport}
+          setOpenEdit={setOpenEdit}
+          setOpenDelete={setOpenDelete}
+          setOpenDuplicate={setOpenDuplicate}
+        />
       </div>
       <ScenarioRecurringFormDialog
         selectRecurring={selectRecurring}
