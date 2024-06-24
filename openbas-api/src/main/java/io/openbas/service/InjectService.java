@@ -234,8 +234,10 @@ public class InjectService {
     return this.assetRepository
         .rawByIds(rawInjects.stream().flatMap(rawInject -> Stream.concat(Stream.concat(
                 rawInject.getInject_asset_groups().stream()
-                    .flatMap(assetGroup -> mapOfAssetGroups.get(assetGroup).getAsset_ids().stream()),
-                rawInject.getInject_assets().stream()
+                    .flatMap(assetGroup -> Optional.ofNullable(mapOfAssetGroups.get(assetGroup))
+                        .map(ag -> ag.getAsset_ids().stream())
+                        .orElse(Stream.empty())),
+            rawInject.getInject_assets().stream()
             ), Stream.concat(
                 rawInject.getInject_expectations().stream()
                     .map(mapOfInjectsExpectations::get)
