@@ -90,6 +90,9 @@ public class ScenarioExecutionJob implements Job {
   }
 
   private boolean isScenarioOutdated(@NotNull final Scenario scenario) {
+    if (scenario.getRecurrenceEnd() == null) {
+      return false;
+    }
     // End date is passed
     if (scenario.getRecurrenceEnd().isBefore(Instant.now())) {
       return true;
