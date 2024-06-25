@@ -347,20 +347,20 @@ const LeftBar = () => {
         <MenuList component="nav">
           <StyledTooltip title={!navOpen && t('Scenarios')} placement="right">
             <MenuItem
-                component={Link}
-                to="/admin/scenarios"
-                selected={location.pathname.includes('/admin/scenarios')}
-                dense={true}
-                classes={{ root: classes.menuItem }}
+              component={Link}
+              to="/admin/scenarios"
+              selected={location.pathname.includes('/admin/scenarios')}
+              dense={true}
+              classes={{ root: classes.menuItem }}
             >
               <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
                 <MovieFilterOutlined />
               </ListItemIcon>
               {navOpen && (
-                  <ListItemText
-                      classes={{ primary: classes.menuItemText }}
-                      primary={t('Scenarios')}
-                  />
+              <ListItemText
+                classes={{ primary: classes.menuItemText }}
+                primary={t('Scenarios')}
+              />
               )}
             </MenuItem>
           </StyledTooltip>
