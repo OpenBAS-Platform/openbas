@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.rest.inject.output.InjectOutput;
 import jakarta.annotation.Resource;
@@ -20,6 +21,14 @@ import lombok.extern.java.Log;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -34,12 +43,13 @@ import static java.time.Instant.now;
 @Log
 public class InjectService {
 
-  private final InjectRepository injectRepository;
-  private final InjectDocumentRepository injectDocumentRepository;
-  private final InjectExpectationRepository injectExpectationRepository;
-  private final AssetRepository assetRepository;
-  private final AssetGroupRepository assetGroupRepository;
-  private final TeamRepository teamRepository;
+    private final InjectRepository injectRepository;
+    private final InjectDocumentRepository injectDocumentRepository;
+    private final InjectExpectationRepository injectExpectationRepository;
+    private final AssetRepository assetRepository;
+    private final AssetGroupRepository assetGroupRepository;
+    private final TeamRepository teamRepository;
+    private final UserRepository userRepository;
 
     @Resource
     protected ObjectMapper mapper;
