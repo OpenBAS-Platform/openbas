@@ -814,6 +814,8 @@ export interface ExerciseSimple {
   /** @uniqueItems true */
   exercise_tags?: Tag[];
   exercise_targets: InjectTargetWithResult[];
+  /** @format date-time */
+  exercise_updated_at?: string;
 }
 
 export interface ExerciseTeamPlayersEnableInput {
@@ -1135,6 +1137,7 @@ export interface InjectInput {
 }
 
 export interface InjectOutput {
+  inject_content?: object;
   /**
    * @format int64
    * @min 0

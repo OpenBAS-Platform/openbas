@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import static io.openbas.utils.ResultUtils.computeGlobalExpectationResults;
 import static io.openbas.utils.ResultUtils.computeTargetResults;
+import static java.time.Instant.now;
 
 @Setter
 @Getter
@@ -55,6 +56,9 @@ public class ExerciseSimple {
   @JsonProperty("exercise_start_date")
   private Instant start;
 
+  @JsonProperty("exercise_updated_at")
+  private Instant updatedAt = now();
+
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("exercise_tags")
   private Set<Tag> tags = new HashSet<>();
@@ -73,6 +77,7 @@ public class ExerciseSimple {
     ExerciseSimple simple = new ExerciseSimple();
     BeanUtils.copyProperties(exercise, simple);
     simple.setStart(exercise.getStart().orElse(null));
+    simple.setUpdatedAt(exercise.getUpdatedAt());
     simple.setExpectationResultByTypes(computeGlobalExpectationResults(exercise.getInjects()));
     simple.setTargets(computeTargetResults(exercise.getInjects()));
     return simple;
@@ -102,6 +107,7 @@ public class ExerciseSimple {
     simple.setSubtitle(exercise.getExercise_subtitle());
     simple.setStatus(ExerciseStatus.valueOf(exercise.getExercise_status()));
     simple.setStart(exercise.getExercise_start_date());
+    simple.setUpdatedAt(exercise.getExercise_updated_at());
 
     // We set the ExpectationResults
     simple.setExpectationResultByTypes(AtomicTestingUtils

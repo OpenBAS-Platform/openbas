@@ -88,7 +88,7 @@ const inlineStyles: Record<string, CSSProperties> = {
     cursor: 'default',
   },
   scenario_tags: {
-    width: '18%',
+    width: '15%',
   },
   scenario_updated_at: {
     width: '10%',
