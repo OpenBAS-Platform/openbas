@@ -1,7 +1,8 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Tabs, Tab } from '@mui/material';
-import type { ScenarioInput, ScenarioInformationInput } from '../../../../utils/api-types';
+import * as R from 'ramda';
+import type { ScenarioInput, ScenarioInformationInput, Exercise } from '../../../../utils/api-types';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
@@ -15,6 +16,7 @@ import useScenarioPermissions from '../../../../utils/Scenario';
 import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
 import { isNotEmptyField } from '../../../../utils/utils';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
+import { addExercise } from '../../../../actions/Exercise';
 
 interface Props {
   scenario: ScenarioStore;
@@ -121,6 +123,25 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   const handleCloseDuplicate = () => {
     setDuplicate(false);
   };
+  const submitDuplicate = async (data: ScenarioInput) => {
+    const toDuplicate = R.pipe(
+      R.pick([
+        'scenario_id',
+        'scenario_name',
+      ]),
+    )(data);
+    await dispatch(addExercise(toDuplicate)).then((result: { data: Exercise }) => {
+      navigate(`/admin/exercises/${result.data.exercise_id}`);
+    });
+  };
+
+  const submitDuplicateHandler = () => {
+    const data: ScenarioInput = {
+      scenario_id: scenario.scenario_id,
+      scenario_name: scenario.scenario_name,
+    };
+    submitDuplicate(data);
+  };
 
   const permissions = useScenarioPermissions(scenario.scenario_id);
 
@@ -170,7 +191,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
       <DialogDuplicate
         open={isNotEmptyField(openDuplicate) ? openDuplicate : duplicate}
         handleClose={() => (setOpenDuplicate ? setOpenDuplicate(false) : handleCloseDuplicate)}
-        handleSubmit={submitDelete}
+        handleSubmit={submitDuplicateHandler}
         text={t('Do you want to duplicate this scenario?')}
       />
     </>

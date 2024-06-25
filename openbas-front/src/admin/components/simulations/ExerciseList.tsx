@@ -123,9 +123,9 @@ const ExerciseList: FunctionComponent<Props> = ({
     },
   ];
 
-  // Edition
+  // Duplicate
   const [openDuplicate, setOpenDuplicate] = useState(false);
-  const handleOpenEdit = () => {
+  const handleOpenDuplicate = () => {
     setOpenDuplicate(true);
   };
 
@@ -137,7 +137,7 @@ const ExerciseList: FunctionComponent<Props> = ({
 
   // Button Popover
   const entries: ButtonPopoverEntry[] = [
-    { label: 'Duplicate', action: setOpenDuplicate ? () => setOpenDuplicate(true) : handleOpenEdit },
+    { label: 'Duplicate', action: setOpenDuplicate ? () => setOpenDuplicate(true) : handleOpenDuplicate },
     { label: 'Export', action: setOpenExport ? () => setOpenExport(true) : handleOpenExport },
   ];
 
@@ -170,9 +170,9 @@ const ExerciseList: FunctionComponent<Props> = ({
               exercise={exercise}
               entries={entries}
               openExport={openExport}
+              setOpenExport={setOpenExport}
               openDuplicate={openDuplicate}
               setOpenDuplicate={setOpenDuplicate}
-              setOpenExport={setOpenExport}
             />
           }
           disablePadding={true}

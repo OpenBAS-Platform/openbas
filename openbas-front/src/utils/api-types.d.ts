@@ -727,6 +727,7 @@ export interface ExerciseCreateInput {
   exercise_description?: string;
   exercise_main_focus?: string;
   exercise_name: string;
+  exercise_id?: string;
   exercise_severity?: string;
   /** @format date-time */
   exercise_start_date?: string;
@@ -1097,6 +1098,7 @@ export interface InjectInput {
   inject_tags?: string[];
   inject_teams?: string[];
   inject_title?: string;
+  inject_id?: string;
 }
 
 export interface InjectOutput {
@@ -2416,6 +2418,7 @@ export interface ScenarioInput {
   scenario_external_url?: string;
   scenario_main_focus?: string;
   scenario_name: string;
+  scenario_id?: string;
   scenario_severity?: string;
   scenario_subtitle?: string;
   scenario_tags?: string[];

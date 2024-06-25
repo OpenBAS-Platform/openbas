@@ -223,21 +223,21 @@ const Scenarios = () => {
     exportFileName: `${t('Scenarios')}.csv`,
   };
 
-  // Edition
+  // Duplicate
   const [openDuplicate, setOpenDuplicate] = useState(false);
-  const handleDuplicate = () => {
+  const handleOpenDuplicate = () => {
     setOpenDuplicate(true);
   };
 
   // Export
   const [openExport, setOpenExport] = useState(false);
-  const handleExport = () => {
+  const handleOpenExport = () => {
     setOpenExport(true);
   };
 
   const entries: ButtonPopoverEntry[] = [
-    { label: 'Duplicate', action: handleDuplicate },
-    { label: 'Export', action: handleExport },
+    { label: 'Duplicate', action: setOpenDuplicate ? () => setOpenDuplicate(true) : handleOpenDuplicate },
+    { label: 'Export', action: setOpenExport ? () => setOpenExport(true) : handleOpenExport },
   ];
 
   return (

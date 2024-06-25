@@ -1,12 +1,13 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
+import R from 'ramda';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import type { InjectStore } from '../../../../actions/injects/Inject';
 import { InjectContext, PermissionsContext } from '../Context';
-import type { Inject, InjectStatus, InjectStatusExecution, Tag } from '../../../../utils/api-types';
-import { tryInject } from '../../../../actions/Inject';
+import type { Inject, InjectInput, InjectStatus, InjectStatusExecution, Tag } from '../../../../utils/api-types';
+import { addInjectForExercise, addInjectForScenario, tryInject } from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 
@@ -58,9 +59,26 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const handleCloseDuplicate = () => setDuplicate(false);
 
-  const submitDuplicate = () => {
-    onDeleteInject(inject.inject_id);
+  const submitDuplicate = (data: InjectInput) => {
+    const toUpdate = R.pipe(
+      R.pick([
+        'inject_id',
+      ]),
+    )(data);
+    if (inject.inject_exercise) {
+      dispatch(addInjectForExercise(inject.inject_exercise), toUpdate);
+    }
+    if (inject.inject_scenario) {
+      dispatch(addInjectForScenario(inject.inject_scenario), toUpdate);
+    }
     handleCloseDuplicate();
+  };
+
+  const submitDuplicateHandler = () => {
+    const data: InjectInput = {
+      inject_id: inject.inject_id,
+    };
+    submitDuplicate(data);
   };
 
   const handleOpenDelete = () => {
@@ -114,7 +132,6 @@ const InjectPopover: FunctionComponent<Props> = ({
   };
 
   const submitDisable = () => {
-    onUpdateInjectActivation(inject.inject_id, { inject_enabled: false });
     handleCloseDisable();
   };
 
@@ -219,7 +236,7 @@ const InjectPopover: FunctionComponent<Props> = ({
       <DialogDuplicate
         open={duplicate}
         handleClose={handleCloseDuplicate}
-        handleSubmit={submitDuplicate}
+        handleSubmit={submitDuplicateHandler}
         text={t('Do you want to duplicate this inject?')}
       />
       <Dialog
