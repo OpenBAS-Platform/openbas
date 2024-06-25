@@ -229,7 +229,7 @@ const AtomicTesting = () => {
                     <TargetListItem onClick={handleTargetClick} target={target} selected={selectedTarget?.id === target.id} />
                     <List component="div" disablePadding>
                       {target?.children?.map((child) => (
-                        <TargetListItem key={child?.id} isChild onClick={handleTargetClick} target={child} selected={selectedTarget?.id === target.id} />
+                        <TargetListItem key={child?.id} isChild onClick={handleTargetClick} target={child} selected={selectedTarget?.id === child.id} />
                       ))}
                     </List>
                   </div>
