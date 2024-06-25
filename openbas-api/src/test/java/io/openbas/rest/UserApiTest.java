@@ -36,8 +36,11 @@ class UserApiTest extends IntegrationTest {
         User user = new User();
         user.setEmail(EMAIL);
         user.setPassword(UserFixture.ENCODED_PASSWORD);
-
-        savedUser = this.userRepository.save(user);
+        if (this.userRepository.findByEmailIgnoreCase(EMAIL).isEmpty()) {
+            savedUser = this.userRepository.save(user);
+        } else {
+            savedUser = this.userRepository.findByEmailIgnoreCase(EMAIL).get();
+        }
     }
 
 
@@ -83,7 +86,7 @@ class UserApiTest extends IntegrationTest {
             @Test
             @WithMockUser
             void given_known_login_user_in_uppercase_input_should_return_user() throws Exception {
-                LoginUserInput loginUserInput = UserFixture.getDefaultWithPwd().login("USER@filigran.io").build();
+                LoginUserInput loginUserInput = UserFixture.getDefaultWithPwd().login("USER2@filigran.io").build();
 
                 mvc.perform(post("/api/login")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -97,7 +100,7 @@ class UserApiTest extends IntegrationTest {
             @Test
             @WithMockUser
             void given_known_login_user_in_alternatingcase_input_should_return_user() throws Exception {
-                LoginUserInput loginUserInput = UserFixture.getDefaultWithPwd().login("uSeR@filigran.io").build();
+                LoginUserInput loginUserInput = UserFixture.getDefaultWithPwd().login("uSeR2@filigran.io").build();
 
                 mvc.perform(post("/api/login")
                                 .contentType(MediaType.APPLICATION_JSON)

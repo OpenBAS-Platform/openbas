@@ -6,6 +6,7 @@ import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
 import jakarta.persistence.*;
@@ -90,6 +91,19 @@ public class Payload implements Base {
   @JsonProperty("payload_prerequisites")
   private List<PayloadPrerequisite> prerequisites = new ArrayList<>();
 
+  @Setter
+  @Column(name = "payload_external_id")
+  @JsonProperty("payload_external_id")
+  private String externalId;
+
+  // -- COLLECTOR --
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "payload_collector")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("payload_collector")
+  private Collector collector;
+
   // -- TAG --
 
   @Queryable(sortable = true)
@@ -110,6 +124,11 @@ public class Payload implements Base {
   @Column(name = "payload_updated_at")
   @JsonProperty("payload_updated_at")
   private Instant updatedAt = now();
+
+  @JsonProperty("payload_collector_type")
+  private String getCollectorType() {
+    return this.getCollector() != null ? this.getCollector().getType() : null;
+  }
 
   @Override
   public int hashCode() {

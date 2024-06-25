@@ -579,7 +579,7 @@ export interface Endpoint {
   endpoint_hostname?: string;
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal" | "Unknown";
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
   updateAttributes?: object;
 }
 
@@ -598,7 +598,7 @@ export interface EndpointInput {
    */
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal" | "Unknown";
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
 }
 
 export interface EndpointRegisterInput {
@@ -617,7 +617,7 @@ export interface EndpointRegisterInput {
    */
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal" | "Unknown";
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
 }
 
 export interface Evaluation {
@@ -1112,6 +1112,8 @@ export interface InjectOutput {
   inject_scenario?: string;
   /** @uniqueItems true */
   inject_tags?: string[];
+  /** @uniqueItems true */
+  inject_teams?: string[];
   inject_title?: string;
   inject_type?: string;
 }
@@ -1208,7 +1210,7 @@ export interface InjectTargetWithResult {
   expectationResultsByTypes?: ExpectationResultsByType[];
   id: string;
   name?: string;
-  platformType?: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal" | "Unknown";
+  platformType?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
   targetType?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }
 
@@ -1267,6 +1269,7 @@ export interface InjectorContract {
   injector_contract_custom?: boolean;
   injector_contract_id: string;
   injector_contract_injector?: Injector;
+  injector_contract_injector_type?: string;
   injector_contract_labels?: Record<string, string>;
   injector_contract_manual?: boolean;
   injector_contract_needs_executor?: boolean;
@@ -1275,6 +1278,11 @@ export interface InjectorContract {
   /** @format date-time */
   injector_contract_updated_at?: string;
   updateAttributes?: object;
+}
+
+export interface InjectorContractLight {
+  injector_contract_id: string;
+  injector_contract_attack_patterns_external_id?: string[];
 }
 
 export interface InjectorContractAddInput {
@@ -1966,6 +1974,25 @@ export interface PageRawPaginationTeam {
   totalPages?: number;
 }
 
+export interface PageRawPaginationImportMapper {
+  content?: RawPaginationImportMapper[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageTag {
   content?: Tag[];
   empty?: boolean;
@@ -2031,9 +2058,12 @@ export interface Payload {
   payload_attack_patterns?: AttackPattern[];
   payload_cleanup_command?: string;
   payload_cleanup_executor?: string;
+  payload_collector?: Collector;
+  payload_collector_type?: string;
   /** @format date-time */
   payload_created_at?: string;
   payload_description?: string;
+  payload_external_id?: string;
   payload_id: string;
   payload_name: string;
   payload_platforms?: string[];
@@ -2095,11 +2125,32 @@ export interface PayloadUpdateInput {
   payload_tags?: string[];
 }
 
+export interface PayloadUpsertInput {
+  command_content?: string;
+  command_executor?: string;
+  dns_resolution_hostname?: string;
+  executable_file?: string;
+  file_drop_file?: string;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: string[];
+  payload_cleanup_command?: string;
+  payload_cleanup_executor?: string;
+  payload_collector?: string;
+  payload_description?: string;
+  payload_external_id: string;
+  payload_name: string;
+  payload_platforms?: string[];
+  payload_prerequisites?: PayloadPrerequisite[];
+  payload_tags?: string[];
+  payload_type: string;
+}
+
 export interface PlatformSettings {
   auth_saml2_enable?: boolean;
   platform_saml2_providers?: OAuthProvider[];
   auth_local_enable?: boolean;
   auth_openid_enable?: boolean;
+  disabled_dev_features?: string[];
   executor_caldera_enable?: boolean;
   executor_caldera_public_url?: string;
   executor_tanium_enable?: boolean;
@@ -2125,7 +2176,6 @@ export interface PlatformSettings {
   rabbitmq_version?: string;
   xtm_opencti_enable?: boolean;
   xtm_opencti_url?: string;
-  disabled_dev_features: string[];
 }
 
 export interface PlatformStatistic {
@@ -2230,6 +2280,13 @@ export interface RawPaginationAssetGroup {
   asset_group_tags?: string[];
 }
 
+export interface RawPaginationImportMapper {
+  mapper_id?: string;
+  mapper_name?: string;
+  mapper_created_at?: string;
+  mapper_updated_at?: string;
+}
+
 export interface RawPaginationDocument {
   document_description?: string;
   document_exercises?: string[];
@@ -2268,6 +2325,7 @@ export interface RawPaginationTeam {
   team_description?: string;
   team_id?: string;
   team_name?: string;
+  team_organization?: string;
   team_tags?: string[];
   /** @format date-time */
   team_updated_at?: string;

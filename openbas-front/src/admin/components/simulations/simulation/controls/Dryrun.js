@@ -336,10 +336,7 @@ const Dryrun = () => {
                 disabled={!dryinject.dryinject_inject.inject_enabled}
               >
                 <ListItemIcon style={{ paddingTop: 5 }}>
-                  <InjectIcon
-                    type={dryinject.dryinject_inject.inject_type}
-                    disabled={!dryinject.dryinject_inject.inject_enabled}
-                  />
+                  <InjectIcon type={dryinject.dryinject_inject.inject_type} disabled={!dryinject.dryinject_inject.inject_enabled}/>
                 </ListItemIcon>
                 <ListItemText
                   primary={

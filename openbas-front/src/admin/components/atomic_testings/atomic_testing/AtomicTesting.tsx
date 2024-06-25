@@ -1,8 +1,7 @@
-import { useParams } from 'react-router-dom';
 import React, { useContext, useEffect, useState } from 'react';
 import { Chip, Grid, List, Paper, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import type { AttackPattern, InjectResultDTO, InjectTargetWithResult, KillChainPhase } from '../../../../utils/api-types';
+import type { AttackPattern, InjectTargetWithResult, KillChainPhase } from '../../../../utils/api-types';
 import ResponsePie from '../../common/injects/ResponsePie';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
@@ -16,6 +15,7 @@ import InjectIcon from '../../common/injects/InjectIcon';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import Loader from '../../../../components/Loader';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
+import { isNotEmptyField } from '../../../../utils/utils';
 
 const useStyles = makeStyles(() => ({
   chip: {
@@ -42,7 +42,6 @@ const AtomicTesting = () => {
   // Standard hooks
   const classes = useStyles();
   const { t, tPick, fldt } = useFormatter();
-  const { injectId } = useParams() as { injectId: InjectResultDTO['inject_id'] };
   const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
   const filtering = useSearchAnFilter('', 'name', ['name']);
 
@@ -97,13 +96,18 @@ const AtomicTesting = () => {
                 >
                   {t('Type')}
                 </Typography>
-                <Tooltip title={tPick(injectResultDto.inject_injector_contract.injector_contract_labels)}>
-                  <div style={{ display: 'flex' }}>
-                    <InjectIcon
-                      variant="inline"
-                      tooltip={t(injectResultDto.inject_type ?? 'Unknown')}
-                      type={injectResultDto.inject_type ?? 'Unknown'}
-                    />
+                <div style={{ display: 'flex' }}>
+                  <InjectIcon
+                    variant="inline"
+                    isPayload={isNotEmptyField(injectResultDto.inject_injector_contract?.injector_contract_payload)}
+                    type={
+                        injectResultDto.inject_injector_contract?.injector_contract_payload
+                          ? injectResultDto.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                            || injectResultDto.inject_injector_contract.injector_contract_payload?.payload_type
+                          : injectResultDto.inject_type
+                    }
+                  />
+                  <Tooltip title={tPick(injectResultDto.inject_injector_contract.injector_contract_labels)}>
                     <div style={{
                       marginLeft: 10,
                       whiteSpace: 'nowrap',
@@ -113,8 +117,8 @@ const AtomicTesting = () => {
                     >
                       {tPick(injectResultDto.inject_injector_contract.injector_contract_labels)}
                     </div>
-                  </div>
-                </Tooltip>
+                  </Tooltip>
+                </div>
               </Grid>
               <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
@@ -244,8 +248,7 @@ const AtomicTesting = () => {
             {selectedTarget && !!injectResultDto.inject_type && (
               <TargetResultsDetail
                 target={selectedTarget}
-                injectId={injectId}
-                injectType={injectResultDto.inject_type}
+                inject={injectResultDto}
                 lastExecutionStartDate={injectResultDto.inject_status?.tracking_sent_date || ''}
                 lastExecutionEndDate={injectResultDto.inject_status?.tracking_end_date || ''}
               />

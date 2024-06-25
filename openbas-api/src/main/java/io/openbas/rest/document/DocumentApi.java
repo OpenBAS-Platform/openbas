@@ -59,6 +59,7 @@ public class DocumentApi extends RestBehavior {
     private InjectDocumentRepository injectDocumentRepository;
     private ChallengeRepository challengeRepository;
     private UserRepository userRepository;
+    private InjectorRepository injectorRepository;
     private CollectorRepository collectorRepository;
 
     @Autowired
@@ -99,6 +100,11 @@ public class DocumentApi extends RestBehavior {
     @Autowired
     public void setChallengeRepository(ChallengeRepository challengeRepository) {
         this.challengeRepository = challengeRepository;
+    }
+
+    @Autowired
+    public void setInjectorRepository(InjectorRepository injectorRepository) {
+        this.injectorRepository = injectorRepository;
     }
 
     @Autowired
@@ -263,9 +269,9 @@ public class DocumentApi extends RestBehavior {
         }
     }
 
-    @GetMapping(value = "/api/images/injectors/{injectType}", produces = MediaType.IMAGE_PNG_VALUE)
-    public @ResponseBody ResponseEntity<byte[]> getInjectorImage(@PathVariable String injectType) throws IOException {
-        Optional<InputStream> fileStream = fileService.getInjectorImage(injectType);
+    @GetMapping(value = "/api/images/injectors/{injectorType}", produces = MediaType.IMAGE_PNG_VALUE)
+    public @ResponseBody ResponseEntity<byte[]> getInjectorImage(@PathVariable String injectorType) throws IOException {
+        Optional<InputStream> fileStream = fileService.getInjectorImage(injectorType);
         if (fileStream.isPresent()) {
             return ResponseEntity.ok()
                     .cacheControl(CacheControl.maxAge(5, TimeUnit.MINUTES))
@@ -274,9 +280,21 @@ public class DocumentApi extends RestBehavior {
         return null;
     }
 
-    @GetMapping(value = "/api/images/collectors/{collectorId}", produces = MediaType.IMAGE_PNG_VALUE)
-    public @ResponseBody ResponseEntity<byte[]> getCollectorImage(@PathVariable String collectorId) throws IOException {
-        Optional<InputStream> fileStream = fileService.getCollectorImage(collectorId);
+    @GetMapping(value = "/api/images/injectors/id/{injectorId}", produces = MediaType.IMAGE_PNG_VALUE)
+    public @ResponseBody ResponseEntity<byte[]> getInjectorImageFromId(@PathVariable String injectorId) throws IOException {
+        Injector injector = this.injectorRepository.findById(injectorId).orElseThrow(ElementNotFoundException::new);
+        Optional<InputStream> fileStream = fileService.getInjectorImage(injector.getType());
+        if (fileStream.isPresent()) {
+            return ResponseEntity.ok()
+                    .cacheControl(CacheControl.maxAge(5, TimeUnit.MINUTES))
+                    .body(IOUtils.toByteArray(fileStream.get()));
+        }
+        return null;
+    }
+
+    @GetMapping(value = "/api/images/collectors/{collectorType}", produces = MediaType.IMAGE_PNG_VALUE)
+    public @ResponseBody ResponseEntity<byte[]> getCollectorImage(@PathVariable String collectorType) throws IOException {
+        Optional<InputStream> fileStream = fileService.getCollectorImage(collectorType);
         if (fileStream.isPresent()) {
             return ResponseEntity.ok()
                     .cacheControl(CacheControl.maxAge(5, TimeUnit.MINUTES))

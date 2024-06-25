@@ -16,6 +16,7 @@ import TagsFilter from '../../../common/filters/TagsFilter';
 import InjectIcon from '../../../common/injects/InjectIcon';
 import ItemTags from '../../../../../components/ItemTags';
 import TeamOrAssetLine from './common/TeamOrAssetLine';
+import { isNotEmptyField } from '../../../../../utils/utils';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -38,7 +39,7 @@ const Validations = () => {
   const dispatch = useDispatch();
   const { exerciseId } = useParams();
   const [tags, setTags] = useState([]);
-  const { t, fndt } = useFormatter();
+  const { fndt } = useFormatter();
   const [keyword, setKeyword] = useState('');
   const handleSearch = (value) => setKeyword(value);
   const handleAddTag = (value) => {
@@ -155,9 +156,13 @@ const Validations = () => {
                 <ListItem divider={true} classes={{ root: classes.item }}>
                   <ListItemIcon style={{ paddingTop: 5 }}>
                     <InjectIcon
-                      tooltip={t(inject.inject_type || 'Unknown')}
-                      config={injectContract.config}
-                      type={inject.inject_type}
+                      isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
+                      type={
+                          inject.inject_injector_contract.injector_contract_payload
+                            ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                              || inject.inject_injector_contract.injector_contract_payload?.payload_type
+                            : inject.inject_type
+                        }
                       disabled={!inject.inject_enabled}
                       size="small"
                     />

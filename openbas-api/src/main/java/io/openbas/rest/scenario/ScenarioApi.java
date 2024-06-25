@@ -1,10 +1,13 @@
 package io.openbas.rest.scenario;
 
-import io.openbas.database.model.*;
+import io.openbas.database.model.Scenario;
+import io.openbas.database.model.Team;
+import io.openbas.database.model.TeamSimple;
+import io.openbas.database.model.User;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.exercise.form.ExerciseSimple;
+import io.openbas.rest.exercise.ExerciseService;
 import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
 import io.openbas.rest.helper.TeamHelper;
 import io.openbas.rest.scenario.form.*;
@@ -46,6 +49,7 @@ public class ScenarioApi {
   private TeamRepository teamRepository;
   private UserRepository userRepository;
   private InjectExpectationRepository injectExpectationRepository;
+  private InjectRepository injectRepository;
   private CommunicationRepository communicationRepository;
   private ExerciseTeamUserRepository exerciseTeamUserRepository;
   private ScenarioRepository scenarioRepository;
@@ -63,6 +67,11 @@ public class ScenarioApi {
   @Autowired
   public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
     this.injectExpectationRepository = injectExpectationRepository;
+  }
+
+  @Autowired
+  public void setInjectRepository(InjectRepository injectRepository) {
+    this.injectRepository = injectRepository;
   }
 
   @Autowired
@@ -94,7 +103,7 @@ public class ScenarioApi {
     return this.scenarioService.scenarios();
   }
 
-  @PostMapping("/api/scenarios/search")
+  @PostMapping(SCENARIO_URI + "/search")
   public Page<RawPaginationScenario> scenarios(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return this.scenarioService.scenarios(searchPaginationInput);
   }
@@ -166,15 +175,6 @@ public class ScenarioApi {
     this.importService.handleFileImport(file);
   }
 
-  // -- SIMULATION --
-
-  @GetMapping(SCENARIO_URI + "/{scenarioId}/exercises")
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
-  public Iterable<ExerciseSimple> scenarioExercises(@PathVariable @NotBlank final String scenarioId) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    return scenario.getExercises().stream().map(ExerciseSimple::fromExercise).toList();
-  }
-
   // -- TEAMS --
 
   @Transactional(rollbackOn = Exception.class)
@@ -190,7 +190,7 @@ public class ScenarioApi {
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<TeamSimple> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {
     return TeamHelper.rawTeamToSimplerTeam(teamRepository.rawTeamByScenarioId(scenarioId),
-            injectExpectationRepository,communicationRepository, exerciseTeamUserRepository, scenarioRepository);
+            injectExpectationRepository, injectRepository, communicationRepository, exerciseTeamUserRepository, scenarioRepository);
   }
 
   @Transactional(rollbackOn = Exception.class)

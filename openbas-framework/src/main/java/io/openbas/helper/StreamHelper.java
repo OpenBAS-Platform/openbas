@@ -11,6 +11,10 @@ import static java.util.stream.StreamSupport.stream;
 
 public class StreamHelper {
 
+    private StreamHelper() {
+
+    }
+
     public static <T> List<T> fromIterable(Iterable<T> results) {
         return stream(results.spliterator(), false).collect(Collectors.toList());
     }

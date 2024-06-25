@@ -365,11 +365,7 @@ const Mails = () => {
                 button={true}
               >
                 <ListItemIcon style={{ paddingTop: 5 }}>
-                  <InjectIcon
-                    tooltip={t(inject.inject_type)}
-                    type={inject.inject_type}
-                    disabled={!inject.inject_enabled}
-                  />
+                  <InjectIcon type={inject.inject_type} disabled={!inject.inject_enabled}/>
                 </ListItemIcon>
                 <ListItemText
                   primary={

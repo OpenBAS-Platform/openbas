@@ -1,6 +1,5 @@
 package io.openbas.utils.pagination;
 
-import io.openbas.database.model.Scenario;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Root;
@@ -12,7 +11,11 @@ import java.util.List;
 
 public class SortUtilsCriteriaBuilder {
 
-  public static List<Order> toSortCriteriaBuilder(CriteriaBuilder cb, Root<Scenario> root, Sort sort) {
+  private SortUtilsCriteriaBuilder() {
+
+  }
+
+  public static <T> List<Order> toSortCriteriaBuilder(CriteriaBuilder cb, Root<T> root, Sort sort) {
     List<Order> orders = new ArrayList<>();
     if (sort.isSorted()) {
       sort.forEach(order -> {

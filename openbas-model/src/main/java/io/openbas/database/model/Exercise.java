@@ -41,7 +41,7 @@ public class Exercise implements Base {
   @Column(name = "exercise_name")
   @JsonProperty("exercise_name")
   @NotBlank
-  @Queryable(searchable = true)
+  @Queryable(searchable = true, sortable = true)
   private String name;
 
   @Getter
@@ -53,6 +53,7 @@ public class Exercise implements Base {
   @Column(name = "exercise_status")
   @JsonProperty("exercise_status")
   @Enumerated(EnumType.STRING)
+  @Queryable(sortable = true)
   private ExerciseStatus status = ExerciseStatus.SCHEDULED;
 
   @Getter
@@ -80,6 +81,7 @@ public class Exercise implements Base {
 
   @Column(name = "exercise_start_date")
   @JsonProperty("exercise_start_date")
+  @Queryable(sortable = true)
   private Instant start;
 
   @Column(name = "exercise_end_date")
@@ -202,6 +204,7 @@ public class Exercise implements Base {
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("exercise_tags")
+  @Queryable(sortable = true)
   private Set<Tag> tags = new HashSet<>();
 
   @Getter
@@ -348,7 +351,7 @@ public class Exercise implements Base {
   }
 
   public List<Inject> getInjects() {
-    return injects.stream().sorted(Inject.executionComparator).toList();
+      return injects.stream().sorted(Inject.executionComparator).toList();
   }
 
   public List<Article> getArticlesForChannel(Channel channel) {
