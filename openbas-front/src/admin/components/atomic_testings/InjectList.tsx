@@ -57,14 +57,14 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '15%',
   },
   inject_status: {
-    width: '15%',
+    width: '10%',
   },
   inject_targets: {
     width: '20%',
     cursor: 'default',
   },
   inject_expectations: {
-    width: '10%',
+    width: '15%',
     cursor: 'default',
   },
   inject_updated_at: {
@@ -119,19 +119,19 @@ const InjectList: FunctionComponent<Props> = ({
       value: (injectDto: InjectResultDTO) => fldt(injectDto.inject_status?.tracking_sent_date),
     },
     {
-      field: 'inject_targets',
-      label: 'Target',
-      isSortable: false,
-      value: (injectDto: InjectResultDTO) => {
-        return (<ItemTargets targets={injectDto.inject_targets} />);
-      },
-    },
-    {
       field: 'inject_status',
       label: 'Status',
       isSortable: true,
       value: (injectDto: InjectResultDTO) => {
         return (<ItemStatus isInject={true} status={injectDto.inject_status?.status_name} label={t(injectDto.inject_status?.status_name)} variant="inList" />);
+      },
+    },
+    {
+      field: 'inject_targets',
+      label: 'Target',
+      isSortable: false,
+      value: (injectDto: InjectResultDTO) => {
+        return (<ItemTargets targets={injectDto.inject_targets} />);
       },
     },
     {

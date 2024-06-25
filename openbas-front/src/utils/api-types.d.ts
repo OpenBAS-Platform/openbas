@@ -814,6 +814,8 @@ export interface ExerciseSimple {
   /** @uniqueItems true */
   exercise_tags?: Tag[];
   exercise_targets: InjectTargetWithResult[];
+  /** @format date-time */
+  exercise_updated_at?: string;
 }
 
 export interface ExerciseTeamPlayersEnableInput {
@@ -1099,6 +1101,7 @@ export interface InjectInput {
 }
 
 export interface InjectOutput {
+  inject_content?: object;
   /**
    * @format int64
    * @min 0
@@ -1278,11 +1281,6 @@ export interface InjectorContract {
   /** @format date-time */
   injector_contract_updated_at?: string;
   updateAttributes?: object;
-}
-
-export interface InjectorContractLight {
-  injector_contract_id: string;
-  injector_contract_attack_patterns_external_id?: string[];
 }
 
 export interface InjectorContractAddInput {
