@@ -35,6 +35,7 @@ const AtomicTestingHeader = () => {
   const [openEdit, setOpenEdit] = useState(false);
   const [availableLaunch, setAvailableLaunch] = useState(true);
   const [openDelete, setOpenDelete] = useState(false);
+  const [openDuplicate, setOpenDuplicate] = useState(false);
 
   const submitLaunch = async () => {
     setOpen(false);
@@ -50,7 +51,7 @@ const AtomicTestingHeader = () => {
 
   const entries: ButtonPopoverEntry[] = [
     { label: 'Update', action: () => setOpenEdit(true) },
-    { label: 'Duplicate', action: () => setOpenEdit(true) },
+    { label: 'Duplicate', action: () => setOpenDuplicate(true) },
     { label: 'Delete', action: () => setOpenDelete(true) },
   ];
 
@@ -99,8 +100,10 @@ const AtomicTestingHeader = () => {
           atomic={injectResultDto}
           openEdit={openEdit}
           openDelete={openDelete}
+          openDuplicate={openDuplicate}
           setOpenEdit={setOpenEdit}
           setOpenDelete={setOpenDelete}
+          setOpenDuplicate={setOpenDuplicate}
           entries={entries}
         />
       </div>

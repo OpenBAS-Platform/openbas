@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import * as R from 'ramda';
 import {
   Box,
   Button,
@@ -19,7 +20,7 @@ import {
   Tabs,
 } from '@mui/material';
 import { useFormatter } from '../../../../components/i18n';
-import { addExercise, deleteExercise, updateExercise} from '../../../../actions/Exercise';
+import { addExercise, deleteExercise, updateExercise } from '../../../../actions/Exercise';
 import { usePermissions } from '../../../../utils/Exercise';
 import Transition from '../../../../components/common/Transition';
 import type { Exercise, ExerciseUpdateInput } from '../../../../utils/api-types';
@@ -170,12 +171,12 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   return (
     <>
       <ButtonPopover entries={entries} />
-      {/*<DialogDuplicate*/}
-      {/*  open={isNotEmptyField(openDuplicate) ? openDuplicate : duplicate}*/}
-      {/*  handleClose={() => (setOpenDuplicate ? setOpenDuplicate(false) : handleCloseDuplicate)}*/}
-      {/*  handleSubmit={}*/}
-      {/*  text={}*/}
-      {/*/>*/}
+      <DialogDuplicate
+        open={isNotEmptyField(openDuplicate) ? openDuplicate : duplicate}
+        handleClose={() => (setOpenDuplicate ? setOpenDuplicate(false) : handleCloseDuplicate)}
+        handleSubmit={submitDuplicateHandler}
+        text={t('Do you want to duplicate this exercise?')}
+      />
       <Dialog
         open={isNotEmptyField(openDelete) ? openDelete : deletion}
         TransitionComponent={Transition}

@@ -248,9 +248,11 @@ const ExerciseHeader = () => {
           entries={entries}
           openEdit={openEdit}
           openDelete={openDelete}
+          openDuplicate={openDuplicate}
           openExport={openExport}
           setOpenEdit={setOpenEdit}
           setOpenDelete={setOpenDelete}
+          setOpenDuplicate={setOpenDuplicate}
           setOpenExport={setOpenExport}
         />
       </div>

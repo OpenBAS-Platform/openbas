@@ -8,6 +8,7 @@ import { InjectContext, PermissionsContext } from '../Context';
 import type { Inject, InjectStatus, InjectStatusExecution, Tag } from '../../../../utils/api-types';
 import { tryInject } from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
+import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 
 interface Props {
   inject: InjectStore;
@@ -33,6 +34,7 @@ const InjectPopover: FunctionComponent<Props> = ({
   } = useContext(InjectContext);
 
   const [openDelete, setOpenDelete] = useState(false);
+  const [duplicate, setDuplicate] = useState(false);
   const [openTry, setOpenTry] = useState(false);
   const [openEnable, setOpenEnable] = useState(false);
   const [openDisable, setOpenDisable] = useState(false);
@@ -48,6 +50,18 @@ const InjectPopover: FunctionComponent<Props> = ({
   };
 
   const handlePopoverClose = () => setAnchorEl(null);
+
+  const handleOpenDuplicate = () => {
+    setDuplicate(true);
+    handlePopoverClose();
+  };
+
+  const handleCloseDuplicate = () => setDuplicate(false);
+
+  const submitDuplicate = () => {
+    onDeleteInject(inject.inject_id);
+    handleCloseDuplicate();
+  };
 
   const handleOpenDelete = () => {
     setOpenDelete(true);
@@ -155,7 +169,7 @@ const InjectPopover: FunctionComponent<Props> = ({
         >
           {t('Update')}
         </MenuItem>
-        <MenuItem onClick={handleOpenDelete}>
+        <MenuItem onClick={handleOpenDuplicate}>
           {t('Duplicate')}
         </MenuItem>
         {!inject.inject_status && onInjectDone && (
@@ -202,6 +216,12 @@ const InjectPopover: FunctionComponent<Props> = ({
           {t('Delete')}
         </MenuItem>
       </Menu>
+      <DialogDuplicate
+        open={duplicate}
+        handleClose={handleCloseDuplicate}
+        handleSubmit={submitDuplicate}
+        text={t('Do you want to duplicate this inject?')}
+      />
       <Dialog
         TransitionComponent={Transition}
         open={openDone}

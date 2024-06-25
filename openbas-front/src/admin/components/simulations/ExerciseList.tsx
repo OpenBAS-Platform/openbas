@@ -166,7 +166,14 @@ const ExerciseList: FunctionComponent<Props> = ({
           key={exercise.exercise_id}
           classes={{ root: classes.item }}
           secondaryAction={
-            <ExercisePopover exercise={exercise} entries={entries} openExport={openExport} setOpenExport={setOpenExport} />
+            <ExercisePopover
+              exercise={exercise}
+              entries={entries}
+              openExport={openExport}
+              openDuplicate={openDuplicate}
+              setOpenDuplicate={setOpenDuplicate}
+              setOpenExport={setOpenExport}
+            />
           }
           disablePadding={true}
         >
