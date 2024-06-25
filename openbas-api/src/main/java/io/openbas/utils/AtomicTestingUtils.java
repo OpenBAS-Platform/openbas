@@ -308,10 +308,11 @@ public class AtomicTestingUtils {
     }
 
     public static InjectExpectation.ExpectationStatus getResult(final OptionalDouble avg) {
-        Double avgAsDouble = avg.getAsDouble();
+        double avgAsDouble = avg.orElseThrow();
+        InjectExpectation.ExpectationStatus expectationStatus = avgAsDouble == 1.0 ? InjectExpectation.ExpectationStatus.VALIDATED :
+                InjectExpectation.ExpectationStatus.PARTIAL;
         return avgAsDouble == 0.0 ? InjectExpectation.ExpectationStatus.FAILED :
-                (avgAsDouble == 1.0 ? InjectExpectation.ExpectationStatus.VALIDATED :
-                        InjectExpectation.ExpectationStatus.PARTIAL);
+                expectationStatus;
     }
 
     public static OptionalDouble calculateAverageFromExpectations(final List<Integer> scores) {
@@ -319,6 +320,35 @@ public class AtomicTestingUtils {
                 .filter(Objects::nonNull)
                 .mapToInt(Integer::intValue)
                 .average();
+    }
+
+    public static Inject copyInject(Inject injectOrigin) {
+        Inject inject = new Inject();
+        inject.setUser(injectOrigin.getUser());
+        inject.setTitle(getNewTitle(injectOrigin, " (duplicate)"));
+        inject.setDescription(injectOrigin.getDescription());
+        inject.setContent(injectOrigin.getContent());
+        inject.setAllTeams(injectOrigin.isAllTeams());
+        inject.setEnabled(injectOrigin.isEnabled());
+        inject.setDependsDuration(injectOrigin.getDependsDuration());
+        inject.setDependsOn(injectOrigin.getDependsOn());
+        inject.setExercise(injectOrigin.getExercise());
+        inject.setCountry(injectOrigin.getCountry());
+        inject.setCity(injectOrigin.getCity());
+        inject.setInjectorContract(injectOrigin.getInjectorContract());
+        inject.setScenario(injectOrigin.getScenario());
+        inject.setAssetGroups(injectOrigin.getAssetGroups().stream().toList());
+        inject.setAssets(injectOrigin.getAssets().stream().toList());
+        inject.setTeams(injectOrigin.getTeams().stream().toList());
+        return inject;
+    }
+
+    private static @org.jetbrains.annotations.NotNull String getNewTitle(Inject injectOrigin, String suffix) {
+        String newTitle = injectOrigin.getTitle() + suffix;
+        if (newTitle.length() > 255) {
+            newTitle = newTitle.substring(0, 254 - suffix.length());
+        }
+        return newTitle;
     }
 
 }

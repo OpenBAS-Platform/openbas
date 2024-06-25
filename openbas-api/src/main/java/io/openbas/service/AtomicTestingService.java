@@ -7,18 +7,17 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
-import io.openbas.execution.ExecutionContextService;
-import io.openbas.execution.Executor;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,88 +32,30 @@ import java.util.stream.StreamSupport;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.utils.AtomicTestingUtils.copyInject;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
+@RequiredArgsConstructor
 @Service
 @Log
 public class AtomicTestingService {
     @Resource
     protected ObjectMapper mapper;
 
-    private Executor executor;
-    private ExecutionContextService executionContextService;
+    private final AssetGroupRepository assetGroupRepository;
 
-    private AssetGroupRepository assetGroupRepository;
+    private final AssetRepository assetRepository;
+    private final InjectRepository injectRepository;
+    private final InjectStatusRepository injectStatusRepository;
+    private final InjectorContractRepository injectorContractRepository;
+    private final InjectDocumentRepository injectDocumentRepository;
+    private final UserRepository userRepository;
+    private final TeamRepository teamRepository;
+    private final TagRepository tagRepository;
+    private final DocumentRepository documentRepository;
 
-    private AssetRepository assetRepository;
-    private InjectRepository injectRepository;
-    private InjectStatusRepository injectStatusRepository;
-    private InjectorContractRepository injectorContractRepository;
-    private InjectDocumentRepository injectDocumentRepository;
-    private UserRepository userRepository;
-    private TeamRepository teamRepository;
-    private TagRepository tagRepository;
-    private DocumentRepository documentRepository;
-
-    @Autowired
-    public void setExecutor(@NotNull final Executor executor) {
-        this.executor = executor;
-    }
-
-    @Autowired
-    public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
-        this.executionContextService = executionContextService;
-    }
-
-    @Autowired
-    public void setInjectRepository(@NotNull final InjectRepository injectRepository) {
-        this.injectRepository = injectRepository;
-    }
-
-    @Autowired
-    public void setInjectStatusRepository(@NotNull final InjectStatusRepository injectStatusRepository) {
-        this.injectStatusRepository = injectStatusRepository;
-    }
-
-    @Autowired
-    public void setAssetRepository(@NotNull final AssetRepository assetRepository) {
-        this.assetRepository = assetRepository;
-    }
-
-    @Autowired
-    public void setAssetGroupRepository(@NotNull final AssetGroupRepository assetGroupRepository) {
-        this.assetGroupRepository = assetGroupRepository;
-    }
-
-    @Autowired
-    public void setInjectDocumentRepository(@NotNull final InjectDocumentRepository injectDocumentRepository) {
-        this.injectDocumentRepository = injectDocumentRepository;
-    }
-
-    @Autowired
-    public void setUserRepository(@NotNull final UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setTeamRepository(@NotNull final TeamRepository teamRepository) {
-        this.teamRepository = teamRepository;
-    }
-
-    @Autowired
-    public void setTagRepository(@NotNull final TagRepository tagRepository) {
-        this.tagRepository = tagRepository;
-    }
-
-    @Autowired
-    public void setDocumentRepository(@NotNull final DocumentRepository documentRepository) {
-        this.documentRepository = documentRepository;
-    }
-
-    @Autowired
-    public void setInjectorContractRepository(@NotNull final InjectorContractRepository injectorContractRepository) {
-        this.injectorContractRepository = injectorContractRepository;
-    }
+    private static final String PRE_DEFINE_EXPECTATIONS = "predefinedExpectations";
+    private static final String EXPECTATIONS = "expectations";
 
     public Page<Inject> findAllAtomicTestings(SearchPaginationInput searchPaginationInput) {
         Specification<Inject> customSpec = Specification.where((root, query, cb) -> {
@@ -142,31 +83,15 @@ public class AtomicTestingService {
             injectToSave = injectRepository.findById(injectId).orElseThrow();
         }
 
-        InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow();
+        if (StringUtils.isNotBlank(input.getId())) {
+            return getDuplicateAtomicTesting(input.getId());
+        }
+        InjectorContract injectorContract =
+                injectorContractRepository.findById(input.getInjectorContract()).orElseThrow();
         ObjectNode finalContent = input.getContent();
         // Set expectations
         if (injectId == null) {
-            if (input.getContent() == null || input.getContent().get("expectations") == null || input.getContent().get("expectations").isEmpty()) {
-                try {
-                    JsonNode jsonNode = mapper.readTree(injectorContract.getContent());
-                    List<JsonNode> contractElements = StreamSupport.stream(jsonNode.get("fields").spliterator(), false).filter(contractElement -> contractElement.get("type").asText().equals(ContractType.Expectation.name().toLowerCase())).toList();
-                    if (!contractElements.isEmpty()) {
-                        JsonNode contractElement = contractElements.getFirst();
-                        if (!contractElement.get("predefinedExpectations").isNull() && !contractElement.get("predefinedExpectations").isEmpty()) {
-                            finalContent = finalContent != null ? finalContent : mapper.createObjectNode();
-                            ArrayNode predefinedExpectations = mapper.createArrayNode();
-                            StreamSupport.stream(contractElement.get("predefinedExpectations").spliterator(), false).forEach(predefinedExpectation -> {
-                                ObjectNode newExpectation = predefinedExpectation.deepCopy();
-                                newExpectation.put("expectation_score", 100);
-                                predefinedExpectations.add(newExpectation);
-                            });
-                            finalContent.put("expectations", predefinedExpectations);
-                        }
-                    }
-                } catch (JsonProcessingException e) {
-                    log.severe("Cannot open injector contract");
-                }
-            }
+            finalContent = setExpectations(input, injectorContract, finalContent);
         }
         injectToSave.setTitle(input.getTitle());
         injectToSave.setContent(finalContent);
@@ -205,6 +130,44 @@ public class AtomicTestingService {
                 }).filter(Objects::nonNull).toList();
         injectToSave.getDocuments().addAll(injectDocuments);
         return injectRepository.save(injectToSave);
+    }
+
+    private ObjectNode setExpectations(AtomicTestingInput input, InjectorContract injectorContract, ObjectNode finalContent) {
+        if (input.getContent() == null || input.getContent().get(EXPECTATIONS) == null
+                || input.getContent().get(EXPECTATIONS).isEmpty()) {
+            try {
+                JsonNode jsonNode = mapper.readTree(injectorContract.getContent());
+                List<JsonNode> contractElements =
+                        StreamSupport.stream(jsonNode.get("fields").spliterator(), false)
+                                .filter(contractElement -> contractElement.get("type").asText()
+                                        .equals(ContractType.Expectation.name().toLowerCase())).toList();
+                if (!contractElements.isEmpty()) {
+                    JsonNode contractElement = contractElements.getFirst();
+                    if (!contractElement.get(PRE_DEFINE_EXPECTATIONS).isNull() && !contractElement.get(PRE_DEFINE_EXPECTATIONS).isEmpty()) {
+                        finalContent = finalContent != null ? finalContent : mapper.createObjectNode();
+                        ArrayNode predefinedExpectations = mapper.createArrayNode();
+                        StreamSupport.stream(contractElement.get(PRE_DEFINE_EXPECTATIONS).spliterator(), false).forEach(predefinedExpectation -> {
+                            ObjectNode newExpectation = predefinedExpectation.deepCopy();
+                            newExpectation.put("expectation_score", 100);
+                            predefinedExpectations.add(newExpectation);
+                        });
+                        finalContent.putIfAbsent(EXPECTATIONS, predefinedExpectations);
+                    }
+                }
+            } catch (JsonProcessingException e) {
+                log.severe("Cannot open injector contract");
+            }
+        }
+        return finalContent;
+    }
+
+    private Inject getDuplicateAtomicTesting(String id) {
+        // We retrieve the original atomic testing (inject)
+        Inject injectOrigin = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
+
+        Inject injectDuplicate = copyInject(injectOrigin);
+
+        return injectRepository.save(injectDuplicate);
     }
 
     public Inject updateAtomicTestingTags(String injectId, AtomicTestingUpdateTagsInput input) {
