@@ -13,7 +13,7 @@ const iconSelector = (type, isPayload, variant, fontSize, done, disabled, onClic
     height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
     borderRadius: 4,
     cursor: onClick ? 'pointer' : 'default',
-    filter: `${done ? 'filter:hue-rotate(100deg);' : `brightness(${disabled ? '30%' : '100%'})`}`,
+    filter: `${done ? 'filter:hue-rotate(100deg)' : `brightness(${disabled ? '30%' : '100%'})`}`,
   };
   if (!type) {
     return (
@@ -52,7 +52,7 @@ const iconSelector = (type, isPayload, variant, fontSize, done, disabled, onClic
         width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
         height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
         borderRadius: 4,
-        filter: `${done ? 'filter:hue-rotate(100deg);' : `brightness(${disabled ? '30%' : '100%'})`}`,
+        filter: `${done ? 'filter:hue-rotate(100deg)' : `brightness(${disabled ? '30%' : '100%'})`}`,
       }}
     />
 
