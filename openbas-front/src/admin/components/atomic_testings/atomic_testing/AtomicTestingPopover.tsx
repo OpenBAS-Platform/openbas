@@ -92,9 +92,14 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
         'inject_id',
       ]),
     )(data);
-    createAtomicTesting(toDuplicate).then((result: { data: InjectResultDTO }) => {
+    await createAtomicTesting(toDuplicate).then((result: { data: InjectResultDTO }) => {
       navigate(`/admin/atomic_testings/${result.data.inject_id}`);
     });
+  };
+
+  const submitDuplicateHandler = () => {
+    const data: AtomicTestingInput = { inject_id: atomic.inject_id }; // Adaptez selon vos besoins
+    submitDuplicate(data);
   };
 
   return (
@@ -114,12 +119,12 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
         handleSubmit={submitDelete}
         text={t('Do you want to delete this atomic testing ?')}
       />
-      {/* <DialogDuplicate */}
-      {/*  open={isNotEmptyField(openDuplicate) ? openDuplicate : duplicate} */}
-      {/*  handleClose={() => (setOpenDuplicate ? setOpenDuplicate(false) : setDuplicate(false))} */}
-      {/*  handleSubmit={submitDuplicate} */}
-      {/*  text={t('Do you want to duplicate this atomic testing ?')} */}
-      {/* /> */}
+      <DialogDuplicate
+        open={isNotEmptyField(openDuplicate) ? openDuplicate : duplicate}
+        handleClose={() => (setOpenDuplicate ? setOpenDuplicate(false) : setDuplicate(false))}
+        handleSubmit={submitDuplicateHandler}
+        text={t('Do you want to duplicate this atomic testing?')}
+      />
     </>
   );
 };

@@ -171,7 +171,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
         open={isNotEmptyField(openDuplicate) ? openDuplicate : duplicate}
         handleClose={() => (setOpenDuplicate ? setOpenDuplicate(false) : handleCloseDuplicate)}
         handleSubmit={submitDelete}
-        text={t('Do you want to duplicate the scenario?')}
+        text={t('Do you want to duplicate this scenario?')}
       />
     </>
   );

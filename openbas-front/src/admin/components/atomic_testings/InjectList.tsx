@@ -79,7 +79,6 @@ const InjectList: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
   const { t, fldt, tPick } = useFormatter();
-  const [openEdit, setOpenDuplicate] = useState(false);
 
   // Filter and sort hook
   const [injects, setInjects] = useState<InjectResultDTO[]>([]);
@@ -150,11 +149,11 @@ const InjectList: FunctionComponent<Props> = ({
     },
   ];
 
-  const [edition, setEdition] = useState(false);
-  const handleEdit = () => setEdition(edition);
+  const [openDuplicate, setOpenDuplicate] = useState(false);
+  const handleDuplicate = () => setOpenDuplicate(true);
 
   const entries: ButtonPopoverEntry[] = [
-    { label: 'Duplicate', action: setOpenDuplicate ? () => setOpenDuplicate(true) : handleEdit },
+    { label: 'Duplicate', action: setOpenDuplicate ? () => setOpenDuplicate(true) : handleDuplicate },
   ];
 
   return (
@@ -190,7 +189,12 @@ const InjectList: FunctionComponent<Props> = ({
               classes={{ root: classes.item }}
               divider
               secondaryAction={
-                <AtomicTestingPopover atomic={injectDto} entries={entries}/>
+                <AtomicTestingPopover
+                  atomic={injectDto}
+                  entries={entries}
+                  openDuplicate={openDuplicate}
+                  setOpenDuplicate={setOpenDuplicate}
+                />
               }
               disablePadding={true}
             >
