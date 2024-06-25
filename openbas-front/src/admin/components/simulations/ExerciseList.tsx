@@ -56,13 +56,13 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '20%',
   },
   exercise_global_score: {
-    width: '15%',
+    width: '10%',
   },
   exercise_tags: {
     width: '15%',
   },
   exercise_updated_at: {
-    width: '10%',
+    width: '15%',
   },
 };
 
@@ -82,7 +82,7 @@ const ExerciseList: FunctionComponent<Props> = ({
   // Standard hooks
   const dispatch = useAppDispatch();
   const classes = useStyles();
-  const { nsdt, fldt } = useFormatter();
+  const { nsdt } = useFormatter();
 
   // Fetching data
   useDataLoader(() => {
@@ -131,7 +131,7 @@ const ExerciseList: FunctionComponent<Props> = ({
       field: 'exercise_updated_at',
       label: 'Updated',
       isSortable: true,
-      value: (exercise: ExerciseSimple) => fldt(exercise.exercise_updated_at),
+      value: (exercise: ExerciseSimple) => nsdt(exercise.exercise_updated_at),
     },
   ];
 

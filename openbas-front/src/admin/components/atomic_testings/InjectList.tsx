@@ -64,11 +64,11 @@ const inlineStyles: Record<string, CSSProperties> = {
     cursor: 'default',
   },
   inject_expectations: {
-    width: '15%',
+    width: '10%',
     cursor: 'default',
   },
   inject_updated_at: {
-    width: '10%',
+    width: '15%',
   },
 };
 
@@ -83,7 +83,7 @@ const InjectList: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const classes = useStyles();
-  const { t, fldt, tPick } = useFormatter();
+  const { t, fldt, tPick, nsdt } = useFormatter();
 
   // Filter and sort hook
   const [injects, setInjects] = useState<InjectResultDTO[]>([]);
@@ -148,7 +148,7 @@ const InjectList: FunctionComponent<Props> = ({
       field: 'inject_updated_at',
       label: 'Updated',
       isSortable: true,
-      value: (injectDto: InjectResultDTO) => fldt(injectDto.inject_updated_at),
+      value: (injectDto: InjectResultDTO) => nsdt(injectDto.inject_updated_at),
     },
   ];
 
