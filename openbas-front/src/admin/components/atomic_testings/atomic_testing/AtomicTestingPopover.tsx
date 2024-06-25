@@ -95,6 +95,9 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     await createAtomicTesting(toDuplicate).then((result: { data: InjectResultDTO }) => {
       navigate(`/admin/atomic_testings/${result.data.inject_id}`);
     });
+    if (setOpenDuplicate) {
+      setOpenDuplicate(false);
+    }
   };
 
   const submitDuplicateHandler = () => {
