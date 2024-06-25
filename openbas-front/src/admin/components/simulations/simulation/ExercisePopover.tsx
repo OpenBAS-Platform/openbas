@@ -19,7 +19,7 @@ import {
   Tabs,
 } from '@mui/material';
 import { useFormatter } from '../../../../components/i18n';
-import { deleteExercise, updateExercise } from '../../../../actions/Exercise';
+import { addExercise, deleteExercise, updateExercise} from '../../../../actions/Exercise';
 import { usePermissions } from '../../../../utils/Exercise';
 import Transition from '../../../../components/common/Transition';
 import type { Exercise, ExerciseUpdateInput } from '../../../../utils/api-types';
@@ -29,15 +29,18 @@ import ExerciseUpdateForm from './ExerciseUpdateForm';
 import Drawer from '../../../../components/common/Drawer';
 import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
 import { isNotEmptyField } from '../../../../utils/utils';
+import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 
 interface ExercisePopoverProps {
   exercise: Exercise;
   entries: ButtonPopoverEntry[];
   openEdit?: boolean;
   openDelete?: boolean;
+  openDuplicate?: boolean;
   openExport?: boolean;
   setOpenEdit?: React.Dispatch<React.SetStateAction<boolean>>;
   setOpenDelete?: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenDuplicate?: React.Dispatch<React.SetStateAction<boolean>>;
   setOpenExport?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -46,15 +49,18 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   entries,
   openEdit,
   openDelete,
+  openDuplicate,
   openExport,
   setOpenEdit,
   setOpenDelete,
+  setOpenDuplicate,
   setOpenExport,
 }) => {
   const { t } = useFormatter();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
+  const [duplicate, setDuplicate] = useState(false);
   const [deletion, setDeletion] = useState(false);
   const [edition, setEdition] = useState(false);
   const [exportation, setExportation] = useState(false);
@@ -107,6 +113,29 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     navigate('/admin/exercises');
   };
 
+  const handleCloseDuplicate = () => setDuplicate(false);
+  const submitDuplicate = async (data: Exercise) => {
+    const toDuplicate = R.pipe(
+      R.pick([
+        'exercise_id',
+        'exercise_name',
+        'exercise_mail_from',
+      ]),
+    )(data);
+    await dispatch(addExercise(toDuplicate)).then((result: { data: Exercise }) => {
+      navigate(`/admin/exercises/${result.data.exercise_id}`);
+    });
+  };
+
+  const submitDuplicateHandler = () => {
+    const data: Exercise = {
+      exercise_id: exercise.exercise_id,
+      exercise_mail_from: exercise.exercise_mail_from,
+      exercise_name: exercise.exercise_name,
+    };
+    submitDuplicate(data);
+  };
+
   const handleCloseExport = () => setExportation(false);
 
   const submitExport = () => {
@@ -141,6 +170,12 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   return (
     <>
       <ButtonPopover entries={entries} />
+      {/*<DialogDuplicate*/}
+      {/*  open={isNotEmptyField(openDuplicate) ? openDuplicate : duplicate}*/}
+      {/*  handleClose={() => (setOpenDuplicate ? setOpenDuplicate(false) : handleCloseDuplicate)}*/}
+      {/*  handleSubmit={}*/}
+      {/*  text={}*/}
+      {/*/>*/}
       <Dialog
         open={isNotEmptyField(openDelete) ? openDelete : deletion}
         TransitionComponent={Transition}
