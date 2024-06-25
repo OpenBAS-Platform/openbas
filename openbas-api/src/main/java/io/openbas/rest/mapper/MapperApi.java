@@ -11,7 +11,7 @@ import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateInput;
-import io.openbas.rest.mapper.form.InjectImporterInput;
+import io.openbas.rest.mapper.form.InjectImporterAddInput;
 import io.openbas.rest.mapper.form.MapperAddInput;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
@@ -65,7 +65,7 @@ public class MapperApi extends RestBehavior {
         importMapper.setId(UUID.randomUUID().toString());
 
         Map<String, InjectorContract> mapInjectorContracts = StreamSupport.stream(injectorContractRepository.findAllById(
-                mapperAddInput.getImporters().stream().map(InjectImporterInput::getInjectorContractId).toList()
+                mapperAddInput.getImporters().stream().map(InjectImporterAddInput::getInjectorContractId).toList()
             ).spliterator(), false).collect(Collectors.toMap(InjectorContract::getId, Function.identity()));
 
         mapperAddInput.getImporters().forEach(

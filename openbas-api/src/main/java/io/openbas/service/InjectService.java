@@ -4,10 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
-import io.openbas.database.repository.InjectDocumentRepository;
-import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.TeamRepository;
-import io.openbas.database.repository.UserRepository;
+import io.openbas.database.raw.*;
+import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.rest.inject.output.InjectOutput;
@@ -38,10 +36,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,12 +53,13 @@ import static java.time.Instant.now;
 @Log
 public class InjectService {
 
-  private final InjectRepository injectRepository;
-  private final InjectDocumentRepository injectDocumentRepository;
-  private final InjectExpectationRepository injectExpectationRepository;
-  private final AssetRepository assetRepository;
-  private final AssetGroupRepository assetGroupRepository;
-  private final TeamRepository teamRepository;
+    private final InjectRepository injectRepository;
+    private final InjectDocumentRepository injectDocumentRepository;
+    private final InjectExpectationRepository injectExpectationRepository;
+    private final AssetRepository assetRepository;
+    private final AssetGroupRepository assetGroupRepository;
+    private final TeamRepository teamRepository;
+    private final UserRepository userRepository;
 
     private List<String> importReservedField = List.of("description", "title", "trigger_time");
 
