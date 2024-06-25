@@ -345,6 +345,25 @@ const LeftBar = () => {
         </MenuList>
         <Divider />
         <MenuList component="nav">
+          <StyledTooltip title={!navOpen && t('Scenarios')} placement="right">
+            <MenuItem
+              component={Link}
+              to="/admin/scenarios"
+              selected={location.pathname.includes('/admin/scenarios')}
+              dense={true}
+              classes={{ root: classes.menuItem }}
+            >
+              <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
+                <MovieFilterOutlined />
+              </ListItemIcon>
+              {navOpen && (
+              <ListItemText
+                classes={{ primary: classes.menuItemText }}
+                primary={t('Scenarios')}
+              />
+              )}
+            </MenuItem>
+          </StyledTooltip>
           <StyledTooltip title={!navOpen && t('Simulations')} placement="right">
             <MenuItem
               component={Link}
@@ -386,25 +405,6 @@ const LeftBar = () => {
         </MenuList>
         <Divider />
         <MenuList component="nav">
-          <StyledTooltip title={!navOpen && t('Scenarios')} placement="right">
-            <MenuItem
-              component={Link}
-              to="/admin/scenarios"
-              selected={location.pathname.includes('/admin/scenarios')}
-              dense={true}
-              classes={{ root: classes.menuItem }}
-            >
-              <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
-                <MovieFilterOutlined />
-              </ListItemIcon>
-              {navOpen && (
-                <ListItemText
-                  classes={{ primary: classes.menuItemText }}
-                  primary={t('Scenarios')}
-                />
-              )}
-            </MenuItem>
-          </StyledTooltip>
           <MenuItem
             aria-label="Assets"
             ref={anchors.assets}
