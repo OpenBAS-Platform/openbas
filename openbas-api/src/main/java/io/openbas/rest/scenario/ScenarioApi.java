@@ -20,7 +20,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
@@ -48,48 +47,14 @@ public class ScenarioApi {
   private final TagRepository tagRepository;
   private final ImportService importService;
 
-  private TeamRepository teamRepository;
-  private UserRepository userRepository;
-  private InjectExpectationRepository injectExpectationRepository;
-  private InjectRepository injectRepository;
-  private CommunicationRepository communicationRepository;
-  private ExerciseTeamUserRepository exerciseTeamUserRepository;
-  private ScenarioRepository scenarioRepository;
+  private final TeamRepository teamRepository;
+  private final UserRepository userRepository;
+  private final InjectExpectationRepository injectExpectationRepository;
+  private final InjectRepository injectRepository;
+  private final CommunicationRepository communicationRepository;
+  private final ExerciseTeamUserRepository exerciseTeamUserRepository;
+  private final ScenarioRepository scenarioRepository;
 
-  @Autowired
-  public void setTeamRepository(TeamRepository teamRepository) {
-    this.teamRepository = teamRepository;
-  }
-
-  @Autowired
-  public void setUserRepository(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
-
-  @Autowired
-  public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
-    this.injectExpectationRepository = injectExpectationRepository;
-  }
-
-  @Autowired
-  public void setInjectRepository(InjectRepository injectRepository) {
-    this.injectRepository = injectRepository;
-  }
-
-  @Autowired
-  public void setCommunicationRepository(CommunicationRepository communicationRepository) {
-    this.communicationRepository = communicationRepository;
-  }
-
-  @Autowired
-  public void setExerciseTeamUserRepository(ExerciseTeamUserRepository exerciseTeamUserRepository) {
-    this.exerciseTeamUserRepository = exerciseTeamUserRepository;
-  }
-
-  @Autowired
-  public void setScenarioRepository(ScenarioRepository scenarioRepository) {
-    this.scenarioRepository = scenarioRepository;
-  }
 
   @PostMapping(SCENARIO_URI)
   // TODO: Admin only ?

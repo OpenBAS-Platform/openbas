@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
-import static io.openbas.injectors.email.EmailContract.TYPE;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -31,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
-public class InjectApiTest {
+class InjectApiTest {
 
   @Autowired
   private MockMvc mvc;
@@ -142,6 +141,7 @@ public class InjectApiTest {
     // -- PREPARE --
     Inject inject = this.injectRepository.findById(INJECT_ID).orElseThrow();
     InjectInput input = new InjectInput();
+    input.setId(INJECT_ID);
     String injectTitle = "A new title";
     input.setTitle(injectTitle);
     input.setInjectorContract(inject.getInjectorContract().getId());

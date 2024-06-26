@@ -129,6 +129,7 @@ public class ScenarioApiTest {
         .getContentAsString();
 
     ScenarioInput scenarioInput = new ScenarioInput();
+    scenarioInput.setId(SCENARIO_ID);
     String subtitle = "A subtitle";
     scenarioInput.setName(JsonPath.read(response, "$.scenario_name"));
     scenarioInput.setSubtitle(subtitle);
