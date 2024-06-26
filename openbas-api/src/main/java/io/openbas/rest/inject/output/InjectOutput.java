@@ -96,7 +96,7 @@ public class InjectOutput {
         this.assetGroups
     );
     this.injectType = injectType;
-    this.teams = teams != null ? new HashSet<>(Arrays.asList(teams)) : new HashSet<>();
+    this.teams = teams != null ? new ArrayList<>(Arrays.asList(teams)) : new ArrayList<>();
     this.content = content;
   }
 }
