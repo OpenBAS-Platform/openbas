@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import R from 'ramda';
+import * as R from 'ramda';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import type { InjectStore } from '../../../../actions/injects/Inject';
@@ -66,10 +66,10 @@ const InjectPopover: FunctionComponent<Props> = ({
       ]),
     )(data);
     if (inject.inject_exercise) {
-      dispatch(addInjectForExercise(inject.inject_exercise), toUpdate);
+      dispatch(addInjectForExercise(inject.inject_exercise, toUpdate));
     }
     if (inject.inject_scenario) {
-      dispatch(addInjectForScenario(inject.inject_scenario), toUpdate);
+      dispatch(addInjectForScenario(inject.inject_scenario, toUpdate));
     }
     handleCloseDuplicate();
   };
