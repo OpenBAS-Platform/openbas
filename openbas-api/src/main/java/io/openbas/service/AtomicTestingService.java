@@ -6,71 +6,72 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawAsset;
+import io.openbas.database.raw.RawAssetGroup;
+import io.openbas.database.raw.RawInjectExpectation;
+import io.openbas.database.raw.RawTeam;
 import io.openbas.database.repository.*;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.inject.output.AtomicTestingOutput;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
-import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Tuple;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.StreamSupport;
 
 import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.criteria.InjectCriteria.countQuery;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.AtomicTestingUtils.copyInject;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+import static io.openbas.utils.AtomicTestingUtils.getRawExpectationResultByTypes;
+import static io.openbas.utils.AtomicTestingUtils.getTargetsFromRaw;
+import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
+import static io.openbas.utils.JpaUtils.createLeftJoin;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
+import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 
-@RequiredArgsConstructor
 @Service
 @Log
+@RequiredArgsConstructor
 public class AtomicTestingService {
-    @Resource
-    protected ObjectMapper mapper;
 
-    private final AssetGroupRepository assetGroupRepository;
+  @Resource
+  protected ObjectMapper mapper;
 
-    private final AssetRepository assetRepository;
-    private final InjectRepository injectRepository;
-    private final InjectStatusRepository injectStatusRepository;
-    private final InjectorContractRepository injectorContractRepository;
-    private final InjectDocumentRepository injectDocumentRepository;
-    private final UserRepository userRepository;
-    private final TeamRepository teamRepository;
-    private final TagRepository tagRepository;
-    private final DocumentRepository documentRepository;
+  private final AssetGroupRepository assetGroupRepository;
+  private final AssetRepository assetRepository;
+  private final InjectRepository injectRepository;
+  private final InjectExpectationRepository injectExpectationRepository;
+  private final InjectStatusRepository injectStatusRepository;
+  private final InjectorContractRepository injectorContractRepository;
+  private final InjectDocumentRepository injectDocumentRepository;
+  private final UserRepository userRepository;
+  private final TeamRepository teamRepository;
+  private final TagRepository tagRepository;
+  private final DocumentRepository documentRepository;
 
-    private static final String PRE_DEFINE_EXPECTATIONS = "predefinedExpectations";
-    private static final String EXPECTATIONS = "expectations";
-
-    public Page<Inject> findAllAtomicTestings(SearchPaginationInput searchPaginationInput) {
-        Specification<Inject> customSpec = Specification.where((root, query, cb) -> {
-            Predicate predicate = cb.conjunction();
-            predicate = cb.and(predicate, cb.isNull(root.get("scenario")));
-            predicate = cb.and(predicate, cb.isNull(root.get("exercise")));
-            return predicate;
-        });
-        return buildPaginationJPA(
-                (Specification<Inject> specification, Pageable pageable) -> injectRepository.findAll(
-                        specification.and(customSpec), pageable),
-                searchPaginationInput,
-                Inject.class
-        );
-    }
+  @PersistenceContext
+  private EntityManager entityManager;
 
     public Optional<Inject> findById(String injectId) {
         return injectRepository.findWithStatusById(injectId);
@@ -161,14 +162,13 @@ public class AtomicTestingService {
         return finalContent;
     }
 
-    private Inject getDuplicateAtomicTesting(String id) {
-        // We retrieve the original atomic testing (inject)
-        Inject injectOrigin = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
+  public Inject updateAtomicTestingTags(String injectId, AtomicTestingUpdateTagsInput input) {
 
-        Inject injectDuplicate = copyInject(injectOrigin);
+    Inject inject = injectRepository.findById(injectId).orElseThrow();
+    inject.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
 
-        return injectRepository.save(injectDuplicate);
-    }
+    return injectRepository.save(inject);
+  }
 
     public Inject updateAtomicTestingTags(String injectId, AtomicTestingUpdateTagsInput input) {
 
@@ -178,28 +178,175 @@ public class AtomicTestingService {
         return injectRepository.save(inject);
     }
 
-    @Transactional
-    public Inject tryInject(String injectId) {
-        Inject inject = injectRepository.findById(injectId).orElseThrow();
+  @Transactional
+  public Inject tryInject(String injectId) {
+    Inject inject = injectRepository.findById(injectId).orElseThrow();
 
-        // Reset injects outcome, communications and expectations
-        inject.clean();
-        inject.setUpdatedAt(Instant.now());
+    // Reset injects outcome, communications and expectations
+    inject.clean();
+    inject.setUpdatedAt(Instant.now());
 
-        // New inject status
-        InjectStatus injectStatus = new InjectStatus();
-        injectStatus.setInject(inject);
-        injectStatus.setTrackingSentDate(Instant.now());
-        injectStatus.setName(ExecutionStatus.QUEUING);
-        this.injectStatusRepository.save(injectStatus);
+    // New inject status
+    InjectStatus injectStatus = new InjectStatus();
+    injectStatus.setInject(inject);
+    injectStatus.setTrackingSentDate(Instant.now());
+    injectStatus.setName(ExecutionStatus.QUEUING);
+    this.injectStatusRepository.save(injectStatus);
 
-        // Return inject
-        return this.injectRepository.save(inject);
+    // Return inject
+    return this.injectRepository.save(inject);
+  }
+
+  @Transactional
+  public void deleteAtomicTesting(String injectId) {
+    injectDocumentRepository.deleteDocumentsFromInject(injectId);
+    injectRepository.deleteById(injectId);
+  }
+
+  // -- PAGINATION --
+
+  public Page<AtomicTestingOutput> findAllAtomicTestings(SearchPaginationInput searchPaginationInput) {
+    Specification<Inject> customSpec = Specification.where((root, query, cb) -> {
+      Predicate predicate = cb.conjunction();
+      predicate = cb.and(predicate, cb.isNull(root.get("scenario")));
+      predicate = cb.and(predicate, cb.isNull(root.get("exercise")));
+      return predicate;
+    });
+    return buildPaginationCriteriaBuilder(
+        (Specification<Inject> specification, Pageable pageable) -> this.atomicTestings(
+            specification.and(customSpec), pageable),
+        searchPaginationInput,
+        Inject.class
+    );
+  }
+
+
+  public Page<AtomicTestingOutput> atomicTestings(Specification<Inject> specification, Pageable pageable) {
+    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+
+    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+    Root<Inject> injectRoot = cq.from(Inject.class);
+    selectForAtomicTesting(cb, cq, injectRoot);
+
+    // -- Text Search and Filters --
+    if (specification != null) {
+      Predicate predicate = specification.toPredicate(injectRoot, cq, cb);
+      if (predicate != null) {
+        cq.where(predicate);
+      }
     }
 
-    @Transactional
-    public void deleteAtomicTesting(String injectId) {
-        injectDocumentRepository.deleteDocumentsFromInject(injectId);
-        injectRepository.deleteById(injectId);
+    // -- Sorting --
+    List<Order> orders = toSortCriteriaBuilder(cb, injectRoot, pageable.getSort());
+    cq.orderBy(orders);
+
+    // Type Query
+    TypedQuery<Tuple> query = entityManager.createQuery(cq);
+
+    // -- Pagination --
+    query.setFirstResult((int) pageable.getOffset());
+    query.setMaxResults(pageable.getPageSize());
+
+    // -- EXECUTION --
+    List<AtomicTestingOutput> injects = execAtomicTesting(query);
+
+    Map<String, List<String>> teamIds = new HashMap<>();
+    Map<String, List<String>> assetIds = new HashMap<>();
+    Map<String, List<String>> assetGroupIds = new HashMap<>();
+    Map<String, List<String>> injectExpectationIds = new HashMap<>();
+    for (AtomicTestingOutput inject : injects) {
+      teamIds.putIfAbsent(inject.getId(), inject.getTeams());
+      assetIds.putIfAbsent(inject.getId(), inject.getAssets());
+      assetGroupIds.putIfAbsent(inject.getId(), inject.getAssetGroups());
+      injectExpectationIds.putIfAbsent(inject.getId(), inject.getExpectations());
     }
+
+    List<RawTeam> teams = this.teamRepository.rawTeamByIds(
+        teamIds.values().stream().flatMap(Collection::stream).distinct().toList()
+    );
+    List<RawAsset> assets = this.assetRepository.rawByIds(
+        assetIds.values().stream().flatMap(Collection::stream).distinct().toList()
+    );
+    List<RawAssetGroup> assetGroups = this.assetGroupRepository.rawAssetGroupByIds(
+        assetGroupIds.values().stream().flatMap(Collection::stream).distinct().toList()
+    );
+    List<RawInjectExpectation> expectations = this.injectExpectationRepository.rawByIds(
+        injectExpectationIds.values().stream().flatMap(Collection::stream).distinct().toList());
+
+    for (AtomicTestingOutput inject : injects) {
+      List<String> currentTeamIds = teamIds.get(inject.getId());
+      List<String> currentAssetIds = assetIds.get(inject.getId());
+      List<String> currentAssetGroupIds = assetGroupIds.get(inject.getId());
+      List<String> currentInjectExpectationIds = injectExpectationIds.get(inject.getId());
+      inject.setTargets(getTargetsFromRaw(
+          teams.stream().filter(t -> currentTeamIds.contains(t.getTeam_id())).toList(),
+          assets.stream().filter(a -> currentAssetIds.contains(a.getAsset_id())).toList(),
+          assetGroups.stream().filter(ag -> currentAssetGroupIds.contains(ag.getAsset_group_id())).toList()
+      ));
+      inject.setExpectationResultByTypes(
+          getRawExpectationResultByTypes(
+              expectations.stream().filter(e -> currentInjectExpectationIds.contains(e.getInject_expectation_id()))
+                  .toList()
+          )
+      );
+    }
+
+    // -- Count Query --
+    Long total = countQuery(cb, this.entityManager);
+
+    return new PageImpl<>(injects, pageable, total);
+  }
+
+  private void selectForAtomicTesting(CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Inject> injectRoot) {
+    // Joins
+    Join<Inject, InjectorContract> injectorContractJoin = createLeftJoin(injectRoot, "injectorContract");
+    Join<InjectorContract, Injector> injectorJoin = injectorContractJoin.join("injector", JoinType.LEFT);
+    Join<Inject, InjectStatus> injectStatusJoin = createLeftJoin(injectRoot, "status");
+    // Array aggregations
+    Expression<String[]> injectExpectationIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "expectations");
+    Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
+    Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
+    Expression<String[]> assetGroupIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assetGroups");
+
+    // SELECT
+    cq.multiselect(
+        injectRoot.get("id").alias("inject_id"),
+        injectRoot.get("title").alias("inject_title"),
+        injectRoot.get("updatedAt").alias("inject_updated_at"),
+        injectorJoin.get("type").alias("inject_type"),
+        injectorContractJoin.alias("inject_injector_contract"),
+        injectStatusJoin.alias("inject_status"),
+        injectExpectationIdsExpression.alias("inject_expectations"),
+        teamIdsExpression.alias("inject_teams"),
+        assetIdsExpression.alias("inject_assets"),
+        assetGroupIdsExpression.alias("inject_asset_groups")
+    ).distinct(true);
+
+    // GROUP BY
+    cq.groupBy(Arrays.asList(
+        injectRoot.get("id"),
+        injectorContractJoin.get("id"),
+        injectorJoin.get("id"),
+        injectStatusJoin.get("id")
+    ));
+  }
+
+  private List<AtomicTestingOutput> execAtomicTesting(TypedQuery<Tuple> query) {
+    return query.getResultList()
+        .stream()
+        .map(tuple -> new AtomicTestingOutput(
+            tuple.get("inject_id", String.class),
+            tuple.get("inject_title", String.class),
+            tuple.get("inject_updated_at", Instant.class),
+            tuple.get("inject_type", String.class),
+            tuple.get("inject_injector_contract", InjectorContract.class),
+            tuple.get("inject_status", InjectStatus.class),
+            tuple.get("inject_expectations", String[].class),
+            tuple.get("inject_teams", String[].class),
+            tuple.get("inject_assets", String[].class),
+            tuple.get("inject_asset_groups", String[].class)
+        ))
+        .toList();
+  }
+
 }

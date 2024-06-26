@@ -54,6 +54,7 @@ public class Inject implements Base, Injection {
     @Queryable(searchable = true, filterable = true, sortable = true)
     @Column(name = "inject_title")
     @JsonProperty("inject_title")
+    @NotBlank
     private String title;
 
     @Getter
@@ -85,12 +86,14 @@ public class Inject implements Base, Injection {
     @Getter
     @Column(name = "inject_created_at")
     @JsonProperty("inject_created_at")
+    @NotNull
     private Instant createdAt = now();
 
     @Getter
     @Column(name = "inject_updated_at")
     @Queryable(sortable = true)
     @JsonProperty("inject_updated_at")
+    @NotNull
     private Instant updatedAt = now();
 
     @Getter
@@ -254,9 +257,9 @@ public class Inject implements Base, Injection {
             getInjectorContract(),
             getContent(),
             isAllTeams(),
-            getTeams().stream().map(Team::getId).collect(Collectors.toSet()),
-            getAssets().stream().map(Asset::getId).collect(Collectors.toSet()),
-            getAssetGroups().stream().map(AssetGroup::getId).collect(Collectors.toSet())
+            getTeams().stream().map(Team::getId).collect(Collectors.toList()),
+            getAssets().stream().map(Asset::getId).collect(Collectors.toList()),
+            getAssetGroups().stream().map(AssetGroup::getId).collect(Collectors.toList())
         );
     }
 

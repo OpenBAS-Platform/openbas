@@ -259,6 +259,7 @@ export const areaChartOptions = (
  * @param {number | 'dataPoints'} tickAmount
  * @param {boolean} isResult
  * @param {boolean} isFakeData
+ * @param {number} max
  */
 export const verticalBarsChartOptions = (
   theme,
@@ -271,6 +272,7 @@ export const verticalBarsChartOptions = (
   tickAmount = undefined,
   isResult = false,
   isFakeData = false,
+  max = undefined,
 ) => ({
   chart: {
     type: 'bar',
@@ -299,9 +301,9 @@ export const verticalBarsChartOptions = (
   },
   grid: {
     borderColor:
-        theme.palette.mode === 'dark'
-          ? 'rgba(255, 255, 255, .1)'
-          : 'rgba(0, 0, 0, .1)',
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, .1)'
+        : 'rgba(0, 0, 0, .1)',
     strokeDashArray: 3,
   },
   legend: {
@@ -346,6 +348,7 @@ export const verticalBarsChartOptions = (
     axisBorder: {
       show: false,
     },
+    max,
   },
   plotOptions: {
     bar: {
@@ -417,9 +420,9 @@ export const horizontalBarsChartOptions = (
   },
   grid: {
     borderColor:
-        theme.palette.mode === 'dark'
-          ? 'rgba(255, 255, 255, .1)'
-          : 'rgba(0, 0, 0, .1)',
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, .1)'
+        : 'rgba(0, 0, 0, .1)',
     strokeDashArray: 3,
   },
   legend: {
@@ -633,16 +636,16 @@ export const polarAreaChartOptions = (
         rings: {
           strokeWidth: 1,
           strokeColor:
-              theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, .1)'
-                : 'rgba(0, 0, 0, .1)',
+            theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, .1)'
+              : 'rgba(0, 0, 0, .1)',
         },
         spokes: {
           strokeWidth: 1,
           connectorColors:
-              theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, .1)'
-                : 'rgba(0, 0, 0, .1)',
+            theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, .1)'
+              : 'rgba(0, 0, 0, .1)',
         },
       },
     },

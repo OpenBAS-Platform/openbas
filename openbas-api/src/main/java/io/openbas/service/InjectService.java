@@ -22,7 +22,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.openbas.utils.JpaUtils.arrayAgg;
+import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
+import static io.openbas.utils.JpaUtils.createLeftJoin;
 import static java.time.Instant.now;
 
 @RequiredArgsConstructor
@@ -80,19 +81,41 @@ public class InjectService {
   public List<InjectOutput> injects(Specification<Inject> specification) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
-    // -- Create Query --
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
     Root<Inject> injectRoot = cq.from(Inject.class);
+    selectForInject(cb, cq, injectRoot);
 
+    // -- Text Search and Filters --
+    if (specification != null) {
+      Predicate predicate = specification.toPredicate(injectRoot, cq, cb);
+      if (predicate != null) {
+        cq.where(predicate);
+      }
+    }
+
+    // -- Sorting --
+    cq.orderBy(cb.asc(injectRoot.get("dependsDuration")));
+
+    // Type Query
+    TypedQuery<Tuple> query = this.entityManager.createQuery(cq);
+
+    // -- EXECUTION --
+    return execInject(query);
+  }
+
+  // -- CRITERIA BUILDER --
+
+  private void selectForInject(CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Inject> injectRoot) {
     // Joins
     Join<Inject, Exercise> injectExerciseJoin = createLeftJoin(injectRoot, "exercise");
     Join<Inject, Scenario> injectScenarioJoin = createLeftJoin(injectRoot, "scenario");
     Join<Inject, InjectorContract> injectorContractJoin = createLeftJoin(injectRoot, "injectorContract");
     Join<InjectorContract, Injector> injectorJoin = injectorContractJoin.join("injector", JoinType.LEFT);
-    Expression<String[]> tagIdsExpression = createArrayAgg(cb, injectRoot, "tags");
-    Expression<String[]> teamIdsExpression = createArrayAgg(cb, injectRoot, "teams");
-    Expression<String[]> assetIdsExpression = createArrayAgg(cb, injectRoot, "assets");
-    Expression<String[]> assetGroupIdsExpression = createArrayAgg(cb, injectRoot, "assetGroups");
+    // Array aggregations
+    Expression<String[]> tagIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "tags");
+    Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
+    Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
+    Expression<String[]> assetGroupIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assetGroups");
 
     // SELECT
     cq.multiselect(
@@ -112,30 +135,17 @@ public class InjectService {
         injectorJoin.get("type").alias("inject_type")
     ).distinct(true);
 
-    // Group By
+    // GROUP BY
     cq.groupBy(Arrays.asList(
         injectRoot.get("id"),
-        injectorContractJoin.get("id"),
-        injectorJoin.get("id"),
         injectExerciseJoin.get("id"),
-        injectScenarioJoin.get("id")
+        injectScenarioJoin.get("id"),
+        injectorContractJoin.get("id"),
+        injectorJoin.get("id")
     ));
+  }
 
-    // Sort
-    cq.orderBy(cb.asc(injectRoot.get("dependsDuration")));
-
-    // -- Specification --
-    if (specification != null) {
-      Predicate predicate = specification.toPredicate(injectRoot, cq, cb);
-      if (predicate != null) {
-        cq.where(predicate);
-      }
-    }
-
-    // Type Query
-    TypedQuery<Tuple> query = this.entityManager.createQuery(cq);
-
-    // -- EXECUTION --
+  private List<InjectOutput> execInject(TypedQuery<Tuple> query) {
     return query.getResultList()
         .stream()
         .map(tuple -> new InjectOutput(
@@ -155,15 +165,6 @@ public class InjectService {
             tuple.get("inject_type", String.class)
         ))
         .toList();
-  }
-
-  private <X, Y> Join<X, Y> createLeftJoin(Root<X> root, String attributeName) {
-    return root.join(attributeName, JoinType.LEFT);
-  }
-
-  private <X, Y> Expression<String[]> createArrayAgg(CriteriaBuilder cb, Root<X> root, String attributeName) {
-    Join<X, Y> join = root.join(attributeName, JoinType.LEFT);
-    return arrayAgg(cb, join);
   }
 
   // -- TEST --

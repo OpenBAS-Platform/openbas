@@ -3,7 +3,10 @@ package io.openbas.utils;
 import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
+import io.openbas.database.raw.RawAsset;
+import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.raw.RawInjectExpectation;
+import io.openbas.database.raw.RawTeam;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
@@ -33,6 +36,27 @@ public class AtomicTestingUtils {
                 .stream()
                 .map(t -> new InjectTargetWithResult(TargetType.ASSETS_GROUPS, t.getId(), t.getName(), List.of(), null))
                 .toList());
+
+        return targets;
+    }
+
+    public static List<InjectTargetWithResult> getTargetsFromRaw(
+        final List<RawTeam> teams,
+        final List<RawAsset> assets,
+        final List<RawAssetGroup> assetGroups) {
+        List<InjectTargetWithResult> targets = new ArrayList<>();
+        targets.addAll(teams
+            .stream()
+            .map(t -> new InjectTargetWithResult(TargetType.TEAMS, t.getTeam_id(), t.getTeam_name(), List.of(), null))
+            .toList());
+        targets.addAll(assets
+            .stream()
+            .map(t -> new InjectTargetWithResult(TargetType.ASSETS, t.getAsset_id(), t.getAsset_name(), List.of(), Objects.equals(t.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(t.getEndpoint_platform()): null))
+            .toList());
+        targets.addAll(assetGroups
+            .stream()
+            .map(t -> new InjectTargetWithResult(TargetType.ASSETS_GROUPS, t.getAsset_group_id(), t.getAsset_group_name(), List.of(), null))
+            .toList());
 
         return targets;
     }
@@ -251,9 +275,9 @@ public class AtomicTestingUtils {
 
         List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
 
-        getExpectationByType(ExpectationType.PREVENTION, preventionScores).map(resultAvgOfExpectations::add);
-        getExpectationByType(ExpectationType.DETECTION, detectionScores).map(resultAvgOfExpectations::add);
-        getExpectationByType(ExpectationType.HUMAN_RESPONSE, humanScores).map(resultAvgOfExpectations::add);
+        getExpectationByType(ExpectationType.PREVENTION, preventionScores).ifPresent(resultAvgOfExpectations::add);
+        getExpectationByType(ExpectationType.DETECTION, detectionScores).ifPresent(resultAvgOfExpectations::add);
+        getExpectationByType(ExpectationType.HUMAN_RESPONSE, humanScores).ifPresent(resultAvgOfExpectations::add);
 
         return resultAvgOfExpectations;
     }
