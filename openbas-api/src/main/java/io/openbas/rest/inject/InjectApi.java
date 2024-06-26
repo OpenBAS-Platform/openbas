@@ -18,6 +18,7 @@ import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
+import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.AtomicTestingService;
 import io.openbas.service.InjectService;
 import io.openbas.service.ScenarioService;
@@ -26,7 +27,9 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,108 +63,30 @@ import static java.time.Instant.now;
 
 @Log
 @RestController
+@RequiredArgsConstructor
 public class InjectApi extends RestBehavior {
 
     public static final String INJECT_URI = "/api/injects";
 
     private static final int MAX_NEXT_INJECTS = 6;
 
-    private Executor executor;
-    private InjectorContractRepository injectorContractRepository;
-    private CommunicationRepository communicationRepository;
-    private ExerciseRepository exerciseRepository;
-    private UserRepository userRepository;
-    private InjectRepository injectRepository;
-    private InjectDocumentRepository injectDocumentRepository;
-    private TeamRepository teamRepository;
-    private AssetService assetService;
-    private AssetGroupService assetGroupService;
-    private TagRepository tagRepository;
-    private DocumentRepository documentRepository;
-    private ExecutionContextService executionContextService;
-    private ScenarioService scenarioService;
-    private InjectService injectService;
-    private AtomicTestingService atomicTestingService;
-
-    @Autowired
-    public void setExecutor(Executor executor) {
-        this.executor = executor;
-    }
-
-    @Autowired
-    public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
-        this.injectorContractRepository = injectorContractRepository;
-    }
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setCommunicationRepository(CommunicationRepository communicationRepository) {
-        this.communicationRepository = communicationRepository;
-    }
-
-    @Autowired
-    public void setInjectDocumentRepository(InjectDocumentRepository injectDocumentRepository) {
-        this.injectDocumentRepository = injectDocumentRepository;
-    }
-
-    @Autowired
-    public void setDocumentRepository(DocumentRepository documentRepository) {
-        this.documentRepository = documentRepository;
-    }
-
-    @Autowired
-    public void setTagRepository(TagRepository tagRepository) {
-        this.tagRepository = tagRepository;
-    }
-
-    @Autowired
-    public void setExerciseRepository(ExerciseRepository exerciseRepository) {
-        this.exerciseRepository = exerciseRepository;
-    }
-
-    @Autowired
-    public void setTeamRepository(TeamRepository teamRepository) {
-        this.teamRepository = teamRepository;
-    }
-
-    @Autowired
-    public void setAssetService(@NotNull final AssetService assetService) {
-        this.assetService = assetService;
-    }
-
-    @Autowired
-    public void setAssetGroupService(@NotNull final AssetGroupService assetGroupService) {
-        this.assetGroupService = assetGroupService;
-    }
-
-    @Autowired
-    public void setInjectRepository(InjectRepository injectRepository) {
-        this.injectRepository = injectRepository;
-    }
-
-    @Autowired
-    public void setScenarioService(ScenarioService scenarioService) {
-        this.scenarioService = scenarioService;
-    }
-
-    @Autowired
-    public void setInjectService(InjectService injectService) {
-        this.injectService = injectService;
-    }
-
-    @Autowired
-    public void setAtomicTestingService(AtomicTestingService atomicTestingService) {
-        this.atomicTestingService = atomicTestingService;
-    }
-
-    @Autowired
-    public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
-        this.executionContextService = executionContextService;
-    }
+    private final Executor executor;
+    private final InjectorContractRepository injectorContractRepository;
+    private final CommunicationRepository communicationRepository;
+    private final ExerciseRepository exerciseRepository;
+    private final UserRepository userRepository;
+    private final InjectRepository injectRepository;
+    private final InjectDocumentRepository injectDocumentRepository;
+    private final TeamRepository teamRepository;
+    private final AssetService assetService;
+    private final AssetGroupService assetGroupService;
+    private final TagRepository tagRepository;
+    private final DocumentRepository documentRepository;
+    private final ExecutionContextService executionContextService;
+    private final ScenarioService scenarioService;
+    private final InjectService injectService;
+    private final AtomicTestingService atomicTestingService;
+    private final InjectDuplicateService injectDuplicateService;
 
     // -- INJECTS --
 
@@ -171,7 +96,7 @@ public class InjectApi extends RestBehavior {
     }
 
     @Secured(ROLE_ADMIN)
-    @PostMapping("/api/injects/execution/reception/{injectId}")
+    @PostMapping(INJECT_URI + "/execution/reception/{injectId}")
     public Inject InjectExecutionReception(@PathVariable String injectId,
                                            @Valid @RequestBody InjectReceptionInput input) {
         Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
@@ -185,7 +110,7 @@ public class InjectApi extends RestBehavior {
     }
 
     @Secured(ROLE_ADMIN)
-    @PostMapping("/api/injects/execution/callback/{injectId}")
+    @PostMapping(INJECT_URI + "/execution/callback/{injectId}")
     public Inject InjectExecutionCallback(@PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input) {
         Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
         InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
@@ -225,7 +150,7 @@ public class InjectApi extends RestBehavior {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    @PutMapping("/api/injects/{exerciseId}/{injectId}")
+    @PutMapping(INJECT_URI + "/{exerciseId}/{injectId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Inject updateInject(
             @PathVariable String exerciseId,
@@ -255,7 +180,7 @@ public class InjectApi extends RestBehavior {
             .toList();
     }
 
-    @PostMapping("/api/exercises/{exerciseId}/injects/search")
+    @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/search")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     @Transactional(readOnly = true)
     public Page<InjectResultDTO> exerciseInjects(
@@ -275,19 +200,19 @@ public class InjectApi extends RestBehavior {
         ));
     }
 
-    @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}")
+    @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Inject exerciseInject(@PathVariable String exerciseId, @PathVariable String injectId) {
         return injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     }
 
-    @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}/teams")
+    @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/teams")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Iterable<Team> exerciseInjectTeams(@PathVariable String exerciseId, @PathVariable String injectId) {
         return injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new).getTeams();
     }
 
-    @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}/communications")
+    @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/communications")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Iterable<Communication> exerciseInjectCommunications(@PathVariable String exerciseId,
                                                                 @PathVariable String injectId) {
@@ -297,10 +222,13 @@ public class InjectApi extends RestBehavior {
         return communicationRepository.saveAll(ackComs);
     }
 
-    @PostMapping("/api/exercises/{exerciseId}/injects")
+    @PostMapping(EXERCISE_URI + "/{exerciseId}/injects")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackFor = Exception.class)
-    public Inject createInject(@PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
+    public Inject createInjectForExercise(@PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
+        if (StringUtils.isNotBlank(input.getId())) {
+            return injectDuplicateService.createInjectForExercise(input, exerciseId);
+        }
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
         InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow(ElementNotFoundException::new);
         // Set expectations
@@ -390,14 +318,14 @@ public class InjectApi extends RestBehavior {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    @DeleteMapping("/api/exercises/{exerciseId}/injects/{injectId}")
+    @DeleteMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public void deleteInject(@PathVariable String exerciseId, @PathVariable String injectId) {
         injectDocumentRepository.deleteDocumentsFromInject(injectId);
         injectRepository.deleteById(injectId);
     }
 
-    @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/activation")
+    @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/activation")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Inject updateInjectActivationForExercise(
             @PathVariable String exerciseId,
@@ -406,7 +334,7 @@ public class InjectApi extends RestBehavior {
         return updateInjectActivation(injectId, input);
     }
 
-    @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/trigger")
+    @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/trigger")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Inject updateInjectTrigger(
             @PathVariable String exerciseId,
@@ -419,14 +347,14 @@ public class InjectApi extends RestBehavior {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    @PostMapping("/api/exercises/{exerciseId}/injects/{injectId}/status")
+    @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/status")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Inject setInjectStatus(@PathVariable String exerciseId, @PathVariable String injectId,
                                   @Valid @RequestBody InjectUpdateStatusInput input) {
         return injectService.updateInjectStatus(injectId, input);
     }
 
-    @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/teams")
+    @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/teams")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Inject updateInjectTeams(@PathVariable String exerciseId, @PathVariable String injectId,
                                     @Valid @RequestBody InjectTeamsInput input) {
@@ -436,7 +364,7 @@ public class InjectApi extends RestBehavior {
         return injectRepository.save(inject);
     }
 
-    @GetMapping("/api/injects/next")
+    @GetMapping(INJECT_URI + "/next")
     public List<Inject> nextInjectsToExecute(@RequestParam Optional<Integer> size) {
         return injectRepository.findAll(InjectSpecification.next()).stream()
                 // Keep only injects visible by the user
@@ -459,6 +387,9 @@ public class InjectApi extends RestBehavior {
     public Inject createInjectForScenario(
             @PathVariable @NotBlank final String scenarioId,
             @Valid @RequestBody InjectInput input) {
+        if (StringUtils.isNotBlank(input.getId())) {
+            return injectDuplicateService.createInjectForScenario(input, scenarioId);
+        }
         Scenario scenario = this.scenarioService.scenario(scenarioId);
         InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow(ElementNotFoundException::new);
         // Set expectations
