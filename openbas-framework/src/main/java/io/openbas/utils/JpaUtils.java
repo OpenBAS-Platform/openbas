@@ -10,6 +10,10 @@ import static org.springframework.util.StringUtils.hasText;
 
 public class JpaUtils {
 
+  private JpaUtils() {
+
+  }
+
   public static <T> Expression<String> toPath(
       @NotNull final PropertySchema propertySchema,
       @NotNull final Root<T> root,
@@ -27,17 +31,6 @@ public class JpaUtils {
     } else {
       return root.get(propertySchema.getName());
     }
-  }
-
-  public static <T, U> Expression<String[]> arrayAgg(
-      @NotNull final CriteriaBuilder cb,
-      @NotNull final Join<T, U> join) {
-    return cb.function(
-        "array_remove",
-        String[].class,
-        cb.function("array_agg", String[].class, join.get("id")),
-        cb.nullLiteral(String.class)
-    );
   }
 
   // -- FUNCTION --
