@@ -2,6 +2,7 @@ package io.openbas.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
@@ -32,11 +33,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -186,13 +188,16 @@ public class InjectService {
                 .toList();
     }
 
-    public ImportTestSummary importXls(Scenario scenario, ImportMapper importMapper, InjectsImportInput input) {
+    public ImportTestSummary importXls(String importId, Scenario scenario, ImportMapper importMapper, InjectsImportInput input) {
         ImportTestSummary importTestSummary = new ImportTestSummary();
+
+        Pattern relativeDayPattern = Pattern.compile("^.*[DJ]([+\\-]?[0-9]*).*$");
+        Pattern relativeTimePattern = Pattern.compile("^.*[HT]([+\\-]?[0-9]*).*$");
 
         try {
             // We open the previously saved file
             String tmpdir = System.getProperty("java.io.tmpdir");
-            Optional<java.nio.file.Path> file = Files.list(Path.of(tmpdir, "\\", input.getImportMapperId(), "\\")).findFirst();
+            Optional<java.nio.file.Path> file = Files.list(Path.of(tmpdir, "\\", importId, "\\")).findFirst();
 
             // If the file do exist
             if (file.isPresent()) {
@@ -217,7 +222,8 @@ public class InjectService {
                 int colTypeIdx = CellReference.convertColStringToIndex(importMapper.getInjectTypeColumn());
 
                 boolean isScheduled = scenario.getRecurrenceStart() != null;
-                var wrapper = new Object(){ Instant earliestAbsoluteDate = null; };
+
+                Map<Integer, InjectTime> mapInstantByRowIndex = new HashMap<>();
 
                 // For each rows of the selected sheet
                 selectedSheet.rowIterator().forEachRemaining(row -> {
@@ -276,6 +282,7 @@ public class InjectService {
 
                     // Creating the inject
                     Inject inject = new Inject();
+                    inject.setDependsDuration(0L);
 
                     // Adding the description
                     RuleAttribute descriptionRuleAttribute = matchingInjectImporter.getRuleAttributes().stream()
@@ -296,46 +303,69 @@ public class InjectService {
                     // Adding the trigger time
                     RuleAttribute triggerTimeRuleAttribute = matchingInjectImporter.getRuleAttributes().stream()
                             .filter(ruleAttribute -> ruleAttribute.getName().equals("trigger_time"))
-                            .findFirst()
-                            .orElseThrow(ElementNotFoundException::new);
-                    boolean specifyDays = triggerTimeRuleAttribute.getAdditionalConfig()
-                            .get("specifyDays").trim().equalsIgnoreCase("true");
-                    boolean relativeDays = triggerTimeRuleAttribute.getAdditionalConfig()
-                            .get("relativeDays").trim().equalsIgnoreCase("true");
-                    boolean relativeTime = triggerTimeRuleAttribute.getAdditionalConfig()
-                            .get("relativeTime").trim().equalsIgnoreCase("true");
+                            .findFirst().orElseGet(() -> {
+                                RuleAttribute ruleAttributeDefault = new RuleAttribute();
+                                ruleAttributeDefault.setAdditionalConfig(
+                                        Map.of("timePattern", "")
+                                );
+                                return ruleAttributeDefault;
+                            });
+
                     String timePattern = triggerTimeRuleAttribute.getAdditionalConfig()
                             .get("timePattern");
-                    DateTimeFormatter dateTimeFormatter;
+                    String dateAsString = Arrays.stream(triggerTimeRuleAttribute.getColumns().split("\\+"))
+                            .map(column -> row.getCell(CellReference.convertColStringToIndex(column)).getStringCellValue())
+                            .collect(Collectors.joining());
 
-                    // We try to find an absolute date on this first pass
-                    if(!relativeDays && !relativeTime) {
-                        if(timePattern == null) {
-                            if(specifyDays) {
-                                dateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
-                            } else {
-                                dateTimeFormatter = DateTimeFormatter.ISO_TIME;
-                            }
-                        } else {
-                            dateTimeFormatter = DateTimeFormatter.ofPattern(timePattern);
-                        }
+                    Matcher relativeDayMatcher = relativeDayPattern.matcher(dateAsString);
+                    Matcher relativeTimeMatcher = relativeTimePattern.matcher(dateAsString);
 
-                        String dateAsString = Arrays.stream(triggerTimeRuleAttribute.getColumns().split("\\+"))
-                                .map(column -> row.getCell(CellReference.convertColStringToIndex(column)).getStringCellValue())
-                                .collect(Collectors.joining());
+                    boolean relativeDays = relativeDayMatcher.matches();
+                    boolean relativeTime = relativeTimeMatcher.matches();
 
-                        Instant injectDate = Instant.ofEpochSecond(
-                                LocalDateTime.parse(dateAsString, dateTimeFormatter)
-                                        .toEpochSecond(ZoneOffset.UTC));
-                        if(wrapper.earliestAbsoluteDate == null) {
-                            wrapper.earliestAbsoluteDate = injectDate;
-                            inject.setDependsDuration(0L);
-                        } else {
-                            if(injectDate.isBefore(wrapper.earliestAbsoluteDate)) {
-                                wrapper.earliestAbsoluteDate = injectDate;
+                    InjectTime injectTime = new InjectTime();
+                    injectTime.setUnformattedDate(dateAsString);
+                    injectTime.setLinkedInject(inject);
+
+                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
+                    LocalDateTime localDateTime = null;
+                    if(timePattern != null && !timePattern.isEmpty()) {
+                        dateTimeFormatter = DateTimeFormatter.ofPattern(timePattern);
+                        localDateTime = LocalDateTime.parse(dateAsString, dateTimeFormatter);
+                    } else {
+                        try {
+                            localDateTime = LocalDateTime.parse(dateAsString, dateTimeFormatter);
+                        } catch (DateTimeParseException firstException) {
+                            // The date is not in ISO_DATE_TIME. Trying just the ISO_TIME
+                            dateTimeFormatter = DateTimeFormatter.ISO_TIME;
+                            try {
+                                localDateTime = LocalDateTime.parse(dateAsString, dateTimeFormatter);
+                            } catch (DateTimeParseException secondException) {
+                                // Neither ISO_DATE_TIME nor ISO_TIME
                             }
                         }
                     }
+                    injectTime.setFormatter(dateTimeFormatter);
+
+                    if (localDateTime == null) {
+                        injectTime.setRelativeDay(relativeDays);
+                        if(relativeDays && relativeDayMatcher.groupCount() > 0 && !relativeDayMatcher.group(1).isBlank()) {
+                            injectTime.setRelativeDayNumber(Integer.parseInt(relativeDayMatcher.group(1)));
+                        }
+                        injectTime.setRelativeTime(relativeTime);
+                        if(relativeTime && relativeTimeMatcher.groupCount() > 0 && !relativeTimeMatcher.group(1).isBlank()) {
+                            injectTime.setRelativeTimeNumber(Integer.parseInt(relativeTimeMatcher.group(1)));
+                        }
+                    }
+                    injectTime.setSpecifyDays(relativeDays || dateTimeFormatter.equals(DateTimeFormatter.ISO_DATE_TIME));
+
+                    // We get the absolute dates available on our first pass
+                    if(!relativeDays && !relativeTime && localDateTime != null) {
+                        Instant injectDate = Instant.ofEpochSecond(
+                                localDateTime.toEpochSecond(ZoneOffset.of("+2")));
+                        injectTime.setDate(injectDate);
+                    }
+                    mapInstantByRowIndex.put(row.getRowNum(), injectTime);
 
                     // Adding the content
                     ObjectMapper mapper = new ObjectMapper();
@@ -348,8 +378,7 @@ public class InjectService {
                                     .collect(Collectors.toMap(jsonNode -> jsonNode.get("key").asText(), Function.identity()));
 
                     // So far, we only support one expectation
-                    InjectExpectation expectation = new InjectExpectation();
-                    expectation.setType(InjectExpectation.EXPECTATION_TYPE.MANUAL);
+                    AtomicReference<InjectExpectation> expectation = new AtomicReference<>();
 
                     // For each rule attributes of the importer
                     matchingInjectImporter.getRuleAttributes().forEach(ruleAttribute -> {
@@ -388,25 +417,38 @@ public class InjectService {
                                         .map(Map.Entry::getValue)
                                         .toList()
                                 );
+                                if(inject.getTeams().size() == 0) {
+                                    importTestSummary.getImportMessage().add(
+                                            new ImportMessage(ImportMessage.MessageLevel.WARN,
+                                                    "No team match for column %s of row %s".formatted(
+                                                            importMapper.getInjectTypeColumn(), row.getRowNum()
+                                                    )
+                                            )
+                                    );
+                                }
                                 break;
                             case "expectation":
                                 // If the rule type is of an expectation,
+                                if (expectation.get() == null) {
+                                    expectation.set(new InjectExpectation());
+                                    expectation.get().setType(InjectExpectation.EXPECTATION_TYPE.MANUAL);
+                                }
                                 if (ruleAttribute.getName().contains(".")) {
-                                    if("score".equals(ruleAttribute.getName().split(".")[1])) {
+                                    if("score".equals(ruleAttribute.getName().split("\\.")[1])) {
                                         Double columnValueExpectation = Arrays.stream(ruleAttribute.getColumns().split("\\+"))
                                                 .map(column -> row.getCell(CellReference.convertColStringToIndex(column)).getNumericCellValue())
                                                 .reduce(0.0, Double::sum);
-                                        expectation.setExpectedScore(columnValueExpectation.intValue());
-                                    } else if ("name".equals(ruleAttribute.getName().split(".")[1])) {
+                                        expectation.get().setExpectedScore(columnValueExpectation.intValue());
+                                    } else if ("name".equals(ruleAttribute.getName().split("\\.")[1])) {
                                         String columnValueExpectation = Arrays.stream(ruleAttribute.getColumns().split("\\+"))
                                                 .map(column -> row.getCell(CellReference.convertColStringToIndex(column)).getStringCellValue())
                                                 .collect(Collectors.joining());
-                                        expectation.setName(columnValueExpectation);
-                                    } else if ("description".equals(ruleAttribute.getName().split(".")[1])) {
+                                        expectation.get().setName(columnValueExpectation);
+                                    } else if ("description".equals(ruleAttribute.getName().split("\\.")[1])) {
                                         String columnValueExpectation = Arrays.stream(ruleAttribute.getColumns().split("\\+"))
                                                 .map(column -> row.getCell(CellReference.convertColStringToIndex(column)).getStringCellValue())
                                                 .collect(Collectors.joining());
-                                        expectation.setDescription(columnValueExpectation);
+                                        expectation.get().setDescription(columnValueExpectation);
                                     }
                                 }
 
@@ -426,22 +468,105 @@ public class InjectService {
                     inject.setExercise(null);
                     // No dependencies
                     inject.setDependsOn(null);
-                    // We set the expectation
-                    inject.setExpectations(List.of(expectation));
+
+                    if(expectation.get() != null) {
+                        // We set the expectation
+                        ArrayNode expectationsNode = mapper.createArrayNode();
+                        ObjectNode expectationNode = mapper.createObjectNode();
+                        expectationNode.put("expectation_description", expectation.get().getDescription());
+                        expectationNode.put("expectation_name", expectation.get().getName());
+                        expectationNode.put("expectation_score", expectation.get().getScore());
+                        expectationNode.put("expectation_type", expectation.get().getType().name());
+                        expectationsNode.add(expectationNode);
+
+                        inject.getContent().set("expectationNode", expectationsNode);
+                    }
+
+                    // We set the scenario
+                    inject.setScenario(scenario);
 
                     importTestSummary.getInjects().add(inject);
                 });
 
                 // Now that we did our first pass, we do another one real quick to find out
                 // the date relative to each others
-                selectedSheet.rowIterator().forEachRemaining(cells -> {
 
-                });
-                if (isScheduled) {
-                    // The scenario is already scheduled
+                // First of all, are there any absolute date
+                boolean allDatesAreAbsolute = mapInstantByRowIndex.values().stream().noneMatch(injectTime -> injectTime.getDate() == null);
+                boolean allDatesAreRelative = mapInstantByRowIndex.values().stream().noneMatch(injectTime -> injectTime.getDate() != null);
+                Optional<Instant> earliestAbsoluteDate = mapInstantByRowIndex.values().stream()
+                        .map(InjectTime::getDate)
+                        .filter(Objects::nonNull)
+                        .min(Comparator.naturalOrder());
+
+                if(allDatesAreAbsolute) {
+                    // If we have an earliest date, we calculate the dates depending on the earliest one
+                    earliestAbsoluteDate.ifPresent(
+                        earliestInstant -> mapInstantByRowIndex.values().stream().filter(injectTime -> injectTime.getDate() != null)
+                            .forEach(injectTime -> {
+                                injectTime.getLinkedInject().setDependsDuration(injectTime.getDate().getEpochSecond() - earliestInstant.getEpochSecond());
+                            })
+                    );
+                } else if (allDatesAreRelative) {
+                    // All is relative and we just need to set depends relative to each others
+                    // First of all, we find the minimal relative number of days and hour
+                    int earliestDay = mapInstantByRowIndex.values().stream()
+                            .min(Comparator.comparing(InjectTime::getRelativeDayNumber))
+                            .map(InjectTime::getRelativeDayNumber).orElse(0);
+                    int earliestHourOfThatDay = mapInstantByRowIndex.values().stream()
+                            .filter(injectTime -> injectTime.getRelativeDayNumber() == earliestDay)
+                            .min(Comparator.comparing(InjectTime::getRelativeTimeNumber))
+                            .map(InjectTime::getRelativeTimeNumber).orElse(0);
+                    int offset = (earliestDay + earliestHourOfThatDay) * -1;
+                    mapInstantByRowIndex.values().stream().filter(InjectTime::isRelativeDay)
+                        .forEach(injectTime -> {
+                            long injectTimeAsHour = ((offset + injectTime.getRelativeDayNumber()) * 24L) + injectTime.getRelativeTimeNumber();
+                            injectTime.getLinkedInject().setDependsDuration(injectTimeAsHour * 60 * 60);
+                    });
                 } else {
-                    // The scenario is not scheduled yet
+                    // Worst case scenario : there is a mix of relative and absolute dates
+                    // We will need to resolve this row by row in the order they are in the import file
+                    Stream<Map.Entry<Integer, InjectTime>> sortedInstantMap = mapInstantByRowIndex.entrySet().stream().sorted();
+                    int firstRow;
+                    if(sortedInstantMap.findFirst().isPresent()) {
+                        firstRow = sortedInstantMap.findFirst().get().getKey();
+                    } else {
+                        firstRow = 0;
+                    }
+                    sortedInstantMap.forEachOrdered(
+                        integerInjectTimeEntry -> {
+                            InjectTime injectTime = integerInjectTimeEntry.getValue();
+
+                            if(injectTime.getDate() != null) {
+                                // Great, we already have an absolute date for this one
+                                // If we are the first, good, nothing more to do
+                                // Otherwise, we need to get the date of the first row to set the depends on
+                                if(integerInjectTimeEntry.getKey() != firstRow) {
+                                    Instant firstDate = mapInstantByRowIndex.get(firstRow).getDate();
+                                    injectTime.getLinkedInject().setDependsDuration(injectTime.getDate().getEpochSecond() - firstDate.getEpochSecond());
+                                }
+                            } else {
+                                // We don't have an absolute date so we need to deduce it from another row
+                                if(injectTime.getRelativeDayNumber() < 0) {
+                                    // We are in the past, so we need to explore the future to find the next absolute date
+                                } else {
+                                    // We are in the future, so we need to explore the past to find an absolute date
+                                }
+                            }
+                        }
+                    );
                 }
+
+                // We find the earliest date available if there exist one
+                earliestAbsoluteDate.ifPresent(date -> {
+                    ZonedDateTime zonedDateTime = date.atZone(ZoneId.of("UTC"));
+                    Instant dayOfStart = ZonedDateTime.of(
+                            zonedDateTime.getYear(), zonedDateTime.getMonthValue(), zonedDateTime.getDayOfMonth(),
+                            0, 0, 0, 0, ZoneId.of("UTC")).toInstant();
+                    scenario.setRecurrenceStart(dayOfStart);
+                    scenario.setRecurrence("0 " + zonedDateTime.getMinute() + " " + zonedDateTime.getHour() + " * * *"); // Every day now + 1 hour
+                    scenario.setRecurrenceEnd(dayOfStart.plus(1, ChronoUnit.DAYS));
+                });
 
             }
         } catch (IOException ex) {
@@ -449,6 +574,9 @@ public class InjectService {
             log.severe(Arrays.toString(ex.getStackTrace()));
             throw new RuntimeException();
         }
+
+        // Sorting by the order of the enum declaration to have error messages first, then warn and then info
+        importTestSummary.getImportMessage().sort(Comparator.comparing(ImportMessage::getMessageLevel));
 
         return importTestSummary;
     }

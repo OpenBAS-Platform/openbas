@@ -6,9 +6,9 @@ import lombok.Data;
 @Data
 public class ImportMessage {
   public enum MessageLevel {
-    INFO,
+    ERROR,
     WARN,
-    ERROR
+    INFO
   }
 
   @JsonProperty("message_level")

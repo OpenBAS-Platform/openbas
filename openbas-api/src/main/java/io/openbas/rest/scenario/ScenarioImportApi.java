@@ -1,8 +1,10 @@
 package io.openbas.rest.scenario;
 
 import io.openbas.database.model.ImportMapper;
+import io.openbas.database.model.Inject;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.ImportMapperRepository;
+import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
@@ -40,6 +42,8 @@ public class ScenarioImportApi extends RestBehavior {
 
 
     private final ScenarioRepository scenarioRepository;
+
+    private final InjectRepository injectRepository;
 
     private final ImportMapperRepository importMapperRepository;
 
@@ -85,7 +89,7 @@ public class ScenarioImportApi extends RestBehavior {
         ImportMapper importMapper = importMapperRepository
                 .findById(UUID.fromString(input.getImportMapperId())).orElseThrow(ElementNotFoundException::new);
 
-        return injectService.importXls(scenario, importMapper, input);
+        return injectService.importXls(importId, scenario, importMapper, input);
     }
 
     @PostMapping(SCENARIO_URI + "/{scenarioId}/xls/{importId}/validate")
@@ -100,8 +104,9 @@ public class ScenarioImportApi extends RestBehavior {
         ImportMapper importMapper = importMapperRepository
                 .findById(UUID.fromString(input.getImportMapperId())).orElseThrow(ElementNotFoundException::new);
 
-        ImportTestSummary importTestSummary = injectService.importXls(scenario, importMapper, input);
-        scenario.getInjects().addAll(importTestSummary.getInjects());
+        ImportTestSummary importTestSummary = injectService.importXls(importId, scenario, importMapper, input);
+        Iterable<Inject> newInjects = injectRepository.saveAll(importTestSummary.getInjects());
+        newInjects.forEach(inject -> {scenario.getInjects().add(inject);});
         scenarioRepository.save(scenario);
         return importTestSummary;
     }
