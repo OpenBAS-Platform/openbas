@@ -4,6 +4,9 @@ import io.openbas.database.model.Exercise;
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Tag;
+import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.exercise.form.ExerciseCreateInput;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.service.InjectService;
 import jakarta.persistence.EntityManager;
@@ -12,17 +15,16 @@ import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.openbas.database.criteria.ExerciseCriteria.countQuery;
@@ -41,6 +43,7 @@ public class ExerciseService {
   private EntityManager entityManager;
 
   private final InjectService injectService;
+  private final ExerciseRepository exerciseRepository;
 
   public Page<ExerciseSimple> exercises(Specification<Exercise> specification, Pageable pageable) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
@@ -155,5 +158,48 @@ public class ExerciseService {
         })
         .toList();
   }
+
+  @Transactional
+  public Exercise getDuplicateExercise(ExerciseCreateInput input) {
+      if (StringUtils.isNotBlank(input.getId())) {
+          Exercise exerciseOrigin = exerciseRepository.findById(input.getId()).orElseThrow();
+          Exercise exercise = copyExercice(exerciseOrigin);
+          return exerciseRepository.save(exercise);
+      }
+      throw new ElementNotFoundException();
+  }
+
+    private Exercise copyExercice(Exercise exerciseOrigin) {
+        Exercise exerciseDuplicate = new Exercise();
+        if (exerciseOrigin.getEnd().isPresent())
+            exerciseDuplicate.setEnd(exerciseOrigin.getEnd().get());
+        exerciseDuplicate.setDocuments(exerciseOrigin.getDocuments().stream().toList());
+        exerciseDuplicate.setCategory(exerciseOrigin.getCategory());
+        exerciseDuplicate.setDescription(exerciseOrigin.getDescription());
+        exerciseDuplicate.setName(exerciseOrigin.getName());
+        exerciseDuplicate.setInjects(exerciseOrigin.getInjects().stream().toList());
+        exerciseDuplicate.setArticles(exerciseOrigin.getArticles().stream().toList());
+        if (exerciseOrigin.getCurrentPause().isPresent())
+            exerciseDuplicate.setCurrentPause(exerciseOrigin.getCurrentPause().get());
+        exerciseDuplicate.setFrom(exerciseOrigin.getFrom());
+        exerciseDuplicate.setCategory(exerciseOrigin.getCategory());
+        exerciseDuplicate.setFooter(exerciseOrigin.getFooter());
+        exerciseDuplicate.setGrants(exerciseOrigin.getGrants().stream().toList());
+        exerciseDuplicate.setTags(new HashSet<>(exerciseOrigin.getTags()));
+        exerciseDuplicate.setTeams((exerciseOrigin.getTeams().stream().toList()));
+        exerciseDuplicate.setTeamUsers((exerciseOrigin.getTeamUsers().stream().toList()));
+        exerciseDuplicate.setReplyTos(exerciseOrigin.getReplyTos().stream().toList());
+        exerciseDuplicate.setScenario(exerciseOrigin.getScenario());
+        exerciseDuplicate.setHeader(exerciseOrigin.getHeader());
+        exerciseDuplicate.setSubtitle(exerciseOrigin.getSubtitle());
+        if (exerciseOrigin.getStart().isPresent())
+            exerciseDuplicate.setStart(exerciseOrigin.getStart().get());
+        exerciseDuplicate.setStatus(exerciseOrigin.getStatus());
+        exerciseDuplicate.setLogoDark(exerciseOrigin.getLogoDark());
+        exerciseDuplicate.setLogoLight(exerciseOrigin.getLogoLight());
+        exerciseDuplicate.setPauses(exerciseOrigin.getPauses().stream().toList());
+        exerciseDuplicate.setObjectives(exerciseOrigin.getObjectives().stream().toList());
+        return exerciseDuplicate;
+    }
 
 }

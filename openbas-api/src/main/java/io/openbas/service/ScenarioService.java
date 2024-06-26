@@ -15,6 +15,7 @@ import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.scenario.export.ScenarioExportMixins;
 import io.openbas.rest.scenario.export.ScenarioFileExport;
+import io.openbas.rest.scenario.form.ScenarioInput;
 import io.openbas.rest.scenario.form.ScenarioSimple;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
@@ -28,6 +29,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -437,6 +439,45 @@ public class ScenarioService {
       this.scenarioTeamUserRepository.deleteById(scenarioTeamUserId);
     });
     return this.scenario(scenarioId);
+  }
+
+  @Transactional
+  public Scenario getDuplicateScenario(ScenarioInput input) {
+    if (StringUtils.isNotBlank(input.getId())) {
+      Scenario scenarioOrigin = scenarioRepository.findById(input.getId()).orElseThrow();
+      Scenario scenario = copyScenario(scenarioOrigin);
+      return scenarioRepository.save(scenario);
+    }
+    throw new ElementNotFoundException();
+  }
+
+  private Scenario copyScenario(Scenario scenario) {
+    Scenario scenarioDuplicate = new Scenario();
+    scenarioDuplicate.setArticles(scenario.getArticles().stream().toList());
+    scenarioDuplicate.setDocuments(scenario.getDocuments().stream().toList());
+    scenarioDuplicate.setFrom(scenario.getFrom());
+    scenarioDuplicate.setCategory(scenario.getCategory());
+    scenarioDuplicate.setTags(new HashSet<>(scenario.getTags()));
+    scenarioDuplicate.setInjects(new HashSet<>(scenario.getInjects()));
+    scenarioDuplicate.setObjectives(scenario.getObjectives().stream().toList());
+    scenarioDuplicate.setDescription(scenario.getDescription());
+    scenarioDuplicate.setExercises(scenario.getExercises().stream().toList());
+    scenarioDuplicate.setExternalReference(scenario.getExternalReference());
+    scenarioDuplicate.setTeamUsers(scenario.getTeamUsers().stream().toList());
+    scenarioDuplicate.setTeams(scenario.getTeams().stream().toList());
+    scenarioDuplicate.setRecurrence(scenario.getRecurrence());
+    scenarioDuplicate.setRecurrenceEnd(scenario.getRecurrenceEnd());
+    scenarioDuplicate.setRecurrenceStart(scenario.getRecurrenceStart());
+    scenarioDuplicate.setName(scenario.getName());
+    scenarioDuplicate.setReplyTos(scenario.getReplyTos().stream().toList());
+    scenarioDuplicate.setLessonsCategories(scenario.getLessonsCategories().stream().toList());
+    scenarioDuplicate.setSeverity(scenario.getSeverity());
+    scenarioDuplicate.setMainFocus(scenario.getMainFocus());
+    scenarioDuplicate.setHeader(scenario.getHeader());
+    scenarioDuplicate.setGrants(scenario.getGrants().stream().toList());
+    scenarioDuplicate.setExternalUrl(scenario.getExternalUrl());
+    scenarioDuplicate.setSubtitle(scenario.getSubtitle());
+    return scenarioDuplicate;
   }
 
 }

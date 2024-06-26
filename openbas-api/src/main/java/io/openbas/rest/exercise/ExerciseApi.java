@@ -26,15 +26,18 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -250,9 +253,7 @@ public class ExerciseApi extends RestBehavior {
     exercise.setTeams(fromIterable(teams));
     exerciseRepository.save(exercise);
     // Remove all association between users / exercises / teams
-    input.getTeamIds().forEach(teamId -> {
-      exerciseTeamUserRepository.deleteTeamFromAllReferences(teamId);
-    });
+    input.getTeamIds().forEach(exerciseTeamUserRepository::deleteTeamFromAllReferences);
     return teamRepository.findAllById(input.getTeamIds());
   }
 
@@ -332,18 +333,23 @@ public class ExerciseApi extends RestBehavior {
   @PostMapping("/api/exercises")
   @Transactional(rollbackOn = Exception.class)
   public Exercise createExercise(@Valid @RequestBody ExerciseCreateInput input) {
-    Exercise exercise = new Exercise();
-    exercise.setUpdateAttributes(input);
-    exercise.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-    if (imapEnabled) {
-      exercise.setFrom(imapUsername);
-      exercise.setReplyTos(List.of(imapUsername));
-    } else {
-      exercise.setFrom(openBASConfig.getDefaultMailer());
-      exercise.setReplyTos(List.of(openBASConfig.getDefaultReplyTo()));
+    if (input != null ) {
+      if (StringUtils.isNotBlank(input.getId()))
+        return exerciseService.getDuplicateExercise(input);
+      Exercise exercise = new Exercise();
+      exercise.setUpdateAttributes(input);
+      exercise.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+      if (imapEnabled) {
+        exercise.setFrom(imapUsername);
+        exercise.setReplyTos(List.of(imapUsername));
+      } else {
+        exercise.setFrom(openBASConfig.getDefaultMailer());
+        exercise.setReplyTos(List.of(openBASConfig.getDefaultReplyTo()));
+      }
+      this.grantService.computeGrant(exercise);
+      return exerciseRepository.save(exercise);
     }
-    this.grantService.computeGrant(exercise);
-    return exerciseRepository.save(exercise);
+    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
   }
 
   @PutMapping("/api/exercises/{exerciseId}")

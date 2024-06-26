@@ -7,7 +7,6 @@ import io.openbas.database.model.User;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.exercise.ExerciseService;
 import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
 import io.openbas.rest.helper.TeamHelper;
 import io.openbas.rest.scenario.form.*;
@@ -20,12 +19,15 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
@@ -92,10 +94,15 @@ public class ScenarioApi {
   @PostMapping(SCENARIO_URI)
   // TODO: Admin only ?
   public Scenario createScenario(@Valid @RequestBody final ScenarioInput input) {
-    Scenario scenario = new Scenario();
-    scenario.setUpdateAttributes(input);
-    scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-    return this.scenarioService.createScenario(scenario);
+    if (input != null) {
+      if (StringUtils.isNotBlank(input.getId()))
+        return scenarioService.getDuplicateScenario(input);
+      Scenario scenario = new Scenario();
+      scenario.setUpdateAttributes(input);
+      scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+      return this.scenarioService.createScenario(scenario);
+    }
+    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
   }
 
   @GetMapping(SCENARIO_URI)
