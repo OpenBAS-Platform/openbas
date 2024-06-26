@@ -154,6 +154,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
         PaperProps={{
           ref: drawerRef,
         }}
+        disableEnforceFocus={true}
       >
         <Grid container spacing={3}>
           <Grid item xs={7} style={{ paddingTop: 30 }}>
