@@ -1,9 +1,6 @@
 package io.openbas.rest.exercise;
 
-import io.openbas.database.model.Exercise;
-import io.openbas.database.model.ExerciseStatus;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.Tag;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseCreateInput;
@@ -14,6 +11,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -178,7 +176,7 @@ public class ExerciseService {
         exerciseDuplicate.setDocuments(exerciseOrigin.getDocuments().stream().toList());
         exerciseDuplicate.setCategory(exerciseOrigin.getCategory());
         exerciseDuplicate.setDescription(exerciseOrigin.getDescription());
-        exerciseDuplicate.setName(exerciseOrigin.getName());
+        exerciseDuplicate.setName(getNewName(exerciseOrigin));
         exerciseDuplicate.setInjects(exerciseOrigin.getInjects().stream().toList());
         exerciseDuplicate.setArticles(exerciseOrigin.getArticles().stream().toList());
         if (exerciseOrigin.getCurrentPause().isPresent())
@@ -202,6 +200,14 @@ public class ExerciseService {
         exerciseDuplicate.setPauses(exerciseOrigin.getPauses().stream().toList());
         exerciseDuplicate.setObjectives(exerciseOrigin.getObjectives().stream().toList());
         return exerciseDuplicate;
+    }
+
+    private static String getNewName(Exercise exerciseOrigin) {
+        String newName = exerciseOrigin.getName() + " (duplicate)";
+        if (newName.length() > 255) {
+            newName = newName.substring(0, 254 - " (duplicate)".length());
+        }
+        return newName;
     }
 
 }

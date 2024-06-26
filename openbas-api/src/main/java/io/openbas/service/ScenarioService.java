@@ -468,7 +468,7 @@ public class ScenarioService {
     scenarioDuplicate.setRecurrence(scenario.getRecurrence());
     scenarioDuplicate.setRecurrenceEnd(scenario.getRecurrenceEnd());
     scenarioDuplicate.setRecurrenceStart(scenario.getRecurrenceStart());
-    scenarioDuplicate.setName(scenario.getName());
+    scenarioDuplicate.setName(getNewName(scenario));
     scenarioDuplicate.setReplyTos(scenario.getReplyTos().stream().toList());
     scenarioDuplicate.setLessonsCategories(scenario.getLessonsCategories().stream().toList());
     scenarioDuplicate.setSeverity(scenario.getSeverity());
@@ -478,6 +478,14 @@ public class ScenarioService {
     scenarioDuplicate.setExternalUrl(scenario.getExternalUrl());
     scenarioDuplicate.setSubtitle(scenario.getSubtitle());
     return scenarioDuplicate;
+  }
+
+  private static String getNewName(Scenario scenarioOrigin) {
+    String newName = scenarioOrigin.getName() + " (duplicate)";
+    if (newName.length() > 255) {
+      newName = newName.substring(0, 254 - " (duplicate)".length());
+    }
+    return newName;
   }
 
 }
