@@ -2,12 +2,12 @@ package io.openbas.database.raw;
 
 public interface RawAsset {
 
-    public String getAsset_id();
+    String getAsset_id();
 
-    public String getAsset_type();
+    String getAsset_type();
 
-    public String getAsset_name();
+    String getAsset_name();
 
-    public String getEndpoint_platform();
+    String getEndpoint_platform();
 
 }

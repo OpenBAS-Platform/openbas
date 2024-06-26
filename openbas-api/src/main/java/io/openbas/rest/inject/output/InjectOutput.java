@@ -9,9 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
 public class InjectOutput {
@@ -50,7 +48,13 @@ public class InjectOutput {
   public String injectType;
 
   @JsonProperty("inject_teams")
-  private Set<String> teams;
+  private List<String> teams;
+
+  @JsonProperty("inject_assets")
+  private List<String> assets;
+
+  @JsonProperty("inject_asset_groups")
+  private List<String> assetGroups;
 
   @JsonProperty("inject_content")
   private ObjectNode content;
@@ -78,16 +82,21 @@ public class InjectOutput {
     this.dependsDuration = dependsDuration;
     this.injectorContract = injectorContract;
     this.tags = tags != null ? new HashSet<>(Arrays.asList(tags)) : new HashSet<>();
+
+    this.teams = teams != null ? new ArrayList<>(Arrays.asList(teams)) : new ArrayList<>();
+    this.assets = assets != null ? new ArrayList<>(Arrays.asList(assets)) : new ArrayList<>();
+    this.assetGroups = assetGroups != null ? new ArrayList<>(Arrays.asList(assetGroups)) : new ArrayList<>();
+
     this.isReady = InjectModelHelper.isReady(
         injectorContract,
         content,
         allTeams,
-        teams != null ? new HashSet<>(Arrays.asList(teams)) : new HashSet<>(),
-        assets != null ? new HashSet<>(Arrays.asList(assets)) : new HashSet<>(),
-        assetGroups != null ? new HashSet<>(Arrays.asList(assetGroups)) : new HashSet<>()
+        this.teams,
+        this.assets,
+        this.assetGroups
     );
     this.injectType = injectType;
-    this.teams = teams != null ? new HashSet<>(Arrays.asList(teams)) : new HashSet<>();
+    this.teams = teams != null ? new ArrayList<>(Arrays.asList(teams)) : new ArrayList<>();
     this.content = content;
   }
 }

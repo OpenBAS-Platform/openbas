@@ -8,15 +8,16 @@ import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
 import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.rest.inject.output.AtomicTestingOutput;
 import io.openbas.service.AtomicTestingService;
 import io.openbas.utils.AtomicTestingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,16 +34,10 @@ public class AtomicTestingApi extends RestBehavior {
   private final InjectExpectationService injectExpectationService;
 
   @PostMapping("/search")
-  public Page<InjectResultDTO> findAllAtomicTestings(
+  @Transactional(readOnly = true)
+  public Page<AtomicTestingOutput> findAllAtomicTestings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return this.atomicTestingService.findAllAtomicTestings(searchPaginationInput)
-        .map(inject -> AtomicTestingMapper.toDto(
-            inject, getTargets(
-                inject.getTeams(),
-                inject.getAssets(),
-                inject.getAssetGroups()
-            )
-        ));
+    return this.atomicTestingService.findAllAtomicTestings(searchPaginationInput);
   }
 
   @GetMapping("/{injectId}")
@@ -53,7 +48,7 @@ public class AtomicTestingApi extends RestBehavior {
   }
 
   @PostMapping()
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public InjectResultDTO createAtomicTesting(@Valid @RequestBody AtomicTestingInput input) {
     Inject inject = this.atomicTestingService.createOrUpdate(input, null);
     return AtomicTestingMapper.toDto(
@@ -66,7 +61,7 @@ public class AtomicTestingApi extends RestBehavior {
   }
 
   @PutMapping("/{injectId}")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public InjectResultDTO updateAtomicTesting(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingInput input) {
@@ -100,7 +95,7 @@ public class AtomicTestingApi extends RestBehavior {
   }
 
   @PutMapping("/{injectId}/tags")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public InjectResultDTO updateAtomicTestingTags(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingUpdateTagsInput input) {
