@@ -209,11 +209,32 @@ public class ScenarioService {
     return new PageImpl<>(scenarios, pageable, total);
   }
 
+  /**
+   * Scenario is recurring
+   * AND start date is before now
+   * AND end date is after now
+   */
   public List<Scenario> recurringScenarios(@NotNull final Instant instant) {
     return this.scenarioRepository.findAll(
         ScenarioSpecification.isRecurring()
-            .and(ScenarioSpecification.recurrenceStartDateAfter(instant))
-            .and(ScenarioSpecification.recurrenceStopDateBefore(instant))
+            .and(ScenarioSpecification.recurrenceStartDateBefore(instant))
+            .and(ScenarioSpecification.recurrenceStopDateAfter(instant))
+    );
+  }
+
+  /**
+   * Scenario is recurring
+   * AND
+   *    start date is before now
+   *    OR stop date is before now
+   */
+  public List<Scenario> potentialOutdatedRecurringScenario(@NotNull final Instant instant) {
+    return this.scenarioRepository.findAll(
+        ScenarioSpecification.isRecurring()
+            .and(
+                ScenarioSpecification.recurrenceStartDateBefore(instant)
+                    .or(ScenarioSpecification.recurrenceStopDateBefore(instant))
+            )
     );
   }
 
@@ -239,6 +260,11 @@ public class ScenarioService {
   public Scenario updateScenario(@NotNull final Scenario scenario) {
     scenario.setUpdatedAt(now());
     return this.scenarioRepository.save(scenario);
+  }
+
+  public Iterable<Scenario> updateScenarios(@NotNull final List<Scenario> scenarios) {
+    scenarios.forEach(scenario -> scenario.setUpdatedAt(now()));
+    return this.scenarioRepository.saveAll(scenarios);
   }
 
   public void deleteScenario(@NotBlank final String scenarioId) {
