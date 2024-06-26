@@ -64,7 +64,7 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
                   {t('Type')}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  {tPick(injectResultDto.inject_injector_contract.injector_contract_labels)}
+                  {tPick(injectResultDto.inject_injector_contract?.injector_contract_labels)}
                 </Typography>
               </div>
               <div>

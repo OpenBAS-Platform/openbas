@@ -107,7 +107,7 @@ const AtomicTesting = () => {
                           : injectResultDto.inject_type
                     }
                   />
-                  <Tooltip title={tPick(injectResultDto.inject_injector_contract.injector_contract_labels)}>
+                  <Tooltip title={tPick(injectResultDto.inject_injector_contract?.injector_contract_labels)}>
                     <div style={{
                       marginLeft: 10,
                       whiteSpace: 'nowrap',
@@ -115,7 +115,7 @@ const AtomicTesting = () => {
                       textOverflow: 'ellipsis',
                     }}
                     >
-                      {tPick(injectResultDto.inject_injector_contract.injector_contract_labels)}
+                      {tPick(injectResultDto.inject_injector_contract?.injector_contract_labels)}
                     </div>
                   </Tooltip>
                 </div>
@@ -151,7 +151,7 @@ const AtomicTesting = () => {
                   {t('Platforms')}
                 </Typography>
                 <div style={{ display: 'flex' }}>
-                  {injectResultDto.inject_injector_contract.injector_contract_platforms?.map((platform: string) => (
+                  {injectResultDto.inject_injector_contract?.injector_contract_platforms?.map((platform: string) => (
                     <div key={platform} style={{ display: 'flex', marginRight: 15 }}>
                       <PlatformIcon width={20} platform={platform} marginRight={5} />
                       {platform}
