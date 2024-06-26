@@ -46,6 +46,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, inje
       PaperProps={{
         ref: drawerRef,
       }}
+      disableEnforceFocus={true}
     >
       {inject && injectorContract && (
         <UpdateInjectDetails
