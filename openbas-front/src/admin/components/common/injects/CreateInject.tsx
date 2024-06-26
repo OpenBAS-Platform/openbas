@@ -233,7 +233,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
           <Grid item xs={5} style={{ paddingTop: 10 }}>
             <CreateInjectDetails
               drawerRef={drawerRef}
-              contractId={selectedContract !== null ? contracts[selectedContract].injector_contract_id : null}
+              contractId={selectedContract !== null && contracts?.length ? contracts[selectedContract]?.injector_contract_id : null}
               contractContent={selectedContract !== null ? parsedContentContracts[selectedContract] : null}
               setSelectedContract={setSelectedContract}
               selectedContractKillChainPhase={selectedContractKillChainPhase}
