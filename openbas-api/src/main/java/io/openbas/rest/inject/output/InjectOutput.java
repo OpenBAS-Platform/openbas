@@ -52,6 +52,9 @@ public class InjectOutput {
   @JsonProperty("inject_teams")
   private Set<String> teams;
 
+  @JsonProperty("inject_content")
+  private ObjectNode content;
+
   public InjectOutput(
       String id,
       String title,
@@ -85,5 +88,6 @@ public class InjectOutput {
     );
     this.injectType = injectType;
     this.teams = teams != null ? new HashSet<>(Arrays.asList(teams)) : new HashSet<>();
+    this.content = content;
   }
 }

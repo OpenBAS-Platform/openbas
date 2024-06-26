@@ -121,6 +121,7 @@ public class ExerciseService {
         exerciseRoot.get("subtitle").alias("exercise_subtitle"),
         exerciseRoot.get("category").alias("exercise_category"),
         exerciseRoot.get("start").alias("exercise_start_date"),
+        exerciseRoot.get("updatedAt").alias("exercise_updated_at"),
         tagIdsExpression.alias("exercise_tags"),
         injectIdsExpression.alias("exercise_injects")
     ).distinct(true);
@@ -144,6 +145,7 @@ public class ExerciseService {
           exerciseSimple.setSubtitle(tuple.get("exercise_subtitle", String.class));
           exerciseSimple.setCategory(tuple.get("exercise_category", String.class));
           exerciseSimple.setStart(tuple.get("exercise_start_date", Instant.class));
+          exerciseSimple.setUpdatedAt(tuple.get("exercise_updated_at", Instant.class));
           exerciseSimple.setTags(
               Arrays.stream(tuple.get("exercise_tags", String[].class))
                   .map(t -> {

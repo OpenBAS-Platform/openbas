@@ -105,7 +105,7 @@ const inlineStyles: Record<string, CSSProperties> = {
     textOverflow: 'ellipsis',
   },
   scenario_tags: {
-    width: '18%',
+    width: '15%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',

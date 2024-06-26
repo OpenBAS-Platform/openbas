@@ -10,6 +10,7 @@ import type { Theme } from './Theme';
 import { useFormatter } from './i18n';
 import useSearchAnFilter from '../utils/SortingFiltering';
 import { truncate } from '../utils/String';
+import { isNotEmptyField } from '../utils/utils';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -258,13 +259,19 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
                           return (
                             <InjectIcon
                               key={inject.inject_id}
-                              type={inject.inject_type}
-                              tooltip={tooltipContent}
+                              isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
+                              type={
+                                inject.inject_injector_contract.injector_contract_payload
+                                  ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                                    || inject.inject_injector_contract.injector_contract_payload?.payload_type
+                                  : inject.inject_type
+                              }
                               onClick={() => handleSelectInject(inject.inject_id)}
                               done={inject.inject_status !== null}
                               disabled={!inject.inject_enabled}
                               size="small"
-                              variant={'timeline'}
+                              variant='timeline'
+                              tooltip={tooltipContent}
                             />
                           );
                         })

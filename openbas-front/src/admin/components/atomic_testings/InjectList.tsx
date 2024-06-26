@@ -1,6 +1,8 @@
 import React, { CSSProperties, FunctionComponent, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Link } from 'react-router-dom';
+import { KeyboardArrowRight } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
 import InjectIcon from '../common/injects/InjectIcon';
 import type { InjectResultDTO, SearchPaginationInput } from '../../../utils/api-types';
@@ -14,6 +16,7 @@ import InjectorContract from '../common/injects/InjectorContract';
 import ItemStatus from '../../../components/ItemStatus';
 import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
 import { ButtonPopoverEntry } from '../../../components/common/ButtonPopover';
+import { isNotEmptyField } from '../../../utils/utils';
 
 const useStyles = makeStyles(() => ({
   bodyItems: {
@@ -38,6 +41,10 @@ const useStyles = makeStyles(() => ({
     paddingLeft: 10,
     height: 50,
   },
+  goIcon: {
+    position: 'absolute',
+    right: -10,
+  },
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
@@ -52,10 +59,10 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '15%',
   },
   inject_status: {
-    width: '15%',
+    width: '10%',
   },
   inject_targets: {
-    width: '15%',
+    width: '20%',
     cursor: 'default',
   },
   inject_expectations: {
@@ -63,7 +70,7 @@ const inlineStyles: Record<string, CSSProperties> = {
     cursor: 'default',
   },
   inject_updated_at: {
-    width: '10%',
+    width: '15%',
   },
 };
 
@@ -78,7 +85,7 @@ const InjectList: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const classes = useStyles();
-  const { t, fldt, tPick } = useFormatter();
+  const { t, fldt, tPick, nsdt } = useFormatter();
 
   // Filter and sort hook
   const [injects, setInjects] = useState<InjectResultDTO[]>([]);
@@ -95,12 +102,10 @@ const InjectList: FunctionComponent<Props> = ({
       value: (injectDto: InjectResultDTO) => {
         if (injectDto.inject_injector_contract) {
           return (
-            <InjectorContract variant="list"
-              label={tPick(injectDto.inject_injector_contract.injector_contract_labels)}
-            />
+            <InjectorContract variant="list" label={tPick(injectDto.inject_injector_contract.injector_contract_labels)} />
           );
         }
-        return <span />;
+        return <InjectorContract variant="list" label={t('Deleted')} deleted={true} />;
       },
     },
     {
@@ -116,19 +121,19 @@ const InjectList: FunctionComponent<Props> = ({
       value: (injectDto: InjectResultDTO) => fldt(injectDto.inject_status?.tracking_sent_date),
     },
     {
-      field: 'inject_targets',
-      label: 'Target',
-      isSortable: false,
-      value: (injectDto: InjectResultDTO) => {
-        return (<ItemTargets targets={injectDto.inject_targets} />);
-      },
-    },
-    {
       field: 'inject_status',
       label: 'Status',
       isSortable: true,
       value: (injectDto: InjectResultDTO) => {
         return (<ItemStatus isInject={true} status={injectDto.inject_status?.status_name} label={t(injectDto.inject_status?.status_name)} variant="inList" />);
+      },
+    },
+    {
+      field: 'inject_targets',
+      label: 'Target',
+      isSortable: false,
+      value: (injectDto: InjectResultDTO) => {
+        return (<ItemTargets targets={injectDto.inject_targets} />);
       },
     },
     {
@@ -145,7 +150,7 @@ const InjectList: FunctionComponent<Props> = ({
       field: 'inject_updated_at',
       label: 'Updated',
       isSortable: true,
-      value: (injectDto: InjectResultDTO) => fldt(injectDto.inject_updated_at),
+      value: (injectDto: InjectResultDTO) => nsdt(injectDto.inject_updated_at),
     },
   ];
 
@@ -184,48 +189,88 @@ const InjectList: FunctionComponent<Props> = ({
         </ListItem>
         {injects.map((injectDto) => {
           return (
-            <ListItem
+
+              <ListItem
+                  key={injectDto.inject_id}
+                  classes={{ root: classes.item }}
+                  divider
+                  secondaryAction={
+                      <AtomicTestingPopover
+                          atomic={injectDto}
+                          entries={entries}
+                          openDuplicate={openDuplicate}
+                          setOpenDuplicate={setOpenDuplicate}
+                      />
+                  }
+                  disablePadding={true}
+              >
+                  <ListItemButton
+                      classes={{ root: classes.item }}
+                      href={goTo(injectDto.inject_id)}
+                  >
+                      <ListItemIcon>
+                          <InjectIcon
+                              tooltip={injectDto.inject_type ? t(injectDto.inject_type) : t('Unknown')}
+                              type={injectDto.inject_type}
+                              variant="list"
+                          />
+                      </ListItemIcon>
+                      <ListItemText
+                          primary={
+                              <div className={classes.bodyItems}>
+                                  {headers.map((header) => (
+                                      <div
+                                          key={header.field}
+                                          className={classes.bodyItem}
+                                          style={inlineStyles[header.field]}
+                                      >
+                                          {header.value(injectDto)}
+                                      </div>
+                                  ))}
+                              </div>
+                          }
+                      />
+                  </ListItemButton>
+              </ListItem>
+
+            <ListItemButton
               key={injectDto.inject_id}
               classes={{ root: classes.item }}
               divider
-              secondaryAction={
-                <AtomicTestingPopover
-                  atomic={injectDto}
-                  entries={entries}
-                  openDuplicate={openDuplicate}
-                  setOpenDuplicate={setOpenDuplicate}
-                />
-              }
-              disablePadding={true}
+              component={Link}
+              to={goTo(injectDto.inject_id)}
             >
-              <ListItemButton
-                classes={{ root: classes.item }}
-                href={goTo(injectDto.inject_id)}
-              >
-                <ListItemIcon>
-                  <InjectIcon
-                    tooltip={injectDto.inject_type ? t(injectDto.inject_type) : t('Unknown')}
-                    type={injectDto.inject_type}
-                    variant="list"
-                  />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <div className={classes.bodyItems}>
-                      {headers.map((header) => (
-                        <div
-                          key={header.field}
-                          className={classes.bodyItem}
-                          style={inlineStyles[header.field]}
-                        >
-                          {header.value(injectDto)}
-                        </div>
-                      ))}
-                    </div>
+              <ListItemIcon>
+                <InjectIcon
+                  isPayload={isNotEmptyField(injectDto.inject_injector_contract?.injector_contract_payload)}
+                  type={
+                    injectDto.inject_injector_contract?.injector_contract_payload
+                      ? injectDto.inject_injector_contract.injector_contract_payload.payload_collector_type
+                        || injectDto.inject_injector_contract.injector_contract_payload.payload_type
+                      : injectDto.inject_type
                   }
+                  variant="list"
                 />
-              </ListItemButton>
-            </ListItem>
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <div className={classes.bodyItems}>
+                    {headers.map((header) => (
+                      <div
+                        key={header.field}
+                        className={classes.bodyItem}
+                        style={inlineStyles[header.field]}
+                      >
+                        {header.value(injectDto)}
+                      </div>
+                    ))}
+                  </div>
+                }
+              />
+              <ListItemIcon classes={{ root: classes.goIcon }}>
+                <KeyboardArrowRight />
+              </ListItemIcon>
+            </ListItemButton>
           );
         })}
         {!injects ? (<Empty message={t('No data available')} />) : null}

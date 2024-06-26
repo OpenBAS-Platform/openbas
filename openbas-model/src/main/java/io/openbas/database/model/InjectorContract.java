@@ -11,7 +11,6 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.converter.ContentConverter;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
-import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -102,6 +101,11 @@ public class InjectorContract implements Base {
     @JsonProperty("injector_contract_atomic_testing")
     @Queryable(filterable = true)
     private boolean isAtomicTesting;
+
+    @JsonProperty("injector_contract_injector_type")
+    private String getInjectorType() {
+        return this.getInjector() != null ? this.getInjector().getType() : null;
+    }
 
     @JsonIgnore
     @Override

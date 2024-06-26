@@ -41,7 +41,7 @@ const useStyles = makeStyles(() => ({
 
 const inlineStyles: Record<string, CSSProperties> = {
   exercise_name: {
-    width: '20%',
+    width: '15%',
   },
   exercise_start_date: {
     width: '15%',
@@ -49,14 +49,17 @@ const inlineStyles: Record<string, CSSProperties> = {
   exercise_status: {
     width: '10%',
   },
-  exercise_tags: {
-    width: '15%',
-  },
   exercise_targets: {
     width: '20%',
   },
   exercise_global_score: {
-    width: '20%',
+    width: '10%',
+  },
+  exercise_tags: {
+    width: '15%',
+  },
+  exercise_updated_at: {
+    width: '15%',
   },
 };
 
@@ -104,12 +107,6 @@ const ExerciseList: FunctionComponent<Props> = ({
       value: (exercise: ExerciseSimple) => <ExerciseStatus variant="list" exerciseStatus={exercise.exercise_status} />,
     },
     {
-      field: 'exercise_tags',
-      label: 'Tags',
-      isSortable: true,
-      value: (exercise: ExerciseSimple) => <ItemTags variant="list" tags={exercise.exercise_tags} />,
-    },
-    {
       field: 'exercise_targets',
       label: 'Target',
       isSortable: false,
@@ -120,6 +117,18 @@ const ExerciseList: FunctionComponent<Props> = ({
       label: 'Global score',
       isSortable: false,
       value: (exercise: ExerciseSimple) => <AtomicTestingResult expectations={exercise.exercise_global_score} />,
+    },
+    {
+      field: 'exercise_tags',
+      label: 'Tags',
+      isSortable: true,
+      value: (exercise: ExerciseSimple) => <ItemTags variant="list" tags={exercise.exercise_tags} />,
+    },
+    {
+      field: 'exercise_updated_at',
+      label: 'Updated',
+      isSortable: true,
+      value: (exercise: ExerciseSimple) => nsdt(exercise.exercise_updated_at),
     },
   ];
 

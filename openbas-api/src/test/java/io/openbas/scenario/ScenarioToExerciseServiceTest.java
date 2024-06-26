@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ScenarioToExerciseServiceTest {
+class ScenarioToExerciseServiceTest {
 
   @Autowired
   private ScenarioToExerciseService scenarioToExerciseService;
@@ -238,16 +238,16 @@ public class ScenarioToExerciseServiceTest {
     assertEquals(1, exerciseSaved.getTags().size());
     // Objectives
     assertEquals(1, exerciseSaved.getObjectives().size());
-    assertEquals(OBJECTIVE_NAME, exerciseSaved.getObjectives().get(0).getTitle());
+    assertEquals(OBJECTIVE_NAME, exerciseSaved.getObjectives().getFirst().getTitle());
     // Documents
     assertEquals(1, exerciseSaved.getDocuments().size());
     // Articles
     assertEquals(1, exerciseSaved.getArticles().size());
-    assertEquals(ARTICLE_NAME, exerciseSaved.getArticles().get(0).getName());
-    assertEquals(documentArticleName, exerciseSaved.getArticles().get(0).getDocuments().get(0).getName());
+    assertEquals(ARTICLE_NAME, exerciseSaved.getArticles().getFirst().getName());
+    assertEquals(documentArticleName, exerciseSaved.getArticles().getFirst().getDocuments().getFirst().getName());
     // Lessons questions
     assertEquals(1, exerciseSaved.getLessonsCategories().size());
-    LessonsCategory exerciseLessonsCategory = exerciseSaved.getLessonsCategories().get(0);
+    LessonsCategory exerciseLessonsCategory = exerciseSaved.getLessonsCategories().getFirst();
     assertEquals(1, exerciseLessonsCategory.getQuestions().size());
     assertTrue(exerciseLessonsCategory.getTeams().stream().anyMatch(t -> teamSaved.getId().equals(t.getId())));
     assertTrue(exerciseLessonsCategory.getTeams().stream().anyMatch(t -> Boolean.TRUE.equals(t.getContextual())));

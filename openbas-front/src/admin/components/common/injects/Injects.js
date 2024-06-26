@@ -35,6 +35,7 @@ import CreateInject from './CreateInject';
 import UpdateInject from './UpdateInject';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import Timeline from '../../../../components/Timeline';
+import { isNotEmptyField } from '../../../../utils/utils';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -330,14 +331,15 @@ const Injects = (props) => {
           </div>
           <div className="clearfix"/>
         </div>
-        {showTimeline && (<div style={{ marginBottom: 50 }}>
+        {showTimeline && (
+        <div style={{ marginBottom: 50 }}>
           <Timeline
             injects={sortedInjects}
             onSelectInject={(id) => setSelectedInjectId(id)}
             teams={teams}
-          ></Timeline>
+          />
           <div className="clearfix"/>
-          </div>
+        </div>
         )}
         <List>
           <ListItem
@@ -457,12 +459,14 @@ const Injects = (props) => {
                 </ListItemIcon>
                 <ListItemIcon style={{ paddingTop: 5 }}>
                   <InjectIcon
-                    tooltip={t(inject.inject_type)}
-                    type={inject.inject_type}
-                    disabled={
-                              !injectContract || isDisabled
-                              || !inject.inject_enabled
-                          }
+                    isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
+                    type={
+                      inject.inject_injector_contract.injector_contract_payload
+                        ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                          || inject.inject_injector_contract.injector_contract_payload?.payload_type
+                        : inject.inject_type
+                    }
+                    disabled={!injectContract || isDisabled || !inject.inject_enabled}
                   />
                 </ListItemIcon>
                 <ListItemText
