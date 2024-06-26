@@ -115,15 +115,16 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   };
 
   const handleCloseDuplicate = () => setDuplicate(false);
-  const submitDuplicate = async (data: ExerciseCreateInput) => {
+  const submitDuplicate = (data: ExerciseCreateInput) => {
     const toDuplicate = R.pipe(
       R.pick([
         'exercise_id',
         'exercise_name',
       ]),
     )(data);
-    await dispatch(addExercise(toDuplicate)).then((result: { data: Exercise }) => {
-      navigate(`/admin/exercises/${result.data.exercise_id}`);
+    dispatch(addExercise(toDuplicate)).then((result: { data: Exercise }) => {
+      handleCloseDuplicate();
+      navigate(`/admin/exercises/${result.result}`);
     });
   };
 
