@@ -272,7 +272,7 @@ public class AtomicTestingService {
     }
 
     // -- Count Query --
-    Long total = countQuery(cb, this.entityManager);
+    Long total = countQuery(cb, this.entityManager, specification);
 
     return new PageImpl<>(injects, pageable, total);
   }
