@@ -91,8 +91,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   };
 
   const submitDuplicate = async (data: AtomicTestingInput) => {
-    const toDuplicate = R.pick(['inject_id'], data);
-    await createAtomicTesting(toDuplicate).then((result: { data: InjectResultDTO }) => {
+    await createAtomicTesting(data).then((result: { data: InjectResultDTO }) => {
       navigate(`/admin/atomic_testings/${result.data.inject_id}`);
     });
     if (setOpenDuplicate) {

@@ -108,29 +108,54 @@ const ScenarioHeader = ({
     dispatch(updateScenarioRecurrence(scenarioId, { scenario_recurrence: undefined, scenario_recurrence_start: undefined, scenario_recurrence_end: undefined }));
   };
 
-  // Deletion
-  const [openDelete, setOpenDelete] = useState(false);
-  const handleDelete = () => setOpenDelete(true);
+  const [openEditId, setOpenEditId] = useState<string | null>(null);
+  const [openExportId, setOpenExportId] = useState<string | null>(null);
+  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
+  const [openDeleteId, setOpenDeleteId] = useState<string | null>(null);
 
-  // Edition
-  const [openEdit, setOpenEdit] = useState(false);
-  const handleEdit = () => setOpenEdit(true);
+  // UPDATE
+  const handleOpenEdit = (scenarioId: string) => {
+    setOpenEditId(scenarioId);
+  };
 
-  // Export
-  const [openExport, setOpenExport] = useState(false);
-  const handleExport = () => setOpenExport(true);
+  const handleCloseEdit = () => {
+    setOpenEditId(null);
+  };
 
-  // Duplicate
-  const [openDuplicate, setOpenDuplicate] = useState(false);
-  const handleDuplicate = () => setOpenDuplicate(true);
+  // EXPORT
+  const handleOpenExport = (scenarioId: string) => {
+    setOpenExportId(scenarioId);
+  };
+
+  const handleCloseExport = () => {
+    setOpenEditId(null);
+  };
+
+  // DUPLICATE
+  const handleOpenDuplicate = (scenarioId: string) => {
+    setOpenDuplicateId(scenarioId);
+  };
+
+  const handleCloseDuplicate = () => {
+    setOpenDuplicateId(null);
+  };
+
+  // DELETE
+  const handleOpenDelete = (scenarioId: string) => {
+    setOpenDeleteId(scenarioId);
+  };
+
+  const handleCloseDelete = () => {
+    setOpenDeleteId(null);
+  };
 
   // Button Popover
   const entries: ButtonPopoverEntry[] = [
-    { label: 'Update', action: handleEdit },
-    { label: 'Duplicate', action: handleDuplicate },
-    { label: 'Export', action: handleExport },
-    { label: 'Delete', action: handleDelete },
-  ];
+    { label: 'Update', action: () => handleOpenEdit(scenarioId) },
+    { label: 'Duplicate', action: () => handleOpenDuplicate(scenarioId) },
+    { label: 'Export', action: () => handleOpenExport(scenarioId) },
+    { label: 'Delete', action: () => handleOpenDelete(scenarioId) },
+  ]
 
   return (
     <>
@@ -170,14 +195,14 @@ const ScenarioHeader = ({
         <ScenarioPopover
           scenario={scenario}
           entries={entries}
-          openEdit={openEdit}
-          openDuplicate={openDuplicate}
-          openDelete={openDelete}
-          openExport={openExport}
-          setOpenExport={setOpenExport}
-          setOpenEdit={setOpenEdit}
-          setOpenDelete={setOpenDelete}
-          setOpenDuplicate={setOpenDuplicate}
+          openEdit={openEditId === scenario.scenario_id}
+          openExport={openExportId === scenario.scenario_id}
+          openDelete={openDeleteId === scenario.scenario_id}
+          openDuplicate={openDuplicateId === scenario.scenario_id}
+          setOpenExport={handleCloseExport}
+          setOpenEdit={handleCloseEdit}
+          setOpenDelete={handleCloseDelete}
+          setOpenDuplicate={handleCloseDuplicate}
         />
       </div>
       <ScenarioRecurringFormDialog

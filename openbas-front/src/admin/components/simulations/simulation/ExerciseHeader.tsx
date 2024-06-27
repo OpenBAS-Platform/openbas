@@ -198,39 +198,54 @@ const ExerciseHeader = () => {
     };
   });
 
-  // Edition
-  const [openEdit, setOpenEdit] = useState(false);
-  const handleOpenEdit = () => {
-    setOpenEdit(true);
+  const [openEditId, setOpenEditId] = useState<string | null>(null);
+  const [openExportId, setOpenExportId] = useState<string | null>(null);
+  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
+  const [openDeleteId, setOpenDeleteId] = useState<string | null>(null);
+
+  // UPDATE
+  const handleOpenEdit = (exerciseId: string) => {
+    setOpenEditId(exerciseId);
   };
 
-  // Duplicate
-  const [openDuplicate, setOpenDuplicate] = useState(false);
-  const handleOpenDuplicate = () => {
-    setOpenDuplicate(true);
+  const handleCloseEdit = () => {
+    setOpenEditId(null);
   };
 
-  // Deletion
-  const [openDelete, setOpenDelete] = useState(false);
-  const handleOpenDelete = () => {
-    setOpenDelete(true);
+  // EXPORT
+  const handleOpenExport = (exerciseId: string) => {
+    setOpenExportId(exerciseId);
   };
 
-  // Export
-  const [openExport, setOpenExport] = useState(false);
-  const handleOpenExport = () => {
-    setOpenExport(true);
+  const handleCloseExport = () => {
+    setOpenEditId(null);
   };
 
-  const permissions = usePermissions(exercise.exercise_id);
+  // DUPLICATE
+  const handleOpenDuplicate = (exerciseId: string) => {
+    setOpenDuplicateId(exerciseId);
+  };
+
+  const handleCloseDuplicate = () => {
+    setOpenDuplicateId(null);
+  };
+
+  // DELETE
+  const handleOpenDelete = (exerciseId: string) => {
+    setOpenDeleteId(exerciseId);
+  };
+
+  const handleCloseDelete = () => {
+    setOpenDeleteId(null);
+  };
 
   // Button Popover
   const entries: ButtonPopoverEntry[] = [
-    { label: 'Update', action: handleOpenEdit, disabled: !permissions.canWriteBypassStatus },
-    { label: 'Duplicate', action: handleOpenDuplicate, disabled: !permissions.canWriteBypassStatus },
-    { label: 'Export', action: handleOpenExport },
-    { label: 'Delete', action: handleOpenDelete, disabled: !permissions.canWriteBypassStatus },
-  ];
+    { label: 'Update', action: () => handleOpenEdit(exerciseId) },
+    { label: 'Duplicate', action: () => handleOpenDuplicate(exerciseId) },
+    { label: 'Export', action: () => handleOpenExport(exerciseId) },
+    { label: 'Delete', action: () => handleOpenDelete(exerciseId) },
+  ]
 
   return (
     <>
@@ -246,14 +261,14 @@ const ExerciseHeader = () => {
         <ExercisePopover
           exercise={exercise}
           entries={entries}
-          openEdit={openEdit}
-          openDelete={openDelete}
-          openDuplicate={openDuplicate}
-          openExport={openExport}
-          setOpenEdit={setOpenEdit}
-          setOpenDelete={setOpenDelete}
-          setOpenDuplicate={setOpenDuplicate}
-          setOpenExport={setOpenExport}
+          openEdit={openEditId === exerciseId}
+          openExport={openExportId === exerciseId}
+          openDelete={openDeleteId === exerciseId}
+          openDuplicate={openDuplicateId === exerciseId}
+          setOpenExport={handleCloseExport}
+          setOpenEdit={handleCloseEdit}
+          setOpenDelete={handleCloseDelete}
+          setOpenDuplicate={handleCloseDuplicate}
         />
       </div>
       <div className="clearfix" />

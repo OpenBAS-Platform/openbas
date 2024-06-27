@@ -31,6 +31,7 @@ import Drawer from '../../../../components/common/Drawer';
 import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
 import { isNotEmptyField } from '../../../../utils/utils';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
+import type {ExerciseStore} from "../../../../actions/exercises/Exercise";
 
 interface ExercisePopoverProps {
   exercise: Exercise;
@@ -116,13 +117,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
 
   const handleCloseDuplicate = () => setDuplicate(false);
   const submitDuplicate = (data: ExerciseCreateInput) => {
-    const toDuplicate = R.pipe(
-      R.pick([
-        'exercise_id',
-        'exercise_name',
-      ]),
-    )(data);
-    dispatch(addExercise(toDuplicate)).then((result: { data: Exercise }) => {
+    dispatch(addExercise(data)).then((result: { result: string, entities: { exercises: ExerciseStore } }) => {
       handleCloseDuplicate();
       navigate(`/admin/exercises/${result.result}`);
     });

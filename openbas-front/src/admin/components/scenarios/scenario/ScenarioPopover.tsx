@@ -127,13 +127,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
     setDuplicate(false);
   };
   const submitDuplicate = (data: ScenarioInput) => {
-    const toDuplicate = R.pipe(
-      R.pick([
-        'scenario_id',
-        'scenario_name',
-      ]),
-    )(data);
-    dispatch(addScenario(toDuplicate)).then((result: { data: Scenario }) => {
+    dispatch(addScenario(data)).then((result: { result: string, entities: { scenarios: Record<string, ScenarioStore> } }) => {
       navigate(`/admin/scenarios/${result.result}`);
       if (setOpenDuplicate) {
         setOpenDuplicate(false);
