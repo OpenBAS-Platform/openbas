@@ -2,7 +2,9 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.helper.MonoIdDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -64,6 +66,12 @@ public class Collector implements Base {
     @Column(name = "collector_last_execution")
     @JsonProperty("collector_last_execution")
     private Instant lastExecution;
+
+    @Getter
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "collector_security_platform")
+    @JsonProperty("collector_security_platform")
+    private SecurityPlatform securityPlatform;
 
     @JsonIgnore
     @Override

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Collector;
 import io.openbas.database.repository.CollectorRepository;
+import io.openbas.database.repository.SecurityPlatformRepository;
 import io.openbas.rest.collector.form.CollectorCreateInput;
 import io.openbas.rest.collector.form.CollectorUpdateInput;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -33,6 +34,8 @@ public class CollectorApi extends RestBehavior {
 
     private FileService fileService;
 
+    private SecurityPlatformRepository securityPlatformRepository;
+
     @Resource
     protected ObjectMapper mapper;
 
@@ -46,18 +49,26 @@ public class CollectorApi extends RestBehavior {
         this.collectorRepository = collectorRepository;
     }
 
+    @Autowired
+    public void setSecurityPlatformRepository(SecurityPlatformRepository securityPlatformRepository) {
+        this.securityPlatformRepository = securityPlatformRepository;
+    }
+
     @GetMapping("/api/collectors")
     public Iterable<Collector> collectors() {
         return collectorRepository.findAll();
     }
 
-    private Collector updateCollector(Collector collector, String type, String name, int period, Instant lastExecution) {
+    private Collector updateCollector(Collector collector, String type, String name, int period, Instant lastExecution, String securityPlatform) {
         collector.setUpdatedAt(Instant.now());
         collector.setExternal(true);
         collector.setType(type);
         collector.setName(name);
         collector.setPeriod(period);
         collector.setLastExecution(lastExecution);
+        if( securityPlatform != null ) {
+            collector.setSecurityPlatform(securityPlatformRepository.findById(securityPlatform).orElseThrow());
+        }
         return collectorRepository.save(collector);
     }
 
@@ -66,7 +77,7 @@ public class CollectorApi extends RestBehavior {
     @Transactional(rollbackOn = Exception.class)
     public Collector updateCollector(@PathVariable String collectorId, @Valid @RequestBody CollectorUpdateInput input) {
         Collector collector = collectorRepository.findById(collectorId).orElseThrow(ElementNotFoundException::new);
-        return updateCollector(collector, collector.getType(), collector.getName(), collector.getPeriod(), input.getLastExecution());
+        return updateCollector(collector, collector.getType(), collector.getName(), collector.getPeriod(), input.getLastExecution(), collector.getSecurityPlatform().getId());
     }
 
     @Secured(ROLE_ADMIN)
@@ -90,7 +101,7 @@ public class CollectorApi extends RestBehavior {
                 }
             }
             if (collector != null) {
-                return updateCollector(collector, input.getType(), input.getName(), input.getPeriod(), collector.getLastExecution());
+                return updateCollector(collector, input.getType(), input.getName(), input.getPeriod(), collector.getLastExecution(), input.getSecurityPlatform());
             } else {
                 // save the injector
                 Collector newCollector = new Collector();
@@ -99,6 +110,9 @@ public class CollectorApi extends RestBehavior {
                 newCollector.setName(input.getName());
                 newCollector.setType(input.getType());
                 newCollector.setPeriod(input.getPeriod());
+                if( input.getSecurityPlatform() != null ) {
+                    newCollector.setSecurityPlatform(securityPlatformRepository.findById(input.getSecurityPlatform()).orElseThrow());
+                }
                 return collectorRepository.save(newCollector);
             }
         } catch (Exception e) {

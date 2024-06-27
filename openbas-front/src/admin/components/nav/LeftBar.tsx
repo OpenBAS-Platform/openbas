@@ -27,7 +27,7 @@ import {
   SubscriptionsOutlined,
   TerminalOutlined,
 } from '@mui/icons-material';
-import { DramaMasks, NewspaperVariantMultipleOutline, PostOutline, SelectGroup, Target } from 'mdi-material-ui';
+import { DramaMasks, NewspaperVariantMultipleOutline, PostOutline, SecurityNetwork, SelectGroup, Target } from 'mdi-material-ui';
 import { createStyles, makeStyles, styled, useTheme } from '@mui/styles';
 import { fileUri, MESSAGING$ } from '../../../utils/Environment';
 import { useFormatter } from '../../../components/i18n';
@@ -432,6 +432,7 @@ const LeftBar = () => {
             [
               { type: 'Endpoint', link: '/admin/assets/endpoints', label: 'Endpoints', icon: <DevicesOtherOutlined fontSize="small" /> },
               { type: 'AssetGroup', link: '/admin/assets/asset_groups', label: 'Asset groups', icon: <SelectGroup fontSize="small" /> },
+              { type: 'SecurityPlatform', link: '/admin/assets/security_platforms', label: 'Security platforms', icon: <SecurityNetwork fontSize="small" /> },
             ],
           )}
           <MenuItem

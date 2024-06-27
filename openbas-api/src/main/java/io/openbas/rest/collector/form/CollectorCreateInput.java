@@ -25,4 +25,7 @@ public class CollectorCreateInput {
 
     @JsonProperty("collector_period")
     private int period;
+
+    @JsonProperty("collector_security_platform")
+    private String securityPlatform;
 }
