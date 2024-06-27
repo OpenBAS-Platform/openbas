@@ -1,4 +1,4 @@
-import React, { CSSProperties, FunctionComponent, useState } from 'react';
+import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useFormatter } from '../../../components/i18n';
@@ -13,7 +13,6 @@ import SortHeadersComponent from '../../../components/common/pagination/SortHead
 import InjectorContract from '../common/injects/InjectorContract';
 import ItemStatus from '../../../components/ItemStatus';
 import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
-import { ButtonPopoverEntry } from '../../../components/common/ButtonPopover';
 import { isNotEmptyField } from '../../../utils/utils';
 
 const useStyles = makeStyles(() => ({
@@ -80,12 +79,20 @@ const InjectList: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
   const { t, fldt, tPick, nsdt } = useFormatter();
+  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
 
   // Filter and sort hook
   const [injects, setInjects] = useState<InjectResultDTO[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
     sorts: initSorting('inject_updated_at', 'DESC'),
   });
+
+  // Fetch injects on initial render and when pagination input changes
+  useEffect(() => {
+    fetchInjects(searchPaginationInput)
+      .then((response) => setInjects(response.data.content))
+      .catch((error) => console.error('Error fetching injects:', error));
+  }, [fetchInjects, searchPaginationInput]);
 
   // Headers
   const headers = [
@@ -148,12 +155,13 @@ const InjectList: FunctionComponent<Props> = ({
     },
   ];
 
-  const [openDuplicate, setOpenDuplicate] = useState(false);
-  const handleDuplicate = () => setOpenDuplicate(true);
+  const handleOpenDuplicate = (injectId: string) => {
+    setOpenDuplicateId(injectId);
+  };
 
-  const entries: ButtonPopoverEntry[] = [
-    { label: 'Duplicate', action: setOpenDuplicate ? () => setOpenDuplicate(true) : handleDuplicate },
-  ];
+  const handleCloseDuplicate = () => {
+    setOpenDuplicateId(null);
+  };
 
   return (
     <>
@@ -191,9 +199,9 @@ const InjectList: FunctionComponent<Props> = ({
               secondaryAction={
                 <AtomicTestingPopover
                   atomic={injectDto}
-                  entries={entries}
-                  openDuplicate={openDuplicate}
-                  setOpenDuplicate={setOpenDuplicate}
+                  entries={[{ label: 'Duplicate', action: () => handleOpenDuplicate(injectDto.inject_id) }]}
+                  openDuplicate={openDuplicateId === injectDto.inject_id}
+                  setOpenDuplicate={handleCloseDuplicate}
                 />
                   }
               disablePadding={true}

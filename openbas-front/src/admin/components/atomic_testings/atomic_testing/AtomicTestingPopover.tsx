@@ -13,19 +13,19 @@ import UpdateInject from '../../common/injects/UpdateInject';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 import { fetchTeams } from '../../../../actions/teams/team-actions';
 import type { TeamStore } from '../../../../actions/teams/Team';
-import { isNotEmptyField } from '../../../../utils/utils';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
+import { isNotEmptyField } from '../../../../utils/utils';
 
 interface Props {
   atomic: InjectResultDTO;
+  entries: ButtonPopoverEntry[];
   openEdit?: boolean;
   openDelete?: boolean;
   openDuplicate?: boolean;
-  setOpenEdit?: React.Dispatch<React.SetStateAction<boolean>>;
-  setOpenDelete?: React.Dispatch<React.SetStateAction<boolean>>;
-  setOpenDuplicate?: React.Dispatch<React.SetStateAction<boolean>>;
-  entries: ButtonPopoverEntry[];
+  setOpenEdit?: (open: boolean) => void;
+  setOpenDelete?: (open: boolean) => void;
+  setOpenDuplicate?: (open: boolean) => void;
 }
 
 const AtomicTestingPopover: FunctionComponent<Props> = ({
@@ -42,8 +42,9 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [edition, setEdition] = useState(false);
+
   const [deletion, setDeletion] = useState(false);
+  const [edition, setEdition] = useState(false);
   const [duplicate, setDuplicate] = useState(false);
 
   // Fetching data
@@ -74,24 +75,23 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     )(data);
     updateAtomicTesting(atomic.inject_id, toUpdate).then((result: { data: InjectResultDTO }) => {
       updateInjectResultDto(result.data);
+      if (setOpenEdit) {
+        setOpenEdit(false);
+      }
     });
   };
 
   const submitDelete = () => {
     deleteAtomicTesting(atomic.inject_id).then(() => {
-      if (setDeletion) {
-        setDeletion(false);
+      if (setOpenDelete) {
+        setOpenDelete(false);
       }
       navigate('/admin/atomic_testings');
     });
   };
 
   const submitDuplicate = async (data: AtomicTestingInput) => {
-    const toDuplicate = R.pipe(
-      R.pick([
-        'inject_id',
-      ]),
-    )(data);
+    const toDuplicate = R.pick(['inject_id'], data);
     await createAtomicTesting(toDuplicate).then((result: { data: InjectResultDTO }) => {
       navigate(`/admin/atomic_testings/${result.data.inject_id}`);
     });
@@ -101,7 +101,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   };
 
   const submitDuplicateHandler = () => {
-    const data: AtomicTestingInput = { inject_id: atomic.inject_id }; // Adaptez selon vos besoins
+    const data: AtomicTestingInput = { inject_id: atomic.inject_id };
     submitDuplicate(data);
   };
 

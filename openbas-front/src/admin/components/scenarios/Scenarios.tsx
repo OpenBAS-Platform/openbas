@@ -28,7 +28,6 @@ import { fetchTags } from '../../../actions/Tag';
 import { useAppDispatch } from '../../../utils/hooks';
 import usePaginationAndFilter from '../../../components/common/usePaginationAndFilter';
 import ScenarioPopover from './scenario/ScenarioPopover';
-import { ButtonPopoverEntry } from '../../../components/common/ButtonPopover';
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -224,21 +223,22 @@ const Scenarios = () => {
   };
 
   // Duplicate
-  const [openDuplicate, setOpenDuplicate] = useState(false);
-  const handleOpenDuplicate = () => {
-    setOpenDuplicate(true);
+  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
+  const handleOpenDuplicate = (scenarioId: string) => {
+    setOpenDuplicateId(scenarioId);
+  };
+  const handleCloseDuplicate = () => {
+    setOpenDuplicateId(null);
   };
 
   // Export
-  const [openExport, setOpenExport] = useState(false);
-  const handleOpenExport = () => {
-    setOpenExport(true);
+  const [openExportId, setOpenExportId] = useState<string | null>(null);
+  const handleOpenExport = (scenarioId: string) => {
+    setOpenExportId(scenarioId);
   };
-
-  const entries: ButtonPopoverEntry[] = [
-    { label: 'Duplicate', action: setOpenDuplicate ? () => setOpenDuplicate(true) : handleOpenDuplicate },
-    { label: 'Export', action: setOpenExport ? () => setOpenExport(true) : handleOpenExport },
-  ];
+  const handleCloseExport = () => {
+    setOpenExportId(null);
+  };
 
   return (
     <>
@@ -314,11 +314,14 @@ const Scenarios = () => {
               secondaryAction={
                 <ScenarioPopover
                   scenario={scenario}
-                  entries={entries}
-                  openExport={openExport}
-                  setOpenExport={setOpenExport}
-                  openDuplicate={openDuplicate}
-                  setOpenDuplicate={setOpenDuplicate}
+                  entries={[
+                    { label: 'Duplicate', action: () => handleOpenDuplicate(scenario.scenario_id) },
+                    { label: 'Export', action: () => handleOpenExport(scenario.scenario_id) },
+                  ]}
+                  openExport={openExportId === scenario.scenario_id}
+                  setOpenExport={handleCloseExport}
+                  openDuplicate={openDuplicateId === scenario.scenario_id}
+                  setOpenDuplicate={handleCloseDuplicate}
                 />
               }
               disablePadding={true}

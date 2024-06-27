@@ -14,7 +14,6 @@ import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../actions/Tag';
 import { useAppDispatch } from '../../../utils/hooks';
 import ExercisePopover from './simulation/ExercisePopover';
-import { ButtonPopoverEntry } from '../../../components/common/ButtonPopover';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -133,22 +132,22 @@ const ExerciseList: FunctionComponent<Props> = ({
   ];
 
   // Duplicate
-  const [openDuplicate, setOpenDuplicate] = useState(false);
-  const handleOpenDuplicate = () => {
-    setOpenDuplicate(true);
+  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
+  const handleOpenDuplicate = (scenarioId: string) => {
+    setOpenDuplicateId(scenarioId);
+  };
+  const handleCloseDuplicate = () => {
+    setOpenDuplicateId(null);
   };
 
   // Export
-  const [openExport, setOpenExport] = useState(false);
-  const handleOpenExport = () => {
-    setOpenExport(true);
+  const [openExportId, setOpenExportId] = useState<string | null>(null);
+  const handleOpenExport = (scenarioId: string) => {
+    setOpenExportId(scenarioId);
   };
-
-  // Button Popover
-  const entries: ButtonPopoverEntry[] = [
-    { label: 'Duplicate', action: setOpenDuplicate ? () => setOpenDuplicate(true) : handleOpenDuplicate },
-    { label: 'Export', action: setOpenExport ? () => setOpenExport(true) : handleOpenExport },
-  ];
+  const handleCloseExport = () => {
+    setOpenExportId(null);
+  };
 
   return (
     <List>
@@ -177,11 +176,14 @@ const ExerciseList: FunctionComponent<Props> = ({
           secondaryAction={
             <ExercisePopover
               exercise={exercise}
-              entries={entries}
-              openExport={openExport}
-              setOpenExport={setOpenExport}
-              openDuplicate={openDuplicate}
-              setOpenDuplicate={setOpenDuplicate}
+              entries={[
+                { label: 'Duplicate', action: () => handleOpenDuplicate(exercise.exercise_id) },
+                { label: 'Export', action: () => handleOpenExport(exercise.exercise_id) },
+              ]}
+              openExport={openExportId === exercise.exercise_id}
+              setOpenExport={handleCloseExport}
+              openDuplicate={openDuplicateId === exercise.exercise_id}
+              setOpenDuplicate={handleCloseDuplicate}
             />
           }
           disablePadding={true}

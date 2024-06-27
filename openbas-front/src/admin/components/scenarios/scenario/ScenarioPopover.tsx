@@ -103,7 +103,9 @@ const ScenarioPopover: FunctionComponent<Props> = ({
     const link = document.createElement('a');
     link.href = exportScenarioUri(scenario.scenario_id, exportTeams, exportPlayers, exportVariableValues);
     link.click();
-    setExportation(false);
+    if (setOpenExport) {
+      setOpenExport(false);
+    }
   };
 
   // Deletion
@@ -113,7 +115,9 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   };
   const submitDelete = () => {
     dispatch(deleteScenario(scenario.scenario_id));
-    setDeletion(false);
+    if (setOpenDelete) {
+      setOpenDelete(false);
+    }
     navigate('/admin/scenarios');
   };
 
@@ -130,8 +134,10 @@ const ScenarioPopover: FunctionComponent<Props> = ({
       ]),
     )(data);
     dispatch(addScenario(toDuplicate)).then((result: { data: Scenario }) => {
-      handleCloseDuplicate();
       navigate(`/admin/scenarios/${result.result}`);
+      if (setOpenDuplicate) {
+        setOpenDuplicate(false);
+      }
     });
   };
 
