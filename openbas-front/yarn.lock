@@ -7216,10 +7216,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:3.1.4":
-  version: 3.1.4
-  resolution: "dompurify@npm:3.1.4"
-  checksum: 10c0/1eb98cf563044933acb6ad171aed6eb5e5eb2fa6c7ad1006a71f713549ce41e68a7be033973cc67fe9473f87eda49e5ac046d4d704334578442a83ac6d327272
+"dompurify@npm:3.1.5":
+  version: 3.1.5
+  resolution: "dompurify@npm:3.1.5"
+  checksum: 10c0/8227fb1328c02d94f823de8cd499fca5ee07051e03e6b52bce06b592348aeb6e56ea8e2a4b0a9cfaeac7d623e4b5a52e4326aedf72596a6c2510b88dfcf2a2b6
   languageName: node
   linkType: hard
 
@@ -11910,7 +11910,7 @@ __metadata:
     cross-env: "npm:7.0.3"
     d3-hierarchy: "npm:3.1.2"
     date-fns: "npm:3.6.0"
-    dompurify: "npm:3.1.4"
+    dompurify: "npm:3.1.5"
     elkjs: "npm:0.9.3"
     esbuild: "npm:0.21.4"
     eslint: "npm:8.57.0"
