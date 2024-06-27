@@ -7,6 +7,7 @@ import NotFound from '../../../components/NotFound';
 
 const Endpoints = lazy(() => import('./endpoints/Endpoints'));
 const AssetGroups = lazy(() => import('./asset_groups/AssetGroups'));
+const SecurityPlatforms = lazy(() => import('./security_platforms/SecurityPlatforms'));
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -23,6 +24,7 @@ const Index = () => {
           <Route path="" element={<Navigate to="endpoints" replace={true} />} />
           <Route path="endpoints" element={errorWrapper(Endpoints)()} />
           <Route path="asset_groups" element={errorWrapper(AssetGroups)()} />
+          <Route path="security_platforms" element={errorWrapper(SecurityPlatforms)()} />
           {/* Not found */}
           <Route path="*" element={<NotFound/>}/>
         </Routes>

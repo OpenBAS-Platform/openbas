@@ -354,6 +354,7 @@ export interface Collector {
   collector_name: string;
   /** @format int32 */
   collector_period?: number;
+  collector_security_platform?: SecurityPlatform;
   collector_type: string;
   /** @format date-time */
   collector_updated_at?: string;
@@ -365,6 +366,7 @@ export interface CollectorCreateInput {
   collector_name: string;
   /** @format int32 */
   collector_period?: number;
+  collector_security_platform?: string;
   collector_type: string;
 }
 
@@ -1320,11 +1322,6 @@ export interface InjectorContract {
   updateAttributes?: object;
 }
 
-export interface InjectorContractLight {
-  injector_contract_id: string;
-  injector_contract_attack_patterns_external_id?: string[];
-}
-
 export interface InjectorContractAddInput {
   atomicTesting?: boolean;
   contract_attack_patterns_external_ids?: string[];
@@ -2047,6 +2044,25 @@ export interface PageRawPaginationTeam {
   totalPages?: number;
 }
 
+export interface PageSecurityPlatform {
+  content?: SecurityPlatform[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageTag {
   content?: Tag[];
   empty?: boolean;
@@ -2614,6 +2630,57 @@ export interface SearchPaginationInput {
 
 export interface SearchTerm {
   searchTerm?: string;
+}
+
+export interface SecurityPlatform {
+  asset_active?: boolean;
+  asset_children?: Asset[];
+  /** @format date-time */
+  asset_cleared_at?: string;
+  /** @format date-time */
+  asset_created_at?: string;
+  asset_description?: string;
+  asset_executor?: Executor;
+  asset_external_reference?: string;
+  asset_id: string;
+  asset_inject?: Inject;
+  /** @format date-time */
+  asset_last_seen?: string;
+  asset_name: string;
+  asset_parent?: Asset;
+  asset_process_name?: string;
+  /** @uniqueItems true */
+  asset_tags?: Tag[];
+  asset_type?: string;
+  /** @format date-time */
+  asset_updated_at?: string;
+  security_platform_logo_dark?: Document;
+  security_platform_logo_light?: Document;
+  security_platform_type: "EDR" | "XDR" | "SIEM" | "SOAR" | "NDR" | "ISPM";
+  updateAttributes?: object;
+}
+
+export interface SecurityPlatformInput {
+  asset_description?: string;
+  /** @format date-time */
+  asset_last_seen?: string;
+  asset_name: string;
+  asset_tags?: string[];
+  security_platform_logo_dark?: string;
+  security_platform_logo_light?: string;
+  security_platform_type: "EDR" | "XDR" | "SIEM" | "SOAR" | "NDR" | "ISPM";
+}
+
+export interface SecurityPlatformUpsertInput {
+  asset_description?: string;
+  asset_external_reference?: string;
+  /** @format date-time */
+  asset_last_seen?: string;
+  asset_name: string;
+  asset_tags?: string[];
+  security_platform_logo_dark?: string;
+  security_platform_logo_light?: string;
+  security_platform_type: "EDR" | "XDR" | "SIEM" | "SOAR" | "NDR" | "ISPM";
 }
 
 export interface SettingsEnterpriseEditionUpdateInput {

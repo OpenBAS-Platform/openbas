@@ -85,7 +85,7 @@ class TagField extends Component {
       tags,
     );
     return (
-      <div>
+      <>
         <Autocomplete
           variant="standard"
           size="small"
@@ -124,7 +124,7 @@ class TagField extends Component {
             </DialogContent>
           </Dialog>
         )}
-      </div>
+      </>
     );
   }
 }
