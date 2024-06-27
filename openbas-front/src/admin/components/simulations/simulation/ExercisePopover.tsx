@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as R from 'ramda';
 import {
   Box,
   Button,
@@ -31,7 +30,7 @@ import Drawer from '../../../../components/common/Drawer';
 import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
 import { isNotEmptyField } from '../../../../utils/utils';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
-import type {ExerciseStore} from "../../../../actions/exercises/Exercise";
+import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 
 interface ExercisePopoverProps {
   exercise: Exercise;
@@ -169,7 +168,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         open={isNotEmptyField(openDuplicate) ? openDuplicate : duplicate}
         handleClose={() => (setOpenDuplicate ? setOpenDuplicate(false) : handleCloseDuplicate)}
         handleSubmit={submitDuplicateHandler}
-        text={t('Do you want to duplicate this exercise?')}
+        text={t(`Do you want to duplicate this exercise : ${exercise.exercise_name} ?`)}
       />
       <Dialog
         open={isNotEmptyField(openDelete) ? openDelete : deletion}
@@ -179,7 +178,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to delete this simulation?')}
+            {t(`Do you want to delete this simulation : ${exercise.exercise_name} ?`)}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
