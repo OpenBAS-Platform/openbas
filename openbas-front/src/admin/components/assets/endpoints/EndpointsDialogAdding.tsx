@@ -185,13 +185,13 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
                     <ListItemText
                       primary={
                         <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <div className={classes.bodyItem} style={{ width: '50%' }}>
+                          <div className={classes.bodyItem} style={{ width: '45%' }}>
                             {endpoint.asset_name}
                           </div>
-                          <div className={classes.bodyItem} style={{ width: '25%' }}>
+                          <div className={classes.bodyItem} style={{ width: '20%' }}>
                             <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} /> {endpoint.endpoint_platform}
                           </div>
-                          <div className={classes.bodyItem} style={{ width: '25%' }}>
+                          <div className={classes.bodyItem} style={{ width: '35%' }}>
                             <ItemTags variant="list" tags={endpoint.asset_tags} />
                           </div>
                         </div>
