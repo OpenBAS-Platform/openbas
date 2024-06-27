@@ -119,13 +119,13 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
         open={isNotEmptyField(openDelete) ? openDelete : deletion}
         handleClose={() => (setOpenDelete ? setOpenDelete(false) : setDeletion(false))}
         handleSubmit={submitDelete}
-        text={t(`Do you want to delete this atomic testing : ${atomic.inject_title} ?`)}
+        text={t(`Do you want to delete this atomic testing: ${atomic.inject_title} ?`)}
       />
       <DialogDuplicate
         open={isNotEmptyField(openDuplicate) ? openDuplicate : duplicate}
         handleClose={() => (setOpenDuplicate ? setOpenDuplicate(false) : setDuplicate(false))}
         handleSubmit={submitDuplicateHandler}
-        text={t(`Do you want to duplicate this atomic testing : ${atomic.inject_title} ?`)}
+        text={t(`Do you want to duplicate this atomic testing: ${atomic.inject_title} ?`)}
       />
     </>
   );

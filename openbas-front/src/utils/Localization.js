@@ -171,6 +171,7 @@ const i18n = {
       Update: 'Modifier',
       Duplicate: 'Dupliquer',
       'Do you want to duplicate this scenario?': 'Voulez-vous dupliquer ce scénario?',
+      'Do you want to duplicate this simulation?': 'Voulez-vous dupliquer cette simulation?',
       'Do you want to duplicate this atomic testing?': 'Voulez-vous dupliquer cet atomic testing?',
       Delete: 'Supprimer',
       Edition: 'Edition',

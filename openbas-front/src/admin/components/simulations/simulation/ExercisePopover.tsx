@@ -168,7 +168,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         open={isNotEmptyField(openDuplicate) ? openDuplicate : duplicate}
         handleClose={() => (setOpenDuplicate ? setOpenDuplicate(false) : handleCloseDuplicate)}
         handleSubmit={submitDuplicateHandler}
-        text={t(`Do you want to duplicate this exercise : ${exercise.exercise_name} ?`)}
+        text={t(`Do you want to duplicate this simulation: ${exercise.exercise_name} ?`)}
       />
       <Dialog
         open={isNotEmptyField(openDelete) ? openDelete : deletion}
