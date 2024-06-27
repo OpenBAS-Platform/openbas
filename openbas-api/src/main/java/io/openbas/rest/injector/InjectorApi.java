@@ -27,16 +27,22 @@ import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.time.Instant;
 import java.util.*;
 
+import static io.openbas.asset.EndpointService.JFROG_BASE;
 import static io.openbas.asset.QueueService.EXCHANGE_KEY;
 import static io.openbas.asset.QueueService.ROUTING_KEY;
 import static io.openbas.database.model.User.ROLE_ADMIN;
@@ -45,6 +51,8 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 @Log
 @RestController
 public class InjectorApi extends RestBehavior {
+
+    @Value("${info.app.version:unknown}") String version;
 
     @Resource
     private RabbitmqConfig rabbitmqConfig;
@@ -280,11 +288,45 @@ public class InjectorApi extends RestBehavior {
     }
 
     @GetMapping(value = "/api/implant/caldera/{platform}/{arch}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public @ResponseBody byte[] getCalderaAgent(@PathVariable String platform, @PathVariable String arch) throws IOException {
+    public @ResponseBody byte[] getCalderaImplant(@PathVariable String platform, @PathVariable String arch) throws IOException {
         InputStream in = getClass().getResourceAsStream("/implants/caldera/" + platform + "/" + arch + "/obas-implant-caldera-" + platform);
         if (in != null) {
             return IOUtils.toByteArray(in);
         }
         return null;
+    }
+
+    // Public API
+    @GetMapping(value = "/api/implant/openbas/{platform}/{architecture}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public @ResponseBody ResponseEntity<byte[]> getOpenBasImplant(@PathVariable String platform, @PathVariable String architecture) throws IOException {
+        InputStream in = null;
+        String filename = null;
+        if (platform.equals("windows") && architecture.equals("x86_64")) {
+            filename = "openbas-implant-" + version + ".exe";
+            String resourcePath = "/openbas-implant/windows/x86_64/";
+            in = getClass().getResourceAsStream("/implants" + resourcePath + filename);
+            if (in == null) { // Dev mode, get from artifactory
+                filename = "openbas-implant-latest.exe";
+                in = new BufferedInputStream(new URL(JFROG_BASE +  resourcePath + filename).openStream());
+            }
+        }
+        if (platform.equals("linux") || platform.equals("macos")) {
+            filename = "openbas-agent-" + version;
+            String resourcePath = "/openbas-implant/" + platform + "/" + architecture + "/";
+            in = getClass().getResourceAsStream("/implants" + resourcePath + filename);
+            if (in == null) { // Dev mode, get from artifactory
+                filename = "openbas-implant-latest";
+                in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
+            }
+        }
+        if (in != null) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(IOUtils.toByteArray(in));
+        }
+        throw new UnsupportedOperationException("Implant " + platform + " executable not supported");
     }
 }
