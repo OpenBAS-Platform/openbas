@@ -165,6 +165,22 @@ export interface AtomicTestingInput {
   inject_title?: string;
 }
 
+export interface AtomicTestingOutput {
+  inject_asset_groups: string[];
+  inject_assets: string[];
+  inject_expectation_results?: ExpectationResultsByType[];
+  inject_expectations: string[];
+  inject_id: string;
+  inject_injector_contract?: InjectorContract;
+  inject_status?: InjectStatus;
+  inject_targets?: InjectTargetWithResult[];
+  inject_teams: string[];
+  inject_title: string;
+  inject_type?: string;
+  /** @format date-time */
+  inject_updated_at: string;
+}
+
 export interface AtomicTestingUpdateTagsInput {
   atomic_tags?: string[];
 }
@@ -983,7 +999,7 @@ export interface Inject {
   inject_content?: object;
   inject_country?: string;
   /** @format date-time */
-  inject_created_at?: string;
+  inject_created_at: string;
   /** @format date-time */
   inject_date?: string;
   /**
@@ -1009,10 +1025,10 @@ export interface Inject {
   /** @uniqueItems true */
   inject_tags?: Tag[];
   inject_teams?: Team[];
-  inject_title?: string;
+  inject_title: string;
   inject_type?: string;
   /** @format date-time */
-  inject_updated_at?: string;
+  inject_updated_at: string;
   inject_user?: User;
   /** @format int64 */
   inject_users_number?: number;
@@ -1139,6 +1155,8 @@ export interface InjectInput {
 }
 
 export interface InjectOutput {
+  inject_asset_groups?: string[];
+  inject_assets?: string[];
   inject_content?: object;
   /**
    * @format int64
@@ -1153,7 +1171,6 @@ export interface InjectOutput {
   inject_scenario?: string;
   /** @uniqueItems true */
   inject_tags?: string[];
-  /** @uniqueItems true */
   inject_teams?: string[];
   inject_title?: string;
   inject_type?: string;
@@ -1738,6 +1755,25 @@ export interface OrganizationUpdateInput {
   organization_description?: string;
   organization_name: string;
   organization_tags?: string[];
+}
+
+export interface PageAtomicTestingOutput {
+  content?: AtomicTestingOutput[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
 }
 
 export interface PageAttackPattern {

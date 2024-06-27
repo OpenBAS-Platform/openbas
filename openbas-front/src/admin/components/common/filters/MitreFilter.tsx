@@ -5,7 +5,7 @@ import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { AttackPattern, InjectorContractLight, KillChainPhase } from '../../../../utils/api-types';
+import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
@@ -16,6 +16,11 @@ import { FilterHelpers } from '../../../../components/common/filter/FilterHelper
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import { fetchInjectorsContracts } from '../../../../actions/InjectorContracts';
 import type { InjectorContractHelper } from '../../../../actions/injector_contracts/injector-contract-helper';
+
+interface InjectorContractLight {
+  injector_contract_id: string;
+  injector_contract_attack_patterns_external_id?: string[];
+}
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
