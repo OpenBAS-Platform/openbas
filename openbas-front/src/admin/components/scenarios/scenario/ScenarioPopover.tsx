@@ -1,8 +1,7 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Tabs, Tab } from '@mui/material';
-import * as R from 'ramda';
-import type { ScenarioInput, ScenarioInformationInput, Scenario } from '../../../../utils/api-types';
+import type { ScenarioInput, ScenarioInformationInput } from '../../../../utils/api-types';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
