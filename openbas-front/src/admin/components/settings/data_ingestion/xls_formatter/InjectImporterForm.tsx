@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import { z } from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { TextField, MenuItem, MenuList, ListItemIcon, ListItemText } from '@mui/material';
+import { TextField, MenuItem, MenuList, ListItemIcon, ListItemText, InputBaseComponentProps } from '@mui/material';
 import { useFormatter } from '../../../../../components/i18n';
 import { zodImplement } from '../../../../../utils/Zod';
 import type { FilterGroup, InjectImporterAddInput, SearchPaginationInput } from '../../../../../utils/api-types';
 import type { InjectorContractStore } from '../../../../../actions/injector_contracts/InjectorContract';
 import PaginationComponent from '../../../../../components/common/pagination/PaginationComponent';
-import { fetchInjectorContract, searchInjectorContracts } from '../../../../../actions/InjectorContracts';
+import { fetchInjectorsContracts, searchInjectorContracts } from '../../../../../actions/InjectorContracts';
 import { initSorting } from '../../../../../components/common/pagination/Page';
+import InjectContractComponent from '../../../../../components/InjectContractComponent';
 import InjectIcon from '../../../common/injects/InjectIcon';
 import { useHelper } from '../../../../../store';
 import type { InjectorHelper } from '../../../../../actions/injectors/injector-helper';
@@ -18,9 +19,11 @@ import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchKillChainPhases } from '../../../../../actions/KillChainPhase';
 import { fetchAttackPatterns } from '../../../../../actions/AttackPattern';
+import { isNotEmptyField } from '../../../../../utils/utils';
 
 interface Props {
   initialValues?: InjectImporterAddInput;
+  inputProps?: InputBaseComponentProps;
   // onDelete: () => void;
 }
 
@@ -44,11 +47,11 @@ const InjectImporterForm: React.FC<Props> = ({
   },
 }) => {
   // Standard hooks
-  const { t, tPick } = useFormatter();
+  const { t } = useFormatter();
   const dispatch = useAppDispatch();
 
   useDataLoader(() => {
-    dispatch(fetchInjectorContract());
+    dispatch(fetchInjectorsContracts());
   });
 
   // Contracts
@@ -59,9 +62,9 @@ const InjectImporterForm: React.FC<Props> = ({
   });
 
   // Fetching data
-  const injectorContractsMap = useHelper((helper: InjectorContractHelper) => ({
-    injectorContractsMap: helper.getInjectorContractsMap(),
-  }));
+  /* const injectorContractsMap = useHelper((helper: InjectorContractHelper) => ({
+     injectorContractsMap: helper.getInjectorContractsMap(),
+   })); */
 
   const {
     register,
@@ -82,13 +85,13 @@ const InjectImporterForm: React.FC<Props> = ({
 
   return (
     <>
-      <PaginationComponent
+      {/* <PaginationComponent
         disablePagination
         fetch={searchInjectorContracts}
         searchPaginationInput={searchPaginationInput}
         setContent={setContracts}
         searchEnable={false}
-      />
+      /> */}
       <form id="injectImporterForm">
         <TextField
           variant="standard"
@@ -112,7 +115,16 @@ const InjectImporterForm: React.FC<Props> = ({
           InputLabelProps={{ required: true }}
         />
 
-        <Controller
+        <InjectContractComponent
+          fetch={searchInjectorContracts}
+          searchPaginationInput={searchPaginationInput}
+          setContent={setContracts}
+          label={'Inject importer injector contract'}
+          injectorContracts={contracts}
+          inputProps={register('inject_importer_injector_contract_id')}
+        />
+
+        {/* <Controller
           control={control}
           name="inject_importer_injector_contract_id"
           render={({ field }) => (
@@ -129,18 +141,21 @@ const InjectImporterForm: React.FC<Props> = ({
               InputLabelProps={{ required: true }}
             >
               {contracts.map((contract) => {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
-                const injector = contract.injector_contract_injector && injectorContractsMap[contract.injector_contract_injector];
-                console.log('injector: ', injector);
-                console.log('map: ', injectorContractsMap);
                 return (
                   <MenuList
                     key={contract.injector_contract_id}
                   >
                     <MenuItem value={contract.injector_contract_id}>
                       <ListItemIcon>
-                        <InjectIcon type={injector.injector_type} />
+                        <InjectIcon
+                          type={
+                            contract.injector_contract_payload
+                              ? contract.injector_contract_payload?.payload_collector_type
+                              || contract.injector_contract_payload?.payload_type
+                              : contract.injector_contract_injector_type
+                          }
+                          isPayload={isNotEmptyField(contract.injector_contract_payload)}
+                        />
                       </ListItemIcon>
                       <ListItemText>
                         {tPick(contract.injector_contract_labels)}
@@ -151,7 +166,7 @@ const InjectImporterForm: React.FC<Props> = ({
               })}
             </TextField>
           )}
-        />
+        /> */}
 
         <TextField
           variant="standard"

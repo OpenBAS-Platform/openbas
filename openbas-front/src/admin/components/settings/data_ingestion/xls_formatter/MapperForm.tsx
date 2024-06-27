@@ -106,14 +106,15 @@ const MapperForm: React.FC<Props> = ({
         >
           <Add fontSize="small" />
         </IconButton>
-        <TextField
+        {/* <TextField
           variant="standard"
           fullWidth
           className={classes.importerTextfieldStyle}
           error={!!errors.mapper_inject_importers}
           helperText={errors.mapper_inject_importers?.message}
           inputProps={register('mapper_inject_importers')}
-        />
+        /> */}
+        <InjectImporterForm inputProps={register('mapper_inject_importers')} />
         {/* {
           showMapperField
           && (
@@ -158,9 +159,6 @@ const MapperForm: React.FC<Props> = ({
         >
           {editing ? t('Update') : t('Create')}
         </Button>
-      </div>
-      <div>
-        <InjectImporterForm />
       </div>
     </form>
   );
