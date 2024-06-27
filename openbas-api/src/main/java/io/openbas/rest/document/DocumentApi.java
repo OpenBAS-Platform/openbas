@@ -173,6 +173,83 @@ public class DocumentApi extends RestBehavior {
         }
     }
 
+    @PostMapping("/api/documents/upsert")
+    @Transactional(rollbackOn = Exception.class)
+    public Document upsertDocument(@Valid @RequestPart("input") DocumentCreateInput input,
+                                   @RequestPart("file") MultipartFile file) throws Exception {
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        String fileTarget = DigestUtils.md5Hex(file.getInputStream()) + "." + extension;
+        Optional<Document> targetDocument = documentRepository.findByTarget(fileTarget);
+        // Document already exists by hash
+        if (targetDocument.isPresent()) {
+            Document document = targetDocument.get();
+            // Compute exercises
+            if (!document.getExercises().isEmpty()) {
+                Set<Exercise> exercises = new HashSet<>(document.getExercises());
+                List<Exercise> inputExercises = fromIterable(exerciseRepository.findAllById(input.getExerciseIds()));
+                exercises.addAll(inputExercises);
+                document.setExercises(exercises);
+            }
+            // Compute scenarios
+            if (!document.getScenarios().isEmpty()) {
+                Set<Scenario> scenarios = new HashSet<>(document.getScenarios());
+                List<Scenario> inputScenarios = fromIterable(scenarioRepository.findAllById(input.getScenarioIds()));
+                scenarios.addAll(inputScenarios);
+                document.setScenarios(scenarios);
+            }
+            // Compute tags
+            Set<Tag> tags = new HashSet<>(document.getTags());
+            List<Tag> inputTags = fromIterable(tagRepository.findAllById(input.getTagIds()));
+            tags.addAll(inputTags);
+            document.setTags(tags);
+            return documentRepository.save(document);
+        } else {
+            Optional<Document> existingDocument = documentRepository.findByName(file.getOriginalFilename());
+            if (existingDocument.isPresent()) {
+                Document document = existingDocument.get();
+                // Update doc
+                fileService.uploadFile(fileTarget, file);
+                document.setDescription(input.getDescription());
+
+                // Compute exercises
+                if (!document.getExercises().isEmpty()) {
+                    Set<Exercise> exercises = new HashSet<>(document.getExercises());
+                    List<Exercise> inputExercises = fromIterable(exerciseRepository.findAllById(input.getExerciseIds()));
+                    exercises.addAll(inputExercises);
+                    document.setExercises(exercises);
+                }
+                // Compute scenarios
+                if (!document.getScenarios().isEmpty()) {
+                    Set<Scenario> scenarios = new HashSet<>(document.getScenarios());
+                    List<Scenario> inputScenarios = fromIterable(scenarioRepository.findAllById(input.getScenarioIds()));
+                    scenarios.addAll(inputScenarios);
+                    document.setScenarios(scenarios);
+                }
+                // Compute tags
+                Set<Tag> tags = new HashSet<>(document.getTags());
+                List<Tag> inputTags = fromIterable(tagRepository.findAllById(input.getTagIds()));
+                tags.addAll(inputTags);
+                document.setTags(tags);
+                return documentRepository.save(document);
+            } else {
+                fileService.uploadFile(fileTarget, file);
+                Document document = new Document();
+                document.setTarget(fileTarget);
+                document.setName(file.getOriginalFilename());
+                document.setDescription(input.getDescription());
+                if (!input.getExerciseIds().isEmpty()) {
+                    document.setExercises(iterableToSet(exerciseRepository.findAllById(input.getExerciseIds())));
+                }
+                if (!input.getScenarioIds().isEmpty()) {
+                    document.setScenarios(iterableToSet(scenarioRepository.findAllById(input.getScenarioIds())));
+                }
+                document.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+                document.setType(file.getContentType());
+                return documentRepository.save(document);
+            }
+        }
+    }
+
     @GetMapping("/api/documents")
     public List<RawDocument> documents() {
         OpenBASPrincipal user = currentUser();

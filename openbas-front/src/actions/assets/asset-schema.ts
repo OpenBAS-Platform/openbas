@@ -8,3 +8,12 @@ export const endpoint = new schema.Entity(
   { idAttribute: 'asset_id' },
 );
 export const arrayOfEndpoints = new schema.Array(endpoint);
+
+// Security Platforms
+
+export const securityPlatform = new schema.Entity(
+  'securityPlatforms',
+  {},
+  { idAttribute: 'asset_id' },
+);
+export const arrayOfSecurityPlatforms = new schema.Array(securityPlatform);

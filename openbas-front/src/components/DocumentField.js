@@ -44,27 +44,25 @@ class DocumentField extends Component {
       documents,
     );
     return (
-      <div>
-        <Autocomplete
-          variant="standard"
-          size="small"
-          name={name}
-          fullWidth={true}
-          multiple={false}
-          label={t('Document')}
-          options={documentsOptions}
-          style={{ marginTop: 20 }}
-          renderOption={(props, option) => (
-            <Box component="li" {...props}>
-              <div className={classes.icon}>
-                <FileOutline />
-              </div>
-              <div className={classes.text}>{option.label}</div>
-            </Box>
-          )}
-          classes={{ clearIndicator: classes.autoCompleteIndicator }}
-        />
-      </div>
+      <Autocomplete
+        variant="standard"
+        size="small"
+        name={name}
+        fullWidth={true}
+        multiple={false}
+        label={t('Document')}
+        options={documentsOptions}
+        style={{ marginTop: 20 }}
+        renderOption={(props, option) => (
+          <Box component="li" {...props}>
+            <div className={classes.icon}>
+              <FileOutline />
+            </div>
+            <div className={classes.text}>{option.label}</div>
+          </Box>
+        )}
+        classes={{ clearIndicator: classes.autoCompleteIndicator }}
+      />
     );
   }
 }

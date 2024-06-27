@@ -33,7 +33,8 @@ export interface ChallengeHelper {
 }
 
 export interface DocumentHelper {
-  getDocumentsMap: () => Record<string, Document>
+  getDocuments: () => Document[];
+  getDocumentsMap: () => Record<string, Document>;
 }
 
 export interface MeTokensHelper {
