@@ -31,20 +31,20 @@ public class InjectDuplicateService {
 
     private Inject getDuplicateInjectForScenario(InjectInput injectInput, String scenarioId) {
         Scenario scenario = scenarioRepository.findById(scenarioId).orElseThrow();
-        Inject inject = copyInject(injectInput);
+        Inject inject = copyInject(injectInput.getId());
         inject.setScenario(scenario);
         return injectRepository.save(inject);
     }
 
     private Inject getDuplicateInjectForExercise(InjectInput injectInput, String exerciseId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-        Inject inject = copyInject(injectInput);
+        Inject inject = copyInject(injectInput.getId());
         inject.setExercise(exercise);
         return injectRepository.save(inject);
     }
 
-    private Inject copyInject(InjectInput injectInput) {
-        Inject inject = injectRepository.findById(injectInput.getId()).orElseThrow();
+    private Inject copyInject(String injectId) {
+        Inject inject = injectRepository.findById(injectId).orElseThrow();
         Inject injectDuplicate = new Inject();
         injectDuplicate.setAssets(inject.getAssets().stream().toList());
         injectDuplicate.setTeams(inject.getTeams().stream().toList());

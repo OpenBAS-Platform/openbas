@@ -1,17 +1,19 @@
 package io.openbas.rest.exercise;
 
 import io.openbas.database.model.*;
+import io.openbas.database.repository.ArticleRepository;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseCreateInput;
 import io.openbas.rest.exercise.form.ExerciseSimple;
+import io.openbas.rest.inject.form.InjectInput;
+import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.InjectService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -41,7 +43,9 @@ public class ExerciseService {
   private EntityManager entityManager;
 
   private final InjectService injectService;
+  private final InjectDuplicateService injectDuplicateService;
   private final ExerciseRepository exerciseRepository;
+  private final ArticleRepository articleRepository;
 
   public Page<ExerciseSimple> exercises(Specification<Exercise> specification, Pageable pageable) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
@@ -125,8 +129,8 @@ public class ExerciseService {
     ).distinct(true);
 
     // GROUP BY
-    cq.groupBy(Arrays.asList(
-        exerciseRoot.get("id")
+    cq.groupBy(Collections.singletonList(
+            exerciseRoot.get("id")
     ));
   }
 
@@ -164,7 +168,10 @@ public class ExerciseService {
       if (StringUtils.isNotBlank(input.getId())) {
           Exercise exerciseOrigin = exerciseRepository.findById(input.getId()).orElseThrow();
           Exercise exercise = copyExercice(exerciseOrigin);
-          return exerciseRepository.save(exercise);
+          Exercise exerciseDuplicate = exerciseRepository.save(exercise);
+          getListOfDuplicatedInjects(exerciseDuplicate, exerciseOrigin);
+          getListOfArticles(exerciseDuplicate, exerciseOrigin);
+          return exerciseDuplicate;
       }
       throw new ElementNotFoundException();
   }
@@ -177,8 +184,6 @@ public class ExerciseService {
         exerciseDuplicate.setCategory(exerciseOrigin.getCategory());
         exerciseDuplicate.setDescription(exerciseOrigin.getDescription());
         exerciseDuplicate.setName(getNewName(exerciseOrigin));
-        exerciseDuplicate.setInjects(exerciseOrigin.getInjects().stream().toList());
-        exerciseDuplicate.setArticles(exerciseOrigin.getArticles().stream().toList());
         if (exerciseOrigin.getCurrentPause().isPresent())
             exerciseDuplicate.setCurrentPause(exerciseOrigin.getCurrentPause().get());
         exerciseDuplicate.setFrom(exerciseOrigin.getFrom());
@@ -208,6 +213,29 @@ public class ExerciseService {
             newName = newName.substring(0, 254 - " (duplicate)".length());
         }
         return newName;
+    }
+
+    private void getListOfDuplicatedInjects(Exercise exercise, Exercise exerciseOrigin) {
+        exerciseOrigin.getInjects().forEach(inject -> {
+            InjectInput injectInput = new InjectInput();
+            injectInput.setId(inject.getId());
+            injectDuplicateService.createInjectForExercise(injectInput, exercise.getId());
+        });
+    }
+
+    private void getListOfArticles(Exercise exercise, Exercise exerciseOrigin) {
+        exerciseOrigin.getArticles().forEach(article -> {
+            Article exerciceArticle = new Article();
+            exerciceArticle.setName(article.getName());
+            exerciceArticle.setContent(article.getContent());
+            exerciceArticle.setAuthor(article.getAuthor());
+            exerciceArticle.setShares(article.getShares());
+            exerciceArticle.setLikes(article.getLikes());
+            exerciceArticle.setComments(article.getComments());
+            exerciceArticle.setChannel(article.getChannel());
+            exerciceArticle.setExercise(exercise);
+            articleRepository.save(exerciceArticle);
+        });
     }
 
 }

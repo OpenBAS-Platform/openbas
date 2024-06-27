@@ -13,6 +13,8 @@ import io.openbas.rest.exercise.exports.ExerciseExportMixins;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
+import io.openbas.rest.inject.form.InjectInput;
+import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.scenario.export.ScenarioExportMixins;
 import io.openbas.rest.scenario.export.ScenarioFileExport;
 import io.openbas.rest.scenario.form.ScenarioInput;
@@ -82,6 +84,8 @@ public class ScenarioService {
   private final UserRepository userRepository;
   private final ScenarioTeamUserRepository scenarioTeamUserRepository;
   private final FileService fileService;
+  private final InjectDuplicateService injectDuplicateService;
+  private final ArticleRepository articleRepository;
 
   @Transactional
   public Scenario createScenario(@NotNull final Scenario scenario) {
@@ -472,7 +476,10 @@ public class ScenarioService {
     if (StringUtils.isNotBlank(input.getId())) {
       Scenario scenarioOrigin = scenarioRepository.findById(input.getId()).orElseThrow();
       Scenario scenario = copyScenario(scenarioOrigin);
-      return scenarioRepository.save(scenario);
+      Scenario scenarioDuplicate = scenarioRepository.save(scenario);
+      getListOfDuplicatedInjects(scenarioDuplicate, scenarioOrigin);
+      getListOfArticles(scenarioDuplicate, scenarioOrigin);
+      return scenarioDuplicate;
     }
     throw new ElementNotFoundException();
   }
@@ -512,6 +519,29 @@ public class ScenarioService {
       newName = newName.substring(0, 254 - " (duplicate)".length());
     }
     return newName;
+  }
+
+  private void getListOfDuplicatedInjects(Scenario scenario, Scenario scenarioOrign) {
+    scenarioOrign.getInjects().forEach(inject -> {
+      InjectInput injectInput = new InjectInput();
+      injectInput.setId(inject.getId());
+      injectDuplicateService.createInjectForScenario(injectInput, scenario.getId());
+    });
+  }
+
+  private void getListOfArticles(Scenario scenario, Scenario scenarioOrign) {
+    scenarioOrign.getArticles().forEach(article -> {
+      Article scenarioArticle = new Article();
+      scenarioArticle.setName(article.getName());
+      scenarioArticle.setContent(article.getContent());
+      scenarioArticle.setAuthor(article.getAuthor());
+      scenarioArticle.setShares(article.getShares());
+      scenarioArticle.setLikes(article.getLikes());
+      scenarioArticle.setComments(article.getComments());
+      scenarioArticle.setChannel(article.getChannel());
+      scenarioArticle.setScenario(scenario);
+      articleRepository.save(scenarioArticle);
+    });
   }
 
 }
