@@ -9,6 +9,7 @@ import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.scenario.form.InjectsImportInput;
+import io.openbas.rest.scenario.response.ImportMessage;
 import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
 import io.openbas.service.InjectService;
@@ -30,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
 
 import static io.openbas.database.model.User.ROLE_USER;
@@ -89,7 +91,15 @@ public class ScenarioImportApi extends RestBehavior {
         ImportMapper importMapper = importMapperRepository
                 .findById(UUID.fromString(input.getImportMapperId())).orElseThrow(ElementNotFoundException::new);
 
-        return injectService.importXls(importId, scenario, importMapper, input);
+        ImportTestSummary importTestSummary = injectService.importXls(importId, scenario, importMapper, input);
+        Optional<ImportMessage> hasCritical = importTestSummary.getImportMessage().stream()
+                .filter(importMessage -> importMessage.getMessageLevel() == ImportMessage.MessageLevel.CRITICAL)
+                .findAny();
+        if(hasCritical.isPresent()) {
+            // If there are critical errors, we empty the list of injects, we just keep the messages
+            importTestSummary.setInjects(new ArrayList<>());
+        }
+        return importTestSummary;
     }
 
     @PostMapping(SCENARIO_URI + "/{scenarioId}/xls/{importId}/validate")
@@ -105,9 +115,18 @@ public class ScenarioImportApi extends RestBehavior {
                 .findById(UUID.fromString(input.getImportMapperId())).orElseThrow(ElementNotFoundException::new);
 
         ImportTestSummary importTestSummary = injectService.importXls(importId, scenario, importMapper, input);
-        Iterable<Inject> newInjects = injectRepository.saveAll(importTestSummary.getInjects());
-        newInjects.forEach(inject -> {scenario.getInjects().add(inject);});
-        scenarioRepository.save(scenario);
+        Optional<ImportMessage> hasCritical = importTestSummary.getImportMessage().stream()
+                .filter(importMessage -> importMessage.getMessageLevel() == ImportMessage.MessageLevel.CRITICAL)
+                .findAny();
+        if(hasCritical.isPresent()) {
+            // If there are critical errors, we do not save and we
+            // empty the list of injects, we just keep the message
+            importTestSummary.setInjects(new ArrayList<>());
+        } else {
+            Iterable<Inject> newInjects = injectRepository.saveAll(importTestSummary.getInjects());
+            newInjects.forEach(inject -> {scenario.getInjects().add(inject);});
+            scenarioRepository.save(scenario);
+        }
         return importTestSummary;
     }
 }
