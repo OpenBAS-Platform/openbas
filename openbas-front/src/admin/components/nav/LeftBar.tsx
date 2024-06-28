@@ -194,7 +194,7 @@ const LeftBar = () => {
   });
   const { dimension } = useDimensions();
   const isMobile = dimension.width < 768;
-  const  generateSubMenu = (menu: string, entries: entry[]) => {
+  const generateSubMenu = (menu: string, entries: entry[]) => {
     return navOpen ? (
       <Collapse in={selectedMenu === menu} timeout="auto" unmountOnExit={true}>
         <MenuList component="nav" disablePadding={true}>
