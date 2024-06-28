@@ -10,6 +10,16 @@ services:
     ports:
       - "5432:5432"
     restart: unless-stopped
+  openbas-test-pgsql:
+    container_name: openbas-test-pgsql
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: openbas
+    ports:
+      - "5433:5432"
+    restart: unless-stopped
   openbas-dev-minio:
     container_name: openbas-dev-minio
     image: minio/minio:latest
