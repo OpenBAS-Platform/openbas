@@ -6,6 +6,7 @@ import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.AssetGroupRepository;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -94,7 +95,16 @@ public class AssetGroupService {
         assetGroups.forEach(assetGroup -> {
             if (!isEmptyFilterGroup(assetGroup.getDynamicFilter())) {
                 Predicate<Object> filters = computeFilterGroupRuntime(assetGroup.getDynamicFilter());
-                assetGroup.setDynamicAssets(assets.stream().filter(filters).toList());
+                // Filters for dynamic assets are applicable only to endpoints
+                List<Asset> endpointAssets = assets.stream()
+                    .filter(a -> a.getType().equals("Endpoint"))
+                    .toList();
+
+                List<Asset> filteredAssets = endpointAssets.stream()
+                    .filter(filters)
+                    .toList();
+
+                assetGroup.setDynamicAssets(filteredAssets);
             }
         });
 
