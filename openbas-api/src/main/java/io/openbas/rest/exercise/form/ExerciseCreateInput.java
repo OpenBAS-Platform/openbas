@@ -19,10 +19,6 @@ import static lombok.AccessLevel.NONE;
 @Data
 public class ExerciseCreateInput {
 
-  @Nullable
-  @JsonProperty("exercise_id")
-  private String id;
-
   @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("exercise_name")
   private String name;

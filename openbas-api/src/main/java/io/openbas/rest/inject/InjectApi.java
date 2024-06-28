@@ -29,8 +29,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -226,9 +224,6 @@ public class InjectApi extends RestBehavior {
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackFor = Exception.class)
     public Inject createInjectForExercise(@PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
-        if (StringUtils.isNotBlank(input.getId())) {
-            return injectDuplicateService.createInjectForExercise(input, exerciseId);
-        }
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
         InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow(ElementNotFoundException::new);
         // Set expectations
@@ -281,6 +276,12 @@ public class InjectApi extends RestBehavior {
             }
         });
         return injectRepository.save(inject);
+    }
+
+    @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Inject duplicateInjectForExercise(@PathVariable final String exerciseId, @PathVariable final String injectId) {
+        return injectDuplicateService.createInjectForExercise(exerciseId, injectId);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -387,9 +388,6 @@ public class InjectApi extends RestBehavior {
     public Inject createInjectForScenario(
             @PathVariable @NotBlank final String scenarioId,
             @Valid @RequestBody InjectInput input) {
-        if (StringUtils.isNotBlank(input.getId())) {
-            return injectDuplicateService.createInjectForScenario(input, scenarioId);
-        }
         Scenario scenario = this.scenarioService.scenario(scenarioId);
         InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow(ElementNotFoundException::new);
         // Set expectations
@@ -442,6 +440,12 @@ public class InjectApi extends RestBehavior {
             }
         });
         return injectRepository.save(inject);
+    }
+
+    @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
+    @PreAuthorize("isScenarioPlanner(#scenarioId)")
+    public Inject createInjectForScenario(@PathVariable final String scenarioId, @PathVariable final String injectId ) {
+        return injectDuplicateService.createInjectForScenario(scenarioId, injectId);
     }
 
     @GetMapping(SCENARIO_URI + "/{scenarioId}/injects")

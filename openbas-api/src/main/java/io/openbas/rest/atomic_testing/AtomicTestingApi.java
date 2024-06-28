@@ -60,6 +60,18 @@ public class AtomicTestingApi extends RestBehavior {
     );
   }
 
+  @PostMapping("/{atomicTestingId}")
+  public InjectResultDTO duplicateAtomicTesting(@PathVariable final String atomicTestingId) {
+    Inject inject = atomicTestingService.getDuplicateAtomicTesting(atomicTestingId);
+    return AtomicTestingMapper.toDto(
+            inject, getTargets(
+                    inject.getTeams(),
+                    inject.getAssets(),
+                    inject.getAssetGroups()
+            )
+    );
+  }
+
   @PutMapping("/{injectId}")
   @Transactional(rollbackFor = Exception.class)
   public InjectResultDTO updateAtomicTesting(

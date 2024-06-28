@@ -41,197 +41,199 @@ import static io.openbas.helper.StreamHelper.iterableToSet;
 @RequiredArgsConstructor
 public class ScenarioApi {
 
-  public static final String SCENARIO_URI = "/api/scenarios";
+    public static final String SCENARIO_URI = "/api/scenarios";
 
-  private final ScenarioService scenarioService;
-  private final TagRepository tagRepository;
-  private final ImportService importService;
+    private final ScenarioService scenarioService;
+    private final TagRepository tagRepository;
+    private final ImportService importService;
 
-  private final TeamRepository teamRepository;
-  private final UserRepository userRepository;
-  private final InjectExpectationRepository injectExpectationRepository;
-  private final InjectRepository injectRepository;
-  private final CommunicationRepository communicationRepository;
-  private final ExerciseTeamUserRepository exerciseTeamUserRepository;
-  private final ScenarioRepository scenarioRepository;
+    private final TeamRepository teamRepository;
+    private final UserRepository userRepository;
+    private final InjectExpectationRepository injectExpectationRepository;
+    private final InjectRepository injectRepository;
+    private final CommunicationRepository communicationRepository;
+    private final ExerciseTeamUserRepository exerciseTeamUserRepository;
+    private final ScenarioRepository scenarioRepository;
 
 
-  @PostMapping(SCENARIO_URI)
-  // TODO: Admin only ?
-  public Scenario createScenario(@Valid @RequestBody final ScenarioInput input) {
-    if (input != null) {
-      if (StringUtils.isNotBlank(input.getId()))
-        return scenarioService.getDuplicateScenario(input);
-      Scenario scenario = new Scenario();
-      scenario.setUpdateAttributes(input);
-      scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-      return this.scenarioService.createScenario(scenario);
+    @PostMapping(SCENARIO_URI)
+    public Scenario createScenario(@Valid @RequestBody final ScenarioInput input) {
+        if (input != null) {
+            Scenario scenario = new Scenario();
+            scenario.setUpdateAttributes(input);
+            scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+            return this.scenarioService.createScenario(scenario);
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
-    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-  }
 
-  @GetMapping(SCENARIO_URI)
-  public List<ScenarioSimple> scenarios() {
-    return this.scenarioService.scenarios();
-  }
+    @PostMapping(SCENARIO_URI + "/{scenarioId}")
+    public Scenario duplicateScenario(@PathVariable @NotBlank final String scenarioId) {
+        return scenarioService.getDuplicateScenario(scenarioId);
+    }
 
-  @PostMapping(SCENARIO_URI + "/search")
-  public Page<RawPaginationScenario> scenarios(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return this.scenarioService.scenarios(searchPaginationInput);
-  }
+    @GetMapping(SCENARIO_URI)
+    public List<ScenarioSimple> scenarios() {
+        return this.scenarioService.scenarios();
+    }
 
-  @GetMapping(SCENARIO_URI + "/{scenarioId}")
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
-  public Scenario scenario(@PathVariable @NotBlank final String scenarioId) {
-    return scenarioService.scenario(scenarioId);
-  }
+    @PostMapping(SCENARIO_URI + "/search")
+    public Page<RawPaginationScenario> scenarios(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+        return this.scenarioService.scenarios(searchPaginationInput);
+    }
 
-  @PutMapping(SCENARIO_URI + "/{scenarioId}")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Scenario updateScenario(
-      @PathVariable @NotBlank final String scenarioId,
-      @Valid @RequestBody final ScenarioInput input) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    scenario.setUpdateAttributes(input);
-    scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-    return this.scenarioService.updateScenario(scenario);
-  }
+    @GetMapping(SCENARIO_URI + "/{scenarioId}")
+    @PreAuthorize("isScenarioObserver(#scenarioId)")
+    public Scenario scenario(@PathVariable @NotBlank final String scenarioId) {
+        return scenarioService.scenario(scenarioId);
+    }
 
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/information")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Scenario updateScenarioInformation(
-      @PathVariable @NotBlank final String scenarioId,
-      @Valid @RequestBody final ScenarioInformationInput input) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    scenario.setUpdateAttributes(input);
-    return this.scenarioService.updateScenario(scenario);
-  }
+    @PutMapping(SCENARIO_URI + "/{scenarioId}")
+    @PreAuthorize("isScenarioPlanner(#scenarioId)")
+    public Scenario updateScenario(
+            @PathVariable @NotBlank final String scenarioId,
+            @Valid @RequestBody final ScenarioInput input) {
+        Scenario scenario = this.scenarioService.scenario(scenarioId);
+        scenario.setUpdateAttributes(input);
+        scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+        return this.scenarioService.updateScenario(scenario);
+    }
 
-  @DeleteMapping(SCENARIO_URI + "/{scenarioId}")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public void deleteScenario(@PathVariable @NotBlank final String scenarioId) {
-    this.scenarioService.deleteScenario(scenarioId);
-  }
+    @PutMapping(SCENARIO_URI + "/{scenarioId}/information")
+    @PreAuthorize("isScenarioPlanner(#scenarioId)")
+    public Scenario updateScenarioInformation(
+            @PathVariable @NotBlank final String scenarioId,
+            @Valid @RequestBody final ScenarioInformationInput input) {
+        Scenario scenario = this.scenarioService.scenario(scenarioId);
+        scenario.setUpdateAttributes(input);
+        return this.scenarioService.updateScenario(scenario);
+    }
 
-  // -- TAGS --
+    @DeleteMapping(SCENARIO_URI + "/{scenarioId}")
+    @PreAuthorize("isScenarioPlanner(#scenarioId)")
+    public void deleteScenario(@PathVariable @NotBlank final String scenarioId) {
+        this.scenarioService.deleteScenario(scenarioId);
+    }
 
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/tags")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Scenario updateScenarioTags(
-      @PathVariable @NotBlank final String scenarioId,
-      @Valid @RequestBody final ScenarioUpdateTagsInput input) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-    return scenarioService.updateScenario(scenario);
-  }
+    // -- TAGS --
 
-  // -- EXPORT --
+    @PutMapping(SCENARIO_URI + "/{scenarioId}/tags")
+    @PreAuthorize("isScenarioPlanner(#scenarioId)")
+    public Scenario updateScenarioTags(
+            @PathVariable @NotBlank final String scenarioId,
+            @Valid @RequestBody final ScenarioUpdateTagsInput input) {
+        Scenario scenario = this.scenarioService.scenario(scenarioId);
+        scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+        return scenarioService.updateScenario(scenario);
+    }
 
-  @GetMapping(SCENARIO_URI + "/{scenarioId}/export")
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
-  public void exportScenario(
-      @PathVariable @NotBlank final String scenarioId,
-      @RequestParam(required = false) final boolean isWithTeams,
-      @RequestParam(required = false) final boolean isWithPlayers,
-      @RequestParam(required = false) final boolean isWithVariableValues,
-      HttpServletResponse response)
-      throws IOException {
-    this.scenarioService.exportScenario(scenarioId, isWithTeams, isWithPlayers, isWithVariableValues, response);
-  }
+    // -- EXPORT --
 
-  // -- IMPORT --
+    @GetMapping(SCENARIO_URI + "/{scenarioId}/export")
+    @PreAuthorize("isScenarioObserver(#scenarioId)")
+    public void exportScenario(
+            @PathVariable @NotBlank final String scenarioId,
+            @RequestParam(required = false) final boolean isWithTeams,
+            @RequestParam(required = false) final boolean isWithPlayers,
+            @RequestParam(required = false) final boolean isWithVariableValues,
+            HttpServletResponse response)
+            throws IOException {
+        this.scenarioService.exportScenario(scenarioId, isWithTeams, isWithPlayers, isWithVariableValues, response);
+    }
 
-  @PostMapping(SCENARIO_URI + "/import")
-  @Secured(ROLE_ADMIN)
-  public void importScenario(@RequestPart("file") @NotNull MultipartFile file) throws Exception {
-    this.importService.handleFileImport(file);
-  }
+    // -- IMPORT --
 
-  // -- TEAMS --
+    @PostMapping(SCENARIO_URI + "/import")
+    @Secured(ROLE_ADMIN)
+    public void importScenario(@RequestPart("file") @NotNull MultipartFile file) throws Exception {
+        this.importService.handleFileImport(file);
+    }
 
-  @Transactional(rollbackOn = Exception.class)
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/add")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Iterable<Team> addScenarioTeams(
-      @PathVariable @NotBlank final String scenarioId,
-      @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
-    return this.scenarioService.addTeams(scenarioId, input.getTeamIds());
-  }
+    // -- TEAMS --
 
-  @GetMapping(SCENARIO_URI + "/{scenarioId}/teams")
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
-  public Iterable<TeamSimple> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {
-    return TeamHelper.rawTeamToSimplerTeam(teamRepository.rawTeamByScenarioId(scenarioId),
-            injectExpectationRepository, injectRepository, communicationRepository, exerciseTeamUserRepository, scenarioRepository);
-  }
+    @Transactional(rollbackOn = Exception.class)
+    @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/add")
+    @PreAuthorize("isScenarioPlanner(#scenarioId)")
+    public Iterable<Team> addScenarioTeams(
+            @PathVariable @NotBlank final String scenarioId,
+            @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
+        return this.scenarioService.addTeams(scenarioId, input.getTeamIds());
+    }
 
-  @Transactional(rollbackOn = Exception.class)
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/remove")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Iterable<Team> removeScenarioTeams(
-      @PathVariable @NotBlank final String scenarioId,
-      @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
-    return this.scenarioService.removeTeams(scenarioId, input.getTeamIds());
-  }
+    @GetMapping(SCENARIO_URI + "/{scenarioId}/teams")
+    @PreAuthorize("isScenarioObserver(#scenarioId)")
+    public Iterable<TeamSimple> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {
+        return TeamHelper.rawTeamToSimplerTeam(teamRepository.rawTeamByScenarioId(scenarioId),
+                injectExpectationRepository, injectRepository, communicationRepository, exerciseTeamUserRepository, scenarioRepository);
+    }
 
-  @Transactional(rollbackOn = Exception.class)
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/enable")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Scenario enableScenarioTeamPlayers(
-      @PathVariable @NotBlank final String scenarioId,
-      @PathVariable @NotBlank final String teamId,
-      @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
-    return this.scenarioService.enablePlayers(scenarioId, teamId, input.getPlayersIds());
-  }
+    @Transactional(rollbackOn = Exception.class)
+    @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/remove")
+    @PreAuthorize("isScenarioPlanner(#scenarioId)")
+    public Iterable<Team> removeScenarioTeams(
+            @PathVariable @NotBlank final String scenarioId,
+            @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
+        return this.scenarioService.removeTeams(scenarioId, input.getTeamIds());
+    }
 
-  @Transactional(rollbackOn = Exception.class)
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/disable")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Scenario disableScenarioTeamPlayers(
-      @PathVariable @NotBlank final String scenarioId,
-      @PathVariable @NotBlank final String teamId,
-      @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
-    return this.scenarioService.disablePlayers(scenarioId, teamId, input.getPlayersIds());
-  }
+    @Transactional(rollbackOn = Exception.class)
+    @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/enable")
+    @PreAuthorize("isScenarioPlanner(#scenarioId)")
+    public Scenario enableScenarioTeamPlayers(
+            @PathVariable @NotBlank final String scenarioId,
+            @PathVariable @NotBlank final String teamId,
+            @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
+        return this.scenarioService.enablePlayers(scenarioId, teamId, input.getPlayersIds());
+    }
 
-  @Transactional(rollbackOn = Exception.class)
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/add")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Scenario addScenarioTeamPlayers(
-      @PathVariable @NotBlank final String scenarioId,
-      @PathVariable @NotBlank final String teamId,
-      @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
-    Team team = teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
-    Iterable<User> teamUsers = userRepository.findAllById(input.getPlayersIds());
-    team.getUsers().addAll(fromIterable(teamUsers));
-    teamRepository.save(team);
-    return this.scenarioService.enablePlayers(scenarioId, teamId, input.getPlayersIds());
-  }
+    @Transactional(rollbackOn = Exception.class)
+    @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/disable")
+    @PreAuthorize("isScenarioPlanner(#scenarioId)")
+    public Scenario disableScenarioTeamPlayers(
+            @PathVariable @NotBlank final String scenarioId,
+            @PathVariable @NotBlank final String teamId,
+            @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
+        return this.scenarioService.disablePlayers(scenarioId, teamId, input.getPlayersIds());
+    }
 
-  @Transactional(rollbackOn = Exception.class)
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/remove")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Scenario removeScenarioTeamPlayers(
-      @PathVariable @NotBlank final String scenarioId,
-      @PathVariable @NotBlank final String teamId,
-      @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
-    Team team = teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
-    Iterable<User> teamUsers = userRepository.findAllById(input.getPlayersIds());
-    team.getUsers().removeAll(fromIterable(teamUsers));
-    teamRepository.save(team);
-    return this.scenarioService.disablePlayers(scenarioId, teamId, input.getPlayersIds());
-  }
+    @Transactional(rollbackOn = Exception.class)
+    @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/add")
+    @PreAuthorize("isScenarioPlanner(#scenarioId)")
+    public Scenario addScenarioTeamPlayers(
+            @PathVariable @NotBlank final String scenarioId,
+            @PathVariable @NotBlank final String teamId,
+            @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
+        Team team = teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
+        Iterable<User> teamUsers = userRepository.findAllById(input.getPlayersIds());
+        team.getUsers().addAll(fromIterable(teamUsers));
+        teamRepository.save(team);
+        return this.scenarioService.enablePlayers(scenarioId, teamId, input.getPlayersIds());
+    }
 
-  // -- RECURRENCE --
+    @Transactional(rollbackOn = Exception.class)
+    @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/remove")
+    @PreAuthorize("isScenarioPlanner(#scenarioId)")
+    public Scenario removeScenarioTeamPlayers(
+            @PathVariable @NotBlank final String scenarioId,
+            @PathVariable @NotBlank final String teamId,
+            @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
+        Team team = teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
+        Iterable<User> teamUsers = userRepository.findAllById(input.getPlayersIds());
+        team.getUsers().removeAll(fromIterable(teamUsers));
+        teamRepository.save(team);
+        return this.scenarioService.disablePlayers(scenarioId, teamId, input.getPlayersIds());
+    }
 
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/recurrence")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Scenario updateScenarioRecurrence(
-      @PathVariable @NotBlank final String scenarioId,
-      @Valid @RequestBody final ScenarioRecurrenceInput input) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    scenario.setUpdateAttributes(input);
-    return this.scenarioService.updateScenario(scenario);
-  }
+    // -- RECURRENCE --
+
+    @PutMapping(SCENARIO_URI + "/{scenarioId}/recurrence")
+    @PreAuthorize("isScenarioPlanner(#scenarioId)")
+    public Scenario updateScenarioRecurrence(
+            @PathVariable @NotBlank final String scenarioId,
+            @Valid @RequestBody final ScenarioRecurrenceInput input) {
+        Scenario scenario = this.scenarioService.scenario(scenarioId);
+        scenario.setUpdateAttributes(input);
+        return this.scenarioService.updateScenario(scenario);
+    }
 
 }

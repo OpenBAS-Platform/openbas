@@ -15,9 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 public class AtomicTestingInput {
 
-  @JsonProperty("inject_id")
-  private String id;
-
   @JsonProperty("inject_title")
   private String title;
 

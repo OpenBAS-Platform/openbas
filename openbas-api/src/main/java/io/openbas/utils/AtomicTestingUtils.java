@@ -346,33 +346,4 @@ public class AtomicTestingUtils {
                 .average();
     }
 
-    public static Inject copyInject(Inject injectOrigin) {
-        Inject inject = new Inject();
-        inject.setUser(injectOrigin.getUser());
-        inject.setTitle(getNewTitle(injectOrigin, " (duplicate)"));
-        inject.setDescription(injectOrigin.getDescription());
-        inject.setContent(injectOrigin.getContent());
-        inject.setAllTeams(injectOrigin.isAllTeams());
-        inject.setEnabled(injectOrigin.isEnabled());
-        inject.setDependsDuration(injectOrigin.getDependsDuration());
-        inject.setDependsOn(injectOrigin.getDependsOn());
-        inject.setExercise(injectOrigin.getExercise());
-        inject.setCountry(injectOrigin.getCountry());
-        inject.setCity(injectOrigin.getCity());
-        inject.setInjectorContract(injectOrigin.getInjectorContract());
-        inject.setScenario(injectOrigin.getScenario());
-        inject.setAssetGroups(injectOrigin.getAssetGroups().stream().toList());
-        inject.setAssets(injectOrigin.getAssets().stream().toList());
-        inject.setTeams(injectOrigin.getTeams().stream().toList());
-        return inject;
-    }
-
-    private static @org.jetbrains.annotations.NotNull String getNewTitle(Inject injectOrigin, String suffix) {
-        String newTitle = injectOrigin.getTitle() + suffix;
-        if (newTitle.length() > 255) {
-            newTitle = newTitle.substring(0, 254 - suffix.length());
-        }
-        return newTitle;
-    }
-
 }

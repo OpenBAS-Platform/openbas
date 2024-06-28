@@ -15,9 +15,6 @@ import java.util.List;
 @Getter
 public class InjectInput {
 
-    @JsonProperty("inject_id")
-    private String id;
-
     @JsonProperty("inject_title")
     private String title;
 

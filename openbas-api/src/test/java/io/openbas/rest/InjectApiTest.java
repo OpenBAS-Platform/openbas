@@ -141,7 +141,6 @@ class InjectApiTest {
     // -- PREPARE --
     Inject inject = this.injectRepository.findById(INJECT_ID).orElseThrow();
     InjectInput input = new InjectInput();
-    input.setId(INJECT_ID);
     String injectTitle = "A new title";
     input.setTitle(injectTitle);
     input.setInjectorContract(inject.getInjectorContract().getId());

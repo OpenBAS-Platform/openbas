@@ -24,14 +24,16 @@ import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.Instant;
 import java.util.*;
@@ -41,7 +43,9 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.InjectCriteria.countQuery;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.utils.AtomicTestingUtils.*;
+import static io.openbas.utils.AtomicTestingUtils.getRawExpectationResultByTypes;
+import static io.openbas.utils.AtomicTestingUtils.getTargetsFromRaw;
+import static io.openbas.utils.Constants.MAX_SIZE_OF_STRING;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.JpaUtils.createLeftJoin;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
@@ -84,9 +88,6 @@ public class AtomicTestingService {
             injectToSave = injectRepository.findById(injectId).orElseThrow();
         }
 
-        if (StringUtils.isNotBlank(input.getId())) {
-            return getDuplicateAtomicTesting(input.getId());
-        }
         InjectorContract injectorContract =
                 injectorContractRepository.findById(input.getInjectorContract()).orElseThrow();
         ObjectNode finalContent = input.getContent();
@@ -162,13 +163,42 @@ public class AtomicTestingService {
         return finalContent;
     }
 
-    private Inject getDuplicateAtomicTesting(String id) {
-        // We retrieve the original atomic testing (inject)
+    @Transactional
+    @Validated
+    public Inject getDuplicateAtomicTesting(@NotBlank String id) {
         Inject injectOrigin = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
-
         Inject injectDuplicate = copyInject(injectOrigin);
-
         return injectRepository.save(injectDuplicate);
+    }
+
+    public Inject copyInject(@NotNull Inject injectOrigin) {
+        Inject inject = new Inject();
+        inject.setUser(injectOrigin.getUser());
+        inject.setTitle(getNewTitle(injectOrigin));
+        inject.setDescription(injectOrigin.getDescription());
+        inject.setContent(injectOrigin.getContent());
+        inject.setAllTeams(injectOrigin.isAllTeams());
+        inject.setEnabled(injectOrigin.isEnabled());
+        inject.setDependsDuration(injectOrigin.getDependsDuration());
+        inject.setDependsOn(injectOrigin.getDependsOn());
+        inject.setExercise(injectOrigin.getExercise());
+        inject.setCountry(injectOrigin.getCountry());
+        inject.setCity(injectOrigin.getCity());
+        inject.setInjectorContract(injectOrigin.getInjectorContract());
+        inject.setScenario(injectOrigin.getScenario());
+        inject.setAssetGroups(injectOrigin.getAssetGroups().stream().toList());
+        inject.setAssets(injectOrigin.getAssets().stream().toList());
+        inject.setTeams(injectOrigin.getTeams().stream().toList());
+        return inject;
+    }
+
+    @NotNull
+    private String getNewTitle(@NotNull Inject injectOrigin) {
+        String newTitle = injectOrigin.getTitle() + " (duplicate)";
+        if (newTitle.length() > MAX_SIZE_OF_STRING) {
+            newTitle = newTitle.substring(0, (MAX_SIZE_OF_STRING - 1) - " (duplicate)".length());
+        }
+        return newTitle;
     }
 
     public Inject updateAtomicTestingTags(String injectId, AtomicTestingUpdateTagsInput input) {

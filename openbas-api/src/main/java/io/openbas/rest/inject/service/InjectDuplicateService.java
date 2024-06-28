@@ -7,43 +7,49 @@ import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.inject.form.InjectInput;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.HashSet;
 
 @Service
 @RequiredArgsConstructor
+@Validated
 public class InjectDuplicateService {
 
     private final ExerciseRepository exerciseRepository;
     private final ScenarioRepository scenarioRepository;
     private final InjectRepository injectRepository;
 
-    public Inject createInjectForScenario(final InjectInput injectInput, final String scenarioId) {
-        return getDuplicateInjectForScenario(injectInput, scenarioId);
+    public Inject createInjectForScenario(@NotBlank final String scenarioId, @NotBlank final String injectId) {
+        return getDuplicateInjectForScenario(scenarioId, injectId);
     }
 
-    public Inject createInjectForExercise(final InjectInput injectInput, final String exerciseId) {
-        return getDuplicateInjectForExercise(injectInput, exerciseId);
+    public Inject createInjectForExercise(final String exerciseId, final String injectId) {
+        return getDuplicateInjectForExercise(exerciseId, injectId);
     }
 
-    private Inject getDuplicateInjectForScenario(InjectInput injectInput, String scenarioId) {
+    @NotNull
+    private Inject getDuplicateInjectForScenario(@NotBlank final String scenarioId, @NotBlank final String injectId) {
         Scenario scenario = scenarioRepository.findById(scenarioId).orElseThrow();
-        Inject inject = copyInject(injectInput.getId());
+        Inject inject = copyInject(injectId);
         inject.setScenario(scenario);
         return injectRepository.save(inject);
     }
 
-    private Inject getDuplicateInjectForExercise(InjectInput injectInput, String exerciseId) {
+    @NotNull
+    private Inject getDuplicateInjectForExercise(@NotBlank String exerciseId, @NotBlank String injectId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-        Inject inject = copyInject(injectInput.getId());
+        Inject inject = copyInject(injectId);
         inject.setExercise(exercise);
         return injectRepository.save(inject);
     }
 
-    private Inject copyInject(String injectId) {
+    @NotNull
+    private Inject copyInject(@NotBlank String injectId) {
         Inject inject = injectRepository.findById(injectId).orElseThrow();
         Inject injectDuplicate = new Inject();
         injectDuplicate.setAssets(inject.getAssets().stream().toList());
@@ -70,7 +76,8 @@ public class InjectDuplicateService {
         return injectDuplicate;
     }
 
-    private static String getNewTitle(Inject injectOrigin) {
+    @NotNull
+    private static String getNewTitle(@NotNull Inject injectOrigin) {
         String newTitle = injectOrigin.getTitle() + " (duplicate)";
         if (newTitle.length() > 255) {
             newTitle = newTitle.substring(0, 254 - " (duplicate)".length());
