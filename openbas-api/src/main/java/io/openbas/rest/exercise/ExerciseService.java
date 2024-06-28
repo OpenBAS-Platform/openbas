@@ -193,6 +193,8 @@ public class ExerciseService {
         exerciseDuplicate.setReplyTos(exerciseOrigin.getReplyTos().stream().toList());
         exerciseDuplicate.setScenario(exerciseOrigin.getScenario());
         exerciseDuplicate.setHeader(exerciseOrigin.getHeader());
+        exerciseDuplicate.setMainFocus(exerciseOrigin.getMainFocus());
+        exerciseDuplicate.setSeverity(exerciseOrigin.getSeverity());
         exerciseDuplicate.setSubtitle(exerciseOrigin.getSubtitle());
         if (exerciseOrigin.getStart().isPresent())
             exerciseDuplicate.setStart(exerciseOrigin.getStart().get());
