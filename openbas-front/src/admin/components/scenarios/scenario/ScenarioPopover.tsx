@@ -5,7 +5,14 @@ import type { ScenarioInput, ScenarioInformationInput } from '../../../../utils/
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
-import { addScenario, deleteScenario, exportScenarioUri, updateScenario, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
+import {
+  addScenario,
+  deleteScenario,
+  duplicateScenario,
+  exportScenarioUri,
+  updateScenario,
+  updateScenarioInformation
+} from '../../../../actions/scenarios/scenario-actions';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import Drawer from '../../../../components/common/Drawer';
 import ScenarioForm from '../ScenarioForm';
@@ -125,8 +132,8 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   const handleCloseDuplicate = () => {
     setDuplicate(false);
   };
-  const submitDuplicate = (data: ScenarioInput) => {
-    dispatch(addScenario(data)).then((result: { result: string, entities: { scenarios: Record<string, ScenarioStore> } }) => {
+  const submitDuplicate = () => {
+    dispatch(duplicateScenario(scenario.scenario_id)).then((result: { result: string, entities: { scenarios: Record<string, ScenarioStore> } }) => {
       navigate(`/admin/scenarios/${result.result}`);
       if (setOpenDuplicate) {
         setOpenDuplicate(false);
@@ -135,11 +142,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   };
 
   const submitDuplicateHandler = () => {
-    const data: ScenarioInput = {
-      scenario_id: scenario.scenario_id,
-      scenario_name: scenario.scenario_name,
-    };
-    submitDuplicate(data);
+    submitDuplicate();
   };
 
   const permissions = useScenarioPermissions(scenario.scenario_id);

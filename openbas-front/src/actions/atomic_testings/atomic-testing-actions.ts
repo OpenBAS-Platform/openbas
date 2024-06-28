@@ -37,3 +37,8 @@ export const fetchTargetResult = (injectId: string, targetId: string, targetType
 export const createAtomicTesting = (data: AtomicTestingInput) => {
   return simplePostCall(ATOMIC_TESTING_URI, data);
 };
+
+export const duplicateAtomicTesting = (injectId: string) => {
+  const uri = `${ATOMIC_TESTING_URI}/${injectId}`;
+  return simplePostCall(uri, null);
+};

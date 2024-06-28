@@ -19,7 +19,7 @@ import {
   Tabs,
 } from '@mui/material';
 import { useFormatter } from '../../../../components/i18n';
-import { addExercise, deleteExercise, updateExercise } from '../../../../actions/Exercise';
+import {addExercise, deleteExercise, duplicateExercise, updateExercise} from '../../../../actions/Exercise';
 import { usePermissions } from '../../../../utils/Exercise';
 import Transition from '../../../../components/common/Transition';
 import type { Exercise, ExerciseCreateInput, ExerciseUpdateInput } from '../../../../utils/api-types';
@@ -116,7 +116,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
 
   const handleCloseDuplicate = () => setDuplicate(false);
   const submitDuplicate = (data: ExerciseCreateInput) => {
-    dispatch(addExercise(data)).then((result: { result: string, entities: { exercises: ExerciseStore } }) => {
+    dispatch(duplicateExercise(exercise.exercise_id)).then((result: { result: string, entities: { exercises: ExerciseStore } }) => {
       handleCloseDuplicate();
       navigate(`/admin/exercises/${result.result}`);
     });

@@ -65,6 +65,11 @@ export const importScenario = (formData: FormData) => (dispatch: Dispatch) => {
   return postReferential(null, uri, formData)(dispatch);
 };
 
+export const duplicateScenario = (scenarioId: string) => (dispatch: Dispatch) => {
+  const uri = `${SCENARIO_URI}/${scenarioId}`;
+  return postReferential(scenario, uri, null)(dispatch);
+};
+
 // -- TAGS --
 
 export const updateScenarioTags = (scenarioId: Scenario['scenario_id'], data: ScenarioUpdateTagsInput) => {

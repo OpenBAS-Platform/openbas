@@ -1,12 +1,16 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
 import * as R from 'ramda';
 import { useNavigate } from 'react-router-dom';
-import type { AtomicTestingInput, Inject, InjectResultDTO } from '../../../../utils/api-types';
+import type { Inject, InjectResultDTO } from '../../../../utils/api-types';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
-import { createAtomicTesting, deleteAtomicTesting, updateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import {
+    deleteAtomicTesting,
+    duplicateAtomicTesting,
+    updateAtomicTesting
+} from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import UpdateInject from '../../common/injects/UpdateInject';
@@ -90,8 +94,8 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     });
   };
 
-  const submitDuplicate = async (data: AtomicTestingInput) => {
-    await createAtomicTesting(data).then((result: { data: InjectResultDTO }) => {
+  const submitDuplicate = async () => {
+    await duplicateAtomicTesting(atomic.inject_id).then((result: { data: InjectResultDTO }) => {
       navigate(`/admin/atomic_testings/${result.data.inject_id}`);
     });
     if (setOpenDuplicate) {
@@ -100,8 +104,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   };
 
   const submitDuplicateHandler = () => {
-    const data: AtomicTestingInput = { inject_id: atomic.inject_id };
-    submitDuplicate(data);
+    submitDuplicate();
   };
 
   return (
