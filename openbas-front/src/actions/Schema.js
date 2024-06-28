@@ -286,7 +286,9 @@ const getInjectWithParsedInjectorContractContent = (i) => {
     ...i,
     inject_injector_contract: {
       ...i.inject_injector_contract,
-      injector_contract_content_parsed: JSON.parse(i.inject_injector_contract.injector_contract_content),
+      injector_contract_content_parsed: i.inject_injector_contract?.injector_contract_content
+        ? JSON.parse(i.inject_injector_contract.injector_contract_content)
+        : null,
     },
   });
 };
