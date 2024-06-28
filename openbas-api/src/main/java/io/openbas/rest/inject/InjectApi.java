@@ -444,7 +444,7 @@ public class InjectApi extends RestBehavior {
 
     @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
     @PreAuthorize("isScenarioPlanner(#scenarioId)")
-    public Inject createInjectForScenario(@PathVariable final String scenarioId, @PathVariable final String injectId ) {
+    public Inject duplicateInjectForScenario(@PathVariable final String scenarioId, @PathVariable final String injectId ) {
         return injectDuplicateService.createInjectForScenario(scenarioId, injectId);
     }
 
