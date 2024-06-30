@@ -6,7 +6,7 @@ import { Chip, Slide, Tooltip } from '@mui/material';
 import { hexToRGB } from '../utils/Colors';
 import { useFormatter } from './i18n';
 import { useHelper } from '../store';
-import { truncate } from '../utils/String';
+import { getLabelOfRemainingItems, getRemainingItemsCount, truncate, getVisibleItems } from '../utils/String';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -14,6 +14,9 @@ const Transition = React.forwardRef((props, ref) => (
 Transition.displayName = 'TransitionSlide';
 
 const useStyles = makeStyles(() => ({
+  inline: {
+    display: 'inline-block',
+  },
   tag: {
     height: 25,
     fontSize: 12,
@@ -21,24 +24,9 @@ const useStyles = makeStyles(() => ({
     borderRadius: 4,
   },
   tagInList: {
-    fontSize: 12,
+    float: 'left',
     height: 20,
-    float: 'left',
     margin: '0 7px 0 0',
-    borderRadius: 4,
-  },
-  tagInLargeList: {
-    fontSize: 12,
-    height: 25,
-    float: 'left',
-    marginRight: 7,
-    borderRadius: 4,
-  },
-  tagInSearch: {
-    height: 25,
-    fontSize: 12,
-    margin: '0 7px 0 0',
-    borderRadius: 4,
   },
 }));
 
@@ -49,29 +37,28 @@ const ItemTags = (props) => {
   const classes = useStyles();
   let style = classes.tag;
   if (variant === 'list') {
-    style = classes.tagInList;
-  }
-  if (variant === 'largeList') {
-    style = classes.tagInLargeList;
-  }
-  if (variant === 'search') {
-    style = classes.tagInSearch;
+    style = `${classes.tag} ${classes.tagInList}`;
   }
   const resolvedTags = useHelper((helper) => {
     const allTags = helper.getTags() ?? [];
     return allTags.filter((tag) => (tags ?? []).includes(tag.tag_id));
   });
   const orderedTags = R.sortWith([R.ascend(R.prop('tag_name'))], resolvedTags);
+
+  const visibleTags = getVisibleItems(orderedTags, limit);
+  const tooltipLabel = getLabelOfRemainingItems(orderedTags, limit, 'tag_name');
+  const remainingTagsCount = getRemainingItemsCount(orderedTags, visibleTags);
+
   return (
-    <>
-      {orderedTags.length > 0 ? (
-        R.map(
+    <div className={classes.inline}>
+      {visibleTags.length > 0
+        ? (visibleTags.map(
           (tag) => (
             <Tooltip key={tag.tag_id} title={tag.tag_name}>
               <Chip
                 variant="outlined"
                 classes={{ root: style }}
-                label={truncate(tag.tag_name, 15)}
+                label={truncate(tag.tag_name, 8)}
                 style={{
                   color: tag.tag_color,
                   borderColor: tag.tag_color,
@@ -80,23 +67,31 @@ const ItemTags = (props) => {
               />
             </Tooltip>
           ),
-          R.take(limit, orderedTags),
-        )
-      ) : (
-        <Chip
-          classes={{ root: style }}
-          variant="outlined"
-          label={t('No tag')}
-          style={{
-            color: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
-            borderColor: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
-            backgroundColor: hexToRGB(
-              theme.palette.mode === 'dark' ? '#ffffff' : 'transparent',
-            ),
-          }}
-        />
+        )) : (
+          <Chip
+            classes={{ root: style }}
+            variant="outlined"
+            label={t('No tag')}
+            style={{
+              color: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
+              borderColor: theme.palette.mode === 'dark' ? '#ffffff'
+                : '#000000',
+              backgroundColor: hexToRGB(
+                theme.palette.mode === 'dark' ? '#ffffff' : 'transparent',
+              ),
+            }}
+          />
+        )}
+      {remainingTagsCount && remainingTagsCount > 0 && (
+        <Tooltip title={tooltipLabel}>
+          <Chip
+            variant="outlined"
+            classes={{ root: style }}
+            label={`+${remainingTagsCount}`}
+          />
+        </Tooltip>
       )}
-    </>
+    </div>
   );
 };
 
