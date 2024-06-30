@@ -67,7 +67,7 @@ const ResultChip: FunctionComponent<Props> = ({
     }
     return result
       ? colorStyles.green
-      : colorStyles.grey;
+      : colorStyles.blueGrey;
   };
 
   return (

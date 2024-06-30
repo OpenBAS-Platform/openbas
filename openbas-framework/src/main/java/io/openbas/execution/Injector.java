@@ -91,8 +91,9 @@ public abstract class Injector {
                 expectationExecution.setSignatures(preventionExpectation.getInjectExpectationSignatures());
             }
             case MANUAL -> {
-                expectationExecution.setType(EXPECTATION_TYPE.MANUAL);
+                ManualExpectation manualExpectation = (ManualExpectation) expectation;
                 expectationExecution.setName(((ManualExpectation) expectation).getName());
+                expectationExecution.setManual(manualExpectation.getAsset(), manualExpectation.getAssetGroup());
                 expectationExecution.setDescription(((ManualExpectation) expectation).getDescription());
             }
             default -> throw new IllegalStateException("Unexpected value: " + expectation);

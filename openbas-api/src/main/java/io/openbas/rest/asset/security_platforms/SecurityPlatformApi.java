@@ -2,6 +2,7 @@ package io.openbas.rest.asset.security_platforms;
 
 import io.openbas.asset.EndpointService;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawAttackPattern;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.AssetAgentJobSpecification;
 import io.openbas.database.specification.EndpointSpecification;
@@ -50,6 +51,11 @@ public class SecurityPlatformApi {
     private final SecurityPlatformRepository securityPlatformRepository;
     private final DocumentRepository documentRepository;
     private final TagRepository tagRepository;
+
+    @GetMapping(SECURITY_PLATFORM_URI)
+    public Iterable<SecurityPlatform> securityPlatforms() {
+        return securityPlatformRepository.findAll();
+    }
 
     @PostMapping(SECURITY_PLATFORM_URI)
     @PreAuthorize("isPlanner()")

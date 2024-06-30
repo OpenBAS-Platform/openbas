@@ -1,15 +1,11 @@
 import React, { useContext, useState } from 'react';
 import * as R from 'ramda';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Slide } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import ArticleForm from './ArticleForm';
 import { ArticleContext, PermissionsContext } from '../Context';
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
+import Transition from '../../../../components/common/Transition';
 
 const ArticlePopover = ({ article, documents, onRemoveArticle = null }) => {
   // Standard hooks

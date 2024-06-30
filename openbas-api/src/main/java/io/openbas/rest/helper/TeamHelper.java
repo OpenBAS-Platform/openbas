@@ -58,6 +58,7 @@ public class TeamHelper {
                                 RawInjectExpectation raw = mapInjectExpectation.get(expectation);
                                 InjectExpectation injectExpectation = new InjectExpectation();
                                 injectExpectation.setScore(raw.getInject_expectation_score());
+                                injectExpectation.setExpectedScore(raw.getInject_expectation_expected_score());
                                 injectExpectation.setId(raw.getInject_expectation_id());
                                 injectExpectation.setExpectedScore(raw.getInject_expectation_expected_score());
                                 if(raw.getExercise_id() != null) {

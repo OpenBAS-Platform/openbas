@@ -36,12 +36,12 @@ public class InjectExpectation implements Base {
     DETECTION,
   }
 
-  public enum ExpectationStatus {
+  public enum EXPECTATION_STATUS {
     FAILED,
     PENDING,
     PARTIAL,
     UNKNOWN,
-    VALIDATED
+    SUCCESS
   }
 
   @Setter
@@ -89,10 +89,17 @@ public class InjectExpectation implements Base {
   private Integer score;
 
   @JsonProperty("inject_expectation_status")
-  public ExpectationStatus getResponse() {
-    return this.getScore() == null
-        ? ExpectationStatus.PENDING
-        : (this.getScore() == 0 ? ExpectationStatus.FAILED : ExpectationStatus.VALIDATED);
+  public EXPECTATION_STATUS getResponse() {
+    if( this.getScore() == null ) {
+      return EXPECTATION_STATUS.PENDING;
+    }
+    if( this.getScore() >= this.getExpectedScore() ) {
+      return EXPECTATION_STATUS.SUCCESS;
+    }
+    if( this.getScore() == 0 ) {
+      return EXPECTATION_STATUS.FAILED;
+    }
+    return EXPECTATION_STATUS.PARTIAL;
   }
 
   @Setter
@@ -180,6 +187,14 @@ public class InjectExpectation implements Base {
   public void setChallenge(Challenge challenge) {
     this.type = EXPECTATION_TYPE.CHALLENGE;
     this.challenge = challenge;
+  }
+
+  public void setManual(
+          @NotNull final Asset asset,
+          @NotNull final AssetGroup assetGroup) {
+    this.type = EXPECTATION_TYPE.MANUAL;
+    this.asset = asset;
+    this.assetGroup = assetGroup;
   }
 
   public void setPrevention(

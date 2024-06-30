@@ -19,7 +19,7 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
   const classes = useStyles();
   const getColor = (result: string | undefined): string => {
     const colorMap: Record<string, string> = {
-      VALIDATED: 'rgb(107, 235, 112)',
+      SUCCESS: 'rgb(107, 235, 112)',
       PENDING: 'rgb(128,128,128)',
       FAILED: 'rgb(220, 81, 72)',
       UNKNOWN: 'rgba(128,127,127,0.37)',

@@ -42,13 +42,16 @@ public class InjectExpectationService {
     public InjectExpectation computeExpectation(
             @NotNull final InjectExpectation expectation,
             @NotBlank final String sourceId,
+            @NotBlank final String sourceType,
             @NotBlank final String sourceName,
             @NotBlank final String result,
-            @NotBlank final boolean success) {
-        computeResult(expectation, sourceId, sourceName, result);
+            @NotBlank final Boolean success
+    ) {
         if (success) {
+            computeResult(expectation, sourceId, sourceType, sourceName, result, expectation.getExpectedScore());
             expectation.setScore(expectation.getExpectedScore());
         } else if (expectation.getScore() == null) {
+            computeResult(expectation, sourceId, sourceType, sourceName, result, 0);
             expectation.setScore(0);
         }
         return this.update(expectation);
@@ -58,14 +61,16 @@ public class InjectExpectationService {
             @NotNull final InjectExpectation expectationAssetGroup,
             @NotNull final List<InjectExpectation> expectationAssets,
             @NotBlank final String sourceId,
-            @NotBlank final String sourceName) {
+            @NotBlank final String sourceType,
+            @NotBlank final String sourceName
+    ) {
         boolean success;
         if (expectationAssetGroup.isExpectationGroup()) {
             success = expectationAssets.stream().anyMatch((e) -> e.getExpectedScore().equals(e.getScore()));
         } else {
             success = expectationAssets.stream().allMatch((e) -> e.getExpectedScore().equals(e.getScore()));
         }
-        computeResult(expectationAssetGroup, sourceId, sourceName, success ? "VALIDATED" : "FAILED");
+        computeResult(expectationAssetGroup, sourceId, sourceType, sourceName, success ? "SUCCESS" : "FAILED", success ? expectationAssetGroup.getExpectedScore() : 0);
         expectationAssetGroup.setScore(success ? expectationAssetGroup.getExpectedScore() : 0);
         this.update(expectationAssetGroup);
     }

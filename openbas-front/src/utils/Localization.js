@@ -871,7 +871,7 @@ const i18n = {
       'Attack Detected': 'Attaque détectée',
       'Validation Success': 'Attaque réussie',
       'Attack Blocked': 'Attaque bloquée',
-      'Attack Undetected': 'Attaque non détectée',
+      'Attack Not Detected': 'Attaque non détectée',
       'Validation Failed': "Échec de l'attaque",
       'Attack Unblocked': 'Attaque débloquée',
       'Waiting Response': 'En attente',

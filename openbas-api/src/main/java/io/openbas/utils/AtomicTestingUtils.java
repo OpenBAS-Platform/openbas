@@ -254,9 +254,9 @@ public class AtomicTestingUtils {
 
     @NotNull
     public static List<ExpectationResultsByType> getExpectationResultByTypes(final List<InjectExpectation> expectations) {
-        List<Integer> preventionScores = getScores(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
-        List<Integer> detectionScores = getScores(List.of(EXPECTATION_TYPE.DETECTION), expectations);
-        List<Integer> humanScores = getScores(List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL), expectations);
+        List<Double> preventionScores = getScores(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
+        List<Double> detectionScores = getScores(List.of(EXPECTATION_TYPE.DETECTION), expectations);
+        List<Double> humanScores = getScores(List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL), expectations);
 
         List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
 
@@ -269,9 +269,9 @@ public class AtomicTestingUtils {
 
     @NotNull
     public static List<ExpectationResultsByType> getRawExpectationResultByTypes(final List<RawInjectExpectation> expectations) {
-        List<Integer> preventionScores = getRawScores(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
-        List<Integer> detectionScores = getRawScores(List.of(EXPECTATION_TYPE.DETECTION), expectations);
-        List<Integer> humanScores = getRawScores(List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL), expectations);
+        List<Double> preventionScores = getRawScores(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
+        List<Double> detectionScores = getRawScores(List.of(EXPECTATION_TYPE.DETECTION), expectations);
+        List<Double> humanScores = getRawScores(List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL), expectations);
 
         List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
 
@@ -282,15 +282,15 @@ public class AtomicTestingUtils {
         return resultAvgOfExpectations;
     }
 
-    public static Optional<ExpectationResultsByType> getExpectationByType(final ExpectationType type, final List<Integer> scores) {
+    public static Optional<ExpectationResultsByType> getExpectationByType(final ExpectationType type, final List<Double> scores) {
         if (scores.isEmpty()) {
-            return Optional.of(new ExpectationResultsByType(type, InjectExpectation.ExpectationStatus.UNKNOWN, Collections.emptyList()));
+            return Optional.of(new ExpectationResultsByType(type, InjectExpectation.EXPECTATION_STATUS.UNKNOWN, Collections.emptyList()));
         }
         OptionalDouble avgResponse = calculateAverageFromExpectations(scores);
         if (avgResponse.isPresent()) {
             return Optional.of(new ExpectationResultsByType(type, getResult(avgResponse), getResultDetail(type, scores)));
         }
-        return Optional.of(new ExpectationResultsByType(type, InjectExpectation.ExpectationStatus.PENDING, getResultDetail(type, scores)));
+        return Optional.of(new ExpectationResultsByType(type, InjectExpectation.EXPECTATION_STATUS.PENDING, getResultDetail(type, scores)));
     }
 
     public static List<InjectExpectation> getRefinedExpectations(Inject inject, List<String> targetIds) {
@@ -301,47 +301,69 @@ public class AtomicTestingUtils {
                 .toList();
     }
 
-    public static List<ResultDistribution> getResultDetail(final ExpectationType type, final List<Integer> normalizedScores) {
-        long successCount = normalizedScores.stream().filter(s -> s != null && s.equals(1)).count();
+    public static List<ResultDistribution> getResultDetail(final ExpectationType type, final List<Double> normalizedScores) {
+        long successCount = normalizedScores.stream().filter(s -> s != null && s.equals(1.0)).count();
+        long partialCount = normalizedScores.stream().filter(s -> s != null && s.equals(0.5)).count();
         long pendingCount = normalizedScores.stream().filter(Objects::isNull).count();
-        long failureCount = normalizedScores.stream().filter(s -> s != null && s.equals(0)).count();
+        long failureCount = normalizedScores.stream().filter(s -> s != null && s.equals(0.0)).count();
 
         return List.of(
                 new ResultDistribution(type.successLabel, (int) successCount),
                 new ResultDistribution(type.pendingLabel, (int) pendingCount),
+                new ResultDistribution(type.partialLabel, (int) partialCount),
                 new ResultDistribution(type.failureLabel, (int) failureCount)
         );
     }
 
-    public static List<Integer> getScores(final List<EXPECTATION_TYPE> types, final List<InjectExpectation> expectations) {
+    public static List<Double> getScores(final List<EXPECTATION_TYPE> types, final List<InjectExpectation> expectations) {
         return expectations
                 .stream()
                 .filter(e -> types.contains(e.getType()))
-                .map(InjectExpectation::getScore)
-                .map(score -> score == null ? null : (score == 0 ? 0 : 1))
+                .map(injectExpectation -> {
+                    if( injectExpectation.getScore() == null ) {
+                        return null;
+                    }
+                    if( injectExpectation.getScore() >= injectExpectation.getExpectedScore() ) {
+                        return 1.0;
+                    }
+                    if( injectExpectation.getScore() == 0 ) {
+                        return 0.0;
+                    }
+                    return 0.5;
+                })
                 .toList();
     }
 
-    public static List<Integer> getRawScores(final List<EXPECTATION_TYPE> types, final List<RawInjectExpectation> expectations) {
+    public static List<Double> getRawScores(final List<EXPECTATION_TYPE> types, final List<RawInjectExpectation> expectations) {
         return expectations
                 .stream()
                 .filter(e -> types.contains(EXPECTATION_TYPE.valueOf(e.getInject_expectation_type())))
-                .map(RawInjectExpectation::getInject_expectation_score)
-                .map(score -> score == null ? null : (score == 0 ? 0 : 1))
+                .map(rawInjectExpectation -> {
+                    if( rawInjectExpectation.getInject_expectation_score() == null ) {
+                        return null;
+                    }
+                    if( rawInjectExpectation.getInject_expectation_score() >= rawInjectExpectation.getInject_expectation_expected_score() ) {
+                        return 1.0;
+                    }
+                    if( rawInjectExpectation.getInject_expectation_score() == 0 ) {
+                        return 0.0;
+                    }
+                    return 0.5;
+                })
                 .toList();
     }
 
-    public static InjectExpectation.ExpectationStatus getResult(final OptionalDouble avg) {
+    public static InjectExpectation.EXPECTATION_STATUS getResult(final OptionalDouble avg) {
         Double avgAsDouble = avg.getAsDouble();
-        return avgAsDouble == 0.0 ? InjectExpectation.ExpectationStatus.FAILED :
-                (avgAsDouble == 1.0 ? InjectExpectation.ExpectationStatus.VALIDATED :
-                        InjectExpectation.ExpectationStatus.PARTIAL);
+        return avgAsDouble == 0.0 ? InjectExpectation.EXPECTATION_STATUS.FAILED :
+                (avgAsDouble == 1.0 ? InjectExpectation.EXPECTATION_STATUS.SUCCESS :
+                        InjectExpectation.EXPECTATION_STATUS.PARTIAL);
     }
 
-    public static OptionalDouble calculateAverageFromExpectations(final List<Integer> scores) {
+    public static OptionalDouble calculateAverageFromExpectations(final List<Double> scores) {
         return scores.stream()
                 .filter(Objects::nonNull)
-                .mapToInt(Integer::intValue)
+                .mapToDouble(Double::doubleValue)
                 .average();
     }
 

@@ -61,6 +61,7 @@ public class DocumentApi extends RestBehavior {
     private UserRepository userRepository;
     private InjectorRepository injectorRepository;
     private CollectorRepository collectorRepository;
+    private SecurityPlatformRepository securityPlatformRepository;
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
@@ -110,6 +111,11 @@ public class DocumentApi extends RestBehavior {
     @Autowired
     public void setCollectorRepository(CollectorRepository collectorRepository) {
         this.collectorRepository = collectorRepository;
+    }
+
+    @Autowired
+    public void setSecurityPlatformRepository(SecurityPlatformRepository securityPlatformRepository) {
+        this.securityPlatformRepository = securityPlatformRepository;
     }
 
     @Autowired
@@ -380,6 +386,15 @@ public class DocumentApi extends RestBehavior {
         return null;
     }
 
+    public void downloadCollectorImage(@PathVariable String collectorType, HttpServletResponse response) throws IOException {
+        response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + collectorType + ".png");
+        response.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_PNG_VALUE);
+        response.setStatus(HttpServletResponse.SC_OK);
+        try (InputStream fileStream = fileService.getCollectorImage(collectorType).orElseThrow(ElementNotFoundException::new)) {
+            fileStream.transferTo(response.getOutputStream());
+        }
+    }
+
     @GetMapping(value = "/api/images/collectors/id/{collectorId}", produces = MediaType.IMAGE_PNG_VALUE)
     public @ResponseBody ResponseEntity<byte[]> getCollectorImageFromId(@PathVariable String collectorId) throws IOException {
         Collector collector = this.collectorRepository.findById(collectorId).orElseThrow(ElementNotFoundException::new);
@@ -390,6 +405,20 @@ public class DocumentApi extends RestBehavior {
                     .body(IOUtils.toByteArray(fileStream.get()));
         }
         return null;
+    }
+
+    @GetMapping(value = "/api/images/security_platforms/id/{assetId}/{theme}")
+    public void getSecurityPlatformImageFromId(@PathVariable String assetId, @PathVariable String theme, HttpServletResponse response) throws IOException {
+        SecurityPlatform securityPlatform = this.securityPlatformRepository.findById(assetId).orElseThrow(ElementNotFoundException::new);
+        if( theme.equals("dark") ) {
+            if( securityPlatform.getLogoDark() != null ) {
+                downloadDocument(securityPlatform.getLogoDark().getId(), response);
+            }
+        }
+        if( securityPlatform.getLogoLight() != null ) {
+            downloadDocument(securityPlatform.getLogoLight().getId(), response);
+        }
+        downloadCollectorImage("openbas_fake_detector", response);
     }
 
     @GetMapping(value = "/api/images/executors/{executorId}", produces = MediaType.IMAGE_PNG_VALUE)
