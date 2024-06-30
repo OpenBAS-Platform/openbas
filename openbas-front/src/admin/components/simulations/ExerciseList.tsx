@@ -53,10 +53,10 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '10%',
   },
   exercise_targets: {
-    width: '20%',
+    width: '15%',
   },
   exercise_global_score: {
-    width: '10%',
+    width: '15%',
   },
   exercise_tags: {
     width: '15%',

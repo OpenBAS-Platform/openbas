@@ -35,3 +35,20 @@ export const resolveUserNames = (users, withEmailAddress = false) => {
 };
 
 export const emptyFilled = (str) => (isNotEmptyField(str) ? str : '-');
+
+// Extract the first two items as visible chips
+export const getVisibleItems = (items, limit) => {
+  return items?.slice(0, limit);
+};
+
+// Generate label with name of remaining items
+export const getLabelOfRemainingItems = (items, start, property) => {
+  return items?.slice(start, items?.length).map(
+    (item) => item[property],
+  ).join(', ');
+};
+
+// Calculate the number of remaining items
+export const getRemainingItemsCount = (items, visibleItems) => {
+  return (items && visibleItems && items.length - visibleItems.length) || null;
+};
