@@ -61,6 +61,9 @@ const ResponsePie: FunctionComponent<Props> = ({
       Blocked: theme.palette.success.main ?? '',
       Detected: theme.palette.success.main ?? '',
       Successful: theme.palette.success.main ?? '',
+      Partial: theme.palette.warning.main ?? '',
+      'Partially Prevented': theme.palette.warning.main ?? '',
+      'Partially Detected': theme.palette.warning.main ?? '',
       Pending: theme.palette.grey?.['500'] ?? '',
     };
     return colorMap[result ?? ''] ?? theme.palette.error.main ?? '';

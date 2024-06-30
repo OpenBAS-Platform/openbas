@@ -36,7 +36,7 @@ public class DetectionExpectation implements Expectation {
         return DETECTION;
     }
 
-    public static DetectionExpectation detectionExpectation(
+    public static DetectionExpectation detectionExpectationForAsset(
             @Nullable final Integer score,
             @NotBlank final String name,
             final String description,

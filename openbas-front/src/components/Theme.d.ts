@@ -48,6 +48,7 @@ interface ExtendedPaletteOptions extends PaletteOptions {
   primary: Partial<ExtendedColor>;
   error: Partial<ExtendedColor>;
   success: Partial<ExtendedColor>;
+  warning: Partial<ExtendedColor>;
   chip: Partial<ExtendedColor>;
   ee: Partial<ExtendedColor>;
   secondary: Partial<ExtendedColor>;

@@ -18,6 +18,7 @@ import io.openbas.injectors.caldera.service.CalderaInjectorService;
 import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.DetectionExpectation;
+import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.utils.Time;
 import jakarta.validation.constraints.NotNull;
@@ -34,10 +35,12 @@ import java.util.stream.StreamSupport;
 
 import static io.openbas.database.model.InjectExpectationSignature.*;
 import static io.openbas.database.model.InjectStatusExecution.*;
-import static io.openbas.model.expectation.DetectionExpectation.detectionExpectation;
+import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAsset;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAssetGroup;
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAsset;
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAssetGroup;
+import static io.openbas.model.expectation.ManualExpectation.manualExpectationForAsset;
+import static io.openbas.model.expectation.ManualExpectation.manualExpectationForAssetGroup;
 import static java.time.Instant.now;
 
 @Component(CalderaContract.TYPE)
@@ -237,7 +240,9 @@ public class CalderaExecutor extends Injector {
                 case PREVENTION ->
                         Stream.of(preventionExpectationForAsset(expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup, injectExpectationSignatures)); // expectationGroup usefully in front-end
                 case DETECTION ->
-                        Stream.of(detectionExpectation(expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup, injectExpectationSignatures));
+                        Stream.of(detectionExpectationForAsset(expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup, injectExpectationSignatures));
+                case MANUAL ->
+                        Stream.of(manualExpectationForAsset(expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup));
                 default -> Stream.of();
             }).toList());
         }
@@ -263,6 +268,14 @@ public class CalderaExecutor extends Injector {
                     List<Asset> assets = this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
                     if (assets.stream().anyMatch((asset) -> expectations.stream().filter(e -> EXPECTATION_TYPE.DETECTION == e.type()).anyMatch((e) -> ((DetectionExpectation) e).getAsset() != null && ((DetectionExpectation) e).getAsset().getId().equals(asset.getId())))) {
                         yield Stream.of(detectionExpectationForAssetGroup(expectation.getScore(), expectation.getName(), expectation.getDescription(), assetGroup, expectation.isExpectationGroup(), injectExpectationSignatures));
+                    }
+                    yield Stream.of();
+                }
+                case MANUAL -> {
+                    // Verify that at least one asset in the group has been executed
+                    List<Asset> assets = this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
+                    if (assets.stream().anyMatch((asset) -> expectations.stream().filter(e -> EXPECTATION_TYPE.MANUAL == e.type()).anyMatch((e) -> ((ManualExpectation) e).getAsset() != null && ((ManualExpectation) e).getAsset().getId().equals(asset.getId())))) {
+                        yield Stream.of(manualExpectationForAssetGroup(expectation.getScore(), expectation.getName(), expectation.getDescription(), assetGroup, expectation.isExpectationGroup()));
                     }
                     yield Stream.of();
                 }

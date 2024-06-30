@@ -476,6 +476,10 @@ export const storeHelper = (state) => ({
   getAssetGroups: () => entities('asset_groups', state),
   getAssetGroupMaps: () => maps('asset_groups', state),
   getAssetGroup: (id) => entity(id, 'asset_groups', state),
+  // security platforms
+  getSecurityPlatforms: () => entities('securityplatforms', state),
+  getSecurityPlatformsMap: () => maps('securityplatforms', state),
+  getSecurityPlatform: (id) => entity(id, 'securityplatforms', state),
   // scenarios
   getScenarios: () => entities('scenarios', state),
   getScenariosMap: () => maps('scenarios', state),

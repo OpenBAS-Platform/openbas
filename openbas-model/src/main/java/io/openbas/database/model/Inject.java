@@ -398,6 +398,7 @@ public class Inject implements Base, Injection {
                 expectation.setType(
                         InjectExpectation.EXPECTATION_TYPE.valueOf(rawInjectExpectation.getInject_expectation_type()));
                 expectation.setScore(rawInjectExpectation.getInject_expectation_score());
+                expectation.setExpectedScore(rawInjectExpectation.getInject_expectation_expected_score());
 
                 // Add the team of the expectation
                 if (rawInjectExpectation.getTeam_id() != null) {

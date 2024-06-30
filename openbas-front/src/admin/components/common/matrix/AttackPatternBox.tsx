@@ -80,7 +80,7 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
     setOpen(true);
     setAnchorEl(event.currentTarget);
   };
-  const lowestSelector = (aggregation: (('FAILED' | 'PENDING' | 'PARTIAL' | 'UNKNOWN' | 'VALIDATED' | undefined)[])): 'FAILED' | 'PENDING' | 'PARTIAL' | 'UNKNOWN' | 'VALIDATED' => {
+  const lowestSelector = (aggregation: (('FAILED' | 'PENDING' | 'PARTIAL' | 'UNKNOWN' | 'SUCCESS' | undefined)[])): 'FAILED' | 'PENDING' | 'PARTIAL' | 'UNKNOWN' | 'SUCCESS' => {
     if (aggregation.includes('FAILED')) {
       return 'FAILED';
     }
@@ -90,7 +90,7 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
     if (aggregation.includes('UNKNOWN')) {
       return 'UNKNOWN';
     }
-    return 'VALIDATED';
+    return 'SUCCESS';
   };
   const aggregatedPrevention = (results ?? []).map((result) => result.results?.filter((r) => r.type === 'PREVENTION').map((r) => r.avgResult)).flat();
   const aggregatedDetection = (results ?? []).map((result) => result.results?.filter((r) => r.type === 'DETECTION').map((r) => r.avgResult)).flat();

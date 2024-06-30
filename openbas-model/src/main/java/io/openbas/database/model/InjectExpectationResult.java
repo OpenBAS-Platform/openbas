@@ -10,9 +10,14 @@ public class InjectExpectationResult {
 
   private String sourceId;
 
+  private String sourceType;
+
   private String sourceName;
+
+  private String date;
+
+  private Integer score;
 
   @NotBlank
   private String result;
-
 }
