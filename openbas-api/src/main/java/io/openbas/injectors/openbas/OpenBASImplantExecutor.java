@@ -19,8 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static io.openbas.model.expectation.DetectionExpectation.detectionExpectation;
+import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAsset;
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAsset;
+import static io.openbas.model.expectation.ManualExpectation.manualExpectationForAsset;
 
 @Component(OpenBASImplantContract.TYPE)
 @RequiredArgsConstructor
@@ -50,7 +51,9 @@ public class OpenBASImplantExecutor extends Injector {
                 case PREVENTION ->
                         Stream.of(preventionExpectationForAsset(expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup, injectExpectationSignatures)); // expectationGroup usefully in front-end
                 case DETECTION ->
-                        Stream.of(detectionExpectation(expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup, injectExpectationSignatures));
+                        Stream.of(detectionExpectationForAsset(expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup, injectExpectationSignatures));
+                case MANUAL ->
+                        Stream.of(manualExpectationForAsset(expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup));
                 default -> Stream.of();
             }).toList();
         }

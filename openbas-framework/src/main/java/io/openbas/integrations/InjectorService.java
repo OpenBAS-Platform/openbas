@@ -140,7 +140,6 @@ public class InjectorService {
                         .collect(Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
                 injectorContract.setLabels(labels);
                 injectorContract.setInjector(injector);
-
                 if (!in.getAttackPatternsExternalIds().isEmpty()) {
                     List<AttackPattern> attackPatterns = fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(in.getAttackPatternsExternalIds()));
                     injectorContract.setAttackPatterns(attackPatterns);
@@ -157,10 +156,11 @@ public class InjectorService {
             injectorContractRepository.deleteAllById(toDeletes);
             injectorContractRepository.saveAll(toCreates);
             injectorContractRepository.saveAll(toUpdates);
+            // TODO Remove the following line in 1.3.0
+            if( injector.isPayloads() ) {
+                this.payloadService.updateInjectorContractsForInjector(injector);
+            }
             injectorRepository.save(injector);
-            // if( injector.isPayloads() ) {
-            //    this.payloadService.updateInjectorContractsForInjector(injector);
-            // }
         } else {
             // save the injector
             Injector newInjector = new Injector();
@@ -173,9 +173,10 @@ public class InjectorService {
             newInjector.setExecutorClearCommands(executorClearCommands);
             newInjector.setPayloads(isPayloads);
             Injector savedInjector = injectorRepository.save(newInjector);
-            // if( savedInjector.isPayloads() ) {
-            //    this.payloadService.updateInjectorContractsForInjector(savedInjector);
-            // }
+            // TODO Remove the following line in 1.3.0
+            if( savedInjector.isPayloads() ) {
+                this.payloadService.updateInjectorContractsForInjector(savedInjector);
+            }
             // Save the contracts
             List<InjectorContract> injectorContracts = contracts.stream().map(in -> {
                 InjectorContract injectorContract = new InjectorContract();
