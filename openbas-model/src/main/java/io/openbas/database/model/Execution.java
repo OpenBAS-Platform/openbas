@@ -27,6 +27,11 @@ public class Execution {
     private boolean async;
 
     @Getter
+    @Setter
+    @JsonProperty("execution_expected_count")
+    private Integer expectedCount;
+
+    @Getter
     @JsonProperty("execution_start")
     private Instant startTime;
 

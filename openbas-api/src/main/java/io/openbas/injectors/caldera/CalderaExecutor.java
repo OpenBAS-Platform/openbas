@@ -130,7 +130,6 @@ public class CalderaExecutor extends Injector {
                                         break;
                                     default:
                                         throw new UnsupportedOperationException("Payload type " + inject.getInjectorContract().getPayload().getType() + " is not supported");
-
                                 }
                             } else {
                                 injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME).value(executionEndpoint.getProcessName()).build());
@@ -162,7 +161,6 @@ public class CalderaExecutor extends Injector {
 
         String message = "Caldera executed the ability on " + asyncIds.size() + " asset(s)";
         execution.addTrace(traceInfo(message, asyncIds));
-
         return new ExecutionProcess(true, expectations);
     }
 
