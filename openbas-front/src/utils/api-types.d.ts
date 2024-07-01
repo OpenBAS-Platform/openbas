@@ -745,7 +745,6 @@ export interface ExerciseCreateInput {
   exercise_description?: string;
   exercise_main_focus?: string;
   exercise_name: string;
-  exercise_id?: string;
   exercise_severity?: string;
   /** @format date-time */
   exercise_start_date?: string;
