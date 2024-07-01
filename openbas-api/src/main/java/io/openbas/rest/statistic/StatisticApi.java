@@ -136,6 +136,7 @@ public class StatisticApi extends RestBehavior {
                                 if(expectation.getInject_expectation_type() != null) {
                                   SimpleRawInjectExpectation rawInjectExpectation = new SimpleRawInjectExpectation();
                                   rawInjectExpectation.setInject_expectation_score(expectation.getInject_expectation_score());
+                                  rawInjectExpectation.setInject_expectation_expected_score(expectation.getInject_expectation_expected_score());
                                   rawInjectExpectation.setInject_expectation_type(expectation.getInject_expectation_type());
                                   resultInjectExpectationResultsByAttackPattern
                                           .setResults(AtomicTestingUtils.getRawExpectationResultByTypes(Stream.of(rawInjectExpectation)

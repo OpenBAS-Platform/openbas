@@ -74,6 +74,11 @@ const computeStatusStyle = (status: string | undefined | null) => {
     case 'Prevented':
     case 'Detected':
       return inlineStyles.green;
+    case 'PARTIAL':
+    case 'Partial':
+    case 'Partially Prevented':
+    case 'Partially Detected':
+      return inlineStyles.orange;
     default:
       return inlineStyles.blueGrey;
   }

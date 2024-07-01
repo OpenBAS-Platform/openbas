@@ -45,6 +45,7 @@ public class ExpectationsExpirationManagerService {
                 this.injectExpectationService.computeExpectation(
                         expectation,
                         this.config.getId(),
+                        "collector",
                         PRODUCT_NAME,
                         result,
                         false
@@ -62,6 +63,7 @@ public class ExpectationsExpirationManagerService {
                 this.injectExpectationService.computeExpectation(
                         expectation,
                         this.config.getId(),
+                        "collector",
                         PRODUCT_NAME,
                         result,
                         false
@@ -82,6 +84,7 @@ public class ExpectationsExpirationManagerService {
                         expectationAssetGroup,
                         expectationAssets,
                         this.config.getId(),
+                        "collector",
                         PRODUCT_NAME
                 );
             }

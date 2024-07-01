@@ -57,7 +57,7 @@ public class AtomicTestingMapper {
     }
 
     public record ExpectationResultsByType(@NotNull ExpectationType type,
-                                           @NotNull InjectExpectation.ExpectationStatus avgResult,
+                                           @NotNull InjectExpectation.EXPECTATION_STATUS avgResult,
                                            @NotNull List<ResultDistribution> distribution) {
 
     }

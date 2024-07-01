@@ -22,7 +22,7 @@ public class ExpectationsExpirationManagerJob implements Runnable {
     try {
       collectorService.register(config.getId(), FAKE_DETECTOR_COLLECTOR_TYPE, FAKE_DETECTOR_COLLECTOR_NAME, getClass().getResourceAsStream("/img/icon-fake-detector.png"));
     } catch (Exception e) {
-      log.log(Level.SEVERE, "Error creating fake detector collector");
+      log.log(Level.SEVERE, "Error creating expectations expiration manager ");
     }
   }
 
@@ -32,7 +32,7 @@ public class ExpectationsExpirationManagerJob implements Runnable {
     try {
       this.fakeDetectorService.computeExpectations();
     } catch (Exception e) {
-      log.log(Level.SEVERE, "Error running fake detector service");
+      log.log(Level.SEVERE, "Error running expectations expiration manager service", e);
     }
   }
 

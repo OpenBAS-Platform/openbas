@@ -18,9 +18,9 @@ public class ExpectationUtils {
 
   public static String computeFailedMessage(@NotNull final EXPECTATION_TYPE expectationType) {
     return DETECTION.equals(expectationType)
-        ? "Not detected"
+        ? "Not Detected"
         : PREVENTION.equals(expectationType)
-            ? "Not prevented"
+            ? "Not Prevented"
             : "FAILED";
   }
 

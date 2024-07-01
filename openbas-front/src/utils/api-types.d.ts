@@ -885,7 +885,7 @@ export interface ExerciseUpdateTeamsInput {
 }
 
 export interface ExpectationResultsByType {
-  avgResult: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
+  avgResult: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   distribution: ResultDistribution[];
   type: "DETECTION" | "HUMAN_RESPONSE" | "PREVENTION";
 }
@@ -893,6 +893,9 @@ export interface ExpectationResultsByType {
 export interface ExpectationUpdateInput {
   /** @format int32 */
   expectation_score: number;
+  source_id: string;
+  source_name: string;
+  source_type: string;
 }
 
 export interface Filter {
@@ -1064,7 +1067,7 @@ export interface InjectExpectation {
   /** @format int32 */
   inject_expectation_score?: number;
   inject_expectation_signatures?: InjectExpectationSignature[];
-  inject_expectation_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
+  inject_expectation_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   inject_expectation_team?: Team;
   inject_expectation_type: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
   /** @format date-time */
@@ -1075,9 +1078,13 @@ export interface InjectExpectation {
 }
 
 export interface InjectExpectationResult {
+  date?: string;
   result: string;
+  /** @format int32 */
+  score?: number;
   sourceId?: string;
   sourceName?: string;
+  sourceType?: string;
 }
 
 export interface InjectExpectationResultsByAttackPattern {

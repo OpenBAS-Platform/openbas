@@ -43,7 +43,6 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
   const [openToneOptions, setOpenToneOptions] = useState(false);
   const [openGenMessageOptions, setOpenGenMessageOptions] = useState(false);
   const [openGenMediaOptions, setOpenGenMediaOptions] = useState(false);
-  const [tone, setTone] = useState<'tactical' | 'operational' | 'strategic'>('tactical');
   const [messageContext, setMessageContext] = useState<string>(context ?? '');
   const [messageInput, setMessageInput] = useState<string>(currentValue);
   const [messageParagraphs, setMessageParagraphs] = useState<number>(5);
@@ -84,7 +83,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
   const askFixSpelling = async () => aiFixSpelling(currentValue, format, (data: string) => setContent(data));
   const askMakeShorter = async () => aiMakeShorter(currentValue, format, (data: string) => setContent(data));
   const askMakeLonger = async () => aiMakeLonger(currentValue, format, (data: string) => setContent(data));
-  const askChangeTone = async () => aiChangeTone(currentValue, tone, format, (data: string) => setContent(data));
+  const askChangeTone = async () => aiChangeTone(currentValue, messageTone, format, (data: string) => setContent(data));
   const askSummarize = async () => aiSummarize(currentValue, format, (data: string) => setContent(data));
   const askExplain = async () => aiExplain(currentValue, (data: string) => setContent(data));
   const askGenMessage = async () => aiGenMessage(
@@ -398,13 +397,19 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               <InputLabel id="tone">{t('Tone')}</InputLabel>
               <Select
                 labelId="tone"
-                value={tone}
-                onChange={(event) => setTone(event.target.value as unknown as 'tactical' | 'operational' | 'strategic')}
+                value={messageTone}
+                onChange={(event) => setMessageTone(event.target.value as unknown as 'informal' | 'formal' | 'assertive' | 'sarcastic' | 'authoritative' | 'bitter' | 'critical' | 'arrogant' | 'aggressive')}
                 fullWidth={true}
               >
-                <MenuItem value="tactical">{t('Tactical')}</MenuItem>
-                <MenuItem value="operational">{t('Operational')}</MenuItem>
-                <MenuItem value="strategic">{t('Strategic')}</MenuItem>
+                <MenuItem value="informal">{t('Informal')}</MenuItem>
+                <MenuItem value="formal">{t('Formal')}</MenuItem>
+                <MenuItem value="assertive">{t('Assertive')}</MenuItem>
+                <MenuItem value="sarcastic">{t('Sarcastic')}</MenuItem>
+                <MenuItem value="authoritative">{t('Authoritative')}</MenuItem>
+                <MenuItem value="bitter">{t('Bitter')}</MenuItem>
+                <MenuItem value="critical">{t('Critical')}</MenuItem>
+                <MenuItem value="arrogant">{t('Arrogant')}</MenuItem>
+                <MenuItem value="aggressive">{t('Aggressive')}</MenuItem>
               </Select>
             </FormControl>
           </DialogContent>

@@ -40,7 +40,7 @@ public class CalderaInjector {
                     "simulation-implant",
                     executorCommands,
                     executorClearCommands,
-                    true
+                    false
             );
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error creating Caldera injector (" + e.getMessage() + ")" + "\n" + Arrays.toString(e.getStackTrace()));

@@ -48,6 +48,7 @@ export const entitiesInitializer = Immutable({
     attackpatterns: Immutable({}),
     endpoints: Immutable({}),
     asset_groups: Immutable({}),
+    securityplatforms: Immutable({}),
     scenarios: Immutable({}),
     injectors: Immutable({}),
     collectors: Immutable({}),

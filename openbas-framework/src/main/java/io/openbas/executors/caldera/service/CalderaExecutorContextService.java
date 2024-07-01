@@ -65,13 +65,14 @@ public class CalderaExecutorContextService {
     public void launchExecutorSubprocess(@NotNull final Inject inject, @NotNull final Asset asset) {
         Injector injector = inject.getInjectorContract().getInjector();
         if (this.injectorExecutorAbilities.containsKey(injector.getId())) {
-            calderaExecutorClient.exploit("base64", asset.getExternalReference(), this.injectorExecutorAbilities.get(injector.getId()).getAbility_id());
+            List<Map<String, String>> additionalFields = List.of(Map.of("trait", "inject", "value", inject.getId()));
+            calderaExecutorClient.exploit("base64", asset.getExternalReference(), this.injectorExecutorAbilities.get(injector.getId()).getAbility_id(), additionalFields);
         }
     }
 
     public void launchExecutorClear(@NotNull final Injector injector, @NotNull final Asset asset) {
         if (this.injectorExecutorAbilities.containsKey(injector.getId())) {
-            calderaExecutorClient.exploit("base64", asset.getExternalReference(), this.injectorExecutorClearAbilities.get(injector.getId()).getAbility_id());
+            calderaExecutorClient.exploit("base64", asset.getExternalReference(), this.injectorExecutorClearAbilities.get(injector.getId()).getAbility_id(), List.of());
         }
     }
 

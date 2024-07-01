@@ -55,7 +55,7 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
      * @param from the max date of creation
      * @return the list of expectations
      */
-    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score " +
+    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score, ie.inject_expectation_expected_score " +
             "FROM injects_expectations ie " +
             "INNER JOIN injects ON ie.inject_id = injects.inject_id " +
             "INNER JOIN exercises ON injects.inject_exercise = exercises.exercise_id " +
@@ -68,7 +68,7 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
      * @param userId the id of the user
      * @return the list of expectations
      */
-    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score " +
+    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score, ie.inject_expectation_expected_score " +
             "FROM injects_expectations ie " +
             "INNER JOIN injects ON ie.inject_id = injects.inject_id " +
             "INNER JOIN exercises e ON injects.inject_exercise = e.exercise_id " +
@@ -84,7 +84,7 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
      * @param from the date max of creation
      * @return a list of expectations
      */
-    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score, injects.inject_title, icap.attack_pattern_id " +
+    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score, ie.inject_expectation_expected_score, injects.inject_title, icap.attack_pattern_id " +
             "FROM exercises " +
             "INNER JOIN injects ON exercises.exercise_id = injects.inject_exercise " +
             "LEFT JOIN injects_expectations ie ON injects.inject_id = ie.exercise_id " +
@@ -99,7 +99,7 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
      * @param userId the id of the user
      * @return the list of global expectations
      */
-    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score, injects.inject_title, icap.attack_pattern_id " +
+    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score, ie.inject_expectation_expected_score, injects.inject_title, icap.attack_pattern_id " +
             "FROM exercises " +
             "INNER JOIN injects ON exercises.exercise_id = injects.inject_exercise " +
             "LEFT JOIN injects_expectations ie ON exercises.exercise_id = ie.exercise_id " +

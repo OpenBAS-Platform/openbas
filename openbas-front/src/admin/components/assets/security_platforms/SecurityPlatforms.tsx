@@ -2,7 +2,6 @@ import React, { CSSProperties, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { useSearchParams } from 'react-router-dom';
-import { SecurityNetwork } from 'mdi-material-ui';
 import SecurityPlatformCreation from './SecurityPlatformCreation';
 import SecurityPlatformPopover from './SecurityPlatformPopover';
 import { useHelper } from '../../../../store';
@@ -141,7 +140,6 @@ const SecurityPlatforms = () => {
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
         {securityPlatforms.map((securityPlatform: SecurityPlatformStore) => {
-          const logo = theme.palette.mode === 'dark' ? securityPlatform.security_platform_logo_dark : securityPlatform.security_platform_logo_light;
           return (
             <ListItem
               key={securityPlatform.asset_id}
@@ -149,7 +147,11 @@ const SecurityPlatforms = () => {
               divider={true}
             >
               <ListItemIcon>
-                {logo ? <img src={`/api/documents/${logo}/file`} alt="logo" style={{ maxHeight: 25, maxWidth: 25 }} /> : <SecurityNetwork color="primary"/>}
+                <img
+                  src={`/api/images/security_platforms/id/${securityPlatform.asset_id}/${theme.palette.mode}`}
+                  alt={securityPlatform.asset_name}
+                  style={{ width: 25, height: 25, borderRadius: 4 }}
+                />
               </ListItemIcon>
               <ListItemText
                 primary={

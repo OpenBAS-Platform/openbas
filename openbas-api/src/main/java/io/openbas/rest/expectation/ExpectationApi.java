@@ -51,6 +51,14 @@ public class ExpectationApi extends RestBehavior {
         return this.exerciseExpectationService.updateInjectExpectation(expectationId, input);
     }
 
+    @Transactional(rollbackOn = Exception.class)
+    @PutMapping("/api/expectations/{expectationId}/{sourceId}/delete")
+    public InjectExpectation deleteInjectExpectationResult(
+            @PathVariable @NotBlank final String expectationId,
+            @PathVariable @NotBlank final String sourceId) {
+        return this.exerciseExpectationService.deleteInjectExpectationResult(expectationId, sourceId);
+    }
+
     @GetMapping("/api/injects/expectations")
     public List<InjectExpectation> getInjectExpectationsNotFilled() {
         return Stream.concat(
@@ -106,7 +114,7 @@ public class ExpectationApi extends RestBehavior {
     public InjectExpectation updateInjectExpectation(@PathVariable @NotBlank final String expectationId, @Valid @RequestBody @NotNull InjectExpectationUpdateInput input) {
         InjectExpectation injectExpectation = this.injectExpectationService.findInjectExpectation(expectationId).orElseThrow();
         Collector collector = this.collectorRepository.findById(input.getCollectorId()).orElseThrow();
-        injectExpectation = this.injectExpectationService.computeExpectation(injectExpectation, collector.getId(), collector.getName(), input.getResult(), input.getSuccess());
+        injectExpectation = this.injectExpectationService.computeExpectation(injectExpectation, collector.getId(), "collector", collector.getName(), input.getResult(), input.getSuccess());
 
         // Compute potential expectations for asset groups
         Inject inject = injectExpectation.getInject();
@@ -121,6 +129,7 @@ public class ExpectationApi extends RestBehavior {
                         expectationAssetGroup,
                         expectationAssets,
                         collector.getId(),
+                        "collector",
                         collector.getName()
                 );
             }

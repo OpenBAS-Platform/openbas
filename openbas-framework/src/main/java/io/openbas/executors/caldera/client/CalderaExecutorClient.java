@@ -212,16 +212,16 @@ public class CalderaExecutorClient {
     public void exploit(
             @NotBlank final String obfuscator,
             @NotBlank final String paw,
-            @NotBlank final String abilityId) {
+            @NotBlank final String abilityId,
+            final List<Map<String, String>> additionalFields
+    ) {
         try {
             Map<String, Object> body = new HashMap<>();
             body.put("obfuscator", obfuscator);
             body.put("paw", paw);
             body.put("ability_id", abilityId);
-            String result = this.post(
-                    this.config.getPluginAccessApiUrl() + EXPLOIT_URI,
-                    body
-            );
+            body.put("facts", additionalFields);
+            String result = this.post(this.config.getPluginAccessApiUrl() + EXPLOIT_URI, body);
             assert result.contains("complete"); // the exploit is well taken into account
         } catch (IOException e) {
             throw new RuntimeException(e);

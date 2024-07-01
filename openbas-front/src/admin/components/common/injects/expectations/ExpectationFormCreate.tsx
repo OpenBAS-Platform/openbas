@@ -42,7 +42,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         expectation_type: predefinedExpectation.expectation_type ?? '',
         expectation_name: predefinedExpectation.expectation_name ?? '',
         expectation_description: predefinedExpectation.expectation_description ?? '',
-        expectation_score: predefinedExpectation.expectation_score ?? 0,
+        expectation_score: predefinedExpectation.expectation_score ?? 100,
         expectation_expectation_group: predefinedExpectation.expectation_expectation_group ?? false,
       };
     }
@@ -50,7 +50,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
       expectation_type: 'MANUAL',
       expectation_name: '',
       expectation_description: '',
-      expectation_score: 0,
+      expectation_score: 100,
       expectation_expectation_group: false,
     };
   };
