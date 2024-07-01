@@ -6,11 +6,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
-import {
-    deleteAtomicTesting,
-    duplicateAtomicTesting,
-    updateAtomicTesting
-} from '../../../../actions/atomic_testings/atomic-testing-actions';
+import { deleteAtomicTesting, duplicateAtomicTesting, updateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import UpdateInject from '../../common/injects/UpdateInject';

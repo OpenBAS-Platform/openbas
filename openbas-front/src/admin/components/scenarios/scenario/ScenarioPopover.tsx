@@ -5,14 +5,7 @@ import type { ScenarioInput, ScenarioInformationInput } from '../../../../utils/
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
-import {
-  addScenario,
-  deleteScenario,
-  duplicateScenario,
-  exportScenarioUri,
-  updateScenario,
-  updateScenarioInformation
-} from '../../../../actions/scenarios/scenario-actions';
+import { deleteScenario, duplicateScenario, exportScenarioUri, updateScenario, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import Drawer from '../../../../components/common/Drawer';
 import ScenarioForm from '../ScenarioForm';

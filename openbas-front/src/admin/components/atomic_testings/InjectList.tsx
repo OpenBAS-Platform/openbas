@@ -90,8 +90,7 @@ const InjectList: FunctionComponent<Props> = ({
   // Fetch injects on initial render and when pagination input changes
   useEffect(() => {
     fetchInjects(searchPaginationInput)
-      .then((response) => setInjects(response.data.content))
-      .catch((error) => console.error('Error fetching injects:', error));
+      .then((response) => setInjects(response.data.content));
   }, [fetchInjects, searchPaginationInput]);
 
   // Headers

@@ -204,7 +204,7 @@ const ExerciseHeader = () => {
   const [openDeleteId, setOpenDeleteId] = useState<string | null>(null);
 
   // UPDATE
-  const handleOpenEdit = (exerciseId: string) => {
+  const handleOpenEdit = () => {
     setOpenEditId(exerciseId);
   };
 
@@ -213,7 +213,7 @@ const ExerciseHeader = () => {
   };
 
   // EXPORT
-  const handleOpenExport = (exerciseId: string) => {
+  const handleOpenExport = () => {
     setOpenExportId(exerciseId);
   };
 
@@ -222,7 +222,7 @@ const ExerciseHeader = () => {
   };
 
   // DUPLICATE
-  const handleOpenDuplicate = (exerciseId: string) => {
+  const handleOpenDuplicate = () => {
     setOpenDuplicateId(exerciseId);
   };
 
@@ -231,7 +231,7 @@ const ExerciseHeader = () => {
   };
 
   // DELETE
-  const handleOpenDelete = (exerciseId: string) => {
+  const handleOpenDelete = () => {
     setOpenDeleteId(exerciseId);
   };
 
@@ -241,11 +241,11 @@ const ExerciseHeader = () => {
 
   // Button Popover
   const entries: ButtonPopoverEntry[] = [
-    { label: 'Update', action: () => handleOpenEdit(exerciseId) },
-    { label: 'Duplicate', action: () => handleOpenDuplicate(exerciseId) },
-    { label: 'Export', action: () => handleOpenExport(exerciseId) },
-    { label: 'Delete', action: () => handleOpenDelete(exerciseId) },
-  ]
+    { label: 'Update', action: () => handleOpenEdit() },
+    { label: 'Duplicate', action: () => handleOpenDuplicate() },
+    { label: 'Export', action: () => handleOpenExport() },
+    { label: 'Delete', action: () => handleOpenDelete() },
+  ];
 
   return (
     <>

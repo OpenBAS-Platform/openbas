@@ -114,7 +114,7 @@ const ScenarioHeader = ({
   const [openDeleteId, setOpenDeleteId] = useState<string | null>(null);
 
   // UPDATE
-  const handleOpenEdit = (scenarioId: string) => {
+  const handleOpenEdit = () => {
     setOpenEditId(scenarioId);
   };
 
@@ -123,7 +123,7 @@ const ScenarioHeader = ({
   };
 
   // EXPORT
-  const handleOpenExport = (scenarioId: string) => {
+  const handleOpenExport = () => {
     setOpenExportId(scenarioId);
   };
 
@@ -132,7 +132,7 @@ const ScenarioHeader = ({
   };
 
   // DUPLICATE
-  const handleOpenDuplicate = (scenarioId: string) => {
+  const handleOpenDuplicate = () => {
     setOpenDuplicateId(scenarioId);
   };
 
@@ -141,7 +141,7 @@ const ScenarioHeader = ({
   };
 
   // DELETE
-  const handleOpenDelete = (scenarioId: string) => {
+  const handleOpenDelete = () => {
     setOpenDeleteId(scenarioId);
   };
 
@@ -151,11 +151,11 @@ const ScenarioHeader = ({
 
   // Button Popover
   const entries: ButtonPopoverEntry[] = [
-    { label: 'Update', action: () => handleOpenEdit(scenarioId) },
-    { label: 'Duplicate', action: () => handleOpenDuplicate(scenarioId) },
-    { label: 'Export', action: () => handleOpenExport(scenarioId) },
-    { label: 'Delete', action: () => handleOpenDelete(scenarioId) },
-  ]
+    { label: 'Update', action: () => handleOpenEdit() },
+    { label: 'Duplicate', action: () => handleOpenDuplicate() },
+    { label: 'Export', action: () => handleOpenExport() },
+    { label: 'Delete', action: () => handleOpenDelete() },
+  ];
 
   return (
     <>
