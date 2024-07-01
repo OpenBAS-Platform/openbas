@@ -96,7 +96,7 @@ public class AssetGroupService {
                 Predicate<Object> filters = computeFilterGroupRuntime(assetGroup.getDynamicFilter());
                 // Filters for dynamic assets are applicable only to endpoints
                 List<Asset> endpointAssets = assets.stream()
-                    .filter(a -> a.getType().equals("Endpoint"))
+                    .filter(asset -> "Endpoint".equals(asset.getType()))
                     .toList();
 
                 List<Asset> filteredAssets = endpointAssets.stream()
