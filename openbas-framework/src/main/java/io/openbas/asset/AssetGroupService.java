@@ -94,7 +94,16 @@ public class AssetGroupService {
         assetGroups.forEach(assetGroup -> {
             if (!isEmptyFilterGroup(assetGroup.getDynamicFilter())) {
                 Predicate<Object> filters = computeFilterGroupRuntime(assetGroup.getDynamicFilter());
-                assetGroup.setDynamicAssets(assets.stream().filter(filters).toList());
+                // Filters for dynamic assets are applicable only to endpoints
+                List<Asset> endpointAssets = assets.stream()
+                    .filter(asset -> "Endpoint".equals(asset.getType()))
+                    .toList();
+
+                List<Asset> filteredAssets = endpointAssets.stream()
+                    .filter(filters)
+                    .toList();
+
+                assetGroup.setDynamicAssets(filteredAssets);
             }
         });
 
