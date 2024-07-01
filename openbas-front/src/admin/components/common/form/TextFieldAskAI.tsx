@@ -374,6 +374,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               {t('Cancel')}
             </Button>
             <Button
+              disabled={messageInput.length < 5}
               onClick={() => {
                 handleCloseGenMediaOptions();
                 handleAskAi('genMedia');
