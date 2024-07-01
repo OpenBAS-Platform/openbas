@@ -41,15 +41,21 @@ public class TaniumExecutorContextService {
         }
         switch (platform ) {
             case Endpoint.PLATFORM_TYPE.Windows -> {
-                String command = injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Windows.name() + "." + arch.name()).replace("\"#{location}\"", "$PWD.Path");
+                String command = injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Windows.name() + "." + arch.name())
+                        .replace("\"#{location}\"", "$PWD.Path")
+                        .replace("#{inject}", inject.getId());
                 this.taniumExecutorClient.executeAction(asset.getExternalReference(), this.taniumExecutorConfig.getWindowsPackageId(), Base64.getEncoder().encodeToString(command.getBytes()));
             }
             case Endpoint.PLATFORM_TYPE.Linux -> {
-                String command = injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Linux.name() + "." + arch.name()).replace("\"#{location}\"", "$(pwd)");
+                String command = injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Linux.name() + "." + arch.name())
+                        .replace("\"#{location}\"", "$(pwd)")
+                        .replace("#{inject}", inject.getId());
                 this.taniumExecutorClient.executeAction(asset.getExternalReference(), this.taniumExecutorConfig.getUnixPackageId(), Base64.getEncoder().encodeToString(command.getBytes()));
             }
             case Endpoint.PLATFORM_TYPE.MacOS -> {
-                String command = injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.MacOS.name() + "." + arch.name()).replace("\"#{location}\"", "$(pwd)");
+                String command = injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.MacOS.name() + "." + arch.name())
+                        .replace("\"#{location}\"", "$(pwd)")
+                        .replace("#{inject}", inject.getId());
                 this.taniumExecutorClient.executeAction(asset.getExternalReference(), this.taniumExecutorConfig.getUnixPackageId(), Base64.getEncoder().encodeToString(command.getBytes()));
             }
             default -> throw new RuntimeException("Unsupported platform: " + platform);

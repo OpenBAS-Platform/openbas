@@ -3,6 +3,7 @@ package io.openbas.config;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -48,6 +49,7 @@ public class OpenBASConfig {
   private String defaultReplyTo;
 
   @JsonProperty("admin_token")
+  @Value("${openbas.admin.token:#{null}}")
   private String adminToken;
 
   @JsonProperty("disabled_dev_features")
@@ -66,5 +68,4 @@ public class OpenBASConfig {
   public String getBaseUrl() {
     return baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
   }
-
 }
