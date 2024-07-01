@@ -2509,7 +2509,6 @@ export interface ScenarioInput {
   scenario_external_url?: string;
   scenario_main_focus?: string;
   scenario_name: string;
-  scenario_id?: string;
   scenario_severity?: string;
   scenario_subtitle?: string;
   scenario_tags?: string[];
