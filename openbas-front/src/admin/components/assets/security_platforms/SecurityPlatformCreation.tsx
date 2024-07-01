@@ -38,10 +38,10 @@ const SecurityPlatformCreation: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const onSubmit = (data: SecurityPlatformInput) => {
     dispatch(addSecurityPlatform(data)).then(
-      (result: { result: string, entities: { securityPlatforms: Record<string, SecurityPlatformStore> } }) => {
+      (result: { result: string, entities: { securityplatforms: Record<string, SecurityPlatformStore> } }) => {
         if (result.entities) {
           if (onCreate) {
-            const securityPlatformCreated = result.entities.securityPlatforms[result.result];
+            const securityPlatformCreated = result.entities.securityplatforms[result.result];
             onCreate(securityPlatformCreated);
           }
           setOpen(false);

@@ -476,7 +476,7 @@ export interface Document {
   /** @uniqueItems true */
   document_exercises?: Exercise[];
   document_id: string;
-  document_name?: string;
+  document_name: string;
   /** @uniqueItems true */
   document_scenarios?: Scenario[];
   /** @uniqueItems true */
@@ -2181,6 +2181,8 @@ export interface Payload {
   payload_name: string;
   payload_platforms?: string[];
   payload_prerequisites?: PayloadPrerequisite[];
+  payload_source?: string;
+  payload_status?: string;
   /** @uniqueItems true */
   payload_tags?: Tag[];
   payload_type?: string;
@@ -2210,6 +2212,8 @@ export interface PayloadCreateInput {
   payload_name: string;
   payload_platforms?: string[];
   payload_prerequisites?: PayloadPrerequisite[];
+  payload_source: string;
+  payload_status: string;
   payload_tags?: string[];
   payload_type: string;
 }
@@ -2254,6 +2258,8 @@ export interface PayloadUpsertInput {
   payload_name: string;
   payload_platforms?: string[];
   payload_prerequisites?: PayloadPrerequisite[];
+  payload_source: string;
+  payload_status: string;
   payload_tags?: string[];
   payload_type: string;
 }

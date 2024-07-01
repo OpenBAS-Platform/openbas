@@ -77,7 +77,7 @@ public class CollectorApi extends RestBehavior {
     @Transactional(rollbackOn = Exception.class)
     public Collector updateCollector(@PathVariable String collectorId, @Valid @RequestBody CollectorUpdateInput input) {
         Collector collector = collectorRepository.findById(collectorId).orElseThrow(ElementNotFoundException::new);
-        return updateCollector(collector, collector.getType(), collector.getName(), collector.getPeriod(), input.getLastExecution(), collector.getSecurityPlatform().getId());
+        return updateCollector(collector, collector.getType(), collector.getName(), collector.getPeriod(), input.getLastExecution(), collector.getSecurityPlatform() != null ? collector.getSecurityPlatform().getId() : null);
     }
 
     @Secured(ROLE_ADMIN)
