@@ -3,15 +3,16 @@ import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { deletePayload, updatePayload } from '../../../actions/Payload';
+import { deletePayload, duplicatePayload, updatePayload } from '../../../actions/Payload';
 import PayloadForm from './PayloadForm';
 import { useFormatter } from '../../../components/i18n';
 import { attackPatternOptions, documentOptions, platformOptions, tagOptions } from '../../../utils/Option';
 import Transition from '../../../components/common/Transition';
 import Drawer from '../../../components/common/Drawer';
 
-const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, killChainPhasesMap, onUpdate, onDelete, disabled }) => {
+const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, killChainPhasesMap, onUpdate, onDelete, onDuplicate, disabled }) => {
   const [openDelete, setOpenDelete] = useState(false);
+  const [openDuplicate, setOpenDuplicate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const dispatch = useDispatch();
@@ -47,7 +48,12 @@ const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, kil
     setOpenDelete(true);
     handlePopoverClose();
   };
+  const handleOpenDuplicate = () => {
+    setOpenDuplicate(true);
+    handlePopoverClose();
+  };
   const handleCloseDelete = () => setOpenDelete(false);
+  const handleCloseDuplicate = () => setOpenDuplicate(false);
   const submitDelete = () => {
     dispatch(deletePayload(payload.payload_id)).then(
       () => {
@@ -57,6 +63,15 @@ const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, kil
       },
     );
     handleCloseDelete();
+  };
+  const submitDuplicate = () => {
+    return dispatch(duplicatePayload(payload.payload_id)).then((result) => {
+      if (onDuplicate) {
+        const payloadUpdated = result.entities.payloads[result.result];
+        onDuplicate(payloadUpdated);
+      }
+      handleCloseDuplicate();
+    });
   };
   const payloadAttackPatterns = attackPatternOptions(payload.payload_attack_patterns, attackPatternsMap, killChainPhasesMap);
   const payloadTags = tagOptions(payload.payload_tags, tagsMap);
@@ -83,7 +98,7 @@ const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, kil
   )(payload);
   return (
     <>
-      <IconButton color="primary" onClick={handlePopoverOpen} aria-haspopup="true" size="large" disabled={disabled}>
+      <IconButton color="primary" onClick={handlePopoverOpen} aria-haspopup="true" size="large">
         <MoreVert />
       </IconButton>
       <Menu
@@ -91,8 +106,9 @@ const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, kil
         open={Boolean(anchorEl)}
         onClose={handlePopoverClose}
       >
-        <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
-        <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
+        <MenuItem onClick={handleOpenDuplicate}>{t('Duplicate')}</MenuItem>
+        <MenuItem onClick={handleOpenEdit} disabled={disabled}>{t('Update')}</MenuItem>
+        <MenuItem onClick={handleOpenDelete} disabled={disabled}>{t('Delete')}</MenuItem>
       </Menu>
       <Dialog
         open={openDelete}
@@ -109,6 +125,24 @@ const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, kil
           <Button onClick={handleCloseDelete}>{t('Cancel')}</Button>
           <Button color="secondary" onClick={submitDelete}>
             {t('Delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openDuplicate}
+        TransitionComponent={Transition}
+        onClose={handleCloseDuplicate}
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t('Do you want to duplicate this payload?')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDuplicate}>{t('Cancel')}</Button>
+          <Button color="secondary" onClick={submitDuplicate}>
+            {t('Duplicate')}
           </Button>
         </DialogActions>
       </Dialog>

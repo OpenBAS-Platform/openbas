@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.Hibernate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -188,6 +189,73 @@ public class PayloadApi extends RestBehavior {
                 payloadNetworkTraffic = payloadRepository.save(payloadNetworkTraffic);
                 this.payloadService.updateInjectorContractsForPayload(payloadNetworkTraffic);
                 return payloadNetworkTraffic;
+            default:
+                throw new UnsupportedOperationException("Payload type " + payload.getType() + " is not supported");
+        }
+    }
+
+    @PostMapping("/api/payloads/{payloadId}/duplicate")
+    @PreAuthorize("isPlanner()")
+    @Transactional(rollbackOn = Exception.class)
+    public Payload duplicatePayload(@NotBlank @PathVariable final String payloadId) {
+        Payload payload = this.payloadRepository.findById(payloadId).orElseThrow();
+        switch (payload.getType()) {
+            case "Command":
+                Command existingCommandPayload = (Command) Hibernate.unproxy(payload);
+                Command commandPayload = new Command();
+                // Payload
+                BeanUtils.copyProperties(existingCommandPayload, commandPayload);
+                commandPayload.setCollector(null);
+                commandPayload.setExternalId(null);
+                commandPayload.setSource("MANUAL");
+                commandPayload.setStatus("VERIFIED");
+                commandPayload = payloadRepository.save(commandPayload);
+                this.payloadService.updateInjectorContractsForPayload(commandPayload);
+                return commandPayload;
+            case "Executable":
+                Executable existingExecutablePayload = (Executable) Hibernate.unproxy(payload);
+                Executable executablePayload = new Executable();
+                BeanUtils.copyProperties(existingExecutablePayload, executablePayload);
+                executablePayload.setCollector(null);
+                executablePayload.setExternalId(null);
+                executablePayload.setSource("MANUAL");
+                executablePayload.setStatus("VERIFIED");
+                // Executable
+                executablePayload.setExecutableFile(existingExecutablePayload.getExecutableFile());
+
+                executablePayload = payloadRepository.save(executablePayload);
+                this.payloadService.updateInjectorContractsForPayload(executablePayload);
+                return executablePayload;
+            case "FileDrop":
+                FileDrop existingFileDropPayload = (FileDrop) Hibernate.unproxy(payload);
+                FileDrop fileDropPayload = new FileDrop();
+                BeanUtils.copyProperties(existingFileDropPayload, fileDropPayload);
+                fileDropPayload.setCollector(null);
+                fileDropPayload.setExternalId(null);
+                fileDropPayload.setSource("MANUAL");
+                fileDropPayload.setStatus("VERIFIED");
+                this.payloadService.updateInjectorContractsForPayload(fileDropPayload);
+                return fileDropPayload;
+            case "DnsResolution":
+                DnsResolution existingDnsResolutionPayload = (DnsResolution) Hibernate.unproxy(payload);
+                DnsResolution dnsResolutionPayload = new DnsResolution();
+                BeanUtils.copyProperties(existingDnsResolutionPayload, dnsResolutionPayload);
+                dnsResolutionPayload.setCollector(null);
+                dnsResolutionPayload.setExternalId(null);
+                dnsResolutionPayload.setSource("MANUAL");
+                dnsResolutionPayload.setStatus("VERIFIED");
+                this.payloadService.updateInjectorContractsForPayload(dnsResolutionPayload);
+                return dnsResolutionPayload;
+            case "NetworkTraffic":
+                NetworkTraffic existingNetworkTrafficPayload = (NetworkTraffic) Hibernate.unproxy(payload);
+                NetworkTraffic networkTrafficPayload = new NetworkTraffic();
+                BeanUtils.copyProperties(existingNetworkTrafficPayload, networkTrafficPayload);
+                networkTrafficPayload.setCollector(null);
+                networkTrafficPayload.setExternalId(null);
+                networkTrafficPayload.setSource("MANUAL");
+                networkTrafficPayload.setStatus("VERIFIED");
+                this.payloadService.updateInjectorContractsForPayload(networkTrafficPayload);
+                return networkTrafficPayload;
             default:
                 throw new UnsupportedOperationException("Payload type " + payload.getType() + " is not supported");
         }

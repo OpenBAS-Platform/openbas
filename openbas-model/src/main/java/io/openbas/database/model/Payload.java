@@ -31,6 +31,17 @@ import static lombok.AccessLevel.NONE;
 @EntityListeners(ModelBaseListener.class)
 public class Payload implements Base {
 
+  public enum PAYLOAD_SOURCE {
+    COMMUNITY,
+    FILIGRAN,
+    MANUAL
+  }
+
+  public enum PAYLOAD_STATUS {
+    UNVERIFIED,
+    VERIFIED
+  }
+
   @Id
   @Column(name = "payload_id")
   @GeneratedValue(generator = "UUID")
@@ -95,6 +106,16 @@ public class Payload implements Base {
   @Column(name = "payload_external_id")
   @JsonProperty("payload_external_id")
   private String externalId;
+
+  @Setter
+  @Column(name = "payload_source")
+  @JsonProperty("payload_source")
+  private String source;
+
+  @Setter
+  @Column(name = "payload_status")
+  @JsonProperty("payload_status")
+  private String status;
 
   // -- COLLECTOR --
 

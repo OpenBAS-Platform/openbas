@@ -119,6 +119,7 @@ const SecurityPlatformForm: React.FC<Props> = ({
             fieldOnChange={onChange}
             errors={errors}
             style={{ marginTop: 20 }}
+            extensions={['png', 'jpg', 'jpeg', 'svg', 'gif']}
           />
         )}
       />
@@ -133,6 +134,7 @@ const SecurityPlatformForm: React.FC<Props> = ({
             fieldOnChange={onChange}
             errors={errors}
             style={{ marginTop: 20 }}
+            extensions={['png', 'jpg', 'tiff', 'tif', 'bmp', 'jpeg', 'svg', 'gif']}
           />
         )}
       />

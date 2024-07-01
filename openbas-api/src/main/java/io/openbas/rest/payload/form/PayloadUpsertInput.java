@@ -24,6 +24,14 @@ public class PayloadUpsertInput {
     private String name;
 
     @NotBlank(message = MANDATORY_MESSAGE)
+    @JsonProperty("payload_source")
+    private String source;
+
+    @NotBlank(message = MANDATORY_MESSAGE)
+    @JsonProperty("payload_status")
+    private String status;
+
+    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("payload_external_id")
     private String externalId;
 

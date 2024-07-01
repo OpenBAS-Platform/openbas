@@ -14,7 +14,8 @@ import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../../actions/Tag';
 import InjectForm from './InjectForm';
 import { useFormatter } from '../../../../components/i18n';
-import { isEmptyField } from '../../../../utils/utils';
+import { isEmptyField, isNotEmptyField } from '../../../../utils/utils';
+import InjectIcon from './InjectIcon';
 
 const useStyles = makeStyles((theme) => ({
   injectorContract: {
@@ -66,6 +67,7 @@ const useStyles = makeStyles((theme) => ({
 
 const CreateInjectDetails = ({
   contractId,
+  contract,
   contractContent,
   handleClose,
   onCreateInject,
@@ -329,7 +331,19 @@ const CreateInjectDetails = ({
       <Card elevation={0} classes={{ root: contractContent ? classes.injectorContract : classes.injectorContractDisabled }}>
         <CardHeader
           classes={{ root: contractContent ? classes.injectorContractHeader : classes.injectorContractHeaderDisabled }}
-          avatar={contractContent ? <Avatar sx={{ width: 24, height: 24 }} src={`/api/images/injectors/${contractContent.config.type}`} /> : <Avatar sx={{ width: 24, height: 24 }}><HelpOutlined /></Avatar>}
+          avatar={contractContent ? (
+            <InjectIcon
+              type={
+              contract.injector_contract_payload
+                ? contract.injector_contract_payload?.payload_collector_type
+                    || contract.injector_contract_payload?.payload_type
+                : contract.injector_contract_injector_type
+              }
+              isPayload={isNotEmptyField(contract.injector_contract_payload)}
+            />
+          ) : (
+            <Avatar sx={{ width: 24, height: 24 }}><HelpOutlined /></Avatar>
+          )}
           action={
             <IconButton aria-label="delete" disabled={!contractContent} onClick={() => setSelectedContract(null)}>
               <HighlightOffOutlined />

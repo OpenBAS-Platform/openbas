@@ -23,6 +23,14 @@ public class PayloadCreateInput {
     @JsonProperty("payload_name")
     private String name;
 
+    @NotBlank(message = MANDATORY_MESSAGE)
+    @JsonProperty("payload_source")
+    private String source;
+
+    @NotBlank(message = MANDATORY_MESSAGE)
+    @JsonProperty("payload_status")
+    private String status;
+
     @JsonProperty("payload_platforms")
     private String[] platforms;
 
