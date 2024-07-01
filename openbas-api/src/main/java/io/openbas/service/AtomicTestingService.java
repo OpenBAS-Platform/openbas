@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawAsset;
 import io.openbas.database.raw.RawAssetGroup;
@@ -14,7 +15,10 @@ import io.openbas.database.repository.*;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
+import io.openbas.rest.atomic_testing.form.InjectResultDTO;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.output.AtomicTestingOutput;
+import io.openbas.utils.AtomicTestingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -54,6 +58,8 @@ public class AtomicTestingService {
   @Resource
   protected ObjectMapper mapper;
 
+  private final AssetGroupService assetGroupService;
+
   private final AssetGroupRepository assetGroupRepository;
   private final AssetRepository assetRepository;
   private final InjectRepository injectRepository;
@@ -69,9 +75,14 @@ public class AtomicTestingService {
   @PersistenceContext
   private EntityManager entityManager;
 
-  public Optional<Inject> findById(String injectId) {
-    return injectRepository.findWithStatusById(injectId);
-  }
+  public InjectResultDTO findById(String injectId) {
+    Optional<Inject> optionalInject = injectRepository.findWithStatusById(injectId);
+
+        Inject inject = optionalInject.orElseThrow(ElementNotFoundException::new);
+        inject.setAssetGroups(inject.getAssetGroups().stream().map(assetGroup-> assetGroupService.computeDynamicAssets(assetGroup)).toList());
+
+        return AtomicTestingMapper.toDtoWithTargetResults(inject);
+    }
 
   @Transactional
   public Inject createOrUpdate(AtomicTestingInput input, String injectId) {

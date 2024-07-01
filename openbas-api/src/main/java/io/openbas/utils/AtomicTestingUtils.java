@@ -133,6 +133,16 @@ public class AtomicTestingUtils {
                         Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null
                 ));
             });
+            // Add dynamic assets as children
+            assetGroup.getDynamicAssets().forEach(asset -> {
+                children.add(new InjectTargetWithResult(
+                        TargetType.ASSETS,
+                        asset.getId(),
+                        asset.getName(),
+                        defaultExpectationResultsByTypes,
+                        Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null
+                ));
+            });
 
             if (noMatchingExpectations) {
                 InjectTargetWithResult target = new InjectTargetWithResult(
@@ -196,18 +206,37 @@ public class AtomicTestingUtils {
                         List<InjectTargetWithResult> children = new ArrayList<>();
 
                         for (InjectTargetWithResult asset : assetsToRefine) {
-                            boolean found = entry.getKey().getAssets().stream()
+                            // Verify if any expectation is related to a dynamic assets
+                            boolean foundExpectationForAsset = entry.getKey().getAssets().stream()
                                     .anyMatch(assetChild -> assetChild.getId().equals(asset.getId()));
-                            if (found) {
+                            boolean foundExpectationForDynamicAssets = entry.getKey().getDynamicAssets().stream()
+                                    .anyMatch(assetChild -> assetChild.getId().equals(asset.getId()));
+                            if (foundExpectationForAsset || foundExpectationForDynamicAssets) {
                                 children.add(asset);
                                 assetsToRemove.add(asset);
                             }
                         }
 
+                        // Other children without expectations are added with a default result
                         entry.getKey().getAssets().forEach(asset -> {
-                            boolean found = children.stream()
+                            boolean foundAssetsWithoutResults = children.stream()
                                     .noneMatch(child -> child.getId().equals(asset.getId()));
-                            if (found) {
+                            if (foundAssetsWithoutResults) {
+                                children.add(new InjectTargetWithResult(
+                                        TargetType.ASSETS,
+                                        asset.getId(),
+                                        asset.getName(),
+                                        defaultExpectationResultsByTypes,
+                                        Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null
+                                ));
+                            }
+                        });
+
+                        // For dynamicAssets
+                        entry.getKey().getDynamicAssets().forEach(asset -> {
+                            boolean foundDynamicAssetsWithoutResults = children.stream()
+                                    .noneMatch(child -> child.getId().equals(asset.getId()));
+                            if (foundDynamicAssetsWithoutResults) {
                                 children.add(new InjectTargetWithResult(
                                         TargetType.ASSETS,
                                         asset.getId(),
