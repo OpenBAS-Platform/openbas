@@ -1116,6 +1116,10 @@ const i18n = {
       // -- Timeline
       'Hide timeline': 'Cacher la chronologie',
       'Show Timeline': 'Afficher la chronologie',
+      COMMUNITY: 'Community',
+      FILIGRAN: 'Filigran',
+      VERIFIED: 'Verified',
+      UNVERIFIED: 'Unverified',
     },
     en: {
       openbas_email: 'Email',
@@ -1197,6 +1201,10 @@ const i18n = {
       'standard-operating-procedure': 'Standard Operating Procedures',
       'crisis-communication': 'Crisis Communication',
       'strategic-reaction': 'Strategic Reaction',
+      COMMUNITY: 'Community',
+      FILIGRAN: 'Filigran',
+      VERIFIED: 'Verified',
+      UNVERIFIED: 'Unverified',
     },
   },
 };

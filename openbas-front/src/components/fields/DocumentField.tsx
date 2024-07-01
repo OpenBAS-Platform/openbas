@@ -32,6 +32,7 @@ interface Props {
   fieldOnChange: (value: string) => void;
   errors: FieldErrors;
   style: CSSProperties;
+  extensions?: string[];
 }
 
 const DocumentField: FunctionComponent<Props> = ({
@@ -41,6 +42,7 @@ const DocumentField: FunctionComponent<Props> = ({
   fieldOnChange,
   errors,
   style,
+  extensions = [],
 }) => {
   const classes = useStyles();
 
@@ -54,12 +56,15 @@ const DocumentField: FunctionComponent<Props> = ({
   });
 
   // Form
-  const documentsOptions = documents.map(
-    (n) => ({
-      id: n.document_id,
-      label: n.document_name,
-    }),
-  );
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+  const documentsOptions = documents.filter((n) => (extensions.length > 0 ? extensions.includes(n.document_name.split('.').pop()) : true))
+    .map(
+      (n) => ({
+        id: n.document_id,
+        label: n.document_name,
+      }),
+    );
   const valueResolver = () => {
     return documentsOptions.filter((document) => fieldValue === document.id).at(0);
   };

@@ -41,6 +41,7 @@ public class Document implements Base {
 
     @Column(name = "document_name")
     @JsonProperty("document_name")
+    @NotBlank
     @Queryable(searchable = true, sortable = true)
     private String name;
 

@@ -40,6 +40,8 @@ class CreatePayload extends Component {
   onSubmit(data) {
     const inputValues = R.pipe(
       R.assoc('payload_type', this.state.selectedType),
+      R.assoc('payload_source', 'MANUAL'),
+      R.assoc('payload_status', 'VERIFIED'),
       R.assoc('payload_platforms', R.pluck('id', data.payload_platforms)),
       R.assoc('payload_tags', R.pluck('id', data.payload_tags)),
       R.assoc('payload_attack_patterns', R.pluck('id', data.payload_attack_patterns)),

@@ -21,6 +21,8 @@ import { fetchDocuments } from '../../../actions/Document';
 import PayloadIcon from '../../../components/PayloadIcon';
 import { fetchCollectors } from '../../../actions/Collector';
 import Drawer from '../../../components/common/Drawer';
+import ItemCopy from '../../../components/ItemCopy';
+import { emptyFilled } from '../../../utils/String';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -51,11 +53,19 @@ const useStyles = makeStyles(() => ({
     borderRadius: 4,
     width: 150,
   },
+  chipInList2: {
+    fontSize: 12,
+    height: 20,
+    float: 'left',
+    textTransform: 'uppercase',
+    borderRadius: 4,
+    width: 120,
+  },
 }));
 
 const inlineStyles = {
   payload_type: {
-    width: '15%',
+    width: '12%',
     cursor: 'default',
   },
   payload_name: {
@@ -66,12 +76,15 @@ const inlineStyles = {
     cursor: 'default',
   },
   payload_description: {
-    width: '20%',
+    width: '15%',
   },
   payload_tags: {
     width: '20%',
   },
-  payload_created_at: {
+  payload_source: {
+    width: '10%',
+  },
+  payload_status: {
     width: '10%',
   },
   payload_updated_at: {
@@ -107,7 +120,8 @@ const Payloads = () => {
     { field: 'payload_platforms', label: 'Platforms', isSortable: true },
     { field: 'payload_description', label: 'Description', isSortable: true },
     { field: 'payload_tags', label: 'Tags', isSortable: true },
-    { field: 'payload_created_at', label: 'Created', isSortable: true },
+    { field: 'payload_source', label: 'Source', isSortable: true },
+    { field: 'payload_status', label: 'Status', isSortable: true },
     { field: 'payload_updated_at', label: 'Updated', isSortable: true },
   ];
 
@@ -123,6 +137,8 @@ const Payloads = () => {
       'payload_type',
       'payload_name',
       'payload_description',
+      'payload_source',
+      'payload_status',
       'payload_created_at',
       'payload_updated_at',
     ],
@@ -240,9 +256,25 @@ const Payloads = () => {
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.payload_created_at}
+                      style={inlineStyles.payload_source}
                     >
-                      {nsdt(payload.payload_created_at)}
+                      <Chip
+                        variant="outlined"
+                        classes={{ root: classes.chipInList2 }}
+                        color="primary"
+                        label={t(payload.payload_source ?? 'MANUAL')}
+                      />
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.payload_status}
+                    >
+                      <Chip
+                        variant="outlined"
+                        classes={{ root: classes.chipInList2 }}
+                        color={payload.payload_status === 'VERIFIED' ? 'success' : 'warning'}
+                        label={t(payload.payload_status ?? 'UNVERIFIED')}
+                      />
                     </div>
                     <div
                       className={classes.bodyItem}
@@ -261,6 +293,7 @@ const Payloads = () => {
                   killChainPhasesMap={killChainPhasesMap}
                   payload={payload}
                   onUpdate={(result) => setPayloads(payloads.map((a) => (a.payload_id !== result.payload_id ? a : result)))}
+                  onDuplicate={(result) => setPayloads([result, ...payloads])}
                   onDelete={(result) => setPayloads(payloads.filter((a) => (a.payload_id !== result)))}
                   disabled={collector !== null}
                 />
@@ -306,7 +339,7 @@ const Payloads = () => {
             >
               {t('Description')}
             </Typography>
-            {selectedPayload?.payload_description}
+            {emptyFilled(selectedPayload?.payload_description)}
           </Grid>
           <Grid item xs={6} style={{ paddingTop: 10 }}>
             <Typography
@@ -314,9 +347,24 @@ const Payloads = () => {
               gutterBottom
               style={{ marginTop: 20 }}
             >
+              {t('External ID')}
+            </Typography>
+            {selectedPayload?.payload_external_id && selectedPayload?.payload_external_id.length > 0 ? <pre>
+              <ItemCopy content={selectedPayload?.payload_external_id} />
+            </pre> : '-'}
+            <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
               {t('Content')}
             </Typography>
-            <pre>{selectedPayload?.command_content ?? selectedPayload?.dns_resolution_hostname ?? selectedPayload?.file_drop_file ?? selectedPayload?.executable_file}</pre>
+            <pre>
+              <ItemCopy content={
+                selectedPayload?.command_content ?? selectedPayload?.dns_resolution_hostname ?? selectedPayload?.file_drop_file ?? selectedPayload?.executable_file
+              }
+              />
+            </pre>
             <Typography
               variant="h3"
               gutterBottom
@@ -324,7 +372,7 @@ const Payloads = () => {
             >
               {t('Cleanup command')}
             </Typography>
-            <pre>{selectedPayload?.payload_cleanup_command}</pre>
+            {selectedPayload?.payload_cleanup_command && selectedPayload?.payload_cleanup_command.length > 0 ? <pre><ItemCopy content={selectedPayload?.payload_cleanup_command} /></pre> : '-'}
           </Grid>
         </Grid>
       </Drawer>

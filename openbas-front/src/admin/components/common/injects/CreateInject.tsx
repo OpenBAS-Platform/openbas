@@ -235,6 +235,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
               drawerRef={drawerRef}
               contractId={selectedContract !== null && contracts?.length ? contracts[selectedContract]?.injector_contract_id : null}
               contractContent={selectedContract !== null ? parsedContentContracts[selectedContract] : null}
+              contract={selectedContract !== null ? contracts[selectedContract] : null}
               setSelectedContract={setSelectedContract}
               selectedContractKillChainPhase={selectedContractKillChainPhase}
               handleClose={handleCloseDrawer}
