@@ -39,8 +39,7 @@ public class InjectModelHelper {
     AtomicBoolean ready = new AtomicBoolean(true);
     ObjectNode contractContent = injectorContract.getConvertedContent();
     List<JsonNode> contractMandatoryFields = StreamSupport.stream(contractContent.get("fields").spliterator(), false)
-        .filter(contractElement -> (contractElement.get("mandatory").asBoolean()
-            || contractElement.get("mandatoryGroups") != null)).toList();
+        .filter(contractElement -> (contractElement.get("mandatory").asBoolean() || (contractElement.get("mandatoryGroups") != null && contractElement.get("mandatoryGroups").asBoolean()))).toList();
     if (!contractMandatoryFields.isEmpty()) {
       contractMandatoryFields.forEach(jsonField -> {
         String key = jsonField.get("key").asText();
