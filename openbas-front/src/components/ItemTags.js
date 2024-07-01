@@ -15,7 +15,11 @@ Transition.displayName = 'TransitionSlide';
 
 const useStyles = makeStyles(() => ({
   inline: {
-    display: 'inline-block',
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'nowrap',
+    overflow: 'hidden',
+    margin: '0 10px',
   },
   tag: {
     height: 25,
@@ -53,19 +57,21 @@ const ItemTags = (props) => {
     <div className={classes.inline}>
       {visibleTags.length > 0
         ? (visibleTags.map(
-          (tag) => (
-            <Tooltip key={tag.tag_id} title={tag.tag_name}>
-              <Chip
-                variant="outlined"
-                classes={{ root: style }}
-                label={truncate(tag.tag_name, 8)}
-                style={{
-                  color: tag.tag_color,
-                  borderColor: tag.tag_color,
-                  backgroundColor: hexToRGB(tag.tag_color),
-                }}
-              />
-            </Tooltip>
+          (tag, index) => (
+            <span key={index}>
+              <Tooltip title={tag.tag_name}>
+                <Chip
+                  variant="outlined"
+                  classes={{ root: style }}
+                  label={truncate(tag.tag_name, 6)}
+                  style={{
+                    color: tag.tag_color,
+                    borderColor: tag.tag_color,
+                    backgroundColor: hexToRGB(tag.tag_color),
+                  }}
+                />
+              </Tooltip>
+            </span>
           ),
         )) : (
           <Chip
