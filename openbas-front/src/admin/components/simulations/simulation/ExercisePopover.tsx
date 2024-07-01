@@ -19,10 +19,10 @@ import {
   Tabs,
 } from '@mui/material';
 import { useFormatter } from '../../../../components/i18n';
-import {addExercise, deleteExercise, duplicateExercise, updateExercise} from '../../../../actions/Exercise';
+import { deleteExercise, duplicateExercise, updateExercise } from '../../../../actions/Exercise';
 import { usePermissions } from '../../../../utils/Exercise';
 import Transition from '../../../../components/common/Transition';
-import type { Exercise, ExerciseCreateInput, ExerciseUpdateInput } from '../../../../utils/api-types';
+import type { Exercise, ExerciseUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import ExerciseUpdateForm from './ExerciseUpdateForm';
@@ -115,7 +115,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   };
 
   const handleCloseDuplicate = () => setDuplicate(false);
-  const submitDuplicate = (data: ExerciseCreateInput) => {
+  const submitDuplicate = () => {
     dispatch(duplicateExercise(exercise.exercise_id)).then((result: { result: string, entities: { exercises: ExerciseStore } }) => {
       handleCloseDuplicate();
       navigate(`/admin/exercises/${result.result}`);
@@ -123,11 +123,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   };
 
   const submitDuplicateHandler = () => {
-    const data: ExerciseCreateInput = {
-      exercise_id: exercise.exercise_id,
-      exercise_name: exercise.exercise_name,
-    };
-    submitDuplicate(data);
+    submitDuplicate();
   };
 
   const handleCloseExport = () => setExportation(false);
