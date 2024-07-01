@@ -171,7 +171,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               size="medium"
               color="secondary"
               onClick={(event) => ((isEnterpriseEdition && enabled && configured) ? handleOpenMenu(event) : null)}
-              disabled={disabled || currentValue.length < 10}
+              disabled={disabled}
               style={{ marginRight: -10 }}
             >
               <AutoAwesomeOutlined fontSize='medium'/>
@@ -374,6 +374,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               {t('Cancel')}
             </Button>
             <Button
+              disabled={messageInput.length < 5}
               onClick={() => {
                 handleCloseGenMediaOptions();
                 handleAskAi('genMedia');

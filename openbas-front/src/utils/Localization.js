@@ -1193,7 +1193,7 @@ const i18n = {
       'data-exfiltration': 'Data Exfiltration',
       'capture-the-flag': 'Capture The Flag',
       'vulnerability-exploitation': 'Vulnerability Exploitation',
-      'lateral-movement': 'Lateral Movemen',
+      'lateral-movement': 'Lateral Movement',
       'url-filtering': 'URL Filtering',
       'endpoint-protection': 'Endpoint Protection',
       'web-filtering': 'Web Filtering',

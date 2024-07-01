@@ -83,7 +83,9 @@ const CreateArticle = (props) => {
             editing={false}
             onSubmit={onSubmit}
             handleClose={handleCloseCreate}
-            initialValues={{ article_name: '', article_channel: '' }}
+            initialValues={{
+              article_name: '',
+              article_channel: '' }}
           />
         </DialogContent>
       </Dialog>
