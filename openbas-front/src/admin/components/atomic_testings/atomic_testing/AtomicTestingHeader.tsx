@@ -34,7 +34,6 @@ const AtomicTestingHeader = () => {
 
   // Launch atomic testing
   const [open, setOpen] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
   const [availableLaunch, setAvailableLaunch] = useState(true);
 
   const submitLaunch = async () => {
@@ -99,7 +98,7 @@ const AtomicTestingHeader = () => {
             variant="contained"
             color="warning"
             size="small"
-            onClick={() => setOpenEdit(true)}
+            onClick={() => setOpenEditId(injectResultDto.inject_id)}
           >
             {t('Configure')}
           </Button>
