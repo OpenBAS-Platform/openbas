@@ -15,7 +15,7 @@ Transition.displayName = 'TransitionSlide';
 
 const useStyles = makeStyles(() => ({
   inline: {
-    display: 'flex',
+    display: 'inline',
     alignItems: 'center',
     flexWrap: 'nowrap',
     overflow: 'hidden',
