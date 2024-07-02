@@ -13,6 +13,10 @@ import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 @Data
 public class ScenarioInput {
 
+  @Nullable
+  @JsonProperty("scenario_id")
+  private String id;
+
   @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("scenario_name")
   private String name;

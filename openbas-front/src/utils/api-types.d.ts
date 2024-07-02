@@ -163,6 +163,7 @@ export interface AtomicTestingInput {
   inject_tags?: string[];
   inject_teams?: string[];
   inject_title?: string;
+  inject_id?: string;
 }
 
 export interface AtomicTestingOutput {
@@ -1123,6 +1124,7 @@ export interface InjectInput {
   inject_tags?: string[];
   inject_teams?: string[];
   inject_title?: string;
+  inject_id?: string;
 }
 
 export interface InjectOutput {

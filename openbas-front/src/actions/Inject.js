@@ -45,6 +45,11 @@ export const addInjectForExercise = (exerciseId, data) => (dispatch) => {
   return postReferential(schema.inject, uri, data)(dispatch);
 };
 
+export const duplicateInjectForExercise = (exerciseId, injectId) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/injects/${injectId}`;
+  return postReferential(schema.inject, uri, null)(dispatch);
+};
+
 export const deleteInjectForExercise = (exerciseId, injectId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects/${injectId}`;
   return delReferential(uri, 'injects', injectId)(dispatch);
@@ -70,6 +75,11 @@ export const injectDone = (exerciseId, injectId) => (dispatch) => {
 export const addInjectForScenario = (scenarioId, data) => (dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/injects`;
   return postReferential(schema.inject, uri, data)(dispatch);
+};
+
+export const duplicateInjectForScenario = (scenarioId, injectId) => (dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/injects/${injectId}`;
+  return postReferential(schema.inject, uri, null)(dispatch);
 };
 
 export const fetchScenarioInjects = (scenarioId) => (dispatch) => {

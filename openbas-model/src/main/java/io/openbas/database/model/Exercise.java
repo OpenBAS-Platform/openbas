@@ -67,10 +67,12 @@ public class Exercise implements Base {
   @Queryable(filterable = true)
   private String category;
 
+  @Getter
   @Column(name = "exercise_main_focus")
   @JsonProperty("exercise_main_focus")
   private String mainFocus;
 
+  @Getter
   @Column(name = "exercise_severity")
   @JsonProperty("exercise_severity")
   private String severity;
