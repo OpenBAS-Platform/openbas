@@ -205,12 +205,15 @@ public class InjectApi extends RestBehavior {
         int currentTotal = injectStatus.getTrackingTotalError() + injectStatus.getTrackingTotalSuccess();
         if (injectStatus.getTrackingTotalCount() >= currentTotal) {
             injectStatus.setTrackingEndDate(trackingEndDate);
-            injectStatus.setTrackingTotalExecutionTime(
-                    Duration.between(injectStatus.getTrackingSentDate(), trackingEndDate).getSeconds());
-            if (injectStatus.getTrackingTotalError().equals(injectStatus.getTrackingTotalCount())) {
+            injectStatus.setTrackingTotalExecutionTime(Duration.between(injectStatus.getTrackingSentDate(), trackingEndDate).getSeconds());
+            if (injectStatus.getTraces().stream().filter(injectStatusExecution -> injectStatusExecution.getStatus().equals(ExecutionStatus.ERROR)).count() >= injectStatus.getTrackingTotalCount()) {
                 injectStatus.setName(ExecutionStatus.ERROR);
-            } else if (injectStatus.getTrackingTotalError() > 0) {
+            } else if (injectStatus.getTraces().stream().anyMatch(trace -> trace.getStatus().equals(ExecutionStatus.ERROR))) {
                 injectStatus.setName(ExecutionStatus.PARTIAL);
+            } else if (injectStatus.getTraces().stream().filter(injectStatusExecution -> injectStatusExecution.getStatus().equals(ExecutionStatus.MAYBE_PREVENTED)).count() >= injectStatus.getTrackingTotalCount()) {
+                injectStatus.setName(ExecutionStatus.MAYBE_PREVENTED);
+            } else if (injectStatus.getTraces().stream().anyMatch(trace -> trace.getStatus().equals(ExecutionStatus.MAYBE_PREVENTED))) {
+                injectStatus.setName(ExecutionStatus.MAYBE_PARTIAL_PREVENTED);
             } else {
                 injectStatus.setName(ExecutionStatus.SUCCESS);
             }
