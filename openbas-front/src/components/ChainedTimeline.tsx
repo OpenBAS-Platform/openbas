@@ -188,10 +188,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
                 onEdgeUpdate={edgeUpdate}
                 onEdgeUpdateStart={edgeUpdateStart}
                 onEdgeUpdateEnd={edgeUpdateEnd}
-                zoomOnScroll={false}
-                zoomOnPinch={false}
-                zoomOnDoubleClick={false}
-                panOnDrag={false}
                 defaultEdgeOptions={defaultEdgeOptions}
                 proOptions={proOptions}
             />
