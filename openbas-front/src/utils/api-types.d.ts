@@ -1089,7 +1089,7 @@ export interface Inject {
    * @min 0
    */
   inject_depends_duration: number;
-  inject_depends_on?: Inject;
+  inject_depends_on?: string;
   inject_description?: string;
   inject_documents?: InjectDocument[];
   inject_enabled?: boolean;

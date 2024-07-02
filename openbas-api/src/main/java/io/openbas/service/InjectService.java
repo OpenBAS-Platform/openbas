@@ -164,11 +164,81 @@ public class InjectService {
     return execInject(query);
   }
 
-    /**
-     * Create inject programmatically based on rawInject, rawInjectExpectation, rawAsset, rawAssetGroup, rawTeam
-     */
-    public Map<String, Inject> mapOfInjects(@NotNull final List<String> injectIds) {
-        List<Inject> listOfInjects = new ArrayList<>();
+  // -- CRITERIA BUILDER --
+
+  private void selectForInject(CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Inject> injectRoot) {
+    // Joins
+    Join<Inject, Exercise> injectExerciseJoin = createLeftJoin(injectRoot, "exercise");
+    Join<Inject, Scenario> injectScenarioJoin = createLeftJoin(injectRoot, "scenario");
+    Join<Inject, InjectorContract> injectorContractJoin = createLeftJoin(injectRoot, "injectorContract");
+    Join<InjectorContract, Injector> injectorJoin = injectorContractJoin.join("injector", JoinType.LEFT);
+    Join<Inject, Inject> injectDependsJoin = createLeftJoin(injectRoot, "dependsOn");
+    // Array aggregations
+    Expression<String[]> tagIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "tags");
+    Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
+    Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
+    Expression<String[]> assetGroupIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assetGroups");
+
+    // SELECT
+    cq.multiselect(
+        injectRoot.get("id").alias("inject_id"),
+        injectRoot.get("title").alias("inject_title"),
+        injectRoot.get("enabled").alias("inject_enabled"),
+        injectRoot.get("content").alias("inject_content"),
+        injectRoot.get("allTeams").alias("inject_all_teams"),
+        injectExerciseJoin.get("id").alias("inject_exercise"),
+        injectScenarioJoin.get("id").alias("inject_scenario"),
+        injectRoot.get("dependsDuration").alias("inject_depends_duration"),
+        injectDependsJoin.get("id").alias("inject_depends_from_another"),
+        injectorContractJoin.alias("inject_injector_contract"),
+        tagIdsExpression.alias("inject_tags"),
+        teamIdsExpression.alias("inject_teams"),
+        assetIdsExpression.alias("inject_assets"),
+        assetGroupIdsExpression.alias("inject_asset_groups"),
+        injectorJoin.get("type").alias("inject_type")
+    ).distinct(true);
+
+    // GROUP BY
+    cq.groupBy(Arrays.asList(
+        injectRoot.get("id"),
+        injectExerciseJoin.get("id"),
+        injectScenarioJoin.get("id"),
+        injectorContractJoin.get("id"),
+        injectorJoin.get("id"),
+        injectDependsJoin.get("id")
+    ));
+  }
+
+  private List<InjectOutput> execInject(TypedQuery<Tuple> query) {
+    return query.getResultList()
+        .stream()
+        .map(tuple -> new InjectOutput(
+            tuple.get("inject_id", String.class),
+            tuple.get("inject_title", String.class),
+            tuple.get("inject_enabled", Boolean.class),
+            tuple.get("inject_content", ObjectNode.class),
+            tuple.get("inject_all_teams", Boolean.class),
+            tuple.get("inject_exercise", String.class),
+            tuple.get("inject_scenario", String.class),
+            tuple.get("inject_depends_duration", Long.class),
+            tuple.get("inject_depends_from_another", String.class),
+            tuple.get("inject_injector_contract", InjectorContract.class),
+            tuple.get("inject_tags", String[].class),
+            tuple.get("inject_teams", String[].class),
+            tuple.get("inject_assets", String[].class),
+            tuple.get("inject_asset_groups", String[].class),
+            tuple.get("inject_type", String.class)
+        ))
+        .toList();
+  }
+
+  // -- TEST --
+
+  /**
+   * Create inject programmatically based on rawInject, rawInjectExpectation, rawAsset, rawAssetGroup, rawTeam
+   */
+  public Map<String, Inject> mapOfInjects(@NotNull final List<String> injectIds) {
+    List<Inject> listOfInjects = new ArrayList<>();
 
         List<RawInject> listOfRawInjects = this.injectRepository.findRawByIds(injectIds);
         // From the list of injects, we get all the inject expectationsIds that we then get

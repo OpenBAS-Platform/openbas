@@ -4,6 +4,7 @@ import { type Node, type Edge, useReactFlow, useNodesInitialized, useStore } fro
 import { getSourceHandlePosition, getTargetHandlePosition } from './utils';
 import layoutAlgorithms, { type LayoutAlgorithmOptions } from './algorithms';
 import type { InjectExpectationsStore } from '../../admin/components/common/injects/expectations/Expectation';
+import {InjectStore} from "../../actions/injects/Inject";
 
 export type LayoutOptions = {
   algorithm: keyof typeof layoutAlgorithms;
@@ -58,6 +59,57 @@ function useAutoLayout(options: LayoutOptions, targetResults: InjectExpectations
     };
     runLayout();
   }, [nodesInitialized, elements, setNodes, setEdges, targetResults]);
+}
+
+export function useAutoLayoutInject(options: LayoutOptions, injects: InjectStore[]) {
+  const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
+  const elements = useStore(
+      (state) => ({
+        nodeMap: state.nodeInternals,
+        edgeMap: state.edges.reduce(
+            (acc, edge) => acc.set(edge.id, edge),
+            new Map(),
+        ),
+      }),
+      // The compare elements function will only update `elements` if something has
+      // changed that should trigger a layout. This includes changes to a node's
+      // dimensions, the number of nodes, or changes to edge sources/targets.
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      compareElements,
+  );
+  const nodesInitialized = useNodesInitialized();
+  useEffect(() => {
+    // Only run the layout if there are nodes and they have been initialized with
+    // their dimensions
+    if (!nodesInitialized || elements.nodeMap.size === 0) {
+      return;
+    }
+    // The callback passed to `useEffect` cannot be `async` itself, so instead we
+    // create an async function here and call it immediately afterwards.
+    const runLayout = async () => {
+      const layoutAlgorithm = layoutAlgorithms[options.algorithm];
+      const nodes = getNodes();
+      const edges = getEdges();
+      const { nodes: nextNodes, edges: nextEdges } = await layoutAlgorithm(
+          nodes,
+          edges,
+          options,
+      );
+      // Mutating the nodes and edges directly here is fine because we expect our
+      // layouting algorithms to return a new array of nodes/edges.
+      for (const node of nextNodes) {
+        node.style = { ...node.style, opacity: 1 };
+        node.sourcePosition = getSourceHandlePosition(options.direction);
+        node.targetPosition = getTargetHandlePosition(options.direction);
+      }
+      for (const edge of edges) {
+        edge.style = { ...edge.style, opacity: 1 };
+      }
+      setNodes(nextNodes);
+      setEdges(nextEdges);
+    };
+    runLayout();
+  }, [nodesInitialized, elements, setNodes, setEdges, injects]);
 }
 
 export default useAutoLayout;

@@ -21,6 +21,7 @@ import useEntityToggle from '../../../../../utils/hooks/useEntityToggle';
 import ToolBar from '../../../common/ToolBar';
 import { isNotEmptyField } from '../../../../../utils/utils';
 import injectContextForScenario from '../ScenarioContext';
+import { Connection } from "reactflow";
 import { fetchScenarioInjectsSimple, bulkTestInjects } from '../../../../../actions/injects/inject-action';
 import { useFormatter } from '../../../../../components/i18n';
 
@@ -113,6 +114,17 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
     : injects.filter(
       (inject: Inject) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id),
     );
+
+  const handleConnectInjects = async (connection: Connection) => {
+    const updateFields = [
+      'inject_title',
+      'inject_depends_from_another',
+      'inject_depends_duration',
+    ]
+    let sourceInject = injects.find((inject: Inject) => inject.inject_id === connection.source)
+    sourceInject.inject_depends_from_another = connection.target;
+    await injectContext.onUpdateInject(sourceInject.inject_id, R.pick(updateFields, sourceInject));
+  }
 
   const massUpdateInjects = async (actions: { field: string, type: string, values: { value: string }[] }[]) => {
     const updateFields = [
@@ -252,6 +264,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
             selectedElements={selectedElements}
             deSelectedElements={deSelectedElements}
             selectAll={selectAll}
+            onConnectInjects={handleConnectInjects}
           />
           <ToolBar
             numberOfSelectedElements={numberOfSelectedElements}
