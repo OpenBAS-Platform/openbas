@@ -111,7 +111,8 @@ public class ExerciseExpectationService {
             if (injectExpectation.getType() == EXPECTATION_TYPE.MANUAL) {
                 injectExpectation.setScore(null);
             } else {
-                injectExpectation.setScore(Collections.max(injectExpectation.getResults().stream().map(InjectExpectationResult::getScore).filter(Objects::nonNull).toList()));
+                List<Integer> scores = injectExpectation.getResults().stream().map(InjectExpectationResult::getScore).filter(Objects::nonNull).toList();
+                injectExpectation.setScore(!scores.isEmpty() ? Collections.max(scores) : 0);
             }
         }
         injectExpectation.setUpdatedAt(now());

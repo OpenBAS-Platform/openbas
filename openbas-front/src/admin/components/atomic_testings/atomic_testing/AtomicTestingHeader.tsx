@@ -91,7 +91,7 @@ const AtomicTestingHeader = () => {
         </Typography>
       </Tooltip>
       <div className={classes.actions}>
-        {!injectResultDto.inject_ready || !injectResultDto.inject_targets || injectResultDto.inject_targets.length === 0 ? (
+        {!injectResultDto.inject_ready ? (
           <Button
             style={{ marginRight: 10 }}
             startIcon={<SettingsOutlined />}

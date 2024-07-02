@@ -90,7 +90,7 @@ public class InjectStatus implements Base {
     int numberOfSuccess = (int) execution.getTraces().stream().filter(ex -> ex.getStatus().equals(ExecutionStatus.SUCCESS)).count();
     injectStatus.setTrackingTotalError(numberOfError);
     injectStatus.setTrackingTotalSuccess(numberOfSuccess);
-    injectStatus.setTrackingTotalCount(numberOfElements);
+    injectStatus.setTrackingTotalCount(execution.getExpectedCount() != null ? execution.getExpectedCount() : numberOfElements);
     ExecutionStatus globalStatus = numberOfSuccess > 0 ? ExecutionStatus.SUCCESS : ExecutionStatus.ERROR;
     ExecutionStatus finalStatus = numberOfError > 0 && numberOfSuccess > 0 ? ExecutionStatus.PARTIAL : globalStatus;
     injectStatus.setName(execution.isAsync() ? ExecutionStatus.PENDING : finalStatus);
