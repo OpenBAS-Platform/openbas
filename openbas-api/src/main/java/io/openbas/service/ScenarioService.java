@@ -498,9 +498,6 @@ public class ScenarioService {
         scenarioDuplicate.setExternalReference(scenario.getExternalReference());
         scenarioDuplicate.setTeamUsers(scenario.getTeamUsers().stream().toList());
         scenarioDuplicate.setTeams(scenario.getTeams().stream().toList());
-        scenarioDuplicate.setRecurrence(scenario.getRecurrence());
-        scenarioDuplicate.setRecurrenceEnd(scenario.getRecurrenceEnd());
-        scenarioDuplicate.setRecurrenceStart(scenario.getRecurrenceStart());
         scenarioDuplicate.setName(getNewName(scenario));
         scenarioDuplicate.setReplyTos(scenario.getReplyTos().stream().toList());
         scenarioDuplicate.setLessonsCategories(scenario.getLessonsCategories().stream().toList());
