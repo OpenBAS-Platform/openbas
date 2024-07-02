@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { Checkbox, Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Menu, MenuItem, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
-import { BarChartOutlined, MoreVert, ReorderOutlined } from '@mui/icons-material';
+import { BarChartOutlined, MoreVert, ReorderOutlined, ViewTimelineOutlined, Link } from '@mui/icons-material';
 import { CSVLink } from 'react-csv';
 import { splitDuration } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
@@ -21,6 +21,7 @@ import CreateInject from './CreateInject';
 import UpdateInject from './UpdateInject';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import Timeline from '../../../../components/Timeline';
+import ChainedTimeline from '../../../../components/ChainedTimeline';
 import { isNotEmptyField } from '../../../../utils/utils';
 
 const useStyles = makeStyles(() => ({
@@ -171,6 +172,7 @@ const Injects = (props) => {
     selectAll,
     onToggleShiftEntity,
     handleToggleSelectAll,
+    onConnectInjects,
   } = props;
   // Standard hooks
   const classes = useStyles();
@@ -184,6 +186,7 @@ const Injects = (props) => {
   );
   const { permissions } = useContext(PermissionsContext);
   const injectContext = useContext(InjectContext);
+  const [chainMode, setChainMode] = useState('chaining');
 
   // Filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
@@ -311,17 +314,54 @@ const Injects = (props) => {
                 </Tooltip>
               </ToggleButtonGroup>
             ) : null}
+            {setChainMode ? (
+                <ToggleButtonGroup
+                    size="small"
+                    exclusive
+                    value={chainMode}
+                    style={{ float: 'right' }}
+                    aria-label="Change chaining mode"
+                >
+                  <Tooltip title={t('Timeline view')}>
+                    <ToggleButton
+                        value='timeline'
+                        onClick={() => setChainMode('timeline')}
+                        aria-label="Timeline view mode"
+                    >
+                      <ViewTimelineOutlined fontSize="small" color='inherit'/>
+                    </ToggleButton>
+                  </Tooltip>
+                  <Tooltip title={t('Chaining view')}>
+                    <ToggleButton
+                        value='chaining'
+                        onClick={() => setChainMode('chaining')}
+                        aria-label="Chaining view mode"
+                    >
+                      <Link fontSize="small" color='primary'/>
+                    </ToggleButton>
+                  </Tooltip>
+                </ToggleButtonGroup>
+            ) : null}
           </div>
           <div className="clearfix"/>
         </div>
         {showTimeline && (
         <div style={{ marginBottom: 50 }}>
-          <Timeline
-            injects={sortedInjects}
-            onSelectInject={(id) => setSelectedInjectId(id)}
-            teams={teams}
-          />
-          <div className="clearfix"/>
+          <div>
+            {chainMode !== "chaining" ? (
+              <Timeline
+                injects={sortedInjects}
+                onSelectInject={(id) => setSelectedInjectId(id)}
+                teams={teams}
+              />
+                ) : (
+                <ChainedTimeline
+                    injects={sortedInjects}
+                    onConnectInjects={onConnectInjects}
+                />
+            )}
+            <div className="clearfix"/>
+          </div>
         </div>
         )}
         <List>

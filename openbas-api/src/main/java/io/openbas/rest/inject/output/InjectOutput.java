@@ -35,6 +35,9 @@ public class InjectOutput {
   @Min(value = 0L, message = "The value must be positive")
   private Long dependsDuration;
 
+  @JsonProperty("inject_depends_on")
+  private String dependsOn;
+
   @JsonProperty("inject_injector_contract")
   private InjectorContract injectorContract;
 
@@ -68,6 +71,7 @@ public class InjectOutput {
       String exerciseId,
       String scenarioId,
       Long dependsDuration,
+      String dependsOn,
       InjectorContract injectorContract,
       String[] tags,
       String[] teams,
@@ -80,6 +84,7 @@ public class InjectOutput {
     this.exercise = exerciseId;
     this.scenario = scenarioId;
     this.dependsDuration = dependsDuration;
+    this.dependsOn = dependsOn;
     this.injectorContract = injectorContract;
     this.tags = tags != null ? new HashSet<>(Arrays.asList(tags)) : new HashSet<>();
 
