@@ -14,8 +14,10 @@ import io.openbas.database.repository.*;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
+import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.output.AtomicTestingOutput;
+import io.openbas.utils.AtomicTestingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -43,8 +45,7 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.InjectCriteria.countQuery;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.utils.AtomicTestingUtils.getRawExpectationResultByTypes;
-import static io.openbas.utils.AtomicTestingUtils.getTargetsFromRaw;
+import static io.openbas.utils.AtomicTestingUtils.*;
 import static io.openbas.utils.Constants.MAX_SIZE_OF_STRING;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.JpaUtils.createLeftJoin;
@@ -77,12 +78,15 @@ public class AtomicTestingService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public Optional<Inject> findById(String injectId) {
-        return injectRepository.findWithStatusById(injectId);
+    public InjectResultDTO findById(String injectId) {
+        Optional<Inject> statusById = injectRepository.findWithStatusById(injectId);
+        return statusById
+                .map(AtomicTestingMapper::toDtoWithTargetResults)
+                .orElseThrow(ElementNotFoundException::new);
     }
 
     @Transactional
-    public Inject createOrUpdate(AtomicTestingInput input, String injectId) {
+    public InjectResultDTO createOrUpdate(AtomicTestingInput input, String injectId) {
         Inject injectToSave = new Inject();
         if (injectId != null) {
             injectToSave = injectRepository.findById(injectId).orElseThrow();
@@ -131,7 +135,14 @@ public class AtomicTestingService {
                     return null;
                 }).filter(Objects::nonNull).toList();
         injectToSave.getDocuments().addAll(injectDocuments);
-        return injectRepository.save(injectToSave);
+        Inject inject = injectRepository.save(injectToSave);
+        return AtomicTestingMapper.toDto(
+                inject, getTargets(
+                        inject.getTeams(),
+                        inject.getAssets(),
+                        inject.getAssetGroups()
+                )
+        );
     }
 
     private ObjectNode setExpectations(AtomicTestingInput input, InjectorContract injectorContract, ObjectNode finalContent) {
@@ -165,10 +176,17 @@ public class AtomicTestingService {
 
     @Transactional
     @Validated
-    public Inject getDuplicateAtomicTesting(@NotBlank String id) {
+    public InjectResultDTO getDuplicateAtomicTesting(@NotBlank String id) {
         Inject injectOrigin = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
         Inject injectDuplicate = copyInject(injectOrigin);
-        return injectRepository.save(injectDuplicate);
+        Inject inject = injectRepository.save(injectDuplicate);
+        return AtomicTestingMapper.toDto(
+                inject, getTargets(
+                        inject.getTeams(),
+                        inject.getAssets(),
+                        inject.getAssetGroups()
+                )
+        );
     }
 
     public Inject copyInject(@NotNull Inject injectOrigin) {
@@ -201,12 +219,19 @@ public class AtomicTestingService {
         return newTitle;
     }
 
-    public Inject updateAtomicTestingTags(String injectId, AtomicTestingUpdateTagsInput input) {
+    public InjectResultDTO updateAtomicTestingTags(String injectId, AtomicTestingUpdateTagsInput input) {
 
         Inject inject = injectRepository.findById(injectId).orElseThrow();
         inject.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
 
-        return injectRepository.save(inject);
+        Inject saved = injectRepository.save(inject);
+        return AtomicTestingMapper.toDto(
+                saved, getTargets(
+                        saved.getTeams(),
+                        saved.getAssets(),
+                        saved.getAssetGroups()
+                )
+        );
     }
 
     @Transactional

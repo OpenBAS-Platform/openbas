@@ -6,11 +6,9 @@ import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
 import io.openbas.rest.atomic_testing.form.InjectResultDTO;
-import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.output.AtomicTestingOutput;
 import io.openbas.service.AtomicTestingService;
-import io.openbas.utils.AtomicTestingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -21,8 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static io.openbas.utils.AtomicTestingUtils.getTargets;
 
 @RestController
 @RequestMapping("/api/atomic_testings")
@@ -42,34 +38,18 @@ public class AtomicTestingApi extends RestBehavior {
 
   @GetMapping("/{injectId}")
   public InjectResultDTO findAtomicTesting(@PathVariable String injectId) {
-    return atomicTestingService.findById(injectId)
-        .map(AtomicTestingMapper::toDtoWithTargetResults)
-        .orElseThrow(ElementNotFoundException::new);
+    return atomicTestingService.findById(injectId);
   }
 
   @PostMapping()
   @Transactional(rollbackFor = Exception.class)
   public InjectResultDTO createAtomicTesting(@Valid @RequestBody AtomicTestingInput input) {
-    Inject inject = this.atomicTestingService.createOrUpdate(input, null);
-    return AtomicTestingMapper.toDto(
-        inject, getTargets(
-            inject.getTeams(),
-            inject.getAssets(),
-            inject.getAssetGroups()
-        )
-    );
+    return this.atomicTestingService.createOrUpdate(input, null);
   }
 
   @PostMapping("/{atomicTestingId}")
   public InjectResultDTO duplicateAtomicTesting(@PathVariable final String atomicTestingId) {
-    Inject inject = atomicTestingService.getDuplicateAtomicTesting(atomicTestingId);
-    return AtomicTestingMapper.toDto(
-            inject, getTargets(
-                    inject.getTeams(),
-                    inject.getAssets(),
-                    inject.getAssetGroups()
-            )
-    );
+    return atomicTestingService.getDuplicateAtomicTesting(atomicTestingId);
   }
 
   @PutMapping("/{injectId}")
@@ -77,14 +57,7 @@ public class AtomicTestingApi extends RestBehavior {
   public InjectResultDTO updateAtomicTesting(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingInput input) {
-    Inject inject = this.atomicTestingService.createOrUpdate(input, injectId);
-    return AtomicTestingMapper.toDto(
-        inject, getTargets(
-            inject.getTeams(),
-            inject.getAssets(),
-            inject.getAssetGroups()
-        )
-    );
+    return this.atomicTestingService.createOrUpdate(input, injectId);
   }
 
   @DeleteMapping("/{injectId}")
@@ -111,14 +84,7 @@ public class AtomicTestingApi extends RestBehavior {
   public InjectResultDTO updateAtomicTestingTags(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingUpdateTagsInput input) {
-    Inject inject = atomicTestingService.updateAtomicTestingTags(injectId, input);
-    return AtomicTestingMapper.toDto(
-        inject, getTargets(
-            inject.getTeams(),
-            inject.getAssets(),
-            inject.getAssetGroups()
-        )
-    );
+    return atomicTestingService.updateAtomicTestingTags(injectId, input);
   }
 
 
