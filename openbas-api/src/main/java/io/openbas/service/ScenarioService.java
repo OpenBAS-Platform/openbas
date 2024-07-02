@@ -269,9 +269,9 @@ public class ScenarioService {
         return this.scenarioRepository.save(scenario);
     }
 
-    public Iterable<Scenario> updateScenarios(@NotNull final List<Scenario> scenarios) {
+    public void updateScenarios(@NotNull final List<Scenario> scenarios) {
         scenarios.forEach(scenario -> scenario.setUpdatedAt(now()));
-        return this.scenarioRepository.saveAll(scenarios);
+        this.scenarioRepository.saveAll(scenarios);
     }
 
     public void deleteScenario(@NotBlank final String scenarioId) {
@@ -495,7 +495,6 @@ public class ScenarioService {
         scenarioDuplicate.setInjects(new HashSet<>(scenario.getInjects()));
         scenarioDuplicate.setObjectives(scenario.getObjectives().stream().toList());
         scenarioDuplicate.setDescription(scenario.getDescription());
-        scenarioDuplicate.setExercises(scenario.getExercises().stream().toList());
         scenarioDuplicate.setExternalReference(scenario.getExternalReference());
         scenarioDuplicate.setTeamUsers(scenario.getTeamUsers().stream().toList());
         scenarioDuplicate.setTeams(scenario.getTeams().stream().toList());
