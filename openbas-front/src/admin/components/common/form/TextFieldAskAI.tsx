@@ -124,44 +124,36 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
     switch (action) {
       case 'spelling':
         await askFixSpelling();
-        setDisableResponse(false);
         break;
       case 'shorter':
         await askMakeShorter();
-        setDisableResponse(false);
         break;
       case 'longer':
         await askMakeLonger();
-        setDisableResponse(false);
         break;
       case 'tone':
         await askChangeTone();
-        setDisableResponse(false);
         break;
       case 'summarize':
         await askSummarize();
-        setDisableResponse(false);
         break;
       case 'explain':
         await askExplain();
-        setDisableResponse(false);
         break;
       case 'genMessage':
         await askGenMessage();
-        setDisableResponse(false);
         break;
       case 'genSubject':
         await askGenSubject();
-        setDisableResponse(false);
         break;
       case 'genMedia':
         await askGenMedia();
-        setDisableResponse(false);
         break;
       default:
         // do nothing
-        setDisableResponse(false);
+        break;
     }
+    setDisableResponse(false);
   };
   const renderButton = () => {
     return (
