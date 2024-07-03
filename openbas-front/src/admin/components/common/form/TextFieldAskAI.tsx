@@ -194,22 +194,22 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               {t('Generate an article')}
             </MenuItem>
           )}
-          <MenuItem onClick={() => handleAskAi('spelling')}>
+          <MenuItem onClick={() => handleAskAi('spelling')} disabled={messageInput.length === 0}>
             {t('Fix spelling & grammar')}
           </MenuItem>
-          <MenuItem onClick={() => handleAskAi('shorter')}>
+          <MenuItem onClick={() => handleAskAi('shorter')} disabled={messageInput.length === 0}>
             {t('Make it shorter')}
           </MenuItem>
-          <MenuItem onClick={() => handleAskAi('longer')}>
+          <MenuItem onClick={() => handleAskAi('longer')} disabled={messageInput.length === 0}>
             {t('Make it longer')}
           </MenuItem>
-          <MenuItem onClick={handleOpenToneOptions}>
+          <MenuItem onClick={handleOpenToneOptions} disabled={messageInput.length === 0}>
             {t('Change tone')}
           </MenuItem>
-          <MenuItem onClick={() => handleAskAi('summarize')}>
+          <MenuItem onClick={() => handleAskAi('summarize')} disabled={messageInput.length === 0}>
             {t('Summarize')}
           </MenuItem>
-          <MenuItem onClick={() => handleAskAi('explain', false)}>
+          <MenuItem onClick={() => handleAskAi('explain', false)} disabled={messageInput.length === 0}>
             {t('Explain')}
           </MenuItem>
         </Menu>
@@ -295,7 +295,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseToneOptions}>
+            <Button onClick={handleCloseGenMessageOptions}>
               {t('Cancel')}
             </Button>
             <Button
@@ -370,7 +370,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseToneOptions}>
+            <Button onClick={handleCloseGenMediaOptions}>
               {t('Cancel')}
             </Button>
             <Button
