@@ -1062,7 +1062,7 @@ class QuickInject extends Component {
                                   className={classes.bodyItem}
                                   style={inlineStyles.team_tags}
                                 >
-                                  <ItemTags variant="list" tags={[]} />
+                                  <ItemTags variant="list-reduce-view" tags={[]} />
                                 </div>
                               </div>
                             }
@@ -1116,7 +1116,7 @@ class QuickInject extends Component {
                                       style={inlineStyles.team_tags}
                                     >
                                       <ItemTags
-                                        variant="list"
+                                        variant="list-reduce-view"
                                         tags={team.team_tags}
                                       />
                                     </div>
@@ -1340,7 +1340,7 @@ class QuickInject extends Component {
                                 style={inlineStyles.document_tags}
                               >
                                 <ItemTags
-                                  variant="list"
+                                  variant="list-reduce-view"
                                   tags={document.document_tags}
                                 />
                               </div>

@@ -192,7 +192,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
                             <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} /> {endpoint.endpoint_platform}
                           </div>
                           <div className={classes.bodyItem} style={{ width: '35%' }}>
-                            <ItemTags variant="list" tags={endpoint.asset_tags} />
+                            <ItemTags variant="list-reduce-view" tags={endpoint.asset_tags} />
                           </div>
                         </div>
                     }

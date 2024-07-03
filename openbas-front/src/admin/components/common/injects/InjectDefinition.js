@@ -1159,7 +1159,7 @@ class InjectDefinition extends Component {
                             className={classes.bodyItem}
                             style={inlineStyles.team_tags}
                           >
-                            <ItemTags variant="list" tags={[]} />
+                            <ItemTags variant="list-reduce-view" tags={[]} />
                           </div>
                         </>
                       }
@@ -1319,7 +1319,7 @@ class InjectDefinition extends Component {
                             style={inlineStyles.challenge_tags}
                           >
                             <ItemTags
-                              variant="list"
+                              variant="list-reduce-view"
                               tags={challenge.challenge_tags}
                             />
                           </div>
@@ -1490,7 +1490,7 @@ class InjectDefinition extends Component {
                             style={inlineStyles.document_tags}
                           >
                             <ItemTags
-                              variant="list"
+                              variant="list-reduce-view"
                               tags={document.document_tags}
                             />
                           </div>

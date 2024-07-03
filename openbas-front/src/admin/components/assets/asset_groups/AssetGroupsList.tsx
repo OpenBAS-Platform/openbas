@@ -74,7 +74,7 @@ const AssetGroupsList: FunctionComponent<Props> = ({
                     className={classes.bodyItem}
                     style={inlineStyles.asset_group_tags}
                   >
-                    <ItemTags variant="list" tags={assetGroup.asset_group_tags} />
+                    <ItemTags variant="list-reduce-view" tags={assetGroup.asset_group_tags} />
                   </div>
                 </>
               }

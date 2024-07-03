@@ -19,7 +19,6 @@ const useStyles = makeStyles(() => ({
     alignItems: 'center',
     flexWrap: 'nowrap',
     overflow: 'hidden',
-    margin: '0 10px',
   },
   tag: {
     height: 25,
@@ -40,8 +39,13 @@ const ItemTags = (props) => {
   const theme = useTheme();
   const classes = useStyles();
   let style = classes.tag;
+  let truncateLimit = 15;
   if (variant === 'list') {
     style = `${classes.tag} ${classes.tagInList}`;
+  }
+  if (variant === 'list-reduce-view') {
+    style = `${classes.tag} ${classes.tagInList}`;
+    truncateLimit = 6;
   }
   const resolvedTags = useHelper((helper) => {
     const allTags = helper.getTags() ?? [];
@@ -63,7 +67,7 @@ const ItemTags = (props) => {
                 <Chip
                   variant="outlined"
                   classes={{ root: style }}
-                  label={truncate(tag.tag_name, 6)}
+                  label={truncate(tag.tag_name, truncateLimit)}
                   style={{
                     color: tag.tag_color,
                     borderColor: tag.tag_color,

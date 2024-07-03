@@ -116,6 +116,7 @@ const inlineStyles: Record<string, CSSProperties> = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     cursor: 'pointer',
+    paddingRight: 10,
   },
   user_email: {
     float: 'left',
