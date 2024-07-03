@@ -299,7 +299,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               {t('Cancel')}
             </Button>
             <Button
-              disabled={messageInput.length < 5}
+              disabled={messageInput.length === 0} // Disable button if messageInput is empty
               onClick={() => {
                 handleCloseGenMessageOptions();
                 handleAskAi('genMessage');
@@ -374,7 +374,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               {t('Cancel')}
             </Button>
             <Button
-              disabled={messageInput.length < 5}
+              disabled={messageInput.length === 0}
               onClick={() => {
                 handleCloseGenMediaOptions();
                 handleAskAi('genMedia');
@@ -419,7 +419,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               {t('Cancel')}
             </Button>
             <Button
-              disabled={messageInput.length < 5}
+              disabled={messageInput.length === 0}
               onClick={() => {
                 handleCloseToneOptions();
                 handleAskAi('tone');
