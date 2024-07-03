@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { z } from 'zod';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useFieldArray, useForm, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { TextField, MenuItem, MenuList, ListItemIcon, ListItemText, InputBaseComponentProps } from '@mui/material';
+import { TextField, MenuItem, MenuList, ListItemIcon, ListItemText, InputBaseComponentProps, Button } from '@mui/material';
 import { useFormatter } from '../../../../../components/i18n';
 import { zodImplement } from '../../../../../utils/Zod';
 import type { FilterGroup, InjectImporterAddInput, SearchPaginationInput } from '../../../../../utils/api-types';
@@ -23,6 +23,7 @@ import { isNotEmptyField } from '../../../../../utils/utils';
 
 interface Props {
   initialValues?: InjectImporterAddInput;
+  // OnSubmit: SubmitHandler<InjectImporterAddInput>;
   inputProps?: InputBaseComponentProps;
   // onDelete: () => void;
 }
@@ -39,6 +40,7 @@ const importFilter: FilterGroup = {
 };
 
 const InjectImporterForm: React.FC<Props> = ({
+
   initialValues = {
     inject_importer_injector_contract_id: '',
     inject_importer_name: '',
@@ -67,8 +69,10 @@ const InjectImporterForm: React.FC<Props> = ({
    })); */
 
   const {
-    register,
-    control,
+    // register,
+    handleSubmit,
+    // control,
+    getValues,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<InjectImporterAddInput>({
     mode: 'onTouched',
@@ -83,15 +87,10 @@ const InjectImporterForm: React.FC<Props> = ({
     defaultValues: initialValues,
   });
 
+  const { register, control } = useFormContext();
+
   return (
     <>
-      {/* <PaginationComponent
-        disablePagination
-        fetch={searchInjectorContracts}
-        searchPaginationInput={searchPaginationInput}
-        setContent={setContracts}
-        searchEnable={false}
-      /> */}
       <form id="injectImporterForm">
         <TextField
           variant="standard"
@@ -115,58 +114,20 @@ const InjectImporterForm: React.FC<Props> = ({
           InputLabelProps={{ required: true }}
         />
 
-        <InjectContractComponent
-          fetch={searchInjectorContracts}
-          searchPaginationInput={searchPaginationInput}
-          setContent={setContracts}
-          label={'Inject importer injector contract'}
-          injectorContracts={contracts}
-          inputProps={register('inject_importer_injector_contract_id')}
-        />
-
-        {/* <Controller
+        <Controller
           control={control}
           name="inject_importer_injector_contract_id"
-          render={({ field }) => (
-            <TextField
-              select
-              variant="standard"
-              fullWidth
-              label={t('Inject importer injector contract')}
-              style={{ marginTop: 10 }}
-              value={field.value}
-              error={!!errors.inject_importer_injector_contract_id}
-              helperText={errors.inject_importer_injector_contract_id?.message}
-              inputProps={register('inject_importer_injector_contract_id')}
-              InputLabelProps={{ required: true }}
-            >
-              {contracts.map((contract) => {
-                return (
-                  <MenuList
-                    key={contract.injector_contract_id}
-                  >
-                    <MenuItem value={contract.injector_contract_id}>
-                      <ListItemIcon>
-                        <InjectIcon
-                          type={
-                            contract.injector_contract_payload
-                              ? contract.injector_contract_payload?.payload_collector_type
-                              || contract.injector_contract_payload?.payload_type
-                              : contract.injector_contract_injector_type
-                          }
-                          isPayload={isNotEmptyField(contract.injector_contract_payload)}
-                        />
-                      </ListItemIcon>
-                      <ListItemText>
-                        {tPick(contract.injector_contract_labels)}
-                      </ListItemText>
-                    </MenuItem>
-                  </MenuList>
-                );
-              })}
-            </TextField>
+          render={({ field: { onChange } }) => (
+            <InjectContractComponent
+              fetch={searchInjectorContracts}
+              searchPaginationInput={searchPaginationInput}
+              setContent={setContracts}
+              label={'Inject importer injector contract'}
+              injectorContracts={contracts}
+              onChange={onChange}
+            />
           )}
-        /> */}
+        />
 
         <TextField
           variant="standard"

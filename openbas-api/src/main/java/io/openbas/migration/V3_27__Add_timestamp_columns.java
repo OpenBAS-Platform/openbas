@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V3_25__Add_timestamp_columns extends BaseJavaMigration {
+public class V3_27__Add_timestamp_columns extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
@@ -16,12 +16,12 @@ public class V3_25__Add_timestamp_columns extends BaseJavaMigration {
     Statement select = connection.createStatement();
     // Create table
     select.execute("""
-          ALTER TABLE import_mappers ADD COLUMN mapper_created_at TIMESTAMP DEFAULT now();
-     """);
+             ALTER TABLE import_mappers ADD COLUMN mapper_created_at TIMESTAMP DEFAULT now();
+        """);
 
     select.execute("""
-          ALTER TABLE import_mappers ADD COLUMN mapper_updated_at TIMESTAMP DEFAULT now();
-     """);
+             ALTER TABLE import_mappers ADD COLUMN mapper_updated_at TIMESTAMP DEFAULT now();
+        """);
 
   }
 }

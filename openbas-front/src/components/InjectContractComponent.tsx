@@ -26,7 +26,7 @@ interface Props<T> {
   setContent: (data: T[]) => void;
   label: string;
   injectorContracts: InjectorContractStore[];
-  inputProps?: InputBaseComponentProps;
+  onChange: (data: string | null | undefined) => void;
 }
 
 const InjectContractComponent = <T extends object>({
@@ -35,6 +35,7 @@ const InjectContractComponent = <T extends object>({
   setContent,
   label,
   injectorContracts,
+  onChange,
   /* exportProps,
   searchEnable = true,
   disablePagination,
@@ -85,6 +86,8 @@ const InjectContractComponent = <T extends object>({
     });
   }, [searchPaginationInput, page, rowsPerPage, textSearch]);
 
+  const [value, setValue] = React.useState<string | null | undefined>('');
+
   return (
 
     <Autocomplete
@@ -106,9 +109,12 @@ const InjectContractComponent = <T extends object>({
         )
       }
       options={injectorContracts}
-      // value={injectorContracts.find((i) => i.injector_contract_id === value.target_type) || null}
+      value={injectorContracts.find((i) => i.injector_contract_id === value) || null}
+      onChange={(event, injectorContract) => {
+        setValue(injectorContract?.injector_contract_id);
+        onChange(injectorContract?.injector_contract_id);
+      }}
       onInputChange={(event) => searchContract(event)}
-      /* onChange={(_, val) => handleChangeEntityType(val)} */
       renderOption={(props, option) => (
         <li {...props}>
           <div className={classes.icon}>

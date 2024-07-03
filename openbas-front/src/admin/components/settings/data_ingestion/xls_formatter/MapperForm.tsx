@@ -1,25 +1,39 @@
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import React from 'react';
-import { TextField, InputLabel, MenuItem, SelectChangeEvent, Button, Typography, IconButton } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import { Controller, SubmitHandler, useForm, FormProvider, useFieldArray } from 'react-hook-form';
+import React, { useState } from 'react';
+import {
+  TextField,
+  InputLabel,
+  MenuItem,
+  SelectChangeEvent,
+  Button,
+  Typography,
+  IconButton,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from '@mui/material';
+import { Add, ExpandMore, Settings } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import type { MapperAddInput } from '../../../../../utils/api-types';
+import type { FilterGroup, InjectImporterAddInput, MapperAddInput, RuleAttributeAddInput, SearchPaginationInput } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
 import { zodImplement } from '../../../../../utils/Zod';
 import InjectImporterForm from './InjectImporterForm';
+import InjectContractComponent from '../../../../../components/InjectContractComponent';
+import { searchInjectorContracts } from '../../../../../actions/InjectorContracts';
+import { initSorting } from '../../../../../components/common/pagination/Page';
+import { InjectorContractStore } from '../../../../../actions/injector_contracts/InjectorContract';
 
 const useStyles = makeStyles(() => ({
   importerStyle: {
     display: 'flex',
     alignItems: 'center',
     marginTop: 20,
-  },
-  importerTextfieldStyle: {
-    position: 'relative',
-    top: '15px',
-    right: '95px',
   },
 
 }));
@@ -45,10 +59,44 @@ const MapperForm: React.FC<Props> = ({
   const { t } = useFormatter();
   const classes = useStyles();
 
-  const {
+  const methods = useForm<MapperAddInput>();
+  const { control } = methods;
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'mapper_inject_importers',
+  });
+
+  const rulesMethods = useForm<InjectImporterAddInput>();
+  const { control: rulesControl } = rulesMethods;
+  const { fields: rulesFields, append: rulesAppend } = useFieldArray({
+    control: rulesControl,
+    name: 'inject_importer_rule_attributes',
+  });
+
+  // Contracts
+  const importFilter: FilterGroup = {
+    mode: 'and',
+    filters: [
+      {
+        key: 'injector_contract_import_available',
+        operator: 'eq',
+        mode: 'and',
+        values: ['true'],
+      }],
+  };
+  const [contracts, setContracts] = useState<InjectorContractStore[]>([]);
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+    sorts: initSorting('injector_contract_labels'),
+    filterGroup: importFilter,
+  });
+
+  const onSubmit = (data) => console.log(data);
+
+  /* const {
     register,
     control,
     handleSubmit,
+    getValues,
     setValue,
     trigger,
     formState: { errors, isDirty, isSubmitting },
@@ -66,20 +114,25 @@ const MapperForm: React.FC<Props> = ({
       }),
     ),
     defaultValues: initialValues,
-  });
+  }); */
 
-  // const [showMapperField, setShowMapperField] = React.useState(false);
+  /* const watchField = methods.watch(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`);
+  if (watchField.length !== 0) {
+    for (let i = 0; i < 1; i++) {
+      rulesAppend({ rule_attribute_name: '', rule_attribute_columns: '' });
+    }
+  } */
 
   return (
-    <form id="mapperForm" onSubmit={handleSubmit(OnSubmit)}>
+    <form id="mapperForm" onSubmit={methods.handleSubmit(OnSubmit)}>
       <TextField
         variant="standard"
         fullWidth
         label={t('Mapper name')}
         style={{ marginTop: 10 }}
-        error={!!errors.mapper_name}
-        helperText={errors.mapper_name?.message}
-        inputProps={register('mapper_name')}
+        error={!!methods.formState.errors.mapper_name}
+        helperText={methods.formState.errors.mapper_name?.message}
+        inputProps={methods.register('mapper_name')}
         InputLabelProps={{ required: true }}
       />
 
@@ -88,9 +141,9 @@ const MapperForm: React.FC<Props> = ({
         style={{ marginTop: 20 }}
         variant="standard"
         fullWidth
-        error={!!errors.mapper_inject_type_column}
-        helperText={errors.mapper_inject_type_column?.message}
-        inputProps={register('mapper_inject_type_column')}
+        error={!!methods.formState.errors.mapper_inject_type_column}
+        helperText={methods.formState.errors.mapper_inject_type_column?.message}
+        inputProps={methods.register('mapper_inject_type_column')}
         InputLabelProps={{ required: true }}
       />
 
@@ -101,46 +154,97 @@ const MapperForm: React.FC<Props> = ({
         <IconButton
           color="secondary"
           aria-label="Add"
-          // onClick={() => setShowMapperField(true)}
+          onClick={() => {
+            append({ inject_importer_name: '', inject_importer_type_value: '', inject_importer_injector_contract_id: '' });
+            rulesAppend({ rule_attribute_name: '', rule_attribute_columns: '', rule_attribute_default_value: '' });
+          }}
           size="large"
         >
           <Add fontSize="small" />
         </IconButton>
-        {/* <TextField
-          variant="standard"
-          fullWidth
-          className={classes.importerTextfieldStyle}
-          error={!!errors.mapper_inject_importers}
-          helperText={errors.mapper_inject_importers?.message}
-          inputProps={register('mapper_inject_importers')}
-        /> */}
-        <InjectImporterForm inputProps={register('mapper_inject_importers')} />
-        {/* {
-          showMapperField
-          && (
-            <Controller
-              control={control}
-              name="mapper_inject_importers"
-              render={({ field }) => (
-                <TextField
-                  select
-                  variant="standard"
-                  fullWidth
-                  value={field.value}
-                  label={t('Importer')}
-                  className={classes.importerTextfieldStyle}
-                  error={!!errors.mapper_inject_importers}
-                  helperText={errors.mapper_inject_importers?.message}
-                  inputProps={register('mapper_inject_importers')}
-                >
-                  <MenuItem value="A">A</MenuItem>
-                  <MenuItem value="B">B</MenuItem>
-                </TextField>
-              )}
-            />
-          )
-        } */}
       </div>
+
+      {fields.map((field, index) => {
+        return (
+          <Accordion key={field.id}>
+            <AccordionSummary
+              expandIcon={<ExpandMore />}
+              aria-controls="panel1-content"
+              id="panel1-header"
+            >
+              <Typography>{t('Inject importer')} {index + 1}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <TextField
+                variant="standard"
+                fullWidth
+                label={t('Inject importer name')}
+                style={{ marginTop: 10 }}
+                inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_name` as const)}
+                InputLabelProps={{ required: true }}
+              />
+              <TextField
+                variant="standard"
+                fullWidth
+                label={t('Inject importer type')}
+                style={{ marginTop: 10 }}
+                inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_type_value` as const)}
+                InputLabelProps={{ required: true }}
+              />
+              <Controller
+                control={control}
+                name={`mapper_inject_importers.${index}.inject_importer_injector_contract_id` as const}
+                render={({ field: { onChange } }) => (
+                  <InjectContractComponent
+                    fetch={searchInjectorContracts}
+                    searchPaginationInput={searchPaginationInput}
+                    setContent={setContracts}
+                    label={'Inject importer injector contract'}
+                    injectorContracts={contracts}
+                    onChange={onChange}
+                  />
+                )}
+              />
+              {
+                rulesFields.map((rulesField, rulesIndex) => {
+                  return (
+                    <List key={rulesField.id}>
+                      <ListItem key={rulesField.id}>
+                        <ListItemText>
+                          <TextField
+                            label="Rule title"
+                            defaultValue="Send mail"
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                            inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_name` as const)}
+                          />
+                        </ListItemText>
+                        <ListItem>
+                          <TextField
+                            label="Rule attributes columns"
+                            inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_columns` as const)}
+                          />
+                        </ListItem>
+                        <ListItem>
+                          <TextField
+                            label="Rule attributes columns"
+                            inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value` as const)}
+                          />
+                        </ListItem>
+                        <ListItemIcon>
+                          <Settings color="primary" />
+                        </ListItemIcon>
+                      </ListItem>
+                    </List>
+                  );
+                })
+              }
+
+            </AccordionDetails>
+          </Accordion>
+        );
+      })}
 
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button
@@ -161,44 +265,8 @@ const MapperForm: React.FC<Props> = ({
         </Button>
       </div>
     </form>
+
   );
 };
 
 export default MapperForm;
-
-/*
- <Controller
-        control={control}
-        name="mapper_inject_type_column"
-        render={({ field }) => (
-          <TextField
-            select
-            label={t('Inject type column')}
-            style={{ marginTop: 20 }}
-            variant="standard"
-            fullWidth
-            value={field.value}
-            error={!!errors.mapper_inject_type_column}
-            helperText={errors.mapper_inject_type_column?.message}
-            inputProps={register('mapper_inject_type_column')}
-          >
-            <MenuItem value="A">A</MenuItem>
-            <MenuItem value="B">B</MenuItem>
-          </TextField>
-        )}
-      /> */
-
-/* <div className={classNames(classes.center, classes.marginTop)}>
-        <Typography variant="h3" sx={{ m: 0 }}>
-          {t_i18n('Representations for entity')}
-        </Typography>
-        <IconButton
-          color="secondary"
-          aria-label="Add"
-          onClick={() => onAddEntityRepresentation(setFieldValue, values)
-          }
-          size="large"
-        >
-          <Add fontSize="small" />
-        </IconButton>
-      </div> */
