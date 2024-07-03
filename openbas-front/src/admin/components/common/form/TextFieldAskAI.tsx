@@ -160,6 +160,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
         break;
       default:
         // do nothing
+        setDisableResponse(false);
     }
   };
   const renderButton = () => {
