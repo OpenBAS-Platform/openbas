@@ -156,10 +156,6 @@ public class InjectorService {
             injectorContractRepository.deleteAllById(toDeletes);
             injectorContractRepository.saveAll(toCreates);
             injectorContractRepository.saveAll(toUpdates);
-            // TODO Remove the following line in 1.3.0
-            if( injector.isPayloads() ) {
-                this.payloadService.updateInjectorContractsForInjector(injector);
-            }
             injectorRepository.save(injector);
         } else {
             // save the injector
@@ -173,10 +169,6 @@ public class InjectorService {
             newInjector.setExecutorClearCommands(executorClearCommands);
             newInjector.setPayloads(isPayloads);
             Injector savedInjector = injectorRepository.save(newInjector);
-            // TODO Remove the following line in 1.3.0
-            if( savedInjector.isPayloads() ) {
-                this.payloadService.updateInjectorContractsForInjector(savedInjector);
-            }
             // Save the contracts
             List<InjectorContract> injectorContracts = contracts.stream().map(in -> {
                 InjectorContract injectorContract = new InjectorContract();
