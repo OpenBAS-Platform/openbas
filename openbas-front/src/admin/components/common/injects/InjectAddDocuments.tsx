@@ -200,7 +200,7 @@ const InjectAddDocuments: FunctionComponent<Props> = ({
                         secondary={document.document_description}
                       />
                       <ItemTags
-                        variant="list"
+                        variant="list-reduced-view"
                         tags={document.document_tags}
                       />
                     </ListItem>

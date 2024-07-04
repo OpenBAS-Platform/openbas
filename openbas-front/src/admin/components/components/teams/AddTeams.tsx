@@ -167,7 +167,7 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
                         primary={team.team_name}
                         secondary={team.organization_name}
                       />
-                      <ItemTags variant="list" tags={team.team_tags} />
+                      <ItemTags variant="list-reduced-view" tags={team.team_tags} />
                     </ListItem>
                   );
                 })}

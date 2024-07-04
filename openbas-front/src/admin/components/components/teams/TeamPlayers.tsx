@@ -407,7 +407,7 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
                     className={classes.bodyItem}
                     style={inlineStyles.user_tags}
                   >
-                    <ItemTags variant="list" tags={user.user_tags} />
+                    <ItemTags variant="list-reduced-view" tags={user.user_tags} />
                   </div>
                 </>
               }

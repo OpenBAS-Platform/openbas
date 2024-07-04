@@ -200,7 +200,7 @@ const InjectAddTeams: FunctionComponent<Props> = ({
                         secondary={team.team_description}
                       />
                       <ItemTags
-                        variant="list"
+                        variant="list-reduced-view"
                         tags={team.team_tags}
                       />
                     </ListItem>
