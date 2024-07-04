@@ -156,8 +156,6 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
     setDisableResponse(false);
   };
   const renderButton = () => {
-    console.log('çurrent :', currentValue);
-    console.log('message : ', messageInput);
     return (
       <>
         <EETooltip forAi={true} title={t('Ask AI')}>
