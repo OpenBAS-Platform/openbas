@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   column: {
     display: 'grid',
-    gridTemplateColumns: '2fr 1fr 1fr 1fr',
+    gridTemplateColumns: '2fr 1fr 1fr 2fr',
   },
   bodyItem: {
     fontSize: theme.typography.h3.fontSize,
