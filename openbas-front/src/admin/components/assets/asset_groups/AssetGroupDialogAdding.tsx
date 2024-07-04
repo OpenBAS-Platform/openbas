@@ -138,7 +138,7 @@ const AssetGroupDialogAdding: FunctionComponent<Props> = ({
                       primary={assetGroup.asset_group_name}
                       secondary={assetGroup.asset_group_description}
                     />
-                    <ItemTags variant="list-reduce-view" tags={assetGroup.asset_group_tags} />
+                    <ItemTags variant="list-reduced-view" tags={assetGroup.asset_group_tags} />
                   </ListItemButton>
                 );
               })}

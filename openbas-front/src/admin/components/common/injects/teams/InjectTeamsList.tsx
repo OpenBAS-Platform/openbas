@@ -59,7 +59,7 @@ const InjectTeamsList: FunctionComponent<Props> = ({
                   {team.team_users_enabled_number}
                 </div>
                 <div className={classes.bodyItem}>
-                  <ItemTags variant="list-reduce-view" tags={team.team_tags} />
+                  <ItemTags variant="list-reduced-view" tags={team.team_tags} />
                 </div>
               </div>
             }
