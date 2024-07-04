@@ -156,6 +156,8 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
     setDisableResponse(false);
   };
   const renderButton = () => {
+    console.log('çurrent :', currentValue);
+    console.log('message : ', messageInput);
     return (
       <>
         <EETooltip forAi={true} title={t('Ask AI')}>
@@ -187,22 +189,22 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               {t('Generate an article')}
             </MenuItem>
           )}
-          <MenuItem onClick={() => handleAskAi('spelling')} disabled={messageInput.length === 0}>
+          <MenuItem onClick={() => handleAskAi('spelling')} disabled={currentValue.length === 0}>
             {t('Fix spelling & grammar')}
           </MenuItem>
-          <MenuItem onClick={() => handleAskAi('shorter')} disabled={messageInput.length === 0}>
+          <MenuItem onClick={() => handleAskAi('shorter')} disabled={currentValue.length === 0}>
             {t('Make it shorter')}
           </MenuItem>
-          <MenuItem onClick={() => handleAskAi('longer')} disabled={messageInput.length === 0}>
+          <MenuItem onClick={() => handleAskAi('longer')} disabled={currentValue.length === 0}>
             {t('Make it longer')}
           </MenuItem>
-          <MenuItem onClick={handleOpenToneOptions} disabled={messageInput.length === 0}>
+          <MenuItem onClick={handleOpenToneOptions} disabled={currentValue.length === 0}>
             {t('Change tone')}
           </MenuItem>
-          <MenuItem onClick={() => handleAskAi('summarize')} disabled={messageInput.length === 0}>
+          <MenuItem onClick={() => handleAskAi('summarize')} disabled={currentValue.length === 0}>
             {t('Summarize')}
           </MenuItem>
-          <MenuItem onClick={() => handleAskAi('explain', false)} disabled={messageInput.length === 0}>
+          <MenuItem onClick={() => handleAskAi('explain', false)} disabled={currentValue.length === 0}>
             {t('Explain')}
           </MenuItem>
         </Menu>
@@ -412,7 +414,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               {t('Cancel')}
             </Button>
             <Button
-              disabled={messageInput.length === 0}
+              disabled={currentValue.length === 0}
               onClick={() => {
                 handleCloseToneOptions();
                 handleAskAi('tone');
