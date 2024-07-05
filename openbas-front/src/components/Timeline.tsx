@@ -125,7 +125,7 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
             )
       ) {
         keys = ['No teams'];
-      } else {
+      } else if (inject.inject_type !== null) {
         keys = [inject.inject_type];
       }
     }
