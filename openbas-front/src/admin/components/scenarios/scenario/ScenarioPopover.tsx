@@ -181,13 +181,13 @@ const ScenarioPopover: FunctionComponent<Props> = ({
         open={isNotEmptyField(openDelete) ? openDelete : deletion}
         handleClose={() => (setOpenDelete ? setOpenDelete(false) : handleCloseDelete)}
         handleSubmit={submitDelete}
-        text={t(`Do you want to delete the scenario: ${scenario.scenario_name} ?`)}
+        text={`${t('Do you want to delete this scenario:')} ${scenario.scenario_name} ?`}
       />
       <DialogDuplicate
         open={isNotEmptyField(openDuplicate) ? openDuplicate : duplicate}
         handleClose={() => (setOpenDuplicate ? setOpenDuplicate(false) : handleCloseDuplicate)}
         handleSubmit={submitDuplicateHandler}
-        text={t(`Do you want to duplicate this scenario: ${scenario.scenario_name} ?`)}
+        text={`${t('Do you want to duplicate this scenario:')} ${scenario.scenario_name} ?`}
       />
     </>
   );
