@@ -59,9 +59,6 @@ steps:
       - cd ..
       - mvn install -DskipTests=true
       - java -jar openbas-api/target/openbas-api.jar
-    depends_on:
-      - api-tests
-      - frontend-tests
 
   - name: frontend-e2e-tests
     image: node:20.14.0
