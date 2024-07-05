@@ -487,11 +487,14 @@ const Injects = (props) => {
                         className={classes.bodyItem}
                         style={inlineStyles.inject_type}
                       >
-                        <InjectorContract
-                          variant="list"
-                          config={injectContract?.config}
-                          label={injectorContractName}
-                        />
+                        {injectContract ? (
+                          <InjectorContract
+                            variant="list"
+                            config={injectContract?.config}
+                            label={injectorContractName}
+                          />
+                        ) : <InjectorContract variant="list" label={t('Deleted')} deleted={true} />
+                        }
                       </div>
                       <div
                         className={classes.bodyItem}
