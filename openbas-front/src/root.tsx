@@ -13,7 +13,6 @@ import { useAppDispatch } from './utils/hooks';
 import type { LoggedHelper } from './actions/helper';
 import Loader from './components/Loader';
 import { UserContext } from './utils/hooks/useAuth';
-import SystemBanners from "./public/components/systembanners/SystemBanners";
 
 const RootPublic = lazy(() => import('./public/Root'));
 const IndexPrivate = lazy(() => import('./private/Index'));
@@ -49,8 +48,7 @@ const Root = () => {
         settings,
       }}
     >
-      <SystemBanners settings={{platform_banner_level:'red', platform_banner_text: 'fezfze'}}/>
-      <StyledEngineProvider injectFirst={true}>
+      <StyledEngineProvider injectFirst>
         <ConnectedIntlProvider>
           <ConnectedThemeProvider>
             <CssBaseline />
