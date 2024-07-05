@@ -1,7 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { isEmptyField, isNotEmptyField } from '../../../utils/utils';
-import type { Theme } from '../../../components/Theme';
 import type { PlatformSettings } from '../../../utils/api-types';
 
 export const SYSTEM_BANNER_HEIGHT = 25;
@@ -20,7 +19,7 @@ export const computeBannerSettings = (settings: PlatformSettings) => {
   };
 };
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   banner: {
     textAlign: 'center',
     height: `${SYSTEM_BANNER_HEIGHT}px`,
@@ -37,21 +36,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   bannerText: {
     fontFamily: 'Arial,Helvetica,Geneva,Swiss,sans-serif',
     fontWeight: 'bold',
-  },
-  banner_debug: {
-    background: theme.palette.success.main,
-  },
-  banner_info: {
-    background: theme.palette.primary.main,
-  },
-  banner_warn: {
-    background: theme.palette.warning.main,
-  },
-  banner_error: {
-    background: theme.palette.error.main,
-  },
-  banner_fatal: {
-    background: theme.palette.error.dark,
   },
 }));
 
