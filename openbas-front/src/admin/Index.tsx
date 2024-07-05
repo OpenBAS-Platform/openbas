@@ -13,6 +13,7 @@ import type { LoggedHelper } from '../actions/helper';
 import Loader from '../components/Loader';
 import NotFound from '../components/NotFound';
 import InjectIndex from './components/simulations/simulation/injects/InjectIndex';
+import SystemBanners from "../public/components/systembanners/SystemBanners";
 
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));
@@ -42,7 +43,9 @@ const Index = () => {
   const theme = useTheme<Theme>();
   const classes = useStyles();
   const navigate = useNavigate();
-  const logged = useHelper((helper: LoggedHelper) => helper.logged());
+  const {logged, settings} = useHelper((helper: LoggedHelper) => {
+    return {logged: helper.logged(), settings: helper.getPlatformSettings()}
+  });
   if (logged.isOnlyPlayer) {
     navigate('/private');
   }
@@ -54,6 +57,7 @@ const Index = () => {
       duration: theme.transitions.duration.enteringScreen,
     }),
     overflowX: 'hidden',
+    overflowY: 'hidden',
   };
   useDataLoader();
   return (

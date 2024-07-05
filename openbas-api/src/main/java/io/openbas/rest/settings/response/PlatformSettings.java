@@ -112,4 +112,11 @@ public class PlatformSettings {
   @JsonProperty("disabled_dev_features")
   private List<String> disabledDevFeatures = new ArrayList<>();
 
+  // PLATFORM MESSAGE
+  @JsonProperty("platform_banner_level")
+  private String platformBannerLevel = "red";
+
+  @JsonProperty("platform_banner_text")
+  private String platformBannerText = "Executor Caldera is not responding, your exercises may be impacted.";
+
 }
