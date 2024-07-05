@@ -33,7 +33,7 @@ public class AtomicTestingApi extends RestBehavior {
   @Transactional(readOnly = true)
   public Page<AtomicTestingOutput> findAllAtomicTestings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return this.atomicTestingService.findAllAtomicTestings(searchPaginationInput);
+    return atomicTestingService.findAllAtomicTestings(searchPaginationInput);
   }
 
   @GetMapping("/{injectId}")
@@ -57,7 +57,7 @@ public class AtomicTestingApi extends RestBehavior {
   public InjectResultDTO updateAtomicTesting(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingInput input) {
-    return this.atomicTestingService.createOrUpdate(input, injectId);
+    return atomicTestingService.createOrUpdate(input, injectId);
   }
 
   @DeleteMapping("/{injectId}")

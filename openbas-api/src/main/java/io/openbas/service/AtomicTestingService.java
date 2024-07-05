@@ -179,6 +179,8 @@ public class AtomicTestingService {
     public InjectResultDTO getDuplicateAtomicTesting(@NotBlank String id) {
         Inject injectOrigin = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
         Inject injectDuplicate = copyInject(injectOrigin);
+        injectDuplicate.setExercise(injectOrigin.getExercise());
+        injectDuplicate.setScenario(injectOrigin.getScenario());
         Inject inject = injectRepository.save(injectDuplicate);
         return AtomicTestingMapper.toDto(
                 inject, getTargets(
@@ -190,24 +192,25 @@ public class AtomicTestingService {
     }
 
     public Inject copyInject(@NotNull Inject injectOrigin) {
-        Inject inject = new Inject();
-        inject.setUser(injectOrigin.getUser());
-        inject.setTitle(getNewTitle(injectOrigin));
-        inject.setDescription(injectOrigin.getDescription());
-        inject.setContent(injectOrigin.getContent());
-        inject.setAllTeams(injectOrigin.isAllTeams());
-        inject.setEnabled(injectOrigin.isEnabled());
-        inject.setDependsDuration(injectOrigin.getDependsDuration());
-        inject.setDependsOn(injectOrigin.getDependsOn());
-        inject.setExercise(injectOrigin.getExercise());
-        inject.setCountry(injectOrigin.getCountry());
-        inject.setCity(injectOrigin.getCity());
-        inject.setInjectorContract(injectOrigin.getInjectorContract());
-        inject.setScenario(injectOrigin.getScenario());
-        inject.setAssetGroups(injectOrigin.getAssetGroups().stream().toList());
-        inject.setAssets(injectOrigin.getAssets().stream().toList());
-        inject.setTeams(injectOrigin.getTeams().stream().toList());
-        return inject;
+        Inject injectDuplicate = new Inject();
+        injectDuplicate.setUser(injectOrigin.getUser());
+        injectDuplicate.setTitle(getNewTitle(injectOrigin));
+        injectDuplicate.setDescription(injectOrigin.getDescription());
+        injectDuplicate.setContent(injectOrigin.getContent());
+        injectDuplicate.setAllTeams(injectOrigin.isAllTeams());
+        injectDuplicate.setTeams(injectOrigin.getTeams().stream().toList());
+        injectDuplicate.setEnabled(injectOrigin.isEnabled());
+        injectDuplicate.setDependsDuration(injectOrigin.getDependsDuration());
+        injectDuplicate.setDependsOn(injectOrigin.getDependsOn());
+        injectDuplicate.setCountry(injectOrigin.getCountry());
+        injectDuplicate.setCity(injectOrigin.getCity());
+        injectDuplicate.setInjectorContract(injectOrigin.getInjectorContract());
+        injectDuplicate.setAssetGroups(injectOrigin.getAssetGroups().stream().toList());
+        injectDuplicate.setAssets(injectOrigin.getAssets().stream().toList());
+        injectDuplicate.setCommunications(injectOrigin.getCommunications().stream().toList());
+        injectDuplicate.setPayloads(injectOrigin.getPayloads().stream().toList());
+        injectDuplicate.setTags(new HashSet<>(injectOrigin.getTags()));
+        return injectDuplicate;
     }
 
     @NotNull

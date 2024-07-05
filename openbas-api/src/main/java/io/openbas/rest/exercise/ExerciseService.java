@@ -175,16 +175,10 @@ public class ExerciseService {
 
     private Exercise copyExercice(Exercise exerciseOrigin) {
         Exercise exerciseDuplicate = new Exercise();
-        if (exerciseOrigin.getEnd().isPresent())
-            exerciseDuplicate.setEnd(exerciseOrigin.getEnd().get());
-        exerciseDuplicate.setDocuments(exerciseOrigin.getDocuments().stream().toList());
+        exerciseDuplicate.setName(getNewName(exerciseOrigin));
         exerciseDuplicate.setCategory(exerciseOrigin.getCategory());
         exerciseDuplicate.setDescription(exerciseOrigin.getDescription());
-        exerciseDuplicate.setName(getNewName(exerciseOrigin));
-        if (exerciseOrigin.getCurrentPause().isPresent())
-            exerciseDuplicate.setCurrentPause(exerciseOrigin.getCurrentPause().get());
         exerciseDuplicate.setFrom(exerciseOrigin.getFrom());
-        exerciseDuplicate.setCategory(exerciseOrigin.getCategory());
         exerciseDuplicate.setFooter(exerciseOrigin.getFooter());
         exerciseDuplicate.setGrants(exerciseOrigin.getGrants().stream().toList());
         exerciseDuplicate.setTags(new HashSet<>(exerciseOrigin.getTags()));
@@ -196,12 +190,9 @@ public class ExerciseService {
         exerciseDuplicate.setMainFocus(exerciseOrigin.getMainFocus());
         exerciseDuplicate.setSeverity(exerciseOrigin.getSeverity());
         exerciseDuplicate.setSubtitle(exerciseOrigin.getSubtitle());
-        if (exerciseOrigin.getStart().isPresent())
-            exerciseDuplicate.setStart(exerciseOrigin.getStart().get());
-        exerciseDuplicate.setStatus(exerciseOrigin.getStatus());
         exerciseDuplicate.setLogoDark(exerciseOrigin.getLogoDark());
         exerciseDuplicate.setLogoLight(exerciseOrigin.getLogoLight());
-        exerciseDuplicate.setPauses(exerciseOrigin.getPauses().stream().toList());
+        exerciseDuplicate.setDocuments(exerciseOrigin.getDocuments().stream().toList());
         exerciseDuplicate.setObjectives(exerciseOrigin.getObjectives().stream().toList());
         return exerciseDuplicate;
     }
@@ -215,9 +206,8 @@ public class ExerciseService {
     }
 
     private void getListOfDuplicatedInjects(Exercise exercise, Exercise exerciseOrigin) {
-        exerciseOrigin.getInjects().forEach(inject -> {
-            injectDuplicateService.createInjectForExercise(exercise.getId(), inject.getId());
-        });
+        exerciseOrigin.getInjects()
+                .forEach(inject -> injectDuplicateService.createInjectForExercise(exercise.getId(), inject.getId()));
     }
 
     private void getListOfArticles(Exercise exercise, Exercise exerciseOrigin) {

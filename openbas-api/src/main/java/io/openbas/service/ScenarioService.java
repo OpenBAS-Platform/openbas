@@ -487,26 +487,26 @@ public class ScenarioService {
 
     private Scenario copyScenario(Scenario scenario) {
         Scenario scenarioDuplicate = new Scenario();
-        scenarioDuplicate.setArticles(scenario.getArticles().stream().toList());
-        scenarioDuplicate.setDocuments(scenario.getDocuments().stream().toList());
-        scenarioDuplicate.setFrom(scenario.getFrom());
+        scenarioDuplicate.setName(getNewName(scenario));
         scenarioDuplicate.setCategory(scenario.getCategory());
+        scenarioDuplicate.setDescription(scenario.getDescription());
+        scenarioDuplicate.setSeverity(scenario.getSeverity());
+        scenarioDuplicate.setSubtitle(scenario.getSubtitle());
+        scenarioDuplicate.setHeader(scenario.getHeader());
+        scenarioDuplicate.setMainFocus(scenario.getMainFocus());
+        scenarioDuplicate.setFrom(scenario.getFrom());
         scenarioDuplicate.setTags(new HashSet<>(scenario.getTags()));
         scenarioDuplicate.setInjects(new HashSet<>(scenario.getInjects()));
-        scenarioDuplicate.setObjectives(scenario.getObjectives().stream().toList());
-        scenarioDuplicate.setDescription(scenario.getDescription());
+        scenarioDuplicate.setExternalUrl(scenario.getExternalUrl());
         scenarioDuplicate.setExternalReference(scenario.getExternalReference());
         scenarioDuplicate.setTeamUsers(scenario.getTeamUsers().stream().toList());
         scenarioDuplicate.setTeams(scenario.getTeams().stream().toList());
-        scenarioDuplicate.setName(getNewName(scenario));
         scenarioDuplicate.setReplyTos(scenario.getReplyTos().stream().toList());
         scenarioDuplicate.setLessonsCategories(scenario.getLessonsCategories().stream().toList());
-        scenarioDuplicate.setSeverity(scenario.getSeverity());
-        scenarioDuplicate.setMainFocus(scenario.getMainFocus());
-        scenarioDuplicate.setHeader(scenario.getHeader());
+        scenarioDuplicate.setObjectives(scenario.getObjectives().stream().toList());
+        scenarioDuplicate.setDocuments(scenario.getDocuments().stream().toList());
+        scenarioDuplicate.setArticles(scenario.getArticles().stream().toList());
         scenarioDuplicate.setGrants(scenario.getGrants().stream().toList());
-        scenarioDuplicate.setExternalUrl(scenario.getExternalUrl());
-        scenarioDuplicate.setSubtitle(scenario.getSubtitle());
         return scenarioDuplicate;
     }
 

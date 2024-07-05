@@ -67,6 +67,8 @@ public class InjectApi extends RestBehavior {
     public static final String INJECT_URI = "/api/injects";
 
     private static final int MAX_NEXT_INJECTS = 6;
+    private static final String EXPECTATIONS = "expectations";
+    private static final String PREDEFINE_EXPECTATIONS = "predefinedExpectations";
 
     private final Executor executor;
     private final InjectorContractRepository injectorContractRepository;
@@ -95,7 +97,7 @@ public class InjectApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PostMapping(INJECT_URI + "/execution/reception/{injectId}")
-    public Inject InjectExecutionReception(@PathVariable String injectId,
+    public Inject injectExecutionReception(@PathVariable String injectId,
                                            @Valid @RequestBody InjectReceptionInput input) {
         Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
         InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
@@ -109,7 +111,7 @@ public class InjectApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PostMapping(INJECT_URI + "/execution/callback/{injectId}")
-    public Inject InjectExecutionCallback(@PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input) {
+    public Inject injectExecutionCallback(@PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input) {
         Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
         InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
         ExecutionStatus executionStatus = ExecutionStatus.valueOf(input.getStatus());
@@ -231,21 +233,21 @@ public class InjectApi extends RestBehavior {
         InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow(ElementNotFoundException::new);
         // Set expectations
         ObjectNode finalContent = input.getContent();
-        if (input.getContent() == null || input.getContent().get("expectations") == null || input.getContent().get("expectations").isEmpty()) {
+        if (input.getContent() == null || input.getContent().get(EXPECTATIONS) == null || input.getContent().get(EXPECTATIONS).isEmpty()) {
             try {
                 JsonNode jsonNode = mapper.readTree(injectorContract.getContent());
                 List<JsonNode> contractElements = StreamSupport.stream(jsonNode.get("fields").spliterator(), false).filter(contractElement -> contractElement.get("type").asText().equals(ContractType.Expectation.name().toLowerCase())).toList();
                 if (!contractElements.isEmpty()) {
                     JsonNode contractElement = contractElements.getFirst();
-                    if (!contractElement.get("predefinedExpectations").isNull() && !contractElement.get("predefinedExpectations").isEmpty()) {
+                    if (!contractElement.get(PREDEFINE_EXPECTATIONS).isNull() && !contractElement.get(PREDEFINE_EXPECTATIONS).isEmpty()) {
                         finalContent = finalContent != null ? finalContent : mapper.createObjectNode();
                         ArrayNode predefinedExpectations = mapper.createArrayNode();
-                        StreamSupport.stream(contractElement.get("predefinedExpectations").spliterator(), false).forEach(predefinedExpectation -> {
+                        StreamSupport.stream(contractElement.get(PREDEFINE_EXPECTATIONS).spliterator(), false).forEach(predefinedExpectation -> {
                             ObjectNode newExpectation = predefinedExpectation.deepCopy();
                             newExpectation.put("expectation_score", 100);
                             predefinedExpectations.add(newExpectation);
                         });
-                        finalContent.put("expectations", predefinedExpectations);
+                        finalContent.put(EXPECTATIONS, predefinedExpectations);
                     }
                 }
             } catch (JsonProcessingException e) {
@@ -395,21 +397,21 @@ public class InjectApi extends RestBehavior {
         InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow(ElementNotFoundException::new);
         // Set expectations
         ObjectNode finalContent = input.getContent();
-        if (input.getContent() == null || input.getContent().get("expectations") == null || input.getContent().get("expectations").isEmpty()) {
+        if (input.getContent() == null || input.getContent().get(EXPECTATIONS) == null || input.getContent().get(EXPECTATIONS).isEmpty()) {
             try {
                 JsonNode jsonNode = mapper.readTree(injectorContract.getContent());
                 List<JsonNode> contractElements = StreamSupport.stream(jsonNode.get("fields").spliterator(), false).filter(contractElement -> contractElement.get("type").asText().equals(ContractType.Expectation.name().toLowerCase())).toList();
                 if (!contractElements.isEmpty()) {
                     JsonNode contractElement = contractElements.getFirst();
-                    if (!contractElement.get("predefinedExpectations").isNull() && !contractElement.get("predefinedExpectations").isEmpty()) {
+                    if (!contractElement.get(PREDEFINE_EXPECTATIONS).isNull() && !contractElement.get(PREDEFINE_EXPECTATIONS).isEmpty()) {
                         finalContent = finalContent != null ? finalContent : mapper.createObjectNode();
                         ArrayNode predefinedExpectations = mapper.createArrayNode();
-                        StreamSupport.stream(contractElement.get("predefinedExpectations").spliterator(), false).forEach(predefinedExpectation -> {
+                        StreamSupport.stream(contractElement.get(PREDEFINE_EXPECTATIONS).spliterator(), false).forEach(predefinedExpectation -> {
                             ObjectNode newExpectation = predefinedExpectation.deepCopy();
                             newExpectation.put("expectation_score", 100);
                             predefinedExpectations.add(newExpectation);
                         });
-                        finalContent.put("expectations", predefinedExpectations);
+                        finalContent.put(EXPECTATIONS, predefinedExpectations);
                     }
                 }
             } catch (JsonProcessingException e) {
@@ -438,7 +440,7 @@ public class InjectApi extends RestBehavior {
         inject.setDocuments(injectDocuments);
         // Linked documents directly to the exercise
         inject.getDocuments().forEach(document -> {
-            if (!document.getDocument().getExercises().contains(scenario)) {
+            if (!document.getDocument().getScenarios().contains(scenario)) {
                 scenario.getDocuments().add(document.getDocument());
             }
         });
