@@ -74,12 +74,11 @@ public class Executor {
             String jsonInject = mapper.writeValueAsString(executableInject);
             status.setName(ExecutionStatus.PENDING); // FIXME: need to be test with HTTP Collector
             status.getTraces().add(traceInfo("The inject has been published and is now waiting to be consumed."));
-            InjectStatus savedStatus = injectStatusRepository.save(status);
             queueService.publish(inject.getInjectorContract().getInjector().getType(), jsonInject);
-            return savedStatus;
         } catch (Exception e) {
             status.setName(ExecutionStatus.ERROR);
             status.getTraces().add(InjectStatusExecution.traceError(e.getMessage()));
+        } finally {
             return injectStatusRepository.save(status);
         }
     }
@@ -98,6 +97,9 @@ public class Executor {
         Inject inject = executableInject.getInjection().getInject();
         if (inject.getContent() == null) {
             throw new UnsupportedOperationException("Inject is empty");
+        }
+        if (!inject.hasInjectorContract()) {
+            throw new UnsupportedOperationException("Inject has not a contract");
         }
         // If inject is too old, reject the execution
         if (isScheduledInject && !isInInjectableRange(inject)) {

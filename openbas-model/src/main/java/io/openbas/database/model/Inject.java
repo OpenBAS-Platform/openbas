@@ -544,4 +544,8 @@ public class Inject implements Base, Injection {
 
         return inject;
     }
+
+    public boolean hasInjectorContract() {
+        return this.injectorContract != null;
+    }
 }

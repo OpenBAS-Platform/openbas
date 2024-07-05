@@ -45,7 +45,7 @@ public class AtomicTestingMapper {
                 .description(inject.getDescription())
                 .content(inject.getContent())
                 .expectations(inject.getExpectations())
-                .type(inject.getInjectorContract() != null ? inject.getInjectorContract().getInjector().getType() : null)
+                .type(inject.hasInjectorContract() ? inject.getInjectorContract().getInjector().getType() : null)
                 .tagIds(inject.getTags().stream().map(Tag::getId).toList())
                 .documents(inject.getDocuments().stream().map(InjectDocument::getDocument).map(Document::getId).toList())
                 .injectorContract(inject.getInjectorContract())

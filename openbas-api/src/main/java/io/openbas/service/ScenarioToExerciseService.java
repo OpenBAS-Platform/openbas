@@ -201,7 +201,7 @@ public class ScenarioToExerciseService {
             exerciseInject.setTags(copy(scenarioInject.getTags(), Tag.class));
 
             // Content
-            if (ChannelContract.TYPE.equals(scenarioInject.getInjectorContract().getInjector().getType())) {
+            if (scenarioInject.hasInjectorContract() && ChannelContract.TYPE.equals(scenarioInject.getInjectorContract().getInjector().getType())) {
                 try {
                     ChannelContent content = mapper.treeToValue(scenarioInject.getContent(), ChannelContent.class);
                     content.setArticles(

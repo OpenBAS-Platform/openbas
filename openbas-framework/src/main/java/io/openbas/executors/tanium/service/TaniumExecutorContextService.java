@@ -33,6 +33,9 @@ public class TaniumExecutorContextService {
     }
 
     public void launchExecutorSubprocess(@NotNull final Inject inject, @NotNull final Asset asset) {
+        if(!inject.hasInjectorContract()){
+            throw new UnsupportedOperationException("Inject has not a contract");
+        }
         Injector injector = inject.getInjectorContract().getInjector();
         Endpoint.PLATFORM_TYPE platform = Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform(): null;
         Endpoint.PLATFORM_ARCH arch = Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getArch(): null;

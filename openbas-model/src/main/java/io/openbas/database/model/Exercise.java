@@ -305,14 +305,16 @@ public class Exercise implements Base {
   // -- PLATFORMS --
   @JsonProperty("exercise_platforms")
   public List<String> getPlatforms() {
-    return getInjects().stream().flatMap(inject -> Arrays.stream(inject.getInjectorContract().getPlatforms()))
+    return getInjects().stream().filter(Inject::hasInjectorContract).flatMap(inject -> Arrays.stream(inject.getInjectorContract().getPlatforms()))
         .distinct().toList();
   }
 
   // -- KILL CHAIN PHASES --
   @JsonProperty("exercise_kill_chain_phases")
   public List<KillChainPhase> getKillChainPhases() {
-    return getInjects().stream().flatMap(
+    return getInjects().stream()
+        .filter(Inject::hasInjectorContract)
+        .flatMap(
         inject -> inject.getInjectorContract().getAttackPatterns().stream().flatMap(
             attackPattern -> attackPattern.getKillChainPhases().stream().toList().stream()
         )

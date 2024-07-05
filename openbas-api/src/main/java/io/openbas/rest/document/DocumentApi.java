@@ -451,7 +451,7 @@ public class DocumentApi extends RestBehavior {
         Stream<Document> articlesDocs = articles.stream()
                 .flatMap(article -> article.getDocuments().stream());
         List<String> challenges = injects.stream()
-                .filter(inject -> inject.getInjectorContract().getId().equals(CHALLENGE_PUBLISH))
+                .filter(inject -> inject.hasInjectorContract() && inject.getInjectorContract().getId().equals(CHALLENGE_PUBLISH))
                 .filter(inject -> inject.getContent() != null)
                 .flatMap(inject -> {
                     try {

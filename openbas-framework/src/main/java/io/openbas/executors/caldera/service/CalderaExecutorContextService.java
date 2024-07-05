@@ -63,6 +63,9 @@ public class CalderaExecutorContextService {
     }
 
     public void launchExecutorSubprocess(@NotNull final Inject inject, @NotNull final Asset asset) {
+        if(!inject.hasInjectorContract()){
+            return;
+        }
         Injector injector = inject.getInjectorContract().getInjector();
         if (this.injectorExecutorAbilities.containsKey(injector.getId())) {
             List<Map<String, String>> additionalFields = List.of(Map.of("trait", "inject", "value", inject.getId()));

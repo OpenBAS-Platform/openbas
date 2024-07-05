@@ -127,7 +127,7 @@ public class OpenBASImplantExecutor extends Injector {
         List<Expectation> expectations = new ArrayList<>();
         assets.forEach((asset, isInGroup) -> {
             List<InjectExpectationSignature> injectExpectationSignatures = new ArrayList<>();
-            if (inject.getInjectorContract().getPayload() != null) {
+            if (inject.hasInjectorContract() && inject.getInjectorContract().getPayload() != null) {
                 // Put the correct number in inject status
                 int totalActionsCount = 0;
                 switch (inject.getInjectorContract().getPayload().getType()) {

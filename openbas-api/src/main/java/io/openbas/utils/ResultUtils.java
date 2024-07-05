@@ -3,6 +3,7 @@ package io.openbas.utils;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
+import io.openbas.database.model.InjectorContract;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
@@ -11,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.openbas.utils.AtomicTestingUtils.getTargetsWithResults;
 
@@ -31,12 +33,17 @@ public class ResultUtils {
 
   public static List<InjectExpectationResultsByAttackPattern> computeInjectExpectationResults(
       @NotNull final List<Inject> injects) {
+
     Map<AttackPattern, List<Inject>> groupedByAttackPattern = injects.stream()
-        .flatMap(inject -> inject.getInjectorContract()
-            .getAttackPatterns()
-            .stream()
-            .map(attackPattern -> Map.entry(attackPattern, inject))
-        )
+        .flatMap(inject -> {
+          InjectorContract contract = inject.getInjectorContract();
+          if (contract != null) {
+            return contract.getAttackPatterns().stream()
+                .map(attackPattern -> Map.entry(attackPattern, inject));
+          } else {
+            return Stream.empty();
+          }
+        })
         .collect(Collectors.groupingBy(
             java.util.Map.Entry::getKey,
             Collectors.mapping(java.util.Map.Entry::getValue, Collectors.toList())

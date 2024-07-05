@@ -127,31 +127,33 @@ public class InjectsExecutionJob implements Job {
 
     private void executeExternal(ExecutableInject executableInject) {
         Inject inject = executableInject.getInjection().getInject();
-        Injection source = executableInject.getInjection();
-        Inject executingInject = null;
-        InjectStatus injectRunningStatus = null;
-        DryInjectStatus dryInjectRunningStatus = null;
-        if (source instanceof Inject) {
-            executingInject = injectRepository.findById(source.getId()).orElseThrow();
-            injectRunningStatus = executingInject.getStatus().orElseThrow();
-        }
-        if (source instanceof DryInject) {
-            DryInject executingInjectDry = dryInjectRepository.findById(source.getId()).orElseThrow();
-            dryInjectRunningStatus = executingInjectDry.getStatus().orElseThrow();
-        }
-        try {
-            String jsonInject = mapper.writeValueAsString(executableInject);
-            queueService.publish(inject.getInjectorContract().getInjector().getType(), jsonInject);
-        } catch (Exception e) {
+        if(inject.hasInjectorContract()) {
+            Injection source = executableInject.getInjection();
+            Inject executingInject = null;
+            InjectStatus injectRunningStatus = null;
+            DryInjectStatus dryInjectRunningStatus = null;
             if (source instanceof Inject) {
-                injectRunningStatus.getTraces().add(InjectStatusExecution.traceError(e.getMessage()));
-                injectStatusRepository.save(injectRunningStatus);
-                executingInject.setUpdatedAt(now());
-                injectRepository.save(executingInject);
+                executingInject = injectRepository.findById(source.getId()).orElseThrow();
+                injectRunningStatus = executingInject.getStatus().orElseThrow();
             }
             if (source instanceof DryInject) {
-                dryInjectRunningStatus.getTraces().add(InjectStatusExecution.traceError(e.getMessage()));
-                dryInjectStatusRepository.save(dryInjectRunningStatus);
+                DryInject executingInjectDry = dryInjectRepository.findById(source.getId()).orElseThrow();
+                dryInjectRunningStatus = executingInjectDry.getStatus().orElseThrow();
+            }
+            try {
+                String jsonInject = mapper.writeValueAsString(executableInject);
+                queueService.publish(inject.getInjectorContract().getInjector().getType(), jsonInject);
+            } catch (Exception e) {
+                if (source instanceof Inject) {
+                    injectRunningStatus.getTraces().add(InjectStatusExecution.traceError(e.getMessage()));
+                    injectStatusRepository.save(injectRunningStatus);
+                    executingInject.setUpdatedAt(now());
+                    injectRepository.save(executingInject);
+                }
+                if (source instanceof DryInject) {
+                    dryInjectRunningStatus.getTraces().add(InjectStatusExecution.traceError(e.getMessage()));
+                    dryInjectStatusRepository.save(dryInjectRunningStatus);
+                }
             }
         }
     }
@@ -185,6 +187,9 @@ public class InjectsExecutionJob implements Job {
     private void executeInject(ExecutableInject executableInject) {
         // Depending on injector type (internal or external) execution must be done differently
         Inject inject = executableInject.getInjection().getInject();
+        if(!inject.hasInjectorContract()){
+            return;
+        }
         if( !inject.isReady() ) {
             // Status
             if( inject.getStatus().isEmpty() ) {
@@ -203,6 +208,7 @@ public class InjectsExecutionJob implements Job {
             }
             return;
         }
+
         Injector externalInjector = injectorRepository.findByType(inject.getInjectorContract().getInjector().getType()).orElseThrow();
         LOGGER.log(Level.INFO, "Executing inject " + inject.getInject().getTitle());
         // Executor logics

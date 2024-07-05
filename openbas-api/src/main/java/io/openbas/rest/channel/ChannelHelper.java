@@ -45,7 +45,7 @@ public class ChannelHelper {
       ObjectMapper mapper) {
     Instant now = Instant.now();
     Map<String, Instant> toPublishArticleIdsMap = injects.stream()
-        .filter(inject -> inject.getInjectorContract().getId().equals(CHANNEL_PUBLISH))
+        .filter(inject -> inject.hasInjectorContract() && inject.getInjectorContract().getId().equals(CHANNEL_PUBLISH))
         .filter(inject -> inject.getContent() != null)
         .sorted(Comparator.comparing(Inject::getDependsDuration))
         .flatMap(inject -> convertToVirtualArticles(inject, now, mapper))

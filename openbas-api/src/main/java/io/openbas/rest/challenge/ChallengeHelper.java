@@ -21,7 +21,7 @@ public class ChallengeHelper {
       @NotNull final List<Inject> injects,
       ObjectMapper mapper) {
     return injects.stream()
-        .filter(inject -> inject.getInjectorContract().getId().equals(CHALLENGE_PUBLISH))
+        .filter(inject -> inject.hasInjectorContract() && inject.getInjectorContract().getId().equals(CHALLENGE_PUBLISH))
         .filter(inject -> inject.getContent() != null)
         .flatMap(inject -> {
           try {
