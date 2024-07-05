@@ -91,30 +91,33 @@ const AtomicTestingHeader = () => {
         </Typography>
       </Tooltip>
       <div className={classes.actions}>
-        {!injectResultDto.inject_ready ? (
-          <Button
-            style={{ marginRight: 10 }}
-            startIcon={<SettingsOutlined />}
-            variant="contained"
-            color="warning"
-            size="small"
-            onClick={() => setOpenEditId(injectResultDto.inject_id)}
-          >
-            {t('Configure')}
-          </Button>
-        ) : (
-          <Button
-            style={{ marginRight: 10 }}
-            startIcon={<PlayArrowOutlined />}
-            variant="contained"
-            color="primary"
-            size="small"
-            onClick={() => setOpen(true)}
-            disabled={!availableLaunch}
-          >
-            {t('Launch')}
-          </Button>
-        )}
+        {/* eslint-disable-next-line no-nested-ternary */}
+        {injectResultDto.inject_injector_contract ? (
+          !injectResultDto.inject_ready ? (
+            <Button
+              style={{ marginRight: 10 }}
+              startIcon={<SettingsOutlined />}
+              variant="contained"
+              color="warning"
+              size="small"
+              onClick={() => setOpenEditId(injectResultDto.inject_id)}
+            >
+              {t('Configure')}
+            </Button>
+          ) : (
+            <Button
+              style={{ marginRight: 10 }}
+              startIcon={<PlayArrowOutlined />}
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={() => setOpen(true)}
+              disabled={!availableLaunch}
+            >
+              {t('Launch')}
+            </Button>
+          )) : null
+        }
 
         <AtomicTestingPopover
           atomic={injectResultDto}
