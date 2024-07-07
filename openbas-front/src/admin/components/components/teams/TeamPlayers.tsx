@@ -135,7 +135,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   user_organization: {
     float: 'left',
-    width: '20%',
+    width: '18%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -143,7 +143,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   user_tags: {
     float: 'left',
-    width: '23%',
+    width: '25%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -407,7 +407,7 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
                     className={classes.bodyItem}
                     style={inlineStyles.user_tags}
                   >
-                    <ItemTags variant="list-reduced-view" tags={user.user_tags} />
+                    <ItemTags variant="reduced-view" tags={user.user_tags} />
                   </div>
                 </>
               }
