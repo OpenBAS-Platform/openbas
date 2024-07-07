@@ -21,13 +21,19 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   targets: InjectTargetWithResult[] | undefined;
+  variant?: string,
 }
 
 const ItemTargets: FunctionComponent<Props> = ({
   targets,
+  variant,
 }) => {
   // Standard hooks
   const classes = useStyles();
+  let truncateLimit = 15;
+  if (variant === 'reduced-view') {
+    truncateLimit = 6;
+  }
 
   // Extract the first two targets as visible chips
   const visibleTargets = getVisibleItems(targets, 2);
@@ -58,7 +64,7 @@ const ItemTargets: FunctionComponent<Props> = ({
               key={target.id}
               classes={{ root: classes.target }}
               icon={getIcon(target.targetType!)}
-              label={truncate(target.name!, 15)}
+              label={truncate(target.name!, truncateLimit)}
             />
           </Tooltip>
         </span>

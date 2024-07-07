@@ -176,7 +176,7 @@ const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
                         primary={resolveUserName(user)}
                         secondary={user.organization_name}
                       />
-                      <ItemTags variant="list-reduced-view" tags={user.user_tags} />
+                      <ItemTags variant="reduced-view" tags={user.user_tags} />
                     </ListItem>
                   );
                 })}

@@ -263,7 +263,7 @@ const ContextualTeams: React.FC<Props> = ({ teamIds }) => {
                     className={classes.bodyItem}
                     style={inlineStylesContextual.team_tags}
                   >
-                    <ItemTags variant="list-reduced-view" tags={team.team_tags} />
+                    <ItemTags variant="reduced-view" tags={team.team_tags} />
                   </div>
                   <div
                     className={classes.bodyItem}

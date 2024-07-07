@@ -40,10 +40,11 @@ const ItemTags = (props) => {
   const classes = useStyles();
   let style = classes.tag;
   let truncateLimit = 15;
+
   if (variant === 'list') {
     style = `${classes.tag} ${classes.tagInList}`;
   }
-  if (variant === 'list-reduced-view') {
+  if (variant === 'reduced-view') {
     style = `${classes.tag} ${classes.tagInList}`;
     truncateLimit = 6;
   }

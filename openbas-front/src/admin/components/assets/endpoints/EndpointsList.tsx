@@ -97,7 +97,7 @@ const EndpointsList: FunctionComponent<Props> = ({
                     className={classes.bodyItem}
                     style={inlineStyles.asset_tags}
                   >
-                    <ItemTags variant="list-reduced-view" tags={endpoint.asset_tags} />
+                    <ItemTags variant="reduced-view" tags={endpoint.asset_tags} />
                   </div>
                   <div
                     className={classes.bodyItem}
