@@ -3,8 +3,9 @@ import { makeStyles } from '@mui/styles';
 import { isEmptyField, isNotEmptyField } from '../../../utils/utils';
 import type { PlatformSettings } from '../../../utils/api-types';
 import type { Theme } from '../../../components/Theme';
+import { ReportProblem } from '@mui/icons-material';
 
-export const SYSTEM_BANNER_HEIGHT = 25;
+export const SYSTEM_BANNER_HEIGHT = 34;
 
 export const computeBannerSettings = (settings: PlatformSettings) => {
   const bannerLevel = settings.platform_banner_level;
@@ -24,20 +25,22 @@ export const computeBannerSettings = (settings: PlatformSettings) => {
 /* Avoid auto-lint removal using --fix with false positive finding of: */
 const useStyles = makeStyles((theme: Theme) => ({
   banner: {
-    textAlign: 'center',
-    height: `${SYSTEM_BANNER_HEIGHT}px`,
-    width: '100%',
     position: 'fixed',
     zIndex: 2000,
+    width: '100%',
+    height: `${SYSTEM_BANNER_HEIGHT}px`,
+    alignContent: 'center',
+    textAlign: 'center',
   },
   bannerTop: {
     top: 0,
   },
-  bannerBottom: {
-    bottom: 0,
+  container: {
+    display: 'flex',
+    justifyContent: 'center',
   },
   bannerText: {
-    fontFamily: 'Arial,Helvetica,Geneva,Swiss,sans-serif',
+    color: 'black',
     fontWeight: 'bold',
   },
   banner_debug: {
@@ -50,7 +53,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     background: theme.palette.warning.main,
   },
   banner_error: {
-    background: theme.palette.error.main,
+    background: '#fbcbc5',
   },
   banner_fatal: {
     background: theme.palette.error.dark,
@@ -77,20 +80,15 @@ const SystemBanners = (settings: {
     classes.bannerTop,
     classes[`banner_${bannerLevel}`],
   ].join(' ');
-  const bottomBannerClasses = [
-    classes.banner,
-    classes.bannerBottom,
-    classes[`banner_${bannerLevel}`],
-  ].join(' ');
   return (
-    <>
-      <div className={topBannerClasses}>
-        <span className={classes.bannerText}>{bannerText}</span>
+    <div className={topBannerClasses}>
+      <div className={classes.container}>
+        <ReportProblem color="error" fontSize="small" style={{ marginRight: 8 }} />
+        <span className={classes.bannerText}>
+          {bannerText}
+        </span>
       </div>
-      <div className={bottomBannerClasses}>
-        <span className={classes.bannerText}>{bannerText}</span>
-      </div>
-    </>
+    </div>
   );
 };
 

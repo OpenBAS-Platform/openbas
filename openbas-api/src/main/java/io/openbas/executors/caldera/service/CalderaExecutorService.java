@@ -91,7 +91,7 @@ public class CalderaExecutorService implements Runnable {
             platformSettingsService.cleanMessage();
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error creating caldera executor: " + e);
-            platformSettingsService.errorMessage("⚠️ Executor Caldera is not responding, your exercises may be impacted.");
+            platformSettingsService.errorMessage("Executor Caldera is not responding, your exercises may be impacted.");
         }
     }
 
