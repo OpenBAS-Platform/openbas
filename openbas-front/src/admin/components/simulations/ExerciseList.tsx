@@ -42,35 +42,36 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const inlineStyles: Record<string, CSSProperties> = {
+const getInlineStyles = (variant: string): Record<string, CSSProperties> => ({
   exercise_name: {
-    width: '15%',
+    width: variant === 'reduced-view' ? '15%' : '15%',
   },
   exercise_start_date: {
-    width: '15%',
+    width: variant === 'reduced-view' ? '12%' : '13%',
   },
   exercise_status: {
-    width: '10%',
+    width: variant === 'reduced-view' ? '12%' : '10%',
   },
   exercise_targets: {
-    width: '20%',
+    width: variant === 'reduced-view' ? '15%' : '17%',
   },
   exercise_global_score: {
-    width: '10%',
+    width: variant === 'reduced-view' ? '16%' : '10%',
   },
   exercise_tags: {
-    width: '15%',
+    width: variant === 'reduced-view' ? '14%' : '19%',
   },
   exercise_updated_at: {
-    width: '15%',
+    width: variant === 'reduced-view' ? '12%' : '13%',
   },
-};
+});
 
 interface Props {
   exercises: ExerciseSimpleStore[];
   searchPaginationInput: SearchPaginationInput;
   setSearchPaginationInput: (datas: SearchPaginationInput) => void;
   hasHeader?: boolean;
+  variant?: string,
 }
 
 const ExerciseList: FunctionComponent<Props> = ({
@@ -78,10 +79,12 @@ const ExerciseList: FunctionComponent<Props> = ({
   searchPaginationInput,
   setSearchPaginationInput,
   hasHeader = true,
+  variant = 'list',
 }) => {
   // Standard hooks
   const dispatch = useAppDispatch();
   const classes = useStyles();
+  const inlineStyles = getInlineStyles(variant);
   const { nsdt } = useFormatter();
 
   // Fetching data
@@ -113,7 +116,7 @@ const ExerciseList: FunctionComponent<Props> = ({
       field: 'exercise_targets',
       label: 'Target',
       isSortable: false,
-      value: (exercise: ExerciseSimple) => <ItemTargets targets={exercise.exercise_targets} />,
+      value: (exercise: ExerciseSimple) => <ItemTargets variant={variant} targets={exercise.exercise_targets} />,
     },
     {
       field: 'exercise_global_score',
@@ -125,7 +128,7 @@ const ExerciseList: FunctionComponent<Props> = ({
       field: 'exercise_tags',
       label: 'Tags',
       isSortable: true,
-      value: (exercise: ExerciseSimple) => <ItemTags variant="list" tags={exercise.exercise_tags} />,
+      value: (exercise: ExerciseSimple) => <ItemTags variant={variant} tags={exercise.exercise_tags} />,
     },
     {
       field: 'exercise_updated_at',

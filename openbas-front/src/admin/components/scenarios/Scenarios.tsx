@@ -84,11 +84,11 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '12%',
   },
   scenario_platforms: {
-    width: '12%',
+    width: '10%',
     cursor: 'default',
   },
   scenario_tags: {
-    width: '15%',
+    width: '18%',
   },
   scenario_updated_at: {
     width: '10%',

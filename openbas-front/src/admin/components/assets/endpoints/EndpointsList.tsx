@@ -28,15 +28,15 @@ const useStyles = makeStyles(() => ({
 
 const inlineStyles: Record<string, CSSProperties> = {
   asset_name: {
-    width: '40%',
+    width: '35%',
   },
   asset_platform: {
-    width: '20%',
+    width: '15%',
     display: 'flex',
     alignItems: 'center',
   },
   asset_tags: {
-    width: '25%',
+    width: '35%',
   },
   asset_type: {
     width: '10%',
@@ -97,7 +97,7 @@ const EndpointsList: FunctionComponent<Props> = ({
                     className={classes.bodyItem}
                     style={inlineStyles.asset_tags}
                   >
-                    <ItemTags variant="list" tags={endpoint.asset_tags} />
+                    <ItemTags variant="reduced-view" tags={endpoint.asset_tags} />
                   </div>
                   <div
                     className={classes.bodyItem}

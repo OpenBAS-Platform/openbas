@@ -223,6 +223,7 @@ const Dashboard = () => {
             searchPaginationInput={searchPaginationInput}
             setSearchPaginationInput={setSearchPaginationInput}
             hasHeader={false}
+            variant={'reduced-view'}
           />
         </Paper>
       </Grid>
