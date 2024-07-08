@@ -2449,7 +2449,7 @@ export interface RawPaginationDocument {
 export interface RawPaginationImportMapper {
   /** @format date-time */
   import_mapper_created_at?: string;
-  import_mapper_id?: string;
+  import_mapper_id: string;
   import_mapper_name?: string;
   /** @format date-time */
   import_mapper_updated_at?: string;
