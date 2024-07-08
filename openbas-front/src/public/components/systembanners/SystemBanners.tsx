@@ -1,9 +1,9 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
+import { ReportProblem } from '@mui/icons-material';
 import { isEmptyField, isNotEmptyField } from '../../../utils/utils';
 import type { PlatformSettings } from '../../../utils/api-types';
 import type { Theme } from '../../../components/Theme';
-import { ReportProblem } from '@mui/icons-material';
 
 export const SYSTEM_BANNER_HEIGHT = 34;
 
