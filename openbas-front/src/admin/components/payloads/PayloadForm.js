@@ -13,6 +13,7 @@ import PlatformField from '../../../components/PlatformField';
 import OldSelectField from '../../../components/fields/OldSelectField';
 import AttackPatternField from '../../../components/AttackPatternField';
 import DocumentField from '../../../components/DocumentField';
+import DocumentLoader from '../../../components/fields/DocumentLoader';
 
 const useStyles = makeStyles(() => ({
   tuple: {
@@ -26,6 +27,7 @@ const PayloadForm = (props) => {
   const { onSubmit, initialValues, editing, handleClose, type } = props;
   const classes = useStyles();
   const { t } = useFormatter();
+
   const validate = (values) => {
     const errors = {};
     const requiredFields = ['payload_name', 'payload_platforms'];
@@ -119,13 +121,13 @@ const PayloadForm = (props) => {
             </>
           )}
           {type === 'Executable' && (
-            <>
-              <DocumentField
-                name="executable_file"
-                label={t('Executable file')}
-                style={{ marginTop: 20 }}
-              />
-            </>
+          <>
+            <DocumentLoader
+              name="executable_file"
+              label={t('Executable file')}
+              setFieldValue={form.mutators.setValue}
+            />
+          </>
           )}
           {type === 'FileDrop' && (
             <>

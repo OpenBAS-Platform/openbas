@@ -8,6 +8,7 @@ import type { SecurityPlatformInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
 import TagField from '../../../../components/fields/TagField';
 import DocumentField from '../../../../components/fields/DocumentField';
+import DocumentLoader from '../../../../components/fields/DocumentLoader';
 
 interface Props {
   onSubmit: SubmitHandler<SecurityPlatformInput>;
@@ -138,6 +139,7 @@ const SecurityPlatformForm: React.FC<Props> = ({
           />
         )}
       />
+      <DocumentLoader label={'Logo dark'} extensions={['png', 'jpg', 'tiff', 'tif', 'bmp', 'jpeg', 'svg', 'gif']}/>
       <Controller
         control={control}
         name="asset_tags"
