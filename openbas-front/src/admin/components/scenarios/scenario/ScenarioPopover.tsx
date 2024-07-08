@@ -6,7 +6,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import { deleteScenario, exportScenarioUri, updateScenario, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
-import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
+import ButtonPopover, { PopoverEntry } from '../../../../components/common/ButtonPopover';
 import Drawer from '../../../../components/common/Drawer';
 import ScenarioForm from '../ScenarioForm';
 import DialogDelete from '../../../../components/common/DialogDelete';
@@ -103,7 +103,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   const permissions = useScenarioPermissions(scenario.scenario_id);
 
   // Button Popover
-  const entries: ButtonPopoverEntry[] = [
+  const entries: PopoverEntry[] = [
     { label: 'Update', action: handleEdit, disabled: !permissions.canWrite },
     { label: 'Export', action: handleExport },
     { label: 'Delete', action: handleDelete, disabled: !permissions.canWrite },

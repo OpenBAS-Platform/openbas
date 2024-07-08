@@ -1,19 +1,14 @@
-import { Menu, MenuItem, ToggleButton } from '@mui/material';
+import { IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import React, { FunctionComponent, useState } from 'react';
 import { useFormatter } from '../i18n';
-
-export interface PopoverEntry {
-  label: string;
-  action: () => void | React.Dispatch<React.SetStateAction<boolean>>;
-  disabled?: boolean;
-}
+import { PopoverEntry } from './ButtonPopover';
 
 interface Props {
   entries: PopoverEntry[];
 }
 
-const ButtonPopover: FunctionComponent<Props> = ({
+const IconPopover: FunctionComponent<Props> = ({
   entries,
 }) => {
   // Standard hooks
@@ -23,16 +18,18 @@ const ButtonPopover: FunctionComponent<Props> = ({
 
   return (
     <>
-      <ToggleButton
-        value="popover"
-        size="small"
+      <IconButton
+        color="primary"
         onClick={(ev) => {
           ev.stopPropagation();
           setAnchorEl(ev.currentTarget);
         }}
+        aria-label={'Xls formatter menu'}
+        aria-haspopup="true"
+        size="large"
       >
-        <MoreVert fontSize="small" color="primary" />
-      </ToggleButton>
+        <MoreVert />
+      </IconButton>
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -56,4 +53,4 @@ const ButtonPopover: FunctionComponent<Props> = ({
   );
 };
 
-export default ButtonPopover;
+export default IconPopover;

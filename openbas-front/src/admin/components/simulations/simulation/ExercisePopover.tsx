@@ -24,7 +24,7 @@ import { usePermissions } from '../../../../utils/Exercise';
 import Transition from '../../../../components/common/Transition';
 import type { Exercise, ExerciseUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
+import ButtonPopover, { PopoverEntry } from '../../../../components/common/ButtonPopover';
 import ExerciseUpdateForm from './ExerciseUpdateForm';
 import Drawer from '../../../../components/common/Drawer';
 import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
@@ -139,7 +139,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const permissions = usePermissions(exercise.exercise_id);
 
   // Button Popover
-  const entries: ButtonPopoverEntry[] = [
+  const entries: PopoverEntry[] = [
     { label: 'Update', action: handleOpenEdit, disabled: !permissions.canWriteBypassStatus },
     { label: 'Export', action: handleOpenExport },
     { label: 'Delete', action: handleOpenDelete, disabled: !permissions.canWriteBypassStatus },
