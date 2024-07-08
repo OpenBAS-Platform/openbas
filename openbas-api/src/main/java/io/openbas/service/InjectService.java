@@ -66,15 +66,16 @@ public class InjectService {
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
 
-    private List<String> importReservedField = List.of("description", "title", "trigger_time");
+    private final List<String> importReservedField = List.of("description", "title", "trigger_time");
 
     @Resource
     protected ObjectMapper mapper;
     @PersistenceContext
     private EntityManager entityManager;
 
-    Pattern relativeDayPattern = Pattern.compile("^.*[DJ]([+\\-]?[0-9]*).*$");
-    Pattern relativeTimePattern = Pattern.compile("^.*[HT]([+\\-]?[0-9]*).*$");
+    Pattern relativeDayPattern = Pattern.compile("^.*[DJ]([+\\-]?[0-9]*)(.*)$");
+    Pattern relativeHourPattern = Pattern.compile("^.*[HT]([+\\-]?[0-9]*).*$");
+    Pattern relativeMinutePattern = Pattern.compile("^.*[M]([+\\-]?[0-9]*).*$");
 
     public void cleanInjectsDocExercise(String exerciseId, String documentId) {
         // Delete document from all exercise injects
@@ -290,7 +291,7 @@ public class InjectService {
             // If there are no values, we add an info message so they now there is a potential issue here
             importTestSummary.getImportMessages().add(
                 new ImportMessage(ImportMessage.MessageLevel.INFO,
-                    "info.no_potential_match_found",
+                        ImportMessage.ErrorCode.NO_POTENTIAL_MATCH_FOUND,
                     Map.of("column_type_num", importMapper.getInjectTypeColumn(),
                             "row_num", String.valueOf(row.getRowNum()))
                 )
@@ -309,7 +310,7 @@ public class InjectService {
         if (matchingInjectImporters.isEmpty()) {
             importTestSummary.getImportMessages().add(
                 new ImportMessage(ImportMessage.MessageLevel.INFO,
-                    "info.no_potential_match_found",
+                        ImportMessage.ErrorCode.NO_POTENTIAL_MATCH_FOUND,
                     Map.of("column_type_num", importMapper.getInjectTypeColumn(),
                             "row_num", String.valueOf(row.getRowNum()))
                 )
@@ -322,7 +323,7 @@ public class InjectService {
             String listMatchers = matchingInjectImporters.stream().map(InjectImporter::getImportTypeValue).collect(Collectors.joining(", "));
             importTestSummary.getImportMessages().add(
                 new ImportMessage(ImportMessage.MessageLevel.WARN,
-                    "warn.several_matches",
+                        ImportMessage.ErrorCode.SEVERAL_MATCHES,
                     Map.of("column_type_num", importMapper.getInjectTypeColumn(),
                             "row_num", String.valueOf(row.getRowNum()),
                             "possible_matches", listMatchers)
@@ -344,7 +345,11 @@ public class InjectService {
             .findFirst()
             .orElseThrow(ElementNotFoundException::new);
         int descriptionCol = CellReference.convertColStringToIndex(descriptionRuleAttribute.getColumns());
-        inject.setDescription(row.getCell(descriptionCol).getStringCellValue());
+        String descriptionValue = row.getCell(descriptionCol).getStringCellValue();
+        if (descriptionValue.isBlank()) {
+            descriptionValue = descriptionRuleAttribute.getDefaultValue();
+        }
+        inject.setDescription(descriptionValue);
 
         // Adding the title
         RuleAttribute titleRuleAttribute = matchingInjectImporter.getRuleAttributes().stream()
@@ -352,7 +357,11 @@ public class InjectService {
             .findFirst()
             .orElseThrow(ElementNotFoundException::new);
         int titleCol = CellReference.convertColStringToIndex(titleRuleAttribute.getColumns());
-        inject.setTitle(row.getCell(titleCol).getStringCellValue());
+        String titleValue = row.getCell(titleCol).getStringCellValue();
+        if (titleValue.isBlank()) {
+            titleValue = titleRuleAttribute.getDefaultValue();
+        }
+        inject.setTitle(titleValue);
 
         // Adding the trigger time
         RuleAttribute triggerTimeRuleAttribute = matchingInjectImporter.getRuleAttributes().stream()
@@ -370,12 +379,18 @@ public class InjectService {
         String dateAsString = Arrays.stream(triggerTimeRuleAttribute.getColumns().split("\\+"))
             .map(column -> row.getCell(CellReference.convertColStringToIndex(column)).getStringCellValue())
             .collect(Collectors.joining());
+        if (dateAsString.isBlank()) {
+            dateAsString = triggerTimeRuleAttribute.getDefaultValue();
+        }
 
         Matcher relativeDayMatcher = relativeDayPattern.matcher(dateAsString);
-        Matcher relativeTimeMatcher = relativeTimePattern.matcher(dateAsString);
+        Matcher relativeHourMatcher = relativeHourPattern.matcher(dateAsString);
+        Matcher relativeMinuteMatcher = relativeMinutePattern.matcher(dateAsString);
+
 
         boolean relativeDays = relativeDayMatcher.matches();
-        boolean relativeTime = relativeTimeMatcher.matches();
+        boolean relativeHour = relativeHourMatcher.matches();
+        boolean relativeMinute = relativeMinuteMatcher.matches();
 
         InjectTime injectTime = new InjectTime();
         injectTime.setUnformattedDate(dateAsString);
@@ -388,15 +403,19 @@ public class InjectService {
             if(relativeDays && relativeDayMatcher.groupCount() > 0 && !relativeDayMatcher.group(1).isBlank()) {
                 injectTime.setRelativeDayNumber(Integer.parseInt(relativeDayMatcher.group(1)));
             }
-            injectTime.setRelativeTime(relativeTime);
-            if(relativeTime && relativeTimeMatcher.groupCount() > 0 && !relativeTimeMatcher.group(1).isBlank()) {
-                injectTime.setRelativeTimeNumber(Integer.parseInt(relativeTimeMatcher.group(1)));
+            injectTime.setRelativeHour(relativeHour);
+            if(relativeHour && relativeHourMatcher.groupCount() > 0 && !relativeHourMatcher.group(1).isBlank()) {
+                injectTime.setRelativeHourNumber(Integer.parseInt(relativeHourMatcher.group(1)));
+            }
+            injectTime.setRelativeMinute(relativeMinute);
+            if(relativeMinute && relativeMinuteMatcher.groupCount() > 0 && !relativeMinuteMatcher.group(1).isBlank()) {
+                injectTime.setRelativeMinuteNumber(Integer.parseInt(relativeMinuteMatcher.group(1)));
             }
         }
         injectTime.setSpecifyDays(relativeDays || injectTime.getFormatter().equals(DateTimeFormatter.ISO_DATE_TIME));
 
         // We get the absolute dates available on our first pass
-        if(!relativeDays && !relativeTime && dateTime != null) {
+        if(!relativeDays && !relativeHour && !relativeMinute && dateTime != null) {
             if (dateTime instanceof LocalDateTime) {
                 Instant injectDate = Instant.ofEpochSecond(
                         ((LocalDateTime)dateTime).toEpochSecond(ZoneOffset.of("+2")));
@@ -405,13 +424,13 @@ public class InjectService {
                 if(scenario.getRecurrenceStart() != null) {
                     injectTime.setDate(scenario.getRecurrenceStart()
                             .atZone(ZoneId.of("+2"))
-                            .with(ChronoField.HOUR_OF_DAY, ((LocalTime)dateTime).getHour())
-                            .with(ChronoField.MINUTE_OF_HOUR, ((LocalTime)dateTime).getMinute())
+                            .withHour(((LocalTime) dateTime).getHour())
+                            .withMinute(((LocalTime) dateTime).getMinute())
                             .toInstant());
                 } else {
                     importTestSummary.getImportMessages().add(
                             new ImportMessage(ImportMessage.MessageLevel.CRITICAL,
-                                    "critical.absolute_time_without_start_date",
+                                    ImportMessage.ErrorCode.ABSOLUTE_TIME_WITHOUT_START_DATE,
                                     Map.of("column_type_num", importMapper.getInjectTypeColumn(),
                                             "row_num", String.valueOf(row.getRowNum()))
                             )
@@ -452,11 +471,29 @@ public class InjectService {
             ObjectNode expectationNode = mapper.createObjectNode();
             expectationNode.put("expectation_description", expectation.get().getDescription());
             expectationNode.put("expectation_name", expectation.get().getName());
-            expectationNode.put("expectation_score", expectation.get().getScore());
+            expectationNode.put("expectation_score", expectation.get().getExpectedScore());
             expectationNode.put("expectation_type", expectation.get().getType().name());
+            expectationNode.put("expectation_expectation_group", false);
             expectationsNode.add(expectationNode);
+            inject.getContent().set("expectations", expectationsNode);
 
-            inject.getContent().set("expectationNode", expectationsNode);
+            /*if(!inject.getTeams().isEmpty()) {
+                List<InjectExpectation> expectations = inject.getTeams().stream().map(team -> {
+                    InjectExpectation expectationOfTeam = new InjectExpectation();
+                    expectationOfTeam.setDescription(expectation.get().getDescription());
+                    expectationOfTeam.setName(expectation.get().getName());
+                    expectationOfTeam.setScore(expectation.get().getScore());
+                    expectationOfTeam.setType(InjectExpectation.EXPECTATION_TYPE.MANUAL);
+                    expectationOfTeam.setTeam(team);
+                    expectationOfTeam.setExpectationGroup(false);
+                    expectationOfTeam.setInject(inject);
+                    return expectationOfTeam;
+                })
+                    .filter(injectExpectation -> injectExpectation.getScore() != null)
+                    .toList();
+
+                inject.setExpectations(expectations);
+            }*/
         }
 
         // We set the scenario
@@ -497,7 +534,11 @@ public class InjectService {
                 String columnValue = Arrays.stream(ruleAttribute.getColumns().split("\\+"))
                         .map(column -> row.getCell(CellReference.convertColStringToIndex(column)).getStringCellValue())
                         .collect(Collectors.joining());
-                inject.getContent().put(ruleAttribute.getName(), columnValue);
+                if (columnValue.isBlank()) {
+                    inject.getContent().put(ruleAttribute.getDefaultValue(), columnValue);
+                } else {
+                    inject.getContent().put(ruleAttribute.getName(), columnValue);
+                }
                 break;
             case "team":
                 // If the rule type is on a team field, we split by "+" if there is a concatenation of columns
@@ -507,15 +548,24 @@ public class InjectService {
                                 .collect(Collectors.joining(","))
                                 .split(","))
                         .toList();
-                inject.getTeams().addAll(mapTeamByName.entrySet().stream()
-                        .filter(nameTeamEntry -> columnValues.contains(nameTeamEntry.getKey()))
-                        .map(Map.Entry::getValue)
-                        .toList()
-                );
+                if (columnValues.isEmpty() || columnValues.stream().allMatch(String::isEmpty)) {
+                    List<String> defaultValues = Arrays.stream(ruleAttribute.getDefaultValue().split(",")).toList();
+                    inject.getTeams().addAll(mapTeamByName.entrySet().stream()
+                            .filter(nameTeamEntry -> defaultValues.contains(nameTeamEntry.getKey()))
+                            .map(Map.Entry::getValue)
+                            .toList()
+                    );
+                } else {
+                    inject.getTeams().addAll(mapTeamByName.entrySet().stream()
+                            .filter(nameTeamEntry -> columnValues.contains(nameTeamEntry.getKey()))
+                            .map(Map.Entry::getValue)
+                            .toList()
+                    );
+                }
                 if(inject.getTeams().isEmpty()) {
                     return List.of(
                             new ImportMessage(ImportMessage.MessageLevel.WARN,
-                                    "warn.no_team_found",
+                                    ImportMessage.ErrorCode.NO_TEAM_FOUND,
                                     Map.of("column_type_num", importMapper.getInjectTypeColumn(),
                                             "row_num", String.valueOf(row.getRowNum()))
                             )
@@ -530,10 +580,13 @@ public class InjectService {
                 }
                 if (ruleAttribute.getName().contains(".")) {
                     if("score".equals(ruleAttribute.getName().split("\\.")[1])) {
-                        Double columnValueExpectation = Arrays.stream(ruleAttribute.getColumns().split("\\+"))
-                                .map(column -> row.getCell(CellReference.convertColStringToIndex(column)).getNumericCellValue())
-                                .reduce(0.0, Double::sum);
-                        expectation.get().setExpectedScore(columnValueExpectation.intValue());
+                        List<String> columns = Arrays.stream(ruleAttribute.getColumns().split("\\+")).toList();
+                        if(columns.stream().allMatch(s -> row.getCell(CellReference.convertColStringToIndex(s)).getCellType()== CellType.NUMERIC)) {
+                            Double columnValueExpectation = columns.stream()
+                                    .map(column -> row.getCell(CellReference.convertColStringToIndex(column)).getNumericCellValue())
+                                    .reduce(0.0, Double::sum);
+                            expectation.get().setExpectedScore(columnValueExpectation.intValue());
+                        }
                     } else if ("name".equals(ruleAttribute.getName().split("\\.")[1])) {
                         String columnValueExpectation = Arrays.stream(ruleAttribute.getColumns().split("\\+"))
                                 .map(column -> row.getCell(CellReference.convertColStringToIndex(column)).getStringCellValue())
@@ -600,13 +653,18 @@ public class InjectService {
                 .map(InjectTime::getRelativeDayNumber).orElse(0);
             int earliestHourOfThatDay = mapInstantByRowIndex.values().stream()
                 .filter(injectTime -> injectTime.getRelativeDayNumber() == earliestDay)
-                .min(Comparator.comparing(InjectTime::getRelativeTimeNumber))
-                .map(InjectTime::getRelativeTimeNumber).orElse(0);
-            int offset = (earliestDay + earliestHourOfThatDay) * -1;
+                .min(Comparator.comparing(InjectTime::getRelativeHourNumber))
+                .map(InjectTime::getRelativeHourNumber).orElse(0);
+            int earliestMinuteOfThatHour = mapInstantByRowIndex.values().stream()
+                    .filter(injectTime -> injectTime.getRelativeDayNumber() == earliestDay
+                            && injectTime.getRelativeHourNumber() == earliestHourOfThatDay)
+                    .min(Comparator.comparing(InjectTime::getRelativeMinuteNumber))
+                    .map(InjectTime::getRelativeMinuteNumber).orElse(0);
+            long offsetAsMinutes = (((earliestDay * 24L) + earliestHourOfThatDay) * 60 + earliestMinuteOfThatHour) * -1;
             mapInstantByRowIndex.values().stream().filter(InjectTime::isRelativeDay)
                 .forEach(injectTime -> {
-                    long injectTimeAsHour = ((offset + injectTime.getRelativeDayNumber()) * 24L) + injectTime.getRelativeTimeNumber();
-                    injectTime.getLinkedInject().setDependsDuration(injectTimeAsHour * 60 * 60);
+                    long injectTimeAsMinutes = (((injectTime.getRelativeDayNumber() * 24L) + injectTime.getRelativeHourNumber()) * 60) + offsetAsMinutes;
+                    injectTime.getLinkedInject().setDependsDuration(injectTimeAsMinutes * 60);
                 });
         } else {
             // Worst case scenario : there is a mix of relative and absolute dates
@@ -633,7 +691,9 @@ public class InjectService {
                         }
                     } else {
                         // We don't have an absolute date so we need to deduce it from another row
-                        if(injectTime.getRelativeDayNumber() < 0 || injectTime.getRelativeDayNumber() == 0 && injectTime.getRelativeTimeNumber() < 0) {
+                        if(injectTime.getRelativeDayNumber() < 0
+                                || (injectTime.getRelativeDayNumber() == 0 && injectTime.getRelativeHourNumber() < 0)
+                                || (injectTime.getRelativeDayNumber() == 0 && injectTime.getRelativeHourNumber() == 0 && injectTime.getRelativeMinuteNumber() < 0)) {
                             // We are in the past, so we need to explore the future to find the next absolute date
                             Optional<Map.Entry<Integer, InjectTime>> firstFutureWithAbsolute =
                                 mapInstantByRowIndex.entrySet().stream()
@@ -645,11 +705,12 @@ public class InjectService {
                                 injectTime.setDate(firstFutureWithAbsolute.get().getValue()
                                     .getDate()
                                     .plus(injectTime.getRelativeDayNumber(), ChronoUnit.DAYS)
-                                    .plus(injectTime.getRelativeTimeNumber(), ChronoUnit.HOURS)
+                                    .plus(injectTime.getRelativeHourNumber(), ChronoUnit.HOURS)
+                                    .plus(injectTime.getRelativeMinuteNumber(), ChronoUnit.MINUTES)
                                 );
                             } else {
                                 importMessages.add(new ImportMessage(ImportMessage.MessageLevel.ERROR,
-                                                "error.date_set_in_past",
+                                                ImportMessage.ErrorCode.DATE_SET_IN_PAST,
                                                 Map.of("row_num", String.valueOf(integerInjectTimeEntry.getKey()))));
                             }
                         } else {
@@ -664,11 +725,39 @@ public class InjectService {
                                 injectTime.setDate(firstPastWithAbsolute.get().getValue()
                                     .getDate()
                                     .plus(injectTime.getRelativeDayNumber(), ChronoUnit.DAYS)
-                                    .plus(injectTime.getRelativeTimeNumber(), ChronoUnit.HOURS)
+                                    .plus(injectTime.getRelativeHourNumber(), ChronoUnit.HOURS)
+                                    .plus(injectTime.getRelativeMinuteNumber(), ChronoUnit.MINUTES)
                                 );
+
+                                Matcher relativeDayMatcher = relativeDayPattern.matcher(injectTime.getUnformattedDate());
+
+                                boolean relativeDays = relativeDayMatcher.matches();
+
+                                // Special case : a mix of relative day and absolute hour
+                                if(relativeDays && relativeDayMatcher.groupCount() > 1 && !relativeDayMatcher.group(2).isBlank()) {
+                                    Temporal date = null;
+                                    try {
+                                        date = LocalTime.parse(relativeDayMatcher.group(2).trim(), injectTime.getFormatter());
+                                    } catch (DateTimeParseException firstException) {
+                                        try {
+                                            date = LocalTime.parse(relativeDayMatcher.group(2).trim(), DateTimeFormatter.ISO_TIME);
+                                        } catch (DateTimeParseException exception) {
+                                            // This is a "probably" a relative date
+                                        }
+                                    }
+                                    if(date != null) {
+                                        injectTime.setDate(
+                                                injectTime.getDate()
+                                                        .atZone(ZoneId.of("+2")).toLocalDateTime()
+                                                        .withHour(date.get(ChronoField.HOUR_OF_DAY))
+                                                        .withMinute( date.get(ChronoField.MINUTE_OF_HOUR))
+                                                        .toInstant(ZoneOffset.of("+2"))
+                                        );
+                                    }
+                                }
                             } else {
                                 importMessages.add(new ImportMessage(ImportMessage.MessageLevel.ERROR,
-                                                "error.date_set_in_future",
+                                        ImportMessage.ErrorCode.DATE_SET_IN_FUTURE,
                                         Map.of("row_num", String.valueOf(integerInjectTimeEntry.getKey()))));
                             }
                         }
