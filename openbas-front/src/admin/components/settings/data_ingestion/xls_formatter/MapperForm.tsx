@@ -6,6 +6,10 @@ import {
   MenuItem,
   SelectChangeEvent,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   Typography,
   IconButton,
   Accordion,
@@ -21,6 +25,7 @@ import { Add, ExpandMore, Settings, DeleteOutline } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { CogOutline } from 'mdi-material-ui';
 import type { FilterGroup, InjectImporterAddInput, MapperAddInput, RuleAttributeAddInput, SearchPaginationInput } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
 import { zodImplement } from '../../../../../utils/Zod';
@@ -60,11 +65,31 @@ const MapperForm: React.FC<Props> = ({
   const { t } = useFormatter();
   const classes = useStyles();
 
-  const methods = useForm<MapperAddInput>();
+  const methods = useForm<MapperAddInput>({
+    mode: 'onTouched',
+    resolver: zodResolver(
+      zodImplement<MapperAddInput>().with({
+        mapper_name: z.string().min(1, { message: t('Should not be empty') }),
+        mapper_inject_importers: z.any().array().optional(),
+        mapper_inject_type_column: z
+          .string()
+          .min(1, { message: t('Should not be empty') })
+          .regex(/^[A-Z]{1,2}$/, 'Invalid')
+          .optional(),
+      }),
+    ),
+    defaultValues: initialValues,
+  });
   const { control } = methods;
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'mapper_inject_importers',
+    rules: {
+      required: {
+        value: true,
+        message: 'At least one is required',
+      },
+    },
   });
 
   const rulesMethods = useForm<InjectImporterAddInput>();
@@ -90,6 +115,15 @@ const MapperForm: React.FC<Props> = ({
     sorts: initSorting('injector_contract_labels'),
     filterGroup: importFilter,
   });
+
+  const [defaultValue, setDefaultValue] = React.useState(false);
+  const handleDefaultValueOpen = () => {
+    setDefaultValue(true);
+  };
+
+  const handleDefaultValueClose = () => {
+    setDefaultValue(false);
+  };
 
   const onSubmit = (data) => console.log(data);
 
@@ -214,70 +248,120 @@ const MapperForm: React.FC<Props> = ({
               {
                 rulesFields.map((rulesField, rulesIndex) => {
                   return (
-                    <Grid container spacing={2} key={rulesField.id} style={{ marginTop: 20 }}>
-                      <Grid item xs={5}>
-                        <InputLabel> {t('Rule title')} </InputLabel>
-                      </Grid>
-                      <Grid item xs={5}>
-                        <TextField
-                          defaultValue="Send mail"
-                          InputProps={{
-                            readOnly: true,
-                          }}
-                        />
-                      </Grid>
-                      <Grid item xs={5}>
-                        <InputLabel> {t('Rule description')} </InputLabel>
-                      </Grid>
-                      <Grid item xs={5}>
-                        <TextField />
-                      </Grid>
-                      <Grid item xs={2}>
-                        <Settings color="primary" />
-                      </Grid>
-                      <Grid item xs={5}>
-                        <InputLabel> {t('Trigger time')} </InputLabel>
-                      </Grid>
-                      <Grid item xs={5}>
-                        <TextField />
-                      </Grid>
-                      <Grid item xs={2}>
-                        <Settings color="primary" />
-                      </Grid>
-                      <Grid item xs={5}>
-                        <InputLabel> {t('Rule attribute name')} </InputLabel>
-                      </Grid>
-                      <Grid item xs={5}>
-                        <TextField
-                          inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_name` as const)}
-                        />
-                      </Grid>
-                      <Grid item xs={2}>
-                        <Settings color="primary" />
-                      </Grid>
-                      <Grid item xs={5}>
-                        <InputLabel> {t('Rule attributes columns')} </InputLabel>
-                      </Grid>
-                      <Grid item xs={5}>
-                        <TextField
-                          inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_columns` as const)}
-                        />
-                      </Grid>
-                      <Grid item xs={2}>
-                        <Settings color="primary" />
-                      </Grid>
-                      <Grid item xs={5}>
-                        <InputLabel> {t('Rule attribute default value')} </InputLabel>
-                      </Grid>
-                      <Grid item xs={5}>
-                        <TextField
-                          inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value` as const)}
-                        />
-                      </Grid>
-                      <Grid item xs={2}>
-                        <Settings color="primary" />
-                      </Grid>
-                    </Grid>
+                    <List key={rulesField.id} style={{ marginTop: 20 }}>
+                      <ListItem key={rulesField.id}>
+                        <ListItemText>
+                          <TextField
+                            label="Rule title"
+                            defaultValue="Send mail"
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                            inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_name` as const)}
+                          />
+                        </ListItemText>
+                        <ListItem>
+                          <TextField
+                            fullWidth
+                            label="Rule attributes columns"
+                            inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_columns` as const)}
+                          />
+                        </ListItem>
+                        <ListItem>
+                          <IconButton
+                            onClick={handleDefaultValueOpen}
+                          >
+                            <CogOutline color="primary" />
+                          </IconButton>
+                          <Dialog
+                            open={defaultValue}
+                            onClose={handleDefaultValueClose}
+                            aria-labelledby="default-value-dialog-title"
+                            aria-describedby="Configure optional settings to the field"
+                          >
+                            <DialogTitle id="default-value-dialog-title">
+                              {t('Attribute mapping configuration')}
+                            </DialogTitle>
+                            <DialogContent>
+                              <TextField
+                                fullWidth
+                                label="Rule attribute default value"
+                                inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value` as const)}
+                              />
+                            </DialogContent>
+                            <DialogActions>
+                              <Button onClick={handleDefaultValueClose} autoFocus>
+                                {t('Close')}
+                              </Button>
+                            </DialogActions>
+                          </Dialog>
+                        </ListItem>
+                      </ListItem>
+                    </List>
+                    /* <Grid container spacing={2} key={rulesField.id} style={{ marginTop: 20 }}>
+                       <Grid item xs={5}>
+                         <InputLabel> {t('Rule title')} </InputLabel>
+                       </Grid>
+                       <Grid item xs={5}>
+                         <TextField
+                           defaultValue="Send mail"
+                           InputProps={{
+                             readOnly: true,
+                           }}
+                         />
+                       </Grid>
+                       <Grid item xs={5}>
+                         <InputLabel> {t('Rule description')} </InputLabel>
+                       </Grid>
+                       <Grid item xs={5}>
+                         <TextField />
+                       </Grid>
+                       <Grid item xs={2}>
+                         <Settings color="primary" />
+                       </Grid>
+                       <Grid item xs={5}>
+                         <InputLabel> {t('Trigger time')} </InputLabel>
+                       </Grid>
+                       <Grid item xs={5}>
+                         <TextField />
+                       </Grid>
+                       <Grid item xs={2}>
+                         <Settings color="primary" />
+                       </Grid>
+                       <Grid item xs={5}>
+                         <InputLabel> {t('Rule attribute name')} </InputLabel>
+                       </Grid>
+                       <Grid item xs={5}>
+                         <TextField
+                           inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_name` as const)}
+                         />
+                       </Grid>
+                       <Grid item xs={2}>
+                         <Settings color="primary" />
+                       </Grid>
+                       <Grid item xs={5}>
+                         <InputLabel> {t('Rule attributes columns')} </InputLabel>
+                       </Grid>
+                       <Grid item xs={5}>
+                         <TextField
+                           inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_columns` as const)}
+                         />
+                       </Grid>
+                       <Grid item xs={2}>
+                         <Settings color="primary" />
+                       </Grid>
+                       <Grid item xs={5}>
+                         <InputLabel> {t('Rule attribute default value')} </InputLabel>
+                       </Grid>
+                       <Grid item xs={5}>
+                         <TextField
+                           inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value` as const)}
+                         />
+                       </Grid>
+                       <Grid item xs={2}>
+                         <Settings color="primary" />
+                       </Grid>
+                     </Grid> */
                   );
                 })
               }
