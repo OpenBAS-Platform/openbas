@@ -1105,13 +1105,15 @@ const i18n = {
       'Cleanup executor': 'Exécuteur de nettoyage',
       'Cleanup command': 'Commande de nettoyage',
       Document: 'Document',
-      // -- Policies
+      // Policies
       'Platform login message': 'Messages de connexion',
       'Platform consent message': 'Message de consentement à la plate-forme',
       'Platform consent confirm text': 'Texte de confirmation du consentement à la plate-forme',
       Write: 'Ecriture',
-      // -- Timeline
+      // Timeline
       'Show Timeline': 'Afficher la chronologie',
+      // Mapper
+      'Do you want to delete this XLS mapper ?': 'Voulez-vous supprimer ce mappage XLS ?',
     },
     en: {
       openbas_email: 'Email',
