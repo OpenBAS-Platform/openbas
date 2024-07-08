@@ -178,7 +178,7 @@ public class AtomicTestingService {
     @Validated
     public InjectResultDTO getDuplicateAtomicTesting(@NotBlank String id) {
         Inject injectOrigin = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
-        Inject injectDuplicate = copyInject(injectOrigin);
+        Inject injectDuplicate = copyInject(injectOrigin, true);
         injectDuplicate.setExercise(injectOrigin.getExercise());
         injectDuplicate.setScenario(injectOrigin.getScenario());
         Inject inject = injectRepository.save(injectDuplicate);
@@ -191,10 +191,14 @@ public class AtomicTestingService {
         );
     }
 
-    public Inject copyInject(@NotNull Inject injectOrigin) {
+    public Inject copyInject(@NotNull Inject injectOrigin, boolean isAtomic) {
         Inject injectDuplicate = new Inject();
         injectDuplicate.setUser(injectOrigin.getUser());
-        injectDuplicate.setTitle(getNewTitle(injectOrigin));
+        if (isAtomic) {
+            injectDuplicate.setTitle(getNewTitle(injectOrigin));
+        } else {
+            injectDuplicate.setTitle(injectOrigin.getTitle());
+        }
         injectDuplicate.setDescription(injectOrigin.getDescription());
         injectDuplicate.setContent(injectOrigin.getContent());
         injectDuplicate.setAllTeams(injectOrigin.isAllTeams());

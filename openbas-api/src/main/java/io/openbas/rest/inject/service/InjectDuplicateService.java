@@ -31,7 +31,7 @@ public class InjectDuplicateService {
     public Inject createInjectForScenario(@NotBlank final String scenarioId, @NotBlank final String injectId) {
         Scenario scenario = scenarioRepository.findById(scenarioId).orElseThrow();
         Inject injectOrigin = injectRepository.findById(injectId).orElseThrow();
-        Inject injectDuplicate = atomicTestingService.copyInject(injectOrigin);
+        Inject injectDuplicate = atomicTestingService.copyInject(injectOrigin, false);
         injectDuplicate.setScenario(scenario);
         Inject saved = injectRepository.save(injectDuplicate);
         getDocumentList(saved, injectId);
@@ -42,7 +42,7 @@ public class InjectDuplicateService {
     public Inject createInjectForExercise(@NotBlank final String exerciseId, @NotBlank final String injectId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
         Inject injectOrigin = injectRepository.findById(injectId).orElseThrow();
-        Inject inject = atomicTestingService.copyInject(injectOrigin);
+        Inject inject = atomicTestingService.copyInject(injectOrigin, false);
         inject.setExercise(exercise);
         Inject saved = injectRepository.save(inject);
         getDocumentList(saved, injectId);
