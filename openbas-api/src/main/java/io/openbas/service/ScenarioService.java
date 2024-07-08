@@ -520,7 +520,7 @@ public class ScenarioService {
 
     private void getListOfDuplicatedInjects(@NotNull Scenario scenario, @NotNull Scenario scenarioOrign) {
         scenarioOrign.getInjects()
-                .forEach(inject -> injectDuplicateService.createInjectForScenario(scenario.getId(), inject.getId()));
+                .forEach(inject -> injectDuplicateService.createInjectForScenario(scenario.getId(), inject.getId(), false));
     }
 
     private void getListOfArticles(@NotNull Scenario scenario, @NotNull Scenario scenarioOrign) {

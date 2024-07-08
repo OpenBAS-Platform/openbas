@@ -207,7 +207,7 @@ public class ExerciseService {
 
     private void getListOfDuplicatedInjects(Exercise exercise, Exercise exerciseOrigin) {
         exerciseOrigin.getInjects()
-                .forEach(inject -> injectDuplicateService.createInjectForExercise(exercise.getId(), inject.getId()));
+                .forEach(inject -> injectDuplicateService.createInjectForExercise(exercise.getId(), inject.getId(), false));
     }
 
     private void getListOfArticles(Exercise exercise, Exercise exerciseOrigin) {
