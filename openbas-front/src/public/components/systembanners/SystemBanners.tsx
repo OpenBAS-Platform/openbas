@@ -2,6 +2,7 @@ import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { isEmptyField, isNotEmptyField } from '../../../utils/utils';
 import type { PlatformSettings } from '../../../utils/api-types';
+import type { Theme } from '../../../components/Theme';
 
 export const SYSTEM_BANNER_HEIGHT = 25;
 
@@ -19,7 +20,9 @@ export const computeBannerSettings = (settings: PlatformSettings) => {
   };
 };
 
-const useStyles = makeStyles(() => ({
+/* eslint-disable */
+/* Avoid auto-lint removal using --fix with false positive finding of: */
+const useStyles = makeStyles((theme: Theme) => ({
   banner: {
     textAlign: 'center',
     height: `${SYSTEM_BANNER_HEIGHT}px`,
@@ -37,7 +40,24 @@ const useStyles = makeStyles(() => ({
     fontFamily: 'Arial,Helvetica,Geneva,Swiss,sans-serif',
     fontWeight: 'bold',
   },
+  banner_debug: {
+    background: theme.palette.success.main,
+  },
+  banner_info: {
+    background: theme.palette.primary.main,
+  },
+  banner_warn: {
+    background: theme.palette.warning.main,
+  },
+  banner_error: {
+    background: theme.palette.error.main,
+  },
+  banner_fatal: {
+    background: theme.palette.error.dark,
+  },
 }));
+/* end banner classes needing eslint-disable */
+/* eslint-enable */
 
 const SystemBanners = (settings: {
   settings: {
