@@ -55,13 +55,13 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '25%',
   },
   team_description: {
-    width: '25%',
+    width: '20%',
   },
   team_users_number: {
     width: '10%',
   },
   team_tags: {
-    width: '20%',
+    width: '25%',
   },
   team_updated_at: {
     width: '20%',

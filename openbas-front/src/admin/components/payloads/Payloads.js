@@ -250,7 +250,7 @@ const Payloads = () => {
                       style={inlineStyles.payload_tags}
                     >
                       <ItemTags
-                        variant="list"
+                        variant="reduced-view"
                         tags={payload.payload_tags}
                       />
                     </div>

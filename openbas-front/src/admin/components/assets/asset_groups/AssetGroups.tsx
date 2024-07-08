@@ -57,13 +57,13 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '20%',
   },
   asset_group_description: {
-    width: '25%',
+    width: '20%',
   },
   asset_group_assets: {
     width: '35%',
   },
   asset_group_tags: {
-    width: '20%',
+    width: '25%',
   },
 };
 
