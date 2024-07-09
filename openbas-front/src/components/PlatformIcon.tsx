@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { useTheme } from '@mui/styles';
-import { Tooltip } from '@mui/material';
+import { PaletteMode, Tooltip } from '@mui/material';
 import type { Theme } from './Theme';
 import windowsDark from '../static/images/platforms/windows-dark.png';
 import windowsLight from '../static/images/platforms/windows-light.png';
@@ -25,24 +25,22 @@ interface PlatformIconProps {
   marginRight?: number;
 }
 
-const renderIcon = (platform: string, width: number | undefined, borderRadius: number | undefined, marginRight: number | undefined) => {
+const platformIcons: Record<PlatformIconProps['platform'], Record<PaletteMode, string>> = {
+  Windows: { dark: windowsDark, light: windowsLight },
+  Linux: { dark: linuxDark, light: linuxLight },
+  MacOS: { dark: macosDark, light: macosLight },
+  Browser: { dark: browserDark, light: browserLight },
+  Service: { dark: serviceDark, light: serviceLight },
+  Internal: { dark: internalDark, light: internalLight },
+  Unknown: { dark: unknownDark, light: unknownLight },
+};
+
+const renderIcon = (platform: string, width: number | undefined = 40, borderRadius: number | undefined = 0, marginRight: number | undefined = 0) => {
   const theme = useTheme<Theme>();
-  switch (platform) {
-    case 'Windows':
-      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? windowsDark : windowsLight} alt="Windows" />);
-    case 'Linux':
-      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? linuxDark : linuxLight} alt="Linux" />);
-    case 'MacOS':
-      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? macosDark : macosLight} alt="MacOS" />);
-    case 'Browser':
-      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? browserDark : browserLight} alt="Browser" />);
-    case 'Service':
-      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? serviceDark : serviceLight} alt="Service" />);
-    case 'Internal':
-      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? internalDark : internalLight} alt="Internal" />);
-    default:
-      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? unknownDark : unknownLight} alt="Unknown" />);
-  }
+  const { mode } = theme.palette;
+  // @ts-expect-error Need a proper enum
+  const src = platformIcons[platform]?.[mode] || platformIcons.Unknown[mode];
+  return <img style={{ width, borderRadius, marginRight }} src={src} alt={platform} />;
 };
 const PlatformIcon: FunctionComponent<PlatformIconProps> = ({ platform, width, borderRadius, marginRight, tooltip = false }) => {
   if (tooltip) {

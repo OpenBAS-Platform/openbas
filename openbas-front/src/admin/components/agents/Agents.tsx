@@ -276,7 +276,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
             <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('windows', windowsExecutors)} disabled={windowsExecutors.length === 0}>
               <CardContent className={classes.content}>
                 <div className={classes.icon}>
-                  <PlatformIcon platform='Windows' width={40} />
+                  <PlatformIcon platform='Windows' />
                 </div>
                 <Typography
                   variant="h6"
@@ -312,7 +312,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
             <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('linux', linuxExecutors)} disabled={linuxExecutors.length === 0}>
               <CardContent className={classes.content}>
                 <div className={classes.icon}>
-                  <PlatformIcon platform="Linux" width={40} />
+                  <PlatformIcon platform="Linux" />
                 </div>
                 <Typography
                   variant="h6"
@@ -348,7 +348,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
             <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('macos', macOsExecutors)} disabled={macOsExecutors.length === 0}>
               <CardContent className={classes.content}>
                 <div className={classes.icon}>
-                  <PlatformIcon platform="MacOS" width={40} />
+                  <PlatformIcon platform="MacOS" />
                 </div>
                 <Typography
                   variant="h6"
@@ -384,7 +384,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
             <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('browser', browserExecutors)} disabled={browserExecutors.length === 0}>
               <CardContent className={classes.content}>
                 <div className={classes.icon}>
-                  <PlatformIcon platform="Browser" width={40} />
+                  <PlatformIcon platform="Browser" />
                 </div>
                 <Typography
                   variant="h6"
