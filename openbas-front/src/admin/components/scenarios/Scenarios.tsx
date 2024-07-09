@@ -249,7 +249,7 @@ const Scenarios = () => {
         <ImportUploaderScenario/>
       </PaginationComponent>
 
-      <List dense sx={{ width: '100%', maxWidth: '100%', bgcolor: 'background.paper' }}>
+      <List>
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
