@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { AttachmentOutlined, ControlPointOutlined, DescriptionOutlined } from '@mui/icons-material';
-import * as R from 'ramda';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
 import type { Document } from '../../utils/api-types';
@@ -69,6 +68,7 @@ interface Props {
   extensions?: string[];
   label: string;
   name: string;
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   setFieldValue: (field: string, value: any) => void;
 }
 
