@@ -78,7 +78,7 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
   const [open, setOpen] = useState(false);
   const [keyword, setKeyword] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
-  const [selectedDocument, setSelectedDocument] = useState<{ id: string, label: string } | null>(initialValue || null);
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
   // Fetching data
   const { documents, userAdmin }: { documents: [Document], userAdmin: string } = useHelper((helper: DocumentHelper & UserHelper) => ({
@@ -91,33 +91,33 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
   });
 
   useEffect(() => {
+    if (initialValue?.id && documents.length > 0) {
+      const resolvedDocument = documents.find((doc) => doc.document_id === initialValue.id);
+      if (resolvedDocument) {
+        setSelectedDocument(resolvedDocument);
+      }
+    }
+  }, [initialValue, documents]);
+
+  useEffect(() => {
     if (selectedDocument) {
-      setFieldValue(name, selectedDocument);
+      setFieldValue(name, { id: selectedDocument.document_id, label: selectedDocument.document_name });
     }
   }, [selectedDocument, setFieldValue]);
 
-  const mapDocument = (document: Document) => ({
-    id: document.document_id,
-    label: document.document_name,
-    description: document.document_description || '',
-    tags: document.document_tags || [],
-    type: document.document_type,
-  });
-
   const filterByKeyword = (n: Document) => keyword === ''
       || R.anyPass([
-        R.pipe(R.propOr('', 'label'), R.toLower, R.includes(R.toLower(keyword))),
-        R.pipe(R.propOr('', 'description'), R.toLower, R.includes(R.toLower(keyword))),
-        R.pipe(R.propOr('', 'type'), R.toLower, R.includes(R.toLower(keyword))),
+        R.pipe(R.propOr('', 'document_name'), R.toLower, R.includes(R.toLower(keyword))),
+        R.pipe(R.propOr('', 'document_description'), R.toLower, R.includes(R.toLower(keyword))),
+        R.pipe(R.propOr('', 'document_type'), R.toLower, R.includes(R.toLower(keyword))),
       ])(n);
 
   const filterByExtensions = (n: Document) => extensions.length === 0
-      || R.contains(R.pipe(R.split('.'), R.last, R.toLower)(n.label), extensions.map(R.toLower));
+      || R.contains(R.pipe(R.split('.'), R.last, R.toLower)(n.document_name), extensions.map(R.toLower));
 
   const filteredDocuments = R.pipe(
-    R.map(mapDocument),
     R.filter(R.allPass([
-      (n) => tags.length === 0 || R.any((tag) => R.contains(tag, n.tags || []), tags),
+      (n: Document) => tags.length === 0 || R.any((tag: any) => R.contains(tag, n.document_tags || []), tags),
       filterByKeyword,
       filterByExtensions,
     ])),
@@ -162,7 +162,7 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
   const entries: ButtonPopoverEntry[] = [
     { label: 'Update', action: handleUpdate },
     { label: 'Remove', action: handleRemove },
-    { label: 'Download', action: () => handleDownload(selectedDocument?.id) },
+    { label: 'Download', action: () => handleDownload(selectedDocument?.document_id) },
   ];
 
   return (
@@ -182,14 +182,14 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
               <ControlPointOutlined color="primary"/>
             </ListItemIcon>
             <ListItemText
-              primary={t('Add document')}
+              primary={`${t('Add')} ${label}`}
               classes={{ primary: classes.text }}
             />
           </ListItem>)}
         {selectedDocument && (
           <ListItem
             classes={{ root: classes.item }}
-            key={selectedDocument.id}
+            key={selectedDocument.document_id}
             divider
             onClick={() => setOpen(true)}
           >
@@ -199,25 +199,16 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
             <ListItemText
               primary={
                 <>
-                  <div className={classes.bodyItem}
-                    style={inlineStyles.document_name}
-                  >
-                    {selectedDocument.label}
+                  <div className={classes.bodyItem} style={inlineStyles.document_name}>
+                    {selectedDocument.document_name}
                   </div>
-                  <div className={classes.bodyItem}
-                    style={inlineStyles.document_type}
-                  >
-                    <DocumentType
-                      type={selectedDocument.type}
-                      variant="list"
-                    />
+                  <div className={classes.bodyItem} style={inlineStyles.document_type}>
+                    <DocumentType type={selectedDocument.document_type} variant="list"/>
                   </div>
-                  <div className={classes.bodyItem}
-                    style={inlineStyles.document_tags}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.document_tags}>
                     <ItemTags
                       variant="list"
-                      tags={selectedDocument.tags}
+                      tags={selectedDocument.document_tags}
                     />
                   </div>
                 </>
@@ -273,7 +264,7 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
             {filteredDocuments.map((document: Document) => {
               return (
                 <ListItem
-                  key={document.id}
+                  key={document.document_id}
                   divider
                   dense
                   onClick={() => addDocument(document)}
@@ -282,12 +273,12 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
                     <DescriptionOutlined/>
                   </ListItemIcon>
                   <ListItemText
-                    primary={document.label}
-                    secondary={document.description}
+                    primary={document.document_name}
+                    secondary={document.document_description}
                   />
                   <ItemTags
                     variant="list"
-                    tags={document.tags}
+                    tags={document.document_tags}
                   />
                 </ListItem>
               );
