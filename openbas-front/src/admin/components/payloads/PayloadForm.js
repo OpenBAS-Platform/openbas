@@ -37,6 +37,9 @@ const PayloadForm = (props) => {
       case 'Executable':
         requiredFields.push(...['executable_file']);
         break;
+      case 'FileDrop':
+        requiredFields.push(...['file_drop_file']);
+        break;
       default:
       // do nothing
     }
@@ -123,7 +126,7 @@ const PayloadForm = (props) => {
           <>
             <DocumentLoader
               name="executable_file"
-              label={t('File')}
+              label={t('Document')}
               setFieldValue={form.mutators.setValue}
               initialValue={values.executable_file}
             />
@@ -133,7 +136,7 @@ const PayloadForm = (props) => {
             <>
               <DocumentLoader
                 name="file_drop_file"
-                label={t('File to drop')}
+                label={t('Document')}
                 setFieldValue={form.mutators.setValue}
                 initialValue={values.file_drop_file}
               />

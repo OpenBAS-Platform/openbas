@@ -105,6 +105,8 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
       setFieldValue(name, { id: selectedDocument.document_id, label: selectedDocument.document_name });
       setTags([]);
       setKeyword('');
+    } else {
+      setFieldValue(name, null);
     }
   }, [selectedDocument, setFieldValue]);
 
@@ -203,7 +205,7 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.document_tags}>
                     <ItemTags
-                      variant="list"
+                      variant="reduced-view"
                       tags={selectedDocument.document_tags}
                     />
                   </div>
