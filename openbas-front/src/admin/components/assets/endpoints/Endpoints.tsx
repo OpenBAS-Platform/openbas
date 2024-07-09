@@ -8,7 +8,7 @@ import EndpointCreation from './EndpointCreation';
 import EndpointPopover from './EndpointPopover';
 import { useHelper } from '../../../../store';
 import { useFormatter } from '../../../../components/i18n';
-import type { UserHelper } from '../../../../actions/helper';
+import type { TagHelper, UserHelper } from '../../../../actions/helper';
 import type { EndpointStore } from './Endpoint';
 import ItemTags from '../../../../components/ItemTags';
 import AssetStatus from '../AssetStatus';
@@ -22,6 +22,7 @@ import PlatformIcon from '../../../../components/PlatformIcon';
 import type { ExecutorHelper } from '../../../../actions/executors/executor-helper';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchExecutors } from '../../../../actions/Executor';
+import { fetchTags } from '../../../../actions/Tag';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -86,12 +87,14 @@ const Endpoints = () => {
   const [searchId] = searchParams.getAll('id');
 
   // Fetching data
-  const { userAdmin, executorsMap } = useHelper((helper: ExecutorHelper & UserHelper) => ({
+  const { userAdmin, executorsMap } = useHelper((helper: ExecutorHelper & UserHelper & TagHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
     executorsMap: helper.getExecutorsMap(),
+    tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchExecutors());
+    dispatch(fetchTags());
   });
 
   // Headers
