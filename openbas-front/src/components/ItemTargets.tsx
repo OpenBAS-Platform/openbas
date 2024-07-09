@@ -4,6 +4,7 @@ import { Chip, Tooltip } from '@mui/material';
 import { DevicesOtherOutlined, Groups3Outlined, HorizontalRule } from '@mui/icons-material';
 import { SelectGroup } from 'mdi-material-ui';
 import type { InjectTargetWithResult } from '../utils/api-types';
+import { getLabelOfRemainingItems, getRemainingItemsCount, getVisibleItems, truncate } from '../utils/String';
 
 const useStyles = makeStyles(() => ({
   inline: {
@@ -13,39 +14,35 @@ const useStyles = makeStyles(() => ({
     fontSize: 12,
     height: 20,
     float: 'left',
-    borderRadius: 4,
     marginRight: 4,
+    borderRadius: 4,
   },
 }));
 
 interface Props {
   targets: InjectTargetWithResult[] | undefined;
+  variant?: string,
 }
 
 const ItemTargets: FunctionComponent<Props> = ({
   targets,
+  variant,
 }) => {
   // Standard hooks
   const classes = useStyles();
+  let truncateLimit = 15;
+  if (variant === 'reduced-view') {
+    truncateLimit = 6;
+  }
 
   // Extract the first two targets as visible chips
-  const visibleTargets = targets?.slice(0, 2);
-
-  // Calculate the number of remaining targets
-  const remainingTargets = targets?.slice(2, targets?.length).map((target) => target.name).join(', ');
-  const remainingTargetsCount = (targets && visibleTargets && targets.length - visibleTargets.length) || null;
+  const visibleTargets = getVisibleItems(targets, 2);
+  const tooltipLabel = getLabelOfRemainingItems(targets, 2, 'name');
+  const remainingTargetsCount = getRemainingItemsCount(targets, visibleTargets);
 
   if (!targets || targets.length === 0) {
     return <HorizontalRule/>;
   }
-
-  // Helper function to truncate text based on character limit
-  const truncateText = (text: string, limit: number): string => {
-    if (text.length > limit) {
-      return `${text.slice(0, limit)}...`;
-    }
-    return text;
-  };
 
   const getIcon = (type: string) => {
     if (type === 'ASSETS') {
@@ -59,7 +56,7 @@ const ItemTargets: FunctionComponent<Props> = ({
 
   return (
     <div className={classes.inline}>
-      {visibleTargets && visibleTargets.map((target, index) => (
+      {visibleTargets && visibleTargets.map((target: InjectTargetWithResult, index: number) => (
         <span key={index}>
           <Tooltip title={target.name}>
             <Chip
@@ -67,13 +64,13 @@ const ItemTargets: FunctionComponent<Props> = ({
               key={target.id}
               classes={{ root: classes.target }}
               icon={getIcon(target.targetType!)}
-              label={truncateText(target.name!, 10)}
+              label={truncate(target.name!, truncateLimit)}
             />
           </Tooltip>
         </span>
       ))}
       {remainingTargetsCount && remainingTargetsCount > 0 && (
-        <Tooltip title={remainingTargets}>
+        <Tooltip title={tooltipLabel}>
           <Chip
             variant="outlined"
             classes={{ root: classes.target }}

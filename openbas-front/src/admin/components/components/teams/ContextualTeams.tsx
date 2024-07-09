@@ -57,19 +57,19 @@ const headerStylesContextual: Record<string, CSSProperties> = {
   },
   team_users_number: {
     float: 'left',
-    width: '12%',
+    width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
   team_users_enabled_number: {
     float: 'left',
-    width: '12%',
+    width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
   team_tags: {
     float: 'left',
-    width: '25%',
+    width: '29%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -92,7 +92,7 @@ const inlineStylesContextual: Record<string, CSSProperties> = {
   },
   team_users_number: {
     float: 'left',
-    width: '12%',
+    width: '10%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -100,7 +100,7 @@ const inlineStylesContextual: Record<string, CSSProperties> = {
   },
   team_users_enabled_number: {
     float: 'left',
-    width: '12%',
+    width: '10%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -108,7 +108,7 @@ const inlineStylesContextual: Record<string, CSSProperties> = {
   },
   team_tags: {
     float: 'left',
-    width: '25%',
+    width: '29%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -263,7 +263,7 @@ const ContextualTeams: React.FC<Props> = ({ teamIds }) => {
                     className={classes.bodyItem}
                     style={inlineStylesContextual.team_tags}
                   >
-                    <ItemTags variant="list" tags={team.team_tags} />
+                    <ItemTags variant="reduced-view" tags={team.team_tags} />
                   </div>
                   <div
                     className={classes.bodyItem}

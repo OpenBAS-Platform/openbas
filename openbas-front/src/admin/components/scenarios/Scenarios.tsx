@@ -69,53 +69,25 @@ const useStyles = makeStyles((theme: Theme) => ({
 const inlineStyles: Record<string, CSSProperties> = {
   scenario_name: {
     width: '25%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   scenario_severity: {
     width: '8%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   scenario_category: {
     width: '12%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   scenario_recurrence: {
     width: '12%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   scenario_platforms: {
-    width: '12%',
+    width: '10%',
     cursor: 'default',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   scenario_tags: {
-    width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    width: '18%',
   },
   scenario_updated_at: {
     width: '10%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
 };
 

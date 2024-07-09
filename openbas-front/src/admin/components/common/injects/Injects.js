@@ -92,7 +92,7 @@ const headerStyles = {
   },
   inject_depends_duration: {
     float: 'left',
-    width: '20%',
+    width: '18%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -104,12 +104,13 @@ const headerStyles = {
   },
   inject_enabled: {
     float: 'left',
-    width: '15%',
+    width: '12%',
     fontSize: 12,
     fontWeight: '700',
   },
   inject_tags: {
     float: 'left',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -134,7 +135,7 @@ const inlineStyles = {
   },
   inject_depends_duration: {
     float: 'left',
-    width: '20%',
+    width: '18%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -152,7 +153,7 @@ const inlineStyles = {
   },
   inject_enabled: {
     float: 'left',
-    width: '15%',
+    width: '12%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -160,6 +161,7 @@ const inlineStyles = {
   },
   inject_tags: {
     float: 'left',
+    width: '20%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
