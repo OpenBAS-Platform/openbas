@@ -139,7 +139,17 @@ const SecurityPlatformForm: React.FC<Props> = ({
           />
         )}
       />
-      <DocumentLoader label={'Logo dark'} extensions={['png', 'jpg', 'tiff', 'tif', 'bmp', 'jpeg', 'svg', 'gif']}/>
+      <Controller
+        control={control}
+        name="security_platform_logo_dark"
+        render={({ field: { onChange, value } }) => (
+          <DocumentLoader
+            label="Logo dark"
+            extensions={['png', 'jpg', 'tiff', 'tif', 'bmp', 'jpeg', 'svg', 'gif']}
+            setFieldValue={onChange}
+          />
+        )}
+      />
       <Controller
         control={control}
         name="asset_tags"

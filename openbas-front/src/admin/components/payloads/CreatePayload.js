@@ -45,7 +45,7 @@ class CreatePayload extends Component {
       R.assoc('payload_platforms', R.pluck('id', data.payload_platforms)),
       R.assoc('payload_tags', R.pluck('id', data.payload_tags)),
       R.assoc('payload_attack_patterns', R.pluck('id', data.payload_attack_patterns)),
-      R.assoc('executable_file', data.executable_file?.document_id),
+      R.assoc('executable_file', data.executable_file?.id),
       R.assoc('file_drop_file', data.file_drop_file?.id),
     )(data);
     return this.props
