@@ -480,6 +480,7 @@ public class ScenarioService {
             Scenario scenarioDuplicate = scenarioRepository.save(scenario);
             getListOfDuplicatedInjects(scenarioDuplicate, scenarioOrigin);
             getListOfArticles(scenarioDuplicate, scenarioOrigin);
+            getListOfVariables(scenarioDuplicate, scenarioOrigin);
             return scenarioDuplicate;
         }
         throw new ElementNotFoundException();
@@ -536,6 +537,20 @@ public class ScenarioService {
             scenarioArticle.setScenario(scenario);
             articleRepository.save(scenarioArticle);
         });
+    }
+
+    private void getListOfVariables(Scenario scenario, Scenario scenarioOrigin) {
+        List<Variable> variables = variableService.variablesFromScenario(scenarioOrigin.getId());
+        List<Variable> variableList = variables.stream().map(variable -> {
+            Variable variable1 = new Variable();
+            variable1.setKey(variable.getKey());
+            variable1.setDescription(variable.getDescription());
+            variable1.setValue(variable.getValue());
+            variable1.setType(variable.getType());
+            variable1.setScenario(scenario);
+            return variable1;
+        }).toList();
+        variableService.createVariables(variableList);
     }
 
 }

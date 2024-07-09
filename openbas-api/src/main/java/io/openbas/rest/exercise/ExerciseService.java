@@ -3,9 +3,11 @@ package io.openbas.rest.exercise;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ArticleRepository;
 import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.database.repository.VariableRepository;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.InjectService;
+import io.openbas.service.VariableService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
@@ -46,6 +48,7 @@ public class ExerciseService {
     private final InjectDuplicateService injectDuplicateService;
     private final ExerciseRepository exerciseRepository;
     private final ArticleRepository articleRepository;
+    private final VariableService variableService;
 
     public Page<ExerciseSimple> exercises(Specification<Exercise> specification, Pageable pageable) {
         CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
@@ -170,6 +173,7 @@ public class ExerciseService {
         Exercise exerciseDuplicate = exerciseRepository.save(exercise);
         getListOfDuplicatedInjects(exerciseDuplicate, exerciseOrigin);
         getListOfArticles(exerciseDuplicate, exerciseOrigin);
+        getListOfVariables(exerciseDuplicate, exerciseOrigin);
         return exerciseDuplicate;
     }
 
@@ -193,6 +197,7 @@ public class ExerciseService {
         exerciseDuplicate.setLogoDark(exerciseOrigin.getLogoDark());
         exerciseDuplicate.setLogoLight(exerciseOrigin.getLogoLight());
         exerciseDuplicate.setDocuments(exerciseOrigin.getDocuments().stream().toList());
+        exerciseDuplicate.setObjectives(exerciseOrigin.getObjectives().stream().toList());
         exerciseDuplicate.setObjectives(exerciseOrigin.getObjectives().stream().toList());
         return exerciseDuplicate;
     }
@@ -223,6 +228,20 @@ public class ExerciseService {
             exerciceArticle.setExercise(exercise);
             articleRepository.save(exerciceArticle);
         });
+    }
+
+    private void getListOfVariables(Exercise exercise, Exercise exerciseOrigin) {
+        List<Variable> variables = variableService.variablesFromExercise(exerciseOrigin.getId());
+        List<Variable> variableList = variables.stream().map(variable -> {
+            Variable variable1 = new Variable();
+            variable1.setKey(variable.getKey());
+            variable1.setDescription(variable.getDescription());
+            variable1.setValue(variable.getValue());
+            variable1.setType(variable.getType());
+            variable1.setExercise(exercise);
+            return variable1;
+        }).toList();
+        variableService.createVariables(variableList);
     }
 
 }
