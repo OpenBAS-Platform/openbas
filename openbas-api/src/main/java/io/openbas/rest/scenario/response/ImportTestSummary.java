@@ -7,7 +7,6 @@ import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.utils.AtomicTestingMapper;
 import lombok.Data;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +23,5 @@ public class ImportTestSummary {
   public List<InjectResultDTO> getInjectResults() {
     return injects.stream().map(AtomicTestingMapper::toDtoWithTargetResults).toList();
   }
-
-  @JsonIgnore
-  private Instant scenarioUpdatedDate;
 
 }

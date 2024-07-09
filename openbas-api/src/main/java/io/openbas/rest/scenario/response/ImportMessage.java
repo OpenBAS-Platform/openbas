@@ -2,10 +2,12 @@ package io.openbas.rest.scenario.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
 @Data
+@NoArgsConstructor
 public class ImportMessage {
   public enum MessageLevel {
     CRITICAL,
@@ -23,7 +25,7 @@ public class ImportMessage {
 
     public final String code;
 
-    private ErrorCode(String code) {
+    ErrorCode(String code) {
       this.code = code;
     }
   }
