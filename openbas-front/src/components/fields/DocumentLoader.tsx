@@ -98,7 +98,7 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
         setSelectedDocument(resolvedDocument);
       }
     }
-  }, [initialValue, documents]);
+  }, []);
 
   useEffect(() => {
     if (selectedDocument) {
@@ -134,6 +134,12 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
     setKeyword(value || '');
   };
 
+  const addDocument = (document: Document) => {
+    setSelectedDocument(document);
+    handleClose();
+  };
+
+  // Create document
   const handleAddTag = (value: string) => {
     if (!tags.includes(value)) {
       setTags([...tags, value]);
@@ -142,15 +148,7 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
 
   const handleClearTag = () => setTags([]);
 
-  const addDocument = (document: Document) => {
-    setSelectedDocument(document);
-    handleClose();
-  };
-
-  const onCreate = (result: Document) => {
-  };
-
-  // Action handlers
+  // Actions
   const handleUpdate = () => setOpen(true);
   const handleRemove = () => setSelectedDocument(null);
   const handleDownload = (documentId: string | undefined) => {
@@ -287,7 +285,7 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
             {userAdmin && (
               <CreateDocument
                 inline
-                onCreate={onCreate}
+                onCreate={addDocument}
               />
             )}
           </List>
