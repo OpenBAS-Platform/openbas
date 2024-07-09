@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { AttachmentOutlined, ControlPointOutlined, DescriptionOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
-import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
 import type { Document } from '../../utils/api-types';
@@ -75,7 +74,6 @@ interface Props {
 const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label, name, setFieldValue }) => {
   const classes = useStyles();
   const { t } = useFormatter();
-  const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
   const [keyword, setKeyword] = useState<string>('');
@@ -225,9 +223,16 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
                 </>
                     }
             />
-            <ListItemSecondaryAction>
-              <ButtonPopover entries={entries}/>
-            </ListItemSecondaryAction>
+            <ButtonPopover
+              entries={entries}
+              buttonProps={{
+                color: 'primary',
+                size: 'large',
+                borderRadius: '50%',
+                border: 'none',
+                padding: '12px',
+              }}
+            />
           </ListItem>)}
       </List>
       <Dialog

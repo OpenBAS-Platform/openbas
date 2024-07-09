@@ -1,4 +1,4 @@
-import { IconButton, Menu, MenuItem } from '@mui/material';
+import { Menu, MenuItem, ToggleButton, ToggleButtonProps } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import React, { FunctionComponent, useState } from 'react';
 import { useFormatter } from '../i18n';
@@ -11,10 +11,12 @@ export interface ButtonPopoverEntry {
 
 interface Props {
   entries: ButtonPopoverEntry[];
+  buttonProps: ToggleButtonProps;
 }
 
 const ButtonPopover: FunctionComponent<Props> = ({
   entries,
+  buttonProps,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -23,7 +25,7 @@ const ButtonPopover: FunctionComponent<Props> = ({
 
   return (
     <>
-      <IconButton
+      <ToggleButton
         value="popover"
         size="large"
         color={'primary'}
@@ -31,9 +33,10 @@ const ButtonPopover: FunctionComponent<Props> = ({
           ev.stopPropagation();
           setAnchorEl(ev.currentTarget);
         }}
+        style={{ ...buttonProps }}
       >
         <MoreVert fontSize="small" color="primary" />
-      </IconButton>
+      </ToggleButton>
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
