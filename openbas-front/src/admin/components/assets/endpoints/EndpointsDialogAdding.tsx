@@ -188,7 +188,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
                           <div className={classes.bodyItem} style={{ width: '45%' }}>
                             {endpoint.asset_name}
                           </div>
-                          <div className={classes.bodyItem} style={{ width: '20%', display: 'flex', alignItems: 'center'}}>
+                          <div className={classes.bodyItem} style={{ width: '20%', display: 'flex', alignItems: 'center' }}>
                             <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} /> {endpoint.endpoint_platform}
                           </div>
                           <div className={classes.bodyItem} style={{ width: '35%' }}>
