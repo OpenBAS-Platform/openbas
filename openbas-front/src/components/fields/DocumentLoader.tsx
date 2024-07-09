@@ -180,7 +180,7 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
               <ControlPointOutlined color="primary"/>
             </ListItemIcon>
             <ListItemText
-              primary={`${t('Add')} ${label}`}
+              primary={t('Add document')}
               classes={{ primary: classes.text }}
             />
           </ListItem>)}

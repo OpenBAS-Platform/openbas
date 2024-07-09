@@ -113,29 +113,12 @@ const SecurityPlatformForm: React.FC<Props> = ({
         control={control}
         name="security_platform_logo_light"
         render={({ field: { onChange, value } }) => (
-          <DocumentField
+          <DocumentLoader
             name="security_platform_logo_light"
             label={t('Logo light')}
-            fieldValue={value ?? ''}
-            fieldOnChange={onChange}
-            errors={errors}
-            style={{ marginTop: 20 }}
             extensions={['png', 'jpg', 'jpeg', 'svg', 'gif']}
-          />
-        )}
-      />
-      <Controller
-        control={control}
-        name="security_platform_logo_dark"
-        render={({ field: { onChange, value } }) => (
-          <DocumentField
-            name="security_platform_logo_dark"
-            label={t('Logo dark')}
-            fieldValue={value ?? ''}
-            fieldOnChange={onChange}
-            errors={errors}
-            style={{ marginTop: 20 }}
-            extensions={['png', 'jpg', 'tiff', 'tif', 'bmp', 'jpeg', 'svg', 'gif']}
+            setFieldValue={onChange}
+            initialValue={{ id: value }}
           />
         )}
       />
@@ -144,9 +127,11 @@ const SecurityPlatformForm: React.FC<Props> = ({
         name="security_platform_logo_dark"
         render={({ field: { onChange, value } }) => (
           <DocumentLoader
-            label="Logo dark"
+            name="security_platform_logo_dark"
+            label={t('Logo dark')}
             extensions={['png', 'jpg', 'tiff', 'tif', 'bmp', 'jpeg', 'svg', 'gif']}
             setFieldValue={onChange}
+            initialValue={{ id: value }}
           />
         )}
       />
