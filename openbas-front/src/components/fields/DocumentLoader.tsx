@@ -103,30 +103,28 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
   useEffect(() => {
     if (selectedDocument) {
       setFieldValue(name, { id: selectedDocument.document_id, label: selectedDocument.document_name });
+      setTags([]);
+      setKeyword('');
     }
   }, [selectedDocument, setFieldValue]);
 
   const filterByKeyword = (n: Document) => keyword === ''
-      || R.anyPass([
-        R.pipe(R.propOr('', 'document_name'), R.toLower, R.includes(R.toLower(keyword))),
-        R.pipe(R.propOr('', 'document_description'), R.toLower, R.includes(R.toLower(keyword))),
-        R.pipe(R.propOr('', 'document_type'), R.toLower, R.includes(R.toLower(keyword))),
-      ])(n);
+      || n.document_name.toLowerCase().includes(keyword.toLowerCase())
+      || n.document_description?.toLowerCase().includes(keyword.toLowerCase())
+      || n.document_type?.toLowerCase().includes(keyword.toLowerCase());
 
   const filterByExtensions = (n: Document) => extensions.length === 0
-      || R.contains(R.pipe(R.split('.'), R.last, R.toLower)(n.document_name), extensions.map(R.toLower));
+      || extensions.map((ext) => ext.toLowerCase()).includes(n.document_name.split('.').pop()?.toLowerCase() || '');
 
-  const filteredDocuments = R.pipe(
-    R.filter(R.allPass([
-      (n: Document) => tags.length === 0 || R.any((tag: any) => R.contains(tag, n.document_tags || []), tags),
-      filterByKeyword,
-      filterByExtensions,
-    ])),
-    R.take(10),
-  )(documents);
+  const filteredDocuments = documents.filter((doc) => {
+    return (!tags.length || tags.every((tag) => doc.document_tags?.includes(tag.id)))
+        && filterByKeyword(doc)
+        && filterByExtensions(doc);
+  }).slice(0, 10);
 
   const handleClose = () => {
     setOpen(false);
+    setTags([]);
     setKeyword('');
   };
 
@@ -139,7 +137,6 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
     handleClose();
   };
 
-  // Create document
   const handleAddTag = (value: string) => {
     if (!tags.includes(value)) {
       setTags([...tags, value]);
