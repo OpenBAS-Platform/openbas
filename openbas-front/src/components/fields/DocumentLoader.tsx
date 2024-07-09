@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     paddingLeft: 10,
     height: 50,
     cursor: 'pointer',
+    margin: 0,
   },
   text: {
     fontSize: 15,
@@ -167,10 +168,10 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
 
   return (
     <>
-      <Typography variant="h3" style={{ marginTop: 20 }}>
+      <Typography variant="h4" style={{ marginTop: 20, marginBottom: 0, textTransform: 'none' }}>
         {label}
       </Typography>
-      <List>
+      <List style={{ marginTop: 0, paddingTop: 0 }}>
         {!selectedDocument && (
           <ListItem
             classes={{ root: classes.item }}

@@ -12,7 +12,6 @@ import TagField from '../../../components/TagField';
 import PlatformField from '../../../components/PlatformField';
 import OldSelectField from '../../../components/fields/OldSelectField';
 import AttackPatternField from '../../../components/AttackPatternField';
-import DocumentField from '../../../components/DocumentField';
 import DocumentLoader from '../../../components/fields/DocumentLoader';
 
 const useStyles = makeStyles(() => ({
