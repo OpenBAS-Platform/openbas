@@ -11,7 +11,7 @@ export interface ButtonPopoverEntry {
 
 interface Props {
   entries: ButtonPopoverEntry[];
-  buttonProps: ToggleButtonProps;
+  buttonProps?: ToggleButtonProps;
 }
 
 const ButtonPopover: FunctionComponent<Props> = ({

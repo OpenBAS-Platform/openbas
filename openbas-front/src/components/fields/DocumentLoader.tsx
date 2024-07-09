@@ -4,7 +4,7 @@ import { makeStyles } from '@mui/styles';
 import { AttachmentOutlined, ControlPointOutlined, DescriptionOutlined } from '@mui/icons-material';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
-import type { Document } from '../../utils/api-types';
+import type { RawDocument } from '../../utils/api-types';
 import { useHelper } from '../../store';
 import type { DocumentHelper, UserHelper } from '../../actions/helper';
 import { fetchDocuments } from '../../actions/Document';
@@ -64,7 +64,7 @@ const inlineStyles = {
 };
 
 interface Props {
-  initialValue?: { id: string, label: string };
+  initialValue?: { id?: string, label?: string };
   extensions?: string[];
   label: string;
   name: string;
@@ -78,11 +78,11 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
 
   const [open, setOpen] = useState(false);
   const [keyword, setKeyword] = useState<string>('');
-  const [tags, setTags] = useState<string[]>([]);
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [tags, setTags] = useState<{ id: string, label: string, color: string }[]>([]);
+  const [selectedDocument, setSelectedDocument] = useState<RawDocument | null>(null);
 
   // Fetching data
-  const { documents, userAdmin }: { documents: [Document], userAdmin: string } = useHelper((helper: DocumentHelper & UserHelper) => ({
+  const { documents, userAdmin }: { documents: [RawDocument], userAdmin: string } = useHelper((helper: DocumentHelper & UserHelper) => ({
     documents: helper.getDocuments(),
     userAdmin: helper.getMe()?.user_admin,
   }));
@@ -110,13 +110,13 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
     }
   }, [selectedDocument, setFieldValue]);
 
-  const filterByKeyword = (n: Document) => keyword === ''
-      || n.document_name.toLowerCase().includes(keyword.toLowerCase())
+  const filterByKeyword = (n: RawDocument) => keyword === ''
+      || n.document_name?.toLowerCase().includes(keyword.toLowerCase())
       || n.document_description?.toLowerCase().includes(keyword.toLowerCase())
       || n.document_type?.toLowerCase().includes(keyword.toLowerCase());
 
-  const filterByExtensions = (n: Document) => extensions.length === 0
-      || extensions.map((ext) => ext.toLowerCase()).includes(n.document_name.split('.').pop()?.toLowerCase() || '');
+  const filterByExtensions = (n: RawDocument) => extensions.length === 0
+      || extensions.map((ext) => ext.toLowerCase()).includes(n.document_name?.split('.').pop()?.toLowerCase() || '');
 
   const filteredDocuments = documents.filter((doc) => {
     return (!tags.length || tags.every((tag) => doc.document_tags?.includes(tag.id)))
@@ -134,12 +134,12 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
     setKeyword(value || '');
   };
 
-  const addDocument = (document: Document) => {
+  const addDocument = (document: RawDocument) => {
     setSelectedDocument(document);
     handleClose();
   };
 
-  const handleAddTag = (value: string) => {
+  const handleAddTag = (value: { id: string, label: string, color: string }) => {
     if (!tags.includes(value)) {
       setTags([...tags, value]);
     }
@@ -197,13 +197,25 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
             <ListItemText
               primary={
                 <>
-                  <div className={classes.bodyItem} style={inlineStyles.document_name}>
+                  <div className={classes.bodyItem}
+                            /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+                            // @ts-ignore
+                    style={inlineStyles.document_name}
+                  >
                     {selectedDocument.document_name}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.document_type}>
+                  <div className={classes.bodyItem}
+                            /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+                            // @ts-ignore
+                    style={inlineStyles.document_type}
+                  >
                     <DocumentType type={selectedDocument.document_type} variant="list"/>
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.document_tags}>
+                  <div className={classes.bodyItem}
+                            /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+                            // @ts-ignore
+                    style={inlineStyles.document_tags}
+                  >
                     <ItemTags
                       variant="reduced-view"
                       tags={selectedDocument.document_tags}
@@ -218,6 +230,8 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
                 buttonProps={{
                   color: 'primary',
                   size: 'large',
+                  /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+                  // @ts-ignore
                   borderRadius: '50%',
                   border: 'none',
                   padding: '12px',
@@ -259,7 +273,7 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
             </Grid>
           </Grid>
           <List>
-            {filteredDocuments.map((document: Document) => {
+            {filteredDocuments.map((document: RawDocument) => {
               return (
                 <ListItem
                   key={document.document_id}
