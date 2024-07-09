@@ -33,7 +33,7 @@ const ScenarioField = (props) => {
     dispatch(fetchScenarios());
   });
 
-  const { name, onKeyDown, style, label, placeholder, noMargin } = props;
+  const { name, onKeyDown, style, label, placeholder } = props;
   const scenarioOptions = (scenarios || []).map((n) => ({
     id: n.scenario_id,
     label: n.scenario_name,
@@ -43,7 +43,6 @@ const ScenarioField = (props) => {
       variant="standard"
       size="small"
       name={name}
-      noMargin={noMargin}
       fullWidth
       multiple
       label={label}

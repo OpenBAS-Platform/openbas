@@ -98,7 +98,7 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
         setSelectedDocument(resolvedDocument);
       }
     }
-  }, []);
+  }, [documents]);
 
   useEffect(() => {
     if (selectedDocument) {

@@ -7,7 +7,6 @@ import { useFormatter } from '../../../../components/i18n';
 import type { SecurityPlatformInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
 import TagField from '../../../../components/fields/TagField';
-import DocumentField from '../../../../components/fields/DocumentField';
 import DocumentLoader from '../../../../components/fields/DocumentLoader';
 
 interface Props {
@@ -117,7 +116,7 @@ const SecurityPlatformForm: React.FC<Props> = ({
             name="security_platform_logo_light"
             label={t('Logo light')}
             extensions={['png', 'jpg', 'jpeg', 'svg', 'gif']}
-            setFieldValue={onChange}
+            setFieldValue={(_name, document) => { onChange(document?.id); }}
             initialValue={{ id: value }}
           />
         )}
@@ -130,7 +129,7 @@ const SecurityPlatformForm: React.FC<Props> = ({
             name="security_platform_logo_dark"
             label={t('Logo dark')}
             extensions={['png', 'jpg', 'tiff', 'tif', 'bmp', 'jpeg', 'svg', 'gif']}
-            setFieldValue={onChange}
+            setFieldValue={(_name, document) => { onChange(document?.id); }}
             initialValue={{ id: value }}
           />
         )}
