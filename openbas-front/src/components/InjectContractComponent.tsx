@@ -36,15 +36,7 @@ const InjectContractComponent = <T extends object>({
   label,
   injectorContracts,
   onChange,
-  /* exportProps,
-  searchEnable = true,
-  disablePagination,
-  entityPrefix,
-  availableFilters,
-  helpers,
-  filterGroup,
-  attackPatterns,
-  children, */
+
 }: Props<T>) => {
   // Standard hooks
   const classes = useStyles();
