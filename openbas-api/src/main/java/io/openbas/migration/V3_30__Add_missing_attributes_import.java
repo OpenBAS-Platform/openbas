@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V3_25__Add_timestamp_columns extends BaseJavaMigration {
+public class V3_30__Add_missing_attributes_import extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
@@ -16,11 +16,11 @@ public class V3_25__Add_timestamp_columns extends BaseJavaMigration {
     Statement select = connection.createStatement();
     // Create table
     select.execute("""
-          ALTER TABLE import_mappers ADD COLUMN mapper_created_at TIMESTAMP DEFAULT now();
+          ALTER TABLE inject_importers ADD COLUMN importer_name VARCHAR(255) NOT NULL DEFAULT '';
      """);
 
     select.execute("""
-          ALTER TABLE import_mappers ADD COLUMN mapper_updated_at TIMESTAMP DEFAULT now();
+          UPDATE injectors_contracts SET injector_contract_import_available = true WHERE injector_contract_labels -> 'en' LIKE ANY(ARRAY['%SMS%', '%Send%mail%']);
      """);
 
   }
