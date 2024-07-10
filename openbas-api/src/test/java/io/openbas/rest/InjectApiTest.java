@@ -2,6 +2,7 @@ package io.openbas.rest;
 
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
+import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exercise.ExerciseService;
@@ -184,7 +185,7 @@ class InjectApiTest extends IntegrationTest {
         InjectInput input = new InjectInput();
         String injectTitle = "A new title";
         input.setTitle(injectTitle);
-        input.setInjectorContract(inject.getInjectorContract().getId());
+        input.setInjectorContract(inject.getInjectorContract().map(InjectorContract::getId).orElse(null));
         input.setDependsDuration(inject.getDependsDuration());
 
         // -- EXECUTE --
