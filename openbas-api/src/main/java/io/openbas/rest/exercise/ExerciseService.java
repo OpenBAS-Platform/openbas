@@ -1,9 +1,11 @@
 package io.openbas.rest.exercise;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ArticleRepository;
 import io.openbas.database.repository.ExerciseRepository;
-import io.openbas.database.repository.VariableRepository;
+import io.openbas.database.repository.InjectRepository;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.InjectService;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 import static io.openbas.database.criteria.ExerciseCriteria.countQuery;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.AtomicTestingUtils.getExpectationResultByTypes;
+import static io.openbas.utils.Constants.ARTICLES;
 import static io.openbas.utils.Constants.MAX_SIZE_OF_STRING;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.ResultUtils.computeTargetResults;
@@ -46,8 +49,9 @@ public class ExerciseService {
 
     private final InjectService injectService;
     private final InjectDuplicateService injectDuplicateService;
-    private final ExerciseRepository exerciseRepository;
     private final ArticleRepository articleRepository;
+    private final ExerciseRepository exerciseRepository;
+    private final InjectRepository injectRepository;
     private final VariableService variableService;
 
     public Page<ExerciseSimple> exercises(Specification<Exercise> specification, Pageable pageable) {
@@ -198,7 +202,6 @@ public class ExerciseService {
         exerciseDuplicate.setLogoLight(exerciseOrigin.getLogoLight());
         exerciseDuplicate.setDocuments(exerciseOrigin.getDocuments().stream().toList());
         exerciseDuplicate.setObjectives(exerciseOrigin.getObjectives().stream().toList());
-        exerciseDuplicate.setObjectives(exerciseOrigin.getObjectives().stream().toList());
         return exerciseDuplicate;
     }
 
@@ -211,11 +214,15 @@ public class ExerciseService {
     }
 
     private void getListOfDuplicatedInjects(Exercise exercise, Exercise exerciseOrigin) {
-        exerciseOrigin.getInjects()
-                .forEach(inject -> injectDuplicateService.createInjectForExercise(exercise.getId(), inject.getId(), false));
+        List<Inject> injectListForExercise = exerciseOrigin.getInjects()
+                .stream().map(inject -> injectDuplicateService.createInjectForExercise(exercise.getId(), inject.getId(), false)).toList();
+        exercise.setInjects(injectListForExercise);
     }
 
     private void getListOfArticles(Exercise exercise, Exercise exerciseOrigin) {
+        List<String> articleNode = new ArrayList<>();
+        List<Article> articleList = new ArrayList<>();
+        Map<String, String> mapIdArticleOriginNew = new HashMap<>();
         exerciseOrigin.getArticles().forEach(article -> {
             Article exerciceArticle = new Article();
             exerciceArticle.setName(article.getName());
@@ -226,8 +233,27 @@ public class ExerciseService {
             exerciceArticle.setComments(article.getComments());
             exerciceArticle.setChannel(article.getChannel());
             exerciceArticle.setExercise(exercise);
-            articleRepository.save(exerciceArticle);
+            Article save = articleRepository.save(exerciceArticle);
+            articleList.add(save);
+            mapIdArticleOriginNew.put(article.getId(), save.getId());
         });
+        exercise.getArticles().addAll(articleList);
+        for (Inject inject : exercise.getInjects()) {
+            if (inject.getContent().has(ARTICLES)) {
+                JsonNode articles = inject.getContent().findValue(ARTICLES);
+                if (articles.isArray()) {
+                    for (final JsonNode node : articles) {
+                        if (mapIdArticleOriginNew.containsKey(node.textValue())) {
+                            articleNode.add(mapIdArticleOriginNew.get(node.textValue()));
+                        }
+                    }
+                }
+                inject.getContent().remove(ARTICLES);
+                ArrayNode arrayNode = inject.getContent().putArray(ARTICLES);
+                articleNode.forEach(arrayNode::add);
+                injectRepository.save(inject);
+            }
+        }
     }
 
     private void getListOfVariables(Exercise exercise, Exercise exerciseOrigin) {

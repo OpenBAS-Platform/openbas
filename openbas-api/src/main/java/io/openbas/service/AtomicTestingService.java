@@ -192,6 +192,7 @@ public class AtomicTestingService {
     }
 
     public Inject copyInject(@NotNull Inject injectOrigin, boolean isAtomic) {
+        ObjectMapper objectMapper = new ObjectMapper();
         Inject injectDuplicate = new Inject();
         injectDuplicate.setUser(injectOrigin.getUser());
         if (isAtomic) {
@@ -200,7 +201,13 @@ public class AtomicTestingService {
             injectDuplicate.setTitle(injectOrigin.getTitle());
         }
         injectDuplicate.setDescription(injectOrigin.getDescription());
-        injectDuplicate.setContent(injectOrigin.getContent());
+        try {
+            ObjectNode content = objectMapper
+                    .readValue(objectMapper.writeValueAsString(injectOrigin.getContent()), ObjectNode.class);
+            injectDuplicate.setContent(content);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         injectDuplicate.setAllTeams(injectOrigin.isAllTeams());
         injectDuplicate.setTeams(injectOrigin.getTeams().stream().toList());
         injectDuplicate.setEnabled(injectOrigin.isEnabled());

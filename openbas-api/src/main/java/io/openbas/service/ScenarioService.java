@@ -1,6 +1,8 @@
 package io.openbas.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawPaginationScenario;
@@ -45,6 +47,7 @@ import java.io.InputStream;
 import java.time.Instant;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -53,6 +56,7 @@ import static io.openbas.database.specification.ScenarioSpecification.findGrante
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_SCENARIO;
+import static io.openbas.utils.Constants.ARTICLES;
 import static io.openbas.utils.Constants.MAX_SIZE_OF_STRING;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
@@ -87,6 +91,7 @@ public class ScenarioService {
     private final FileService fileService;
     private final InjectDuplicateService injectDuplicateService;
     private final ArticleRepository articleRepository;
+    private final InjectRepository injectRepository;
 
     @Transactional
     public Scenario createScenario(@NotNull final Scenario scenario) {
@@ -520,11 +525,16 @@ public class ScenarioService {
     }
 
     private void getListOfDuplicatedInjects(@NotNull Scenario scenario, @NotNull Scenario scenarioOrign) {
-        scenarioOrign.getInjects()
-                .forEach(inject -> injectDuplicateService.createInjectForScenario(scenario.getId(), inject.getId(), false));
+        Set<Inject> injectListForScenario = scenarioOrign.getInjects()
+                .stream().map(inject -> injectDuplicateService.createInjectForScenario(scenario.getId(), inject.getId(), false))
+                .collect(Collectors.toSet());
+        scenario.setInjects(injectListForScenario);
     }
 
     private void getListOfArticles(@NotNull Scenario scenario, @NotNull Scenario scenarioOrign) {
+        Map<String, String> mapIdArticleOriginNew = new HashMap<>();
+        List<String> articleNode = new ArrayList<>();
+        List<Article> articleList = new ArrayList<>();
         scenarioOrign.getArticles().forEach(article -> {
             Article scenarioArticle = new Article();
             scenarioArticle.setName(article.getName());
@@ -535,8 +545,29 @@ public class ScenarioService {
             scenarioArticle.setComments(article.getComments());
             scenarioArticle.setChannel(article.getChannel());
             scenarioArticle.setScenario(scenario);
-            articleRepository.save(scenarioArticle);
+            Article save = articleRepository.save(scenarioArticle);
+            articleList.add(save);
+            mapIdArticleOriginNew.put(article.getId(), scenarioArticle.getId());
         });
+
+        scenario.getArticles().addAll(articleList);
+
+        for (Inject inject : scenario.getInjects()) {
+            if (inject.getContent().has(ARTICLES)) {
+                JsonNode articles = inject.getContent().findValue(ARTICLES);
+                if (articles.isArray()) {
+                    for (final JsonNode node : articles) {
+                        if (mapIdArticleOriginNew.containsKey(node.textValue())) {
+                            articleNode.add(mapIdArticleOriginNew.get(node.textValue()));
+                        }
+                    }
+                }
+                inject.getContent().remove(ARTICLES);
+                ArrayNode arrayNode = inject.getContent().putArray(ARTICLES);
+                articleNode.forEach(arrayNode::add);
+                injectRepository.save(inject);
+            }
+        }
     }
 
     private void getListOfVariables(Scenario scenario, Scenario scenarioOrigin) {
