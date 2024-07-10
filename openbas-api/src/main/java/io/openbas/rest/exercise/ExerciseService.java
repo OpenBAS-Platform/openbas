@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ArticleRepository;
 import io.openbas.database.repository.ExerciseRepository;
-import io.openbas.database.repository.InjectRepository;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.InjectService;
@@ -51,7 +50,6 @@ public class ExerciseService {
     private final InjectDuplicateService injectDuplicateService;
     private final ArticleRepository articleRepository;
     private final ExerciseRepository exerciseRepository;
-    private final InjectRepository injectRepository;
     private final VariableService variableService;
 
     public Page<ExerciseSimple> exercises(Specification<Exercise> specification, Pageable pageable) {
@@ -178,7 +176,7 @@ public class ExerciseService {
         getListOfDuplicatedInjects(exerciseDuplicate, exerciseOrigin);
         getListOfArticles(exerciseDuplicate, exerciseOrigin);
         getListOfVariables(exerciseDuplicate, exerciseOrigin);
-        return exerciseDuplicate;
+        return exerciseRepository.save(exercise);
     }
 
     private Exercise copyExercice(Exercise exerciseOrigin) {
@@ -188,11 +186,6 @@ public class ExerciseService {
         exerciseDuplicate.setDescription(exerciseOrigin.getDescription());
         exerciseDuplicate.setFrom(exerciseOrigin.getFrom());
         exerciseDuplicate.setFooter(exerciseOrigin.getFooter());
-        exerciseDuplicate.setGrants(exerciseOrigin.getGrants().stream().toList());
-        exerciseDuplicate.setTags(new HashSet<>(exerciseOrigin.getTags()));
-        exerciseDuplicate.setTeams((exerciseOrigin.getTeams().stream().toList()));
-        exerciseDuplicate.setTeamUsers((exerciseOrigin.getTeamUsers().stream().toList()));
-        exerciseDuplicate.setReplyTos(exerciseOrigin.getReplyTos().stream().toList());
         exerciseDuplicate.setScenario(exerciseOrigin.getScenario());
         exerciseDuplicate.setHeader(exerciseOrigin.getHeader());
         exerciseDuplicate.setMainFocus(exerciseOrigin.getMainFocus());
@@ -200,8 +193,13 @@ public class ExerciseService {
         exerciseDuplicate.setSubtitle(exerciseOrigin.getSubtitle());
         exerciseDuplicate.setLogoDark(exerciseOrigin.getLogoDark());
         exerciseDuplicate.setLogoLight(exerciseOrigin.getLogoLight());
-        exerciseDuplicate.setDocuments(exerciseOrigin.getDocuments().stream().toList());
-        exerciseDuplicate.setObjectives(exerciseOrigin.getObjectives().stream().toList());
+        exerciseDuplicate.setGrants(new ArrayList<>(exerciseOrigin.getGrants()));
+        exerciseDuplicate.setTags(new HashSet<>(exerciseOrigin.getTags()));
+        exerciseDuplicate.setTeams(new ArrayList<>(exerciseOrigin.getTeams()));
+        exerciseDuplicate.setTeamUsers(new ArrayList<>(exerciseOrigin.getTeamUsers()));
+        exerciseDuplicate.setReplyTos(new ArrayList<>(exerciseOrigin.getReplyTos()));
+        exerciseDuplicate.setDocuments(new ArrayList<>(exerciseOrigin.getDocuments()));
+        exerciseDuplicate.setObjectives(new ArrayList<>(exerciseOrigin.getObjectives()));
         return exerciseDuplicate;
     }
 
@@ -216,7 +214,7 @@ public class ExerciseService {
     private void getListOfDuplicatedInjects(Exercise exercise, Exercise exerciseOrigin) {
         List<Inject> injectListForExercise = exerciseOrigin.getInjects()
                 .stream().map(inject -> injectDuplicateService.createInjectForExercise(exercise.getId(), inject.getId(), false)).toList();
-        exercise.setInjects(injectListForExercise);
+        exercise.setInjects(new ArrayList<>(injectListForExercise));
     }
 
     private void getListOfArticles(Exercise exercise, Exercise exerciseOrigin) {
@@ -237,7 +235,7 @@ public class ExerciseService {
             articleList.add(save);
             mapIdArticleOriginNew.put(article.getId(), save.getId());
         });
-        exercise.getArticles().addAll(articleList);
+        exercise.setArticles(articleList);
         for (Inject inject : exercise.getInjects()) {
             if (inject.getContent().has(ARTICLES)) {
                 JsonNode articles = inject.getContent().findValue(ARTICLES);
@@ -251,7 +249,6 @@ public class ExerciseService {
                 inject.getContent().remove(ARTICLES);
                 ArrayNode arrayNode = inject.getContent().putArray(ARTICLES);
                 articleNode.forEach(arrayNode::add);
-                injectRepository.save(inject);
             }
         }
     }

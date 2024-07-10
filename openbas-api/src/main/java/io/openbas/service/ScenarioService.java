@@ -91,7 +91,6 @@ public class ScenarioService {
     private final FileService fileService;
     private final InjectDuplicateService injectDuplicateService;
     private final ArticleRepository articleRepository;
-    private final InjectRepository injectRepository;
 
     @Transactional
     public Scenario createScenario(@NotNull final Scenario scenario) {
@@ -285,7 +284,6 @@ public class ScenarioService {
 
     // -- EXPORT --
 
-    // TODO: we can do better
     public void exportScenario(
             @NotBlank final String scenarioId,
             final boolean isWithTeams,
@@ -295,8 +293,6 @@ public class ScenarioService {
             throws IOException {
         ObjectMapper objectMapper = ObjectMapperHelper.openBASJsonMapper();
         Scenario scenario = this.scenario(scenarioId);
-        List<Tag> scenarioTags = new ArrayList<>();
-        List<String> documentIds = new ArrayList<>();
 
         // Start exporting scenario
         ScenarioFileExport scenarioFileExport = new ScenarioFileExport();
@@ -304,7 +300,7 @@ public class ScenarioService {
         // Add Scenario
         scenarioFileExport.setScenario(scenario);
         objectMapper.addMixIn(Scenario.class, ScenarioExportMixins.Scenario.class);
-        scenarioTags.addAll(scenario.getTags());
+        List<Tag> scenarioTags = new ArrayList<>(scenario.getTags());
         // Add Objectives
         scenarioFileExport.setObjectives(scenario.getObjectives());
         objectMapper.addMixIn(Objective.class, ExerciseExportMixins.Objective.class);
@@ -331,7 +327,7 @@ public class ScenarioService {
         scenarioFileExport.setDocuments(scenario.getDocuments());
         objectMapper.addMixIn(Document.class, ExerciseExportMixins.Document.class);
         scenarioTags.addAll(scenario.getDocuments().stream().flatMap(doc -> doc.getTags().stream()).toList());
-        documentIds.addAll(scenario.getDocuments().stream().map(Document::getId).toList());
+        List<String> documentIds = new ArrayList<>(scenario.getDocuments().stream().map(Document::getId).toList());
 
         if (isWithTeams) {
             // Add Teams
@@ -442,9 +438,7 @@ public class ScenarioService {
     public Iterable<Team> removeTeams(@NotBlank final String scenarioId, @NotNull final List<String> teamIds) {
         Scenario scenario = this.scenario(scenarioId);
         List<Team> teams = scenario.getTeams().stream().filter(team -> !teamIds.contains(team.getId())).toList();
-        scenario.setTeams(new ArrayList<>() {{
-            addAll(teams);
-        }});
+        scenario.setTeams(new ArrayList<>(teams));
         this.updateScenario(scenario);
         // Remove all association between users / exercises / teams
         teamIds.forEach(this.scenarioTeamUserRepository::deleteTeamFromAllReferences);
@@ -486,7 +480,7 @@ public class ScenarioService {
             getListOfDuplicatedInjects(scenarioDuplicate, scenarioOrigin);
             getListOfArticles(scenarioDuplicate, scenarioOrigin);
             getListOfVariables(scenarioDuplicate, scenarioOrigin);
-            return scenarioDuplicate;
+            return scenarioRepository.save(scenario);
         }
         throw new ElementNotFoundException();
     }
@@ -501,18 +495,17 @@ public class ScenarioService {
         scenarioDuplicate.setHeader(scenario.getHeader());
         scenarioDuplicate.setMainFocus(scenario.getMainFocus());
         scenarioDuplicate.setFrom(scenario.getFrom());
+        scenarioDuplicate.setExternalUrl(scenario.getExternalUrl());
         scenarioDuplicate.setTags(new HashSet<>(scenario.getTags()));
         scenarioDuplicate.setInjects(new HashSet<>(scenario.getInjects()));
-        scenarioDuplicate.setExternalUrl(scenario.getExternalUrl());
         scenarioDuplicate.setExternalReference(scenario.getExternalReference());
-        scenarioDuplicate.setTeamUsers(scenario.getTeamUsers().stream().toList());
-        scenarioDuplicate.setTeams(scenario.getTeams().stream().toList());
-        scenarioDuplicate.setReplyTos(scenario.getReplyTos().stream().toList());
-        scenarioDuplicate.setLessonsCategories(scenario.getLessonsCategories().stream().toList());
-        scenarioDuplicate.setObjectives(scenario.getObjectives().stream().toList());
-        scenarioDuplicate.setDocuments(scenario.getDocuments().stream().toList());
-        scenarioDuplicate.setArticles(scenario.getArticles().stream().toList());
-        scenarioDuplicate.setGrants(scenario.getGrants().stream().toList());
+        scenarioDuplicate.setTeamUsers(new ArrayList<>(scenario.getTeamUsers()));
+        scenarioDuplicate.setTeams(new ArrayList<>(scenario.getTeams()));
+        scenarioDuplicate.setReplyTos(new ArrayList<>(scenario.getReplyTos()));
+        scenarioDuplicate.setLessonsCategories(new ArrayList<>(scenario.getLessonsCategories()));
+        scenarioDuplicate.setObjectives(new ArrayList<>(scenario.getObjectives()));
+        scenarioDuplicate.setDocuments(new ArrayList<>(scenario.getDocuments()));
+        scenarioDuplicate.setGrants(new ArrayList<>(scenario.getGrants()));
         return scenarioDuplicate;
     }
 
@@ -528,12 +521,11 @@ public class ScenarioService {
         Set<Inject> injectListForScenario = scenarioOrign.getInjects()
                 .stream().map(inject -> injectDuplicateService.createInjectForScenario(scenario.getId(), inject.getId(), false))
                 .collect(Collectors.toSet());
-        scenario.setInjects(injectListForScenario);
+        scenario.setInjects(new HashSet<>(injectListForScenario));
     }
 
     private void getListOfArticles(@NotNull Scenario scenario, @NotNull Scenario scenarioOrign) {
         Map<String, String> mapIdArticleOriginNew = new HashMap<>();
-        List<String> articleNode = new ArrayList<>();
         List<Article> articleList = new ArrayList<>();
         scenarioOrign.getArticles().forEach(article -> {
             Article scenarioArticle = new Article();
@@ -549,11 +541,10 @@ public class ScenarioService {
             articleList.add(save);
             mapIdArticleOriginNew.put(article.getId(), scenarioArticle.getId());
         });
-
-        scenario.getArticles().addAll(articleList);
-
+        scenario.setArticles(articleList);
         for (Inject inject : scenario.getInjects()) {
             if (inject.getContent().has(ARTICLES)) {
+                List<String> articleNode = new ArrayList<>();
                 JsonNode articles = inject.getContent().findValue(ARTICLES);
                 if (articles.isArray()) {
                     for (final JsonNode node : articles) {
@@ -565,7 +556,6 @@ public class ScenarioService {
                 inject.getContent().remove(ARTICLES);
                 ArrayNode arrayNode = inject.getContent().putArray(ARTICLES);
                 articleNode.forEach(arrayNode::add);
-                injectRepository.save(inject);
             }
         }
     }
