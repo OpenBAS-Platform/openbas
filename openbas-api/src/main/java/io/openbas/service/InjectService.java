@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.*;
@@ -74,9 +75,11 @@ public class InjectService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    Pattern relativeDayPattern = Pattern.compile("^.*[DJ]([+\\-]?[0-9]*)(.*)$");
-    Pattern relativeHourPattern = Pattern.compile("^.*[HT]([+\\-]?[0-9]*).*$");
-    Pattern relativeMinutePattern = Pattern.compile("^.*[M]([+\\-]?[0-9]*).*$");
+    final Pattern relativeDayPattern = Pattern.compile("^.*[DJ]([+\\-]?[0-9]*)(.*)$");
+    final Pattern relativeHourPattern = Pattern.compile("^.*[HT]([+\\-]?[0-9]*).*$");
+    final Pattern relativeMinutePattern = Pattern.compile("^.*[M]([+\\-]?[0-9]*).*$");
+
+    final String pathSeparator = FileSystems.getDefault().getSeparator();
 
     public void cleanInjectsDocExercise(String exerciseId, String documentId) {
         // Delete document from all exercise injects
@@ -211,7 +214,7 @@ public class InjectService {
         try {
             // We open the previously saved file
             String tmpdir = System.getProperty("java.io.tmpdir");
-            java.nio.file.Path file = Files.list(Path.of(tmpdir, "\\", importId, "\\")).findFirst().orElseThrow();
+            java.nio.file.Path file = Files.list(Path.of(tmpdir, pathSeparator, importId, pathSeparator)).findFirst().orElseThrow();
 
             // We open the file and convert it to an apache POI object
             InputStream xlsFile = Files.newInputStream(file);
