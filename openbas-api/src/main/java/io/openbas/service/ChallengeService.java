@@ -70,21 +70,23 @@ public class ChallengeService {
   }
 
   // -- PRIVATE --
-
   private Stream<Challenge> resolveChallenges(@NotNull final List<Inject> injects) {
     List<String> challenges = injects.stream()
-        .filter(inject -> inject.getInjectorContract().getId().equals(CHALLENGE_PUBLISH))
-        .filter(inject -> inject.getContent() != null)
-        .flatMap(inject -> {
-          try {
-            ChallengeContent content = this.mapper.treeToValue(inject.getContent(), ChallengeContent.class);
-            return content.getChallenges().stream();
-          } catch (JsonProcessingException e) {
-            return Stream.empty();
-          }
-        })
-        .distinct().toList();
+            .filter(inject -> inject.getInjectorContract()
+                    .map(contract -> contract.getId().equals(CHALLENGE_PUBLISH))
+                    .orElse(false))
+            .filter(inject -> inject.getContent() != null)
+            .flatMap(inject -> {
+              try {
+                ChallengeContent content = mapper.treeToValue(inject.getContent(), ChallengeContent.class);
+                return content.getChallenges().stream();
+              } catch (JsonProcessingException e) {
+                return Stream.empty();
+              }
+            })
+            .distinct()
+            .toList();
+
     return fromIterable(this.challengeRepository.findAllById(challenges)).stream();
   }
-
 }

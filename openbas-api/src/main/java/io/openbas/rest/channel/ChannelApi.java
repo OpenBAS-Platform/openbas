@@ -177,7 +177,9 @@ public class ChannelApi extends RestBehavior {
             throw new UnsupportedOperationException("User must be logged or dynamic player is required");
         }
         Map<String, Instant> toPublishArticleIdsMap = injects.stream()
-                .filter(inject -> inject.hasInjectorContract() && inject.getInjectorContract().getId().equals(CHANNEL_PUBLISH))
+                .filter(inject -> inject.getInjectorContract()
+                        .map(contract -> contract.getId().equals(CHANNEL_PUBLISH))
+                        .orElse(false))
                 .filter(inject -> inject.getStatus().isPresent())
                 .sorted(Comparator.comparing(inject -> inject.getStatus().get().getTrackingSentDate()))
                 .flatMap(inject -> {
