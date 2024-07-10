@@ -67,6 +67,9 @@ public class Executor {
     }
 
     private InjectStatus executeExternal(ExecutableInject executableInject, Inject inject) {
+        InjectorContract injectorContract = inject.getInjectorContract()
+                .orElseThrow(() -> new UnsupportedOperationException("Inject does not have a contract"));
+
         InjectStatus status = injectStatusRepository.findByInject(inject).orElse(new InjectStatus());
         status.setTrackingSentDate(Instant.now());
         status.setInject(inject);
@@ -74,7 +77,7 @@ public class Executor {
             String jsonInject = mapper.writeValueAsString(executableInject);
             status.setName(ExecutionStatus.PENDING); // FIXME: need to be test with HTTP Collector
             status.getTraces().add(traceInfo("The inject has been published and is now waiting to be consumed."));
-            queueService.publish(inject.getInjectorContract().getInjector().getType(), jsonInject);
+            queueService.publish(injectorContract.getInjector().getType(), jsonInject);
         } catch (Exception e) {
             status.setName(ExecutionStatus.ERROR);
             status.getTraces().add(InjectStatusExecution.traceError(e.getMessage()));
@@ -84,7 +87,10 @@ public class Executor {
     }
 
     private InjectStatus executeInternal(ExecutableInject executableInject, Inject inject) {
-        io.openbas.execution.Injector executor = this.context.getBean(inject.getInjectorContract().getInjector().getType(), io.openbas.execution.Injector.class);
+        InjectorContract injectorContract = inject.getInjectorContract()
+                .orElseThrow(() -> new UnsupportedOperationException("Inject does not have a contract"));
+
+        io.openbas.execution.Injector executor = this.context.getBean(injectorContract.getInjector().getType(), io.openbas.execution.Injector.class);
         Execution execution = executor.executeInjection(executableInject);
         Inject executedInject = injectRepository.findById(inject.getId()).orElseThrow();
         InjectStatus completeStatus = InjectStatus.fromExecution(execution, executedInject);
@@ -105,8 +111,8 @@ public class Executor {
 
         InjectorContract injectorContract = inject.getInjectorContract().orElseThrow(() -> new UnsupportedOperationException("Inject does not have a contract"));
 
-      // Depending on injector type (internal or external) execution must be done differently
-      Optional<Injector> externalInjector = injectorRepository.findByType(injectorContract.getInjector().getType());
+        // Depending on injector type (internal or external) execution must be done differently
+        Optional<Injector> externalInjector = injectorRepository.findByType(injectorContract.getInjector().getType());
 
         return externalInjector
                 .map(Injector::isExternal)
