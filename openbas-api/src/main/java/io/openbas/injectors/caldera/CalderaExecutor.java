@@ -68,12 +68,12 @@ public class CalderaExecutor extends Injector {
             execution.addTrace(traceError("Found 0 asset to execute the ability on (likely this inject does not have any target or the targeted asset is inactive and has been purged)"));
         }
 
+        List<String> asyncIds = new ArrayList<>();
+        List<Expectation> expectations = new ArrayList<>();
         List<Map<String, String>> additionalFields = new ArrayList<>();
-        ObjectNode rawContent = injection.getInjection().getInject().getContent();
-        Optional<InjectorContract> optionalInjectorContract = injection.getInjection().getInject().getInjectorContract();
 
-        if (optionalInjectorContract.isPresent()) {
-            InjectorContract injectorContract = optionalInjectorContract.get();
+        inject.getInjectorContract().ifPresentOrElse(injectorContract -> {
+            ObjectNode rawContent = injection.getInjection().getInject().getContent();
             ObjectNode contractContent = injectorContract.getConvertedContent();
             List<JsonNode> contractTextFields = StreamSupport.stream(contractContent.get("fields").spliterator(), false)
                     .filter(contractElement -> contractElement.get("type").asText().equals("text"))
@@ -90,12 +90,7 @@ public class CalderaExecutor extends Injector {
                     }
                 });
             }
-        }
 
-        List<String> asyncIds = new ArrayList<>();
-        List<Expectation> expectations = new ArrayList<>();
-
-        inject.getInjectorContract().ifPresentOrElse(injectorContract -> {
             String contract;
             if (injectorContract.getPayload() != null) {
                 // This is a payload, need to create the ability on the fly
@@ -112,7 +107,7 @@ public class CalderaExecutor extends Injector {
                 try {
                     Endpoint executionEndpoint = this.findAndRegisterAssetForExecution(injection.getInjection().getInject(), asset);
                     if (executionEndpoint != null) {
-                        if (Arrays.stream(injectorContractFromExecutableInjection.getPlatforms()).anyMatch(s -> s.equals(executionEndpoint.getPlatform().name()))) {
+                        if (Arrays.stream(injectorContract.getPlatforms()).anyMatch(s -> s.equals(executionEndpoint.getPlatform().name()))) {
                             String result = this.calderaService.exploit(obfuscator, executionEndpoint.getExternalReference(), contract, additionalFields);
                             if (result.contains("complete")) {
                                 ExploitResult exploitResult = this.calderaService.exploitResult(executionEndpoint.getExternalReference(), contract);
