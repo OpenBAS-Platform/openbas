@@ -69,7 +69,7 @@ public class ImportMapper implements Base {
 
     @Override
     public String getId() {
-        return this.id.toString();
+        return this.id != null ? this.id.toString(): "";
     }
 
     @Override
