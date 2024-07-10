@@ -1,7 +1,9 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.helper.MonoIdDeserializer;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,6 +39,7 @@ public class InjectImporter implements Base {
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "importer_injector_contract_id")
     @JsonProperty("inject_importer_injector_contract")
+    @JsonSerialize(using = MonoIdDeserializer.class)
     private InjectorContract injectorContract;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
