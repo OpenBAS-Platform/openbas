@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V3_24__Add_missing_attributes_import extends BaseJavaMigration {
+public class V3_32__Add_description_title_column_importer extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
@@ -16,11 +16,7 @@ public class V3_24__Add_missing_attributes_import extends BaseJavaMigration {
     Statement select = connection.createStatement();
     // Create table
     select.execute("""
-          ALTER TABLE inject_importers ADD COLUMN importer_name VARCHAR(255) NOT NULL DEFAULT '';
-     """);
-
-    select.execute("""
-          UPDATE injectors_contracts SET injector_contract_import_available = true WHERE injector_contract_labels -> 'en' LIKE ANY(ARRAY['%SMS%', '%Send%mail%']);
+          ALTER TABLE rule_attributes ADD COLUMN attribute_additional_config HSTORE;
      """);
 
   }
