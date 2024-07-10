@@ -12,6 +12,7 @@ import io.openbas.injectors.email.service.EmailService;
 import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ChallengeExpectation;
+import io.openbas.rest.exception.ElementNotFoundException;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,13 @@ public class ChallengeExecutor extends Injector {
         try {
             ChallengeContent content = contentConvert(injection, ChallengeContent.class);
             List<Challenge> challenges = fromIterable(challengeRepository.findAllById(content.getChallenges()));
-            String contract = injection.getInjection().getInject().getInjectorContract().getId();
+            String contract = injection
+                .getInjection()
+                .getInject()
+                .getInjectorContract()
+                .map(InjectorContract::getId)
+                .orElseThrow(() -> new ElementNotFoundException("InjectorContract not found for the given inject"));
+
             if (contract.equals(CHALLENGE_PUBLISH)) {
                 // Challenge publishing is only linked to execution date of this inject.
                 String challengeNames = challenges.stream().map(Challenge::getName).collect(Collectors.joining(","));
