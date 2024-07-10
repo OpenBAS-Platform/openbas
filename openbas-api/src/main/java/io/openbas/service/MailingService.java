@@ -27,54 +27,60 @@ import static io.openbas.config.SessionHelper.currentUser;
 @Service
 public class MailingService {
 
-  @Resource
-  protected ObjectMapper mapper;
+    @Resource
+    protected ObjectMapper mapper;
 
-  private ApplicationContext context;
+    private ApplicationContext context;
 
-  private UserRepository userRepository;
+    private UserRepository userRepository;
 
-  private InjectorContractRepository injectorContractRepository;
+    private InjectorContractRepository injectorContractRepository;
 
-  private ExecutionContextService executionContextService;
+    private ExecutionContextService executionContextService;
 
-  @Autowired
-  public void setUserRepository(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
-  @Autowired
-  public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
-    this.injectorContractRepository = injectorContractRepository;
-  }
+    @Autowired
+    public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
+        this.injectorContractRepository = injectorContractRepository;
+    }
 
-  @Autowired
-  public void setContext(ApplicationContext context) {
-    this.context = context;
-  }
+    @Autowired
+    public void setContext(ApplicationContext context) {
+        this.context = context;
+    }
 
-  @Autowired
-  public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
-    this.executionContextService = executionContextService;
-  }
+    @Autowired
+    public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
+        this.executionContextService = executionContextService;
+    }
 
-  public void sendEmail(String subject, String body, List<User> users, Optional<Exercise> exercise) {
-    EmailContent emailContent = new EmailContent();
-    emailContent.setSubject(subject);
-    emailContent.setBody(body);
-    Inject inject = new Inject();
-    inject.setContent(this.mapper.valueToTree(emailContent));
-    inject.setInjectorContract(this.injectorContractRepository.findById(EmailContract.EMAIL_DEFAULT).orElseThrow());
-    inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow());
-    exercise.ifPresent(inject::setExercise);
-    List<ExecutionContext> userInjectContexts = users.stream().distinct()
-        .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
-    ExecutableInject injection = new ExecutableInject(false, true, inject, userInjectContexts);
-    Injector executor = this.context.getBean(inject.getInjectorContract().getInjector().getType(), Injector.class);
-    executor.executeInjection(injection);
-  }
+    public void sendEmail(String subject, String body, List<User> users, Optional<Exercise> exercise) {
+        EmailContent emailContent = new EmailContent();
+        emailContent.setSubject(subject);
+        emailContent.setBody(body);
 
-  public void sendEmail(String subject, String body, List<User> users) {
-    sendEmail(subject, body, users, Optional.empty());
-  }
+        Inject inject = new Inject();
+        inject.setInjectorContract(this.injectorContractRepository.findById(EmailContract.EMAIL_DEFAULT).orElseThrow());
+
+        inject.getInjectorContract().ifPresent(injectorContract -> {
+            inject.setContent(this.mapper.valueToTree(emailContent));
+            inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow());
+
+            exercise.ifPresent(inject::setExercise);
+
+            List<ExecutionContext> userInjectContexts = users.stream().distinct()
+                    .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
+            ExecutableInject injection = new ExecutableInject(false, true, inject, userInjectContexts);
+            Injector executor = this.context.getBean(injectorContract.getInjector().getType(), Injector.class);
+            executor.executeInjection(injection);
+        });
+    }
+
+    public void sendEmail(String subject, String body, List<User> users) {
+        sendEmail(subject, body, users, Optional.empty());
+    }
 }
