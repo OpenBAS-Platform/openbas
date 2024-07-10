@@ -252,7 +252,7 @@ public class InjectService {
 
             // Now that we did our first pass, we do another one real quick to find out
             // the date relative to each others
-            importTestSummary.getImportMessage().addAll(updateInjectDates(mapInstantByRowIndex, zoneOffset));
+            importTestSummary.getImportMessage().addAll(updateInjectDates(mapInstantByRowIndex));
 
             // We get the earliest date
             Optional<Instant> earliestDate = mapInstantByRowIndex.values().stream()
@@ -690,7 +690,7 @@ public class InjectService {
         return null;
     }
 
-    private List<ImportMessage> updateInjectDates(Map<Integer, InjectTime> mapInstantByRowIndex, ZoneOffset timezoneOffset) {
+    private List<ImportMessage> updateInjectDates(Map<Integer, InjectTime> mapInstantByRowIndex) {
         List<ImportMessage> importMessages = new ArrayList<>();
         // First of all, are there any absolute date
         boolean allDatesAreAbsolute = mapInstantByRowIndex.values().stream().noneMatch(
