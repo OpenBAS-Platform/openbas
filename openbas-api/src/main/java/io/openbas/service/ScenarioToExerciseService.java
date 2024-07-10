@@ -189,7 +189,7 @@ public class ScenarioToExerciseService {
             Inject exerciseInject = new Inject();
             exerciseInject.setTitle(scenarioInject.getTitle());
             exerciseInject.setDescription(scenarioInject.getDescription());
-            exerciseInject.setInjectorContract(scenarioInject.getInjectorContract());
+            exerciseInject.setInjectorContract(scenarioInject.getInjectorContract().orElse(null));
             exerciseInject.setCountry(scenarioInject.getCountry());
             exerciseInject.setCity(scenarioInject.getCity());
             exerciseInject.setEnabled(scenarioInject.isEnabled());
@@ -201,19 +201,20 @@ public class ScenarioToExerciseService {
             exerciseInject.setTags(copy(scenarioInject.getTags(), Tag.class));
 
             // Content
-            if (scenarioInject.hasInjectorContract() && ChannelContract.TYPE.equals(scenarioInject.getInjectorContract().getInjector().getType())) {
-                try {
-                    ChannelContent content = mapper.treeToValue(scenarioInject.getContent(), ChannelContent.class);
-                    content.setArticles(
-                            content.getArticles().stream().map(articleId -> articles.get(articleId).getId()).toList()
-                    );
-                    exerciseInject.setContent(mapper.valueToTree(content));
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                exerciseInject.setContent(scenarioInject.getContent());
-            }
+            scenarioInject.getInjectorContract().ifPresentOrElse(injectorContract -> {
+                        if (ChannelContract.TYPE.equals(injectorContract.getInjector().getType())) {
+                            try {
+                                ChannelContent content = mapper.treeToValue(scenarioInject.getContent(), ChannelContent.class);
+                                content.setArticles(
+                                        content.getArticles().stream().map(articleId -> articles.get(articleId).getId()).toList()
+                                );
+                                exerciseInject.setContent(mapper.valueToTree(content));
+                            } catch (JsonProcessingException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }, () -> exerciseInject.setContent(scenarioInject.getContent())
+            );
 
             // Teams
             List<Team> teams = new ArrayList<>();
@@ -270,20 +271,20 @@ public class ScenarioToExerciseService {
         return destinations;
     }
 
-  private <T extends Base> Set<T> copy(@NotNull final Set<T> origins, Class<T> clazz) {
-    Set<T> destinations = new HashSet<>();
-    origins.forEach(origin -> {
-      try {
-        T destination = clazz.getDeclaredConstructor().newInstance();
-        BeanUtils.copyProperties(destination, origin);
-        destinations.add(destination);
-      } catch (IllegalAccessException | InvocationTargetException | InstantiationException |
-               NoSuchMethodException e) {
-        throw new RuntimeException(e);
-      }
-    });
-    return destinations;
-  }
+    private <T extends Base> Set<T> copy(@NotNull final Set<T> origins, Class<T> clazz) {
+        Set<T> destinations = new HashSet<>();
+        origins.forEach(origin -> {
+            try {
+                T destination = clazz.getDeclaredConstructor().newInstance();
+                BeanUtils.copyProperties(destination, origin);
+                destinations.add(destination);
+            } catch (IllegalAccessException | InvocationTargetException | InstantiationException |
+                     NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return destinations;
+    }
 
     private List<Document> addExerciseToDocuments(
             @NotNull final List<Document> origDocuments,
