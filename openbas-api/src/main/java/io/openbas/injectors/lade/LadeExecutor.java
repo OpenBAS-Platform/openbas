@@ -3,6 +3,7 @@ package io.openbas.injectors.lade;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.Execution;
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.InjectorContract;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.Injector;
 import io.openbas.injectors.lade.service.LadeService;
@@ -32,10 +33,11 @@ public class LadeExecutor extends Injector {
     ObjectNode content = inject.getContent();
     try {
       String actionWorkflowId;
+      final InjectorContract injectorContract = inject.getInjectorContract().orElseThrow(() -> new UnsupportedOperationException("Inject does not have a contract"));
       switch (ladeType) {
-        case "action" -> actionWorkflowId = ladeService.executeAction(bundleIdentifier, inject.getInjectorContract().getId(), content);
+        case "action" -> actionWorkflowId = ladeService.executeAction(bundleIdentifier, injectorContract.getId(), content);
         case "scenario" ->
-            actionWorkflowId = ladeService.executeScenario(bundleIdentifier, inject.getInjectorContract().getId(), content);
+            actionWorkflowId = ladeService.executeScenario(bundleIdentifier, injectorContract.getId(), content);
         default -> throw new UnsupportedOperationException(ladeType + " not supported");
       }
       String message = "Lade " + ladeType + " sent with workflow (" + actionWorkflowId + ")";

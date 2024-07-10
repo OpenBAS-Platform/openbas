@@ -53,12 +53,14 @@ public class OpenCTIExecutor extends Injector {
     List<DataAttachment> attachments = resolveAttachments(execution, injection, documents);
     String name = content.getName();
     String description = content.getDescription();
-    if(inject.hasInjectorContract()) {
-      switch (inject.getInjectorContract().getId()) {
+
+    inject.getInjectorContract().ifPresent(injectorContract -> {
+      switch (injectorContract.getId()) {
         case OPENCTI_CREATE_CASE -> createCase(execution, name, description, attachments);
         default -> createReport(execution, name, description, attachments);
       }
-    }
+    });
+
     List<Expectation> expectations = content.getExpectations()
             .stream()
             .flatMap((entry) -> switch (entry.getType()) {
