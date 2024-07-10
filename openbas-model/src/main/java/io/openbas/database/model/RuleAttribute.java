@@ -5,7 +5,6 @@ import io.hypersistence.utils.hibernate.type.basic.PostgreSQLHStoreType;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -40,9 +39,7 @@ public class RuleAttribute implements Base {
 
     @Column(name = "attribute_default_value")
     @JsonProperty("rule_attribute_default_value")
-    @NotBlank
-    @NotNull
-    private String defaultValue;
+    private String defaultValue = "";
 
     @Type(PostgreSQLHStoreType.class)
     @Column(name = "attribute_additional_config")
@@ -66,7 +63,7 @@ public class RuleAttribute implements Base {
 
     @Override
     public String getId() {
-        return this.id.toString();
+        return this.id != null ? this.id.toString(): "";
     }
 
     @Override
