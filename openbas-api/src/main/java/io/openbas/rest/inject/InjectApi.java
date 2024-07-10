@@ -575,6 +575,7 @@ public class InjectApi extends RestBehavior {
         this.injectDocumentRepository.deleteDocumentsFromInject(injectId);
         this.injectRepository.deleteById(injectId);
     }
+
     // -- PRIVATE --
 
     private Inject updateInject(@NotBlank final String injectId, @NotNull InjectInput input) {
