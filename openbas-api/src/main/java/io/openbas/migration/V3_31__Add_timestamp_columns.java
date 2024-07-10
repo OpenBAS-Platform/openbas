@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V3_26__Add_description_title_column_importer extends BaseJavaMigration {
+public class V3_31__Add_timestamp_columns extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
@@ -16,7 +16,11 @@ public class V3_26__Add_description_title_column_importer extends BaseJavaMigrat
     Statement select = connection.createStatement();
     // Create table
     select.execute("""
-          ALTER TABLE rule_attributes ADD COLUMN attribute_additional_config HSTORE;
+          ALTER TABLE import_mappers ADD COLUMN mapper_created_at TIMESTAMP DEFAULT now();
+     """);
+
+    select.execute("""
+          ALTER TABLE import_mappers ADD COLUMN mapper_updated_at TIMESTAMP DEFAULT now();
      """);
 
   }
