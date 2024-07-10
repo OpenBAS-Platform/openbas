@@ -68,7 +68,7 @@ public class ChallengeExecutor extends Injector {
                 .getInject()
                 .getInjectorContract()
                 .map(InjectorContract::getId)
-                .orElseThrow(() -> new ElementNotFoundException("InjectorContract not found for the given inject"));
+                .orElseThrow(() -> new UnsupportedOperationException("Inject does not have a contract"));
 
             if (contract.equals(CHALLENGE_PUBLISH)) {
                 // Challenge publishing is only linked to execution date of this inject.

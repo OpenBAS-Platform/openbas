@@ -69,7 +69,14 @@ public class ChannelExecutor extends Injector {
     try {
       ChannelContent content = contentConvert(injection, ChannelContent.class);
       List<Article> articles = fromIterable(articleRepository.findAllById(content.getArticles()));
-      String contract = injection.getInjection().getInject().getInjectorContract().getId();
+
+      String contract = injection
+          .getInjection()
+          .getInject()
+          .getInjectorContract()
+          .map(InjectorContract::getId)
+          .orElseThrow(() -> new UnsupportedOperationException("Inject does not have a contract"));
+
       if (contract.equals(CHANNEL_PUBLISH)) {
         // Article publishing is only linked to execution date of this inject.
         String articleNames = articles.stream().map(Article::getName).collect(Collectors.joining(","));
