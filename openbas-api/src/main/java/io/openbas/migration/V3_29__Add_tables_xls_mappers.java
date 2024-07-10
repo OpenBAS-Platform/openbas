@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V3_23__Add_tables_xls_mappers extends BaseJavaMigration {
+public class V3_29__Add_tables_xls_mappers extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
