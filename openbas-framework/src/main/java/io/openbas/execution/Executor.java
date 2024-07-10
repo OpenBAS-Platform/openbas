@@ -98,21 +98,21 @@ public class Executor {
         if (inject.getContent() == null) {
             throw new UnsupportedOperationException("Inject is empty");
         }
-        if (!inject.hasInjectorContract()) {
-            throw new UnsupportedOperationException("Inject has not a contract");
-        }
         // If inject is too old, reject the execution
         if (isScheduledInject && !isInInjectableRange(inject)) {
             throw new UnsupportedOperationException("Inject is now too old for execution");
         }
-        // Depending on injector type (internal or external) execution must be done differently
-        Optional<Injector> externalInjector = injectorRepository.findByType(inject.getInjectorContract().getInjector().getType());
+
+        InjectorContract injectorContract = inject.getInjectorContract().orElseThrow(() -> new UnsupportedOperationException("Inject does not have a contract"));
+
+      // Depending on injector type (internal or external) execution must be done differently
+      Optional<Injector> externalInjector = injectorRepository.findByType(injectorContract.getInjector().getType());
 
         return externalInjector
                 .map(Injector::isExternal)
                 .map(isExternal -> {
                     ExecutableInject newExecutableInject = executableInject;
-                    if (inject.getInjectorContract().getNeedsExecutor() ) {
+                    if (injectorContract.getNeedsExecutor()) {
                         try {
                             newExecutableInject = this.executionExecutorService.launchExecutorContext(executableInject, inject);
                         } catch (InterruptedException e) {
@@ -125,7 +125,7 @@ public class Executor {
                         return executeInternal(newExecutableInject, inject);
                     }
                 })
-                .orElseThrow(() -> new IllegalStateException("External injector not found for type: " +inject.getInjectorContract().getInjector().getType()));
+                .orElseThrow(() -> new IllegalStateException("External injector not found for type: " + injectorContract.getInjector().getType()));
     }
 
     // region utils

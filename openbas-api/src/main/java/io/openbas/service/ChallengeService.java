@@ -73,7 +73,7 @@ public class ChallengeService {
 
   private Stream<Challenge> resolveChallenges(@NotNull final List<Inject> injects) {
     List<String> challenges = injects.stream()
-        .filter(inject -> inject.hasInjectorContract() && inject.getInjectorContract().getId().equals(CHALLENGE_PUBLISH))
+        .filter(inject -> inject.getInjectorContract().getId().equals(CHALLENGE_PUBLISH))
         .filter(inject -> inject.getContent() != null)
         .flatMap(inject -> {
           try {
@@ -86,4 +86,5 @@ public class ChallengeService {
         .distinct().toList();
     return fromIterable(this.challengeRepository.findAllById(challenges)).stream();
   }
+
 }
