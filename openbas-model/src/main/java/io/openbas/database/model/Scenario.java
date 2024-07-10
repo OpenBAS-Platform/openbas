@@ -251,17 +251,26 @@ public class Scenario implements Base {
   // -- PLATFORMS --
   @JsonProperty("scenario_platforms")
   public List<String> getPlatforms() {
-    return getInjects().stream().filter(Inject::hasInjectorContract).flatMap(inject -> Arrays.stream(inject.getInjectorContract().getPlatforms())).filter(Objects::nonNull).distinct().toList();
+    return getInjects().stream()
+        .flatMap(inject -> inject.getInjectorContract()
+            .map(InjectorContract::getPlatforms)
+            .stream())
+        .flatMap(Arrays::stream)
+        .filter(Objects::nonNull)
+        .distinct()
+        .toList();
   }
-
   // -- KILL CHAIN PHASES --
   @JsonProperty("scenario_kill_chain_phases")
   public List<KillChainPhase> getKillChainPhases() {
-    return getInjects().stream().filter(Inject::hasInjectorContract).flatMap(
-            inject -> inject.getInjectorContract().getAttackPatterns().stream().flatMap(
-                            attackPattern -> attackPattern.getKillChainPhases().stream().toList().stream()
-                    )
-            ).distinct().toList();
+    return getInjects().stream()
+        .flatMap(inject -> inject.getInjectorContract()
+            .map(InjectorContract::getAttackPatterns)
+            .stream()
+            .flatMap(Collection::stream)
+            .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream()))
+        .distinct()
+        .toList();
   }
 
   @Override
