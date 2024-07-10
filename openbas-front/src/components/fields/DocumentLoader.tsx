@@ -36,6 +36,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.primary.main,
     fontWeight: 500,
   },
+  title: {
+    fontSize: '0.7 rem',
+    color: theme.palette.text?.secondary,
+    fontWeight: 500,
+    marginTop: 20,
+    marginBottom: 10,
+  },
 }));
 
 const inlineStyles = {
@@ -69,9 +76,10 @@ interface Props {
   name: string;
   /* eslint-disable @typescript-eslint/no-explicit-any */
   setFieldValue: (field: string, value: any) => void;
+  InputLabelProps?: { required: boolean }
 }
 
-const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label, name, setFieldValue }) => {
+const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], InputLabelProps, label, name, setFieldValue }) => {
   const classes = useStyles();
   const { t } = useFormatter();
 
@@ -164,8 +172,9 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
 
   return (
     <>
-      <Typography variant="h4" style={{ marginTop: 20, marginBottom: 10, textTransform: 'none' }}>
+      <Typography className={classes.title}>
         {label}
+        {InputLabelProps?.required && <span> *</span>}
       </Typography>
       <List style={{ marginTop: 0, paddingTop: 0 }}>
         {!selectedDocument && (

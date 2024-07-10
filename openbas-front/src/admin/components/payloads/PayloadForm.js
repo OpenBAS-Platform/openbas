@@ -72,6 +72,7 @@ const PayloadForm = (props) => {
             fullWidth={true}
             label={t('Name')}
             style={{ marginTop: 10 }}
+            InputLabelProps={{ required: true }}
           />
           <PlatformField
             name="payload_platforms"
@@ -80,6 +81,7 @@ const PayloadForm = (props) => {
             label={t('Platforms')}
             style={{ marginTop: 20 }}
             setFieldValue={form.mutators.setValue}
+            InputLabelProps={{ required: true }}
           />
           <OldTextField
             name="payload_description"
@@ -97,6 +99,7 @@ const PayloadForm = (props) => {
                 name="command_executor"
                 fullWidth={true}
                 style={{ marginTop: 20 }}
+                InputLabelProps={{ required: true }}
               >
                 <MenuItem value="psh">
                   {t('PowerShell')}
@@ -119,6 +122,7 @@ const PayloadForm = (props) => {
                 label={t('Command')}
                 style={{ marginTop: 20 }}
                 helperText={t('To put arguments in the command line, use #{argument_key}')}
+                InputLabelProps={{ required: true }}
               />
             </>
           )}
@@ -129,6 +133,7 @@ const PayloadForm = (props) => {
               label={t('Document')}
               setFieldValue={form.mutators.setValue}
               initialValue={values.executable_file}
+              InputLabelProps={{ required: true }}
             />
           </>
           )}
@@ -139,6 +144,7 @@ const PayloadForm = (props) => {
                 label={t('Document')}
                 setFieldValue={form.mutators.setValue}
                 initialValue={values.file_drop_file}
+                InputLabelProps={{ required: true }}
               />
             </>
           )}
@@ -152,6 +158,7 @@ const PayloadForm = (props) => {
                 fullWidth={true}
                 rows={3}
                 helperText={t('One hostname by line')}
+                InputLabelProps={{ required: true }}
               />
             </>
           )}
