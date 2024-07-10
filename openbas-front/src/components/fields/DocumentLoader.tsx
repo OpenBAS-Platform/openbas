@@ -27,7 +27,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     paddingLeft: 10,
     height: 50,
     cursor: 'pointer',
-    margin: 0,
+    '&:hover': {
+      backgroundColor: theme.palette.action?.hover,
+    },
   },
   text: {
     fontSize: 15,
@@ -40,7 +42,6 @@ const inlineStyles = {
   document_name: {
     float: 'left',
     width: '35%',
-    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -48,7 +49,6 @@ const inlineStyles = {
   document_type: {
     float: 'left',
     width: '20%',
-    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -56,7 +56,6 @@ const inlineStyles = {
   document_tags: {
     float: 'left',
     width: '30%',
-    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -165,7 +164,7 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
 
   return (
     <>
-      <Typography variant="h4" style={{ marginTop: 20, marginBottom: 0, textTransform: 'none' }}>
+      <Typography variant="h4" style={{ marginTop: 20, marginBottom: 10, textTransform: 'none' }}>
         {label}
       </Typography>
       <List style={{ marginTop: 0, paddingTop: 0 }}>
@@ -276,9 +275,9 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], label,
             {filteredDocuments.map((document: RawDocument) => {
               return (
                 <ListItem
+                  classes={{ root: classes.item }}
                   key={document.document_id}
                   divider
-                  dense
                   onClick={() => addDocument(document)}
                 >
                   <ListItemIcon>
