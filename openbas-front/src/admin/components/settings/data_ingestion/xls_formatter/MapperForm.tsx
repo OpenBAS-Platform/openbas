@@ -48,7 +48,10 @@ const useStyles = makeStyles(() => ({
     alignItems: 'center',
     marginTop: 20,
   },
-
+  importersErrorMessage: {
+    fontSize: 13,
+    color: '#f44336',
+  },
 }));
 
 interface Props {
@@ -77,16 +80,18 @@ const MapperForm: React.FC<Props> = ({
     resolver: zodResolver(
       zodImplement<MapperAddInput>().with({
         mapper_name: z.string().min(1, { message: t('Should not be empty') }),
-        mapper_inject_importers: z.any().array().optional(),
+        mapper_inject_importers: z.any().array().min(1, { message: t('At least one inject importer is required') }),
         mapper_inject_type_column: z
           .string()
-          .min(1, { message: t('Should not be empty') })
-          .optional(),
+          .min(1, { message: t('Should not be empty') }),
       }),
     ),
     defaultValues: initialValues,
   });
-  const { control } = methods;
+  const { control, formState: { errors } } = methods;
+
+  console.log(`values : ${methods.getValues('mapper_inject_importers')}`);
+  console.log(`mapper form error : ${errors.mapper_inject_importers?.message}`);
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'mapper_inject_importers',
@@ -133,7 +138,12 @@ const MapperForm: React.FC<Props> = ({
         control={control}
         name={'mapper_inject_type_column'}
         render={({ field: { onChange } }) => (
-          <RegexComponent label={t('Inject type column')} onChange={onChange} />
+          <RegexComponent
+            label={t('Inject type column')}
+            onChange={onChange}
+            errors={methods.formState.errors}
+            name={'mapper_inject_type_column'}
+          />
         )}
       />
 
@@ -151,6 +161,9 @@ const MapperForm: React.FC<Props> = ({
         >
           <Add fontSize="small" />
         </IconButton>
+        <div>
+          <span className={classes.importersErrorMessage}>{methods.formState.errors.mapper_inject_importers?.message}</span>
+        </div>
       </div>
 
       {fields.map((field, index) => (

@@ -7,6 +7,11 @@ import { useFormatter } from './i18n';
 import InjectIcon from '../admin/components/common/injects/InjectIcon';
 import type { InjectorContractStore } from '../actions/injector_contracts/InjectorContract';
 import { isNotEmptyField } from '../utils/utils';
+import { useAppDispatch } from '../utils/hooks';
+import { useHelper } from '../store';
+import type { InjectorHelper } from '../actions/injectors/injector-helper';
+import useDataLoader from '../utils/hooks/useDataLoader';
+import { fetchInjectors } from '../actions/Injectors';
 
 const useStyles = makeStyles(() => ({
   icon: {
@@ -41,6 +46,15 @@ const InjectContractComponent = <T extends object>({
   // Standard hooks
   const classes = useStyles();
   const { t, tPick } = useFormatter();
+  const dispatch = useAppDispatch();
+
+  // Fetching data
+  const { injectorMap } = useHelper((helper: InjectorHelper) => ({
+    injectorMap: helper.getInjectorsMap(),
+  }));
+  useDataLoader(() => {
+    dispatch(fetchInjectors());
+  });
 
   // Pagination
   const [page, setPage] = React.useState(0);
@@ -81,7 +95,6 @@ const InjectContractComponent = <T extends object>({
   const [value, setValue] = React.useState<string | null | undefined>('');
 
   return (
-
     <Autocomplete
       selectOnFocus
       openOnFocus
@@ -115,7 +128,7 @@ const InjectContractComponent = <T extends object>({
                 option.injector_contract_payload
                   ? option.injector_contract_payload?.payload_collector_type
                   || option.injector_contract_payload?.payload_type
-                  : option.injector_contract_injector_type
+                  : injectorMap[option.injector_contract_injector]?.injector_type
               }
               isPayload={isNotEmptyField(option.injector_contract_payload)}
             />
