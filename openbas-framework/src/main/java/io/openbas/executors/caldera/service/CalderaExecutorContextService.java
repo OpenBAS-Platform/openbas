@@ -3,6 +3,7 @@ package io.openbas.executors.caldera.service;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Injector;
+import io.openbas.database.model.InjectorContract;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.client.model.Ability;
 import io.openbas.integrations.InjectorService;
@@ -63,14 +64,12 @@ public class CalderaExecutorContextService {
     }
 
     public void launchExecutorSubprocess(@NotNull final Inject inject, @NotNull final Asset asset) {
-        if(!inject.hasInjectorContract()){
-            return;
-        }
-        Injector injector = inject.getInjectorContract().getInjector();
-        if (this.injectorExecutorAbilities.containsKey(injector.getId())) {
-            List<Map<String, String>> additionalFields = List.of(Map.of("trait", "inject", "value", inject.getId()));
-            calderaExecutorClient.exploit("base64", asset.getExternalReference(), this.injectorExecutorAbilities.get(injector.getId()).getAbility_id(), additionalFields);
-        }
+        inject.getInjectorContract().map(InjectorContract::getInjector).ifPresent(injector->{
+            if (this.injectorExecutorAbilities.containsKey(injector.getId())) {
+                List<Map<String, String>> additionalFields = List.of(Map.of("trait", "inject", "value", inject.getId()));
+                calderaExecutorClient.exploit("base64", asset.getExternalReference(), this.injectorExecutorAbilities.get(injector.getId()).getAbility_id(), additionalFields);
+            }
+        });
     }
 
     public void launchExecutorClear(@NotNull final Injector injector, @NotNull final Asset asset) {

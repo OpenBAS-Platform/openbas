@@ -22,10 +22,10 @@ public class OpenBASExecutorContextService {
     }
 
     private String computeCommand(@NotNull final Inject inject, Endpoint.PLATFORM_TYPE platform, Endpoint.PLATFORM_ARCH arch) {
-        if(!inject.hasInjectorContract()){
-            throw new UnsupportedOperationException("Inject has not a contract");
-        }
-        Injector injector = inject.getInjectorContract().getInjector();
+        Injector injector = inject.getInjectorContract()
+            .map(InjectorContract::getInjector)
+            .orElseThrow(() -> new UnsupportedOperationException("Inject does not have a contract"));
+
         switch (platform) {
             case Endpoint.PLATFORM_TYPE.Windows -> {
                 return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Windows.name() + "." + arch.name())
