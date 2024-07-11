@@ -3,14 +3,13 @@ package io.openbas.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.database.model.ImportMapper;
-import io.openbas.database.model.InjectImporter;
-import io.openbas.database.model.InjectorContract;
-import io.openbas.database.model.RuleAttribute;
 import io.openbas.database.repository.ImportMapperRepository;
-import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.rest.mapper.MapperApi;
-import io.openbas.rest.mapper.form.*;
+import io.openbas.rest.mapper.form.ImportMapperAddInput;
+import io.openbas.rest.mapper.form.ImportMapperUpdateInput;
+import io.openbas.service.MapperService;
 import io.openbas.utils.fixtures.PaginationFixture;
+import io.openbas.utils.mockMapper.MockMapperUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,8 +26,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.Instant;
-import java.util.*;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Optional;
 
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,19 +47,21 @@ public class MapperApiTest {
   private ImportMapperRepository importMapperRepository;
 
   @Mock
-  private InjectorContractRepository injectorContractRepository;
+  private MapperService mapperService;
+
+  private MapperApi mapperApi;
 
   @Autowired
   private ObjectMapper objectMapper;
 
-  private MapperApi mapperApi;
-
-
-
   @BeforeEach
-  void before() {
+  void before() throws IllegalAccessException, NoSuchFieldException {
     // Injecting mocks into the controller
-    mapperApi = new MapperApi(importMapperRepository, injectorContractRepository);
+    mapperApi = new MapperApi(importMapperRepository, mapperService);
+
+    Field sessionContextField = MapperApi.class.getSuperclass().getDeclaredField("mapper");
+    sessionContextField.setAccessible(true);
+    sessionContextField.set(mapperApi, objectMapper);
 
     mvc = MockMvcBuilders.standaloneSetup(mapperApi)
             .build();
@@ -71,7 +73,7 @@ public class MapperApiTest {
   @Test
   void searchMappers() throws Exception {
     // -- PREPARE --
-    List<ImportMapper> importMappers = List.of(createImportMapper());
+    List<ImportMapper> importMappers = List.of(MockMapperUtils.createImportMapper());
     Pageable pageable = PageRequest.of(0, 10);
     PageImpl page = new PageImpl<>(importMappers, pageable, importMappers.size());
     when(importMapperRepository.findAll(any(), any())).thenReturn(page);
@@ -94,7 +96,7 @@ public class MapperApiTest {
   @Test
   void searchSpecificMapper() throws Exception {
     // -- PREPARE --
-    ImportMapper importMapper = createImportMapper();
+    ImportMapper importMapper = MockMapperUtils.createImportMapper();
     when(importMapperRepository.findById(any())).thenReturn(Optional.of(importMapper));
     // -- EXECUTE --
     String response = this.mvc
@@ -114,31 +116,10 @@ public class MapperApiTest {
   @Test
   void createMapper() throws Exception {
     // -- PREPARE --
-    ImportMapper importMapper = createImportMapper();
-    MapperAddInput importMapperInput = new MapperAddInput();
-    importMapperInput.setName(importMapper.getName());
-    importMapperInput.setInjectTypeColumn(importMapper.getInjectTypeColumn());
-    importMapperInput.setImporters(importMapper.getInjectImporters().stream().map(
-      injectImporter -> {
-        InjectImporterAddInput injectImporterAddInput = new InjectImporterAddInput();
-        injectImporterAddInput.setName(injectImporter.getName());
-        injectImporterAddInput.setInjectTypeValue(injectImporter.getImportTypeValue());
-        injectImporterAddInput.setInjectorContractId(injectImporter.getInjectorContract().getId());
-
-        injectImporterAddInput.setRuleAttributes(injectImporter.getRuleAttributes().stream().map(
-          ruleAttribute -> {
-            RuleAttributeAddInput ruleAttributeAddInput = new RuleAttributeAddInput();
-            ruleAttributeAddInput.setName(ruleAttribute.getName());
-            ruleAttributeAddInput.setColumns(ruleAttribute.getColumns());
-            ruleAttributeAddInput.setDefaultValue(ruleAttribute.getDefaultValue());
-            ruleAttributeAddInput.setAdditionalConfig(ruleAttribute.getAdditionalConfig());
-            return ruleAttributeAddInput;
-          }
-        ).toList());
-        return injectImporterAddInput;
-      }
-    ).toList());
-    when(importMapperRepository.save(any())).thenReturn(importMapper);
+    ImportMapper importMapper = MockMapperUtils.createImportMapper();
+    ImportMapperAddInput importMapperInput = new ImportMapperAddInput();
+    importMapperInput.setName("Test");
+    when(mapperService.createAndSaveImportMapper(any())).thenReturn(importMapper);
     // -- EXECUTE --
     String response = this.mvc
             .perform(MockMvcRequestBuilders.post("/api/mappers/")
@@ -158,7 +139,7 @@ public class MapperApiTest {
   @Test
   void deleteSpecificMapper() throws Exception {
     // -- PREPARE --
-    ImportMapper importMapper = createImportMapper();
+    ImportMapper importMapper = MockMapperUtils.createImportMapper();
     // -- EXECUTE --
     this.mvc
             .perform(MockMvcRequestBuilders.delete("/api/mappers/" + importMapper.getId())
@@ -171,35 +152,12 @@ public class MapperApiTest {
 
   @DisplayName("Test update a specific mapper by using new rule attributes and new inject importer")
   @Test
-  void updateSpecificMapperWithNewElements() throws Exception {
+  void updateSpecificMapper() throws Exception {
     // -- PREPARE --
-    ImportMapper importMapper = createImportMapper();
-    MapperUpdateInput importMapperInput = new MapperUpdateInput();
-    importMapperInput.setName(importMapper.getName());
-    importMapperInput.setInjectTypeColumn(importMapper.getInjectTypeColumn());
-    importMapperInput.setImporters(importMapper.getInjectImporters().stream().map(
-      injectImporter -> {
-        InjectImporterUpdateInput injectImporterUpdateInput = new InjectImporterUpdateInput();
-        injectImporterUpdateInput.setName(injectImporter.getName());
-        injectImporterUpdateInput.setInjectTypeValue(injectImporter.getImportTypeValue());
-        injectImporterUpdateInput.setInjectorContractId(injectImporter.getInjectorContract().getId());
-
-        injectImporterUpdateInput.setRuleAttributes(injectImporter.getRuleAttributes().stream().map(
-          ruleAttribute -> {
-            RuleAttributeUpdateInput ruleAttributeUpdateInput = new RuleAttributeUpdateInput();
-            ruleAttributeUpdateInput.setName(ruleAttribute.getName());
-            ruleAttributeUpdateInput.setColumns(ruleAttribute.getColumns());
-            ruleAttributeUpdateInput.setDefaultValue(ruleAttribute.getDefaultValue());
-            ruleAttributeUpdateInput.setAdditionalConfig(ruleAttribute.getAdditionalConfig());
-            return ruleAttributeUpdateInput;
-          }
-        ).toList());
-        return injectImporterUpdateInput;
-      }
-    ).toList());
-    when(importMapperRepository.findById(any())).thenReturn(Optional.of(importMapper));
-    when(importMapperRepository.save(any())).thenReturn(importMapper);
-    when(injectorContractRepository.findAllById(any())).thenReturn(importMapper.getInjectImporters().stream().map(InjectImporter::getInjectorContract).toList());
+    ImportMapper importMapper = MockMapperUtils.createImportMapper();
+    ImportMapperUpdateInput importMapperInput = new ImportMapperUpdateInput();
+    importMapperInput.setName("New name");
+    when(mapperService.updateImportMapper(any(), any())).thenReturn(importMapper);
     // -- EXECUTE --
     String response = this.mvc
             .perform(MockMvcRequestBuilders.put("/api/mappers/" + importMapper.getId())
@@ -213,139 +171,6 @@ public class MapperApiTest {
     // -- ASSERT --
     assertNotNull(response);
     assertEquals(JsonPath.read(response, "$.import_mapper_id"), importMapper.getId());
-  }
-
-    @DisplayName("Test update a specific mapper by creating rule attributes and updating new inject importer")
-    @Test
-    void updateSpecificMapperWithUpdatedInjectImporter() throws Exception {
-        // -- PREPARE --
-        ImportMapper importMapper = createImportMapper();
-        MapperUpdateInput importMapperInput = new MapperUpdateInput();
-        importMapperInput.setName(importMapper.getName());
-        importMapperInput.setInjectTypeColumn(importMapper.getInjectTypeColumn());
-        importMapperInput.setImporters(importMapper.getInjectImporters().stream().map(
-                injectImporter -> {
-                    InjectImporterUpdateInput injectImporterUpdateInput = new InjectImporterUpdateInput();
-                    injectImporterUpdateInput.setName(injectImporter.getName());
-                    injectImporterUpdateInput.setInjectTypeValue(injectImporter.getImportTypeValue());
-                    injectImporterUpdateInput.setInjectorContractId(injectImporter.getInjectorContract().getId());
-                    injectImporterUpdateInput.setId(injectImporter.getId());
-
-                    injectImporterUpdateInput.setRuleAttributes(injectImporter.getRuleAttributes().stream().map(
-                            ruleAttribute -> {
-                                RuleAttributeUpdateInput ruleAttributeUpdateInput = new RuleAttributeUpdateInput();
-                                ruleAttributeUpdateInput.setName(ruleAttribute.getName());
-                                ruleAttributeUpdateInput.setColumns(ruleAttribute.getColumns());
-                                ruleAttributeUpdateInput.setDefaultValue(ruleAttribute.getDefaultValue());
-                                ruleAttributeUpdateInput.setAdditionalConfig(ruleAttribute.getAdditionalConfig());
-                                return ruleAttributeUpdateInput;
-                            }
-                    ).toList());
-                    return injectImporterUpdateInput;
-                }
-        ).toList());
-        when(importMapperRepository.findById(any())).thenReturn(Optional.of(importMapper));
-        when(importMapperRepository.save(any())).thenReturn(importMapper);
-        when(injectorContractRepository.findAllById(any())).thenReturn(importMapper.getInjectImporters().stream().map(InjectImporter::getInjectorContract).toList());
-        // -- EXECUTE --
-        String response = this.mvc
-                .perform(MockMvcRequestBuilders.put("/api/mappers/" + importMapper.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(importMapperInput)))
-                .andExpect(status().is2xxSuccessful())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        // -- ASSERT --
-        assertNotNull(response);
-        assertEquals(JsonPath.read(response, "$.import_mapper_id"), importMapper.getId());
-    }
-
-    @DisplayName("Test update a specific mapper by updating rule attributes and updating inject importer")
-    @Test
-    void updateSpecificMapperWithUpdatedElements() throws Exception {
-        // -- PREPARE --
-        ImportMapper importMapper = createImportMapper();
-        MapperUpdateInput importMapperInput = new MapperUpdateInput();
-        importMapperInput.setName(importMapper.getName());
-        importMapperInput.setInjectTypeColumn(importMapper.getInjectTypeColumn());
-        importMapperInput.setImporters(importMapper.getInjectImporters().stream().map(
-                injectImporter -> {
-                    InjectImporterUpdateInput injectImporterUpdateInput = new InjectImporterUpdateInput();
-                    injectImporterUpdateInput.setName(injectImporter.getName());
-                    injectImporterUpdateInput.setInjectTypeValue(injectImporter.getImportTypeValue());
-                    injectImporterUpdateInput.setInjectorContractId(injectImporter.getInjectorContract().getId());
-                    injectImporterUpdateInput.setId(injectImporter.getId());
-
-                    injectImporterUpdateInput.setRuleAttributes(injectImporter.getRuleAttributes().stream().map(
-                            ruleAttribute -> {
-                                RuleAttributeUpdateInput ruleAttributeUpdateInput = new RuleAttributeUpdateInput();
-                                ruleAttributeUpdateInput.setName(ruleAttribute.getName());
-                                ruleAttributeUpdateInput.setColumns(ruleAttribute.getColumns());
-                                ruleAttributeUpdateInput.setDefaultValue(ruleAttribute.getDefaultValue());
-                                ruleAttributeUpdateInput.setAdditionalConfig(ruleAttribute.getAdditionalConfig());
-                                ruleAttributeUpdateInput.setId(ruleAttribute.getId());
-                                return ruleAttributeUpdateInput;
-                            }
-                    ).toList());
-                    return injectImporterUpdateInput;
-                }
-        ).toList());
-        when(importMapperRepository.findById(any())).thenReturn(Optional.of(importMapper));
-        when(importMapperRepository.save(any())).thenReturn(importMapper);
-        when(injectorContractRepository.findAllById(any())).thenReturn(importMapper.getInjectImporters().stream().map(InjectImporter::getInjectorContract).toList());
-        // -- EXECUTE --
-        String response = this.mvc
-                .perform(MockMvcRequestBuilders.put("/api/mappers/" + importMapper.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(importMapperInput)))
-                .andExpect(status().is2xxSuccessful())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        // -- ASSERT --
-        assertNotNull(response);
-        assertEquals(JsonPath.read(response, "$.import_mapper_id"), importMapper.getId());
-    }
-
-  private ImportMapper createImportMapper() {
-    ImportMapper importMapper = new ImportMapper();
-    importMapper.setId(UUID.randomUUID().toString());
-    importMapper.setName("Test");
-    importMapper.setUpdateDate(Instant.now());
-    importMapper.setCreationDate(Instant.now());
-    importMapper.setInjectTypeColumn("A");
-    importMapper.setInjectImporters(new ArrayList<>());
-
-    importMapper.getInjectImporters().add(createInjectImporter());
-
-    return importMapper;
-  }
-
-  private InjectImporter createInjectImporter() {
-      InjectImporter injectImporter = new InjectImporter();
-      injectImporter.setId(UUID.randomUUID().toString());
-      injectImporter.setName("Test");
-      injectImporter.setImportTypeValue("Test");
-      InjectorContract injectorContract = new InjectorContract();
-      injectorContract.setId(UUID.randomUUID().toString());
-      injectImporter.setInjectorContract(injectorContract);
-      injectImporter.setRuleAttributes(new ArrayList<>());
-
-      injectImporter.getRuleAttributes().add(createRuleAttribute());
-      return injectImporter;
-  }
-
-  private RuleAttribute createRuleAttribute() {
-      RuleAttribute ruleAttribute = new RuleAttribute();
-      ruleAttribute.setColumns("Test");
-      ruleAttribute.setName("Test");
-      ruleAttribute.setId(UUID.randomUUID().toString());
-      ruleAttribute.setAdditionalConfig(Map.of("test", "test"));
-      ruleAttribute.setDefaultValue("");
-      return ruleAttribute;
   }
 
 }
