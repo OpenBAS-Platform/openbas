@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { TextField, Autocomplete, Box, SelectChangeEvent, InputBaseComponentProps } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { FieldErrors } from 'react-hook-form';
+import { FieldError, FieldErrors } from 'react-hook-form';
 import type { SearchPaginationInput } from '../utils/api-types';
 import type { Page } from './common/pagination/Page';
 import { useFormatter } from './i18n';
@@ -33,8 +33,7 @@ interface Props<T> {
   label: string;
   injectorContracts: InjectorContractStore[];
   onChange: (data: string | null | undefined) => void;
-  errors: FieldErrors;
-  name: string;
+  error: FieldError | undefined;
 }
 
 const InjectContractComponent = <T extends object>({
@@ -44,9 +43,7 @@ const InjectContractComponent = <T extends object>({
   label,
   injectorContracts,
   onChange,
-  errors,
-  name,
-
+  error,
 }: Props<T>) => {
   // Standard hooks
   const classes = useStyles();
@@ -68,10 +65,6 @@ const InjectContractComponent = <T extends object>({
 
   // Text Search
   const [textSearch, setTextSearch] = React.useState(searchPaginationInput.textSearch ?? '');
-  const handleTextSearch = (value?: string) => {
-    setPage(0);
-    setTextSearch(value || '');
-  };
 
   const searchContract = (event: React.SyntheticEvent) => {
     const selectChangeEvent = event as SelectChangeEvent;
@@ -115,7 +108,8 @@ const InjectContractComponent = <T extends object>({
             variant="outlined"
             size="small"
             InputLabelProps={{ required: true }}
-            error={!!errors[name]}
+            error={!!error}
+            helperText={error?.message}
           />
         )
       }

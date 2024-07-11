@@ -1,21 +1,20 @@
 import React from 'react';
 import { Autocomplete, TextField } from '@mui/material';
-import { FieldErrors } from 'react-hook-form';
+import { FieldError } from 'react-hook-form';
 import alphabet from '../admin/components/settings/data_ingestion/AttributeUtils';
 import { useFormatter } from './i18n';
 
 interface Props {
   label: string;
   onChange: (data: string | null) => void;
-  errors: FieldErrors;
+  error: FieldError;
   name: string;
 }
 
 const RegexComponent: React.FC<Props> = ({
   label,
   onChange,
-  errors,
-  name,
+  error,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -29,7 +28,7 @@ const RegexComponent: React.FC<Props> = ({
       selectOnFocus
       openOnFocus
       autoHighlight
-      style={{ flexGrow: 1 }}
+      style={{ marginBottom: 10 }}
       noOptionsText={t('No available options')}
       renderInput={
         (params) => (
@@ -40,7 +39,8 @@ const RegexComponent: React.FC<Props> = ({
             variant="outlined"
             size="small"
             InputLabelProps={{ required: true }}
-            error={!!errors[name]}
+            error={!!error}
+            helperText={error?.message}
           />
         )
       }

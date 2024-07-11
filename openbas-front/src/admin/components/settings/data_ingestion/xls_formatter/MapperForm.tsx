@@ -1,45 +1,14 @@
-import { Controller, SubmitHandler, useForm, FormProvider, useFieldArray } from 'react-hook-form';
-import React, { useEffect, useState } from 'react';
-import {
-  TextField,
-  InputLabel,
-  MenuItem,
-  SelectChangeEvent,
-  Badge,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Typography,
-  IconButton,
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Grid,
-  Autocomplete,
-} from '@mui/material';
-import { Add, ExpandMore, Settings, DeleteOutline } from '@mui/icons-material';
+import { Controller, SubmitHandler, useForm, useFieldArray } from 'react-hook-form';
+import React from 'react';
+import { TextField, Button, Typography, IconButton } from '@mui/material';
+import { Add } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { CogOutline } from 'mdi-material-ui';
-import type { FilterGroup, InjectImporterAddInput, MapperAddInput, RuleAttributeAddInput, SearchPaginationInput } from '../../../../../utils/api-types';
+import type { MapperAddInput } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
 import { zodImplement } from '../../../../../utils/Zod';
-import InjectContractComponent from '../../../../../components/InjectContractComponent';
-import { fetchInjectorContract, fetchInjectorsContracts, searchInjectorContracts } from '../../../../../actions/InjectorContracts';
-import { initSorting } from '../../../../../components/common/pagination/Page';
-import { InjectorContractStore } from '../../../../../actions/injector_contracts/InjectorContract';
 import RegexComponent from '../../../../../components/RegexComponent';
-import { InjectorContractHelper } from '../../../../../actions/injector_contracts/injector-contract-helper';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { useAppDispatch } from '../../../../../utils/hooks';
 import RulesContractContent from './RulesContractContent';
 
 const useStyles = makeStyles(() => ({
@@ -75,19 +44,34 @@ const MapperForm: React.FC<Props> = ({
   const { t } = useFormatter();
   const classes = useStyles();
 
+  const ruleAttributeZodObject = z.object({
+    rule_attribute_name: z.string().min(1, { message: t('Should not be empty') }),
+    rule_attribute_columns: z.string().min(1, { message: t('Should not be empty') }),
+    rule_attribute_default_value: z.string().optional(),
+    rule_attribute_additional_config: z.record(z.string(), z.string()).optional(),
+  });
+
+  const importerZodObject = z.object({
+    inject_importer_name: z.string().min(1, { message: t('Should not be empty') }),
+    inject_importer_type_value: z.string().min(1, { message: t('Should not be empty') }),
+    inject_importer_injector_contract_id: z.string().min(1, { message: t('Should not be empty') }),
+    inject_importer_rule_attributes: z.array(ruleAttributeZodObject).min(1, { message: t('Should not be empty') }),
+  });
+
   const methods = useForm<MapperAddInput>({
     mode: 'onTouched',
     resolver: zodResolver(
       zodImplement<MapperAddInput>().with({
         mapper_name: z.string().min(1, { message: t('Should not be empty') }),
-        mapper_inject_importers: z.any().array().min(1, { message: t('At least one inject importer is required') }),
-        mapper_inject_type_column: z
-          .string()
+        mapper_inject_importers: z.array(importerZodObject)
+          .min(1, { message: t('At least one inject importer is required') }),
+        mapper_inject_type_column: z.string()
           .min(1, { message: t('Should not be empty') }),
       }),
     ),
     defaultValues: initialValues,
   });
+
   const { control } = methods;
 
   const { fields, append, remove } = useFieldArray({
@@ -114,11 +98,11 @@ const MapperForm: React.FC<Props> = ({
       <Controller
         control={control}
         name={'mapper_inject_type_column'}
-        render={({ field: { onChange } }) => (
+        render={({ field: { onChange }, fieldState: { error } }) => (
           <RegexComponent
             label={t('Inject type column')}
             onChange={onChange}
-            errors={methods.formState.errors}
+            error={error}
             name={'mapper_inject_type_column'}
           />
         )}
@@ -132,7 +116,7 @@ const MapperForm: React.FC<Props> = ({
           color="secondary"
           aria-label="Add"
           onClick={() => {
-            append({ inject_importer_name: '', inject_importer_type_value: '', inject_importer_injector_contract_id: '' });
+            append({ inject_importer_name: '', inject_importer_type_value: '', inject_importer_injector_contract_id: '', inject_importer_rule_attributes: [] });
           }}
           size="large"
         >
