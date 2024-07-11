@@ -41,7 +41,18 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.text?.secondary,
     fontWeight: 500,
     marginTop: 20,
-    marginBottom: 10,
+    marginBottom: 5,
+  },
+  errorText: {
+    color: theme.palette.error.main,
+  },
+  errorMessage: {
+    color: theme.palette.error.main,
+    fontSize: '0.75rem',
+    marginTop: 4,
+  },
+  errorDivider: {
+    borderColor: theme.palette.error.main,
   },
 }));
 
@@ -76,10 +87,11 @@ interface Props {
   name: string;
   /* eslint-disable @typescript-eslint/no-explicit-any */
   setFieldValue: (field: string, value: any) => void;
-  InputLabelProps?: { required: boolean }
+  InputLabelProps?: { required: boolean };
+  onSubmit: boolean;
 }
 
-const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], InputLabelProps, label, name, setFieldValue }) => {
+const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], InputLabelProps, label, name, onSubmit, setFieldValue }) => {
   const classes = useStyles();
   const { t } = useFormatter();
 
@@ -131,6 +143,10 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], InputL
         && filterByExtensions(doc);
   }).slice(0, 10);
 
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
   const handleClose = () => {
     setOpen(false);
     setTags([]);
@@ -172,32 +188,37 @@ const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], InputL
 
   return (
     <>
-      <Typography className={classes.title}>
+      <Typography className={`${classes.title} ${InputLabelProps?.required && onSubmit && !selectedDocument ? classes.errorText : ''}`}>
         {label}
-        {InputLabelProps?.required && <span> *</span>}
+        {InputLabelProps?.required && <span className={!selectedDocument && onSubmit ? classes.errorText : ''}> *</span>}
       </Typography>
       <List style={{ marginTop: 0, paddingTop: 0 }}>
         {!selectedDocument && (
-          <ListItem
-            classes={{ root: classes.item }}
-            divider
-            onClick={() => setOpen(true)}
-            color="primary"
-          >
-            <ListItemIcon color="primary">
-              <ControlPointOutlined color="primary"/>
-            </ListItemIcon>
-            <ListItemText
-              primary={t('Add document')}
-              classes={{ primary: classes.text }}
-            />
-          </ListItem>)}
+        <ListItem
+          className={`${classes.item} ${InputLabelProps?.required && onSubmit && !selectedDocument ? classes.errorDivider : ''}`}
+          divider
+          onClick={handleOpen}
+          color="primary"
+        >
+          <ListItemIcon color="primary">
+            <ControlPointOutlined color="primary"/>
+          </ListItemIcon>
+          <ListItemText
+            primary={'Add document'}
+            classes={{ primary: classes.text }}
+          />
+        </ListItem>
+        )}
+        {InputLabelProps?.required && onSubmit && !selectedDocument && (
+        <Typography className={classes.errorMessage}>{t('Should not be empty')}
+        </Typography>
+        )}
         {selectedDocument && (
           <ListItem
             classes={{ root: classes.item }}
             key={selectedDocument.document_id}
             divider
-            onClick={() => setOpen(true)}
+            onClick={handleOpen}
           >
             <ListItemIcon>
               <AttachmentOutlined/>

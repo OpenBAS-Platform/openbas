@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button, IconButton, InputLabel, List, ListItem, ListItemText, MenuItem } from '@mui/material';
@@ -27,6 +27,8 @@ const PayloadForm = (props) => {
   const classes = useStyles();
   const { t } = useFormatter();
 
+  const [submitButtonClicked, setSubmitButtonClicked] = useState(false);
+
   const validate = (values) => {
     const errors = {};
     const requiredFields = ['payload_name', 'payload_platforms'];
@@ -45,9 +47,9 @@ const PayloadForm = (props) => {
     }
     requiredFields.forEach((field) => {
       if (field === 'payload_platforms' && (!values[field] || values[field].length === 0)) {
-        errors[field] = t('This field is required.');
+        errors[field] = t('Should not be empty');
       } else if (!values[field]) {
-        errors[field] = t('This field is required.');
+        errors[field] = t('Should not be empty');
       }
     });
     return errors;
@@ -65,8 +67,12 @@ const PayloadForm = (props) => {
         },
       }}
     >
-      {({ handleSubmit, form, values, submitting, errors }) => (
-        <form id="payloadForm" onSubmit={handleSubmit}>
+      {({ handleSubmit, form, values, submitting }) => (
+        <form id="payloadForm" onSubmit={(event) => {
+          handleSubmit(event);
+          setSubmitButtonClicked(true);
+        }}
+        >
           <OldTextField
             name="payload_name"
             fullWidth={true}
@@ -134,6 +140,7 @@ const PayloadForm = (props) => {
               setFieldValue={form.mutators.setValue}
               initialValue={values.executable_file}
               InputLabelProps={{ required: true }}
+              onSubmit={submitButtonClicked}
             />
           </>
           )}
@@ -145,6 +152,7 @@ const PayloadForm = (props) => {
                 setFieldValue={form.mutators.setValue}
                 initialValue={values.file_drop_file}
                 InputLabelProps={{ required: true }}
+                onSubmit={submitButtonClicked}
               />
             </>
           )}
@@ -380,7 +388,7 @@ const PayloadForm = (props) => {
               variant="contained"
               color="secondary"
               type="submit"
-              disabled={submitting || Object.keys(errors).length > 0}
+              disabled={submitting}
             >
               {editing ? t('Update') : t('Create')}
             </Button>
