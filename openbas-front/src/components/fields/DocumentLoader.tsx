@@ -87,6 +87,7 @@ interface Props {
   name: string;
   /* eslint-disable @typescript-eslint/no-explicit-any */
   setFieldValue: (field: string, value: any) => void;
+  /* For mandatory fields */
   InputLabelProps?: { required: boolean };
   onSubmit?: boolean;
 }
