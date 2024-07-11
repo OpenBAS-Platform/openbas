@@ -88,7 +88,7 @@ interface Props {
   /* eslint-disable @typescript-eslint/no-explicit-any */
   setFieldValue: (field: string, value: any) => void;
   InputLabelProps?: { required: boolean };
-  onSubmit: boolean;
+  onSubmit?: boolean;
 }
 
 const DocumentLoader: React.FC<Props> = ({ initialValue, extensions = [], InputLabelProps, label, name, onSubmit, setFieldValue }) => {
