@@ -2,15 +2,13 @@ package io.openbas.rest.mapper.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.Map;
 
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
-@Getter
-@Setter
+@Data
 public class RuleAttributeUpdateInput {
 
     @JsonProperty("rule_attribute_id")

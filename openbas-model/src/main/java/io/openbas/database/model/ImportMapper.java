@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
@@ -16,8 +16,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "import_mappers")
 @EntityListeners(ModelBaseListener.class)
@@ -28,6 +27,7 @@ public class ImportMapper implements Base {
     @JsonProperty("import_mapper_id")
     @GeneratedValue
     @UuidGenerator
+    @NotNull
     private UUID id;
 
     @Column(name = "mapper_name")
@@ -37,6 +37,7 @@ public class ImportMapper implements Base {
 
     @Column(name = "mapper_inject_type_column")
     @JsonProperty("import_mapper_inject_type_column")
+    @NotNull
     private String injectTypeColumn;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)

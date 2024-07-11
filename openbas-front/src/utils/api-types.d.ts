@@ -974,6 +974,32 @@ export interface GroupUpdateUsersInput {
   group_users?: string[];
 }
 
+export interface ImportMapper {
+  /** @format date-time */
+  import_mapper_created_at?: string;
+  import_mapper_id: string;
+  import_mapper_inject_type_column: string;
+  import_mapper_name: string;
+  /** @format date-time */
+  import_mapper_updated_at?: string;
+  inject_importers?: InjectImporter[];
+  updateAttributes?: object;
+}
+
+export interface ImportMapperAddInput {
+  mapper_inject_importers?: InjectImporterAddInput[];
+  /** @pattern ^[A-Z]{1,2}$ */
+  mapper_inject_type_column?: string;
+  mapper_name: string;
+}
+
+export interface ImportMapperUpdateInput {
+  mapper_inject_importers?: InjectImporterUpdateInput[];
+  /** @pattern ^[A-Z]{1,2}$ */
+  mapper_inject_type_column?: string;
+  mapper_name: string;
+}
+
 export interface Inject {
   footer?: string;
   header?: string;
@@ -1105,6 +1131,34 @@ export interface InjectExpectationUpdateInput {
   is_success: boolean;
   result: string;
   success?: boolean;
+}
+
+export interface InjectImporter {
+  /** @format date-time */
+  inject_importer_created_at?: string;
+  inject_importer_id: string;
+  inject_importer_injector_contract: InjectorContract;
+  inject_importer_name: string;
+  inject_importer_type_value: string;
+  /** @format date-time */
+  inject_importer_updated_at?: string;
+  rule_attributes?: RuleAttribute[];
+  updateAttributes?: object;
+}
+
+export interface InjectImporterAddInput {
+  inject_importer_injector_contract_id: string;
+  inject_importer_name: string;
+  inject_importer_rule_attributes?: RuleAttributeAddInput[];
+  inject_importer_type_value: string;
+}
+
+export interface InjectImporterUpdateInput {
+  inject_importer_id?: string;
+  inject_importer_injector_contract_id: string;
+  inject_importer_name: string;
+  inject_importer_rule_attributes?: RuleAttributeUpdateInput[];
+  inject_importer_type_value: string;
 }
 
 export interface InjectInput {
@@ -1297,6 +1351,7 @@ export interface InjectorContract {
   injector_contract_created_at?: string;
   injector_contract_custom?: boolean;
   injector_contract_id: string;
+  injector_contract_import_available?: boolean;
   injector_contract_injector?: Injector;
   injector_contract_injector_type?: string;
   injector_contract_labels?: Record<string, string>;
@@ -1960,6 +2015,25 @@ export interface PageRawPaginationDocument {
   totalPages?: number;
 }
 
+export interface PageRawPaginationImportMapper {
+  content?: RawPaginationImportMapper[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageRawPaginationPlayer {
   content?: RawPaginationPlayer[];
   empty?: boolean;
@@ -2017,42 +2091,23 @@ export interface PageRawPaginationTeam {
   totalPages?: number;
 }
 
-export interface PageRawPaginationImportMapper {
-    content?: RawPaginationImportMapper[];
-    empty?: boolean;
-    first?: boolean;
-    last?: boolean;
-    /** @format int32 */
-    number?: number;
-    /** @format int32 */
-    numberOfElements?: number;
-    pageable?: PageableObject;
-    /** @format int32 */
-    size?: number;
-    sort?: SortObject[];
-    /** @format int64 */
-    totalElements?: number;
-    /** @format int32 */
-    totalPages?: number;
-}
-
 export interface PageSecurityPlatform {
-    content?: SecurityPlatform[];
-    empty?: boolean;
-    first?: boolean;
-    last?: boolean;
-    /** @format int32 */
-    number?: number;
-    /** @format int32 */
-    numberOfElements?: number;
-    pageable?: PageableObject;
-    /** @format int32 */
-    size?: number;
-    sort?: SortObject[];
-    /** @format int64 */
-    totalElements?: number;
-    /** @format int32 */
-    totalPages?: number;
+  content?: SecurityPlatform[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
 }
 
 export interface PageTag {
@@ -2348,13 +2403,6 @@ export interface RawPaginationAssetGroup {
   asset_group_tags?: string[];
 }
 
-export interface RawPaginationImportMapper {
-  mapper_id?: string;
-  mapper_name?: string;
-  mapper_created_at?: string;
-  mapper_updated_at?: string;
-}
-
 export interface RawPaginationDocument {
   document_description?: string;
   document_exercises?: string[];
@@ -2363,6 +2411,15 @@ export interface RawPaginationDocument {
   document_scenarios?: string[];
   document_tags?: string[];
   document_type?: string;
+}
+
+export interface RawPaginationImportMapper {
+  /** @format date-time */
+  import_mapper_created_at?: string;
+  import_mapper_id?: string;
+  import_mapper_name?: string;
+  /** @format date-time */
+  import_mapper_updated_at?: string;
 }
 
 export interface RawPaginationPlayer {
@@ -2475,6 +2532,34 @@ export interface ResultDistribution {
   label: string;
   /** @format int32 */
   value: number;
+}
+
+export interface RuleAttribute {
+  rule_attribute_additional_config?: Record<string, string>;
+  rule_attribute_columns: string;
+  /** @format date-time */
+  rule_attribute_created_at?: string;
+  rule_attribute_default_value?: string;
+  rule_attribute_id: string;
+  rule_attribute_name: string;
+  /** @format date-time */
+  rule_attribute_updated_at?: string;
+  updateAttributes?: object;
+}
+
+export interface RuleAttributeAddInput {
+  rule_attribute_additional_config?: Record<string, string>;
+  rule_attribute_columns: string;
+  rule_attribute_default_value?: string;
+  rule_attribute_name: string;
+}
+
+export interface RuleAttributeUpdateInput {
+  rule_attribute_additional_config?: Record<string, string>;
+  rule_attribute_columns: string;
+  rule_attribute_default_value?: string;
+  rule_attribute_id?: string;
+  rule_attribute_name: string;
 }
 
 export interface Scenario {

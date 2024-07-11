@@ -5,17 +5,20 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "inject_importers")
 @EntityListeners(ModelBaseListener.class)
@@ -26,26 +29,40 @@ public class InjectImporter implements Base {
     @JsonProperty("inject_importer_id")
     @GeneratedValue
     @UuidGenerator
+    @NotNull
     private UUID id;
 
     @Column(name = "importer_name")
     @JsonProperty("inject_importer_name")
+    @NotBlank
     private String name;
 
     @Column(name = "importer_import_type_value")
     @JsonProperty("inject_importer_type_value")
+    @NotBlank
     private String importTypeValue;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne
     @JoinColumn(name = "importer_injector_contract_id")
     @JsonProperty("inject_importer_injector_contract")
     @JsonSerialize(using = MonoIdDeserializer.class)
+    @NotNull
     private InjectorContract injectorContract;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "attribute_inject_importer_id", nullable = false)
     @JsonProperty("rule_attributes")
     private List<RuleAttribute> ruleAttributes = new ArrayList<>();
+
+    @CreationTimestamp
+    @Column(name="importer_created_at")
+    @JsonProperty("inject_importer_created_at")
+    private Instant creationDate;
+
+    @UpdateTimestamp
+    @Column(name= "importer_updated_at")
+    @JsonProperty("inject_importer_updated_at")
+    private Instant updateDate;
 
     @Override
     public boolean equals(Object o) {
