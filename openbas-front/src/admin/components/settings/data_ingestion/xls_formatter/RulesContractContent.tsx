@@ -94,12 +94,12 @@ const RulesContractContent: React.FC<Props> = ({
     }
   }, [injectorContractId]);
 
-  const [defaultValue, setDefaultValue] = React.useState(false);
-  const handleDefaultValueOpen = () => {
-    setDefaultValue(true);
+  const [currentRuleIndex, setCurrentRuleIndex] = useState<number | null>(null);
+  const handleDefaultValueOpen = (rulesIndex: number) => {
+    setCurrentRuleIndex(rulesIndex);
   };
   const handleDefaultValueClose = () => {
-    setDefaultValue(false);
+    setCurrentRuleIndex(null);
   };
 
   // Contracts
@@ -194,7 +194,7 @@ const RulesContractContent: React.FC<Props> = ({
                         />
                         <IconButton
                           color="primary"
-                          onClick={handleDefaultValueOpen}
+                          onClick={() => handleDefaultValueOpen(rulesIndex)}
                         >
                           <Badge color="secondary" variant="dot"
                             invisible={!methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
@@ -206,28 +206,30 @@ const RulesContractContent: React.FC<Props> = ({
                       </div>
                     }
                   />
-                  <Dialog
-                    open={defaultValue}
-                    onClose={handleDefaultValueClose}
-                    aria-labelledby="default-value-dialog-title"
-                    aria-describedby="Configure optional settings to the field"
-                  >
-                    <DialogTitle id="default-value-dialog-title">
-                      {t('Attribute mapping configuration')}
-                    </DialogTitle>
-                    <DialogContent>
-                      <TextField
-                        fullWidth
-                        label={t('Rule attribute default value')}
-                        inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value` as const)}
-                      />
-                    </DialogContent>
-                    <DialogActions>
-                      <Button onClick={handleDefaultValueClose} autoFocus>
-                        {t('Close')}
-                      </Button>
-                    </DialogActions>
-                  </Dialog>
+                  {currentRuleIndex !== null
+                    && <Dialog
+                      open
+                      onClose={handleDefaultValueClose}
+                      aria-labelledby="default-value-dialog-title"
+                      aria-describedby="Configure optional settings to the field"
+                       >
+                      <DialogTitle id="default-value-dialog-title">
+                        {t('Attribute mapping configuration')}
+                      </DialogTitle>
+                      <DialogContent>
+                        <TextField
+                          fullWidth
+                          label={t('Rule attribute default value')}
+                          inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_default_value`)}
+                        />
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={handleDefaultValueClose} autoFocus>
+                          {t('Close')}
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
+                  }
                   {
                     rulesIndex === rulesFields.length - 1 && <ListItemText>
                       <TextField
