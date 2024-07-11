@@ -218,7 +218,6 @@ public class ExerciseService {
     }
 
     private void getListOfArticles(Exercise exercise, Exercise exerciseOrigin) {
-        List<String> articleNode = new ArrayList<>();
         List<Article> articleList = new ArrayList<>();
         Map<String, String> mapIdArticleOriginNew = new HashMap<>();
         exerciseOrigin.getArticles().forEach(article -> {
@@ -230,6 +229,7 @@ public class ExerciseService {
             exerciceArticle.setLikes(article.getLikes());
             exerciceArticle.setComments(article.getComments());
             exerciceArticle.setChannel(article.getChannel());
+            exerciceArticle.setDocuments(new ArrayList<>(article.getDocuments()));
             exerciceArticle.setExercise(exercise);
             Article save = articleRepository.save(exerciceArticle);
             articleList.add(save);
@@ -238,6 +238,7 @@ public class ExerciseService {
         exercise.setArticles(articleList);
         for (Inject inject : exercise.getInjects()) {
             if (inject.getContent().has(ARTICLES)) {
+                List<String> articleNode = new ArrayList<>();
                 JsonNode articles = inject.getContent().findValue(ARTICLES);
                 if (articles.isArray()) {
                     for (final JsonNode node : articles) {

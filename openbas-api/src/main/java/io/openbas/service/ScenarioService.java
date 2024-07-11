@@ -536,6 +536,7 @@ public class ScenarioService {
             scenarioArticle.setLikes(article.getLikes());
             scenarioArticle.setComments(article.getComments());
             scenarioArticle.setChannel(article.getChannel());
+            scenarioArticle.setDocuments(new ArrayList<>(article.getDocuments()));
             scenarioArticle.setScenario(scenario);
             Article save = articleRepository.save(scenarioArticle);
             articleList.add(save);
