@@ -178,6 +178,8 @@ const RulesContractContent: React.FC<Props> = ({
           style={{ marginTop: 10 }}
           inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_type_value` as const)}
           InputLabelProps={{ required: true }}
+          error={!!methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_type_value}
+          helperText={methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_type_value?.message}
         />
         <Controller
           control={control}
@@ -192,6 +194,8 @@ const RulesContractContent: React.FC<Props> = ({
               onChange={(data) => {
                 onChange(data);
               }}
+              errors={methods.formState.errors}
+              name={`mapper_inject_importers.${index}.inject_importer_injector_contract_id`}
             />
           )}
         />

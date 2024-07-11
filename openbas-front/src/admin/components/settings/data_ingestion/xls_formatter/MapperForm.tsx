@@ -88,38 +88,15 @@ const MapperForm: React.FC<Props> = ({
     ),
     defaultValues: initialValues,
   });
-  const { control, formState: { errors } } = methods;
+  const { control } = methods;
 
-  console.log(`values : ${methods.getValues('mapper_inject_importers')}`);
-  console.log(`mapper form error : ${errors.mapper_inject_importers?.message}`);
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'mapper_inject_importers',
-    rules: {
-      required: {
-        value: true,
-        message: t('At least one inject importer is required'),
-      },
-    },
-  });
 
-  const rulesInitialValues: RuleAttributeAddInput = {
-    rule_attribute_name: '',
-    rule_attribute_columns: '',
-    rule_attribute_default_value: '',
-  };
-  const rulesMethods = useForm<RuleAttributeAddInput>({
-    defaultValues: rulesInitialValues,
   });
 
   const onSubmit = (data) => console.log(data);
-
-  /* const watchField = methods.watch(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`);
-  if (watchField.length !== 0) {
-    for (let i = 0; i < 1; i++) {
-      rulesAppend({ rule_attribute_name: '', rule_attribute_columns: '' });
-    }
-  } */
 
   return (
     <form id="mapperForm" onSubmit={methods.handleSubmit(onSubmit)}>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { TextField, Autocomplete, Box, SelectChangeEvent, InputBaseComponentProps } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { FieldErrors } from 'react-hook-form';
 import type { SearchPaginationInput } from '../utils/api-types';
 import type { Page } from './common/pagination/Page';
 import { useFormatter } from './i18n';
@@ -32,6 +33,8 @@ interface Props<T> {
   label: string;
   injectorContracts: InjectorContractStore[];
   onChange: (data: string | null | undefined) => void;
+  errors: FieldErrors;
+  name: string;
 }
 
 const InjectContractComponent = <T extends object>({
@@ -41,6 +44,8 @@ const InjectContractComponent = <T extends object>({
   label,
   injectorContracts,
   onChange,
+  errors,
+  name,
 
 }: Props<T>) => {
   // Standard hooks
@@ -110,6 +115,7 @@ const InjectContractComponent = <T extends object>({
             variant="outlined"
             size="small"
             InputLabelProps={{ required: true }}
+            error={!!errors[name]}
           />
         )
       }
