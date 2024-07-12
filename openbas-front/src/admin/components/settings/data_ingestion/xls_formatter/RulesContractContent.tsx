@@ -3,7 +3,9 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  AccordionActions,
   Typography,
+  Tooltip,
   List,
   ListItem,
   ListItemText,
@@ -16,7 +18,7 @@ import {
   IconButton,
   Button,
 } from '@mui/material';
-import { ExpandMore, DeleteOutline } from '@mui/icons-material';
+import { ExpandMore, DeleteOutlined } from '@mui/icons-material';
 import { CogOutline } from 'mdi-material-ui';
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
@@ -35,7 +37,11 @@ const useStyles = makeStyles(() => ({
     display: 'inline-grid',
     marginTop: '10px',
     alignItems: 'center',
-    gridTemplateColumns: ' 2fr 3fr 50px',
+    gridTemplateColumns: ' 1fr 3fr 50px',
+  },
+  container: {
+    display: 'inline-flex',
+    alignItems: 'center',
   },
 }));
 
@@ -119,17 +125,25 @@ const RulesContractContent: React.FC<Props> = ({
   });
 
   return (
-    <Accordion key={field.id}>
+    <Accordion key={field.id} variant="outlined"
+      style={{ width: '100%' }}
+    >
       <AccordionSummary
         expandIcon={<ExpandMore />}
-        aria-controls="panel1-content"
-        id="panel1-header"
       >
-        <Typography>{t('Inject importer')} {index + 1}</Typography>
-        <DeleteOutline color="error" onClick={() => {
-          remove(index);
-        }}
-        />
+        <div className={classes.container}>
+          <Typography>
+            {t('Inject importer')} {index + 1}
+          </Typography>
+          <Tooltip title={t('Delete')}>
+            <IconButton color="error" onClick={() => {
+              remove(index);
+            }}
+            >
+              <DeleteOutlined fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </div>
       </AccordionSummary>
       <AccordionDetails>
         <TextField
@@ -208,11 +222,10 @@ const RulesContractContent: React.FC<Props> = ({
                   {currentRuleIndex !== null
                     && <Dialog
                       open
+                      fullWidth
                       onClose={handleDefaultValueClose}
-                      aria-labelledby="default-value-dialog-title"
-                      aria-describedby="Configure optional settings to the field"
                        >
-                      <DialogTitle id="default-value-dialog-title">
+                      <DialogTitle>
                         {t('Attribute mapping configuration')}
                       </DialogTitle>
                       <DialogContent>
@@ -246,6 +259,12 @@ const RulesContractContent: React.FC<Props> = ({
         }
 
       </AccordionDetails>
+      <AccordionActions>
+        <Button color="error" variant="contained" onClick={() => {
+          remove(index);
+        }}
+        >{t('Delete')}</Button>
+      </AccordionActions>
     </Accordion>
   );
 };
