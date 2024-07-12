@@ -1163,6 +1163,7 @@ export interface InjectResultDTO {
   inject_expectations?: InjectExpectation[];
   /** Id */
   inject_id: string;
+  inject_injector_contract_labels: Record<string, string>;
   inject_injector_contract: InjectorContract;
   /** Kill Chain Phases */
   inject_kill_chain_phases: KillChainPhase[];

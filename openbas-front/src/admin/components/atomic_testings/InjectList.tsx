@@ -98,9 +98,9 @@ const InjectList: FunctionComponent<Props> = ({
       label: 'Type',
       isSortable: true,
       value: (injectDto: InjectResultDTO) => {
-        if (injectDto.inject_injector_contract) {
+        if (injectDto.inject_injector_contract_labels) {
           return (
-            <InjectorContract variant="list" label={tPick(injectDto.inject_injector_contract?.injector_contract_labels)} />
+            <InjectorContract variant="list" label={tPick(injectDto.inject_injector_contract_labels)} />
           );
         }
         return <InjectorContract variant="list" label={t('Deleted')} deleted={true} />;
