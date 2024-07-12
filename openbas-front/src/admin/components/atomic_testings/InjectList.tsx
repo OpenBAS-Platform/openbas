@@ -98,7 +98,7 @@ const InjectList: FunctionComponent<Props> = ({
       label: 'Type',
       isSortable: true,
       value: (injectDto: InjectResultDTO) => {
-        if (injectDto.inject_injector_contract_labels) {
+        if (injectDto.inject_injector_contract_labels && tPick(injectDto.inject_injector_contract_labels)) {
           return (
             <InjectorContract variant="list" label={tPick(injectDto.inject_injector_contract_labels)} />
           );
