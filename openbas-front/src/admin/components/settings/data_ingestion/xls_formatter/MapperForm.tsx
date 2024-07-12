@@ -83,7 +83,7 @@ const MapperForm: React.FC<Props> = ({
   const onSubmit = (data) => console.log(data);
 
   return (
-    <form id="mapperForm" onSubmit={methods.handleSubmit(OnSubmit)}>
+    <form id="mapperForm" onSubmit={methods.handleSubmit(onSubmit)}>
       <TextField
         variant="standard"
         fullWidth

@@ -20,11 +20,11 @@ import { ExpandMore, DeleteOutline } from '@mui/icons-material';
 import { CogOutline } from 'mdi-material-ui';
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
-import { directFetchInjectorContract, fetchInjectorContract, fetchInjectorsContracts, searchInjectorContracts } from '../../../../../actions/InjectorContracts';
+import { directFetchInjectorContract, searchInjectorContracts } from '../../../../../actions/InjectorContracts';
 import InjectContractComponent from '../../../../../components/InjectContractComponent';
 import { useFormatter } from '../../../../../components/i18n';
 import RegexComponent from '../../../../../components/RegexComponent';
-import { InjectorContractStore } from '../../../../../actions/injector_contracts/InjectorContract';
+import type { InjectorContractStore } from '../../../../../actions/injector_contracts/InjectorContract';
 import type { FilterGroup, InjectorContract, MapperAddInput, SearchPaginationInput } from '../../../../../utils/api-types';
 import { initSorting } from '../../../../../components/common/pagination/Page';
 
@@ -79,7 +79,6 @@ const RulesContractContent: React.FC<Props> = ({
       rule_attribute_name: 'trigger_time',
       rule_attribute_columns: '',
       rule_attribute_default_value: '',
-      rule_attribute_additional_config: { '': '' },
     });
   };
 
