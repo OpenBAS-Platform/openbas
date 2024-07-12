@@ -10,7 +10,9 @@ import io.openbas.database.repository.*;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.scenario.form.InjectsImportInput;
 import io.openbas.rest.scenario.response.ImportMessage;
+import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
+import io.openbas.utils.CustomMockMultipartFile;
 import jakarta.annotation.Resource;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,6 +59,10 @@ class InjectServiceTest {
     TeamRepository teamRepository;
     @Mock
     UserRepository userRepository;
+    @Mock
+    ScenarioService scenarioService;
+    @Mock
+    ImportMapperRepository importMapperRepository;
     @InjectMocks
     private InjectService injectService;
 
@@ -69,11 +75,59 @@ class InjectServiceTest {
     protected ObjectMapper mapper;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         injectService = new InjectService(injectRepository, injectDocumentRepository, injectExpectationRepository,
-                assetRepository, assetGroupRepository, teamRepository, userRepository);
+                assetRepository, assetGroupRepository, teamRepository, userRepository, scenarioService, importMapperRepository);
 
+        mockedScenario = new Scenario();
         mapper = new ObjectMapper();
+    }
+
+    @DisplayName("Post and store an XLS file")
+    @Test
+    void postAnXLSFile() throws Exception {
+        // -- PREPARE --
+        // Getting a test file
+        File testFile = ResourceUtils.getFile("classpath:xls-test-files/test_file_1.xlsx");
+
+        InputStream in = new FileInputStream(testFile);
+        MockMultipartFile xlsFile = new MockMultipartFile("file",
+                "my-awesome-file.xls",
+                "application/xlsx",
+                in.readAllBytes());
+
+        ImportPostSummary response = injectService.storeXlsFileForImport(xlsFile);
+
+        // -- ASSERT --
+        assertNotNull(response);
+        try {
+            UUID.fromString(response.getImportId());
+        } catch (Exception ex) {
+            fail();
+        }
+        assertEquals(1, response.getAvailableSheets().size());
+        assertEquals("CHECKLIST", response.getAvailableSheets().get(0));
+    }
+
+    @DisplayName("Post and store a corrupted XLS file")
+    @Test
+    void postACorruptedXLSFile() throws Exception {
+        // Getting a test file
+        File testFile = ResourceUtils.getFile("classpath:xls-test-files/test_file_1.xlsx");
+        // -- PREPARE --
+        InputStream in = new FileInputStream(testFile);
+        MockMultipartFile xlsFile = new CustomMockMultipartFile("file",
+                "my-awesome-file.xls",
+                "application/xlsx",
+                in.readAllBytes());
+
+        // -- EXECUTE --
+        try {
+            injectService.storeXlsFileForImport(xlsFile);
+            fail();
+        } catch(Exception ex) {
+            assertTrue(ex instanceof BadRequestException);
+        }
     }
 
     @DisplayName("Import an XLS file with relative date")
@@ -98,9 +152,14 @@ class InjectServiceTest {
             when(teamRepository.findAll()).thenReturn(List.of(team1));
             when(teamRepository.save(any())).thenReturn(team2);
 
+            mockedScenario.setId(UUID.randomUUID().toString());
+            when(scenarioService.scenario(mockedScenario.getId())).thenReturn(mockedScenario);
+            when(importMapperRepository.findById(any()))
+                    .thenReturn(Optional.ofNullable(mockedImportMapper));
+
             sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
-            ImportTestSummary importTestSummary = injectService.importXls(fileID, mockedScenario, mockedImportMapper,
-                    mockedInjectsImportInput);
+            ImportTestSummary importTestSummary = injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                    mockedInjectsImportInput, fileID, true);
 
             verify(teamRepository, times(1)).save(any());
             assertEquals(30 * 24 * 60 * 60, importTestSummary.getInjects().getLast().getDependsDuration());
@@ -117,7 +176,6 @@ class InjectServiceTest {
     @Test
     void testImportXlsBadFile() throws IOException {
         try (MockedStatic<SessionHelper> sessionHelper = Mockito.mockStatic(SessionHelper.class)) {
-            User mockedUser = new User();
             String fileID = UUID.randomUUID().toString();
             mockedInjectsImportInput = new InjectsImportInput();
             mockedInjectsImportInput.setImportMapperId(fileID);
@@ -125,8 +183,11 @@ class InjectServiceTest {
             mockedInjectsImportInput.setTimezoneOffset(120);
 
             mockedImportMapper = createImportMapper(UUID.randomUUID().toString());
+            when(importMapperRepository.findById(any()))
+                    .thenReturn(Optional.ofNullable(mockedImportMapper));
             try {
-                injectService.importXls(fileID, mockedScenario, mockedImportMapper, mockedInjectsImportInput);
+                injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                        mockedInjectsImportInput, fileID, true);
                 fail();
             } catch (Exception ex) {
                 assertTrue(ex instanceof BadRequestException);
@@ -167,8 +228,10 @@ class InjectServiceTest {
 
             injectImporterMailCopy.getRuleAttributes().addAll(createRuleAttributeMail());
             mockedImportMapper.getInjectImporters().add(injectImporterMailCopy);
-            ImportTestSummary importTestSummary = injectService.importXls(fileID, mockedScenario, mockedImportMapper,
-                    mockedInjectsImportInput);
+            when(importMapperRepository.findById(any()))
+                    .thenReturn(Optional.ofNullable(mockedImportMapper));
+            ImportTestSummary importTestSummary = injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                    mockedInjectsImportInput, fileID, true);
             assertTrue(
                     importTestSummary.getImportMessage().stream().anyMatch(
                             importMessage -> importMessage.getMessageLevel().equals(ImportMessage.MessageLevel.WARN)
@@ -192,6 +255,8 @@ class InjectServiceTest {
             mockedInjectsImportInput.setTimezoneOffset(120);
 
             mockedScenario = new Scenario();
+            mockedScenario.setId(UUID.randomUUID().toString());
+            when(scenarioService.scenario(mockedScenario.getId())).thenReturn(mockedScenario);
 
             mockedImportMapper = createImportMapper(UUID.randomUUID().toString());
             mockedImportMapper.getInjectImporters().forEach(injectImporter -> {
@@ -211,10 +276,12 @@ class InjectServiceTest {
             team2.setName("team2");
             when(teamRepository.findAll()).thenReturn(List.of(team1));
             when(teamRepository.save(any())).thenReturn(team2);
+            when(importMapperRepository.findById(any()))
+                    .thenReturn(Optional.ofNullable(mockedImportMapper));
 
             sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
-            ImportTestSummary importTestSummary = injectService.importXls(fileID, mockedScenario, mockedImportMapper,
-                    mockedInjectsImportInput);
+            ImportTestSummary importTestSummary = injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                    mockedInjectsImportInput, fileID, true);
 
             assertTrue(LocalDateTime.of(2024, Month.JUNE, 26, 0, 0)
                     .toInstant(ZoneOffset.of("Z"))
@@ -237,6 +304,8 @@ class InjectServiceTest {
             mockedInjectsImportInput.setTimezoneOffset(120);
 
             mockedScenario = new Scenario();
+            mockedScenario.setId(UUID.randomUUID().toString());
+            when(scenarioService.scenario(mockedScenario.getId())).thenReturn(mockedScenario);
 
             mockedImportMapper = createImportMapper(UUID.randomUUID().toString());
             mockedImportMapper.getInjectImporters().forEach(injectImporter -> {
@@ -256,10 +325,12 @@ class InjectServiceTest {
             team2.setName("team2");
             when(teamRepository.findAll()).thenReturn(List.of(team1));
             when(teamRepository.save(any())).thenReturn(team2);
+            when(importMapperRepository.findById(any()))
+                    .thenReturn(Optional.ofNullable(mockedImportMapper));
 
             sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
-            ImportTestSummary importTestSummary = injectService.importXls(fileID, mockedScenario, mockedImportMapper,
-                    mockedInjectsImportInput);
+            ImportTestSummary importTestSummary = injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                    mockedInjectsImportInput, fileID, true);
 
             List<Inject> sortedInjects = importTestSummary.getInjects().stream()
                     .sorted(Comparator.comparing(Inject::getDependsDuration))
@@ -284,9 +355,10 @@ class InjectServiceTest {
             mockedInjectsImportInput.setName("CHECKLIST");
             mockedInjectsImportInput.setTimezoneOffset(120);
 
-            mockedScenario = new Scenario();
+            mockedScenario.setId(UUID.randomUUID().toString());
             mockedScenario.setRecurrenceStart(LocalDateTime.of(2024, Month.JUNE, 26, 0, 0)
                     .toInstant(ZoneOffset.of("Z")));
+            when(scenarioService.scenario(mockedScenario.getId())).thenReturn(mockedScenario);
 
             mockedImportMapper = createImportMapper(UUID.randomUUID().toString());
             mockedImportMapper.getInjectImporters().forEach(injectImporter -> {
@@ -306,10 +378,12 @@ class InjectServiceTest {
             team2.setName("team2");
             when(teamRepository.findAll()).thenReturn(List.of(team1));
             when(teamRepository.save(any())).thenReturn(team2);
+            when(importMapperRepository.findById(any()))
+                    .thenReturn(Optional.ofNullable(mockedImportMapper));
 
             sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
-            ImportTestSummary importTestSummary = injectService.importXls(fileID, mockedScenario, mockedImportMapper,
-                    mockedInjectsImportInput);
+            ImportTestSummary importTestSummary = injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                    mockedInjectsImportInput, fileID, true);
 
             List<Inject> sortedInjects = importTestSummary.getInjects().stream()
                     .sorted(Comparator.comparing(Inject::getDependsDuration))
@@ -336,6 +410,8 @@ class InjectServiceTest {
             mockedInjectsImportInput.setTimezoneOffset(120);
 
             mockedScenario = new Scenario();
+            mockedScenario.setId(UUID.randomUUID().toString());
+            when(scenarioService.scenario(mockedScenario.getId())).thenReturn(mockedScenario);
 
             mockedImportMapper = createImportMapper(UUID.randomUUID().toString());
             mockedImportMapper.getInjectImporters().forEach(injectImporter -> {
@@ -355,10 +431,12 @@ class InjectServiceTest {
             team2.setName("team2");
             when(teamRepository.findAll()).thenReturn(List.of(team1));
             when(teamRepository.save(any())).thenReturn(team2);
+            when(importMapperRepository.findById(any()))
+                    .thenReturn(Optional.ofNullable(mockedImportMapper));
 
             sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
-            ImportTestSummary importTestSummary = injectService.importXls(fileID, mockedScenario, mockedImportMapper,
-                    mockedInjectsImportInput);
+            ImportTestSummary importTestSummary = injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                    mockedInjectsImportInput, fileID, true);
 
             assertTrue(importTestSummary.getImportMessage().stream().anyMatch(
                     importMessage -> ImportMessage.MessageLevel.CRITICAL.equals(importMessage.getMessageLevel())
@@ -390,10 +468,12 @@ class InjectServiceTest {
             team2.setName("team2");
             when(teamRepository.findAll()).thenReturn(List.of(team1));
             when(teamRepository.save(any())).thenReturn(team2);
+            when(importMapperRepository.findById(any()))
+                    .thenReturn(Optional.ofNullable(mockedImportMapper));
 
             sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
-            ImportTestSummary importTestSummary = injectService.importXls(fileID, mockedScenario, mockedImportMapper,
-                    mockedInjectsImportInput);
+            ImportTestSummary importTestSummary = injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                    mockedInjectsImportInput, fileID, true);
 
             List<Inject> sortedInjects = importTestSummary.getInjects().stream()
                     .sorted(Comparator.comparing(Inject::getDependsDuration))
@@ -419,6 +499,8 @@ class InjectServiceTest {
             mockedInjectsImportInput.setTimezoneOffset(120);
 
             mockedScenario = new Scenario();
+            mockedScenario.setId(UUID.randomUUID().toString());
+            when(scenarioService.scenario(mockedScenario.getId())).thenReturn(mockedScenario);
 
             mockedImportMapper = createImportMapper(UUID.randomUUID().toString());
             mockedImportMapper.getInjectImporters().forEach(injectImporter -> {
@@ -439,10 +521,12 @@ class InjectServiceTest {
             team2.setName("team2");
             when(teamRepository.findAll()).thenReturn(List.of(team1));
             when(teamRepository.save(any())).thenReturn(team2);
+            when(importMapperRepository.findById(any()))
+                    .thenReturn(Optional.ofNullable(mockedImportMapper));
 
             sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
-            ImportTestSummary importTestSummary = injectService.importXls(fileID, mockedScenario, mockedImportMapper,
-                    mockedInjectsImportInput);
+            ImportTestSummary importTestSummary = injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                    mockedInjectsImportInput, fileID, true);
 
             assertSame("title", importTestSummary.getInjects().getFirst().getTitle());
         }

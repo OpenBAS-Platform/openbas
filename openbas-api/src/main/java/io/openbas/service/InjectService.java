@@ -13,7 +13,9 @@ import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.rest.inject.output.InjectOutput;
 import io.openbas.rest.scenario.form.InjectsImportInput;
 import io.openbas.rest.scenario.response.ImportMessage;
+import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
+import io.openbas.utils.InjectUtils;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -24,11 +26,12 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +46,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -67,6 +71,8 @@ public class InjectService {
     private final AssetGroupRepository assetGroupRepository;
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
+    private final ScenarioService scenarioService;
+    private final ImportMapperRepository importMapperRepository;
 
     private final List<String> importReservedField = List.of("description", "title", "trigger_time");
 
@@ -144,71 +150,100 @@ public class InjectService {
     return execInject(query);
   }
 
-  // -- CRITERIA BUILDER --
+    /**
+     * Create inject programmatically based on rawInject, rawInjectExpectation, rawAsset, rawAssetGroup, rawTeam
+     */
+    public Map<String, Inject> mapOfInjects(@NotNull final List<String> injectIds) {
+        List<Inject> listOfInjects = new ArrayList<>();
 
-  private void selectForInject(CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Inject> injectRoot) {
-    // Joins
-    Join<Inject, Exercise> injectExerciseJoin = createLeftJoin(injectRoot, "exercise");
-    Join<Inject, Scenario> injectScenarioJoin = createLeftJoin(injectRoot, "scenario");
-    Join<Inject, InjectorContract> injectorContractJoin = createLeftJoin(injectRoot, "injectorContract");
-    Join<InjectorContract, Injector> injectorJoin = injectorContractJoin.join("injector", JoinType.LEFT);
-    // Array aggregations
-    Expression<String[]> tagIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "tags");
-    Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
-    Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
-    Expression<String[]> assetGroupIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assetGroups");
+        List<RawInject> listOfRawInjects = this.injectRepository.findRawByIds(injectIds);
+        // From the list of injects, we get all the inject expectationsIds that we then get
+        // and put into a map with the expections ids as key
+        Map<String, RawInjectExpectation> mapOfInjectsExpectations = mapOfInjectsExpectations(listOfRawInjects);
 
-        // SELECT
-        cq.multiselect(
-                injectRoot.get("id").alias("inject_id"),
-                injectRoot.get("title").alias("inject_title"),
-                injectRoot.get("enabled").alias("inject_enabled"),
-                injectRoot.get("content").alias("inject_content"),
-                injectRoot.get("allTeams").alias("inject_all_teams"),
-                injectExerciseJoin.get("id").alias("inject_exercise"),
-                injectScenarioJoin.get("id").alias("inject_scenario"),
-                injectRoot.get("dependsDuration").alias("inject_depends_duration"),
-                injectorContractJoin.alias("inject_injector_contract"),
-                tagIdsExpression.alias("inject_tags"),
-                teamIdsExpression.alias("inject_teams"),
-                assetIdsExpression.alias("inject_assets"),
-                assetGroupIdsExpression.alias("inject_asset_groups"),
-                injectorJoin.get("type").alias("inject_type")
-        ).distinct(true);
+        // We get the asset groups from the injects AND the injects expectations as those can also have asset groups
+        // We then make a map out of it for faster access
+        Map<String, RawAssetGroup> mapOfAssetGroups = mapOfAssetGroups(listOfRawInjects, mapOfInjectsExpectations.values());
 
-    // GROUP BY
-    cq.groupBy(Arrays.asList(
-        injectRoot.get("id"),
-        injectExerciseJoin.get("id"),
-        injectScenarioJoin.get("id"),
-        injectorContractJoin.get("id"),
-        injectorJoin.get("id")
-    ));
-  }
+        // We get all the assets that are
+        // 1 - linked to an inject
+        // 2 - linked to an asset group linked to an inject
+        // 3 - linked to an inject expectation
+        // 4 - linked to an asset group linked to an inject expectations
+        // We then make a map out of it
+        Map<String, RawAsset> mapOfAssets = mapOfAssets(listOfRawInjects, mapOfInjectsExpectations, mapOfAssetGroups);
 
-  private List<InjectOutput> execInject(TypedQuery<Tuple> query) {
-    return query.getResultList()
-        .stream()
-        .map(tuple -> new InjectOutput(
-            tuple.get("inject_id", String.class),
-            tuple.get("inject_title", String.class),
-            tuple.get("inject_enabled", Boolean.class),
-            tuple.get("inject_content", ObjectNode.class),
-            tuple.get("inject_all_teams", Boolean.class),
-            tuple.get("inject_exercise", String.class),
-            tuple.get("inject_scenario", String.class),
-            tuple.get("inject_depends_duration", Long.class),
-            tuple.get("inject_injector_contract", InjectorContract.class),
-            tuple.get("inject_tags", String[].class),
-            tuple.get("inject_teams", String[].class),
-            tuple.get("inject_assets", String[].class),
-            tuple.get("inject_asset_groups", String[].class),
-            tuple.get("inject_type", String.class)
-        ))
-        .toList();
-  }
+        // We get all the teams that are linked to an inject or an asset group
+        // Then we make a map out of it for faster access
+        Map<String, RawTeam> mapOfRawTeams = mapOfRawTeams(listOfRawInjects, mapOfInjectsExpectations);
 
-    public ImportTestSummary importXls(String importId, Scenario scenario, ImportMapper importMapper, InjectsImportInput input) {
+        // Once we have all of this, we create an Inject for each InjectRaw that we have using all the Raw objects we got
+        // Then we make a map out of it for faster access
+        listOfRawInjects.stream().map((inject) -> Inject.fromRawInject(inject, mapOfRawTeams, mapOfInjectsExpectations, mapOfAssetGroups, mapOfAssets)).forEach(listOfInjects::add);
+        return listOfInjects.stream().collect(Collectors.toMap(Inject::getId, Function.identity()));
+    }
+
+    /**
+     * Store an xls file for ulterior import. The file will be deleted on exit.
+     * @param file
+     * @return
+     */
+    public ImportPostSummary storeXlsFileForImport(MultipartFile file) {
+        ImportPostSummary result = new ImportPostSummary();
+        result.setAvailableSheets(new ArrayList<>());
+        // Generating an UUID for identifying the file
+        String fileID = UUID.randomUUID().toString();
+        result.setImportId(fileID);
+        try {
+            // We're opening the file and listing the names of the sheets
+            Workbook workbook = WorkbookFactory.create(file.getInputStream());
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                result.getAvailableSheets().add(workbook.getSheetName(i));
+            }
+            // Writing the file in a temp dir
+            Path tempDir = Files.createDirectory(Path.of(System.getProperty("java.io.tmpdir"), fileID));
+            Path tempFile = Files.createTempFile(tempDir, null, "." + FilenameUtils.getExtension(file.getOriginalFilename()));
+            Files.write(tempFile, file.getBytes());
+
+            // We're making sure the files are deleted when the backend restart
+            tempDir.toFile().deleteOnExit();
+            tempFile.toFile().deleteOnExit();
+        } catch (Exception ex) {
+            log.severe("Error while importing an xls file");
+            log.severe(Arrays.toString(ex.getStackTrace()));
+            throw new BadRequestException("File seems to be corrupt");
+        }
+
+        return result;
+    }
+
+    public ImportTestSummary importInjectIntoScenarioFromXLS(String scenarioId, InjectsImportInput input, String importId, boolean saveAll) {
+        Scenario scenario = scenarioService.scenario(scenarioId);
+
+        // Getting the mapper to use
+        ImportMapper importMapper = importMapperRepository
+                .findById(UUID.fromString(input.getImportMapperId()))
+                .orElseThrow(() -> new ElementNotFoundException(String.format("The import mapper %s was not found", input.getImportMapperId())));
+
+        // We call the inject service to get the injects to create as well as messages on how things went
+        ImportTestSummary importTestSummary = importXls(importId, scenario, importMapper, input);
+        Optional<ImportMessage> hasCritical = importTestSummary.getImportMessage().stream()
+                .filter(importMessage -> importMessage.getMessageLevel() == ImportMessage.MessageLevel.CRITICAL)
+                .findAny();
+        if(hasCritical.isPresent()) {
+            // If there are critical errors, we do not save and we
+            // empty the list of injects, we just keep the messages
+            importTestSummary.setInjects(new ArrayList<>());
+        } else if(saveAll) {
+            Iterable<Inject> newInjects = injectRepository.saveAll(importTestSummary.getInjects());
+            newInjects.forEach(inject -> {scenario.getInjects().add(inject);});
+            scenarioService.updateScenario(scenario);
+        }
+
+        return importTestSummary;
+    }
+
+    private ImportTestSummary importXls(String importId, Scenario scenario, ImportMapper importMapper, InjectsImportInput input) {
         ImportTestSummary importTestSummary = new ImportTestSummary();
 
         try {
@@ -290,7 +325,7 @@ public class InjectService {
         int colTypeIdx = CellReference.convertColStringToIndex(importMapper.getInjectTypeColumn());
 
         //If the row is completely empty, we ignore it altogether and do not send a warn message
-        if (checkIfRowIsEmpty(row)) {
+        if (InjectUtils.checkIfRowIsEmpty(row)) {
             return importTestSummary;
         }
         // First of all, we get the value of the differenciation cell
@@ -348,30 +383,10 @@ public class InjectService {
         inject.setDependsDuration(0L);
 
         // Adding the description
-        RuleAttribute descriptionRuleAttribute = matchingInjectImporter.getRuleAttributes().stream()
-            .filter(ruleAttribute -> ruleAttribute.getName().equals("description"))
-            .findFirst()
-            .orElseThrow(ElementNotFoundException::new);
-        int descriptionCol = CellReference.convertColStringToIndex(descriptionRuleAttribute.getColumns());
-        Cell descriptionValueCell = row.getCell(descriptionCol);
-        if (descriptionValueCell == null || descriptionValueCell.getStringCellValue().isBlank()) {
-            inject.setDescription(descriptionRuleAttribute.getDefaultValue());
-        } else {
-            inject.setDescription(descriptionValueCell.getStringCellValue());
-        }
+        setAttributeValue(row, matchingInjectImporter, "description", inject::setDescription);
 
         // Adding the title
-        RuleAttribute titleRuleAttribute = matchingInjectImporter.getRuleAttributes().stream()
-            .filter(ruleAttribute -> ruleAttribute.getName().equals("title"))
-            .findFirst()
-            .orElseThrow(ElementNotFoundException::new);
-        int titleCol = CellReference.convertColStringToIndex(titleRuleAttribute.getColumns());
-        Cell titleValueCell = row.getCell(titleCol);
-        if (titleValueCell == null || titleValueCell.getStringCellValue().isBlank()) {
-            inject.setTitle(titleRuleAttribute.getDefaultValue());
-        } else {
-            inject.setTitle(titleValueCell.getStringCellValue());
-        }
+        setAttributeValue(row, matchingInjectImporter, "title", inject::setTitle);
 
         // Adding the trigger time
         RuleAttribute triggerTimeRuleAttribute = matchingInjectImporter.getRuleAttributes().stream()
@@ -484,7 +499,7 @@ public class InjectService {
             }
         }
 
-        // Adding the content
+        // Initializing the content with a root node
         ObjectMapper mapper = new ObjectMapper();
         inject.setContent(mapper.createObjectNode());
 
@@ -497,7 +512,7 @@ public class InjectService {
         // For each rule attributes of the importer
         matchingInjectImporter.getRuleAttributes().forEach(ruleAttribute -> {
             importTestSummary.getImportMessages().addAll(
-                    addFieldsFromExpectations(inject, ruleAttribute,
+                    addFields(inject, ruleAttribute,
                             row, mapTeamByName, expectation, importMapper));
         });
         // This is by default at false
@@ -520,24 +535,6 @@ public class InjectService {
             expectationNode.put("expectation_expectation_group", false);
             expectationsNode.add(expectationNode);
             inject.getContent().set("expectations", expectationsNode);
-
-            /*if(!inject.getTeams().isEmpty()) {
-                List<InjectExpectation> expectations = inject.getTeams().stream().map(team -> {
-                    InjectExpectation expectationOfTeam = new InjectExpectation();
-                    expectationOfTeam.setDescription(expectation.get().getDescription());
-                    expectationOfTeam.setName(expectation.get().getName());
-                    expectationOfTeam.setScore(expectation.get().getScore());
-                    expectationOfTeam.setType(InjectExpectation.EXPECTATION_TYPE.MANUAL);
-                    expectationOfTeam.setTeam(team);
-                    expectationOfTeam.setExpectationGroup(false);
-                    expectationOfTeam.setInject(inject);
-                    return expectationOfTeam;
-                })
-                    .filter(injectExpectation -> injectExpectation.getScore() != null)
-                    .toList();
-
-                inject.setExpectations(expectations);
-            }*/
         }
 
         // We set the scenario
@@ -548,10 +545,27 @@ public class InjectService {
         return importTestSummary;
     }
 
-    private List<ImportMessage> addFieldsFromExpectations(Inject inject, RuleAttribute ruleAttribute,
-                                                          Row row, Map<String, Team> mapTeamByName,
-                                                          AtomicReference<InjectExpectation> expectation,
-                                                          ImportMapper importMapper) {
+    private void setAttributeValue(Row row, InjectImporter matchingInjectImporter, String attributeName, Consumer<String> setter) {
+        RuleAttribute ruleAttribute = matchingInjectImporter.getRuleAttributes().stream()
+                .filter(attr -> attr.getName().equals(attributeName))
+                .findFirst()
+                .orElseThrow(ElementNotFoundException::new);
+
+        int colIndex = CellReference.convertColStringToIndex(ruleAttribute.getColumns());
+        Cell valueCell = row.getCell(colIndex);
+
+        if (valueCell == null || valueCell.getStringCellValue().isBlank()) {
+            setter.accept(ruleAttribute.getDefaultValue());
+        } else {
+            setter.accept(valueCell.getStringCellValue());
+        }
+
+    }
+
+    private List<ImportMessage> addFields(Inject inject, RuleAttribute ruleAttribute,
+                                          Row row, Map<String, Team> mapTeamByName,
+                                          AtomicReference<InjectExpectation> expectation,
+                                          ImportMapper importMapper) {
         // If it's a reserved field, it's already taken care of
         if(importReservedField.contains(ruleAttribute.getName())) {
             return Collections.emptyList();
@@ -822,56 +836,7 @@ public class InjectService {
         );
     }
 
-    private boolean checkIfRowIsEmpty(Row row) {
-        if (row == null) {
-            return true;
-        }
-        if (row.getLastCellNum() <= 0) {
-            return true;
-        }
-        for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
-            Cell cell = row.getCell(cellNum);
-            if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
   // -- TEST --
-
-  /**
-   * Create inject programmatically based on rawInject, rawInjectExpectation, rawAsset, rawAssetGroup, rawTeam
-   */
-  public Map<String, Inject> mapOfInjects(@NotNull final List<String> injectIds) {
-    List<Inject> listOfInjects = new ArrayList<>();
-
-    List<RawInject> listOfRawInjects = this.injectRepository.findRawByIds(injectIds);
-    // From the list of injects, we get all the inject expectationsIds that we then get
-    // and put into a map with the expections ids as key
-    Map<String, RawInjectExpectation> mapOfInjectsExpectations = mapOfInjectsExpectations(listOfRawInjects);
-
-    // We get the asset groups from the injects AND the injects expectations as those can also have asset groups
-    // We then make a map out of it for faster access
-    Map<String, RawAssetGroup> mapOfAssetGroups = mapOfAssetGroups(listOfRawInjects, mapOfInjectsExpectations.values());
-
-    // We get all the assets that are
-    // 1 - linked to an inject
-    // 2 - linked to an asset group linked to an inject
-    // 3 - linked to an inject expectation
-    // 4 - linked to an asset group linked to an inject expectations
-    // We then make a map out of it
-    Map<String, RawAsset> mapOfAssets = mapOfAssets(listOfRawInjects, mapOfInjectsExpectations, mapOfAssetGroups);
-
-    // We get all the teams that are linked to an inject or an asset group
-    // Then we make a map out of it for faster access
-    Map<String, RawTeam> mapOfRawTeams = mapOfRawTeams(listOfRawInjects, mapOfInjectsExpectations);
-
-    // Once we have all of this, we create an Inject for each InjectRaw that we have using all the Raw objects we got
-    // Then we make a map out of it for faster access
-    listOfRawInjects.stream().map((inject) -> Inject.fromRawInject(inject, mapOfRawTeams, mapOfInjectsExpectations, mapOfAssetGroups, mapOfAssets)).forEach(listOfInjects::add);
-    return listOfInjects.stream().collect(Collectors.toMap(Inject::getId, Function.identity()));
-  }
 
   private Map<String, RawInjectExpectation> mapOfInjectsExpectations(@NotNull final List<RawInject> rawInjects) {
     return this.injectExpectationRepository
@@ -932,5 +897,69 @@ public class InjectService {
             ).filter(Objects::nonNull)
         ).distinct().toList()).stream().collect(Collectors.toMap(RawTeam::getTeam_id, Function.identity()));
   }
+
+    // -- CRITERIA BUILDER --
+
+    private void selectForInject(CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Inject> injectRoot) {
+        // Joins
+        Join<Inject, Exercise> injectExerciseJoin = createLeftJoin(injectRoot, "exercise");
+        Join<Inject, Scenario> injectScenarioJoin = createLeftJoin(injectRoot, "scenario");
+        Join<Inject, InjectorContract> injectorContractJoin = createLeftJoin(injectRoot, "injectorContract");
+        Join<InjectorContract, Injector> injectorJoin = injectorContractJoin.join("injector", JoinType.LEFT);
+        // Array aggregations
+        Expression<String[]> tagIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "tags");
+        Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
+        Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
+        Expression<String[]> assetGroupIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assetGroups");
+
+        // SELECT
+        cq.multiselect(
+                injectRoot.get("id").alias("inject_id"),
+                injectRoot.get("title").alias("inject_title"),
+                injectRoot.get("enabled").alias("inject_enabled"),
+                injectRoot.get("content").alias("inject_content"),
+                injectRoot.get("allTeams").alias("inject_all_teams"),
+                injectExerciseJoin.get("id").alias("inject_exercise"),
+                injectScenarioJoin.get("id").alias("inject_scenario"),
+                injectRoot.get("dependsDuration").alias("inject_depends_duration"),
+                injectorContractJoin.alias("inject_injector_contract"),
+                tagIdsExpression.alias("inject_tags"),
+                teamIdsExpression.alias("inject_teams"),
+                assetIdsExpression.alias("inject_assets"),
+                assetGroupIdsExpression.alias("inject_asset_groups"),
+                injectorJoin.get("type").alias("inject_type")
+        ).distinct(true);
+
+        // GROUP BY
+        cq.groupBy(Arrays.asList(
+                injectRoot.get("id"),
+                injectExerciseJoin.get("id"),
+                injectScenarioJoin.get("id"),
+                injectorContractJoin.get("id"),
+                injectorJoin.get("id")
+        ));
+    }
+
+    private List<InjectOutput> execInject(TypedQuery<Tuple> query) {
+        return query.getResultList()
+                .stream()
+                .map(tuple -> new InjectOutput(
+                        tuple.get("inject_id", String.class),
+                        tuple.get("inject_title", String.class),
+                        tuple.get("inject_enabled", Boolean.class),
+                        tuple.get("inject_content", ObjectNode.class),
+                        tuple.get("inject_all_teams", Boolean.class),
+                        tuple.get("inject_exercise", String.class),
+                        tuple.get("inject_scenario", String.class),
+                        tuple.get("inject_depends_duration", Long.class),
+                        tuple.get("inject_injector_contract", InjectorContract.class),
+                        tuple.get("inject_tags", String[].class),
+                        tuple.get("inject_teams", String[].class),
+                        tuple.get("inject_assets", String[].class),
+                        tuple.get("inject_asset_groups", String[].class),
+                        tuple.get("inject_type", String.class)
+                ))
+                .toList();
+    }
 
 }
