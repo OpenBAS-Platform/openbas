@@ -11,9 +11,7 @@ import lombok.Data;
 import lombok.Getter;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static io.openbas.database.model.InjectStatus.draftInjectStatus;
 import static lombok.AccessLevel.NONE;
@@ -35,6 +33,9 @@ public class AtomicTestingOutput {
 
   @JsonProperty("inject_type")
   public String injectType;
+
+  @JsonProperty("inject_injector_contract_labels")
+  public Map<String, String> injectorContractLabels;
 
   @JsonProperty("inject_injector_contract")
   private InjectorContract injectorContract;
@@ -79,7 +80,8 @@ public class AtomicTestingOutput {
       String title,
       Instant updatedAt,
       String injectType,
-      InjectorContract injectorContract,
+      Map<String, String> injectorContractLabels,
+      //InjectorContract injectorContract,
       InjectStatus injectStatus,
       String[] injectExpectations,
       String[] teams,
@@ -89,7 +91,8 @@ public class AtomicTestingOutput {
     this.title = title;
     this.updatedAt = updatedAt;
     this.injectType = injectType;
-    this.injectorContract = injectorContract;
+    this.injectorContractLabels = injectorContractLabels != null ? injectorContractLabels : new HashMap<>();
+    //this.injectorContract = injectorContract;
     this.status = injectStatus;
     this.expectations = injectExpectations != null ? new ArrayList<>(Arrays.asList(injectExpectations)) : new ArrayList<>();
 
