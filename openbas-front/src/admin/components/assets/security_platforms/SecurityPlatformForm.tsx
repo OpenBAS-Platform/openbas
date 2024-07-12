@@ -7,7 +7,7 @@ import { useFormatter } from '../../../../components/i18n';
 import type { SecurityPlatformInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
 import TagField from '../../../../components/fields/TagField';
-import DocumentLoader from '../../../../components/fields/DocumentLoader';
+import FileLoader from '../../../../components/fields/FileLoader';
 
 interface Props {
   onSubmit: SubmitHandler<SecurityPlatformInput>;
@@ -112,7 +112,7 @@ const SecurityPlatformForm: React.FC<Props> = ({
         control={control}
         name="security_platform_logo_light"
         render={({ field: { onChange, value } }) => (
-          <DocumentLoader
+          <FileLoader
             name="security_platform_logo_light"
             label={t('Logo light')}
             extensions={['png', 'jpg', 'jpeg', 'svg', 'gif']}
@@ -125,7 +125,7 @@ const SecurityPlatformForm: React.FC<Props> = ({
         control={control}
         name="security_platform_logo_dark"
         render={({ field: { onChange, value } }) => (
-          <DocumentLoader
+          <FileLoader
             name="security_platform_logo_dark"
             label={t('Logo dark')}
             extensions={['png', 'jpg', 'tiff', 'tif', 'bmp', 'jpeg', 'svg', 'gif']}
