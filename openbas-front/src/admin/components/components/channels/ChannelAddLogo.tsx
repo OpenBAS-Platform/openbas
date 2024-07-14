@@ -47,7 +47,7 @@ const ChannelAddLogo: React.FC<Props> = ({ handleAddLogo }) => {
           label={t('Select an image')}
           open={open}
           setOpen={setOpen}
-          onSelectDocument={setSelectedDocument}
+          onAddDocument={setSelectedDocument}
           extensions={['png', 'jpg', 'jpeg', 'svg', 'gif']}
         >
         </FileTransferDialog>)}

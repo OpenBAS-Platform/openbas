@@ -17,8 +17,8 @@ import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchExercises } from '../../../../actions/Exercise';
 import { fetchDocuments } from '../../../../actions/Document';
-import ChallengeAddDocuments from './ChallengeAddDocuments';
 import TagField from '../../../../components/TagField';
+import MultipleFileLoader from '../../../../components/fields/MultipleFileLoader';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -103,7 +103,9 @@ const ChallengeForm = (props) => {
   const [documentsSortBy, setDocumentsSortBy] = useState('document_name');
   const [documentsOrderAsc, setDocumentsOrderAsc] = useState(true);
   const [documents, setDocuments] = useState(documentsIds || []);
-  const handleAddDocuments = (docsIds) => setDocuments([...documents, ...docsIds]);
+  const handleAddDocuments = (updatedDocuments) => {
+    setDocuments(updatedDocuments.map((document) => document.document_id));
+  };
   const handleRemoveDocument = (docId) => setDocuments(documents.filter((n) => n !== docId));
   // Functions
   const validate = (values) => {
@@ -155,6 +157,7 @@ const ChallengeForm = (props) => {
   const submitForm = (data) => {
     return onSubmit({ ...data, challenge_documents: documents });
   };
+
   // Rendering
   return (
     <Form
@@ -299,8 +302,7 @@ const ChallengeForm = (props) => {
                 </ListItem>
               );
             })}
-            <ChallengeAddDocuments
-              challengeDocumentsIds={documents}
+            <MultipleFileLoader initialDocumentIds={documents}
               handleAddDocuments={handleAddDocuments}
             />
           </List>

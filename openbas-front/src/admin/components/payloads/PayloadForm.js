@@ -43,7 +43,7 @@ const PayloadForm = (props) => {
         requiredFields.push(...['file_drop_file']);
         break;
       default:
-            // do nothing
+        // do nothing
     }
     requiredFields.forEach((field) => {
       if (field === 'payload_platforms' && (!values[field] || values[field].length === 0)) {
@@ -137,7 +137,7 @@ const PayloadForm = (props) => {
             <>
               <FileLoader
                 name="executable_file"
-                label={t('File')}
+                label={t('Document')}
                 setFieldValue={form.mutators.setValue}
                 initialValue={values.executable_file}
                 InputLabelProps={{ required: true }}
@@ -149,7 +149,7 @@ const PayloadForm = (props) => {
             <>
               <FileLoader
                 name="file_drop_file"
-                label={t('File')}
+                label={t('Document')}
                 setFieldValue={form.mutators.setValue}
                 initialValue={values.file_drop_file}
                 InputLabelProps={{ required: true }}

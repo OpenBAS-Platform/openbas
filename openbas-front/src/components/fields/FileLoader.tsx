@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     fontWeight: 500,
   },
   title: {
-    fontSize: '0.7 rem',
+    fontSize: 11,
     color: theme.palette.text?.secondary,
     fontWeight: 500,
     marginTop: 20,
@@ -172,7 +172,7 @@ const FileLoader: React.FC<Props> = ({
             <ControlPointOutlined color="primary"/>
           </ListItemIcon>
           <ListItemText
-            primary={'Add file'}
+            primary={'Add document'}
             classes={{ primary: classes.text }}
           />
         </ListItem>
@@ -227,11 +227,11 @@ const FileLoader: React.FC<Props> = ({
       </List>
       {open && (
         <FileTransferDialog
-          extensions={extensions}
           label={label}
           open={open}
           setOpen={setOpen}
-          onSelectDocument={setSelectedDocument}
+          onAddDocument={setSelectedDocument}
+          extensions={extensions}
         >
         </FileTransferDialog>)}
     </>

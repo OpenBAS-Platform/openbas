@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Button, DialogActions, DialogContent, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Chip, DialogActions, DialogContent, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { DescriptionOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import SearchFilter from '../SearchFilter';
@@ -7,13 +7,23 @@ import TagsFilter from '../../admin/components/common/filters/TagsFilter';
 import type { RawDocument } from '../../utils/api-types';
 import ItemTags from '../ItemTags';
 import CreateDocument from '../../admin/components/components/documents/CreateDocument';
-import { useFormatter } from '../i18n';
 import { useHelper } from '../../store';
 import type { DocumentHelper, UserHelper } from '../../actions/helper';
 import type { Theme } from '../Theme';
 import Dialog from '../common/Dialog';
+import { useFormatter } from '../i18n';
+import { truncate } from '../../utils/String';
 
 const useStyles = makeStyles((theme: Theme) => ({
+  box: {
+    width: '100%',
+    minHeight: '100%',
+    padding: 20,
+    border: '1px dashed rgba(255, 255, 255, 0.3)',
+  },
+  chip: {
+    margin: '0 10px 10px 0',
+  },
   item: {
     paddingLeft: 10,
     height: 50,
@@ -25,18 +35,33 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  extensions?: string[];
   label: string;
   open: boolean;
   setOpen: (open: boolean) => void;
-  onSelectDocument: (document: RawDocument | null) => void;
+  onAddDocument?: (document: RawDocument) => void;
+  extensions?: string[];
+  /* If we want to load multiples files */
+  multiple?: boolean;
+  initialDocumentIds?: string[];
+  onSubmitAddDocuments?: (documents: RawDocument[]) => void;
 }
 
-const FileTransferDialog: React.FC<Props> = ({ extensions, label, open, setOpen, onSelectDocument }) => {
+const FileTransferDialog: React.FC<Props> = ({
+  label,
+  open,
+  setOpen,
+  onAddDocument,
+  extensions = [],
+  multiple = false,
+  initialDocumentIds = [],
+  onSubmitAddDocuments,
+}) => {
   const classes = useStyles();
+  const { t } = useFormatter();
 
   const [keyword, setKeyword] = useState<string>('');
   const [tags, setTags] = useState<{ id: string, label: string, color: string }[]>([]);
+  const [selectedDocuments, setSelectedDocuments] = useState<RawDocument[]>([]);
 
   // Fetching data
   const { documents, userAdmin }: {
@@ -47,19 +72,14 @@ const FileTransferDialog: React.FC<Props> = ({ extensions, label, open, setOpen,
     userAdmin: helper.getMe()?.user_admin,
   }));
 
-  const filterByKeyword = (n: RawDocument) => keyword === ''
-        || n.document_name?.toLowerCase().includes(keyword.toLowerCase())
-        || n.document_description?.toLowerCase().includes(keyword.toLowerCase())
-        || n.document_type?.toLowerCase().includes(keyword.toLowerCase());
-
-  const filterByExtensions = (n: RawDocument) => extensions?.length === 0
-        || extensions?.map((ext) => ext.toLowerCase()).includes(n.document_name?.split('.').pop()?.toLowerCase() || '');
-
-  const filteredDocuments = documents.filter((doc) => {
-    return (!tags.length || tags.every((tag) => doc.document_tags?.includes(tag.id)))
-            && filterByKeyword(doc)
-            && filterByExtensions(doc);
-  }).slice(0, 10);
+  useEffect(() => {
+    if (initialDocumentIds.length > 0) {
+      setSelectedDocuments(documents.filter((document) => {
+        const docId = document.document_id;
+        return docId && initialDocumentIds.includes(docId);
+      }));
+    }
+  }, [initialDocumentIds]);
 
   const handleSearchDocuments = (value?: string) => {
     setKeyword(value || '');
@@ -77,12 +97,53 @@ const FileTransferDialog: React.FC<Props> = ({ extensions, label, open, setOpen,
     setOpen(false);
     setTags([]);
     setKeyword('');
+    setSelectedDocuments([]);
   };
 
-  const addDocument = (document: RawDocument) => {
-    onSelectDocument(document);
+  const handleAddDocument = (document: RawDocument) => {
+    if (!selectedDocuments.some((doc) => doc.document_id === document.document_id)) {
+      setSelectedDocuments([...selectedDocuments, document]);
+    }
+    if (!multiple && onAddDocument) {
+      onAddDocument(document);
+      handleClose();
+    }
+  };
+
+  const handleSubmitAddDocuments = () => {
+    if (onSubmitAddDocuments) {
+      onSubmitAddDocuments(selectedDocuments);
+    }
     handleClose();
   };
+
+  const handleRemoveDocument = (document: RawDocument) => {
+    setSelectedDocuments(selectedDocuments.filter((doc) => doc.document_id !== document.document_id));
+  };
+
+  const filterByExtensions = (document: RawDocument) => {
+    return extensions?.length === 0
+    || extensions?.map((ext) => ext.toLowerCase()).includes(document.document_name?.split('.').pop()?.toLowerCase() || '');
+  };
+
+  const filterByKeyword = (document: RawDocument) => {
+    return keyword === ''
+    || document.document_name?.toLowerCase().includes(keyword.toLowerCase())
+    || document.document_description?.toLowerCase().includes(keyword.toLowerCase())
+    || document.document_type?.toLowerCase().includes(keyword.toLowerCase());
+  };
+
+  const filterByTag = (document: RawDocument) => {
+    return tags.length === 0 || tags.every((tag) => document.document_tags?.includes(tag.id));
+  };
+
+  const filteredDocuments = documents.filter((document) => {
+    const isInitialValue = document.document_id && initialDocumentIds?.includes(document.document_id);
+    return !isInitialValue
+        && filterByExtensions(document)
+        && filterByKeyword(document)
+        && filterByTag(document);
+  }).slice(0, 10);
 
   return (
     <Dialog
@@ -93,52 +154,81 @@ const FileTransferDialog: React.FC<Props> = ({ extensions, label, open, setOpen,
     >
       <DialogContent>
         <Grid container spacing={3}>
-          <Grid item xs={6}>
-            <SearchFilter
-              onChange={handleSearchDocuments}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TagsFilter
-              onAddTag={handleAddTag}
-              onClearTag={handleClearTag}
-              currentTags={tags}
-              fullWidth
-            />
-          </Grid>
-        </Grid>
-        <List>
-          {filteredDocuments.map((document: RawDocument) => {
-            return (
-              <ListItem
-                classes={{ root: classes.item }}
-                key={document.document_id}
-                divider
-                onClick={() => addDocument(document)}
-              >
-                <ListItemIcon>
-                  <DescriptionOutlined/>
-                </ListItemIcon>
-                <ListItemText
-                  primary={document.document_name}
-                  secondary={document.document_description}
+          <Grid item xs={multiple ? 8 : 12}>
+            <Grid container spacing={3}>
+              <Grid item xs={6}>
+                <SearchFilter
+                  onChange={handleSearchDocuments}
+                  fullWidth
                 />
-                <ItemTags
-                  variant="list"
-                  tags={document.document_tags}
+              </Grid>
+              <Grid item xs={6}>
+                <TagsFilter
+                  onAddTag={handleAddTag}
+                  onClearTag={handleClearTag}
+                  currentTags={tags}
+                  fullWidth
                 />
-              </ListItem>
-            );
-          })}
-          {userAdmin && (
-            <CreateDocument
-              inline
-              onCreate={addDocument}
-            />
+              </Grid>
+            </Grid>
+            <List>
+              {filteredDocuments.map((document: RawDocument) => {
+                return (
+                  <ListItem
+                    classes={{ root: classes.item }}
+                    key={document.document_id}
+                    divider
+                    onClick={() => handleAddDocument(document)}
+                  >
+                    <ListItemIcon>
+                      <DescriptionOutlined/>
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={document.document_name}
+                      secondary={document.document_description}
+                    />
+                    <ItemTags
+                      variant="reduced-view"
+                      tags={document.document_tags}
+                    />
+                  </ListItem>
+                );
+              })}
+              {userAdmin && (
+                <CreateDocument
+                  inline
+                  onCreate={handleAddDocument}
+                />
+              )}
+            </List>
+          </Grid>
+          {multiple && (
+            <Grid item xs={4}>
+              <Box className={classes.box}>
+                {selectedDocuments.map((document) => (
+                  <Chip
+                    key={document.document_id}
+                    variant="outlined"
+                    onDelete={() => handleRemoveDocument(document)}
+                    label={truncate(document?.document_name, 15)}
+                    icon={<DescriptionOutlined />}
+                    classes={{ root: classes.chip }}
+                  />
+                ))}
+              </Box>
+            </Grid>
           )}
-        </List>
+        </Grid>
       </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose}>{t('Cancel')}</Button>
+        {multiple && (<Button
+          color="secondary"
+          onClick={handleSubmitAddDocuments}
+                      >
+          {t('Add')}
+        </Button>)}
+      </DialogActions>
     </Dialog>
   );
 };
