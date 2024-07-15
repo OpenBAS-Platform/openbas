@@ -1,6 +1,22 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs } from '@mui/material';
+import {
+  Box,
+  Button,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tabs,
+} from '@mui/material';
 import { useFormatter } from '../../../../components/i18n';
 import { deleteExercise, duplicateExercise, updateExercise } from '../../../../actions/Exercise';
 import { usePermissions } from '../../../../utils/Exercise';
