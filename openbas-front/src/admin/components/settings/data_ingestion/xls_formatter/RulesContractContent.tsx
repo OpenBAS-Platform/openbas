@@ -17,6 +17,7 @@ import {
   Badge,
   IconButton,
   Button,
+  DialogContentText,
 } from '@mui/material';
 import { ExpandMore, DeleteOutlined } from '@mui/icons-material';
 import { CogOutline } from 'mdi-material-ui';
@@ -27,7 +28,7 @@ import InjectContractComponent from '../../../../../components/InjectContractCom
 import { useFormatter } from '../../../../../components/i18n';
 import RegexComponent from '../../../../../components/RegexComponent';
 import type { InjectorContractStore } from '../../../../../actions/injector_contracts/InjectorContract';
-import type { FilterGroup, InjectorContract, MapperAddInput, SearchPaginationInput } from '../../../../../utils/api-types';
+import type { FilterGroup, InjectorContract, ImportMapperAddInput, SearchPaginationInput } from '../../../../../utils/api-types';
 import { initSorting } from '../../../../../components/common/pagination/Page';
 
 const useStyles = makeStyles(() => ({
@@ -43,11 +44,15 @@ const useStyles = makeStyles(() => ({
     display: 'inline-flex',
     alignItems: 'center',
   },
+  redStar: {
+    color: 'rgb(244, 67, 54)',
+    marginLeft: '2px',
+  },
 }));
 
 interface Props {
-  field: FieldArrayWithId<MapperAddInput, 'mapper_inject_importers', 'id'>;
-  methods: UseFormReturn<MapperAddInput>;
+  field: FieldArrayWithId<ImportMapperAddInput, 'mapper_inject_importers', 'id'>;
+  methods: UseFormReturn<ImportMapperAddInput>;
   index: number;
   remove: UseFieldArrayRemove;
 }
@@ -107,6 +112,16 @@ const RulesContractContent: React.FC<Props> = ({
     setCurrentRuleIndex(null);
   };
 
+  const [openAlertDelete, setOpenAlertDelete] = React.useState(false);
+
+  const handleClickOpenAlertDelete = () => {
+    setOpenAlertDelete(true);
+  };
+
+  const handleCloseAlertDelete = () => {
+    setOpenAlertDelete(false);
+  };
+
   // Contracts
   const importFilter: FilterGroup = {
     mode: 'and',
@@ -125,147 +140,161 @@ const RulesContractContent: React.FC<Props> = ({
   });
 
   return (
-    <Accordion key={field.id} variant="outlined"
-      style={{ width: '100%' }}
-    >
-      <AccordionSummary
-        expandIcon={<ExpandMore />}
+    <>
+      <Accordion key={field.id} variant="outlined"
+        style={{ width: '100%' }}
       >
-        <div className={classes.container}>
-          <Typography>
-            {t('Inject importer')} {index + 1}
-          </Typography>
-          <Tooltip title={t('Delete')}>
-            <IconButton color="error" onClick={() => {
-              remove(index);
-            }}
-            >
-              <DeleteOutlined fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </div>
-      </AccordionSummary>
-      <AccordionDetails>
-        <TextField
-          variant="standard"
-          fullWidth
-          label={t('Inject importer name')}
-          style={{ marginTop: 10 }}
-          inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_name` as const)}
-          InputLabelProps={{ required: true }}
-          error={!!methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_name}
-          helperText={methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_name?.message}
-        />
-        <TextField
-          variant="standard"
-          fullWidth
-          label={t('Inject importer type')}
-          style={{ marginTop: 10 }}
-          inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_type_value` as const)}
-          InputLabelProps={{ required: true }}
-          error={!!methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_type_value}
-          helperText={methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_type_value?.message}
-        />
-        <Controller
-          control={control}
-          name={`mapper_inject_importers.${index}.inject_importer_injector_contract_id` as const}
-          render={({ field: { onChange }, fieldState: { error } }) => (
-            <InjectContractComponent
-              fetch={searchInjectorContracts}
-              searchPaginationInput={searchPaginationInput}
-              setContent={setContracts}
-              label={t('Inject importer injector contract')}
-              injectorContracts={contracts}
-              onChange={(data) => {
-                onChange(data);
-              }}
-              error={error}
-            />
-          )}
-        />
-        {
-          rulesFields.map((ruleField, rulesIndex) => {
-            return (
-              <List key={ruleField.id} style={{ marginTop: 20 }}>
-                <ListItem key={ruleField.id}>
-                  <ListItemText
-                    primary={
-                      <div className={classes.rulesArray}>
-                        <Typography
-                          variant="subtitle1" {...methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_name` as const)}
-                        >
-                          {ruleField.rule_attribute_name}
-                        </Typography>
-                        <Controller
-                          control={control}
-                          name={`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_columns` as const}
-                          render={({ field: { onChange }, fieldState: { error } }) => (
-                            <RegexComponent label={t('Rule attributes columns')} onChange={onChange} error={error}
-                              name={`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_columns`}
-                            />
-                          )}
-                        />
-                        <IconButton
-                          color="primary"
-                          onClick={() => handleDefaultValueOpen(rulesIndex)}
-                        >
-                          <Badge color="secondary" variant="dot"
-                            invisible={!methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
-                                   || methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0}
+        <AccordionSummary
+          expandIcon={<ExpandMore />}
+        >
+          <div className={classes.container}>
+            <Typography>
+              {t('Inject importer')} {index + 1}
+            </Typography>
+            <Tooltip title={t('Delete')}>
+              <IconButton color="error" onClick={handleClickOpenAlertDelete}>
+                <DeleteOutlined fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </div>
+        </AccordionSummary>
+        <AccordionDetails>
+          <TextField
+            variant="standard"
+            fullWidth
+            label={t('Inject importer name')}
+            style={{ marginTop: 10 }}
+            inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_name` as const)}
+            InputLabelProps={{ required: true }}
+            error={!!methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_name}
+            helperText={methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_name?.message}
+          />
+          <TextField
+            variant="standard"
+            fullWidth
+            label={t('Inject importer type')}
+            style={{ marginTop: 10 }}
+            inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_type_value` as const)}
+            InputLabelProps={{ required: true }}
+            error={!!methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_type_value}
+            helperText={methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_type_value?.message}
+          />
+          <Controller
+            control={control}
+            name={`mapper_inject_importers.${index}.inject_importer_injector_contract_id` as const}
+            render={({ field: { onChange }, fieldState: { error } }) => (
+              <InjectContractComponent
+                fetch={searchInjectorContracts}
+                searchPaginationInput={searchPaginationInput}
+                setContent={setContracts}
+                label={t('Inject importer injector contract')}
+                injectorContracts={contracts}
+                onChange={(data) => {
+                  onChange(data);
+                }}
+                error={error}
+              />
+            )}
+          />
+          {
+            rulesFields.map((ruleField, rulesIndex) => {
+              return (
+                <List key={ruleField.id} style={{ marginTop: 20 }}>
+                  <ListItem key={ruleField.id}>
+                    <ListItemText
+                      primary={
+                        <div className={classes.rulesArray}>
+                          <Typography
+                            variant="subtitle1" {...methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_name` as const)}
                           >
-                            <CogOutline />
-                          </Badge>
-                        </IconButton>
-                      </div>
+                            {ruleField.rule_attribute_name} <span className={classes.redStar}>*</span>
+                          </Typography>
+                          <Controller
+                            control={control}
+                            name={`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_columns` as const}
+                            render={({ field: { onChange }, fieldState: { error } }) => (
+                              <RegexComponent label={t('Rule attributes columns')} onChange={onChange} error={error}
+                                name={`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_columns`}
+                              />
+                            )}
+                          />
+                          <IconButton
+                            color="primary"
+                            onClick={() => handleDefaultValueOpen(rulesIndex)}
+                          >
+                            <Badge color="secondary" variant="dot"
+                              invisible={!methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
+                                     || methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0}
+                            >
+                              <CogOutline />
+                            </Badge>
+                          </IconButton>
+                        </div>
+                      }
+                    />
+                    {currentRuleIndex !== null
+                      && <Dialog
+                        open
+                        PaperProps={{ elevation: 1 }}
+                        onClose={handleDefaultValueClose}
+                         >
+                        <DialogTitle>
+                          {t('Attribute mapping configuration')}
+                        </DialogTitle>
+                        <DialogContent>
+                          <TextField
+                            fullWidth
+                            label={t('Rule attribute default value')}
+                            inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_default_value`)}
+                          />
+                          {
+                            currentRuleIndex === rulesFields.length - 1 && <TextField
+                              label={t('Rule additional config')}
+                              fullWidth
+                              inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern` as const)}
+                                                                           />
+                          }
+                        </DialogContent>
+                        <DialogActions>
+                          <Button onClick={handleDefaultValueClose} autoFocus>
+                            {t('Close')}
+                          </Button>
+                        </DialogActions>
+                      </Dialog>
                     }
-                  />
-                  {currentRuleIndex !== null
-                    && <Dialog
-                      open
-                      fullWidth
-                      onClose={handleDefaultValueClose}
-                       >
-                      <DialogTitle>
-                        {t('Attribute mapping configuration')}
-                      </DialogTitle>
-                      <DialogContent>
-                        <TextField
-                          fullWidth
-                          label={t('Rule attribute default value')}
-                          inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_default_value`)}
-                        />
-                      </DialogContent>
-                      <DialogActions>
-                        <Button onClick={handleDefaultValueClose} autoFocus>
-                          {t('Close')}
-                        </Button>
-                      </DialogActions>
-                    </Dialog>
-                  }
-                  {
-                    rulesIndex === rulesFields.length - 1 && <ListItemText>
-                      <TextField
-                        label={t('Rule additional config')}
-                        fullWidth
-                        inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern` as const)}
-                      />
-                    </ListItemText>
-                  }
+                  </ListItem>
+                </List>
+              );
+            })
+          }
 
-                </ListItem>
-              </List>
-            );
-          })
-        }
+        </AccordionDetails>
+        <AccordionActions>
+          <Button color="error" variant="contained" onClick={handleClickOpenAlertDelete}>{t('Delete')}</Button>
+        </AccordionActions>
+      </Accordion>
 
-      </AccordionDetails>
-      <AccordionActions>
-        <Button color="error" variant="contained" onClick={() => {
-          remove(index);
-        }}
-        >{t('Delete')}</Button>
-      </AccordionActions>
-    </Accordion>
+      <Dialog
+        open={openAlertDelete}
+        onClose={handleCloseAlertDelete}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t('Do you want to delete this representation?')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAlertDelete}>{t('Cancel')}</Button>
+          <Button color="secondary" onClick={() => {
+            remove(index);
+            handleCloseAlertDelete();
+          }}
+          >
+            {t('Delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 

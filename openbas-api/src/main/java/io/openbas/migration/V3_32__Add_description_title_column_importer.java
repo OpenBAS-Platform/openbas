@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V3_28__Add_description_title_column_importer extends BaseJavaMigration {
+public class V3_32__Add_description_title_column_importer extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {

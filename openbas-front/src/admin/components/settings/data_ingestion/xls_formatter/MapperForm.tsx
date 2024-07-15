@@ -5,7 +5,7 @@ import { Add } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import type { MapperAddInput } from '../../../../../utils/api-types';
+import type { ImportMapperAddInput } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
 import { zodImplement } from '../../../../../utils/Zod';
 import RegexComponent from '../../../../../components/RegexComponent';
@@ -24,10 +24,10 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  OnSubmit: SubmitHandler<MapperAddInput>;
+  OnSubmit: SubmitHandler<ImportMapperAddInput>;
   handleClose: () => void;
   editing?: boolean;
-  initialValues?: MapperAddInput;
+  initialValues?: ImportMapperAddInput;
 }
 
 const MapperForm: React.FC<Props> = ({
@@ -58,10 +58,10 @@ const MapperForm: React.FC<Props> = ({
     inject_importer_rule_attributes: z.array(ruleAttributeZodObject).min(1, { message: t('Should not be empty') }),
   });
 
-  const methods = useForm<MapperAddInput>({
+  const methods = useForm<ImportMapperAddInput>({
     mode: 'onTouched',
     resolver: zodResolver(
-      zodImplement<MapperAddInput>().with({
+      zodImplement<ImportMapperAddInput>().with({
         mapper_name: z.string().min(1, { message: t('Should not be empty') }),
         mapper_inject_importers: z.array(importerZodObject)
           .min(1, { message: t('At least one inject importer is required') }),
@@ -83,7 +83,7 @@ const MapperForm: React.FC<Props> = ({
   const onSubmit = (data) => console.log(data);
 
   return (
-    <form id="mapperForm" onSubmit={methods.handleSubmit(onSubmit)}>
+    <form id="mapperForm" onSubmit={methods.handleSubmit(OnSubmit)}>
       <TextField
         variant="standard"
         fullWidth
