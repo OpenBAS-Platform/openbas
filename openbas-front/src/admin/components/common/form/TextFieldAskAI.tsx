@@ -1,6 +1,21 @@
 import React, { FunctionComponent, useState } from 'react';
 import { AutoAwesomeOutlined } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, IconButton, InputAdornment, InputLabel, Menu, MenuItem, Select, TextField } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  Menu,
+  MenuItem,
+  Select,
+  TextField,
+  Tooltip,
+} from '@mui/material';
 import EETooltip from '../entreprise_edition/EETooltip';
 import { useFormatter } from '../../../../components/i18n';
 // eslint-disable-next-line import/no-cycle
@@ -50,7 +65,10 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
   const [messageSender, setMessageSender] = useState<string>('');
   const [messageRecipient, setMessageRecipient] = useState<string>('');
   const [isAcceptable, setIsAcceptable] = useState(true);
-  const [menuOpen, setMenuOpen] = useState<{ open: boolean; anchorEl: HTMLButtonElement | null; }>({ open: false, anchorEl: null });
+  const [menuOpen, setMenuOpen] = useState<{ open: boolean; anchorEl: HTMLButtonElement | null; }>({
+    open: false,
+    anchorEl: null,
+  });
   const [displayAskAI, setDisplayAskAI] = useState(false);
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     if (isEnterpriseEdition) {
@@ -124,44 +142,42 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
     switch (action) {
       case 'spelling':
         await askFixSpelling();
-        setDisableResponse(false);
         break;
       case 'shorter':
         await askMakeShorter();
-        setDisableResponse(false);
         break;
       case 'longer':
         await askMakeLonger();
-        setDisableResponse(false);
         break;
       case 'tone':
         await askChangeTone();
-        setDisableResponse(false);
         break;
       case 'summarize':
         await askSummarize();
-        setDisableResponse(false);
         break;
       case 'explain':
         await askExplain();
-        setDisableResponse(false);
         break;
       case 'genMessage':
         await askGenMessage();
-        setDisableResponse(false);
         break;
       case 'genSubject':
         await askGenSubject();
-        setDisableResponse(false);
         break;
       case 'genMedia':
         await askGenMedia();
-        setDisableResponse(false);
         break;
       default:
         // do nothing
+        break;
     }
+    setDisableResponse(false);
   };
+
+  const isContentEmpty = () => {
+    return currentValue.length === 0;
+  };
+
   const renderButton = () => {
     return (
       <>
@@ -171,7 +187,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               size="medium"
               color="secondary"
               onClick={(event) => ((isEnterpriseEdition && enabled && configured) ? handleOpenMenu(event) : null)}
-              disabled={disabled || currentValue.length < 10}
+              disabled={disabled}
               style={{ marginRight: -10 }}
             >
               <AutoAwesomeOutlined fontSize='medium'/>
@@ -185,33 +201,53 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
           onClose={handleCloseMenu}
         >
           {inInject && (
-            <MenuItem onClick={handleOpenGenMessageOptions}>
-              {t('Generate a message')}
-            </MenuItem>
+          <MenuItem onClick={handleOpenGenMessageOptions}>
+            {t('Generate a message')}
+          </MenuItem>
           )}
           {inArticle && (
-            <MenuItem onClick={handleOpenGenMediaOptions}>
-              {t('Generate an article')}
-            </MenuItem>
+          <MenuItem onClick={handleOpenGenMediaOptions}>
+            {t('Generate an article')}
+          </MenuItem>
           )}
-          <MenuItem onClick={() => handleAskAi('spelling')}>
-            {t('Fix spelling & grammar')}
-          </MenuItem>
-          <MenuItem onClick={() => handleAskAi('shorter')}>
-            {t('Make it shorter')}
-          </MenuItem>
-          <MenuItem onClick={() => handleAskAi('longer')}>
-            {t('Make it longer')}
-          </MenuItem>
-          <MenuItem onClick={handleOpenToneOptions}>
-            {t('Change tone')}
-          </MenuItem>
-          <MenuItem onClick={() => handleAskAi('summarize')}>
-            {t('Summarize')}
-          </MenuItem>
-          <MenuItem onClick={() => handleAskAi('explain', false)}>
-            {t('Explain')}
-          </MenuItem>
+          <Tooltip title={isContentEmpty() ? t('Content should not be empty') : ''} placement="left">
+            <div>
+              <MenuItem onClick={() => handleAskAi('spelling')} disabled={isContentEmpty()}>
+                {t('Fix spelling & grammar')}
+              </MenuItem>
+            </div>
+          </Tooltip>
+          <Tooltip title={isContentEmpty() ? t('Content should not be empty') : ''} placement="left">
+            <div>
+              <MenuItem onClick={() => handleAskAi('shorter')} disabled={isContentEmpty()}>
+                {t('Make it shorter')}
+              </MenuItem>
+            </div>
+          </Tooltip>
+          <Tooltip title={isContentEmpty() ? t('Content should not be empty') : ''} placement="left">
+            <div>
+              <MenuItem onClick={() => handleAskAi('longer')} disabled={isContentEmpty()}>
+                {t('Make it longer')}
+              </MenuItem></div>
+          </Tooltip>
+          <Tooltip title={isContentEmpty() ? t('Content should not be empty') : ''} placement="left">
+            <div>
+              <MenuItem onClick={handleOpenToneOptions} disabled={isContentEmpty()}>
+                {t('Change tone')}
+              </MenuItem></div>
+          </Tooltip>
+          <Tooltip title={isContentEmpty() ? t('Content should not be empty') : ''} placement="left">
+            <div>
+              <MenuItem onClick={() => handleAskAi('summarize')} disabled={isContentEmpty()}>
+                {t('Summarize')}
+              </MenuItem></div>
+          </Tooltip>
+          <Tooltip title={isContentEmpty() ? t('Content should not be empty') : ''} placement="left">
+            <div>
+              <MenuItem onClick={() => handleAskAi('explain', false)} disabled={isContentEmpty()}>
+                {t('Explain')}
+              </MenuItem></div>
+          </Tooltip>
         </Menu>
         <ResponseDialog
           isDisabled={disableResponse}
@@ -295,11 +331,11 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseToneOptions}>
+            <Button onClick={handleCloseGenMessageOptions}>
               {t('Cancel')}
             </Button>
             <Button
-              disabled={messageInput.length < 5}
+              disabled={messageInput.length === 0} // Disable button if messageInput is empty
               onClick={() => {
                 handleCloseGenMessageOptions();
                 handleAskAi('genMessage');
@@ -370,10 +406,11 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseToneOptions}>
+            <Button onClick={handleCloseGenMediaOptions}>
               {t('Cancel')}
             </Button>
             <Button
+              disabled={messageInput.length === 0}
               onClick={() => {
                 handleCloseGenMediaOptions();
                 handleAskAi('genMedia');
@@ -418,7 +455,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               {t('Cancel')}
             </Button>
             <Button
-              disabled={messageInput.length < 5}
+              disabled={isContentEmpty()}
               onClick={() => {
                 handleCloseToneOptions();
                 handleAskAi('tone');
