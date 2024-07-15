@@ -16,6 +16,7 @@ import type { ExercisesHelper } from '../../../../actions/exercises/exercise-hel
 import type { Exercise as ExerciseType } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
 import type { Theme } from '../../../../components/Theme';
+import { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -196,6 +197,56 @@ const ExerciseHeader = () => {
       exercise: helper.getExercise(exerciseId),
     };
   });
+
+  const [openEditId, setOpenEditId] = useState<string | null>(null);
+  const [openExportId, setOpenExportId] = useState<string | null>(null);
+  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
+  const [openDeleteId, setOpenDeleteId] = useState<string | null>(null);
+
+  // UPDATE
+  const handleOpenEdit = () => {
+    setOpenEditId(exerciseId);
+  };
+
+  const handleCloseEdit = () => {
+    setOpenEditId(null);
+  };
+
+  // EXPORT
+  const handleOpenExport = () => {
+    setOpenExportId(exerciseId);
+  };
+
+  const handleCloseExport = () => {
+    setOpenEditId(null);
+  };
+
+  // DUPLICATE
+  const handleOpenDuplicate = () => {
+    setOpenDuplicateId(exerciseId);
+  };
+
+  const handleCloseDuplicate = () => {
+    setOpenDuplicateId(null);
+  };
+
+  // DELETE
+  const handleOpenDelete = () => {
+    setOpenDeleteId(exerciseId);
+  };
+
+  const handleCloseDelete = () => {
+    setOpenDeleteId(null);
+  };
+
+  // Button Popover
+  const entries: ButtonPopoverEntry[] = [
+    { label: 'Update', action: () => handleOpenEdit() },
+    { label: 'Duplicate', action: () => handleOpenDuplicate() },
+    { label: 'Export', action: () => handleOpenExport() },
+    { label: 'Delete', action: () => handleOpenDelete() },
+  ];
+
   return (
     <>
       <Tooltip title={exercise.exercise_name}>
@@ -207,7 +258,18 @@ const ExerciseHeader = () => {
       <ExerciseStatus exerciseStatus={exercise.exercise_status} exerciseStartDate={exercise.exercise_start_date} />
       <div className={classes.actions}>
         <Buttons exerciseId={exercise.exercise_id} exerciseStatus={exercise.exercise_status} exerciseName={exercise.exercise_name} />
-        <ExercisePopover exercise={exercise} />
+        <ExercisePopover
+          exercise={exercise}
+          entries={entries}
+          openEdit={openEditId === exerciseId}
+          openExport={openExportId === exerciseId}
+          openDelete={openDeleteId === exerciseId}
+          openDuplicate={openDuplicateId === exerciseId}
+          setOpenExport={handleCloseExport}
+          setOpenEdit={handleCloseEdit}
+          setOpenDelete={handleCloseDelete}
+          setOpenDuplicate={handleCloseDuplicate}
+        />
       </div>
       <div className="clearfix" />
     </>

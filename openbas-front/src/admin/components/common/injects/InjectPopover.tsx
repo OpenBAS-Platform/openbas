@@ -6,8 +6,9 @@ import Transition from '../../../../components/common/Transition';
 import type { InjectStore } from '../../../../actions/injects/Inject';
 import { InjectContext, PermissionsContext } from '../Context';
 import type { Inject, InjectStatus, InjectStatusExecution, Tag } from '../../../../utils/api-types';
-import { tryInject } from '../../../../actions/Inject';
+import { duplicateInjectForExercise, duplicateInjectForScenario, tryInject } from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
+import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 
 interface Props {
   inject: InjectStore;
@@ -33,6 +34,7 @@ const InjectPopover: FunctionComponent<Props> = ({
   } = useContext(InjectContext);
 
   const [openDelete, setOpenDelete] = useState(false);
+  const [duplicate, setDuplicate] = useState(false);
   const [openTry, setOpenTry] = useState(false);
   const [openEnable, setOpenEnable] = useState(false);
   const [openDisable, setOpenDisable] = useState(false);
@@ -49,6 +51,27 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const handlePopoverClose = () => setAnchorEl(null);
 
+  const handleOpenDuplicate = () => {
+    setDuplicate(true);
+    handlePopoverClose();
+  };
+
+  const handleCloseDuplicate = () => setDuplicate(false);
+
+  const submitDuplicate = () => {
+    if (inject.inject_exercise) {
+      dispatch(duplicateInjectForExercise(inject.inject_exercise, inject.inject_id));
+    }
+    if (inject.inject_scenario) {
+      dispatch(duplicateInjectForScenario(inject.inject_scenario, inject.inject_id));
+    }
+    handleCloseDuplicate();
+  };
+
+  const submitDuplicateHandler = () => {
+    submitDuplicate();
+  };
+
   const handleOpenDelete = () => {
     setOpenDelete(true);
     handlePopoverClose();
@@ -60,11 +83,6 @@ const InjectPopover: FunctionComponent<Props> = ({
     onDeleteInject(inject.inject_id);
     handleCloseDelete();
   };
-
-  // const handleOpenTry = () => {
-  //   setOpenTry(true);
-  //   handlePopoverClose();
-  // };
 
   const handleCloseTry = () => setOpenTry(false);
 
@@ -105,7 +123,6 @@ const InjectPopover: FunctionComponent<Props> = ({
   };
 
   const submitDisable = () => {
-    onUpdateInjectActivation(inject.inject_id, { inject_enabled: false });
     handleCloseDisable();
   };
 
@@ -160,6 +177,9 @@ const InjectPopover: FunctionComponent<Props> = ({
         >
           {t('Update')}
         </MenuItem>
+        <MenuItem onClick={handleOpenDuplicate}>
+          {t('Duplicate')}
+        </MenuItem>
         {!inject.inject_status && onInjectDone && (
           <MenuItem
             onClick={handleOpenDone}
@@ -204,6 +224,32 @@ const InjectPopover: FunctionComponent<Props> = ({
           {t('Delete')}
         </MenuItem>
       </Menu>
+      <DialogDuplicate
+        open={duplicate}
+        handleClose={handleCloseDuplicate}
+        handleSubmit={submitDuplicateHandler}
+        text={t(`Do you want to duplicate this inject: ${inject.inject_title}?`)}
+      />
+      <Dialog
+        TransitionComponent={Transition}
+        open={openDone}
+        onClose={handleCloseDone}
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t(`Do you want to mark this inject as done: ${inject.inject_title}?`)}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDone}>
+            {t('Cancel')}
+          </Button>
+          <Button color="secondary" onClick={submitDone}>
+            {t('Mark')}
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Dialog
         open={openDelete}
         TransitionComponent={Transition}
@@ -212,7 +258,7 @@ const InjectPopover: FunctionComponent<Props> = ({
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to delete this inject?')}
+            {t(`Do you want to delete this inject: ${inject.inject_title}?`)}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -232,7 +278,7 @@ const InjectPopover: FunctionComponent<Props> = ({
       >
         <DialogContent>
           <DialogContentText>
-            <p>{t('Do you want to try this inject?')}</p>
+            <p>{t(`Do you want to try this inject: ${inject.inject_title}?`)}</p>
             <Alert severity="info">
               {t('The inject will only be sent to you.')}
             </Alert>
@@ -255,7 +301,7 @@ const InjectPopover: FunctionComponent<Props> = ({
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to enable this inject?')}
+            {t(`Do you want to enable this inject: ${inject.inject_title}?`)}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -275,7 +321,7 @@ const InjectPopover: FunctionComponent<Props> = ({
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to disable this inject?')}
+            {t(`Do you want to disable this inject: ${inject.inject_title}?`)}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -295,7 +341,7 @@ const InjectPopover: FunctionComponent<Props> = ({
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to mark this inject as done?')}
+            {t(`Do you want to mark this inject as done: ${inject.inject_title}?`)}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -315,7 +361,7 @@ const InjectPopover: FunctionComponent<Props> = ({
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to trigger this inject now?')}
+            {t(`Do you want to trigger this inject now: ${inject.inject_title}?`)}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

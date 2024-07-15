@@ -1,6 +1,20 @@
 import React, { useContext, useState } from 'react';
 import { makeStyles } from '@mui/styles';
-import { Checkbox, Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Menu, MenuItem, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
+import {
+  Checkbox,
+  Chip,
+  IconButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+  Menu,
+  MenuItem,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
+} from '@mui/material';
 import { BarChartOutlined, MoreVert, ReorderOutlined } from '@mui/icons-material';
 import { CSVLink } from 'react-csv';
 import { splitDuration } from '../../../../utils/Time';
@@ -263,13 +277,16 @@ const Injects = (props) => {
           >
             {sortedInjects.length > 0 && (
               <div style={{ marginRight: 10 }}>
-                <ToggleButton value="popover" size="small" onClick={(ev) => {
-                  ev.stopPropagation();
-                  setAnchorEl(ev.currentTarget);
-                }}
+                <IconButton
+                  value="popover"
+                  size="large"
+                  onClick={(ev) => {
+                    ev.stopPropagation();
+                    setAnchorEl(ev.currentTarget);
+                  }}
                 >
                   <MoreVert fontSize="small" color="primary" />
-                </ToggleButton>
+                </IconButton>
                 <Menu
                   anchorEl={anchorEl}
                   open={Boolean(anchorEl)}

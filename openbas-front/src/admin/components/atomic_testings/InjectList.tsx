@@ -1,8 +1,6 @@
-import React, { CSSProperties, FunctionComponent, useState } from 'react';
+import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { KeyboardArrowRight } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
 import InjectIcon from '../common/injects/InjectIcon';
 import type { InjectResultDTO, SearchPaginationInput } from '../../../utils/api-types';
@@ -14,6 +12,7 @@ import PaginationComponent from '../../../components/common/pagination/Paginatio
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
 import InjectorContract from '../common/injects/InjectorContract';
 import ItemStatus from '../../../components/ItemStatus';
+import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
 import { isNotEmptyField } from '../../../utils/utils';
 
 const useStyles = makeStyles(() => ({
@@ -38,10 +37,6 @@ const useStyles = makeStyles(() => ({
   item: {
     paddingLeft: 10,
     height: 50,
-  },
-  goIcon: {
-    position: 'absolute',
-    right: -10,
   },
 }));
 
@@ -84,12 +79,19 @@ const InjectList: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
   const { t, fldt, tPick, nsdt } = useFormatter();
+  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
 
   // Filter and sort hook
   const [injects, setInjects] = useState<InjectResultDTO[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
     sorts: initSorting('inject_updated_at', 'DESC'),
   });
+
+  // Fetch injects on initial render and when pagination input changes
+  useEffect(() => {
+    fetchInjects(searchPaginationInput)
+      .then((response) => setInjects(response.data.content));
+  }, [fetchInjects, searchPaginationInput]);
 
   // Headers
   const headers = [
@@ -152,6 +154,14 @@ const InjectList: FunctionComponent<Props> = ({
     },
   ];
 
+  const handleOpenDuplicate = (injectId: string) => {
+    setOpenDuplicateId(injectId);
+  };
+
+  const handleCloseDuplicate = () => {
+    setOpenDuplicateId(null);
+  };
+
   return (
     <>
       <PaginationComponent
@@ -180,44 +190,54 @@ const InjectList: FunctionComponent<Props> = ({
         </ListItem>
         {injects.map((injectDto) => {
           return (
-            <ListItemButton
+
+            <ListItem
               key={injectDto.inject_id}
               classes={{ root: classes.item }}
               divider
-              component={Link}
-              to={goTo(injectDto.inject_id)}
-            >
-              <ListItemIcon>
-                <InjectIcon
-                  isPayload={isNotEmptyField(injectDto.inject_injector_contract?.injector_contract_payload)}
-                  type={
-                    injectDto.inject_injector_contract?.injector_contract_payload
-                      ? injectDto.inject_injector_contract.injector_contract_payload.payload_collector_type
-                        || injectDto.inject_injector_contract.injector_contract_payload.payload_type
-                      : injectDto.inject_type
-                  }
-                  variant="list"
+              secondaryAction={
+                <AtomicTestingPopover
+                  atomic={injectDto}
+                  entries={[{ label: 'Duplicate', action: () => handleOpenDuplicate(injectDto.inject_id) }]}
+                  openDuplicate={openDuplicateId === injectDto.inject_id}
+                  setOpenDuplicate={handleCloseDuplicate}
                 />
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <div className={classes.bodyItems}>
-                    {headers.map((header) => (
-                      <div
-                        key={header.field}
-                        className={classes.bodyItem}
-                        style={inlineStyles[header.field]}
-                      >
-                        {header.value(injectDto)}
-                      </div>
-                    ))}
-                  </div>
-                }
-              />
-              <ListItemIcon classes={{ root: classes.goIcon }}>
-                <KeyboardArrowRight />
-              </ListItemIcon>
-            </ListItemButton>
+                  }
+              disablePadding={true}
+            >
+              <ListItemButton
+                classes={{ root: classes.item }}
+                href={goTo(injectDto.inject_id)}
+              >
+                <ListItemIcon>
+                  <InjectIcon
+                    isPayload={isNotEmptyField(injectDto.inject_injector_contract?.injector_contract_payload)}
+                    type={
+                                injectDto.inject_injector_contract?.injector_contract_payload
+                                  ? injectDto.inject_injector_contract.injector_contract_payload.payload_collector_type
+                                    || injectDto.inject_injector_contract.injector_contract_payload.payload_type
+                                  : injectDto.inject_type
+                              }
+                    variant="list"
+                  />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <div className={classes.bodyItems}>
+                      {headers.map((header) => (
+                        <div
+                          key={header.field}
+                          className={classes.bodyItem}
+                          style={inlineStyles[header.field]}
+                        >
+                          {header.value(injectDto)}
+                        </div>
+                      ))}
+                    </div>
+                          }
+                />
+              </ListItemButton>
+            </ListItem>
           );
         })}
         {!injects ? (<Empty message={t('No data available')} />) : null}

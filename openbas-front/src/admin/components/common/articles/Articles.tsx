@@ -199,10 +199,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
                       >
                         <VisibilityOutlined />
                       </IconButton>
-                      <ArticlePopover
-                        article={article}
-                        documents={docs}
-                      />
+                      <ArticlePopover article={article} />
                     </React.Fragment>
                   }
                 />

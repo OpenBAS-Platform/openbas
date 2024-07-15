@@ -1,8 +1,7 @@
 import { makeStyles } from '@mui/styles';
 import { Card, CardActionArea, CardContent, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
-import { KeyboardArrowRight, MovieFilterOutlined } from '@mui/icons-material';
+import { MovieFilterOutlined } from '@mui/icons-material';
 import React, { CSSProperties, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
@@ -28,6 +27,7 @@ import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../actions/Tag';
 import { useAppDispatch } from '../../../utils/hooks';
 import usePaginationAndFilter from '../../../components/common/usePaginationAndFilter';
+import ScenarioPopover from './scenario/ScenarioPopover';
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -63,10 +63,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     paddingRight: 10,
-  },
-  goIcon: {
-    position: 'absolute',
-    right: -10,
   },
 }));
 
@@ -198,6 +194,24 @@ const Scenarios = () => {
     exportFileName: `${t('Scenarios')}.csv`,
   };
 
+  // Duplicate
+  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
+  const handleOpenDuplicate = (scenarioId: string) => {
+    setOpenDuplicateId(scenarioId);
+  };
+  const handleCloseDuplicate = () => {
+    setOpenDuplicateId(null);
+  };
+
+  // Export
+  const [openExportId, setOpenExportId] = useState<string | null>(null);
+  const handleOpenExport = (scenarioId: string) => {
+    setOpenExportId(scenarioId);
+  };
+  const handleCloseExport = () => {
+    setOpenExportId(null);
+  };
+
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Scenarios'), current: true }]} />
@@ -226,16 +240,15 @@ const Scenarios = () => {
           categoryCard(key, value)
         ))}
       </div>
-      <>
-        <PaginationComponent
-          fetch={searchScenarios}
-          searchPaginationInput={searchPaginationInput}
-          setContent={setScenarios}
-          exportProps={exportProps}
-        >
-          <ImportUploaderScenario />
-        </PaginationComponent>
-      </>
+      <PaginationComponent
+        fetch={searchScenarios}
+        searchPaginationInput={searchPaginationInput}
+        setContent={setScenarios}
+        exportProps={exportProps}
+      >
+        <ImportUploaderScenario/>
+      </PaginationComponent>
+
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -265,84 +278,99 @@ const Scenarios = () => {
             }
           />
         </ListItem>
-        {scenarios.map((scenario: ScenarioStore) => (
-          <ListItemButton
-            key={scenario.scenario_id}
-            classes={{ root: classes.item }}
-            divider
-            component={Link}
-            to={`/admin/scenarios/${scenario.scenario_id}`}
-          >
-            <ListItemIcon>
-              <MovieFilterOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={
-                <div className={classes.bodyItems}>
-                  <Tooltip title={scenario.scenario_name}>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.scenario_name}
-                    >
-                      {scenario.scenario_name}
-                    </div>
-                  </Tooltip>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.scenario_severity}
-                  >
-                    <ItemSeverity label={t(scenario.scenario_severity ?? 'Unknown')} severity={scenario.scenario_severity ?? 'Unknown'} variant="inList" />
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.scenario_category}
-                  >
-                    <ItemCategory category={scenario.scenario_category ?? 'Unknown'} label={t(scenario.scenario_category ?? 'Unknown')} size="medium" />
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.scenario_recurrence}
-                  >
-                    <ScenarioStatus scenario={scenario} variant="list" />
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.scenario_platforms}
-                  >
-                    {scenario.scenario_platforms?.length === 0 ? (
-                      <PlatformIcon platform={t('No inject in this scenario')} tooltip={true} width={25} />
-                    ) : scenario.scenario_platforms?.map(
-                      (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip={true} width={20} marginRight={10} />,
-                    )}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.scenario_tags}
-                  >
-                    <ItemTags tags={scenario.scenario_tags} variant="list" />
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.scenario_updated_at}
-                  >
-                    {nsdt(scenario.scenario_updated_at)}
-                  </div>
-                </div>
+        {scenarios.map((scenario: ScenarioStore) => {
+          return (
+            <ListItem
+              key={scenario.scenario_id}
+              classes={{ root: classes.item }}
+              secondaryAction={
+                <ScenarioPopover
+                  scenario={scenario}
+                  entries={[
+                    { label: 'Duplicate', action: () => handleOpenDuplicate(scenario.scenario_id) },
+                    { label: 'Export', action: () => handleOpenExport(scenario.scenario_id) },
+                  ]}
+                  openExport={openExportId === scenario.scenario_id}
+                  setOpenExport={handleCloseExport}
+                  openDuplicate={openDuplicateId === scenario.scenario_id}
+                  setOpenDuplicate={handleCloseDuplicate}
+                />
               }
-            />
-            <ListItemIcon classes={{ root: classes.goIcon }}>
-              <KeyboardArrowRight />
-            </ListItemIcon>
-          </ListItemButton>
-        ))}
+              disablePadding={true}
+            >
+              <ListItemButton
+                classes={{ root: classes.item }}
+                divider
+                href={`/admin/scenarios/${scenario.scenario_id}`}
+              >
+                <ListItemIcon>
+                  <MovieFilterOutlined color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <div className={classes.bodyItems}>
+                      <Tooltip title={scenario.scenario_name}>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.scenario_name}
+                        >
+                          {scenario.scenario_name}
+                        </div>
+                      </Tooltip>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.scenario_severity}
+                      >
+                        <ItemSeverity label={t(scenario.scenario_severity ?? 'Unknown')} severity={scenario.scenario_severity ?? 'Unknown'} variant="inList" />
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.scenario_category}
+                      >
+                        <ItemCategory category={scenario.scenario_category ?? 'Unknown'} label={t(scenario.scenario_category ?? 'Unknown')} size="medium" />
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.scenario_recurrence}
+                      >
+                        <ScenarioStatus scenario={scenario} variant="list" />
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.scenario_platforms}
+                      >
+                        {scenario.scenario_platforms?.length === 0 ? (
+                          <PlatformIcon platform={t('No inject in this scenario')} tooltip={true} width={25} />
+                        ) : scenario.scenario_platforms?.map(
+                          (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip={true} width={20} marginRight={10} />,
+                        )}
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.scenario_tags}
+                      >
+                        <ItemTags tags={scenario.scenario_tags} variant="list" />
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.scenario_updated_at}
+                      >
+                        {nsdt(scenario.scenario_updated_at)}
+                      </div>
+                    </div>
+                  }
+                />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
       </List>
-      {userAdmin
-          && <ScenarioCreation
-            onCreate={(result: ScenarioStore) => {
-              setScenarios([result, ...scenarios]);
-              fetchStatistics();
-            }}
-             />
+      {userAdmin && <ScenarioCreation
+        onCreate={(result: ScenarioStore) => {
+          setScenarios([result, ...scenarios]);
+          fetchStatistics();
+        }}
+                    />
       }
     </>
   );
