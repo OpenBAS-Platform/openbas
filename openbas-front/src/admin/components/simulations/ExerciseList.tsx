@@ -168,6 +168,7 @@ const ExerciseList: FunctionComponent<Props> = ({
                 inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
+                defaultSortAsc={searchPaginationInput.sorts?.[0].direction === 'DESC'}
               />
             }
           />
