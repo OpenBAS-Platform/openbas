@@ -4,7 +4,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Toolti
 import { CancelOutlined, PauseOutlined, PlayArrowOutlined, RestartAltOutlined } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import { updateExerciseStatus } from '../../../../actions/Exercise';
-import ExercisePopover from './ExercisePopover';
+import ExercisePopover, { ExerciseActionPopover } from './ExercisePopover';
 import { useHelper } from '../../../../store';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
@@ -16,7 +16,6 @@ import type { ExercisesHelper } from '../../../../actions/exercises/exercise-hel
 import type { Exercise as ExerciseType } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
 import type { Theme } from '../../../../components/Theme';
-import { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -198,54 +197,8 @@ const ExerciseHeader = () => {
     };
   });
 
-  const [openEditId, setOpenEditId] = useState<string | null>(null);
-  const [openExportId, setOpenExportId] = useState<string | null>(null);
-  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
-  const [openDeleteId, setOpenDeleteId] = useState<string | null>(null);
-
-  // UPDATE
-  const handleOpenEdit = () => {
-    setOpenEditId(exerciseId);
-  };
-
-  const handleCloseEdit = () => {
-    setOpenEditId(null);
-  };
-
-  // EXPORT
-  const handleOpenExport = () => {
-    setOpenExportId(exerciseId);
-  };
-
-  const handleCloseExport = () => {
-    setOpenEditId(null);
-  };
-
-  // DUPLICATE
-  const handleOpenDuplicate = () => {
-    setOpenDuplicateId(exerciseId);
-  };
-
-  const handleCloseDuplicate = () => {
-    setOpenDuplicateId(null);
-  };
-
-  // DELETE
-  const handleOpenDelete = () => {
-    setOpenDeleteId(exerciseId);
-  };
-
-  const handleCloseDelete = () => {
-    setOpenDeleteId(null);
-  };
-
   // Button Popover
-  const entries: ButtonPopoverEntry[] = [
-    { label: 'Update', action: () => handleOpenEdit() },
-    { label: 'Duplicate', action: () => handleOpenDuplicate() },
-    { label: 'Export', action: () => handleOpenExport() },
-    { label: 'Delete', action: () => handleOpenDelete() },
-  ];
+  const actions: ExerciseActionPopover[] = ['Update', 'Duplicate', 'Export', 'Delete'];
 
   return (
     <>
@@ -260,15 +213,7 @@ const ExerciseHeader = () => {
         <Buttons exerciseId={exercise.exercise_id} exerciseStatus={exercise.exercise_status} exerciseName={exercise.exercise_name} />
         <ExercisePopover
           exercise={exercise}
-          entries={entries}
-          openEdit={openEditId === exerciseId}
-          openExport={openExportId === exerciseId}
-          openDelete={openDeleteId === exerciseId}
-          openDuplicate={openDuplicateId === exerciseId}
-          setOpenExport={handleCloseExport}
-          setOpenEdit={handleCloseEdit}
-          setOpenDelete={handleCloseDelete}
-          setOpenDuplicate={handleCloseDuplicate}
+          actions={actions}
         />
       </div>
       <div className="clearfix" />

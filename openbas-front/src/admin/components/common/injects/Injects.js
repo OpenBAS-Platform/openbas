@@ -294,7 +294,7 @@ const Injects = (props) => {
                 >
                   <MenuItem>
                     <CSVLink style={{ color: 'inherit' }} data={exportInjects} filename={filename}>
-                      {`${t('Export this list')} (.xls)`}
+                      {`${t('Export injects')}`}
                     </CSVLink>
                   </MenuItem>
                   <MenuItem onClick={handleShowTimeline}>
