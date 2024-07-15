@@ -14,6 +14,8 @@ export const fetchExerciseInjectExpectations = (exerciseId) => (dispatch) => get
 
 export const addExercise = (data) => (dispatch) => postReferential(schema.exercise, '/api/exercises', data)(dispatch);
 
+export const duplicateExercise = (exerciseId) => (dispatch) => postReferential(schema.exercise, `/api/exercises/${exerciseId}`, null)(dispatch);
+
 export const updateExercise = (exerciseId, data) => (dispatch) => putReferential(
   schema.exercise,
   `/api/exercises/${exerciseId}`,

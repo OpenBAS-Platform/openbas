@@ -58,9 +58,9 @@ public class ImportService {
         // 01. Use a temporary file.
         File tempFile = createTempFile("openbas-import-" + now().getEpochSecond(), ".zip");
         FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
-        try {
+
+        try(ZipFile zipFile = new ZipFile(tempFile)) {
             // 02. Use this file to load zip with information
-            ZipFile zipFile = new ZipFile(tempFile);
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
             // 01. Iter on each document to create it
             List<InputStream> dataImports = new ArrayList<>();

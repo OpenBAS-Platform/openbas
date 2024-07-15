@@ -7,7 +7,7 @@ import ArticleForm from './ArticleForm';
 import { ArticleContext, PermissionsContext } from '../Context';
 import Transition from '../../../../components/common/Transition';
 
-const ArticlePopover = ({ article, documents, onRemoveArticle = null }) => {
+const ArticlePopover = ({ article, onRemoveArticle = null }) => {
   // Standard hooks
   const { t } = useFormatter();
 
@@ -124,7 +124,7 @@ const ArticlePopover = ({ article, documents, onRemoveArticle = null }) => {
             onSubmit={onSubmitEdit}
             handleClose={handleCloseEdit}
             initialValues={initialValues}
-            documentsIds={(documents || []).map((i) => i.document_id)}
+            documentsIds={article.article_documents ?? []}
           />
         </DialogContent>
       </Dialog>

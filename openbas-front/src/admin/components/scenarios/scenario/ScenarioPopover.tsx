@@ -5,7 +5,7 @@ import type { ScenarioInput, ScenarioInformationInput } from '../../../../utils/
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
-import { deleteScenario, exportScenarioUri, updateScenario, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
+import { deleteScenario, duplicateScenario, exportScenarioUri, updateScenario, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import Drawer from '../../../../components/common/Drawer';
 import ScenarioForm from '../ScenarioForm';
@@ -13,13 +13,33 @@ import DialogDelete from '../../../../components/common/DialogDelete';
 import ScenarioExportDialog from './ScenarioExportDialog';
 import useScenarioPermissions from '../../../../utils/Scenario';
 import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
+import { isNotEmptyField } from '../../../../utils/utils';
+import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 
 interface Props {
   scenario: ScenarioStore;
+  entries: ButtonPopoverEntry[];
+  openEdit?: boolean;
+  setOpenEdit?: React.Dispatch<React.SetStateAction<boolean>>;
+  openExport?: boolean;
+  setOpenExport?: React.Dispatch<React.SetStateAction<boolean>>;
+  openDelete?: boolean;
+  setOpenDelete?: React.Dispatch<React.SetStateAction<boolean>>;
+  openDuplicate?: boolean;
+  setOpenDuplicate?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ScenarioPopover: FunctionComponent<Props> = ({
   scenario,
+  entries,
+  openEdit,
+  setOpenEdit,
+  openExport,
+  setOpenExport,
+  openDelete,
+  setOpenDelete,
+  openDuplicate,
+  setOpenDuplicate,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -52,9 +72,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
 
   // Edition
   const [edition, setEdition] = useState(false);
-  const handleEdit = () => {
-    setEdition(true);
-  };
+  const handleCloseEdit = () => setEdition(false);
   const submitEdit = (data: ScenarioInput) => {
     dispatch(updateScenario(scenario.scenario_id, data));
     setEdition(false);
@@ -78,43 +96,56 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   };
 
   // Export
-  const [openExport, setOpenExport] = useState(false);
-  const handleExport = () => {
-    setOpenExport(true);
-  };
+  const [exportation, setExportation] = useState(false);
+  const handleCloseExport = () => setExportation(false);
   const submitExport = (exportTeams: boolean, exportPlayers: boolean, exportVariableValues: boolean) => {
     const link = document.createElement('a');
     link.href = exportScenarioUri(scenario.scenario_id, exportTeams, exportPlayers, exportVariableValues);
     link.click();
-    setOpenExport(false);
+    if (setOpenExport) {
+      setOpenExport(false);
+    }
   };
 
   // Deletion
   const [deletion, setDeletion] = useState(false);
-  const handleDelete = () => {
-    setDeletion(true);
+  const handleCloseDelete = () => {
+    setDeletion(false);
   };
   const submitDelete = () => {
     dispatch(deleteScenario(scenario.scenario_id));
-    setDeletion(false);
+    if (setOpenDelete) {
+      setOpenDelete(false);
+    }
     navigate('/admin/scenarios');
   };
 
-  const permissions = useScenarioPermissions(scenario.scenario_id);
+  // Duplicate
+  const [duplicate, setDuplicate] = useState(false);
+  const handleCloseDuplicate = () => {
+    setDuplicate(false);
+  };
+  const submitDuplicate = () => {
+    dispatch(duplicateScenario(scenario.scenario_id)).then((result: { result: string, entities: { scenarios: Record<string, ScenarioStore> } }) => {
+      navigate(`/admin/scenarios/${result.result}`);
+      if (setOpenDuplicate) {
+        setOpenDuplicate(false);
+      }
+    });
+  };
 
-  // Button Popover
-  const entries: ButtonPopoverEntry[] = [
-    { label: 'Update', action: handleEdit, disabled: !permissions.canWrite },
-    { label: 'Export', action: handleExport },
-    { label: 'Delete', action: handleDelete, disabled: !permissions.canWrite },
-  ];
+  const submitDuplicateHandler = () => {
+    submitDuplicate();
+  };
+
+  const permissions = useScenarioPermissions(scenario.scenario_id);
 
   return (
     <>
       <ButtonPopover entries={entries} />
       <Drawer
-        open={edition}
-        handleClose={() => setEdition(false)}
+        open={isNotEmptyField(openEdit) ? openEdit : edition}
+        handleClose={() => (setOpenEdit ? setOpenEdit(false) : handleCloseEdit)}
         title={t('Update the scenario')}
       >
         <>
@@ -129,7 +160,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
               initialValues={initialValues}
               editing
               onSubmit={submitEdit}
-              handleClose={() => setEdition(false)}
+              handleClose={() => (setOpenEdit ? setOpenEdit(false) : handleCloseEdit)}
             />
           )}
           {currentTab === 1 && (
@@ -142,15 +173,21 @@ const ScenarioPopover: FunctionComponent<Props> = ({
         </>
       </Drawer>
       <ScenarioExportDialog
-        open={openExport}
-        handleClose={() => setOpenExport(false)}
+        open={isNotEmptyField(openExport) ? openExport : exportation}
+        handleClose={() => (setOpenExport ? setOpenExport(false) : handleCloseExport)}
         handleSubmit={submitExport}
       />
       <DialogDelete
-        open={deletion}
-        handleClose={() => setDeletion(false)}
+        open={isNotEmptyField(openDelete) ? openDelete : deletion}
+        handleClose={() => (setOpenDelete ? setOpenDelete(false) : handleCloseDelete)}
         handleSubmit={submitDelete}
-        text={t('Do you want to delete the scenario ?')}
+        text={`${t('Do you want to delete this scenario:')} ${scenario.scenario_name} ?`}
+      />
+      <DialogDuplicate
+        open={isNotEmptyField(openDuplicate) ? openDuplicate : duplicate}
+        handleClose={() => (setOpenDuplicate ? setOpenDuplicate(false) : handleCloseDuplicate)}
+        handleSubmit={submitDuplicateHandler}
+        text={`${t('Do you want to duplicate this scenario:')} ${scenario.scenario_name} ?`}
       />
     </>
   );

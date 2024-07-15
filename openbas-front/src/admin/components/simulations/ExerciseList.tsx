@@ -1,7 +1,6 @@
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { HubOutlined, KeyboardArrowRight } from '@mui/icons-material';
-import React, { CSSProperties, FunctionComponent } from 'react';
+import { HubOutlined } from '@mui/icons-material';
+import React, { CSSProperties, FunctionComponent, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import ExerciseStatus from './simulation/ExerciseStatus';
 import ItemTags from '../../../components/ItemTags';
@@ -14,6 +13,7 @@ import type { ExerciseSimple, SearchPaginationInput } from '../../../utils/api-t
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../actions/Tag';
 import { useAppDispatch } from '../../../utils/hooks';
+import ExercisePopover from './simulation/ExercisePopover';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -35,10 +35,6 @@ const useStyles = makeStyles(() => ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     paddingRight: 10,
-  },
-  goIcon: {
-    position: 'absolute',
-    right: -10,
   },
 }));
 
@@ -138,6 +134,24 @@ const ExerciseList: FunctionComponent<Props> = ({
     },
   ];
 
+  // Duplicate
+  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
+  const handleOpenDuplicate = (scenarioId: string) => {
+    setOpenDuplicateId(scenarioId);
+  };
+  const handleCloseDuplicate = () => {
+    setOpenDuplicateId(null);
+  };
+
+  // Export
+  const [openExportId, setOpenExportId] = useState<string | null>(null);
+  const handleOpenExport = (scenarioId: string) => {
+    setOpenExportId(scenarioId);
+  };
+  const handleCloseExport = () => {
+    setOpenExportId(null);
+  };
+
   return (
     <List>
       {hasHeader
@@ -159,35 +173,49 @@ const ExerciseList: FunctionComponent<Props> = ({
           />
         </ListItem>}
       {exercises.map((exercise: ExerciseStore) => (
-        <ListItemButton
+        <ListItem
           key={exercise.exercise_id}
           classes={{ root: classes.item }}
-          divider
-          component={Link}
-          to={`/admin/exercises/${exercise.exercise_id}`}
+          secondaryAction={
+            <ExercisePopover
+              exercise={exercise}
+              entries={[
+                { label: 'Duplicate', action: () => handleOpenDuplicate(exercise.exercise_id) },
+                { label: 'Export', action: () => handleOpenExport(exercise.exercise_id) },
+              ]}
+              openExport={openExportId === exercise.exercise_id}
+              setOpenExport={handleCloseExport}
+              openDuplicate={openDuplicateId === exercise.exercise_id}
+              setOpenDuplicate={handleCloseDuplicate}
+            />
+          }
+          disablePadding={true}
         >
-          <ListItemIcon>
-            <HubOutlined color="primary" />
-          </ListItemIcon>
-          <ListItemText
-            primary={
-              <div className={classes.bodyItems}>
-                {headers.map((header) => (
-                  <div
-                    key={header.field}
-                    className={classes.bodyItem}
-                    style={inlineStyles[header.field]}
-                  >
-                    {header.value(exercise)}
-                  </div>
-                ))}
-              </div>
-            }
-          />
-          <ListItemIcon classes={{ root: classes.goIcon }}>
-            <KeyboardArrowRight />
-          </ListItemIcon>
-        </ListItemButton>
+          <ListItemButton
+            classes={{ root: classes.item }}
+            divider
+            href={`/admin/exercises/${exercise.exercise_id}`}
+          >
+            <ListItemIcon>
+              <HubOutlined color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                <div className={classes.bodyItems}>
+                  {headers.map((header) => (
+                    <div
+                      key={header.field}
+                      className={classes.bodyItem}
+                      style={inlineStyles[header.field]}
+                    >
+                      {header.value(exercise)}
+                    </div>
+                  ))}
+                </div>
+              }
+            />
+          </ListItemButton>
+        </ListItem>
       ))}
     </List>
   );

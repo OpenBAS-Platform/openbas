@@ -1,4 +1,4 @@
-import { Menu, MenuItem, ToggleButton } from '@mui/material';
+import { IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import React, { FunctionComponent, useState } from 'react';
 import { useFormatter } from '../i18n';
@@ -23,16 +23,17 @@ const ButtonPopover: FunctionComponent<Props> = ({
 
   return (
     <>
-      <ToggleButton
+      <IconButton
         value="popover"
-        size="small"
+        size="large"
+        color={'primary'}
         onClick={(ev) => {
           ev.stopPropagation();
           setAnchorEl(ev.currentTarget);
         }}
       >
         <MoreVert fontSize="small" color="primary" />
-      </ToggleButton>
+      </IconButton>
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -40,7 +41,8 @@ const ButtonPopover: FunctionComponent<Props> = ({
       >
         {entries.map((entry, idx) => {
           return (
-            <MenuItem key={idx}
+            <MenuItem
+              key={idx}
               disabled={entry.disabled}
               onClick={() => {
                 entry.action();
