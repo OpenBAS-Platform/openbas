@@ -61,6 +61,7 @@ import static io.openbas.utils.Constants.MAX_SIZE_OF_STRING;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
 @Service
@@ -544,7 +545,7 @@ public class ScenarioService {
         });
         scenario.setArticles(articleList);
         for (Inject inject : scenario.getInjects()) {
-            if (inject.getContent().has(ARTICLES)) {
+            if (ofNullable(inject.getContent()).map(c -> c.has(ARTICLES)).orElse(Boolean.FALSE)) {
                 List<String> articleNode = new ArrayList<>();
                 JsonNode articles = inject.getContent().findValue(ARTICLES);
                 if (articles.isArray()) {
