@@ -48,6 +48,7 @@ public class CalderaExecutorService implements Runnable {
     private final CalderaExecutorContextService calderaExecutorContextService;
 
     private final InjectorService injectorService;
+    private final PlatformSettingsService platformSettingsService;
 
     private Executor executor = null;
 
@@ -81,6 +82,7 @@ public class CalderaExecutorService implements Runnable {
         this.endpointService = endpointService;
         this.calderaExecutorContextService = calderaExecutorContextService;
         this.injectorService = injectorService;
+        this.platformSettingsService = platformSettingsService;
         try {
             if (config.isEnable()) {
                 this.executor = executorService.register(config.getId(), CALDERA_EXECUTOR_TYPE, CALDERA_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-caldera.png"), new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
@@ -88,47 +90,50 @@ public class CalderaExecutorService implements Runnable {
             } else {
                 executorService.remove(config.getId());
             }
-            platformSettingsService.cleanMessage();
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error creating caldera executor: " + e);
-            platformSettingsService.errorMessage("Executor Caldera is not responding, your exercises may be impacted.");
         }
     }
 
     @Override
     public void run() {
-        log.info("Running Caldera executor endpoints gathering...");
-        // The executor only retrieve "main" agents (without the keyword "executor")
-        // This is NOT a standard behaviour, this is because we are using Caldera as an executor and we should not
-        // Will be replaced by the XTM agent
-        List<Agent> agents = this.client.agents().stream().filter(agent -> !agent.getExe_name().contains("implant")).toList();
-        List<Endpoint> endpoints = toEndpoint(agents).stream().filter(Asset::getActive).toList();
-        log.info("Caldera executor provisioning based on " + endpoints.size() + " assets");
-        endpoints.forEach(endpoint -> {
-            List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
-            if (existingEndpoints.isEmpty()) {
-                Optional<Endpoint> endpointByExternalReference = endpointService.findByExternalReference(endpoint.getExternalReference());
-                if (endpointByExternalReference.isPresent()) {
-                    this.updateEndpoint(endpoint, List.of(endpointByExternalReference.get()));
+        try {
+            log.info("Running Caldera executor endpoints gathering...");
+            // The executor only retrieve "main" agents (without the keyword "executor")
+            // This is NOT a standard behaviour, this is because we are using Caldera as an executor and we should not
+            // Will be replaced by the XTM agent
+            List<Agent> agents = this.client.agents().stream().filter(agent -> !agent.getExe_name().contains("implant")).toList();
+            List<Endpoint> endpoints = toEndpoint(agents).stream().filter(Asset::getActive).toList();
+            log.info("Caldera executor provisioning based on " + endpoints.size() + " assets");
+            endpoints.forEach(endpoint -> {
+                List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
+                if (existingEndpoints.isEmpty()) {
+                    Optional<Endpoint> endpointByExternalReference = endpointService.findByExternalReference(endpoint.getExternalReference());
+                    if (endpointByExternalReference.isPresent()) {
+                        this.updateEndpoint(endpoint, List.of(endpointByExternalReference.get()));
+                    } else {
+                        this.endpointService.createEndpoint(endpoint);
+                    }
                 } else {
-                    this.endpointService.createEndpoint(endpoint);
+                    this.updateEndpoint(endpoint, existingEndpoints);
                 }
-            } else {
-                this.updateEndpoint(endpoint, existingEndpoints);
-            }
-        });
-        List<Endpoint> inactiveEndpoints = toEndpoint(agents).stream().filter(endpoint -> !endpoint.getActive()).toList();
-        inactiveEndpoints.forEach(endpoint -> {
-            Optional<Endpoint> optionalExistingEndpoint = this.endpointService.findByExternalReference(endpoint.getExternalReference());
-            if (optionalExistingEndpoint.isPresent()) {
-                Endpoint existingEndpoint = optionalExistingEndpoint.get();
-                if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli()) > DELETE_TTL) {
-                    log.info("Found stale agent " + existingEndpoint.getName() + ", deleting it...");
-                    this.client.deleteAgent(existingEndpoint);
-                    this.endpointService.deleteEndpoint(existingEndpoint.getId());
+            });
+            List<Endpoint> inactiveEndpoints = toEndpoint(agents).stream().filter(endpoint -> !endpoint.getActive()).toList();
+            inactiveEndpoints.forEach(endpoint -> {
+                Optional<Endpoint> optionalExistingEndpoint = this.endpointService.findByExternalReference(endpoint.getExternalReference());
+                if (optionalExistingEndpoint.isPresent()) {
+                    Endpoint existingEndpoint = optionalExistingEndpoint.get();
+                    if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli()) > DELETE_TTL) {
+                        log.info("Found stale agent " + existingEndpoint.getName() + ", deleting it...");
+                        this.client.deleteAgent(existingEndpoint);
+                        this.endpointService.deleteEndpoint(existingEndpoint.getId());
+                    }
                 }
-            }
-        });
+            });
+            this.platformSettingsService.cleanMessage();
+        } catch (Exception e) {
+            this.platformSettingsService.errorMessage("Executor Caldera is not responding, your exercises may be impacted.");
+        }
     }
 
     // -- PRIVATE --

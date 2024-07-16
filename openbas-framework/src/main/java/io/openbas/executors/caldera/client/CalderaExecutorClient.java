@@ -49,7 +49,7 @@ public class CalderaExecutorClient {
             });
         } catch (IOException e) {
             log.severe("Cannot retrieve agent list");
-            return new ArrayList<>();
+            throw new RuntimeException(e);
         }
     }
 
