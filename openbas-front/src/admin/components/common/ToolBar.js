@@ -12,6 +12,7 @@ import { fetchAssetGroups } from '../../../actions/asset_groups/assetgroup-actio
 import { fetchEndpoints } from '../../../actions/assets/endpoint-actions';
 import { storeHelper } from '../../../actions/Schema';
 import { fetchTeams } from '../../../actions/teams/team-actions';
+import DialogDelete from '../../../components/common/DialogDelete';
 
 const styles = (theme) => ({
   bottomNav: {
@@ -143,6 +144,7 @@ class ToolBar extends Component {
     super(props);
     this.state = {
       displayUpdate: false,
+      displayDelete: false,
       actions: [],
       actionsInputs: [{}],
       navOpen: localStorage.getItem('navOpen') === 'true',
@@ -164,9 +166,6 @@ class ToolBar extends Component {
 
   handleOpenUpdate() {
     this.setState({ displayUpdate: true });
-  }
-
-  handleOpenDelete() {
   }
 
   handleCloseUpdate() {
@@ -444,6 +443,18 @@ class ToolBar extends Component {
     this.props.handleUpdate(this.state.actionsInputs);
   }
 
+  // Deletion
+  handleOpenDelete = () => {
+    this.setState({ displayDelete: true });
+  };
+
+  handleCloseDelete = () => {
+    this.setState({ displayDelete: false });
+  };
+
+  handleSubmitDelete = () => {
+  };
+
   render() {
     const {
       t,
@@ -633,6 +644,12 @@ class ToolBar extends Component {
             </div>
           </Drawer>
         </Drawer>
+        <DialogDelete
+          open={this.state.displayDelete}
+          handleClose={this.handleCloseDelete.bind(this)}
+          handleSubmit={this.handleSubmitDelete.bind(this)}
+          text={t('Do you want to delete these injects ?')}
+        />
       </>
     );
   }
