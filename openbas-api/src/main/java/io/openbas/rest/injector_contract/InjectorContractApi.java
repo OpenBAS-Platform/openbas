@@ -66,7 +66,7 @@ public class InjectorContractApi extends RestBehavior {
                     return buildPaginationCriteriaBuilder(
                         (Specification<InjectorContract> specification, Pageable pageable) -> this.injectorContractService.injectorContracts(
                             InjectorContractSpecification.fromKillChainPhase(killChainPhaseFilter.getValues().getFirst()).and(specification), pageable),
-                        searchPaginationInput,
+                        newSearchPaginationInput,
                         InjectorContract.class
                     );
                 }
