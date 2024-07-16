@@ -40,7 +40,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -575,20 +574,6 @@ public class InjectApi extends RestBehavior {
         assert scenarioId.equals(scenario.getId());
         this.injectDocumentRepository.deleteDocumentsFromInject(injectId);
         this.injectRepository.deleteById(injectId);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    @DeleteMapping(SCENARIO_URI + "/{scenarioId}/injects")
-    @PreAuthorize("isScenarioPlanner(#scenarioId)")
-    public void massDeleteInjectForScenario(
-            @PathVariable @NotBlank final String scenarioId,
-            @RequestParam String[] injectIds) {
-        Scenario scenario = this.scenarioService.scenario(scenarioId);
-        assert scenarioId.equals(scenario.getId());
-        Arrays.stream(injectIds).forEach(injectId -> {
-            this.injectDocumentRepository.deleteDocumentsFromInject(injectId);
-            this.injectRepository.deleteById(injectId);
-        });
     }
 
     // -- PRIVATE --
