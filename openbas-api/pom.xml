@@ -22,6 +22,7 @@
         <springdoc.version>2.5.0</springdoc.version>
         <springdoc-plugin.version>1.4</springdoc-plugin.version>
         <cron-utils.version>9.2.1</cron-utils.version>
+        <apache-poi.version>5.3.0</apache-poi.version>
     </properties>
 
     <profiles>
@@ -166,6 +167,16 @@
             <groupId>com.cronutils</groupId>
             <artifactId>cron-utils</artifactId>
             <version>${cron-utils.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${apache-poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${apache-poi.version}</version>
         </dependency>
         <!-- TEST -->
         <dependency>
