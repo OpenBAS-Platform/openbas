@@ -55,9 +55,7 @@ const RulesContractContent: React.FC<Props> = ({
 
   // Fetching data
 
-  const { control, watch, formState: { errors } } = methods;
-
-  const injectorContractId = watch(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`);
+  const { control, formState: { errors } } = methods;
 
   const { fields: rulesFields, remove: rulesRemove, append: rulesAppend } = useFieldArray({
     control,
@@ -80,21 +78,14 @@ const RulesContractContent: React.FC<Props> = ({
     });
   };
 
-  const isFirstRun = useRef(true); // Hack to keep value on update
-  useEffect(() => {
-    if (editing && isFirstRun.current) {
-      isFirstRun.current = false;
-      return;
-    }
-    if (injectorContractId) {
+  const onChangeInjectorContractId = () => {
       directFetchInjectorContract(methods.getValues(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`)).then((result: { data: InjectorContract }) => {
         const injectorContract = result.data;
         const contractFieldKeys = injectorContract?.convertedContent?.fields.map((f) => f.key);
         rulesRemove();
         AddRules(contractFieldKeys);
       });
-    }
-  }, [injectorContractId]);
+  }
 
   const [currentRuleIndex, setCurrentRuleIndex] = useState<number | null>(null);
   const handleDefaultValueOpen = (rulesIndex: number) => {
@@ -188,6 +179,7 @@ const RulesContractContent: React.FC<Props> = ({
                 injectorContracts={contracts}
                 onChange={(data) => {
                   onChange(data);
+                  onChangeInjectorContractId();
                 }}
                 error={error}
                 fieldValue={value}
