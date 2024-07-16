@@ -14,7 +14,7 @@ interface Props {
 
 const XlsMapperPopover: FunctionComponent<Props> = ({
   mapper,
-  onUpdate,
+  onUpdate: _onUpdate,
   onDelete,
 }) => {
   // Standard hooks
