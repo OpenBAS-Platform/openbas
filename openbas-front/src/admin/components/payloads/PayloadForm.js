@@ -41,7 +41,7 @@ const PayloadForm = (props) => {
         requiredFields.push(...['file_drop_file']);
         break;
       default:
-      // do nothing
+            // do nothing
     }
     requiredFields.forEach((field) => {
       if (field === 'payload_platforms' && (!values[field] || values[field].length === 0)) {
@@ -131,11 +131,10 @@ const PayloadForm = (props) => {
             </>
           )}
           {type === 'Executable' && (
-            <Field name="executable_file">
+            <Field name="executable_file" subscription={{ dirty: true, error: true, touched: true }}>
               {({ input, meta }) => (
                 <FileLoader
                   {...input}
-                  name="executable_file"
                   label={t('Executable file')}
                   setFieldValue={form.mutators.setValue}
                   initialValue={values.executable_file}
@@ -146,11 +145,11 @@ const PayloadForm = (props) => {
             </Field>
           )}
           {type === 'FileDrop' && (
-            <Field name="file_drop_file">
+            <Field name="file_drop_file" subscription={{ dirty: true, error: true, touched: true }}>
               {({ input, meta }) => (
                 <FileLoader
                   {...input}
-                  label="File to drop"
+                  label={t('File to drop')}
                   setFieldValue={form.mutators.setValue}
                   initialValue={values.file_drop_file}
                   InputLabelProps={{ required: true }}
@@ -193,12 +192,12 @@ const PayloadForm = (props) => {
                       style={{ marginTop: -2 }}
                       color="primary"
                     >
-                      <ControlPointOutlined />
+                      <ControlPointOutlined/>
                     </IconButton>
                     {meta.error && meta.touched && (
-                      <div className={classes.errorColor}>
-                        {meta.error}
-                      </div>
+                    <div className={classes.errorColor}>
+                      {meta.error}
+                    </div>
                     )}
                   </InputLabel>
                 </div>
@@ -241,7 +240,7 @@ const PayloadForm = (props) => {
                           size="small"
                           color="primary"
                         >
-                          <DeleteOutlined />
+                          <DeleteOutlined/>
                         </IconButton>
                       </ListItem>
                     );
@@ -270,12 +269,12 @@ const PayloadForm = (props) => {
                       style={{ marginTop: -2 }}
                       color="primary"
                     >
-                      <ControlPointOutlined />
+                      <ControlPointOutlined/>
                     </IconButton>
                     {meta.error && meta.touched && (
-                      <div className={classes.errorColor}>
-                        {meta.error}
-                      </div>
+                    <div className={classes.errorColor}>
+                      {meta.error}
+                    </div>
                     )}
                   </InputLabel>
                 </div>
@@ -327,7 +326,7 @@ const PayloadForm = (props) => {
                           size="small"
                           color="primary"
                         >
-                          <DeleteOutlined />
+                          <DeleteOutlined/>
                         </IconButton>
                       </ListItem>
                     );
@@ -391,7 +390,7 @@ const PayloadForm = (props) => {
               variant="contained"
               color="secondary"
               type="submit"
-              disabled={!dirty || submitting}
+              disabled={submitting || !dirty}
             >
               {editing ? t('Update') : t('Create')}
             </Button>

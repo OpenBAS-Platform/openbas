@@ -83,18 +83,18 @@ interface Props {
   label: string;
   name: string;
   setFieldValue: (field: string, value: { id?: string, label?: string } | undefined) => void;
-  error?: boolean;
   /* For mandatory fields */
   InputLabelProps?: { required: boolean };
+  error?: boolean;
 }
 
 const FileLoader: React.FC<Props> = ({
   initialValue,
   extensions = [],
-  InputLabelProps,
   label,
   name,
   setFieldValue,
+  InputLabelProps,
   error,
 }) => {
   const classes = useStyles();
@@ -102,7 +102,9 @@ const FileLoader: React.FC<Props> = ({
   const dispatch = useAppDispatch();
 
   const [open, setOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<RawDocument | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<RawDocument | undefined>(undefined);
+  // Check if selectedDocument resulted from a remove action or an interaction with the File loader dialog
+  const [firstInteraction, setFirstInteraction] = useState(false);
 
   // Fetching data
   const { documents }: {
@@ -124,25 +126,28 @@ const FileLoader: React.FC<Props> = ({
   }, [documents]);
 
   useEffect(() => {
-    if (selectedDocument) {
-      setFieldValue(name, { id: selectedDocument.document_id, label: selectedDocument.document_name });
-    } else {
-      setFieldValue(name, undefined);
+    if (firstInteraction) {
+      if (selectedDocument) {
+        setFieldValue(name, { id: selectedDocument.document_id, label: selectedDocument.document_name });
+      } else {
+        setFieldValue(name, undefined);
+      }
     }
-  }, [selectedDocument, setFieldValue]);
+  }, [selectedDocument]);
 
   const handleOpen = () => {
+    setFirstInteraction(true);
     setOpen(true);
   };
 
   // Actions
-  const handleUpdate = () => setOpen(true);
-
   const handleRemove = () => {
-    setSelectedDocument(null);
+    setFirstInteraction(true);
+    setSelectedDocument(undefined);
   };
 
   const handleDownload = (documentId: string | undefined) => {
+    setFirstInteraction(true);
     if (documentId) {
       window.location.href = `/api/documents/${documentId}/file`;
     }
@@ -150,7 +155,7 @@ const FileLoader: React.FC<Props> = ({
 
   // Button Popover entries
   const entries: ButtonPopoverEntry[] = [
-    { label: 'Update', action: handleUpdate },
+    { label: 'Update', action: handleOpen },
     { label: 'Remove', action: handleRemove },
     { label: 'Download', action: () => handleDownload(selectedDocument?.document_id) },
   ];
@@ -158,16 +163,15 @@ const FileLoader: React.FC<Props> = ({
   return (
     <>
       <Typography
-        className={`${classes.title} ${InputLabelProps?.required && !selectedDocument && error ? classes.errorText : ''}`}
+        className={`${classes.title} ${InputLabelProps?.required && error ? classes.errorText : ''}`}
       >
         {label}
-        {InputLabelProps?.required
-                    && <span className={!selectedDocument && error ? classes.errorText : ''}> *</span>}
+        {InputLabelProps?.required && <span className={ error ? classes.errorText : ''}> *</span>}
       </Typography>
       <List style={{ marginTop: 0, paddingTop: 0 }}>
         {!selectedDocument && (
         <ListItem
-          className={`${classes.item} ${InputLabelProps?.required && !selectedDocument && error ? classes.errorDivider : ''}`}
+          className={`${classes.item} ${InputLabelProps?.required && error ? classes.errorDivider : ''}`}
           divider
           onClick={handleOpen}
           color="primary"
@@ -181,7 +185,7 @@ const FileLoader: React.FC<Props> = ({
           />
         </ListItem>
         )}
-        {InputLabelProps?.required && !selectedDocument && error && (
+        {InputLabelProps?.required && error && (
         <Typography className={classes.errorMessage}>{t('Should not be empty')}
         </Typography>
         )}
