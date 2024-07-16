@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import SearchFilter from '../../SearchFilter';
 import type { Page } from './Page';
-import type { FilterGroup, SearchPaginationInput, Filter } from '../../../utils/api-types';
+import type { Filter, FilterGroup, SearchPaginationInput } from '../../../utils/api-types';
 import ExportButton, { ExportProps } from '../ExportButton';
 import mitreAttack from '../../../static/images/misc/attack.png';
 import KillChainPhasesFilter from '../../../admin/components/common/filters/KillChainPhasesFilter';
@@ -37,6 +37,8 @@ const useStyles = makeStyles(() => ({
     alignItems: 'center',
   },
 }));
+
+const ROWS_PER_PAGE_OPTIONS = [20, 50, 100];
 
 interface Props<T> {
   fetch: (input: SearchPaginationInput) => Promise<{ data: Page<T> }>;
@@ -72,7 +74,7 @@ const PaginationComponent = <T extends object>({
 
   // Pagination
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(100);
+  const [rowsPerPage, setRowsPerPage] = React.useState(ROWS_PER_PAGE_OPTIONS[0]);
   const [totalElements, setTotalElements] = useState(0);
 
   const handleChangePage = (
@@ -156,7 +158,7 @@ const PaginationComponent = <T extends object>({
                 open={openMitreFilter}
                 handleClose={() => setOpenMitreFilter(false)}
                 title={t('ATT&CK Matrix')}
-                variant='full'
+                variant="full"
               >
                 <MitreFilter helpers={helpers} onClick={() => setOpenMitreFilter(false)} />
               </Drawer>
@@ -167,14 +169,14 @@ const PaginationComponent = <T extends object>({
           <div className={classes.container}>
             <TablePagination
               component="div"
-              rowsPerPageOptions={[100, 200, 500, 1000]}
+              rowsPerPageOptions={ROWS_PER_PAGE_OPTIONS}
               count={totalElements}
               page={page}
               onPageChange={handleChangePage}
               rowsPerPage={rowsPerPage}
               onRowsPerPageChange={handleChangeRowsPerPage}
             />
-            <ToggleButtonGroup value='fake' exclusive={true}>
+            <ToggleButtonGroup value="fake" exclusive>
               {exportProps && <ExportButton totalElements={totalElements} exportProps={exportProps} />}
               {!!component && component}
             </ToggleButtonGroup>

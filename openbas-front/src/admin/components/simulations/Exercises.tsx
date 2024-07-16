@@ -24,7 +24,7 @@ const Exercises = () => {
 
   const [exercises, setExercises] = useState<EndpointStore[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
-    sorts: initSorting('exercise_updated_at'),
+    sorts: initSorting('exercise_updated_at', 'DESC'),
   });
 
   // Export
