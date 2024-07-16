@@ -12013,7 +12013,7 @@ __metadata:
     vite: "npm:5.2.11"
     vite-plugin-istanbul: "npm:6.0.2"
     vitest: "npm:1.6.0"
-    xlsx: "npm:^0.18.5"
+    xlsx: "npm:0.18.5"
     zod: "npm:3.23.8"
   languageName: unknown
   linkType: soft
@@ -16192,7 +16192,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xlsx@npm:^0.18.5":
+"xlsx@npm:0.18.5":
   version: 0.18.5
   resolution: "xlsx@npm:0.18.5"
   dependencies:
