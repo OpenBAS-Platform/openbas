@@ -23,6 +23,6 @@ public class MapperAddInput {
     private String injectTypeColumn;
 
     @JsonProperty("mapper_inject_importers")
-    private List<InjectImporterInput> importers;
+    private List<InjectImporterAddInput> importers;
 
 }
