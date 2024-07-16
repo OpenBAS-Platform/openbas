@@ -34,6 +34,7 @@ interface Props<T> {
   injectorContracts: InjectorContractStore[];
   onChange: (data: string | null | undefined) => void;
   error: FieldError | undefined;
+  fieldValue: string | undefined;
 }
 
 const InjectContractComponent = <T extends object>({
@@ -44,6 +45,7 @@ const InjectContractComponent = <T extends object>({
   injectorContracts,
   onChange,
   error,
+  fieldValue,
 }: Props<T>) => {
   // Standard hooks
   const classes = useStyles();
@@ -90,7 +92,7 @@ const InjectContractComponent = <T extends object>({
     });
   }, [searchPaginationInput, page, rowsPerPage, textSearch]);
 
-  const [value, setValue] = React.useState<string | null | undefined>('');
+  const [value, setValue] = React.useState<string | null | undefined>(fieldValue ?? '');
 
   return (
     <Autocomplete

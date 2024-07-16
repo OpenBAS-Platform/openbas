@@ -1,6 +1,6 @@
-import { Controller, SubmitHandler, useForm, useFieldArray } from 'react-hook-form';
+import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import React from 'react';
-import { TextField, Button, Typography, IconButton } from '@mui/material';
+import { Button, IconButton, TextField, Typography } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,14 +24,14 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  OnSubmit: SubmitHandler<ImportMapperAddInput>;
+  onSubmit: SubmitHandler<ImportMapperAddInput>;
   handleClose: () => void;
   editing?: boolean;
   initialValues?: ImportMapperAddInput;
 }
 
 const MapperForm: React.FC<Props> = ({
-  OnSubmit,
+  onSubmit,
   handleClose,
   editing,
   initialValues = {
@@ -77,13 +77,10 @@ const MapperForm: React.FC<Props> = ({
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'mapper_inject_importers',
-
   });
 
-  const onSubmit = (data) => console.log(data);
-
   return (
-    <form id="mapperForm" onSubmit={methods.handleSubmit(OnSubmit)}>
+    <form id="mapperForm" onSubmit={methods.handleSubmit(onSubmit)}>
       <TextField
         variant="standard"
         fullWidth
@@ -98,12 +95,12 @@ const MapperForm: React.FC<Props> = ({
       <Controller
         control={control}
         name={'mapper_inject_type_column'}
-        render={({ field: { onChange }, fieldState: { error } }) => (
+        render={({ field: { onChange, value }, fieldState: { error } }) => (
           <RegexComponent
             label={t('Inject type column')}
+            fieldValue={value}
             onChange={onChange}
             error={error}
-            name={'mapper_inject_type_column'}
           />
         )}
       />
@@ -134,6 +131,7 @@ const MapperForm: React.FC<Props> = ({
           methods={methods}
           index={index}
           remove={remove}
+          editing={editing}
         />
       ))}
 

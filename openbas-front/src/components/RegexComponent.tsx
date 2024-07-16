@@ -6,13 +6,14 @@ import { useFormatter } from './i18n';
 
 interface Props {
   label: string;
+  fieldValue: string | undefined;
   onChange: (data: string | null) => void;
   error: FieldError;
-  name: string;
 }
 
 const RegexComponent: React.FC<Props> = ({
   label,
+  fieldValue,
   onChange,
   error,
 }) => {
@@ -20,10 +21,9 @@ const RegexComponent: React.FC<Props> = ({
   const { t } = useFormatter();
 
   const regexOptions = alphabet(26);
-  const [value, setValue] = React.useState<string | null | undefined>('');
+  const [value, setValue] = React.useState<string | null | undefined>(fieldValue ?? '');
 
   return (
-
     <Autocomplete
       selectOnFocus
       openOnFocus
