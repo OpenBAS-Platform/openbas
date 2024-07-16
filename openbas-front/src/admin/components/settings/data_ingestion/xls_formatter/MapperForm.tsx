@@ -107,7 +107,7 @@ const MapperForm: React.FC<Props> = ({
 
       <div className={classes.importerStyle}>
         <Typography variant="h3" sx={{ m: 0 }}>
-          {t('Inject importer')}
+          {t('Representation for inject')}
         </Typography>
         <IconButton
           color="secondary"
@@ -139,10 +139,11 @@ const MapperForm: React.FC<Props> = ({
         <Button
           variant="contained"
           onClick={handleClose}
+          color="primary"
           style={{ marginRight: 10 }}
           // disabled={isSubmitting}
         >
-          {t('Cancel')}
+          {t('Test')}
         </Button>
         <Button
           variant="contained"

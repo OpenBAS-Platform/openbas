@@ -55,7 +55,9 @@ const RulesContractContent: React.FC<Props> = ({
 
   // Fetching data
 
-  const { control, formState: { errors } } = methods;
+  const { control, watch, getValues } = methods;
+
+  const injectorContractId = watch(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`);
 
   const { fields: rulesFields, remove: rulesRemove, append: rulesAppend } = useFieldArray({
     control,
@@ -63,6 +65,16 @@ const RulesContractContent: React.FC<Props> = ({
   });
 
   const AddRules = (contractFieldKeys: string[]) => {
+    rulesAppend({
+      rule_attribute_name: 'title',
+      rule_attribute_columns: '',
+      rule_attribute_default_value: '',
+    });
+    rulesAppend({
+      rule_attribute_name: 'description',
+      rule_attribute_columns: '',
+      rule_attribute_default_value: '',
+    });
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < contractFieldKeys?.length; i++) {
       rulesAppend({
@@ -71,6 +83,21 @@ const RulesContractContent: React.FC<Props> = ({
         rule_attribute_default_value: '',
       });
     }
+    rulesAppend({
+      rule_attribute_name: 'expectation_name',
+      rule_attribute_columns: '',
+      rule_attribute_default_value: '',
+    });
+    rulesAppend({
+      rule_attribute_name: 'expectation_description',
+      rule_attribute_columns: '',
+      rule_attribute_default_value: '',
+    });
+    rulesAppend({
+      rule_attribute_name: 'expectation_score',
+      rule_attribute_columns: '',
+      rule_attribute_default_value: '',
+    });
     rulesAppend({
       rule_attribute_name: 'trigger_time',
       rule_attribute_columns: '',
@@ -81,7 +108,7 @@ const RulesContractContent: React.FC<Props> = ({
   const onChangeInjectorContractId = () => {
       directFetchInjectorContract(methods.getValues(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`)).then((result: { data: InjectorContract }) => {
         const injectorContract = result.data;
-        const contractFieldKeys = injectorContract?.convertedContent?.fields.map((f) => f.key);
+        const contractFieldKeys = injectorContract?.convertedContent?.fields.filter((f) => f.key !== 'expectations').map((f) => f.key);
         rulesRemove();
         AddRules(contractFieldKeys);
       });
@@ -137,7 +164,7 @@ const RulesContractContent: React.FC<Props> = ({
         >
           <div className={classes.container}>
             <Typography>
-              {t('Inject importer')} {index + 1}
+              #{index + 1} {t('New representation')}
             </Typography>
             <Tooltip title={t('Delete')}>
               <IconButton color="error" onClick={handleClickOpenAlertDelete}>
@@ -151,7 +178,6 @@ const RulesContractContent: React.FC<Props> = ({
             variant="standard"
             fullWidth
             label={t('Inject importer name')}
-            style={{ marginTop: 10 }}
             inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_name` as const)}
             InputLabelProps={{ required: true }}
             error={!!methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_name}
@@ -160,7 +186,7 @@ const RulesContractContent: React.FC<Props> = ({
           <TextField
             variant="standard"
             fullWidth
-            label={t('Inject importer type')}
+            label={t('Matching type in the xls')}
             style={{ marginTop: 10 }}
             inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_type_value` as const)}
             InputLabelProps={{ required: true }}
@@ -175,7 +201,7 @@ const RulesContractContent: React.FC<Props> = ({
                 fetch={searchInjectorContracts}
                 searchPaginationInput={searchPaginationInput}
                 setContent={setContracts}
-                label={t('Inject importer injector contract')}
+                label={t('Inject type')}
                 injectorContracts={contracts}
                 onChange={(data) => {
                   onChange(data);
@@ -189,13 +215,14 @@ const RulesContractContent: React.FC<Props> = ({
           {
             rulesFields.map((ruleField, rulesIndex) => {
               return (
-                <List key={ruleField.id} style={{ marginTop: 20 }}>
+                <List key={ruleField.id} sx={{ height: '60px' }}>
                   <ListItem key={ruleField.id}>
                     <ListItemText
                       primary={
                         <div className={classes.rulesArray}>
                           <Typography
-                            variant="subtitle1" {...methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_name` as const)}
+                            style={{ textTransform: 'capitalize' }}
+                            variant="body1" {...methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_name` as const)}
                           >
                             {ruleField.rule_attribute_name} <span className={classes.redStar}>*</span>
                           </Typography>
@@ -239,7 +266,7 @@ const RulesContractContent: React.FC<Props> = ({
                           />
                           {
                             currentRuleIndex === rulesFields.length - 1 && <TextField
-                              label={t('Rule additional config')}
+                              label={t('Time pattern')}
                               fullWidth
                               inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern` as const)}
                             />
@@ -260,7 +287,7 @@ const RulesContractContent: React.FC<Props> = ({
 
         </AccordionDetails>
         <AccordionActions>
-          <Button color="error" variant="contained" onClick={handleClickOpenAlertDelete}>{t('Delete')}</Button>
+          <Button sx={{ marginTop: '30px' }} color="error" variant="contained" onClick={handleClickOpenAlertDelete}>{t('Delete')}</Button>
         </AccordionActions>
       </Accordion>
 
