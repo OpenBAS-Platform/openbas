@@ -16,10 +16,6 @@ public class InjectImporterUpdateInput {
     private String id;
 
     @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("inject_importer_name")
-    private String name;
-
-    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("inject_importer_type_value")
     private String injectTypeValue;
 

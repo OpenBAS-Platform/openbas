@@ -33,7 +33,6 @@ public class V3_29__Add_tables_xls_mappers extends BaseJavaMigration {
             importer_mapper_id UUID NOT NULL
               CONSTRAINT inject_importers_mapper_id_fkey REFERENCES import_mappers(mapper_id) ON DELETE SET NULL,
             importer_import_type_value VARCHAR(255) NOT NULL,
-            importer_name VARCHAR(255) NOT NULL DEFAULT '',
             importer_injector_contract_id VARCHAR(255) NOT NULL
               CONSTRAINT inject_importers_injector_contract_id_fkey REFERENCES injectors_contracts(injector_contract_id) ON DELETE SET NULL,
             importer_created_at TIMESTAMP DEFAULT now(),

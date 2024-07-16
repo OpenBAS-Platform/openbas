@@ -1000,6 +1000,28 @@ export interface ImportMapperUpdateInput {
   mapper_name: string;
 }
 
+export interface ImportMessage {
+  message_code?:
+    | "NO_POTENTIAL_MATCH_FOUND"
+    | "SEVERAL_MATCHES"
+    | "ABSOLUTE_TIME_WITHOUT_START_DATE"
+    | "DATE_SET_IN_PAST"
+    | "DATE_SET_IN_FUTURE"
+    | "NO_TEAM_FOUND";
+  message_level?: "CRITICAL" | "ERROR" | "WARN" | "INFO";
+  message_params?: Record<string, string>;
+}
+
+export interface ImportPostSummary {
+  available_sheets: string[];
+  import_id: string;
+}
+
+export interface ImportTestSummary {
+  import_message?: ImportMessage[];
+  injects?: InjectResultDTO[];
+}
+
 export interface Inject {
   footer?: string;
   header?: string;
@@ -1138,7 +1160,6 @@ export interface InjectImporter {
   inject_importer_created_at?: string;
   inject_importer_id: string;
   inject_importer_injector_contract: InjectorContract;
-  inject_importer_name: string;
   inject_importer_type_value: string;
   /** @format date-time */
   inject_importer_updated_at?: string;
@@ -1148,7 +1169,6 @@ export interface InjectImporter {
 
 export interface InjectImporterAddInput {
   inject_importer_injector_contract_id: string;
-  inject_importer_name: string;
   inject_importer_rule_attributes?: RuleAttributeAddInput[];
   inject_importer_type_value: string;
 }
@@ -1156,7 +1176,6 @@ export interface InjectImporterAddInput {
 export interface InjectImporterUpdateInput {
   inject_importer_id?: string;
   inject_importer_injector_contract_id: string;
-  inject_importer_name: string;
   inject_importer_rule_attributes?: RuleAttributeUpdateInput[];
   inject_importer_type_value: string;
 }
@@ -1427,6 +1446,13 @@ export interface InjectorUpdateInput {
   injector_executor_commands?: Record<string, string>;
   injector_name: string;
   injector_payloads?: boolean;
+}
+
+export interface InjectsImportInput {
+  import_mapper_id: string;
+  sheet_name: string;
+  /** @format int32 */
+  timezone_offset: number;
 }
 
 export type JsonNode = object;

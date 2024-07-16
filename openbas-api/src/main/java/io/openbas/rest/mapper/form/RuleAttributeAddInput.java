@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-import java.util.Map;
-
+import java.util.HashMap;
 import java.util.Map;
 
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
@@ -25,6 +24,6 @@ public class RuleAttributeAddInput {
     private String defaultValue;
 
     @JsonProperty("rule_attribute_additional_config")
-    private Map<String, String> additionalConfig;
+    private Map<String, String> additionalConfig = new HashMap<>();
 
 }
