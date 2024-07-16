@@ -1,5 +1,24 @@
 import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayRemove, UseFormReturn } from 'react-hook-form';
-import { Accordion, AccordionActions, AccordionDetails, AccordionSummary, Badge, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, List, ListItem, ListItemText, TextField, Tooltip, Typography, } from '@mui/material';
+import {
+  Accordion,
+  AccordionActions,
+  AccordionDetails,
+  AccordionSummary,
+  Badge,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { DeleteOutlined, ExpandMore } from '@mui/icons-material';
 import { CogOutline } from 'mdi-material-ui';
 import React, { useEffect, useRef, useState } from 'react';
@@ -55,7 +74,7 @@ const RulesContractContent: React.FC<Props> = ({
 
   // Fetching data
 
-  const { control, watch, getValues } = methods;
+  const { control, watch, formState: { errors }, getValues } = methods;
 
   const injectorContractId = watch(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`);
 
@@ -106,13 +125,13 @@ const RulesContractContent: React.FC<Props> = ({
   };
 
   const onChangeInjectorContractId = () => {
-      directFetchInjectorContract(methods.getValues(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`)).then((result: { data: InjectorContract }) => {
-        const injectorContract = result.data;
-        const contractFieldKeys = injectorContract?.convertedContent?.fields.filter((f) => f.key !== 'expectations').map((f) => f.key);
-        rulesRemove();
-        AddRules(contractFieldKeys);
-      });
-  }
+    directFetchInjectorContract(methods.getValues(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`)).then((result: { data: InjectorContract }) => {
+      const injectorContract = result.data;
+      const contractFieldKeys = injectorContract?.convertedContent?.fields.filter((f) => f.key !== 'expectations').map((f) => f.key);
+      rulesRemove();
+      AddRules(contractFieldKeys);
+    });
+  };
 
   const [currentRuleIndex, setCurrentRuleIndex] = useState<number | null>(null);
   const handleDefaultValueOpen = (rulesIndex: number) => {
@@ -154,7 +173,7 @@ const RulesContractContent: React.FC<Props> = ({
       <Accordion
         key={field.id}
         variant="outlined"
-        style={{ width: '100%' }}
+        style={{ width: '100%', marginBottom: '10px' }}
         className={classNames({
           [classes.red]: !!errors.mapper_inject_importers?.[index],
         })}
@@ -231,7 +250,7 @@ const RulesContractContent: React.FC<Props> = ({
                             name={`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_columns` as const}
                             render={({ field: { onChange, value }, fieldState: { error } }) => (
                               <RegexComponent label={t('Rule attributes columns')} onChange={onChange} error={error}
-                                              fieldValue={value}
+                                fieldValue={value}
                               />
                             )}
                           />
@@ -240,7 +259,7 @@ const RulesContractContent: React.FC<Props> = ({
                             onClick={() => handleDefaultValueOpen(rulesIndex)}
                           >
                             <Badge color="secondary" variant="dot"
-                                   invisible={!methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
+                              invisible={!methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
                                      || methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0}
                             >
                               <CogOutline />
@@ -254,7 +273,7 @@ const RulesContractContent: React.FC<Props> = ({
                         open
                         PaperProps={{ elevation: 1 }}
                         onClose={handleDefaultValueClose}
-                      >
+                         >
                         <DialogTitle>
                           {t('Attribute mapping configuration')}
                         </DialogTitle>
@@ -269,7 +288,7 @@ const RulesContractContent: React.FC<Props> = ({
                               label={t('Time pattern')}
                               fullWidth
                               inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern` as const)}
-                            />
+                                                                           />
                           }
                         </DialogContent>
                         <DialogActions>
