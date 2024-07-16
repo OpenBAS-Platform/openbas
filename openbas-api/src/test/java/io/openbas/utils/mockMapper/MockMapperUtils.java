@@ -28,7 +28,6 @@ public class MockMapperUtils {
     private static InjectImporter createInjectImporter() {
         InjectImporter injectImporter = new InjectImporter();
         injectImporter.setId(UUID.randomUUID().toString());
-        injectImporter.setName("Test");
         injectImporter.setImportTypeValue("Test");
         InjectorContract injectorContract = new InjectorContract();
         injectorContract.setId(UUID.randomUUID().toString());
