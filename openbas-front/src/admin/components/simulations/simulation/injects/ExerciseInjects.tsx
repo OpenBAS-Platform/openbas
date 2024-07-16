@@ -192,6 +192,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
       }
     }
   };
+  const bulkDeleteInjects = () => {};
 
   return (
     <>
@@ -225,6 +226,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
               context="exercise"
               id={exercise.exercise_id}
               handleUpdate={massUpdateInjects}
+              handleBulkDelete={bulkDeleteInjects}
             />
           </TeamContext.Provider>
         </ArticleContext.Provider>

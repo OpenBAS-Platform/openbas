@@ -144,7 +144,7 @@ class ToolBar extends Component {
     super(props);
     this.state = {
       displayUpdate: false,
-      displayDelete: false,
+      displayBulkDelete: false,
       actions: [],
       actionsInputs: [{}],
       navOpen: localStorage.getItem('navOpen') === 'true',
@@ -444,15 +444,16 @@ class ToolBar extends Component {
   }
 
   // Deletion
-  handleOpenDelete = () => {
-    this.setState({ displayDelete: true });
+  handleOpenBulkDelete = () => {
+    this.setState({ displayBulkDelete: true });
   };
 
-  handleCloseDelete = () => {
-    this.setState({ displayDelete: false });
+  handleCloseBulkDelete = () => {
+    this.setState({ displayBulkDelete: false, actionsInputs: [{}] });
   };
 
-  handleSubmitDelete = () => {
+  handleSubmitBulkDelete = () => {
+    this.props.handleBulkDelete(this.state.actionsInputs);
   };
 
   render() {
@@ -542,7 +543,7 @@ class ToolBar extends Component {
                           numberOfSelectedElements === 0
                           || this.state.processing
                         }
-                  onClick={this.handleOpenDelete.bind(this)}
+                  onClick={this.handleOpenBulkDelete.bind(this)}
                   color="primary"
                   size="small"
                 >
@@ -645,9 +646,9 @@ class ToolBar extends Component {
           </Drawer>
         </Drawer>
         <DialogDelete
-          open={this.state.displayDelete}
-          handleClose={this.handleCloseDelete.bind(this)}
-          handleSubmit={this.handleSubmitDelete.bind(this)}
+          open={this.state.displayBulkDelete}
+          handleClose={this.handleCloseBulkDelete.bind(this)}
+          handleSubmit={this.handleSubmitBulkDelete.bind(this)}
           text={t('Do you want to delete these injects ?')}
         />
       </>

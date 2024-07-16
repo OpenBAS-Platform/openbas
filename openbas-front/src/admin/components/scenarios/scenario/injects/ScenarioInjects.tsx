@@ -162,6 +162,9 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
     }
   };
 
+  const bulkDeleteInjects = () => {
+  };
+
   return (
     <ArticleContext.Provider value={articleContext}>
       <TeamContext.Provider value={teamContext}>
@@ -191,6 +194,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
           context="scenario"
           id={scenario.scenario_id}
           handleUpdate={massUpdateInjects}
+          handleBulkDelete={bulkDeleteInjects}
         />
       </TeamContext.Provider>
     </ArticleContext.Provider>

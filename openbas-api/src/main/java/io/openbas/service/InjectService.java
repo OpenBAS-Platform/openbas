@@ -130,8 +130,14 @@ public class InjectService {
         return injectRepository.save(inject);
     }
 
-    public List<InjectOutput> injects(Specification<Inject> specification) {
-        CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+
+  @Transactional
+  public void deleteAllByIds(List<String> injectIds) {
+    injectRepository.deleteAllById(injectIds);
+  }
+
+  public List<InjectOutput> injects(Specification<Inject> specification) {
+    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
     Root<Inject> injectRoot = cq.from(Inject.class);
