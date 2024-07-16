@@ -68,7 +68,7 @@ const InjectAddExpectation: FunctionComponent<InjectAddExpectationProps> = ({
         handleClose={handleClose}
         title={t('Add expectation in this inject')}
         childrenStyle={{
-          padding: '10px 30px 30px 30px' }}
+          padding: '10px 30px 30px' }}
       >
         <ExpectationFormCreate
           predefinedExpectations={predefinedExpectations}

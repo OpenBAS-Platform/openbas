@@ -97,7 +97,7 @@ const CreateDocument = (props) => {
           handleClose={() => setOpen(false)}
           title={t('Create a new document')}
           childrenStyle={{
-            padding: '0px 30px 30px 30px' }}
+            padding: '0 30px 30px' }}
         >
           <DocumentForm
             initialValues={initialValues}

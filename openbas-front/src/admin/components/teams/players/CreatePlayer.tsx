@@ -91,7 +91,7 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
         handleClose={handleClose}
         title={t('Create a new player')}
         childrenStyle={{
-          padding: '0px 30px 30px 30px' }}
+          padding: '0 30px 30px' }}
       >
         <PlayerForm
           initialValues={{ user_tags: [] }}

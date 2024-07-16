@@ -28,7 +28,7 @@ const Dialog: FunctionComponent<DialogProps> = ({
       PaperProps={{ elevation: 1 }}
       TransitionComponent={Transition}
     >
-      <DialogTitle>{title}</DialogTitle>
+      <DialogTitle style={{ paddingBottom: 5 }}>{title}</DialogTitle>
       <div style={childrenStyle}>{children}</div>
     </DialogMUI>);
 };

@@ -159,7 +159,7 @@ const EndpointPopover: React.FC<Props> = ({
           handleClose={() => setEdition(false)}
           title={t('Update the endpoint')}
           childrenStyle={{
-            padding: '0px 30px 30px 30px' }}
+            padding: '0 30px 30px' }}
         >
           <EndpointForm
             initialValues={initialValues}

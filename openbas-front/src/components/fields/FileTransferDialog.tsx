@@ -220,7 +220,7 @@ const FileTransferDialog: React.FC<Props> = ({
           )}
         </Grid>
       </DialogContent>
-      <DialogActions>
+      <DialogActions style={{ padding: '0 20px 20px 0' }}>
         <Button onClick={handleClose}>{t('Cancel')}</Button>
         {multiple && (<Button
           color="secondary"
