@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import * as PropTypes from 'prop-types';
-import { Form } from 'react-final-form';
+import { Field, Form } from 'react-final-form';
 import { Button, IconButton, InputLabel, List, ListItem, ListItemText, MenuItem } from '@mui/material';
 import { ControlPointOutlined, DeleteOutlined } from '@mui/icons-material';
 import { FieldArray } from 'react-final-form-arrays';
@@ -27,8 +27,6 @@ const PayloadForm = (props) => {
   const classes = useStyles();
   const { t } = useFormatter();
 
-  const [changedValue, setChangedValue] = useState(false);
-
   const validate = (values) => {
     const errors = {};
     const requiredFields = ['payload_name', 'payload_platforms'];
@@ -43,7 +41,7 @@ const PayloadForm = (props) => {
         requiredFields.push(...['file_drop_file']);
         break;
       default:
-        // do nothing
+      // do nothing
     }
     requiredFields.forEach((field) => {
       if (field === 'payload_platforms' && (!values[field] || values[field].length === 0)) {
@@ -70,7 +68,6 @@ const PayloadForm = (props) => {
       {({ handleSubmit, form, values, submitting, dirty }) => (
         <form id="payloadForm" onSubmit={(event) => {
           event.preventDefault();
-          setChangedValue(true);
           handleSubmit(event);
         }}
         >
@@ -134,30 +131,33 @@ const PayloadForm = (props) => {
             </>
           )}
           {type === 'Executable' && (
-            <>
-              <FileLoader
-                name="executable_file"
-                label={t('Executable file')}
-                setFieldValue={form.mutators.setValue}
-                initialValue={values.executable_file}
-                InputLabelProps={{ required: true }}
-                onSubmit={changedValue}
-                onChange={setChangedValue}
-              />
-            </>
+            <Field name="executable_file">
+              {({ input, meta }) => (
+                <FileLoader
+                  {...input}
+                  name="executable_file"
+                  label={t('Executable file')}
+                  setFieldValue={form.mutators.setValue}
+                  initialValue={values.executable_file}
+                  InputLabelProps={{ required: true }}
+                  error={meta.error && meta.touched}
+                />
+              )}
+            </Field>
           )}
           {type === 'FileDrop' && (
-            <>
-              <FileLoader
-                name="file_drop_file"
-                label={t('File to drop')}
-                setFieldValue={form.mutators.setValue}
-                initialValue={values.file_drop_file}
-                InputLabelProps={{ required: true }}
-                onSubmit={changedValue}
-                onChange={setChangedValue}
-              />
-            </>
+            <Field name="file_drop_file">
+              {({ input, meta }) => (
+                <FileLoader
+                  {...input}
+                  label="File to drop"
+                  setFieldValue={form.mutators.setValue}
+                  initialValue={values.file_drop_file}
+                  InputLabelProps={{ required: true }}
+                  error={meta.error && meta.touched}
+                />
+              )}
+            </Field>
           )}
           {type === 'DnsResolution' && (
             <>
@@ -193,12 +193,12 @@ const PayloadForm = (props) => {
                       style={{ marginTop: -2 }}
                       color="primary"
                     >
-                      <ControlPointOutlined/>
+                      <ControlPointOutlined />
                     </IconButton>
                     {meta.error && meta.touched && (
-                    <div className={classes.errorColor}>
-                      {meta.error}
-                    </div>
+                      <div className={classes.errorColor}>
+                        {meta.error}
+                      </div>
                     )}
                   </InputLabel>
                 </div>
@@ -241,7 +241,7 @@ const PayloadForm = (props) => {
                           size="small"
                           color="primary"
                         >
-                          <DeleteOutlined/>
+                          <DeleteOutlined />
                         </IconButton>
                       </ListItem>
                     );
@@ -270,12 +270,12 @@ const PayloadForm = (props) => {
                       style={{ marginTop: -2 }}
                       color="primary"
                     >
-                      <ControlPointOutlined/>
+                      <ControlPointOutlined />
                     </IconButton>
                     {meta.error && meta.touched && (
-                    <div className={classes.errorColor}>
-                      {meta.error}
-                    </div>
+                      <div className={classes.errorColor}>
+                        {meta.error}
+                      </div>
                     )}
                   </InputLabel>
                 </div>
@@ -327,7 +327,7 @@ const PayloadForm = (props) => {
                           size="small"
                           color="primary"
                         >
-                          <DeleteOutlined/>
+                          <DeleteOutlined />
                         </IconButton>
                       </ListItem>
                     );
@@ -391,7 +391,7 @@ const PayloadForm = (props) => {
               variant="contained"
               color="secondary"
               type="submit"
-              disabled={submitting || !(dirty || changedValue)}
+              disabled={!dirty || submitting}
             >
               {editing ? t('Update') : t('Create')}
             </Button>

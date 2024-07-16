@@ -6,7 +6,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import { deleteScenario, duplicateScenario, exportScenarioUri, updateScenario, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
-import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
+import ButtonPopover, { ButtonPopoverEntry, VariantButtonPopover } from '../../../../components/common/ButtonPopover';
 import Drawer from '../../../../components/common/Drawer';
 import ScenarioForm from '../ScenarioForm';
 import DialogDelete from '../../../../components/common/DialogDelete';
@@ -27,6 +27,7 @@ interface Props {
   setOpenDelete?: React.Dispatch<React.SetStateAction<boolean>>;
   openDuplicate?: boolean;
   setOpenDuplicate?: React.Dispatch<React.SetStateAction<boolean>>;
+  variantButtonPopover?: VariantButtonPopover;
 }
 
 const ScenarioPopover: FunctionComponent<Props> = ({
@@ -40,6 +41,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   setOpenDelete,
   openDuplicate,
   setOpenDuplicate,
+  variantButtonPopover,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -142,7 +144,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
 
   return (
     <>
-      <ButtonPopover entries={entries} />
+      <ButtonPopover entries={entries} variant={variantButtonPopover}/>
       <Drawer
         open={isNotEmptyField(openEdit) ? openEdit : edition}
         handleClose={() => (setOpenEdit ? setOpenEdit(false) : handleCloseEdit)}

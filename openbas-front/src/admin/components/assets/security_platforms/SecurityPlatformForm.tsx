@@ -25,8 +25,8 @@ const SecurityPlatformForm: React.FC<Props> = ({
     security_platform_type: 'SIEM',
     asset_description: '',
     asset_last_seen: undefined,
-    security_platform_logo_light: '',
-    security_platform_logo_dark: '',
+    security_platform_logo_light: undefined,
+    security_platform_logo_dark: undefined,
     asset_tags: [],
   },
 }) => {

@@ -24,7 +24,7 @@ import { usePermissions } from '../../../../utils/Exercise';
 import Transition from '../../../../components/common/Transition';
 import type { Exercise, ExerciseUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
+import ButtonPopover, { ButtonPopoverEntry, VariantButtonPopover } from '../../../../components/common/ButtonPopover';
 import ExerciseUpdateForm from './ExerciseUpdateForm';
 import Drawer from '../../../../components/common/Drawer';
 import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
@@ -43,6 +43,7 @@ interface ExercisePopoverProps {
   setOpenDelete?: React.Dispatch<React.SetStateAction<boolean>>;
   setOpenDuplicate?: React.Dispatch<React.SetStateAction<boolean>>;
   setOpenExport?: React.Dispatch<React.SetStateAction<boolean>>;
+  variantButtonPopover?: VariantButtonPopover;
 }
 
 const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
@@ -56,6 +57,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   setOpenDelete,
   setOpenDuplicate,
   setOpenExport,
+  variantButtonPopover,
 }) => {
   const { t } = useFormatter();
   const navigate = useNavigate();
@@ -159,7 +161,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
 
   return (
     <>
-      <ButtonPopover entries={entries} />
+      <ButtonPopover entries={entries} variant={variantButtonPopover}/>
       <DialogDuplicate
         open={isNotEmptyField(openDuplicate) ? openDuplicate : duplicate}
         handleClose={() => (setOpenDuplicate ? setOpenDuplicate(false) : handleCloseDuplicate)}

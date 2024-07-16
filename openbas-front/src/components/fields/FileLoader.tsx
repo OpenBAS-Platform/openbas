@@ -82,11 +82,10 @@ interface Props {
   extensions?: string[];
   label: string;
   name: string;
-  setFieldValue: (field: string, value: { id?: string, label?: string } | null) => void;
-  onChange?: (changedValue: boolean)=> void;
+  setFieldValue: (field: string, value: { id?: string, label?: string } | undefined) => void;
+  error?: boolean;
   /* For mandatory fields */
   InputLabelProps?: { required: boolean };
-  onSubmit?: boolean;
 }
 
 const FileLoader: React.FC<Props> = ({
@@ -95,9 +94,8 @@ const FileLoader: React.FC<Props> = ({
   InputLabelProps,
   label,
   name,
-  onChange,
-  onSubmit,
   setFieldValue,
+  error,
 }) => {
   const classes = useStyles();
   const { t } = useFormatter();
@@ -129,16 +127,9 @@ const FileLoader: React.FC<Props> = ({
     if (selectedDocument) {
       setFieldValue(name, { id: selectedDocument.document_id, label: selectedDocument.document_name });
     } else {
-      setFieldValue(name, null);
+      setFieldValue(name, undefined);
     }
   }, [selectedDocument, setFieldValue]);
-
-  // Control the state of the update/create button in the parent form
-  useEffect(() => {
-    if (selectedDocument && onChange) {
-      onChange(true);
-    }
-  }, [open]);
 
   const handleOpen = () => {
     setOpen(true);
@@ -149,9 +140,6 @@ const FileLoader: React.FC<Props> = ({
 
   const handleRemove = () => {
     setSelectedDocument(null);
-    if (onChange) {
-      onChange(true);
-    }
   };
 
   const handleDownload = (documentId: string | undefined) => {
@@ -170,16 +158,16 @@ const FileLoader: React.FC<Props> = ({
   return (
     <>
       <Typography
-        className={`${classes.title} ${InputLabelProps?.required && !selectedDocument && onSubmit ? classes.errorText : ''}`}
+        className={`${classes.title} ${InputLabelProps?.required && !selectedDocument && error ? classes.errorText : ''}`}
       >
         {label}
         {InputLabelProps?.required
-                    && <span className={!selectedDocument && onSubmit ? classes.errorText : ''}> *</span>}
+                    && <span className={!selectedDocument && error ? classes.errorText : ''}> *</span>}
       </Typography>
       <List style={{ marginTop: 0, paddingTop: 0 }}>
         {!selectedDocument && (
         <ListItem
-          className={`${classes.item} ${InputLabelProps?.required && !selectedDocument && onSubmit ? classes.errorDivider : ''}`}
+          className={`${classes.item} ${InputLabelProps?.required && !selectedDocument && error ? classes.errorDivider : ''}`}
           divider
           onClick={handleOpen}
           color="primary"
@@ -193,7 +181,7 @@ const FileLoader: React.FC<Props> = ({
           />
         </ListItem>
         )}
-        {InputLabelProps?.required && !selectedDocument && onSubmit && (
+        {InputLabelProps?.required && !selectedDocument && error && (
         <Typography className={classes.errorMessage}>{t('Should not be empty')}
         </Typography>
         )}
@@ -228,15 +216,7 @@ const FileLoader: React.FC<Props> = ({
           <ListItemSecondaryAction>
             <ButtonPopover
               entries={entries}
-              buttonProps={{
-                color: 'primary',
-                size: 'large',
-                /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
-                // @ts-ignore
-                borderRadius: '50%',
-                border: 'none',
-                padding: '12px',
-              }}
+              variant={'icon'}
             />
           </ListItemSecondaryAction>
         </ListItem>)}

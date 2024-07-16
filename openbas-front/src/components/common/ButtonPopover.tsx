@@ -1,4 +1,4 @@
-import { Menu, MenuItem, ToggleButton, ToggleButtonProps } from '@mui/material';
+import { IconButton, Menu, MenuItem, ToggleButton, ToggleButtonProps } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import React, { FunctionComponent, useState } from 'react';
 import { useFormatter } from '../i18n';
@@ -9,14 +9,18 @@ export interface ButtonPopoverEntry {
   disabled?: boolean;
 }
 
+export type VariantButtonPopover = 'toggle' | 'icon';
+
 interface Props {
   entries: ButtonPopoverEntry[];
   buttonProps?: ToggleButtonProps;
+  variant?: VariantButtonPopover;
 }
 
 const ButtonPopover: FunctionComponent<Props> = ({
   entries,
   buttonProps,
+  variant = 'toggle',
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -25,27 +29,43 @@ const ButtonPopover: FunctionComponent<Props> = ({
 
   return (
     <>
-      <ToggleButton
-        value="popover"
-        size="large"
-        color={'primary'}
-        onClick={(ev) => {
-          ev.stopPropagation();
-          setAnchorEl(ev.currentTarget);
-        }}
-        style={{ ...buttonProps }}
-      >
-        <MoreVert fontSize="small" color="primary" />
-      </ToggleButton>
+      {variant === 'toggle'
+        && <ToggleButton
+          value="popover"
+          size="small"
+          color={'primary'}
+          onClick={(ev) => {
+            ev.stopPropagation();
+            setAnchorEl(ev.currentTarget);
+          }}
+          style={{ ...buttonProps }}
+           >
+          <MoreVert fontSize="small" color="primary" />
+        </ToggleButton>
+      }
+      {variant === 'icon'
+        && <IconButton
+          value="popover"
+          size="large"
+          color={'primary'}
+          onClick={(ev) => {
+            ev.stopPropagation();
+            setAnchorEl(ev.currentTarget);
+          }}
+          style={{ ...buttonProps }}
+           >
+          <MoreVert />
+        </IconButton>
+      }
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={() => setAnchorEl(null)}
       >
-        {entries.map((entry, idx) => {
+        {entries.map((entry) => {
           return (
             <MenuItem
-              key={idx}
+              key={entry.label}
               disabled={entry.disabled}
               onClick={() => {
                 entry.action();

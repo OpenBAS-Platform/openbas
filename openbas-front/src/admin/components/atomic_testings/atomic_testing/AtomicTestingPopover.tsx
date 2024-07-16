@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Inject, InjectResultDTO } from '../../../../utils/api-types';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
-import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
+import ButtonPopover, { ButtonPopoverEntry, VariantButtonPopover } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { deleteAtomicTesting, duplicateAtomicTesting, updateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useHelper } from '../../../../store';
@@ -26,6 +26,7 @@ interface Props {
   setOpenEdit?: (open: boolean) => void;
   setOpenDelete?: (open: boolean) => void;
   setOpenDuplicate?: (open: boolean) => void;
+  variantButtonPopover?: VariantButtonPopover;
 }
 
 const AtomicTestingPopover: FunctionComponent<Props> = ({
@@ -37,6 +38,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   setOpenEdit,
   setOpenDelete,
   setOpenDuplicate,
+  variantButtonPopover,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -105,7 +107,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
 
   return (
     <>
-      <ButtonPopover entries={entries} />
+      <ButtonPopover entries={entries} variant={variantButtonPopover} />
       <UpdateInject
         open={isNotEmptyField(openEdit) ? openEdit : edition}
         handleClose={() => (setOpenEdit ? setOpenEdit(false) : setEdition(false))}
