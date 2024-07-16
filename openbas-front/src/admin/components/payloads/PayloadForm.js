@@ -137,7 +137,7 @@ const PayloadForm = (props) => {
             <>
               <FileLoader
                 name="executable_file"
-                label={t('Document')}
+                label={t('Executable file')}
                 setFieldValue={form.mutators.setValue}
                 initialValue={values.executable_file}
                 InputLabelProps={{ required: true }}
@@ -150,7 +150,7 @@ const PayloadForm = (props) => {
             <>
               <FileLoader
                 name="file_drop_file"
-                label={t('Document')}
+                label={t('File to drop')}
                 setFieldValue={form.mutators.setValue}
                 initialValue={values.file_drop_file}
                 InputLabelProps={{ required: true }}
