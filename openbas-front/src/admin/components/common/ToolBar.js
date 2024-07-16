@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { withStyles, withTheme } from '@mui/styles';
 import { Autocomplete, Button, Drawer, FormControl, Grid, IconButton, InputLabel, MenuItem, Select, Slide, TextField, Toolbar, Tooltip, Typography } from '@mui/material';
-import { AddOutlined, BrushOutlined, CancelOutlined, ClearOutlined, CloseOutlined, DevicesOtherOutlined, GroupsOutlined } from '@mui/icons-material';
+import { AddOutlined, BrushOutlined, CancelOutlined, ClearOutlined, CloseOutlined, DeleteOutlined, DevicesOtherOutlined, GroupsOutlined } from '@mui/icons-material';
 import { SelectGroup } from 'mdi-material-ui';
 import { connect } from 'react-redux';
 import inject18n from '../../../components/i18n';
@@ -164,6 +164,9 @@ class ToolBar extends Component {
 
   handleOpenUpdate() {
     this.setState({ displayUpdate: true });
+  }
+
+  handleOpenDelete() {
   }
 
   handleCloseUpdate() {
@@ -517,6 +520,22 @@ class ToolBar extends Component {
                   size="small"
                 >
                   <BrushOutlined fontSize="small"/>
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title={t('Delete')}>
+              <span>
+                <IconButton
+                  aria-label="delete"
+                  disabled={
+                          numberOfSelectedElements === 0
+                          || this.state.processing
+                        }
+                  onClick={this.handleOpenDelete.bind(this)}
+                  color="primary"
+                  size="small"
+                >
+                  <DeleteOutlined fontSize="small"/>
                 </IconButton>
               </span>
             </Tooltip>
