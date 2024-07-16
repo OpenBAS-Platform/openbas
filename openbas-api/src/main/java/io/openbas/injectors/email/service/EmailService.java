@@ -20,8 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.openbas.database.model.InjectStatusExecution.traceError;
-import static io.openbas.database.model.InjectStatusExecution.traceSuccess;
+import static io.openbas.database.model.InjectStatusExecution.*;
 import static io.openbas.helper.TemplateHelper.buildContextualContent;
 import static java.util.stream.Collectors.joining;
 
@@ -106,7 +105,7 @@ public class EmailService {
                     execution.addTrace(traceSuccess("Mail successfully stored in IMAP"));
                     return;
                 } catch (Exception e) {
-                    execution.addTrace(traceError("Fail to store mail in IMAP" + e.getMessage()));
+                    execution.addTrace(traceInfo("Fail to store mail in IMAP" + e.getMessage()));
                     Thread.sleep(2000);
                 }
             }
