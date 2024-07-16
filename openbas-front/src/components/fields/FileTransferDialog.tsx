@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Chip, DialogActions, DialogContent, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { DescriptionOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import SearchFilter from '../SearchFilter';
@@ -10,9 +10,9 @@ import CreateDocument from '../../admin/components/components/documents/CreateDo
 import { useHelper } from '../../store';
 import type { DocumentHelper, UserHelper } from '../../actions/helper';
 import type { Theme } from '../Theme';
-import Dialog from '../common/Dialog';
 import { useFormatter } from '../i18n';
 import { truncate } from '../../utils/String';
+import Transition from '../common/Transition';
 
 const useStyles = makeStyles((theme: Theme) => ({
   box: {
@@ -148,10 +148,19 @@ const FileTransferDialog: React.FC<Props> = ({
   return (
     <Dialog
       open={open}
-      handleClose={handleClose}
-      title={label}
+      onClose={handleClose}
+      fullWidth
       maxWidth="lg"
+      PaperProps={{
+        elevation: 1,
+        sx: {
+          minHeight: 580,
+          maxHeight: 580,
+        },
+      }}
+      TransitionComponent={Transition}
     >
+      <DialogTitle>{t(label)}</DialogTitle>
       <DialogContent>
         <Grid container spacing={3}>
           <Grid item xs={multiple ? 8 : 12}>
@@ -220,7 +229,7 @@ const FileTransferDialog: React.FC<Props> = ({
           )}
         </Grid>
       </DialogContent>
-      <DialogActions style={{ padding: '0 20px 20px 0' }}>
+      <DialogActions>
         <Button onClick={handleClose}>{t('Cancel')}</Button>
         {multiple && (<Button
           color="secondary"

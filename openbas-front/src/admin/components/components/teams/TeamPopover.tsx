@@ -191,8 +191,6 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
         open={openEdit}
         handleClose={handleCloseEdit}
         title={t('Update the team')}
-        childrenStyle={{
-          padding: '0 30px 30px' }}
       >
         <TeamForm
           initialValues={initialValues}

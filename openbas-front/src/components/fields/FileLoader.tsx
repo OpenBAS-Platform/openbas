@@ -243,7 +243,7 @@ const FileLoader: React.FC<Props> = ({
       </List>
       {open && (
         <FileTransferDialog
-          label={label}
+          label={t('Add document')}
           open={open}
           setOpen={setOpen}
           onAddDocument={setSelectedDocument}
