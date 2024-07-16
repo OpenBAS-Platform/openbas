@@ -27,7 +27,7 @@ const PayloadForm = (props) => {
   const classes = useStyles();
   const { t } = useFormatter();
 
-  const [submitButtonClicked, setSubmitButtonClicked] = useState(false);
+  const [changedValue, setChangedValue] = useState(false);
 
   const validate = (values) => {
     const errors = {};
@@ -70,7 +70,7 @@ const PayloadForm = (props) => {
       {({ handleSubmit, form, values, submitting, dirty }) => (
         <form id="payloadForm" onSubmit={(event) => {
           event.preventDefault();
-          setSubmitButtonClicked(true);
+          setChangedValue(true);
           handleSubmit(event);
         }}
         >
@@ -141,7 +141,8 @@ const PayloadForm = (props) => {
                 setFieldValue={form.mutators.setValue}
                 initialValue={values.executable_file}
                 InputLabelProps={{ required: true }}
-                onSubmit={submitButtonClicked}
+                onSubmit={changedValue}
+                onChange={setChangedValue}
               />
             </>
           )}
@@ -153,7 +154,8 @@ const PayloadForm = (props) => {
                 setFieldValue={form.mutators.setValue}
                 initialValue={values.file_drop_file}
                 InputLabelProps={{ required: true }}
-                onSubmit={submitButtonClicked}
+                onSubmit={changedValue}
+                onChange={setChangedValue}
               />
             </>
           )}
@@ -389,7 +391,7 @@ const PayloadForm = (props) => {
               variant="contained"
               color="secondary"
               type="submit"
-              disabled={submitting || !dirty}
+              disabled={submitting || !(dirty || changedValue)}
             >
               {editing ? t('Update') : t('Create')}
             </Button>

@@ -90,6 +90,8 @@ const CreateTeam: FunctionComponent<CreateTeamProps> = ({
         open={openDialog}
         handleClose={handleClose}
         title={t('Create a new team')}
+        childrenStyle={{
+          padding: '0px 30px 30px 30px' }}
       >
         <TeamForm
           initialValues={{ team_tags: [] }}

@@ -169,6 +169,8 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
         open={openEdit}
         handleClose={handleCloseEdit}
         title={t('Update the player')}
+        childrenStyle={{
+          padding: '0px 30px 30px 30px' }}
       >
         <PlayerForm
           initialValues={initialValues}

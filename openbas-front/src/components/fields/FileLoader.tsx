@@ -83,6 +83,7 @@ interface Props {
   label: string;
   name: string;
   setFieldValue: (field: string, value: { id?: string, label?: string } | null) => void;
+  onChange?: (changedValue: boolean)=> void;
   /* For mandatory fields */
   InputLabelProps?: { required: boolean };
   onSubmit?: boolean;
@@ -94,6 +95,7 @@ const FileLoader: React.FC<Props> = ({
   InputLabelProps,
   label,
   name,
+  onChange,
   onSubmit,
   setFieldValue,
 }) => {
@@ -131,13 +133,27 @@ const FileLoader: React.FC<Props> = ({
     }
   }, [selectedDocument, setFieldValue]);
 
+  // Control the state of the update/create button in the parent form
+  useEffect(() => {
+    if (selectedDocument && onChange) {
+      onChange(true);
+    }
+  }, [open]);
+
   const handleOpen = () => {
     setOpen(true);
   };
 
   // Actions
   const handleUpdate = () => setOpen(true);
-  const handleRemove = () => setSelectedDocument(null);
+
+  const handleRemove = () => {
+    setSelectedDocument(null);
+    if (onChange) {
+      onChange(true);
+    }
+  };
+
   const handleDownload = (documentId: string | undefined) => {
     if (documentId) {
       window.location.href = `/api/documents/${documentId}/file`;
