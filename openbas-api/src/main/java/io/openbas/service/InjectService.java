@@ -131,9 +131,11 @@ public class InjectService {
     }
 
 
-  @Transactional
+  @Transactional(rollbackOn = Exception.class)
   public void deleteAllByIds(List<String> injectIds) {
-    injectRepository.deleteAllById(injectIds);
+    if (injectIds != null && !injectIds.isEmpty()) {
+      injectRepository.deleteAllById(injectIds);
+    }
   }
 
   public List<InjectOutput> injects(Specification<Inject> specification) {
