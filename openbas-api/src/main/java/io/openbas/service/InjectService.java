@@ -411,8 +411,7 @@ public class InjectService {
         String timePattern = triggerTimeRuleAttribute.getAdditionalConfig()
             .get("timePattern");
         String dateAsString = Arrays.stream(triggerTimeRuleAttribute.getColumns().split("\\+"))
-            .map(column -> row.getCell(CellReference.convertColStringToIndex(column)) != null ?
-                        row.getCell(CellReference.convertColStringToIndex(column)).getStringCellValue() : "")
+            .map(column -> getDateAsStringFromCell(row, column))
             .collect(Collectors.joining());
         if (dateAsString.isBlank()) {
             dateAsString = triggerTimeRuleAttribute.getDefaultValue();
@@ -843,6 +842,18 @@ public class InjectService {
                             injectTime.getLinkedInject().setDependsDuration(injectTime.getDate().getEpochSecond() - earliestInstant.getEpochSecond());
                         })
         );
+    }
+
+    private String getDateAsStringFromCell(Row row, String cellColumn) {
+        if(row.getCell(CellReference.convertColStringToIndex(cellColumn)) != null) {
+            Cell cell = row.getCell(CellReference.convertColStringToIndex(cellColumn));
+            if(cell.getCellType() == CellType.STRING) {
+                return cell.getStringCellValue();
+            } else if(cell.getCellType() == CellType.NUMERIC) {
+                return cell.getDateCellValue().toString();
+            }
+        }
+        return "";
     }
 
   // -- TEST --
