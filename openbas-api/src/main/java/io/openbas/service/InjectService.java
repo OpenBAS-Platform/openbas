@@ -68,6 +68,7 @@ public class InjectService {
     private final InjectExpectationRepository injectExpectationRepository;
     private final AssetRepository assetRepository;
     private final AssetGroupRepository assetGroupRepository;
+    private final ScenarioTeamUserRepository scenarioTeamUserRepository;
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final ScenarioService scenarioService;
@@ -215,9 +216,7 @@ public class InjectService {
         return result;
     }
 
-    public ImportTestSummary importInjectIntoScenarioFromXLS(String scenarioId, ImportMapper importMapper, String importId, String sheetName, int timezoneOffset, boolean saveAll) {
-        Scenario scenario = scenarioService.scenario(scenarioId);
-
+    public ImportTestSummary importInjectIntoScenarioFromXLS(Scenario scenario, ImportMapper importMapper, String importId, String sheetName, int timezoneOffset, boolean saveAll) {
         // We call the inject service to get the injects to create as well as messages on how things went
         ImportTestSummary importTestSummary = importXls(importId, scenario, importMapper, sheetName, timezoneOffset);
         Optional<ImportMessage> hasCritical = importTestSummary.getImportMessage().stream()
@@ -229,7 +228,24 @@ public class InjectService {
             importTestSummary.setInjects(new ArrayList<>());
         } else if(saveAll) {
             Iterable<Inject> newInjects = injectRepository.saveAll(importTestSummary.getInjects());
-            newInjects.forEach(inject -> {scenario.getInjects().add(inject);});
+            newInjects.forEach(inject -> {
+                scenario.getInjects().add(inject);
+                inject.getTeams().forEach(team -> {
+                    if (!scenario.getTeams().contains(team)) {
+                        scenario.getTeams().add(team);
+                    }
+                });
+                inject.getTeams().forEach(team -> team.getUsers().forEach(user -> {
+                    if(!scenario.getTeamUsers().contains(user)) {
+                        ScenarioTeamUser scenarioTeamUser = new ScenarioTeamUser();
+                        scenarioTeamUser.setScenario(scenario);
+                        scenarioTeamUser.setTeam(team);
+                        scenarioTeamUser.setUser(user);
+                        scenarioTeamUserRepository.save(scenarioTeamUser);
+                        scenario.getTeamUsers().add(scenarioTeamUser);
+                    }
+                }));
+            });
             scenarioService.updateScenario(scenario);
         }
 

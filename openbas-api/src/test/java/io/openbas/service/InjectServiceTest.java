@@ -58,6 +58,8 @@ class InjectServiceTest {
     @Mock
     TeamRepository teamRepository;
     @Mock
+    ScenarioTeamUserRepository scenarioTeamUserRepository;
+    @Mock
     UserRepository userRepository;
     @Mock
     ScenarioService scenarioService;
@@ -77,7 +79,7 @@ class InjectServiceTest {
     @BeforeEach
     void setUp() {
         injectService = new InjectService(injectRepository, injectDocumentRepository, injectExpectationRepository,
-                assetRepository, assetGroupRepository, teamRepository, userRepository, scenarioService);
+                assetRepository, assetGroupRepository, scenarioTeamUserRepository, teamRepository, userRepository, scenarioService);
 
         mockedScenario = new Scenario();
         mapper = new ObjectMapper();
@@ -149,10 +151,9 @@ class InjectServiceTest {
             when(teamRepository.save(any())).thenReturn(team2);
 
             mockedScenario.setId(UUID.randomUUID().toString());
-            when(scenarioService.scenario(mockedScenario.getId())).thenReturn(mockedScenario);
 
             sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
-            ImportTestSummary importTestSummary = injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+            ImportTestSummary importTestSummary = injectService.importInjectIntoScenarioFromXLS(mockedScenario,
                     mockedImportMapper, fileID, "CHECKLIST", 120, true);
 
             verify(teamRepository, times(1)).save(any());
@@ -174,7 +175,7 @@ class InjectServiceTest {
 
             mockedImportMapper = createImportMapper(UUID.randomUUID().toString());
             try {
-                injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                injectService.importInjectIntoScenarioFromXLS(mockedScenario,
                         mockedImportMapper, fileID, "CHECKLIST", 120, true);
                 fail();
             } catch (Exception ex) {
@@ -212,7 +213,7 @@ class InjectServiceTest {
             injectImporterMailCopy.getRuleAttributes().addAll(createRuleAttributeMail());
             mockedImportMapper.getInjectImporters().add(injectImporterMailCopy);
             ImportTestSummary importTestSummary =
-                    injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                    injectService.importInjectIntoScenarioFromXLS(mockedScenario,
                             mockedImportMapper, fileID, "CHECKLIST", 120, true);
             assertTrue(
                     importTestSummary.getImportMessage().stream().anyMatch(
@@ -234,7 +235,6 @@ class InjectServiceTest {
 
             mockedScenario = new Scenario();
             mockedScenario.setId(UUID.randomUUID().toString());
-            when(scenarioService.scenario(mockedScenario.getId())).thenReturn(mockedScenario);
 
             mockedImportMapper = createImportMapper(UUID.randomUUID().toString());
             mockedImportMapper.getInjectImporters().forEach(injectImporter -> {
@@ -257,7 +257,7 @@ class InjectServiceTest {
 
             sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
             ImportTestSummary importTestSummary =
-                    injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                    injectService.importInjectIntoScenarioFromXLS(mockedScenario,
                             mockedImportMapper, fileID, "CHECKLIST", 120, true);
 
             assertTrue(LocalDateTime.of(2024, Month.JUNE, 26, 0, 0)
@@ -278,7 +278,6 @@ class InjectServiceTest {
 
             mockedScenario = new Scenario();
             mockedScenario.setId(UUID.randomUUID().toString());
-            when(scenarioService.scenario(mockedScenario.getId())).thenReturn(mockedScenario);
 
             mockedImportMapper = createImportMapper(UUID.randomUUID().toString());
             mockedImportMapper.getInjectImporters().forEach(injectImporter -> {
@@ -301,7 +300,7 @@ class InjectServiceTest {
 
             sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
             ImportTestSummary importTestSummary =
-                    injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                    injectService.importInjectIntoScenarioFromXLS(mockedScenario,
                             mockedImportMapper, fileID, "CHECKLIST", 120, true);
 
             List<Inject> sortedInjects = importTestSummary.getInjects().stream()
@@ -326,7 +325,6 @@ class InjectServiceTest {
             mockedScenario.setId(UUID.randomUUID().toString());
             mockedScenario.setRecurrenceStart(LocalDateTime.of(2024, Month.JUNE, 26, 0, 0)
                     .toInstant(ZoneOffset.of("Z")));
-            when(scenarioService.scenario(mockedScenario.getId())).thenReturn(mockedScenario);
 
             mockedImportMapper = createImportMapper(UUID.randomUUID().toString());
             mockedImportMapper.getInjectImporters().forEach(injectImporter -> {
@@ -349,7 +347,7 @@ class InjectServiceTest {
 
             sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
             ImportTestSummary importTestSummary =
-                    injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                    injectService.importInjectIntoScenarioFromXLS(mockedScenario,
                             mockedImportMapper, fileID, "CHECKLIST", 120, true);
 
             List<Inject> sortedInjects = importTestSummary.getInjects().stream()
@@ -374,7 +372,6 @@ class InjectServiceTest {
 
             mockedScenario = new Scenario();
             mockedScenario.setId(UUID.randomUUID().toString());
-            when(scenarioService.scenario(mockedScenario.getId())).thenReturn(mockedScenario);
 
             mockedImportMapper = createImportMapper(UUID.randomUUID().toString());
             mockedImportMapper.getInjectImporters().forEach(injectImporter -> {
@@ -397,7 +394,7 @@ class InjectServiceTest {
 
             sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
             ImportTestSummary importTestSummary =
-                    injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                    injectService.importInjectIntoScenarioFromXLS(mockedScenario,
                             mockedImportMapper, fileID, "CHECKLIST", 120, true);
 
             assertTrue(importTestSummary.getImportMessage().stream().anyMatch(
@@ -433,7 +430,7 @@ class InjectServiceTest {
 
             sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
             ImportTestSummary importTestSummary =
-                    injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                    injectService.importInjectIntoScenarioFromXLS(mockedScenario,
                             mockedImportMapper, fileID, "CHECKLIST", 120, true);
 
             List<Inject> sortedInjects = importTestSummary.getInjects().stream()
@@ -457,7 +454,6 @@ class InjectServiceTest {
 
             mockedScenario = new Scenario();
             mockedScenario.setId(UUID.randomUUID().toString());
-            when(scenarioService.scenario(mockedScenario.getId())).thenReturn(mockedScenario);
 
             mockedImportMapper = createImportMapper(UUID.randomUUID().toString());
             mockedImportMapper.getInjectImporters().forEach(injectImporter -> {
@@ -481,7 +477,7 @@ class InjectServiceTest {
 
             sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
             ImportTestSummary importTestSummary =
-                    injectService.importInjectIntoScenarioFromXLS(mockedScenario.getId(),
+                    injectService.importInjectIntoScenarioFromXLS(mockedScenario,
                             mockedImportMapper, fileID, "CHECKLIST", 120, true);
 
             assertSame("title", importTestSummary.getInjects().getFirst().getTitle());
