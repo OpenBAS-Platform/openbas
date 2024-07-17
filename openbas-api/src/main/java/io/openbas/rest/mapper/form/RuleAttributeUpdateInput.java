@@ -19,7 +19,6 @@ public class RuleAttributeUpdateInput {
     @JsonProperty("rule_attribute_name")
     private String name;
 
-    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("rule_attribute_columns")
     private String columns;
 

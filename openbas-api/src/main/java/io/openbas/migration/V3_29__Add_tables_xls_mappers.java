@@ -48,7 +48,7 @@ public class V3_29__Add_tables_xls_mappers extends BaseJavaMigration {
             attribute_inject_importer_id UUID NOT NULL
               CONSTRAINT rule_attributes_importer_id_fkey REFERENCES inject_importers(importer_id) ON DELETE SET NULL,
             attribute_name varchar(255) not null,
-            attribute_columns varchar(255) not null,
+            attribute_columns varchar(255),
             attribute_default_value varchar(255),
             attribute_additional_config HSTORE,
             attribute_created_at TIMESTAMP DEFAULT now(),

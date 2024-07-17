@@ -69,7 +69,7 @@ public class MapperService {
             }
     );
 
-    return importMapperRepository.save(importMapper);
+    return importMapper;
   }
 
   /**
