@@ -196,7 +196,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
     const injectsToDelete = selectAll
       ? injects.filter((inject: Inject) => !R.keys(deSelectedElements).includes(inject.inject_id))
       : injects.filter((inject: Inject) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id));
-    injectContext.onBulkDeleteInjects(injectsToDelete);
+    injectContext.onBulkDeleteInjects(injectsToDelete.map((inject: Inject) => inject.inject_id));
   };
 
   return (
