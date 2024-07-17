@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Inject, InjectResultDTO } from '../../../../utils/api-types';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
-import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
+import ButtonPopover, { PopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { deleteAtomicTesting, updateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useHelper } from '../../../../store';
@@ -76,7 +76,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     });
   };
   // Button Popover
-  const entries: ButtonPopoverEntry[] = [
+  const entries: PopoverEntry[] = [
     { label: 'Update', action: setOpenEdit ? () => setOpenEdit(true) : handleEdit },
     { label: 'Delete', action: handleDelete },
   ];

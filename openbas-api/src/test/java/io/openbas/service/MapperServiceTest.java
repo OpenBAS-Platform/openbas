@@ -53,7 +53,6 @@ public class MapperServiceTest {
     importMapperInput.setImporters(importMapper.getInjectImporters().stream().map(
       injectImporter -> {
         InjectImporterAddInput injectImporterAddInput = new InjectImporterAddInput();
-        injectImporterAddInput.setName(injectImporter.getName());
         injectImporterAddInput.setInjectTypeValue(injectImporter.getImportTypeValue());
         injectImporterAddInput.setInjectorContractId(injectImporter.getInjectorContract().getId());
 
@@ -90,7 +89,6 @@ public class MapperServiceTest {
     importMapperInput.setImporters(importMapper.getInjectImporters().stream().map(
       injectImporter -> {
         InjectImporterUpdateInput injectImporterUpdateInput = new InjectImporterUpdateInput();
-        injectImporterUpdateInput.setName(injectImporter.getName());
         injectImporterUpdateInput.setInjectTypeValue(injectImporter.getImportTypeValue());
         injectImporterUpdateInput.setInjectorContractId(injectImporter.getInjectorContract().getId());
 
@@ -130,7 +128,6 @@ public class MapperServiceTest {
         importMapperInput.setImporters(importMapper.getInjectImporters().stream().map(
                 injectImporter -> {
                     InjectImporterUpdateInput injectImporterUpdateInput = new InjectImporterUpdateInput();
-                    injectImporterUpdateInput.setName(injectImporter.getName());
                     injectImporterUpdateInput.setInjectTypeValue(injectImporter.getImportTypeValue());
                     injectImporterUpdateInput.setInjectorContractId(injectImporter.getInjectorContract().getId());
                     injectImporterUpdateInput.setId(injectImporter.getId());
@@ -171,7 +168,6 @@ public class MapperServiceTest {
         importMapperInput.setImporters(importMapper.getInjectImporters().stream().map(
                 injectImporter -> {
                     InjectImporterUpdateInput injectImporterUpdateInput = new InjectImporterUpdateInput();
-                    injectImporterUpdateInput.setName(injectImporter.getName());
                     injectImporterUpdateInput.setInjectTypeValue(injectImporter.getImportTypeValue());
                     injectImporterUpdateInput.setInjectorContractId(injectImporter.getInjectorContract().getId());
                     injectImporterUpdateInput.setId(injectImporter.getId());

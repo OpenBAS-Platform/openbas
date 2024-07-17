@@ -220,7 +220,6 @@ class InjectServiceTest {
             sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
 
             InjectImporter injectImporterMailCopy = new InjectImporter();
-            injectImporterMailCopy.setName("Send Mail copy");
             injectImporterMailCopy.setId(UUID.randomUUID().toString());
             injectImporterMailCopy.setImportTypeValue(".*mail");
             injectImporterMailCopy.setRuleAttributes(new ArrayList<>());
@@ -557,7 +556,6 @@ class InjectServiceTest {
         importMapper.setInjectImporters(new ArrayList<>());
 
         InjectImporter injectImporterSms = new InjectImporter();
-        injectImporterSms.setName("Send SMS");
         injectImporterSms.setId(UUID.randomUUID().toString());
         injectImporterSms.setImportTypeValue(".*(sms|SMS).*");
         injectImporterSms.setRuleAttributes(new ArrayList<>());
@@ -566,7 +564,6 @@ class InjectServiceTest {
         injectImporterSms.getRuleAttributes().addAll(createRuleAttributeSms());
 
         InjectImporter injectImporterMail = new InjectImporter();
-        injectImporterMail.setName("Send Mail");
         injectImporterMail.setId(UUID.randomUUID().toString());
         injectImporterMail.setImportTypeValue(".*mail.*");
         injectImporterMail.setRuleAttributes(new ArrayList<>());

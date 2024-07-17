@@ -13,10 +13,6 @@ import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 public class InjectImporterAddInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("inject_importer_name")
-    private String name;
-
-    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("inject_importer_type_value")
     private String injectTypeValue;
 

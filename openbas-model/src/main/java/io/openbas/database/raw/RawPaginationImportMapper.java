@@ -1,6 +1,7 @@
 package io.openbas.database.raw;
 
 import io.openbas.database.model.ImportMapper;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.time.Instant;
@@ -8,6 +9,7 @@ import java.time.Instant;
 @Data
 public class RawPaginationImportMapper {
 
+    @NotBlank
     String import_mapper_id;
     String import_mapper_name;
     Instant import_mapper_created_at;

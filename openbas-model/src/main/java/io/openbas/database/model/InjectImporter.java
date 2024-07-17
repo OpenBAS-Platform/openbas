@@ -32,11 +32,6 @@ public class InjectImporter implements Base {
     @NotNull
     private UUID id;
 
-    @Column(name = "importer_name")
-    @JsonProperty("inject_importer_name")
-    @NotBlank
-    private String name;
-
     @Column(name = "importer_import_type_value")
     @JsonProperty("inject_importer_type_value")
     @NotBlank
