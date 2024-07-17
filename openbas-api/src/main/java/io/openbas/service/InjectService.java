@@ -44,6 +44,8 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -85,6 +87,8 @@ public class InjectService {
     final Pattern relativeMinutePattern = Pattern.compile("^.*[M]([+\\-]?[0-9]*).*$");
 
     final String pathSeparator = FileSystems.getDefault().getSeparator();
+
+    final int FILE_STORAGE_DURATION = 60;
 
     public void cleanInjectsDocExercise(String exerciseId, String documentId) {
         // Delete document from all exercise injects
@@ -203,6 +207,11 @@ public class InjectService {
             Path tempDir = Files.createDirectory(Path.of(System.getProperty("java.io.tmpdir"), fileID));
             Path tempFile = Files.createTempFile(tempDir, null, "." + FilenameUtils.getExtension(file.getOriginalFilename()));
             Files.write(tempFile, file.getBytes());
+
+            CompletableFuture.delayedExecutor(FILE_STORAGE_DURATION, TimeUnit.MINUTES).execute(() -> {
+                tempFile.toFile().delete();
+                tempDir.toFile().delete();
+            });
 
             // We're making sure the files are deleted when the backend restart
             tempDir.toFile().deleteOnExit();
