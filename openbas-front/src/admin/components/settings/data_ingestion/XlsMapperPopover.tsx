@@ -56,7 +56,7 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
       >
         <XlsFormatterUpdate
           xlsMapperId={mapper.import_mapper_id}
-          onUpdate={onUpdate}
+          onUpdate={_onUpdate}
           handleClose={handleCloseEdit}
         />
       </Drawer>
