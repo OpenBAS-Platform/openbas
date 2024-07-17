@@ -55,6 +55,11 @@ export const deleteInjectForExercise = (exerciseId, injectId) => (dispatch) => {
   return delReferential(uri, 'injects', injectId)(dispatch);
 };
 
+export const bulkDeleteInjectsForExercise = (exerciseId, injectIds) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/injects/delete`;
+  return postReferential(null, uri, injectIds)(dispatch);
+};
+
 export const executeInject = (exerciseId, values, files) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/inject`;
   const formData = new FormData();
@@ -100,4 +105,9 @@ export const updateInjectActivationForScenario = (exerciseId, injectId, data) =>
 export const deleteInjectScenario = (scenarioId, injectId) => (dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/injects/${injectId}`;
   return delReferential(uri, 'injects', injectId)(dispatch);
+};
+
+export const bulkDeleteInjectsForScenario = (scenarioId, injectIds) => (dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/injects/delete`;
+  return postReferential(null, uri, injectIds)(dispatch);
 };

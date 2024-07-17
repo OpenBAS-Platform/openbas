@@ -163,6 +163,10 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
   };
 
   const bulkDeleteInjects = () => {
+    const injectsToDelete = selectAll
+      ? injects.filter((inject: Inject) => !R.keys(deSelectedElements).includes(inject.inject_id))
+      : injects.filter((inject: Inject) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id));
+    injectContext.onBulkDeleteInjects(injectsToDelete);
   };
 
   return (
