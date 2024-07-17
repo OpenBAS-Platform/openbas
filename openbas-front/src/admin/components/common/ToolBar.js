@@ -453,6 +453,8 @@ class ToolBar extends Component {
   };
 
   handleSubmitBulkDelete = () => {
+    this.handleCloseBulkDelete();
+    this.props.handleClearSelectedElements();
     this.props.handleBulkDelete(this.state.actionsInputs);
   };
 
