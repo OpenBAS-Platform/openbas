@@ -11,7 +11,6 @@ import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.rest.inject.output.InjectOutput;
-import io.openbas.rest.scenario.form.InjectsImportInput;
 import io.openbas.rest.scenario.response.ImportMessage;
 import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
@@ -69,10 +68,10 @@ public class InjectService {
     private final InjectExpectationRepository injectExpectationRepository;
     private final AssetRepository assetRepository;
     private final AssetGroupRepository assetGroupRepository;
+    private final ScenarioTeamUserRepository scenarioTeamUserRepository;
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final ScenarioService scenarioService;
-    private final ImportMapperRepository importMapperRepository;
 
     private final List<String> importReservedField = List.of("description", "title", "trigger_time");
 
@@ -217,16 +216,9 @@ public class InjectService {
         return result;
     }
 
-    public ImportTestSummary importInjectIntoScenarioFromXLS(String scenarioId, InjectsImportInput input, String importId, boolean saveAll) {
-        Scenario scenario = scenarioService.scenario(scenarioId);
-
-        // Getting the mapper to use
-        ImportMapper importMapper = importMapperRepository
-                .findById(UUID.fromString(input.getImportMapperId()))
-                .orElseThrow(() -> new ElementNotFoundException(String.format("The import mapper %s was not found", input.getImportMapperId())));
-
+    public ImportTestSummary importInjectIntoScenarioFromXLS(Scenario scenario, ImportMapper importMapper, String importId, String sheetName, int timezoneOffset, boolean saveAll) {
         // We call the inject service to get the injects to create as well as messages on how things went
-        ImportTestSummary importTestSummary = importXls(importId, scenario, importMapper, input);
+        ImportTestSummary importTestSummary = importXls(importId, scenario, importMapper, sheetName, timezoneOffset);
         Optional<ImportMessage> hasCritical = importTestSummary.getImportMessage().stream()
                 .filter(importMessage -> importMessage.getMessageLevel() == ImportMessage.MessageLevel.CRITICAL)
                 .findAny();
@@ -236,14 +228,31 @@ public class InjectService {
             importTestSummary.setInjects(new ArrayList<>());
         } else if(saveAll) {
             Iterable<Inject> newInjects = injectRepository.saveAll(importTestSummary.getInjects());
-            newInjects.forEach(inject -> {scenario.getInjects().add(inject);});
+            newInjects.forEach(inject -> {
+                scenario.getInjects().add(inject);
+                inject.getTeams().forEach(team -> {
+                    if (!scenario.getTeams().contains(team)) {
+                        scenario.getTeams().add(team);
+                    }
+                });
+                inject.getTeams().forEach(team -> team.getUsers().forEach(user -> {
+                    if(!scenario.getTeamUsers().contains(user)) {
+                        ScenarioTeamUser scenarioTeamUser = new ScenarioTeamUser();
+                        scenarioTeamUser.setScenario(scenario);
+                        scenarioTeamUser.setTeam(team);
+                        scenarioTeamUser.setUser(user);
+                        scenarioTeamUserRepository.save(scenarioTeamUser);
+                        scenario.getTeamUsers().add(scenarioTeamUser);
+                    }
+                }));
+            });
             scenarioService.updateScenario(scenario);
         }
 
         return importTestSummary;
     }
 
-    private ImportTestSummary importXls(String importId, Scenario scenario, ImportMapper importMapper, InjectsImportInput input) {
+    private ImportTestSummary importXls(String importId, Scenario scenario, ImportMapper importMapper, String sheetName, int timezoneOffset) {
         ImportTestSummary importTestSummary = new ImportTestSummary();
 
         try {
@@ -254,7 +263,7 @@ public class InjectService {
             // We open the file and convert it to an apache POI object
             InputStream xlsFile = Files.newInputStream(file);
             Workbook workbook = WorkbookFactory.create(xlsFile);
-            Sheet selectedSheet = workbook.getSheet(input.getName());
+            Sheet selectedSheet = workbook.getSheet(sheetName);
 
             Map<Integer, InjectTime> mapInstantByRowIndex = new HashMap<>();
 
@@ -270,7 +279,7 @@ public class InjectService {
                     StreamSupport.stream(teamRepository.findAll().spliterator(), false)
                             .collect(Collectors.toMap(Team::getName, Function.identity(), (first, second) -> first));
 
-            ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(input.getTimezoneOffset() * 60);
+            ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(timezoneOffset * 60);
 
             // For each rows of the selected sheet
             selectedSheet.rowIterator().forEachRemaining(row -> {

@@ -34,6 +34,12 @@ public class MapperService {
    * @return The created ImportMapper
    */
   public ImportMapper createAndSaveImportMapper(ImportMapperAddInput importMapperAddInput) {
+    ImportMapper importMapper = createImportMapper(importMapperAddInput);
+
+    return importMapperRepository.save(importMapper);
+  }
+
+  public ImportMapper createImportMapper(ImportMapperAddInput importMapperAddInput) {
     ImportMapper importMapper = new ImportMapper();
     importMapper.setUpdateAttributes(importMapperAddInput);
     importMapper.setInjectImporters(new ArrayList<>());

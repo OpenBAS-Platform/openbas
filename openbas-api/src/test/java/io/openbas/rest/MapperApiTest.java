@@ -7,7 +7,11 @@ import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.rest.mapper.MapperApi;
 import io.openbas.rest.mapper.form.ImportMapperAddInput;
 import io.openbas.rest.mapper.form.ImportMapperUpdateInput;
+import io.openbas.rest.scenario.form.InjectsImportTestInput;
+import io.openbas.rest.scenario.response.ImportTestSummary;
+import io.openbas.service.InjectService;
 import io.openbas.service.MapperService;
+import io.openbas.service.ScenarioService;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.mockMapper.MockMapperUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,13 +26,19 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,6 +58,10 @@ public class MapperApiTest {
 
   @Mock
   private MapperService mapperService;
+  @Mock
+  private InjectService injectService;
+  @Mock
+  private ScenarioService scenarioService;
 
   private MapperApi mapperApi;
 
@@ -57,7 +71,7 @@ public class MapperApiTest {
   @BeforeEach
   void before() throws IllegalAccessException, NoSuchFieldException {
     // Injecting mocks into the controller
-    mapperApi = new MapperApi(importMapperRepository, mapperService);
+    mapperApi = new MapperApi(importMapperRepository, mapperService, injectService, scenarioService);
 
     Field sessionContextField = MapperApi.class.getSuperclass().getDeclaredField("mapper");
     sessionContextField.setAccessible(true);
@@ -171,6 +185,63 @@ public class MapperApiTest {
     // -- ASSERT --
     assertNotNull(response);
     assertEquals(JsonPath.read(response, "$.import_mapper_id"), importMapper.getId());
+  }
+
+
+
+  @DisplayName("Test store xls")
+  @Test
+  void testStoreXls() throws Exception {
+    // -- PREPARE --
+    // Getting a test file
+    File testFile = ResourceUtils.getFile("classpath:xls-test-files/test_file_1.xlsx");
+
+    InputStream in = new FileInputStream(testFile);
+    MockMultipartFile xlsFile = new MockMultipartFile("file",
+            "my-awesome-file.xls",
+            "application/xlsx",
+            in.readAllBytes());
+
+    // -- EXECUTE --
+    String response = this.mvc
+            .perform(MockMvcRequestBuilders.multipart("/api/mappers/store")
+                    .file(xlsFile))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // -- ASSERT --
+    assertNotNull(response);
+  }
+
+
+
+  @DisplayName("Test testing an import xls")
+  @Test
+  void testTestingXls() throws Exception {
+    // -- PREPARE --
+    InjectsImportTestInput injectsImportInput = new InjectsImportTestInput();
+    injectsImportInput.setImportMapper(new ImportMapperAddInput());
+    injectsImportInput.setName("TEST");
+    injectsImportInput.setTimezoneOffset(120);
+
+    injectsImportInput.getImportMapper().setName("TEST");
+
+    when(injectService.importInjectIntoScenarioFromXLS(any(), any(), any(), any(), anyInt(), anyBoolean())).thenReturn(new ImportTestSummary());
+
+    // -- EXECUTE --
+    String response = this.mvc
+            .perform(MockMvcRequestBuilders.post("/api/mappers/store/{importId}", UUID.randomUUID().toString())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(injectsImportInput)))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // -- ASSERT --
+    assertNotNull(response);
   }
 
 }
