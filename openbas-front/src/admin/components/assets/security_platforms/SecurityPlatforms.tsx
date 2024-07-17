@@ -148,7 +148,7 @@ const SecurityPlatforms = () => {
             >
               <ListItemIcon>
                 <img
-                  src={`/api/images/security_platforms/id/${securityPlatform.asset_id}/${theme.palette.mode}`}
+                  src={`/api/images/security_platforms/id/${securityPlatform.asset_id}/${theme.palette.mode}?${Date.now()}`}
                   alt={securityPlatform.asset_name}
                   style={{ width: 25, height: 25, borderRadius: 4 }}
                 />

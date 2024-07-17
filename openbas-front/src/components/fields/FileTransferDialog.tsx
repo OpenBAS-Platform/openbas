@@ -1,0 +1,245 @@
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { DescriptionOutlined } from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
+import SearchFilter from '../SearchFilter';
+import TagsFilter from '../../admin/components/common/filters/TagsFilter';
+import type { RawDocument } from '../../utils/api-types';
+import ItemTags from '../ItemTags';
+import CreateDocument from '../../admin/components/components/documents/CreateDocument';
+import { useHelper } from '../../store';
+import type { DocumentHelper, UserHelper } from '../../actions/helper';
+import type { Theme } from '../Theme';
+import { useFormatter } from '../i18n';
+import { truncate } from '../../utils/String';
+import Transition from '../common/Transition';
+
+const useStyles = makeStyles((theme: Theme) => ({
+  box: {
+    width: '100%',
+    minHeight: '100%',
+    padding: 20,
+    border: '1px dashed rgba(255, 255, 255, 0.3)',
+  },
+  chip: {
+    margin: '0 10px 10px 0',
+  },
+  item: {
+    paddingLeft: 10,
+    height: 50,
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: theme.palette.action?.hover,
+    },
+  },
+}));
+
+interface Props {
+  label: string;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  onAddDocument?: (document: RawDocument) => void;
+  extensions?: string[];
+  /* If we want to load multiples files */
+  multiple?: boolean;
+  initialDocumentIds?: string[];
+  onSubmitAddDocuments?: (documents: RawDocument[]) => void;
+}
+
+const FileTransferDialog: React.FC<Props> = ({
+  label,
+  open,
+  setOpen,
+  onAddDocument,
+  extensions = [],
+  multiple = false,
+  initialDocumentIds = [],
+  onSubmitAddDocuments,
+}) => {
+  const classes = useStyles();
+  const { t } = useFormatter();
+
+  const [keyword, setKeyword] = useState<string>('');
+  const [tags, setTags] = useState<{ id: string, label: string, color: string }[]>([]);
+  const [selectedDocuments, setSelectedDocuments] = useState<RawDocument[]>([]);
+
+  // Fetching data
+  const { documents, userAdmin }: {
+    documents: [RawDocument],
+    userAdmin: string
+  } = useHelper((helper: DocumentHelper & UserHelper) => ({
+    documents: helper.getDocuments(),
+    userAdmin: helper.getMe()?.user_admin,
+  }));
+
+  useEffect(() => {
+    if (initialDocumentIds.length > 0) {
+      setSelectedDocuments(documents.filter((document) => {
+        const docId = document.document_id;
+        return docId && initialDocumentIds.includes(docId);
+      }));
+    }
+  }, [initialDocumentIds]);
+
+  const handleSearchDocuments = (value?: string) => {
+    setKeyword(value || '');
+  };
+
+  const handleAddTag = (value: { id: string, label: string, color: string }) => {
+    if (!tags.includes(value)) {
+      setTags([...tags, value]);
+    }
+  };
+
+  const handleClearTag = () => setTags([]);
+
+  const handleClose = () => {
+    setOpen(false);
+    setTags([]);
+    setKeyword('');
+    setSelectedDocuments([]);
+  };
+
+  const handleAddDocument = (document: RawDocument) => {
+    if (!selectedDocuments.some((doc) => doc.document_id === document.document_id)) {
+      setSelectedDocuments([...selectedDocuments, document]);
+    }
+    if (!multiple && onAddDocument) {
+      onAddDocument(document);
+      handleClose();
+    }
+  };
+
+  const handleSubmitAddDocuments = () => {
+    if (onSubmitAddDocuments) {
+      onSubmitAddDocuments(selectedDocuments);
+    }
+    handleClose();
+  };
+
+  const handleRemoveDocument = (document: RawDocument) => {
+    setSelectedDocuments(selectedDocuments.filter((doc) => doc.document_id !== document.document_id));
+  };
+
+  const filterByExtensions = (document: RawDocument) => {
+    return extensions?.length === 0
+    || extensions?.map((ext) => ext.toLowerCase()).includes(document.document_name?.split('.').pop()?.toLowerCase() || '');
+  };
+
+  const filterByKeyword = (document: RawDocument) => {
+    return keyword === ''
+    || document.document_name?.toLowerCase().includes(keyword.toLowerCase())
+    || document.document_description?.toLowerCase().includes(keyword.toLowerCase())
+    || document.document_type?.toLowerCase().includes(keyword.toLowerCase());
+  };
+
+  const filterByTag = (document: RawDocument) => {
+    return tags.length === 0 || tags.every((tag) => document.document_tags?.includes(tag.id));
+  };
+
+  const filteredDocuments = documents.filter((document) => {
+    const isInitialValue = document.document_id && initialDocumentIds?.includes(document.document_id);
+    return !isInitialValue
+        && filterByExtensions(document)
+        && filterByKeyword(document)
+        && filterByTag(document);
+  }).slice(0, 10);
+
+  return (
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="lg"
+      PaperProps={{
+        elevation: 1,
+        sx: {
+          minHeight: 580,
+          maxHeight: 580,
+        },
+      }}
+      TransitionComponent={Transition}
+    >
+      <DialogTitle>{t(label)}</DialogTitle>
+      <DialogContent>
+        <Grid container spacing={3}>
+          <Grid item xs={multiple ? 8 : 12}>
+            <Grid container spacing={3}>
+              <Grid item xs={6}>
+                <SearchFilter
+                  onChange={handleSearchDocuments}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TagsFilter
+                  onAddTag={handleAddTag}
+                  onClearTag={handleClearTag}
+                  currentTags={tags}
+                  fullWidth
+                />
+              </Grid>
+            </Grid>
+            <List>
+              {filteredDocuments.map((document: RawDocument) => {
+                return (
+                  <ListItem
+                    classes={{ root: classes.item }}
+                    key={document.document_id}
+                    divider
+                    onClick={() => handleAddDocument(document)}
+                  >
+                    <ListItemIcon>
+                      <DescriptionOutlined/>
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={document.document_name}
+                      secondary={document.document_description}
+                    />
+                    <ItemTags
+                      variant="reduced-view"
+                      tags={document.document_tags}
+                    />
+                  </ListItem>
+                );
+              })}
+              {userAdmin && (
+                <CreateDocument
+                  inline
+                  onCreate={handleAddDocument}
+                />
+              )}
+            </List>
+          </Grid>
+          {multiple && (
+            <Grid item xs={4}>
+              <Box className={classes.box}>
+                {selectedDocuments.map((document) => (
+                  <Chip
+                    key={document.document_id}
+                    variant="outlined"
+                    onDelete={() => handleRemoveDocument(document)}
+                    label={truncate(document?.document_name, 15)}
+                    icon={<DescriptionOutlined />}
+                    classes={{ root: classes.chip }}
+                  />
+                ))}
+              </Box>
+            </Grid>
+          )}
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose}>{t('Cancel')}</Button>
+        {multiple && (<Button
+          color="secondary"
+          onClick={handleSubmitAddDocuments}
+                      >
+          {t('Add')}
+        </Button>)}
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+export default FileTransferDialog;

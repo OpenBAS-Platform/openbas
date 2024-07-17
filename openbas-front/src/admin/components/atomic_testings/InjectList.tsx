@@ -201,6 +201,7 @@ const InjectList: FunctionComponent<Props> = ({
                   entries={[{ label: 'Duplicate', action: () => handleOpenDuplicate(injectDto.inject_id) }]}
                   openDuplicate={openDuplicateId === injectDto.inject_id}
                   setOpenDuplicate={handleCloseDuplicate}
+                  variantButtonPopover={'icon'}
                 />
                   }
               disablePadding={true}

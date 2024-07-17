@@ -11,6 +11,7 @@ const renderAutocomplete = ({
   fullWidth,
   style,
   openCreate,
+  InputLabelProps,
   ...others
 }) => {
   return (
@@ -36,6 +37,7 @@ const renderAutocomplete = ({
         renderInput={(params) => (
           <TextField
             {...params}
+            InputLabelProps={InputLabelProps}
             variant={others.variant || 'standard'}
             label={label}
             placeholder={placeholder}

@@ -43,7 +43,7 @@ import InjectAddTeams from './InjectAddTeams';
 import OldTextField from '../../../../components/fields/OldTextField';
 import SwitchField from '../../../../components/fields/SwitchField';
 import RichTextField from '../../../../components/fields/RichTextField';
-import InjectAddDocuments from './InjectAddDocuments';
+import MultipleFileLoader from '../../../../components/fields/MultipleFileLoader';
 import Loader from '../../../../components/Loader';
 import DocumentType from '../../components/documents/DocumentType';
 import DocumentPopover from '../../components/documents/DocumentPopover';
@@ -479,7 +479,7 @@ class InjectDefinition extends Component {
   // Documents
   handleAddDocuments(documents) {
     this.setState({
-      documents: [...this.state.documents, ...documents],
+      documents,
     }, () => this.props.setInjectDetailsState(this.state));
   }
 
@@ -1524,8 +1524,8 @@ class InjectDefinition extends Component {
                     </ListItemSecondaryAction>
                   </ListItem>
                 ))}
-                <InjectAddDocuments
-                  injectDocumentsIds={documents.filter((a) => !a.inject_document_attached).map((d) => d.document_id)}
+                <MultipleFileLoader
+                  initialDocumentIds={documents.filter((a) => !a.inject_document_attached).map((d) => d.document_id)}
                   handleAddDocuments={this.handleAddDocuments.bind(this)}
                   hasAttachments={hasAttachments}
                 />

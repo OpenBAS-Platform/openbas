@@ -67,10 +67,10 @@ const SecurityPlatformPopover: React.FC<Props> = ({
   };
   const submitEdit = (data: SecurityPlatformInput) => {
     dispatch(updateSecurityPlatform(securityPlatform.asset_id, data)).then(
-      (result: { result: string, entities: { securityPlatforms: Record<string, SecurityPlatformStore> } }) => {
+      (result: { result: string, entities: { securityplatforms: Record<string, SecurityPlatformStore> } }) => {
         if (result.entities) {
           if (onUpdate) {
-            const securityPlatformUpdated = result.entities.securityPlatforms[result.result];
+            const securityPlatformUpdated = result.entities.securityplatforms[result.result];
             onUpdate(securityPlatformUpdated);
           }
         }

@@ -294,6 +294,7 @@ const Scenarios = () => {
                   setOpenExport={handleCloseExport}
                   openDuplicate={openDuplicateId === scenario.scenario_id}
                   setOpenDuplicate={handleCloseDuplicate}
+                  variantButtonPopover={'icon'}
                 />
               }
               disablePadding={true}

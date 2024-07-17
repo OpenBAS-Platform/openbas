@@ -188,6 +188,7 @@ const ExerciseList: FunctionComponent<Props> = ({
               setOpenExport={handleCloseExport}
               openDuplicate={openDuplicateId === exercise.exercise_id}
               setOpenDuplicate={handleCloseDuplicate}
+              variantButtonPopover={'icon'}
             />
           }
           disablePadding={true}

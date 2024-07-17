@@ -44,7 +44,7 @@ import { isExerciseReadOnly, isExerciseUpdatable, secondsFromToNow } from '../..
 import OldTextField from '../../../../../components/fields/OldTextField';
 import SwitchField from '../../../../../components/fields/SwitchField';
 import RichTextField from '../../../../../components/fields/RichTextField';
-import InjectAddDocuments from '../../../common/injects/InjectAddDocuments';
+import MultipleFileLoader from '../../../../../components/fields/MultipleFileLoader';
 import DocumentType from '../../../components/documents/DocumentType';
 import DocumentPopover from '../../../components/documents/DocumentPopover';
 import OldSelectField from '../../../../../components/fields/OldSelectField';
@@ -277,7 +277,7 @@ class QuickInject extends Component {
 
   handleAddDocuments(documents) {
     this.setState({
-      documents: [...this.state.documents, ...documents],
+      documents,
     });
   }
 
@@ -1392,9 +1392,9 @@ class QuickInject extends Component {
                         </ListItemSecondaryAction>
                       </ListItem>
                     ))}
-                    <InjectAddDocuments
+                    <MultipleFileLoader
                       exerciseId={exerciseId}
-                      injectDocumentsIds={documents
+                      initialDocumentIds={documents
                         .filter((a) => !a.inject_document_attached)
                         .map((d) => d.document_id)}
                       handleAddDocuments={this.handleAddDocuments.bind(this)}
