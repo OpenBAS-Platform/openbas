@@ -23,7 +23,7 @@ import { usePermissions } from '../../../../utils/Exercise';
 import Transition from '../../../../components/common/Transition';
 import type { Exercise, ExerciseUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import ButtonPopover, { VariantButtonPopover } from '../../../../components/common/ButtonPopover';
+import ButtonPopover, { PopoverEntry, VariantButtonPopover } from '../../../../components/common/ButtonPopover';
 import ExerciseUpdateForm from './ExerciseUpdateForm';
 import Drawer from '../../../../components/common/Drawer';
 import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
@@ -149,11 +149,17 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   };
   const permissions = usePermissions(exercise.exercise_id);
 
-  const entries = [];
+  // Button Popover
+  const entries: PopoverEntry[] = [
+    { label: 'Update', action: handleOpenEdit, disabled: !permissions.canWriteBypassStatus },
+    { label: 'Export', action: handleOpenExport },
+    { label: 'Delete', action: handleOpenDelete, disabled: !permissions.canWriteBypassStatus },
+  ];
+  /*const entries = [];
   if (actions.includes('Update')) entries.push({ label: 'Update', action: () => handleOpenEdit() });
   if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete() });
   if (actions.includes('Duplicate')) entries.push({ label: 'Duplicate', action: () => handleOpenDuplicate() });
-  if (actions.includes('Export')) entries.push({ label: 'Export', action: () => handleOpenExport() });
+  if (actions.includes('Export')) entries.push({ label: 'Export', action: () => handleOpenExport() });*/
 
   return (
     <>

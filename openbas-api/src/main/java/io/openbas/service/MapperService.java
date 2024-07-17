@@ -50,7 +50,6 @@ public class MapperService {
               InjectImporter injectImporter = new InjectImporter();
               injectImporter.setInjectorContract(mapInjectorContracts.get(injectImporterInput.getInjectorContractId()));
               injectImporter.setImportTypeValue(injectImporterInput.getInjectTypeValue());
-              injectImporter.setName(injectImporterInput.getName());
               injectImporter.setRuleAttributes(new ArrayList<>());
               injectImporterInput.getRuleAttributes().forEach(ruleAttributeInput -> {
                 RuleAttribute ruleAttribute = new RuleAttribute();
@@ -157,7 +156,6 @@ public class MapperService {
         InjectImporter injectImporter = new InjectImporter();
         injectImporter.setInjectorContract(mapInjectorContracts.get(injectImporterUpdateInput.getInjectorContractId()));
         injectImporter.setImportTypeValue(injectImporterUpdateInput.getInjectTypeValue());
-        injectImporter.setName(injectImporterUpdateInput.getName());
         injectImporter.setRuleAttributes(new ArrayList<>());
         injectImporterUpdateInput.getRuleAttributes().forEach(ruleAttributeInput -> {
           RuleAttribute ruleAttribute = new RuleAttribute();

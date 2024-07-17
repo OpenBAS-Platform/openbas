@@ -3,7 +3,7 @@ import { MoreVert } from '@mui/icons-material';
 import React, { FunctionComponent, useState } from 'react';
 import { useFormatter } from '../i18n';
 
-export interface ButtonPopoverEntry {
+export interface PopoverEntry {
   label: string;
   action: () => void | React.Dispatch<React.SetStateAction<boolean>>;
   disabled?: boolean;
@@ -12,7 +12,7 @@ export interface ButtonPopoverEntry {
 export type VariantButtonPopover = 'toggle' | 'icon';
 
 interface Props {
-  entries: ButtonPopoverEntry[];
+  entries: PopoverEntry[];
   buttonProps?: ToggleButtonProps;
   variant?: VariantButtonPopover;
 }

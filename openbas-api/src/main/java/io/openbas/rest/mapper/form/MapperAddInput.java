@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
@@ -23,6 +24,6 @@ public class MapperAddInput {
     private String injectTypeColumn;
 
     @JsonProperty("mapper_inject_importers")
-    private List<InjectImporterAddInput> importers;
+    private List<InjectImporterAddInput> importers = new ArrayList<>();
 
 }
