@@ -1,0 +1,111 @@
+import { Button } from '@mui/material';
+import React, { FunctionComponent, SyntheticEvent, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { makeStyles } from '@mui/styles';
+import { zodImplement } from '../../../../utils/Zod';
+import { useFormatter } from '../../../../components/i18n';
+import CustomFileUploader from '../../../../components/common/CustomFileUploader';
+import Loader from '../../../../components/Loader';
+
+const useStyles = makeStyles(() => ({
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+  },
+  buttons: {
+    display: 'flex',
+    justifyContent: 'right',
+    gap: '8px',
+    marginTop: '24px',
+  },
+}));
+
+interface FormProps {
+  file: File;
+}
+
+interface Props {
+  handleClose: () => void;
+  handleSubmit: (values: FormProps) => Promise<void>;
+}
+
+const ImportUploaderInjectImportFile: FunctionComponent<Props> = ({
+  handleClose,
+  handleSubmit,
+}) => {
+  // Standard hooks
+  const { t } = useFormatter();
+  const classes = useStyles();
+
+  const [loading, setLoading] = useState(false);
+
+  // Form
+  const {
+    control,
+    handleSubmit: handleSubmitForm,
+    formState: { errors, isDirty, isSubmitting },
+  } = useForm<FormProps>({
+    mode: 'onTouched',
+    resolver: zodResolver(
+      zodImplement<FormProps>().with({
+        file: z.instanceof(File),
+      }),
+    ),
+  });
+
+  const onSubmitImportFile = (values: FormProps) => {
+    setLoading(true);
+    handleSubmit(values).then(() => setLoading(false));
+  };
+
+  const handleSubmitWithoutPropagation = (e: SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleSubmitForm(onSubmitImportFile)(e);
+  };
+
+  return (
+    <>
+      {loading && <Loader variant="inElement" />}
+      {!loading
+        && <form id="importUploadInjectForm" onSubmit={handleSubmitWithoutPropagation}>
+          <div className={classes.container}>
+            <Controller
+              control={control}
+              name="file"
+              render={({ field: { onChange } }) => (
+                <CustomFileUploader
+                  name="file"
+                  fieldOnChange={onChange}
+                  label={t('Your file should be a XLS')}
+                  acceptMimeTypes={'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'}
+                  errors={errors}
+                />
+              )}
+            />
+          </div>
+          <div className={classes.buttons}>
+            <Button
+              onClick={handleClose}
+              disabled={isSubmitting}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              color="secondary"
+              type="submit"
+              disabled={!isDirty || isSubmitting}
+            >
+              {t('Next')}
+            </Button>
+          </div>
+        </form>
+      }
+    </>
+  );
+};
+
+export default ImportUploaderInjectImportFile;

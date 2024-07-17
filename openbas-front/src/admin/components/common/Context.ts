@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 import type { ArticleStore, FullArticleStore } from '../../../actions/channels/Article';
-import type { ArticleCreateInput, ArticleUpdateInput, Inject, Team, TeamCreateInput, Variable, VariableInput } from '../../../utils/api-types';
+import type { ArticleCreateInput, ArticleUpdateInput, Inject, InjectsImportInput, Team, TeamCreateInput, Variable, VariableInput } from '../../../utils/api-types';
 import type { UserStore } from '../teams/players/Player';
 import type { InjectStore } from '../../../actions/injects/Inject';
 
@@ -54,6 +54,7 @@ export type InjectContextType = {
   }>,
   onInjectDone?: (injectId: Inject['inject_id']) => void,
   onDeleteInject: (injectId: Inject['inject_id']) => void,
+  onImportInjectFromXls: (importId: string, input: InjectsImportInput) => Promise<void>
 };
 
 export type AtomicTestingContextType = {
@@ -129,6 +130,10 @@ export const InjectContext = createContext<InjectContextType>({
   },
   onDeleteInject(_injectId: Inject['inject_id']): void {
   },
+  onImportInjectFromXls(_importId: string, _input: InjectsImportInput): Promise<void> {
+    return new Promise<void>(() => {
+    });
+  }
 });
 
 export const AtomicTestingContext = createContext<AtomicTestingContextType>({

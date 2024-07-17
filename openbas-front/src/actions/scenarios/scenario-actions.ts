@@ -2,6 +2,8 @@ import { Dispatch } from 'redux';
 import { delReferential, getReferential, postReferential, putReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import { arrayOfScenarios, scenario } from './scenario-schema';
 import type {
+  ImportMapper,
+  InjectsImportInput,
   Scenario,
   ScenarioInformationInput,
   ScenarioInput,
@@ -143,4 +145,29 @@ export const updateScenarioRecurrence = (
 export const fetchScenarioStatistic = () => {
   const uri = `${SCENARIO_URI}/statistics`;
   return simpleCall(uri);
+};
+
+// -- IMPORT --
+
+export const sendXls = (scenarioId: Scenario['scenario_id'], file: File) => {
+  const uri = `${SCENARIO_URI}/${scenarioId}/xls`;
+  const formData = new FormData();
+  formData.append('file', file);
+  return simplePostCall(uri, formData);
+};
+
+export const importXls = (scenarioId: Scenario['scenario_id'], importId: string, input: InjectsImportInput) => {
+  const uri = `${SCENARIO_URI}/${scenarioId}/xls/${importId}/import`; //FIXME is dry
+  return simplePostCall(uri, input);
+};
+
+export interface InjectsImportTestInput {
+  import_mapper: ImportMapper;
+  sheet_name: string;
+  timezone_offset: number;
+}
+
+export const textXls = (scenarioId: Scenario['scenario_id'], importId: string, input: InjectsImportTestInput) => {
+  const uri = `${SCENARIO_URI}/${scenarioId}/xls/${importId}/test`;
+  return simplePostCall(uri, input);
 };

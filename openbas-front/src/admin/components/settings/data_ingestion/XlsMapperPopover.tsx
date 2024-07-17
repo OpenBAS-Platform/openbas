@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useState } from 'react';
 import { PopoverEntry } from '../../../../components/common/ButtonPopover';
 import IconPopover from '../../../../components/common/IconPopover';
-import { ImportMapper, RawPaginationImportMapper } from '../../../../utils/api-types';
+import type { ImportMapper, RawPaginationImportMapper } from '../../../../utils/api-types';
 import { deleteXlsMapper } from '../../../../actions/xls_formatter/xls-formatter-actions';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../components/i18n';
@@ -16,7 +16,7 @@ interface Props {
 
 const XlsMapperPopover: FunctionComponent<Props> = ({
   mapper,
-  onUpdate: _onUpdate,
+  onUpdate,
   onDelete,
 }) => {
   // Standard hooks

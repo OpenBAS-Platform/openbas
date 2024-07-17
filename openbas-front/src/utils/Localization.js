@@ -1049,6 +1049,7 @@ const i18n = {
       backlabel: 'étiquette de retour',
       backuri: 'uri de retour',
       'Injects Results': 'Résultats des stimulis',
+      'Import injects': 'Importer des stimulis',
       'Browse the link': 'Parcourir le lien',
       EE: 'EE',
       'Error or prevented': 'Erreur ou empêché',
