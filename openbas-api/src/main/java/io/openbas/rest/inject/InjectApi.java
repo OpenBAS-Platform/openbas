@@ -331,9 +331,9 @@ public class InjectApi extends RestBehavior {
         injectRepository.deleteById(injectId);
     }
 
-    @DeleteMapping
+    @DeleteMapping(EXERCISE_URI + "/{exerciseId}/injects")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public void deleteListOfInjectsForExercise(@RequestParam List<String> injectIds) {
+    public void deleteListOfInjectsForExercise(@PathVariable final String exerciseId, @RequestParam List<String> injectIds) {
         injectService.deleteAllByIds(injectIds);
     }
 
@@ -519,9 +519,9 @@ public class InjectApi extends RestBehavior {
         this.injectRepository.deleteById(injectId);
     }
 
-    @DeleteMapping
+    @DeleteMapping(SCENARIO_URI + "/{scenarioId}/injects")
     @PreAuthorize("isScenarioPlanner(#scenarioId)")
-    public void deleteListOfInjectsForScenario(@RequestParam List<String> injectIds) {
+    public void deleteListOfInjectsForScenario(@PathVariable final String scenarioId, @RequestParam List<String> injectIds) {
         injectService.deleteAllByIds(injectIds);
     }
 
