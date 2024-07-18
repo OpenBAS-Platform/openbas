@@ -58,13 +58,13 @@ public class ScenarioApi {
 
     @PostMapping(SCENARIO_URI)
     public Scenario createScenario(@Valid @RequestBody final ScenarioInput input) {
-        if (input != null) {
-            Scenario scenario = new Scenario();
-            scenario.setUpdateAttributes(input);
-            scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-            return this.scenarioService.createScenario(scenario);
+        if (input == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Scenario input cannot be null");
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        Scenario scenario = new Scenario();
+        scenario.setUpdateAttributes(input);
+        scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+        return this.scenarioService.createScenario(scenario);
     }
 
     @PostMapping(SCENARIO_URI + "/{scenarioId}")

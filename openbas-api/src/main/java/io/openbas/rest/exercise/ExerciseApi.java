@@ -1,7 +1,6 @@
 package io.openbas.rest.exercise;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
@@ -20,14 +19,11 @@ import io.openbas.service.*;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -72,23 +68,11 @@ public class ExerciseApi extends RestBehavior {
 
     private static final Logger LOGGER = Logger.getLogger(ExerciseApi.class.getName());
 
-    // region properties
-    @Value("${openbas.mail.imap.enabled}")
-    private boolean imapEnabled;
-
-    @Value("${openbas.mail.imap.username}")
-    private String imapUsername;
-
-    @Resource
-    private OpenBASConfig openBASConfig;
-    // endregion
-
     // region repositories
     private final LogRepository logRepository;
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
     private final PauseRepository pauseRepository;
-    private final GrantService grantService;
     private final DocumentRepository documentRepository;
     private final ExerciseRepository exerciseRepository;
     private final TeamRepository teamRepository;
@@ -331,21 +315,10 @@ public class ExerciseApi extends RestBehavior {
     @PostMapping("/api/exercises")
     @Transactional(rollbackOn = Exception.class)
     public Exercise createExercise(@Valid @RequestBody ExerciseCreateInput input) {
-        if (input != null) {
-            Exercise exercise = new Exercise();
-            exercise.setUpdateAttributes(input);
-            exercise.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-            if (imapEnabled) {
-                exercise.setFrom(imapUsername);
-                exercise.setReplyTos(List.of(imapUsername));
-            } else {
-                exercise.setFrom(openBASConfig.getDefaultMailer());
-                exercise.setReplyTos(List.of(openBASConfig.getDefaultReplyTo()));
-            }
-            this.grantService.computeGrant(exercise);
-            return exerciseRepository.save(exercise);
+        if (input == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Exercise input cannot be null");
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        return this.exerciseService.createExercise(input);
     }
 
     @PostMapping("/api/exercises/{exerciseId}")

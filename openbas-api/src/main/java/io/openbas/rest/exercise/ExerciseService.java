@@ -2,13 +2,18 @@ package io.openbas.rest.exercise;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ArticleRepository;
 import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.database.repository.TagRepository;
+import io.openbas.rest.exercise.form.ExerciseCreateInput;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
+import io.openbas.service.GrantService;
 import io.openbas.service.InjectService;
 import io.openbas.service.VariableService;
+import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
@@ -16,6 +21,7 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +36,7 @@ import java.util.stream.Collectors;
 
 import static io.openbas.database.criteria.ExerciseCriteria.countQuery;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.AtomicTestingUtils.getExpectationResultByTypes;
 import static io.openbas.utils.Constants.ARTICLES;
 import static io.openbas.utils.Constants.MAX_SIZE_OF_STRING;
@@ -47,11 +54,25 @@ public class ExerciseService {
     @PersistenceContext
     private EntityManager entityManager;
 
+    private final GrantService grantService;
     private final InjectService injectService;
     private final InjectDuplicateService injectDuplicateService;
+    private final VariableService variableService;
+
     private final ArticleRepository articleRepository;
     private final ExerciseRepository exerciseRepository;
-    private final VariableService variableService;
+    private final TagRepository tagRepository;
+
+    // region properties
+    @Value("${openbas.mail.imap.enabled}")
+    private boolean imapEnabled;
+
+    @Value("${openbas.mail.imap.username}")
+    private String imapUsername;
+
+    @Resource
+    private OpenBASConfig openBASConfig;
+    // endregion
 
     public Page<ExerciseSimple> exercises(Specification<Exercise> specification, Pageable pageable) {
         CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
@@ -168,6 +189,25 @@ public class ExerciseService {
                 })
                 .toList();
     }
+
+    // -- CREATION --
+
+    public Exercise createExercise(ExerciseCreateInput input){
+            Exercise exercise = new Exercise();
+            exercise.setUpdateAttributes(input);
+            exercise.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+            if (imapEnabled) {
+                exercise.setFrom(imapUsername);
+                exercise.setReplyTos(List.of(imapUsername));
+            } else {
+                exercise.setFrom(openBASConfig.getDefaultMailer());
+                exercise.setReplyTos(List.of(openBASConfig.getDefaultReplyTo()));
+            }
+            this.grantService.computeGrant(exercise);
+            return exerciseRepository.save(exercise);
+    }
+
+    // -- DUPLICATION --
 
     @Transactional
     public Exercise getDuplicateExercise(@NotBlank String exerciseId) {
