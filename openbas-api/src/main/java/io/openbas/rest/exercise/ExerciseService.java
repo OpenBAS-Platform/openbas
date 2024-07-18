@@ -20,6 +20,7 @@ import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -193,10 +194,7 @@ public class ExerciseService {
     // -- CREATION --
 
     @Transactional
-    public Exercise createExercise(ExerciseCreateInput input){
-            Exercise exercise = new Exercise();
-            exercise.setUpdateAttributes(input);
-            exercise.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+    public Exercise createExercise(@NotNull final Exercise exercise){
             if (imapEnabled) {
                 exercise.setFrom(imapUsername);
                 exercise.setReplyTos(List.of(imapUsername));

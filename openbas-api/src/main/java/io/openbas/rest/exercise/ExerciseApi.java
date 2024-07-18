@@ -106,12 +106,12 @@ public class ExerciseApi extends RestBehavior {
     // endregion
 
     // region logs
-    @GetMapping("/api/exercises/{exercise}/logs")
+    @GetMapping(EXERCISE_URI + "/{exercise}/logs")
     public Iterable<Log> logs(@PathVariable String exercise) {
         return exerciseLogRepository.findAll(ExerciseLogSpecification.fromExercise(exercise));
     }
 
-    @PostMapping("/api/exercises/{exerciseId}/logs")
+    @PostMapping(EXERCISE_URI + "/{exerciseId}/logs")
     @Transactional(rollbackOn = Exception.class)
     public Log createLog(@PathVariable String exerciseId, @Valid @RequestBody LogCreateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
@@ -123,7 +123,7 @@ public class ExerciseApi extends RestBehavior {
         return exerciseLogRepository.save(log);
     }
 
-    @PutMapping("/api/exercises/{exerciseId}/logs/{logId}")
+    @PutMapping(EXERCISE_URI + "/{exerciseId}/logs/{logId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackOn = Exception.class)
     public Log updateLog(@PathVariable String exerciseId, @PathVariable String logId,
@@ -134,7 +134,7 @@ public class ExerciseApi extends RestBehavior {
         return logRepository.save(log);
     }
 
-    @DeleteMapping("/api/exercises/{exerciseId}/logs/{logId}")
+    @DeleteMapping(EXERCISE_URI + "/{exerciseId}/logs/{logId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackOn = Exception.class)
     public void deleteLog(@PathVariable String exerciseId, @PathVariable String logId) {
@@ -143,12 +143,12 @@ public class ExerciseApi extends RestBehavior {
     // endregion
 
     // region dryruns
-    @GetMapping("/api/exercises/{exerciseId}/dryruns")
+    @GetMapping(EXERCISE_URI + "/{exerciseId}/dryruns")
     public Iterable<Dryrun> dryruns(@PathVariable String exerciseId) {
         return dryRunRepository.findAll(DryRunSpecification.fromExercise(exerciseId));
     }
 
-    @PostMapping("/api/exercises/{exerciseId}/dryruns")
+    @PostMapping(EXERCISE_URI + "/{exerciseId}/dryruns")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackOn = Exception.class)
     public Dryrun createDryrun(@PathVariable String exerciseId, @Valid @RequestBody DryrunCreateInput input) {
@@ -160,21 +160,21 @@ public class ExerciseApi extends RestBehavior {
         return dryrunService.provisionDryrun(exercise, users, input.getName());
     }
 
-    @GetMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}")
+    @GetMapping(EXERCISE_URI + "/{exerciseId}/dryruns/{dryrunId}")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Dryrun dryrun(@PathVariable String exerciseId, @PathVariable String dryrunId) {
         Specification<Dryrun> filters = DryRunSpecification.fromExercise(exerciseId).and(DryRunSpecification.id(dryrunId));
         return dryRunRepository.findOne(filters).orElseThrow(ElementNotFoundException::new);
     }
 
-    @DeleteMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}")
+    @DeleteMapping(EXERCISE_URI + "/{exerciseId}/dryruns/{dryrunId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackOn = Exception.class)
     public void deleteDryrun(@PathVariable String exerciseId, @PathVariable String dryrunId) {
         dryRunRepository.deleteById(dryrunId);
     }
 
-    @GetMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}/dryinjects")
+    @GetMapping(EXERCISE_URI + "/{exerciseId}/dryruns/{dryrunId}/dryinjects")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     public List<DryInject> dryrunInjects(@PathVariable String exerciseId, @PathVariable String dryrunId) {
         return dryInjectRepository.findAll(DryInjectSpecification.fromDryRun(dryrunId));
@@ -182,26 +182,26 @@ public class ExerciseApi extends RestBehavior {
     // endregion
 
     // region comchecks
-    @GetMapping("/api/exercises/{exercise}/comchecks")
+    @GetMapping(EXERCISE_URI + "/{exercise}/comchecks")
     public Iterable<Comcheck> comchecks(@PathVariable String exercise) {
         return comcheckRepository.findAll(ComcheckSpecification.fromExercise(exercise));
     }
 
-    @GetMapping("/api/exercises/{exercise}/comchecks/{comcheck}")
+    @GetMapping(EXERCISE_URI + "/{exercise}/comchecks/{comcheck}")
     public Comcheck comcheck(@PathVariable String exercise, @PathVariable String comcheck) {
         Specification<Comcheck> filters = ComcheckSpecification.fromExercise(exercise)
                 .and(ComcheckSpecification.id(comcheck));
         return comcheckRepository.findOne(filters).orElseThrow(ElementNotFoundException::new);
     }
 
-    @GetMapping("/api/exercises/{exercise}/comchecks/{comcheck}/statuses")
+    @GetMapping(EXERCISE_URI + "/{exercise}/comchecks/{comcheck}/statuses")
     public List<ComcheckStatus> comcheckStatuses(@PathVariable String exercise, @PathVariable String comcheck) {
         return comcheck(exercise, comcheck).getComcheckStatus();
     }
     // endregion
 
     // region teams
-    @GetMapping("/api/exercises/{exerciseId}/teams")
+    @GetMapping(EXERCISE_URI + "/{exerciseId}/teams")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Iterable<TeamSimple> getExerciseTeams(@PathVariable String exerciseId) {
         return TeamHelper.rawTeamToSimplerTeam(teamRepository.rawTeamByExerciseId(exerciseId),
@@ -209,7 +209,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    @PutMapping("/api/exercises/{exerciseId}/teams/add")
+    @PutMapping(EXERCISE_URI + "/{exerciseId}/teams/add")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Iterable<Team> addExerciseTeams(
             @PathVariable String exerciseId,
@@ -225,7 +225,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    @PutMapping("/api/exercises/{exerciseId}/teams/remove")
+    @PutMapping(EXERCISE_URI + "/{exerciseId}/teams/remove")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Iterable<Team> removeExerciseTeams(@PathVariable String exerciseId,
                                               @Valid @RequestBody ExerciseUpdateTeamsInput input) {
@@ -240,7 +240,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    @PutMapping("/api/exercises/{exerciseId}/teams/{teamId}/players/enable")
+    @PutMapping(EXERCISE_URI + "/{exerciseId}/teams/{teamId}/players/enable")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Exercise enableExerciseTeamPlayers(@PathVariable String exerciseId, @PathVariable String teamId,
                                               @Valid @RequestBody ExerciseTeamPlayersEnableInput input) {
@@ -257,7 +257,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    @PutMapping("/api/exercises/{exerciseId}/teams/{teamId}/players/disable")
+    @PutMapping(EXERCISE_URI + "/{exerciseId}/teams/{teamId}/players/disable")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Exercise disableExerciseTeamPlayers(@PathVariable String exerciseId, @PathVariable String teamId,
                                                @Valid @RequestBody ExerciseTeamPlayersEnableInput input) {
@@ -272,7 +272,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    @PutMapping("/api/exercises/{exerciseId}/teams/{teamId}/players/add")
+    @PutMapping(EXERCISE_URI + "/{exerciseId}/teams/{teamId}/players/add")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Exercise addExerciseTeamPlayers(@PathVariable String exerciseId, @PathVariable String teamId,
                                            @Valid @RequestBody ExerciseTeamPlayersEnableInput input) {
@@ -291,7 +291,7 @@ public class ExerciseApi extends RestBehavior {
         return exercise;
     }
 
-    @PutMapping("/api/exercises/{exerciseId}/teams/{teamId}/players/remove")
+    @PutMapping(EXERCISE_URI + "/{exerciseId}/teams/{teamId}/players/remove")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackOn = Exception.class)
     public Exercise removeExerciseTeamPlayers(@PathVariable String exerciseId, @PathVariable String teamId,
@@ -312,21 +312,24 @@ public class ExerciseApi extends RestBehavior {
     // endregion
 
     // region exercises
-    @PostMapping("/api/exercises")
+    @PostMapping(EXERCISE_URI)
     public Exercise createExercise(@Valid @RequestBody ExerciseCreateInput input) {
         if (input == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Exercise input cannot be null");
         }
-        return this.exerciseService.createExercise(input);
+        Exercise exercise = new Exercise();
+        exercise.setUpdateAttributes(input);
+        exercise.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+        return this.exerciseService.createExercise(exercise);
     }
 
-    @PostMapping("/api/exercises/{exerciseId}")
+    @PostMapping(EXERCISE_URI + "/{exerciseId}")
     @Transactional(rollbackOn = Exception.class)
     public Exercise duplicateExercise(@PathVariable @NotBlank final String exerciseId) {
         return exerciseService.getDuplicateExercise(exerciseId);
     }
 
-    @PutMapping("/api/exercises/{exerciseId}")
+    @PutMapping(EXERCISE_URI + "/{exerciseId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackOn = Exception.class)
     public Exercise updateExerciseInformation(@PathVariable String exerciseId,
@@ -337,7 +340,7 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
-    @PutMapping("/api/exercises/{exerciseId}/start_date")
+    @PutMapping(EXERCISE_URI + "/{exerciseId}/start_date")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackOn = Exception.class)
     public Exercise updateExerciseStart(@PathVariable String exerciseId,
@@ -351,7 +354,7 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
-    @PutMapping("/api/exercises/{exerciseId}/tags")
+    @PutMapping(EXERCISE_URI + "/{exerciseId}/tags")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackOn = Exception.class)
     public Exercise updateExerciseTags(@PathVariable String exerciseId,
@@ -361,7 +364,7 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
-    @PutMapping("/api/exercises/{exerciseId}/logos")
+    @PutMapping(EXERCISE_URI + "/{exerciseId}/logos")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackOn = Exception.class)
     public Exercise updateExerciseLogos(@PathVariable String exerciseId,
@@ -372,7 +375,7 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
-    @PutMapping("/api/exercises/{exerciseId}/lessons")
+    @PutMapping(EXERCISE_URI + "/{exerciseId}/lessons")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackOn = Exception.class)
     public Exercise updateExerciseLessons(@PathVariable String exerciseId,
@@ -382,14 +385,14 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
-    @DeleteMapping("/api/exercises/{exerciseId}")
+    @DeleteMapping(EXERCISE_URI + "/{exerciseId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackOn = Exception.class)
     public void deleteExercise(@PathVariable String exerciseId) {
         exerciseRepository.deleteById(exerciseId);
     }
 
-    @GetMapping("/api/exercises/{exerciseId}")
+    @GetMapping(EXERCISE_URI + "/{exerciseId}")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public ExerciseDetails exercise(@PathVariable String exerciseId) {
@@ -496,7 +499,7 @@ public class ExerciseApi extends RestBehavior {
         return detail;
     }
 
-    @GetMapping("/api/exercises/{exerciseId}/results")
+    @GetMapping(EXERCISE_URI + "/{exerciseId}/results")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     public List<ExpectationResultsByType> globalResults(@NotBlank final @PathVariable String exerciseId) {
         return exerciseRepository.findById(exerciseId)
@@ -505,7 +508,7 @@ public class ExerciseApi extends RestBehavior {
                 .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + exerciseId));
     }
 
-    @GetMapping("/api/exercises/{exerciseId}/injects/results")
+    @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/results")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     public List<InjectExpectationResultsByAttackPattern> injectResults(@NotBlank final @PathVariable String exerciseId) {
         return exerciseRepository.findById(exerciseId)
@@ -514,7 +517,7 @@ public class ExerciseApi extends RestBehavior {
                 .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + exerciseId));
     }
 
-    @DeleteMapping("/api/exercises/{exerciseId}/{documentId}")
+    @DeleteMapping(EXERCISE_URI + "/{exerciseId}/{documentId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackOn = Exception.class)
     public Exercise deleteDocument(@PathVariable String exerciseId, @PathVariable String documentId) {
@@ -537,7 +540,7 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
-    @PutMapping("/api/exercises/{exerciseId}/status")
+    @PutMapping(EXERCISE_URI + "/{exerciseId}/status")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackOn = Exception.class)
     public Exercise changeExerciseStatus(
@@ -604,7 +607,7 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
-    @GetMapping("/api/exercises")
+    @GetMapping(EXERCISE_URI)
     public List<ExerciseSimple> exercises() {
         // We get the exercises depending on whether or not we are granted
         Iterable<RawExercise> exercises = currentUser().isAdmin() ? exerciseRepository.rawAll()
@@ -657,7 +660,7 @@ public class ExerciseApi extends RestBehavior {
     // endregion
 
     // region communication
-    @GetMapping("/api/exercises/{exerciseId}/communications")
+    @GetMapping(EXERCISE_URI + "/{exerciseId}/communications")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Iterable<Communication> exerciseCommunications(@PathVariable String exerciseId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
@@ -678,7 +681,7 @@ public class ExerciseApi extends RestBehavior {
     // endregion
 
     // region import/export
-    @GetMapping("/api/exercises/{exerciseId}/export")
+    @GetMapping(EXERCISE_URI + "/{exerciseId}/export")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     public void exerciseExport(@NotBlank @PathVariable final String exerciseId,
                                @RequestParam(required = false) final boolean isWithTeams,
@@ -811,7 +814,7 @@ public class ExerciseApi extends RestBehavior {
         zipExport.close();
     }
 
-    @PostMapping("/api/exercises/import")
+    @PostMapping(EXERCISE_URI + "/import")
     @Secured(ROLE_ADMIN)
     public void exerciseImport(@RequestPart("file") MultipartFile file) throws Exception {
         importService.handleFileImport(file);

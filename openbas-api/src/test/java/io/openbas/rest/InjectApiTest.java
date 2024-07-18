@@ -8,7 +8,9 @@ import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.ScenarioRepository;
+import io.openbas.rest.exercise.ExerciseService;
 import io.openbas.rest.inject.form.InjectInput;
+import io.openbas.service.ScenarioService;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import org.junit.jupiter.api.*;
@@ -41,18 +43,23 @@ class InjectApiTest extends IntegrationTest {
     @Autowired
     private MockMvc mvc;
     @Autowired
-    private ScenarioRepository scenarioRepository;
+    private ScenarioService scenarioService;
+    @Autowired
+    private ExerciseService exerciseService;
     @Autowired
     private ExerciseRepository exerciseRepository;
+    @Autowired
+    private ScenarioRepository scenarioRepository;
     @Autowired
     private InjectRepository injectRepository;
 
     @BeforeAll
-    void beforeAll(){
+    void beforeAll() {
         Scenario scenario = new Scenario();
         scenario.setName("Scenario name");
-        scenario.setFrom("user@openbas.io");
-        Scenario scenarioCreated = scenarioRepository.save(scenario);
+        scenario.setFrom("test@test.com");
+        scenario.setReplyTos(List.of("test@test.com"));
+        Scenario scenarioCreated = scenarioService.createScenario(scenario);
         SCENARIO_ID = scenarioCreated.getId();
 
         Exercise exercise = new Exercise();
@@ -61,11 +68,9 @@ class InjectApiTest extends IntegrationTest {
         exercise.setFrom("test@test.com");
         exercise.setReplyTos(List.of("test@test.com"));
         exercise.setStatus(RUNNING);
-        Exercise exerciseCreated = exerciseRepository.save(exercise);
+        Exercise exerciseCreated = exerciseService.createExercise(exercise);
         EXERCISE_ID = exerciseCreated.getId();
-
     }
-
 
     @AfterAll
     void afterAll() {
@@ -247,7 +252,7 @@ class InjectApiTest extends IntegrationTest {
         // -- BULK DELETE --
         @DisplayName("Delete list of inject for exercise")
         @Test
-        @Order(2)
+        @Order(8)
         @WithMockPlannerUser
         void deleteInjectsForExerciseTest() throws Exception {
             // -- EXECUTE 1 ASSERT --

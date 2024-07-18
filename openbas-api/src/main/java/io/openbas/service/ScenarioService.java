@@ -102,9 +102,7 @@ public class ScenarioService {
             scenario.setFrom(this.openBASConfig.getDefaultMailer());
             scenario.setReplyTos(List.of(this.openBASConfig.getDefaultReplyTo()));
         }
-
         this.grantService.computeGrant(scenario);
-
         return this.scenarioRepository.save(scenario);
     }
 
