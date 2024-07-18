@@ -1,5 +1,5 @@
 import { Autocomplete as MuiAutocomplete, Box, Button, MenuItem, TextField } from '@mui/material';
-import { TableViewOutlined } from '@mui/icons-material';
+import { LabelOutlined, TableViewOutlined } from '@mui/icons-material';
 import React, { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,11 +24,14 @@ const useStyles = makeStyles(() => ({
     gap: '8px',
     marginTop: '24px',
   },
-  option: {
-    display: 'flex',
-    gap: '8px',
-    margin: '4px 8px',
-    cursor: 'pointer',
+  icon: {
+    paddingTop: 4,
+    display: 'inline-block',
+  },
+  text: {
+    display: 'inline-block',
+    flexGrow: 1,
+    marginLeft: 10,
   },
 }));
 
@@ -152,9 +155,11 @@ const ImportUploaderInjectImportInjects: FunctionComponent<Props> = ({
                 onChange(v?.id);
               }}
               renderOption={(props, option) => (
-                <Box component="li" {...props} key={option.id} className={classes.option}>
-                  <TableViewOutlined color="primary" />
-                  <div>{option.label}</div>
+                <Box component="li" {...props} key={option.id}>
+                  <div className={classes.icon} >
+                    <TableViewOutlined color="primary" />
+                  </div>
+                  <div className={classes.text}>{option.label}</div>
                 </Box>
               )}
               getOptionLabel={(option) => option.label}

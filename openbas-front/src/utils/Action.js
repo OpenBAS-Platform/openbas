@@ -46,10 +46,6 @@ export const simplePutCall = (uri, data) => api().put(buildUri(uri), data)
     throw error;
   });
 export const simpleDelCall = (uri, data) => api().delete(buildUri(uri), data)
-  .then((response) => {
-    MESSAGING$.notifySuccess('The element has been deleted');
-    return response;
-  })
   .catch((error) => {
     MESSAGING$.notifyError(error.message);
     throw error;

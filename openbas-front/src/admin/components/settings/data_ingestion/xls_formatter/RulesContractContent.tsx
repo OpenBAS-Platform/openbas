@@ -93,6 +93,11 @@ const RulesContractContent: React.FC<Props> = ({
       rule_attribute_columns: '',
       rule_attribute_default_value: '',
     });
+    rulesAppend({
+      rule_attribute_name: 'trigger_time',
+      rule_attribute_columns: '',
+      rule_attribute_default_value: '',
+    });
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < contractFieldKeys?.length; i++) {
       rulesAppend({
@@ -113,11 +118,6 @@ const RulesContractContent: React.FC<Props> = ({
     });
     rulesAppend({
       rule_attribute_name: 'expectation_score',
-      rule_attribute_columns: '',
-      rule_attribute_default_value: '',
-    });
-    rulesAppend({
-      rule_attribute_name: 'trigger_time',
       rule_attribute_columns: '',
       rule_attribute_default_value: '',
     });
@@ -267,9 +267,10 @@ const RulesContractContent: React.FC<Props> = ({
                     <DialogContent>
                       <TextField
                         fullWidth
-                        label={t('Rule attribute default value')}
+                        label={t('Default value')}
                         inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_default_value`)}
                       />
+                      {/*FIXME: change to trigger time*/}
                       {currentRuleIndex === rulesFields.length - 1
                         && <TextField
                           label={t('Time pattern')}

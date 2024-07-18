@@ -8,7 +8,7 @@ interface Props {
   label: string;
   fieldValue: string | undefined;
   onChange: (data: string | null) => void;
-  required: boolean;
+  required?: boolean;
   error: FieldError | undefined;
 }
 

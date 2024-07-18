@@ -45,7 +45,7 @@ const MapperForm: React.FC<Props> = ({
 
   const ruleAttributeZodObject = z.object({
     rule_attribute_name: z.string().min(1, { message: t('Should not be empty') }),
-    rule_attribute_columns: z.string().optional(),
+    rule_attribute_columns: z.string().optional().nullable(),
     rule_attribute_default_value: z.string().optional(),
     rule_attribute_additional_config: z.record(z.string(), z.string()).optional(),
   });
@@ -62,7 +62,7 @@ const MapperForm: React.FC<Props> = ({
       zodImplement<ImportMapperAddInput>().with({
         mapper_name: z.string().min(1, { message: t('Should not be empty') }),
         mapper_inject_importers: z.array(importerZodObject)
-          .min(1, { message: t('At least one inject importer is required') }),
+          .min(1, { message: t('At least one inject type is required') }),
         mapper_inject_type_column: z.string()
           .min(1, { message: t('Should not be empty') }),
       }),
@@ -109,7 +109,7 @@ const MapperForm: React.FC<Props> = ({
         </div>
         <div className={classes.importerStyle}>
           <Typography variant="h3" sx={{ m: 0 }}>
-            {t('Representation for inject')}
+            {t('Representation for inject type')}
           </Typography>
           <IconButton
             color="secondary"
