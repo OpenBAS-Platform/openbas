@@ -270,12 +270,12 @@ const RulesContractContent: React.FC<Props> = ({
                         label={t('Default value')}
                         inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_default_value`)}
                       />
-                      {/*FIXME: change to trigger time*/}
-                      {currentRuleIndex === rulesFields.length - 1
+                      {currentRuleIndex === rulesFields.findIndex((r) => r.rule_attribute_name === 'trigger_time')
                         && <TextField
                           label={t('Time pattern')}
                           fullWidth
-                          inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern` as const)}
+                          style={{ marginTop: 10 }}
+                          inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_additional_config.timePattern`)}
                            />
                       }
                     </DialogContent>
