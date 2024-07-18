@@ -193,7 +193,7 @@ const RulesContractContent: React.FC<Props> = ({
           </div>
         </AccordionSummary>
         <AccordionDetails>
-          <div style={{ display: 'flex' }}>
+          <div style={{ display: 'flex', alignItems: 'end', gap: '8px' }}>
             <TextField
               variant="standard"
               fullWidth
@@ -210,7 +210,7 @@ const RulesContractContent: React.FC<Props> = ({
               )}
             >
               <InformationOutline
-                fontSize="small"
+                fontSize="medium"
                 color="primary"
                 style={{ cursor: 'default' }}
               />
@@ -287,20 +287,20 @@ const RulesContractContent: React.FC<Props> = ({
                         inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_default_value`)}
                       />
                       {currentRuleIndex === rulesFields.findIndex((r) => r.rule_attribute_name === 'trigger_time')
-                        && <div style={{ display: 'flex' }}>
+                        && <div style={{ display: 'flex', alignItems: 'end', gap: '8px' }}>
                           <TextField
                             label={t('Time pattern')}
                             fullWidth
                             style={{ marginTop: 10 }}
-                          inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_additional_config.timePattern`)}
+                            inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_additional_config.timePattern`)}
                           />
                           <Tooltip
                             title={t(
-                              'By default we accept iso date (YYYY-MM-DD), but you cans specify your own date format in ISO notation (for instance DD.MM.YYYY)',
+                              'By default we accept iso date (YYYY-MM-DD hh:mm:ss[.mmm]TZD), but you can specify your own date format in ISO notation (for instance DD.MM.YYYY hh\'h\'mm)',
                             )}
                           >
                             <InformationOutline
-                              fontSize="small"
+                              fontSize="medium"
                               color="primary"
                               style={{ cursor: 'default' }}
                             />
