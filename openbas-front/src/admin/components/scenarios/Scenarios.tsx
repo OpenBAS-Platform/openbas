@@ -212,6 +212,15 @@ const Scenarios = () => {
     setOpenExportId(null);
   };
 
+  // Delete
+  const [openDeleteId, setOpenDeleteId] = useState<string | null>(null);
+  const handleOpenDelete = (scenarioId: string) => {
+    setOpenExportId(scenarioId);
+  };
+  const handleCloseDelete = () => {
+    setOpenDeleteId(null);
+  };
+
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Scenarios'), current: true }]} />
@@ -289,11 +298,14 @@ const Scenarios = () => {
                   entries={[
                     { label: 'Duplicate', action: () => handleOpenDuplicate(scenario.scenario_id) },
                     { label: 'Export', action: () => handleOpenExport(scenario.scenario_id) },
+                    { label: 'Delete', action: () => handleOpenDelete(scenario.scenario_id) },
                   ]}
                   openExport={openExportId === scenario.scenario_id}
                   setOpenExport={handleCloseExport}
                   openDuplicate={openDuplicateId === scenario.scenario_id}
                   setOpenDuplicate={handleCloseDuplicate}
+                  openDelete={openDeleteId === scenario.scenario_id}
+                  setOpenDelete={handleCloseDelete}
                   variantButtonPopover={'icon'}
                 />
               }

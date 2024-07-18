@@ -80,6 +80,7 @@ const InjectList: FunctionComponent<Props> = ({
   const classes = useStyles();
   const { t, fldt, tPick, nsdt } = useFormatter();
   const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
+  const [openDeleteId, setOpenDeleteId] = useState<string | null>(null);
 
   // Filter and sort hook
   const [injects, setInjects] = useState<InjectResultDTO[]>([]);
@@ -162,6 +163,14 @@ const InjectList: FunctionComponent<Props> = ({
     setOpenDuplicateId(null);
   };
 
+  const handleOpenDelete = (injectId: string) => {
+    setOpenDeleteId(injectId);
+  };
+
+  const handleCloseDelete = () => {
+    setOpenDeleteId(null);
+  };
+
   return (
     <>
       <PaginationComponent
@@ -198,9 +207,14 @@ const InjectList: FunctionComponent<Props> = ({
               secondaryAction={
                 <AtomicTestingPopover
                   atomic={injectDto}
-                  entries={[{ label: 'Duplicate', action: () => handleOpenDuplicate(injectDto.inject_id) }]}
+                  entries={[
+                    { label: 'Duplicate', action: () => handleOpenDuplicate(injectDto.inject_id) },
+                    { label: 'Delete', action: () => handleOpenDelete(injectDto.inject_id) },
+                  ]}
                   openDuplicate={openDuplicateId === injectDto.inject_id}
                   setOpenDuplicate={handleCloseDuplicate}
+                  openDelete={openDeleteId === injectDto.inject_id}
+                  setOpenDelete={handleCloseDelete}
                   variantButtonPopover={'icon'}
                 />
                   }

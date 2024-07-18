@@ -152,6 +152,15 @@ const ExerciseList: FunctionComponent<Props> = ({
     setOpenExportId(null);
   };
 
+  // Delete
+  const [openDeleteId, setOpenDeleteId] = useState<string | null>(null);
+  const handleOpenDelete = (scenarioId: string) => {
+    setOpenDeleteId(scenarioId);
+  };
+  const handleCloseDelete = () => {
+    setOpenDeleteId(null);
+  };
+
   return (
     <List>
       {hasHeader
@@ -183,11 +192,14 @@ const ExerciseList: FunctionComponent<Props> = ({
               entries={[
                 { label: 'Duplicate', action: () => handleOpenDuplicate(exercise.exercise_id) },
                 { label: 'Export', action: () => handleOpenExport(exercise.exercise_id) },
+                { label: 'Delete', action: () => handleOpenDelete(exercise.exercise_id) },
               ]}
               openExport={openExportId === exercise.exercise_id}
               setOpenExport={handleCloseExport}
               openDuplicate={openDuplicateId === exercise.exercise_id}
               setOpenDuplicate={handleCloseDuplicate}
+              openDelete={openDeleteId === exercise.exercise_id}
+              setOpenDelete={handleCloseDelete}
               variantButtonPopover={'icon'}
             />
           }
