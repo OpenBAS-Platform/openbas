@@ -400,7 +400,6 @@ const i18n = {
       'Manual launch': 'Lancement manuel',
       'Manage content': 'Gérer le contenu',
       Controls: 'Contrôles',
-      'Lessons learned': 'Expérience',
       Planning: 'Planification',
       Comchecks: 'Vérifications',
       Dryruns: 'Simulations',
@@ -540,20 +539,8 @@ const i18n = {
         'Souhaitez-vous supprimer cette pression médiatique ?',
       'Do you want to delete this challenge?':
         'Souhaitez-vous supprimer ce challenge ?',
-      'Do you want to delete this lessons learned category?':
-        "Souhaitez-vous supprimer cette catégorie de retour d'expérience ?",
-      'Update the lessons learned category':
-        "Modifier une catégorie de retour d'expérience",
       'Create a new media pressure': 'Créer une nouvelle pression médiatique',
-      'Create a new lessons learned question':
-        "Créer une nouvelle question de retour d'expérience",
       'Collaborative lessons learned': "Retour d'expérience collaboratif",
-      'Create a new lessons learned category':
-        "Créer une catégorie de retour d'expérience",
-      'Do you want to delete this lessons learned question?':
-        "Souhaitez-vous supprimer cette question de retour d'expérience ?",
-      'Update the lessons learned question':
-        "Modifier la question de retour d'expérience",
       Answers: 'Réponses',
       'Categories and questions': 'Catégories et questions',
       Questions: 'Questions',
@@ -586,12 +573,6 @@ const i18n = {
       Explanation: 'Explication',
       Category: 'Catégorie',
       'Create a new challenge': 'Créer un nouveau challenge',
-      'Create a new lessons learned template':
-        "Créer un nouveau template de retour d'expérience",
-      'Update the lessons learned template':
-        "Modifier le template de retour d'expérience",
-      'Do you want to delete this lessons learned template?':
-        "Souhaitez-vous supprimer ce template de retour d'expérience ?",
       Channel: 'Média',
       Author: 'Auteur',
       'Max number of attempts': "Nombre maximum d'essais",
@@ -1157,6 +1138,26 @@ const i18n = {
       Trigger_time: 'Temps de déclenchement',
       'This expression will be used to find a match in the specified column to determine the inject type. Regular Expressions can be used.': 'Cette expression est utilisé pour déterminer si il y a correspondance avec la colonne spécifié. L\'utilisation d\'expression régulière est possible.',
       'By default we accept iso date (YYYY-MM-DDThh:mm:ss[.mmm]TZD), but you can specify your own date format in ISO notation (for instance DD.MM.YYYY hh\'h\'mm)': 'Par défaut nous acceptons la date iso (AAAA-MM-JJ hh:mm:ss[.mmm]TZD), mais vous pouvez spécifiez votre propre format de date en notation ISO (par exemple JJ.MM.AAAA hh\'h\'mm)',
+      // -- Lessons --
+      'Lessons learned': 'Expérience',
+      'Create a new lessons learned template':
+        "Créer un nouveau template de retour d'expérience",
+      'Update the lessons learned template':
+        "Modifier le template de retour d'expérience",
+      'Do you want to delete this lessons learned template?':
+        "Souhaitez-vous supprimer ce template de retour d'expérience ?",
+      'Create a new lessons learned category':
+        "Créer une catégorie de retour d'expérience",
+      'Update the lessons learned category':
+        "Modifier une catégorie de retour d'expérience",
+      'Do you want to delete this lessons learned category?':
+        "Souhaitez-vous supprimer cette catégorie de retour d'expérience ?",
+      'Create a new lessons learned question':
+        "Créer une nouvelle question de retour d'expérience",
+      'Update the lessons learned question':
+        "Modifier la question de retour d'expérience",
+      'Do you want to delete this lessons learned question?':
+        "Souhaitez-vous supprimer cette question de retour d'expérience ?",
     },
     en: {
       openbas_email: 'Email',

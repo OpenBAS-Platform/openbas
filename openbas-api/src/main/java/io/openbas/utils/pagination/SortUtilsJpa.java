@@ -10,6 +10,10 @@ import java.util.List;
 
 public class SortUtilsJpa {
 
+  private SortUtilsJpa() {
+
+  }
+
   public static <T> Sort toSortJpa(@Nullable final List<SortField> sorts, @NotNull final Class<T> clazz) {
     List<PropertySchema> propertySchemas = SchemaUtils.schema(clazz);
 

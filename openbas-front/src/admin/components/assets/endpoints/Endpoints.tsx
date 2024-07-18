@@ -145,17 +145,7 @@ const Endpoints = () => {
           divider={false}
           style={{ paddingTop: 0 }}
         >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
-              &nbsp;
-            </span>
-          </ListItemIcon>
+          <ListItemIcon />
           <ListItemText
             primary={
               <SortHeadersComponent
@@ -166,7 +156,7 @@ const Endpoints = () => {
               />
             }
           />
-          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
+          <ListItemSecondaryAction />
         </ListItem>
         {endpoints.map((endpoint: EndpointStore) => {
           const executor = executorsMap[endpoint.asset_executor ?? 'Unknown'];
@@ -174,7 +164,7 @@ const Endpoints = () => {
             <ListItem
               key={endpoint.asset_id}
               classes={{ root: classes.item }}
-              divider={true}
+              divider
             >
               <ListItemIcon>
                 <DevicesOtherOutlined color="primary"/>

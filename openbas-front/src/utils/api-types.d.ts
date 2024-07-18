@@ -163,7 +163,6 @@ export interface AtomicTestingInput {
   inject_tags?: string[];
   inject_teams?: string[];
   inject_title?: string;
-  inject_id?: string;
 }
 
 export interface AtomicTestingOutput {
@@ -1197,7 +1196,6 @@ export interface InjectInput {
   inject_tags?: string[];
   inject_teams?: string[];
   inject_title?: string;
-  inject_id?: string;
 }
 
 export interface InjectOutput {
@@ -1611,80 +1609,61 @@ export interface LessonsSendInput {
 
 export interface LessonsTemplate {
   /** @format date-time */
-  lessons_template_created_at?: string;
+  lessons_template_created_at: string;
   lessons_template_description?: string;
-  lessons_template_name?: string;
+  lessons_template_name: string;
   /** @format date-time */
-  lessons_template_updated_at?: string;
-  lessonstemplate_id?: string;
+  lessons_template_updated_at: string;
+  lessonstemplate_id: string;
   updateAttributes?: object;
 }
 
 export interface LessonsTemplateCategory {
   /** @format date-time */
-  lessons_template_category_created_at?: string;
+  lessons_template_category_created_at: string;
   lessons_template_category_description?: string;
-  lessons_template_category_name?: string;
+  lessons_template_category_name: string;
   /** @format int32 */
-  lessons_template_category_order?: number;
+  lessons_template_category_order: number;
   lessons_template_category_questions?: LessonsTemplateQuestion[];
   lessons_template_category_template?: LessonsTemplate;
   /** @format date-time */
-  lessons_template_category_updated_at?: string;
-  lessonstemplatecategory_id?: string;
+  lessons_template_category_updated_at: string;
+  lessonstemplatecategory_id: string;
   updateAttributes?: object;
 }
 
-export interface LessonsTemplateCategoryCreateInput {
+export interface LessonsTemplateCategoryInput {
   lessons_template_category_description?: string;
   lessons_template_category_name: string;
   /** @format int32 */
-  lessons_template_category_order?: number;
+  lessons_template_category_order: number;
 }
 
-export interface LessonsTemplateCategoryUpdateInput {
-  lessons_template_category_description?: string;
-  lessons_template_category_name: string;
-  /** @format int32 */
-  lessons_template_category_order?: number;
-}
-
-export interface LessonsTemplateCreateInput {
+export interface LessonsTemplateInput {
   lessons_template_description?: string;
   lessons_template_name: string;
 }
 
 export interface LessonsTemplateQuestion {
   lessons_template_question_category?: LessonsTemplateCategory;
-  lessons_template_question_content?: string;
+  lessons_template_question_content: string;
   /** @format date-time */
-  lessons_template_question_created_at?: string;
+  lessons_template_question_created_at: string;
   lessons_template_question_explanation?: string;
   /** @format int32 */
-  lessons_template_question_order?: number;
+  lessons_template_question_order: number;
   /** @format date-time */
-  lessons_template_question_updated_at?: string;
-  lessonstemplatequestion_id?: string;
+  lessons_template_question_updated_at: string;
+  lessonstemplatequestion_id: string;
   updateAttributes?: object;
 }
 
-export interface LessonsTemplateQuestionCreateInput {
+export interface LessonsTemplateQuestionInput {
   lessons_template_question_content: string;
   lessons_template_question_explanation?: string;
   /** @format int32 */
-  lessons_template_question_order?: number;
-}
-
-export interface LessonsTemplateQuestionUpdateInput {
-  lessons_template_question_content: string;
-  lessons_template_question_explanation?: string;
-  /** @format int32 */
-  lessons_template_question_order?: number;
-}
-
-export interface LessonsTemplateUpdateInput {
-  lessons_template_description?: string;
-  lessons_template_name: string;
+  lessons_template_question_order: number;
 }
 
 export interface Log {
@@ -1967,6 +1946,25 @@ export interface PageInjectorContractOutput {
 
 export interface PageKillChainPhase {
   content?: KillChainPhase[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageLessonsTemplate {
+  content?: LessonsTemplate[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
