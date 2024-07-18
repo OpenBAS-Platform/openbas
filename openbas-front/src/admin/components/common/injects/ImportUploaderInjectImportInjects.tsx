@@ -1,5 +1,5 @@
 import { Autocomplete as MuiAutocomplete, Box, Button, MenuItem, TextField } from '@mui/material';
-import { LabelOutlined, TableViewOutlined } from '@mui/icons-material';
+import { TableViewOutlined } from '@mui/icons-material';
 import React, { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

@@ -2,6 +2,7 @@ package io.openbas.rest.mapper.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,7 @@ public class MapperAddInput {
     private String injectTypeColumn;
 
     @JsonProperty("mapper_inject_importers")
+    @NotNull
     private List<InjectImporterAddInput> importers = new ArrayList<>();
 
 }

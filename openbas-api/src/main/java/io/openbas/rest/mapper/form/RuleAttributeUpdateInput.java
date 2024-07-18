@@ -1,6 +1,7 @@
 package io.openbas.rest.mapper.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class RuleAttributeUpdateInput {
     private String name;
 
     @JsonProperty("rule_attribute_columns")
+    @Schema(nullable = true)
     private String columns;
 
     @JsonProperty("rule_attribute_default_value")

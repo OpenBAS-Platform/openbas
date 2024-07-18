@@ -1,7 +1,18 @@
 import { Dispatch } from 'redux';
 import { delReferential, getReferential, postReferential, putReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import { arrayOfScenarios, scenario } from './scenario-schema';
-import type { InjectsImportInput, Scenario, ScenarioInformationInput, ScenarioInput, ScenarioRecurrenceInput, ScenarioTeamPlayersEnableInput, ScenarioUpdateTagsInput, ScenarioUpdateTeamsInput, SearchPaginationInput, Team, } from '../../utils/api-types';
+import type {
+  InjectsImportInput,
+  Scenario,
+  ScenarioInformationInput,
+  ScenarioInput,
+  ScenarioRecurrenceInput,
+  ScenarioTeamPlayersEnableInput,
+  ScenarioUpdateTagsInput,
+  ScenarioUpdateTeamsInput,
+  SearchPaginationInput,
+  Team,
+} from '../../utils/api-types';
 import * as schema from '../Schema';
 
 const SCENARIO_URI = '/api/scenarios';

@@ -53,7 +53,7 @@ const MapperForm: React.FC<Props> = ({
   const importerZodObject = z.object({
     inject_importer_type_value: z.string().min(1, { message: t('Should not be empty') }),
     inject_importer_injector_contract_id: z.string().min(1, { message: t('Should not be empty') }),
-    inject_importer_rule_attributes: z.array(ruleAttributeZodObject).min(1, { message: t('Should not be empty') }),
+    inject_importer_rule_attributes: z.array(ruleAttributeZodObject).optional(),
   });
 
   const methods = useForm<ImportMapperAddInput>({

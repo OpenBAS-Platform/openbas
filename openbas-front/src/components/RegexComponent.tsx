@@ -6,7 +6,7 @@ import { useFormatter } from './i18n';
 
 interface Props {
   label: string;
-  fieldValue: string | undefined;
+  fieldValue: string | null | undefined;
   onChange: (data: string | null) => void;
   required?: boolean;
   error: FieldError | undefined;

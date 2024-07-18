@@ -1,11 +1,12 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import MapperForm from './MapperForm';
 import { fetchMapper, updateXlsMapper } from '../../../../../actions/xls_formatter/xls-formatter-actions';
-import type { ImportMapper, ImportMapperUpdateInput, RawPaginationImportMapper } from '../../../../../utils/api-types';
+import type { ImportMapperUpdateInput, RawPaginationImportMapper } from '../../../../../utils/api-types';
 import Loader from '../../../../../components/Loader';
+import type { ImportMapperStore } from '../../../../../actions/xls_formatter/ImportMapper';
 
 interface XlsFormatterUpdateComponentProps {
-  xlsMapper: ImportMapper;
+  xlsMapper: ImportMapperStore;
   onUpdate?: (result: RawPaginationImportMapper) => void;
   handleClose: () => void;
 }
@@ -60,10 +61,10 @@ const XlsFormatterUpdate: FunctionComponent<XlsFormatterUpdateProps> = ({
   onUpdate,
   handleClose,
 }) => {
-  const [xlsMapper, setXlsMapper] = useState<ImportMapper | null>();
+  const [xlsMapper, setXlsMapper] = useState<ImportMapperStore | null>();
 
   useEffect(() => {
-    fetchMapper(xlsMapperId).then((result: { data: ImportMapper }) => {
+    fetchMapper(xlsMapperId).then((result: { data: ImportMapperStore }) => {
       setXlsMapper(result.data);
     });
   }, []);

@@ -987,14 +987,14 @@ export interface ImportMapper {
 }
 
 export interface ImportMapperAddInput {
-  mapper_inject_importers?: InjectImporterAddInput[];
+  mapper_inject_importers: InjectImporterAddInput[];
   /** @pattern ^[A-Z]{1,2}$ */
   mapper_inject_type_column: string;
   mapper_name: string;
 }
 
 export interface ImportMapperUpdateInput {
-  mapper_inject_importers?: InjectImporterUpdateInput[];
+  mapper_inject_importers: InjectImporterUpdateInput[];
   /** @pattern ^[A-Z]{1,2}$ */
   mapper_inject_type_column: string;
   mapper_name: string;
@@ -2582,14 +2582,14 @@ export interface RuleAttribute {
 
 export interface RuleAttributeAddInput {
   rule_attribute_additional_config?: Record<string, string>;
-  rule_attribute_columns?: string;
+  rule_attribute_columns?: string | null;
   rule_attribute_default_value?: string;
   rule_attribute_name: string;
 }
 
 export interface RuleAttributeUpdateInput {
   rule_attribute_additional_config?: Record<string, string>;
-  rule_attribute_columns: string;
+  rule_attribute_columns?: string | null;
   rule_attribute_default_value?: string;
   rule_attribute_id?: string;
   rule_attribute_name: string;

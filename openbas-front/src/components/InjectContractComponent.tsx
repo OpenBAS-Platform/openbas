@@ -13,7 +13,7 @@ import type { InjectorHelper } from '../actions/injectors/injector-helper';
 import useDataLoader from '../utils/hooks/useDataLoader';
 import { fetchInjectors } from '../actions/Injectors';
 import { searchInjectorContracts } from '../actions/InjectorContracts';
-import { InjectorContractStore } from '../actions/injector_contracts/InjectorContract';
+import type { InjectorContractStore } from '../actions/injector_contracts/InjectorContract';
 
 const useStyles = makeStyles(() => ({
   icon: {
