@@ -313,7 +313,6 @@ public class ExerciseApi extends RestBehavior {
 
     // region exercises
     @PostMapping("/api/exercises")
-    @Transactional(rollbackOn = Exception.class)
     public Exercise createExercise(@Valid @RequestBody ExerciseCreateInput input) {
         if (input == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Exercise input cannot be null");

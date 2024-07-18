@@ -192,6 +192,7 @@ public class ExerciseService {
 
     // -- CREATION --
 
+    @Transactional
     public Exercise createExercise(ExerciseCreateInput input){
             Exercise exercise = new Exercise();
             exercise.setUpdateAttributes(input);

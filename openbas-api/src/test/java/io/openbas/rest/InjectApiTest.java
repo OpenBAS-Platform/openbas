@@ -7,11 +7,8 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.ScenarioRepository;
-import io.openbas.rest.exercise.ExerciseService;
 import io.openbas.rest.inject.form.InjectInput;
-import io.openbas.service.ScenarioService;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import org.junit.jupiter.api.*;
@@ -40,20 +37,35 @@ class InjectApiTest extends IntegrationTest {
     static String EXERCISE_ID;
     static String SCENARIO_ID;
     static String INJECT_ID;
+
     @Autowired
     private MockMvc mvc;
-    @Autowired
-    private ScenarioService scenarioService;
-    @Autowired
-    private ExerciseService exerciseService;
     @Autowired
     private ScenarioRepository scenarioRepository;
     @Autowired
     private ExerciseRepository exerciseRepository;
     @Autowired
     private InjectRepository injectRepository;
-    @Autowired
-    private InjectorContractRepository injectorContractRepository;
+
+    @BeforeAll
+    void beforeAll(){
+        Scenario scenario = new Scenario();
+        scenario.setName("Scenario name");
+        scenario.setFrom("user@openbas.io");
+        Scenario scenarioCreated = scenarioRepository.save(scenario);
+        SCENARIO_ID = scenarioCreated.getId();
+
+        Exercise exercise = new Exercise();
+        exercise.setName("Exercise name");
+        exercise.setStart(Instant.now());
+        exercise.setFrom("test@test.com");
+        exercise.setReplyTos(List.of("test@test.com"));
+        exercise.setStatus(RUNNING);
+        Exercise exerciseCreated = exerciseRepository.save(exercise);
+        EXERCISE_ID = exerciseCreated.getId();
+
+    }
+
 
     @AfterAll
     void afterAll() {
@@ -73,11 +85,6 @@ class InjectApiTest extends IntegrationTest {
         @WithMockPlannerUser
         void addInjectForScenarioTest() throws Exception {
             // -- PREPARE --
-            Scenario scenario = new Scenario();
-            scenario.setName("Scenario name");
-            Scenario scenarioCreated = scenarioService.createScenario(scenario);
-            SCENARIO_ID = scenarioCreated.getId();
-
             InjectInput input = new InjectInput();
             input.setTitle("Test inject");
             input.setInjectorContract(EMAIL_DEFAULT);
@@ -145,7 +152,7 @@ class InjectApiTest extends IntegrationTest {
             assertEquals(INJECT_ID, JsonPath.read(response, "$.inject_id"));
         }
 
-        @DisplayName("Add an inject for scenario")
+        @DisplayName("Update inject for scenario")
         @Test
         @Order(4)
         @WithMockPlannerUser
@@ -190,6 +197,7 @@ class InjectApiTest extends IntegrationTest {
         @Order(6)
         @WithMockPlannerUser
         void deleteInjectsForScenarioTest() throws Exception {
+            // -- EXECUTE --
             mvc.perform(post(SCENARIO_URI + "/" + SCENARIO_ID + "/injects/delete")
                             .content(asJsonString(List.of('1', '2')))
                             .contentType(MediaType.APPLICATION_JSON))
@@ -204,19 +212,9 @@ class InjectApiTest extends IntegrationTest {
 
         @DisplayName("Add an inject for exercise")
         @Test
-        @Order(1)
+        @Order(7)
         @WithMockPlannerUser
         void addInjectForExerciseTest() throws Exception {
-            // -- PREPARE --
-            Exercise exercise = new Exercise();
-            exercise.setName("Exercise name");
-            exercise.setStart(Instant.now());
-            exercise.setFrom("test@test.com");
-            exercise.setReplyTos(List.of("test@test.com"));
-            exercise.setStatus(RUNNING);
-            Exercise exerciseCreated = exerciseRepository.save(exercise);
-            EXERCISE_ID = exerciseCreated.getId();
-
             InjectInput input = new InjectInput();
             input.setTitle("Test inject");
             input.setInjectorContract(EMAIL_DEFAULT);
