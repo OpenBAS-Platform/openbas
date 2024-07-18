@@ -11,7 +11,6 @@ import io.openbas.rest.scenario.form.InjectsImportTestInput;
 import io.openbas.rest.scenario.response.ImportTestSummary;
 import io.openbas.service.InjectService;
 import io.openbas.service.MapperService;
-import io.openbas.service.ScenarioService;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.mockMapper.MockMapperUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,8 +59,6 @@ public class MapperApiTest {
   private MapperService mapperService;
   @Mock
   private InjectService injectService;
-  @Mock
-  private ScenarioService scenarioService;
 
   private MapperApi mapperApi;
 
@@ -71,7 +68,7 @@ public class MapperApiTest {
   @BeforeEach
   void before() throws IllegalAccessException, NoSuchFieldException {
     // Injecting mocks into the controller
-    mapperApi = new MapperApi(importMapperRepository, mapperService, injectService, scenarioService);
+    mapperApi = new MapperApi(importMapperRepository, mapperService, injectService);
 
     Field sessionContextField = MapperApi.class.getSuperclass().getDeclaredField("mapper");
     sessionContextField.setAccessible(true);
