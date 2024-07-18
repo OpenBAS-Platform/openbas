@@ -237,6 +237,21 @@ const ChallengesPlayer = () => {
       },
     );
   };
+
+  // Result
+  const noResult = () => {
+    return (currentExpectation?.inject_expectation_results?.length ?? 0) === 0 && currentResult === null;
+  };
+  const hasResult = () => {
+    return (currentExpectation?.inject_expectation_results?.length ?? 0) > 0 || currentResult !== null;
+  };
+  const validResult = () => {
+    return (currentExpectation?.inject_expectation_results?.length ?? 0) > 0;
+  };
+  const invalidResult = () => {
+    return (currentExpectation?.inject_expectation_results?.length ?? 0) === 0 && currentResult !== null;
+  };
+
   if (exercise) {
     const groupChallenges = R.groupBy(
       R.path(['challenge_detail', 'challenge_category']),
@@ -325,7 +340,7 @@ const ChallengesPlayer = () => {
                                 <IconButton
                                   size="large"
                                   color={
-                                    expectation?.inject_expectation_result
+                                    (expectation?.inject_expectation_results?.length ?? 0) > 0
                                       ? 'success'
                                       : 'inherit'
                                   }
@@ -494,22 +509,20 @@ const ChallengesPlayer = () => {
             <Typography variant="h2" style={{ marginTop: 30 }}>
               {t('Results')}
             </Typography>
-            {(currentExpectation?.inject_expectation_result !== null
-              || currentResult !== null) && (
+            {hasResult() && (
               <div>
-                {currentExpectation?.inject_expectation_result !== null && (
+                {validResult() && (
                   <Alert severity="success">
                     {t('Flag is correct! It has been successfully submitted.')}
                   </Alert>
                 )}
-                {currentExpectation?.inject_expectation_result === null
-                  && currentResult !== null && (
-                    <Alert
-                      severity="error"
-                      onClose={() => setCurrentResult(null)}
-                    >
-                      {t('Flag is not correct! Try again...')}
-                    </Alert>
+                {invalidResult() && (
+                <Alert
+                  severity="error"
+                  onClose={() => setCurrentResult(null)}
+                >
+                  {t('Flag is not correct! Try again...')}
+                </Alert>
                 )}
                 <div style={{ float: 'right', marginTop: 20 }}>
                   <Button onClick={handleClose} style={{ marginRight: 10 }}>
@@ -518,48 +531,47 @@ const ChallengesPlayer = () => {
                 </div>
               </div>
             )}
-            {currentExpectation?.inject_expectation_result === null
-              && currentResult === null && (
-                <Form
-                  keepDirtyOnReinitialize={true}
-                  onSubmit={(data) => submit(currentChallenge?.challenge_id, data)
+            {noResult() && (
+            <Form
+              keepDirtyOnReinitialize={true}
+              onSubmit={(data) => submit(currentChallenge?.challenge_id, data)
                   }
-                  validate={validate}
-                  mutators={{
-                    setValue: ([field, value], state, { changeValue }) => {
-                      changeValue(state, field, () => value);
-                    },
-                  }}
-                >
-                  {({ handleSubmit, submitting, errors }) => (
-                    <form id="challengeForm" onSubmit={handleSubmit}>
-                      <OldTextField
-                        variant="standard"
-                        name="challenge_value"
-                        fullWidth={true}
-                        label={t('Flag')}
-                      />
-                      <div style={{ float: 'right', marginTop: 20 }}>
-                        <Button
-                          onClick={handleClose}
-                          style={{ marginRight: 10 }}
-                          disabled={submitting}
-                        >
-                          {t('Cancel')}
-                        </Button>
-                        <Button
-                          color="secondary"
-                          type="submit"
-                          disabled={
+              validate={validate}
+              mutators={{
+                setValue: ([field, value], state, { changeValue }) => {
+                  changeValue(state, field, () => value);
+                },
+              }}
+            >
+              {({ handleSubmit, submitting, errors }) => (
+                <form id="challengeForm" onSubmit={handleSubmit}>
+                  <OldTextField
+                    variant="standard"
+                    name="challenge_value"
+                    fullWidth={true}
+                    label={t('Flag')}
+                  />
+                  <div style={{ float: 'right', marginTop: 20 }}>
+                    <Button
+                      onClick={handleClose}
+                      style={{ marginRight: 10 }}
+                      disabled={submitting}
+                    >
+                      {t('Cancel')}
+                    </Button>
+                    <Button
+                      color="secondary"
+                      type="submit"
+                      disabled={
                             submitting || Object.keys(errors).length > 0
                           }
-                        >
-                          {t('Submit')}
-                        </Button>
-                      </div>
-                    </form>
-                  )}
-                </Form>
+                    >
+                      {t('Submit')}
+                    </Button>
+                  </div>
+                </form>
+              )}
+            </Form>
             )}
           </DialogContent>
         </Dialog>

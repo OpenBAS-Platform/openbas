@@ -10,11 +10,11 @@ steps:
       MINIO_ENDPOINT: minio
       MINIO_PORT: 9000
     commands:
-      - mvn clean install -DskipTests
+      - mvn clean install -q -DskipTests
       - cd openbas-api
-      - mvn test
+      - mvn test -q
       - cd ../openbas-framework
-      - mvn test
+      - mvn test -q
 
   - name: frontend-tests
     image: node:20-alpine
