@@ -1147,6 +1147,8 @@ const i18n = {
       Expectation_description: 'Description de l\'attendu',
       Expectation_score: 'Score de l\'attendu',
       Trigger_time: 'Temps de déclenchement',
+      'This word will match in the specified column to determine the inject': 'Ce mot sera relié à la colonne correspondante pour déterminer l\'inject',
+      'By default we accept iso date (YYYY-MM-DD), but you cans specify your own date format in ISO notation (for instance DD.MM.YYYY)': 'Par défaut nous acceptons la date iso (AAAA-MM-JJ), mais vous pouvez spécifiez votre propre format de date en notation ISO (par exemple JJ.MM.AAAA)',
     },
     en: {
       openbas_email: 'Email',

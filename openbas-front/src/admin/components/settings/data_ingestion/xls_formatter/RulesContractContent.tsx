@@ -17,7 +17,7 @@ import {
   Typography,
 } from '@mui/material';
 import { DeleteOutlined, ExpandMore } from '@mui/icons-material';
-import { CogOutline } from 'mdi-material-ui';
+import { CogOutline, InformationOutline } from 'mdi-material-ui';
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
@@ -125,7 +125,9 @@ const RulesContractContent: React.FC<Props> = ({
 
   useEffect(() => {
     if (methods.getValues(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`)) {
-      directFetchInjectorContract(methods.getValues(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`)).then((result: { data: InjectorContractConverted }) => {
+      directFetchInjectorContract(methods.getValues(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`)).then((result: {
+        data: InjectorContractConverted
+      }) => {
         const injectorContract = result.data;
         setInjectorContractLabel(tPick(injectorContract.injector_contract_labels));
         const tmp = injectorContract?.convertedContent?.fields
@@ -191,16 +193,30 @@ const RulesContractContent: React.FC<Props> = ({
           </div>
         </AccordionSummary>
         <AccordionDetails>
-          <TextField
-            variant="standard"
-            fullWidth
-            label={t('Matching type in the xls')}
-            style={{ marginTop: 10 }}
-            inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_type_value` as const)}
-            InputLabelProps={{ required: true }}
-            error={!!methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_type_value}
-            helperText={methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_type_value?.message}
-          />
+          <div style={{ display: 'flex' }}>
+            <TextField
+              variant="standard"
+              fullWidth
+              label={t('Matching type in the xls')}
+              style={{ marginTop: 10 }}
+              inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_type_value` as const)}
+              InputLabelProps={{ required: true }}
+              error={!!methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_type_value}
+              helperText={methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_type_value?.message}
+            />
+            <Tooltip
+              title={t(
+                'This word will match in the specified column to determine the inject',
+              )}
+            >
+              <InformationOutline
+                fontSize="small"
+                color="primary"
+                style={{ cursor: 'default' }}
+              />
+            </Tooltip>
+          </div>
+
           <Controller
             control={control}
             name={`mapper_inject_importers.${index}.inject_importer_injector_contract_id` as const}
@@ -271,12 +287,25 @@ const RulesContractContent: React.FC<Props> = ({
                         inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_default_value`)}
                       />
                       {currentRuleIndex === rulesFields.findIndex((r) => r.rule_attribute_name === 'trigger_time')
-                        && <TextField
-                          label={t('Time pattern')}
-                          fullWidth
-                          style={{ marginTop: 10 }}
+                        && <div style={{ display: 'flex' }}>
+                          <TextField
+                            label={t('Time pattern')}
+                            fullWidth
+                            style={{ marginTop: 10 }}
                           inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_additional_config.timePattern`)}
-                           />
+                          />
+                          <Tooltip
+                            title={t(
+                              'By default we accept iso date (YYYY-MM-DD), but you cans specify your own date format in ISO notation (for instance DD.MM.YYYY)',
+                            )}
+                          >
+                            <InformationOutline
+                              fontSize="small"
+                              color="primary"
+                              style={{ cursor: 'default' }}
+                            />
+                          </Tooltip>
+                        </div>
                       }
                     </DialogContent>
                     <DialogActions>

@@ -1,0 +1,175 @@
+Subject: [PATCH] Add 'update' column with sort
+---
+Index: openbas-front/src/utils/Localization.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/openbas-front/src/utils/Localization.js b/openbas-front/src/utils/Localization.js
+--- a/openbas-front/src/utils/Localization.js	(revision da8e91138c29a89757ebeaa04f5295cee59246d8)
++++ b/openbas-front/src/utils/Localization.js	(date 1721233672460)
+@@ -517,7 +517,7 @@
+       'Primary color (light)': 'Couleur primaire (clair)',
+       'Secondary color (light)': 'Couleur secondaire (clair)',
+       logo: 'Logo seulement',
+-      title: 'Titre seulement',
++      'Title only': 'Titre seulement',
+       'logo-title': 'Logo et titre',
+       'Dark theme': 'Thème sombre',
+       'Light theme': 'Thème clair',
+@@ -1139,10 +1139,14 @@
+       'Rule title': 'Titre de la règle',
+       'Rule description': 'Description de la règle',
+       'Do you want to delete this representation?': 'Voulez-vous supprimer cette représentation ?',
+-      'Trigger time': 'Heure de lancement',
++      trigger_time: 'Heure de lancement',
+       'Attribute mapping configuration': 'Configuration d\'attribut de mappeur',
+       Test: 'Test',
+       'Do you want to delete this XLS mapper ?': 'Voulez-vous supprimer ce mappage XLS ?',
++      title: 'Titre',
++      expectation_name: 'Nom de l\'attente',
++      expectation_description: 'Description de l\'attente',
++      expectation_score: 'Score de l\'attente',
+     },
+     en: {
+       openbas_email: 'Email',
+@@ -1173,7 +1177,6 @@
+       tv: 'TV channel',
+       microblogging: 'Microblogging',
+       logo: 'Logo only',
+-      title: 'Title only',
+       'logo-title': 'Logo and title',
+       VALUE: 'Text',
+       VALUE_CASE: 'Text (case-sensitive)',
+Index: openbas-front/src/admin/components/settings/data_ingestion/xls_formatter/MapperForm.tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/openbas-front/src/admin/components/settings/data_ingestion/xls_formatter/MapperForm.tsx b/openbas-front/src/admin/components/settings/data_ingestion/xls_formatter/MapperForm.tsx
+--- a/openbas-front/src/admin/components/settings/data_ingestion/xls_formatter/MapperForm.tsx	(revision da8e91138c29a89757ebeaa04f5295cee59246d8)
++++ b/openbas-front/src/admin/components/settings/data_ingestion/xls_formatter/MapperForm.tsx	(date 1721233672418)
+@@ -52,7 +52,6 @@
+   });
+ 
+   const importerZodObject = z.object({
+-    inject_importer_name: z.string().min(1, { message: t('Should not be empty') }),
+     inject_importer_type_value: z.string().min(1, { message: t('Should not be empty') }),
+     inject_importer_injector_contract_id: z.string().min(1, { message: t('Should not be empty') }),
+     inject_importer_rule_attributes: z.array(ruleAttributeZodObject).min(1, { message: t('Should not be empty') }),
+@@ -113,7 +112,7 @@
+           color="secondary"
+           aria-label="Add"
+           onClick={() => {
+-            append({ inject_importer_name: '', inject_importer_type_value: '', inject_importer_injector_contract_id: '', inject_importer_rule_attributes: [] });
++            append({ inject_importer_type_value: '', inject_importer_injector_contract_id: '', inject_importer_rule_attributes: [] });
+           }}
+           size="large"
+         >
+Index: openbas-front/src/admin/components/settings/data_ingestion/xls_formatter/RulesContractContent.tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/openbas-front/src/admin/components/settings/data_ingestion/xls_formatter/RulesContractContent.tsx b/openbas-front/src/admin/components/settings/data_ingestion/xls_formatter/RulesContractContent.tsx
+--- a/openbas-front/src/admin/components/settings/data_ingestion/xls_formatter/RulesContractContent.tsx	(revision da8e91138c29a89757ebeaa04f5295cee59246d8)
++++ b/openbas-front/src/admin/components/settings/data_ingestion/xls_formatter/RulesContractContent.tsx	(date 1721233676507)
+@@ -69,7 +69,7 @@
+   remove,
+   editing,
+ }) => {
+-  const { t } = useFormatter();
++  const { t, tPick } = useFormatter();
+   const classes = useStyles();
+ 
+   // Fetching data
+@@ -124,10 +124,12 @@
+     });
+   };
+ 
++  const [injectorContractLabel, setInjectorContractLabel] = useState<Record<string, string> | undefined>({ '': '' });
+   const onChangeInjectorContractId = () => {
+     directFetchInjectorContract(methods.getValues(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`)).then((result: { data: InjectorContract }) => {
+       const injectorContract = result.data;
+       const contractFieldKeys = injectorContract?.convertedContent?.fields.filter((f) => f.key !== 'expectations').map((f) => f.key);
++      setInjectorContractLabel(injectorContract.injector_contract_labels);
+       rulesRemove();
+       AddRules(contractFieldKeys);
+     });
+@@ -183,7 +185,7 @@
+         >
+           <div className={classes.container}>
+             <Typography>
+-              #{index + 1} {t('New representation')}
++              #{index + 1} {JSON.stringify(injectorContractLabel) === JSON.stringify({ '': '' }) ? t('New representation') : tPick(injectorContractLabel)}
+             </Typography>
+             <Tooltip title={t('Delete')}>
+               <IconButton color="error" onClick={handleClickOpenAlertDelete}>
+@@ -193,15 +195,6 @@
+           </div>
+         </AccordionSummary>
+         <AccordionDetails>
+-          <TextField
+-            variant="standard"
+-            fullWidth
+-            label={t('Inject importer name')}
+-            inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_name` as const)}
+-            InputLabelProps={{ required: true }}
+-            error={!!methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_name}
+-            helperText={methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_name?.message}
+-          />
+           <TextField
+             variant="standard"
+             fullWidth
+@@ -243,7 +236,7 @@
+                             style={{ textTransform: 'capitalize' }}
+                             variant="body1" {...methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_name` as const)}
+                           >
+-                            {ruleField.rule_attribute_name} <span className={classes.redStar}>*</span>
++                            {t(ruleField.rule_attribute_name)} <span className={classes.redStar}>*</span>
+                           </Typography>
+                           <Controller
+                             control={control}
+@@ -271,7 +264,7 @@
+                     {currentRuleIndex !== null
+                       && <Dialog
+                         open
+-                        PaperProps={{ elevation: 1 }}
++                        BackdropProps={{ style: { backgroundColor: 'transparent' } }}
+                         onClose={handleDefaultValueClose}
+                          >
+                         <DialogTitle>
+Index: openbas-front/src/admin/components/components/channels/ChannelParametersForm.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/openbas-front/src/admin/components/components/channels/ChannelParametersForm.js b/openbas-front/src/admin/components/components/channels/ChannelParametersForm.js
+--- a/openbas-front/src/admin/components/components/channels/ChannelParametersForm.js	(revision da8e91138c29a89757ebeaa04f5295cee59246d8)
++++ b/openbas-front/src/admin/components/components/channels/ChannelParametersForm.js	(date 1721233672426)
+@@ -84,7 +84,7 @@
+                   style={{ marginTop: 20 }}
+                 >
+                   <MenuItem key="title" value="title">
+-                    {t('title')}
++                    {t('Title only')}
+                   </MenuItem>
+                   <MenuItem key="logo" value="logo">
+                     {t('logo')}
+Index: openbas-front/src/admin/components/settings/data_ingestion/XlsMapperPopover.tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/openbas-front/src/admin/components/settings/data_ingestion/XlsMapperPopover.tsx b/openbas-front/src/admin/components/settings/data_ingestion/XlsMapperPopover.tsx
+--- a/openbas-front/src/admin/components/settings/data_ingestion/XlsMapperPopover.tsx	(revision da8e91138c29a89757ebeaa04f5295cee59246d8)
++++ b/openbas-front/src/admin/components/settings/data_ingestion/XlsMapperPopover.tsx	(date 1721233672445)
+@@ -56,7 +56,7 @@
+       >
+         <XlsFormatterUpdate
+           xlsMapperId={mapper.import_mapper_id}
+-          onUpdate={onUpdate}
++          onUpdate={_onUpdate}
+           handleClose={handleCloseEdit}
+         />
+       </Drawer>
