@@ -26,6 +26,7 @@ const useStyles = makeStyles(() => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    height: 52,
   },
   filters: {
     display: 'flex',
@@ -35,6 +36,7 @@ const useStyles = makeStyles(() => ({
     paddingLeft: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
+    height: 40,
   },
   item: {
     paddingLeft: 10,
