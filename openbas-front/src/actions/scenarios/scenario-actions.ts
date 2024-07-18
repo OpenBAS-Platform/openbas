@@ -14,6 +14,7 @@ import type {
   Team,
 } from '../../utils/api-types';
 import * as schema from '../Schema';
+import { MESSAGING$ } from '../../utils/Environment';
 
 const SCENARIO_URI = '/api/scenarios';
 
@@ -150,5 +151,14 @@ export const fetchScenarioStatistic = () => {
 
 export const importXls = (scenarioId: Scenario['scenario_id'], importId: string, input: InjectsImportInput) => {
   const uri = `${SCENARIO_URI}/${scenarioId}/xls/${importId}/import`;
-  return simplePostCall(uri, input);
+  return simplePostCall(uri, input)
+    .then((response) => {
+      const injectCount = response.data.injects.length;
+      if (injectCount === 0) {
+        MESSAGING$.notifySuccess('No inject imported');
+      } else {
+        MESSAGING$.notifySuccess(`${injectCount} inject imported`);
+      }
+      return response;
+    });
 };

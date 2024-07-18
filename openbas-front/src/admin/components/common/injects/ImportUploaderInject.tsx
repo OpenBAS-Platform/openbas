@@ -1,21 +1,15 @@
 import { ToggleButton, Tooltip } from '@mui/material';
 import { CloudUploadOutlined } from '@mui/icons-material';
-import React, { FunctionComponent, useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Dialog from '../../../../components/common/Dialog';
 import { useFormatter } from '../../../../components/i18n';
 import type { ImportPostSummary, InjectsImportInput } from '../../../../utils/api-types';
 import ImportUploaderInjectImportFile from './ImportUploaderInjectImportFile';
 import ImportUploaderInjectImportInjects from './ImportUploaderInjectImportInjects';
-import { sendXls } from '../../../../actions/scenarios/scenario-actions';
 import { InjectContext } from '../Context';
+import { storeXlsFile } from '../../../../actions/xls_formatter/xls-formatter-actions';
 
-interface Props {
-  exerciseOrScenarioId: string;
-}
-
-const ImportUploaderInject: FunctionComponent<Props> = ({
-  exerciseOrScenarioId,
-}) => {
+const ImportUploaderInject = () => {
   // Standard hooks
   const { t } = useFormatter();
   const injectContext = useContext(InjectContext);
@@ -32,8 +26,8 @@ const ImportUploaderInject: FunctionComponent<Props> = ({
     setOpen(false);
   };
 
-  const onSubmitImportFile = async (values: { file: File }) => {
-    sendXls(exerciseOrScenarioId, values.file).then((result: { data: ImportPostSummary }) => {
+  const onSubmitImportFile = (values: { file: File }) => {
+    storeXlsFile(values.file).then((result: { data: ImportPostSummary }) => {
       const { data } = result;
       setImportId(data.import_id);
       setSheets(data.available_sheets);
@@ -42,7 +36,7 @@ const ImportUploaderInject: FunctionComponent<Props> = ({
 
   const onSubmitImportInjects = (input: InjectsImportInput) => {
     if (importId) {
-      injectContext.onImportInjectFromXls(importId, input).then(() => {
+      injectContext.onImportInjectFromXls?.(importId, input).then(() => {
         handleClose();
       });
     }
@@ -75,14 +69,14 @@ const ImportUploaderInject: FunctionComponent<Props> = ({
             && <ImportUploaderInjectImportFile
               handleClose={handleClose}
               handleSubmit={onSubmitImportFile}
-            />
+               />
           }
           {importId
             && <ImportUploaderInjectImportInjects
               sheets={sheets}
               handleClose={handleClose}
               handleSubmit={onSubmitImportInjects}
-            />
+               />
           }
         </>
       </Dialog>
