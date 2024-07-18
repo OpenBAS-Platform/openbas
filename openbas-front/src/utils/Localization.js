@@ -517,7 +517,7 @@ const i18n = {
       'Primary color (light)': 'Couleur primaire (clair)',
       'Secondary color (light)': 'Couleur secondaire (clair)',
       logo: 'Logo seulement',
-      title: 'Titre seulement',
+      'Title only': 'Titre seulement',
       'logo-title': 'Logo et titre',
       'Dark theme': 'Thème sombre',
       'Light theme': 'Thème clair',
@@ -1144,6 +1144,11 @@ const i18n = {
       'Attribute mapping configuration': 'Configuration d\'attribut de mappeur',
       Test: 'Test',
       'Do you want to delete this XLS mapper ?': 'Voulez-vous supprimer ce mappage XLS ?',
+      Title: 'Titre',
+      Expectation_name: 'Nom de l\'attendu',
+      Expectation_description: 'Description de l\'attendu',
+      Expectation_score: 'Score de l\'attendu',
+      Trigger_time: 'Temps de déclenchement',
     },
     en: {
       openbas_email: 'Email',
@@ -1229,6 +1234,11 @@ const i18n = {
       FILIGRAN: 'Filigran',
       VERIFIED: 'Verified',
       UNVERIFIED: 'Unverified',
+      // - XLS Mapper
+      Expectation_name: 'Expectation name',
+      Expectation_description: 'Expectation description',
+      Expectation_score: 'Expectation score',
+      Trigger_time: 'Trigger time',
     },
   },
 };

@@ -54,7 +54,7 @@ export type InjectContextType = {
   }>,
   onInjectDone?: (injectId: Inject['inject_id']) => void,
   onDeleteInject: (injectId: Inject['inject_id']) => void,
-  onImportInjectFromXls: (importId: string, input: InjectsImportInput) => Promise<void>
+  onImportInjectFromXls?: (importId: string, input: InjectsImportInput) => Promise<void>
 };
 
 export type AtomicTestingContextType = {
@@ -133,7 +133,7 @@ export const InjectContext = createContext<InjectContextType>({
   onImportInjectFromXls(_importId: string, _input: InjectsImportInput): Promise<void> {
     return new Promise<void>(() => {
     });
-  }
+  },
 });
 
 export const AtomicTestingContext = createContext<AtomicTestingContextType>({

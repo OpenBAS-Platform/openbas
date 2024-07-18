@@ -1,4 +1,4 @@
-import { ImportMapperAddInput, ImportMapperUpdateInput, RawPaginationImportMapper, SearchPaginationInput } from '../../utils/api-types';
+import type { ImportMapperAddInput, ImportMapperUpdateInput, InjectsImportTestInput, RawPaginationImportMapper, SearchPaginationInput } from '../../utils/api-types';
 import { simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
 
 const XLS_FORMATTER_URI = '/api/mappers';
@@ -26,4 +26,16 @@ export const createXlsMapper = (data: ImportMapperAddInput) => {
 export const updateXlsMapper = (mapperId: string, data: ImportMapperUpdateInput) => {
   const uri = `${XLS_FORMATTER_URI}/${mapperId}`;
   return simplePutCall(uri, data);
+};
+
+export const storeXlsFile = (file: File) => {
+  const uri = `${XLS_FORMATTER_URI}/store`;
+  const formData = new FormData();
+  formData.append('file', file);
+  return simplePostCall(uri, formData);
+};
+
+export const testXlsFile = (importId: string, input: InjectsImportTestInput) => {
+  const uri = `${XLS_FORMATTER_URI}/store/${importId}`;
+  return simplePostCall(uri, input);
 };

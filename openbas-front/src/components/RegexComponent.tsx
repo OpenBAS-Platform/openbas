@@ -8,13 +8,15 @@ interface Props {
   label: string;
   fieldValue: string | undefined;
   onChange: (data: string | null) => void;
-  error: FieldError;
+  required: boolean;
+  error: FieldError | undefined;
 }
 
 const RegexComponent: React.FC<Props> = ({
   label,
   fieldValue,
   onChange,
+  required,
   error,
 }) => {
   // Standard hooks
@@ -23,30 +25,30 @@ const RegexComponent: React.FC<Props> = ({
   const regexOptions = alphabet(26);
   const [value, setValue] = React.useState<string | null | undefined>(fieldValue ?? '');
 
+  const inputLabelProps = required ? { required: true } : {};
+
   return (
     <Autocomplete
       selectOnFocus
       openOnFocus
       autoHighlight
-      style={{ marginBottom: 10 }}
       noOptionsText={t('No available options')}
       renderInput={
         (params) => (
           <TextField
             {...params}
             label={t(label)}
-            style={{ marginTop: 20 }}
             variant="outlined"
             size="small"
-            InputLabelProps={{ required: true }}
+            InputLabelProps={inputLabelProps}
             error={!!error}
             helperText={error?.message}
           />
         )
       }
       options={regexOptions}
-      value={regexOptions.find((r) => r === value) || null}
-      onChange={(event, newValue) => {
+      value={regexOptions.find((r) => r === value) ?? null}
+      onChange={(_event, newValue) => {
         setValue(newValue);
         onChange(newValue);
       }}

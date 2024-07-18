@@ -15,7 +15,7 @@ const CodeBlock: FunctionComponent<CodeBlockProps> = ({ language, code }) => {
     <SyntaxHighlighter
       language={language}
       style={theme.palette.mode === 'dark' ? a11yDark : coy}
-      customStyle={{ height: '400px', minWidth: '550px' }}
+      customStyle={{ minHeight: '100px', minWidth: '550px' }}
       showLineNumbers
     >
       {code}

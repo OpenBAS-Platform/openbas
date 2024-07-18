@@ -26,14 +26,12 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   onSubmit: SubmitHandler<ImportMapperAddInput>;
-  handleClose: () => void;
   editing?: boolean;
   initialValues?: ImportMapperAddInput;
 }
 
 const MapperForm: React.FC<Props> = ({
   onSubmit,
-  handleClose,
   editing,
   initialValues = {
     mapper_name: '',
@@ -47,13 +45,12 @@ const MapperForm: React.FC<Props> = ({
 
   const ruleAttributeZodObject = z.object({
     rule_attribute_name: z.string().min(1, { message: t('Should not be empty') }),
-    rule_attribute_columns: z.string().min(1, { message: t('Should not be empty') }),
+    rule_attribute_columns: z.string().optional(),
     rule_attribute_default_value: z.string().optional(),
     rule_attribute_additional_config: z.record(z.string(), z.string()).optional(),
   });
 
   const importerZodObject = z.object({
-    inject_importer_name: z.string().min(1, { message: t('Should not be empty') }),
     inject_importer_type_value: z.string().min(1, { message: t('Should not be empty') }),
     inject_importer_injector_contract_id: z.string().min(1, { message: t('Should not be empty') }),
     inject_importer_rule_attributes: z.array(ruleAttributeZodObject).min(1, { message: t('Should not be empty') }),
@@ -95,20 +92,21 @@ const MapperForm: React.FC<Props> = ({
           inputProps={methods.register('mapper_name')}
           InputLabelProps={{ required: true }}
         />
-
-        <Controller
-          control={control}
-          name={'mapper_inject_type_column'}
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <RegexComponent
-              label={t('Inject type column')}
-              fieldValue={value}
-              onChange={onChange}
-              error={error}
-            />
-          )}
-        />
-
+        <div style={{ marginTop: 20 }}>
+          <Controller
+            control={control}
+            name={'mapper_inject_type_column'}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <RegexComponent
+                label={t('Inject type column')}
+                fieldValue={value}
+                onChange={onChange}
+                required={true}
+                error={error}
+              />
+            )}
+          />
+        </div>
         <div className={classes.importerStyle}>
           <Typography variant="h3" sx={{ m: 0 }}>
             {t('Representation for inject')}
@@ -117,7 +115,7 @@ const MapperForm: React.FC<Props> = ({
             color="secondary"
             aria-label="Add"
             onClick={() => {
-              append({ inject_importer_name: '', inject_importer_type_value: '', inject_importer_injector_contract_id: '', inject_importer_rule_attributes: [] });
+              append({ inject_importer_type_value: '', inject_importer_injector_contract_id: '', inject_importer_rule_attributes: [] });
             }}
             size="large"
           >
@@ -135,7 +133,6 @@ const MapperForm: React.FC<Props> = ({
             methods={methods}
             index={index}
             remove={remove}
-            editing={editing}
           />
         ))}
 

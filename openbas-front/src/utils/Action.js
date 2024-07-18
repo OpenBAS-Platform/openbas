@@ -45,7 +45,15 @@ export const simplePutCall = (uri, data) => api().put(buildUri(uri), data)
     MESSAGING$.notifyError(error.message);
     throw error;
   });
-export const simpleDelCall = (uri, data) => api().delete(buildUri(uri), data);
+export const simpleDelCall = (uri, data) => api().delete(buildUri(uri), data)
+  .then((response) => {
+    MESSAGING$.notifySuccess('The element has been deleted');
+    return response;
+  })
+  .catch((error) => {
+    MESSAGING$.notifyError(error.message);
+    throw error;
+  });
 export const getReferential = (schema, uri, noloading) => (dispatch) => {
   if (noloading !== true) {
     dispatch({ type: Constants.DATA_FETCH_SUBMITTED });

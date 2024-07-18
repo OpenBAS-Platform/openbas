@@ -51,10 +51,7 @@ const XlsFormatterCreation: React.FC<Props> = ({ onCreate }) => {
         handleClose={() => setOpen(false)}
         title={t('Create a xls mapper')}
       >
-        <MapperForm
-          onSubmit={onSubmit}
-          handleClose={() => setOpen(true)}
-        />
+        <MapperForm onSubmit={onSubmit} />
       </Drawer>
     </>
   );

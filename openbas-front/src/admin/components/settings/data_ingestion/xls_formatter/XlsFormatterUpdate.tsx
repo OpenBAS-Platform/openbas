@@ -20,7 +20,6 @@ const XlsFormatterUpdateComponent: FunctionComponent<XlsFormatterUpdateComponent
     mapper_inject_type_column: xlsMapper.import_mapper_inject_type_column ?? '',
     mapper_inject_importers: xlsMapper.inject_importers?.map((i) => ({
       inject_importer_injector_contract_id: i.inject_importer_injector_contract,
-      inject_importer_name: i.inject_importer_name,
       inject_importer_type_value: i.inject_importer_type_value,
       inject_importer_rule_attributes: i.rule_attributes?.map((r) => ({
         rule_attribute_name: r.rule_attribute_name,
@@ -46,7 +45,6 @@ const XlsFormatterUpdateComponent: FunctionComponent<XlsFormatterUpdateComponent
       initialValues={initialValues}
       editing
       onSubmit={onSubmit}
-      handleClose={handleClose}
     />
   );
 };

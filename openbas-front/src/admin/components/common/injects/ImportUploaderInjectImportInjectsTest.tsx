@@ -7,9 +7,9 @@ import moment from 'moment-timezone';
 import { makeStyles } from '@mui/styles';
 import { zodImplement } from '../../../../utils/Zod';
 import { useFormatter } from '../../../../components/i18n';
-import type { ImportMapperAddInput, ImportPostSummary, ImportTestSummary } from '../../../../utils/api-types';
-import { InjectsImportTestInput, textXls } from '../../../../actions/scenarios/scenario-actions';
+import type { ImportMapperAddInput, ImportTestSummary, InjectsImportTestInput } from '../../../../utils/api-types';
 import CodeBlock from '../../../../components/common/CodeBlock';
+import { testXlsFile } from '../../../../actions/xls_formatter/xls-formatter-actions';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -31,7 +31,6 @@ interface FormProps {
 }
 
 interface Props {
-  exerciseOrScenarioId: string;
   importId: string;
   sheets: string[];
   importMapperValues: ImportMapperAddInput;
@@ -39,7 +38,6 @@ interface Props {
 }
 
 const ImportUploaderInjectImportInjectsTest: FunctionComponent<Props> = ({
-  exerciseOrScenarioId,
   importId,
   sheets,
   importMapperValues,
@@ -79,8 +77,8 @@ const ImportUploaderInjectImportInjectsTest: FunctionComponent<Props> = ({
       sheet_name: values.sheetName,
       timezone_offset: moment.tz(values.timezone).utcOffset(),
     };
-    textXls(exerciseOrScenarioId, importId, input).then((result: { data: ImportPostSummary }) => {
-      const { data } = result;
+    testXlsFile(importId, input).then((rs: { data: ImportTestSummary }) => {
+      const { data } = rs;
       setResult(data);
     });
   };
@@ -142,31 +140,17 @@ const ImportUploaderInjectImportInjectsTest: FunctionComponent<Props> = ({
           )}
         />
       </div>
-      {result
-        && <Box
-          sx={{
-            paddingTop: '8px',
-            fontSize: '1rem',
-            gap: '8px',
-            justifyContent: 'center',
-            display: 'flex',
-          }}
-           >
-          <>
-            <span>{t('Import Message')} : </span>
-            {result?.import_message?.forEach((m) => (
-              <>
-                <span>{m.message_level}</span>
-                <span>{m.message_code}</span>
-              </>
-            ))
-            }
-          </>
-        </Box>
-      }
       <Box sx={{ marginTop: '8px' }}>
+        <span>{t('Result')} : </span>
         <CodeBlock
-          code={JSON.stringify(result?.injects) || t('You will find here the result in JSON format.')}
+          code={JSON.stringify(result?.injects, null, ' ') || t('You will find here the result in JSON format.')}
+          language={'json'}
+        />
+      </Box>
+      <Box sx={{ marginTop: '8px' }}>
+        <span>{t('Import Message')} : </span>
+        <CodeBlock
+          code={JSON.stringify(result?.import_message, null, ' ') || t('You will find here the result log in JSON format.')}
           language={'json'}
         />
       </Box>

@@ -989,14 +989,14 @@ export interface ImportMapper {
 export interface ImportMapperAddInput {
   mapper_inject_importers?: InjectImporterAddInput[];
   /** @pattern ^[A-Z]{1,2}$ */
-  mapper_inject_type_column?: string;
+  mapper_inject_type_column: string;
   mapper_name: string;
 }
 
 export interface ImportMapperUpdateInput {
   mapper_inject_importers?: InjectImporterUpdateInput[];
   /** @pattern ^[A-Z]{1,2}$ */
-  mapper_inject_type_column?: string;
+  mapper_inject_type_column: string;
   mapper_name: string;
 }
 
@@ -1371,7 +1371,7 @@ export interface InjectorContract {
   injector_contract_custom?: boolean;
   injector_contract_id: string;
   injector_contract_import_available?: boolean;
-  injector_contract_injector?: Injector;
+  injector_contract_injector: Injector;
   injector_contract_injector_type?: string;
   injector_contract_labels?: Record<string, string>;
   injector_contract_manual?: boolean;
@@ -1450,6 +1450,13 @@ export interface InjectorUpdateInput {
 
 export interface InjectsImportInput {
   import_mapper_id: string;
+  sheet_name: string;
+  /** @format int32 */
+  timezone_offset: number;
+}
+
+export interface InjectsImportTestInput {
+  import_mapper: ImportMapperAddInput;
   sheet_name: string;
   /** @format int32 */
   timezone_offset: number;
@@ -2562,7 +2569,7 @@ export interface ResultDistribution {
 
 export interface RuleAttribute {
   rule_attribute_additional_config?: Record<string, string>;
-  rule_attribute_columns: string;
+  rule_attribute_columns?: string;
   /** @format date-time */
   rule_attribute_created_at?: string;
   rule_attribute_default_value?: string;
@@ -2575,7 +2582,7 @@ export interface RuleAttribute {
 
 export interface RuleAttributeAddInput {
   rule_attribute_additional_config?: Record<string, string>;
-  rule_attribute_columns: string;
+  rule_attribute_columns?: string;
   rule_attribute_default_value?: string;
   rule_attribute_name: string;
 }

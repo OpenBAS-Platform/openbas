@@ -4,6 +4,7 @@ import ImportUploaderInjectImportFile from '../../../common/injects/ImportUpload
 import type { ImportMapperAddInput, ImportPostSummary } from '../../../../../utils/api-types';
 import ImportUploaderInjectImportInjectsTest from '../../../common/injects/ImportUploaderInjectImportInjectsTest';
 import Dialog from '../../../../../components/common/Dialog';
+import { storeXlsFile } from '../../../../../actions/xls_formatter/xls-formatter-actions';
 
 interface IngestionCsvMapperTestDialogProps {
   open: boolean;
@@ -19,14 +20,15 @@ const XlsMapperTestDialog: FunctionComponent<IngestionCsvMapperTestDialogProps> 
   // Standard hooks
   const { t } = useFormatter();
 
-  // File Step
   const [importId, setImportId] = useState<string | null>(null);
   const [sheets, setSheets] = useState<string[]>([]);
 
-  // Mapper Step
-  const onSubmitImportFile = (data: ImportPostSummary) => {
-    setImportId(data.import_id);
-    setSheets(data.available_sheets);
+  const onSubmitImportFile = (values: { file: File }) => {
+    storeXlsFile(values.file).then((result: { data: ImportPostSummary }) => {
+      const { data } = result;
+      setImportId(data.import_id);
+      setSheets(data.available_sheets);
+    });
   };
 
   const handleClose = () => {
@@ -45,19 +47,17 @@ const XlsMapperTestDialog: FunctionComponent<IngestionCsvMapperTestDialogProps> 
       <>
         {importId === null
           && <ImportUploaderInjectImportFile
-            exerciseOrScenarioId={'73a6f938-37fe-4500-adde-d79ae4ce6a28'}
             handleClose={handleClose}
             handleSubmit={onSubmitImportFile}
-          />
+             />
         }
         {importId !== null
           && <ImportUploaderInjectImportInjectsTest
-            exerciseOrScenarioId={'73a6f938-37fe-4500-adde-d79ae4ce6a28'}
             importId={importId}
             sheets={sheets}
             importMapperValues={importMapperValues}
             handleClose={handleClose}
-          />
+             />
         }
       </>
     </Dialog>

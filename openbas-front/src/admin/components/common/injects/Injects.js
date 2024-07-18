@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { makeStyles } from '@mui/styles';
-import { Checkbox, Chip, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Menu, MenuItem, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
+import { Checkbox, Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Menu, MenuItem, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { BarChartOutlined, MoreVert, ReorderOutlined } from '@mui/icons-material';
 import { CSVLink } from 'react-csv';
 import { splitDuration } from '../../../../utils/Time';
@@ -297,29 +297,29 @@ const Injects = (props) => {
               aria-label="Change view mode"
             >
               {injectContext.onImportInjectFromXls
-              && <ImportUploaderInject exerciseOrScenarioId={exerciseOrScenarioId} />}
-              {setViewMode ? (
-                <>
-                  <Tooltip title={t('List view')}>
-                    <ToggleButton
-                      value='list'
-                      selected
-                      aria-label="List view mode"
-                    >
-                      <ReorderOutlined fontSize="small" color='inherit' />
-                    </ToggleButton>
+              && <ImportUploaderInject />}
+              {setViewMode
+                && <Tooltip title={t('List view')}>
+                  <ToggleButton
+                    value='list'
+                    selected
+                    aria-label="List view mode"
+                  >
+                    <ReorderOutlined fontSize="small" color='inherit' />
+                  </ToggleButton>
                   </Tooltip>
-                  <Tooltip title={t('Distribution view')}>
-                    <ToggleButton
-                      value='distribution'
-                      onClick={() => setViewMode('distribution')}
-                      aria-label="Distribution view mode"
-                    >
-                      <BarChartOutlined fontSize="small" color='primary' />
-                    </ToggleButton>
+              }
+              {setViewMode
+                && <Tooltip title={t('Distribution view')}>
+                  <ToggleButton
+                    value='distribution'
+                    onClick={() => setViewMode('distribution')}
+                    aria-label="Distribution view mode"
+                  >
+                    <BarChartOutlined fontSize="small" color='primary' />
+                  </ToggleButton>
                   </Tooltip>
-                </>
-              ) : null}
+              }
             </ToggleButtonGroup>
           </div>
           <div className="clearfix" />
@@ -499,10 +499,10 @@ const Injects = (props) => {
                       >
                         {inject.inject_injector_contract?.injector_contract_platforms?.map(
                           (platform) => <PlatformIcon key={platform}
-                                                      width={20}
-                                                      platform={platform}
-                                                      marginRight={10}
-                          />,
+                            width={20}
+                            platform={platform}
+                            marginRight={10}
+                                        />,
                         )}
                       </div>
                       <div
@@ -522,7 +522,7 @@ const Injects = (props) => {
                         style={inlineStyles.inject_tags}
                       >
                         <ItemTags variant="list"
-                                  tags={inject.inject_tags}
+                          tags={inject.inject_tags}
                         />
                       </div>
                     </>
@@ -555,7 +555,7 @@ const Injects = (props) => {
                 allUsersNumber={allUsersNumber}
                 usersNumber={usersNumber}
                 teamsUsers={teamsUsers}
-              />
+                 />
             }
             <CreateInject
               title={t('Create a new inject')}

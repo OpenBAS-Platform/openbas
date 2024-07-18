@@ -84,7 +84,7 @@ class ChannelParametersForm extends Component {
                   style={{ marginTop: 20 }}
                 >
                   <MenuItem key="title" value="title">
-                    {t('title')}
+                    {t('Title only')}
                   </MenuItem>
                   <MenuItem key="logo" value="logo">
                     {t('logo')}

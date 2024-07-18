@@ -29,7 +29,7 @@ interface FormProps {
 
 interface Props {
   handleClose: () => void;
-  handleSubmit: (values: FormProps) => Promise<void>;
+  handleSubmit: (values: FormProps) => void;
 }
 
 const ImportUploaderInjectImportFile: FunctionComponent<Props> = ({
@@ -58,7 +58,8 @@ const ImportUploaderInjectImportFile: FunctionComponent<Props> = ({
 
   const onSubmitImportFile = (values: FormProps) => {
     setLoading(true);
-    handleSubmit(values).then(() => setLoading(false));
+    handleSubmit(values);
+    setLoading(false);
   };
 
   const handleSubmitWithoutPropagation = (e: SyntheticEvent) => {

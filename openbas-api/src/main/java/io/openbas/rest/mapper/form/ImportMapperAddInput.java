@@ -19,6 +19,7 @@ public class ImportMapperAddInput {
 
     @Pattern(regexp="^[A-Z]{1,2}$")
     @JsonProperty("mapper_inject_type_column")
+    @NotBlank
     private String injectTypeColumn;
 
     @JsonProperty("mapper_inject_importers")

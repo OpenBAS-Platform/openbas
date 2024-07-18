@@ -1,17 +1,32 @@
 import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayRemove, UseFormReturn } from 'react-hook-form';
-import { Accordion, AccordionActions, AccordionDetails, AccordionSummary, Badge, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, List, ListItem, ListItemText, TextField, Tooltip, Typography, } from '@mui/material';
+import {
+  Accordion,
+  AccordionActions,
+  AccordionDetails,
+  AccordionSummary,
+  Badge,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { DeleteOutlined, ExpandMore } from '@mui/icons-material';
 import { CogOutline } from 'mdi-material-ui';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
-import { directFetchInjectorContract, searchInjectorContracts } from '../../../../../actions/InjectorContracts';
+import { directFetchInjectorContract } from '../../../../../actions/InjectorContracts';
 import InjectContractComponent from '../../../../../components/InjectContractComponent';
 import { useFormatter } from '../../../../../components/i18n';
 import RegexComponent from '../../../../../components/RegexComponent';
-import type { InjectorContractStore } from '../../../../../actions/injector_contracts/InjectorContract';
-import type { FilterGroup, ImportMapperAddInput, InjectorContract, SearchPaginationInput } from '../../../../../utils/api-types';
-import { initSorting } from '../../../../../components/common/pagination/Page';
+import type { ImportMapperAddInput } from '../../../../../utils/api-types';
+import type { ContractElement, InjectorContractConverted } from '../../../../../actions/injector_contracts/InjectorContract';
 
 const useStyles = makeStyles(() => ({
   rulesArray: {
@@ -40,7 +55,6 @@ interface Props {
   methods: UseFormReturn<ImportMapperAddInput>;
   index: number;
   remove: UseFieldArrayRemove;
-  editing?: boolean;
 }
 
 const RulesContractContent: React.FC<Props> = ({
@@ -48,9 +62,8 @@ const RulesContractContent: React.FC<Props> = ({
   methods,
   index,
   remove,
-  editing,
 }) => {
-  const { t } = useFormatter();
+  const { t, tPick } = useFormatter();
   const classes = useStyles();
 
   // Fetching data
@@ -62,7 +75,14 @@ const RulesContractContent: React.FC<Props> = ({
     name: `mapper_inject_importers.${index}.inject_importer_rule_attributes`,
   });
 
-  const AddRules = (contractFieldKeys: string[]) => {
+  const [contractFields, setContractFields] = useState<ContractElement[]>([]);
+  const [injectorContractLabel, setInjectorContractLabel] = useState<string | undefined>(undefined);
+
+  const isMandatoryField = (fieldKey: string) => {
+    return ['title'].includes(fieldKey) || contractFields.find((f) => f.key === fieldKey)?.mandatory;
+  };
+
+  const addRules = (contractFieldKeys: string[]) => {
     rulesAppend({
       rule_attribute_name: 'title',
       rule_attribute_columns: '',
@@ -103,14 +123,28 @@ const RulesContractContent: React.FC<Props> = ({
     });
   };
 
+  useEffect(() => {
+    if (methods.getValues(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`)) {
+      directFetchInjectorContract(methods.getValues(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`)).then((result: { data: InjectorContractConverted }) => {
+        const injectorContract = result.data;
+        setInjectorContractLabel(tPick(injectorContract.injector_contract_labels));
+        const tmp = injectorContract?.convertedContent?.fields
+          .filter((f) => !['checkbox', 'attachment', 'expectation'].includes(f.type));
+        setContractFields(tmp);
+      });
+    }
+  }, []);
+
   const onChangeInjectorContractId = () => {
-    directFetchInjectorContract(methods.getValues(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`)).then((result: { data: InjectorContract }) => {
+    directFetchInjectorContract(methods.getValues(`mapper_inject_importers.${index}.inject_importer_injector_contract_id`)).then((result: { data: InjectorContractConverted }) => {
       const injectorContract = result.data;
-      const contractFieldKeys = injectorContract?.convertedContent?.fields
-        .filter((f) => !['checkbox', 'attachment', 'expectation'].includes(f.type))
-        .map((f) => f.key);
+      setInjectorContractLabel(tPick(injectorContract.injector_contract_labels));
+      const tmp = injectorContract?.convertedContent?.fields
+        .filter((f) => !['checkbox', 'attachment', 'expectation'].includes(f.type));
+      setContractFields(tmp);
+      const contractFieldKeys = tmp.map((f) => f.key);
       rulesRemove();
-      AddRules(contractFieldKeys);
+      addRules(contractFieldKeys);
     });
   };
 
@@ -132,23 +166,6 @@ const RulesContractContent: React.FC<Props> = ({
     setOpenAlertDelete(false);
   };
 
-  // Contracts
-  const importFilter: FilterGroup = {
-    mode: 'and',
-    filters: [
-      {
-        key: 'injector_contract_import_available',
-        operator: 'eq',
-        mode: 'and',
-        values: ['true'],
-      }],
-  };
-  const [contracts, setContracts] = useState<InjectorContractStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
-    sorts: initSorting('injector_contract_labels'),
-    filterGroup: importFilter,
-  });
-
   return (
     <>
       <Accordion
@@ -164,7 +181,7 @@ const RulesContractContent: React.FC<Props> = ({
         >
           <div className={classes.container}>
             <Typography>
-              #{index + 1} {t('New representation')}
+              #{index + 1} {injectorContractLabel ?? t('New representation')}
             </Typography>
             <Tooltip title={t('Delete')}>
               <IconButton color="error" onClick={handleClickOpenAlertDelete}>
@@ -174,15 +191,6 @@ const RulesContractContent: React.FC<Props> = ({
           </div>
         </AccordionSummary>
         <AccordionDetails>
-          <TextField
-            variant="standard"
-            fullWidth
-            label={t('Inject importer name')}
-            inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_name` as const)}
-            InputLabelProps={{ required: true }}
-            error={!!methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_name}
-            helperText={methods.formState.errors.mapper_inject_importers?.[index]?.inject_importer_name?.message}
-          />
           <TextField
             variant="standard"
             fullWidth
@@ -198,11 +206,7 @@ const RulesContractContent: React.FC<Props> = ({
             name={`mapper_inject_importers.${index}.inject_importer_injector_contract_id` as const}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <InjectContractComponent
-                fetch={searchInjectorContracts}
-                searchPaginationInput={searchPaginationInput}
-                setContent={setContracts}
                 label={t('Inject type')}
-                injectorContracts={contracts}
                 onChange={(data) => {
                   onChange(data);
                   onChangeInjectorContractId();
@@ -212,82 +216,83 @@ const RulesContractContent: React.FC<Props> = ({
               />
             )}
           />
-          {
-            rulesFields.map((ruleField, rulesIndex) => {
-              return (
-                <List key={ruleField.id} sx={{ height: '60px' }}>
-                  <ListItem key={ruleField.id}>
-                    <ListItemText
-                      primary={
-                        <div className={classes.rulesArray}>
-                          <Typography
-                            style={{ textTransform: 'capitalize' }}
-                            variant="body1" {...methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_name` as const)}
-                          >
-                            {ruleField.rule_attribute_name} <span className={classes.redStar}>*</span>
-                          </Typography>
-                          <Controller
-                            control={control}
-                            name={`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_columns` as const}
-                            render={({ field: { onChange, value }, fieldState: { error } }) => (
-                              <RegexComponent label={t('Rule attributes columns')} onChange={onChange} error={error}
-                                              fieldValue={value}
-                              />
-                            )}
-                          />
-                          <IconButton
-                            color="primary"
-                            onClick={() => handleDefaultValueOpen(rulesIndex)}
-                          >
-                            <Badge color="secondary" variant="dot"
-                                   invisible={!methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
-                                     || methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0}
-                            >
-                              <CogOutline />
-                            </Badge>
-                          </IconButton>
-                        </div>
-                      }
-                    />
-                    {currentRuleIndex !== null
-                      && <Dialog
-                        open
-                        PaperProps={{ elevation: 1 }}
-                        onClose={handleDefaultValueClose}
-                      >
-                        <DialogTitle>
-                          {t('Attribute mapping configuration')}
-                        </DialogTitle>
-                        <DialogContent>
-                          <TextField
-                            fullWidth
-                            label={t('Rule attribute default value')}
-                            inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_default_value`)}
-                          />
-                          {
-                            currentRuleIndex === rulesFields.length - 1 && <TextField
-                              label={t('Time pattern')}
-                              fullWidth
-                              inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern` as const)}
-                            />
-                          }
-                        </DialogContent>
-                        <DialogActions>
-                          <Button onClick={handleDefaultValueClose} autoFocus>
-                            {t('Close')}
-                          </Button>
-                        </DialogActions>
-                      </Dialog>
+          {rulesFields.map((ruleField, rulesIndex) => {
+            return (
+              <div key={ruleField.id} style={{ marginTop: 20 }}>
+                <div className={classes.rulesArray}>
+                  <Typography
+                    style={{ textTransform: 'capitalize' }}
+                    variant="body1" {...methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_name` as const)}
+                  >
+                    {t(ruleField.rule_attribute_name[0].toUpperCase() + ruleField.rule_attribute_name.slice(1))}
+                    {isMandatoryField(ruleField.rule_attribute_name)
+                      && <span className={classes.redStar}>*</span>
                     }
-                  </ListItem>
-                </List>
-              );
-            })
+                  </Typography>
+                  <Controller
+                    control={control}
+                    name={`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_columns` as const}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <RegexComponent
+                        label={t('Rule attributes columns')}
+                        onChange={onChange}
+                        error={error}
+                        fieldValue={value}
+                      />
+                    )}
+                  />
+                  <IconButton
+                    color="primary"
+                    onClick={() => handleDefaultValueOpen(rulesIndex)}
+                  >
+                    <Badge
+                      color="secondary" variant="dot"
+                      invisible={!methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
+                        || methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0}
+                    >
+                      <CogOutline />
+                    </Badge>
+                  </IconButton>
+                </div>
+                {currentRuleIndex !== null
+                  && <Dialog
+                    open
+                    PaperProps={{ elevation: 1 }}
+                    BackdropProps={{ style: { backgroundColor: 'transparent' } }}
+                    onClose={handleDefaultValueClose}
+                     >
+                    <DialogTitle>
+                      {t('Attribute mapping configuration')}
+                    </DialogTitle>
+                    <DialogContent>
+                      <TextField
+                        fullWidth
+                        label={t('Rule attribute default value')}
+                        inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_default_value`)}
+                      />
+                      {currentRuleIndex === rulesFields.length - 1
+                        && <TextField
+                          label={t('Time pattern')}
+                          fullWidth
+                          inputProps={methods.register(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern` as const)}
+                           />
+                      }
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={handleDefaultValueClose} autoFocus>
+                        {t('Close')}
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+                }
+              </div>
+            );
+          })
           }
 
         </AccordionDetails>
-        <AccordionActions>
-          <Button sx={{ marginTop: '30px' }} color="error" variant="contained" onClick={handleClickOpenAlertDelete}>{t('Delete')}</Button>
+        <AccordionActions sx={{ padding: '16px' }}>
+          <Button color="error" variant="contained" onClick={handleClickOpenAlertDelete}>{t('Delete')}</Button>
         </AccordionActions>
       </Accordion>
 
