@@ -5,6 +5,7 @@ import io.openbas.database.model.Scenario;
 import io.openbas.database.raw.RawPaginationImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.exception.FileTooBigException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.mapper.form.ImportMapperAddInput;
 import io.openbas.rest.mapper.form.ImportMapperUpdateInput;
@@ -13,7 +14,6 @@ import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
 import io.openbas.service.InjectService;
 import io.openbas.service.MapperService;
-import io.openbas.service.ScenarioService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
@@ -21,12 +21,15 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
@@ -43,7 +46,9 @@ public class MapperApi extends RestBehavior {
 
     private final InjectService injectService;
 
-    private final ScenarioService scenarioService;
+    // 25mb in byte
+    private static final int MAXIMUM_FILE_SIZE_ALLOWED = 25 * 1000 * 1000;
+    private static final List<String> ACCEPTED_FILE_TYPES = List.of("xls", "xlsx");
 
     @Secured(ROLE_USER)
     @PostMapping("/api/mappers/search")
@@ -84,6 +89,7 @@ public class MapperApi extends RestBehavior {
     @Operation(summary = "Import injects into an xls file")
     @Secured(ROLE_USER)
     public ImportPostSummary importXLSFile(@RequestPart("file") @NotNull MultipartFile file) {
+        validateUploadedFile(file);
         return injectService.storeXlsFileForImport(file);
     }
 
@@ -97,5 +103,23 @@ public class MapperApi extends RestBehavior {
         Scenario scenario = new Scenario();
         scenario.setRecurrenceStart(Instant.now());
         return injectService.importInjectIntoScenarioFromXLS(scenario, importMapper, importId, input.getName(), input.getTimezoneOffset(), false);
+    }
+
+    private void validateUploadedFile(MultipartFile file) {
+        validateExtension(file);
+        validateFileSize(file);
+    }
+
+    private void validateExtension(MultipartFile file) {
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        if (!ACCEPTED_FILE_TYPES.contains(extension)) {
+            throw new UnsupportedMediaTypeException("Only the following file types are accepted : " + String.join(", ", ACCEPTED_FILE_TYPES));
+        }
+    }
+
+    private void validateFileSize(MultipartFile file){
+        if (file.getSize() >= MAXIMUM_FILE_SIZE_ALLOWED) {
+            throw new FileTooBigException("File size cannot be greater than 25 Mb");
+        }
     }
 }

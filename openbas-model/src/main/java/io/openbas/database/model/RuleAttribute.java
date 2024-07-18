@@ -38,7 +38,6 @@ public class RuleAttribute implements Base {
 
     @Column(name = "attribute_columns")
     @JsonProperty("rule_attribute_columns")
-    @NotBlank
     private String columns;
 
     @Column(name = "attribute_default_value")

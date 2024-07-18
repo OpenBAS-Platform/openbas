@@ -26,6 +26,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import org.springframework.data.jpa.domain.Specification;
@@ -44,6 +45,8 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -85,6 +88,8 @@ public class InjectService {
     final Pattern relativeMinutePattern = Pattern.compile("^.*[M]([+\\-]?[0-9]*).*$");
 
     final String pathSeparator = FileSystems.getDefault().getSeparator();
+
+    final int FILE_STORAGE_DURATION = 60;
 
     public void cleanInjectsDocExercise(String exerciseId, String documentId) {
         // Delete document from all exercise injects
@@ -203,6 +208,11 @@ public class InjectService {
             Path tempDir = Files.createDirectory(Path.of(System.getProperty("java.io.tmpdir"), fileID));
             Path tempFile = Files.createTempFile(tempDir, null, "." + FilenameUtils.getExtension(file.getOriginalFilename()));
             Files.write(tempFile, file.getBytes());
+
+            CompletableFuture.delayedExecutor(FILE_STORAGE_DURATION, TimeUnit.MINUTES).execute(() -> {
+                tempFile.toFile().delete();
+                tempDir.toFile().delete();
+            });
 
             // We're making sure the files are deleted when the backend restart
             tempDir.toFile().deleteOnExit();
@@ -354,7 +364,8 @@ public class InjectService {
         // We find the matching importers on the inject
         List<InjectImporter> matchingInjectImporters = importMapper.getInjectImporters().stream()
             .filter(injectImporter -> {
-                Matcher matcher = mapPatternByInjectImport.get(injectImporter.getId()).matcher(typeCell.getStringCellValue());
+                Matcher matcher = mapPatternByInjectImport.get(injectImporter.getId())
+                        .matcher(getValueAsString(row, importMapper.getInjectTypeColumn()));
                 return matcher.matches();
             }).toList();
 
@@ -410,10 +421,12 @@ public class InjectService {
 
         String timePattern = triggerTimeRuleAttribute.getAdditionalConfig()
             .get("timePattern");
-        String dateAsString = Arrays.stream(triggerTimeRuleAttribute.getColumns().split("\\+"))
-            .map(column -> row.getCell(CellReference.convertColStringToIndex(column)) != null ?
-                        row.getCell(CellReference.convertColStringToIndex(column)).getStringCellValue() : "")
-            .collect(Collectors.joining());
+        String dateAsString = Strings.EMPTY;
+        if(triggerTimeRuleAttribute.getColumns() != null) {
+            dateAsString = Arrays.stream(triggerTimeRuleAttribute.getColumns().split("\\+"))
+                    .map(column -> getDateAsStringFromCell(row, column))
+                    .collect(Collectors.joining());
+        }
         if (dateAsString.isBlank()) {
             dateAsString = triggerTimeRuleAttribute.getDefaultValue();
         }
@@ -560,13 +573,16 @@ public class InjectService {
                 .findFirst()
                 .orElseThrow(ElementNotFoundException::new);
 
-        int colIndex = CellReference.convertColStringToIndex(ruleAttribute.getColumns());
-        Cell valueCell = row.getCell(colIndex);
+        if(ruleAttribute.getColumns() != null) {
+            int colIndex = CellReference.convertColStringToIndex(ruleAttribute.getColumns());
+            Cell valueCell = row.getCell(colIndex);
 
-        if (valueCell == null || valueCell.getStringCellValue().isBlank()) {
-            setter.accept(ruleAttribute.getDefaultValue());
-        } else {
-            setter.accept(valueCell.getStringCellValue());
+            if (valueCell == null) {
+                setter.accept(ruleAttribute.getDefaultValue());
+            } else {
+                String cellValue = getValueAsString(row, ruleAttribute.getColumns());
+                setter.accept(cellValue.isBlank() ? ruleAttribute.getDefaultValue() : cellValue);
+            }
         }
 
     }
@@ -598,9 +614,12 @@ public class InjectService {
             case "textarea":
                 // If text, we get the columns, split by "+" if there is a concatenation of columns
                 // and then joins the result of the cells
-                String columnValue = Arrays.stream(ruleAttribute.getColumns().split("\\+"))
-                        .map(column -> row.getCell(CellReference.convertColStringToIndex(column)).getStringCellValue())
-                        .collect(Collectors.joining());
+                String columnValue = Strings.EMPTY;
+                if(ruleAttribute.getColumns() != null) {
+                    columnValue = Arrays.stream(ruleAttribute.getColumns().split("\\+"))
+                            .map(column -> getValueAsString(row, column))
+                            .collect(Collectors.joining());
+                }
                 if (columnValue.isBlank()) {
                     inject.getContent().put(ruleAttribute.getDefaultValue(), columnValue);
                 } else {
@@ -610,11 +629,15 @@ public class InjectService {
             case "team":
                 // If the rule type is on a team field, we split by "+" if there is a concatenation of columns
                 // and then joins the result, split again by "," and use the list of results to get the teams by their name
-                List<String> columnValues = Arrays.stream(Arrays.stream(ruleAttribute.getColumns().split("\\+"))
-                                .map(column -> row.getCell(CellReference.convertColStringToIndex(column)).getStringCellValue())
-                                .collect(Collectors.joining(","))
-                                .split(","))
-                        .toList();
+
+                List<String> columnValues = new ArrayList<>();
+                if(ruleAttribute.getColumns() != null) {
+                    columnValues = Arrays.stream(Arrays.stream(ruleAttribute.getColumns().split("\\+"))
+                                    .map(column -> getValueAsString(row, column))
+                                    .collect(Collectors.joining(","))
+                                    .split(","))
+                            .toList();
+                }
                 if (columnValues.isEmpty() || columnValues.stream().allMatch(String::isEmpty)) {
                     List<String> defaultValues = Arrays.stream(ruleAttribute.getDefaultValue().split(",")).toList();
                     inject.getTeams().addAll(mapTeamByName.entrySet().stream()
@@ -656,23 +679,37 @@ public class InjectService {
                 }
                 if (ruleAttribute.getName().contains(".")) {
                     if("score".equals(ruleAttribute.getName().split("\\.")[1])) {
-                        List<String> columns = Arrays.stream(ruleAttribute.getColumns().split("\\+")).toList();
-                        if(columns.stream().allMatch(s -> row.getCell(CellReference.convertColStringToIndex(s)).getCellType()== CellType.NUMERIC)) {
-                            Double columnValueExpectation = columns.stream()
-                                    .map(column -> row.getCell(CellReference.convertColStringToIndex(column)).getNumericCellValue())
-                                    .reduce(0.0, Double::sum);
-                            expectation.get().setExpectedScore(columnValueExpectation.intValue());
+                        if(ruleAttribute.getColumns() != null) {
+                            List<String> columns = Arrays.stream(ruleAttribute.getColumns().split("\\+")).toList();
+                            if(columns.stream().allMatch(s -> row.getCell(CellReference.convertColStringToIndex(s)).getCellType()== CellType.NUMERIC)) {
+                                Double columnValueExpectation = columns.stream()
+                                        .map(column -> getValueAsDouble(row, column))
+                                        .reduce(0.0, Double::sum);
+                                expectation.get().setExpectedScore(columnValueExpectation.intValue());
+                            } else {
+                                expectation.get().setExpectedScore(Integer.parseInt(ruleAttribute.getDefaultValue()));
+                            }
+                        } else {
+                            expectation.get().setExpectedScore(Integer.parseInt(ruleAttribute.getDefaultValue()));
                         }
                     } else if ("name".equals(ruleAttribute.getName().split("\\.")[1])) {
-                        String columnValueExpectation = Arrays.stream(ruleAttribute.getColumns().split("\\+"))
-                                .map(column -> row.getCell(CellReference.convertColStringToIndex(column)).getStringCellValue())
-                                .collect(Collectors.joining());
-                        expectation.get().setName(columnValueExpectation);
+                        if(ruleAttribute.getColumns() != null) {
+                            String columnValueExpectation = Arrays.stream(ruleAttribute.getColumns().split("\\+"))
+                                    .map(column -> getValueAsString(row, column))
+                                    .collect(Collectors.joining());
+                            expectation.get().setName(columnValueExpectation.isBlank() ? ruleAttribute.getDefaultValue() : columnValueExpectation);
+                        } else {
+                            expectation.get().setName(ruleAttribute.getDefaultValue());
+                        }
                     } else if ("description".equals(ruleAttribute.getName().split("\\.")[1])) {
-                        String columnValueExpectation = Arrays.stream(ruleAttribute.getColumns().split("\\+"))
-                                .map(column -> row.getCell(CellReference.convertColStringToIndex(column)).getStringCellValue())
-                                .collect(Collectors.joining());
-                        expectation.get().setDescription(columnValueExpectation);
+                        if(ruleAttribute.getColumns() != null) {
+                            String columnValueExpectation = Arrays.stream(ruleAttribute.getColumns().split("\\+"))
+                                    .map(column -> getValueAsString(row, column))
+                                    .collect(Collectors.joining());
+                            expectation.get().setDescription(columnValueExpectation.isBlank() ? ruleAttribute.getDefaultValue() : columnValueExpectation);
+                        } else {
+                            expectation.get().setDescription(ruleAttribute.getDefaultValue());
+                        }
                     }
                 }
 
@@ -843,6 +880,42 @@ public class InjectService {
                             injectTime.getLinkedInject().setDependsDuration(injectTime.getDate().getEpochSecond() - earliestInstant.getEpochSecond());
                         })
         );
+    }
+
+    private String getDateAsStringFromCell(Row row, String cellColumn) {
+        if(row.getCell(CellReference.convertColStringToIndex(cellColumn)) != null) {
+            Cell cell = row.getCell(CellReference.convertColStringToIndex(cellColumn));
+            if(cell.getCellType() == CellType.STRING) {
+                return cell.getStringCellValue();
+            } else if(cell.getCellType() == CellType.NUMERIC) {
+                return cell.getDateCellValue().toString();
+            }
+        }
+        return "";
+    }
+
+    private String getValueAsString(Row row, String cellColumn) {
+        if(row.getCell(CellReference.convertColStringToIndex(cellColumn)) != null) {
+            Cell cell = row.getCell(CellReference.convertColStringToIndex(cellColumn));
+            if(cell.getCellType() == CellType.STRING) {
+                return cell.getStringCellValue();
+            } else if(cell.getCellType() == CellType.NUMERIC) {
+                return Double.valueOf(cell.getNumericCellValue()).toString();
+            }
+        }
+        return "";
+    }
+
+    private Double getValueAsDouble(Row row, String cellColumn) {
+        if(row.getCell(CellReference.convertColStringToIndex(cellColumn)) != null) {
+            Cell cell = row.getCell(CellReference.convertColStringToIndex(cellColumn));
+            if(cell.getCellType() == CellType.STRING) {
+                return Double.valueOf(cell.getStringCellValue());
+            } else if(cell.getCellType() == CellType.NUMERIC) {
+                return cell.getNumericCellValue();
+            }
+        }
+        return 0.0;
     }
 
   // -- TEST --
