@@ -21,7 +21,8 @@ public class ImportMessage {
     ABSOLUTE_TIME_WITHOUT_START_DATE ("absolute_time_without_start_date"),
     DATE_SET_IN_PAST ("date_set_in_past"),
     DATE_SET_IN_FUTURE ("date_set_in_future"),
-    NO_TEAM_FOUND("no_team_found");
+    NO_TEAM_FOUND("no_team_found"),
+    EXPECTATION_SCORE_UNDEFINED("expectation_score_undefined");
 
     public final String code;
 

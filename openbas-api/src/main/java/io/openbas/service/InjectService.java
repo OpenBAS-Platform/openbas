@@ -285,9 +285,18 @@ public class InjectService {
                     ));
 
             // We also get the list of teams into a map to be able to get them easily later on
+            // First, all the teams that are non-contextual
             Map<String, Team> mapTeamByName =
                     StreamSupport.stream(teamRepository.findAll().spliterator(), false)
+                            .filter(team -> !team.getContextual())
                             .collect(Collectors.toMap(Team::getName, Function.identity(), (first, second) -> first));
+
+            // Then we add the contextual teams of the scenario
+            mapTeamByName.putAll(
+                scenario.getTeams().stream()
+                    .filter(Team::getContextual)
+                    .collect(Collectors.toMap(Team::getName, Function.identity(), (first, second) -> first))
+            );
 
             ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(timezoneOffset * 60);
 
@@ -366,7 +375,7 @@ public class InjectService {
             .filter(injectImporter -> {
                 Matcher matcher = mapPatternByInjectImport.get(injectImporter.getId())
                         .matcher(getValueAsString(row, importMapper.getInjectTypeColumn()));
-                return matcher.matches();
+                return matcher.find();
             }).toList();
 
         // If there are no match, we add a message for the user and we go to the next row
@@ -575,6 +584,7 @@ public class InjectService {
 
         if(ruleAttribute.getColumns() != null) {
             int colIndex = CellReference.convertColStringToIndex(ruleAttribute.getColumns());
+            if(colIndex == -1) return;
             Cell valueCell = row.getCell(colIndex);
 
             if (valueCell == null) {
@@ -654,8 +664,10 @@ public class InjectService {
                             // The team does not exist, we create a new one
                             Team team = new Team();
                             team.setName(teamName);
+                            team.setContextual(true);
                             teamRepository.save(team);
                             mapTeamByName.put(team.getName(), team);
+                            inject.getTeams().add(team);
 
                             // We aldo add a message so the user knows there was a new team created
                             importMessages.add(new ImportMessage(ImportMessage.MessageLevel.WARN,
@@ -677,8 +689,8 @@ public class InjectService {
                     expectation.set(new InjectExpectation());
                     expectation.get().setType(InjectExpectation.EXPECTATION_TYPE.MANUAL);
                 }
-                if (ruleAttribute.getName().contains(".")) {
-                    if("score".equals(ruleAttribute.getName().split("\\.")[1])) {
+                if (ruleAttribute.getName().contains("_")) {
+                    if("score".equals(ruleAttribute.getName().split("_")[1])) {
                         if(ruleAttribute.getColumns() != null) {
                             List<String> columns = Arrays.stream(ruleAttribute.getColumns().split("\\+")).toList();
                             if(columns.stream().allMatch(s -> row.getCell(CellReference.convertColStringToIndex(s)).getCellType()== CellType.NUMERIC)) {
@@ -687,12 +699,22 @@ public class InjectService {
                                         .reduce(0.0, Double::sum);
                                 expectation.get().setExpectedScore(columnValueExpectation.intValue());
                             } else {
-                                expectation.get().setExpectedScore(Integer.parseInt(ruleAttribute.getDefaultValue()));
+                                try {
+                                    expectation.get().setExpectedScore(Integer.parseInt(ruleAttribute.getDefaultValue()));
+                                } catch (NumberFormatException exception) {
+                                    List<ImportMessage> importMessages = new ArrayList<>();
+                                    importMessages.add(new ImportMessage(ImportMessage.MessageLevel.WARN,
+                                            ImportMessage.ErrorCode.EXPECTATION_SCORE_UNDEFINED,
+                                            Map.of("column_type_num", String.join(", ", columns),
+                                                    "row_num", String.valueOf(row.getRowNum()))
+                                    ));
+                                    return importMessages;
+                                }
                             }
                         } else {
                             expectation.get().setExpectedScore(Integer.parseInt(ruleAttribute.getDefaultValue()));
                         }
-                    } else if ("name".equals(ruleAttribute.getName().split("\\.")[1])) {
+                    } else if ("name".equals(ruleAttribute.getName().split("_")[1])) {
                         if(ruleAttribute.getColumns() != null) {
                             String columnValueExpectation = Arrays.stream(ruleAttribute.getColumns().split("\\+"))
                                     .map(column -> getValueAsString(row, column))
@@ -701,7 +723,7 @@ public class InjectService {
                         } else {
                             expectation.get().setName(ruleAttribute.getDefaultValue());
                         }
-                    } else if ("description".equals(ruleAttribute.getName().split("\\.")[1])) {
+                    } else if ("description".equals(ruleAttribute.getName().split("_")[1])) {
                         if(ruleAttribute.getColumns() != null) {
                             String columnValueExpectation = Arrays.stream(ruleAttribute.getColumns().split("\\+"))
                                     .map(column -> getValueAsString(row, column))
