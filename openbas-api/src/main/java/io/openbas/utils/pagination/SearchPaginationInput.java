@@ -22,7 +22,7 @@ public class SearchPaginationInput {
   @Min(0) int page = 0;
 
   @Schema(description = "Element number by page")
-  @Max(1000) int size = 10;
+  @Max(1000) int size = 20;
 
   @Schema(description = "Filter object to search within filterable attributes")
   private FilterGroup filterGroup;

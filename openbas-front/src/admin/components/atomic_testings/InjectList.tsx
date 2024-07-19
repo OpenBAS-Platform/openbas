@@ -81,6 +81,7 @@ const InjectList: FunctionComponent<Props> = ({
   const { t, fldt, tPick, nsdt } = useFormatter();
   const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
   const [openDeleteId, setOpenDeleteId] = useState<string | null>(null);
+  const [modificationTrigger, setModificationTrigger] = useState<boolean>(false);
 
   // Filter and sort hook
   const [injects, setInjects] = useState<InjectResultDTO[]>([]);
@@ -88,10 +89,17 @@ const InjectList: FunctionComponent<Props> = ({
     sorts: initSorting('inject_updated_at', 'DESC'),
   });
 
+  const fetchData = () => {
+    fetchInjects(searchPaginationInput)
+      .then((response) => {
+        setInjects(response.data.content);
+        setModificationTrigger((prev) => !prev);
+      });
+  };
+
   // Fetch injects on initial render and when pagination input changes
   useEffect(() => {
-    fetchInjects(searchPaginationInput)
-      .then((response) => setInjects(response.data.content));
+    fetchData();
   }, [fetchInjects, searchPaginationInput]);
 
   // Headers
@@ -171,9 +179,14 @@ const InjectList: FunctionComponent<Props> = ({
     setOpenDeleteId(null);
   };
 
+  const refreshData = () => {
+    fetchData();
+  };
+
   return (
     <>
       <PaginationComponent
+        key={modificationTrigger.toString()}
         fetch={fetchInjects}
         searchPaginationInput={searchPaginationInput}
         setContent={setInjects}
@@ -215,6 +228,7 @@ const InjectList: FunctionComponent<Props> = ({
                   setOpenDuplicate={handleCloseDuplicate}
                   openDelete={openDeleteId === injectDto.inject_id}
                   setOpenDelete={handleCloseDelete}
+                  onDelete={refreshData}
                   variantButtonPopover={'icon'}
                 />
                   }

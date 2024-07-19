@@ -41,6 +41,7 @@ const useStyles = makeStyles(() => ({
 const ROWS_PER_PAGE_OPTIONS = [20, 50, 100];
 
 interface Props<T> {
+  key?: React.Key;
   fetch: (input: SearchPaginationInput) => Promise<{ data: Page<T> }>;
   searchPaginationInput: SearchPaginationInput;
   setContent: (data: T[]) => void;
@@ -56,6 +57,7 @@ interface Props<T> {
 }
 
 const PaginationComponent = <T extends object>({
+  key,
   fetch,
   searchPaginationInput,
   setContent, exportProps,
@@ -101,7 +103,7 @@ const PaginationComponent = <T extends object>({
   // Filters
   const [openMitreFilter, setOpenMitreFilter] = React.useState(false);
 
-  useEffect(() => {
+  const fetchData = () => {
     const finalSearchPaginationInput = {
       ...searchPaginationInput,
       textSearch,
@@ -114,6 +116,10 @@ const PaginationComponent = <T extends object>({
       setContent(data.content);
       setTotalElements(data.totalElements);
     });
+  };
+
+  useEffect(() => {
+    fetchData();
   }, [searchPaginationInput, page, rowsPerPage, textSearch]);
 
   // Utils

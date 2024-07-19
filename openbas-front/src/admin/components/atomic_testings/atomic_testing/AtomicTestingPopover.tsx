@@ -26,6 +26,7 @@ interface Props {
   setOpenEdit?: (open: boolean) => void;
   setOpenDelete?: (open: boolean) => void;
   setOpenDuplicate?: (open: boolean) => void;
+  onDelete?: () => void;
   variantButtonPopover?: VariantButtonPopover;
 }
 
@@ -38,6 +39,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   setOpenEdit,
   setOpenDelete,
   setOpenDuplicate,
+  onDelete,
   variantButtonPopover,
 }) => {
   // Standard hooks
@@ -87,6 +89,9 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     deleteAtomicTesting(atomic.inject_id).then(() => {
       if (setOpenDelete) {
         setOpenDelete(false);
+      }
+      if (onDelete) {
+        onDelete();
       }
       navigate('/admin/atomic_testings');
     });
