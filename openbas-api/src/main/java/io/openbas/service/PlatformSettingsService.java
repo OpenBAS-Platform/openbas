@@ -143,6 +143,10 @@ public class PlatformSettingsService {
 
   private Setting resolveFromMap(Map<String, Setting> dbSettings, String themeKey, String value) {
     Optional<Setting> optionalSetting = ofNullable(dbSettings.get(themeKey));
+    return resolve(optionalSetting, themeKey, value);
+  }
+
+  private Setting resolve(Optional<Setting> optionalSetting, String themeKey, String value) {
     if (optionalSetting.isPresent()) {
       Setting updateSetting = optionalSetting.get();
       updateSetting.setValue(value);
@@ -174,10 +178,12 @@ public class PlatformSettingsService {
     OpenBASPrincipal user = currentUser();
     if (user != null) {
       platformSettings.setPlatformEnterpriseEdition(
-          ofNullable(dbSettings.get(PLATFORM_ENTERPRISE_EDITION.key())).map(Setting::getValue).orElse(PLATFORM_ENTERPRISE_EDITION.defaultValue())
+          ofNullable(dbSettings.get(PLATFORM_ENTERPRISE_EDITION.key())).map(Setting::getValue)
+              .orElse(PLATFORM_ENTERPRISE_EDITION.defaultValue())
       );
       platformSettings.setPlatformWhitemark(
-          ofNullable(dbSettings.get(PLATFORM_WHITEMARK.key())).map(Setting::getValue).orElse(PLATFORM_WHITEMARK.defaultValue())
+          ofNullable(dbSettings.get(PLATFORM_WHITEMARK.key())).map(Setting::getValue)
+              .orElse(PLATFORM_WHITEMARK.defaultValue())
       );
       platformSettings.setMapTileServerLight(openBASConfig.getMapTileServerLight());
       platformSettings.setMapTileServerDark(openBASConfig.getMapTileServerDark());
@@ -219,9 +225,15 @@ public class PlatformSettingsService {
     platformSettings.setPolicies(policies);
 
     // FEATURE FLAG
-    if(!openBASConfig.getDisabledDevFeatures().isEmpty()) {
-      platformSettings.setDisabledDevFeatures(Arrays.stream(openBASConfig.getDisabledDevFeatures().split(",")).toList());
+    if (!openBASConfig.getDisabledDevFeatures().isEmpty()) {
+      platformSettings.setDisabledDevFeatures(
+          Arrays.stream(openBASConfig.getDisabledDevFeatures().split(",")).toList()
+      );
     }
+
+    // PLATFORM MESSAGE
+    platformSettings.setPlatformBannerLevel(getValueFromMapOfSettings(dbSettings, PLATFORM_BANNER_LEVEL.key()));
+    platformSettings.setPlatformBannerText(getValueFromMapOfSettings(dbSettings, PLATFORM_BANNER_TEXT.key()));
 
     return platformSettings;
   }
@@ -313,6 +325,23 @@ public class PlatformSettingsService {
     settingRepository.deleteAllById(delete.stream().map(Setting::getId).collect(Collectors.toList()));
     settingRepository.saveAll(update);
     return findSettings();
+  }
+
+  // -- PLATFORM MESSAGE --
+
+  public void cleanMessage() {
+    settingRepository.deleteByKeyIn(List.of(PLATFORM_BANNER_LEVEL.key(), PLATFORM_BANNER_TEXT.key()));
+  }
+
+  public void errorMessage(@NotBlank final String message) {
+    List<Setting> settingsToSave = new ArrayList<>();
+    Optional<Setting> bannerLevelOpt = this.settingRepository.findByKey(PLATFORM_BANNER_LEVEL.key());
+    Setting bannerLevel = resolve(bannerLevelOpt, PLATFORM_BANNER_LEVEL.key(), BannerLevel.ERROR.name());
+    settingsToSave.add(bannerLevel);
+    Optional<Setting> bannerTextOpt = this.settingRepository.findByKey(PLATFORM_BANNER_TEXT.key());
+    Setting bannerText = resolve(bannerTextOpt, PLATFORM_BANNER_TEXT.key(), message);
+    settingsToSave.add(bannerText);
+    settingRepository.saveAll(settingsToSave);
   }
 
 }

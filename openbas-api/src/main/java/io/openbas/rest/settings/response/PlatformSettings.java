@@ -3,13 +3,13 @@ package io.openbas.rest.settings.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.rest.settings.form.PolicyInput;
 import io.openbas.rest.settings.form.ThemeInput;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.Optional.ofNullable;
+import static lombok.AccessLevel.NONE;
 
 @Setter
 @Getter
@@ -111,5 +111,19 @@ public class PlatformSettings {
   // FEATURE FLAG
   @JsonProperty("disabled_dev_features")
   private List<String> disabledDevFeatures = new ArrayList<>();
+
+  // PLATFORM MESSAGE
+  @JsonProperty("platform_banner_level")
+  @Getter(NONE)
+  private String platformBannerLevel;
+
+  public String getPlatformBannerLevel() {
+    return ofNullable(this.platformBannerLevel)
+        .map(String::toLowerCase)
+        .orElse(null);
+  }
+
+  @JsonProperty("platform_banner_text")
+  private String platformBannerText;
 
 }

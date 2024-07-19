@@ -48,7 +48,7 @@ const Root = () => {
         settings,
       }}
     >
-      <StyledEngineProvider injectFirst={true}>
+      <StyledEngineProvider injectFirst>
         <ConnectedIntlProvider>
           <ConnectedThemeProvider>
             <CssBaseline />

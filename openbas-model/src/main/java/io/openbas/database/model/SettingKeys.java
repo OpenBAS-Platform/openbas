@@ -9,7 +9,9 @@ public enum SettingKeys {
   PLATFORM_ENTERPRISE_EDITION( "platform_enterprise_edition", "false"),
   PLATFORM_LOGIN_MESSAGE( "platform_login_message", "This platform is dedicated to Filigran team testing. **Sandbox running the latest rolling release.**"),
   PLATFORM_WHITEMARK( "platform_whitemark", "false"),
-  PLATFORM_NAME( "platform_name", "OpenBAS - Breach and Attack Simulation Platform");
+  PLATFORM_NAME( "platform_name", "OpenBAS - Breach and Attack Simulation Platform"),
+  PLATFORM_BANNER_LEVEL( "platform_banner_level", ""),
+  PLATFORM_BANNER_TEXT( "platform_banner_text", "");
 
   private final String key;
   private final String defaultValue;
@@ -25,6 +27,14 @@ public enum SettingKeys {
 
   public String defaultValue() {
     return defaultValue;
+  }
+
+  public enum BannerLevel {
+    DEBUG,
+    INFO,
+    WARN,
+    ERROR,
+    FATAL
   }
 
 }

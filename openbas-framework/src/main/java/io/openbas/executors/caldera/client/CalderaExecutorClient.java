@@ -7,7 +7,6 @@ import io.openbas.database.model.Injector;
 import io.openbas.executors.caldera.client.model.Ability;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.model.Agent;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +41,6 @@ public class CalderaExecutorClient {
     // -- AGENTS --
 
     private final static String AGENT_URI = "/agents";
-    private final HttpSession httpSession;
 
     public List<Agent> agents() {
         try {
@@ -50,8 +48,8 @@ public class CalderaExecutorClient {
             return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
             });
         } catch (IOException e) {
-            log.severe("Cannot retrive agent list");
-            return new ArrayList<>();
+            log.severe("Cannot retrieve agent list");
+            throw new RuntimeException(e);
         }
     }
 

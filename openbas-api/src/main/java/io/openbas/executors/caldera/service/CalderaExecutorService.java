@@ -6,11 +6,11 @@ import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Executor;
 import io.openbas.database.model.Injector;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
-import io.openbas.executors.caldera.client.model.Ability;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.model.Agent;
 import io.openbas.integrations.ExecutorService;
 import io.openbas.integrations.InjectorService;
+import io.openbas.service.PlatformSettingsService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.java.Log;
@@ -35,6 +35,7 @@ import static java.time.ZoneOffset.UTC;
 @Log
 @Service
 public class CalderaExecutorService implements Runnable {
+
     private static final int CLEAR_TTL = 1800000; // 30 minutes
     private static final int DELETE_TTL = 86400000; // 24 hours
     private static final String CALDERA_EXECUTOR_TYPE = "openbas_caldera";
@@ -47,6 +48,7 @@ public class CalderaExecutorService implements Runnable {
     private final CalderaExecutorContextService calderaExecutorContextService;
 
     private final InjectorService injectorService;
+    private final PlatformSettingsService platformSettingsService;
 
     private Executor executor = null;
 
@@ -74,12 +76,13 @@ public class CalderaExecutorService implements Runnable {
             CalderaExecutorConfig config,
             CalderaExecutorContextService calderaExecutorContextService,
             EndpointService endpointService,
-            InjectorService injectorService
-    ) {
+            InjectorService injectorService,
+            PlatformSettingsService platformSettingsService) {
         this.client = client;
         this.endpointService = endpointService;
         this.calderaExecutorContextService = calderaExecutorContextService;
         this.injectorService = injectorService;
+        this.platformSettingsService = platformSettingsService;
         try {
             if (config.isEnable()) {
                 this.executor = executorService.register(config.getId(), CALDERA_EXECUTOR_TYPE, CALDERA_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-caldera.png"), new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
@@ -94,38 +97,43 @@ public class CalderaExecutorService implements Runnable {
 
     @Override
     public void run() {
-        log.info("Running Caldera executor endpoints gathering...");
-        // The executor only retrieve "main" agents (without the keyword "executor")
-        // This is NOT a standard behaviour, this is because we are using Caldera as an executor and we should not
-        // Will be replaced by the XTM agent
-        List<Agent> agents = this.client.agents().stream().filter(agent -> !agent.getExe_name().contains("implant")).toList();
-        List<Endpoint> endpoints = toEndpoint(agents).stream().filter(Asset::getActive).toList();
-        log.info("Caldera executor provisioning based on " + endpoints.size() + " assets");
-        endpoints.forEach(endpoint -> {
-            List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
-            if (existingEndpoints.isEmpty()) {
-                Optional<Endpoint> endpointByExternalReference = endpointService.findByExternalReference(endpoint.getExternalReference());
-                if (endpointByExternalReference.isPresent()) {
-                    this.updateEndpoint(endpoint, List.of(endpointByExternalReference.get()));
+        try {
+            log.info("Running Caldera executor endpoints gathering...");
+            // The executor only retrieve "main" agents (without the keyword "executor")
+            // This is NOT a standard behaviour, this is because we are using Caldera as an executor and we should not
+            // Will be replaced by the XTM agent
+            List<Agent> agents = this.client.agents().stream().filter(agent -> !agent.getExe_name().contains("implant")).toList();
+            List<Endpoint> endpoints = toEndpoint(agents).stream().filter(Asset::getActive).toList();
+            log.info("Caldera executor provisioning based on " + endpoints.size() + " assets");
+            endpoints.forEach(endpoint -> {
+                List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
+                if (existingEndpoints.isEmpty()) {
+                    Optional<Endpoint> endpointByExternalReference = endpointService.findByExternalReference(endpoint.getExternalReference());
+                    if (endpointByExternalReference.isPresent()) {
+                        this.updateEndpoint(endpoint, List.of(endpointByExternalReference.get()));
+                    } else {
+                        this.endpointService.createEndpoint(endpoint);
+                    }
                 } else {
-                    this.endpointService.createEndpoint(endpoint);
+                    this.updateEndpoint(endpoint, existingEndpoints);
                 }
-            } else {
-                this.updateEndpoint(endpoint, existingEndpoints);
-            }
-        });
-        List<Endpoint> inactiveEndpoints = toEndpoint(agents).stream().filter(endpoint -> !endpoint.getActive()).toList();
-        inactiveEndpoints.forEach(endpoint -> {
-            Optional<Endpoint> optionalExistingEndpoint = this.endpointService.findByExternalReference(endpoint.getExternalReference());
-            if (optionalExistingEndpoint.isPresent()) {
-                Endpoint existingEndpoint = optionalExistingEndpoint.get();
-                if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli()) > DELETE_TTL) {
-                    log.info("Found stale agent " + existingEndpoint.getName() + ", deleting it...");
-                    this.client.deleteAgent(existingEndpoint);
-                    this.endpointService.deleteEndpoint(existingEndpoint.getId());
+            });
+            List<Endpoint> inactiveEndpoints = toEndpoint(agents).stream().filter(endpoint -> !endpoint.getActive()).toList();
+            inactiveEndpoints.forEach(endpoint -> {
+                Optional<Endpoint> optionalExistingEndpoint = this.endpointService.findByExternalReference(endpoint.getExternalReference());
+                if (optionalExistingEndpoint.isPresent()) {
+                    Endpoint existingEndpoint = optionalExistingEndpoint.get();
+                    if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli()) > DELETE_TTL) {
+                        log.info("Found stale agent " + existingEndpoint.getName() + ", deleting it...");
+                        this.client.deleteAgent(existingEndpoint);
+                        this.endpointService.deleteEndpoint(existingEndpoint.getId());
+                    }
                 }
-            }
-        });
+            });
+            this.platformSettingsService.cleanMessage();
+        } catch (Exception e) {
+            this.platformSettingsService.errorMessage("Executor Caldera is not responding, your exercises may be impacted.");
+        }
     }
 
     // -- PRIVATE --
@@ -183,9 +191,5 @@ public class CalderaExecutorService implements Runnable {
         LocalDateTime localDateTime = LocalDateTime.parse(lastSeen, dateTimeFormatter);
         ZonedDateTime zonedDateTime = localDateTime.atZone(UTC);
         return zonedDateTime.toInstant();
-    }
-
-    private List<Ability> abilities() {
-        return this.client.abilities();
     }
 }

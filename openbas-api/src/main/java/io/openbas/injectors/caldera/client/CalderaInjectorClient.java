@@ -1,10 +1,8 @@
 package io.openbas.injectors.caldera.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Injector;
 import io.openbas.injectors.caldera.client.model.Ability;
 import io.openbas.injectors.caldera.client.model.Agent;
 import io.openbas.injectors.caldera.client.model.Result;
@@ -13,8 +11,8 @@ import io.openbas.injectors.caldera.model.Obfuscator;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.apache.hc.client5.http.ClientProtocolException;
-import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPatch;
@@ -27,13 +25,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
+@Log
 public class CalderaInjectorClient {
 
     private static final String KEY_HEADER = "KEY";
@@ -86,6 +84,7 @@ public class CalderaInjectorClient {
             return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
             });
         } catch (IOException e) {
+            log.severe("Cannot retrieve agent list");
             throw new RuntimeException(e);
         }
     }
