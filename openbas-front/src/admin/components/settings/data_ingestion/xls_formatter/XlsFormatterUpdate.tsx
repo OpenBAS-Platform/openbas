@@ -3,7 +3,7 @@ import MapperForm from './MapperForm';
 import { fetchMapper, updateMapper } from '../../../../../actions/mapper/mapper-actions';
 import type { ImportMapperUpdateInput, RawPaginationImportMapper } from '../../../../../utils/api-types';
 import Loader from '../../../../../components/Loader';
-import type { ImportMapperStore } from '../../../../../actions/mapper/ImportMapper';
+import { ImportMapperStore } from '../../../../../actions/mapper/mapper';
 
 interface XlsFormatterUpdateComponentProps {
   xlsMapper: ImportMapperStore;
