@@ -177,7 +177,9 @@ const InjectPopover: FunctionComponent<Props> = ({
         >
           {t('Update')}
         </MenuItem>
-        <MenuItem onClick={handleOpenDuplicate}>
+        <MenuItem onClick={handleOpenDuplicate}
+          disabled={isDisabled}
+        >
           {t('Duplicate')}
         </MenuItem>
         {!inject.inject_status && onInjectDone && (
