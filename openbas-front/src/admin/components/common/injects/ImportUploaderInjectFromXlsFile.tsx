@@ -32,7 +32,7 @@ interface Props {
   handleSubmit: (values: FormProps) => void;
 }
 
-const ImportUploaderInjectImportFile: FunctionComponent<Props> = ({
+const ImportUploaderInjectFromXlsFile: FunctionComponent<Props> = ({
   handleClose,
   handleSubmit,
 }) => {
@@ -109,4 +109,4 @@ const ImportUploaderInjectImportFile: FunctionComponent<Props> = ({
   );
 };
 
-export default ImportUploaderInjectImportFile;
+export default ImportUploaderInjectFromXlsFile;

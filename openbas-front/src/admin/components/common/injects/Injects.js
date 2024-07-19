@@ -22,7 +22,7 @@ import UpdateInject from './UpdateInject';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import Timeline from '../../../../components/Timeline';
 import { isNotEmptyField } from '../../../../utils/utils';
-import ImportUploaderInject from './ImportUploaderInject';
+import ImportUploaderInjectFromXls from './ImportUploaderInjectFromXls.js';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -297,7 +297,7 @@ const Injects = (props) => {
               aria-label="Change view mode"
             >
               {injectContext.onImportInjectFromXls
-              && <ImportUploaderInject />}
+              && <ImportUploaderInjectFromXls />}
               {setViewMode
                 && <Tooltip title={t('List view')}>
                   <ToggleButton

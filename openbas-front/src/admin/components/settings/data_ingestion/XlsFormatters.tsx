@@ -6,7 +6,7 @@ import { useFormatter } from '../../../../components/i18n';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import type { RawPaginationImportMapper, SearchPaginationInput } from '../../../../utils/api-types';
-import { searchMappers } from '../../../../actions/xls_formatter/xls-formatter-actions';
+import { searchMappers } from '../../../../actions/mapper/mapper-actions';
 import { initSorting } from '../../../../components/common/pagination/Page';
 import Empty from '../../../../components/Empty';
 import DataIngestionMenu from '../DataIngestionMenu';

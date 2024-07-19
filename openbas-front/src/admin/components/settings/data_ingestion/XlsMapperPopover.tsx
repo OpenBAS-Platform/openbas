@@ -2,7 +2,7 @@ import React, { FunctionComponent, useState } from 'react';
 import { PopoverEntry } from '../../../../components/common/ButtonPopover';
 import IconPopover from '../../../../components/common/IconPopover';
 import type { RawPaginationImportMapper } from '../../../../utils/api-types';
-import { deleteXlsMapper } from '../../../../actions/xls_formatter/xls-formatter-actions';
+import { deleteMapper } from '../../../../actions/mapper/mapper-actions';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../components/i18n';
 import Drawer from '../../../../components/common/Drawer';
@@ -34,7 +34,7 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
   const handleOpenDelete = () => setOpenDelete(true);
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
-    deleteXlsMapper(mapper.import_mapper_id);
+    deleteMapper(mapper.import_mapper_id);
     if (onDelete) {
       onDelete(mapper.import_mapper_id);
     }

@@ -9,7 +9,7 @@ import { zodImplement } from '../../../../utils/Zod';
 import { useFormatter } from '../../../../components/i18n';
 import type { ImportMapperAddInput, ImportTestSummary, InjectsImportTestInput } from '../../../../utils/api-types';
 import CodeBlock from '../../../../components/common/CodeBlock';
-import { testXlsFile } from '../../../../actions/xls_formatter/xls-formatter-actions';
+import { testXlsFile } from '../../../../actions/mapper/mapper-actions';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -37,7 +37,7 @@ interface Props {
   handleClose: () => void;
 }
 
-const ImportUploaderInjectImportInjectsTest: FunctionComponent<Props> = ({
+const ImportUploaderInjectFromInjectsTest: FunctionComponent<Props> = ({
   importId,
   sheets,
   importMapperValues,
@@ -173,4 +173,4 @@ const ImportUploaderInjectImportInjectsTest: FunctionComponent<Props> = ({
   );
 };
 
-export default ImportUploaderInjectImportInjectsTest;
+export default ImportUploaderInjectFromInjectsTest;

@@ -1,10 +1,10 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useFormatter } from '../../../../../components/i18n';
-import ImportUploaderInjectImportFile from '../../../common/injects/ImportUploaderInjectImportFile';
+import ImportUploaderInjectFromXlsFile from '../../../common/injects/ImportUploaderInjectFromXlsFile';
 import type { ImportMapperAddInput, ImportPostSummary } from '../../../../../utils/api-types';
-import ImportUploaderInjectImportInjectsTest from '../../../common/injects/ImportUploaderInjectImportInjectsTest';
+import ImportUploaderInjectFromInjectsTest from '../../../common/injects/ImportUploaderInjectFromInjectsTest';
 import Dialog from '../../../../../components/common/Dialog';
-import { storeXlsFile } from '../../../../../actions/xls_formatter/xls-formatter-actions';
+import { storeXlsFile } from '../../../../../actions/mapper/mapper-actions';
 
 interface IngestionCsvMapperTestDialogProps {
   open: boolean;
@@ -46,13 +46,13 @@ const XlsMapperTestDialog: FunctionComponent<IngestionCsvMapperTestDialogProps> 
     >
       <>
         {importId === null
-          && <ImportUploaderInjectImportFile
+          && <ImportUploaderInjectFromXlsFile
             handleClose={handleClose}
             handleSubmit={onSubmitImportFile}
              />
         }
         {importId !== null
-          && <ImportUploaderInjectImportInjectsTest
+          && <ImportUploaderInjectFromInjectsTest
             importId={importId}
             sheets={sheets}
             importMapperValues={importMapperValues}

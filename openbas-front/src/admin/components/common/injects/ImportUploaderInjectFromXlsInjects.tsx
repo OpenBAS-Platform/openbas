@@ -9,7 +9,7 @@ import { makeStyles } from '@mui/styles';
 import { zodImplement } from '../../../../utils/Zod';
 import { useFormatter } from '../../../../components/i18n';
 import type { ImportMapper, InjectsImportInput } from '../../../../utils/api-types';
-import { searchMappers } from '../../../../actions/xls_formatter/xls-formatter-actions';
+import { searchMappers } from '../../../../actions/mapper/mapper-actions';
 import type { Page } from '../../../../components/common/pagination/Page';
 
 const useStyles = makeStyles(() => ({
@@ -47,7 +47,7 @@ interface Props {
   handleSubmit: (input: InjectsImportInput) => void;
 }
 
-const ImportUploaderInjectImportInjects: FunctionComponent<Props> = ({
+const ImportUploaderInjectFromXlsInjects: FunctionComponent<Props> = ({
   sheets,
   handleClose,
   handleSubmit,
@@ -217,4 +217,4 @@ const ImportUploaderInjectImportInjects: FunctionComponent<Props> = ({
   );
 };
 
-export default ImportUploaderInjectImportInjects;
+export default ImportUploaderInjectFromXlsInjects;

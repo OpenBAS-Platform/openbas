@@ -4,7 +4,7 @@ import { Fab } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import { useFormatter } from '../../../../../components/i18n';
 import type { ImportMapperAddInput, RawPaginationImportMapper } from '../../../../../utils/api-types';
-import { createXlsMapper } from '../../../../../actions/xls_formatter/xls-formatter-actions';
+import { createMapper } from '../../../../../actions/mapper/mapper-actions';
 import Drawer from '../../../../../components/common/Drawer';
 import MapperForm from './MapperForm';
 
@@ -27,7 +27,7 @@ const XlsFormatterCreation: React.FC<Props> = ({ onCreate }) => {
   const [open, setOpen] = useState(false);
 
   const onSubmit = ((data: ImportMapperAddInput) => {
-    createXlsMapper(data).then(
+    createMapper(data).then(
       (result: { data: RawPaginationImportMapper }) => {
         onCreate?.(result.data);
         return result;

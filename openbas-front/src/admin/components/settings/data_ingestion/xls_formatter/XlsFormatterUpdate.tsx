@@ -1,9 +1,9 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import MapperForm from './MapperForm';
-import { fetchMapper, updateXlsMapper } from '../../../../../actions/xls_formatter/xls-formatter-actions';
+import { fetchMapper, updateMapper } from '../../../../../actions/mapper/mapper-actions';
 import type { ImportMapperUpdateInput, RawPaginationImportMapper } from '../../../../../utils/api-types';
 import Loader from '../../../../../components/Loader';
-import type { ImportMapperStore } from '../../../../../actions/xls_formatter/ImportMapper';
+import type { ImportMapperStore } from '../../../../../actions/mapper/ImportMapper';
 
 interface XlsFormatterUpdateComponentProps {
   xlsMapper: ImportMapperStore;
@@ -32,7 +32,7 @@ const XlsFormatterUpdateComponent: FunctionComponent<XlsFormatterUpdateComponent
   };
 
   const onSubmit = ((data: ImportMapperUpdateInput) => {
-    updateXlsMapper(xlsMapper.import_mapper_id, data).then(
+    updateMapper(xlsMapper.import_mapper_id, data).then(
       (result: { data: RawPaginationImportMapper }) => {
         onUpdate?.(result.data);
         return result;

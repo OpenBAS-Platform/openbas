@@ -4,12 +4,12 @@ import React, { useContext, useState } from 'react';
 import Dialog from '../../../../components/common/Dialog';
 import { useFormatter } from '../../../../components/i18n';
 import type { ImportPostSummary, InjectsImportInput } from '../../../../utils/api-types';
-import ImportUploaderInjectImportFile from './ImportUploaderInjectImportFile';
-import ImportUploaderInjectImportInjects from './ImportUploaderInjectImportInjects';
+import ImportUploaderInjectFromXlsFile from './ImportUploaderInjectFromXlsFile';
+import ImportUploaderInjectFromXlsInjects from './ImportUploaderInjectFromXlsInjects';
 import { InjectContext } from '../Context';
-import { storeXlsFile } from '../../../../actions/xls_formatter/xls-formatter-actions';
+import { storeXlsFile } from '../../../../actions/mapper/mapper-actions';
 
-const ImportUploaderInject = () => {
+const ImportUploaderInjectFromXls = () => {
   // Standard hooks
   const { t } = useFormatter();
   const injectContext = useContext(InjectContext);
@@ -66,13 +66,13 @@ const ImportUploaderInject = () => {
       >
         <>
           {!importId
-            && <ImportUploaderInjectImportFile
+            && <ImportUploaderInjectFromXlsFile
               handleClose={handleClose}
               handleSubmit={onSubmitImportFile}
                />
           }
           {importId
-            && <ImportUploaderInjectImportInjects
+            && <ImportUploaderInjectFromXlsInjects
               sheets={sheets}
               handleClose={handleClose}
               handleSubmit={onSubmitImportInjects}
@@ -84,4 +84,4 @@ const ImportUploaderInject = () => {
   );
 };
 
-export default ImportUploaderInject;
+export default ImportUploaderInjectFromXls;

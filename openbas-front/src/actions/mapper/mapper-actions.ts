@@ -14,16 +14,16 @@ export const fetchMapper = (mapperId: string) => {
   return simpleCall(uri);
 };
 
-export const deleteXlsMapper = (mapperId: RawPaginationImportMapper['import_mapper_id']) => {
+export const deleteMapper = (mapperId: RawPaginationImportMapper['import_mapper_id']) => {
   const uri = `${XLS_FORMATTER_URI}/${mapperId}`;
   return simpleDelCall(uri, mapperId);
 };
 
-export const createXlsMapper = (data: ImportMapperAddInput) => {
+export const createMapper = (data: ImportMapperAddInput) => {
   return simplePostCall(XLS_FORMATTER_URI, data);
 };
 
-export const updateXlsMapper = (mapperId: string, data: ImportMapperUpdateInput) => {
+export const updateMapper = (mapperId: string, data: ImportMapperUpdateInput) => {
   const uri = `${XLS_FORMATTER_URI}/${mapperId}`;
   return simplePutCall(uri, data);
 };
