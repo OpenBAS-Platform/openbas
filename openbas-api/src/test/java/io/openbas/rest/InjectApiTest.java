@@ -31,14 +31,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestInstance(PER_CLASS)
 class InjectApiTest extends IntegrationTest {
 
-    static String EXERCISE_ID;
-    static String SCENARIO_ID;
+    static Exercise EXERCISE;
+    static Scenario SCENARIO;
+    static Document DOCUMENT1;
+    static Document DOCUMENT2;
+    static Team TEAM;
     static String SCENARIO_INJECT_ID;
-    static String SCENARIO_INJECT_ID_1;
-    static String EXERCISE_INJECT_ID_1;
-    static String EXERCISE_INJECT_ID_2;
-    static String DOCUMENT_1;
-    static String DOCUMENT_2;
 
     @Autowired
     private MockMvc mvc;
@@ -55,7 +53,13 @@ class InjectApiTest extends IntegrationTest {
     @Autowired
     private DocumentRepository documentRepository;
     @Autowired
-    private InjectDocumentRepository injectDocumentRepository;
+    private CommunicationRepository communicationRepository;
+    @Autowired
+    private InjectExpectationRepository injectExpectationRepository;
+    @Autowired
+    private TeamRepository teamRepository;
+    @Autowired
+    private InjectorContractRepository injectorContractRepository;
 
     @BeforeAll
     void beforeAll() {
@@ -63,8 +67,7 @@ class InjectApiTest extends IntegrationTest {
         scenario.setName("Scenario name");
         scenario.setFrom("test@test.com");
         scenario.setReplyTos(List.of("test@test.com"));
-        Scenario scenarioCreated = scenarioService.createScenario(scenario);
-        SCENARIO_ID = scenarioCreated.getId();
+        SCENARIO = scenarioService.createScenario(scenario);
 
         Exercise exercise = new Exercise();
         exercise.setName("Exercise name");
@@ -72,10 +75,7 @@ class InjectApiTest extends IntegrationTest {
         exercise.setFrom("test@test.com");
         exercise.setReplyTos(List.of("test@test.com"));
         exercise.setStatus(RUNNING);
-        Exercise exerciseCreated = exerciseService.createExercise(exercise);
-        EXERCISE_ID = exerciseCreated.getId();
-
-        // CREATE INJECTS
+        EXERCISE = exerciseService.createExercise(exercise);
 
         Document document1 = new Document();
         document1.setName("Document 1");
@@ -83,64 +83,20 @@ class InjectApiTest extends IntegrationTest {
         Document document2 = new Document();
         document2.setName("Document 2");
         document2.setType("pdf");
-        Document createdDocument1 = documentRepository.save(document1);
-        DOCUMENT_1 = createdDocument1.getId();
-        Document createdDocument2 = documentRepository.save(document2);
-        DOCUMENT_2 = createdDocument2.getId();
+        DOCUMENT1 = documentRepository.save(document1);
+        DOCUMENT2 = documentRepository.save(document2);
 
-        Inject injectForExercise1 = new Inject();
-        injectForExercise1.setTitle("Inject for exercise 1");
-        injectForExercise1.setCreatedAt(Instant.now());
-        injectForExercise1.setUpdatedAt(Instant.now());
-        injectForExercise1.setDependsDuration(1L);
-        injectForExercise1.setExercise(exercise);
-
-        Inject injectForExercise2 = new Inject();
-        injectForExercise2.setTitle("Inject for exercise 2");
-        injectForExercise2.setCreatedAt(Instant.now());
-        injectForExercise2.setUpdatedAt(Instant.now());
-        injectForExercise2.setDependsDuration(2L);
-        injectForExercise2.setExercise(exercise);
-
-        Inject injectForScenario1 = new Inject();
-        injectForScenario1.setTitle("Inject for scenario 1");
-        injectForScenario1.setCreatedAt(Instant.now());
-        injectForScenario1.setUpdatedAt(Instant.now());
-        injectForScenario1.setDependsDuration(2L);
-        injectForScenario1.setExercise(exercise);
-
-        Inject createdInject1 = injectRepository.save(injectForExercise1);
-        EXERCISE_INJECT_ID_1 = createdInject1.getId();
-        Inject createdInject2 = injectRepository.save(injectForExercise2);
-        EXERCISE_INJECT_ID_2 = createdInject2.getId();
-        Inject createdInject3 = injectRepository.save(injectForScenario1);
-        SCENARIO_INJECT_ID_1 = createdInject3.getId();
-
-        InjectDocument injectDocument1 = new InjectDocument();
-        injectDocument1.setInject(createdInject1);
-        injectDocument1.setDocument(createdDocument1);
-
-        InjectDocument injectDocument2 = new InjectDocument();
-        injectDocument2.setInject(createdInject2);
-        injectDocument2.setDocument(createdDocument1);
-
-        InjectDocument injectDocument3 = new InjectDocument();
-        injectDocument3.setInject(createdInject1);
-        injectDocument3.setDocument(createdDocument2);
-
-        createdInject1.setDocuments(List.of(injectDocument1, injectDocument3));
-        createdInject2.setDocuments(List.of(injectDocument2));
+        Team team = new Team();
+        team.setName("team");
+        TEAM = teamRepository.save(team);
     }
 
     @AfterAll
     void afterAll() {
-        this.scenarioRepository.deleteById(SCENARIO_ID);
-        this.exerciseRepository.deleteById(EXERCISE_ID);
-        this.injectRepository.deleteById(EXERCISE_INJECT_ID_1);
-        this.injectRepository.deleteById(EXERCISE_INJECT_ID_2);
-        this.injectRepository.deleteById(SCENARIO_INJECT_ID);
-        this.documentRepository.deleteById(DOCUMENT_1);
-        this.documentRepository.deleteById(DOCUMENT_2);
+        this.scenarioRepository.delete(SCENARIO);
+        this.exerciseRepository.delete(EXERCISE);
+        this.documentRepository.deleteAll(List.of(DOCUMENT1, DOCUMENT2));
+        this.teamRepository.delete(TEAM);
     }
 
     // -- SCENARIOS --
@@ -158,7 +114,7 @@ class InjectApiTest extends IntegrationTest {
 
         // -- EXECUTE --
         String response = mvc
-                .perform(post(SCENARIO_URI + "/" + SCENARIO_ID + "/injects")
+                .perform(post(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects")
                         .content(asJsonString(input))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -170,13 +126,13 @@ class InjectApiTest extends IntegrationTest {
         // -- ASSERT --
         assertNotNull(response);
         SCENARIO_INJECT_ID = JsonPath.read(response, "$.inject_id");
-        response = mvc
-                .perform(get(SCENARIO_URI + "/" + SCENARIO_ID)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().is2xxSuccessful())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+            response = mvc
+                    .perform(get(SCENARIO_URI + "/" + SCENARIO.getId())
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().is2xxSuccessful())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
         assertEquals(SCENARIO_INJECT_ID, JsonPath.read(response, "$.scenario_injects[0]"));
     }
 
@@ -187,7 +143,7 @@ class InjectApiTest extends IntegrationTest {
     void retrieveInjectsForScenarioTest() throws Exception {
         // -- EXECUTE --
         String response = mvc
-                .perform(get(SCENARIO_URI + "/" + SCENARIO_ID + "/injects")
+                .perform(get(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn()
@@ -206,7 +162,7 @@ class InjectApiTest extends IntegrationTest {
     void retrieveInjectForScenarioTest() throws Exception {
         // -- EXECUTE --
         String response = mvc
-                .perform(get(SCENARIO_URI + "/" + SCENARIO_ID + "/injects/" + SCENARIO_INJECT_ID)
+                .perform(get(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects/" + SCENARIO_INJECT_ID)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn()
@@ -233,7 +189,7 @@ class InjectApiTest extends IntegrationTest {
 
         // -- EXECUTE --
         String response = mvc
-                .perform(put(SCENARIO_URI + "/" + SCENARIO_ID + "/injects/" + SCENARIO_INJECT_ID)
+                .perform(put(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects/" + SCENARIO_INJECT_ID)
                         .content(asJsonString(input))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -253,11 +209,10 @@ class InjectApiTest extends IntegrationTest {
     @WithMockPlannerUser
     void deleteInjectForScenarioTest() throws Exception {
         // -- EXECUTE 1 ASSERT --
-        mvc.perform(delete(SCENARIO_URI + "/" + SCENARIO_ID + "/injects/" + SCENARIO_INJECT_ID))
+        mvc.perform(delete(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects/" + SCENARIO_INJECT_ID))
                 .andExpect(status().is2xxSuccessful());
 
-        boolean injectExists = injectRepository.existsById(SCENARIO_INJECT_ID);
-        assertFalse(injectExists, "Inject should be deleted from the database");
+        assertFalse(injectRepository.existsById(SCENARIO_INJECT_ID));
     }
 
     // BULK DELETE
@@ -266,14 +221,44 @@ class InjectApiTest extends IntegrationTest {
     @Order(6)
     @WithMockPlannerUser
     void deleteInjectsForScenarioTest() throws Exception {
+        // -- PREPARE --
+        Inject injectForScenario1 = new Inject();
+        injectForScenario1.setTitle("Inject for scenario 1");
+        injectForScenario1.setCreatedAt(Instant.now());
+        injectForScenario1.setUpdatedAt(Instant.now());
+        injectForScenario1.setDependsDuration(5L);
+        injectForScenario1.setInjectorContract(injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+        injectForScenario1.setScenario(SCENARIO);
+        Inject createdInject = injectRepository.save(injectForScenario1);
+
+        InjectDocument injectDocument4 = new InjectDocument();
+        injectDocument4.setInject(createdInject);
+        injectDocument4.setDocument(DOCUMENT2);
+        createdInject.setDocuments(List.of(injectDocument4));
+
+        InjectExpectation injectExpectation4 = new InjectExpectation();
+        injectExpectation4.setInject(createdInject);
+        injectExpectation4.setType(InjectExpectation.EXPECTATION_TYPE.ARTICLE);
+        injectExpectation4.setTeam(TEAM);
+        injectExpectationRepository.save(injectExpectation4);
+
+        // -- ASSERT --
+        assertTrue(injectRepository.existsById(createdInject.getId()), "The inject should exist from the database");
+        assertFalse(injectRepository.findByScenarioId(SCENARIO.getId()).isEmpty(), "There should be injects for the scenario in the database");
+        assertFalse(injectExpectationRepository.findAllByInjectAndTeam(createdInject.getId(), TEAM.getId()).isEmpty(), "There should be expectations for the scenario in the database");
+
         // -- EXECUTE --
-        mvc.perform(post(SCENARIO_URI + "/" + SCENARIO_ID + "/injects/delete")
-                        .content(asJsonString(List.of(SCENARIO_INJECT_ID_1)))
+        mvc.perform(post(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects/delete")
+                        .content(asJsonString(List.of(createdInject.getId())))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful());
 
-        boolean injectExists = injectRepository.existsById(SCENARIO_INJECT_ID_1);
-        assertFalse(injectExists, "Inject should be deleted from the database");
+        // -- ASSERT --
+        assertFalse(injectRepository.existsById(createdInject.getId()), "The inject should be deleted from the database");
+        assertTrue(scenarioRepository.existsById(SCENARIO.getId()), "The scenario should still exist in the database");
+        assertTrue(injectRepository.findByScenarioId(SCENARIO.getId()).isEmpty(), "There should be no injects for the scenario in the database");
+        assertTrue(documentRepository.existsById(DOCUMENT2.getId()), "The document should still exist in the database");
+        assertTrue(injectExpectationRepository.findAllByInjectAndTeam(createdInject.getId(), TEAM.getId()).isEmpty(), "There should be no expectations related to the inject in the database");
     }
 
     // -- EXERCISES --
@@ -285,18 +270,91 @@ class InjectApiTest extends IntegrationTest {
     @Order(8)
     @WithMockPlannerUser
     void deleteInjectsForExerciseTest() throws Exception {
-        // -- EXECUTE 1 ASSERT --
-        mvc.perform(post(EXERCISE_URI + "/" + EXERCISE_ID + "/injects/delete")
-                        .content(asJsonString(List.of(EXERCISE_INJECT_ID_1, EXERCISE_INJECT_ID_2)))
+        // -- PREPARE --
+        Inject injectForExercise1 = new Inject();
+        injectForExercise1.setTitle("Inject for exercise 1");
+        injectForExercise1.setCreatedAt(Instant.now());
+        injectForExercise1.setUpdatedAt(Instant.now());
+        injectForExercise1.setDependsDuration(1L);
+        injectForExercise1.setExercise(EXERCISE);
+
+        Inject injectForExercise2 = new Inject();
+        injectForExercise2.setTitle("Inject for exercise 2");
+        injectForExercise2.setCreatedAt(Instant.now());
+        injectForExercise2.setUpdatedAt(Instant.now());
+        injectForExercise2.setDependsDuration(2L);
+        injectForExercise2.setExercise(EXERCISE);
+
+        Inject createdInject1 = injectRepository.save(injectForExercise1);
+        Inject createdInject2 = injectRepository.save(injectForExercise2);
+
+        InjectDocument injectDocument1 = new InjectDocument();
+        injectDocument1.setInject(createdInject1);
+        injectDocument1.setDocument(DOCUMENT1);
+
+        InjectDocument injectDocument2 = new InjectDocument();
+        injectDocument2.setInject(createdInject1);
+        injectDocument2.setDocument(DOCUMENT2);
+
+        InjectDocument injectDocument3 = new InjectDocument();
+        injectDocument3.setInject(createdInject2);
+        injectDocument3.setDocument(DOCUMENT1);
+
+        createdInject1.setDocuments(List.of(injectDocument1, injectDocument2));
+        createdInject2.setDocuments(List.of(injectDocument3));
+
+        injectRepository.save(createdInject1);
+        injectRepository.save(createdInject2);
+
+        Communication communication = new Communication();
+        communication.setInject(createdInject1);
+        communication.setIdentifier("messageId");
+        communication.setFrom("test@test.com");
+        communication.setTo("test@test.com");
+        communication.setSentAt(Instant.now());
+        communication.setReceivedAt(Instant.now());
+        Communication createdCommunication = communicationRepository.save(communication);
+
+        InjectExpectation injectExpectation1 = new InjectExpectation();
+        injectExpectation1.setInject(createdInject1);
+        injectExpectation1.setType(InjectExpectation.EXPECTATION_TYPE.PREVENTION);
+        injectExpectation1.setTeam(TEAM);
+
+        InjectExpectation injectExpectation2 = new InjectExpectation();
+        injectExpectation2.setInject(createdInject1);
+        injectExpectation2.setType(InjectExpectation.EXPECTATION_TYPE.DETECTION);
+        injectExpectation2.setTeam(TEAM);
+
+        InjectExpectation injectExpectation3 = new InjectExpectation();
+        injectExpectation3.setInject(createdInject2);
+        injectExpectation3.setType(InjectExpectation.EXPECTATION_TYPE.MANUAL);
+        injectExpectation3.setTeam(TEAM);
+
+        injectExpectationRepository.save(injectExpectation1);
+        injectExpectationRepository.save(injectExpectation2);
+        injectExpectationRepository.save(injectExpectation3);
+
+        // -- ASSERT --
+        assertTrue(injectRepository.existsById(createdInject1.getId()), "The inject should exist from the database");
+        assertFalse(injectRepository.findByExerciseId(EXERCISE.getId()).isEmpty(), "There should be injects for the exercise in the database");
+        assertEquals(1, communicationRepository.findByInjectId(createdInject1.getId()).size());
+        assertEquals(2, injectExpectationRepository.findAllByInjectAndTeam(createdInject1.getId(), TEAM.getId()).size());
+        assertEquals(1, injectExpectationRepository.findAllByInjectAndTeam(createdInject2.getId(), TEAM.getId()).size());
+
+        // -- EXECUTE --
+        mvc.perform(post(EXERCISE_URI + "/" + EXERCISE.getId() + "/injects/delete")
+                        .content(asJsonString(List.of(createdInject1.getId(), createdInject2.getId())))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful());
 
-        boolean injectExists = injectRepository.existsById(EXERCISE_INJECT_ID_1);
-        assertFalse(injectExists, "Inject should be deleted from the database");
-
-        boolean documentExists = documentRepository.existsById(DOCUMENT_1);
-        assertTrue(documentExists, "Document should be still exists in the database");
-
+        // -- ASSERT --
+        assertFalse(injectRepository.existsById(createdInject1.getId()), "The inject should be deleted from the database");
+        assertFalse(injectRepository.existsById(createdInject2.getId()), "The inject should be deleted from the database");
+        assertTrue(exerciseRepository.existsById(EXERCISE.getId()), "The exercise should still exist in the database");
+        assertTrue(injectRepository.findByExerciseId(EXERCISE.getId()).isEmpty(), "There should be no injects for the exercise in the database");
+        assertTrue(documentRepository.existsById(DOCUMENT1.getId()), "The document should still exist in the database");
+        assertFalse(communicationRepository.existsById(createdCommunication.getId()), "The communication should be deleted from the database");
+        assertTrue(injectExpectationRepository.findAllByInjectAndTeam(createdInject1.getId(), TEAM.getId()).isEmpty(), "There should be no expectations related to the inject in the database");
     }
 }
 

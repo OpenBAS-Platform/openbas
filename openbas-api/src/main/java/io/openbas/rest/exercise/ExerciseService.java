@@ -6,8 +6,6 @@ import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ArticleRepository;
 import io.openbas.database.repository.ExerciseRepository;
-import io.openbas.database.repository.TagRepository;
-import io.openbas.rest.exercise.form.ExerciseCreateInput;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.GrantService;
@@ -37,7 +35,6 @@ import java.util.stream.Collectors;
 
 import static io.openbas.database.criteria.ExerciseCriteria.countQuery;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.AtomicTestingUtils.getExpectationResultByTypes;
 import static io.openbas.utils.Constants.ARTICLES;
 import static io.openbas.utils.Constants.MAX_SIZE_OF_STRING;
@@ -62,7 +59,6 @@ public class ExerciseService {
 
     private final ArticleRepository articleRepository;
     private final ExerciseRepository exerciseRepository;
-    private final TagRepository tagRepository;
 
     // region properties
     @Value("${openbas.mail.imap.enabled}")

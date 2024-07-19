@@ -2,7 +2,6 @@ package io.openbas.service;
 
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.InjectExpectation;
-import io.openbas.database.model.InjectExpectation.EXPECTATION_STATUS;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.model.InjectExpectationResult;
 import io.openbas.database.repository.ExerciseRepository;
@@ -13,7 +12,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;

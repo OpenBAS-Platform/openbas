@@ -129,6 +129,13 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
     // @ts-expect-error
     return onToggleEntity(currentEntity, event);
   };
+
+  const injectsToProcess = selectAll
+    ? injects.filter((inject: Inject) => !R.keys(deSelectedElements).includes(inject.inject_id))
+    : injects.filter(
+      (inject: Inject) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id),
+    );
+
   const massUpdateInjects = async (actions: {
     field: string,
     type: string,
@@ -150,9 +157,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
       'inject_city',
       'inject_tags',
     ];
-    const injectsToUpdate = selectAll
-      ? injects.filter((inject: Inject) => !R.keys(deSelectedElements).includes(inject.inject_id))
-      : injects.filter((inject: Inject) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id));
+    const injectsToUpdate = injectsToProcess;
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < actions.length; i++) {
       const action = actions[i];
@@ -192,11 +197,8 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
       }
     }
   };
-  const bulkDeleteInjects = async () => {
-    const injectsToDelete = selectAll
-      ? injects.filter((inject: Inject) => !R.keys(deSelectedElements).includes(inject.inject_id))
-      : injects.filter((inject: Inject) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id));
-    injectContext.onBulkDeleteInjects(injectsToDelete.map((inject: Inject) => inject.inject_id));
+  const bulkDeleteInjects = () => {
+    injectContext.onBulkDeleteInjects(injectsToProcess.map((inject: Inject) => inject.inject_id));
   };
 
   return (

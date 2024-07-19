@@ -480,6 +480,11 @@ class ToolBar extends Component {
       default:
         paperClass = classes.bottomNav;
     }
+    const confirmationText = () => {
+      return numberOfSelectedElements === 1
+        ? t('Do you want to delete this inject?')
+        : t(`Do you want to delete these ${numberOfSelectedElements} injects?`);
+    };
     return (
       <>
         <Drawer
@@ -651,7 +656,7 @@ class ToolBar extends Component {
           open={this.state.displayBulkDelete}
           handleClose={this.handleCloseBulkDelete.bind(this)}
           handleSubmit={this.handleSubmitBulkDelete.bind(this)}
-          text={t('Do you want to delete these injects ?')}
+          text={confirmationText()}
         />
       </>
     );
