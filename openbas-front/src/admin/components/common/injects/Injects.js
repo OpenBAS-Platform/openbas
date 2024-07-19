@@ -35,6 +35,7 @@ import UpdateInject from './UpdateInject';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import Timeline from '../../../../components/Timeline';
 import { isNotEmptyField } from '../../../../utils/utils';
+import ImportUploaderInjectFromXls from './ImportUploaderInjectFromXls';
 import useExportToXLS from '../../../../utils/hooks/useExportToXLS';
 
 const useStyles = makeStyles(() => ({
@@ -301,14 +302,16 @@ const Injects = (props) => {
                 </Menu>
               </div>
             )}
-            {setViewMode ? (
-              <ToggleButtonGroup
-                size="small"
-                exclusive
-                style={{ float: 'right' }}
-                aria-label="Change view mode"
-              >
-                <Tooltip title={t('List view')}>
+            <ToggleButtonGroup
+              size="small"
+              exclusive
+              style={{ float: 'right' }}
+              aria-label="Change view mode"
+            >
+              {injectContext.onImportInjectFromXls
+              && <ImportUploaderInjectFromXls />}
+              {setViewMode
+                && <Tooltip title={t('List view')}>
                   <ToggleButton
                     value='list'
                     selected
@@ -316,8 +319,10 @@ const Injects = (props) => {
                   >
                     <ReorderOutlined fontSize="small" color='inherit' />
                   </ToggleButton>
-                </Tooltip>
-                <Tooltip title={t('Distribution view')}>
+                  </Tooltip>
+              }
+              {setViewMode
+                && <Tooltip title={t('Distribution view')}>
                   <ToggleButton
                     value='distribution'
                     onClick={() => setViewMode('distribution')}
@@ -325,9 +330,9 @@ const Injects = (props) => {
                   >
                     <BarChartOutlined fontSize="small" color='primary' />
                   </ToggleButton>
-                </Tooltip>
-              </ToggleButtonGroup>
-            ) : null}
+                  </Tooltip>
+              }
+            </ToggleButtonGroup>
           </div>
           <div className="clearfix" />
         </div>

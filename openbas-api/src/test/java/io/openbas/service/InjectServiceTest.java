@@ -575,17 +575,17 @@ class InjectServiceTest {
         ruleAttributeTeams.setDefaultValue("teams");
 
         RuleAttribute ruleAttributeExpectationScore = new RuleAttribute();
-        ruleAttributeExpectationScore.setName("expectation.score");
+        ruleAttributeExpectationScore.setName("expectation_score");
         ruleAttributeExpectationScore.setColumns("J");
         ruleAttributeExpectationScore.setDefaultValue("500");
 
         RuleAttribute ruleAttributeExpectationName = new RuleAttribute();
-        ruleAttributeExpectationName.setName("expectation.name");
+        ruleAttributeExpectationName.setName("expectation_name");
         ruleAttributeExpectationName.setColumns("I");
         ruleAttributeExpectationName.setDefaultValue("name");
 
         RuleAttribute ruleAttributeExpectationDescription = new RuleAttribute();
-        ruleAttributeExpectationDescription.setName("expectation.description");
+        ruleAttributeExpectationDescription.setName("expectation_description");
         ruleAttributeExpectationDescription.setColumns("H");
         ruleAttributeExpectationDescription.setDefaultValue("description");
 
@@ -635,17 +635,17 @@ class InjectServiceTest {
         ruleAttributeTeams.setDefaultValue("teams");
 
         RuleAttribute ruleAttributeExpectationScore = new RuleAttribute();
-        ruleAttributeExpectationScore.setName("expectation.score");
+        ruleAttributeExpectationScore.setName("expectation_score");
         ruleAttributeExpectationScore.setColumns("J");
         ruleAttributeExpectationScore.setDefaultValue("500");
 
         RuleAttribute ruleAttributeExpectationName = new RuleAttribute();
-        ruleAttributeExpectationName.setName("expectation.name");
+        ruleAttributeExpectationName.setName("expectation_name");
         ruleAttributeExpectationName.setColumns("I");
         ruleAttributeExpectationName.setDefaultValue("name");
 
         RuleAttribute ruleAttributeExpectationDescription = new RuleAttribute();
-        ruleAttributeExpectationDescription.setName("expectation.description");
+        ruleAttributeExpectationDescription.setName("expectation_description");
         ruleAttributeExpectationDescription.setColumns("H");
         ruleAttributeExpectationDescription.setDefaultValue("description");
 

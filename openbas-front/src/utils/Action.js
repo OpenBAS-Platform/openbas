@@ -31,9 +31,25 @@ const buildError = (data) => {
 };
 
 export const simpleCall = (uri) => api().get(buildUri(uri));
-export const simplePostCall = (uri, data) => api().post(buildUri(uri), data);
-export const simplePutCall = (uri, data) => api().put(buildUri(uri), data);
-export const simpleDelCall = (uri, data) => api().delete(buildUri(uri), data);
+export const simplePostCall = (uri, data) => api().post(buildUri(uri), data)
+  .catch((error) => {
+    MESSAGING$.notifyError(error.message);
+    throw error;
+  });
+export const simplePutCall = (uri, data) => api().put(buildUri(uri), data)
+  .then((response) => {
+    MESSAGING$.notifySuccess('The element has been updated');
+    return response;
+  })
+  .catch((error) => {
+    MESSAGING$.notifyError(error.message);
+    throw error;
+  });
+export const simpleDelCall = (uri, data) => api().delete(buildUri(uri), data)
+  .catch((error) => {
+    MESSAGING$.notifyError(error.message);
+    throw error;
+  });
 export const getReferential = (schema, uri, noloading) => (dispatch) => {
   if (noloading !== true) {
     dispatch({ type: Constants.DATA_FETCH_SUBMITTED });

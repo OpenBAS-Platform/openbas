@@ -130,6 +130,7 @@ public class MapperApiTest {
     ImportMapper importMapper = MockMapperUtils.createImportMapper();
     ImportMapperAddInput importMapperInput = new ImportMapperAddInput();
     importMapperInput.setName("Test");
+    importMapperInput.setInjectTypeColumn("B");
     when(mapperService.createAndSaveImportMapper(any())).thenReturn(importMapper);
     // -- EXECUTE --
     String response = this.mvc
@@ -168,6 +169,7 @@ public class MapperApiTest {
     ImportMapper importMapper = MockMapperUtils.createImportMapper();
     ImportMapperUpdateInput importMapperInput = new ImportMapperUpdateInput();
     importMapperInput.setName("New name");
+    importMapperInput.setInjectTypeColumn("B");
     when(mapperService.updateImportMapper(any(), any())).thenReturn(importMapper);
     // -- EXECUTE --
     String response = this.mvc
@@ -222,10 +224,12 @@ public class MapperApiTest {
     injectsImportInput.setImportMapper(new ImportMapperAddInput());
     injectsImportInput.setName("TEST");
     injectsImportInput.setTimezoneOffset(120);
+    ImportMapper importMapper = MockMapperUtils.createImportMapper();
 
     injectsImportInput.getImportMapper().setName("TEST");
 
     when(injectService.importInjectIntoScenarioFromXLS(any(), any(), any(), any(), anyInt(), anyBoolean())).thenReturn(new ImportTestSummary());
+    when(mapperService.createImportMapper(any())).thenReturn(importMapper);
 
     // -- EXECUTE --
     String response = this.mvc

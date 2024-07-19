@@ -100,6 +100,12 @@ public class MapperApi extends RestBehavior {
     public ImportTestSummary testImportXLSFile(@PathVariable @NotBlank final String importId,
                                                @Valid @RequestBody final InjectsImportTestInput input) {
         ImportMapper importMapper = mapperService.createImportMapper(input.getImportMapper());
+        importMapper.getInjectImporters().forEach(
+                injectImporter -> {
+                    injectImporter.setId(UUID.randomUUID().toString());
+                    injectImporter.getRuleAttributes().forEach(ruleAttribute -> ruleAttribute.setId(UUID.randomUUID().toString()));
+                }
+        );
         Scenario scenario = new Scenario();
         scenario.setRecurrenceStart(Instant.now());
         return injectService.importInjectIntoScenarioFromXLS(scenario, importMapper, importId, input.getName(), input.getTimezoneOffset(), false);

@@ -13,6 +13,7 @@ import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -85,6 +86,7 @@ public class InjectorContract implements Base {
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("injector_contract_injector")
     @Queryable(filterable = true, property = "id")
+    @NotNull
     private Injector injector;
 
     @Setter
