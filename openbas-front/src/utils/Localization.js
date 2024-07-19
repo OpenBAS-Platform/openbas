@@ -1155,7 +1155,7 @@ const i18n = {
       Expectation_description: 'Description de l\'attendu',
       Expectation_score: 'Score de l\'attendu',
       Trigger_time: 'Temps de déclenchement',
-      'This word will match in the specified column to determine the inject': 'Ce mot sera relié à la colonne correspondante pour déterminer l\'inject',
+      'This expression will be used to find a match in the specified column to determine the inject type. Regular Expressions can be used.': 'Cette expression est utilisé pour déterminer si il y a correspondance avec la colonne spécifié. L\'utilisation d\'expression régulière est possible.',
       'By default we accept iso date (YYYY-MM-DDThh:mm:ss[.mmm]TZD), but you can specify your own date format in ISO notation (for instance DD.MM.YYYY hh\'h\'mm)': 'Par défaut nous acceptons la date iso (AAAA-MM-JJ hh:mm:ss[.mmm]TZD), mais vous pouvez spécifiez votre propre format de date en notation ISO (par exemple JJ.MM.AAAA hh\'h\'mm)',
     },
     en: {

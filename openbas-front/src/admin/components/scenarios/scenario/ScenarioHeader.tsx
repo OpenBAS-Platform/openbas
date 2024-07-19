@@ -16,7 +16,7 @@ import ScenarioRecurringFormDialog from './ScenarioRecurringFormDialog';
 import { truncate } from '../../../../utils/String';
 import type { Theme } from '../../../../components/Theme';
 import { PopoverEntry } from '../../../../components/common/ButtonPopover';
-import useScenarioPermissions from "../../../../utils/Scenario";
+import useScenarioPermissions from '../../../../utils/Scenario';
 
 const useStyles = makeStyles(() => ({
   title: {
