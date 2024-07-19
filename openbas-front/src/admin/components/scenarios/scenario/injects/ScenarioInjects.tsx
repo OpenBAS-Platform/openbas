@@ -128,7 +128,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
       'inject_city',
       'inject_tags',
     ];
-    const injectsToUpdate = injectsToProcess;
+    const injectsToUpdate = injectsToProcess.filter((inject: Inject) => inject.inject_injector_contract?.convertedContent);
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < actions.length; i++) {
       const action = actions[i];
