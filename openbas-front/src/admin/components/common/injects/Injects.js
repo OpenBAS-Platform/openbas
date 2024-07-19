@@ -22,7 +22,7 @@ import UpdateInject from './UpdateInject';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import Timeline from '../../../../components/Timeline';
 import { isNotEmptyField } from '../../../../utils/utils';
-import ImportUploaderInjectFromXls from './ImportUploaderInjectFromXls.js';
+import ImportUploaderInjectFromXls from './ImportUploaderInjectFromXls';
 
 const useStyles = makeStyles(() => ({
   container: {
