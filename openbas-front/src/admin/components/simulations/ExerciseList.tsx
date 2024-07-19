@@ -1,6 +1,6 @@
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { HubOutlined } from '@mui/icons-material';
-import React, { CSSProperties, FunctionComponent, useState } from 'react';
+import React, { CSSProperties, FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import ExerciseStatus from './simulation/ExerciseStatus';
 import ItemTags from '../../../components/ItemTags';
@@ -134,33 +134,6 @@ const ExerciseList: FunctionComponent<Props> = ({
     },
   ];
 
-  // Duplicate
-  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
-  const handleOpenDuplicate = (scenarioId: string) => {
-    setOpenDuplicateId(scenarioId);
-  };
-  const handleCloseDuplicate = () => {
-    setOpenDuplicateId(null);
-  };
-
-  // Export
-  const [openExportId, setOpenExportId] = useState<string | null>(null);
-  const handleOpenExport = (scenarioId: string) => {
-    setOpenExportId(scenarioId);
-  };
-  const handleCloseExport = () => {
-    setOpenExportId(null);
-  };
-
-  // Delete
-  const [openDeleteId, setOpenDeleteId] = useState<string | null>(null);
-  const handleOpenDelete = (scenarioId: string) => {
-    setOpenDeleteId(scenarioId);
-  };
-  const handleCloseDelete = () => {
-    setOpenDeleteId(null);
-  };
-
   return (
     <List>
       {hasHeader
@@ -189,17 +162,7 @@ const ExerciseList: FunctionComponent<Props> = ({
           secondaryAction={
             <ExercisePopover
               exercise={exercise}
-              entries={[
-                { label: 'Duplicate', action: () => handleOpenDuplicate(exercise.exercise_id) },
-                { label: 'Export', action: () => handleOpenExport(exercise.exercise_id) },
-                { label: 'Delete', action: () => handleOpenDelete(exercise.exercise_id) },
-              ]}
-              openExport={openExportId === exercise.exercise_id}
-              setOpenExport={handleCloseExport}
-              openDuplicate={openDuplicateId === exercise.exercise_id}
-              setOpenDuplicate={handleCloseDuplicate}
-              openDelete={openDeleteId === exercise.exercise_id}
-              setOpenDelete={handleCloseDelete}
+              actions={['Duplicate', 'Export']}
               variantButtonPopover={'icon'}
             />
           }
