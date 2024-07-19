@@ -18,6 +18,7 @@ import oermLight from '../../../static/images/xtm/oerm_light.png';
 import omtdDark from '../../../static/images/xtm/omtd_dark.png';
 import omtdLight from '../../../static/images/xtm/omtd_light.png';
 import useAuth from '../../../utils/hooks/useAuth';
+import { computeBannerSettings } from '../../../public/components/systembanners/SystemBanners';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   appBar: {
@@ -98,6 +99,7 @@ const TopBar: React.FC = () => {
   const classes = useStyles();
   const { t } = useFormatter();
   const { settings } = useAuth();
+  const { bannerHeightNumber } = computeBannerSettings(settings);
 
   const [xtmOpen, setXtmOpen] = useState<{
     open: boolean;
@@ -159,7 +161,7 @@ const TopBar: React.FC = () => {
       variant="outlined"
       elevation={0}
     >
-      <Toolbar style={{ marginTop: 0, paddingLeft: 0 }}>
+      <Toolbar style={{ marginTop: bannerHeightNumber, paddingLeft: 0 }}>
         <div className={classes.logoContainer}>
           <Link to="/admin">
             <img

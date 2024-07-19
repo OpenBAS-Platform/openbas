@@ -16,7 +16,6 @@ import {
   Tooltip,
 } from '@mui/material';
 import { BarChartOutlined, MoreVert, ReorderOutlined } from '@mui/icons-material';
-import { CSVLink } from 'react-csv';
 import { splitDuration } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
@@ -36,6 +35,7 @@ import UpdateInject from './UpdateInject';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import Timeline from '../../../../components/Timeline';
 import { isNotEmptyField } from '../../../../utils/utils';
+import useExportToXLS from '../../../../utils/hooks/useExportToXLS';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -242,7 +242,7 @@ const Injects = (props) => {
     sortedInjects,
     tagsMap,
   );
-  const filename = `${t('Injects')}.xls`;
+  const exportInjectsToXLS = useExportToXLS({ data: exportInjects, fileName: `${t('Injects')}` });
 
   const handleShowTimeline = () => {
     setShowTimeline(!showTimeline);
@@ -292,10 +292,8 @@ const Injects = (props) => {
                   open={Boolean(anchorEl)}
                   onClose={() => setAnchorEl(null)}
                 >
-                  <MenuItem>
-                    <CSVLink style={{ color: 'inherit' }} data={exportInjects} filename={filename}>
-                      {`${t('Export this list')} (.xls)`}
-                    </CSVLink>
+                  <MenuItem onClick={exportInjectsToXLS}>
+                    {`${t('Export injects')}`}
                   </MenuItem>
                   <MenuItem onClick={handleShowTimeline}>
                     {showTimeline ? t('Hide timeline') : t('Show timeline')}
@@ -316,7 +314,7 @@ const Injects = (props) => {
                     selected
                     aria-label="List view mode"
                   >
-                    <ReorderOutlined fontSize="small" color='inherit'/>
+                    <ReorderOutlined fontSize="small" color='inherit' />
                   </ToggleButton>
                 </Tooltip>
                 <Tooltip title={t('Distribution view')}>
@@ -325,23 +323,23 @@ const Injects = (props) => {
                     onClick={() => setViewMode('distribution')}
                     aria-label="Distribution view mode"
                   >
-                    <BarChartOutlined fontSize="small" color='primary'/>
+                    <BarChartOutlined fontSize="small" color='primary' />
                   </ToggleButton>
                 </Tooltip>
               </ToggleButtonGroup>
             ) : null}
           </div>
-          <div className="clearfix"/>
+          <div className="clearfix" />
         </div>
         {showTimeline && (
-        <div style={{ marginBottom: 50 }}>
-          <Timeline
-            injects={sortedInjects}
-            onSelectInject={(id) => setSelectedInjectId(id)}
-            teams={teams}
-          />
-          <div className="clearfix"/>
-        </div>
+          <div style={{ marginBottom: 50 }}>
+            <Timeline
+              injects={sortedInjects}
+              onSelectInject={(id) => setSelectedInjectId(id)}
+              teams={teams}
+            />
+            <div className="clearfix" />
+          </div>
         )}
         <List>
           <ListItem
@@ -355,9 +353,9 @@ const Injects = (props) => {
                 checked={selectAll}
                 disableRipple
                 onChange={
-                        typeof handleToggleSelectAll === 'function'
-                        && handleToggleSelectAll.bind(this)
-                    }
+                  typeof handleToggleSelectAll === 'function'
+                  && handleToggleSelectAll.bind(this)
+                }
                 disabled={typeof handleToggleSelectAll !== 'function'}
               />
             </ListItemIcon>
@@ -412,7 +410,7 @@ const Injects = (props) => {
                     headerStyles,
                   )}
                 </>
-                  }
+              }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
@@ -436,9 +434,9 @@ const Injects = (props) => {
                 divider
                 button
                 disabled={
-                          !injectContract || isDisabled
-                          || !inject.inject_enabled
-                      }
+                  !injectContract || isDisabled
+                  || !inject.inject_enabled
+                }
                 onClick={() => setSelectedInjectId(inject.inject_id)}
               >
                 <ListItemIcon
@@ -447,15 +445,15 @@ const Injects = (props) => {
                   onClick={(event) => (event.shiftKey
                     ? onToggleShiftEntity(index, inject, event)
                     : onToggleEntity(inject, event))
-                        }
+                  }
                 >
                   <Checkbox
                     edge="start"
                     checked={
-                              (selectAll && !(inject.inject_id
-                                  in (deSelectedElements || {})))
-                              || inject.inject_id in (selectedElements || {})
-                          }
+                      (selectAll && !(inject.inject_id
+                        in (deSelectedElements || {})))
+                      || inject.inject_id in (selectedElements || {})
+                    }
                     disableRipple
                   />
                 </ListItemIcon>
@@ -465,7 +463,7 @@ const Injects = (props) => {
                     type={
                       inject.inject_injector_contract.injector_contract_payload
                         ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
-                          || inject.inject_injector_contract.injector_contract_payload?.payload_type
+                        || inject.inject_injector_contract.injector_contract_payload?.payload_type
                         : inject.inject_type
                     }
                     disabled={!injectContract || isDisabled || !inject.inject_enabled}
@@ -535,7 +533,7 @@ const Injects = (props) => {
                         />
                       </div>
                     </>
-                        }
+                  }
                 />
                 <ListItemSecondaryAction>
                   <InjectPopover
@@ -552,20 +550,20 @@ const Injects = (props) => {
         {permissions.canWrite && (
           <>
             {selectedInjectId !== null
-                    && <UpdateInject
-                      open
-                      handleClose={() => setSelectedInjectId(null)}
-                      onUpdateInject={onUpdateInject}
-                      injectId={selectedInjectId}
-                      teamsFromExerciseOrScenario={teams}
-                      articlesFromExerciseOrScenario={articles}
-                      variablesFromExerciseOrScenario={variables}
-                      uriVariable={uriVariable}
-                      allUsersNumber={allUsersNumber}
-                      usersNumber={usersNumber}
-                      teamsUsers={teamsUsers}
-                       />
-                }
+              && <UpdateInject
+                open
+                handleClose={() => setSelectedInjectId(null)}
+                onUpdateInject={onUpdateInject}
+                injectId={selectedInjectId}
+                teamsFromExerciseOrScenario={teams}
+                articlesFromExerciseOrScenario={articles}
+                variablesFromExerciseOrScenario={variables}
+                uriVariable={uriVariable}
+                allUsersNumber={allUsersNumber}
+                usersNumber={usersNumber}
+                teamsUsers={teamsUsers}
+                 />
+            }
             <CreateInject
               title={t('Create a new inject')}
               onCreateInject={onCreateInject}
@@ -584,7 +582,7 @@ const Injects = (props) => {
   }
   return (
     <div className={classes.container}>
-      <Loader/>
+      <Loader />
     </div>
   );
 };

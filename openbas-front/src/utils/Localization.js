@@ -88,7 +88,7 @@ const i18n = {
       microblogging: 'Microblogging',
       'Targeted players': 'Joueurs ciblés',
       'Inject details': 'Détails du stimuli',
-      'Export this list': 'Exporter cette liste',
+      'Export injects': 'Exporter les stimulis',
       'Create a new simulation': 'Créer une nouvelle simulation',
       'Create a new scenario': 'Créer un nouveau scenario',
       'Do you want to delete this team?':

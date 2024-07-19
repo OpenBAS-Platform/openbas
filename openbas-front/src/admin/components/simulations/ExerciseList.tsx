@@ -1,6 +1,6 @@
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { HubOutlined } from '@mui/icons-material';
-import React, { CSSProperties, FunctionComponent, useState } from 'react';
+import React, { CSSProperties, FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import ExerciseStatus from './simulation/ExerciseStatus';
 import ItemTags from '../../../components/ItemTags';
@@ -134,24 +134,6 @@ const ExerciseList: FunctionComponent<Props> = ({
     },
   ];
 
-  // Duplicate
-  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
-  const handleOpenDuplicate = (scenarioId: string) => {
-    setOpenDuplicateId(scenarioId);
-  };
-  const handleCloseDuplicate = () => {
-    setOpenDuplicateId(null);
-  };
-
-  // Export
-  const [openExportId, setOpenExportId] = useState<string | null>(null);
-  const handleOpenExport = (scenarioId: string) => {
-    setOpenExportId(scenarioId);
-  };
-  const handleCloseExport = () => {
-    setOpenExportId(null);
-  };
-
   return (
     <List>
       {hasHeader
@@ -180,14 +162,7 @@ const ExerciseList: FunctionComponent<Props> = ({
           secondaryAction={
             <ExercisePopover
               exercise={exercise}
-              entries={[
-                { label: 'Duplicate', action: () => handleOpenDuplicate(exercise.exercise_id) },
-                { label: 'Export', action: () => handleOpenExport(exercise.exercise_id) },
-              ]}
-              openExport={openExportId === exercise.exercise_id}
-              setOpenExport={handleCloseExport}
-              openDuplicate={openDuplicateId === exercise.exercise_id}
-              setOpenDuplicate={handleCloseDuplicate}
+              actions={['Duplicate', 'Export']}
               variantButtonPopover={'icon'}
             />
           }

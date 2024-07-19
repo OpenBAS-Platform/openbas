@@ -36,6 +36,7 @@ import static io.openbas.utils.Constants.MAX_SIZE_OF_STRING;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.ResultUtils.computeTargetResults;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
+import static java.util.Optional.ofNullable;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @RequiredArgsConstructor
@@ -237,7 +238,7 @@ public class ExerciseService {
         });
         exercise.setArticles(articleList);
         for (Inject inject : exercise.getInjects()) {
-            if (inject.getContent().has(ARTICLES)) {
+            if (ofNullable(inject.getContent()).map(c -> c.has(ARTICLES)).orElse(Boolean.FALSE)) {
                 List<String> articleNode = new ArrayList<>();
                 JsonNode articles = inject.getContent().findValue(ARTICLES);
                 if (articles.isArray()) {
