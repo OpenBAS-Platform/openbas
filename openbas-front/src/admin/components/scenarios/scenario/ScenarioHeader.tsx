@@ -15,7 +15,8 @@ import { parseCron, ParsedCron } from '../../../../utils/Cron';
 import ScenarioRecurringFormDialog from './ScenarioRecurringFormDialog';
 import { truncate } from '../../../../utils/String';
 import type { Theme } from '../../../../components/Theme';
-import { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
+import { PopoverEntry } from '../../../../components/common/ButtonPopover';
+import useScenarioPermissions from "../../../../utils/Scenario";
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -149,12 +150,14 @@ const ScenarioHeader = ({
     setOpenDeleteId(null);
   };
 
+  const permissions = useScenarioPermissions(scenario.scenario_id);
+
   // Button Popover
-  const entries: ButtonPopoverEntry[] = [
-    { label: 'Update', action: () => handleOpenEdit() },
+  const entries: PopoverEntry[] = [
+    { label: 'Update', action: () => handleOpenEdit(), disabled: !permissions.canWrite },
     { label: 'Duplicate', action: () => handleOpenDuplicate() },
     { label: 'Export', action: () => handleOpenExport() },
-    { label: 'Delete', action: () => handleOpenDelete() },
+    { label: 'Delete', action: () => handleOpenDelete(), disabled: !permissions.canWrite },
   ];
 
   return (

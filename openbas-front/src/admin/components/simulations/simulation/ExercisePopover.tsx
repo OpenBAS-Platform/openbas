@@ -150,16 +150,11 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const permissions = usePermissions(exercise.exercise_id);
 
   // Button Popover
-  const entries: PopoverEntry[] = [
-    { label: 'Update', action: handleOpenEdit, disabled: !permissions.canWriteBypassStatus },
-    { label: 'Export', action: handleOpenExport },
-    { label: 'Delete', action: handleOpenDelete, disabled: !permissions.canWriteBypassStatus },
-  ];
-  /*const entries = [];
-  if (actions.includes('Update')) entries.push({ label: 'Update', action: () => handleOpenEdit() });
-  if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete() });
+  const entries = [];
+  if (actions.includes('Update')) entries.push({ label: 'Update', action: () => handleOpenEdit(), disabled: !permissions.canWriteBypassStatus });
+  if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete(), disabled: !permissions.canWriteBypassStatus });
   if (actions.includes('Duplicate')) entries.push({ label: 'Duplicate', action: () => handleOpenDuplicate() });
-  if (actions.includes('Export')) entries.push({ label: 'Export', action: () => handleOpenExport() });*/
+  if (actions.includes('Export')) entries.push({ label: 'Export', action: () => handleOpenExport() });
 
   return (
     <>
