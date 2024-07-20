@@ -57,7 +57,6 @@ interface Props<T> {
 }
 
 const PaginationComponent = <T extends object>({
-  key,
   fetch,
   searchPaginationInput,
   setContent, exportProps,

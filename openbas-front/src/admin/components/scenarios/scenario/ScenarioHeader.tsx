@@ -194,15 +194,7 @@ const ScenarioHeader = ({
         )}
         <ScenarioPopover
           scenario={scenario}
-          entries={entries}
-          openEdit={openEditId === scenario.scenario_id}
-          openExport={openExportId === scenario.scenario_id}
-          openDelete={openDeleteId === scenario.scenario_id}
-          openDuplicate={openDuplicateId === scenario.scenario_id}
-          setOpenExport={handleCloseExport}
-          setOpenEdit={handleCloseEdit}
-          setOpenDelete={handleCloseDelete}
-          setOpenDuplicate={handleCloseDuplicate}
+          actions={['Update', 'Duplicate', 'Export', 'Delete']}
         />
       </div>
       <ScenarioRecurringFormDialog

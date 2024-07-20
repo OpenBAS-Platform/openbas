@@ -79,8 +79,6 @@ const InjectList: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
   const { t, fldt, tPick, nsdt } = useFormatter();
-  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
-  const [openDeleteId, setOpenDeleteId] = useState<string | null>(null);
   const [modificationTrigger, setModificationTrigger] = useState<boolean>(false);
 
   // Filter and sort hook
@@ -163,26 +161,6 @@ const InjectList: FunctionComponent<Props> = ({
     },
   ];
 
-  const handleOpenDuplicate = (injectId: string) => {
-    setOpenDuplicateId(injectId);
-  };
-
-  const handleCloseDuplicate = () => {
-    setOpenDuplicateId(null);
-  };
-
-  const handleOpenDelete = (injectId: string) => {
-    setOpenDeleteId(injectId);
-  };
-
-  const handleCloseDelete = () => {
-    setOpenDeleteId(null);
-  };
-
-  const refreshData = () => {
-    fetchData();
-  };
-
   return (
     <>
       <PaginationComponent
@@ -220,15 +198,8 @@ const InjectList: FunctionComponent<Props> = ({
               secondaryAction={
                 <AtomicTestingPopover
                   atomic={injectDto}
-                  entries={[
-                    { label: 'Duplicate', action: () => handleOpenDuplicate(injectDto.inject_id) },
-                    { label: 'Delete', action: () => handleOpenDelete(injectDto.inject_id) },
-                  ]}
-                  openDuplicate={openDuplicateId === injectDto.inject_id}
-                  setOpenDuplicate={handleCloseDuplicate}
-                  openDelete={openDeleteId === injectDto.inject_id}
-                  setOpenDelete={handleCloseDelete}
-                  onDelete={refreshData}
+                  actions={['Duplicate', 'Delete']}
+                  onOperationSuccess={fetchData}
                   variantButtonPopover={'icon'}
                 />
                   }

@@ -42,7 +42,7 @@ interface ExercisePopoverProps {
 
 const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   exercise,
-  actions,
+  actions = [],
   variantButtonPopover,
   onOperationSuccess,
 }) => {

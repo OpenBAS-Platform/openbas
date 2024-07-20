@@ -29,8 +29,6 @@ const AtomicTestingHeader = () => {
 
   const { injectResultDto, updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
   const [openEditId, setOpenEditId] = useState<string | null>(null);
-  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
-  const [openDeleteId, setOpenDeleteId] = useState<string | null>(null);
 
   // Launch atomic testing
   const [open, setOpen] = useState(false);
@@ -51,28 +49,6 @@ const AtomicTestingHeader = () => {
   // UPDATE
   const handleOpenEdit = (injectId: string) => {
     setOpenEditId(injectId);
-  };
-
-  const handleCloseEdit = () => {
-    setOpenEditId(null);
-  };
-
-  // DUPLICATE
-  const handleOpenDuplicate = (injectId: string) => {
-    setOpenDuplicateId(injectId);
-  };
-
-  const handleCloseDuplicate = () => {
-    setOpenDuplicateId(null);
-  };
-
-  // DELETE
-  const handleOpenDelete = (injectId: string) => {
-    setOpenDeleteId(injectId);
-  };
-
-  const handleCloseDelete = () => {
-    setOpenDeleteId(null);
   };
 
   if (!injectResultDto) {
@@ -98,7 +74,7 @@ const AtomicTestingHeader = () => {
             variant="contained"
             color="warning"
             size="small"
-            onClick={() => setOpenEditId(injectResultDto.inject_id)}
+            onClick={() => handleOpenEdit(injectResultDto.inject_id)}
           >
             {t('Configure')}
           </Button>
@@ -118,17 +94,8 @@ const AtomicTestingHeader = () => {
 
         <AtomicTestingPopover
           atomic={injectResultDto}
-          openEdit={openEditId === injectResultDto.inject_id}
-          openDelete={openDeleteId === injectResultDto.inject_id}
-          openDuplicate={openDuplicateId === injectResultDto.inject_id}
-          setOpenEdit={handleCloseEdit}
-          setOpenDelete={handleCloseDelete}
-          setOpenDuplicate={handleCloseDuplicate}
-          entries={[
-            { label: 'Update', action: () => handleOpenEdit(injectResultDto.inject_id) },
-            { label: 'Duplicate', action: () => handleOpenDuplicate(injectResultDto.inject_id) },
-            { label: 'Delete', action: () => handleOpenDelete(injectResultDto.inject_id) },
-          ]}
+          actions={['Update', 'Delete', 'Duplicate']}
+          onEdit={() => handleOpenEdit(injectResultDto.inject_id)}
         />
       </div>
       <Dialog

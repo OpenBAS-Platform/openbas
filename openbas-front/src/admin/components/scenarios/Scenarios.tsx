@@ -194,31 +194,14 @@ const Scenarios = () => {
     exportFileName: `${t('Scenarios')}.csv`,
   };
 
-  // Duplicate
-  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
-  const handleOpenDuplicate = (scenarioId: string) => {
-    setOpenDuplicateId(scenarioId);
-  };
-  const handleCloseDuplicate = () => {
-    setOpenDuplicateId(null);
-  };
+  const [modificationTrigger, setModificationTrigger] = useState<boolean>(false);
 
-  // Export
-  const [openExportId, setOpenExportId] = useState<string | null>(null);
-  const handleOpenExport = (scenarioId: string) => {
-    setOpenExportId(scenarioId);
-  };
-  const handleCloseExport = () => {
-    setOpenExportId(null);
-  };
-
-  // Delete
-  const [openDeleteId, setOpenDeleteId] = useState<string | null>(null);
-  const handleOpenDelete = (scenarioId: string) => {
-    setOpenExportId(scenarioId);
-  };
-  const handleCloseDelete = () => {
-    setOpenDeleteId(null);
+  const refreshScenarios = () => {
+    searchScenarios(searchPaginationInput).then((result) => {
+      const { data } = result;
+      setScenarios(data.content);
+      setModificationTrigger((prev) => !prev);
+    });
   };
 
   return (
@@ -250,6 +233,7 @@ const Scenarios = () => {
         ))}
       </div>
       <PaginationComponent
+        key={modificationTrigger.toString()}
         fetch={searchScenarios}
         searchPaginationInput={searchPaginationInput}
         setContent={setScenarios}
@@ -295,18 +279,9 @@ const Scenarios = () => {
               secondaryAction={
                 <ScenarioPopover
                   scenario={scenario}
-                  entries={[
-                    { label: 'Duplicate', action: () => handleOpenDuplicate(scenario.scenario_id) },
-                    { label: 'Export', action: () => handleOpenExport(scenario.scenario_id) },
-                    { label: 'Delete', action: () => handleOpenDelete(scenario.scenario_id) },
-                  ]}
-                  openExport={openExportId === scenario.scenario_id}
-                  setOpenExport={handleCloseExport}
-                  openDuplicate={openDuplicateId === scenario.scenario_id}
-                  setOpenDuplicate={handleCloseDuplicate}
-                  openDelete={openDeleteId === scenario.scenario_id}
-                  setOpenDelete={handleCloseDelete}
+                  actions={['Duplicate', 'Export', 'Delete']}
                   variantButtonPopover={'icon'}
+                  onOperationSuccess={refreshScenarios}
                 />
               }
               disablePadding={true}
