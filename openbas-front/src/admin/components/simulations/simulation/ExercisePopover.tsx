@@ -31,18 +31,20 @@ import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import DialogDelete from '../../../../components/common/DialogDelete';
 
-export type ExerciseActionPopover = 'Update' | 'Delete' | 'Duplicate' | 'Export' | '' | '';
+export type ExerciseActionPopover = 'Update' | 'Delete' | 'Duplicate' | 'Export';
 
 interface ExercisePopoverProps {
   exercise: Exercise;
   actions: ExerciseActionPopover[];
   variantButtonPopover?: VariantButtonPopover;
+  onOperationSuccess?: () => void;
 }
 
 const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   exercise,
   actions,
   variantButtonPopover,
+                                                                    onOperationSuccess,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -92,7 +94,10 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const handleCloseDelete = () => setOpenDelete(false);
 
   const submitDelete = () => {
-    dispatch(deleteExercise(exercise.exercise_id)).then(() => handleCloseDelete());
+    dispatch(deleteExercise(exercise.exercise_id)).then(() => {
+      handleCloseDelete()
+      if (onOperationSuccess) onOperationSuccess();
+    });
     navigate('/admin/exercises');
   };
 
@@ -104,6 +109,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const submitDuplicate = () => {
     dispatch(duplicateExercise(exercise.exercise_id)).then((result: { result: string, entities: { exercises: ExerciseStore } }) => {
       handleCloseDuplicate();
+      if (onOperationSuccess) onOperationSuccess();
       navigate(`/admin/exercises/${result.result}`);
     });
   };

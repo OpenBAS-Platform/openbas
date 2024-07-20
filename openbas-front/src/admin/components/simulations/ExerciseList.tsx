@@ -66,6 +66,7 @@ interface Props {
   exercises: ExerciseSimpleStore[];
   searchPaginationInput: SearchPaginationInput;
   setSearchPaginationInput: (datas: SearchPaginationInput) => void;
+  onOperationSuccess?: () => void;
   hasHeader?: boolean;
   variant?: string,
 }
@@ -74,6 +75,7 @@ const ExerciseList: FunctionComponent<Props> = ({
   exercises = [],
   searchPaginationInput,
   setSearchPaginationInput,
+                                                  onOperationSuccess,
   hasHeader = true,
   variant = 'list',
 }) => {
@@ -162,8 +164,9 @@ const ExerciseList: FunctionComponent<Props> = ({
           secondaryAction={
             <ExercisePopover
               exercise={exercise}
-              actions={['Duplicate', 'Export']}
+              actions={['Duplicate', 'Delete', 'Export']}
               variantButtonPopover={'icon'}
+              onOperationSuccess={onOperationSuccess}
             />
           }
           disablePadding={true}
