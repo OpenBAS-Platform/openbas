@@ -44,7 +44,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   exercise,
   actions,
   variantButtonPopover,
-                                                                    onOperationSuccess,
+  onOperationSuccess,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -98,7 +98,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
       handleCloseDelete();
       if (onOperationSuccess) onOperationSuccess();
     });
-    //navigate('/admin/exercises');
+    navigate('/admin/exercises');
   };
 
   // Duplicate
@@ -110,7 +110,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     dispatch(duplicateExercise(exercise.exercise_id)).then((result: { result: string, entities: { exercises: ExerciseStore } }) => {
       handleCloseDuplicate();
       if (onOperationSuccess) onOperationSuccess();
-      //navigate(`/admin/exercises/${result.result}`);
+      navigate(`/admin/exercises/${result.result}`);
     });
   };
 
