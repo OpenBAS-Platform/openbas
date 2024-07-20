@@ -95,10 +95,10 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
 
   const submitDelete = () => {
     dispatch(deleteExercise(exercise.exercise_id)).then(() => {
-      handleCloseDelete()
+      handleCloseDelete();
       if (onOperationSuccess) onOperationSuccess();
     });
-    navigate('/admin/exercises');
+    //navigate('/admin/exercises');
   };
 
   // Duplicate
@@ -110,7 +110,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     dispatch(duplicateExercise(exercise.exercise_id)).then((result: { result: string, entities: { exercises: ExerciseStore } }) => {
       handleCloseDuplicate();
       if (onOperationSuccess) onOperationSuccess();
-      navigate(`/admin/exercises/${result.result}`);
+      //navigate(`/admin/exercises/${result.result}`);
     });
   };
 

@@ -76,6 +76,13 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
     sorts: initSorting('exercise_start_date'),
   });
+
+  const refreshExercises = () => {
+    searchScenarioExercises(scenarioId, searchPaginationInput).then((result) => {
+      const { data } = result;
+      setExercises(data.content);
+    });
+  };
   return (
     <>
       <Grid
@@ -215,6 +222,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
                 exercises={exercises}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
+                onOperationSuccess={refreshExercises}
               />
             </Paper>
           </Grid>

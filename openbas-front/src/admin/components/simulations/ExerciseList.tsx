@@ -75,7 +75,7 @@ const ExerciseList: FunctionComponent<Props> = ({
   exercises = [],
   searchPaginationInput,
   setSearchPaginationInput,
-                                                  onOperationSuccess,
+  onOperationSuccess,
   hasHeader = true,
   variant = 'list',
 }) => {

@@ -110,12 +110,16 @@ const Dashboard = () => {
     page: 0,
     size: 6,
   });
-  useEffect(() => {
+
+  const refreshExercises = () => {
     searchExercises(searchPaginationInput).then((result: { data: Page<ExerciseSimple> }) => {
       const { data } = result;
       setExercises(data.content);
     });
-  }, [searchPaginationInput]);
+  };
+  useEffect(() => {
+    refreshExercises();
+  }, [searchPaginationInput, exercisesFromStore]);
   return (
     <Grid container spacing={3}>
       <Grid item xs={3}>
@@ -222,6 +226,7 @@ const Dashboard = () => {
             exercises={exercises}
             searchPaginationInput={searchPaginationInput}
             setSearchPaginationInput={setSearchPaginationInput}
+            onOperationSuccess={refreshExercises}
             hasHeader={false}
             variant={'reduced-view'}
           />

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Page } from '@playwright/test';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import Breadcrumbs from '../../../components/Breadcrumbs';
@@ -7,12 +8,11 @@ import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper
 import type { UserHelper } from '../../../actions/helper';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import { initSorting } from '../../../components/common/pagination/Page';
-import type {ExerciseSimple, SearchPaginationInput} from '../../../utils/api-types';
+import type { ExerciseSimple, SearchPaginationInput } from '../../../utils/api-types';
 import type { EndpointStore } from '../assets/endpoints/Endpoint';
 import ExerciseList from './ExerciseList';
 import { searchExercises } from '../../../actions/Exercise';
 import ImportUploaderExercise from './ImportUploaderExercise';
-import {Page} from "@playwright/test";
 
 const Exercises = () => {
   // Standard hooks
@@ -28,12 +28,12 @@ const Exercises = () => {
     sorts: initSorting('exercise_updated_at', 'DESC'),
   });
 
-    const refreshExercises = () => {
-        searchExercises(searchPaginationInput).then((result) => {
-            const { data } = result;
-            setExercises(data.content);
-        });
-    };
+  const refreshExercises = () => {
+    searchExercises(searchPaginationInput).then((result) => {
+      const { data } = result;
+      setExercises(data.content);
+    });
+  };
 
   // Export
   const exportProps = {
