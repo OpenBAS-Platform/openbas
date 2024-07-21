@@ -47,7 +47,7 @@ const AtomicTestingHeader = () => {
   };
 
   // UPDATE
-  const handleOpenEdit = (injectId: string) => {
+  const handleOpenEditId = (injectId: string) => {
     setOpenEditId(injectId);
   };
 
@@ -74,7 +74,7 @@ const AtomicTestingHeader = () => {
             variant="contained"
             color="warning"
             size="small"
-            onClick={() => handleOpenEdit(injectResultDto.inject_id)}
+            onClick={() => handleOpenEditId(injectResultDto.inject_id)}
           >
             {t('Configure')}
           </Button>
@@ -95,7 +95,8 @@ const AtomicTestingHeader = () => {
         <AtomicTestingPopover
           atomic={injectResultDto}
           actions={['Update', 'Delete', 'Duplicate']}
-          onEdit={() => handleOpenEdit(injectResultDto.inject_id)}
+          openEditId={openEditId}
+          setOpenEditId={setOpenEditId}
         />
       </div>
       <Dialog

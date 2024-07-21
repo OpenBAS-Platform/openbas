@@ -22,6 +22,8 @@ interface Props {
   atomic: InjectResultDTO;
   actions: AtomicTestingActionPopover[];
   onOperationSuccess?: () => void;
+  openEditId: string | null;
+  setOpenEditId: (id: string | null) => void;
   variantButtonPopover?: VariantButtonPopover;
 }
 
@@ -29,6 +31,8 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   atomic,
   actions = [],
   onOperationSuccess,
+  openEditId,
+  setOpenEditId,
   variantButtonPopover,
 }) => {
   // Standard hooks
@@ -45,9 +49,9 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     dispatch(fetchTeams());
   });
 
-  const [openEdit, setOpenEdit] = useState(false);
-  const handleOpenEdit = () => setOpenEdit(true);
-  const handleCloseEdit = () => setOpenEdit(false);
+  const handleOpenEdit = () => setOpenEditId(atomic.inject_id);
+  const handleCloseEdit = () => setOpenEditId(null);
+
   const onUpdateAtomicTesting = async (data: Inject) => {
     const toUpdate = R.pipe(
       R.pick([
@@ -85,24 +89,24 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   const [openDuplicate, setOpenDuplicate] = useState(false);
   const handleOpenDuplicate = () => setOpenDuplicate(true);
   const handleCloseDuplicate = () => setOpenDuplicate(false);
-  const submitDuplicate = async () => {
-    await duplicateAtomicTesting(atomic.inject_id).then((result: { data: InjectResultDTO }) => {
+  const submitDuplicate = () => {
+    duplicateAtomicTesting(atomic.inject_id).then((result: { data: InjectResultDTO }) => {
       handleCloseDuplicate();
       if (onOperationSuccess) onOperationSuccess();
-      navigate(`/admin/atomic_testings/${result.data.inject_id}`);
+      navigate(`/admin/atomic_testings/${result.data.inject_id}`, { replace: true });
     });
   };
 
   const entries = [];
-  if (actions.includes('Update')) entries.push({ label: 'Update', action: () => handleOpenEdit() });
-  if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete() });
-  if (actions.includes('Duplicate')) entries.push({ label: 'Duplicate', action: () => handleOpenDuplicate() });
+  if (actions.includes('Update')) entries.push({ label: 'Update', action: handleOpenEdit });
+  if (actions.includes('Delete')) entries.push({ label: 'Delete', action: handleOpenDelete });
+  if (actions.includes('Duplicate')) entries.push({ label: 'Duplicate', action: handleOpenDuplicate });
 
   return (
     <>
       <ButtonPopover entries={entries} variant={variantButtonPopover} />
       <UpdateInject
-        open={openEdit}
+        open={openEditId === atomic.inject_id}
         handleClose={handleCloseEdit}
         onUpdateInject={onUpdateAtomicTesting}
         injectId={atomic.inject_id}
