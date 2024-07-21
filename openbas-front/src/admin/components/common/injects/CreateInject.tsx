@@ -150,7 +150,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
         open={open}
         handleClose={handleCloseDrawer}
         title={title}
-        variant='full'
+        variant="full"
         PaperProps={{
           ref: drawerRef,
         }}
@@ -162,7 +162,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
               fetch={searchInjectorContracts}
               searchPaginationInput={searchPaginationInput}
               setContent={setContracts}
-              entityPrefix='injector_contract'
+              entityPrefix="injector_contract"
               availableFilters={['injector_contract_kill_chain_phases', 'injector_contract_attack_patterns']}
               helpers={helpers}
               filterGroup={filterGroup}
@@ -185,10 +185,11 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
                   >
                     <ListItemIcon>
                       <InjectIcon
+                        variant="list"
                         type={
                           contract.injector_contract_payload
                             ? contract.injector_contract_payload?.payload_collector_type
-                              || contract.injector_contract_payload?.payload_type
+                            || contract.injector_contract_payload?.payload_type
                             : contract.injector_contract_injector_type
                         }
                         isPayload={isNotEmptyField(contract.injector_contract_payload)}
