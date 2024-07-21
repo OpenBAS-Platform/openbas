@@ -49,9 +49,8 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     dispatch(fetchTeams());
   });
 
-  const [openEdit, setOpenEdit] = useState(false);
-  const handleOpenEdit = () => (setOpenEditId ? setOpenEditId(atomic.inject_id) : setOpenEdit(true));
-  const handleCloseEdit = () => (setOpenEditId ? setOpenEditId(null) : setOpenEdit(false));
+  const handleOpenEdit = () => setOpenEditId?.(atomic.inject_id);
+  const handleCloseEdit = () => setOpenEditId?.(null);
 
   const onUpdateAtomicTesting = async (data: Inject) => {
     const toUpdate = R.pipe(
