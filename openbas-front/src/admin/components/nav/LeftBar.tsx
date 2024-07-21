@@ -40,6 +40,7 @@ import logoFiligranTextDark from '../../../static/images/logo_filigran_text_dark
 import logoFiligranTextLight from '../../../static/images/logo_filigran_text_light.png';
 import useDimensions from '../../../utils/hooks/useDimensions';
 import useAuth from '../../../utils/hooks/useAuth';
+import { computeBannerSettings } from '../../../public/components/systembanners/SystemBanners';
 
 type entry = {
   type?: string,
@@ -141,8 +142,9 @@ const StyledTooltip = styled(({ className, ...props }) => (
 
 const LeftBar = () => {
   const {
-    settings: { platform_whitemark, platform_enterprise_edition },
+    settings,
   } = useAuth();
+  const { bannerHeightNumber } = computeBannerSettings(settings);
   const theme = useTheme<Theme>();
   const location = useLocation();
   const navigate = useNavigate();
@@ -196,8 +198,8 @@ const LeftBar = () => {
   const isMobile = dimension.width < 768;
   const generateSubMenu = (menu: string, entries: entry[]) => {
     return navOpen ? (
-      <Collapse in={selectedMenu === menu} timeout="auto" unmountOnExit={true}>
-        <MenuList component="nav" disablePadding={true}>
+      <Collapse in={selectedMenu === menu} timeout="auto" unmountOnExit>
+        <MenuList component="nav" disablePadding>
           {entries.filter((entry) => entry.granted !== false).map((entry) => {
             return (
               <StyledTooltip key={entry.label} title={entry.disabled ? t(`${entry.label} - Coming soon`) : t(entry.label)} placement="right">
@@ -206,7 +208,7 @@ const LeftBar = () => {
                     component={Link}
                     to={entry.link}
                     selected={entry.exact ? location.pathname === entry.link : location.pathname.includes(entry.link)}
-                    dense={true}
+                    dense
                     classes={{ root: classes.menuSubItem }}
                     disabled={entry.disabled}
                   >
@@ -238,8 +240,8 @@ const LeftBar = () => {
           horizontal: 'left',
         }}
         onClose={handleSelectedMenuClose}
-        disableRestoreFocus={true}
-        disableScrollLock={true}
+        disableRestoreFocus
+        disableScrollLock
         slotProps={{
           paper: {
             elevation: 1,
@@ -265,7 +267,7 @@ const LeftBar = () => {
                       component={Link}
                       to={entry.link}
                       selected={entry.exact ? location.pathname === entry.link : location.pathname.includes(entry.link)}
-                      dense={true}
+                      dense
                       classes={{ root: classes.menuHoverItem }}
                       onClick={handleSelectedMenuClose}
                       disabled={entry.disabled}
@@ -288,7 +290,7 @@ const LeftBar = () => {
                 component={Link}
                 to={entry.link}
                 selected={entry.exact ? location.pathname === entry.link : location.pathname.includes(entry.link)}
-                dense={true}
+                dense
                 classes={{ root: classes.menuHoverItem }}
                 onClick={handleSelectedMenuClose}
               >
@@ -322,13 +324,13 @@ const LeftBar = () => {
     >
       <Toolbar />
       <div ref={ref.current}>
-        <MenuList component="nav">
+        <MenuList component="nav" style={{ marginTop: bannerHeightNumber }}>
           <StyledTooltip title={!navOpen && t('Home')} placement="right">
             <MenuItem
               component={Link}
               to="/admin"
               selected={location.pathname === '/admin'}
-              dense={true}
+              dense
               classes={{ root: classes.menuItem }}
             >
               <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
@@ -350,7 +352,7 @@ const LeftBar = () => {
               component={Link}
               to="/admin/scenarios"
               selected={location.pathname.includes('/admin/scenarios')}
-              dense={true}
+              dense
               classes={{ root: classes.menuItem }}
             >
               <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
@@ -369,7 +371,7 @@ const LeftBar = () => {
               component={Link}
               to="/admin/exercises"
               selected={location.pathname.includes('/admin/exercises')}
-              dense={true}
+              dense
               classes={{ root: classes.menuItem }}
             >
               <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
@@ -388,7 +390,7 @@ const LeftBar = () => {
               component={Link}
               to="/admin/atomic_testings"
               selected={location.pathname.includes('/admin/atomic_testings')}
-              dense={true}
+              dense
               classes={{ root: classes.menuItem }}
             >
               <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
@@ -410,7 +412,7 @@ const LeftBar = () => {
             ref={anchors.assets}
             href="assets"
             selected={!navOpen && location.pathname.includes('/admin/assets')}
-            dense={true}
+            dense
             classes={{ root: classes.menuItem }}
             onClick={() => (isMobile || navOpen ? handleSelectedMenuToggle('assets') : handleGoToPage('/admin/assets'))}
             onMouseEnter={() => !navOpen && handleSelectedMenuOpen('assets')}
@@ -439,7 +441,7 @@ const LeftBar = () => {
             ref={anchors.teams}
             href="teams"
             selected={!navOpen && location.pathname.includes('/admin/teams')}
-            dense={true}
+            dense
             classes={{ root: classes.menuItem }}
             onClick={() => (isMobile || navOpen ? handleSelectedMenuToggle('teams') : handleGoToPage('/admin/teams'))}
             onMouseEnter={() => !navOpen && handleSelectedMenuOpen('teams')}
@@ -468,7 +470,7 @@ const LeftBar = () => {
             ref={anchors.components}
             href="components"
             selected={!navOpen && location.pathname.includes('/admin/components')}
-            dense={true}
+            dense
             classes={{ root: classes.menuItem }}
             onClick={() => (isMobile || navOpen ? handleSelectedMenuToggle('components') : handleGoToPage('/admin/components'))}
             onMouseEnter={() => !navOpen && handleSelectedMenuOpen('components')}
@@ -504,9 +506,9 @@ const LeftBar = () => {
                 component={Link}
                 to="/admin/reports"
                 selected={location.pathname.includes('/admin/reports')}
-                dense={true}
+                dense
                 classes={{ root: classes.menuItem }}
-                disabled={true}
+                disabled
               >
                 <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
                   <DescriptionOutlined />
@@ -526,9 +528,9 @@ const LeftBar = () => {
                 component={Link}
                 to="/admin/skills"
                 selected={location.pathname === '/admin/skills'}
-                dense={true}
+                dense
                 classes={{ root: classes.menuItem }}
-                disabled={true}
+                disabled
               >
                 <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
                   <BeenhereOutlined />
@@ -547,7 +549,7 @@ const LeftBar = () => {
               component={Link}
               to="/admin/payloads"
               selected={location.pathname === '/admin/payloads'}
-              dense={true}
+              dense
               classes={{ root: classes.menuItem }}
             >
               <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
@@ -566,7 +568,7 @@ const LeftBar = () => {
               component={Link}
               to="/admin/mitigations"
               selected={location.pathname === '/admin/mitigations'}
-              dense={true}
+              dense
               classes={{ root: classes.menuItem }}
             >
               <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
@@ -584,7 +586,7 @@ const LeftBar = () => {
             ref={anchors.integrations}
             href="integrations"
             selected={!navOpen && location.pathname.includes('/admin/integrations')}
-            dense={true}
+            dense
             classes={{ root: classes.menuItem }}
             onClick={() => (isMobile || navOpen ? handleSelectedMenuToggle('integrations') : handleGoToPage('/admin/integrations'))}
             onMouseEnter={() => !navOpen && handleSelectedMenuOpen('integrations')}
@@ -617,7 +619,7 @@ const LeftBar = () => {
               ref={anchors.settings}
               href="settings"
               selected={!navOpen && location.pathname.includes('/admin/settings')}
-              dense={true}
+              dense
               classes={{ root: classes.menuItem }}
               onClick={() => (isMobile || navOpen ? handleSelectedMenuToggle('settings') : handleGoToPage('/admin/settings'))}
               onMouseEnter={() => !navOpen && handleSelectedMenuOpen('settings')}
@@ -646,10 +648,10 @@ const LeftBar = () => {
         </MenuList>
       </div>
       <div style={{ marginTop: 'auto' }}>
-        <MenuList component="nav">
-          {(platform_whitemark === 'false' || platform_enterprise_edition === 'false') && (
+        <MenuList component="nav" style={{ marginBottom: bannerHeightNumber }}>
+          {(settings.platform_whitemark === 'false' || settings.platform_enterprise_edition === 'false') && (
             <MenuItem
-              dense={true}
+              dense
               classes={{
                 root: navOpen ? classes.menuLogoOpen : classes.menuLogo,
               }}
@@ -676,7 +678,7 @@ const LeftBar = () => {
             </MenuItem>
           )}
           <MenuItem
-            dense={true}
+            dense
             classes={{
               root: navOpen ? classes.menuCollapseOpen : classes.menuCollapse,
             }}

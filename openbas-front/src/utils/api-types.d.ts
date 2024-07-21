@@ -2224,6 +2224,8 @@ export interface PlatformSettings {
   platform_theme?: string;
   platform_version?: string;
   platform_whitemark?: string;
+  platform_banner_level: string;
+  platform_banner_text: string;
   postgre_version?: string;
   rabbitmq_version?: string;
   xtm_opencti_enable?: boolean;

@@ -33,7 +33,7 @@ const ExerciseField = (props) => {
   useDataLoader(() => {
     dispatch(fetchExercises());
   });
-  const { name, onKeyDown, style, label, placeholder, noMargin } = props;
+  const { name, onKeyDown, style, label, placeholder } = props;
   const exerciseOptions = (exercises || []).map((n) => ({
     id: n.exercise_id,
     label: n.exercise_name,
@@ -43,7 +43,6 @@ const ExerciseField = (props) => {
       variant="standard"
       size="small"
       name={name}
-      noMargin={noMargin}
       fullWidth
       multiple
       label={label}

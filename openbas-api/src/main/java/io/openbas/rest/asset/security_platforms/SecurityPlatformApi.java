@@ -1,41 +1,24 @@
 package io.openbas.rest.asset.security_platforms;
 
-import io.openbas.asset.EndpointService;
 import io.openbas.database.model.*;
-import io.openbas.database.raw.RawAttackPattern;
 import io.openbas.database.repository.*;
-import io.openbas.database.specification.AssetAgentJobSpecification;
-import io.openbas.database.specification.EndpointSpecification;
-import io.openbas.rest.asset.endpoint.form.EndpointInput;
-import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.rest.asset.security_platforms.form.SecurityPlatformInput;
 import io.openbas.rest.asset.security_platforms.form.SecurityPlatformUpsertInput;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.payload.form.PayloadUpsertInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.security.Security;
-import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.executors.openbas.OpenBASExecutor.OPENBAS_EXECUTOR_ID;
-import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 

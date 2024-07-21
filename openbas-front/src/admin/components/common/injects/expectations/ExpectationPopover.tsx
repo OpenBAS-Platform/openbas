@@ -29,6 +29,14 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
 
+  const initialValues = {
+    expectation_type: expectation.expectation_type ?? '',
+    expectation_name: expectation.expectation_name ?? '',
+    expectation_description: expectation.expectation_description ?? '',
+    expectation_score: expectation.expectation_score ?? 100,
+    expectation_expectation_group: expectation.expectation_expectation_group ?? false,
+  };
+
   // Popover
   const handlePopoverOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -112,7 +120,7 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
         title={t('Update the expectation')}
       >
         <ExpectationFormUpdate
-          initialValues={expectation}
+          initialValues={initialValues}
           onSubmit={onSubmitEdit}
           handleClose={handleCloseEdit}
         />

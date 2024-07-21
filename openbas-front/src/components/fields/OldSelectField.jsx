@@ -23,11 +23,13 @@ const renderSelectField = ({
   style,
   onChange: onChangePassed,
   helperText,
+  InputLabelProps,
   ...others
 }) => (
   <FormControl error={touched && error} fullWidth={fullWidth} style={style}>
     {others.displayEmpty ? (
       <InputLabel
+        required={InputLabelProps?.required}
         shrink={true}
         htmlFor={name}
         variant={others.variant || 'standard'}
@@ -35,7 +37,7 @@ const renderSelectField = ({
         {label}
       </InputLabel>
     ) : (
-      <InputLabel htmlFor={name} variant={others.variant || 'standard'}>
+      <InputLabel required={InputLabelProps?.required} htmlFor={name} variant={others.variant || 'standard'}>
         {label}
       </InputLabel>
     )}

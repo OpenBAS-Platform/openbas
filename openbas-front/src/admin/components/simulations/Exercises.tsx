@@ -5,13 +5,13 @@ import Breadcrumbs from '../../../components/Breadcrumbs';
 import ExerciseCreation from './simulation/ExerciseCreation';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
 import type { UserHelper } from '../../../actions/helper';
-import ImportUploaderScenario from '../scenarios/ImportUploaderScenario';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import { initSorting } from '../../../components/common/pagination/Page';
 import type { SearchPaginationInput } from '../../../utils/api-types';
 import type { EndpointStore } from '../assets/endpoints/Endpoint';
 import ExerciseList from './ExerciseList';
 import { searchExercises } from '../../../actions/Exercise';
+import ImportUploaderExercise from './ImportUploaderExercise';
 
 const Exercises = () => {
   // Standard hooks
@@ -24,7 +24,7 @@ const Exercises = () => {
 
   const [exercises, setExercises] = useState<EndpointStore[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
-    sorts: initSorting('exercise_updated_at'),
+    sorts: initSorting('exercise_updated_at', 'DESC'),
   });
 
   // Export
@@ -50,7 +50,7 @@ const Exercises = () => {
         setContent={setExercises}
         exportProps={exportProps}
       >
-        <ImportUploaderScenario />
+        <ImportUploaderExercise />
       </PaginationComponent>
       <ExerciseList
         exercises={exercises}

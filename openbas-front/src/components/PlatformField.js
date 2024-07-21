@@ -32,6 +32,7 @@ class PlatformField extends Component {
       label,
       placeholder,
       disabled,
+      InputLabelProps,
     } = this.props;
     const platformsOptions = [
       { id: 'Windows', label: 'Windows' },
@@ -51,6 +52,7 @@ class PlatformField extends Component {
         options={platformsOptions}
         style={style}
         onKeyDown={onKeyDown}
+        InputLabelProps={InputLabelProps}
         renderOption={(props, option) => (
           <Box component="li" {...props}>
             <div className={classes.icon}>

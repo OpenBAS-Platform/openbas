@@ -17,6 +17,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
   root: {
     minWidth: 1280,
     height: '100%',
+    overflowY: 'auto',
   },
   content: {
     height: '100%',

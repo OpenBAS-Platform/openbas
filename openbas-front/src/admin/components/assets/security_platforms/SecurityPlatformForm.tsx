@@ -7,7 +7,7 @@ import { useFormatter } from '../../../../components/i18n';
 import type { SecurityPlatformInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
 import TagField from '../../../../components/fields/TagField';
-import DocumentField from '../../../../components/fields/DocumentField';
+import FileLoader from '../../../../components/fields/FileLoader';
 
 interface Props {
   onSubmit: SubmitHandler<SecurityPlatformInput>;
@@ -25,8 +25,8 @@ const SecurityPlatformForm: React.FC<Props> = ({
     security_platform_type: 'SIEM',
     asset_description: '',
     asset_last_seen: undefined,
-    security_platform_logo_light: '',
-    security_platform_logo_dark: '',
+    security_platform_logo_light: undefined,
+    security_platform_logo_dark: undefined,
     asset_tags: [],
   },
 }) => {
@@ -112,14 +112,12 @@ const SecurityPlatformForm: React.FC<Props> = ({
         control={control}
         name="security_platform_logo_light"
         render={({ field: { onChange, value } }) => (
-          <DocumentField
+          <FileLoader
             name="security_platform_logo_light"
             label={t('Logo light')}
-            fieldValue={value ?? ''}
-            fieldOnChange={onChange}
-            errors={errors}
-            style={{ marginTop: 20 }}
             extensions={['png', 'jpg', 'jpeg', 'svg', 'gif']}
+            setFieldValue={(_name, document) => { onChange(document?.id); }}
+            initialValue={{ id: value }}
           />
         )}
       />
@@ -127,14 +125,12 @@ const SecurityPlatformForm: React.FC<Props> = ({
         control={control}
         name="security_platform_logo_dark"
         render={({ field: { onChange, value } }) => (
-          <DocumentField
+          <FileLoader
             name="security_platform_logo_dark"
             label={t('Logo dark')}
-            fieldValue={value ?? ''}
-            fieldOnChange={onChange}
-            errors={errors}
-            style={{ marginTop: 20 }}
             extensions={['png', 'jpg', 'tiff', 'tif', 'bmp', 'jpeg', 'svg', 'gif']}
+            setFieldValue={(_name, document) => { onChange(document?.id); }}
+            initialValue={{ id: value }}
           />
         )}
       />
