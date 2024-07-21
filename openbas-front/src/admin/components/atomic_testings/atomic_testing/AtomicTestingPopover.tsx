@@ -22,8 +22,8 @@ interface Props {
   atomic: InjectResultDTO;
   actions: AtomicTestingActionPopover[];
   onOperationSuccess?: () => void;
-  openEditId: string | null;
-  setOpenEditId: (id: string | null) => void;
+  openEditId?: string | null;
+  setOpenEditId?: (id: string | null) => void;
   variantButtonPopover?: VariantButtonPopover;
 }
 
@@ -49,8 +49,9 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     dispatch(fetchTeams());
   });
 
-  const handleOpenEdit = () => setOpenEditId(atomic.inject_id);
-  const handleCloseEdit = () => setOpenEditId(null);
+  const [openEdit, setOpenEdit] = useState(false);
+  const handleOpenEdit = () => (setOpenEditId ? setOpenEditId(atomic.inject_id) : setOpenEdit(true));
+  const handleCloseEdit = () => (setOpenEditId ? setOpenEditId(null) : setOpenEdit(false));
 
   const onUpdateAtomicTesting = async (data: Inject) => {
     const toUpdate = R.pipe(
@@ -93,7 +94,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     duplicateAtomicTesting(atomic.inject_id).then((result: { data: InjectResultDTO }) => {
       handleCloseDuplicate();
       if (onOperationSuccess) onOperationSuccess();
-      navigate(`/admin/atomic_testings/${result.data.inject_id}`, { replace: true });
+      navigate(`/admin/atomic_testings/${result.data.inject_id}`);
     });
   };
 
