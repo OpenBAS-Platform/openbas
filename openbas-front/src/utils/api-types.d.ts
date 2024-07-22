@@ -1335,6 +1335,16 @@ export interface InjectorContractInput {
   is_atomic_testing?: boolean;
 }
 
+export interface InjectorContractOutput {
+  injector_contract_attack_patterns?: string[];
+  injector_contract_content: string;
+  injector_contract_id: string;
+  injector_contract_injector_type?: string;
+  injector_contract_labels?: Record<string, string>;
+  injector_contract_payload_type?: string;
+  injector_contract_platforms?: string[];
+}
+
 export interface InjectorContractUpdateInput {
   atomicTesting?: boolean;
   contract_attack_patterns_ids?: string[];
@@ -1848,8 +1858,8 @@ export interface PageInjectResultDTO {
   totalPages?: number;
 }
 
-export interface PageInjectorContract {
-  content?: InjectorContract[];
+export interface PageInjectorContractOutput {
+  content?: InjectorContractOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;

@@ -12,6 +12,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.injector_contract.form.InjectorContractAddInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateMappingInput;
+import io.openbas.rest.injector_contract.output.InjectorContractOutput;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -28,7 +29,7 @@ import java.util.List;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
 @RequiredArgsConstructor
 @RestController
@@ -39,6 +40,7 @@ public class InjectorContractApi extends RestBehavior {
     private final InjectorRepository injectorRepository;
 
     private final InjectorContractRepository injectorContractRepository;
+    private final InjectorContractService injectorContractService;
 
     @GetMapping("/api/injector_contracts")
     public Iterable<RawInjectorsContrats> injectContracts() {
@@ -46,7 +48,7 @@ public class InjectorContractApi extends RestBehavior {
     }
 
     @PostMapping("/api/injector_contracts/search")
-    public Page<InjectorContract> injectorContracts(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    public Page<InjectorContractOutput> injectorContracts(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
         if( searchPaginationInput.getFilterGroup() != null && searchPaginationInput.getFilterGroup().getFilters() != null ) {
             List<Filters.Filter> killChainPhaseFilters = searchPaginationInput.getFilterGroup().getFilters().stream().filter(filter -> filter.getKey().equals("injector_contract_kill_chain_phases")).toList();
             if (!killChainPhaseFilters.isEmpty()) {
@@ -61,17 +63,17 @@ public class InjectorContractApi extends RestBehavior {
                     Filters.FilterGroup newFilterGroup = new Filters.FilterGroup();
                     newFilterGroup.setFilters(searchPaginationInput.getFilterGroup().getFilters().stream().filter(filter -> !filter.getKey().equals("injector_contract_kill_chain_phases")).toList());
                     newSearchPaginationInput.setFilterGroup(newFilterGroup);
-                    return buildPaginationJPA(
-                            (Specification<InjectorContract> specification, Pageable pageable) -> this.injectorContractRepository.findAll(
-                                    InjectorContractSpecification.fromKillChainPhase(killChainPhaseFilter.getValues().getFirst()).and(specification), pageable),
-                            newSearchPaginationInput,
-                            InjectorContract.class
+                    return buildPaginationCriteriaBuilder(
+                        (Specification<InjectorContract> specification, Pageable pageable) -> this.injectorContractService.injectorContracts(
+                            InjectorContractSpecification.fromKillChainPhase(killChainPhaseFilter.getValues().getFirst()).and(specification), pageable),
+                        newSearchPaginationInput,
+                        InjectorContract.class
                     );
                 }
             }
         }
-        return buildPaginationJPA(
-                this.injectorContractRepository::findAll,
+        return buildPaginationCriteriaBuilder(
+            this.injectorContractService::injectorContracts,
                 searchPaginationInput,
                 InjectorContract.class
         );
