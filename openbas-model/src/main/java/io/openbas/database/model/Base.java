@@ -1,8 +1,7 @@
 package io.openbas.database.model;
 
-import org.springframework.beans.BeanUtils;
-
 import jakarta.persistence.Transient;
+import org.springframework.beans.BeanUtils;
 
 public interface Base {
     String getId();
@@ -20,5 +19,9 @@ public interface Base {
     @Transient
     default void setUpdateAttributes(Object input) {
         BeanUtils.copyProperties(input, this);
+    }
+
+    default boolean isListened() {
+        return true;
     }
 }

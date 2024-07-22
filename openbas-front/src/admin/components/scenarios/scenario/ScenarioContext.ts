@@ -1,9 +1,15 @@
 import type { Inject, InjectsImportInput } from '../../../../utils/api-types';
-import { addInjectForScenario, deleteInjectScenario, updateInjectActivationForScenario, updateInjectForScenario } from '../../../../actions/Inject';
+import {
+  addInjectForScenario,
+  deleteInjectScenario,
+  fetchScenarioInjects,
+  updateInjectActivationForScenario,
+  updateInjectForScenario
+} from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { InjectStore } from '../../../../actions/injects/Inject';
-import { importXls } from '../../../../actions/scenarios/scenario-actions';
+import {fetchScenario, importXls} from '../../../../actions/scenarios/scenario-actions';
 
 const injectContextForScenario = (scenario: ScenarioStore) => {
   const dispatch = useAppDispatch();
@@ -25,8 +31,11 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
       return dispatch(deleteInjectScenario(scenario.scenario_id, injectId));
     },
     onImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<void> {
-      // @ts-expect-error: handle axios
-      return importXls(scenario.scenario_id, importId, input);
+      return importXls(scenario.scenario_id, importId, input).then(value => new Promise(function(resolve, reject) {
+        dispatch(fetchScenarioInjects(scenario.scenario_id));
+        dispatch(fetchScenario(scenario.scenario_id));
+        resolve();
+      }));
     },
   };
 };

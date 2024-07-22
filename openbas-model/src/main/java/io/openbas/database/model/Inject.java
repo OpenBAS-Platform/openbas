@@ -214,6 +214,11 @@ public class Inject implements Base, Injection {
     @JsonSerialize(using = MultiModelDeserializer.class)
     private List<InjectExpectation> expectations = new ArrayList<>();
 
+    @Getter
+    @Setter
+    @Transient
+    private boolean isListened = true;
+
     // region transient
     @Transient
     public String getHeader() {

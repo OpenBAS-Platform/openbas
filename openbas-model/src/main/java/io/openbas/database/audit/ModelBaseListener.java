@@ -2,14 +2,13 @@ package io.openbas.database.audit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Base;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
-
 import jakarta.annotation.Resource;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
 import jakarta.persistence.PreRemove;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ModelBaseListener {
@@ -31,20 +30,26 @@ public class ModelBaseListener {
     @PostPersist
     void postPersist(Object base) {
         Base instance = (Base) base;
-        BaseEvent event = new BaseEvent(DATA_PERSIST, instance, mapper);
-        appPublisher.publishEvent(event);
+        if(instance.isListened()) {
+            BaseEvent event = new BaseEvent(DATA_PERSIST, instance, mapper);
+            appPublisher.publishEvent(event);
+        }
     }
 
     @PostUpdate
     void postUpdate(Object base) {
         Base instance = (Base) base;
-        BaseEvent event = new BaseEvent(DATA_UPDATE, instance, mapper);
-        appPublisher.publishEvent(event);
+        if(instance.isListened()) {
+            BaseEvent event = new BaseEvent(DATA_UPDATE, instance, mapper);
+            appPublisher.publishEvent(event);
+        }
     }
 
     @PreRemove
     void preRemove(Object base) {
         Base instance = (Base) base;
-        appPublisher.publishEvent(new BaseEvent(DATA_DELETE, instance, mapper));
+        if(instance.isListened()) {
+            appPublisher.publishEvent(new BaseEvent(DATA_DELETE, instance, mapper));
+        }
     }
 }
