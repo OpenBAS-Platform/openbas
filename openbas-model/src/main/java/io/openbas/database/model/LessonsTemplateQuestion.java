@@ -4,23 +4,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
 
-import jakarta.persistence.*;
 import java.time.Instant;
-import java.util.Objects;
 
 import static java.time.Instant.now;
 
 @Entity
 @Table(name = "lessons_template_questions")
 @EntityListeners(ModelBaseListener.class)
+@Data
 public class LessonsTemplateQuestion implements Base {
     @Id
     @Column(name = "lessons_template_question_id")
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("lessonstemplatequestion_id")
+    @NotBlank
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,14 +35,17 @@ public class LessonsTemplateQuestion implements Base {
 
     @Column(name = "lessons_template_question_created_at")
     @JsonProperty("lessons_template_question_created_at")
+    @NotNull
     private Instant created = now();
 
     @Column(name = "lessons_template_question_updated_at")
     @JsonProperty("lessons_template_question_updated_at")
+    @NotNull
     private Instant updated = now();
 
     @Column(name = "lessons_template_question_content")
     @JsonProperty("lessons_template_question_content")
+    @NotBlank
     private String content;
 
     @Column(name = "lessons_template_question_explanation")
@@ -47,80 +54,12 @@ public class LessonsTemplateQuestion implements Base {
 
     @Column(name = "lessons_template_question_order")
     @JsonProperty("lessons_template_question_order")
+    @NotNull
     private int order;
-
-    @Override
-    public String getId() {
-        return id;
-    }
 
     @Override
     public boolean isUserHasAccess(User user) {
         return user.isAdmin();
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public LessonsTemplateCategory getCategory() {
-        return category;
-    }
-
-    public void setCategory(LessonsTemplateCategory category) {
-        this.category = category;
-    }
-
-    public Instant getCreated() {
-        return created;
-    }
-
-    public void setCreated(Instant created) {
-        this.created = created;
-    }
-
-    public Instant getUpdated() {
-        return updated;
-    }
-
-    public void setUpdated(Instant updated) {
-        this.updated = updated;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getExplanation() {
-        return explanation;
-    }
-
-    public void setExplanation(String explanation) {
-        this.explanation = explanation;
-    }
-
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
-        Base base = (Base) o;
-        return id.equals(base.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }

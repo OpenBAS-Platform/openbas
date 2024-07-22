@@ -3,10 +3,13 @@ package io.openbas.rest.lessons_template.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
-public class LessonsTemplateQuestionCreateInput {
+@Data
+public class LessonsTemplateQuestionInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("lessons_template_question_content")
@@ -16,29 +19,7 @@ public class LessonsTemplateQuestionCreateInput {
     private String explanation;
 
     @JsonProperty("lessons_template_question_order")
+    @NotNull
     private int order;
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getExplanation() {
-        return explanation;
-    }
-
-    public void setExplanation(String explanation) {
-        this.explanation = explanation;
-    }
-
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
 }

@@ -1,0 +1,148 @@
+import React, { CSSProperties, useState } from 'react';
+import { makeStyles } from '@mui/styles';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { ChevronRightOutlined, SchoolOutlined } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
+import CreateLessonsTemplate from './CreateLessonsTemplate';
+import { useHelper } from '../../../../store';
+import { searchLessonsTemplates } from '../../../../actions/Lessons';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
+import { useFormatter } from '../../../../components/i18n';
+import PaginationComponent from '../../../../components/common/pagination/PaginationComponent.js';
+import { initSorting } from '../../../../components/common/pagination/Page';
+import type { LessonsTemplate, SearchPaginationInput } from '../../../../utils/api-types';
+import type { UserHelper } from '../../../../actions/helper';
+import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
+
+const useStyles = makeStyles(() => ({
+  itemHead: {
+    paddingLeft: 17,
+    textTransform: 'uppercase',
+    cursor: 'pointer',
+  },
+  item: {
+    height: 50,
+  },
+  bodyItems: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  bodyItem: {
+    height: 20,
+    fontSize: 13,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    paddingRight: 10,
+  },
+}));
+
+const inlineStyles: Record<string, CSSProperties> = {
+  lessons_template_name: {
+    width: '25%',
+  },
+  lessons_template_description: {
+    width: '50%',
+  },
+};
+
+const LessonsTemplates = () => {
+  // Standard hooks
+  const { t } = useFormatter();
+  const classes = useStyles();
+
+  // Fetching data
+  const { userAdmin } = useHelper((helper: UserHelper) => {
+    return {
+      userAdmin: helper.getMe()?.user_admin ?? false,
+    };
+  });
+
+  // Headers
+  const headers = [
+    {
+      field: 'lessons_template_name',
+      label: 'Name',
+      isSortable: true,
+      value: (lessonsTemplate: LessonsTemplate) => lessonsTemplate.lessons_template_name,
+    },
+    {
+      field: 'lessons_template_description',
+      label: 'Description',
+      isSortable: true,
+      value: (lessonsTemplate: LessonsTemplate) => lessonsTemplate.lessons_template_description,
+    },
+  ];
+
+  const [lessonTemplates, setLessonTemplates] = useState<LessonsTemplate[]>([]);
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+    sorts: initSorting('lessons_template_name'),
+  });
+
+  return (
+    <>
+      <Breadcrumbs variant="list" elements={[{ label: t('Components') }, { label: t('Lessons learned'), current: true }]} />
+      <PaginationComponent
+        fetch={searchLessonsTemplates}
+        searchPaginationInput={searchPaginationInput}
+        setContent={setLessonTemplates}
+      />
+      <List>
+        <ListItem
+          classes={{ root: classes.itemHead }}
+          divider={false}
+          style={{ paddingTop: 0 }}
+        >
+          <ListItemIcon />
+          <ListItemText
+            primary={
+              <SortHeadersComponent
+                headers={headers}
+                inlineStylesHeaders={inlineStyles}
+                searchPaginationInput={searchPaginationInput}
+                setSearchPaginationInput={setSearchPaginationInput}
+              />
+            }
+          />
+          <ListItemSecondaryAction />
+        </ListItem>
+        {lessonTemplates.map((lessonsTemplate) => {
+          return (
+            <ListItemButton
+              key={lessonsTemplate.lessonstemplate_id}
+              classes={{ root: classes.item }}
+              divider
+              component={Link}
+              to={`/admin/components/lessons/${lessonsTemplate.lessonstemplate_id}`}
+            >
+              <ListItemIcon>
+                <SchoolOutlined color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <div className={classes.bodyItems}>
+                    {headers.map((header) => (
+                      <div
+                        key={header.field}
+                        className={classes.bodyItem}
+                        style={inlineStyles[header.field]}
+                      >
+                        {header.value(lessonsTemplate)}
+                      </div>
+                    ))}
+                  </div>
+                }
+              />
+              <ListItemSecondaryAction>
+                <ChevronRightOutlined />
+              </ListItemSecondaryAction>
+            </ListItemButton>
+          );
+        })}
+      </List>
+      {userAdmin && <CreateLessonsTemplate onCreate={(result) => setLessonTemplates([result, ...lessonTemplates])} />}
+    </>
+  );
+};
+
+export default LessonsTemplates;

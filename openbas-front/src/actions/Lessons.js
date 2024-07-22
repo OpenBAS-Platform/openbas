@@ -1,9 +1,15 @@
 import * as schema from './Schema';
-import { getReferential, putReferential, postReferential, delReferential } from '../utils/Action';
+import { getReferential, putReferential, postReferential, delReferential, simplePostCall } from '../utils/Action';
 
 export const fetchLessonsTemplates = () => (dispatch) => {
   const uri = '/api/lessons_templates';
   return getReferential(schema.arrayOfLessonsTemplates, uri)(dispatch);
+};
+
+export const searchLessonsTemplates = (searchPaginationInput) => {
+  const data = searchPaginationInput;
+  const uri = '/api/lessons_templates/search';
+  return simplePostCall(uri, data);
 };
 
 export const updateLessonsTemplate = (lessonsTemplateId, data) => (dispatch) => {

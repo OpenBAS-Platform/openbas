@@ -10,134 +10,178 @@ import io.openbas.database.specification.LessonsTemplateCategorySpecification;
 import io.openbas.database.specification.LessonsTemplateQuestionSpecification;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.rest.lessons_template.form.*;
+import io.openbas.rest.lessons_template.form.LessonsTemplateCategoryInput;
+import io.openbas.rest.lessons_template.form.LessonsTemplateInput;
+import io.openbas.rest.lessons_template.form.LessonsTemplateQuestionInput;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
 @RestController
+@RequiredArgsConstructor
 public class LessonsTemplateApi extends RestBehavior {
 
-    private LessonsTemplateRepository lessonsTemplateRepository;
-    private LessonsTemplateCategoryRepository lessonsTemplateCategoryRepository;
-    private LessonsTemplateQuestionRepository lessonsTemplateQuestionRepository;
+  public static final String LESSON_TEMPLATE_URI = "/api/lessons_templates";
 
-    @Autowired
-    public void setLessonsTemplateRepository(LessonsTemplateRepository lessonsTemplateRepository) {
-        this.lessonsTemplateRepository = lessonsTemplateRepository;
-    }
+  private final LessonsTemplateRepository lessonsTemplateRepository;
+  private final LessonsTemplateCategoryRepository lessonsTemplateCategoryRepository;
+  private final LessonsTemplateQuestionRepository lessonsTemplateQuestionRepository;
 
-    @Autowired
-    public void setLessonsTemplateCategoryRepository(LessonsTemplateCategoryRepository lessonsTemplateCategoryRepository) {
-        this.lessonsTemplateCategoryRepository = lessonsTemplateCategoryRepository;
-    }
+  // -- LESSONS TEMPLATES --
 
-    @Autowired
-    public void setLessonsTemplateQuestionRepository(LessonsTemplateQuestionRepository lessonsTemplateQuestionRepository) {
-        this.lessonsTemplateQuestionRepository = lessonsTemplateQuestionRepository;
-    }
+  @Secured(ROLE_ADMIN)
+  @PostMapping(LESSON_TEMPLATE_URI)
+  @Transactional(rollbackOn = Exception.class)
+  public LessonsTemplate createLessonsTemplate(@Valid @RequestBody LessonsTemplateInput input) {
+    LessonsTemplate lessonsTemplate = new LessonsTemplate();
+    lessonsTemplate.setUpdateAttributes(input);
+    return lessonsTemplateRepository.save(lessonsTemplate);
+  }
 
-    @GetMapping("/api/lessons_templates")
-    public Iterable<LessonsTemplate> lessonsTemplates() {
-        return fromIterable(lessonsTemplateRepository.findAll()).stream().toList();
-    }
+  @GetMapping(LESSON_TEMPLATE_URI)
+  public Iterable<LessonsTemplate> lessonsTemplates() {
+    return fromIterable(lessonsTemplateRepository.findAll()).stream().toList();
+  }
 
-    @Secured(ROLE_ADMIN)
-    @PostMapping("/api/lessons_templates")
-    @Transactional(rollbackOn = Exception.class)
-    public LessonsTemplate createLessonsTemplate(@Valid @RequestBody LessonsTemplateCreateInput input) {
-        LessonsTemplate lessonsTemplate = new LessonsTemplate();
-        lessonsTemplate.setUpdateAttributes(input);
-        return lessonsTemplateRepository.save(lessonsTemplate);
-    }
+  @PostMapping(LESSON_TEMPLATE_URI + "/search")
+  public Page<LessonsTemplate> lessonsTemplates(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+        this.lessonsTemplateRepository::findAll,
+        searchPaginationInput,
+        LessonsTemplate.class
+    );
+  }
 
-    @Secured(ROLE_ADMIN)
-    @PutMapping("/api/lessons_templates/{lessonsTemplateId}")
-    public LessonsTemplate updateLessonsTemplate(@PathVariable String lessonsTemplateId,
-                                                 @Valid @RequestBody LessonsTemplateUpdateInput input) {
-        LessonsTemplate lessonsTemplate = lessonsTemplateRepository.findById(lessonsTemplateId).orElseThrow(ElementNotFoundException::new);
-        lessonsTemplate.setUpdateAttributes(input);
-        lessonsTemplate.setUpdated(now());
-        return lessonsTemplateRepository.save(lessonsTemplate);
-    }
+  @Secured(ROLE_ADMIN)
+  @PutMapping(LESSON_TEMPLATE_URI + "/{lessonsTemplateId}")
+  public LessonsTemplate updateLessonsTemplate(
+      @PathVariable String lessonsTemplateId,
+      @Valid @RequestBody LessonsTemplateInput input) {
+    LessonsTemplate lessonsTemplate = lessonsTemplateRepository.findById(lessonsTemplateId)
+        .orElseThrow(ElementNotFoundException::new);
+    lessonsTemplate.setUpdateAttributes(input);
+    lessonsTemplate.setUpdated(now());
+    return lessonsTemplateRepository.save(lessonsTemplate);
+  }
 
-    @Secured(ROLE_ADMIN)
-    @DeleteMapping("/api/lessons_templates/{lessonsTemplateId}")
-    public void deleteLessonsTemplate(@PathVariable String lessonsTemplateId) {
-        lessonsTemplateRepository.deleteById(lessonsTemplateId);
-    }
+  @Secured(ROLE_ADMIN)
+  @DeleteMapping(LESSON_TEMPLATE_URI + "/{lessonsTemplateId}")
+  public void deleteLessonsTemplate(@PathVariable String lessonsTemplateId) {
+    lessonsTemplateRepository.deleteById(lessonsTemplateId);
+  }
 
-    @GetMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories")
-    public Iterable<LessonsTemplateCategory> lessonsTemplateCategories(@PathVariable String lessonsTemplateId) {
-        return lessonsTemplateCategoryRepository.findAll(LessonsTemplateCategorySpecification.fromTemplate(lessonsTemplateId));
-    }
+  // -- LESSONS TEMPLATES CATEGORIES --
 
-    @Secured(ROLE_ADMIN)
-    @PostMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories")
-    @Transactional(rollbackOn = Exception.class)
-    public LessonsTemplateCategory createLessonsTemplateCategory(@PathVariable String lessonsTemplateId, @Valid @RequestBody LessonsTemplateCategoryCreateInput input) {
-        LessonsTemplate lessonsTemplate = lessonsTemplateRepository.findById(lessonsTemplateId).orElseThrow(ElementNotFoundException::new);
-        LessonsTemplateCategory lessonsTemplateCategory = new LessonsTemplateCategory();
-        lessonsTemplateCategory.setUpdateAttributes(input);
-        lessonsTemplateCategory.setTemplate(lessonsTemplate);
-        return lessonsTemplateCategoryRepository.save(lessonsTemplateCategory);
-    }
+  public static final String LESSON_CATEGORY_URI =
+      LESSON_TEMPLATE_URI + "/{lessonsTemplateId}/lessons_template_categories";
 
-    @Secured(ROLE_ADMIN)
-    @PutMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories/{lessonsTemplateCategoryId}")
-    @Transactional(rollbackOn = Exception.class)
-    public LessonsTemplateCategory updateLessonsTemplateCategory(@PathVariable String lessonsTemplateCategoryId, @Valid @RequestBody LessonsTemplateCategoryUpdateInput input) {
-        LessonsTemplateCategory lessonsTemplateCategory = lessonsTemplateCategoryRepository.findById(lessonsTemplateCategoryId).orElseThrow(ElementNotFoundException::new);
-        lessonsTemplateCategory.setUpdateAttributes(input);
-        lessonsTemplateCategory.setUpdated(now());
-        return lessonsTemplateCategoryRepository.save(lessonsTemplateCategory);
-    }
+  @Secured(ROLE_ADMIN)
+  @PostMapping(LESSON_CATEGORY_URI)
+  @Transactional(rollbackOn = Exception.class)
+  public LessonsTemplateCategory createLessonsTemplateCategory(
+      @PathVariable String lessonsTemplateId,
+      @Valid @RequestBody LessonsTemplateCategoryInput input) {
+    LessonsTemplate lessonsTemplate = lessonsTemplateRepository.findById(lessonsTemplateId)
+        .orElseThrow(ElementNotFoundException::new);
+    LessonsTemplateCategory lessonsTemplateCategory = new LessonsTemplateCategory();
+    lessonsTemplateCategory.setUpdateAttributes(input);
+    lessonsTemplateCategory.setTemplate(lessonsTemplate);
+    return lessonsTemplateCategoryRepository.save(lessonsTemplateCategory);
+  }
 
-    @Secured(ROLE_ADMIN)
-    @DeleteMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories/{lessonsTemplateCategoryId}")
-    public void deleteLessonsTemplateCategory(@PathVariable String lessonsTemplateCategoryId) {
-        lessonsTemplateCategoryRepository.deleteById(lessonsTemplateCategoryId);
-    }
+  @GetMapping(LESSON_CATEGORY_URI)
+  public Iterable<LessonsTemplateCategory> lessonsTemplateCategories(@PathVariable String lessonsTemplateId) {
+    return lessonsTemplateCategoryRepository.findAll(
+        LessonsTemplateCategorySpecification.fromTemplate(lessonsTemplateId));
+  }
 
-    @GetMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_questions")
-    public Iterable<LessonsTemplateQuestion> lessonsTemplateQuestions(@PathVariable String lessonsTemplateId) {
-        return lessonsTemplateCategoryRepository.findAll(LessonsTemplateCategorySpecification.fromTemplate(lessonsTemplateId)).stream().
-                flatMap(lessonsTemplateCategory -> lessonsTemplateQuestionRepository.findAll(LessonsTemplateQuestionSpecification.fromCategory(lessonsTemplateCategory.getId())).stream()).toList();
-    }
+  @Secured(ROLE_ADMIN)
+  @PutMapping(LESSON_CATEGORY_URI + "/{lessonsTemplateCategoryId}")
+  @Transactional(rollbackOn = Exception.class)
+  public LessonsTemplateCategory updateLessonsTemplateCategory(
+      @PathVariable String lessonsTemplateId,
+      @PathVariable String lessonsTemplateCategoryId,
+      @Valid @RequestBody LessonsTemplateCategoryInput input) {
+    LessonsTemplateCategory lessonsTemplateCategory = lessonsTemplateCategoryRepository.findById(
+        lessonsTemplateCategoryId).orElseThrow(ElementNotFoundException::new);
+    lessonsTemplateCategory.setUpdateAttributes(input);
+    lessonsTemplateCategory.setUpdated(now());
+    return lessonsTemplateCategoryRepository.save(lessonsTemplateCategory);
+  }
 
-    @GetMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories/{lessonsTemplateCategoryId}/lessons_template_questions")
-    public Iterable<LessonsTemplateQuestion> lessonsTemplateCategoryQuestions(@PathVariable String lessonsTemplateCategoryId) {
-        return lessonsTemplateQuestionRepository.findAll(LessonsTemplateQuestionSpecification.fromCategory(lessonsTemplateCategoryId));
-    }
+  @Secured(ROLE_ADMIN)
+  @DeleteMapping(LESSON_CATEGORY_URI + "/{lessonsTemplateCategoryId}")
+  public void deleteLessonsTemplateCategory(
+      @PathVariable String lessonsTemplateId,
+      @PathVariable String lessonsTemplateCategoryId) {
+    lessonsTemplateCategoryRepository.deleteById(lessonsTemplateCategoryId);
+  }
 
-    @Secured(ROLE_ADMIN)
-    @PostMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories/{lessonsTemplateCategoryId}/lessons_template_questions")
-    public LessonsTemplateQuestion createLessonsTemplateQuestion(@PathVariable String lessonsTemplateCategoryId, @Valid @RequestBody LessonsTemplateQuestionCreateInput input) {
-        LessonsTemplateCategory lessonsTemplateCategory = lessonsTemplateCategoryRepository.findById(lessonsTemplateCategoryId).orElseThrow(ElementNotFoundException::new);
-        LessonsTemplateQuestion lessonsTemplateQuestion = new LessonsTemplateQuestion();
-        lessonsTemplateQuestion.setUpdateAttributes(input);
-        lessonsTemplateQuestion.setCategory(lessonsTemplateCategory);
-        return lessonsTemplateQuestionRepository.save(lessonsTemplateQuestion);
-    }
+  // -- LESSONS TEMPLATES QUESTIONS --
 
-    @Secured(ROLE_ADMIN)
-    @PutMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories/{lessonsTemplateCategoryId}/lessons_template_questions/{lessonsTemplateQuestionId}")
-    public LessonsTemplateQuestion updateLessonsTemplateQuestion(@PathVariable String lessonsTemplateQuestionId, @Valid @RequestBody LessonsTemplateQuestionUpdateInput input) {
-        LessonsTemplateQuestion lessonsTemplateQuestion = lessonsTemplateQuestionRepository.findById(lessonsTemplateQuestionId).orElseThrow(ElementNotFoundException::new);
-        lessonsTemplateQuestion.setUpdateAttributes(input);
-        lessonsTemplateQuestion.setUpdated(now());
-        return lessonsTemplateQuestionRepository.save(lessonsTemplateQuestion);
-    }
+  @GetMapping(LESSON_TEMPLATE_URI + "/{lessonsTemplateId}/lessons_template_questions")
+  public Iterable<LessonsTemplateQuestion> lessonsTemplateQuestions(@PathVariable String lessonsTemplateId) {
+    return lessonsTemplateCategoryRepository.findAll(
+            LessonsTemplateCategorySpecification.fromTemplate(lessonsTemplateId)).stream().
+        flatMap(lessonsTemplateCategory -> lessonsTemplateQuestionRepository.findAll(
+            LessonsTemplateQuestionSpecification.fromCategory(lessonsTemplateCategory.getId())).stream()).toList();
+  }
 
-    @Secured(ROLE_ADMIN)
-    @DeleteMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories/{lessonsTemplateCategoryId}/lessons_template_questions/{lessonsTemplateQuestionId}")
-    public void deleteLessonsTemplateQuestion(@PathVariable String lessonsTemplateQuestionId) {
-        lessonsTemplateQuestionRepository.deleteById(lessonsTemplateQuestionId);
-    }
+  public static final String LESSON_QUESTION_URI =
+      LESSON_CATEGORY_URI + "/{lessonsTemplateCategoryId}/lessons_template_questions";
+
+
+  @Secured(ROLE_ADMIN)
+  @PostMapping(LESSON_QUESTION_URI)
+  public LessonsTemplateQuestion createLessonsTemplateQuestion(
+      @PathVariable String lessonsTemplateId,
+      @PathVariable String lessonsTemplateCategoryId,
+      @Valid @RequestBody LessonsTemplateQuestionInput input) {
+    LessonsTemplateCategory lessonsTemplateCategory = lessonsTemplateCategoryRepository.findById(
+        lessonsTemplateCategoryId).orElseThrow(ElementNotFoundException::new);
+    LessonsTemplateQuestion lessonsTemplateQuestion = new LessonsTemplateQuestion();
+    lessonsTemplateQuestion.setUpdateAttributes(input);
+    lessonsTemplateQuestion.setCategory(lessonsTemplateCategory);
+    return lessonsTemplateQuestionRepository.save(lessonsTemplateQuestion);
+  }
+
+  @GetMapping(LESSON_QUESTION_URI)
+  public Iterable<LessonsTemplateQuestion> lessonsTemplateCategoryQuestions(
+      @PathVariable String lessonsTemplateId,
+      @PathVariable String lessonsTemplateCategoryId) {
+    return lessonsTemplateQuestionRepository.findAll(
+        LessonsTemplateQuestionSpecification.fromCategory(lessonsTemplateCategoryId));
+  }
+
+  @Secured(ROLE_ADMIN)
+  @PutMapping(LESSON_QUESTION_URI + "/{lessonsTemplateQuestionId}")
+  public LessonsTemplateQuestion updateLessonsTemplateQuestion(
+      @PathVariable String lessonsTemplateId,
+      @PathVariable String lessonsTemplateCategoryId,
+      @PathVariable String lessonsTemplateQuestionId,
+      @Valid @RequestBody LessonsTemplateQuestionInput input) {
+    LessonsTemplateQuestion lessonsTemplateQuestion = lessonsTemplateQuestionRepository.findById(
+        lessonsTemplateQuestionId).orElseThrow(ElementNotFoundException::new);
+    lessonsTemplateQuestion.setUpdateAttributes(input);
+    lessonsTemplateQuestion.setUpdated(now());
+    return lessonsTemplateQuestionRepository.save(lessonsTemplateQuestion);
+  }
+
+  @Secured(ROLE_ADMIN)
+  @DeleteMapping(LESSON_QUESTION_URI + "/{lessonsTemplateQuestionId}")
+  public void deleteLessonsTemplateQuestion(
+      @PathVariable String lessonsTemplateId,
+      @PathVariable String lessonsTemplateCategoryId,
+      @PathVariable String lessonsTemplateQuestionId) {
+    lessonsTemplateQuestionRepository.deleteById(lessonsTemplateQuestionId);
+  }
 }
