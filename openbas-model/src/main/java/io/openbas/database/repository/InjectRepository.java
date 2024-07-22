@@ -25,7 +25,6 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
 
   List<Inject> findByExerciseId(@NotNull String exerciseId);
 
-  @NotNull
   List<Inject> findByScenarioId(@NotNull String scenarioId);
 
   @NotNull
