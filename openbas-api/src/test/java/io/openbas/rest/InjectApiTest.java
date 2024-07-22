@@ -248,7 +248,7 @@ class InjectApiTest extends IntegrationTest {
         assertFalse(injectExpectationRepository.findAllByInjectAndTeam(createdInject.getId(), TEAM.getId()).isEmpty(), "There should be expectations for the scenario in the database");
 
         // -- EXECUTE --
-        mvc.perform(post(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects/delete")
+        mvc.perform(delete(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects")
                         .content(asJsonString(List.of(createdInject.getId())))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful());
@@ -342,7 +342,7 @@ class InjectApiTest extends IntegrationTest {
         assertEquals(1, injectExpectationRepository.findAllByInjectAndTeam(createdInject2.getId(), TEAM.getId()).size());
 
         // -- EXECUTE --
-        mvc.perform(post(EXERCISE_URI + "/" + EXERCISE.getId() + "/injects/delete")
+        mvc.perform(delete(EXERCISE_URI + "/" + EXERCISE.getId() + "/injects")
                         .content(asJsonString(List.of(createdInject1.getId(), createdInject2.getId())))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful());
