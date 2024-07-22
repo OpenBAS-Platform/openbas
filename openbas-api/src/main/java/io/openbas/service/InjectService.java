@@ -704,7 +704,8 @@ public class InjectService {
                     if("score".equals(ruleAttribute.getName().split("_")[1])) {
                         if(ruleAttribute.getColumns() != null) {
                             List<String> columns = Arrays.stream(ruleAttribute.getColumns().split("\\+")).toList();
-                            if(columns.stream().filter(s -> !s.isBlank()).allMatch(s -> row.getCell(CellReference.convertColStringToIndex(s)).getCellType()== CellType.NUMERIC)) {
+                            if(columns.stream().filter(column -> column != null && !column.isBlank())
+                                    .allMatch(column -> row.getCell(CellReference.convertColStringToIndex(column)).getCellType()== CellType.NUMERIC)) {
                                 Double columnValueExpectation = columns.stream()
                                         .map(column -> getValueAsDouble(row, column))
                                         .reduce(0.0, Double::sum);
