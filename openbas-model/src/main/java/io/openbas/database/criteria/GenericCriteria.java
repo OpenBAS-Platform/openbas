@@ -1,6 +1,5 @@
 package io.openbas.database.criteria;
 
-import io.openbas.database.model.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -9,18 +8,19 @@ import jakarta.persistence.criteria.Root;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 
-public class InjectCriteria {
+public class GenericCriteria {
 
-  private InjectCriteria() {
+  private GenericCriteria() {
 
   }
 
-  public static Long countQuery(
+  public static <T> Long countQuery(
       @NotNull final CriteriaBuilder cb,
       @NotNull final EntityManager entityManager,
-      Specification<Inject> specification) {
+      @NotNull final Class<T> entityClass,
+      Specification<T> specification) {
     CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-    Root<Inject> countRoot = countQuery.from(Inject.class);
+    Root<T> countRoot = countQuery.from(entityClass);
     countQuery.select(cb.count(countRoot));
     if (specification != null) {
       Predicate predicate = specification.toPredicate(countRoot, countQuery, cb);

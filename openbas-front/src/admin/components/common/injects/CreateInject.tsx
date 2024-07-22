@@ -7,8 +7,7 @@ import { useFormatter } from '../../../../components/i18n';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
 import computeAttackPatterns from '../../../../utils/injector_contract/InjectorContractUtils';
-import type { InjectorContractStore } from '../../../../actions/injector_contracts/InjectorContract';
-import type { FilterGroup, Inject, SearchPaginationInput } from '../../../../utils/api-types';
+import type { FilterGroup, Inject, InjectorContractOutput, SearchPaginationInput } from '../../../../utils/api-types';
 import { initSorting } from '../../../../components/common/pagination/Page';
 import useFiltersState from '../../../../components/common/filter/useFiltersState';
 import { emptyFilterGroup } from '../../../../components/common/filter/FilterUtils';
@@ -105,7 +104,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
   });
 
   // Contracts
-  const [contracts, setContracts] = useState<InjectorContractStore[]>([]);
+  const [contracts, setContracts] = useState<InjectorContractOutput[]>([]);
   // as we don't know the type of the content of a contract we need to put any here
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [parsedContentContracts, setParsedContentContracts] = useState<any[]>([]);
@@ -185,14 +184,8 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
                   >
                     <ListItemIcon>
                       <InjectIcon
-                        variant="list"
-                        type={
-                          contract.injector_contract_payload
-                            ? contract.injector_contract_payload?.payload_collector_type
-                            || contract.injector_contract_payload?.payload_type
-                            : contract.injector_contract_injector_type
-                        }
-                        isPayload={isNotEmptyField(contract.injector_contract_payload)}
+                        variant="list"type={contract.injector_contract_payload_type ?? contract.injector_contract_injector_type}
+                        isPayload={isNotEmptyField(contract.injector_contract_payload_type)}
                       />
                     </ListItemIcon>
                     <ListItemText
