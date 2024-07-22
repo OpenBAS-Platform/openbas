@@ -33,6 +33,7 @@ import org.apache.poi.ss.util.CellReference;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -133,7 +134,7 @@ public class InjectService {
 
   @Transactional(rollbackOn = Exception.class)
   public void deleteAllByIds(List<String> injectIds) {
-    if (injectIds != null && !injectIds.isEmpty()) {
+    if (!CollectionUtils.isEmpty(injectIds)) {
       injectRepository.deleteAllById(injectIds);
     }
   }

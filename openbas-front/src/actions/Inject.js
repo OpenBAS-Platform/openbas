@@ -56,8 +56,8 @@ export const deleteInjectForExercise = (exerciseId, injectId) => (dispatch) => {
 };
 
 export const bulkDeleteInjectsForExercise = (exerciseId, injectIds) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/injects/delete`;
-  return postReferential(null, uri, injectIds)(dispatch);
+  const uri = `/api/exercises/${exerciseId}/injects`;
+  return delReferential(uri, injectIds)(dispatch);
 };
 
 export const executeInject = (exerciseId, values, files) => (dispatch) => {
@@ -108,6 +108,6 @@ export const deleteInjectScenario = (scenarioId, injectId) => (dispatch) => {
 };
 
 export const bulkDeleteInjectsForScenario = (scenarioId, injectIds) => (dispatch) => {
-  const uri = `/api/scenarios/${scenarioId}/injects/delete`;
-  return postReferential(null, uri, injectIds)(dispatch);
+  const uri = `/api/scenarios/${scenarioId}/injects`;
+  return delReferential(uri, injectIds)(dispatch);
 };

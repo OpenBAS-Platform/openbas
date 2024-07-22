@@ -17,6 +17,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Instant;
@@ -189,7 +189,7 @@ public class ExerciseService {
 
     // -- CREATION --
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     public Exercise createExercise(@NotNull final Exercise exercise){
             if (imapEnabled) {
                 exercise.setFrom(imapUsername);
