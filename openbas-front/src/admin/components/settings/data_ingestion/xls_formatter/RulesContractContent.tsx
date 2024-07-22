@@ -261,17 +261,18 @@ const RulesContractContent: React.FC<Props> = ({
                     color="primary"
                     onClick={() => handleDefaultValueOpen(rulesIndex)}
                   >
-                    {(ruleField.rule_attribute_name === 'trigger_time') ?
-                        (<Badge
+                    {(ruleField.rule_attribute_name === 'trigger_time')
+                      ? (
+                        <Badge
                           color="secondary" variant="dot"
                           invisible={(!methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
                             || methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0)
                             && (!methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern`)
-                              || methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.timePattern?.length === 0)}
-                        >
+                            || methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.timePattern?.length === 0)}
+                          >
                           <CogOutline />
-                        </Badge>)
-                      :(
+                        </Badge>
+                      ) : (
                       <Badge
                           color="secondary" variant="dot"
                           invisible={!methods.getValues(`mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
@@ -279,7 +280,7 @@ const RulesContractContent: React.FC<Props> = ({
                       >
                         <CogOutline />
                       </Badge>)
-                        }
+                    }
                   </IconButton>
                 </div>
                 {currentRuleIndex !== null
