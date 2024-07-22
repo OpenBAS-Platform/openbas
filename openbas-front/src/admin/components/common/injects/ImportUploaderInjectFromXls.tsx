@@ -8,7 +8,7 @@ import ImportUploaderInjectFromXlsFile from './ImportUploaderInjectFromXlsFile';
 import ImportUploaderInjectFromXlsInjects from './ImportUploaderInjectFromXlsInjects';
 import { InjectContext } from '../Context';
 import { storeXlsFile } from '../../../../actions/mapper/mapper-actions';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 const ImportUploaderInjectFromXls = () => {
   // Standard hooks
