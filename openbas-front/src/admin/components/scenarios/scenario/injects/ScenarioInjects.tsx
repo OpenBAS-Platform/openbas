@@ -138,7 +138,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
         switch (action.type) {
           case 'ADD':
             if (isNotEmptyField(injectToUpdate[`inject_${action.field}`])) {
-              injectToUpdate[`inject_${action.field}`] = R.uniq([...injectToUpdate[`inject_${action.field}`], action.values.map((n) => n.value)]);
+              injectToUpdate[`inject_${action.field}`] = R.uniq([...injectToUpdate[`inject_${action.field}`], ...action.values.map((n) => n.value)]);
             } else {
               injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map((n) => n.value));
             }

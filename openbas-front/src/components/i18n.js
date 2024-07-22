@@ -18,7 +18,7 @@ const inject18n = (WrappedComponent) => {
   class InjectIntl extends Component {
     render() {
       const { children } = this.props;
-      const translate = (message) => this.props.intl.formatMessage({ id: message });
+      const translate = (message, values) => this.props.intl.formatMessage({ id: message }, values);
       const formatNumber = (number) => {
         if (number === null || number === '') {
           return '-';
@@ -162,7 +162,7 @@ const inject18n = (WrappedComponent) => {
 
 export const useFormatter = () => {
   const intl = useIntl();
-  const translate = (message) => intl.formatMessage({ id: message });
+  const translate = (message, values) => intl.formatMessage({ id: message }, values);
   const formatNumber = (number) => {
     if (number === null || number === '') {
       return '-';

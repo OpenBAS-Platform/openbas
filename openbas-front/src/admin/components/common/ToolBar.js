@@ -483,7 +483,7 @@ class ToolBar extends Component {
     const confirmationText = () => {
       return numberOfSelectedElements === 1
         ? t('Do you want to delete this inject?')
-        : t(`Do you want to delete these ${numberOfSelectedElements} injects?`);
+        : t('Do you want to delete these {count} injects?', { count: numberOfSelectedElements });
     };
     return (
       <>
