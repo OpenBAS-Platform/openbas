@@ -1007,7 +1007,8 @@ export interface ImportMessage {
     | "ABSOLUTE_TIME_WITHOUT_START_DATE"
     | "DATE_SET_IN_PAST"
     | "DATE_SET_IN_FUTURE"
-    | "NO_TEAM_FOUND";
+    | "NO_TEAM_FOUND"
+    | "EXPECTATION_SCORE_UNDEFINED";
   message_level?: "CRITICAL" | "ERROR" | "WARN" | "INFO";
   message_params?: Record<string, string>;
 }
@@ -1020,6 +1021,8 @@ export interface ImportPostSummary {
 export interface ImportTestSummary {
   import_message?: ImportMessage[];
   injects?: InjectResultDTO[];
+  /** @format int32 */
+  total_injects?: number;
 }
 
 export interface Inject {
