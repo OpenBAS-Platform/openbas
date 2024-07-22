@@ -198,9 +198,6 @@ const InjectList: FunctionComponent<Props> = ({
               secondaryAction={
                 <AtomicTestingPopover
                   atomic={injectDto}
-                  entries={[{ label: 'Duplicate', action: () => handleOpenDuplicate(injectDto.inject_id) }]}
-                  openDuplicate={openDuplicateId === injectDto.inject_id}
-                  setOpenDuplicate={handleCloseDuplicate}
                   variantButtonPopover={'icon'}
                 />
                   }
