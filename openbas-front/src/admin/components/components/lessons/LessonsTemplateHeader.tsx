@@ -8,10 +8,6 @@ import type { LessonsTemplatesHelper } from '../../../../actions/lessons/lesson-
 import type { UserHelper } from '../../../../actions/helper';
 
 const useStyles = makeStyles(() => ({
-  container: {
-    display: 'flex',
-    justifyContent: 'space-between',
-  },
   containerTitle: {
     display: 'flex',
     alignItems: 'center',
@@ -33,7 +29,7 @@ const LessonsTemplateHeader = () => {
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
   return (
-    <div className={classes.container}>
+    <>
       <div className={classes.containerTitle}>
         <Typography
           variant="h1"
@@ -50,7 +46,7 @@ const LessonsTemplateHeader = () => {
       <Typography variant="body2">
         {lessonsTemplate.lessons_template_description}
       </Typography>
-    </div>
+    </>
   );
 };
 

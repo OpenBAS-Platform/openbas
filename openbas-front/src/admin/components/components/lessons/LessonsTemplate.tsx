@@ -79,7 +79,7 @@ const LessonsTemplate = () => {
                 />
               </div>
               <Typography variant="h3">
-                {category.lessons_template_category_description ?? t('No description')}
+                {category.lessons_template_category_description}
               </Typography>
               <Paper variant="outlined">
                 <List disablePadding>
