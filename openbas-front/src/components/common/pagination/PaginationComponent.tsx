@@ -102,7 +102,7 @@ const PaginationComponent = <T extends object>({
   // Filters
   const [openMitreFilter, setOpenMitreFilter] = React.useState(false);
 
-  const fetchData = () => {
+  useEffect(() => {
     const finalSearchPaginationInput = {
       ...searchPaginationInput,
       textSearch,
@@ -115,10 +115,6 @@ const PaginationComponent = <T extends object>({
       setContent(data.content);
       setTotalElements(data.totalElements);
     });
-  };
-
-  useEffect(() => {
-    fetchData();
   }, [searchPaginationInput, page, rowsPerPage, textSearch]);
 
   // Utils
