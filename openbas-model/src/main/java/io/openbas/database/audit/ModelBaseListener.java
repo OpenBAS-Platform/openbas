@@ -30,20 +30,26 @@ public class ModelBaseListener {
     @PostPersist
     void postPersist(Object base) {
         Base instance = (Base) base;
-        BaseEvent event = new BaseEvent(DATA_PERSIST, instance, mapper);
-        appPublisher.publishEvent(event);
+        if(instance.isListened()) {
+            BaseEvent event = new BaseEvent(DATA_PERSIST, instance, mapper);
+            appPublisher.publishEvent(event);
+        }
     }
 
     @PostUpdate
     void postUpdate(Object base) {
         Base instance = (Base) base;
-        BaseEvent event = new BaseEvent(DATA_UPDATE, instance, mapper);
-        appPublisher.publishEvent(event);
+        if(instance.isListened()) {
+            BaseEvent event = new BaseEvent(DATA_UPDATE, instance, mapper);
+            appPublisher.publishEvent(event);
+        }
     }
 
     @PreRemove
     void preRemove(Object base) {
         Base instance = (Base) base;
-        appPublisher.publishEvent(new BaseEvent(DATA_DELETE, instance, mapper));
+        if(instance.isListened()) {
+            appPublisher.publishEvent(new BaseEvent(DATA_DELETE, instance, mapper));
+        }
     }
 }
