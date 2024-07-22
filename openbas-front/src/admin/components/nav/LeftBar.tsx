@@ -22,6 +22,7 @@ import {
   OnlinePredictionOutlined,
   PersonOutlined,
   RowingOutlined,
+  SchoolOutlined,
   SettingsOutlined,
   SmartButtonOutlined,
   SubscriptionsOutlined,
@@ -495,6 +496,7 @@ const LeftBar = () => {
               { type: 'Persona', link: '/admin/components/personas', label: 'Personas', icon: <DramaMasks fontSize="small" />, disabled: true },
               { type: 'Channel', link: '/admin/components/channels', label: 'Channels', icon: <PostOutline fontSize="small" /> },
               { type: 'Challenge', link: '/admin/components/challenges', label: 'Challenges', icon: <RowingOutlined fontSize="small" /> },
+              { type: 'Lessons', link: '/admin/components/lessons', label: 'Lessons learned', icon: <SchoolOutlined fontSize="small" /> },
             ],
           )}
         </MenuList>
