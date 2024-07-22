@@ -120,3 +120,19 @@ export const delReferential = (uri, type, id) => (dispatch) => {
       throw error;
     });
 };
+
+export const bulkDeleteReferential = (uri, type, data) => (dispatch) => {
+  dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
+  return api()
+    .delete(buildUri(uri), { data })
+    .then(() => {
+      dispatch({
+        type: Constants.DATA_DELETE_SUCCESS,
+        payload: Immutable({ type, data }),
+      });
+    })
+    .catch((error) => {
+      dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });
+      throw error;
+    });
+};

@@ -1,5 +1,5 @@
 import * as schema from './Schema';
-import { delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
+import { bulkDeleteReferential, delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
 
 // -- INJECTS --
 
@@ -57,7 +57,7 @@ export const deleteInjectForExercise = (exerciseId, injectId) => (dispatch) => {
 
 export const bulkDeleteInjectsForExercise = (exerciseId, injectIds) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects`;
-  return delReferential(uri, injectIds)(dispatch);
+  return bulkDeleteReferential(uri, 'injects', injectIds)(dispatch);
 };
 
 export const executeInject = (exerciseId, values, files) => (dispatch) => {
@@ -109,5 +109,5 @@ export const deleteInjectScenario = (scenarioId, injectId) => (dispatch) => {
 
 export const bulkDeleteInjectsForScenario = (scenarioId, injectIds) => (dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/injects`;
-  return delReferential(uri, injectIds)(dispatch);
+  return bulkDeleteReferential(uri, 'injects', injectIds)(dispatch);
 };
