@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { useFormatter } from '../../../../components/i18n';
 import LessonsTemplateForm from './LessonsTemplateForm';
 import { addLessonsTemplate } from '../../../../actions/Lessons';
@@ -7,7 +7,13 @@ import Drawer from '../../../../components/common/Drawer';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { LessonsTemplate, LessonsTemplateInput } from '../../../../utils/api-types';
 
-const CreateLessonsTemplate = () => {
+interface Props {
+  onCreate: (result: LessonsTemplate) => void;
+}
+
+const CreateLessonsTemplate: FunctionComponent<Props> = ({
+  onCreate,
+}) => {
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -18,6 +24,10 @@ const CreateLessonsTemplate = () => {
   const onSubmit = (data: LessonsTemplateInput) => {
     return dispatch(addLessonsTemplate(data)).then((result: { result: string, entities: { lessonstemplates: Record<string, LessonsTemplate> } }) => {
       if (result.result) {
+        if (onCreate) {
+          const created = result.entities.lessonstemplates[result.result];
+          onCreate(created);
+        }
         return handleClose();
       }
       return result;

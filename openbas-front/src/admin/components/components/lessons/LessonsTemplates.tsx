@@ -140,7 +140,7 @@ const LessonsTemplates = () => {
           );
         })}
       </List>
-      {userAdmin && <CreateLessonsTemplate />}
+      {userAdmin && <CreateLessonsTemplate onCreate={(result) => setLessonTemplates([result, ...lessonTemplates])} />}
     </>
   );
 };

@@ -3,11 +3,11 @@ import { makeStyles } from '@mui/styles';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../../../../components/i18n';
-import LessonsTemplateQuestionForm from './LessonsTemplateQuestionForm';
+import LessonsTemplateQuestionForm, { LessonsTemplateQuestionInputForm } from './LessonsTemplateQuestionForm';
 import { addLessonsTemplateQuestion } from '../../../../../../actions/Lessons';
 import Drawer from '../../../../../../components/common/Drawer';
 import { useAppDispatch } from '../../../../../../utils/hooks';
-import type { LessonsTemplateCategory, LessonsTemplateQuestionInput } from '../../../../../../utils/api-types';
+import type { LessonsTemplateCategory } from '../../../../../../utils/api-types';
 import type { Theme } from '../../../../../../components/Theme';
 
 interface Props {
@@ -35,7 +35,7 @@ const CreateLessonsTemplateQuestion: FunctionComponent<Props> = ({
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const onSubmit = (data: LessonsTemplateQuestionInput) => {
+  const onSubmit = (data: LessonsTemplateQuestionInputForm) => {
     return dispatch(
       addLessonsTemplateQuestion(
         lessonsTemplateId,

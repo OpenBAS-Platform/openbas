@@ -1,8 +1,8 @@
 import React, { FunctionComponent, useState } from 'react';
-import LessonsTemplateCategoryForm from './LessonsTemplateCategoryForm';
+import LessonsTemplateCategoryForm, { LessonsTemplateCategoryInputForm } from './LessonsTemplateCategoryForm';
 import { useFormatter } from '../../../../../components/i18n';
 import { deleteLessonsTemplateCategory, updateLessonsTemplateCategory } from '../../../../../actions/Lessons';
-import type { LessonsTemplateCategory, LessonsTemplateCategoryInput } from '../../../../../utils/api-types';
+import type { LessonsTemplateCategory } from '../../../../../utils/api-types';
 import DialogDelete from '../../../../../components/common/DialogDelete';
 import Drawer from '../../../../../components/common/Drawer';
 import ButtonPopover from '../../../../../components/common/ButtonPopover';
@@ -24,14 +24,14 @@ const LessonsTemplateCategoryPopover: FunctionComponent<Props> = ({
   const initialValues = {
     lessons_template_category_name: lessonsTemplateCategory.lessons_template_category_name,
     lessons_template_category_description: lessonsTemplateCategory.lessons_template_category_description,
-    lessons_template_category_order: lessonsTemplateCategory.lessons_template_category_order,
+    lessons_template_category_order: lessonsTemplateCategory.lessons_template_category_order?.toString(),
   };
 
   // Edition
   const [openEdit, setOpenEdit] = useState(false);
   const handleOpenEdit = () => setOpenEdit(true);
   const handleCloseEdit = () => setOpenEdit(false);
-  const onSubmitEdit = (data: LessonsTemplateCategoryInput) => {
+  const onSubmitEdit = (data: LessonsTemplateCategoryInputForm) => {
     return dispatch(
       updateLessonsTemplateCategory(
         lessonsTemplateId,

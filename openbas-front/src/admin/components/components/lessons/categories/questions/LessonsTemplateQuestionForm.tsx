@@ -8,11 +8,15 @@ import type { LessonsTemplateQuestionInput } from '../../../../../../utils/api-t
 import { zodImplement } from '../../../../../../utils/Zod';
 import TextField from '../../../../../../components/fields/TextField';
 
+export type LessonsTemplateQuestionInputForm = Omit<LessonsTemplateQuestionInput, 'lessons_template_question_order'> & {
+  lessons_template_question_order: string;
+};
+
 interface Props {
-  onSubmit: SubmitHandler<LessonsTemplateQuestionInput>;
+  onSubmit: SubmitHandler<LessonsTemplateQuestionInputForm>;
   handleClose: () => void;
   editing?: boolean;
-  initialValues?: LessonsTemplateQuestionInput;
+  initialValues?: LessonsTemplateQuestionInputForm;
 }
 
 const LessonsTemplateQuestionForm: FunctionComponent<Props> = ({
@@ -21,7 +25,7 @@ const LessonsTemplateQuestionForm: FunctionComponent<Props> = ({
   initialValues = {
     lessons_template_question_content: '',
     lessons_template_question_explanation: '',
-    lessons_template_question_order: 0,
+    lessons_template_question_order: '0',
   },
   editing = false,
 }) => {
@@ -32,13 +36,12 @@ const LessonsTemplateQuestionForm: FunctionComponent<Props> = ({
     register,
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
-  } = useForm<LessonsTemplateQuestionInput>({
+  } = useForm<LessonsTemplateQuestionInputForm>({
     mode: 'onTouched',
     resolver: zodResolver(
-      zodImplement<LessonsTemplateQuestionInput>().with({
+      zodImplement<LessonsTemplateQuestionInputForm>().with({
         lessons_template_question_content: z.string().min(1, { message: t('Should not be empty') }),
         lessons_template_question_explanation: z.string().optional(),
-        // @ts-expect-error: should be handled as a number
         lessons_template_question_order: z.string().min(1, { message: t('Should not be empty') }),
       }),
     ),
@@ -75,6 +78,7 @@ const LessonsTemplateQuestionForm: FunctionComponent<Props> = ({
         helperText={errors.lessons_template_question_order?.message}
         inputProps={register('lessons_template_question_order')}
         type="number"
+        InputLabelProps={{ required: true }}
       />
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button

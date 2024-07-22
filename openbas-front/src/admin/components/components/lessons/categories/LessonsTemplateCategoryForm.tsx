@@ -8,11 +8,15 @@ import type { LessonsTemplateCategoryInput } from '../../../../../utils/api-type
 import { zodImplement } from '../../../../../utils/Zod';
 import TextField from '../../../../../components/fields/TextField';
 
+export type LessonsTemplateCategoryInputForm = Omit<LessonsTemplateCategoryInput, 'lessons_template_category_order'> & {
+  lessons_template_category_order: string;
+};
+
 interface Props {
-  onSubmit: SubmitHandler<LessonsTemplateCategoryInput>;
+  onSubmit: SubmitHandler<LessonsTemplateCategoryInputForm>;
   handleClose: () => void;
   editing?: boolean;
-  initialValues?: LessonsTemplateCategoryInput;
+  initialValues?: LessonsTemplateCategoryInputForm;
 }
 
 const LessonsTemplateCategoryForm: FunctionComponent<Props> = ({
@@ -21,7 +25,7 @@ const LessonsTemplateCategoryForm: FunctionComponent<Props> = ({
   initialValues = {
     lessons_template_category_name: '',
     lessons_template_category_description: '',
-    lessons_template_category_order: 0,
+    lessons_template_category_order: '0',
   },
   editing = false,
 }) => {
@@ -32,13 +36,12 @@ const LessonsTemplateCategoryForm: FunctionComponent<Props> = ({
     register,
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
-  } = useForm<LessonsTemplateCategoryInput>({
+  } = useForm<LessonsTemplateCategoryInputForm>({
     mode: 'onTouched',
     resolver: zodResolver(
-      zodImplement<LessonsTemplateCategoryInput>().with({
+      zodImplement<LessonsTemplateCategoryInputForm>().with({
         lessons_template_category_name: z.string().min(1, { message: t('Should not be empty') }),
         lessons_template_category_description: z.string().optional(),
-        // @ts-expect-error: should be handled as a number
         lessons_template_category_order: z.string().min(1, { message: t('Should not be empty') }),
       }),
     ),
@@ -75,6 +78,7 @@ const LessonsTemplateCategoryForm: FunctionComponent<Props> = ({
         helperText={errors.lessons_template_category_order?.message}
         inputProps={register('lessons_template_category_order')}
         type="number"
+        InputLabelProps={{ required: true }}
       />
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button

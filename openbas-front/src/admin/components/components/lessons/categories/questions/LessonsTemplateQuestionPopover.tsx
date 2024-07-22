@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
-import LessonsTemplateQuestionForm from './LessonsTemplateQuestionForm';
+import LessonsTemplateQuestionForm, { LessonsTemplateQuestionInputForm } from './LessonsTemplateQuestionForm';
 import { useFormatter } from '../../../../../../components/i18n';
 import { deleteLessonsTemplateQuestion, updateLessonsTemplateQuestion } from '../../../../../../actions/Lessons';
 import { useAppDispatch } from '../../../../../../utils/hooks';
@@ -7,7 +7,6 @@ import ButtonPopover from '../../../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../../../components/common/DialogDelete';
 import Drawer from '../../../../../../components/common/Drawer';
 import type { LessonsTemplateQuestionStore } from '../../../../../../actions/lessons/Lessons';
-import type { LessonsTemplateQuestionInput } from '../../../../../../utils/api-types';
 
 interface Props {
   lessonsTemplateId: string;
@@ -27,14 +26,14 @@ const LessonsTemplateQuestionPopover: FunctionComponent<Props> = ({
   const initialValues = {
     lessons_template_question_content: lessonsTemplateQuestion.lessons_template_question_content,
     lessons_template_question_explanation: lessonsTemplateQuestion.lessons_template_question_explanation,
-    lessons_template_question_order: lessonsTemplateQuestion.lessons_template_question_order,
+    lessons_template_question_order: lessonsTemplateQuestion.lessons_template_question_order?.toString(),
   };
 
   // Edition
   const [openEdit, setOpenEdit] = useState(false);
   const handleOpenEdit = () => setOpenEdit(true);
   const handleCloseEdit = () => setOpenEdit(false);
-  const onSubmitEdit = (data: LessonsTemplateQuestionInput) => {
+  const onSubmitEdit = (data: LessonsTemplateQuestionInputForm) => {
     return dispatch(
       updateLessonsTemplateQuestion(
         lessonsTemplateId,
