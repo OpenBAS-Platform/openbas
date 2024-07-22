@@ -54,6 +54,7 @@ import SendLessonsForm from './SendLessonsForm';
 import { fetchPlayers } from '../../../../../actions/User';
 import LessonsObjectives from './LessonsObjectives';
 import LessonsCategories from './LessonsCategories';
+import CreateLessonsTemplate from '../../../components/lessons/CreateLessonsTemplate';
 
 const useStyles = makeStyles((theme) => ({
   metric: {
@@ -93,10 +94,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Lessons = () => {
+  // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
   const theme = useTheme();
   const { t, nsdt } = useFormatter();
+
   const [selectedObjective, setSelectedObjective] = useState(null);
   const [openApplyTemplate, setOpenApplyTemplate] = useState(false);
   const [openResetAnswers, setOpenResetAnswers] = useState(false);
@@ -406,6 +409,7 @@ const Lessons = () => {
                     style={{
                       width: '100%',
                       borderBottom: `1px solid ${theme.palette.background.paper}`,
+                      margin: 0,
                     }}
                     value={template.lessonstemplate_id}
                     control={<Radio />}
@@ -429,6 +433,7 @@ const Lessons = () => {
               })}
             </RadioGroup>
           </FormControl>
+          <CreateLessonsTemplate inline />
           <div className="clearfix" />
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button

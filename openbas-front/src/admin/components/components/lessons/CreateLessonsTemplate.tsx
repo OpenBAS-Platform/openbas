@@ -6,12 +6,16 @@ import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Drawer from '../../../../components/common/Drawer';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { LessonsTemplate, LessonsTemplateInput } from '../../../../utils/api-types';
+import ListItemButtonCreate from '../../../../components/common/ListItemButtonCreate';
+import Dialog from '../../../../components/common/Dialog';
 
 interface Props {
-  onCreate: (result: LessonsTemplate) => void;
+  inline?: boolean;
+  onCreate?: (result: LessonsTemplate) => void;
 }
 
 const CreateLessonsTemplate: FunctionComponent<Props> = ({
+  inline,
   onCreate,
 }) => {
   // Standard hooks
@@ -35,14 +39,31 @@ const CreateLessonsTemplate: FunctionComponent<Props> = ({
   };
   return (
     <>
-      <ButtonCreate onClick={handleOpen} />
-      <Drawer
-        open={open}
-        handleClose={handleClose}
-        title={t('Create a new lessons learned template')}
-      >
-        <LessonsTemplateForm onSubmit={onSubmit} handleClose={handleClose} />
-      </Drawer>
+      {inline ? (
+        <ListItemButtonCreate
+          title={t('Create a new lessons learned template')}
+          onClick={handleOpen}
+        />
+      ) : (
+        <ButtonCreate onClick={handleOpen} />
+      )}
+      {inline ? (
+        <Dialog
+          open={open}
+          handleClose={handleClose}
+          title={t('Create a new lessons learned template')}
+        >
+          <LessonsTemplateForm onSubmit={onSubmit} handleClose={handleClose} />
+        </Dialog>
+      ) : (
+        <Drawer
+          open={open}
+          handleClose={handleClose}
+          title={t('Create a new lessons learned template')}
+        >
+          <LessonsTemplateForm onSubmit={onSubmit} handleClose={handleClose} />
+        </Drawer>
+      )}
     </>
   );
 };
