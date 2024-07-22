@@ -351,6 +351,17 @@ public class InjectService {
         ImportRow importTestSummary = new ImportRow();
         // The column that differenciate the importer is the same for all so we get it right now
         int colTypeIdx = CellReference.convertColStringToIndex(importMapper.getInjectTypeColumn());
+        if (colTypeIdx < 0) {
+            // If there are no values, we add an info message so they know there is a potential issue here
+            importTestSummary.getImportMessages().add(
+                    new ImportMessage(ImportMessage.MessageLevel.INFO,
+                            ImportMessage.ErrorCode.NO_POTENTIAL_MATCH_FOUND,
+                            Map.of("column_type_num", importMapper.getInjectTypeColumn(),
+                                    "row_num", String.valueOf(row.getRowNum()))
+                    )
+            );
+            return importTestSummary;
+        }
 
         //If the row is completely empty, we ignore it altogether and do not send a warn message
         if (InjectUtils.checkIfRowIsEmpty(row)) {
@@ -693,7 +704,8 @@ public class InjectService {
                     if("score".equals(ruleAttribute.getName().split("_")[1])) {
                         if(ruleAttribute.getColumns() != null) {
                             List<String> columns = Arrays.stream(ruleAttribute.getColumns().split("\\+")).toList();
-                            if(columns.stream().allMatch(s -> row.getCell(CellReference.convertColStringToIndex(s)).getCellType()== CellType.NUMERIC)) {
+                            if(columns.stream().filter(column -> column != null && !column.isBlank())
+                                    .allMatch(column -> row.getCell(CellReference.convertColStringToIndex(column)).getCellType()== CellType.NUMERIC)) {
                                 Double columnValueExpectation = columns.stream()
                                         .map(column -> getValueAsDouble(row, column))
                                         .reduce(0.0, Double::sum);
@@ -905,7 +917,8 @@ public class InjectService {
     }
 
     private String getDateAsStringFromCell(Row row, String cellColumn) {
-        if(row.getCell(CellReference.convertColStringToIndex(cellColumn)) != null) {
+        if(cellColumn != null && !cellColumn.isBlank()
+                && row.getCell(CellReference.convertColStringToIndex(cellColumn)) != null) {
             Cell cell = row.getCell(CellReference.convertColStringToIndex(cellColumn));
             if(cell.getCellType() == CellType.STRING) {
                 return cell.getStringCellValue();
@@ -917,7 +930,8 @@ public class InjectService {
     }
 
     private String getValueAsString(Row row, String cellColumn) {
-        if(row.getCell(CellReference.convertColStringToIndex(cellColumn)) != null) {
+        if(cellColumn != null && !cellColumn.isBlank()
+                && row.getCell(CellReference.convertColStringToIndex(cellColumn)) != null) {
             Cell cell = row.getCell(CellReference.convertColStringToIndex(cellColumn));
             if(cell.getCellType() == CellType.STRING) {
                 return cell.getStringCellValue();
@@ -929,7 +943,8 @@ public class InjectService {
     }
 
     private Double getValueAsDouble(Row row, String cellColumn) {
-        if(row.getCell(CellReference.convertColStringToIndex(cellColumn)) != null) {
+        if(cellColumn != null && !cellColumn.isBlank()
+                && row.getCell(CellReference.convertColStringToIndex(cellColumn)) != null) {
             Cell cell = row.getCell(CellReference.convertColStringToIndex(cellColumn));
             if(cell.getCellType() == CellType.STRING) {
                 return Double.valueOf(cell.getStringCellValue());
