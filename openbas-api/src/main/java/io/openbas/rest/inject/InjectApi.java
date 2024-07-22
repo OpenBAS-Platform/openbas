@@ -177,7 +177,7 @@ public class InjectApi extends RestBehavior {
     @GetMapping(EXERCISE_URI + "/{exerciseId}/injects")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Iterable<Inject> exerciseInjects(@PathVariable @NotBlank final String exerciseId) {
-        return injectRepository.findAll(InjectSpecification.fromExercise(exerciseId))
+        return injectRepository.findByExerciseId(exerciseId)
             .stream()
             .sorted(Inject.executionComparator)
             .toList();
@@ -456,7 +456,7 @@ public class InjectApi extends RestBehavior {
     @GetMapping(SCENARIO_URI + "/{scenarioId}/injects")
     @PreAuthorize("isScenarioObserver(#scenarioId)")
     public Iterable<Inject> scenarioInjects(@PathVariable @NotBlank final String scenarioId) {
-        return this.injectRepository.findAll(InjectSpecification.fromScenario(scenarioId))
+        return this.injectRepository.findByScenarioId(scenarioId)
                 .stream()
                 .sorted(Inject.executionComparator)
                 .toList();
