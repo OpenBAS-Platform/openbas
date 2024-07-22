@@ -16,6 +16,9 @@ public class ImportTestSummary {
   @JsonProperty("import_message")
   private List<ImportMessage> importMessage = new ArrayList<>();
 
+  @JsonProperty("total_injects")
+  public int totalNumberOfInjects;
+
   @JsonIgnore
   private List<Inject> injects = new ArrayList<>();
 
