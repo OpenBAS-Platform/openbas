@@ -1,6 +1,7 @@
 import { ToggleButton, Tooltip } from '@mui/material';
 import { CloudUploadOutlined } from '@mui/icons-material';
 import React, { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Dialog from '../../../../components/common/Dialog';
 import { useFormatter } from '../../../../components/i18n';
 import type { ImportPostSummary, InjectsImportInput } from '../../../../utils/api-types';
@@ -8,7 +9,6 @@ import ImportUploaderInjectFromXlsFile from './ImportUploaderInjectFromXlsFile';
 import ImportUploaderInjectFromXlsInjects from './ImportUploaderInjectFromXlsInjects';
 import { InjectContext } from '../Context';
 import { storeXlsFile } from '../../../../actions/mapper/mapper-actions';
-import { useNavigate } from 'react-router-dom';
 
 const ImportUploaderInjectFromXls = () => {
   // Standard hooks
