@@ -158,7 +158,7 @@ export const importXls = (scenarioId: Scenario['scenario_id'], importId: string,
   const uri = `${SCENARIO_URI}/${scenarioId}/xls/${importId}/import`;
   return simplePostCall(uri, input)
     .then((response) => {
-      const injectCount = response.data.injects.length;
+      const injectCount = response.data.total_injects;
       if (injectCount === 0) {
         MESSAGING$.notifySuccess('No inject imported');
       } else {

@@ -26,6 +26,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
@@ -232,9 +233,11 @@ public class InjectService {
         Optional<ImportMessage> hasCritical = importTestSummary.getImportMessage().stream()
                 .filter(importMessage -> importMessage.getMessageLevel() == ImportMessage.MessageLevel.CRITICAL)
                 .findAny();
+        importTestSummary.setTotalNumberOfInjects(importTestSummary.getInjects().size());
         if(hasCritical.isPresent()) {
             // If there are critical errors, we do not save and we
             // empty the list of injects, we just keep the messages
+            importTestSummary.setTotalNumberOfInjects(0);
             importTestSummary.setInjects(new ArrayList<>());
         } else if(saveAll) {
             Iterable<Inject> newInjects = injectRepository.saveAll(importTestSummary.getInjects());
@@ -257,6 +260,9 @@ public class InjectService {
                 }));
             });
             scenarioService.updateScenario(scenario);
+            importTestSummary.setInjects(new ArrayList<>());
+        } else {
+            importTestSummary.setInjects(importTestSummary.getInjects().stream().limit(5).toList());
         }
 
         return importTestSummary;
@@ -444,7 +450,7 @@ public class InjectService {
         String dateAsString = Strings.EMPTY;
         if(triggerTimeRuleAttribute.getColumns() != null) {
             dateAsString = Arrays.stream(triggerTimeRuleAttribute.getColumns().split("\\+"))
-                    .map(column -> getDateAsStringFromCell(row, column))
+                    .map(column -> getDateAsStringFromCell(row, column, timePattern))
                     .collect(Collectors.joining());
         }
         if (dateAsString.isBlank()) {
@@ -703,9 +709,10 @@ public class InjectService {
                 if (ruleAttribute.getName().contains("_")) {
                     if("score".equals(ruleAttribute.getName().split("_")[1])) {
                         if(ruleAttribute.getColumns() != null) {
-                            List<String> columns = Arrays.stream(ruleAttribute.getColumns().split("\\+")).toList();
-                            if(columns.stream().filter(column -> column != null && !column.isBlank())
-                                    .allMatch(column -> row.getCell(CellReference.convertColStringToIndex(column)).getCellType()== CellType.NUMERIC)) {
+                            List<String> columns = Arrays.stream(ruleAttribute.getColumns().split("\\+"))
+                                    .filter(column -> column != null && !column.isBlank()).toList();
+                            if(!columns.isEmpty() && columns.stream().allMatch(column ->
+                                    row.getCell(CellReference.convertColStringToIndex(column)).getCellType()== CellType.NUMERIC)) {
                                 Double columnValueExpectation = columns.stream()
                                         .map(column -> getValueAsDouble(row, column))
                                         .reduce(0.0, Double::sum);
@@ -916,14 +923,18 @@ public class InjectService {
         );
     }
 
-    private String getDateAsStringFromCell(Row row, String cellColumn) {
+    private String getDateAsStringFromCell(Row row, String cellColumn, String timePattern) {
         if(cellColumn != null && !cellColumn.isBlank()
                 && row.getCell(CellReference.convertColStringToIndex(cellColumn)) != null) {
             Cell cell = row.getCell(CellReference.convertColStringToIndex(cellColumn));
             if(cell.getCellType() == CellType.STRING) {
                 return cell.getStringCellValue();
             } else if(cell.getCellType() == CellType.NUMERIC) {
-                return cell.getDateCellValue().toString();
+                if(timePattern == null || timePattern.isEmpty()) {
+                    return cell.getDateCellValue().toString();
+                } else {
+                    return DateFormatUtils.format(cell.getDateCellValue(), timePattern);
+                }
             }
         }
         return "";
