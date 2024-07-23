@@ -184,7 +184,7 @@ public class ScenarioToExerciseService {
         });
 
         // Injects
-        List<Inject> scenarioInjects = scenario.getInjects();
+        List<Inject> scenarioInjects = scenario.getInjects().stream().filter(inject -> inject.getInjectorContract().isPresent()).toList(); // Only injects with a contract can be added to the exercise
         scenarioInjects.forEach(scenarioInject -> {
             Inject exerciseInject = new Inject();
             exerciseInject.setTitle(scenarioInject.getTitle());
