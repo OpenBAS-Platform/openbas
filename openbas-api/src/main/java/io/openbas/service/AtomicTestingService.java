@@ -178,11 +178,6 @@ public class AtomicTestingService {
     @Validated
     public InjectResultDTO getDuplicateAtomicTesting(@NotBlank String id) {
         Inject injectOrigin = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
-
-        if(injectOrigin.getInjectorContract().isEmpty()){
-            throw new ElementNotFoundException();
-        }
-
         Inject injectDuplicate = copyInject(injectOrigin, true);
         injectDuplicate.setExercise(injectOrigin.getExercise());
         injectDuplicate.setScenario(injectOrigin.getScenario());
