@@ -6,6 +6,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.injectors.channel.ChannelContract;
 import io.openbas.injectors.channel.model.ChannelContent;
+import io.openbas.rest.exception.ElementNotFoundException;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
@@ -189,7 +190,7 @@ public class ScenarioToExerciseService {
             Inject exerciseInject = new Inject();
             exerciseInject.setTitle(scenarioInject.getTitle());
             exerciseInject.setDescription(scenarioInject.getDescription());
-            exerciseInject.setInjectorContract(scenarioInject.getInjectorContract().orElse(null));
+            exerciseInject.setInjectorContract(scenarioInject.getInjectorContract().orElseThrow(ElementNotFoundException::new));
             exerciseInject.setCountry(scenarioInject.getCountry());
             exerciseInject.setCity(scenarioInject.getCity());
             exerciseInject.setEnabled(scenarioInject.isEnabled());
