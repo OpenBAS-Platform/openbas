@@ -24,7 +24,6 @@ public class InjectSpecification {
             Path<Object> exercisePath = root.get("exercise");
             return cb.and(
                     cb.equal(root.get("enabled"), true), // isEnable
-                    cb.isNotNull(root.get("injectorContract")), // has an injector_contract
                     cb.isNotNull(exercisePath.get("start")), // fromScheduled
                     cb.isNull(root.join("status", JoinType.LEFT).get("name")) // notExecuted
             );
@@ -37,7 +36,6 @@ public class InjectSpecification {
             return cb.and(
                     // cb.notEqual(root.get("type"), ManualContract.TYPE),  // notManual
                     cb.equal(root.get("enabled"), true), // isEnable
-                    cb.isNotNull(root.get("injectorContract")), // has an injector_contract
                     cb.isNotNull(exercisePath.get("start")), // fromScheduled
                     cb.equal(exercisePath.get("status"), ExerciseStatus.RUNNING), // fromRunningExercise
                     cb.isNull(root.join("status", JoinType.LEFT).get("name")) // notExecuted
@@ -49,7 +47,6 @@ public class InjectSpecification {
         return (root, query, cb) -> cb.and(
                 // cb.notEqual(root.get("type"), ManualContract.TYPE),  // notManual
                 cb.equal(root.get("enabled"), true), // isEnable
-                cb.isNotNull(root.get("injectorContract")), // has an injector_contract
                 cb.equal(root.get("exercise").get("id"), exerciseId) // fromWantedExercise
         );
     }
@@ -58,7 +55,6 @@ public class InjectSpecification {
         return (root, query, cb) -> cb.and(
                 cb.isNull(root.get("exercise")), // No exercise
                 cb.isNull(root.get("scenario")), // No scenario
-                cb.isNotNull(root.get("injectorContract")), // has an injector_contract
                 cb.equal(root.get("status").get("name"), ExecutionStatus.QUEUING),
                 cb.notEqual(root.get("status").get("name"), ExecutionStatus.PENDING)
         );

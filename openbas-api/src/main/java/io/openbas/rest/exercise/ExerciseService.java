@@ -242,8 +242,6 @@ public class ExerciseService {
     private void getListOfDuplicatedInjects(Exercise exercise, Exercise exerciseOrigin) {
         List<Inject> injectListForExercise = exerciseOrigin.getInjects()
                 .stream().map(inject -> injectDuplicateService.createInjectForExercise(exercise.getId(), inject.getId(), false))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
                 .toList();
         exercise.setInjects(new ArrayList<>(injectListForExercise));
     }

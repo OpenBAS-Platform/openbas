@@ -16,7 +16,6 @@ public class InjectStatisticsHelper {
     long executed = injects.stream().filter(inject -> inject.getStatus().isPresent()).count();
     stats.put("total_executed", executed);
     stats.put("total_remaining", injects.stream().filter(Inject::isNotExecuted).count());
-    stats.put("total_deleted", injects.stream().filter(inject -> inject.getInjectorContract().isEmpty()).count());
     stats.put("total_past", injects.stream().filter(Inject::isPastInject).count());
     stats.put("total_future", injects.stream().filter(Inject::isFutureInject).count());
     stats.put("total_progress", total > 0 ? (executed * 100 / total) : 0);

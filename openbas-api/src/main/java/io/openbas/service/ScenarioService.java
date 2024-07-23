@@ -511,8 +511,6 @@ public class ScenarioService {
     private void getListOfDuplicatedInjects(@NotNull Scenario scenario, @NotNull Scenario scenarioOrign) {
         Set<Inject> injectListForScenario = scenarioOrign.getInjects()
                 .stream().map(inject -> injectDuplicateService.createInjectForScenario(scenario.getId(), inject.getId(), false))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
                 .collect(Collectors.toSet());
         scenario.setInjects(new HashSet<>(injectListForScenario));
     }

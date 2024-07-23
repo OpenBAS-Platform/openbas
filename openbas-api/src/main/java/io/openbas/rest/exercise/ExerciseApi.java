@@ -566,11 +566,10 @@ public class ExerciseApi extends RestBehavior {
             this.injectStatusRepository.deleteAllById(
                     exercise.getInjects()
                             .stream()
-                            .filter(inject -> inject.getInjectorContract().isEmpty())
                             .map(Inject::getStatus)
                             .map(i -> i.map(InjectStatus::getId).orElse(""))
                             .toList());
-            exercise.getInjects().stream().filter(inject -> inject.getInjectorContract().isEmpty()).forEach(Inject::clean); // The status of injects without a contract is not modified
+            exercise.getInjects().forEach(Inject::clean);
             // Reset lessons learned answers
             List<LessonsAnswer> lessonsAnswers = lessonsCategoryRepository.findAll(
                     LessonsCategorySpecification.fromExercise(exerciseId)).stream().flatMap(
