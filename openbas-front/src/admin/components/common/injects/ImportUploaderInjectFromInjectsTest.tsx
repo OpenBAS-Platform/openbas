@@ -151,7 +151,7 @@ const ImportUploaderInjectFromInjectsTest: FunctionComponent<Props> = ({
       <Box sx={{ marginTop: '8px' }}>
         <span>{t('Log')} : </span>
         <CodeBlock
-          code={JSON.stringify(result?.import_message, null, ' ') || t('You will find here the result log in JSON format.')}
+          code={JSON.stringify(result?.import_message?.filter((i) => i.message_level === 'ERROR' || i.message_level === 'CRITICAL'), null, ' ') || t('You will find here the result log in JSON format.')}
           language={'json'}
           maxHeight={'200px'}
         />
