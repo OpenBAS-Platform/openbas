@@ -25,7 +25,7 @@ import static io.openbas.service.UserService.buildAuthenticationToken;
 @Component
 public class WithMockObserverUserSecurityContextFactory implements WithSecurityContextFactory<WithMockObserverUser> {
 
-  public static final String MOCK_USER_OBSERVER_EMAIL = "observer@opencti.io";
+  public static final String MOCK_USER_OBSERVER_EMAIL = "observer@openbas.io";
   @Autowired
   private GrantRepository grantRepository;
   @Autowired
@@ -65,6 +65,7 @@ public class WithMockObserverUserSecurityContextFactory implements WithSecurityC
       Group newGroup = new Group();
       newGroup.setName(groupName);
       newGroup.setScenariosDefaultGrants(List.of(OBSERVER));
+      newGroup.setExercisesDefaultGrants(List.of(OBSERVER));
       group = this.groupRepository.save(newGroup);
       // Create grant
       Grant grant = new Grant();

@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { withStyles, withTheme } from '@mui/styles';
 import { Autocomplete, Button, Drawer, FormControl, Grid, IconButton, InputLabel, MenuItem, Select, Slide, TextField, Toolbar, Tooltip, Typography } from '@mui/material';
-import { AddOutlined, BrushOutlined, CancelOutlined, ClearOutlined, CloseOutlined, DevicesOtherOutlined, GroupsOutlined } from '@mui/icons-material';
+import { AddOutlined, BrushOutlined, CancelOutlined, ClearOutlined, CloseOutlined, DeleteOutlined, DevicesOtherOutlined, GroupsOutlined } from '@mui/icons-material';
 import { SelectGroup } from 'mdi-material-ui';
 import { connect } from 'react-redux';
 import inject18n from '../../../components/i18n';
@@ -12,6 +12,7 @@ import { fetchAssetGroups } from '../../../actions/asset_groups/assetgroup-actio
 import { fetchEndpoints } from '../../../actions/assets/endpoint-actions';
 import { storeHelper } from '../../../actions/Schema';
 import { fetchTeams } from '../../../actions/teams/team-actions';
+import DialogDelete from '../../../components/common/DialogDelete';
 
 const styles = (theme) => ({
   bottomNav: {
@@ -143,6 +144,7 @@ class ToolBar extends Component {
     super(props);
     this.state = {
       displayUpdate: false,
+      displayBulkDelete: false,
       actions: [],
       actionsInputs: [{}],
       navOpen: localStorage.getItem('navOpen') === 'true',
@@ -441,6 +443,21 @@ class ToolBar extends Component {
     this.props.handleUpdate(this.state.actionsInputs);
   }
 
+  // Deletion
+  handleOpenBulkDelete = () => {
+    this.setState({ displayBulkDelete: true });
+  };
+
+  handleCloseBulkDelete = () => {
+    this.setState({ displayBulkDelete: false, actionsInputs: [{}] });
+  };
+
+  handleSubmitBulkDelete = () => {
+    this.handleCloseBulkDelete();
+    this.props.handleClearSelectedElements();
+    this.props.handleBulkDelete(this.state.actionsInputs);
+  };
+
   render() {
     const {
       t,
@@ -463,6 +480,11 @@ class ToolBar extends Component {
       default:
         paperClass = classes.bottomNav;
     }
+    const confirmationText = () => {
+      return numberOfSelectedElements === 1
+        ? t('Do you want to delete this inject?')
+        : t('Do you want to delete these {count} injects?', { count: numberOfSelectedElements });
+    };
     return (
       <>
         <Drawer
@@ -517,6 +539,22 @@ class ToolBar extends Component {
                   size="small"
                 >
                   <BrushOutlined fontSize="small"/>
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title={t('Delete')}>
+              <span>
+                <IconButton
+                  aria-label="delete"
+                  disabled={
+                          numberOfSelectedElements === 0
+                          || this.state.processing
+                        }
+                  onClick={this.handleOpenBulkDelete.bind(this)}
+                  color="primary"
+                  size="small"
+                >
+                  <DeleteOutlined fontSize="small"/>
                 </IconButton>
               </span>
             </Tooltip>
@@ -614,6 +652,12 @@ class ToolBar extends Component {
             </div>
           </Drawer>
         </Drawer>
+        <DialogDelete
+          open={this.state.displayBulkDelete}
+          handleClose={this.handleCloseBulkDelete.bind(this)}
+          handleSubmit={this.handleSubmitBulkDelete.bind(this)}
+          text={confirmationText()}
+        />
       </>
     );
   }

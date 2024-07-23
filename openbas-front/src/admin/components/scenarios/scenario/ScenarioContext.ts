@@ -1,5 +1,12 @@
 import type { Inject, InjectsImportInput } from '../../../../utils/api-types';
-import { addInjectForScenario, deleteInjectScenario, fetchScenarioInjects, updateInjectActivationForScenario, updateInjectForScenario } from '../../../../actions/Inject';
+import {
+  addInjectForScenario,
+  bulkDeleteInjectsForScenario,
+  deleteInjectScenario,
+  fetchScenarioInjects,
+  updateInjectActivationForScenario,
+  updateInjectForScenario,
+} from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { InjectStore } from '../../../../actions/injects/Inject';
@@ -31,6 +38,9 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
         dispatch(fetchScenarioTeams(scenario.scenario_id));
         resolve();
       }));
+    },
+    onBulkDeleteInjects(injectIds: string[]): void {
+      return dispatch(bulkDeleteInjectsForScenario(scenario.scenario_id, injectIds));
     },
   };
 };

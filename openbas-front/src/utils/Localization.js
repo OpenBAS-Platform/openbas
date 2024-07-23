@@ -99,6 +99,8 @@ const i18n = {
         'Souhaitez-vous supprimer ce joueur ?',
       'Do you want to delete this inject?':
         'Souhaitez-vous supprimer ce stimuli ?',
+      'Do you want to delete these {count} injects?':
+        'Souhaitez-vous supprimer ces {count} stimulis ?',
       'Do you want to delete this channel?':
         'Souhaitez-vous supprimer ce canal ?',
       'Start date (optional)': 'Date de début (optionnel)',
@@ -176,6 +178,7 @@ const i18n = {
       'Do you want to delete this simulation:': 'Voulez-vous supprimer cette simulation : ',
       'Do you want to duplicate this atomic testing:': 'Voulez-vous dupliquer cet atomic testing : ',
       'Do you want to delete this atomic testing:': 'Voulez-vous supprimer cet atomic testing : ',
+      'Do you want to duplicate this inject:': 'Voulez-vous dupliquer ce stimuli : ',
       Delete: 'Supprimer',
       Edition: 'Edition',
       Confirmation: 'Confirmation',
@@ -1247,6 +1250,8 @@ const i18n = {
       Expectation_description: 'Expectation description',
       Expectation_score: 'Expectation score',
       Trigger_time: 'Trigger time',
+      // Bulk actions
+      'Do you want to delete these {count} injects?': 'Do you want to delete these {count} injects?',
     },
   },
 };

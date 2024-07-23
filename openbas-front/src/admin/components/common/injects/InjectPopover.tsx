@@ -123,7 +123,9 @@ const InjectPopover: FunctionComponent<Props> = ({
   };
 
   const submitDisable = () => {
-    handleCloseDisable();
+    onUpdateInjectActivation(inject.inject_id, { inject_enabled: false }).then(() => {
+      handleCloseDisable();
+    });
   };
 
   const handleOpenDone = () => {
@@ -177,7 +179,9 @@ const InjectPopover: FunctionComponent<Props> = ({
         >
           {t('Update')}
         </MenuItem>
-        <MenuItem onClick={handleOpenDuplicate}>
+        <MenuItem onClick={handleOpenDuplicate}
+          disabled={isDisabled}
+        >
           {t('Duplicate')}
         </MenuItem>
         {!inject.inject_status && onInjectDone && (
@@ -228,7 +232,7 @@ const InjectPopover: FunctionComponent<Props> = ({
         open={duplicate}
         handleClose={handleCloseDuplicate}
         handleSubmit={submitDuplicateHandler}
-        text={t(`Do you want to duplicate this inject: ${inject.inject_title}?`)}
+        text={`${t('Do you want to duplicate this inject:')} ${inject.inject_title} ?`}
       />
       <Dialog
         TransitionComponent={Transition}

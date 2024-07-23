@@ -35,8 +35,8 @@ public class GrantService {
           return grant;
         }).toList();
     if (!grants.isEmpty()) {
-      Iterable<Grant> scenarioGrants = this.grantRepository.saveAll(grants);
-      exercise.setGrants(fromIterable(scenarioGrants));
+      Iterable<Grant> exerciseGrants = this.grantRepository.saveAll(grants);
+      exercise.setGrants(fromIterable(exerciseGrants));
     }
   }
 
