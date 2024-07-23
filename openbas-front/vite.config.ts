@@ -76,7 +76,7 @@ export default ({ mode }: { mode: string }) => {
         '@dagrejs/dagre',
         'react-syntax-highlighter',
         'xlsx',
-        'js-file-download'
+        'js-file-download',
       ],
     },
 

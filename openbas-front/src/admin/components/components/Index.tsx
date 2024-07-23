@@ -30,7 +30,7 @@ const Index = () => {
           <Route path="channels/:channelId/*" element={errorWrapper(IndexChannel)()} />
           <Route path="challenges" element={errorWrapper(Challenges)()} />
           <Route path="lessons" element={errorWrapper(Lessons)()} />
-          <Route path="lessons/:lessonsTemplateId" element={errorWrapper(LessonIndex)()} />
+          <Route path="lessons/:lessonsTemplateId/*" element={errorWrapper(LessonIndex)()} />
           {/* Not found */}
           <Route path="*" element={<NotFound/>}/>
         </Routes>
