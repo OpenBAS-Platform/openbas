@@ -79,7 +79,6 @@ const InjectList: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
   const { t, fldt, tPick, nsdt } = useFormatter();
-  const [modificationTrigger, setModificationTrigger] = useState<boolean>(false);
 
   // Filter and sort hook
   const [injects, setInjects] = useState<InjectResultDTO[]>([]);
@@ -91,7 +90,6 @@ const InjectList: FunctionComponent<Props> = ({
     fetchInjects(searchPaginationInput)
       .then((response) => {
         setInjects(response.data.content);
-        setModificationTrigger((prev) => !prev);
       });
   };
 
@@ -164,7 +162,6 @@ const InjectList: FunctionComponent<Props> = ({
   return (
     <>
       <PaginationComponent
-        key={modificationTrigger.toString()}
         fetch={fetchInjects}
         searchPaginationInput={searchPaginationInput}
         setContent={setInjects}

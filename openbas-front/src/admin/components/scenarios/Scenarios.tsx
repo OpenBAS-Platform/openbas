@@ -194,13 +194,10 @@ const Scenarios = () => {
     exportFileName: `${t('Scenarios')}.csv`,
   };
 
-  const [modificationTrigger, setModificationTrigger] = useState<boolean>(false);
-
   const refreshScenarios = () => {
     searchScenarios(searchPaginationInput).then((result) => {
       const { data } = result;
       setScenarios(data.content);
-      setModificationTrigger((prev) => !prev);
     });
   };
 
@@ -233,7 +230,6 @@ const Scenarios = () => {
         ))}
       </div>
       <PaginationComponent
-        key={modificationTrigger.toString()}
         fetch={searchScenarios}
         searchPaginationInput={searchPaginationInput}
         setContent={setScenarios}

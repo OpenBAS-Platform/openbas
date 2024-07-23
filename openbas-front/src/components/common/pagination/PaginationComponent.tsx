@@ -41,7 +41,6 @@ const useStyles = makeStyles(() => ({
 const ROWS_PER_PAGE_OPTIONS = [20, 50, 100];
 
 interface Props<T> {
-  key?: React.Key;
   fetch: (input: SearchPaginationInput) => Promise<{ data: Page<T> }>;
   searchPaginationInput: SearchPaginationInput;
   setContent: (data: T[]) => void;
