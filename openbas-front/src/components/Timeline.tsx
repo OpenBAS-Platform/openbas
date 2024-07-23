@@ -171,9 +171,7 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
     searchColumns,
   );
 
-  const handleSelectInject = (id: string) => {
-    onSelectInject(id);
-  };
+  const handleSelectInject = (id: string) => onSelectInject(id);
 
   const lastInject = R.pipe(
     R.sortWith([R.descend(R.prop('inject_depends_duration'))]),
