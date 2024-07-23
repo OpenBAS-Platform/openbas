@@ -249,6 +249,7 @@ const Injects = (props) => {
     sortedInjects,
     tagsMap,
   );
+
   const exportInjectsToXLS = useExportToXLS({ data: exportInjects, fileName: `${t('Injects')}` });
 
   const handleShowTimeline = () => {

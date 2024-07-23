@@ -52,7 +52,7 @@ export const exportData = (
       let entry = d;
 
       if (entry[`${type}_type`] === null) {
-        entry = 'deleted';
+        entry[`${type}_type`] = 'deleted';
       }
 
       if (entry[`${type}_tags`]) {
