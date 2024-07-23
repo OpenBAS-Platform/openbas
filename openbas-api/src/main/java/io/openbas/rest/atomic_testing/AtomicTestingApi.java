@@ -9,6 +9,7 @@ import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.output.AtomicTestingOutput;
 import io.openbas.service.AtomicTestingService;
+import io.openbas.utils.annotation.LogExecutionTime;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -31,6 +32,7 @@ public class AtomicTestingApi extends RestBehavior {
 
   @PostMapping("/search")
   @Transactional(readOnly = true)
+  @LogExecutionTime
   public Page<AtomicTestingOutput> findAllAtomicTestings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return atomicTestingService.findAllAtomicTestings(searchPaginationInput);
