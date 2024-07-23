@@ -1,5 +1,12 @@
 import type { Inject, InjectsImportInput } from '../../../../utils/api-types';
-import { addInjectForScenario, bulkDeleteInjectsForScenario, deleteInjectScenario, fetchScenarioInjects, updateInjectActivationForScenario, updateInjectForScenario } from '../../../../actions/Inject';
+import {
+  addInjectForScenario,
+  bulkDeleteInjectsForScenario,
+  deleteInjectScenario,
+  fetchScenarioInjects,
+  updateInjectActivationForScenario,
+  updateInjectForScenario,
+} from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { InjectStore } from '../../../../actions/injects/Inject';
