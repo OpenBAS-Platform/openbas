@@ -7,15 +7,16 @@ import { Theme } from '@mui/material';
 interface CodeBlockProps {
   code: string;
   language: string;
+  maxHeight?: string;
 }
 
-const CodeBlock: FunctionComponent<CodeBlockProps> = ({ language, code }) => {
+const CodeBlock: FunctionComponent<CodeBlockProps> = ({ language, code, maxHeight }) => {
   const theme = useTheme<Theme>();
   return (
     <SyntaxHighlighter
       language={language}
       style={theme.palette.mode === 'dark' ? a11yDark : coy}
-      customStyle={{ minHeight: '100px', minWidth: '550px' }}
+      customStyle={{ minHeight: '100px', minWidth: '550px', maxHeight: maxHeight }}
       showLineNumbers
     >
       {code}

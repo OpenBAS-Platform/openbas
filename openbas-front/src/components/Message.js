@@ -20,7 +20,8 @@ class Message extends Component {
             ? this.props.t(firstMessage.text)
             : firstMessage.text;
           const error = firstMessage.type === 'error';
-          this.setState({ open: true, error, text });
+          const sticky = firstMessage.sticky;
+          this.setState({ open: true, error, text, sticky });
         }
       },
     });
