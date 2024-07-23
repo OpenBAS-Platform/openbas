@@ -230,6 +230,10 @@ const Injects = (props) => {
 
   const sortedInjects = filtering.filterAndSort(injects);
 
+  const isAtLeastOneValidInject = sortedInjects.some((inject) => inject.inject_injector_contract?.injector_contract_content_parsed !== null);
+
+  console.log(sortedInjects);
+
   // Menu
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -340,7 +344,7 @@ const Injects = (props) => {
           </div>
           <div className="clearfix" />
         </div>
-        {showTimeline && (
+        {showTimeline && isAtLeastOneValidInject && (
           <div style={{ marginBottom: 50 }}>
             <Timeline
               injects={sortedInjects}
