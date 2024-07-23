@@ -38,6 +38,7 @@ interface ExercisePopoverProps {
   actions: ExerciseActionPopover[];
   variantButtonPopover?: VariantButtonPopover;
   onOperationSuccess?: () => void;
+  redirectOnSuccess?: boolean;
 }
 
 const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
@@ -45,6 +46,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   actions = [],
   variantButtonPopover,
   onOperationSuccess,
+  redirectOnSuccess = true,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -98,7 +100,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
       handleCloseDelete();
       if (onOperationSuccess) onOperationSuccess();
     });
-    navigate('/admin/exercises');
+    if (redirectOnSuccess) navigate('/admin/exercises');
   };
 
   // Duplicate
@@ -153,12 +155,12 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     setting_message_header: exercise.exercise_message_header,
     setting_message_footer: exercise.exercise_message_footer,
   };
-  const permissions = usePermissions(exercise.exercise_id);
+  const permissions = usePermissions(exercise);
 
   // Button Popover
   const entries = [];
   if (actions.includes('Update')) entries.push({ label: 'Update', action: () => handleOpenEdit(), disabled: !permissions.canWriteBypassStatus });
-  if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete(), disabled: !permissions.canWriteBypassStatus });
+  if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete() });
   if (actions.includes('Duplicate')) entries.push({ label: 'Duplicate', action: () => handleOpenDuplicate() });
   if (actions.includes('Export')) entries.push({ label: 'Export', action: () => handleOpenExport() });
 

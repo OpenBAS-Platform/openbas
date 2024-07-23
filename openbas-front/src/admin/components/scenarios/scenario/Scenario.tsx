@@ -223,6 +223,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
                 onOperationSuccess={refreshExercises}
+                redirectOnSuccess={false}
               />
             </Paper>
           </Grid>

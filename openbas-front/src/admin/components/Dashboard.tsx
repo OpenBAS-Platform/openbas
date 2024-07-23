@@ -229,6 +229,7 @@ const Dashboard = () => {
             onOperationSuccess={refreshExercises}
             hasHeader={false}
             variant={'reduced-view'}
+            disablePopover={true}
           />
         </Paper>
       </Grid>

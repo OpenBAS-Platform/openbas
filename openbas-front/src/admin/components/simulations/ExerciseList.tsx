@@ -69,6 +69,8 @@ interface Props {
   onOperationSuccess?: () => void;
   hasHeader?: boolean;
   variant?: string,
+  disablePopover?: boolean;
+  redirectOnSuccess?: boolean;
 }
 
 const ExerciseList: FunctionComponent<Props> = ({
@@ -78,6 +80,8 @@ const ExerciseList: FunctionComponent<Props> = ({
   onOperationSuccess,
   hasHeader = true,
   variant = 'list',
+  disablePopover = false,
+  redirectOnSuccess = true,
 }) => {
   // Standard hooks
   const dispatch = useAppDispatch();
@@ -161,14 +165,15 @@ const ExerciseList: FunctionComponent<Props> = ({
         <ListItem
           key={exercise.exercise_id}
           classes={{ root: classes.item }}
-          secondaryAction={
+          secondaryAction={!disablePopover && (
             <ExercisePopover
               exercise={exercise}
               actions={['Duplicate', 'Delete', 'Export']}
               variantButtonPopover={'icon'}
               onOperationSuccess={onOperationSuccess}
+              redirectOnSuccess={redirectOnSuccess}
             />
-          }
+          )}
           disablePadding={true}
         >
           <ListItemButton
