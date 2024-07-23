@@ -8,24 +8,32 @@ import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Organization;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.UserRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.exception.FileTooBigException;
 import io.openbas.rest.exception.InputValidationException;
+import jakarta.annotation.Resource;
+import lombok.extern.java.Log;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springdoc.api.ErrorMessage;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 
-import jakarta.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
 import static io.openbas.config.SessionHelper.currentUser;
 
-
+@RestControllerAdvice
+@Log
 public class RestBehavior {
 
   @Resource
@@ -95,6 +103,27 @@ public class RestBehavior {
       errorBag.setError(e.getMessage());
     }
     return errorBag;
+  }
+
+  @ExceptionHandler(ElementNotFoundException.class)
+  public ResponseEntity<ErrorMessage> handleElementNotFoundException(ElementNotFoundException ex) {
+    ErrorMessage message = new ErrorMessage("Element not found: " + ex.getMessage());
+    log.warning("ElementNotFoundException: " + ex.getMessage());
+    return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+  }
+
+  @ExceptionHandler(UnsupportedMediaTypeException.class)
+  public ResponseEntity<ErrorMessage> handleUnsupportedMediaTypeException(UnsupportedMediaTypeException ex) {
+    ErrorMessage message = new ErrorMessage(ex.getMessage());
+    log.warning("UnsupportedMediaTypeException: " + ex.getMessage());
+    return new ResponseEntity<>(message, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+  }
+
+  @ExceptionHandler(FileTooBigException.class)
+  public ResponseEntity<ErrorMessage> handleFileTooBigException(FileTooBigException ex) {
+    ErrorMessage message = new ErrorMessage(ex.getMessage());
+    log.warning("FileTooBigException: " + ex.getMessage());
+    return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
   }
 
   // --- Open channel access

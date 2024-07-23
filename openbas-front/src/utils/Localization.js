@@ -400,7 +400,6 @@ const i18n = {
       'Manual launch': 'Lancement manuel',
       'Manage content': 'Gérer le contenu',
       Controls: 'Contrôles',
-      'Lessons learned': 'Expérience',
       Planning: 'Planification',
       Comchecks: 'Vérifications',
       Dryruns: 'Simulations',
@@ -525,7 +524,7 @@ const i18n = {
       'Primary color (light)': 'Couleur primaire (clair)',
       'Secondary color (light)': 'Couleur secondaire (clair)',
       logo: 'Logo seulement',
-      title: 'Titre seulement',
+      'Title only': 'Titre seulement',
       'logo-title': 'Logo et titre',
       'Dark theme': 'Thème sombre',
       'Light theme': 'Thème clair',
@@ -540,20 +539,8 @@ const i18n = {
         'Souhaitez-vous supprimer cette pression médiatique ?',
       'Do you want to delete this challenge?':
         'Souhaitez-vous supprimer ce challenge ?',
-      'Do you want to delete this lessons learned category?':
-        "Souhaitez-vous supprimer cette catégorie de retour d'expérience ?",
-      'Update the lessons learned category':
-        "Modifier une catégorie de retour d'expérience",
       'Create a new media pressure': 'Créer une nouvelle pression médiatique',
-      'Create a new lessons learned question':
-        "Créer une nouvelle question de retour d'expérience",
       'Collaborative lessons learned': "Retour d'expérience collaboratif",
-      'Create a new lessons learned category':
-        "Créer une catégorie de retour d'expérience",
-      'Do you want to delete this lessons learned question?':
-        "Souhaitez-vous supprimer cette question de retour d'expérience ?",
-      'Update the lessons learned question':
-        "Modifier la question de retour d'expérience",
       Answers: 'Réponses',
       'Categories and questions': 'Catégories et questions',
       Questions: 'Questions',
@@ -586,12 +573,6 @@ const i18n = {
       Explanation: 'Explication',
       Category: 'Catégorie',
       'Create a new challenge': 'Créer un nouveau challenge',
-      'Create a new lessons learned template':
-        "Créer un nouveau template de retour d'expérience",
-      'Update the lessons learned template':
-        "Modifier le template de retour d'expérience",
-      'Do you want to delete this lessons learned template?':
-        "Souhaitez-vous supprimer ce template de retour d'expérience ?",
       Channel: 'Média',
       Author: 'Auteur',
       'Max number of attempts': "Nombre maximum d'essais",
@@ -1057,6 +1038,7 @@ const i18n = {
       backlabel: 'étiquette de retour',
       backuri: 'uri de retour',
       'Injects Results': 'Résultats des stimulis',
+      'Import injects': 'Importer des stimulis',
       'Browse the link': 'Parcourir le lien',
       EE: 'EE',
       'Error or prevented': 'Erreur ou empêché',
@@ -1116,18 +1098,66 @@ const i18n = {
       'Cleanup executor': 'Exécuteur de nettoyage',
       'Cleanup command': 'Commande de nettoyage',
       Document: 'Document',
-      // -- Policies
+      // Policies
       'Platform login message': 'Messages de connexion',
       'Platform consent message': 'Message de consentement à la plate-forme',
       'Platform consent confirm text': 'Texte de confirmation du consentement à la plate-forme',
       Write: 'Ecriture',
-      // -- Timeline
+      // Timeline
       'Hide timeline': 'Cacher la chronologie',
       'Show Timeline': 'Afficher la chronologie',
       COMMUNITY: 'Community',
       FILIGRAN: 'Filigran',
       VERIFIED: 'Verified',
       UNVERIFIED: 'Unverified',
+      // ---Xls mapper
+      'Create a xls mapper': 'Créer un mapper xls',
+      'Mapper name': 'Nom du mapper',
+      'Inject type column': 'Colonne de type d\'inject',
+      'Representation for inject type': 'Représentation de l\'inject type',
+      'Inject importer name': 'Nom d\'inject importer',
+      'Matching type in the xls': 'Type correspondant dans le xls',
+      'Inject importer description': 'Description d\'inject importer',
+      'Inject type': 'Typed d\'inject',
+      'Inject importer rules': 'Règles d\'inject importer',
+      'At least one inject type is required': 'Au moins un inject type est requis',
+      'New representation': 'Nouvelle représentation',
+      'Rule attribute name': 'Nom de règle d\'attribut',
+      'Rule attribute columns': 'Colonnes de règle d\'attribut',
+      'Time pattern': 'Modèle de temps',
+      'Rule title': 'Titre de la règle',
+      'Rule description': 'Description de la règle',
+      'Do you want to delete this representation?': 'Voulez-vous supprimer cette représentation ?',
+      'Trigger time': 'Heure de lancement',
+      'Attribute mapping configuration': 'Configuration d\'attribut de mappeur',
+      Test: 'Test',
+      'Do you want to delete this XLS mapper ?': 'Voulez-vous supprimer ce mappage XLS ?',
+      Expectation_name: 'Nom de l\'attendu',
+      Expectation_description: 'Description de l\'attendu',
+      Expectation_score: 'Score de l\'attendu',
+      Trigger_time: 'Temps de déclenchement',
+      'This expression will be used to find a match in the specified column to determine the inject type. Regular Expressions can be used.': 'Cette expression est utilisé pour déterminer si il y a correspondance avec la colonne spécifié. L\'utilisation d\'expression régulière est possible.',
+      'By default we accept iso date (YYYY-MM-DDThh:mm:ss[.mmm]TZD), but you can specify your own date format in ISO notation (for instance DD.MM.YYYY hh\'h\'mm)': 'Par défaut nous acceptons la date iso (AAAA-MM-JJ hh:mm:ss[.mmm]TZD), mais vous pouvez spécifiez votre propre format de date en notation ISO (par exemple JJ.MM.AAAA hh\'h\'mm)',
+      // -- Lessons --
+      'Lessons learned': 'Expérience',
+      'Create a new lessons learned template':
+        "Créer un nouveau template de retour d'expérience",
+      'Update the lessons learned template':
+        "Modifier le template de retour d'expérience",
+      'Do you want to delete this lessons learned template?':
+        "Souhaitez-vous supprimer ce template de retour d'expérience ?",
+      'Create a new lessons learned category':
+        "Créer une catégorie de retour d'expérience",
+      'Update the lessons learned category':
+        "Modifier une catégorie de retour d'expérience",
+      'Do you want to delete this lessons learned category?':
+        "Souhaitez-vous supprimer cette catégorie de retour d'expérience ?",
+      'Create a new lessons learned question':
+        "Créer une nouvelle question de retour d'expérience",
+      'Update the lessons learned question':
+        "Modifier la question de retour d'expérience",
+      'Do you want to delete this lessons learned question?':
+        "Souhaitez-vous supprimer cette question de retour d'expérience ?",
     },
     en: {
       openbas_email: 'Email',
@@ -1158,7 +1188,6 @@ const i18n = {
       tv: 'TV channel',
       microblogging: 'Microblogging',
       logo: 'Logo only',
-      title: 'Title only',
       'logo-title': 'Logo and title',
       VALUE: 'Text',
       VALUE_CASE: 'Text (case-sensitive)',
@@ -1213,6 +1242,11 @@ const i18n = {
       FILIGRAN: 'Filigran',
       VERIFIED: 'Verified',
       UNVERIFIED: 'Unverified',
+      // - XLS Mapper
+      Expectation_name: 'Expectation name',
+      Expectation_description: 'Expectation description',
+      Expectation_score: 'Expectation score',
+      Trigger_time: 'Trigger time',
     },
   },
 };

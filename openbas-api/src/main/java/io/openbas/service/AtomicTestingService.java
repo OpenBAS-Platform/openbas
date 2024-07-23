@@ -42,7 +42,7 @@ import java.util.*;
 import java.util.stream.StreamSupport;
 
 import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.criteria.InjectCriteria.countQuery;
+import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.AtomicTestingUtils.*;
@@ -362,7 +362,7 @@ public class AtomicTestingService {
         }
 
     // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, specification);
+    Long total = countQuery(cb, this.entityManager, Inject.class, specification);
 
         return new PageImpl<>(injects, pageable, total);
     }

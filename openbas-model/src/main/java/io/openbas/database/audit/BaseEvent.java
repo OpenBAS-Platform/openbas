@@ -6,10 +6,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Base;
 import jakarta.persistence.Id;
-import java.lang.reflect.Field;
 import lombok.Getter;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
+
+import java.lang.reflect.Field;
 
 @Getter
 public class BaseEvent implements Cloneable {
@@ -26,11 +27,14 @@ public class BaseEvent implements Cloneable {
     private String schema;
     @JsonProperty("instance")
     private JsonNode instanceData;
+    @JsonProperty("listened")
+    private boolean listened;
 
     public BaseEvent(String type, Base data, ObjectMapper mapper) {
         this.type = type;
         this.instance = data;
         this.instanceData = mapper.valueToTree(instance);
+        this.listened = data.isListened();
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         this.sessionId = requestAttributes != null ? requestAttributes.getSessionId() : null;
         Class<? extends Base> currentClass = data.getClass();

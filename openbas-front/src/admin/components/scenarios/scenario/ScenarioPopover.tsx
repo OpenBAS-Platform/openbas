@@ -5,8 +5,8 @@ import type { ScenarioInput, ScenarioInformationInput } from '../../../../utils/
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
-import { deleteScenario, duplicateScenario, exportScenarioUri, updateScenario, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
-import ButtonPopover, { ButtonPopoverEntry, VariantButtonPopover } from '../../../../components/common/ButtonPopover';
+import { deleteScenario, exportScenarioUri, updateScenario, updateScenarioInformation, duplicateScenario } from '../../../../actions/scenarios/scenario-actions';
+import ButtonPopover, { PopoverEntry, VariantButtonPopover } from '../../../../components/common/ButtonPopover';
 import Drawer from '../../../../components/common/Drawer';
 import ScenarioForm from '../ScenarioForm';
 import DialogDelete from '../../../../components/common/DialogDelete';
@@ -18,7 +18,7 @@ import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 
 interface Props {
   scenario: ScenarioStore;
-  entries: ButtonPopoverEntry[];
+  entries: PopoverEntry[];
   openEdit?: boolean;
   setOpenEdit?: React.Dispatch<React.SetStateAction<boolean>>;
   openExport?: boolean;

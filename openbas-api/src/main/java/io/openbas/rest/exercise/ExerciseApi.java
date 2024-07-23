@@ -104,8 +104,6 @@ public class ExerciseApi extends RestBehavior {
     private final InjectStatusRepository injectStatusRepository;
     private final InjectRepository injectRepository;
     private final InjectExpectationRepository injectExpectationRepository;
-    private final AssetGroupRepository assetGroupRepository;
-    private final AssetRepository assetRepository;
     private final ScenarioRepository scenarioRepository;
     private final CommunicationRepository communicationRepository;
     private final ObjectiveRepository objectiveRepository;

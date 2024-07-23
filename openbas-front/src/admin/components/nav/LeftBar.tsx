@@ -22,6 +22,7 @@ import {
   OnlinePredictionOutlined,
   PersonOutlined,
   RowingOutlined,
+  SchoolOutlined,
   SettingsOutlined,
   SmartButtonOutlined,
   SubscriptionsOutlined,
@@ -495,6 +496,7 @@ const LeftBar = () => {
               { type: 'Persona', link: '/admin/components/personas', label: 'Personas', icon: <DramaMasks fontSize="small" />, disabled: true },
               { type: 'Channel', link: '/admin/components/channels', label: 'Channels', icon: <PostOutline fontSize="small" /> },
               { type: 'Challenge', link: '/admin/components/challenges', label: 'Challenges', icon: <RowingOutlined fontSize="small" /> },
+              { type: 'Lessons', link: '/admin/components/lessons', label: 'Lessons learned', icon: <SchoolOutlined fontSize="small" /> },
             ],
           )}
         </MenuList>
@@ -514,10 +516,10 @@ const LeftBar = () => {
                   <DescriptionOutlined />
                 </ListItemIcon>
                 {navOpen && (
-                <ListItemText
-                  classes={{ primary: classes.menuItemText }}
-                  primary={t('Reports')}
-                />
+                  <ListItemText
+                    classes={{ primary: classes.menuItemText }}
+                    primary={t('Reports')}
+                  />
                 )}
               </MenuItem>
             </span>
@@ -643,6 +645,7 @@ const LeftBar = () => {
               { link: '/admin/settings', label: 'Parameters', exact: true },
               { link: '/admin/settings/security', label: 'Security' },
               { link: '/admin/settings/taxonomies', label: 'Taxonomies' },
+              { link: '/admin/settings/data_ingestion', label: 'Data ingestion' },
             ],
           )}
         </MenuList>

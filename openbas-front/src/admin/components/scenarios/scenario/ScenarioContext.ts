@@ -1,8 +1,9 @@
-import type { Inject } from '../../../../utils/api-types';
-import { addInjectForScenario, deleteInjectScenario, updateInjectActivationForScenario, updateInjectForScenario } from '../../../../actions/Inject';
+import type { Inject, InjectsImportInput } from '../../../../utils/api-types';
+import { addInjectForScenario, deleteInjectScenario, fetchScenarioInjects, updateInjectActivationForScenario, updateInjectForScenario } from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { InjectStore } from '../../../../actions/injects/Inject';
+import { fetchScenario, fetchScenarioTeams, importXls } from '../../../../actions/scenarios/scenario-actions';
 
 const injectContextForScenario = (scenario: ScenarioStore) => {
   const dispatch = useAppDispatch();
@@ -22,6 +23,14 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
     },
     onDeleteInject(injectId: Inject['inject_id']): void {
       return dispatch(deleteInjectScenario(scenario.scenario_id, injectId));
+    },
+    onImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<void> {
+      return importXls(scenario.scenario_id, importId, input).then((_value) => new Promise((resolve, _reject) => {
+        dispatch(fetchScenarioInjects(scenario.scenario_id));
+        dispatch(fetchScenario(scenario.scenario_id));
+        dispatch(fetchScenarioTeams(scenario.scenario_id));
+        resolve();
+      }));
     },
   };
 };

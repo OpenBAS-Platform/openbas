@@ -9,6 +9,8 @@ const IndexChannel = lazy(() => import('./channels/Index'));
 const Channels = lazy(() => import('./channels/Channels'));
 const Documents = lazy(() => import('./documents/Documents'));
 const Challenges = lazy(() => import('./challenges/Challenges'));
+const Lessons = lazy(() => import('./lessons/LessonsTemplates'));
+const LessonIndex = lazy(() => import('./lessons/Index'));
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -27,6 +29,8 @@ const Index = () => {
           <Route path="channels" element={errorWrapper(Channels)()} />
           <Route path="channels/:channelId/*" element={errorWrapper(IndexChannel)()} />
           <Route path="challenges" element={errorWrapper(Challenges)()} />
+          <Route path="lessons" element={errorWrapper(Lessons)()} />
+          <Route path="lessons/:lessonsTemplateId" element={errorWrapper(LessonIndex)()} />
           {/* Not found */}
           <Route path="*" element={<NotFound/>}/>
         </Routes>

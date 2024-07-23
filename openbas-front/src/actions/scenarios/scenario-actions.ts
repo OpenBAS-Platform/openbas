@@ -2,6 +2,7 @@ import { Dispatch } from 'redux';
 import { delReferential, getReferential, postReferential, putReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import { arrayOfScenarios, scenario } from './scenario-schema';
 import type {
+  InjectsImportInput,
   Scenario,
   ScenarioInformationInput,
   ScenarioInput,
@@ -13,6 +14,7 @@ import type {
   Team,
 } from '../../utils/api-types';
 import * as schema from '../Schema';
+import { MESSAGING$ } from '../../utils/Environment';
 
 const SCENARIO_URI = '/api/scenarios';
 
@@ -148,4 +150,20 @@ export const updateScenarioRecurrence = (
 export const fetchScenarioStatistic = () => {
   const uri = `${SCENARIO_URI}/statistics`;
   return simpleCall(uri);
+};
+
+// -- IMPORT --
+
+export const importXls = (scenarioId: Scenario['scenario_id'], importId: string, input: InjectsImportInput) => {
+  const uri = `${SCENARIO_URI}/${scenarioId}/xls/${importId}/import`;
+  return simplePostCall(uri, input)
+    .then((response) => {
+      const injectCount = response.data.total_injects;
+      if (injectCount === 0) {
+        MESSAGING$.notifySuccess('No inject imported');
+      } else {
+        MESSAGING$.notifySuccess(`${injectCount} inject imported`);
+      }
+      return response;
+    });
 };

@@ -12,7 +12,7 @@ import ItemTags from '../ItemTags';
 import type { Theme } from '../Theme';
 import { useFormatter } from '../i18n';
 import DocumentType from '../../admin/components/components/documents/DocumentType';
-import ButtonPopover, { ButtonPopoverEntry } from '../common/ButtonPopover';
+import ButtonPopover, { PopoverEntry } from '../common/ButtonPopover';
 import FileTransferDialog from './FileTransferDialog';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -154,7 +154,7 @@ const FileLoader: React.FC<Props> = ({
   };
 
   // Button Popover entries
-  const entries: ButtonPopoverEntry[] = [
+  const entries: PopoverEntry[] = [
     { label: 'Update', action: handleOpen },
     { label: 'Remove', action: handleRemove },
     { label: 'Download', action: () => handleDownload(selectedDocument?.document_id) },

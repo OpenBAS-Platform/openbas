@@ -163,7 +163,6 @@ export interface AtomicTestingInput {
   inject_tags?: string[];
   inject_teams?: string[];
   inject_title?: string;
-  inject_id?: string;
 }
 
 export interface AtomicTestingOutput {
@@ -975,6 +974,57 @@ export interface GroupUpdateUsersInput {
   group_users?: string[];
 }
 
+export interface ImportMapper {
+  /** @format date-time */
+  import_mapper_created_at?: string;
+  import_mapper_id: string;
+  import_mapper_inject_type_column: string;
+  import_mapper_name: string;
+  /** @format date-time */
+  import_mapper_updated_at?: string;
+  inject_importers?: InjectImporter[];
+  updateAttributes?: object;
+}
+
+export interface ImportMapperAddInput {
+  mapper_inject_importers: InjectImporterAddInput[];
+  /** @pattern ^[A-Z]{1,2}$ */
+  mapper_inject_type_column: string;
+  mapper_name: string;
+}
+
+export interface ImportMapperUpdateInput {
+  mapper_inject_importers: InjectImporterUpdateInput[];
+  /** @pattern ^[A-Z]{1,2}$ */
+  mapper_inject_type_column: string;
+  mapper_name: string;
+}
+
+export interface ImportMessage {
+  message_code?:
+    | "NO_POTENTIAL_MATCH_FOUND"
+    | "SEVERAL_MATCHES"
+    | "ABSOLUTE_TIME_WITHOUT_START_DATE"
+    | "DATE_SET_IN_PAST"
+    | "DATE_SET_IN_FUTURE"
+    | "NO_TEAM_FOUND"
+    | "EXPECTATION_SCORE_UNDEFINED";
+  message_level?: "CRITICAL" | "ERROR" | "WARN" | "INFO";
+  message_params?: Record<string, string>;
+}
+
+export interface ImportPostSummary {
+  available_sheets: string[];
+  import_id: string;
+}
+
+export interface ImportTestSummary {
+  import_message?: ImportMessage[];
+  injects?: InjectResultDTO[];
+  /** @format int32 */
+  total_injects?: number;
+}
+
 export interface Inject {
   footer?: string;
   header?: string;
@@ -1108,6 +1158,31 @@ export interface InjectExpectationUpdateInput {
   success?: boolean;
 }
 
+export interface InjectImporter {
+  /** @format date-time */
+  inject_importer_created_at?: string;
+  inject_importer_id: string;
+  inject_importer_injector_contract: InjectorContract;
+  inject_importer_type_value: string;
+  /** @format date-time */
+  inject_importer_updated_at?: string;
+  rule_attributes?: RuleAttribute[];
+  updateAttributes?: object;
+}
+
+export interface InjectImporterAddInput {
+  inject_importer_injector_contract_id: string;
+  inject_importer_rule_attributes?: RuleAttributeAddInput[];
+  inject_importer_type_value: string;
+}
+
+export interface InjectImporterUpdateInput {
+  inject_importer_id?: string;
+  inject_importer_injector_contract_id: string;
+  inject_importer_rule_attributes?: RuleAttributeUpdateInput[];
+  inject_importer_type_value: string;
+}
+
 export interface InjectInput {
   inject_all_teams?: boolean;
   inject_asset_groups?: string[];
@@ -1124,7 +1199,6 @@ export interface InjectInput {
   inject_tags?: string[];
   inject_teams?: string[];
   inject_title?: string;
-  inject_id?: string;
 }
 
 export interface InjectOutput {
@@ -1300,7 +1374,8 @@ export interface InjectorContract {
   injector_contract_created_at?: string;
   injector_contract_custom?: boolean;
   injector_contract_id: string;
-  injector_contract_injector?: Injector;
+  injector_contract_import_available?: boolean;
+  injector_contract_injector: Injector;
   injector_contract_injector_type?: string;
   injector_contract_labels?: Record<string, string>;
   injector_contract_manual?: boolean;
@@ -1334,6 +1409,16 @@ export interface InjectorContractInput {
   contract_manual?: boolean;
   contract_platforms?: string[];
   is_atomic_testing?: boolean;
+}
+
+export interface InjectorContractOutput {
+  injector_contract_attack_patterns?: string[];
+  injector_contract_content: string;
+  injector_contract_id: string;
+  injector_contract_injector_type?: string;
+  injector_contract_labels?: Record<string, string>;
+  injector_contract_payload_type?: string;
+  injector_contract_platforms?: string[];
 }
 
 export interface InjectorContractUpdateInput {
@@ -1375,6 +1460,20 @@ export interface InjectorUpdateInput {
   injector_executor_commands?: Record<string, string>;
   injector_name: string;
   injector_payloads?: boolean;
+}
+
+export interface InjectsImportInput {
+  import_mapper_id: string;
+  sheet_name: string;
+  /** @format int32 */
+  timezone_offset: number;
+}
+
+export interface InjectsImportTestInput {
+  import_mapper: ImportMapperAddInput;
+  sheet_name: string;
+  /** @format int32 */
+  timezone_offset: number;
 }
 
 export type JsonNode = object;
@@ -1514,80 +1613,61 @@ export interface LessonsSendInput {
 
 export interface LessonsTemplate {
   /** @format date-time */
-  lessons_template_created_at?: string;
+  lessons_template_created_at: string;
   lessons_template_description?: string;
-  lessons_template_name?: string;
+  lessons_template_name: string;
   /** @format date-time */
-  lessons_template_updated_at?: string;
-  lessonstemplate_id?: string;
+  lessons_template_updated_at: string;
+  lessonstemplate_id: string;
   updateAttributes?: object;
 }
 
 export interface LessonsTemplateCategory {
   /** @format date-time */
-  lessons_template_category_created_at?: string;
+  lessons_template_category_created_at: string;
   lessons_template_category_description?: string;
-  lessons_template_category_name?: string;
+  lessons_template_category_name: string;
   /** @format int32 */
-  lessons_template_category_order?: number;
+  lessons_template_category_order: number;
   lessons_template_category_questions?: LessonsTemplateQuestion[];
   lessons_template_category_template?: LessonsTemplate;
   /** @format date-time */
-  lessons_template_category_updated_at?: string;
-  lessonstemplatecategory_id?: string;
+  lessons_template_category_updated_at: string;
+  lessonstemplatecategory_id: string;
   updateAttributes?: object;
 }
 
-export interface LessonsTemplateCategoryCreateInput {
+export interface LessonsTemplateCategoryInput {
   lessons_template_category_description?: string;
   lessons_template_category_name: string;
   /** @format int32 */
-  lessons_template_category_order?: number;
+  lessons_template_category_order: number;
 }
 
-export interface LessonsTemplateCategoryUpdateInput {
-  lessons_template_category_description?: string;
-  lessons_template_category_name: string;
-  /** @format int32 */
-  lessons_template_category_order?: number;
-}
-
-export interface LessonsTemplateCreateInput {
+export interface LessonsTemplateInput {
   lessons_template_description?: string;
   lessons_template_name: string;
 }
 
 export interface LessonsTemplateQuestion {
   lessons_template_question_category?: LessonsTemplateCategory;
-  lessons_template_question_content?: string;
+  lessons_template_question_content: string;
   /** @format date-time */
-  lessons_template_question_created_at?: string;
+  lessons_template_question_created_at: string;
   lessons_template_question_explanation?: string;
   /** @format int32 */
-  lessons_template_question_order?: number;
+  lessons_template_question_order: number;
   /** @format date-time */
-  lessons_template_question_updated_at?: string;
-  lessonstemplatequestion_id?: string;
+  lessons_template_question_updated_at: string;
+  lessonstemplatequestion_id: string;
   updateAttributes?: object;
 }
 
-export interface LessonsTemplateQuestionCreateInput {
+export interface LessonsTemplateQuestionInput {
   lessons_template_question_content: string;
   lessons_template_question_explanation?: string;
   /** @format int32 */
-  lessons_template_question_order?: number;
-}
-
-export interface LessonsTemplateQuestionUpdateInput {
-  lessons_template_question_content: string;
-  lessons_template_question_explanation?: string;
-  /** @format int32 */
-  lessons_template_question_order?: number;
-}
-
-export interface LessonsTemplateUpdateInput {
-  lessons_template_description?: string;
-  lessons_template_name: string;
+  lessons_template_question_order: number;
 }
 
 export interface Log {
@@ -1849,8 +1929,8 @@ export interface PageInjectResultDTO {
   totalPages?: number;
 }
 
-export interface PageInjectorContract {
-  content?: InjectorContract[];
+export interface PageInjectorContractOutput {
+  content?: InjectorContractOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -1870,6 +1950,25 @@ export interface PageInjectorContract {
 
 export interface PageKillChainPhase {
   content?: KillChainPhase[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageLessonsTemplate {
+  content?: LessonsTemplate[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -1946,6 +2045,25 @@ export interface PageRawPaginationAssetGroup {
 
 export interface PageRawPaginationDocument {
   content?: RawPaginationDocument[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageRawPaginationImportMapper {
+  content?: RawPaginationImportMapper[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -2344,6 +2462,15 @@ export interface RawPaginationDocument {
   document_type?: string;
 }
 
+export interface RawPaginationImportMapper {
+  /** @format date-time */
+  import_mapper_created_at?: string;
+  import_mapper_id: string;
+  import_mapper_name?: string;
+  /** @format date-time */
+  import_mapper_updated_at?: string;
+}
+
 export interface RawPaginationPlayer {
   user_email?: string;
   user_firstname?: string;
@@ -2454,6 +2581,34 @@ export interface ResultDistribution {
   label: string;
   /** @format int32 */
   value: number;
+}
+
+export interface RuleAttribute {
+  rule_attribute_additional_config?: Record<string, string>;
+  rule_attribute_columns?: string;
+  /** @format date-time */
+  rule_attribute_created_at?: string;
+  rule_attribute_default_value?: string;
+  rule_attribute_id: string;
+  rule_attribute_name: string;
+  /** @format date-time */
+  rule_attribute_updated_at?: string;
+  updateAttributes?: object;
+}
+
+export interface RuleAttributeAddInput {
+  rule_attribute_additional_config?: Record<string, string>;
+  rule_attribute_columns?: string | null;
+  rule_attribute_default_value?: string;
+  rule_attribute_name: string;
+}
+
+export interface RuleAttributeUpdateInput {
+  rule_attribute_additional_config?: Record<string, string>;
+  rule_attribute_columns?: string | null;
+  rule_attribute_default_value?: string;
+  rule_attribute_id?: string;
+  rule_attribute_name: string;
 }
 
 export interface Scenario {

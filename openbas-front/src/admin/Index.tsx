@@ -29,8 +29,6 @@ const Teams = lazy(() => import('./components/teams/Index'));
 const IndexComponents = lazy(() => import('./components/components/Index'));
 const IndexIntegrations = lazy(() => import('./components/integrations/Index'));
 const IndexAgents = lazy(() => import('./components/agents/Agents'));
-const LessonsTemplates = lazy(() => import('./components/lessons/LessonsTemplates'));
-const IndexLessonsTemplate = lazy(() => import('./components/lessons/Index'));
 const Payloads = lazy(() => import('./components/payloads/Payloads'));
 const Mitigations = lazy(() => import('./components/mitigations/Mitigations'));
 const IndexSettings = lazy(() => import('./components/settings/Index'));
@@ -92,8 +90,6 @@ const Index = () => {
               <Route path="assets/*" element={errorWrapper(Assets)()} />
               <Route path="teams/*" element={errorWrapper(Teams)()} />
               <Route path="components/*" element={errorWrapper(IndexComponents)()} />
-              <Route path="lessons" element={errorWrapper(LessonsTemplates)()} />
-              <Route path="lessons/:lessonsTemplateId/*" element={errorWrapper(IndexLessonsTemplate)()} />
               <Route path="payloads" element={errorWrapper(Payloads)()} />
               <Route path="mitigations" element={errorWrapper(Mitigations)()} />
               <Route path="integrations/*" element={errorWrapper(IndexIntegrations)()} />
