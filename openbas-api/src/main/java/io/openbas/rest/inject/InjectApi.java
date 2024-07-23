@@ -286,7 +286,7 @@ public class InjectApi extends RestBehavior {
     @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Inject duplicateInjectForExercise(@PathVariable final String exerciseId, @PathVariable final String injectId) {
-        return injectDuplicateService.createInjectForExercise(exerciseId, injectId, true).orElseThrow(ElementNotFoundException:: new);
+        return injectDuplicateService.createInjectForExercise(exerciseId, injectId, true);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -450,7 +450,7 @@ public class InjectApi extends RestBehavior {
     @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
     @PreAuthorize("isScenarioPlanner(#scenarioId)")
     public Inject duplicateInjectForScenario(@PathVariable final String scenarioId, @PathVariable final String injectId ) {
-        return injectDuplicateService.createInjectForScenario(scenarioId, injectId, true).orElseThrow(ElementNotFoundException:: new);
+        return injectDuplicateService.createInjectForScenario(scenarioId, injectId, true);
     }
 
     @GetMapping(SCENARIO_URI + "/{scenarioId}/injects")
