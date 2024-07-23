@@ -1,4 +1,4 @@
-import type { Inject, InjectsImportInput } from '../../../../utils/api-types';
+import type { Inject, InjectsImportInput, ImportMessage } from '../../../../utils/api-types';
 import {
   addInjectForScenario,
   bulkDeleteInjectsForScenario,
@@ -11,7 +11,6 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { InjectStore } from '../../../../actions/injects/Inject';
 import { fetchScenario, fetchScenarioTeams, importXls } from '../../../../actions/scenarios/scenario-actions';
-import type { ImportMessage } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { useFormatter } from '../../../../components/i18n';
 
