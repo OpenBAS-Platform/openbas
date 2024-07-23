@@ -34,23 +34,23 @@ const useDataLoader = (loader = () => {}) => {
     sseClient.addEventListener('open', () => [...listeners.keys()].forEach((load) => load()));
     sseClient.addEventListener('message', (event) => {
       const data = JSON.parse(event.data);
-      if(data.listened) {
+      if (data.listened) {
         if (data.event_type === DATA_DELETE_SUCCESS) {
           const payload = {
             id: data.instance[data.attribute_id],
             type: data.attribute_schema,
           };
-          const deleteEvent = {type: DATA_DELETE_SUCCESS, payload};
+          const deleteEvent = { type: DATA_DELETE_SUCCESS, payload };
           store.dispatch(deleteEvent);
         } else {
-          const schemaInfo = {idAttribute: data.attribute_id};
+          const schemaInfo = { idAttribute: data.attribute_id };
           const schemas = new schema.Entity(
-              data.attribute_schema,
-              {},
-              schemaInfo,
+            data.attribute_schema,
+            {},
+            schemaInfo,
           );
           const dataNormalize = normalize(data.instance, schemas);
-          const storeEvent = {type: data.event_type, payload: dataNormalize};
+          const storeEvent = { type: data.event_type, payload: dataNormalize };
           store.dispatch(storeEvent);
         }
       }
