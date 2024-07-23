@@ -3,7 +3,7 @@ import { addInjectForScenario, deleteInjectScenario, fetchScenarioInjects, updat
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { InjectStore } from '../../../../actions/injects/Inject';
-import { fetchScenario, importXls } from '../../../../actions/scenarios/scenario-actions';
+import {fetchScenario, fetchScenarioTeams, importXls} from '../../../../actions/scenarios/scenario-actions';
 
 const injectContextForScenario = (scenario: ScenarioStore) => {
   const dispatch = useAppDispatch();
@@ -28,6 +28,7 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
       return importXls(scenario.scenario_id, importId, input).then((_value) => new Promise((resolve, _reject) => {
         dispatch(fetchScenarioInjects(scenario.scenario_id));
         dispatch(fetchScenario(scenario.scenario_id));
+        dispatch(fetchScenarioTeams(scenario.scenario_id));
         resolve();
       }));
     },
