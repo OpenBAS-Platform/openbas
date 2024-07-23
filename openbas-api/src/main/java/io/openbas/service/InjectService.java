@@ -240,6 +240,10 @@ public class InjectService {
             importTestSummary.setTotalNumberOfInjects(0);
             importTestSummary.setInjects(new ArrayList<>());
         } else if(saveAll) {
+            importTestSummary.setInjects(importTestSummary.getInjects().stream().map(inject -> {
+                inject.setListened(false);
+                return inject;
+            }).toList());
             Iterable<Inject> newInjects = injectRepository.saveAll(importTestSummary.getInjects());
             newInjects.forEach(inject -> {
                 scenario.getInjects().add(inject);
