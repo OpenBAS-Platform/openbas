@@ -219,6 +219,7 @@ const i18n = {
       Scenario: 'Scénario',
       Title: 'Titre',
       Enabled: 'Activé',
+      Deleted: 'Supprimé',
       Disabled: 'Désactivé',
       Days: 'Jours',
       Hours: 'Heures',

@@ -12,6 +12,7 @@ import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Injector;
 import io.openbas.injectors.email.EmailContract;
 import io.openbas.injectors.email.model.EmailContent;
+import io.openbas.rest.exception.ElementNotFoundException;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,7 @@ public class MailingService {
         emailContent.setBody(body);
 
         Inject inject = new Inject();
-        inject.setInjectorContract(this.injectorContractRepository.findById(EmailContract.EMAIL_DEFAULT).orElseThrow());
+        inject.setInjectorContract(this.injectorContractRepository.findById(EmailContract.EMAIL_DEFAULT).orElseThrow(ElementNotFoundException::new));
 
         inject.getInjectorContract().ifPresent(injectorContract -> {
             inject.setContent(this.mapper.valueToTree(emailContent));

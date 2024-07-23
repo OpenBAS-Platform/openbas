@@ -91,9 +91,18 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   };
 
   const entries: PopoverEntry[] = [
-    { label: 'Update', action: () => (isNotEmptyField(setOpenEdit) ? setOpenEdit(atomic.inject_id) : setEdition(true)) },
-    { label: 'Duplicate', action: () => setDuplicate(true) },
-    { label: 'Delete', action: () => setDeletion(true) }];
+    { label: 'Delete', action: () => setDeletion(true) },
+  ];
+
+  if (atomic.inject_injector_contract !== null) {
+    entries.unshift(
+      {
+        label: 'Update',
+        action: () => (isNotEmptyField(setOpenEdit) ? setOpenEdit(atomic.inject_id) : setEdition(true)),
+      },
+      { label: 'Duplicate', action: () => setDuplicate(true) },
+    );
+  }
 
   return (
     <>

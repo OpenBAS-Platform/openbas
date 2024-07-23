@@ -298,6 +298,10 @@ public class Inject implements Base, Injection {
     }
     // endregion
 
+    public Optional<InjectorContract> getInjectorContract() {
+        return Optional.ofNullable(this.injectorContract);
+    }
+
     public Optional<InjectStatus> getStatus() {
         return ofNullable(this.status);
     }
@@ -553,9 +557,5 @@ public class Inject implements Base, Injection {
         inject.setAssetGroups(injectAssetGroups);
 
         return inject;
-    }
-
-    public Optional<InjectorContract> getInjectorContract() {
-        return Optional.ofNullable(this.injectorContract);
     }
 }

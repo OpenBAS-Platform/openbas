@@ -79,7 +79,6 @@ const InjectList: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
   const { t, fldt, tPick, nsdt } = useFormatter();
-  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
 
   // Filter and sort hook
   const [injects, setInjects] = useState<InjectResultDTO[]>([]);
@@ -154,14 +153,6 @@ const InjectList: FunctionComponent<Props> = ({
     },
   ];
 
-  const handleOpenDuplicate = (injectId: string) => {
-    setOpenDuplicateId(injectId);
-  };
-
-  const handleCloseDuplicate = () => {
-    setOpenDuplicateId(null);
-  };
-
   return (
     <>
       <PaginationComponent
@@ -190,7 +181,6 @@ const InjectList: FunctionComponent<Props> = ({
         </ListItem>
         {injects.map((injectDto) => {
           return (
-
             <ListItem
               key={injectDto.inject_id}
               classes={{ root: classes.item }}
