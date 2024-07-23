@@ -155,7 +155,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     setting_message_header: exercise.exercise_message_header,
     setting_message_footer: exercise.exercise_message_footer,
   };
-  const permissions = usePermissions(exercise);
+  const permissions = usePermissions(exercise.exercise_id);
 
   // Button Popover
   const entries = [];
