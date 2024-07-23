@@ -232,8 +232,6 @@ const Injects = (props) => {
 
   const isAtLeastOneValidInject = sortedInjects.some((inject) => inject.inject_injector_contract?.injector_contract_content_parsed !== null);
 
-  console.log(sortedInjects);
-
   // Menu
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -304,9 +302,9 @@ const Injects = (props) => {
                   <MenuItem onClick={exportInjectsToXLS}>
                     {`${t('Export injects')}`}
                   </MenuItem>
-                  <MenuItem onClick={handleShowTimeline}>
+                  {isAtLeastOneValidInject && (<MenuItem onClick={handleShowTimeline}>
                     {showTimeline ? t('Hide timeline') : t('Show timeline')}
-                  </MenuItem>
+                  </MenuItem>)}
                 </Menu>
               </div>
             )}
