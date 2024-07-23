@@ -11,9 +11,9 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { InjectStore } from '../../../../actions/injects/Inject';
 import { fetchScenario, fetchScenarioTeams, importXls } from '../../../../actions/scenarios/scenario-actions';
-import { ImportMessage } from "../../../../utils/api-types";
-import { MESSAGING$ } from "../../../../utils/Environment";
-import { useFormatter } from "../../../../components/i18n";
+import type { ImportMessage } from '../../../../utils/api-types';
+import { MESSAGING$ } from '../../../../utils/Environment';
+import { useFormatter } from '../../../../components/i18n';
 
 const injectContextForScenario = (scenario: ScenarioStore) => {
   const dispatch = useAppDispatch();
@@ -40,7 +40,7 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
         dispatch(fetchScenarioInjects(scenario.scenario_id));
         dispatch(fetchScenario(scenario.scenario_id));
         dispatch(fetchScenarioTeams(scenario.scenario_id));
-        let criticalMessages = response.data.import_message.filter((value: ImportMessage) => value.message_level === "CRITICAL")
+        const criticalMessages = response.data.import_message.filter((value: ImportMessage) => value.message_level === 'CRITICAL');
         if (criticalMessages?.length > 0) {
           MESSAGING$.notifyError(t(criticalMessages[0].message_code), true);
         }
