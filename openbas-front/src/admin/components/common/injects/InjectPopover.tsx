@@ -173,16 +173,14 @@ const InjectPopover: FunctionComponent<Props> = ({
         open={Boolean(anchorEl)}
         onClose={handlePopoverClose}
       >
+        <MenuItem onClick={handleOpenDuplicate}>
+          {t('Duplicate')}
+        </MenuItem>
         <MenuItem
           onClick={handleOpenEditContent}
           disabled={isDisabled}
         >
           {t('Update')}
-        </MenuItem>
-        <MenuItem onClick={handleOpenDuplicate}
-          disabled={isDisabled}
-        >
-          {t('Duplicate')}
         </MenuItem>
         {!inject.inject_status && onInjectDone && (
           <MenuItem

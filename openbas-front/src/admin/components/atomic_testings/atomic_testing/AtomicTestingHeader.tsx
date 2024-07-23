@@ -125,8 +125,8 @@ const AtomicTestingHeader = () => {
           setOpenDelete={handleCloseDelete}
           setOpenDuplicate={handleCloseDuplicate}
           entries={[
-            { label: 'Update', action: () => handleOpenEdit(injectResultDto.inject_id) },
             { label: 'Duplicate', action: () => handleOpenDuplicate(injectResultDto.inject_id) },
+            { label: 'Update', action: () => handleOpenEdit(injectResultDto.inject_id) },
             { label: 'Delete', action: () => handleOpenDelete(injectResultDto.inject_id) },
           ]}
         />
