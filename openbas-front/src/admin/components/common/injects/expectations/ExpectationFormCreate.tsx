@@ -6,7 +6,6 @@ import type { ExpectationInput } from './Expectation';
 import { formProps, infoMessage } from './ExpectationFormUtils';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
-import { hasExpectationByGroup } from './ExpectationUtils';
 import ExpectationGroupField from './field/ExpectationGroupField';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -138,11 +137,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         }
         inputProps={register('expectation_score')}
       />
-
-      {hasExpectationByGroup(watchType)
-        && <ExpectationGroupField control={control} />
-      }
-
+      <ExpectationGroupField control={control} />
       <div className={classes.buttons}>
         <Button
           onClick={handleClose}
