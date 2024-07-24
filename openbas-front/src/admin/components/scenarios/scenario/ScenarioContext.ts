@@ -10,7 +10,12 @@ import {
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { InjectStore } from '../../../../actions/injects/Inject';
-import { fetchScenario, fetchScenarioTeams, importXls } from '../../../../actions/scenarios/scenario-actions';
+import {
+  dryImportXls,
+  fetchScenario,
+  fetchScenarioTeams,
+  importXls
+} from '../../../../actions/scenarios/scenario-actions';
 
 const injectContextForScenario = (scenario: ScenarioStore) => {
   const dispatch = useAppDispatch();
@@ -36,6 +41,11 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
         dispatch(fetchScenarioInjects(scenario.scenario_id));
         dispatch(fetchScenario(scenario.scenario_id));
         dispatch(fetchScenarioTeams(scenario.scenario_id));
+        resolve(response.data);
+      }));
+    },
+    onDryImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {
+      return dryImportXls(scenario.scenario_id, importId, input).then((response) => new Promise((resolve, _reject) => {
         resolve(response.data);
       }));
     },
