@@ -8,6 +8,9 @@ import ImportUploaderInjectFromXlsFile from './ImportUploaderInjectFromXlsFile';
 import ImportUploaderInjectFromXlsInjects from './ImportUploaderInjectFromXlsInjects';
 import { InjectContext } from '../Context';
 import { storeXlsFile } from '../../../../actions/mapper/mapper-actions';
+import {ImportMessage, ImportTestSummary} from "../../../../utils/api-types";
+import {MESSAGING$} from "../../../../utils/Environment";
+import {AxiosResponse} from "axios";
 
 const ImportUploaderInjectFromXls = () => {
   // Standard hooks
@@ -36,7 +39,11 @@ const ImportUploaderInjectFromXls = () => {
 
   const onSubmitImportInjects = (input: InjectsImportInput) => {
     if (importId) {
-      injectContext.onImportInjectFromXls?.(importId, input).then(() => {
+      injectContext.onImportInjectFromXls?.(importId, input).then((value: ImportTestSummary) => {
+        const criticalMessages = value.import_message?.filter((value: ImportMessage) => value.message_level === 'CRITICAL');
+        if (criticalMessages && criticalMessages?.length > 0) {
+          MESSAGING$.notifyError(t(criticalMessages[0].message_code), true);
+        }
         handleClose();
       });
     }

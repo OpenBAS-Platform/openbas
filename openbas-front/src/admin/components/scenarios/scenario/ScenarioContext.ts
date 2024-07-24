@@ -1,4 +1,4 @@
-import type { Inject, InjectsImportInput, ImportMessage } from '../../../../utils/api-types';
+import type {Inject, InjectsImportInput, ImportTestSummary} from '../../../../utils/api-types';
 import {
   addInjectForScenario,
   bulkDeleteInjectsForScenario,
@@ -11,7 +11,6 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { InjectStore } from '../../../../actions/injects/Inject';
 import { fetchScenario, fetchScenarioTeams, importXls } from '../../../../actions/scenarios/scenario-actions';
-import { MESSAGING$ } from '../../../../utils/Environment';
 import { useFormatter } from '../../../../components/i18n';
 
 const injectContextForScenario = (scenario: ScenarioStore) => {
@@ -34,16 +33,12 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
     onDeleteInject(injectId: Inject['inject_id']): void {
       return dispatch(deleteInjectScenario(scenario.scenario_id, injectId));
     },
-    onImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<void> {
+    onImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<{ result: ImportTestSummary }> {
       return importXls(scenario.scenario_id, importId, input).then((response) => new Promise((resolve, _reject) => {
         dispatch(fetchScenarioInjects(scenario.scenario_id));
         dispatch(fetchScenario(scenario.scenario_id));
         dispatch(fetchScenarioTeams(scenario.scenario_id));
-        const criticalMessages = response.data.import_message.filter((value: ImportMessage) => value.message_level === 'CRITICAL');
-        if (criticalMessages?.length > 0) {
-          MESSAGING$.notifyError(t(criticalMessages[0].message_code), true);
-        }
-        resolve();
+        resolve(response.data);
       }));
     },
     onBulkDeleteInjects(injectIds: string[]): void {

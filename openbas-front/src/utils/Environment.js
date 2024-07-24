@@ -8,7 +8,7 @@ import { useLocation } from 'react-router-dom';
 const MESSENGER$ = new Subject().pipe(debounce(() => timer(500)));
 export const MESSAGING$ = {
   messages: MESSENGER$,
-  notifyError: (text, sticky) => MESSENGER$.next([{ type: 'error', text, sticky }]),
+  notifyError: (text, sticky = false) => MESSENGER$.next([{ type: 'error', text, sticky }]),
   notifySuccess: (text) => MESSENGER$.next([{ type: 'message', text }]),
   toggleNav: new Subject(),
   redirect: new Subject(),
