@@ -111,6 +111,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
     sorts: initSorting('injector_contract_labels'),
     filterGroup: isAtomic ? atomicFilter : emptyFilterGroup,
+    size: 100,
   });
   const [filterGroup, helpers] = useFiltersState(isAtomic ? atomicFilter : emptyFilterGroup, (f: FilterGroup) => setSearchPaginationInput({
     ...searchPaginationInput,
