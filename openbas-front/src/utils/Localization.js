@@ -620,7 +620,7 @@ const i18n = {
       'Each team should submit a text response':
         'Chaque équipe doit soumettre une réponse texte',
       // -- Expectation start --
-      'This expectation is handled automatically by the platform and triggered when team reads articles': 'Cet attendu est géré automatiquement par la plateforme et déclenché lorsque une équipe lit les articles',
+      'This expectation is handled automatically by the platform and triggered when target reads the articles': 'Cet attendu est géré automatiquement par la plateforme et déclenché lorsque une cible lit les articles',
       'Add expectations': 'Ajouter des attendus',
       'Add expectation in this inject': 'Ajouter des attendus dans ce stimuli',
       'Update the expectation': 'Modifier l\'attendu',
@@ -2467,7 +2467,7 @@ const i18n = {
       REGEXP: 'Regular expression',
       '-': 'None',
       MANUAL: 'Manual',
-      ARTICLE: 'Automatic - Triggered when team reads articles',
+      ARTICLE: 'Automatic - Triggered when target reads the articles',
       DETECTION: 'Automatic - Detection: Triggered when inject is processed',
       PREVENTION: 'Automatic - Prevention: Triggered when inject is processed',
       TYPE_ARTICLE: 'Article',
