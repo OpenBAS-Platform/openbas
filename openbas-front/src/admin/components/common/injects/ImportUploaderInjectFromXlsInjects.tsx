@@ -83,7 +83,7 @@ const ImportUploaderInjectFromXlsInjects: FunctionComponent<Props> = ({
         importMapperId: z.string().min(1, { message: t('Should not be empty') }),
         timezone: z.string().min(1, { message: t('Should not be empty') }),
         startDate: z.string().optional(),
-      }).refine(data => !needLaunchDate || (needLaunchDate && data.startDate !== undefined), {
+      }).refine((data) => !needLaunchDate || (needLaunchDate && data.startDate !== undefined), {
         message: t('Should not be empty'),
         path: ['startDate'],
       }),
@@ -213,8 +213,8 @@ const ImportUploaderInjectFromXlsInjects: FunctionComponent<Props> = ({
             />
           )}
         />
-        {needLaunchDate &&
-        <Controller
+        {needLaunchDate
+        && <Controller
           control={control}
           name="startDate"
           render={({ field, fieldState }) => (
@@ -235,7 +235,7 @@ const ImportUploaderInjectFromXlsInjects: FunctionComponent<Props> = ({
               label={t('Start date')}
             />
           )}
-        />}
+           />}
         <Controller
           control={control}
           name="timezone"
