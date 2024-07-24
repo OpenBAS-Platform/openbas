@@ -24,7 +24,7 @@ const IconPopover: FunctionComponent<Props> = ({
           ev.stopPropagation();
           setAnchorEl(ev.currentTarget);
         }}
-        aria-label={'Xls formatter menu'}
+        aria-label={'Xls mapper menu'}
         aria-haspopup="true"
         size="large"
       >

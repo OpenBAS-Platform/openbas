@@ -1,4 +1,4 @@
-import type { Inject, InjectsImportInput } from '../../../../utils/api-types';
+import type { Inject, InjectsImportInput, ImportTestSummary } from '../../../../utils/api-types';
 import {
   addInjectForScenario,
   bulkDeleteInjectsForScenario,
@@ -31,12 +31,12 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
     onDeleteInject(injectId: Inject['inject_id']): void {
       return dispatch(deleteInjectScenario(scenario.scenario_id, injectId));
     },
-    onImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<void> {
-      return importXls(scenario.scenario_id, importId, input).then((_value) => new Promise((resolve, _reject) => {
+    onImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {
+      return importXls(scenario.scenario_id, importId, input).then((response) => new Promise((resolve, _reject) => {
         dispatch(fetchScenarioInjects(scenario.scenario_id));
         dispatch(fetchScenario(scenario.scenario_id));
         dispatch(fetchScenarioTeams(scenario.scenario_id));
-        resolve();
+        resolve(response.data);
       }));
     },
     onBulkDeleteInjects(injectIds: string[]): void {

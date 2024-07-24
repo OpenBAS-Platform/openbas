@@ -832,7 +832,8 @@ public class InjectService {
                     .min(Comparator.comparing(InjectTime::getRelativeMinuteNumber))
                     .map(InjectTime::getRelativeMinuteNumber).orElse(0);
             long offsetAsMinutes = (((earliestDay * 24L) + earliestHourOfThatDay) * 60 + earliestMinuteOfThatHour) * -1;
-            mapInstantByRowIndex.values().stream().filter(InjectTime::isRelativeDay)
+            mapInstantByRowIndex.values().stream()
+                .filter(injectTime -> injectTime.getDate() == null && (injectTime.isRelativeDay() || injectTime.isRelativeHour() || injectTime.isRelativeMinute()))
                 .forEach(injectTime -> {
                     long injectTimeAsMinutes =
                         (((injectTime.getRelativeDayNumber() * 24L) + injectTime.getRelativeHourNumber()) * 60)

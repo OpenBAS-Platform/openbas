@@ -1138,6 +1138,7 @@ const i18n = {
       Expectation_name: 'Nom de l\'attendu',
       Expectation_description: 'Description de l\'attendu',
       Expectation_score: 'Score de l\'attendu',
+      ABSOLUTE_TIME_WITHOUT_START_DATE: 'L\'import contient des injects qui se déclenche à une certaine heure de la journée (ex: 9h30) mais le scenario n\'a pas de date de départ. Veuillez spécifier une date de départ.',
       Trigger_time: 'Temps de déclenchement',
       'This expression will be used to find a match in the specified column to determine the inject type. Regular Expressions can be used.': 'Cette expression est utilisé pour déterminer si il y a correspondance avec la colonne spécifié. L\'utilisation d\'expression régulière est possible.',
       'By default we accept iso date (YYYY-MM-DDThh:mm:ss[.mmm]TZD), but you can specify your own date format in ISO notation (for instance DD.MM.YYYY hh\'h\'mm)': 'Par défaut nous acceptons la date iso (AAAA-MM-JJ hh:mm:ss[.mmm]TZD), mais vous pouvez spécifiez votre propre format de date en notation ISO (par exemple JJ.MM.AAAA hh\'h\'mm)',
@@ -1250,6 +1251,7 @@ const i18n = {
       Expectation_description: 'Expectation description',
       Expectation_score: 'Expectation score',
       Trigger_time: 'Trigger time',
+      ABSOLUTE_TIME_WITHOUT_START_DATE: 'Your import contains injects triggered only with the time of the day (e.g.: 9:30) but there is no launch date specified for this scenario. Please specify a launch date for this scenario.',
       // Bulk actions
       'Do you want to delete these {count} injects?': 'Do you want to delete these {count} injects?',
     },

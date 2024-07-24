@@ -70,7 +70,7 @@ const XlsFormatters = () => {
 
   return (
     <div className={classes.container}>
-      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Data ingestion') }, { label: t('Xls formatters'), current: true }]} />
+      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Data ingestion') }, { label: t('Xls mappers'), current: true }]} />
       <DataIngestionMenu />
       <PaginationComponent
         fetch={searchMappers}
