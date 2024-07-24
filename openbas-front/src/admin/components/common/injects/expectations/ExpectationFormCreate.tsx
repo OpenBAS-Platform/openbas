@@ -7,6 +7,7 @@ import { formProps, infoMessage } from './ExpectationFormUtils';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import ExpectationGroupField from './field/ExpectationGroupField';
+import { isTechnicalExpectation } from './ExpectationUtils';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
@@ -137,7 +138,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         }
         inputProps={register('expectation_score')}
       />
-      <ExpectationGroupField control={control} />
+      <ExpectationGroupField isTechnicalExpectation={isTechnicalExpectation(watchType)} control={control} />
       <div className={classes.buttons}>
         <Button
           onClick={handleClose}

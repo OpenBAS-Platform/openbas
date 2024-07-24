@@ -19,3 +19,7 @@ export const typeIcon = (type: string) => {
   }
   return <AssignmentTurnedIn />;
 };
+
+export const isTechnicalExpectation = (type: string) => {
+  return [ExpectationType.PREVENTION.toString(), ExpectationType.DETECTION.toString()].includes(type);
+};
