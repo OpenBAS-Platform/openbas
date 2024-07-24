@@ -20,7 +20,7 @@ interface Props {
   onCreate?: (result: RawPaginationImportMapper) => void;
 }
 
-const XlsFormatterCreation: React.FC<Props> = ({ onCreate }) => {
+const XlsMapperCreation: React.FC<Props> = ({ onCreate }) => {
   const classes = useStyles();
   const { t } = useFormatter();
 
@@ -57,4 +57,4 @@ const XlsFormatterCreation: React.FC<Props> = ({ onCreate }) => {
   );
 };
 
-export default XlsFormatterCreation;
+export default XlsMapperCreation;
