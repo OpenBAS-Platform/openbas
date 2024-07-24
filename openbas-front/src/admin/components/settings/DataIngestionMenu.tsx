@@ -7,7 +7,7 @@ const DataIngestionMenu = () => {
     {
       path: '/admin/settings/data_ingestion/xls_formatter',
       icon: () => (<TableViewOutlined />),
-      label: 'Xls formatters',
+      label: 'Xls mappers',
     },
   ];
   return (
