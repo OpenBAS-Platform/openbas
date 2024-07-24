@@ -57,7 +57,7 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_SCENARIO;
 import static io.openbas.utils.Constants.ARTICLES;
-import static io.openbas.utils.Constants.MAX_SIZE_OF_STRING;
+import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static java.time.Instant.now;
@@ -486,7 +486,7 @@ public class ScenarioService {
 
     private Scenario copyScenario(Scenario scenario) {
         Scenario scenarioDuplicate = new Scenario();
-        scenarioDuplicate.setName(getNewName(scenario));
+        scenarioDuplicate.setName(duplicateString(scenario.getName()));
         scenarioDuplicate.setCategory(scenario.getCategory());
         scenarioDuplicate.setDescription(scenario.getDescription());
         scenarioDuplicate.setSeverity(scenario.getSeverity());
@@ -506,14 +506,6 @@ public class ScenarioService {
         scenarioDuplicate.setDocuments(new ArrayList<>(scenario.getDocuments()));
         scenarioDuplicate.setGrants(new ArrayList<>(scenario.getGrants()));
         return scenarioDuplicate;
-    }
-
-    private static String getNewName(Scenario scenarioOrigin) {
-        String newName = scenarioOrigin.getName() + " (duplicate)";
-        if (newName.length() > MAX_SIZE_OF_STRING) {
-            newName = newName.substring(0, (MAX_SIZE_OF_STRING - 1) - " (duplicate)".length());
-        }
-        return newName;
     }
 
     private void getListOfDuplicatedInjects(@NotNull Scenario scenario, @NotNull Scenario scenarioOrign) {

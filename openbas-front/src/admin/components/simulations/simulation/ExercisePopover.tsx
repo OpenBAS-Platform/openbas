@@ -31,7 +31,7 @@ import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import DialogDelete from '../../../../components/common/DialogDelete';
 
-export type ExerciseActionPopover = 'Update' | 'Delete' | 'Duplicate' | 'Export' | '' | '';
+export type ExerciseActionPopover = 'Duplicate' | 'Update' | 'Delete' | 'Export' | '';
 
 interface ExercisePopoverProps {
   exercise: Exercise;
@@ -151,9 +151,9 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
 
   // Button Popover
   const entries = [];
+  if (actions.includes('Duplicate')) entries.push({ label: 'Duplicate', action: () => handleOpenDuplicate() });
   if (actions.includes('Update')) entries.push({ label: 'Update', action: () => handleOpenEdit(), disabled: !permissions.canWriteBypassStatus });
   if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete(), disabled: !permissions.canWriteBypassStatus });
-  if (actions.includes('Duplicate')) entries.push({ label: 'Duplicate', action: () => handleOpenDuplicate() });
   if (actions.includes('Export')) entries.push({ label: 'Export', action: () => handleOpenExport() });
 
   return (

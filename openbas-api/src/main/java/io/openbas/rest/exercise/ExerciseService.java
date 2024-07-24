@@ -37,9 +37,9 @@ import static io.openbas.database.criteria.ExerciseCriteria.countQuery;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.AtomicTestingUtils.getExpectationResultByTypes;
 import static io.openbas.utils.Constants.ARTICLES;
-import static io.openbas.utils.Constants.MAX_SIZE_OF_STRING;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.ResultUtils.computeTargetResults;
+import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static java.util.Optional.ofNullable;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -217,7 +217,7 @@ public class ExerciseService {
 
     private Exercise copyExercice(Exercise exerciseOrigin) {
         Exercise exerciseDuplicate = new Exercise();
-        exerciseDuplicate.setName(getNewName(exerciseOrigin));
+        exerciseDuplicate.setName(duplicateString(exerciseOrigin.getName()));
         exerciseDuplicate.setCategory(exerciseOrigin.getCategory());
         exerciseDuplicate.setDescription(exerciseOrigin.getDescription());
         exerciseDuplicate.setFrom(exerciseOrigin.getFrom());
@@ -237,14 +237,6 @@ public class ExerciseService {
         exerciseDuplicate.setDocuments(new ArrayList<>(exerciseOrigin.getDocuments()));
         exerciseDuplicate.setObjectives(new ArrayList<>(exerciseOrigin.getObjectives()));
         return exerciseDuplicate;
-    }
-
-    private static String getNewName(Exercise exerciseOrigin) {
-        String newName = exerciseOrigin.getName() + " (duplicate)";
-        if (newName.length() > MAX_SIZE_OF_STRING) {
-            newName = newName.substring(0, (MAX_SIZE_OF_STRING - 1) - " (duplicate)".length());
-        }
-        return newName;
     }
 
     private void getListOfDuplicatedInjects(Exercise exercise, Exercise exerciseOrigin) {
