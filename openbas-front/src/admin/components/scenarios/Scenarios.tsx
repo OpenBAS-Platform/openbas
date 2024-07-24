@@ -194,24 +194,6 @@ const Scenarios = () => {
     exportFileName: `${t('Scenarios')}.csv`,
   };
 
-  // Duplicate
-  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
-  const handleOpenDuplicate = (scenarioId: string) => {
-    setOpenDuplicateId(scenarioId);
-  };
-  const handleCloseDuplicate = () => {
-    setOpenDuplicateId(null);
-  };
-
-  // Export
-  const [openExportId, setOpenExportId] = useState<string | null>(null);
-  const handleOpenExport = (scenarioId: string) => {
-    setOpenExportId(scenarioId);
-  };
-  const handleCloseExport = () => {
-    setOpenExportId(null);
-  };
-
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Scenarios'), current: true }]} />
@@ -246,7 +228,7 @@ const Scenarios = () => {
         setContent={setScenarios}
         exportProps={exportProps}
       >
-        <ImportUploaderScenario/>
+        <ImportUploaderScenario />
       </PaginationComponent>
 
       <List>
@@ -286,18 +268,12 @@ const Scenarios = () => {
               secondaryAction={
                 <ScenarioPopover
                   scenario={scenario}
-                  entries={[
-                    { label: 'Duplicate', action: () => handleOpenDuplicate(scenario.scenario_id) },
-                    { label: 'Export', action: () => handleOpenExport(scenario.scenario_id) },
-                  ]}
-                  openExport={openExportId === scenario.scenario_id}
-                  setOpenExport={handleCloseExport}
-                  openDuplicate={openDuplicateId === scenario.scenario_id}
-                  setOpenDuplicate={handleCloseDuplicate}
-                  variantButtonPopover={'icon'}
+                  actions={['Duplicate', 'Export', 'Delete']}
+                  onDelete={(result) => setScenarios(scenarios.filter((e) => (e.scenario_id !== result)))}
+                  inList
                 />
               }
-              disablePadding={true}
+              disablePadding
             >
               <ListItemButton
                 classes={{ root: classes.item }}

@@ -12,6 +12,8 @@ import type { EndpointStore } from '../assets/endpoints/Endpoint';
 import ExerciseList from './ExerciseList';
 import { searchExercises } from '../../../actions/Exercise';
 import ImportUploaderExercise from './ImportUploaderExercise';
+import ExercisePopover from './simulation/ExercisePopover';
+import type { ExerciseStore } from '../../../actions/exercises/Exercise';
 
 const Exercises = () => {
   // Standard hooks
@@ -41,6 +43,15 @@ const Exercises = () => {
     exportFileName: `${t('Simulations')}.csv`,
   };
 
+  const secondaryAction = (exercise: ExerciseStore) => (
+    <ExercisePopover
+      exercise={exercise}
+      actions={['Duplicate', 'Export', 'Delete']}
+      onDelete={(result) => setExercises(exercises.filter((e) => (e.exercise_id !== result)))}
+      inList
+    />
+  );
+
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Simulations'), current: true }]} />
@@ -56,6 +67,7 @@ const Exercises = () => {
         exercises={exercises}
         searchPaginationInput={searchPaginationInput}
         setSearchPaginationInput={setSearchPaginationInput}
+        secondaryAction={secondaryAction}
       />
       {userAdmin && <ExerciseCreation />}
     </>

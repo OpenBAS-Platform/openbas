@@ -29,6 +29,7 @@ import type { EndpointStore } from '../../assets/endpoints/Endpoint';
 import { initSorting } from '../../../../components/common/pagination/Page';
 import ExerciseList from '../../simulations/ExerciseList';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
+import ExercisePopover from '../../simulations/simulation/ExercisePopover';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -76,6 +77,15 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
     sorts: initSorting('exercise_start_date'),
   });
+  const secondaryAction = (exercise: ExerciseStore) => (
+    <ExercisePopover
+      exercise={exercise}
+      actions={['Duplicate', 'Export', 'Delete']}
+      onDelete={(result) => setExercises(exercises.filter((e) => (e.exercise_id !== result)))}
+      inList
+    />
+  );
+
   return (
     <>
       <Grid
@@ -215,6 +225,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
                 exercises={exercises}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
+                secondaryAction={secondaryAction}
               />
             </Paper>
           </Grid>

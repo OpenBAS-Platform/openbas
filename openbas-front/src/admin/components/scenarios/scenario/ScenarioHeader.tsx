@@ -1,5 +1,5 @@
-import { useParams } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect } from 'react';
 import { Button, Tooltip, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { PlayArrowOutlined, Stop } from '@mui/icons-material';
@@ -15,8 +15,6 @@ import { parseCron, ParsedCron } from '../../../../utils/Cron';
 import ScenarioRecurringFormDialog from './ScenarioRecurringFormDialog';
 import { truncate } from '../../../../utils/String';
 import type { Theme } from '../../../../components/Theme';
-import { PopoverEntry } from '../../../../components/common/ButtonPopover';
-import useScenarioPermissions from '../../../../utils/Scenario';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -69,6 +67,7 @@ const ScenarioHeader = ({
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const classes = useStyles();
   const theme = useTheme<Theme>();
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
@@ -109,57 +108,6 @@ const ScenarioHeader = ({
     dispatch(updateScenarioRecurrence(scenarioId, { scenario_recurrence: undefined, scenario_recurrence_start: undefined, scenario_recurrence_end: undefined }));
   };
 
-  const [openEditId, setOpenEditId] = useState<string | null>(null);
-  const [openExportId, setOpenExportId] = useState<string | null>(null);
-  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
-  const [openDeleteId, setOpenDeleteId] = useState<string | null>(null);
-
-  // UPDATE
-  const handleOpenEdit = () => {
-    setOpenEditId(scenarioId);
-  };
-
-  const handleCloseEdit = () => {
-    setOpenEditId(null);
-  };
-
-  // EXPORT
-  const handleOpenExport = () => {
-    setOpenExportId(scenarioId);
-  };
-
-  const handleCloseExport = () => {
-    setOpenEditId(null);
-  };
-
-  // DUPLICATE
-  const handleOpenDuplicate = () => {
-    setOpenDuplicateId(scenarioId);
-  };
-
-  const handleCloseDuplicate = () => {
-    setOpenDuplicateId(null);
-  };
-
-  // DELETE
-  const handleOpenDelete = () => {
-    setOpenDeleteId(scenarioId);
-  };
-
-  const handleCloseDelete = () => {
-    setOpenDeleteId(null);
-  };
-
-  const permissions = useScenarioPermissions(scenario.scenario_id);
-
-  // Button Popover
-  const entries: PopoverEntry[] = [
-    { label: 'Update', action: () => handleOpenEdit(), disabled: !permissions.canWrite },
-    { label: 'Duplicate', action: () => handleOpenDuplicate() },
-    { label: 'Export', action: () => handleOpenExport() },
-    { label: 'Delete', action: () => handleOpenDelete(), disabled: !permissions.canWrite },
-  ];
-
   return (
     <>
       <Tooltip title={scenario.scenario_name}>
@@ -197,15 +145,8 @@ const ScenarioHeader = ({
         )}
         <ScenarioPopover
           scenario={scenario}
-          entries={entries}
-          openEdit={openEditId === scenario.scenario_id}
-          openExport={openExportId === scenario.scenario_id}
-          openDelete={openDeleteId === scenario.scenario_id}
-          openDuplicate={openDuplicateId === scenario.scenario_id}
-          setOpenExport={handleCloseExport}
-          setOpenEdit={handleCloseEdit}
-          setOpenDelete={handleCloseDelete}
-          setOpenDuplicate={handleCloseDuplicate}
+          actions={['Duplicate', 'Update', 'Delete', 'Export']}
+          onDelete={() => navigate('/admin/scenarios')}
         />
       </div>
       <ScenarioRecurringFormDialog
