@@ -1,4 +1,4 @@
-import type {Inject, InjectsImportInput, ImportTestSummary} from '../../../../utils/api-types';
+import type { Inject, InjectsImportInput, ImportTestSummary } from '../../../../utils/api-types';
 import {
   addInjectForScenario,
   bulkDeleteInjectsForScenario,
@@ -11,11 +11,9 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { InjectStore } from '../../../../actions/injects/Inject';
 import { fetchScenario, fetchScenarioTeams, importXls } from '../../../../actions/scenarios/scenario-actions';
-import { useFormatter } from '../../../../components/i18n';
 
 const injectContextForScenario = (scenario: ScenarioStore) => {
   const dispatch = useAppDispatch();
-  const { t } = useFormatter();
 
   return {
     onAddInject(inject: Inject): Promise<{ result: string }> {

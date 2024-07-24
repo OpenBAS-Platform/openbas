@@ -3,14 +3,12 @@ import { CloudUploadOutlined } from '@mui/icons-material';
 import React, { useContext, useState } from 'react';
 import Dialog from '../../../../components/common/Dialog';
 import { useFormatter } from '../../../../components/i18n';
-import type { ImportPostSummary, InjectsImportInput } from '../../../../utils/api-types';
+import type { ImportPostSummary, InjectsImportInput, ImportMessage, ImportTestSummary } from '../../../../utils/api-types';
 import ImportUploaderInjectFromXlsFile from './ImportUploaderInjectFromXlsFile';
 import ImportUploaderInjectFromXlsInjects from './ImportUploaderInjectFromXlsInjects';
 import { InjectContext } from '../Context';
 import { storeXlsFile } from '../../../../actions/mapper/mapper-actions';
-import {ImportMessage, ImportTestSummary} from "../../../../utils/api-types";
-import {MESSAGING$} from "../../../../utils/Environment";
-import {AxiosResponse} from "axios";
+import { MESSAGING$ } from '../../../../utils/Environment';
 
 const ImportUploaderInjectFromXls = () => {
   // Standard hooks
@@ -40,7 +38,7 @@ const ImportUploaderInjectFromXls = () => {
   const onSubmitImportInjects = (input: InjectsImportInput) => {
     if (importId) {
       injectContext.onImportInjectFromXls?.(importId, input).then((value: ImportTestSummary) => {
-        const criticalMessages = value.import_message?.filter((value: ImportMessage) => value.message_level === 'CRITICAL');
+        const criticalMessages = value.import_message?.filter((importMessage: ImportMessage) => importMessage.message_level === 'CRITICAL');
         if (criticalMessages && criticalMessages?.length > 0) {
           MESSAGING$.notifyError(t(criticalMessages[0].message_code), true);
         }
