@@ -9,7 +9,7 @@ import type {
   TeamCreateInput,
   Variable,
   VariableInput,
-  ImportTestSummary
+  ImportTestSummary,
 } from '../../../utils/api-types';
 import type { UserStore } from '../teams/players/Player';
 import type { InjectStore } from '../../../actions/injects/Inject';
