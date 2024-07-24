@@ -1,19 +1,18 @@
 import { Autocomplete as MuiAutocomplete, Box, Button, MenuItem, TextField } from '@mui/material';
 import { TableViewOutlined } from '@mui/icons-material';
-import React, {FunctionComponent, SyntheticEvent, useContext, useEffect, useState } from 'react';
+import React, { FunctionComponent, SyntheticEvent, useContext, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import moment from 'moment-timezone';
 import { makeStyles } from '@mui/styles';
+import { DateTimePicker } from '@mui/x-date-pickers';
 import { zodImplement } from '../../../../utils/Zod';
 import { useFormatter } from '../../../../components/i18n';
-import type { ImportMapper, InjectsImportInput } from '../../../../utils/api-types';
+import type { ImportMapper, InjectsImportInput, ImportMessage, ImportTestSummary } from '../../../../utils/api-types';
 import { searchMappers } from '../../../../actions/mapper/mapper-actions';
 import type { Page } from '../../../../components/common/pagination/Page';
-import { ImportMessage, ImportTestSummary } from '../../../../utils/api-types';
 import { InjectContext } from '../Context';
-import { DateTimePicker } from '@mui/x-date-pickers';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -85,8 +84,8 @@ const ImportUploaderInjectFromXlsInjects: FunctionComponent<Props> = ({
         timezone: z.string().min(1, { message: t('Should not be empty') }),
         startDate: z.string().optional(),
       }).refine(data => !needLaunchDate || (needLaunchDate && data.startDate !== undefined), {
-          message: t('Should not be empty'),
-          path: ['startDate']
+        message: t('Should not be empty'),
+        path: ['startDate'],
       }),
     ),
     defaultValues: {
@@ -127,21 +126,21 @@ const ImportUploaderInjectFromXlsInjects: FunctionComponent<Props> = ({
 
   const checkNeedLaunchDate = () => {
     const formValues = getValues();
-    if(formValues.importMapperId && formValues.sheetName && formValues.timezone) {
-        const input: InjectsImportInput = {
-            import_mapper_id: formValues.importMapperId,
-            sheet_name: formValues.sheetName,
-            timezone_offset: moment.tz(formValues.timezone).utcOffset(),
-        };
-        injectContext.onDryImportInjectFromXls?.(importId, input).then((value: ImportTestSummary) => {
-            const criticalMessages = value.import_message?.filter((importMessage: ImportMessage) => importMessage.message_level === 'CRITICAL');
-            if (criticalMessages && criticalMessages?.filter(message => {return message.message_code === 'ABSOLUTE_TIME_WITHOUT_START_DATE'}).length > 0) {
-                setNeedLaunchDate(true);
-            }
-        });
-        setNeedLaunchDate(false);
+    if (formValues.importMapperId && formValues.sheetName && formValues.timezone) {
+      const input: InjectsImportInput = {
+        import_mapper_id: formValues.importMapperId,
+        sheet_name: formValues.sheetName,
+        timezone_offset: moment.tz(formValues.timezone).utcOffset(),
+      };
+      injectContext.onDryImportInjectFromXls?.(importId, input).then((value: ImportTestSummary) => {
+        const criticalMessages = value.import_message?.filter((importMessage: ImportMessage) => importMessage.message_level === 'CRITICAL');
+        if (criticalMessages && criticalMessages?.filter((message) => { return message.message_code === 'ABSOLUTE_TIME_WITHOUT_START_DATE'; }).length > 0) {
+          setNeedLaunchDate(true);
+        }
+      });
+      setNeedLaunchDate(false);
     }
-  }
+  };
 
   return (
     <form id="importUploadInjectForm" onSubmit={handleSubmitWithoutPropagation} >
@@ -188,7 +187,7 @@ const ImportUploaderInjectFromXlsInjects: FunctionComponent<Props> = ({
               options={mapperOptions}
               onChange={(_, v) => {
                 onChange(v?.id);
-                checkNeedLaunchDate()
+                checkNeedLaunchDate();
               }}
               renderOption={(props, option) => (
                 <Box component="li" {...props} key={option.id}>
@@ -214,27 +213,28 @@ const ImportUploaderInjectFromXlsInjects: FunctionComponent<Props> = ({
             />
           )}
         />
-        {needLaunchDate && <Controller
-            control={control}
-            name="startDate"
-            render={({ field, fieldState }) => (
-                <DateTimePicker
-                    views={['year', 'month', 'day']}
-                    value={(field.value)}
-                    minDate={new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()}
-                    onChange={(startDate) => {
-                        return (startDate ? field.onChange(new Date(startDate).toISOString()) : field.onChange(''));
-                    }}
-                    slotProps={{
-                        textField: {
-                            fullWidth: true,
-                            error: !!fieldState.error,
-                            helperText: fieldState.error && fieldState.error?.message,
-                        },
-                    }}
-                    label={t('Start date')}
-                />
-            )}
+        {needLaunchDate &&
+        <Controller
+          control={control}
+          name="startDate"
+          render={({ field, fieldState }) => (
+            <DateTimePicker
+              views={['year', 'month', 'day']}
+              value={(field.value)}
+              minDate={new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()}
+              onChange={(startDate) => {
+                return (startDate ? field.onChange(new Date(startDate).toISOString()) : field.onChange(''));
+              }}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  error: !!fieldState.error,
+                  helperText: fieldState.error && fieldState.error?.message,
+                },
+              }}
+              label={t('Start date')}
+            />
+          )}
         />}
         <Controller
           control={control}

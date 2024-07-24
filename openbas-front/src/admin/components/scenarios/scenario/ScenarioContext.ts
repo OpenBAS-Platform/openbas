@@ -10,12 +10,7 @@ import {
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { InjectStore } from '../../../../actions/injects/Inject';
-import {
-  dryImportXls,
-  fetchScenario,
-  fetchScenarioTeams,
-  importXls
-} from '../../../../actions/scenarios/scenario-actions';
+import { dryImportXls, fetchScenario, fetchScenarioTeams, importXls } from '../../../../actions/scenarios/scenario-actions';
 
 const injectContextForScenario = (scenario: ScenarioStore) => {
   const dispatch = useAppDispatch();

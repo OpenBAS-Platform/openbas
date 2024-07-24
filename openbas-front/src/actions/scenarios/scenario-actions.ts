@@ -171,7 +171,7 @@ export const importXls = (scenarioId: Scenario['scenario_id'], importId: string,
 export const dryImportXls = (scenarioId: Scenario['scenario_id'], importId: string, input: InjectsImportInput) => {
   const uri = `${SCENARIO_URI}/${scenarioId}/xls/${importId}/dry`;
   return simplePostCall(uri, input)
-      .then((response) => {
-        return response;
-      });
+    .then((response) => {
+      return response;
+    });
 };
