@@ -33,7 +33,7 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
     onDeleteInject(injectId: Inject['inject_id']): void {
       return dispatch(deleteInjectScenario(scenario.scenario_id, injectId));
     },
-    onImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<{ result: ImportTestSummary }> {
+    onImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {
       return importXls(scenario.scenario_id, importId, input).then((response) => new Promise((resolve, _reject) => {
         dispatch(fetchScenarioInjects(scenario.scenario_id));
         dispatch(fetchScenario(scenario.scenario_id));
