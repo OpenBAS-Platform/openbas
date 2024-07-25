@@ -315,7 +315,7 @@ const TimelineOverview = () => {
       </Grid>
       {selectedInjectId && (
         <UpdateInject
-          open={selectedInjectId !== null}
+          open={true}
           handleClose={() => setSelectedInjectId(null)}
           onUpdateInject={onUpdateInject}
           injectId={selectedInjectId}
