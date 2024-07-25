@@ -27,6 +27,7 @@ interface Props {
   setOpenDelete?: (open: boolean) => void;
   setOpenDuplicate?: (open: boolean) => void;
   variantButtonPopover?: VariantButtonPopover;
+  teams?: TeamStore[];
 }
 
 const AtomicTestingPopover: FunctionComponent<Props> = ({
@@ -39,10 +40,10 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   setOpenDelete,
   setOpenDuplicate,
   variantButtonPopover,
+  teams,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const [deletion, setDeletion] = useState(false);
@@ -51,12 +52,6 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
 
   // Fetching data
   const { updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
-  const { teams } = useHelper((helper: TeamsHelper) => ({
-    teams: helper.getTeams(),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchTeams());
-  });
 
   const onUpdateAtomicTesting = async (data: Inject) => {
     const toUpdate = R.pipe(
@@ -112,6 +107,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
         open={isNotEmptyField(openEdit) ? openEdit : edition}
         handleClose={() => (setOpenEdit ? setOpenEdit(false) : setEdition(false))}
         onUpdateInject={onUpdateAtomicTesting}
+        inject={atomic}
         injectId={atomic.inject_id}
         isAtomic
         teamsFromExerciseOrScenario={teams?.filter((team: TeamStore) => !team.team_contextual) ?? []}

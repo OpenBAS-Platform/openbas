@@ -253,6 +253,7 @@ const Injects = (props) => {
 
   // Rendering
   if (injects) {
+    const selectedInject = injects.find((injectSelected) => injectSelected.inject_id === selectedInjectId);
     return (
       <div className={classes.container}>
         <div style={{ marginBottom: setViewMode ? 8 : 0 }}>
@@ -554,7 +555,7 @@ const Injects = (props) => {
         </List>
         {permissions.canWrite && (
           <>
-            {selectedInjectId !== null
+            {selectedInjectId !== null && selectedInject !== null
               && <UpdateInject
                 open
                 handleClose={() => setSelectedInjectId(null)}
@@ -567,6 +568,7 @@ const Injects = (props) => {
                 allUsersNumber={allUsersNumber}
                 usersNumber={usersNumber}
                 teamsUsers={teamsUsers}
+                inject={selectedInject}
                  />
             }
             <CreateInject

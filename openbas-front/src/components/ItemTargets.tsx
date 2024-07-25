@@ -56,7 +56,7 @@ const ItemTargets: FunctionComponent<Props> = ({
 
   return (
     <div className={classes.inline}>
-      {visibleTargets && visibleTargets.map((target: InjectTargetWithResult, index: number) => (
+      {visibleTargets?.map((target: InjectTargetWithResult, index: number) => (
         <span key={index}>
           <Tooltip title={target.name}>
             <Chip

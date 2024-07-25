@@ -16,7 +16,7 @@ import UpdateInject from '../../../common/injects/UpdateInject';
 import ItemStatus from '../../../../../components/ItemStatus';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import type { Exercise, Inject } from '../../../../../utils/api-types';
+import type { Exercise, Inject, InjectResultDTO } from '../../../../../utils/api-types';
 import type { TagHelper } from '../../../../../actions/helper';
 import type { InjectStore } from '../../../../../actions/injects/Inject';
 import { fetchExerciseInjects, updateInjectForExercise } from '../../../../../actions/Inject';
@@ -114,6 +114,8 @@ const TimelineOverview = () => {
       await dispatch(updateInjectForExercise(exerciseId, selectedInjectId, inject));
     }
   };
+
+  const selectedInject = injects.find((inject: InjectResultDTO) => inject.inject_id === selectedInjectId);
 
   return (
     <div className={classes.root}>
@@ -319,6 +321,7 @@ const TimelineOverview = () => {
           injectId={selectedInjectId}
           teamsFromExerciseOrScenario={teams}
           isAtomic={false}
+          inject={selectedInject}
         />
       )}
     </div>

@@ -10,6 +10,11 @@ import { truncate } from '../../../../utils/String';
 import Loader from '../../../../components/Loader';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
 import type { InjectResultDTO } from '../../../../utils/api-types';
+import { useHelper } from '../../../../store';
+import type { TeamsHelper } from '../../../../actions/teams/team-helper';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { fetchTeams } from '../../../../actions/teams/team-actions';
+import { useAppDispatch } from '../../../../utils/hooks';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -25,7 +30,14 @@ const useStyles = makeStyles(() => ({
 const AtomicTestingHeader = () => {
   // Standard hooks
   const { t } = useFormatter();
+  const dispatch = useAppDispatch();
   const classes = useStyles();
+  const { teams } = useHelper((helper: TeamsHelper) => ({
+    teams: helper.getTeams(),
+  }));
+  useDataLoader(() => {
+    dispatch(fetchTeams());
+  });
 
   const { injectResultDto, updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
   const [openEditId, setOpenEditId] = useState<string | null>(null);
@@ -129,6 +141,7 @@ const AtomicTestingHeader = () => {
             { label: 'Duplicate', action: () => handleOpenDuplicate(injectResultDto.inject_id) },
             { label: 'Delete', action: () => handleOpenDelete(injectResultDto.inject_id) },
           ]}
+          teams={teams}
         />
       </div>
       <Dialog

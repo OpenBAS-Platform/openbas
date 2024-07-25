@@ -1,4 +1,4 @@
-import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
+import React, { CSSProperties, FunctionComponent, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useFormatter } from '../../../components/i18n';
@@ -86,12 +86,6 @@ const InjectList: FunctionComponent<Props> = ({
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
     sorts: initSorting('inject_updated_at', 'DESC'),
   });
-
-  // Fetch injects on initial render and when pagination input changes
-  useEffect(() => {
-    fetchInjects(searchPaginationInput)
-      .then((response) => setInjects(response.data.content));
-  }, [fetchInjects, searchPaginationInput]);
 
   // Headers
   const headers = [
