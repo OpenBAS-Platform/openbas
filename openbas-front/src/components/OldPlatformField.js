@@ -21,7 +21,7 @@ const styles = () => ({
   },
 });
 
-class PlatformField extends Component {
+class OldPlatformField extends Component {
   render() {
     const {
       name,
@@ -40,7 +40,7 @@ class PlatformField extends Component {
       { id: 'MacOS', label: 'MacOS' },
     ];
     return (
-      <Autocomplete
+      <Autocomplete // rewrite with ui autocomplete !!!!
         variant="standard"
         size="small"
         name={name}
@@ -70,4 +70,4 @@ class PlatformField extends Component {
 export default R.compose(
   inject18n,
   withStyles(styles),
-)(PlatformField);
+)(OldPlatformField);

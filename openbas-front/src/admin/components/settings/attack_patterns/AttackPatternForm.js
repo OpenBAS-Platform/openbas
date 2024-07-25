@@ -88,6 +88,7 @@ AttackPatternForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleClose: PropTypes.func,
   editing: PropTypes.bool,
+  initialValues: PropTypes.object,
 };
 
 export default AttackPatternForm;

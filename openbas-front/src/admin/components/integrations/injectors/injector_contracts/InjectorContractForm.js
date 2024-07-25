@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
 import { useFormatter } from '../../../../../components/i18n';
-import AttackPatternField from '../../../../../components/AttackPatternField';
+import OldAttackPatternField from '../../../../../components/OldAttackPatternField';
 
 const InjectorContractForm = (props) => {
   const { onSubmit, initialValues, editing, handleClose } = props;
@@ -21,7 +21,7 @@ const InjectorContractForm = (props) => {
     >
       {({ handleSubmit, form, values, submitting, pristine }) => (
         <form id="injectorContractForm" onSubmit={handleSubmit}>
-          <AttackPatternField
+          <OldAttackPatternField
             name="injector_contract_attack_patterns"
             label={t('Attack patterns')}
             values={values}

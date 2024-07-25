@@ -134,21 +134,20 @@ class CreatePayload extends Component {
           <>
             <Stepper activeStep={activeStep} style={{ marginBottom: 20 }}>
               <Step>
-                <StepLabel >{t('Select the type')}</StepLabel>
+                <StepLabel>{t('Select the type')}</StepLabel>
               </Step>
               <Step>
-                <StepLabel >{t('Create the payload')}</StepLabel>
+                <StepLabel>{t('Create the payload')}</StepLabel>
               </Step>
             </Stepper>
             {activeStep === 0 && this.renderTypes()}
             {activeStep === 1 && (
-            <PayloadForm
-              editing={false}
-              onSubmit={this.onSubmit.bind(this)}
-              initialValues={{ payload_tags: [], payload_platforms: [], payload_attack_patterns: [] }}
-              handleClose={this.handleClose.bind(this)}
-              type={selectedType}
-            />
+              <PayloadForm
+                editing={false}
+                onSubmit={this.onSubmit.bind(this)}
+                handleClose={this.handleClose.bind(this)}
+                type={selectedType}
+              />
             )}
           </>
         </Drawer>

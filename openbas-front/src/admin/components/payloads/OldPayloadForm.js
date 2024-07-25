@@ -9,9 +9,9 @@ import arrayMutators from 'final-form-arrays';
 import OldTextField from '../../../components/fields/OldTextField';
 import { useFormatter } from '../../../components/i18n';
 import TagField from '../../../components/TagField';
-import PlatformField from '../../../components/PlatformField';
+import OldPlatformField from '../../../components/OldPlatformField';
 import OldSelectField from '../../../components/fields/OldSelectField';
-import AttackPatternField from '../../../components/AttackPatternField';
+import OldAttackPatternField from '../../../components/OldAttackPatternField';
 import FileLoader from '../../../components/fields/FileLoader';
 
 const useStyles = makeStyles(() => ({
@@ -22,7 +22,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const PayloadForm = (props) => {
+const OldPayloadForm = (props) => {
   const { onSubmit, initialValues, editing, handleClose, type } = props;
   const classes = useStyles();
   const { t } = useFormatter();
@@ -41,7 +41,7 @@ const PayloadForm = (props) => {
         requiredFields.push(...['file_drop_file']);
         break;
       default:
-            // do nothing
+      // do nothing
     }
     requiredFields.forEach((field) => {
       if (field === 'payload_platforms' && (!values[field] || values[field].length === 0)) {
@@ -66,7 +66,7 @@ const PayloadForm = (props) => {
       }}
     >
       {({ handleSubmit, form, values, submitting, dirty }) => (
-        <form id="payloadForm" onSubmit={(event) => {
+        <form id="oldPayloadForm" onSubmit={(event) => {
           event.preventDefault();
           handleSubmit(event);
         }}
@@ -78,7 +78,7 @@ const PayloadForm = (props) => {
             style={{ marginTop: 10 }}
             InputLabelProps={{ required: true }}
           />
-          <PlatformField
+          <OldPlatformField
             name="payload_platforms"
             fullWidth={true}
             multiple={true}
@@ -192,12 +192,12 @@ const PayloadForm = (props) => {
                       style={{ marginTop: -2 }}
                       color="primary"
                     >
-                      <ControlPointOutlined/>
+                      <ControlPointOutlined />
                     </IconButton>
                     {meta.error && meta.touched && (
-                    <div className={classes.errorColor}>
-                      {meta.error}
-                    </div>
+                      <div className={classes.errorColor}>
+                        {meta.error}
+                      </div>
                     )}
                   </InputLabel>
                 </div>
@@ -240,7 +240,7 @@ const PayloadForm = (props) => {
                           size="small"
                           color="primary"
                         >
-                          <DeleteOutlined/>
+                          <DeleteOutlined />
                         </IconButton>
                       </ListItem>
                     );
@@ -269,12 +269,12 @@ const PayloadForm = (props) => {
                       style={{ marginTop: -2 }}
                       color="primary"
                     >
-                      <ControlPointOutlined/>
+                      <ControlPointOutlined />
                     </IconButton>
                     {meta.error && meta.touched && (
-                    <div className={classes.errorColor}>
-                      {meta.error}
-                    </div>
+                      <div className={classes.errorColor}>
+                        {meta.error}
+                      </div>
                     )}
                   </InputLabel>
                 </div>
@@ -326,7 +326,7 @@ const PayloadForm = (props) => {
                           size="small"
                           color="primary"
                         >
-                          <DeleteOutlined/>
+                          <DeleteOutlined />
                         </IconButton>
                       </ListItem>
                     );
@@ -363,7 +363,7 @@ const PayloadForm = (props) => {
             label={t('Cleanup command')}
             style={{ marginTop: 20 }}
           />
-          <AttackPatternField
+          <OldAttackPatternField
             name="payload_attack_patterns"
             label={t('Attack patterns')}
             values={values}
@@ -401,10 +401,10 @@ const PayloadForm = (props) => {
   );
 };
 
-PayloadForm.propTypes = {
+OldPayloadForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleClose: PropTypes.func,
   editing: PropTypes.bool,
 };
 
-export default PayloadForm;
+export default OldPayloadForm;

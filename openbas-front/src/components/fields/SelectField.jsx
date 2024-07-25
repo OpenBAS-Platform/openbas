@@ -12,20 +12,23 @@ const SelectField = (props) => {
     helperText,
     control,
     defaultValue,
+    InputLabelProps,
+    error,
     ...others
   } = props;
   return (
-    <FormControl fullWidth={fullWidth} style={style}>
+    <FormControl fullWidth={fullWidth} style={style} error={error}>
       {others.displayEmpty ? (
         <InputLabel
           shrink={true}
           htmlFor={name}
           variant={others.variant || 'standard'}
+          required={InputLabelProps?.required}
         >
           {label}
         </InputLabel>
       ) : (
-        <InputLabel htmlFor={name} variant={others.variant || 'standard'}>
+        <InputLabel htmlFor={name} variant={others.variant || 'standard'} required={InputLabelProps?.required}>
           {label}
         </InputLabel>
       )}
@@ -40,9 +43,9 @@ const SelectField = (props) => {
           </MUISelect>
         )}
       />
-      {helperText && (
-        <FormHelperText variant={others.variant}>
-          {helperText}
+      {!!error && (
+        <FormHelperText variant={others.variant} error={!!error}>
+          {helperText ?? error?.message}
         </FormHelperText>
       )}
     </FormControl>
