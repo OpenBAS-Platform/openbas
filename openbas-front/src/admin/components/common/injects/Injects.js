@@ -42,6 +42,10 @@ const useStyles = makeStyles(() => ({
   container: {
     margin: '-12px 0 50px 0',
   },
+  disabled: {
+    opacity: 0.38,
+    pointerEvents: 'none',
+  },
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -426,7 +430,7 @@ const Injects = (props) => {
             const duration = splitDuration(
               inject.inject_depends_duration || 0,
             );
-            const isDisabled = !injectContract?.config.expose;
+            const isContractExposed = injectContract?.config.expose;
             let injectStatus = inject.inject_enabled
               ? t('Enabled')
               : t('Disabled');
@@ -439,11 +443,11 @@ const Injects = (props) => {
                 classes={{ root: classes.item }}
                 divider
                 button
-                disabled={
-                  !injectContract || isDisabled
-                  || !inject.inject_enabled
-                }
-                onClick={() => setSelectedInjectId(inject.inject_id)}
+                onClick={() => {
+                  if (injectContract && isContractExposed) {
+                    setSelectedInjectId(inject.inject_id);
+                  }
+                }}
               >
                 <ListItemIcon
                   classes={{ root: classes.itemIcon }}
@@ -472,12 +476,14 @@ const Injects = (props) => {
                         || inject.inject_injector_contract.injector_contract_payload?.payload_type
                         : inject.inject_type
                     }
-                    disabled={!injectContract || isDisabled || !inject.inject_enabled}
+                    disabled={!injectContract || !isContractExposed || !inject.inject_enabled}
                   />
                 </ListItemIcon>
                 <ListItemText
                   primary={
-                    <>
+                    <div className={(!injectContract || !isContractExposed
+                        || !inject.inject_enabled) ? classes.disabled : ''}
+                    >
                       <div
                         className={classes.bodyItem}
                         style={inlineStyles.inject_type}
@@ -538,7 +544,7 @@ const Injects = (props) => {
                           tags={inject.inject_tags}
                         />
                       </div>
-                    </>
+                    </div>
                   }
                 />
                 <ListItemSecondaryAction>
@@ -546,7 +552,7 @@ const Injects = (props) => {
                     inject={inject}
                     tagsMap={tagsMap}
                     setSelectedInjectId={setSelectedInjectId}
-                    isDisabled={!injectContract || isDisabled}
+                    isDisabled={!injectContract || !isContractExposed}
                   />
                 </ListItemSecondaryAction>
               </ListItem>

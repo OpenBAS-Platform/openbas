@@ -2,10 +2,7 @@ package io.openbas.integrations;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.database.model.AttackPattern;
-import io.openbas.database.model.Injector;
-import io.openbas.database.model.InjectorContract;
-import io.openbas.database.model.Payload;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.InjectorRepository;
@@ -18,16 +15,21 @@ import io.openbas.injector_contract.fields.ContractAsset;
 import io.openbas.injector_contract.fields.ContractAssetGroup;
 import io.openbas.injector_contract.fields.ContractExpectations;
 import io.openbas.model.inject.form.Expectation;
+import io.openbas.utils.StringUtils;
 import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.DETECTION;
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVENTION;
+import static io.openbas.database.model.Payload.PAYLOAD_SOURCE.MANUAL;
+import static io.openbas.database.model.Payload.PAYLOAD_STATUS.VERIFIED;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.SupportedLanguage.en;
 import static io.openbas.helper.SupportedLanguage.fr;
@@ -42,6 +44,7 @@ import static io.openbas.injector_contract.fields.ContractText.textField;
 @RequiredArgsConstructor
 @Service
 public class PayloadService {
+
     @Resource
     protected ObjectMapper mapper;
 
@@ -50,21 +53,9 @@ public class PayloadService {
     private final InjectorContractRepository injectorContractRepository;
     private final AttackPatternRepository attackPatternRepository;
 
-    public void updateInjectorContractsForInjector(Injector injector) {
-        if( !injector.isPayloads() ) {
-            throw new UnsupportedOperationException("This injector does not support payloads");
-        }
-        Iterable<Payload> payloads = payloadRepository.findAll();
-        payloads.forEach(payload -> {
-            updateInjectorContract(injector, payload);
-        });
-    }
-
     public void updateInjectorContractsForPayload(Payload payload) {
-        List<Injector> injectors = injectorRepository.findAllByPayloads(true);
-        injectors.forEach(injector -> {
-            updateInjectorContract(injector, payload);
-        });
+        List<Injector> injectors = this.injectorRepository.findAllByPayloads(true);
+        injectors.forEach(injector -> updateInjectorContract(injector, payload));
     }
 
     private void updateInjectorContract(Injector injector, Payload payload) {
@@ -146,5 +137,59 @@ public class PayloadService {
         detectionExpectation.setName("Expect inject to be detected");
         detectionExpectation.setScore(0);
         return expectationsField("expectations", "Expectations", List.of(preventionExpectation, detectionExpectation));
+    }
+
+    public Payload duplicate(@NotBlank final String payloadId) {
+        Payload origin = this.payloadRepository.findById(payloadId).orElseThrow();
+        Payload duplicate;
+        switch (origin.getType()) {
+            case "Command":
+                Command originCommand = (Command) Hibernate.unproxy(origin);
+                Command duplicateCommand = new Command();
+                duplicateCommonProperties(originCommand, duplicateCommand);
+                duplicate = payloadRepository.save(duplicateCommand);
+                break;
+            case "Executable":
+                Executable originExecutable = (Executable) Hibernate.unproxy(origin);
+                Executable duplicateExecutable = new Executable();
+                duplicateCommonProperties(originExecutable, duplicateExecutable);
+                duplicateExecutable.setExecutableFile(originExecutable.getExecutableFile());
+                duplicate = payloadRepository.save(duplicateExecutable);
+                break;
+            case "FileDrop":
+                FileDrop originFileDrop = (FileDrop) Hibernate.unproxy(origin);
+                FileDrop duplicateFileDrop = new FileDrop();
+                duplicateCommonProperties(originFileDrop, duplicateFileDrop);
+                duplicate = payloadRepository.save(duplicateFileDrop);
+                break;
+            case "DnsResolution":
+                DnsResolution originDnsResolution = (DnsResolution) Hibernate.unproxy(origin);
+                DnsResolution duplicateDnsResolution = new DnsResolution();
+                duplicateCommonProperties(originDnsResolution, duplicateDnsResolution);
+                duplicate = payloadRepository.save(duplicateDnsResolution);
+                break;
+            case "NetworkTraffic":
+                NetworkTraffic originNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(origin);
+                NetworkTraffic duplicateNetworkTraffic = new NetworkTraffic();
+                duplicateCommonProperties(originNetworkTraffic, duplicateNetworkTraffic);
+                duplicate = payloadRepository.save(duplicateNetworkTraffic);
+                break;
+            default:
+                throw new UnsupportedOperationException("Payload type " + origin.getType() + " is not supported");
+        }
+        this.updateInjectorContractsForPayload(duplicate);
+        return duplicate;
+    }
+
+    private <T extends Payload> void duplicateCommonProperties(@org.jetbrains.annotations.NotNull final T origin, @org.jetbrains.annotations.NotNull T duplicate) {
+        BeanUtils.copyProperties(origin, duplicate);
+        duplicate.setId(null);
+        duplicate.setName(StringUtils.duplicateString(origin.getName()));
+        duplicate.setAttackPatterns(new ArrayList<>(origin.getAttackPatterns()));
+        duplicate.setTags(new HashSet<>(origin.getTags()));
+        duplicate.setExternalId(null);
+        duplicate.setSource(MANUAL.name());
+        duplicate.setStatus(VERIFIED.name());
+        duplicate.setCollector(null);
     }
 }

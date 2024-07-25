@@ -38,11 +38,10 @@ const UpdateInject: React.FC<Props> = ({
       open={open}
       handleClose={handleClose}
       title={t('Update the inject')}
-      variant="half"
       PaperProps={{
         ref: drawerRef,
       }}
-      disableEnforceFocus={true}
+      disableEnforceFocus
     >
       {inject && injectorContract && (
         <UpdateInjectDetails

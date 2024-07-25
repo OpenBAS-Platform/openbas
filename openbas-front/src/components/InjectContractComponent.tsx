@@ -7,11 +7,6 @@ import { initSorting, Page } from './common/pagination/Page';
 import { useFormatter } from './i18n';
 import InjectIcon from '../admin/components/common/injects/InjectIcon';
 import { isNotEmptyField } from '../utils/utils';
-import { useAppDispatch } from '../utils/hooks';
-import { useHelper } from '../store';
-import type { InjectorHelper } from '../actions/injectors/injector-helper';
-import useDataLoader from '../utils/hooks/useDataLoader';
-import { fetchInjectors } from '../actions/Injectors';
 import { searchInjectorContracts } from '../actions/InjectorContracts';
 import type { InjectorContractStore } from '../actions/injector_contracts/InjectorContract';
 
@@ -43,15 +38,6 @@ const InjectContractComponent: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
   const { t, tPick } = useFormatter();
-  const dispatch = useAppDispatch();
-
-  // Fetching data
-  const { injectorMap } = useHelper((helper: InjectorHelper) => ({
-    injectorMap: helper.getInjectorsMap(),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchInjectors());
-  });
 
   // Pagination
   const [contracts, setContracts] = useState<InjectorContractStore[]>([]);
@@ -130,7 +116,7 @@ const InjectContractComponent: FunctionComponent<Props> = ({
               type={
                 option.injector_contract_payload
                   ? (option.injector_contract_payload?.payload_collector_type ?? option.injector_contract_payload?.payload_type)
-                  : injectorMap[option.injector_contract_injector]?.injector_type
+                  : option.injector_contract_injector_type
               }
               isPayload={isNotEmptyField(option.injector_contract_payload)}
             />

@@ -10,7 +10,7 @@ import { searchMappers } from '../../../../actions/mapper/mapper-actions';
 import { initSorting } from '../../../../components/common/pagination/Page';
 import Empty from '../../../../components/Empty';
 import DataIngestionMenu from '../DataIngestionMenu';
-import XlsFormatterCreation from './xls_formatter/XlsFormatterCreation';
+import XlsMapperCreation from './xls_mapper/XlsMapperCreation';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import XlsMapperPopover from './XlsMapperPopover';
 
@@ -48,7 +48,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
 };
 
-const XlsFormatters = () => {
+const XlsMappers = () => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
@@ -70,7 +70,7 @@ const XlsFormatters = () => {
 
   return (
     <div className={classes.container}>
-      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Data ingestion') }, { label: t('Xls formatters'), current: true }]} />
+      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Data ingestion') }, { label: t('XLS mappers'), current: true }]} />
       <DataIngestionMenu />
       <PaginationComponent
         fetch={searchMappers}
@@ -135,9 +135,9 @@ const XlsFormatters = () => {
         }
         {!mappers ? (<Empty message={t('No data available')} />) : null}
       </List>
-      <XlsFormatterCreation onCreate={(result) => setMappers([result, ...mappers])} />
+      <XlsMapperCreation onCreate={(result) => setMappers([result, ...mappers])} />
     </div>
   );
 };
 
-export default XlsFormatters;
+export default XlsMappers;

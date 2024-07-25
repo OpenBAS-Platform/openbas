@@ -8,9 +8,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
@@ -24,7 +24,13 @@ public class ScenarioInjectApi extends RestBehavior {
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   @Transactional(readOnly = true)
   public Iterable<InjectOutput> scenarioInjectsSimple(@PathVariable @NotBlank final String scenarioId) {
-    return this.injectService.injects(InjectSpecification.fromScenario(scenarioId));
+    return injectService.injects(InjectSpecification.fromScenario(scenarioId));
+  }
+
+  @DeleteMapping(SCENARIO_URI + "/{scenarioId}/injects")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public void deleteListOfInjectsForScenario(@PathVariable final String scenarioId, @RequestBody List<String> injectIds) {
+    injectService.deleteAllByIds(injectIds);
   }
 
 }

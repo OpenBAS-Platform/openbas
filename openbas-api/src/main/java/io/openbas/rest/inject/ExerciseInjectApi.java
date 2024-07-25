@@ -13,9 +13,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 
@@ -38,7 +38,13 @@ public class ExerciseInjectApi extends RestBehavior {
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
   public Iterable<InjectOutput> exerciseInjectsSimple(@PathVariable @NotBlank final String exerciseId) {
-    return this.injectService.injects(InjectSpecification.fromExercise(exerciseId));
+    return injectService.injects(InjectSpecification.fromExercise(exerciseId));
+  }
+
+  @DeleteMapping(EXERCISE_URI + "/{exerciseId}/injects")
+  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  public void deleteListOfInjectsForExercise(@PathVariable final String exerciseId, @RequestBody List<String> injectIds) {
+    injectService.deleteAllByIds(injectIds);
   }
 
 }

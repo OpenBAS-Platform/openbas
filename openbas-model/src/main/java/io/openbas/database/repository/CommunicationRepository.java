@@ -18,6 +18,8 @@ public interface CommunicationRepository extends CrudRepository<Communication, S
     @NotNull
     Optional<Communication> findById(@NotNull String id);
 
+    List<Communication> findByInjectId(@NotNull String injectId);
+
     @Query("select c from Communication c join c.users as user where user.id = :userId order by c.receivedAt desc")
     List<Communication> findByUser(@Param("userId") String userId);
 

@@ -33,6 +33,7 @@ import org.apache.poi.ss.util.CellReference;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -130,8 +131,16 @@ public class InjectService {
         return injectRepository.save(inject);
     }
 
-    public List<InjectOutput> injects(Specification<Inject> specification) {
-        CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+
+  @Transactional(rollbackOn = Exception.class)
+  public void deleteAllByIds(List<String> injectIds) {
+    if (!CollectionUtils.isEmpty(injectIds)) {
+      injectRepository.deleteAllById(injectIds);
+    }
+  }
+
+  public List<InjectOutput> injects(Specification<Inject> specification) {
+    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
     Root<Inject> injectRoot = cq.from(Inject.class);
@@ -823,7 +832,8 @@ public class InjectService {
                     .min(Comparator.comparing(InjectTime::getRelativeMinuteNumber))
                     .map(InjectTime::getRelativeMinuteNumber).orElse(0);
             long offsetAsMinutes = (((earliestDay * 24L) + earliestHourOfThatDay) * 60 + earliestMinuteOfThatHour) * -1;
-            mapInstantByRowIndex.values().stream().filter(InjectTime::isRelativeDay)
+            mapInstantByRowIndex.values().stream()
+                .filter(injectTime -> injectTime.getDate() == null && (injectTime.isRelativeDay() || injectTime.isRelativeHour() || injectTime.isRelativeMinute()))
                 .forEach(injectTime -> {
                     long injectTimeAsMinutes =
                         (((injectTime.getRelativeDayNumber() * 24L) + injectTime.getRelativeHourNumber()) * 60)

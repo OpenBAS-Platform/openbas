@@ -6,7 +6,7 @@ import { deleteMapper } from '../../../../actions/mapper/mapper-actions';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../components/i18n';
 import Drawer from '../../../../components/common/Drawer';
-import XlsFormatterUpdate from './xls_formatter/XlsFormatterUpdate';
+import XlsMapperUpdate from './xls_mapper/XlsMapperUpdate';
 
 interface Props {
   mapper: RawPaginationImportMapper;
@@ -54,7 +54,7 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
         handleClose={handleCloseEdit}
         title={t('Update the xls mapper')}
       >
-        <XlsFormatterUpdate
+        <XlsMapperUpdate
           xlsMapperId={mapper.import_mapper_id}
           onUpdate={onUpdate}
           handleClose={handleCloseEdit}

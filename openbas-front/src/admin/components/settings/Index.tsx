@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import XlsFormatters from './data_ingestion/XlsFormatters';
+import XlsMappers from './data_ingestion/XlsMappers';
 import Parameters from './Parameters';
 import Users from './users/Users';
 import Groups from './groups/Groups';
@@ -22,8 +22,8 @@ const Index = () => (
     <Route path="taxonomies/tags" element={errorWrapper(Tags)()} />
     <Route path="taxonomies/attack_patterns" element={errorWrapper(AttackPatterns)()} />
     <Route path="taxonomies/kill_chain_phases" element={errorWrapper(KillChainPhases)()} />
-    <Route path="data_ingestion" element={<Navigate to="xls_formatter" replace={true} />} />
-    <Route path="data_ingestion/xls_formatter" element={errorWrapper(XlsFormatters)()} />
+    <Route path="data_ingestion" element={<Navigate to="xls_mappers" replace={true} />} />
+    <Route path="data_ingestion/xls_mappers" element={errorWrapper(XlsMappers)()} />
     {/* Not found */}
     <Route path="*" element={<NotFound />} />
   </Routes>

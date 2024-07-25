@@ -44,6 +44,7 @@ const iconSelector = (type, isPayload, variant, fontSize, done, disabled, onClic
   return (
     <img
       src={`/api/images/injectors/${type}`}
+      onClick={onClick}
       alt={type}
       style={{
         marginTop: variant === 'list' ? 5 : 0,
