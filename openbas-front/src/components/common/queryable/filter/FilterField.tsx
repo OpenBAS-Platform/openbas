@@ -2,13 +2,13 @@ import React, { CSSProperties, FunctionComponent, useEffect, useState } from 're
 import { Autocomplete as MuiAutocomplete, IconButton, TextField, Tooltip } from '@mui/material';
 import { FilterListOffOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { availableOperators, buildEmptyFilter, emptyFilterGroup } from './FilterUtils';
-import { useFormatter } from '../../i18n';
-import useFiltersState from './useFiltersState';
-import type { Filter, FilterGroup, PropertySchemaDTO } from '../../../utils/api-types';
+import { availableOperators, buildEmptyFilter } from './FilterUtils';
+import { useFormatter } from '../../../i18n';
+import type { Filter, FilterGroup, PropertySchemaDTO } from '../../../../utils/api-types';
 import FilterChips from './FilterChips';
-import useFilterableProperties from '../../../utils/hooks/useFilterableProperties';
-import { Option } from '../../../utils/Option';
+import useFilterableProperties from './useFilterableProperties';
+import { Option } from '../../../../utils/Option';
+import { FilterHelpers } from './FilterHelpers';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -21,15 +21,17 @@ type OptionPropertySchema = Option & { operator: Filter['operator'] };
 
 interface Props {
   clazz: string;
-  initialValue?: FilterGroup;
-  onChange: (value: FilterGroup) => void;
+  availableFilterNames?: string[];
+  filterGroup: FilterGroup;
+  helpers: FilterHelpers;
   style: CSSProperties;
 }
 
 const FilterField: FunctionComponent<Props> = ({
   clazz,
-  initialValue,
-  onChange,
+  availableFilterNames = [],
+  filterGroup,
+  helpers,
   style,
 }) => {
   // Standard hooks
@@ -37,19 +39,17 @@ const FilterField: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const [pristine, setPristine] = useState(true);
 
-  const [filterGroup, helpers] = useFiltersState(initialValue ?? emptyFilterGroup, onChange);
-
   const [properties, setProperties] = useState<PropertySchemaDTO[]>([]);
   const [options, setOptions] = useState<OptionPropertySchema[]>([]);
   const [inputValue, setInputValue] = React.useState('');
 
   useEffect(() => {
-    useFilterableProperties(clazz).then((result: { data: PropertySchemaDTO[] }) => {
-      const propertySchemas: PropertySchemaDTO[] = result.data;
-      setProperties(propertySchemas);
-      setOptions(propertySchemas.map((property) => (
+    useFilterableProperties(clazz, availableFilterNames).then((propertySchemas: PropertySchemaDTO[]) => {
+      const newOptions = propertySchemas.map((property) => (
         { id: property.schema_property_name, label: t(property.schema_property_name), operator: availableOperators(property)[0] } as OptionPropertySchema
-      )));
+      ));
+      setOptions(newOptions);
+      setProperties(propertySchemas);
     });
   }, []);
 
@@ -107,7 +107,13 @@ const FilterField: FunctionComponent<Props> = ({
           </IconButton>
         </Tooltip>
       </div>
-      <FilterChips propertySchemas={properties} filterGroup={filterGroup} helpers={helpers} pristine={pristine} />
+      <FilterChips
+        propertySchemas={properties}
+        filterGroup={filterGroup}
+        availableFilterNames={availableFilterNames}
+        helpers={helpers}
+        pristine={pristine}
+      />
     </>
   );
 };

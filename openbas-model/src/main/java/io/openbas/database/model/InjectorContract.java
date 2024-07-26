@@ -64,9 +64,11 @@ public class InjectorContract implements Base {
     private Boolean needsExecutor = false;
 
     @Type(StringArrayType.class)
+    @Enumerated(EnumType.STRING)
     @Column(name = "injector_contract_platforms", columnDefinition = "text[]")
     @JsonProperty("injector_contract_platforms")
-    private String[] platforms = new String[0];
+    @Queryable(filterable = true)
+    private Endpoint.PLATFORM_TYPE[] platforms = new Endpoint.PLATFORM_TYPE[0];
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "injector_contract_payload")
@@ -87,7 +89,7 @@ public class InjectorContract implements Base {
     @JoinColumn(name = "injector_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("injector_contract_injector")
-    @Queryable(filterable = true, property = "id")
+    @Queryable(filterable = true, property = "id", dynamicValues = true)
     @NotNull
     private Injector injector;
 

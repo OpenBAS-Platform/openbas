@@ -18,6 +18,10 @@ import static org.springframework.util.StringUtils.hasText;
 
 public class SearchUtilsJpa {
 
+  private SearchUtilsJpa() {
+
+  }
+
   private static final Specification<?> EMPTY_SPECIFICATION = (root, query, cb) -> cb.conjunction();
 
   @SuppressWarnings("unchecked")
@@ -31,7 +35,7 @@ public class SearchUtilsJpa {
       List<PropertySchema> searchableProperties = getSearchableProperties(propertySchemas);
       List<Predicate> predicates = searchableProperties.stream()
           .map(propertySchema -> {
-            Expression<String> paths = toPath(propertySchema, root, cb);
+            Expression<String> paths = toPath(propertySchema, root);
             return toPredicate(paths, search, cb, propertySchema.getType());
           })
           .toList();

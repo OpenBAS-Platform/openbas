@@ -29,7 +29,8 @@ import Empty from '../../components/Empty';
 import { attackPatternsFakeData, categoriesDataFakeData, categoriesLabelsFakeData, exercisesTimeSeriesFakeData } from '../../utils/fakeData';
 import ExerciseList from './simulations/ExerciseList';
 import type { EndpointStore } from './assets/endpoints/Endpoint';
-import { initSorting, type Page } from '../../components/common/pagination/Page';
+import { initSorting, type Page } from '../../components/common/queryable/Page';
+import { buildSearchPagination } from '../../components/common/queryable/useQueryable';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -105,11 +106,11 @@ const Dashboard = () => {
 
   // Exercises
   const [exercises, setExercises] = useState<EndpointStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
     sorts: initSorting('exercise_start_date'),
     page: 0,
     size: 6,
-  });
+  }));
   useEffect(() => {
     searchExercises(searchPaginationInput).then((result: { data: Page<ExerciseSimple> }) => {
       const { data } = result;

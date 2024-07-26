@@ -84,7 +84,7 @@ public class ChallengeContract extends Contractor {
                 .optional(attachmentField("attachments", "Attachments", Multiple))
                 .build();
         Contract publishChallenge = executableContract(contractConfig,
-                CHALLENGE_PUBLISH, Map.of(en, "Publish challenges", fr, "Publier des challenges"), publishInstance, List.of(Endpoint.PLATFORM_TYPE.Internal.name()), false);
+                CHALLENGE_PUBLISH, Map.of(en, "Publish challenges", fr, "Publier des challenges"), publishInstance, List.of(Endpoint.PLATFORM_TYPE.Internal), false);
         publishChallenge.setAtomicTesting(false);
         return List.of(publishChallenge);
     }

@@ -47,7 +47,7 @@ public class ManualContract extends Contractor {
         List<ContractElement> instance = contractBuilder()
                 .mandatory(textareaField("content", "Content")).build();
         return List.of(manualContract(contractConfig, MANUAL_DEFAULT,
-                Map.of(en, "Manual", fr, "Manuel"), instance, List.of(Endpoint.PLATFORM_TYPE.Internal.name()), false));
+                Map.of(en, "Manual", fr, "Manuel"), instance, List.of(Endpoint.PLATFORM_TYPE.Internal), false));
     }
 
     @Override

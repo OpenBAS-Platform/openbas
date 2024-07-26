@@ -9,6 +9,10 @@ import java.util.Map;
 
 public class OperationUtilsJpa {
 
+  private OperationUtilsJpa() {
+
+  }
+
   // -- NOT CONTAINS --
 
   public static Predicate notContainsTexts(
@@ -31,7 +35,8 @@ public class OperationUtilsJpa {
 
   public static Predicate containsTexts(
       Expression<String> paths, CriteriaBuilder cb,
-      List<String> texts, Class<?> type) {
+      List<String> texts,
+      Class<?> type) {
     Predicate[] predicates = texts.stream().map(text -> containsText(paths, cb, text, type)).toArray(Predicate[]::new);
 
     return cb.or(predicates);
@@ -44,14 +49,17 @@ public class OperationUtilsJpa {
     }
     if (type.isArray()) {
       return cb.like(
-          arrayToString(paths, cb),
+          lower(arrayToString(paths, cb), cb),
           "%" + text.toLowerCase() + "%"
       );
     }
-    return cb.like(cb.lower(paths), "%" + text.toLowerCase() + "%");
+    return cb.and(
+        cb.like(cb.lower(paths), "%" + text.toLowerCase() + "%"),
+        cb.isNotNull(paths)
+    );
   }
 
-  // -- NOT EQUALS --
+  // -- NOT EQULS --
 
   public static Predicate notEqualsTexts(Expression<String> paths, CriteriaBuilder cb, List<String> texts, Class<?> type) {
     Predicate[] predicates = texts.stream().map(text -> notEqualsText(
@@ -109,6 +117,28 @@ public class OperationUtilsJpa {
 
   public static Predicate startWithText(Expression<String> paths, CriteriaBuilder cb, String text) {
     return cb.like(cb.lower(paths), text.toLowerCase() + "%");
+  }
+
+  // -- NOT EMPTY --
+
+  public static Predicate notEmpty(Expression<String> paths, CriteriaBuilder cb, Class<?> type) {
+    return empty(paths, cb, type).not();
+  }
+
+  // -- EMPTY --
+
+  public static Predicate empty(Expression<String> paths, CriteriaBuilder cb, Class<?> type) {
+    Expression<String> finalPaths;
+    if (type.isArray()) {
+      finalPaths = arrayToString(paths, cb);
+    } else {
+      finalPaths = paths;
+    }
+    return cb.or(
+        cb.isNull(finalPaths),
+        cb.equal(finalPaths, ""),
+        cb.equal(finalPaths, " ")
+    );
   }
 
   // -- CUSTOM FUNCTION --

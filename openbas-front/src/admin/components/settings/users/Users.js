@@ -13,7 +13,7 @@ import { useHelper } from '../../../../store';
 import UserPopover from './UserPopover';
 import SecurityMenu from '../SecurityMenu';
 import { useFormatter } from '../../../../components/i18n';
-import { initSorting } from '../../../../components/common/pagination/Page';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';

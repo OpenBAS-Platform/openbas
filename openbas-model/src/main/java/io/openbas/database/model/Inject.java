@@ -52,7 +52,7 @@ public class Inject implements Base, Injection {
   private String id;
 
   @Getter
-  @Queryable(searchable = true, filterable = true, sortable = true)
+    @Queryable(searchable = true, sortable = true)
   @Column(name = "inject_title")
   @JsonProperty("inject_title")
   @NotBlank
@@ -350,10 +350,12 @@ public class Inject implements Base, Injection {
   public List<KillChainPhase> getKillChainPhases() {
     return getInjectorContract()
         .map(injectorContract ->
-            injectorContract.getAttackPatterns().stream()
-                .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream())
-                .distinct()
-                .collect(Collectors.toList())
+                injectorContract.getAttackPatterns()
+                  .stream()
+                  .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream())
+                  .distinct()
+                  .collect(Collectors.toList()
+            )
         )
         .orElseGet(ArrayList::new);
   }
@@ -581,3 +583,4 @@ public class Inject implements Base, Injection {
     return inject;
   }
 }
+

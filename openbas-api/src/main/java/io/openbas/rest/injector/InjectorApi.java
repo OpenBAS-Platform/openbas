@@ -2,7 +2,6 @@ package io.openbas.rest.injector;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -21,6 +20,7 @@ import io.openbas.rest.injector.response.InjectorConnection;
 import io.openbas.rest.injector.response.InjectorRegistration;
 import io.openbas.rest.injector_contract.form.InjectorContractInput;
 import io.openbas.service.FileService;
+import io.openbas.utils.FilterUtilsJpa;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -28,6 +28,7 @@ import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -46,11 +47,14 @@ import static io.openbas.asset.EndpointService.JFROG_BASE;
 import static io.openbas.asset.QueueService.EXCHANGE_KEY;
 import static io.openbas.asset.QueueService.ROUTING_KEY;
 import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.database.specification.InjectorSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
 
 @Log
 @RestController
 public class InjectorApi extends RestBehavior {
+
+    public static final String INJECT0R_URI = "/api/injectors";
 
     @Value("${info.app.version:unknown}") String version;
 
@@ -64,9 +68,6 @@ public class InjectorApi extends RestBehavior {
     private InjectorContractRepository injectorContractRepository;
 
     private FileService fileService;
-
-    @Resource
-    protected ObjectMapper mapper;
 
     @Autowired
     public void setFileService(FileService fileService) {
@@ -329,4 +330,23 @@ public class InjectorApi extends RestBehavior {
         }
         throw new UnsupportedOperationException("Implant " + platform + " executable not supported");
     }
+
+    // -- OPTION --
+
+    @GetMapping(INJECT0R_URI + "/options")
+    public List<FilterUtilsJpa.Option> optionsByName(@RequestParam(required = false) final String searchText) {
+        return fromIterable(this.injectorRepository.findAll(byName(searchText), PageRequest.of(0, 10)))
+            .stream()
+            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+            .toList();
+    }
+
+    @PostMapping(INJECT0R_URI + "/options")
+    public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+        return fromIterable(this.injectorRepository.findAllById(ids))
+            .stream()
+            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+            .toList();
+    }
+
 }

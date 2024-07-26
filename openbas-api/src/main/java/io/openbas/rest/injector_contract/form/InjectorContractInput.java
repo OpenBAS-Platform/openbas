@@ -1,6 +1,7 @@
 package io.openbas.rest.injector_contract.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,7 +42,7 @@ public class InjectorContractInput {
 
     @Getter
     @JsonProperty("contract_platforms")
-    private String[] platforms = new String[0];
+    private PLATFORM_TYPE[] platforms = new PLATFORM_TYPE[0];
 
     public void setId(String id) {
         this.id = id;
@@ -71,7 +72,7 @@ public class InjectorContractInput {
         isAtomicTesting = atomicTesting;
     }
 
-    public void setPlatforms(String[] platforms) {
+    public void setPlatforms(PLATFORM_TYPE[] platforms) {
         this.platforms = platforms;
     }
 }

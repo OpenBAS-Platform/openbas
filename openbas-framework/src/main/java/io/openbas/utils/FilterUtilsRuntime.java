@@ -14,13 +14,16 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
-import static io.openbas.database.model.Filters.FilterMode.and;
-import static io.openbas.database.model.Filters.FilterMode.or;
+import static io.openbas.database.model.Filters.FilterMode.*;
 import static io.openbas.utils.schema.SchemaUtils.getFilterableProperties;
 import static io.openbas.utils.schema.SchemaUtils.retrieveProperty;
 import static org.springframework.util.StringUtils.hasText;
 
 public class FilterUtilsRuntime {
+
+  private FilterUtilsRuntime() {
+
+  }
 
   private static final Predicate<Object> EMPTY_PREDICATE = (value) -> true;
 
@@ -141,6 +144,10 @@ public class FilterUtilsRuntime {
       return OperationUtilsRuntime::startWithTexts;
     } else if (operator.equals(FilterOperator.not_eq)) {
       return OperationUtilsRuntime::notEqualsTexts;
+    } else if (operator.equals(FilterOperator.empty)) {
+      return (value, texts) -> OperationUtilsRuntime.empty(value);
+    } else if (operator.equals(FilterOperator.not_empty)) {
+      return (value, texts) -> OperationUtilsRuntime.notEmpty(value);
     } else { // Default case
       return OperationUtilsRuntime::equalsTexts;
     }

@@ -7,13 +7,14 @@ import type { InjectResultDTO, SearchPaginationInput } from '../../../utils/api-
 import AtomicTestingResult from './atomic_testing/AtomicTestingResult';
 import ItemTargets from '../../../components/ItemTargets';
 import Empty from '../../../components/Empty';
-import { initSorting, type Page } from '../../../components/common/pagination/Page';
+import { initSorting, type Page } from '../../../components/common/queryable/Page';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
 import InjectorContract from '../common/injects/InjectorContract';
 import ItemStatus from '../../../components/ItemStatus';
 import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
 import { isNotEmptyField } from '../../../utils/utils';
+import { buildSearchPagination } from '../../../components/common/queryable/useQueryable';
 
 const useStyles = makeStyles(() => ({
   bodyItems: {
@@ -82,9 +83,9 @@ const InjectList: FunctionComponent<Props> = ({
 
   // Filter and sort hook
   const [injects, setInjects] = useState<InjectResultDTO[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
     sorts: initSorting('inject_updated_at', 'DESC'),
-  });
+  }));
 
   // Fetch injects on initial render and when pagination input changes
   useEffect(() => {

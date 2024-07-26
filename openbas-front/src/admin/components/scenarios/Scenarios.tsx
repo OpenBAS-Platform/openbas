@@ -10,24 +10,25 @@ import { fetchScenarioStatistic, searchScenarios } from '../../../actions/scenar
 import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import ScenarioCreation from './ScenarioCreation';
 import Breadcrumbs from '../../../components/Breadcrumbs';
-import { initSorting } from '../../../components/common/pagination/Page';
+import { initSorting } from '../../../components/common/queryable/Page';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
-import type { FilterGroup, ScenarioStatistic } from '../../../utils/api-types';
+import type { FilterGroup, ScenarioStatistic, SearchPaginationInput } from '../../../utils/api-types';
 import ItemTags from '../../../components/ItemTags';
 import ItemSeverity from '../../../components/ItemSeverity';
 import PlatformIcon from '../../../components/PlatformIcon';
 import ItemCategory from '../../../components/ItemCategory';
 import type { Theme } from '../../../components/Theme';
 import ImportUploaderScenario from './ImportUploaderScenario';
-import { buildEmptyFilter } from '../../../components/common/filter/FilterUtils';
+import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
 import { scenarioCategories } from './ScenarioForm';
 import ScenarioStatus from './scenario/ScenarioStatus';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../actions/Tag';
 import { useAppDispatch } from '../../../utils/hooks';
-import usePaginationAndFilter from '../../../components/common/usePaginationAndFilter';
+import { buildSearchPagination } from '../../../components/common/queryable/useQueryable';
 import ScenarioPopover from './scenario/ScenarioPopover';
+import useFiltersState from '../../../components/common/queryable/filter/useFiltersState';
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -124,9 +125,14 @@ const Scenarios = () => {
     mode: 'and',
     filters: [buildEmptyFilter(CATEGORY_FILTER_KEY, 'eq')],
   };
-  const { filterGroup, helpers, searchPaginationInput, setSearchPaginationInput } = usePaginationAndFilter(scenarioFilter, {
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
     sorts: initSorting('scenario_updated_at', 'DESC'),
-  });
+    filterGroup: scenarioFilter,
+  }));
+  const [filterGroup, helpers] = useFiltersState(searchPaginationInput.filterGroup, (f: FilterGroup) => setSearchPaginationInput({
+    ...searchPaginationInput,
+    filterGroup: f,
+  }));
 
   const handleOnClickCategory = (category?: string) => {
     if (!category) {

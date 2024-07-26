@@ -4,6 +4,7 @@ import io.openbas.database.model.Filters.FilterGroup;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,9 +20,11 @@ import java.util.List;
 public class SearchPaginationInput {
 
   @Schema(description = "Page number to get")
+  @NotNull
   @Min(0) int page = 0;
 
   @Schema(description = "Element number by page")
+  @NotNull
   @Max(1000) int size = 20;
 
   @Schema(description = "Filter object to search within filterable attributes")

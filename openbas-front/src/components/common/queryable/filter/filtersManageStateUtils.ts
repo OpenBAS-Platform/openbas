@@ -1,4 +1,4 @@
-import type { Filter, FilterGroup } from '../../../utils/api-types';
+import type { Filter, FilterGroup } from '../../../../utils/api-types';
 import { isExistFilter } from './FilterUtils';
 
 const updateFilters = (filters: FilterGroup, updateFn: (filter: Filter) => Filter): FilterGroup => {
@@ -37,7 +37,7 @@ export const handleAddMultipleValueFilterUtil = (filters: FilterGroup, key: stri
 };
 
 export const handleChangeOperatorFiltersUtil = (filters: FilterGroup, key: string, operator: Filter['operator']) => {
-  return updateFilters(filters, (f) => (f.key === key ? { ...f, operator } : f));
+  return updateFilters(filters, (f) => (f.key === key ? { ...f, operator, values: [] } : f));
 };
 
 export const handleRemoveFilterUtil = (filters: FilterGroup, key: string) => {

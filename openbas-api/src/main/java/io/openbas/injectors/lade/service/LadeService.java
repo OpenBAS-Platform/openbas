@@ -235,7 +235,7 @@ public class LadeService {
                     }
                 });
                 Contract contractInstance = executableContract(contractConfig,
-                        identifier, Map.of(en, contractName), builder.build(), List.of(Endpoint.PLATFORM_TYPE.Service.name()), false);
+                        identifier, Map.of(en, contractName), builder.build(), List.of(Endpoint.PLATFORM_TYPE.Service), false);
                 contractInstance.addContext("lade_type", "action");
                 contractInstance.addContext("bundle_identifier", bundleIdentifier);
                 contracts.add(contractInstance);
@@ -253,7 +253,7 @@ public class LadeService {
             String qualifier = jsonNode.get("qualifier") != null ? "( " + jsonNode.get("qualifier").asText() + ")" : "";
             String bundleIdentifier = jsonNode.get("bundle_identifier").asText();
             Contract contractInstance = executableContract(contractConfig,
-                    identifier, Map.of(en, contractName + qualifier), builder.build(), List.of(Endpoint.PLATFORM_TYPE.Service.name()), false);
+                    identifier, Map.of(en, contractName + qualifier), builder.build(), List.of(Endpoint.PLATFORM_TYPE.Service), false);
             contractInstance.addContext("lade_type", "scenario");
             contractInstance.addContext("bundle_identifier", bundleIdentifier);
             contracts.add(contractInstance);
