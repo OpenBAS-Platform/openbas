@@ -32,6 +32,7 @@ public class PropertySchema {
   private final boolean searchable;
   private final boolean filterable;
   private final List<String> availableValues;
+  private final boolean dynamicValues;
   private final boolean sortable;
   private final String propertyRepresentative;
 

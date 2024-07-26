@@ -26,9 +26,10 @@ import { fetchScenarioExercises, searchScenarioExercises } from '../../../../act
 import type { Theme } from '../../../../components/Theme';
 import { isEmptyField } from '../../../../utils/utils';
 import type { EndpointStore } from '../../assets/endpoints/Endpoint';
-import { initSorting } from '../../../../components/common/pagination/Page';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import ExerciseList from '../../simulations/ExerciseList';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
+import { buildSearchPagination } from '../../../../components/common/queryable/useQueryable';
 import ExercisePopover from '../../simulations/simulation/ExercisePopover';
 
 // Deprecated - https://mui.com/system/styles/basics/
@@ -74,9 +75,9 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
 
   // Exercises
   const [exercises, setExercises] = useState<EndpointStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
     sorts: initSorting('exercise_start_date'),
-  });
+  }));
   const secondaryAction = (exercise: ExerciseStore) => (
     <ExercisePopover
       exercise={exercise}
@@ -85,7 +86,6 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
       inList
     />
   );
-
   return (
     <>
       <Grid

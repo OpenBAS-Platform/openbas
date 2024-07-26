@@ -15,7 +15,7 @@ import AssetStatus from '../AssetStatus';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
-import { initSorting } from '../../../../components/common/pagination/Page';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import type { SearchPaginationInput } from '../../../../utils/api-types';
 import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import PlatformIcon from '../../../../components/PlatformIcon';
@@ -23,6 +23,7 @@ import type { ExecutorHelper } from '../../../../actions/executors/executor-help
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchExecutors } from '../../../../actions/Executor';
 import { fetchTags } from '../../../../actions/Tag';
+import { buildSearchPagination } from '../../../../components/common/queryable/useQueryable';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -108,10 +109,10 @@ const Endpoints = () => {
   ];
 
   const [endpoints, setEndpoints] = useState<EndpointStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
     sorts: initSorting('asset_name'),
     textSearch: search,
-  });
+  }));
 
   // Export
   const exportProps = {

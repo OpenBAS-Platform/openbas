@@ -1,13 +1,7 @@
 package io.openbas.migration;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.hypersistence.utils.hibernate.type.array.StringArrayType;
-import io.openbas.annotation.Queryable;
-import jakarta.persistence.Column;
-import lombok.Getter;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
-import org.hibernate.annotations.Type;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;

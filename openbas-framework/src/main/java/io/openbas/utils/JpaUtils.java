@@ -16,8 +16,7 @@ public class JpaUtils {
 
   public static <T> Expression<String> toPath(
       @NotNull final PropertySchema propertySchema,
-      @NotNull final Root<T> root,
-      @NotNull final CriteriaBuilder cb) {
+      @NotNull final Root<T> root) {
     // Join
     if (propertySchema.getJoinTable() != null) {
       PropertySchema.JoinTable joinTable = propertySchema.getJoinTable();

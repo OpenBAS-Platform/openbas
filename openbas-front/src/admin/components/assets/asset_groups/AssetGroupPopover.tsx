@@ -14,7 +14,7 @@ import AssetGroupForm from './AssetGroupForm';
 import AssetGroupManagement from './AssetGroupManagement';
 import Dialog from '../../../../components/common/Dialog';
 import EndpointsDialogAdding from '../endpoints/EndpointsDialogAdding';
-import { emptyFilterGroup } from '../../../../components/common/filter/FilterUtils';
+import { emptyFilterGroup } from '../../../../components/common/queryable/filter/FilterUtils';
 
 const useStyles = makeStyles(() => ({
   drawerPaper: {

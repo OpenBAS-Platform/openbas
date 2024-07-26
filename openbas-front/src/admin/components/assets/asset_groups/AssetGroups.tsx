@@ -16,12 +16,13 @@ import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { SearchPaginationInput } from '../../../../utils/api-types';
-import { initSorting } from '../../../../components/common/pagination/Page';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
-import { convertOperatorToIcon } from '../../../../components/common/filter/FilterUtils';
+import { convertOperatorToIcon } from '../../../../components/common/queryable/filter/FilterUtils';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { fetchTags } from '../../../../actions/Tag';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { buildSearchPagination } from '../../../../components/common/queryable/useQueryable';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -98,10 +99,10 @@ const AssetGroups = () => {
   ];
 
   const [assetGroups, setAssetGroups] = useState<AssetGroupStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
     sorts: initSorting('asset_group_name'),
     textSearch: search,
-  });
+  }));
 
   // Export
   const exportProps = {

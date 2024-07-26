@@ -1,8 +1,8 @@
-import { simpleCall } from '../../utils/Action';
+import { simplePostCall } from '../../utils/Action';
 
-const filterableProperties = (clazz: string) => {
+const filterableProperties = (clazz: string, filterNames: string[] = []) => {
   const uri = `/api/schemas/${clazz}?filterableOnly=${true}`;
-  return simpleCall(uri);
+  return simplePostCall(uri, filterNames);
 };
 
 export default filterableProperties;

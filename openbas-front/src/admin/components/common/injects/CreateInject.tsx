@@ -2,15 +2,15 @@ import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { Chip, Grid, List, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { KeyboardArrowRight } from '@mui/icons-material';
+import * as qs from 'qs';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import { useFormatter } from '../../../../components/i18n';
-import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
 import computeAttackPatterns from '../../../../utils/injector_contract/InjectorContractUtils';
 import type { FilterGroup, Inject, InjectorContractOutput, SearchPaginationInput } from '../../../../utils/api-types';
-import { initSorting } from '../../../../components/common/pagination/Page';
-import useFiltersState from '../../../../components/common/filter/useFiltersState';
-import { emptyFilterGroup } from '../../../../components/common/filter/FilterUtils';
+import { initSorting } from '../../../../components/common/queryable/Page';
+import { emptyFilterGroup } from '../../../../components/common/queryable/filter/FilterUtils';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
@@ -25,6 +25,9 @@ import PlatformIcon from '../../../../components/PlatformIcon';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import { isNotEmptyField } from '../../../../utils/utils';
+import FilterField from '../../../../components/common/queryable/filter/FilterField';
+import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
+import useQueryable from '../../../../components/common/queryable/useQueryable';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -69,9 +72,9 @@ const inlineStyles = {
 };
 
 interface Props {
-  title: string
-  onCreateInject: (data: Inject) => Promise<void>
-  isAtomic?: boolean
+  title: string;
+  onCreateInject: (data: Inject) => Promise<void>;
+  isAtomic?: boolean;
 }
 
 const atomicFilter: FilterGroup = {
@@ -91,6 +94,8 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
   const drawerRef = useRef(null);
   const dispatch = useAppDispatch();
   const { t, tPick } = useFormatter();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Fetching data
   const { attackPatterns, attackPatternsMap, killChainPhasesMap } = useHelper((helper: AttackPatternHelper & KillChainPhaseHelper & InjectorHelper) => ({
@@ -108,15 +113,26 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
   // as we don't know the type of the content of a contract we need to put any here
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [parsedContentContracts, setParsedContentContracts] = useState<any[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
-    sorts: initSorting('injector_contract_labels'),
-    filterGroup: isAtomic ? atomicFilter : emptyFilterGroup,
-    size: 100,
-  });
-  const [filterGroup, helpers] = useFiltersState(isAtomic ? atomicFilter : emptyFilterGroup, (f: FilterGroup) => setSearchPaginationInput({
-    ...searchPaginationInput,
-    filterGroup: f,
-  }));
+  const initSearchPaginationInput = () => {
+    const params = location.search?.startsWith('?') ? location.search.substring(1) : '';
+    const paramsJson = qs.parse(params) as unknown as SearchPaginationInput;
+    if (paramsJson) {
+      return paramsJson;
+    }
+    return ({
+      sorts: initSorting('injector_contract_labels'),
+      filterGroup: isAtomic ? atomicFilter : emptyFilterGroup,
+      size: 100,
+      page: 0,
+    });
+  };
+
+  const { queryableHelpers, searchPaginationInput } = useQueryable('injector-contracts', initSearchPaginationInput());
+
+  useEffect(() => {
+    const params = qs.stringify(searchPaginationInput);
+    navigate(`?${params}`);
+  }, [searchPaginationInput]);
   const [selectedContract, setSelectedContract] = useState<number | null>(null);
   const selectContract = (contract: number) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -154,20 +170,26 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
         PaperProps={{
           ref: drawerRef,
         }}
-        disableEnforceFocus={true}
+        disableEnforceFocus
       >
         <Grid container spacing={3}>
           <Grid item xs={7} style={{ paddingTop: 30 }}>
-            <PaginationComponent
+            <PaginationComponentV2
               fetch={searchInjectorContracts}
               searchPaginationInput={searchPaginationInput}
               setContent={setContracts}
               entityPrefix="injector_contract"
-              availableFilters={['injector_contract_kill_chain_phases', 'injector_contract_attack_patterns']}
-              helpers={helpers}
-              filterGroup={filterGroup}
+              availableFilters={['injector_contract_attack_patterns']}
+              queryableHelpers={queryableHelpers}
               disablePagination
               attackPatterns={attackPatterns}
+            />
+            <FilterField
+              clazz="InjectorContract"
+              availableFilterNames={['injector_contract_platforms', 'injector_contract_injector', 'injector_contract_kill_chain_phases']}
+              filterGroup={searchPaginationInput.filterGroup ?? emptyFilterGroup}
+              helpers={queryableHelpers.filterHelpers}
+              style={{ marginTop: 20 }}
             />
             <List>
               {contracts.map((contract, index) => {
@@ -185,7 +207,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
                   >
                     <ListItemIcon>
                       <InjectIcon
-                        variant="list"type={contract.injector_contract_payload_type ?? contract.injector_contract_injector_type}
+                        variant="list" type={contract.injector_contract_payload_type ?? contract.injector_contract_injector_type}
                         isPayload={isNotEmptyField(contract.injector_contract_payload_type)}
                       />
                     </ListItemIcon>

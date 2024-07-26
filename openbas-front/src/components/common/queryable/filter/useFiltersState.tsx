@@ -9,15 +9,15 @@ import {
   handleRemoveFilterUtil,
   handleSwitchMode,
 } from './filtersManageStateUtils';
-import type { Filter, FilterGroup } from '../../../utils/api-types';
+import type { Filter, FilterGroup } from '../../../../utils/api-types';
 
-interface useFiltersStateProps {
+interface Props {
   filters: FilterGroup,
   latestAddFilterId?: string
 }
 
 const useFiltersState = (initFilters: FilterGroup = emptyFilterGroup, onChange?: (value: FilterGroup) => void): [FilterGroup, FilterHelpers] => {
-  const [filtersState, setFiltersState] = useState<useFiltersStateProps>({
+  const [filtersState, setFiltersState] = useState<Props>({
     filters: initFilters,
   });
   const helpers: FilterHelpers = {

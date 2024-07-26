@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
 public @interface Queryable {
   boolean searchable() default false;
   boolean filterable() default false;
+  boolean dynamicValues() default false;
   boolean sortable() default false;
   String property() default "";
 }

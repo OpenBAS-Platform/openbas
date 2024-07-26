@@ -6,12 +6,13 @@ import ExerciseCreation from './simulation/ExerciseCreation';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
 import type { UserHelper } from '../../../actions/helper';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
-import { initSorting } from '../../../components/common/pagination/Page';
+import { initSorting } from '../../../components/common/queryable/Page';
 import type { SearchPaginationInput } from '../../../utils/api-types';
 import type { EndpointStore } from '../assets/endpoints/Endpoint';
 import ExerciseList from './ExerciseList';
 import { searchExercises } from '../../../actions/Exercise';
 import ImportUploaderExercise from './ImportUploaderExercise';
+import { buildSearchPagination } from '../../../components/common/queryable/useQueryable';
 import ExercisePopover from './simulation/ExercisePopover';
 import type { ExerciseStore } from '../../../actions/exercises/Exercise';
 
@@ -25,9 +26,9 @@ const Exercises = () => {
   }));
 
   const [exercises, setExercises] = useState<EndpointStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
     sorts: initSorting('exercise_updated_at', 'DESC'),
-  });
+  }));
 
   // Export
   const exportProps = {

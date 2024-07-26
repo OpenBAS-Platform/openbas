@@ -21,11 +21,14 @@ public class PropertySchemaDTO {
   private boolean isArray;
   @JsonProperty("schema_property_values")
   private List<String> values;
+  @JsonProperty("schema_property_has_dynamic_value")
+  private boolean dynamicValues;
 
   public PropertySchemaDTO(@NotNull final PropertySchema propertySchema) {
     this.setJsonName(propertySchema.getJsonName());
     this.setArray(propertySchema.getType().isArray());
     this.setValues(propertySchema.getAvailableValues());
+    this.setDynamicValues(propertySchema.isDynamicValues());
   }
 
 }

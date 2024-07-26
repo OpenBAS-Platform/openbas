@@ -2,10 +2,10 @@ import React, { FunctionComponent } from 'react';
 import { Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FilterHelpers } from './FilterHelpers';
-import type { Filter, FilterGroup, PropertySchemaDTO } from '../../../utils/api-types';
+import type { Filter, FilterGroup, PropertySchemaDTO } from '../../../../utils/api-types';
 import FilterChip from './FilterChip';
-import { useFormatter } from '../../i18n';
-import type { Theme } from '../../Theme';
+import { useFormatter } from '../../../i18n';
+import type { Theme } from '../../../Theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   mode: {
@@ -24,16 +24,18 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  filterGroup: FilterGroup;
-  helpers: FilterHelpers;
   propertySchemas: PropertySchemaDTO[];
+  filterGroup: FilterGroup;
+  availableFilterNames?: string[];
+  helpers: FilterHelpers;
   pristine: boolean;
 }
 
 const FilterChips: FunctionComponent<Props> = ({
-  filterGroup,
-  helpers,
   propertySchemas,
+  filterGroup,
+  availableFilterNames = [],
+  helpers,
   pristine,
 }) => {
   // Standard hooks
@@ -44,9 +46,7 @@ const FilterChips: FunctionComponent<Props> = ({
     return propertySchemas.find((p) => p.schema_property_name === filter.key);
   };
 
-  const handleSwitchMode = () => {
-    helpers.handleSwitchMode();
-  };
+  const handleSwitchMode = () => helpers.handleSwitchMode();
 
   return (
     <Box
@@ -57,29 +57,27 @@ const FilterChips: FunctionComponent<Props> = ({
         gap: 1,
       }}
     >
-      {filterGroup.filters?.map((filter, idx) => {
-        const property = propertySchema(filter);
-        if (!property) {
-          return (<></>);
-        }
-        return (
-          <React.Fragment key={filter.key}>
-            {idx !== 0
-              && <div
-                onClick={handleSwitchMode}
-                className={classes.mode}
-                 >
-                {t(filterGroup.mode.toUpperCase())}
-              </div>}
-            <FilterChip
-              filter={filter}
-              helpers={helpers}
-              propertySchema={property}
-              pristine={pristine}
-            />
-          </React.Fragment>
-        );
-      })
+      {filterGroup.filters?.filter((f) => availableFilterNames.length === 0 || availableFilterNames.includes(f.key))
+        .map((filter, idx) => {
+          const property = propertySchema(filter);
+          if (!property) {
+            return (<React.Fragment key={filter.key}></React.Fragment>);
+          }
+          return (
+            <React.Fragment key={filter.key}>
+              {idx !== 0
+                && <div onClick={handleSwitchMode} className={classes.mode}>
+                  {t(filterGroup.mode.toUpperCase())}
+                </div>}
+              <FilterChip
+                filter={filter}
+                helpers={helpers}
+                propertySchema={property}
+                pristine={pristine}
+              />
+            </React.Fragment>
+          );
+        })
       }
     </Box>
   );
