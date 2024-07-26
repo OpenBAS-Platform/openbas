@@ -12,14 +12,14 @@ import AtomicTestingDetail from '../../../atomic_testings/atomic_testing/AtomicT
 import type { Exercise as ExerciseType, InjectResultDTO } from '../../../../../utils/api-types';
 import { PermissionsContext, PermissionsContextType } from '../../../common/Context';
 import { usePermissions } from '../../../../../utils/Exercise';
-import Breadcrumbs from '../../../../../components/Breadcrumbs';
+import Breadcrumbs, { BreadcrumbsElement } from '../../../../../components/Breadcrumbs';
 import { useHelper } from '../../../../../store';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchExercise } from '../../../../../actions/Exercise';
 import { fetchInjectResultDto } from '../../../../../actions/atomic_testings/atomic-testing-actions';
 import { InjectResultDtoContext } from '../../../atomic_testings/InjectResultDtoContext';
-import ExerciseHeader from '../ExerciseHeader';
+import InjectHeader from '../../../injects/InjectHeader';
 
 const useStyles = makeStyles(() => ({
   item: {
@@ -58,17 +58,21 @@ const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType, injectRe
     setInjectResultDto(newData);
   };
 
+  const breadcrumbs: BreadcrumbsElement[] = [
+    { label: t('Simulations'), link: '/admin/exercises' },
+    { label: t(exercise.exercise_name), link: `/admin/exercises/${exercise.exercise_id}` },
+  ];
+  if (backlabel && backuri) {
+    breadcrumbs.push({ label: backlabel, link: backuri });
+  }
+  breadcrumbs.push({ label: t('Injects') });
+  breadcrumbs.push({ label: injectResultDto.inject_title, current: true });
+
   return (
     <InjectResultDtoContext.Provider value={{ injectResultDto, updateInjectResultDto }}>
       <PermissionsContext.Provider value={permissionsContext}>
-        <Breadcrumbs variant="object" elements={[
-          { label: t('Simulations'), link: '/admin/exercises' },
-          { label: backlabel ?? t(exercise.exercise_name), link: backuri ?? `/admin/exercises/${exercise.exercise_id}` },
-          { label: t('Injects') },
-          { label: injectResultDto.inject_title, current: true },
-        ]}
-        />
-        <ExerciseHeader />
+        <Breadcrumbs variant="object" elements={breadcrumbs} />
+        <InjectHeader inject={injectResult} />
         <Box
           sx={{
             borderBottom: 1,
