@@ -1,14 +1,22 @@
-import React, {FunctionComponent, useCallback, useEffect, useRef, useState} from 'react';
+import React, {FunctionComponent, useEffect, useRef, useState} from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import * as R from 'ramda';
 import type { InjectStore } from '../actions/injects/Inject';
 import type { Theme } from './Theme';
 import { useFormatter } from './i18n';
-import {MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow, reconnectEdge} from "reactflow";
+import {
+  MarkerType,
+  ReactFlow,
+  ReactFlowProvider,
+  useEdgesState,
+  useNodesState,
+  useReactFlow,
+  reconnectEdge,
+  Background, BackgroundVariant, ViewportPortal, Connection, Edge, Node
+} from "@xyflow/react";
 import nodeTypes from "./nodes";
 import {useAutoLayoutInject, LayoutOptions} from "../utils/flows/useAutoLayout";
-import {Connection} from "@reactflow/core/dist/esm/types";
-import {Edge} from "@reactflow/core/dist/esm/types/edges";
+import {CustomTimelineBackground} from "./CustomTimelineBackground";
+import {NodeInject} from "./nodes/NodeInject";
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -92,8 +100,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
   const classes = useStyles();
   const theme = useTheme<Theme>();
   const { t } = useFormatter();
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<NodeInject>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [injectsToShow, setInjectsToShow] = useState<InjectStore[]>([]);
 
   // Flow
@@ -163,7 +171,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
     if (!reconnectDone.current) {
       setEdges((eds) => eds.filter((e) => e.id !== edge.id));
       onConnectInjects({
-        target: null,
+        target: "",
         source: edge.source,
         sourceHandle: null,
         targetHandle: null,
@@ -185,12 +193,24 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
                 nodesConnectable={onConnectInjects !== undefined}
                 nodesFocusable={false}
                 elementsSelectable={false}
-                onEdgeUpdate={edgeUpdate}
-                onEdgeUpdateStart={edgeUpdateStart}
-                onEdgeUpdateEnd={edgeUpdateEnd}
+                //onEdgeUpdate={edgeUpdate}
+                //onEdgeUpdateStart={edgeUpdateStart}
+                //onEdgeUpdateEnd={edgeUpdateEnd}
                 defaultEdgeOptions={defaultEdgeOptions}
                 proOptions={proOptions}
-            />
+                translateExtent={[[-3000, -3000], [3000, 3000]]}
+                nodeExtent={[[-2000, -2000], [2000, 2000]]}
+            >
+              <CustomTimelineBackground>
+              </CustomTimelineBackground>
+              <ViewportPortal>
+                <div
+                    style={{ transform: 'translate(100px, 100px)', position: 'absolute' }}
+                >
+                  This div is positioned at [100, 100] on the flow.
+                </div>
+              </ViewportPortal>
+            </ReactFlow>
           </div>
       ) : null
         }

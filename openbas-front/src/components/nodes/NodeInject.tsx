@@ -1,9 +1,10 @@
 import React, { memo } from 'react';
-import { Handle, NodeProps, Position } from 'reactflow';
+import { Handle, NodeProps, Position, Node } from "@xyflow/react";
 import { makeStyles } from '@mui/styles';
 import { Tooltip } from '@mui/material';
 import { FlagOutlined, HelpOutlined, ModeStandbyOutlined, ScoreOutlined } from '@mui/icons-material';
 import {Theme} from "../Theme";
+import {OnConnect} from "reactflow";
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -57,7 +58,19 @@ const renderIcon = (icon: string) => {
   }
 };
 
-const NodeInject = ({ data }: NodeProps) => {
+export type NodeInject = Node<{
+  background?: string,
+  color?: string,
+  key: string,
+  label: string,
+  description: string,
+  isTargeted: boolean,
+  isTargeting: boolean,
+  onConnectInjects?: OnConnect
+  }
+>;
+
+const NodeInject = ({ data }: NodeProps<NodeInject>) => {
   const classes = useStyles();
   return (
     <div className={classes.node} style={{ backgroundColor: data.background, color: data.color }}>

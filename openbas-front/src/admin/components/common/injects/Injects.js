@@ -33,7 +33,6 @@ import { InjectContext, PermissionsContext } from '../Context';
 import CreateInject from './CreateInject';
 import UpdateInject from './UpdateInject';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import Timeline from '../../../../components/Timeline';
 import ChainedTimeline from '../../../../components/ChainedTimeline';
 import { isNotEmptyField } from '../../../../utils/utils';
 import ImportUploaderInjectFromXls from './ImportUploaderInjectFromXls';
@@ -207,7 +206,6 @@ const Injects = (props) => {
   );
   const { permissions } = useContext(PermissionsContext);
   const injectContext = useContext(InjectContext);
-  const [chainMode, setChainMode] = useState('chaining');
 
   // Filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
@@ -377,18 +375,10 @@ const Injects = (props) => {
         {showTimeline && isAtLeastOneValidInject (
         <div style={{ marginBottom: 50 }}>
           <div>
-            {chainMode !== "chaining" ? (
-              <Timeline
+            <ChainedTimeline
                 injects={sortedInjects}
-                onSelectInject={(id) => setSelectedInjectId(id)}
-                teams={teams}
-              />
-                ) : (
-                <ChainedTimeline
-                    injects={sortedInjects}
-                    onConnectInjects={onConnectInjects}
-                />
-            )}
+                onConnectInjects={onConnectInjects}
+            />
             <div className="clearfix"/>
           </div>
         </div>
