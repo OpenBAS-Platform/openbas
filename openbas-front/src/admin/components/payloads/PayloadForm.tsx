@@ -65,7 +65,7 @@ const PayloadForm: FunctionComponent<Props> = ({
   const payloadPrerequisiteZodObject = z.object({
     executor: z.string().min(1, { message: t('Should not be empty') }),
     get_command: z.string().min(1, { message: t('Should not be empty') }),
-    description: z.string().optional(),
+    description: z.string().nullish(),
     check_command: z.string().optional(),
   });
 
@@ -73,7 +73,7 @@ const PayloadForm: FunctionComponent<Props> = ({
     default_value: z.string().min(1, { message: t('Should not be empty') }),
     key: z.string().min(1, { message: t('Should not be empty') }),
     type: z.string().min(1, { message: t('Should not be empty') }),
-    description: z.string().optional(),
+    description: z.string().nullish(),
   });
 
   const baseSchema = z.object({
@@ -86,7 +86,6 @@ const PayloadForm: FunctionComponent<Props> = ({
     payload_attack_patterns: z.string().array().optional(),
     payload_cleanup_command: z.string().optional(),
     payload_cleanup_executor: z.string().optional(),
-    dns_resolution_hostname: z.string().optional(),
     payload_tags: z.string().array().optional(),
     payload_arguments: z.array(payloadArgumentZodObject).optional(),
     payload_prerequisites: z.array(payloadPrerequisiteZodObject).optional(),
@@ -112,6 +111,11 @@ const PayloadForm: FunctionComponent<Props> = ({
     case 'FileDrop':
       extendedSchema = baseSchema.extend({
         file_drop_file: z.string().min(1, { message: t('Should not be empty') }),
+      });
+      break;
+    case 'DnsResolution':
+      extendedSchema = baseSchema.extend({
+        dns_resolution_hostname: z.string().min(1, { message: t('Should not be empty') }),
       });
       break;
     default:
@@ -173,8 +177,8 @@ const PayloadForm: FunctionComponent<Props> = ({
 
       <TextField
         name="payload_description"
-        multiline={true}
-        fullWidth={true}
+        multiline
+        fullWidth
         rows={3}
         label={t('Description')}
         style={{ marginTop: 20 }}
@@ -211,8 +215,8 @@ const PayloadForm: FunctionComponent<Props> = ({
           </SelectField>
           <TextField
             name="command_content"
-            multiline={true}
-            fullWidth={true}
+            multiline
+            fullWidth
             rows={3}
             label={t('Command')}
             style={{ marginTop: 20 }}
@@ -251,12 +255,13 @@ const PayloadForm: FunctionComponent<Props> = ({
               name="file_drop_file"
               label={t('File to drop')}
               setFieldValue={(_name, document) => {
-                onChange(document);
+                onChange(document?.id);
               }}
-              initialValue={{ id: initialValues.executable_file?.id }}
+              initialValue={{ id: initialValues.file_drop_file }}
               InputLabelProps={{ required: true }}
               error={!!errors.file_drop_file}
             />
+
           )}
         />
       )}
@@ -266,8 +271,8 @@ const PayloadForm: FunctionComponent<Props> = ({
             name="dns_resolution_hostname"
             label={t('Hostname')}
             style={{ marginTop: 20 }}
-            multiline={true}
-            fullWidth={true}
+            multiline
+            fullWidth
             rows={3}
             error={!!errors.dns_resolution_hostname}
             helperText={t('One hostname by line')}
@@ -453,8 +458,8 @@ const PayloadForm: FunctionComponent<Props> = ({
         </MenuItem>
       </SelectField>
       <TextField
-        multiline={true}
-        fullWidth={true}
+        multiline
+        fullWidth
         rows={3}
         label={t('Cleanup command')}
         style={{ marginTop: 20 }}
