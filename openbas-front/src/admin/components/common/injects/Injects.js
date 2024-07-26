@@ -496,7 +496,7 @@ const Injects = (props) => {
                             config={injectContract?.config}
                             label={injectorContractName}
                           />
-                        ) : <InjectorContract variant="list" label={t('Deleted')} deleted={true} />
+                        ) : <InjectorContract variant="list" label={t('Deleted')} deleted/>
                         }
                       </div>
                       <div
