@@ -105,6 +105,12 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
     return onToggleEntity(currentEntity, event);
   };
 
+  const injectsToProcess = selectAll
+    ? injects.filter((inject: Inject) => !R.keys(deSelectedElements).includes(inject.inject_id))
+    : injects.filter(
+      (inject: Inject) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id),
+    );
+
   const massUpdateInjects = async (actions: { field: string, type: string, values: { value: string }[] }[]) => {
     const updateFields = [
       'inject_title',
@@ -122,9 +128,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
       'inject_city',
       'inject_tags',
     ];
-    const injectsToUpdate = selectAll
-      ? injects.filter((inject: Inject) => !R.keys(deSelectedElements).includes(inject.inject_id))
-      : injects.filter((inject: Inject) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id));
+    const injectsToUpdate = injectsToProcess.filter((inject: Inject) => inject.inject_injector_contract?.convertedContent);
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < actions.length; i++) {
       const action = actions[i];
@@ -134,7 +138,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
         switch (action.type) {
           case 'ADD':
             if (isNotEmptyField(injectToUpdate[`inject_${action.field}`])) {
-              injectToUpdate[`inject_${action.field}`] = R.uniq([...injectToUpdate[`inject_${action.field}`], action.values.map((n) => n.value)]);
+              injectToUpdate[`inject_${action.field}`] = R.uniq([...injectToUpdate[`inject_${action.field}`], ...action.values.map((n) => n.value)]);
             } else {
               injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map((n) => n.value));
             }
@@ -160,6 +164,10 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
         }
       }
     }
+  };
+
+  const bulkDeleteInjects = () => {
+    injectContext.onBulkDeleteInjects(injectsToProcess.map((inject: Inject) => inject.inject_id));
   };
 
   return (
@@ -191,6 +199,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
           context="scenario"
           id={scenario.scenario_id}
           handleUpdate={massUpdateInjects}
+          handleBulkDelete={bulkDeleteInjects}
         />
       </TeamContext.Provider>
     </ArticleContext.Provider>

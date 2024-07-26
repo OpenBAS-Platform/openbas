@@ -42,7 +42,7 @@ const XlsMapperTestDialog: FunctionComponent<IngestionCsvMapperTestDialogProps> 
       open={open}
       handleClose={handleClose}
       title={t('Testing XLS mapper')}
-      maxWidth={'sm'}
+      maxWidth={importId !== null ? 'lg' : 'sm'}
     >
       <>
         {importId === null

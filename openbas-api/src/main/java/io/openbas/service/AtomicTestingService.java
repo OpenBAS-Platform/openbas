@@ -46,9 +46,9 @@ import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.AtomicTestingUtils.*;
-import static io.openbas.utils.Constants.MAX_SIZE_OF_STRING;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.JpaUtils.createLeftJoin;
+import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 
@@ -196,7 +196,7 @@ public class AtomicTestingService {
         Inject injectDuplicate = new Inject();
         injectDuplicate.setUser(injectOrigin.getUser());
         if (isAtomic) {
-            injectDuplicate.setTitle(getNewTitle(injectOrigin));
+            injectDuplicate.setTitle(duplicateString(injectOrigin.getTitle()));
         } else {
             injectDuplicate.setTitle(injectOrigin.getTitle());
         }
@@ -222,15 +222,6 @@ public class AtomicTestingService {
         injectDuplicate.setPayloads(injectOrigin.getPayloads().stream().toList());
         injectDuplicate.setTags(new HashSet<>(injectOrigin.getTags()));
         return injectDuplicate;
-    }
-
-    @NotNull
-    private String getNewTitle(@NotNull Inject injectOrigin) {
-        String newTitle = injectOrigin.getTitle() + " (duplicate)";
-        if (newTitle.length() > MAX_SIZE_OF_STRING) {
-            newTitle = newTitle.substring(0, (MAX_SIZE_OF_STRING - 1) - " (duplicate)".length());
-        }
-        return newTitle;
     }
 
     public InjectResultDTO updateAtomicTestingTags(String injectId, AtomicTestingUpdateTagsInput input) {

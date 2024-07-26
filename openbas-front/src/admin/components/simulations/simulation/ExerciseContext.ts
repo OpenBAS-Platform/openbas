@@ -3,6 +3,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import type { Inject } from '../../../../utils/api-types';
 import {
   addInjectForExercise,
+  bulkDeleteInjectsForExercise,
   deleteInjectForExercise,
   injectDone,
   updateInjectActivationForExercise,
@@ -39,6 +40,9 @@ const injectContextForExercise = (exercise: ExerciseStore) => {
     },
     onDeleteInject(injectId: Inject['inject_id']): void {
       return dispatch(deleteInjectForExercise(exercise.exercise_id, injectId));
+    },
+    onBulkDeleteInjects(injectIds: string[]): void {
+      return dispatch(bulkDeleteInjectsForExercise(exercise.exercise_id, injectIds));
     },
   };
 };

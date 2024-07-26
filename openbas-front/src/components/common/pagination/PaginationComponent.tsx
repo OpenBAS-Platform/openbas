@@ -74,7 +74,7 @@ const PaginationComponent = <T extends object>({
 
   // Pagination
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(ROWS_PER_PAGE_OPTIONS[0]);
+  const [rowsPerPage, setRowsPerPage] = React.useState(searchPaginationInput.size ?? ROWS_PER_PAGE_OPTIONS[0]);
   const [totalElements, setTotalElements] = useState(0);
 
   const handleChangePage = (

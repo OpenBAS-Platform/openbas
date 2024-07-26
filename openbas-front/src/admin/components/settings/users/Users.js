@@ -47,7 +47,7 @@ const useStyles = makeStyles(() => ({
 
 const inlineStyles = {
   user_email: {
-    width: '25%',
+    width: '20%',
   },
   user_firstname: {
     width: '15%',
@@ -56,13 +56,13 @@ const inlineStyles = {
     width: '15%',
   },
   user_organization: {
-    width: '20%',
+    width: '15%',
   },
   user_admin: {
-    width: '12%',
+    width: '10%',
   },
   user_tags: {
-    width: '12%',
+    width: '25%',
   },
 };
 

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { truncate } from '../utils/String';
 
-interface element {
+export interface BreadcrumbsElement {
   label: string;
   link?: string;
   current?: boolean;
@@ -12,7 +12,7 @@ interface element {
 
 interface BreadcrumbsProps {
   variant: 'standard' | 'list' | 'object',
-  elements: element[],
+  elements: BreadcrumbsElement[],
 }
 
 // Deprecated - https://mui.com/system/styles/basics/

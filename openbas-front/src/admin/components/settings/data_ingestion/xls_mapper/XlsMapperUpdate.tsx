@@ -5,13 +5,13 @@ import type { ImportMapperUpdateInput, RawPaginationImportMapper } from '../../.
 import Loader from '../../../../../components/Loader';
 import { ImportMapperStore } from '../../../../../actions/mapper/mapper';
 
-interface XlsFormatterUpdateComponentProps {
+interface XlsMapperUpdateComponentProps {
   xlsMapper: ImportMapperStore;
   onUpdate?: (result: RawPaginationImportMapper) => void;
   handleClose: () => void;
 }
 
-const XlsFormatterUpdateComponent: FunctionComponent<XlsFormatterUpdateComponentProps> = ({
+const XlsMapperUpdateComponent: FunctionComponent<XlsMapperUpdateComponentProps> = ({
   xlsMapper,
   onUpdate,
   handleClose,
@@ -50,13 +50,13 @@ const XlsFormatterUpdateComponent: FunctionComponent<XlsFormatterUpdateComponent
   );
 };
 
-interface XlsFormatterUpdateProps {
+interface XlsMapperUpdateProps {
   xlsMapperId: string;
   onUpdate?: (result: RawPaginationImportMapper) => void;
   handleClose: () => void;
 }
 
-const XlsFormatterUpdate: FunctionComponent<XlsFormatterUpdateProps> = ({
+const XlsMapperUpdate: FunctionComponent<XlsMapperUpdateProps> = ({
   xlsMapperId,
   onUpdate,
   handleClose,
@@ -74,7 +74,7 @@ const XlsFormatterUpdate: FunctionComponent<XlsFormatterUpdateProps> = ({
   }
 
   return (
-    <XlsFormatterUpdateComponent
+    <XlsMapperUpdateComponent
       xlsMapper={xlsMapper}
       onUpdate={onUpdate}
       handleClose={handleClose}
@@ -82,4 +82,4 @@ const XlsFormatterUpdate: FunctionComponent<XlsFormatterUpdateProps> = ({
   );
 };
 
-export default XlsFormatterUpdate;
+export default XlsMapperUpdate;

@@ -19,7 +19,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
@@ -58,13 +57,13 @@ public class ScenarioApi {
 
     @PostMapping(SCENARIO_URI)
     public Scenario createScenario(@Valid @RequestBody final ScenarioInput input) {
-        if (input != null) {
-            Scenario scenario = new Scenario();
-            scenario.setUpdateAttributes(input);
-            scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-            return this.scenarioService.createScenario(scenario);
+        if (input == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Scenario input cannot be null");
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        Scenario scenario = new Scenario();
+        scenario.setUpdateAttributes(input);
+        scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+        return this.scenarioService.createScenario(scenario);
     }
 
     @PostMapping(SCENARIO_URI + "/{scenarioId}")

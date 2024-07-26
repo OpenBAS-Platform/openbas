@@ -75,6 +75,8 @@ export default ({ mode }: { mode: string }) => {
         'd3-hierarchy',
         '@dagrejs/dagre',
         'react-syntax-highlighter',
+        'xlsx',
+        'js-file-download',
       ],
     },
 
