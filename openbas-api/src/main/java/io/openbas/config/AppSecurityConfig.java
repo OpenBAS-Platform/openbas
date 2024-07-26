@@ -221,9 +221,11 @@ public class AppSecurityConfig {
       String lastName) {
     String email = ofNullable(emailAttribute).orElseThrow();
     String rolesAdminConfig = "openbas.provider." + registrationId + ".roles_admin";
+    String allAdminConfig = "openbas.provider." + registrationId + ".all_admin";
     //noinspection unchecked
     List<String> rolesAdmin = this.env.getProperty(rolesAdminConfig, List.class, new ArrayList<String>());
-    boolean isAdmin = rolesAdmin.stream().anyMatch(rolesFromToken::contains);
+    boolean allAdmin = this.env.getProperty(allAdminConfig, Boolean.class, false);
+    boolean isAdmin = allAdmin || rolesAdmin.stream().anyMatch(rolesFromToken::contains);
     if (hasLength(email)) {
       Optional<User> optionalUser = userRepository.findByEmailIgnoreCase(email);
       // If user not exists, create it
@@ -232,7 +234,7 @@ public class AppSecurityConfig {
         createUserInput.setEmail(email);
         createUserInput.setFirstname(firstName);
         createUserInput.setLastname(lastName);
-        if (!rolesAdmin.isEmpty()) {
+        if (allAdmin || !rolesAdmin.isEmpty()) {
           createUserInput.setAdmin(isAdmin);
         }
         return this.userService.createUser(createUserInput, 0);
@@ -241,7 +243,7 @@ public class AppSecurityConfig {
         User currentUser = optionalUser.get();
         currentUser.setFirstname(firstName);
         currentUser.setLastname(lastName);
-        if (!rolesAdmin.isEmpty()) {
+        if (allAdmin || !rolesAdmin.isEmpty()) {
           currentUser.setAdmin(isAdmin);
         }
         return this.userService.updateUser(currentUser);
