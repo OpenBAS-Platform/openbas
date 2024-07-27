@@ -188,6 +188,7 @@ const InjectList: FunctionComponent<Props> = ({
               secondaryAction={
                 <AtomicTestingPopover
                   atomic={injectDto}
+                  actions={['Duplicate', 'Delete']}
                   variantButtonPopover={'icon'}
                 />
                   }

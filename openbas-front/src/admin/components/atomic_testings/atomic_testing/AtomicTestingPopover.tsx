@@ -17,8 +17,11 @@ import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectRes
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import { isNotEmptyField } from '../../../../utils/utils';
 
+type AtomicTestingActionPopover = 'Duplicate' | 'Update' | 'Delete';
+
 interface Props {
   atomic: InjectResultDTO;
+  actions: AtomicTestingActionPopover[];
   openEdit?: boolean;
   setOpenEdit?: (id: string | null) => void;
   variantButtonPopover?: VariantButtonPopover;
@@ -26,6 +29,7 @@ interface Props {
 
 const AtomicTestingPopover: FunctionComponent<Props> = ({
   atomic,
+  actions,
   openEdit,
   setOpenEdit,
   variantButtonPopover,
@@ -90,19 +94,16 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     });
   };
 
-  const entries: PopoverEntry[] = [
-    { label: 'Delete', action: () => setDeletion(true) },
-  ];
-
+  const entries: PopoverEntry[] = [];
   if (atomic.inject_injector_contract !== null) {
-    entries.unshift(
-      {
-        label: 'Update',
-        action: () => (isNotEmptyField(setOpenEdit) ? setOpenEdit(atomic.inject_id) : setEdition(true)),
-      },
-      { label: 'Duplicate', action: () => setDuplicate(true) },
-    );
+    if (actions.includes('Duplicate')) {
+      entries.push({ label: 'Duplicate', action: () => setDuplicate(true) });
+    }
+    if (actions.includes('Update')) {
+      entries.push({ label: 'Update', action: () => (isNotEmptyField(setOpenEdit) ? setOpenEdit(atomic.inject_id) : setEdition(true)) });
+    }
   }
+  if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => setDeletion(true) });
 
   return (
     <>

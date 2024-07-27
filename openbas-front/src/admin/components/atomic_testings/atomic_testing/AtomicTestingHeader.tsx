@@ -91,6 +91,7 @@ const AtomicTestingHeader = () => {
         }
         <AtomicTestingPopover
           atomic={injectResultDto}
+          actions={['Duplicate', 'Update', 'Delete']}
           openEdit={openEditId === injectResultDto.inject_id}
           setOpenEdit={setOpenEditId}
         />
