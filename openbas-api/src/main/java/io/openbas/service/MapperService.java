@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @RequiredArgsConstructor
@@ -176,4 +177,34 @@ public class MapperService {
     });
   }
 
+  public List<ImportMapperAddInput> exportMappers(List<String> idsToExport) {
+    List<ImportMapper> mappersList = StreamSupport.stream(importMapperRepository.findAllById(idsToExport.stream().map(UUID::fromString).toList()).spliterator(), false).toList();
+
+    return mappersList.stream().map(importMapper -> {
+      ImportMapperAddInput importMapperAddInput = new ImportMapperAddInput();
+      importMapperAddInput.setName(importMapper.getName());
+      importMapperAddInput.setInjectTypeColumn(importMapper.getInjectTypeColumn());
+      importMapperAddInput.setImporters(importMapper.getInjectImporters().stream().map(
+        injectImporter -> {
+          InjectImporterAddInput injectImporterAddInput = new InjectImporterAddInput();
+          injectImporterAddInput.setInjectTypeValue(injectImporter.getImportTypeValue());
+          injectImporterAddInput.setInjectorContractId(injectImporter.getInjectorContract().getId());
+          injectImporterAddInput.setRuleAttributes(injectImporter.getRuleAttributes().stream().map(ruleAttribute -> {
+            RuleAttributeAddInput ruleAttributeAddInput = new RuleAttributeAddInput();
+            ruleAttributeAddInput.setColumns(ruleAttribute.getColumns());
+            ruleAttributeAddInput.setName(ruleAttribute.getName());
+            ruleAttributeAddInput.setDefaultValue(ruleAttribute.getDefaultValue());
+            ruleAttributeAddInput.setAdditionalConfig(ruleAttribute.getAdditionalConfig());
+            return ruleAttributeAddInput;
+          }).toList());
+          return injectImporterAddInput;
+        }
+      ).toList());
+      return importMapperAddInput;
+    }).toList();
+  }
+
+  public void importMappers(List<ImportMapperAddInput> mappers) {
+    importMapperRepository.saveAll(mappers.stream().map(this::createImportMapper).toList());
+  }
 }
