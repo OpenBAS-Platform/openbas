@@ -43,10 +43,9 @@ class CreatePayload extends Component {
       R.assoc('payload_source', 'MANUAL'),
       R.assoc('payload_status', 'VERIFIED'),
       R.assoc('payload_platforms', R.pluck('id', data.payload_platforms)),
-      R.assoc('payload_tags', R.pluck('id', data.payload_tags)),
-      R.assoc('payload_attack_patterns', R.pluck('id', data.payload_attack_patterns)),
+      R.assoc('payload_tags', data.payload_tags),
+      R.assoc('payload_attack_patterns', data.payload_attack_patterns),
       R.assoc('executable_file', data.executable_file?.id),
-      R.assoc('file_drop_file', data.file_drop_file?.id),
     )(data);
     return this.props
       .addPayload(inputValues)
@@ -134,21 +133,20 @@ class CreatePayload extends Component {
           <>
             <Stepper activeStep={activeStep} style={{ marginBottom: 20 }}>
               <Step>
-                <StepLabel >{t('Select the type')}</StepLabel>
+                <StepLabel>{t('Select the type')}</StepLabel>
               </Step>
               <Step>
-                <StepLabel >{t('Create the payload')}</StepLabel>
+                <StepLabel>{t('Create the payload')}</StepLabel>
               </Step>
             </Stepper>
             {activeStep === 0 && this.renderTypes()}
             {activeStep === 1 && (
-            <PayloadForm
-              editing={false}
-              onSubmit={this.onSubmit.bind(this)}
-              initialValues={{ payload_tags: [], payload_platforms: [], payload_attack_patterns: [] }}
-              handleClose={this.handleClose.bind(this)}
-              type={selectedType}
-            />
+              <PayloadForm
+                editing={false}
+                onSubmit={this.onSubmit.bind(this)}
+                handleClose={this.handleClose.bind(this)}
+                type={selectedType}
+              />
             )}
           </>
         </Drawer>

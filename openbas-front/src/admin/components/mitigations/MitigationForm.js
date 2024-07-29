@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
 import OldTextField from '../../../components/fields/OldTextField';
 import { useFormatter } from '../../../components/i18n';
-import AttackPatternField from '../../../components/AttackPatternField';
+import OldAttackPatternField from '../../../components/OldAttackPatternField';
 
 const MitigationForm = (props) => {
   const { onSubmit, initialValues, editing, handleClose } = props;
@@ -39,7 +39,7 @@ const MitigationForm = (props) => {
             label={t('External ID')}
             style={{ marginTop: 10 }}
           />
-          <AttackPatternField
+          <OldAttackPatternField
             name="mitigation_attack_patterns"
             label={t('Attack patterns')}
             values={values}

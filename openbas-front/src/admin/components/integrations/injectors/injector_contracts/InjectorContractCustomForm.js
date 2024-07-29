@@ -8,7 +8,7 @@ import 'ckeditor5-custom-build/build/translations/fr';
 import { Button, Typography, Grid, Switch, TextField as MUITextField } from '@mui/material';
 import { useTheme } from '@mui/styles';
 import { useFormatter } from '../../../../../components/i18n';
-import AttackPatternField from '../../../../../components/AttackPatternField';
+import OldAttackPatternField from '../../../../../components/OldAttackPatternField';
 import OldTextField from '../../../../../components/fields/OldTextField';
 
 const InjectorContractForm = (props) => {
@@ -95,7 +95,7 @@ const InjectorContractForm = (props) => {
             fullWidth={true}
             label={t('Name')}
           />
-          <AttackPatternField
+          <OldAttackPatternField
             name="injector_contract_attack_patterns"
             label={t('Attack patterns')}
             values={values}

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.PayloadArgument;
 import io.openbas.database.model.PayloadPrerequisite;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,60 +16,62 @@ import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 @Getter
 @Setter
 public class PayloadCreateInput {
-    @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("payload_type")
-    private String type;
 
-    @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("payload_name")
-    private String name;
+  @NotBlank(message = MANDATORY_MESSAGE)
+  @JsonProperty("payload_type")
+  private String type;
 
-    @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("payload_source")
-    private String source;
+  @NotBlank(message = MANDATORY_MESSAGE)
+  @JsonProperty("payload_name")
+  private String name;
 
-    @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("payload_status")
-    private String status;
+  @NotBlank(message = MANDATORY_MESSAGE)
+  @JsonProperty("payload_source")
+  private String source;
 
-    @JsonProperty("payload_platforms")
-    private String[] platforms;
+  @NotBlank(message = MANDATORY_MESSAGE)
+  @JsonProperty("payload_status")
+  private String status;
 
-    @JsonProperty("payload_description")
-    private String description;
+  @NotEmpty(message = MANDATORY_MESSAGE)
+  @JsonProperty("payload_platforms")
+  private String[] platforms;
 
-    @JsonProperty("command_executor")
-    private String executor;
+  @JsonProperty("payload_description")
+  private String description;
 
-    @JsonProperty("command_content")
-    private String content;
+  @JsonProperty("command_executor")
+  private String executor;
 
-    @JsonProperty("executable_file")
-    private String executableFile;
+  @JsonProperty("command_content")
+  private String content;
 
-    @JsonProperty("file_drop_file")
-    private String fileDropFile;
+  @JsonProperty("executable_file")
+  private String executableFile;
 
-    @JsonProperty("dns_resolution_hostname")
-    private String hostname;
+  @JsonProperty("file_drop_file")
+  private String fileDropFile;
 
-    @JsonProperty("payload_arguments")
-    private List<PayloadArgument> arguments;
+  @JsonProperty("dns_resolution_hostname")
+  private String hostname;
 
-    @JsonProperty("payload_prerequisites")
-    private List<PayloadPrerequisite> prerequisites;
+  @JsonProperty("payload_arguments")
+  private List<PayloadArgument> arguments;
 
-    @JsonProperty("payload_cleanup_executor")
-    private String cleanupExecutor;
+  @JsonProperty("payload_prerequisites")
+  private List<PayloadPrerequisite> prerequisites;
 
-    @JsonProperty("payload_cleanup_command")
-    private String cleanupCommand;
+  @JsonProperty("payload_cleanup_executor")
+  private String cleanupExecutor;
 
-    @JsonProperty("payload_tags")
-    private List<String> tagIds = new ArrayList<>();
+  @JsonProperty("payload_cleanup_command")
+  private String cleanupCommand;
 
-    @JsonProperty("payload_attack_patterns")
-    private List<String> attackPatternsIds = new ArrayList<>();
+  @JsonProperty("payload_tags")
+  private List<String> tagIds = new ArrayList<>();
+
+  @JsonProperty("payload_attack_patterns")
+  private List<String> attackPatternsIds = new ArrayList<>();
 }
 
 

@@ -6,11 +6,11 @@ import { MoreVert } from '@mui/icons-material';
 import { deletePayload, duplicatePayload, updatePayload } from '../../../actions/Payload';
 import PayloadForm from './PayloadForm';
 import { useFormatter } from '../../../components/i18n';
-import { attackPatternOptions, documentOptions, platformOptions, tagOptions } from '../../../utils/Option';
+import { documentOptions, platformOptions } from '../../../utils/Option';
 import Transition from '../../../components/common/Transition';
 import Drawer from '../../../components/common/Drawer';
 
-const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, killChainPhasesMap, onUpdate, onDelete, onDuplicate, disabled }) => {
+const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate, disabled }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openDuplicate, setOpenDuplicate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -30,10 +30,9 @@ const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, kil
   const onSubmitEdit = (data) => {
     const inputValues = R.pipe(
       R.assoc('payload_platforms', R.pluck('id', data.payload_platforms)),
-      R.assoc('payload_tags', R.pluck('id', data.payload_tags)),
-      R.assoc('payload_attack_patterns', R.pluck('id', data.payload_attack_patterns)),
+      R.assoc('payload_tags', data.payload_tags),
+      R.assoc('payload_attack_patterns', data.payload_attack_patterns),
       R.assoc('executable_file', data.executable_file?.id),
-      R.assoc('file_drop_file', data.file_drop_file?.id),
     )(data);
     return dispatch(updatePayload(payload.payload_id, inputValues)).then((result) => {
       if (onUpdate) {
@@ -73,11 +72,8 @@ const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, kil
       handleCloseDuplicate();
     });
   };
-  const payloadAttackPatterns = attackPatternOptions(payload.payload_attack_patterns, attackPatternsMap, killChainPhasesMap);
-  const payloadTags = tagOptions(payload.payload_tags, tagsMap);
   const payloadPlatforms = platformOptions(payload.payload_platforms);
   const payloadExecutableFiles = documentOptions(payload.executable_file ? [payload.executable_file] : [], documentsMap);
-  const payloadDropFiles = documentOptions(payload.file_drop_file ? [payload.file_drop_file] : [], documentsMap);
   const initialValues = R.pipe(
     R.pick([
       'payload_name',
@@ -89,12 +85,12 @@ const PayloadPopover = ({ payload, documentsMap, tagsMap, attackPatternsMap, kil
       'dns_resolution_hostname',
       'payload_arguments',
       'payload_prerequisites',
+      'file_drop_file',
+      'payload_attack_patterns',
+      'payload_tags',
     ]),
     R.assoc('payload_platforms', payloadPlatforms),
-    R.assoc('payload_attack_patterns', payloadAttackPatterns),
-    R.assoc('payload_tags', payloadTags),
     R.assoc('executable_file', R.head(payloadExecutableFiles)),
-    R.assoc('file_drop_file', R.head(payloadDropFiles)),
   )(payload);
   return (
     <>

@@ -25,7 +25,7 @@ const styles = () => ({
   },
 });
 
-class AttackPatternField extends Component {
+class OldAttackPatternField extends Component {
   constructor(props) {
     super(props);
     this.state = { attackPatternCreation: false, attackPatternInput: '' };
@@ -145,4 +145,4 @@ export default R.compose(
   connect(select, { fetchAttackPatterns, addAttackPattern }),
   inject18n,
   withStyles(styles),
-)(AttackPatternField);
+)(OldAttackPatternField);
