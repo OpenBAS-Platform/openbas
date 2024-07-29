@@ -11,50 +11,51 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.openbas.utils.AtomicTestingUtils.getTargetsWithResults;
 
 public class ResultUtils {
 
-  private ResultUtils() {
-  }
+    private ResultUtils() {
+    }
 
-  // -- GLOBAL SCORE --
+    // -- GLOBAL SCORE --
 
-  public static List<ExpectationResultsByType> computeGlobalExpectationResults(@NotNull final List<Inject> injects) {
-    List<InjectExpectation> expectations = injects
-        .stream()
-        .flatMap(inject -> inject.getExpectations().stream())
-        .toList();
-    return AtomicTestingUtils.getExpectationResultByTypes(expectations);
-  }
+    public static List<ExpectationResultsByType> computeGlobalExpectationResults(@NotNull final List<Inject> injects) {
+        List<InjectExpectation> expectations = injects
+                .stream()
+                .flatMap(inject -> inject.getExpectations().stream())
+                .toList();
+        return AtomicTestingUtils.getExpectationResultByTypes(expectations);
+    }
 
-  public static List<InjectExpectationResultsByAttackPattern> computeInjectExpectationResults(
-      @NotNull final List<Inject> injects) {
-    Map<AttackPattern, List<Inject>> groupedByAttackPattern = injects.stream()
-        .flatMap(inject -> inject.getInjectorContract()
-            .getAttackPatterns()
-            .stream()
-            .map(attackPattern -> Map.entry(attackPattern, inject))
-        )
-        .collect(Collectors.groupingBy(
-            java.util.Map.Entry::getKey,
-            Collectors.mapping(java.util.Map.Entry::getValue, Collectors.toList())
-        ));
+    public static List<InjectExpectationResultsByAttackPattern> computeInjectExpectationResults(
+            @NotNull final List<Inject> injects) {
 
-    return groupedByAttackPattern.entrySet()
-        .stream()
-        .map(entry -> new InjectExpectationResultsByAttackPattern(entry.getKey(), entry.getValue()))
-        .toList();
-  }
+        Map<AttackPattern, List<Inject>> groupedByAttackPattern = injects.stream()
+                .flatMap(inject -> inject.getInjectorContract()
+                        .map(contract -> contract.getAttackPatterns().stream()
+                                .map(attackPattern -> Map.entry(attackPattern, inject)))
+                        .orElseGet(Stream::empty))
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())
+                ));
 
-  // -- TARGET --
+        return groupedByAttackPattern.entrySet()
+                .stream()
+                .map(entry -> new InjectExpectationResultsByAttackPattern(entry.getKey(), entry.getValue()))
+                .toList();
+    }
 
-  public static List<InjectTargetWithResult> computeTargetResults(@NotNull final List<Inject> injects) {
-    return injects.stream()
-        .flatMap(inject -> getTargetsWithResults(inject).stream())
-        .distinct()
-        .toList();
-  }
+    // -- TARGET --
+
+    public static List<InjectTargetWithResult> computeTargetResults(@NotNull final List<Inject> injects) {
+        return injects.stream()
+                .flatMap(inject -> getTargetsWithResults(inject).stream())
+                .distinct()
+                .toList();
+    }
 
 }

@@ -59,106 +59,115 @@ public class CalderaExecutor extends Injector {
     @Transactional
     public ExecutionProcess process(@NotNull final Execution execution, @NotNull final ExecutableInject injection) throws Exception {
         CalderaInjectContent content = contentConvert(injection, CalderaInjectContent.class);
-        ObjectNode rawContent = injection.getInjection().getInject().getContent();
-        ObjectNode contractContent = injection.getInjection().getInject().getInjectorContract().getConvertedContent();
-        List<JsonNode> contractTextFields = StreamSupport.stream(contractContent.get("fields").spliterator(), false).filter(contractElement -> contractElement.get("type").asText().equals("text")).toList();
-        List<Map<String, String>> additionalFields = new ArrayList<>();
-        if (!contractTextFields.isEmpty()) {
-            contractTextFields.forEach(jsonField -> {
-                String key = jsonField.get("key").asText();
-                if (rawContent.get(key) != null) {
-                    Map<String, String> additionalField = new HashMap<>();
-                    additionalField.put("trait", key);
-                    additionalField.put("value", rawContent.get(key).asText());
-                    additionalFields.add(additionalField);
-                }
-            });
-        }
         String obfuscator = content.getObfuscator() != null ? content.getObfuscator() : "base64";
         Inject inject = this.injectRepository.findById(injection.getInjection().getInject().getId()).orElseThrow();
+
         Map<Asset, Boolean> assets = this.resolveAllAssets(injection);
-        List<String> asyncIds = new ArrayList<>();
-        List<Expectation> expectations = new ArrayList<>();
         // Execute inject for all assets
         if (assets.isEmpty()) {
             execution.addTrace(traceError("Found 0 asset to execute the ability on (likely this inject does not have any target or the targeted asset is inactive and has been purged)"));
         }
-        String contract;
-        if (inject.getInjectorContract().getPayload() != null) {
-            // This is a payload, need to create the ability on the fly
-            List<Ability> abilities = calderaService.abilities().stream().filter(ability -> ability.getName().equals(inject.getInjectorContract().getPayload().getId())).toList();
-            if (!abilities.isEmpty()) {
-                calderaService.deleteAbility(abilities.getFirst());
+
+        List<String> asyncIds = new ArrayList<>();
+        List<Expectation> expectations = new ArrayList<>();
+        List<Map<String, String>> additionalFields = new ArrayList<>();
+
+        inject.getInjectorContract().ifPresentOrElse(injectorContract -> {
+            ObjectNode rawContent = injection.getInjection().getInject().getContent();
+            ObjectNode contractContent = injectorContract.getConvertedContent();
+            List<JsonNode> contractTextFields = StreamSupport.stream(contractContent.get("fields").spliterator(), false)
+                    .filter(contractElement -> contractElement.get("type").asText().equals("text"))
+                    .toList();
+
+            if (!contractTextFields.isEmpty()) {
+                contractTextFields.forEach(jsonField -> {
+                    String key = jsonField.get("key").asText();
+                    if (rawContent.get(key) != null) {
+                        Map<String, String> additionalField = new HashMap<>();
+                        additionalField.put("trait", key);
+                        additionalField.put("value", rawContent.get(key).asText());
+                        additionalFields.add(additionalField);
+                    }
+                });
             }
-            Ability abilityToExecute = calderaService.createAbility(inject.getInjectorContract().getPayload());
-            contract = abilityToExecute.getAbility_id();
-        } else {
-            contract = inject.getInjectorContract().getId();
-        }
-        assets.forEach((asset, aBoolean) -> {
-            try {
-                Endpoint executionEndpoint = this.findAndRegisterAssetForExecution(injection.getInjection().getInject(), asset);
-                if (executionEndpoint != null) {
-                    if (Arrays.stream(injection.getInjection().getInject().getInjectorContract().getPlatforms()).anyMatch(s -> s.equals(executionEndpoint.getPlatform().name()))) {
-                        String result = this.calderaService.exploit(obfuscator, executionEndpoint.getExternalReference(), contract, additionalFields);
-                        if (result.contains("complete")) {
-                            ExploitResult exploitResult = this.calderaService.exploitResult(executionEndpoint.getExternalReference(), contract);
-                            asyncIds.add(exploitResult.getLinkId());
-                            execution.addTrace(traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
-                            // Compute expectations
-                            boolean isInGroup = assets.get(executionEndpoint.getParent());
-                            List<InjectExpectationSignature> injectExpectationSignatures = new ArrayList<>();
-                            if (inject.getInjectorContract().getPayload() != null) {
-                                switch (inject.getInjectorContract().getPayload().getType()) {
-                                    case "Command":
-                                        injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME).value(executionEndpoint.getProcessName()).build());
-                                        injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE).value(exploitResult.getCommand()).build());
-                                        break;
-                                    case "Executable":
-                                        Executable payloadExecutable = (Executable) Hibernate.unproxy(inject.getInjectorContract().getPayload());
-                                        injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME).value(payloadExecutable.getExecutableFile().getName()).build());
-                                        // TODO File hash
-                                        break;
-                                    case "FileDrop":
-                                        FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(inject.getInjectorContract().getPayload());
-                                        injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME).value(payloadFileDrop.getFileDropFile().getName()).build());
-                                        // TODO File hash
-                                        break;
-                                    case "DnsResolution":
-                                        DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(inject.getInjectorContract().getPayload());
-                                        injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_HOSTNAME).value(payloadDnsResolution.getHostname().split("\\r?\\n")[0]).build());
-                                        break;
-                                    default:
-                                        throw new UnsupportedOperationException("Payload type " + inject.getInjectorContract().getPayload().getType() + " is not supported");
+
+            String contract;
+            if (injectorContract.getPayload() != null) {
+                // This is a payload, need to create the ability on the fly
+                List<Ability> abilities = calderaService.abilities().stream().filter(ability -> ability.getName().equals(injectorContract.getPayload().getId())).toList();
+                if (!abilities.isEmpty()) {
+                    calderaService.deleteAbility(abilities.getFirst());
+                }
+                Ability abilityToExecute = calderaService.createAbility(injectorContract.getPayload());
+                contract = abilityToExecute.getAbility_id();
+            } else {
+                contract = injectorContract.getId();
+            }
+            assets.forEach((asset, aBoolean) -> {
+                try {
+                    Endpoint executionEndpoint = this.findAndRegisterAssetForExecution(injection.getInjection().getInject(), asset);
+                    if (executionEndpoint != null) {
+                        if (Arrays.stream(injectorContract.getPlatforms()).anyMatch(s -> s.equals(executionEndpoint.getPlatform().name()))) {
+                            String result = this.calderaService.exploit(obfuscator, executionEndpoint.getExternalReference(), contract, additionalFields);
+                            if (result.contains("complete")) {
+                                ExploitResult exploitResult = this.calderaService.exploitResult(executionEndpoint.getExternalReference(), contract);
+                                asyncIds.add(exploitResult.getLinkId());
+                                execution.addTrace(traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
+                                // Compute expectations
+                                boolean isInGroup = assets.get(executionEndpoint.getParent());
+                                List<InjectExpectationSignature> injectExpectationSignatures = new ArrayList<>();
+                                if (injectorContract.getPayload() != null) {
+                                    switch (injectorContract.getPayload().getType()) {
+                                        case "Command":
+                                            injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME).value(executionEndpoint.getProcessName()).build());
+                                            injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE).value(exploitResult.getCommand()).build());
+                                            break;
+                                        case "Executable":
+                                            Executable payloadExecutable = (Executable) Hibernate.unproxy(injectorContract.getPayload());
+                                            injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME).value(payloadExecutable.getExecutableFile().getName()).build());
+                                            // TODO File hash
+                                            break;
+                                        case "FileDrop":
+                                            FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(injectorContract.getPayload());
+                                            injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME).value(payloadFileDrop.getFileDropFile().getName()).build());
+                                            // TODO File hash
+                                            break;
+                                        case "DnsResolution":
+                                            DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(injectorContract.getPayload());
+                                            injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_HOSTNAME).value(payloadDnsResolution.getHostname().split("\\r?\\n")[0]).build());
+                                            break;
+                                        default:
+                                            throw new UnsupportedOperationException("Payload type " + injectorContract.getPayload().getType() + " is not supported");
+                                    }
+                                } else {
+                                    injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME).value(executionEndpoint.getProcessName()).build());
+                                    injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE).value(exploitResult.getCommand()).build());
                                 }
+                                computeExpectationsForAsset(expectations, content, executionEndpoint.getParent(), isInGroup, injectExpectationSignatures);
+                                execution.addTrace(traceInfo("Caldera executed the ability on asset " + asset.getName() + " using " + executionEndpoint.getProcessName() + " (paw: " + executionEndpoint.getExternalReference() + ", linkID: " + exploitResult.getLinkId() + ")"));
                             } else {
-                                injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME).value(executionEndpoint.getProcessName()).build());
-                                injectExpectationSignatures.add(InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE).value(exploitResult.getCommand()).build());
+                                execution.addTrace(traceError("Caldera failed to execute the ability on asset " + asset.getName() + " (" + result + ")"));
                             }
-                            computeExpectationsForAsset(expectations, content, executionEndpoint.getParent(), isInGroup, injectExpectationSignatures);
-                            execution.addTrace(traceInfo("Caldera executed the ability on asset " + asset.getName() + " using " + executionEndpoint.getProcessName() + " (paw: " + executionEndpoint.getExternalReference() + ", linkID: " + exploitResult.getLinkId() + ")"));
                         } else {
-                            execution.addTrace(traceError("Caldera failed to execute the ability on asset " + asset.getName() + " (" + result + ")"));
+                            execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (platform is not compatible: " + executionEndpoint.getPlatform().name() + ")"));
                         }
                     } else {
-                        execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (platform is not compatible: " + executionEndpoint.getPlatform().name() + ")"));
+                        execution.addTrace(traceError("Caldera failed to execute the ability on asset " + asset.getName() + " (temporary injector not spawned correctly)"));
                     }
-                } else {
-                    execution.addTrace(traceError("Caldera failed to execute the ability on asset " + asset.getName() + " (temporary injector not spawned correctly)"));
+                } catch (Exception e) {
+                    execution.addTrace(traceError("Caldera failed to execute the ability on asset " + asset.getName() + " (" + e.getMessage() + ")"));
+                    log.severe(Arrays.toString(e.getStackTrace()));
                 }
-            } catch (Exception e) {
-                execution.addTrace(traceError("Caldera failed to execute the ability on asset " + asset.getName() + " (" + e.getMessage() + ")"));
-                log.severe(Arrays.toString(e.getStackTrace()));
-            }
-        });
-
-        List<AssetGroup> assetGroups = injection.getAssetGroups();
-        assetGroups.forEach((assetGroup -> computeExpectationsForAssetGroup(expectations, content, assetGroup, new ArrayList<>())));
+            });
+        },
+                ()->execution.addTrace(traceError("Inject does not have a contract")));
 
         if (asyncIds.isEmpty()) {
             throw new UnsupportedOperationException("Caldera failed to execute the ability due to above errors");
         }
 
+        List<AssetGroup> assetGroups = injection.getAssetGroups();
+        assetGroups.forEach((assetGroup -> computeExpectationsForAssetGroup(expectations, content, assetGroup, new ArrayList<>())));
         String message = "Caldera executed the ability on " + asyncIds.size() + " asset(s)";
         execution.addTrace(traceInfo(message, asyncIds));
         return new ExecutionProcess(true, expectations);

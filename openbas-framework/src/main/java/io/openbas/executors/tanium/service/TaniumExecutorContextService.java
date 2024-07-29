@@ -4,6 +4,7 @@ import io.openbas.database.model.Asset;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Injector;
+import io.openbas.database.model.InjectorContract;
 import io.openbas.executors.tanium.client.TaniumExecutorClient;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import jakarta.validation.constraints.NotNull;
@@ -33,7 +34,10 @@ public class TaniumExecutorContextService {
     }
 
     public void launchExecutorSubprocess(@NotNull final Inject inject, @NotNull final Asset asset) {
-        Injector injector = inject.getInjectorContract().getInjector();
+        Injector injector = inject.getInjectorContract()
+            .map(InjectorContract::getInjector)
+            .orElseThrow(() -> new UnsupportedOperationException("Inject does not have a contract"));
+
         Endpoint.PLATFORM_TYPE platform = Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform(): null;
         Endpoint.PLATFORM_ARCH arch = Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getArch(): null;
         if( platform == null || arch == null ) {

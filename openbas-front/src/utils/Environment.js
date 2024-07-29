@@ -50,6 +50,11 @@ export const exportData = (
     .map((d) => R.pick(keys, d))
     .map((d) => {
       let entry = d;
+
+      if (entry[`${type}_type`] === null) {
+        entry[`${type}_type`] = 'deleted';
+      }
+
       if (entry[`${type}_tags`]) {
         entry = R.assoc(
           `${type}_tags`,

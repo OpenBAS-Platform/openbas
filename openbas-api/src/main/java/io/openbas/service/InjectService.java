@@ -638,11 +638,10 @@ public class InjectService {
 
         // For ease of use, we create a map of the available keys for the injector
         Map<String, JsonNode> mapFieldByKey =
-                StreamSupport.stream((inject.getInjectorContract().getConvertedContent().get("fields")
-                                .spliterator()), false)
+                StreamSupport.stream((Objects.requireNonNull(inject.getInjectorContract().map(injectorContract -> injectorContract.getConvertedContent().get("fields").spliterator()).orElse(null))), false)
                         .collect(Collectors.toMap(jsonNode -> jsonNode.get("key").asText(), Function.identity()));
 
-        // Otherwise, the default type is text but it can be overriden
+        // Otherwise, the default type is text, but it can be overriden
         String type = "text";
         if (mapFieldByKey.get(ruleAttribute.getName()) != null) {
             type = mapFieldByKey.get(ruleAttribute.getName()).get("type").asText();

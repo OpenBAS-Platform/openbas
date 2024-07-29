@@ -129,7 +129,6 @@ public class Inject implements Base, Injection {
     @Min(value = 0L, message = "The value must be positive")
     private Long dependsDuration;
 
-    @Getter
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "inject_injector_contract")
     @JsonProperty("inject_injector_contract")
@@ -259,7 +258,7 @@ public class Inject implements Base, Injection {
     @JsonProperty("inject_ready")
     public boolean isReady() {
         return InjectModelHelper.isReady(
-            getInjectorContract(),
+            getInjectorContract().orElse(null),
             getContent(),
             isAllTeams(),
             getTeams().stream().map(Team::getId).collect(Collectors.toList()),
@@ -299,6 +298,10 @@ public class Inject implements Base, Injection {
     }
     // endregion
 
+    public Optional<InjectorContract> getInjectorContract() {
+        return Optional.ofNullable(this.injectorContract);
+    }
+
     public Optional<InjectStatus> getStatus() {
         return ofNullable(this.status);
     }
@@ -337,18 +340,29 @@ public class Inject implements Base, Injection {
 
     @JsonProperty("inject_kill_chain_phases")
     public List<KillChainPhase> getKillChainPhases() {
-        return this.getInjectorContract() != null ? this.getInjectorContract().getAttackPatterns().stream()
-                .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream()).distinct().toList() : new ArrayList<>();
+        return getInjectorContract()
+            .map(injectorContract ->
+                injectorContract.getAttackPatterns().stream()
+                    .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream())
+                    .distinct()
+                    .collect(Collectors.toList())
+            )
+            .orElseGet(ArrayList::new);
     }
 
     @JsonProperty("inject_attack_patterns")
     public List<AttackPattern> getAttackPatterns() {
-    return this.getInjectorContract() != null ? this.getInjectorContract().getAttackPatterns() : new ArrayList<>();
+        return getInjectorContract()
+            .map(InjectorContract::getAttackPatterns)
+            .orElseGet(ArrayList::new);
     }
 
     @JsonProperty("inject_type")
     private String getType() {
-        return this.getInjectorContract() != null ? this.getInjectorContract().getInjector().getType() : null;
+        return getInjectorContract()
+            .map(InjectorContract::getInjector)
+            .map(Injector::getType)
+            .orElse(null);
     }
 
     @JsonIgnore

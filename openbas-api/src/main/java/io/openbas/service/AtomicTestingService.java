@@ -93,7 +93,7 @@ public class AtomicTestingService {
         }
 
         InjectorContract injectorContract =
-                injectorContractRepository.findById(input.getInjectorContract()).orElseThrow();
+                injectorContractRepository.findById(input.getInjectorContract()).orElseThrow(ElementNotFoundException::new);
         ObjectNode finalContent = input.getContent();
         // Set expectations
         if (injectId == null) {
@@ -215,7 +215,7 @@ public class AtomicTestingService {
         injectDuplicate.setDependsOn(injectOrigin.getDependsOn());
         injectDuplicate.setCountry(injectOrigin.getCountry());
         injectDuplicate.setCity(injectOrigin.getCity());
-        injectDuplicate.setInjectorContract(injectOrigin.getInjectorContract());
+        injectDuplicate.setInjectorContract(injectOrigin.getInjectorContract().orElse(null));
         injectDuplicate.setAssetGroups(injectOrigin.getAssetGroups().stream().toList());
         injectDuplicate.setAssets(injectOrigin.getAssets().stream().toList());
         injectDuplicate.setCommunications(injectOrigin.getCommunications().stream().toList());

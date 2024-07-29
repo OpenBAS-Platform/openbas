@@ -78,7 +78,7 @@ public class EmailExecutor extends Injector {
     String from = exercise != null ? exercise.getFrom() : this.openBASConfig.getDefaultMailer();
     List<String> replyTos = exercise != null ? exercise.getReplyTos() : List.of(this.openBASConfig.getDefaultReplyTo());
     //noinspection SwitchStatementWithTooFewBranches
-    switch (inject.getInjectorContract().getId()) {
+    switch (inject.getInjectorContract().map(InjectorContract::getId).orElseThrow(() -> new UnsupportedOperationException("Inject does not have a contract"))) {
       case EMAIL_GLOBAL -> sendMulti(execution, users, from, replyTos, inReplyTo, subject, message, attachments);
       default -> sendSingle(execution, users, from, replyTos, inReplyTo, mustBeEncrypted, subject, message, attachments);
     }

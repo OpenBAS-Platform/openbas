@@ -230,6 +230,8 @@ const Injects = (props) => {
 
   const sortedInjects = filtering.filterAndSort(injects);
 
+  const isAtLeastOneValidInject = sortedInjects.some((inject) => inject.inject_injector_contract?.injector_contract_content_parsed !== null);
+
   // Menu
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -247,6 +249,7 @@ const Injects = (props) => {
     sortedInjects,
     tagsMap,
   );
+
   const exportInjectsToXLS = useExportToXLS({ data: exportInjects, fileName: `${t('Injects')}` });
 
   const handleShowTimeline = () => {
@@ -300,9 +303,9 @@ const Injects = (props) => {
                   <MenuItem onClick={exportInjectsToXLS}>
                     {`${t('Export injects')}`}
                   </MenuItem>
-                  <MenuItem onClick={handleShowTimeline}>
+                  {isAtLeastOneValidInject && (<MenuItem onClick={handleShowTimeline}>
                     {showTimeline ? t('Hide timeline') : t('Show timeline')}
-                  </MenuItem>
+                  </MenuItem>)}
                 </Menu>
               </div>
             )}
@@ -340,7 +343,7 @@ const Injects = (props) => {
           </div>
           <div className="clearfix" />
         </div>
-        {showTimeline && (
+        {showTimeline && isAtLeastOneValidInject && (
           <div style={{ marginBottom: 50 }}>
             <Timeline
               injects={sortedInjects}
@@ -487,11 +490,14 @@ const Injects = (props) => {
                         className={classes.bodyItem}
                         style={inlineStyles.inject_type}
                       >
-                        <InjectorContract
-                          variant="list"
-                          config={injectContract?.config}
-                          label={injectorContractName}
-                        />
+                        {injectContract ? (
+                          <InjectorContract
+                            variant="list"
+                            config={injectContract?.config}
+                            label={injectorContractName}
+                          />
+                        ) : <InjectorContract variant="list" label={t('Deleted')} deleted/>
+                        }
                       </div>
                       <div
                         className={classes.bodyItem}

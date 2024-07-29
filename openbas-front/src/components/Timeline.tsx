@@ -125,7 +125,7 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
             )
       ) {
         keys = ['No teams'];
-      } else {
+      } else if (inject.inject_type !== null) {
         keys = [inject.inject_type];
       }
     }
@@ -205,7 +205,7 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
 
   return (
     <>
-      {injects.length > 0 ? (
+      {injects.length > 0 && sortedTeams.length > 0 ? (
         <div className={classes.container}>
           <div className={classes.names}>
             {sortedTeams.map((team) => (

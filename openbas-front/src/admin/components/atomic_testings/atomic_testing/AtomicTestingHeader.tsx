@@ -29,8 +29,6 @@ const AtomicTestingHeader = () => {
 
   const { injectResultDto, updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
   const [openEditId, setOpenEditId] = useState<string | null>(null);
-  const [openDuplicateId, setOpenDuplicateId] = useState<string | null>(null);
-  const [openDeleteId, setOpenDeleteId] = useState<string | null>(null);
 
   // Launch atomic testing
   const [open, setOpen] = useState(false);
@@ -46,33 +44,6 @@ const AtomicTestingHeader = () => {
       });
     }
     setAvailableLaunch(true);
-  };
-
-  // UPDATE
-  const handleOpenEdit = (injectId: string) => {
-    setOpenEditId(injectId);
-  };
-
-  const handleCloseEdit = () => {
-    setOpenEditId(null);
-  };
-
-  // DUPLICATE
-  const handleOpenDuplicate = (injectId: string) => {
-    setOpenDuplicateId(injectId);
-  };
-
-  const handleCloseDuplicate = () => {
-    setOpenDuplicateId(null);
-  };
-
-  // DELETE
-  const handleOpenDelete = (injectId: string) => {
-    setOpenDeleteId(injectId);
-  };
-
-  const handleCloseDelete = () => {
-    setOpenDeleteId(null);
   };
 
   if (!injectResultDto) {
@@ -91,44 +62,38 @@ const AtomicTestingHeader = () => {
         </Typography>
       </Tooltip>
       <div className={classes.actions}>
-        {!injectResultDto.inject_ready ? (
-          <Button
-            style={{ marginRight: 10 }}
-            startIcon={<SettingsOutlined />}
-            variant="contained"
-            color="warning"
-            size="small"
-            onClick={() => setOpenEditId(injectResultDto.inject_id)}
-          >
-            {t('Configure')}
-          </Button>
-        ) : (
-          <Button
-            style={{ marginRight: 10 }}
-            startIcon={<PlayArrowOutlined />}
-            variant="contained"
-            color="primary"
-            size="small"
-            onClick={() => setOpen(true)}
-            disabled={!availableLaunch}
-          >
-            {t('Launch')}
-          </Button>
-        )}
-
+        {/* eslint-disable-next-line no-nested-ternary */}
+        {injectResultDto.inject_injector_contract ? (
+          !injectResultDto.inject_ready ? (
+            <Button
+              style={{ marginRight: 10 }}
+              startIcon={<SettingsOutlined />}
+              variant="contained"
+              color="warning"
+              size="small"
+              onClick={() => setOpenEditId(injectResultDto.inject_id)}
+            >
+              {t('Configure')}
+            </Button>
+          ) : (
+            <Button
+              style={{ marginRight: 10 }}
+              startIcon={<PlayArrowOutlined />}
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={() => setOpen(true)}
+              disabled={!availableLaunch}
+            >
+              {t('Launch')}
+            </Button>
+          )) : null
+        }
         <AtomicTestingPopover
           atomic={injectResultDto}
+          actions={['Duplicate', 'Update', 'Delete']}
           openEdit={openEditId === injectResultDto.inject_id}
-          openDelete={openDeleteId === injectResultDto.inject_id}
-          openDuplicate={openDuplicateId === injectResultDto.inject_id}
-          setOpenEdit={handleCloseEdit}
-          setOpenDelete={handleCloseDelete}
-          setOpenDuplicate={handleCloseDuplicate}
-          entries={[
-            { label: 'Duplicate', action: () => handleOpenDuplicate(injectResultDto.inject_id) },
-            { label: 'Update', action: () => handleOpenEdit(injectResultDto.inject_id) },
-            { label: 'Delete', action: () => handleOpenDelete(injectResultDto.inject_id) },
-          ]}
+          setOpenEdit={setOpenEditId}
         />
       </div>
       <Dialog
