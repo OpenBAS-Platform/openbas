@@ -64,6 +64,7 @@
     "reactflow": "11.11.4",
     "react-router-dom": "6.26.1",
     "react-syntax-highlighter": "15.5.0",
+    "reactflow": "11.11.4",
     "redux": "4.2.1",
     "redux-first-history": "5.2.0",
     "redux-thunk": "2.4.2",

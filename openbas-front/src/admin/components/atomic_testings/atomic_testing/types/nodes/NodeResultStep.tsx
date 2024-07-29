@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { Handle, NodeProps, Position } from 'reactflow';
+import { Handle, NodeProps, Position } from '@xyflow/react';
 import { makeStyles } from '@mui/styles';
 import { Tooltip } from '@mui/material';
 import { FlagOutlined, HelpOutlined, ModeStandbyOutlined, ScoreOutlined } from '@mui/icons-material';

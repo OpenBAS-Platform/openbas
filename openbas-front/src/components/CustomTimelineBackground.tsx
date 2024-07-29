@@ -2,7 +2,7 @@ import React, { CSSProperties, memo, useRef } from 'react';
 import cc from 'classcat';
 import { shallow } from 'zustand/shallow';
 
-import { useStore, type ReactFlowState, type BackgroundProps, BackgroundVariant } from 'reactflow';
+import { useStore, type ReactFlowState, type BackgroundProps, BackgroundVariant } from '@xyflow/react';
 
 const defaultSize = {
     [BackgroundVariant.Dots]: 1,
@@ -74,11 +74,11 @@ function BackgroundComponent({
             </pattern>
             <rect x="0" y="0" width="100%" height="100%" fill={`url(#${_patternId})`}/>
 
-            <text fill="#ffffff" font-size={45 * scaledSize} font-family="Verdana" x="50" y="86">
+            <text fill="#ffffff" fontSize={45 * scaledSize} fontFamily="Verdana" x="50" y="86">
                 {transform}
             </text>
 
-            <text fill="#ffffff" font-size={45 * scaledSize} font-family="Verdana" x={transform[0]} y={50}>
+            <text fill="#ffffff" fontSize={45 * scaledSize} fontFamily="Verdana" x={transform[0]} y={50}>
                 SVG
             </text>
         </svg>

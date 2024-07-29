@@ -4,7 +4,7 @@ import { makeStyles } from '@mui/styles';
 import { Tooltip } from '@mui/material';
 import { FlagOutlined, HelpOutlined, ModeStandbyOutlined, ScoreOutlined } from '@mui/icons-material';
 import {Theme} from "../Theme";
-import {OnConnect} from "reactflow";
+import {OnConnect} from "@xyflow/react";
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -63,9 +63,9 @@ export type NodeInject = Node<{
   color?: string,
   key: string,
   label: string,
-  description: string,
-  isTargeted: boolean,
-  isTargeting: boolean,
+  description?: string,
+  isTargeted?: boolean,
+  isTargeting?: boolean,
   onConnectInjects?: OnConnect
   }
 >;

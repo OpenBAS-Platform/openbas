@@ -12447,6 +12447,7 @@ __metadata:
     reactflow: "npm:11.11.4"
     react-router-dom: "npm:6.26.1"
     react-syntax-highlighter: "npm:15.5.0"
+    reactflow: "npm:11.11.4"
     redux: "npm:4.2.1"
     redux-first-history: "npm:5.2.0"
     redux-thunk: "npm:2.4.2"

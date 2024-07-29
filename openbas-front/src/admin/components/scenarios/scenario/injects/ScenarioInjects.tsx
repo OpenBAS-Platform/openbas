@@ -21,7 +21,7 @@ import useEntityToggle from '../../../../../utils/hooks/useEntityToggle';
 import ToolBar from '../../../common/ToolBar';
 import { isNotEmptyField } from '../../../../../utils/utils';
 import injectContextForScenario from '../ScenarioContext';
-import { Connection } from "reactflow";
+import { Connection } from "@xyflow/react";
 import { fetchScenarioInjectsSimple, bulkTestInjects } from '../../../../../actions/injects/inject-action';
 import { useFormatter } from '../../../../../components/i18n';
 

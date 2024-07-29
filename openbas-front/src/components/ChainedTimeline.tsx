@@ -11,12 +11,13 @@ import {
   useNodesState,
   useReactFlow,
   reconnectEdge,
-  Background, BackgroundVariant, ViewportPortal, Connection, Edge, Node
+  Background, BackgroundVariant, ViewportPortal, Connection, Edge, Node, Panel
 } from "@xyflow/react";
 import nodeTypes from "./nodes";
 import {useAutoLayoutInject, LayoutOptions} from "../utils/flows/useAutoLayout";
 import {CustomTimelineBackground} from "./CustomTimelineBackground";
 import {NodeInject} from "./nodes/NodeInject";
+import {CustomTimelinePanel} from "./CustomTimelinePanel";
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -203,13 +204,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
             >
               <CustomTimelineBackground>
               </CustomTimelineBackground>
-              <ViewportPortal>
-                <div
-                    style={{ transform: 'translate(100px, 100px)', position: 'absolute' }}
-                >
-                  This div is positioned at [100, 100] on the flow.
-                </div>
-              </ViewportPortal>
+              <CustomTimelinePanel>
+              </CustomTimelinePanel>
             </ReactFlow>
           </div>
       ) : null

@@ -22,7 +22,15 @@ import {
   Typography,
 } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
-import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow } from 'reactflow';
+import {
+  Edge,
+  MarkerType,
+  ReactFlow,
+  ReactFlowProvider,
+  useEdgesState,
+  useNodesState,
+  useReactFlow
+} from '@xyflow/react';
 import 'reactflow/dist/style.css';
 import { AddBoxOutlined, MoreVertOutlined } from '@mui/icons-material';
 import type { InjectResultDTO, InjectTargetWithResult, InjectExpectationResult } from '../../../../utils/api-types';
@@ -43,6 +51,7 @@ import DetectionPreventionExpectationsValidationForm from '../../simulations/sim
 import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { InjectExpectationStore } from '../../../../actions/injects/Inject';
+import {NodeInject} from "../../../../components/nodes/NodeInject";
 import { isTechnicalExpectation } from '../../common/injects/expectations/ExpectationUtils';
 
 interface Steptarget {
@@ -117,8 +126,8 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   const [initialized, setInitialized] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [targetResults, setTargetResults] = useState<InjectExpectationsStore[]>([]);
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<NodeInject>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const initialSteps = [{ label: t('Attack started'), type: '', key: 'attack-started' }, { label: t('Attack ended'), type: '', key: 'attack-ended' }];
   const sortOrder = ['PREVENTION', 'DETECTION', 'MANUAL'];
   // Flow
@@ -205,7 +214,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         id: `result-${index}`,
         type: 'result',
         data: {
-          key: step.key,
+          key: step.key ? step.key : '',
           label: step.label,
           start: index === 0,
           end: index === steps.length - 1,
@@ -372,7 +381,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         id: `result-${index}`,
         type: 'result',
         data: {
-          key: step.key,
+          key: step.key ? step.key : '',
           label: step.label,
           start: index === 0,
           end: index === mergedSteps.length - 1,

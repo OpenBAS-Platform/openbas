@@ -15,7 +15,7 @@ import {
   ToggleButtonGroup,
   Tooltip,
 } from '@mui/material';
-import { BarChartOutlined, MoreVert, ReorderOutlined } from '@mui/icons-material';
+import { BarChartOutlined, MoreVert, ReorderOutlined, ViewTimelineOutlined, Link } from '@mui/icons-material';
 import { splitDuration } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
@@ -33,6 +33,7 @@ import { InjectContext, PermissionsContext } from '../Context';
 import CreateInject from './CreateInject';
 import UpdateInject from './UpdateInject';
 import PlatformIcon from '../../../../components/PlatformIcon';
+import Timeline from '../../../../components/Timeline';
 import ChainedTimeline from '../../../../components/ChainedTimeline';
 import { isNotEmptyField } from '../../../../utils/utils';
 import ImportUploaderInjectFromXls from './ImportUploaderInjectFromXls';
@@ -206,6 +207,7 @@ const Injects = (props) => {
   );
   const { permissions } = useContext(PermissionsContext);
   const injectContext = useContext(InjectContext);
+  const [chainMode, setChainMode] = useState('chaining');
 
   // Filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
