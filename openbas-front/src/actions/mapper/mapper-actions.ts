@@ -1,5 +1,13 @@
-import type { ImportMapperAddInput, ImportMapperUpdateInput, InjectsImportTestInput, RawPaginationImportMapper, SearchPaginationInput } from '../../utils/api-types';
-import { simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
+import {
+  ExportMapperInput,
+  ImportMapperAddInput,
+  ImportMapperUpdateInput,
+  InjectsImportTestInput,
+  RawPaginationImportMapper,
+  SearchPaginationInput
+} from '../../utils/api-types';
+import {postReferential, simpleCall, simpleDelCall, simplePostCall, simplePutCall} from '../../utils/Action';
+import {Dispatch} from "redux";
 
 const XLS_MAPPER_URI = '/api/mappers';
 
@@ -38,4 +46,14 @@ export const storeXlsFile = (file: File) => {
 export const testXlsFile = (importId: string, input: InjectsImportTestInput) => {
   const uri = `${XLS_MAPPER_URI}/store/${importId}`;
   return simplePostCall(uri, input);
+};
+
+export const exportMapper = (input: ExportMapperInput) => {
+  const uri = `${XLS_MAPPER_URI}/export`;
+  return simplePostCall(uri, input);
+};
+
+export const importMapper = (formData: FormData) => (dispatch: Dispatch) => {
+  const uri = `${XLS_MAPPER_URI}/import`;
+  return postReferential(null, uri, formData)(dispatch);
 };

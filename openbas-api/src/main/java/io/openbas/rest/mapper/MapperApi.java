@@ -18,6 +18,7 @@ import io.openbas.service.InjectService;
 import io.openbas.service.MapperService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -30,6 +31,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -37,6 +39,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 
+import javax.print.attribute.standard.Media;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -48,6 +51,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.zip.ZipOutputStream;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
@@ -90,21 +94,21 @@ public class MapperApi extends RestBehavior {
     }
 
     @Secured(ROLE_ADMIN)
-    @PostMapping(value="/api/mappers/export",
-            produces=MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<byte[]> exportMappers(@RequestBody @Valid final ExportMapperInput exportMapperInput) {
+    @PostMapping(value="/api/mappers/export")
+    public void exportMappers(@RequestBody @Valid final ExportMapperInput exportMapperInput,
+                                                HttpServletResponse response) {
         List<ImportMapperAddInput> mappers = mapperService.exportMappers(exportMapperInput.getIdsToExport());
         try {
             String rightNow = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now());
-            Path filename = Path.of(System.getProperty("java.io.tmpdir"), MessageFormat.format("mappers_{0}.json", rightNow));
-            FileOutputStream fos = new FileOutputStream(filename.toString(), false);
-            fos.write(mapper.writeValueAsString(mappers).getBytes(StandardCharsets.UTF_8));
-            fos.flush();
-            fos.close();
+            String filename = MessageFormat.format("mappers_{0}.json", rightNow);
 
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .body(new FileInputStream(filename.toString()).readAllBytes());
+            response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            response.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpServletResponse.SC_OK);
+
+            response.getOutputStream().write(mapper.writeValueAsString(mappers).getBytes(StandardCharsets.UTF_8));
+            response.getOutputStream().flush();
+            response.getOutputStream().close();
         } catch (IOException e) {
             throw new RuntimeException("Error during export", e);
         }

@@ -13,6 +13,7 @@ import DataIngestionMenu from '../DataIngestionMenu';
 import XlsMapperCreation from './xls_mapper/XlsMapperCreation';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import XlsMapperPopover from './XlsMapperPopover';
+import ImportUploaderMapper from './ImportUploaderMapper';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -76,7 +77,9 @@ const XlsMappers = () => {
         fetch={searchMappers}
         searchPaginationInput={searchPaginationInput}
         setContent={setMappers}
-      />
+      >
+        <ImportUploaderMapper/>
+      </PaginationComponent>
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}

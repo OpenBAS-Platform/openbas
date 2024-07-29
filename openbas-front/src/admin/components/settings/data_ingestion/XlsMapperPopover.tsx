@@ -1,23 +1,27 @@
 import React, { FunctionComponent, useState } from 'react';
 import { PopoverEntry } from '../../../../components/common/ButtonPopover';
 import IconPopover from '../../../../components/common/IconPopover';
-import type { RawPaginationImportMapper } from '../../../../utils/api-types';
-import { deleteMapper } from '../../../../actions/mapper/mapper-actions';
+import type {ImportMapperAddInput, RawPaginationImportMapper} from '../../../../utils/api-types';
+import {deleteMapper, exportMapper} from '../../../../actions/mapper/mapper-actions';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../components/i18n';
 import Drawer from '../../../../components/common/Drawer';
 import XlsMapperUpdate from './xls_mapper/XlsMapperUpdate';
+import {download} from '../../../../utils/utils';
+import {AxiosResponse} from 'axios';
 
 interface Props {
   mapper: RawPaginationImportMapper;
   onUpdate?: (result: RawPaginationImportMapper) => void;
   onDelete?: (result: string) => void;
+  onExport?: (result: string) => void;
 }
 
 const XlsMapperPopover: FunctionComponent<Props> = ({
   mapper,
   onUpdate,
   onDelete,
+  onExport,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -41,9 +45,25 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
     handleCloseDelete();
   };
 
+  const exportMapperAction = () => {
+    exportMapper({
+      ids_to_export: [mapper.import_mapper_id]
+    }).then(
+        (result: AxiosResponse<{ data: string }>) => {
+          let filename = result.headers['content-disposition'].split('filename=')[1];
+          console.log(filename);
+          download(JSON.stringify(result.data, null, 2), filename, 'application/json');
+        },
+    );
+    if (onExport) {
+      onExport(mapper.import_mapper_id);
+    }
+  };
+
   const entries: PopoverEntry[] = [
     { label: 'Update', action: handleOpenEdit },
     { label: 'Delete', action: handleOpenDelete },
+    { label: 'Export', action: exportMapperAction},
   ];
 
   return (

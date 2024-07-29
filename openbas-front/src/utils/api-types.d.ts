@@ -916,6 +916,10 @@ export interface ExpectationUpdateInput {
   source_type: string;
 }
 
+export interface ExportMapperInput {
+  ids_to_export: string[];
+}
+
 export interface Filter {
   key: string;
   mode?: "and" | "or";
