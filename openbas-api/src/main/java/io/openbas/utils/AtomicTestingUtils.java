@@ -8,6 +8,7 @@ import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.raw.RawTeam;
 import io.openbas.expectation.ExpectationType;
+import io.openbas.model.Expectation;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.utils.AtomicTestingMapper.ResultDistribution;
@@ -66,12 +67,17 @@ public class AtomicTestingUtils {
         List<InjectExpectation> expectations = inject.getExpectations();
 
         List<InjectExpectation> teamExpectations = new ArrayList<>();
+        List<InjectExpectation> playerExpectations = new ArrayList<>();
         List<InjectExpectation> assetExpectations = new ArrayList<>();
         List<InjectExpectation> assetGroupExpectations = new ArrayList<>();
 
         expectations.forEach(expectation -> {
             if (expectation.getTeam() != null) {
-                teamExpectations.add(expectation);
+                if(expectation.getUser() != null) {
+                    playerExpectations.add(expectation);
+                }else{
+                    teamExpectations.add(expectation);
+                }
             }
             if (expectation.getAsset() != null) {
                 assetExpectations.add(expectation);
@@ -84,6 +90,18 @@ public class AtomicTestingUtils {
         List<InjectTargetWithResult> targets = new ArrayList<>();
         List<InjectTargetWithResult> assetsToRefine = new ArrayList<>();
 
+        // Players
+        Map<String, List<InjectTargetWithResult>> playerExpectationsMap = playerExpectations.stream()
+                .collect(Collectors.groupingBy(
+                        pe -> pe.getTeam().getId(),
+                        Collectors.mapping(pe -> new InjectTargetWithResult(
+                                TargetType.PLAYER,
+                                pe.getUser().getId(),
+                                pe.getUser().getName(),
+                                getExpectationResultByTypes(Collections.singletonList(pe)),
+                                null
+                        ), Collectors.toList())
+                ));
         /* Match Target with expectations
          * */
         inject.getTeams().forEach(team -> {
@@ -171,7 +189,7 @@ public class AtomicTestingUtils {
                                     )
                             )
                             .entrySet().stream()
-                            .map(entry -> new InjectTargetWithResult(TargetType.TEAMS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue(), null))
+                            .map(entry -> new InjectTargetWithResult(TargetType.TEAMS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue(), playerExpectationsMap.get(entry.getKey().getId()), null))
                             .toList()
             );
         }

@@ -14,10 +14,17 @@ public class ChannelExpectation implements Expectation {
 
   private Integer score;
   private Article article;
+  private boolean expectationGroup;
 
   public ChannelExpectation(Integer score, Article article) {
     setScore(Objects.requireNonNullElse(score, 100));
     setArticle(article);
+  }
+
+  public ChannelExpectation(Integer score, Article article, boolean expectationGroup) {
+    setScore(Objects.requireNonNullElse(score, 100));
+    setArticle(article);
+    setExpectationGroup(expectationGroup);
   }
 
   @Override

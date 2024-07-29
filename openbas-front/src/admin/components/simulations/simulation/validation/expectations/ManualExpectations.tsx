@@ -1,17 +1,16 @@
 import React, { FunctionComponent, useState } from 'react';
-import { List, ListItemButton, ListItemIcon, ListItemText, Chip } from '@mui/material';
+import { List, ListItemButton, ListItemIcon, ListItemText, Chip, Typography, Alert, AlertTitle, Divider } from '@mui/material';
 import { AssignmentTurnedIn } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
-import type { Team, Inject } from '../../../../../../utils/api-types';
-import { useHelper } from '../../../../../../store';
 import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 import { useFormatter } from '../../../../../../components/i18n';
 import type { Theme } from '../../../../../../components/Theme';
 import colorStyles from '../../../../../../components/Color';
-import type { TeamsHelper } from '../../../../../../actions/teams/team-helper';
 import Drawer from '../../../../../../components/common/Drawer';
 import ManualExpectationsValidationForm from './ManualExpectationsValidationForm';
+import ExpandableText from '../../../../../../components/common/ExpendableText';
+import { Inject } from '../../../../../../utils/api-types';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -38,6 +37,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     border: '1px solid #ec407a',
     color: '#ec407a',
   },
+  validationType: {
+    height: 20,
+    border: '1px solid',
+    borderRadius: 4,
+  },
 }));
 
 interface Props {
@@ -53,78 +57,58 @@ const ManualExpectations: FunctionComponent<Props> = ({
   const classes = useStyles();
   const { t } = useFormatter();
 
-  const { teamsMap }: { teamsMap: Record<string, Team> } = useHelper((helper: TeamsHelper) => {
-    return ({
-      teamsMap: helper.getTeamsMap(),
-    });
-  });
-
-  const groupedByTeam = expectations.reduce((group: Map<string, InjectExpectationsStore[]>, expectation) => {
-    const { inject_expectation_team } = expectation;
-    if (inject_expectation_team) {
-      const values = group.get(inject_expectation_team) ?? [];
-      values.push(expectation);
-      group.set(inject_expectation_team, values);
-    }
-    return group;
-  }, new Map());
-
   const [currentExpectations, setCurrentExpectations] = useState<InjectExpectationsStore[] | null>(null);
+
+  const parentExpectation = expectations.filter((e) => !e.inject_expectation_user)[0];
+  const childrenExpectations = expectations.filter((e) => e.inject_expectation_user);
+
+  const validatedCount = expectations.filter((v) => !R.isEmpty(v.inject_expectation_results)).length;
+  const isAllValidated = validatedCount === expectations.length;
+
+  const label = isAllValidated
+    ? `${t('Validated')} (${expectations.reduce((acc, el) => acc + el.inject_expectation_score, 0) / expectations.length})`
+    : t('Pending validation');
+
+  const style = isAllValidated ? colorStyles.green : colorStyles.orange;
 
   return (
     <>
       <List component="div" disablePadding>
-        {Array.from(groupedByTeam)
-          .map(([entry, values]) => {
-            const team = teamsMap[entry] || {};
-            const expectationValues = values
-              .reduce((acc, el) => ({
-                ...acc,
-                expected_score: acc.expected_score + (el.inject_expectation_expected_score ?? 0),
-                score: acc.score + (el.inject_expectation_score ?? 0),
-                result: acc.result + (el.inject_expectation_results ?? ''),
-              }), { expected_score: 0, score: 0, result: '' });
-            const validated = values.filter((v) => !R.isEmpty(v.inject_expectation_results)).length;
-            let label = t('Pending validation');
-            if (validated === values.length) {
-              label = `${t('Validated')} (${expectationValues.score})`;
-            }
-            return (
-              <ListItemButton
-                key={team.team_id}
-                divider
-                sx={{ pl: 8 }}
-                classes={{ root: classes.item }}
-                onClick={() => setCurrentExpectations(values)}
-              >
-                <ListItemIcon>
-                  <AssignmentTurnedIn fontSize="small" />
-                </ListItemIcon>
-                <ListItemText
-                  primary={(
-                    <div className={classes.container}>
-                      {t('Manual expectations')}
-                      <div className={classes.chip}>
-                        <Chip
-                          classes={{ root: classes.points }}
-                          label={expectationValues.expected_score}
-                        />
-                        <Chip
-                          classes={{ root: classes.chipInList }}
-                          style={
-                            validated === values.length
-                              ? colorStyles.green
-                              : colorStyles.orange
-                          }
-                          label={label}
-                        />
-                      </div>
-                    </div>
+        {expectations.length > 0 && (
+        <ListItemButton
+          key={expectations[0].inject_expectation_name}
+          divider
+          sx={{ pl: 8 }}
+          classes={{ root: classes.item }}
+          onClick={() => setCurrentExpectations(expectations)}
+        >
+          <ListItemIcon>
+            <AssignmentTurnedIn fontSize="small" />
+          </ListItemIcon>
+          <ListItemText
+            primary={(
+              <div className={classes.container}>
+                {expectations[0].inject_expectation_name}
+                <div className={classes.chip}>
+                  <Chip
+                    classes={{ root: classes.validationType }}
+                    label={expectations[0].inject_expectation_group ? 'At least one player' : 'All players'}
+                  />
+                  <Chip
+                    classes={{ root: classes.points }}
+                    label={expectations[0].inject_expectation_expected_score}
+                  />
+                  <Chip
+                    classes={{ root: classes.chipInList }}
+                    style={style}
+                    label={label}
+                  />
+                </div>
+              </div>
                   )}
-                />
-              </ListItemButton>
-            );
-          })}
+          />
+        </ListItemButton>
+        )}
       </List>
       <Drawer
         open={currentExpectations !== null}
@@ -132,10 +116,33 @@ const ManualExpectations: FunctionComponent<Props> = ({
         title={t('Expectations of ') + inject.inject_title}
       >
         <>
-          {
-            expectations
-            && expectations.map((e) => <ManualExpectationsValidationForm key={e.inject_expectation_id} expectation={e} />)
-          }
+          <Alert
+            severity="warning"
+            variant="outlined"
+            style={{ position: 'relative' }}
+          >
+            <AlertTitle>
+              <ExpandableText
+                source={
+                    expectations[0].inject_expectation_group
+                      ? t('At least one player (per team) must validate the expectation')
+                      : t('All players (per team) must validate the expectation')
+                  }
+                limit={120}
+              />
+            </AlertTitle>
+          </Alert>
+          <div style={{ paddingTop: 10 }}>
+            <ManualExpectationsValidationForm key={parentExpectation} expectation={parentExpectation}/>
+          </div>
+          <div style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+            {childrenExpectations && childrenExpectations.map((e) => (
+              <ManualExpectationsValidationForm
+                key={e.inject_expectation_id}
+                expectation={e}
+              />
+            ))}
+          </div>
         </>
       </Drawer>
     </>

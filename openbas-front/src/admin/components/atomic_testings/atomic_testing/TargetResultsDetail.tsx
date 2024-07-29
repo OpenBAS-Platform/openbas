@@ -88,6 +88,7 @@ interface Props {
   lastExecutionStartDate: string,
   lastExecutionEndDate: string,
   target: InjectTargetWithResult,
+  teamId: string,
 }
 
 const TargetResultsDetailFlow: FunctionComponent<Props> = ({
@@ -95,6 +96,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   lastExecutionStartDate,
   lastExecutionEndDate,
   target,
+  teamId,
 }) => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -213,9 +215,15 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         labelShowBg: false,
         labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
       })));
-      fetchTargetResult(inject.inject_id, target.id!, target.targetType!).then(
-        (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
-      );
+      if (target.targetType === 'PLAYER') {
+        fetchTargetResult(inject.inject_id, target.id!, target.targetType!, teamId).then(
+          (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
+        );
+      } else {
+        fetchTargetResult(inject.inject_id, target.id!, target.targetType!).then(
+          (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
+        );
+      }
       setActiveTab(0);
       setTimeout(() => setInitialized(true), 1000);
     }

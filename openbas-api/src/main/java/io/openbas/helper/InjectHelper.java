@@ -41,7 +41,13 @@ public class InjectHelper {
 
   private List<Team> getInjectTeams(@NotNull final Inject inject) {
     Exercise exercise = inject.getExercise();
-    return inject.isAllTeams() ? exercise.getTeams() : inject.getTeams();
+    if(inject.isAllTeams()) {
+      exercise.getTeams().forEach(team -> Hibernate.initialize(team.getUsers()));
+      return exercise.getTeams();
+    } else {
+      inject.getTeams().forEach(team -> Hibernate.initialize(team.getUsers()));
+      return inject.getTeams();
+    }
   }
 
   // -- INJECTION --

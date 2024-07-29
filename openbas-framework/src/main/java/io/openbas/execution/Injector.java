@@ -13,6 +13,7 @@ import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.io.IOUtils;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static io.openbas.database.model.InjectStatusExecution.traceError;
 
@@ -63,6 +66,16 @@ public abstract class Injector {
         Expectation expectation) {
         InjectExpectation expectationExecution = new InjectExpectation();
         expectationExecution.setTeam(team);
+        return this.expectationConverter(expectationExecution, executableInject, expectation);
+    }
+    private InjectExpectation expectationConverter(
+        @NotNull final Team team,
+        @NotNull final User user,
+        @NotNull final ExecutableInject executableInject,
+        Expectation expectation) {
+        InjectExpectation expectationExecution = new InjectExpectation();
+        expectationExecution.setTeam(team);
+        expectationExecution.setUser(user);
         return this.expectationConverter(expectationExecution, executableInject, expectation);
     }
     private InjectExpectation expectationConverter(
@@ -128,7 +141,14 @@ public abstract class Injector {
                     List<InjectExpectation> injectExpectations = teams.stream()
                         .flatMap(team -> expectations.stream()
                             .map(expectation -> expectationConverter(team, executableInject, expectation)))
-                        .toList();
+                        .collect(Collectors.toList());
+                    // Create expectation for every player in every team
+                    List<InjectExpectation> injectExpectationsByUserAndTeam = teams.stream()
+                            .flatMap(team -> team.getUsers().stream()
+                                    .flatMap(user -> expectations.stream()
+                                            .map(expectation -> expectationConverter(team, user, executableInject, expectation))))
+                            .toList();
+                    injectExpectations.addAll(injectExpectationsByUserAndTeam);
                     this.injectExpectationRepository.saveAll(injectExpectations);
                 } else if (!assets.isEmpty() || !assetGroups.isEmpty()) {
                     List<InjectExpectation> injectExpectations = expectations.stream()

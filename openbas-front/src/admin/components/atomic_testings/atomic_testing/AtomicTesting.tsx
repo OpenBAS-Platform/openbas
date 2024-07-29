@@ -246,6 +246,7 @@ const AtomicTesting = () => {
         <Paper classes={{ root: classes.paper }} variant="outlined" style={{ marginTop: 18 }}>
           {selectedTarget && !!injectResultDto.inject_type && (
           <TargetResultsDetail
+            teamId={}
             target={selectedTarget}
             inject={injectResultDto}
             lastExecutionStartDate={injectResultDto.inject_status?.tracking_sent_date || ''}

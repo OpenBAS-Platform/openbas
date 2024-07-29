@@ -49,7 +49,14 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
 
     // -- BY TARGET TYPE
 
-    @Query(value = "select i from InjectExpectation i where i.inject.id = :injectId and i.team.id = :teamId")
+    @Query(value = "select i from InjectExpectation i where i.inject.id = :injectId and i.team.id = :teamId and i.user.id = :playerId")
+    List<InjectExpectation> findAllByInjectAndTeamAndPlayer(
+        @Param("injectId") @NotBlank final String injectId,
+        @Param("teamId") @NotBlank final String teamId,
+        @Param("playerId") @NotBlank final String playerId
+    );
+
+    @Query(value = "select i from InjectExpectation i where i.inject.id = :injectId and i.team.id = :teamId and i.user is null")
     List<InjectExpectation> findAllByInjectAndTeam(
         @Param("injectId") @NotBlank final String injectId,
         @Param("teamId") @NotBlank final String teamId

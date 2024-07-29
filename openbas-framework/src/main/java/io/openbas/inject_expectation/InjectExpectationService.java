@@ -176,11 +176,13 @@ public class InjectExpectationService {
     public List<InjectExpectation> findExpectationsByInjectAndTargetAndTargetType(
             @NotBlank final String injectId,
             @NotBlank final String targetId,
+            @NotBlank final String targetParentId,
             @NotBlank final String targetType) {
         try {
             TargetType targetTypeEnum = TargetType.valueOf(targetType);
             return switch (targetTypeEnum) {
                 case TEAMS -> injectExpectationRepository.findAllByInjectAndTeam(injectId, targetId);
+                case PLAYER -> injectExpectationRepository.findAllByInjectAndTeamAndPlayer(injectId, targetParentId, targetId);
                 case ASSETS -> injectExpectationRepository.findAllByInjectAndAsset(injectId, targetId);
                 case ASSETS_GROUPS -> injectExpectationRepository.findAllByInjectAndAssetGroup(injectId, targetId);
             };

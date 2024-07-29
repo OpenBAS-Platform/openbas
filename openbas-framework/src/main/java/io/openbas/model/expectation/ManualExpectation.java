@@ -39,6 +39,13 @@ public class ManualExpectation implements Expectation {
     this.description = description;
   }
 
+  public ManualExpectation(final Integer score, @NotBlank final String name, final String description, final boolean expectationGroup) {
+    this(score);
+    this.name = name;
+    this.description = description;
+    this.expectationGroup = expectationGroup;
+  }
+
   public static ManualExpectation manualExpectationForAsset(
           @Nullable final Integer score,
           @NotBlank final String name,

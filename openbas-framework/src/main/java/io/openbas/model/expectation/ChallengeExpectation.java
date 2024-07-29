@@ -14,10 +14,17 @@ public class ChallengeExpectation implements Expectation {
 
   private Integer score;
   private Challenge challenge;
+  private boolean expectationGroup;
 
   public ChallengeExpectation(Integer score, Challenge challenge) {
     setScore(Objects.requireNonNullElse(score, 100));
     setChallenge(challenge);
+  }
+
+  public ChallengeExpectation(Integer score, Challenge challenge, boolean expectationGroup) {
+    setScore(Objects.requireNonNullElse(score, 100));
+    setChallenge(challenge);
+    setExpectationGroup(expectationGroup);
   }
 
   @Override

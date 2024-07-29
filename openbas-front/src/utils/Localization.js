@@ -628,7 +628,7 @@ const i18n = {
       'Number of expectations': "Nombre d'attendus",
       'Inject expectations': 'Attendus du stimuli',
       'Manual expectations': 'Attendus manuels',
-      'Expectations of ': 'Attendus de',
+      'Expectations of ': 'Attendus de ',
       MANUAL: 'Manuel',
       ARTICLE: 'Automatique - Déclenché lorsque l\'équipe a lu l\'article',
       DETECTION: 'Automatique - Detection: Déclenché lorsque l\'injection est traitée',

@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { Button, Chip, TextField as MuiTextField, Typography } from '@mui/material';
+import { Button, Chip, Divider, TextField as MuiTextField, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -83,39 +83,39 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
       expectation_score: expectation.inject_expectation_score ?? expectation.inject_expectation_expected_score ?? 0,
     },
   });
+
   return (
-    <form id="expectationForm" onSubmit={handleSubmit(onSubmit)}>
-      <Chip
-        classes={{ root: classes.chipInList }}
-        style={computeColorStyle(expectation)}
-        label={computeLabel(expectation)}
-      />
-      <Typography variant="h3">{t('Name')}</Typography>
-      {expectation.inject_expectation_name}
-      <div className={classes.marginTop_2}>
-        <Typography variant="h3">{t('Description')}</Typography>
-        <ExpandableText source={expectation.inject_expectation_description} limit={120} />
-      </div>
-      <MuiTextField
-        className={classes.marginTop_2}
-        variant="standard"
-        fullWidth
-        label={t('Score')}
-        type="number"
-        error={!!errors.expectation_score}
-        helperText={errors.expectation_score && errors.expectation_score?.message ? errors.expectation_score?.message : `${t('Expected score:')} ${expectation.inject_expectation_expected_score}`}
-        inputProps={register('expectation_score')}
-      />
-      <div className={classes.buttons}>
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          variant="contained"
-        >
-          {t('Validate')}
-        </Button>
-      </div>
-    </form>
+    <div style={{ marginTop: 10 }}>
+      <form id="expectationForm" onSubmit={handleSubmit(onSubmit)}>
+        <Chip
+          classes={{ root: classes.chipInList }}
+          style={computeColorStyle(expectation)}
+          label={computeLabel(expectation)}
+        />
+        <Typography variant="h3">{expectation.inject_expectation_user ? t('Player') : t('Team')}</Typography>
+        {expectation.inject_expectation_user ? expectation.inject_expectation_user : expectation.inject_expectation_team}
+        <MuiTextField
+          className={classes.marginTop_2}
+          variant="standard"
+          fullWidth
+          label={t('Score')}
+          type="number"
+          error={!!errors.expectation_score}
+          helperText={errors.expectation_score && errors.expectation_score?.message ? errors.expectation_score?.message : `${t('Expected score:')} ${expectation.inject_expectation_expected_score}`}
+          inputProps={register('expectation_score')}
+        />
+        <div className={classes.buttons}>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            variant="contained"
+          >
+            {t('Validate')}
+          </Button>
+        </div>
+        <Divider style={{ marginTop: 20 }}/>
+      </form>
+    </div>
   );
 };
 

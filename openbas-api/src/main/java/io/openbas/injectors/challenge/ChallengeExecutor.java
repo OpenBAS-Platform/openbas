@@ -102,7 +102,7 @@ public class ChallengeExecutor extends Injector {
                 });
                 // Return expectations
                 List<Expectation> expectations = new ArrayList<>();
-                challenges.forEach(challenge -> expectations.add(new ChallengeExpectation(challenge.getScore(), challenge)));
+                challenges.forEach(challenge -> expectations.add(new ChallengeExpectation(challenge.getScore(), challenge, false)));
                 return new ExecutionProcess(false, expectations);
             } else {
                 throw new UnsupportedOperationException("Unknown contract " + contract);
