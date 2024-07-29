@@ -125,6 +125,7 @@ const AttackPatternField: FunctionComponent<Props> = ({
                       typeof openCreate === 'function' && (
                         <IconButton
                           onClick={() => openCreate()}
+                          style={{ position: 'absolute', top: '-8px', right: '22px' }}
                         >
                           <AddOutlined />
                         </IconButton>
