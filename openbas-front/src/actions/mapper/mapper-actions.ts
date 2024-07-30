@@ -1,5 +1,12 @@
 import { Dispatch } from 'redux';
-import type { ExportMapperInput, ImportMapperAddInput, ImportMapperUpdateInput, InjectsImportTestInput, RawPaginationImportMapper, SearchPaginationInput } from '../../utils/api-types';
+import type {
+  ExportMapperInput,
+  ImportMapperAddInput,
+  ImportMapperUpdateInput,
+  InjectsImportTestInput,
+  RawPaginationImportMapper,
+  SearchPaginationInput,
+} from '../../utils/api-types';
 import { postReferential, simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
 
 const XLS_MAPPER_URI = '/api/mappers';
