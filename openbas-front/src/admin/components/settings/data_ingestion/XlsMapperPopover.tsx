@@ -50,7 +50,7 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
       ids_to_export: [mapper.import_mapper_id],
     }).then(
       (result: AxiosResponse<{ data: string }>) => {
-        let filename = result.headers['content-disposition'].split('filename=')[1];
+        const filename = result.headers['content-disposition'].split('filename=')[1];
         download(JSON.stringify(result.data, null, 2), filename, 'application/json');
       },
     );
