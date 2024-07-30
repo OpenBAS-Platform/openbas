@@ -1178,7 +1178,6 @@ const i18n = {
       'Logo dark': 'Logo dark',
       'Update the security platform': 'Update the security platform',
       'Security Platforms': 'Security Platforms',
-      Deleted: 'Deleted',
       'Content should not be empty': 'Content should not be empty',
       Timezone: 'Timezone',
       Log: 'Log',
@@ -1207,7 +1206,7 @@ const i18n = {
       'Security platform': 'Security platform',
       'Security platforms': 'Security platforms',
     },
-    	zh: {
+    zh: {
       'Email address': 'email地址',
       Password: '密码',
       'Password validation': '密码验证',
@@ -2383,7 +2382,6 @@ const i18n = {
       'Logo dark': '深色Logo',
       'Update the security platform': '更新安全平台',
       'Security Platforms': '安全平台',
-      Deleted: '已删除',
       'Content should not be empty': '内容不可为空',
       Timezone: '时区',
       Log: '日志',
