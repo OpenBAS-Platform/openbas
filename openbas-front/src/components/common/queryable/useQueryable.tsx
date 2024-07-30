@@ -1,9 +1,10 @@
 import { useLocalStorage } from 'usehooks-ts';
 import useFiltersState from './filter/useFiltersState';
-import type { FilterGroup, SearchPaginationInput } from '../../../utils/api-types';
+import type { FilterGroup, SearchPaginationInput, SortField } from '../../../utils/api-types';
 import useTextSearchState from './textSearch/useTextSearchState';
 import usPaginationState, { ROWS_PER_PAGE_OPTIONS } from './pagination/usPaginationState';
 import { QueryableHelpers } from './QueryableHelpers';
+import useSortState from './sort/useSortState';
 
 export const buildSearchPagination = (searchPaginationInput: Partial<SearchPaginationInput>) => {
   return ({
@@ -38,10 +39,17 @@ const useQueryable = (localStorageKey: string, initSearchPaginationInput: Partia
     filterGroup,
   }));
 
+  // Sorts
+  const sortHelpers = useSortState(initSearchPaginationInput.sorts, (sorts: SortField[]) => setSearchPaginationInput({
+    ...searchPaginationInput,
+    sorts,
+  }));
+
   const queryableHelpers: QueryableHelpers = {
     textSearchHelpers,
     paginationHelpers,
     filterHelpers,
+    sortHelpers,
   };
 
   return ({

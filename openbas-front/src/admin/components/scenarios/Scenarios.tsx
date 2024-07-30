@@ -1,5 +1,5 @@
 import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { MovieFilterOutlined } from '@mui/icons-material';
 import React, { CSSProperties, useMemo, useState } from 'react';
 import { useFormatter } from '../../../components/i18n';
@@ -11,40 +11,24 @@ import ScenarioCreation from './ScenarioCreation';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { initSorting } from '../../../components/common/queryable/Page';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
-import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
 import type { FilterGroup } from '../../../utils/api-types';
-import type { FilterGroup, ScenarioStatistic, SearchPaginationInput } from '../../../utils/api-types';
 import ItemTags from '../../../components/ItemTags';
 import ItemSeverity from '../../../components/ItemSeverity';
 import PlatformIcon from '../../../components/PlatformIcon';
 import ItemCategory from '../../../components/ItemCategory';
-import type { Theme } from '../../../components/Theme';
 import ImportUploaderScenario from './ImportUploaderScenario';
 import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
 import ScenarioStatus from './scenario/ScenarioStatus';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../actions/Tag';
 import { useAppDispatch } from '../../../utils/hooks';
-import { buildSearchPagination } from '../../../components/common/queryable/useQueryable';
+import useQueryable, { buildSearchPagination } from '../../../components/common/queryable/useQueryable';
 import ScenarioPopover from './scenario/ScenarioPopover';
 import { fetchStatistics } from '../../../actions/Application';
 import ScenariosCard, { CATEGORY_FILTER_KEY } from './ScenariosCard';
-import useFiltersState from '../../../components/common/queryable/filter/useFiltersState';
+import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
 
-const useStyles = makeStyles((theme: Theme) => ({
-  card: {
-    overflow: 'hidden',
-    width: 250,
-    height: 100,
-    marginRight: 20,
-  },
-  cardSelected: {
-    border: `1px solid ${theme.palette.secondary.main}`,
-  },
-  area: {
-    width: '100%',
-    height: '100%',
-  },
+const useStyles = makeStyles(() => ({
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -123,7 +107,7 @@ const Scenarios = () => {
         label={t(scenario.scenario_severity ?? 'Unknown')}
         severity={scenario.scenario_severity ?? 'Unknown'}
         variant="inList"
-      />,
+                                          />,
     },
     {
       field: 'scenario_category',
@@ -133,7 +117,7 @@ const Scenarios = () => {
         category={scenario.scenario_category ?? 'Unknown'}
         label={t(scenario.scenario_category ?? 'Unknown')}
         size="medium"
-      />,
+                                          />,
     },
     {
       field: 'scenario_recurrence',
@@ -176,13 +160,9 @@ const Scenarios = () => {
     mode: 'and',
     filters: [buildEmptyFilter(CATEGORY_FILTER_KEY, 'eq')],
   };
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput } = useQueryable('scenarios', buildSearchPagination({
     sorts: initSorting('scenario_updated_at', 'DESC'),
     filterGroup: scenarioFilter,
-  }));
-  const [filterGroup, helpers] = useFiltersState(searchPaginationInput.filterGroup, (f: FilterGroup) => setSearchPaginationInput({
-    ...searchPaginationInput,
-    filterGroup: f,
   }));
 
   // Export
@@ -204,7 +184,7 @@ const Scenarios = () => {
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Scenarios'), current: true }]} />
-      <ScenariosCard helpers={filterHelpers} searchPaginationInput={searchPaginationInput} />
+      <ScenariosCard helpers={queryableHelpers.filterHelpers} searchPaginationInput={searchPaginationInput} />
       <PaginationComponent
         fetch={searchScenarios}
         searchPaginationInput={searchPaginationInput}
@@ -222,12 +202,10 @@ const Scenarios = () => {
           <ListItemIcon />
           <ListItemText
             primary={
-              <SortHeadersComponent
+              <SortHeadersComponentV2
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
-                searchPaginationInput={searchPaginationInput}
-                setSearchPaginationInput={setSearchPaginationInput}
-                defaultSortAsc
+                sortHelpers={queryableHelpers.sortHelpers}
               />
             }
           />
@@ -280,7 +258,7 @@ const Scenarios = () => {
           setScenarios([result, ...scenarios]);
           fetchStatistics();
         }}
-      />
+                    />
       }
     </>
   );
