@@ -35,8 +35,9 @@ const checkLanguageSupport = (lang) => {
         }
       });
     } catch (error) {
-      console.error(`Error reading file ${filePath}:${error}`);
+      return `Error reading file ${filePath}:${error}`;
     }
+    return null;
   };
   const read = (dirPath) => {
     const files = fs.readdirSync(dirPath);
@@ -56,17 +57,16 @@ const checkLanguageSupport = (lang) => {
 
 const run = () => {
   const languages = ['fr', 'zh'];
-  let hasMissingKeys = false;
+  const _missingKeys = {};
 
   languages.forEach((lang) => {
-    const missingKeys = checkLanguageSupport(lang);
-    if (missingKeys.length > 0) {
-      console.error(`Missing keys for ${lang}:${missingKeys.join(', ')}`);
-      hasMissingKeys = true;
+    const keys = checkLanguageSupport(lang);
+    if (keys.length > 0) {
+      _missingKeys[lang] = keys;
     }
   });
 
-  process.exit(hasMissingKeys ? 1 : 0);
+  return _missingKeys;
 };
 
-run();
+const _missingKeys = run();
