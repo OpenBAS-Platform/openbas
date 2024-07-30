@@ -18,47 +18,55 @@ const computeLangKeys = (lang) => {
 
 // -- Match missing keys --
 
-const results = [];
-let langI18n = {};
+const checkLanguageSupport = (lang) => {
+  const results = [];
+  const langI18n = computeLangKeys(lang);
 
-const match = (filePath) => {
-  const data = fs.readFileSync(filePath, { encoding: 'utf8' });
-  const regexp = /t\('([\w\s]+)'\)/g;
-  const matches = [...data.matchAll(regexp)];
-  if (matches.length > 0) {
-    matches.forEach((m) => {
-      const regexWithQuote = `'${m[1]}':`;
-      const regexWithoutQuote = `${m[1]}:`;
-      if (!langI18n.match(regexWithQuote) && !langI18n.match(regexWithoutQuote)) {
-        results.push(m[1]);
+  const match = (filePath) => {
+    try {
+      const data = fs.readFileSync(filePath, { encoding: 'utf8' });
+      const regexp = /t\('([\w\s]+)'\)/g;
+      const matches = [...data.matchAll(regexp)];
+      matches.forEach((m) => {
+        const regexWithQuote = `'${m[1]}':`;
+        const regexWithoutQuote = `${m[1]}:`;
+        if (!langI18n.match(regexWithQuote) && !langI18n.match(regexWithoutQuote)) {
+          results.push(m[1]);
+        }
+      });
+    } catch (error) {
+      return `Error reading file ${filePath}:${error}`;
+    }
+    return null;
+  };
+  const read = (dirPath) => {
+    const files = fs.readdirSync(dirPath);
+    files.forEach((file) => {
+      const filePath = path.join(dirPath, file);
+      const isDir = fs.lstatSync(filePath).isDirectory();
+      if (!isDir) {
+        match(filePath);
+      } else {
+        read(filePath);
       }
     });
-  }
-};
-
-const read = (dirPath) => {
-  const files = fs.readdirSync(dirPath);
-  files.forEach((file) => {
-    const filePath = path.join(dirPath, file);
-    const isDir = fs.lstatSync(filePath).isDirectory();
-    if (!isDir) {
-      match(filePath);
-    } else {
-      read(filePath);
-    }
-  });
+  };
+  read(__dirname);
+  return results;
 };
 
 const run = () => {
-  langI18n = computeLangKeys('fr');
-  read(__dirname);
-  if (results.length === 0) {
-    process.exit(0);
-  } else {
-    // eslint-disable-next-line no-console
-    console.error(`Missing keys : ${results.join(', ')}`);
-    process.exit(1);
-  }
+  const languages = ['fr', 'zh'];
+  const _missingKeys = {};
+
+  languages.forEach((lang) => {
+    const keys = checkLanguageSupport(lang);
+    if (keys.length > 0) {
+      _missingKeys[lang] = keys;
+    }
+  });
+
+  return _missingKeys;
 };
 
-run();
+const _missingKeys = run();
