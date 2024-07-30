@@ -27,6 +27,7 @@ import ScenarioPopover from './scenario/ScenarioPopover';
 import { fetchStatistics } from '../../../actions/Application';
 import ScenariosCard, { CATEGORY_FILTER_KEY } from './ScenariosCard';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
+import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -185,14 +186,17 @@ const Scenarios = () => {
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Scenarios'), current: true }]} />
       <ScenariosCard helpers={queryableHelpers.filterHelpers} searchPaginationInput={searchPaginationInput} />
-      <PaginationComponent
+      <PaginationComponentV2
         fetch={searchScenarios}
         searchPaginationInput={searchPaginationInput}
         setContent={setScenarios}
+        entityPrefix="scenario"
+        availableFilterNames={['scenario_kill_chain_phases', 'scenario_tags']}
+        queryableHelpers={queryableHelpers}
         exportProps={exportProps}
       >
         <ImportUploaderScenario />
-      </PaginationComponent>
+      </PaginationComponentV2>
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}

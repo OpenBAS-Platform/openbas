@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { searchInjectorByIdAsOptions } from '../../../../actions/injectors/injector-action';
 import { Option } from '../../../../utils/Option';
 import { searchKillChainPhasesByIdAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
+import { searchTagAsOption, searchTagByIdAsOption } from '../../../../actions/tags/tag-action';
 
 const useRetrieveOptions = () => {
   const [options, setOptions] = useState<Option[]>([]);
@@ -14,7 +15,13 @@ const useRetrieveOptions = () => {
         });
         break;
       case 'injector_contract_kill_chain_phases':
+      case 'scenario_kill_chain_phases':
         searchKillChainPhasesByIdAsOption(ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'scenario_tags':
+        searchTagByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;

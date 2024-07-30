@@ -855,6 +855,9 @@ const i18n = {
       injector_contract_platforms: 'Platforms',
       injector_contract_injector: 'Injector',
       injector_contract_kill_chain_phases: 'Phases de kill chain',
+      // Scenario
+      scenario_tags: 'Tags',
+      scenario_kill_chain_phases: 'Phases de kill chain',
       Recurrence: 'Récurrence',
       'Does not repeat': 'Ne se répète pas',
       Daily: 'Quotidien',
@@ -2524,6 +2527,9 @@ const i18n = {
       injector_contract_platforms: 'Platforms',
       injector_contract_injector: 'Injector',
       injector_contract_kill_chain_phases: 'Kill chain phases',
+      // Scenario
+      scenario_tags: 'Tags',
+      scenario_kill_chain_phases: 'Kill chain phases',
       recurrence_The: 'The',
       recurrence_at: 'at',
       recurrence_from: 'from',

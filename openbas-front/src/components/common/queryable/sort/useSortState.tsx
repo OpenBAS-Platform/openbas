@@ -10,8 +10,8 @@ const computeDirection = (direction?: string) => {
 };
 
 const useSortState = (initSorts: SortField[] = [], onChange?: (sorts: SortField[]) => void) => {
-  const [sortBy, setSortBy] = useState(initSorts?.[0].property ?? '');
-  const [sortAsc, setSortAsc] = useState(computeDirection(initSorts?.[0].direction));
+  const [sortBy, setSortBy] = useState(initSorts?.[0]?.property ?? '');
+  const [sortAsc, setSortAsc] = useState(computeDirection(initSorts?.[0]?.direction));
 
   const helpers: SortHelpers = {
     handleSort: (field: string) => {

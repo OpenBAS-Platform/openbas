@@ -34,7 +34,7 @@ const DynamicAssetField: FunctionComponent<Props> = ({
         </Tooltip>
       </div>
       <FilterField
-        clazz="Endpoint"
+        entityPrefix="endpoint"
         filterGroup={filterGroup}
         helpers={helpers}
         style={{ marginTop: 20 }}
