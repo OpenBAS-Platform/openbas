@@ -1,18 +1,17 @@
 package io.openbas.database.specification;
 
-import io.openbas.database.model.Injector;
+import io.openbas.database.model.Tag;
 import jakarta.annotation.Nullable;
 import org.springframework.data.jpa.domain.Specification;
 
-public class InjectorSpecification {
+public class TagSpecification {
 
-  private InjectorSpecification() {
+  private TagSpecification() {
 
   }
 
-  public static Specification<Injector> byName(@Nullable final String searchText) {
+  public static Specification<Tag> byName(@Nullable final String searchText) {
     return UtilsSpecification.byName(searchText, "name");
   }
-
 
 }

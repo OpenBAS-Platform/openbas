@@ -11,13 +11,7 @@ public class KillChainPhaseSpecification {
   }
 
   public static Specification<KillChainPhase> byName(@Nullable final String searchText) {
-    return (root, query, cb) -> {
-      if (searchText == null || searchText.isEmpty()) {
-        return cb.conjunction();
-      }
-      String likePattern = "%" + searchText.toLowerCase() + "%";
-      return cb.like(cb.lower(root.get("name")), likePattern);
-    };
+    return UtilsSpecification.byName(searchText, "name");
   }
 
 }

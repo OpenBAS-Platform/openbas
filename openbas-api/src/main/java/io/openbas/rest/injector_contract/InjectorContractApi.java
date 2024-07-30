@@ -1,6 +1,5 @@
 package io.openbas.rest.injector_contract;
 
-import io.openbas.database.model.Filters;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.raw.RawInjectorsContrats;
 import io.openbas.database.repository.AttackPatternRepository;
@@ -23,13 +22,12 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
-import java.util.Optional;
 import java.util.function.Function;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.utils.FilterUtilsJpa.computeFilterFromSpecificPath;
+import static io.openbas.rest.injector_contract.utils.InjectorContractUtils.handleCustomFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
 @RequiredArgsConstructor
@@ -50,37 +48,15 @@ public class InjectorContractApi extends RestBehavior {
 
     @PostMapping("/api/injector_contracts/search")
     public Page<InjectorContractOutput> injectorContracts(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-        if( searchPaginationInput.getFilterGroup() != null ) {
-            Optional<Filters.Filter> killChainPhaseFilterOpt = searchPaginationInput.getFilterGroup()
-                .findByKey("injector_contract_kill_chain_phases");
-            if (killChainPhaseFilterOpt.isPresent()) {
-                Filters.Filter killChainPhaseFilter = killChainPhaseFilterOpt.get();
-                    // Purge filter
-                    searchPaginationInput.getFilterGroup().removeByKey("injector_contract_kill_chain_phases");
-                    Specification<InjectorContract> customSpecification = computeFilterFromSpecificPath(
-                        killChainPhaseFilter, "attackPatterns.killChainPhases.id"
-                    );
-                    // Final specification
-                    Function<Specification<InjectorContract>, Specification<InjectorContract>> computeSpecification;
-                    if (Filters.FilterMode.and.equals(searchPaginationInput.getFilterGroup().getMode())) {
-                        computeSpecification = customSpecification::and;
-                    } else if (Filters.FilterMode.or.equals(searchPaginationInput.getFilterGroup().getMode())){
-                        computeSpecification = customSpecification::or;
-                    } else {
-                      computeSpecification = (Specification<InjectorContract> specification) -> specification;
-                    }
-              return buildPaginationCriteriaBuilder(
-                        (Specification<InjectorContract> specification, Pageable pageable) -> this.injectorContractService.injectorContracts(
-                            computeSpecification.apply(specification),
-                            pageable
-                        ),
-                        searchPaginationInput,
-                        InjectorContract.class
-                    );
-            }
-        }
+        Function<Specification<InjectorContract>, Specification<InjectorContract>> finalSpecification = handleCustomFilter(
+            searchPaginationInput
+        );
+
         return buildPaginationCriteriaBuilder(
-            this.injectorContractService::injectorContracts,
+            (Specification<InjectorContract> specification, Pageable pageable) -> this.injectorContractService.injectorContracts(
+                finalSpecification.apply(specification),
+                pageable
+            ),
                 searchPaginationInput,
                 InjectorContract.class
         );

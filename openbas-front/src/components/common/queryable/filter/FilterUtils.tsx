@@ -94,7 +94,12 @@ export const availableOperators = (propertySchema: PropertySchemaDTO) => {
   ];
 };
 
-export const convertJavaClassToJsonClass = (input: string) => {
-  const converted = input.replace(/([A-Z])/g, '_$1').toLowerCase();
-  return converted.startsWith('_') ? converted.slice(1) : converted;
+export const convertJsonClassToJavaClass = (input: string) => {
+  const segments = input.split('_');
+
+  return segments
+    .map((segment) => {
+      return segment.charAt(0).toUpperCase() + segment.slice(1).toLowerCase();
+    })
+    .join('');
 };
