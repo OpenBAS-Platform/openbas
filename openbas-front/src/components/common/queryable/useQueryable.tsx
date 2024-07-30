@@ -14,7 +14,6 @@ export const buildSearchPagination = (searchPaginationInput: Partial<SearchPagin
 };
 
 const useQueryable = (localStorageKey: string, initSearchPaginationInput: Partial<SearchPaginationInput>) => {
-
   const finalSearchPaginationInput: SearchPaginationInput = buildSearchPagination(initSearchPaginationInput);
 
   const [searchPaginationInput, setSearchPaginationInput] = useLocalStorage<SearchPaginationInput>(localStorageKey, finalSearchPaginationInput);
