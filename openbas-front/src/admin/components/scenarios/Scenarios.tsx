@@ -1,18 +1,18 @@
 import { makeStyles } from '@mui/styles';
-import { Card, CardActionArea, CardContent, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { MovieFilterOutlined } from '@mui/icons-material';
-import React, { CSSProperties, useEffect, useState } from 'react';
-import classNames from 'classnames';
+import React, { CSSProperties, useMemo, useState } from 'react';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import type { TagHelper, UserHelper } from '../../../actions/helper';
-import { fetchScenarioStatistic, searchScenarios } from '../../../actions/scenarios/scenario-actions';
+import { searchScenarios } from '../../../actions/scenarios/scenario-actions';
 import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import ScenarioCreation from './ScenarioCreation';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { initSorting } from '../../../components/common/queryable/Page';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
+import type { FilterGroup } from '../../../utils/api-types';
 import type { FilterGroup, ScenarioStatistic, SearchPaginationInput } from '../../../utils/api-types';
 import ItemTags from '../../../components/ItemTags';
 import ItemSeverity from '../../../components/ItemSeverity';
@@ -21,13 +21,14 @@ import ItemCategory from '../../../components/ItemCategory';
 import type { Theme } from '../../../components/Theme';
 import ImportUploaderScenario from './ImportUploaderScenario';
 import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
-import { scenarioCategories } from './ScenarioForm';
 import ScenarioStatus from './scenario/ScenarioStatus';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../actions/Tag';
 import { useAppDispatch } from '../../../utils/hooks';
 import { buildSearchPagination } from '../../../components/common/queryable/useQueryable';
 import ScenarioPopover from './scenario/ScenarioPopover';
+import { fetchStatistics } from '../../../actions/Application';
+import ScenariosCard, { CATEGORY_FILTER_KEY } from './ScenariosCard';
 import useFiltersState from '../../../components/common/queryable/filter/useFiltersState';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -107,20 +108,70 @@ const Scenarios = () => {
   });
 
   // Headers
-  const headers = [
-    { field: 'scenario_name', label: 'Name', isSortable: true },
-    { field: 'scenario_severity', label: 'Severity', isSortable: true },
-    { field: 'scenario_category', label: 'Category', isSortable: true },
-    { field: 'scenario_recurrence', label: 'Status', isSortable: true },
-    { field: 'scenario_platforms', label: 'Platforms', isSortable: false },
-    { field: 'scenario_tags', label: 'Tags', isSortable: false },
-    { field: 'scenario_updated_at', label: 'Updated', isSortable: true },
-  ];
+  const headers = useMemo(() => [
+    {
+      field: 'scenario_name',
+      label: 'Name',
+      isSortable: true,
+      value: (scenario: ScenarioStore) => scenario.scenario_name,
+    },
+    {
+      field: 'scenario_severity',
+      label: 'Severity',
+      isSortable: true,
+      value: (scenario: ScenarioStore) => <ItemSeverity
+        label={t(scenario.scenario_severity ?? 'Unknown')}
+        severity={scenario.scenario_severity ?? 'Unknown'}
+        variant="inList"
+      />,
+    },
+    {
+      field: 'scenario_category',
+      label: 'Category',
+      isSortable: true,
+      value: (scenario: ScenarioStore) => <ItemCategory
+        category={scenario.scenario_category ?? 'Unknown'}
+        label={t(scenario.scenario_category ?? 'Unknown')}
+        size="medium"
+      />,
+    },
+    {
+      field: 'scenario_recurrence',
+      label: 'Status',
+      isSortable: true,
+      value: (scenario: ScenarioStore) => <ScenarioStatus scenario={scenario} variant="list" />,
+    },
+    {
+      field: 'scenario_platforms',
+      label: 'Platforms',
+      isSortable: false,
+      value: (scenario: ScenarioStore) => {
+        const platforms = scenario.scenario_platforms ?? [];
+        if (platforms.length === 0) {
+          return <PlatformIcon platform={t('No inject in this scenario')} tooltip={true} width={25} />;
+        }
+        return platforms.map(
+          (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip={true} width={20} marginRight={10} />,
+        );
+      },
+    },
+    {
+      field: 'scenario_tags',
+      label: 'Tags',
+      isSortable: false,
+      value: (scenario: ScenarioStore) => <ItemTags tags={scenario.scenario_tags} variant="list" />,
+    },
+    {
+      field: 'scenario_updated_at',
+      label: 'Updated',
+      isSortable: true,
+      value: (scenario: ScenarioStore) => nsdt(scenario.scenario_updated_at),
+    },
+  ], []);
 
   const [scenarios, setScenarios] = useState<ScenarioStore[]>([]);
 
   // Category filter
-  const CATEGORY_FILTER_KEY = 'scenario_category';
   const scenarioFilter: FilterGroup = {
     mode: 'and',
     filters: [buildEmptyFilter(CATEGORY_FILTER_KEY, 'eq')],
@@ -133,56 +184,6 @@ const Scenarios = () => {
     ...searchPaginationInput,
     filterGroup: f,
   }));
-
-  const handleOnClickCategory = (category?: string) => {
-    if (!category) {
-      // Clear filter
-      helpers.handleAddMultipleValueFilter(
-        CATEGORY_FILTER_KEY,
-        [],
-      );
-    } else {
-      helpers.handleAddSingleValueFilter(
-        CATEGORY_FILTER_KEY,
-        category,
-      );
-    }
-  };
-  const getCategoryValue = () => filterGroup.filters?.find((f) => f.key === CATEGORY_FILTER_KEY)?.values;
-  const hasCategory = (category: string) => getCategoryValue()?.includes(category);
-  const noCategory = () => getCategoryValue()?.length === 0;
-
-  // Statistic
-  const [statistic, setStatistic] = useState<ScenarioStatistic>();
-  const fetchStatistics = () => {
-    fetchScenarioStatistic().then((result: { data: ScenarioStatistic }) => setStatistic(result.data));
-  };
-  useEffect(() => {
-    fetchStatistics();
-  }, []);
-
-  const categoryCard = (category: string, count: number) => (
-    <Card
-      key={category}
-      classes={{ root: classes.card }} variant="outlined"
-      onClick={() => handleOnClickCategory(category)}
-      className={classNames({ [classes.cardSelected]: hasCategory(category) })}
-    >
-      <CardActionArea classes={{ root: classes.area }}>
-        <CardContent>
-          <div style={{ marginBottom: 10 }}>
-            <ItemCategory category={category} size="small" />
-          </div>
-          <div style={{ fontSize: 15, fontWeight: 600 }}>
-            {t(scenarioCategories.get(category) ?? category)}
-          </div>
-          <div style={{ marginTop: 10, fontSize: 12, fontWeight: 500 }}>
-            {count} {t('scenarios')}
-          </div>
-        </CardContent>
-      </CardActionArea>
-    </Card>
-  );
 
   // Export
   const exportProps = {
@@ -203,31 +204,7 @@ const Scenarios = () => {
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Scenarios'), current: true }]} />
-      <div style={{ display: 'flex', marginBottom: 30 }}>
-        <Card
-          key="all"
-          classes={{ root: classes.card }} variant="outlined"
-          onClick={() => handleOnClickCategory()}
-          className={classNames({ [classes.cardSelected]: noCategory() })}
-        >
-          <CardActionArea classes={{ root: classes.area }}>
-            <CardContent>
-              <div style={{ marginBottom: 10 }}>
-                <ItemCategory category="all" size="small" />
-              </div>
-              <div style={{ fontSize: 15, fontWeight: 600 }}>
-                {t('All categories')}
-              </div>
-              <div style={{ marginTop: 10, fontSize: 12, fontWeight: 500 }}>
-                {statistic?.scenarios_global_count ?? '-'} {t('scenarios')}
-              </div>
-            </CardContent>
-          </CardActionArea>
-        </Card>
-        {Object.entries(statistic?.scenarios_attack_scenario_count ?? {}).map(([key, value]) => (
-          categoryCard(key, value)
-        ))}
-      </div>
+      <ScenariosCard helpers={filterHelpers} searchPaginationInput={searchPaginationInput} />
       <PaginationComponent
         fetch={searchScenarios}
         searchPaginationInput={searchPaginationInput}
@@ -236,24 +213,13 @@ const Scenarios = () => {
       >
         <ImportUploaderScenario />
       </PaginationComponent>
-
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
         >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
-              &nbsp;
-            </span>
-          </ListItemIcon>
+          <ListItemIcon />
           <ListItemText
             primary={
               <SortHeadersComponent
@@ -292,54 +258,15 @@ const Scenarios = () => {
                 <ListItemText
                   primary={
                     <div className={classes.bodyItems}>
-                      <Tooltip title={scenario.scenario_name}>
+                      {headers.map((header) => (
                         <div
+                          key={header.field}
                           className={classes.bodyItem}
-                          style={inlineStyles.scenario_name}
+                          style={inlineStyles[header.field]}
                         >
-                          {scenario.scenario_name}
+                          {header.value(scenario)}
                         </div>
-                      </Tooltip>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.scenario_severity}
-                      >
-                        <ItemSeverity label={t(scenario.scenario_severity ?? 'Unknown')} severity={scenario.scenario_severity ?? 'Unknown'} variant="inList" />
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.scenario_category}
-                      >
-                        <ItemCategory category={scenario.scenario_category ?? 'Unknown'} label={t(scenario.scenario_category ?? 'Unknown')} size="medium" />
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.scenario_recurrence}
-                      >
-                        <ScenarioStatus scenario={scenario} variant="list" />
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.scenario_platforms}
-                      >
-                        {scenario.scenario_platforms?.length === 0 ? (
-                          <PlatformIcon platform={t('No inject in this scenario')} tooltip={true} width={25} />
-                        ) : scenario.scenario_platforms?.map(
-                          (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip={true} width={20} marginRight={10} />,
-                        )}
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.scenario_tags}
-                      >
-                        <ItemTags tags={scenario.scenario_tags} variant="list" />
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.scenario_updated_at}
-                      >
-                        {nsdt(scenario.scenario_updated_at)}
-                      </div>
+                      ))}
                     </div>
                   }
                 />
@@ -353,7 +280,7 @@ const Scenarios = () => {
           setScenarios([result, ...scenarios]);
           fetchStatistics();
         }}
-                    />
+      />
       }
     </>
   );
