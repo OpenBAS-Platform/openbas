@@ -10,7 +10,7 @@ import colorStyles from '../../../../../../components/Color';
 import Drawer from '../../../../../../components/common/Drawer';
 import ManualExpectationsValidationForm from './ManualExpectationsValidationForm';
 import ExpandableText from '../../../../../../components/common/ExpendableText';
-import { Inject } from '../../../../../../utils/api-types';
+import type { Inject } from '../../../../../../utils/api-types';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -132,10 +132,12 @@ const ManualExpectations: FunctionComponent<Props> = ({
               />
             </AlertTitle>
           </Alert>
-          <div style={{ paddingTop: 10 }}>
+          <div style={{ padding: '10px 0' }}>
             <ManualExpectationsValidationForm key={parentExpectation} expectation={parentExpectation}/>
           </div>
-          <div style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+          <Divider style={{ marginTop: 20 }}/>
+          <div style={{ maxHeight: '80vh', overflowY: 'auto', padding: '10px 0 10px 0' }}>
+            <Typography variant="h5">{t('Players')}</Typography>
             {childrenExpectations && childrenExpectations.map((e) => (
               <ManualExpectationsValidationForm
                 key={e.inject_expectation_id}

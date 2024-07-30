@@ -41,6 +41,7 @@ import DetectionPreventionExpectationsValidationForm from '../../simulations/sim
 import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { InjectExpectationStore } from '../../../../actions/injects/Inject';
+import { isTechnicalExpectation } from '../../common/injects/expectations/ExpectationUtils';
 
 interface Steptarget {
   label: string;
@@ -88,7 +89,7 @@ interface Props {
   lastExecutionStartDate: string,
   lastExecutionEndDate: string,
   target: InjectTargetWithResult,
-  teamId: string,
+  parentTargetId?: string,
 }
 
 const TargetResultsDetailFlow: FunctionComponent<Props> = ({
@@ -96,7 +97,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   lastExecutionStartDate,
   lastExecutionEndDate,
   target,
-  teamId,
+  parentTargetId,
 }) => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -216,7 +217,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
       })));
       if (target.targetType === 'PLAYER') {
-        fetchTargetResult(inject.inject_id, target.id!, target.targetType!, teamId).then(
+        fetchTargetResult(inject.inject_id, target.id!, target.targetType!, parentTargetId).then(
           (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
         );
       } else {
@@ -274,7 +275,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         return '';
     }
   };
-
   const getAvatar = (injectExpectation: InjectExpectationStore, expectationResult: InjectExpectationResult) => {
     if (expectationResult.sourceType === 'collector') {
       return (
@@ -400,6 +400,17 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     type: 'straight',
     markerEnd: { type: MarkerType.ArrowClosed },
   };
+  const getLabelOfValidationType = (injectExpectation: InjectExpectationsStore): string => {
+    // eslint-disable-next-line no-nested-ternary
+    return isTechnicalExpectation(injectExpectation.inject_expectation_type)
+      ? injectExpectation.inject_expectation_group
+        ? 'At least one asset'
+        : 'All assets'
+      : injectExpectation.inject_expectation_group
+        ? 'At least one player'
+        : 'All players';
+  };
+
   return (
     <>
       <div className={classes.target}>
@@ -470,9 +481,9 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                 </Grid>
                 <Grid item={true} xs={8}>
                   <Typography variant="h4">
-                    {t('Description')}
+                    {t('Validation type')}
                   </Typography>
-                  {emptyFilled(injectExpectation.inject_expectation_description)}
+                  {emptyFilled(getLabelOfValidationType(injectExpectation))}
                 </Grid>
               </Grid>
               <Typography variant="h4" style={{ marginTop: 20 }}>

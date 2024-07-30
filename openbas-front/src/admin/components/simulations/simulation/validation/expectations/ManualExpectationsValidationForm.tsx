@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { Button, Chip, Divider, TextField as MuiTextField, Typography } from '@mui/material';
+import { Button, Chip, TextField as MuiTextField, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,7 +8,6 @@ import type { InjectExpectationsStore } from '../../../../common/injects/expecta
 import { useFormatter } from '../../../../../../components/i18n';
 import { updateInjectExpectation } from '../../../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../../../utils/hooks';
-import ExpandableText from '../../../../../../components/common/ExpendableText';
 import type { Theme } from '../../../../../../components/Theme';
 import colorStyles from '../../../../../../components/Color';
 import { zodImplement } from '../../../../../../utils/Zod';
@@ -113,7 +112,6 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
             {t('Validate')}
           </Button>
         </div>
-        <Divider style={{ marginTop: 20 }}/>
       </form>
     </div>
   );

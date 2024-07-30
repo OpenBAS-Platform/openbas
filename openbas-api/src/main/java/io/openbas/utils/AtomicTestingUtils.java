@@ -8,7 +8,6 @@ import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.raw.RawTeam;
 import io.openbas.expectation.ExpectationType;
-import io.openbas.model.Expectation;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.utils.AtomicTestingMapper.ResultDistribution;
@@ -91,17 +90,12 @@ public class AtomicTestingUtils {
         List<InjectTargetWithResult> assetsToRefine = new ArrayList<>();
 
         // Players
-        Map<String, List<InjectTargetWithResult>> playerExpectationsMap = playerExpectations.stream()
+        Map<Team, Map<User, List<InjectExpectation>>> groupedByTeamAndUser = playerExpectations.stream()
                 .collect(Collectors.groupingBy(
-                        pe -> pe.getTeam().getId(),
-                        Collectors.mapping(pe -> new InjectTargetWithResult(
-                                TargetType.PLAYER,
-                                pe.getUser().getId(),
-                                pe.getUser().getName(),
-                                getExpectationResultByTypes(Collections.singletonList(pe)),
-                                null
-                        ), Collectors.toList())
+                        InjectExpectation::getTeam,
+                        Collectors.groupingBy(InjectExpectation::getUser)
                 ));
+
         /* Match Target with expectations
          * */
         inject.getTeams().forEach(team -> {
@@ -189,7 +183,7 @@ public class AtomicTestingUtils {
                                     )
                             )
                             .entrySet().stream()
-                            .map(entry -> new InjectTargetWithResult(TargetType.TEAMS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue(), playerExpectationsMap.get(entry.getKey().getId()), null))
+                            .map(entry -> new InjectTargetWithResult(TargetType.TEAMS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue(), calculateChildren(groupedByTeamAndUser.get(entry.getKey())), null))
                             .toList()
             );
         }
@@ -283,6 +277,18 @@ public class AtomicTestingUtils {
 
         targets.addAll(assetsToRefine);
         return sortResults(targets);
+    }
+
+    private static List<InjectTargetWithResult> calculateChildren(Map<User, List<InjectExpectation>> expectationsByUser) {
+        return expectationsByUser.entrySet().stream()
+                .map(userEntry -> new InjectTargetWithResult(
+                        TargetType.PLAYER,
+                        userEntry.getKey().getId(),
+                        userEntry.getKey().getName(),
+                        getExpectationResultByTypes(userEntry.getValue()),
+                        null
+                ))
+                .toList();
     }
 
     private static List<InjectTargetWithResult> sortResults(List<InjectTargetWithResult> targets) {
