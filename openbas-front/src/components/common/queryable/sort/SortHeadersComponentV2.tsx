@@ -1,8 +1,8 @@
-import React, { CSSProperties, FunctionComponent, useState } from 'react';
+import React, { CSSProperties, FunctionComponent } from 'react';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../../i18n';
-import type { SearchPaginationInput } from '../../../utils/api-types';
+import { SortHelpers } from './SortHelpers';
+import { useFormatter } from '../../../i18n';
 
 const useStyles = makeStyles(() => ({
   sortableHeaderItem: {
@@ -39,50 +39,28 @@ export interface Header {
 interface Props {
   headers: Header[];
   inlineStylesHeaders: Record<string, CSSProperties>;
-  searchPaginationInput: SearchPaginationInput;
-  setSearchPaginationInput: (datas: SearchPaginationInput) => void;
-  defaultSortAsc?: boolean;
+  sortHelpers: SortHelpers;
 }
 
-const SortHeadersComponent: FunctionComponent<Props> = ({
+const SortHeadersComponentV2: FunctionComponent<Props> = ({
   headers,
   inlineStylesHeaders,
-  searchPaginationInput,
-  setSearchPaginationInput,
-  defaultSortAsc = false,
+  sortHelpers,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();
 
-  const [sortBy, setSortBy] = useState(searchPaginationInput.sorts?.[0].property ?? '');
-  const [sortAsc, setSortAsc] = useState(defaultSortAsc);
-
-  const reverseBy = (field: string) => {
-    setSortBy(field);
-    setSortAsc(!sortAsc);
-
-    const sorts = [{
-      property: field,
-      direction: (sortAsc ? 'ASC' : 'DESC'),
-    }];
-
-    setSearchPaginationInput({
-      ...searchPaginationInput,
-      sorts,
-    });
-  };
-
   const sortComponent = (asc: boolean) => {
-    return asc ? (<ArrowDropDownOutlined />) : (<ArrowDropUpOutlined />);
+    return asc ? (<ArrowDropUpOutlined />) : (<ArrowDropDownOutlined/>);
   };
 
   const sortHeader = (header: Header, style: CSSProperties) => {
     if (header.isSortable) {
       return (
-        <div key={header.field} className={classes.sortableHeaderItem} style={style} onClick={() => reverseBy(header.field)}>
+        <div key={header.field} className={classes.sortableHeaderItem} style={style} onClick={() => sortHelpers.handleSort(header.field)}>
           <div className={classes.headerItemText}>{t(header.label)}</div>
-          {sortBy === header.field ? sortComponent(sortAsc) : ''}
+          {sortHelpers.getSortBy() === header.field ? sortComponent(sortHelpers.getSortAsc()) : ''}
         </div>
       );
     }
@@ -100,4 +78,4 @@ const SortHeadersComponent: FunctionComponent<Props> = ({
   );
 };
 
-export default SortHeadersComponent;
+export default SortHeadersComponentV2;
