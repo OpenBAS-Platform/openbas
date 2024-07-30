@@ -1,41 +1,47 @@
-import React, {CSSProperties, memo, useRef, useState} from 'react';
-import cc from 'classcat';
+import React, { CSSProperties, memo } from 'react';
 import { shallow } from 'zustand/shallow';
-
-import {useStore, type ReactFlowState, type BackgroundProps, BackgroundVariant, Panel, Transform} from '@xyflow/react';
+import { useStore, type ReactFlowState, type BackgroundProps, Panel } from '@xyflow/react';
+import { makeStyles } from '@mui/styles';
+import moment from 'moment-timezone';
 
 const selector = (s: ReactFlowState) => ({ transform: s.transform, patternId: `pattern-${s.rfId}` });
 
-function BackgroundComponent({
-                                 id,
-                                 variant = BackgroundVariant.Dots,
-                                 // only used for dots and cross
-                                 gap = 100,
-                                 // only used for lines and cross
-                                 size,
-                                 lineWidth = 1,
-                                 offset = 2,
-                                 color,
-                                 style,
-                                 className,
-                             }: BackgroundProps) {
-    const ref = useRef<SVGSVGElement>(null);
-    const { transform, patternId } = useStore(selector, shallow);
-    const transformRef = useRef<Transform>(transform);
-    const patternSize = size || 1;
-    const gapXY: [number, number] = Array.isArray(gap) ? gap : [gap, gap];
-    const scaledGap: [number, number] = [gapXY[0] * transform[2] || 1, gapXY[1] * transform[2] || 1];
-    const scaledSize = patternSize * transform[2];
+const useStyles = makeStyles(() => ({
+  panel: {
+    pointerEvents: 'none !important',
+    width: '100%',
+    height: '100%',
+    margin: '0px',
+  },
+}));
 
-    return (
-        <Panel>
-            <div
-                style={{ transform: `translate(${transformRef.current[0]}, 100px)`, position: 'absolute' }}
-            >
-                This div is positioned at [{transformRef.current[0]}, 100] on the flow.
-            </div>
-        </Panel>
-    );
+function BackgroundComponent({
+  style,
+}: BackgroundProps) {
+  const classes = useStyles();
+  const { transform } = useStore(selector, shallow);
+  const desiredFontSize = 16;
+  const parsedDate = moment(new Date(2024, 7, 28, 9, 30, 0)).format('HH:mm:ss');
+
+  return (
+    <Panel className={classes.panel}>
+      <svg
+        style={
+          {
+            ...style,
+            width: '100%',
+            height: '100%',
+            top: 0,
+            left: 0,
+          } as CSSProperties
+        }
+      >
+        <text fill="#ffffff" fontSize={desiredFontSize} fontFamily="Verdana" x={transform[0]} y={desiredFontSize}>
+          {parsedDate}
+        </text>
+      </svg>
+    </Panel>
+  );
 }
 
 BackgroundComponent.displayName = 'CustomTimelinePanel';

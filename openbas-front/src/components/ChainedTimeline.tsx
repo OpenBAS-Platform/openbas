@@ -1,93 +1,19 @@
-import React, {FunctionComponent, useEffect, useRef, useState} from 'react';
+import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
+import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow, reconnectEdge, Connection, Edge } from '@xyflow/react';
 import type { InjectStore } from '../actions/injects/Inject';
 import type { Theme } from './Theme';
 import { useFormatter } from './i18n';
-import {
-  MarkerType,
-  ReactFlow,
-  ReactFlowProvider,
-  useEdgesState,
-  useNodesState,
-  useReactFlow,
-  reconnectEdge,
-  Background, BackgroundVariant, ViewportPortal, Connection, Edge, Node, Panel
-} from "@xyflow/react";
-import nodeTypes from "./nodes";
-import {useAutoLayoutInject, LayoutOptions} from "../utils/flows/useAutoLayout";
-import {CustomTimelineBackground} from "./CustomTimelineBackground";
-import {NodeInject} from "./nodes/NodeInject";
-import {CustomTimelinePanel} from "./CustomTimelinePanel";
+import nodeTypes from './nodes';
+import { useAutoLayoutInject, LayoutOptions } from '../utils/flows/useAutoLayout';
+import { CustomTimelineBackground } from './CustomTimelineBackground';
+import { NodeInject } from './nodes/NodeInject';
+import { CustomTimelinePanel } from './CustomTimelinePanel';
 
 const useStyles = makeStyles(() => ({
   container: {
     marginTop: 60,
     paddingRight: 40,
-  },
-  names: {
-    float: 'left',
-    width: '10%',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  lineName: {
-    width: '100%',
-    height: 50,
-    lineHeight: '50px',
-  },
-  name: {
-    fontSize: 14,
-    fontWeight: 400,
-    display: 'flex',
-    alignItems: 'center',
-  },
-  timeline: {
-    float: 'left',
-    width: '90%',
-    position: 'relative',
-  },
-  line: {
-    position: 'relative',
-    width: '100%',
-    height: 50,
-    lineHeight: '50px',
-    padding: '0 20px 0 20px',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
-    verticalAlign: 'middle',
-  },
-  scale: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    top: 0,
-    left: 0,
-  },
-  tick: {
-    position: 'absolute',
-    width: 1,
-  },
-  tickLabelTop: {
-    position: 'absolute',
-    left: -28,
-    top: -20,
-    width: 100,
-    fontSize: 10,
-  },
-  tickLabelBottom: {
-    position: 'absolute',
-    left: -28,
-    bottom: -20,
-    width: 100,
-    fontSize: 10,
-  },
-  injectGroup: {
-    position: 'absolute',
-    padding: '6px 5px 0 5px',
-    zIndex: 1000,
-    display: 'grid',
-    gridAutoFlow: 'column',
-    gridTemplateRows: 'repeat(2, 20px)',
   },
 }));
 
@@ -96,7 +22,7 @@ interface Props {
   onConnectInjects(connection: Connection): void
 }
 
-const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjects}) => {
+const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjects }) => {
   // Standard hooks
   const classes = useStyles();
   const theme = useTheme<Theme>();
@@ -104,6 +30,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeInject>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [injectsToShow, setInjectsToShow] = useState<InjectStore[]>([]);
+  const [coordinates, setCoordinates] = useState<number[]>([]);
+
+  let timer;
 
   // Flow
   const layoutOptions: LayoutOptions = {
@@ -129,12 +58,12 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
           color: 'green',
           background: 'black',
           onConnectInjects,
-          isTargeted: onConnectInjects !== undefined || injects.some(value => value.inject_depends_on === inject.inject_id),
-          isTargeting: onConnectInjects !== undefined || inject.inject_depends_on !== null
+          isTargeted: onConnectInjects !== undefined || injects.some((value) => value.inject_depends_on === inject.inject_id),
+          isTargeting: onConnectInjects !== undefined || inject.inject_depends_on !== null,
         },
-        position: {x: 0, y: 0},
+        position: { x: 0, y: 0 },
       })));
-      setEdges(injects.filter(inject => inject.inject_depends_on != null).map((inject, i) => {
+      setEdges(injects.filter((inject) => inject.inject_depends_on != null).map((inject, i) => {
         return ({
           id: `${inject.inject_id}->${inject.inject_depends_on}`,
           source: `${inject.inject_id}`,
@@ -143,22 +72,20 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
           targetHandle: `target-${inject.inject_depends_on}`,
           label: '',
           labelShowBg: false,
-          labelStyle: {fill: theme.palette.text?.primary, fontSize: 9},
-        })
-
+          labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
+        });
       }));
     }
   }, [injects]);
-  const proOptions = {account: 'paid-pro', hideAttribution: true};
+  const proOptions = { account: 'paid-pro', hideAttribution: true };
   const defaultEdgeOptions = {
     type: 'straight',
-    markerEnd: {type: MarkerType.ArrowClosed},
+    markerEnd: { type: MarkerType.ArrowClosed },
   };
 
   const reconnectDone = useRef(true);
 
-  const onReconnect =
-      (oldEdge: Edge, newConnection: Connection) => setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
+  const onReconnect = (oldEdge: Edge, newConnection: Connection) => setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
   const edgeUpdateStart = () => {
     reconnectDone.current = false;
   };
@@ -168,59 +95,95 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
     setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
   };
 
+  const moveNewNode = (event) => {
+    const bounds = event.target?.getBoundingClientRect();
+    console.log(event);
+    const newX = event.clientX - bounds.left;
+    const newY = event.clientY - bounds.top;
+
+    const nodesList = nodes.filter((currentNode) => currentNode.id !== 'fantom');
+    const node = {
+      id: 'fantom',
+      type: 'default',
+      connectable: false,
+      data: {
+        key: 'fantom',
+        label: 'fantom',
+        color: 'green',
+        background: 'black',
+      },
+      position: { x: newX, y: newY },
+    };
+    nodesList.push(node);
+    setNodes(nodesList);
+  };
+
+  const onMouseMove = (eventMove) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      moveNewNode(eventMove);
+    }, 300);
+  };
+
   const edgeUpdateEnd = (_: any, edge: Edge) => {
     if (!reconnectDone.current) {
       setEdges((eds) => eds.filter((e) => e.id !== edge.id));
       onConnectInjects({
-        target: "",
+        target: '',
         source: edge.source,
         sourceHandle: null,
         targetHandle: null,
-      })
+      });
     }
   };
 
   return (
     <>
       {injectsToShow.length > 0 ? (
-          <div className={classes.container} style={{ width: '100%', height: 350 }}>
-            <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                nodeTypes={nodeTypes}
-                nodesDraggable={onConnectInjects !== undefined}
-                nodesConnectable={onConnectInjects !== undefined}
-                nodesFocusable={false}
-                elementsSelectable={false}
-                //onEdgeUpdate={edgeUpdate}
-                //onEdgeUpdateStart={edgeUpdateStart}
-                //onEdgeUpdateEnd={edgeUpdateEnd}
-                defaultEdgeOptions={defaultEdgeOptions}
-                proOptions={proOptions}
-                translateExtent={[[-3000, -3000], [3000, 3000]]}
-                nodeExtent={[[-2000, -2000], [2000, 2000]]}
-            >
-              <CustomTimelineBackground>
-              </CustomTimelineBackground>
-              <CustomTimelinePanel>
-              </CustomTimelinePanel>
-            </ReactFlow>
-          </div>
+        <div className={classes.container} style={{ width: '100%', height: 350 }}>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            nodeTypes={nodeTypes}
+            nodesDraggable={onConnectInjects !== undefined}
+            nodesConnectable={onConnectInjects !== undefined}
+            nodesFocusable={false}
+            elementsSelectable={false}
+              // onEdgeUpdate={edgeUpdate}
+              // onEdgeUpdateStart={edgeUpdateStart}
+              // onEdgeUpdateEnd={edgeUpdateEnd}
+            defaultEdgeOptions={defaultEdgeOptions}
+            onMouseMove={onMouseMove}
+            proOptions={proOptions}
+            translateExtent={[[-3000, -3000], [3000, 3000]]}
+            nodeExtent={[[-2000, -2000], [2000, 2000]]}
+          >
+            <CustomTimelineBackground>
+            </CustomTimelineBackground>
+            <CustomTimelinePanel>
+            </CustomTimelinePanel>
+            <svg>
+              <text fill="#ffffff" fontSize={24} fontFamily="Verdana" x={50} y={100}>
+                {coordinates}
+              </text>
+            </svg>
+          </ReactFlow>
+        </div>
       ) : null
-        }
+      }
     </>
   );
 };
 
 const ChainedTimeline: FunctionComponent<Props> = (props) => {
   return (
-      <>
-        <ReactFlowProvider>
-          <ChainedTimelineFlow {...props} />
-        </ReactFlowProvider>
-      </>
+    <>
+      <ReactFlowProvider>
+        <ChainedTimelineFlow {...props} />
+      </ReactFlowProvider>
+    </>
   );
 };
 
