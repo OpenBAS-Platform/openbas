@@ -1,14 +1,14 @@
 import React, { FunctionComponent, useState } from 'react';
+import { AxiosResponse } from 'axios';
 import { PopoverEntry } from '../../../../components/common/ButtonPopover';
 import IconPopover from '../../../../components/common/IconPopover';
-import type {ImportMapperAddInput, RawPaginationImportMapper} from '../../../../utils/api-types';
-import {deleteMapper, exportMapper} from '../../../../actions/mapper/mapper-actions';
+import type { RawPaginationImportMapper } from '../../../../utils/api-types';
+import { deleteMapper, exportMapper } from '../../../../actions/mapper/mapper-actions';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../components/i18n';
 import Drawer from '../../../../components/common/Drawer';
 import XlsMapperUpdate from './xls_mapper/XlsMapperUpdate';
-import {download} from '../../../../utils/utils';
-import {AxiosResponse} from 'axios';
+import { download } from '../../../../utils/utils';
 
 interface Props {
   mapper: RawPaginationImportMapper;
@@ -47,13 +47,12 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
 
   const exportMapperAction = () => {
     exportMapper({
-      ids_to_export: [mapper.import_mapper_id]
+      ids_to_export: [mapper.import_mapper_id],
     }).then(
-        (result: AxiosResponse<{ data: string }>) => {
-          let filename = result.headers['content-disposition'].split('filename=')[1];
-          console.log(filename);
-          download(JSON.stringify(result.data, null, 2), filename, 'application/json');
-        },
+      (result: AxiosResponse<{ data: string }>) => {
+        let filename = result.headers['content-disposition'].split('filename=')[1];
+        download(JSON.stringify(result.data, null, 2), filename, 'application/json');
+      },
     );
     if (onExport) {
       onExport(mapper.import_mapper_id);
@@ -63,7 +62,7 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
   const entries: PopoverEntry[] = [
     { label: 'Update', action: handleOpenEdit },
     { label: 'Delete', action: handleOpenDelete },
-    { label: 'Export', action: exportMapperAction},
+    { label: 'Export', action: exportMapperAction },
   ];
 
   return (

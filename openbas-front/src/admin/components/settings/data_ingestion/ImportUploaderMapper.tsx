@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import {useAppDispatch} from '../../../../utils/hooks';
+import { useAppDispatch } from '../../../../utils/hooks';
 import ImportUploader from '../../../../components/common/ImportUploader';
-import {importMapper} from '../../../../actions/mapper/mapper-actions';
+import { importMapper } from '../../../../actions/mapper/mapper-actions';
 
 const ImportUploaderMapper = () => {
   // Standard hooks
