@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
@@ -59,9 +60,18 @@ public class InjectorContractApi extends RestBehavior {
                     Specification<InjectorContract> customSpecification = computeFilterFromSpecificPath(
                         killChainPhaseFilter, "attackPatterns.killChainPhases.id"
                     );
-                    return buildPaginationCriteriaBuilder(
+                    // Final specification
+                    Function<Specification<InjectorContract>, Specification<InjectorContract>> computeSpecification;
+                    if (Filters.FilterMode.and.equals(searchPaginationInput.getFilterGroup().getMode())) {
+                        computeSpecification = customSpecification::and;
+                    } else if (Filters.FilterMode.or.equals(searchPaginationInput.getFilterGroup().getMode())){
+                        computeSpecification = customSpecification::or;
+                    } else {
+                      computeSpecification = (Specification<InjectorContract> specification) -> specification;
+                    }
+              return buildPaginationCriteriaBuilder(
                         (Specification<InjectorContract> specification, Pageable pageable) -> this.injectorContractService.injectorContracts(
-                            customSpecification.and(specification),
+                            computeSpecification.apply(specification),
                             pageable
                         ),
                         searchPaginationInput,
