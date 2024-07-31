@@ -23,7 +23,7 @@ import type { ExecutorHelper } from '../../../../actions/executors/executor-help
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchExecutors } from '../../../../actions/Executor';
 import { fetchTags } from '../../../../actions/Tag';
-import { buildSearchPagination } from '../../../../components/common/queryable/useQueryable';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 
 const useStyles = makeStyles(() => ({
   itemHead: {

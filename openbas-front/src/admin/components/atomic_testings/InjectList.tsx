@@ -14,7 +14,7 @@ import InjectorContract from '../common/injects/InjectorContract';
 import ItemStatus from '../../../components/ItemStatus';
 import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
 import { isNotEmptyField } from '../../../utils/utils';
-import { buildSearchPagination } from '../../../components/common/queryable/useQueryable';
+import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 
 const useStyles = makeStyles(() => ({
   bodyItems: {

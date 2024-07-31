@@ -74,27 +74,23 @@ public class FilterUtilsJpa {
       return (Specification<T>) EMPTY_SPECIFICATION;
     }
     String filterKey = filter.getKey();
-    List<String> filterValues = filter.getValues();
 
-    if (!filterValues.isEmpty()) {
-      return (root, query, cb) -> {
-        List<PropertySchema> propertySchemas = SchemaUtils.schema(root.getJavaType());
-        List<PropertySchema> filterableProperties = getFilterableProperties(propertySchemas);
-        PropertySchema filterableProperty = retrieveProperty(filterableProperties, filterKey);
-        Expression<String> paths = toPath(filterableProperty, root);
-        // In case of join table, we will use ID so type is String
-        return toPredicate(
-            paths, filter, cb, filterableProperty.getJoinTable() != null ? String.class : filterableProperty.getType()
-        );
-      };
-    }
-    return (Specification<T>) EMPTY_SPECIFICATION;
+    return (root, query, cb) -> {
+      List<PropertySchema> propertySchemas = SchemaUtils.schema(root.getJavaType());
+      List<PropertySchema> filterableProperties = getFilterableProperties(propertySchemas);
+      PropertySchema filterableProperty = retrieveProperty(filterableProperties, filterKey);
+      Expression<String> paths = toPath(filterableProperty, root);
+      // In case of join table, we will use ID so type is String
+      return toPredicate(
+          paths, filter, cb, filterableProperty.getJoinTable() != null ? String.class : filterableProperty.getType()
+      );
+    };
   }
 
   /**
-   * Allows to manage deep paths not currently managed by the queryable annotation
-   * Next step: improvement of the queryable annotation in order to directly manage filters on deep properties as well
-   * as having several possible filters on these properties
+   * Allows to manage deep paths not currently managed by the queryable annotation Next step: improvement of the
+   * queryable annotation in order to directly manage filters on deep properties as well as having several possible
+   * filters on these properties
    */
   @SuppressWarnings("unchecked")
   public static <T> Specification<T> computeFilterFromSpecificPath(

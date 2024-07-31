@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Collection;
 import java.util.List;
 
 @Data
@@ -26,7 +27,7 @@ public class PropertySchemaDTO {
 
   public PropertySchemaDTO(@NotNull final PropertySchema propertySchema) {
     this.setJsonName(propertySchema.getJsonName());
-    this.setArray(propertySchema.getType().isArray());
+    this.setArray(propertySchema.getType().isArray() || Collection.class.isAssignableFrom(propertySchema.getType()));
     this.setValues(propertySchema.getAvailableValues());
     this.setDynamicValues(propertySchema.isDynamicValues());
   }

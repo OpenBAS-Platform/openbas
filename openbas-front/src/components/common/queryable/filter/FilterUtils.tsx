@@ -75,13 +75,16 @@ export const OperatorKeyValues: {
 };
 
 export const availableOperators = (propertySchema: PropertySchemaDTO) => {
-  if (propertySchema.schema_property_values) {
-    if (propertySchema.schema_property_type_array) {
-      return ['contains', 'not_contains', 'empty', 'not_empty'];
-    }
+  // Array
+  if (propertySchema.schema_property_type_array) {
+    return ['contains', 'not_contains', 'empty', 'not_empty'];
+  }
+  // Enum & not array
+  if (propertySchema.schema_property_values && !propertySchema.schema_property_type_array) {
     return ['eq'];
   }
-  if (propertySchema.schema_property_type_array) {
+  // Dynamic value & not array
+  if (propertySchema.schema_property_has_dynamic_value && !propertySchema.schema_property_type_array) {
     return ['contains', 'not_contains', 'empty', 'not_empty'];
   }
   return [

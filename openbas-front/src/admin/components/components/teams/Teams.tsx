@@ -21,7 +21,7 @@ import type { TagHelper, UserHelper } from '../../../../actions/helper';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../../actions/Tag';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { buildSearchPagination } from '../../../../components/common/queryable/useQueryable';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 
 const useStyles = makeStyles(() => ({
   itemHead: {

@@ -22,7 +22,7 @@ import { convertOperatorToIcon } from '../../../../components/common/queryable/f
 import { useAppDispatch } from '../../../../utils/hooks';
 import { fetchTags } from '../../../../actions/Tag';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { buildSearchPagination } from '../../../../components/common/queryable/useQueryable';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 
 const useStyles = makeStyles(() => ({
   itemHead: {

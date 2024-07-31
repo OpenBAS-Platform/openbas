@@ -20,7 +20,7 @@ import type { UserStore } from './players/Player';
 import type { SearchPaginationInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import { fetchTags } from '../../../actions/Tag';
-import { buildSearchPagination } from '../../../components/common/queryable/useQueryable';
+import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 
 const useStyles = makeStyles(() => ({
   itemHeader: {

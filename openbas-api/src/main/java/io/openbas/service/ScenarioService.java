@@ -46,7 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -119,7 +119,7 @@ public class ScenarioService {
   }
 
   public Page<RawPaginationScenario> scenarios(@NotNull final SearchPaginationInput searchPaginationInput) {
-    Function<Specification<Scenario>, Specification<Scenario>> finalSpecification = handleCustomFilter(
+    UnaryOperator<Specification<Scenario>> finalSpecification = handleCustomFilter(
         searchPaginationInput
     );
 

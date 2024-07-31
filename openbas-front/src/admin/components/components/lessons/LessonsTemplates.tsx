@@ -13,7 +13,7 @@ import { initSorting } from '../../../../components/common/queryable/Page';
 import type { LessonsTemplate, SearchPaginationInput } from '../../../../utils/api-types';
 import type { UserHelper } from '../../../../actions/helper';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
-import { buildSearchPagination } from '../../../../components/common/queryable/useQueryable';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
