@@ -91,7 +91,46 @@ public class ExerciseExpectationService {
             }
         }
         injectExpectation.setUpdatedAt(now());
-        return this.injectExpectationRepository.save(injectExpectation);
+        InjectExpectation updated = this.injectExpectationRepository.save(injectExpectation);
+
+        if(updated.getType() == EXPECTATION_TYPE.MANUAL && updated.getTeam() != null){
+            if(updated.getUser() != null){ //If updated was a player expectation I have to update team expectation using expectation of player (based on validation type)
+                InjectExpectation parentExpectation = injectExpectationRepository.findByInjectAndTeamAndExpectationNameAndUserIsNull(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()).orElseThrow();
+                if(updated.isExpectationGroup()) { //If true is at least
+                   parentExpectation.setScore(injectExpectationRepository.computeAverageScoreWhenValidationTypeIsAtLeastOnePlayer(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()));
+                }else{ // all
+                    parentExpectation.setScore(injectExpectationRepository.computeAverageScoreWhenValidationTypeIsAllPlayers(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()));
+                }
+                InjectExpectationResult expectationResult = InjectExpectationResult.builder()
+                        .sourceId("player")
+                        .sourceType("player")
+                        .sourceName("Player validation")
+                        .result(result)
+                        .date(now().toString())
+                        .score(parentExpectation.getScore())
+                        .build();
+                parentExpectation.getResults().add(expectationResult);
+                injectExpectationRepository.save(parentExpectation);
+            }else{
+                // If I update the expectation team: What happens with children? -> update expectation score for all children -> set score from InjectExpectation
+                List<InjectExpectation> toProcess = injectExpectationRepository.findAllByInjectAndTeamAndExpectationNameAndUserIsNotNull(updated.getInject().getId(), updated.getTeam().getId(), updated.getName());
+                for (InjectExpectation expectation : toProcess) {
+                    InjectExpectationResult expectationResult = InjectExpectationResult.builder()
+                            .sourceId("team")
+                            .sourceType("team")
+                            .sourceName("Team validation")
+                            .result(result)
+                            .date(now().toString())
+                            .score(updated.getScore())
+                            .build();
+                    expectation.getResults().add(expectationResult);
+                    expectation.setScore(updated.getScore());
+                    injectExpectationRepository.save(expectation);
+                }
+            }
+        }
+
+        return updated;
     }
 
     public InjectExpectation deleteInjectExpectationResult(
@@ -109,8 +148,8 @@ public class ExerciseExpectationService {
             if (injectExpectation.getType() == EXPECTATION_TYPE.MANUAL) {
                 injectExpectation.setScore(null);
             } else {
-                List<Integer> scores = injectExpectation.getResults().stream().map(InjectExpectationResult::getScore).filter(Objects::nonNull).toList();
-                injectExpectation.setScore(!scores.isEmpty() ? Collections.max(scores) : 0);
+                List<Double> scores = injectExpectation.getResults().stream().map(InjectExpectationResult::getScore).filter(Objects::nonNull).toList();
+                injectExpectation.setScore(!scores.isEmpty() ? Collections.max(scores) : 0.0);
             }
         }
         injectExpectation.setUpdatedAt(now());

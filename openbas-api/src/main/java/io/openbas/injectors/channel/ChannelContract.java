@@ -75,7 +75,7 @@ public class ChannelContract extends Contractor {
         Expectation expectation = new Expectation();
         expectation.setType(ARTICLE);
         expectation.setName("Expect teams to read the article(s)");
-        expectation.setScore(0);
+        expectation.setScore(0.0);
         ContractExpectations expectationsField = expectationsField(
                 "expectations", "Expectations", List.of(expectation)
         );

@@ -4,9 +4,9 @@ public interface RawInjectExpectation {
 
     String getInject_expectation_type();
 
-    Integer getInject_expectation_score();
+    Double getInject_expectation_score();
 
-    Integer getInject_expectation_expected_score();
+    Double getInject_expectation_expected_score();
 
     String getTeam_id();
 

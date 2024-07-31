@@ -29,7 +29,7 @@ public class InjectExpectationUtils {
             @NotBlank final String sourceType,
             @NotBlank final String sourceName,
             @NotBlank final String result,
-            @NotBlank final Integer score
+            @NotBlank final Double score
     ) {
         Optional<InjectExpectationResult> exists = expectation.getResults()
                 .stream()

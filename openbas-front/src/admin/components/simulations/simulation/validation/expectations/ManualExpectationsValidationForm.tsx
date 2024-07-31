@@ -11,6 +11,13 @@ import { useAppDispatch } from '../../../../../../utils/hooks';
 import type { Theme } from '../../../../../../components/Theme';
 import colorStyles from '../../../../../../components/Color';
 import { zodImplement } from '../../../../../../utils/Zod';
+import type { TeamsHelper } from '../../../../../../actions/teams/team-helper';
+import type { UserHelper } from '../../../../../../actions/helper';
+import { useHelper } from '../../../../../../store';
+import type { Team, User } from '../../../../../../utils/api-types';
+import { resolveUserName, truncate } from '../../../../../../utils/String';
+import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
+import { fetchUsers } from '../../../../../../actions/User';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
@@ -20,7 +27,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     placeContent: 'end',
     gap: theme.spacing(2),
-    marginTop: theme.spacing(2),
   },
   chipInList: {
     height: 30,
@@ -39,7 +45,19 @@ interface FormProps {
 const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expectation, onUpdate }) => {
   const classes = useStyles();
   const { t } = useFormatter();
+  const { teamsMap, usersMap }: {
+    teamsMap: Record<string, Team>,
+    usersMap: Record<string, User>
+  } = useHelper((helper: TeamsHelper & UserHelper) => {
+    return ({
+      teamsMap: helper.getTeamsMap(),
+      usersMap: helper.getUsersMap(),
+    });
+  });
   const dispatch = useAppDispatch();
+  useDataLoader(() => {
+    dispatch(fetchUsers());
+  });
   const computeLabel = (e: InjectExpectationsStore) => {
     if (e.inject_expectation_status === 'PENDING') {
       return t('Pending validation');
@@ -64,8 +82,23 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
     }
     return colorStyles.red;
   };
+
+  const targetLabel = (expectationToProcess: InjectExpectationsStore) => {
+    if (expectationToProcess.inject_expectation_user && usersMap[expectationToProcess.inject_expectation_user]) {
+      return truncate(resolveUserName(usersMap[expectationToProcess.inject_expectation_user]), 22);
+    }
+    if (expectationToProcess.inject_expectation_team) {
+      return teamsMap[expectationToProcess.inject_expectation_team]?.team_name;
+    }
+    return t('Unknown');
+  };
   const onSubmit = (data: { expectation_score: number }) => {
-    dispatch(updateInjectExpectation(expectation.inject_expectation_id, { ...data, source_id: 'ui', source_type: 'ui', source_name: 'User input' })).then(() => {
+    dispatch(updateInjectExpectation(expectation.inject_expectation_id, {
+      ...data,
+      source_id: 'ui',
+      source_type: 'ui',
+      source_name: 'User input',
+    })).then(() => {
       onUpdate?.();
     });
   };
@@ -92,7 +125,7 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
           label={computeLabel(expectation)}
         />
         <Typography variant="h3">{expectation.inject_expectation_user ? t('Player') : t('Team')}</Typography>
-        {expectation.inject_expectation_user ? expectation.inject_expectation_user : expectation.inject_expectation_team}
+        {targetLabel(expectation)}
         <MuiTextField
           className={classes.marginTop_2}
           variant="standard"

@@ -32,7 +32,7 @@ public class ChallengeOutput {
   private String content;
 
   @JsonProperty("challenge_score")
-  private Integer score;
+  private Double score;
 
   @JsonProperty("challenge_max_attempts")
   private Integer maxAttempts;

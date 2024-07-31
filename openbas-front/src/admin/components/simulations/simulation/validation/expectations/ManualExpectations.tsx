@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
-import { List, ListItemButton, ListItemIcon, ListItemText, Chip, Typography, Alert, AlertTitle, Divider } from '@mui/material';
+import { Alert, AlertTitle, Chip, Divider, List, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import { AssignmentTurnedIn } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
@@ -11,6 +11,7 @@ import Drawer from '../../../../../../components/common/Drawer';
 import ManualExpectationsValidationForm from './ManualExpectationsValidationForm';
 import ExpandableText from '../../../../../../components/common/ExpendableText';
 import type { Inject } from '../../../../../../utils/api-types';
+import Paper from '../../../../../../components/common/Paper';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -66,7 +67,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
   const isAllValidated = validatedCount === expectations.length;
 
   const label = isAllValidated
-    ? `${t('Validated')} (${expectations.reduce((acc, el) => acc + el.inject_expectation_score, 0) / expectations.length})`
+    ? `${t('Validated')} (${parentExpectation.inject_expectation_score})`
     : t('Pending validation');
 
   const style = isAllValidated ? colorStyles.green : colorStyles.orange;
@@ -83,7 +84,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
           onClick={() => setCurrentExpectations(expectations)}
         >
           <ListItemIcon>
-            <AssignmentTurnedIn fontSize="small" />
+            <AssignmentTurnedIn fontSize="small"/>
           </ListItemIcon>
           <ListItemText
             primary={(
@@ -105,7 +106,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
                   />
                 </div>
               </div>
-                  )}
+                            )}
           />
         </ListItemButton>
         )}
@@ -119,7 +120,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
           <Alert
             severity="warning"
             variant="outlined"
-            style={{ position: 'relative' }}
+            style={{ position: 'relative', marginBottom: 10 }}
           >
             <AlertTitle>
               <ExpandableText
@@ -127,22 +128,23 @@ const ManualExpectations: FunctionComponent<Props> = ({
                     expectations[0].inject_expectation_group
                       ? t('At least one player (per team) must validate the expectation')
                       : t('All players (per team) must validate the expectation')
-                  }
+                }
                 limit={120}
               />
             </AlertTitle>
           </Alert>
-          <div style={{ padding: '10px 0' }}>
+          <Paper>
             <ManualExpectationsValidationForm key={parentExpectation} expectation={parentExpectation}/>
-          </div>
-          <Divider style={{ marginTop: 20 }}/>
-          <div style={{ maxHeight: '80vh', overflowY: 'auto', padding: '10px 0 10px 0' }}>
-            <Typography variant="h5">{t('Players')}</Typography>
+          </Paper>
+          <Typography variant="h5" style={{ fontWeight: 500, margin: '10px' }}>
+            {t('Players')}
+          </Typography>
+          <div style={{ maxHeight: '80vh', overflowY: 'auto', padding: 10 }}>
             {childrenExpectations && childrenExpectations.map((e) => (
-              <ManualExpectationsValidationForm
-                key={e.inject_expectation_id}
-                expectation={e}
-              />
+              <div key={e.inject_expectation_id}>
+                <ManualExpectationsValidationForm expectation={e}/>
+                <Divider style={{ margin: '20px 0' }}/>
+              </div>
             ))}
           </div>
         </>

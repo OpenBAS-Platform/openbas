@@ -51,8 +51,8 @@ public class InjectExpectationService {
             computeResult(expectation, sourceId, sourceType, sourceName, result, expectation.getExpectedScore());
             expectation.setScore(expectation.getExpectedScore());
         } else if (expectation.getScore() == null) {
-            computeResult(expectation, sourceId, sourceType, sourceName, result, 0);
-            expectation.setScore(0);
+            computeResult(expectation, sourceId, sourceType, sourceName, result, 0.0);
+            expectation.setScore(0.0);
         }
         return this.update(expectation);
     }
@@ -71,7 +71,7 @@ public class InjectExpectationService {
             success = expectationAssets.stream().allMatch((e) -> e.getExpectedScore().equals(e.getScore()));
         }
         computeResult(expectationAssetGroup, sourceId, sourceType, sourceName, success ? "SUCCESS" : "FAILED", success ? expectationAssetGroup.getExpectedScore() : 0);
-        expectationAssetGroup.setScore(success ? expectationAssetGroup.getExpectedScore() : 0);
+        expectationAssetGroup.setScore(success ? expectationAssetGroup.getExpectedScore() : 0.0);
         this.update(expectationAssetGroup);
     }
 

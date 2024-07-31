@@ -24,5 +24,5 @@ public class ExpectationUpdateInput {
 
   @JsonProperty("expectation_score")
   @NotNull
-  private Integer score;
+  private Double score;
 }

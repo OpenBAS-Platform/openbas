@@ -86,7 +86,7 @@ public class InjectExpectation implements Base {
   @Setter
   @Column(name = "inject_expectation_score")
   @JsonProperty("inject_expectation_score")
-  private Integer score;
+  private Double score;
 
   @JsonProperty("inject_expectation_status")
   public EXPECTATION_STATUS getResponse() {
@@ -105,7 +105,7 @@ public class InjectExpectation implements Base {
   @Setter
   @Column(name = "inject_expectation_expected_score")
   @JsonProperty("inject_expectation_expected_score")
-  private Integer expectedScore;
+  private Double expectedScore;
 
   @Setter
   @Column(name = "inject_expectation_created_at")

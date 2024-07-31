@@ -19,7 +19,7 @@ import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 @Setter
 public class ManualExpectation implements Expectation {
 
-  private Integer score;
+  private Double score;
   private String name;
   private String description;
   private Asset asset;
@@ -29,17 +29,17 @@ public class ManualExpectation implements Expectation {
   public ManualExpectation() {
   }
 
-  public ManualExpectation(final Integer score) {
-    this.score = Objects.requireNonNullElse(score, 100);
+  public ManualExpectation(final Double score) {
+    this.score = Objects.requireNonNullElse(score, 100.0);
   }
 
-  public ManualExpectation(final Integer score, @NotBlank final String name, final String description) {
+  public ManualExpectation(final Double score, @NotBlank final String name, final String description) {
     this(score);
     this.name = name;
     this.description = description;
   }
 
-  public ManualExpectation(final Integer score, @NotBlank final String name, final String description, final boolean expectationGroup) {
+  public ManualExpectation(final Double score, @NotBlank final String name, final String description, final boolean expectationGroup) {
     this(score);
     this.name = name;
     this.description = description;
@@ -47,14 +47,14 @@ public class ManualExpectation implements Expectation {
   }
 
   public static ManualExpectation manualExpectationForAsset(
-          @Nullable final Integer score,
+          @Nullable final Double score,
           @NotBlank final String name,
           final String description,
           @NotNull final Asset asset,
           final boolean expectationGroup
   ) {
     ManualExpectation manualExpectation = new ManualExpectation();
-    manualExpectation.setScore(Objects.requireNonNullElse(score, 100));
+    manualExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
     manualExpectation.setName(name);
     manualExpectation.setDescription(description);
     manualExpectation.setAsset(asset);
@@ -63,14 +63,14 @@ public class ManualExpectation implements Expectation {
   }
 
   public static ManualExpectation manualExpectationForAssetGroup(
-          @Nullable final Integer score,
+          @Nullable final Double score,
           @NotBlank final String name,
           final String description,
           @NotNull final AssetGroup assetGroup,
           final boolean expectationGroup
   ) {
     ManualExpectation manualExpectation = new ManualExpectation();
-    manualExpectation.setScore(Objects.requireNonNullElse(score, 100));
+    manualExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
     manualExpectation.setName(name);
     manualExpectation.setDescription(description);
     manualExpectation.setAssetGroup(assetGroup);

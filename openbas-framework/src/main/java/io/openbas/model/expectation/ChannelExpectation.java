@@ -12,17 +12,17 @@ import java.util.Objects;
 @Setter
 public class ChannelExpectation implements Expectation {
 
-  private Integer score;
+  private Double score;
   private Article article;
   private boolean expectationGroup;
 
-  public ChannelExpectation(Integer score, Article article) {
-    setScore(Objects.requireNonNullElse(score, 100));
+  public ChannelExpectation(Double score, Article article) {
+    setScore(Objects.requireNonNullElse(score, 100.0));
     setArticle(article);
   }
 
-  public ChannelExpectation(Integer score, Article article, boolean expectationGroup) {
-    setScore(Objects.requireNonNullElse(score, 100));
+  public ChannelExpectation(Double score, Article article, boolean expectationGroup) {
+    setScore(Objects.requireNonNullElse(score, 100.0));
     setArticle(article);
     setExpectationGroup(expectationGroup);
   }

@@ -216,15 +216,9 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         labelShowBg: false,
         labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
       })));
-      if (target.targetType === 'PLAYER') {
-        fetchTargetResult(inject.inject_id, target.id!, target.targetType!, parentTargetId).then(
-          (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
-        );
-      } else {
-        fetchTargetResult(inject.inject_id, target.id!, target.targetType!).then(
-          (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
-        );
-      }
+      fetchTargetResult(inject.inject_id, target.id!, target.targetType!, parentTargetId).then(
+        (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
+      );
       setActiveTab(0);
       setTimeout(() => setInitialized(true), 1000);
     }

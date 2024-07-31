@@ -12,17 +12,17 @@ import java.util.Objects;
 @Setter
 public class ChallengeExpectation implements Expectation {
 
-  private Integer score;
+  private Double score;
   private Challenge challenge;
   private boolean expectationGroup;
 
-  public ChallengeExpectation(Integer score, Challenge challenge) {
-    setScore(Objects.requireNonNullElse(score, 100));
+  public ChallengeExpectation(Double score, Challenge challenge) {
+    setScore(Objects.requireNonNullElse(score, 100.0));
     setChallenge(challenge);
   }
 
-  public ChallengeExpectation(Integer score, Challenge challenge, boolean expectationGroup) {
-    setScore(Objects.requireNonNullElse(score, 100));
+  public ChallengeExpectation(Double score, Challenge challenge, boolean expectationGroup) {
+    setScore(Objects.requireNonNullElse(score, 100.0));
     setChallenge(challenge);
     setExpectationGroup(expectationGroup);
   }

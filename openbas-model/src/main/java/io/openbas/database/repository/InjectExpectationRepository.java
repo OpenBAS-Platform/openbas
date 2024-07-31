@@ -56,6 +56,18 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
         @Param("playerId") @NotBlank final String playerId
     );
 
+    @Query("select ie from InjectExpectation ie where ie.inject.id = :injectId and ie.team.id = :teamId and ie.name = :expectationName and ie.user is not null")
+    List<InjectExpectation> findAllByInjectAndTeamAndExpectationNameAndUserIsNotNull(String injectId, String teamId, String expectationName);
+
+    @Query("select AVG(ie.score) from InjectExpectation ie where ie.inject.id = :injectId and ie.team.id = :teamId and ie.name = :expectationName and ie.user is not null")
+    Double computeAverageScoreWhenValidationTypeIsAtLeastOnePlayer(String injectId, String teamId, String expectationName);
+
+    @Query("select AVG(COALESCE(ie.score, 0)) from InjectExpectation ie where ie.inject.id = :injectId and ie.team.id = :teamId and ie.name = :expectationName and ie.user is not null")
+    Double computeAverageScoreWhenValidationTypeIsAllPlayers(String injectId, String teamId, String expectationName);
+
+    @Query("select ie from InjectExpectation ie where ie.inject.id = :injectId and ie.team.id = :teamId and ie.name = :expectationName and ie.user is null")
+    Optional<InjectExpectation> findByInjectAndTeamAndExpectationNameAndUserIsNull(String injectId, String teamId, String expectationName);
+
     @Query(value = "select i from InjectExpectation i where i.inject.id = :injectId and i.team.id = :teamId and i.user is null")
     List<InjectExpectation> findAllByInjectAndTeam(
         @Param("injectId") @NotBlank final String injectId,

@@ -183,7 +183,7 @@ public class AtomicTestingUtils {
                                     )
                             )
                             .entrySet().stream()
-                            .map(entry -> new InjectTargetWithResult(TargetType.TEAMS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue(), calculateChildren(groupedByTeamAndUser.get(entry.getKey())), null))
+                            .map(entry -> new InjectTargetWithResult(TargetType.TEAMS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue(), playerExpectations.isEmpty()? List.of() : calculateChildren(groupedByTeamAndUser.get(entry.getKey())), null))
                             .toList()
             );
         }
@@ -351,6 +351,7 @@ public class AtomicTestingUtils {
                 .getExpectations()
                 .stream()
                 .filter(expectation -> targetIds.contains(expectation.getTargetId()))
+                .filter(expectation -> expectation.getUser() == null) // Filter expectations linked to players
                 .toList();
     }
 
