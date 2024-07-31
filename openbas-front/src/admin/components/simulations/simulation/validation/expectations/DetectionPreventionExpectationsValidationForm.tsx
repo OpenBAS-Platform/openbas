@@ -34,10 +34,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface FormProps {
   expectation: InjectExpectationsStore;
   result?: InjectExpectationResult;
+  sourceIds?: string[];
   onUpdate?: () => void;
 }
 
-const DetectionPreventionExpectationsValidationForm: FunctionComponent<FormProps> = ({ expectation, result, onUpdate }) => {
+const DetectionPreventionExpectationsValidationForm: FunctionComponent<FormProps> = ({ expectation, result, sourceIds = [], onUpdate }) => {
   const classes = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -69,10 +70,14 @@ const DetectionPreventionExpectationsValidationForm: FunctionComponent<FormProps
       security_platform: z.string().min(1, { message: t('Should not be empty') }),
     })),
     defaultValues: {
-      expectation_score: result?.score ?? expectation.inject_expectation_score ?? expectation.inject_expectation_expected_score ?? 0,
+      expectation_score: result?.score ?? expectation.inject_expectation_expected_score ?? 0,
       security_platform: result?.sourceId ?? '',
     },
   });
+
+  // Security Platform Options
+  const filterOptions = (n: SecurityPlatform) => (n.asset_external_reference === null && !sourceIds.includes(n.asset_id));
+
   return (
     <form id="expectationForm" onSubmit={handleSubmit(onSubmit)}>
       {result && (
@@ -96,8 +101,9 @@ const DetectionPreventionExpectationsValidationForm: FunctionComponent<FormProps
             fieldValue={value ?? ''}
             fieldOnChange={onChange}
             errors={errors}
+            filterOptions={filterOptions}
             style={{ marginTop: 20 }}
-            onlyManual={true}
+            editing={!!result}
           />
         )}
       />
