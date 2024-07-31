@@ -12,9 +12,7 @@ import io.openbas.injectors.email.service.EmailService;
 import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ChallengeExpectation;
-import io.openbas.model.expectation.ChannelExpectation;
 import io.openbas.model.expectation.ManualExpectation;
-import io.openbas.rest.exception.ElementNotFoundException;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,7 +108,10 @@ public class ChallengeExecutor extends Injector {
                             content.getExpectations()
                                     .stream()
                                     .flatMap((entry) -> switch (entry.getType()) {
-                                        case MANUAL -> challenges.stream()
+                                        case MANUAL -> Stream.of(
+                                                (Expectation) new ManualExpectation(entry.getScore(), entry.getName(), entry.getDescription(), entry.isExpectationGroup())
+                                        );
+                                        case CHALLENGE -> challenges.stream()
                                                 .map(challenge -> (Expectation) new ChallengeExpectation(entry.getScore(), challenge, entry.isExpectationGroup()));
                                         default -> Stream.of();
                                     })
