@@ -56,8 +56,8 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
 
   // Button Popover
   const entries = [];
-  if (actions.includes('Duplicate')) entries.push({ label: 'Duplicate', action: () => handleOpenDuplicate() });
-  if (actions.includes('Update')) entries.push({ label: 'Update', action: () => handleOpenEdit() });
+  if (actions.includes('Duplicate') && atomic.inject_injector_contract !== null) entries.push({ label: 'Duplicate', action: () => handleOpenDuplicate() });
+  if (actions.includes('Update') && atomic.inject_injector_contract !== null) entries.push({ label: 'Update', action: () => handleOpenEdit() });
   if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete() });
 
   return (
