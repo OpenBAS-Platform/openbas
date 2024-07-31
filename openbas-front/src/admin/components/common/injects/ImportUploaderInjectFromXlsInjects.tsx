@@ -127,6 +127,7 @@ const ImportUploaderInjectFromXlsInjects: FunctionComponent<Props> = ({
   const checkNeedLaunchDate = () => {
     const formValues = getValues();
     if (formValues.importMapperId && formValues.sheetName && formValues.timezone) {
+      setNeedLaunchDate(false);
       const input: InjectsImportInput = {
         import_mapper_id: formValues.importMapperId,
         sheet_name: formValues.sheetName,
@@ -138,7 +139,6 @@ const ImportUploaderInjectFromXlsInjects: FunctionComponent<Props> = ({
           setNeedLaunchDate(true);
         }
       });
-      setNeedLaunchDate(false);
     }
   };
 

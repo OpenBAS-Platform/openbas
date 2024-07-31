@@ -39,10 +39,8 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
         resolve(response.data);
       }));
     },
-    onDryImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {
-      return dryImportXls(scenario.scenario_id, importId, input).then((response) => new Promise((resolve, _reject) => {
-        resolve(response.data);
-      }));
+    async onDryImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {
+      return dryImportXls(scenario.scenario_id, importId, input).then((result) => result.data);
     },
     onBulkDeleteInjects(injectIds: string[]): void {
       return dispatch(bulkDeleteInjectsForScenario(scenario.scenario_id, injectIds));
