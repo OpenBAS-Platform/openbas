@@ -1,5 +1,4 @@
 import React, { FunctionComponent, useState } from 'react';
-import { AxiosResponse } from 'axios';
 import { PopoverEntry } from '../../../../components/common/ButtonPopover';
 import IconPopover from '../../../../components/common/IconPopover';
 import type { RawPaginationImportMapper } from '../../../../utils/api-types';
@@ -49,9 +48,8 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
     exportMapper({
       ids_to_export: [mapper.import_mapper_id],
     }).then(
-      (result: AxiosResponse<{ data: string }>) => {
-        const filename = result.headers['content-disposition'].split('filename=')[1];
-        download(JSON.stringify(result.data, null, 2), filename, 'application/json');
+      (result:{ data: string, filename: string }) => {
+        download(JSON.stringify(result.data, null, 2), result.filename, 'application/json');
       },
     );
     if (onExport) {

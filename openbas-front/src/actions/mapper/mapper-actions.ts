@@ -50,7 +50,9 @@ export const testXlsFile = (importId: string, input: InjectsImportTestInput) => 
 
 export const exportMapper = (input: ExportMapperInput) => {
   const uri = `${XLS_MAPPER_URI}/export`;
-  return simplePostCall(uri, input);
+  return simplePostCall(uri, input).then((response) => {
+    return { data: response.data, filename: response.headers['content-disposition'].split('filename=')[1] };
+  });
 };
 
 export const importMapper = (formData: FormData) => (dispatch: Dispatch) => {
