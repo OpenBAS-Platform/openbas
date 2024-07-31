@@ -82,7 +82,7 @@
     "@stylistic/eslint-plugin": "1.8.1",
     "@testing-library/react": "14.3.1",
     "@types/d3-hierarchy": "3.1.7",
-    "@types/node": "20.14.5",
+    "@types/node": "20.14.13",
     "@types/react": "18.3.3",
     "@types/react-csv": "1.1.10",
     "@types/react-dom": "18.3.0",

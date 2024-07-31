@@ -64,7 +64,7 @@ steps:
       - frontend-tests
 
   - name: frontend-e2e-tests
-    image: node:20.14.0
+    image: node:20.16.0
     volumes:
     - name: cache-node-frontend-e2e
       path: /drone/src/openbas-front/node_modules
