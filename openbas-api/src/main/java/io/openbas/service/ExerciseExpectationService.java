@@ -42,12 +42,16 @@ public class ExerciseExpectationService {
 
         String result = "";
         if (injectExpectation.getType() == EXPECTATION_TYPE.MANUAL) {
-            if (input.getScore() >= injectExpectation.getExpectedScore()) {
-                result = "Success";
-            } else if (input.getScore() > 0) {
-                result = "Partial";
+            if (injectExpectation.getTeam() != null && injectExpectation.getUser() == null) { //If It is an expectation of a team
+                result = input.getScore() > 0 ? "Success" : "Failed";
             } else {
-                result = "Failed";
+                if (input.getScore() >= injectExpectation.getExpectedScore()) {
+                    result = "Success";
+                } else if (input.getScore() > 0) {
+                    result = "Partial";
+                } else {
+                    result = "Failed";
+                }
             }
         } else if (injectExpectation.getType() == EXPECTATION_TYPE.DETECTION) {
             if (input.getScore() >= injectExpectation.getExpectedScore()) {
@@ -93,44 +97,54 @@ public class ExerciseExpectationService {
         injectExpectation.setUpdatedAt(now());
         InjectExpectation updated = this.injectExpectationRepository.save(injectExpectation);
 
-        if(updated.getType() == EXPECTATION_TYPE.MANUAL && updated.getTeam() != null){
-            if(updated.getUser() != null){ //If updated was a player expectation I have to update team expectation using expectation of player (based on validation type)
-                InjectExpectation parentExpectation = injectExpectationRepository.findByInjectAndTeamAndExpectationNameAndUserIsNull(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()).orElseThrow();
-                if(updated.isExpectationGroup()) { //If true is at least
-                   parentExpectation.setScore(injectExpectationRepository.computeAverageScoreWhenValidationTypeIsAtLeastOnePlayer(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()));
-                }else{ // all
-                    parentExpectation.setScore(injectExpectationRepository.computeAverageScoreWhenValidationTypeIsAllPlayers(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()));
-                }
-                InjectExpectationResult expectationResult = InjectExpectationResult.builder()
-                        .sourceId("player")
-                        .sourceType("player")
-                        .sourceName("Player validation")
-                        .result(result)
-                        .date(now().toString())
-                        .score(parentExpectation.getScore())
-                        .build();
-                parentExpectation.getResults().add(expectationResult);
-                injectExpectationRepository.save(parentExpectation);
-            }else{
-                // If I update the expectation team: What happens with children? -> update expectation score for all children -> set score from InjectExpectation
-                List<InjectExpectation> toProcess = injectExpectationRepository.findAllByInjectAndTeamAndExpectationNameAndUserIsNotNull(updated.getInject().getId(), updated.getTeam().getId(), updated.getName());
-                for (InjectExpectation expectation : toProcess) {
-                    InjectExpectationResult expectationResult = InjectExpectationResult.builder()
-                            .sourceId("team")
-                            .sourceType("team")
-                            .sourceName("Team validation")
-                            .result(result)
-                            .date(now().toString())
-                            .score(updated.getScore())
-                            .build();
-                    expectation.getResults().add(expectationResult);
-                    expectation.setScore(updated.getScore());
-                    injectExpectationRepository.save(expectation);
-                }
-            }
+        // If The expectation is type manual we should update expectations for the teams end the players
+        if (updated.getType() == EXPECTATION_TYPE.MANUAL && updated.getTeam() != null) {
+            computeExpectationsForTeamsAndPlayer(updated, result);
         }
 
         return updated;
+    }
+
+    private void computeExpectationsForTeamsAndPlayer(InjectExpectation updated, String result) {
+        if (updated.getUser() != null) { //If updated was a player expectation I have to update team expectation using expectation of player (based on validation type)
+            InjectExpectation parentExpectation = injectExpectationRepository.findByInjectAndTeamAndExpectationNameAndUserIsNull(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()).orElseThrow();
+            if (updated.isExpectationGroup()) { //If true is at least
+                parentExpectation.setScore(injectExpectationRepository.computeAverageScoreWhenValidationTypeIsAtLeastOnePlayer(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()));
+                result = parentExpectation.getScore() > 0 ? "Success" : "Failed";
+            } else { // all
+                parentExpectation.setScore(injectExpectationRepository.computeAverageScoreWhenValidationTypeIsAllPlayers(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()));
+                // All players should give an answer
+                result = injectExpectationRepository.countExpectationsWithScoreNullOrZero(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()) == 0 ? "Success" : "Failed";
+            }
+            InjectExpectationResult expectationResult = InjectExpectationResult.builder()
+                    .sourceId("manual-player-validation")
+                    .sourceType("manual-player-validation")
+                    .sourceName("Manual Player Validation")
+                    .result(result)
+                    .date(now().toString())
+                    .score(parentExpectation.getScore())
+                    .build();
+            parentExpectation.getResults().clear();
+            parentExpectation.getResults().add(expectationResult);
+            injectExpectationRepository.save(parentExpectation);
+        } else {
+            // If I update the expectation team: What happens with children? -> update expectation score for all children -> set score from InjectExpectation
+            List<InjectExpectation> toProcess = injectExpectationRepository.findAllByInjectAndTeamAndExpectationNameAndUserIsNotNull(updated.getInject().getId(), updated.getTeam().getId(), updated.getName());
+            for (InjectExpectation expectation : toProcess) {
+                InjectExpectationResult expectationResult = InjectExpectationResult.builder()
+                        .sourceId("manual-team-validation")
+                        .sourceType("manual-team-validation")
+                        .sourceName("Manual Team Validation")
+                        .result(result)
+                        .date(now().toString())
+                        .score(updated.getScore())
+                        .build();
+                expectation.getResults().clear();
+                expectation.getResults().add(expectationResult);
+                expectation.setScore(updated.getScore());
+                injectExpectationRepository.save(expectation);
+            }
+        }
     }
 
     public InjectExpectation deleteInjectExpectationResult(

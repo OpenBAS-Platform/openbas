@@ -226,6 +226,11 @@ public class ChannelApi extends RestBehavior {
                 injectExpectationExecution.setScore(injectExpectationExecution.getExpectedScore());
                 injectExpectationExecution.setUpdatedAt(Instant.now());
                 injectExpectationExecutionRepository.save(injectExpectationExecution);
+
+                //Todo after update expectation player we have to update expectation team
+
+
+
             });
         }
         return channelReader;
