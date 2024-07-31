@@ -38,7 +38,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
   const layoutOptions: LayoutOptions = {
     algorithm: 'd3-hierarchy',
     direction: 'LR',
-    spacing: [50, 50],
+    spacing: [50, 150],
   };
   useAutoLayoutInject(layoutOptions, injectsToShow);
   const { fitView } = useReactFlow();
@@ -56,10 +56,14 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
           key: inject.inject_id,
           label: inject.inject_title,
           color: 'green',
-          background: 'black',
+          background: '#09101e',
           onConnectInjects,
-          isTargeted: onConnectInjects !== undefined || injects.some((value) => value.inject_depends_on === inject.inject_id),
-          isTargeting: onConnectInjects !== undefined || inject.inject_depends_on !== null,
+          isTargeted: false,
+          isTargeting: false,
+          injectType: inject.inject_type,
+          injectorContractPayload: inject.inject_injector_contract?.injector_contract_payload,
+          triggerTime: inject.inject_depends_duration,
+          description: inject.inject_description,
         },
         position: { x: 0, y: 0 },
       })));
@@ -97,7 +101,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
 
   const moveNewNode = (event) => {
     const bounds = event.target?.getBoundingClientRect();
-    console.log(event);
     const newX = event.clientX - bounds.left;
     const newY = event.clientY - bounds.top;
 
@@ -115,7 +118,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
       position: { x: newX, y: newY },
     };
     nodesList.push(node);
-    setNodes(nodesList);
+    // setNodes(nodesList);
   };
 
   const onMouseMove = (eventMove) => {
@@ -147,8 +150,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             nodeTypes={nodeTypes}
-            nodesDraggable={onConnectInjects !== undefined}
-            nodesConnectable={onConnectInjects !== undefined}
+            nodesDraggable={false}
+            nodesConnectable={false}
             nodesFocusable={false}
             elementsSelectable={false}
               // onEdgeUpdate={edgeUpdate}
@@ -158,7 +161,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
             onMouseMove={onMouseMove}
             proOptions={proOptions}
             translateExtent={[[-3000, -3000], [3000, 3000]]}
-            nodeExtent={[[-2000, -2000], [2000, 2000]]}
+            nodeExtent={[[-200000, -2000000], [2000000, 2000000]]}
           >
             <CustomTimelineBackground>
             </CustomTimelineBackground>

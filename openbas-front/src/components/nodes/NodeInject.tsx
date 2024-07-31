@@ -1,10 +1,12 @@
 import React, { memo } from 'react';
-import { Handle, NodeProps, Position, Node } from "@xyflow/react";
+import { Handle, NodeProps, Position, Node, OnConnect } from '@xyflow/react';
 import { makeStyles } from '@mui/styles';
 import { Tooltip } from '@mui/material';
 import { FlagOutlined, HelpOutlined, ModeStandbyOutlined, ScoreOutlined } from '@mui/icons-material';
-import {Theme} from "../Theme";
-import {OnConnect} from "@xyflow/react";
+import { Theme } from '../Theme';
+import { isNotEmptyField } from '../../utils/utils';
+import InjectIcon from '../../admin/components/common/injects/InjectIcon';
+import { Inject, Payload } from '../../utils/api-types';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -16,19 +18,28 @@ const useStyles = makeStyles<Theme>((theme) => ({
         ? '1px solid rgba(255, 255, 255, 0.12)'
         : '1px solid rgba(0, 0, 0, 0.12)',
     borderRadius: 4,
-    width: 200,
-    height: 100,
+    width: 250,
+    minHeight: '20px',
+    height: 'auto',
     padding: '8px 5px 5px 5px',
   },
   icon: {
-    textAlign: 'center',
-    margin: '10px 0 10px 0',
+    textAlign: 'left',
+    margin: '10px 0 0px 5px',
+  },
+  triggerTime: {
+    textAlign: 'right',
+    margin: '10px 0 0px 5px',
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    color: '#7d8188',
   },
   label: {
-    margin: '0 auto',
-    textAlign: 'center',
+    margin: '0 0 0 5px',
+    textAlign: 'left',
     fontSize: 15,
-    whiteSpace: 'nowrap',
+    whiteSpace: 'auto',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
@@ -67,24 +78,47 @@ export type NodeInject = Node<{
   isTargeted?: boolean,
   isTargeting?: boolean,
   onConnectInjects?: OnConnect
-  }
+  injectorContractPayload?: Payload
+  injectType?: string,
+  triggerTime?: number,
+  injectorType?: string,
+}
+
 >;
 
 const NodeInject = ({ data }: NodeProps<NodeInject>) => {
   const classes = useStyles();
   return (
-    <div className={classes.node} style={{ backgroundColor: data.background, color: data.color }}>
+    <div className={classes.node} style={{ backgroundColor: data.background, color: 'white' }}>
       <div className={classes.icon}>
-        {renderIcon(data.key)}
+        <InjectIcon
+          isPayload={isNotEmptyField(data.injectorContractPayload)}
+          type={
+            data.injectorContractPayload
+              ? data.injectorContractPayload?.payload_collector_type
+                  || data.injectorContractPayload?.payload_type
+              : data.injectType
+            }
+        />
       </div>
+      <div className={classes.triggerTime}>{data.triggerTime}</div>
       <Tooltip title={data.label}>
         <div className={classes.label}>{data.label}</div>
       </Tooltip>
       <Tooltip title={data.description}>
         <div className={classes.description}>{data.description}</div>
       </Tooltip>
-      {(data.isTargeted ? (<Handle type="target" id={`target-${data.key}`} position={Position.Left} isConnectable={true} onConnect={data.onConnectInjects}/>) : null)}
-      {(data.isTargeting ? (<Handle type="source" id={`source-${data.key}`} position={Position.Right} isConnectable={true} onConnect={data.onConnectInjects} />) : null)}
+      <Tooltip title={data.description}>
+        <div className={classes.type}>{data.injectorType}</div>
+      </Tooltip>
+      {(data.isTargeted ? (
+        <Handle type="target" id={`target-${data.key}`} position={Position.Left} isConnectable={true}
+          onConnect={data.onConnectInjects}
+        />) : null)}
+      {(data.isTargeting ? (
+        <Handle type="source" id={`source-${data.key}`} position={Position.Right} isConnectable={true}
+          onConnect={data.onConnectInjects}
+        />) : null)}
     </div>
   );
 };

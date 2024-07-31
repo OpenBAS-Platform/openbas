@@ -28,7 +28,7 @@ function BackgroundComponent({
   const ref = useRef<SVGSVGElement>(null);
   const { transform, patternId } = useStore(selector, shallow);
   const patternSize = size || 1;
-  const gapXY: [number, number] = Array.isArray(gap) ? gap : [gap, gap];
+  const gapXY: [number, number] = Array.isArray(gap) ? gap : [gap, gap * 2];
   const scaledGap: [number, number] = [gapXY[0] * transform[2] || 1, gapXY[1] * transform[2] || 1];
   const scaledSize = patternSize * transform[2];
 
@@ -68,7 +68,8 @@ function BackgroundComponent({
           <rect
             width="100%"
             height="100%"
-            stroke="red"
+            stroke="#121823"
+            fill='#070d19'
             strokeWidth={3}
           />
         </svg>
