@@ -3101,12 +3101,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hookform/resolvers@npm:3.4.2":
-  version: 3.4.2
-  resolution: "@hookform/resolvers@npm:3.4.2"
+"@hookform/resolvers@npm:3.9.0":
+  version: 3.9.0
+  resolution: "@hookform/resolvers@npm:3.9.0"
   peerDependencies:
     react-hook-form: ^7.0.0
-  checksum: 10c0/cb8a3e0cc1c9aeaf2adad585f29badf342a96da9cfdf4efa1168aadb7ef52f440cac5cc6fedf0fda6a52effd27a5c859692c89bb99ed5c76d03064aea1f0d684
+  checksum: 10c0/0e0e55f63abbd212cf14abbd39afad1f9b6105d6b25ce827fc651b624ed2be467ebe9b186026e0f032062db59ce2370b14e9583b436ae2d057738bdd6f04356c
   languageName: node
   linkType: hard
 
@@ -12048,7 +12048,7 @@ __metadata:
     "@eslint/js": "npm:8.57.0"
     "@fontsource/geologica": "npm:5.0.5"
     "@fontsource/ibm-plex-sans": "npm:5.0.20"
-    "@hookform/resolvers": "npm:3.4.2"
+    "@hookform/resolvers": "npm:3.9.0"
     "@microsoft/fetch-event-source": "npm:2.0.1"
     "@mui/icons-material": "npm:5.15.20"
     "@mui/lab": "npm:5.0.0-alpha.170"
