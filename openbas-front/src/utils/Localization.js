@@ -1134,7 +1134,7 @@ const i18n = {
       'Rule description': 'Description de la règle',
       'Do you want to delete this representation?': 'Voulez-vous supprimer cette représentation ?',
       'Trigger time': 'Heure de lancement',
-      'Attribute mapping configuration': 'Configuration d\'attribut de mappeur',
+      'Attribute mapping configuration': 'Configuration d\'attribut de mapper',
       Test: 'Test',
       'Do you want to delete this XLS mapper ?': 'Voulez-vous supprimer ce mappage XLS ?',
       Expectation_name: 'Nom de l\'attendu',
