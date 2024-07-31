@@ -23,6 +23,13 @@ const localeMap = {
   zh: cnLocale,
 };
 
+const momentMap = {
+  en: 'en-us',
+  fr: 'fr-fr',
+  es: 'es-es',
+  zh: 'zh-cn',
+};
+
 const AppIntlProvider = (props) => {
   const { children } = props;
   const { platformName, lang } = useHelper((helper) => {
@@ -36,11 +43,8 @@ const AppIntlProvider = (props) => {
     return { platformName: name, lang: userLang };
   });
   const baseMessages = i18n.messages[lang] || i18n.messages[DEFAULT_LANG];
-  if (lang === 'fr') {
-    moment.locale('fr-fr');
-  } else {
-    moment.locale('en-us');
-  }
+  const momentLocale = momentMap[lang];
+  moment.locale(momentLocale);
   useEffect(() => {
     document.title = platformName;
   }, [platformName]);
