@@ -1166,7 +1166,7 @@ const i18n = {
       'Rule description': 'Description de la règle',
       'Do you want to delete this representation?': 'Voulez-vous supprimer cette représentation ?',
       'Trigger time': 'Heure de lancement',
-      'Attribute mapping configuration': 'Configuration d\'attribut de mappeur',
+      'Attribute mapping configuration': 'Configuration d\'attribut de mapper',
       'The imported file contains absolute dates (ex.: 9h30). A starting date must be provided for the Scenario to be build': 'Le fichier importé contient des dates absolues (ex.: 9h30). Une date de début doit être fournie pour que le scénario puisse être créé',
       Test: 'Test',
       'Do you want to delete this XLS mapper ?': 'Voulez-vous supprimer ce mappage XLS ?',
