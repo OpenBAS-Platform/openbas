@@ -11,7 +11,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 
 interface Props {
-  inject: InjectStore & { inject_test?: boolean }; // FIXME: Inject object coming from multiple endpoints with difeerent properties
+  inject: InjectStore & { inject_test?: boolean }; // FIXME: Inject object coming from multiple endpoints with different properties
   tagsMap: Record<string, Tag>;
   setSelectedInjectId: (injectId: Inject['inject_id']) => void;
   isDisabled: boolean;
