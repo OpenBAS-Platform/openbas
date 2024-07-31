@@ -12,7 +12,7 @@
     "@emotion/styled": "11.11.5",
     "@fontsource/geologica": "5.0.5",
     "@fontsource/ibm-plex-sans": "5.0.20",
-    "@hookform/resolvers": "3.4.2",
+    "@hookform/resolvers": "3.9.0",
     "@microsoft/fetch-event-source": "2.0.1",
     "@mui/icons-material": "5.15.20",
     "@mui/lab": "5.0.0-alpha.170",
