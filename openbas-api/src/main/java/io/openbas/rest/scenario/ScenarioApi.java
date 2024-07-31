@@ -12,6 +12,7 @@ import io.openbas.rest.helper.TeamHelper;
 import io.openbas.rest.scenario.form.*;
 import io.openbas.service.ImportService;
 import io.openbas.service.ScenarioService;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -20,6 +21,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,6 +34,7 @@ import java.util.List;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.database.specification.ScenarioSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 
@@ -233,6 +236,24 @@ public class ScenarioApi {
         Scenario scenario = this.scenarioService.scenario(scenarioId);
         scenario.setUpdateAttributes(input);
         return this.scenarioService.updateScenario(scenario);
+    }
+
+    // -- OPTION --
+
+    @GetMapping(SCENARIO_URI + "/options")
+    public List<FilterUtilsJpa.Option> optionsByName(@RequestParam(required = false) final String searchText) {
+        return fromIterable(this.scenarioRepository.findAll(byName(searchText), PageRequest.of(0, 10)))
+            .stream()
+            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+            .toList();
+    }
+
+    @PostMapping(SCENARIO_URI + "/options")
+    public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+        return fromIterable(this.scenarioRepository.findAllById(ids))
+            .stream()
+            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+            .toList();
     }
 
 }

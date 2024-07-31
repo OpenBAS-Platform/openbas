@@ -8,7 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 public class InjectorContractUtils {
 
@@ -24,7 +24,7 @@ public class InjectorContractUtils {
   /**
    * Manage filters that are not directly managed by the generic mechanics -> injector_contract_kill_chain_phases
    */
-  public static Function<Specification<InjectorContract>, Specification<InjectorContract>> handleCustomFilter(
+  public static UnaryOperator<Specification<InjectorContract>> handleCustomFilter(
       @NotNull final SearchPaginationInput searchPaginationInput) {
     return CustomFilterUtils.handleCustomFilter(
         searchPaginationInput,

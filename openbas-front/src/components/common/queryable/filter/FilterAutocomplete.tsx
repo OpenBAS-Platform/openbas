@@ -91,7 +91,7 @@ const FilterAutocomplete: FunctionComponent<Props> = ({
         </IconButton>
       </Tooltip>
     </div>
-  )
-}
+  );
+};
 
 export default FilterAutocomplete;

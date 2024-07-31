@@ -1,6 +1,6 @@
-package io.openbas.rest.scenario.utils;
+package io.openbas.rest.exercise.utils;
 
-import io.openbas.database.model.Scenario;
+import io.openbas.database.model.Exercise;
 import io.openbas.utils.CustomFilterUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import org.jetbrains.annotations.NotNull;
@@ -10,25 +10,25 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-public class ScenarioUtils {
+public class ExerciseUtils {
 
-  private static final String SCENARIO_KILL_CHAIN_PHASES_FILTER = "scenario_kill_chain_phases";
+  private static final String EXERCISE_KILL_CHAIN_PHASES_FILTER = "exercise_kill_chain_phases";
   private static final Map<String, String> CORRESPONDENCE_MAP = Collections.singletonMap(
-      SCENARIO_KILL_CHAIN_PHASES_FILTER, "injects.injectorContract.attackPatterns.killChainPhases.id"
+      EXERCISE_KILL_CHAIN_PHASES_FILTER, "injects.injectorContract.attackPatterns.killChainPhases.id"
   );
 
-  private ScenarioUtils() {
+  private ExerciseUtils() {
 
   }
 
   /**
-   * Manage filters that are not directly managed by the generic mechanics -> scenario_kill_chain_phases
+   * Manage filters that are not directly managed by the generic mechanics -> exercise_kill_chain_phases
    */
-  public static UnaryOperator<Specification<Scenario>> handleCustomFilter(
+  public static UnaryOperator<Specification<Exercise>> handleCustomFilter(
       @NotNull final SearchPaginationInput searchPaginationInput) {
     return CustomFilterUtils.handleCustomFilter(
         searchPaginationInput,
-        SCENARIO_KILL_CHAIN_PHASES_FILTER,
+        EXERCISE_KILL_CHAIN_PHASES_FILTER,
         CORRESPONDENCE_MAP
     );
   }

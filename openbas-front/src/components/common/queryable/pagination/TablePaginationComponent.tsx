@@ -1,8 +1,8 @@
 import { TablePagination, ToggleButtonGroup } from '@mui/material';
-import { ROWS_PER_PAGE_OPTIONS } from './usPaginationState';
-import ExportButton, { ExportProps } from '../../ExportButton';
 import React from 'react';
 import { makeStyles } from '@mui/styles';
+import { ROWS_PER_PAGE_OPTIONS } from './usPaginationState';
+import ExportButton, { ExportProps } from '../../ExportButton';
 import { PaginationHelpers } from './PaginationHelpers';
 
 const useStyles = makeStyles(() => ({

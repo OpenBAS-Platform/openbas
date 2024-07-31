@@ -67,7 +67,6 @@ public class Exercise implements Base {
   @Getter
   @Column(name = "exercise_category")
   @JsonProperty("exercise_category")
-  @Queryable(filterable = true)
   private String category;
 
   @Getter
@@ -145,6 +144,7 @@ public class Exercise implements Base {
       inverseJoinColumns = @JoinColumn(name = "scenario_id"))
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("exercise_scenario")
+  @Queryable(filterable = true, dynamicValues = true)
   private Scenario scenario;
 
   // -- AUDIT --
@@ -211,7 +211,7 @@ public class Exercise implements Base {
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("exercise_tags")
-  @Queryable(sortable = true)
+  @Queryable(filterable = true, dynamicValues = true)
   private Set<Tag> tags = new HashSet<>();
 
   @Getter

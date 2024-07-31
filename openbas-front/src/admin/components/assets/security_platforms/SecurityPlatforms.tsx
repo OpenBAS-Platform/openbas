@@ -17,7 +17,7 @@ import type { SearchPaginationInput } from '../../../../utils/api-types';
 import { searchSecurityPlatforms } from '../../../../actions/assets/securityPlatform-actions';
 import type { Theme } from '../../../../components/Theme';
 import { isNotEmptyField } from '../../../../utils/utils';
-import { buildSearchPagination } from '../../../../components/common/queryable/useQueryable';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 
 const useStyles = makeStyles(() => ({
   itemHead: {

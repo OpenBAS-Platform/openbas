@@ -852,12 +852,16 @@ const i18n = {
       endpoint_arch: 'Architecture',
       endpoint_agent_version: 'Version de l\'agent',
       // Injector Contract
-      injector_contract_platforms: 'Platforms',
-      injector_contract_injector: 'Injector',
       injector_contract_kill_chain_phases: 'Phases de kill chain',
+      injector_contract_injector: 'Injector',
+      injector_contract_platforms: 'Platforms',
       // Scenario
-      scenario_tags: 'Tags',
       scenario_kill_chain_phases: 'Phases de kill chain',
+      scenario_tags: 'Tags',
+      // Exercise
+      exercise_kill_chain_phases: 'Phases de kill chain',
+      exercise_scenario: 'Scenario',
+      exercise_tags: 'Tags',
       Recurrence: 'Récurrence',
       'Does not repeat': 'Ne se répète pas',
       Daily: 'Quotidien',
@@ -2524,12 +2528,16 @@ const i18n = {
       endpoint_arch: 'Architecture',
       endpoint_agent_version: 'Agent version',
       // Injector Contract
-      injector_contract_platforms: 'Platforms',
-      injector_contract_injector: 'Injector',
       injector_contract_kill_chain_phases: 'Kill chain phases',
+      injector_contract_injector: 'Injector',
+      injector_contract_platforms: 'Platforms',
       // Scenario
-      scenario_tags: 'Tags',
       scenario_kill_chain_phases: 'Kill chain phases',
+      scenario_tags: 'Tags',
+      // Exercise
+      exercise_kill_chain_phases: 'Kill chain phases',
+      exercise_scenario: 'Scenario',
+      exercise_tags: 'Tags',
       recurrence_The: 'The',
       recurrence_at: 'at',
       recurrence_from: 'from',

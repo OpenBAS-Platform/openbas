@@ -14,7 +14,7 @@ import useEntityIcon from '../../../utils/hooks/useEntityIcon';
 import type { Theme } from '../../../components/Theme';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import ItemTags from '../../../components/ItemTags';
-import { buildSearchPagination } from '../../../components/common/queryable/useQueryable';
+import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {

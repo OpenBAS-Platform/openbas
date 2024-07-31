@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { searchInjectorByIdAsOptions } from '../../../../actions/injectors/injector-action';
 import { Option } from '../../../../utils/Option';
 import { searchKillChainPhasesByIdAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
-import { searchTagAsOption, searchTagByIdAsOption } from '../../../../actions/tags/tag-action';
+import { searchTagByIdAsOption } from '../../../../actions/tags/tag-action';
+import { searchScenarioByIdAsOption } from '../../../../actions/scenarios/scenario-actions';
 
 const useRetrieveOptions = () => {
   const [options, setOptions] = useState<Option[]>([]);
@@ -16,12 +17,19 @@ const useRetrieveOptions = () => {
         break;
       case 'injector_contract_kill_chain_phases':
       case 'scenario_kill_chain_phases':
+      case 'exercise_kill_chain_phases':
         searchKillChainPhasesByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;
       case 'scenario_tags':
+      case 'exercise_tags':
         searchTagByIdAsOption(ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'exercise_scenario':
+        searchScenarioByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;

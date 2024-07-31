@@ -59,7 +59,7 @@ public class OperationUtilsJpa {
     );
   }
 
-  // -- NOT EQULS --
+  // -- NOT EQUALS --
 
   public static Predicate notEqualsTexts(Expression<String> paths, CriteriaBuilder cb, List<String> texts, Class<?> type) {
     Predicate[] predicates = texts.stream().map(text -> notEqualsText(

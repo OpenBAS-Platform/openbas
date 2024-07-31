@@ -1,6 +1,7 @@
 package io.openbas.database.specification;
 
 import io.openbas.database.model.Scenario;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.Path;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.domain.Specification;
@@ -46,5 +47,9 @@ public class ScenarioSpecification {
           .join("users").get("id");
       return criteriaBuilder.equal(path, userId);
     };
+  }
+
+  public static Specification<Scenario> byName(@Nullable final String searchText) {
+    return UtilsSpecification.byName(searchText, "name");
   }
 }

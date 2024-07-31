@@ -22,7 +22,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
@@ -48,7 +48,7 @@ public class InjectorContractApi extends RestBehavior {
 
     @PostMapping("/api/injector_contracts/search")
     public Page<InjectorContractOutput> injectorContracts(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-        Function<Specification<InjectorContract>, Specification<InjectorContract>> finalSpecification = handleCustomFilter(
+        UnaryOperator<Specification<InjectorContract>> finalSpecification = handleCustomFilter(
             searchPaginationInput
         );
 

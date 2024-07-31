@@ -1,5 +1,5 @@
-import SearchFilter from '../../../SearchFilter';
 import React, { FunctionComponent } from 'react';
+import SearchFilter from '../../../SearchFilter';
 import { TextSearchHelpers } from './TextSearchHelpers';
 
 interface Props {
@@ -11,7 +11,6 @@ const TextSearchComponent: FunctionComponent<Props> = ({
   textSearch,
   textSearchHelpers,
 }) => {
-
   const handleTextSearch = (value?: string) => textSearchHelpers.handleTextSearch(value);
 
   return (

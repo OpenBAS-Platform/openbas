@@ -2,17 +2,11 @@ import { useLocalStorage } from 'usehooks-ts';
 import useFiltersState from './filter/useFiltersState';
 import type { FilterGroup, SearchPaginationInput, SortField } from '../../../utils/api-types';
 import useTextSearchState from './textSearch/useTextSearchState';
-import usPaginationState, { ROWS_PER_PAGE_OPTIONS } from './pagination/usPaginationState';
+import usPaginationState from './pagination/usPaginationState';
 import { QueryableHelpers } from './QueryableHelpers';
 import useSortState from './sort/useSortState';
-
-export const buildSearchPagination = (searchPaginationInput: Partial<SearchPaginationInput>) => {
-  return ({
-    page: 0,
-    size: ROWS_PER_PAGE_OPTIONS[0],
-    ...searchPaginationInput,
-  });
-};
+import useUriState from './uri/useUriState';
+import { buildSearchPagination } from './QueryableUtils';
 
 const useQueryable = (localStorageKey: string, initSearchPaginationInput: Partial<SearchPaginationInput>) => {
   const finalSearchPaginationInput: SearchPaginationInput = buildSearchPagination(initSearchPaginationInput);
@@ -34,22 +28,26 @@ const useQueryable = (localStorageKey: string, initSearchPaginationInput: Partia
   }));
 
   // Filters
-  const [__, filterHelpers] = useFiltersState(initSearchPaginationInput.filterGroup, (filterGroup: FilterGroup) => setSearchPaginationInput({
+  const [__, filterHelpers] = useFiltersState(searchPaginationInput.filterGroup, (filterGroup: FilterGroup) => setSearchPaginationInput({
     ...searchPaginationInput,
     filterGroup,
   }));
 
   // Sorts
-  const sortHelpers = useSortState(initSearchPaginationInput.sorts, (sorts: SortField[]) => setSearchPaginationInput({
+  const sortHelpers = useSortState(searchPaginationInput.sorts, (sorts: SortField[]) => setSearchPaginationInput({
     ...searchPaginationInput,
     sorts,
   }));
+
+  // Uri
+  const uriHelpers = useUriState(searchPaginationInput, (input: SearchPaginationInput) => setSearchPaginationInput(input));
 
   const queryableHelpers: QueryableHelpers = {
     textSearchHelpers,
     paginationHelpers,
     filterHelpers,
     sortHelpers,
+    uriHelpers,
   };
 
   return ({
