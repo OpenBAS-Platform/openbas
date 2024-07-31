@@ -11,17 +11,28 @@ const useStyles = makeStyles(() => ({
     pointerEvents: 'none !important',
     width: '100%',
     height: '100%',
-    margin: '0px !important',
+    margin: '0px 0px 0px 5px !important',
   },
 }));
 
 function BackgroundComponent({
   style,
+  gap = 100,
 }: BackgroundProps) {
   const classes = useStyles();
   const { transform } = useStore(selector, shallow);
-  const desiredFontSize = 16;
-  const parsedDate = moment(new Date(2024, 7, 28, 9, 30, 0)).format('HH:mm:ss');
+  const desiredFontSize = 12;
+
+  const numberOfIntervals = 10;
+  const parsedDates: string[] = [];
+
+  const gapXY: [number, number] = Array.isArray(gap) ? gap : [gap, gap];
+  const scaledGap: [number, number] = [gapXY[0] * transform[2] || 1, gapXY[1] * transform[2] || 1];
+
+  for (let i = 0; i < numberOfIntervals; i += 1) {
+    const date = moment.utc(moment.duration(0, 'd').add(15 * i, 'm').asMilliseconds());
+    parsedDates.push(`${date.dayOfYear() - 1} d, ${date.hour()} h, ${date.minute()} m`);
+  }
 
   return (
     <Panel className={classes.panel}>
@@ -36,9 +47,11 @@ function BackgroundComponent({
           } as CSSProperties
         }
       >
-        <text fill="#ffffff" fontSize={desiredFontSize} fontFamily="Verdana" x={transform[0]} y={desiredFontSize}>
-          {parsedDate}
-        </text>
+        {parsedDates.map((parsedDate, index) => (
+          <text fill="#ffffff" fontSize={desiredFontSize} fontFamily="Verdana" x={transform[0] + (index * 5 * scaledGap[1])} y={desiredFontSize}>
+            {parsedDate}
+          </text>
+        ))}
       </svg>
     </Panel>
   );

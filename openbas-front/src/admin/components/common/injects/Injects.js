@@ -380,6 +380,13 @@ const Injects = (props) => {
               <ChainedTimeline
                 injects={sortedInjects}
                 onConnectInjects={onConnectInjects}
+                onSelectedInject={(inject) => {
+                  const injectContract = inject.inject_injector_contract.convertedContent;
+                  const isContractExposed = injectContract?.config.expose;
+                  if (injectContract && isContractExposed) {
+                    setSelectedInjectId(inject.inject_id);
+                  }
+                }}
               />
               <div className="clearfix"/>
             </div>

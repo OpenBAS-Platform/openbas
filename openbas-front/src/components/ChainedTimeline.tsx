@@ -1,7 +1,6 @@
-import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow, Connection, Edge } from '@xyflow/react';
-import { NodeJS } from 'timers';
 import type { InjectStore } from '../actions/injects/Inject';
 import type { Theme } from './Theme';
 import nodeTypes from './nodes';
@@ -9,7 +8,7 @@ import { useAutoLayoutInject, LayoutOptions } from '../utils/flows/useAutoLayout
 import { CustomTimelineBackground } from './CustomTimelineBackground';
 import { NodeInject } from './nodes/NodeInject';
 import { CustomTimelinePanel } from './CustomTimelinePanel';
-import type { Scenario } from '../utils/api-types';
+import type { Inject, Scenario } from '../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -21,10 +20,11 @@ const useStyles = makeStyles(() => ({
 interface Props {
   injects: InjectStore[],
   scenario: Scenario,
-  onConnectInjects(connection: Connection): void
+  onConnectInjects(connection: Connection): void,
+  onSelectedInject(inject: InjectStore): void,
 }
 
-const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, scenario, onConnectInjects }) => {
+const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, scenario, onConnectInjects, onSelectedInject }) => {
   // Standard hooks
   const classes = useStyles();
   const theme = useTheme<Theme>();
@@ -116,6 +116,10 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, scenario, onCo
     }, 300);
   };
 
+  const onNodeClick = (event: React.MouseEvent, node: NodeInject) => {
+    onSelectedInject(injects.find((value) => value.inject_id === node.id)!);
+  };
+
   return (
     <>
       {injectsToShow.length > 0 ? (
@@ -138,11 +142,11 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, scenario, onCo
             proOptions={proOptions}
             translateExtent={[[-50, -50], [Infinity, Infinity]]}
             nodeExtent={[[0, 0], [Infinity, Infinity]]}
-            fitView={true}
+            onNodeClick={onNodeClick}
           >
             <CustomTimelineBackground>
             </CustomTimelineBackground>
-            <CustomTimelinePanel startDate={scenario.scenario_recurrence_start}>
+            <CustomTimelinePanel startDate={scenario?.scenario_recurrence_start}>
             </CustomTimelinePanel>
           </ReactFlow>
         </div>
