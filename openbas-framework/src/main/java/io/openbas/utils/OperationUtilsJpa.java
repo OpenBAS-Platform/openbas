@@ -37,12 +37,20 @@ public class OperationUtilsJpa {
       Expression<String> paths, CriteriaBuilder cb,
       List<String> texts,
       Class<?> type) {
+    if (texts == null || texts.isEmpty()) {
+      return cb.conjunction();
+    }
+
     Predicate[] predicates = texts.stream().map(text -> containsText(paths, cb, text, type)).toArray(Predicate[]::new);
 
     return cb.or(predicates);
   }
 
   public static Predicate containsText(Expression<String> paths, CriteriaBuilder cb, String text, Class<?> type) {
+    if (text == null) {
+      return cb.conjunction();
+    }
+
     if (type.isAssignableFrom(Map.class) || type.getName().contains("ImmutableCollections")) {
       Expression<String> values = lower(arrayToString(avals(paths, cb), cb), cb);
       return cb.like(values, "%" + text.toLowerCase() + "%");
@@ -76,6 +84,10 @@ public class OperationUtilsJpa {
   // -- EQUALS --
 
   public static Predicate equalsTexts(Expression<String> paths, CriteriaBuilder cb, List<String> texts, Class<?> type) {
+    if (texts == null || texts.isEmpty()) {
+      return cb.conjunction();
+    }
+
     Predicate[] predicates = texts.stream().map(text -> equalsText(
         paths, cb, text, type
     )).toArray(Predicate[]::new);
@@ -84,6 +96,10 @@ public class OperationUtilsJpa {
   }
 
   private static Predicate equalsText(Expression<String> paths, CriteriaBuilder cb, String text, Class<?> type) {
+    if (text == null) {
+      return cb.conjunction();
+    }
+
     if (type.isAssignableFrom(Map.class) || type.getName().contains("ImmutableCollections")) {
       Expression<String[]> values = lowerArray(avals(paths, cb), cb);
       return cb.isNotNull(arrayPosition(values, cb, cb.literal(text.toLowerCase())));
