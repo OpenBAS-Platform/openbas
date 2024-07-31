@@ -64,6 +64,7 @@ export interface Article {
   article_updated_at: string;
   /** @format date-time */
   article_virtual_publication?: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -119,6 +120,7 @@ export interface Asset {
   asset_type?: string;
   /** @format date-time */
   asset_updated_at?: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -127,6 +129,7 @@ export interface AssetAgentJob {
   asset_agent_command: string;
   asset_agent_id: string;
   asset_agent_inject?: Inject;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -143,6 +146,7 @@ export interface AssetGroup {
   asset_group_tags?: Tag[];
   /** @format date-time */
   asset_group_updated_at?: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -200,6 +204,7 @@ export interface AttackPattern {
   attack_pattern_stix_id: string;
   /** @format date-time */
   attack_pattern_updated_at?: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -246,6 +251,7 @@ export interface Challenge {
   challenge_updated_at: string;
   /** @format date-time */
   challenge_virtual_publication?: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -271,6 +277,7 @@ export interface ChallengeFlag {
   /** @format date-time */
   flag_updated_at?: string;
   flag_value?: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -327,6 +334,7 @@ export interface Channel {
   channel_type?: string;
   /** @format date-time */
   channel_updated_at?: string;
+  listened?: boolean;
   logos?: Document[];
   updateAttributes?: object;
 }
@@ -375,6 +383,7 @@ export interface Collector {
   collector_type: string;
   /** @format date-time */
   collector_updated_at?: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -406,6 +415,7 @@ export interface Comcheck {
   comcheck_subject?: string;
   /** @format int64 */
   comcheck_users_number?: number;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -429,6 +439,7 @@ export interface ComcheckStatus {
   comcheckstatus_sent_retry?: number;
   comcheckstatus_state?: 'RUNNING' | 'SUCCESS' | 'FAILURE';
   comcheckstatus_user?: User;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -450,6 +461,7 @@ export interface Communication {
   communication_subject?: string;
   communication_to?: string;
   communication_users?: User[];
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -484,6 +496,7 @@ export interface Document {
   document_tags?: Tag[];
   document_target?: string;
   document_type?: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -513,10 +526,12 @@ export interface DryInject {
   dryinject_id?: string;
   dryinject_inject?: Inject;
   dryinject_status?: DryInjectStatus;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
 export interface DryInjectStatus {
+  listened?: boolean;
   status_id?: string;
   status_name?:
     | 'DRAFT'
@@ -563,6 +578,7 @@ export interface Dryrun {
   dryrun_users?: User[];
   /** @format int64 */
   dryrun_users_number?: number;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -599,6 +615,7 @@ export interface Endpoint {
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
   endpoint_platform: 'Linux' | 'Windows' | 'MacOS' | 'Container' | 'Service' | 'Generic' | 'Internal' | 'Unknown';
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -649,6 +666,7 @@ export interface Evaluation {
   /** @format date-time */
   evaluation_updated_at?: string;
   evaluation_user?: User;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -667,6 +685,7 @@ export interface Executor {
   executor_type: string;
   /** @format date-time */
   executor_updated_at?: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -737,6 +756,7 @@ export interface Exercise {
   exercise_users?: User[];
   /** @format int64 */
   exercise_users_number?: number;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -935,6 +955,7 @@ export interface Grant {
   grant_id?: string;
   grant_name?: 'OBSERVER' | 'PLANNER';
   grant_scenario?: Scenario;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -952,6 +973,7 @@ export interface Group {
   group_name?: string;
   group_organizations?: Organization[];
   group_users?: User[];
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -984,6 +1006,7 @@ export interface ImportMapper {
   /** @format date-time */
   import_mapper_updated_at?: string;
   inject_importers?: InjectImporter[];
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -1075,6 +1098,7 @@ export interface Inject {
   inject_user?: User;
   /** @format int64 */
   inject_users_number?: number;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -1123,6 +1147,7 @@ export interface InjectExpectation {
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: User;
+  listened?: boolean;
   targetId?: string;
   updateAttributes?: object;
 }
@@ -1167,6 +1192,7 @@ export interface InjectImporter {
   inject_importer_type_value: string;
   /** @format date-time */
   inject_importer_updated_at?: string;
+  listened?: boolean;
   rule_attributes?: RuleAttribute[];
   updateAttributes?: object;
 }
@@ -1220,6 +1246,7 @@ export interface InjectOutput {
   /** @uniqueItems true */
   inject_tags?: string[];
   inject_teams?: string[];
+  inject_test?: boolean;
   inject_title?: string;
   inject_type?: string;
 }
@@ -1260,6 +1287,7 @@ export interface InjectResultDTO {
 }
 
 export interface InjectStatus {
+  listened?: boolean;
   status_id?: string;
   status_name?:
     | 'DRAFT'
@@ -1352,6 +1380,7 @@ export interface Injector {
   injector_type: string;
   /** @format date-time */
   injector_updated_at?: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -1384,6 +1413,7 @@ export interface InjectorContract {
   injector_contract_platforms?: string[];
   /** @format date-time */
   injector_contract_updated_at?: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -1479,6 +1509,7 @@ export interface InjectsImportTestInput {
 export type JsonNode = object;
 
 export interface KillChainPhase {
+  listened?: boolean;
   /** @format date-time */
   phase_created_at?: string;
   phase_description?: string;
@@ -1530,6 +1561,7 @@ export interface LessonsAnswer {
   lessons_answer_updated_at?: string;
   lessons_answer_user?: User;
   lessonsanswer_id?: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -1555,6 +1587,7 @@ export interface LessonsCategory {
   lessons_category_updated_at?: string;
   lessons_category_users?: string[];
   lessonscategory_id?: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -1589,6 +1622,7 @@ export interface LessonsQuestion {
   /** @format date-time */
   lessons_question_updated_at?: string;
   lessonsquestion_id?: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -1619,6 +1653,7 @@ export interface LessonsTemplate {
   /** @format date-time */
   lessons_template_updated_at: string;
   lessonstemplate_id: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -1634,6 +1669,7 @@ export interface LessonsTemplateCategory {
   /** @format date-time */
   lessons_template_category_updated_at: string;
   lessonstemplatecategory_id: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -1660,6 +1696,7 @@ export interface LessonsTemplateQuestion {
   /** @format date-time */
   lessons_template_question_updated_at: string;
   lessonstemplatequestion_id: string;
+  listened?: boolean;
   updateAttributes?: object;
 }
 
@@ -1671,6 +1708,7 @@ export interface LessonsTemplateQuestionInput {
 }
 
 export interface Log {
+  listened?: boolean;
   log_content?: string;
   /** @format date-time */
   log_created_at?: string;
@@ -1697,6 +1735,7 @@ export interface LoginUserInput {
 }
 
 export interface Mitigation {
+  listened?: boolean;
   mitigation_attack_patterns?: AttackPattern[];
   /** @format date-time */
   mitigation_created_at?: string;
@@ -1740,6 +1779,7 @@ export interface OAuthProvider {
 }
 
 export interface Objective {
+  listened?: boolean;
   /** @format date-time */
   objective_created_at?: string;
   objective_description?: string;
@@ -1765,6 +1805,7 @@ export interface ObjectiveInput {
 }
 
 export interface Organization {
+  listened?: boolean;
   /** @format date-time */
   organization_created_at?: string;
   organization_description?: string;
@@ -2208,6 +2249,7 @@ export interface PageableObject {
 }
 
 export interface Pause {
+  listened?: boolean;
   log_id?: string;
   /** @format date-time */
   pause_date?: string;
@@ -2218,6 +2260,7 @@ export interface Pause {
 }
 
 export interface Payload {
+  listened?: boolean;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: AttackPattern[];
   payload_cleanup_command?: string;
@@ -2526,6 +2569,7 @@ export interface RenewTokenInput {
 }
 
 export interface Report {
+  listened?: boolean;
   /** @format date-time */
   report_created_at?: string;
   report_description?: string;
@@ -2583,6 +2627,7 @@ export interface ResultDistribution {
 }
 
 export interface RuleAttribute {
+  listened?: boolean;
   rule_attribute_additional_config?: Record<string, string>;
   rule_attribute_columns?: string;
   /** @format date-time */
@@ -2611,6 +2656,7 @@ export interface RuleAttributeUpdateInput {
 }
 
 export interface Scenario {
+  listened?: boolean;
   /** @format int64 */
   scenario_all_users_number?: number;
   scenario_articles?: Article[];
@@ -2762,6 +2808,7 @@ export interface SecurityPlatform {
   asset_type?: string;
   /** @format date-time */
   asset_updated_at?: string;
+  listened?: boolean;
   security_platform_logo_dark?: Document;
   security_platform_logo_light?: Document;
   security_platform_type: 'EDR' | 'XDR' | 'SIEM' | 'SOAR' | 'NDR' | 'ISPM';
@@ -2827,6 +2874,7 @@ export interface StatisticElement {
 }
 
 export interface Tag {
+  listened?: boolean;
   tag_color?: string;
   tag_id: string;
   tag_name?: string;
@@ -2844,6 +2892,7 @@ export interface TagUpdateInput {
 }
 
 export interface Team {
+  listened?: boolean;
   team_communications?: Communication[];
   team_contextual?: boolean;
   /** @format date-time */
@@ -2910,6 +2959,7 @@ export interface ThemeInput {
 }
 
 export interface Token {
+  listened?: boolean;
   /** @format date-time */
   token_created_at?: string;
   token_id?: string;
@@ -2964,6 +3014,7 @@ export interface UpdateUsersTeamInput {
 export interface User {
   user_phone2?: string;
   injects?: Inject[];
+  listened?: boolean;
   updateAttributes?: object;
   user_admin?: boolean;
   user_city?: string;
@@ -3018,6 +3069,7 @@ export interface ValidationErrorBag {
 }
 
 export interface Variable {
+  listened?: boolean;
   updateAttributes?: object;
   /** @format date-time */
   variable_created_at?: string;

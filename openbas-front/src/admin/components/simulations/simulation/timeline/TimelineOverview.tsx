@@ -117,7 +117,7 @@ const TimelineOverview = () => {
 
   return (
     <div className={classes.root}>
-      <AnimationMenu exerciseId={exerciseId}/>
+      <AnimationMenu exerciseId={exerciseId} />
       <div style={{ float: 'left', marginRight: 10 }}>
         <SearchFilter
           variant="small"
@@ -132,13 +132,13 @@ const TimelineOverview = () => {
           currentTags={filtering.tags}
         />
       </div>
-      <div className="clearfix"/>
+      <div className="clearfix" />
       <Timeline
         injects={filteredInjects}
         teams={teams}
         onSelectInject={(id: string) => setSelectedInjectId(id)}
       ></Timeline>
-      <div className="clearfix"/>
+      <div className="clearfix" />
       <Grid container spacing={3} style={{ marginTop: 50, paddingBottom: 24 }}>
         <Grid container item spacing={3}>
           <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -162,10 +162,10 @@ const TimelineOverview = () => {
                           <InjectIcon
                             isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
                             type={
-                                inject.inject_injector_contract.injector_contract_payload
-                                  ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
-                                    || inject.inject_injector_contract.injector_contract_payload?.payload_type
-                                  : inject.inject_type
+                              inject.inject_injector_contract.injector_contract_payload
+                                ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                                || inject.inject_injector_contract.injector_contract_payload?.payload_type
+                                : inject.inject_type
                             }
                             variant="inline"
                           />
@@ -186,9 +186,9 @@ const TimelineOverview = () => {
                                 <ProgressBarCountdown
                                   date={inject.inject_date}
                                   paused={
-                                              exercise?.exercise_status === 'PAUSED'
-                                              || exercise?.exercise_status === 'CANCELED'
-                                          }
+                                    exercise?.exercise_status === 'PAUSED'
+                                    || exercise?.exercise_status === 'CANCELED'
+                                  }
                                 />
                               </div>
                               <div
@@ -201,11 +201,12 @@ const TimelineOverview = () => {
                                 {fndt(inject.inject_date)}
                               </div>
                             </div>
-                                }
+                          }
                         />
                         <ListItemSecondaryAction>
                           <InjectPopover
                             inject={inject}
+                            canBeTested={false}
                             tagsMap={tagsMap}
                             setSelectedInjectId={setSelectedInjectId}
                             isDisabled={isDisabled}
@@ -216,7 +217,7 @@ const TimelineOverview = () => {
                   })}
                 </List>
               ) : (
-                <Empty message={t('No pending injects in this simulation.')}/>
+                <Empty message={t('No pending injects in this simulation.')} />
               )}
             </Paper>
           </Grid>
@@ -238,11 +239,11 @@ const TimelineOverview = () => {
                         <InjectIcon
                           isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
                           type={
-                              inject.inject_injector_contract.injector_contract_payload
-                                ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
-                                  || inject.inject_injector_contract.injector_contract_payload?.payload_type
-                                : inject.inject_type
-                            }
+                            inject.inject_injector_contract.injector_contract_payload
+                              ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                              || inject.inject_injector_contract.injector_contract_payload?.payload_type
+                              : inject.inject_type
+                          }
                           variant="inline"
                         />
                       </ListItemIcon>
@@ -278,16 +279,16 @@ const TimelineOverview = () => {
                               {t('s')})
                             </div>
                           </div>
-                              }
+                        }
                       />
                       <ListItemSecondaryAction>
-                        <PreviewOutlined/>
+                        <PreviewOutlined />
                       </ListItemSecondaryAction>
                     </ListItemButton>
                   ))}
                 </List>
               ) : (
-                <Empty message={t('No processed injects in this simulation.')}/>
+                <Empty message={t('No processed injects in this simulation.')} />
               )}
             </Paper>
           </Grid>
@@ -299,7 +300,7 @@ const TimelineOverview = () => {
             {t('Sent injects over time')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            <InjectOverTimeArea exerciseId={exerciseId}/>
+            <InjectOverTimeArea exerciseId={exerciseId} />
           </Paper>
         </Grid>
         <Grid item xs={6}>
@@ -307,7 +308,7 @@ const TimelineOverview = () => {
             {t('Sent injects over time')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            <InjectOverTimeLine exerciseId={exerciseId}/>
+            <InjectOverTimeLine exerciseId={exerciseId} />
           </Paper>
         </Grid>
       </Grid>

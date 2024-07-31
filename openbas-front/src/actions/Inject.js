@@ -13,6 +13,11 @@ export const tryInject = (injectId) => (dispatch) => {
   return getReferential(null, uri, null)(dispatch);
 };
 
+export const testInject = (injectId) => (dispatch) => {
+  const uri = `/api/injects/test/${injectId}`;
+  return getReferential(schema.injectStatus, uri, null)(dispatch);
+};
+
 // -- EXERCISES --
 
 export const fetchExerciseInjects = (exerciseId) => (dispatch) => {

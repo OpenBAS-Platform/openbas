@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.helper.InjectModelHelper;
+import io.openbas.injectors.email.EmailContract;
+import io.openbas.injectors.ovh.OvhSmsContract;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -58,6 +60,11 @@ public class InjectOutput {
 
   @JsonProperty("inject_content")
   private ObjectNode content;
+
+  @JsonProperty("inject_test")
+  public boolean canBeTested() {
+    return this.getInjectType().equals(EmailContract.TYPE) || this.getInjectType().equals(OvhSmsContract.TYPE);
+  }
 
   public InjectOutput(
       String id,
