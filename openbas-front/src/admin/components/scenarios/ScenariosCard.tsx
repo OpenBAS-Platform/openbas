@@ -97,7 +97,13 @@ const ScenariosCard: FunctionComponent<ScenariosCardProps> = ({
     );
   };
 
-  const noCategory = () => searchPaginationInput.filterGroup?.filters?.find((f) => f.key === CATEGORY_FILTER_KEY)?.values?.length === 0;
+  const noCategory = () => {
+    const categoryFilter = searchPaginationInput.filterGroup?.filters?.find((f) => f.key === CATEGORY_FILTER_KEY);
+    if (categoryFilter) {
+      return !categoryFilter.values || categoryFilter.values.length === 0;
+    }
+    return false;
+  };
 
   // Statistic
   const [statistic, setStatistic] = useState<ScenarioStatistic>();
