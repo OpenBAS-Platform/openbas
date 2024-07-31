@@ -1,4 +1,3 @@
-import { Dispatch } from 'redux';
 import type {
   ExportMapperInput,
   ImportMapperAddInput,
@@ -7,7 +6,7 @@ import type {
   RawPaginationImportMapper,
   SearchPaginationInput,
 } from '../../utils/api-types';
-import { postReferential, simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
+import { simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
 
 const XLS_MAPPER_URI = '/api/mappers';
 
@@ -55,7 +54,7 @@ export const exportMapper = (input: ExportMapperInput) => {
   });
 };
 
-export const importMapper = (formData: FormData) => (dispatch: Dispatch) => {
+export const importMapper = (formData: FormData) => {
   const uri = `${XLS_MAPPER_URI}/import`;
-  return postReferential(null, uri, formData)(dispatch);
+  return simplePostCall(uri, formData);
 };
