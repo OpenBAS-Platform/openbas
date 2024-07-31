@@ -1065,6 +1065,7 @@ public class InjectService {
         Join<Inject, Scenario> injectScenarioJoin = createLeftJoin(injectRoot, "scenario");
         Join<Inject, InjectorContract> injectorContractJoin = createLeftJoin(injectRoot, "injectorContract");
         Join<InjectorContract, Injector> injectorJoin = injectorContractJoin.join("injector", JoinType.LEFT);
+        Join<Inject, Inject> injectDependsJoin = createLeftJoin(injectRoot, "dependsOn");
         // Array aggregations
         Expression<String[]> tagIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "tags");
         Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
@@ -1081,6 +1082,7 @@ public class InjectService {
                 injectExerciseJoin.get("id").alias("inject_exercise"),
                 injectScenarioJoin.get("id").alias("inject_scenario"),
                 injectRoot.get("dependsDuration").alias("inject_depends_duration"),
+                injectDependsJoin.get("id").alias("inject_depends_from_another"),
                 injectorContractJoin.alias("inject_injector_contract"),
                 tagIdsExpression.alias("inject_tags"),
                 teamIdsExpression.alias("inject_teams"),

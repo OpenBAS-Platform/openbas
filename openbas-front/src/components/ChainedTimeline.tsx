@@ -1,14 +1,15 @@
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow, reconnectEdge, Connection, Edge } from '@xyflow/react';
+import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow, Connection, Edge } from '@xyflow/react';
+import { NodeJS } from 'timers';
 import type { InjectStore } from '../actions/injects/Inject';
 import type { Theme } from './Theme';
-import { useFormatter } from './i18n';
 import nodeTypes from './nodes';
 import { useAutoLayoutInject, LayoutOptions } from '../utils/flows/useAutoLayout';
 import { CustomTimelineBackground } from './CustomTimelineBackground';
 import { NodeInject } from './nodes/NodeInject';
 import { CustomTimelinePanel } from './CustomTimelinePanel';
+import type { Scenario } from '../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -19,26 +20,25 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   injects: InjectStore[],
+  scenario: Scenario,
   onConnectInjects(connection: Connection): void
 }
 
-const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjects }) => {
+const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, scenario, onConnectInjects }) => {
   // Standard hooks
   const classes = useStyles();
   const theme = useTheme<Theme>();
-  const { t } = useFormatter();
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeInject>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [injectsToShow, setInjectsToShow] = useState<InjectStore[]>([]);
-  const [coordinates, setCoordinates] = useState<number[]>([]);
 
-  let timer;
+  let timer: NodeJS.Timeout;
 
   // Flow
   const layoutOptions: LayoutOptions = {
     algorithm: 'd3-hierarchy',
     direction: 'LR',
-    spacing: [50, 150],
+    spacing: [0, 150],
   };
   useAutoLayoutInject(layoutOptions, injectsToShow);
   const { fitView } = useReactFlow();
@@ -65,9 +65,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
           triggerTime: inject.inject_depends_duration,
           description: inject.inject_description,
         },
-        position: { x: 0, y: 0 },
+        position: { x: 0, y: index * 150 },
       })));
-      setEdges(injects.filter((inject) => inject.inject_depends_on != null).map((inject, i) => {
+      setEdges(injects.filter((inject) => inject.inject_depends_on != null).map((inject) => {
         return ({
           id: `${inject.inject_id}->${inject.inject_depends_on}`,
           source: `${inject.inject_id}`,
@@ -87,19 +87,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
     markerEnd: { type: MarkerType.ArrowClosed },
   };
 
-  const reconnectDone = useRef(true);
-
-  const onReconnect = (oldEdge: Edge, newConnection: Connection) => setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
-  const edgeUpdateStart = () => {
-    reconnectDone.current = false;
-  };
-
-  const edgeUpdate = (oldEdge: Edge, newConnection: Connection) => {
-    reconnectDone.current = true;
-    setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
-  };
-
-  const moveNewNode = (event) => {
+  const moveNewNode = (event: React.MouseEvent) => {
     const bounds = event.target?.getBoundingClientRect();
     const newX = event.clientX - bounds.left;
     const newY = event.clientY - bounds.top;
@@ -121,23 +109,11 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
     // setNodes(nodesList);
   };
 
-  const onMouseMove = (eventMove) => {
+  const onMouseMove = (eventMove: React.MouseEvent) => {
     clearTimeout(timer);
     timer = setTimeout(() => {
       moveNewNode(eventMove);
     }, 300);
-  };
-
-  const edgeUpdateEnd = (_: any, edge: Edge) => {
-    if (!reconnectDone.current) {
-      setEdges((eds) => eds.filter((e) => e.id !== edge.id));
-      onConnectInjects({
-        target: '',
-        source: edge.source,
-        sourceHandle: null,
-        targetHandle: null,
-      });
-    }
   };
 
   return (
@@ -160,18 +136,14 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, onConnectInjec
             defaultEdgeOptions={defaultEdgeOptions}
             onMouseMove={onMouseMove}
             proOptions={proOptions}
-            translateExtent={[[-3000, -3000], [3000, 3000]]}
-            nodeExtent={[[-200000, -2000000], [2000000, 2000000]]}
+            translateExtent={[[-50, -50], [Infinity, Infinity]]}
+            nodeExtent={[[0, 0], [Infinity, Infinity]]}
+            fitView={true}
           >
             <CustomTimelineBackground>
             </CustomTimelineBackground>
-            <CustomTimelinePanel>
+            <CustomTimelinePanel startDate={scenario.scenario_recurrence_start}>
             </CustomTimelinePanel>
-            <svg>
-              <text fill="#ffffff" fontSize={24} fontFamily="Verdana" x={50} y={100}>
-                {coordinates}
-              </text>
-            </svg>
           </ReactFlow>
         </div>
       ) : null

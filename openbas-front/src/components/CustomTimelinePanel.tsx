@@ -11,7 +11,7 @@ const useStyles = makeStyles(() => ({
     pointerEvents: 'none !important',
     width: '100%',
     height: '100%',
-    margin: '0px',
+    margin: '0px !important',
   },
 }));
 

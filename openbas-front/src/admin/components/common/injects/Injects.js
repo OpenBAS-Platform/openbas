@@ -342,48 +342,48 @@ const Injects = (props) => {
                   </ToggleButton>
                 </Tooltip>
               }
-              </ToggleButtonGroup>
+            </ToggleButtonGroup>
             {setChainMode ? (
-                <ToggleButtonGroup
-                    size="small"
-                    exclusive
-                    value={chainMode}
-                    style={{ float: 'right' }}
-                    aria-label="Change chaining mode"
-                >
-                  <Tooltip title={t('Timeline view')}>
-                    <ToggleButton
-                        value='timeline'
-                        onClick={() => setChainMode('timeline')}
-                        aria-label="Timeline view mode"
-                    >
-                      <ViewTimelineOutlined fontSize="small" color='inherit'/>
-                    </ToggleButton>
-                  </Tooltip>
-                  <Tooltip title={t('Chaining view')}>
-                    <ToggleButton
-                        value='chaining'
-                        onClick={() => setChainMode('chaining')}
-                        aria-label="Chaining view mode"
-                    >
-                      <Link fontSize="small" color='primary'/>
-                    </ToggleButton>
-                  </Tooltip>
-                </ToggleButtonGroup>
+              <ToggleButtonGroup
+                size="small"
+                exclusive
+                value={chainMode}
+                style={{ float: 'right' }}
+                aria-label="Change chaining mode"
+              >
+                <Tooltip title={t('Timeline view')}>
+                  <ToggleButton
+                    value='timeline'
+                    onClick={() => setChainMode('timeline')}
+                    aria-label="Timeline view mode"
+                  >
+                    <ViewTimelineOutlined fontSize="small" color='inherit'/>
+                  </ToggleButton>
+                </Tooltip>
+                <Tooltip title={t('Chaining view')}>
+                  <ToggleButton
+                    value='chaining'
+                    onClick={() => setChainMode('chaining')}
+                    aria-label="Chaining view mode"
+                  >
+                    <Link fontSize="small" color='primary'/>
+                  </ToggleButton>
+                </Tooltip>
+              </ToggleButtonGroup>
             ) : null}
           </div>
           <div className="clearfix" />
         </div>
-        {showTimeline && isAtLeastOneValidInject (
-        <div style={{ marginBottom: 50 }}>
-          <div>
-            <ChainedTimeline
+        {showTimeline && isAtLeastOneValidInject && (
+          <div style={{ marginBottom: 50 }}>
+            <div>
+              <ChainedTimeline
                 injects={sortedInjects}
                 onConnectInjects={onConnectInjects}
-            />
-            <div className="clearfix"/>
+              />
+              <div className="clearfix"/>
+            </div>
           </div>
-        </div>
         )}
         <List>
           <ListItem
