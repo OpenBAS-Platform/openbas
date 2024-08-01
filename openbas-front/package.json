@@ -114,7 +114,7 @@
     "nyc": "15.1.0",
     "swagger-typescript-api": "13.0.6",
     "typescript": "5.4.5",
-    "vite": "5.2.11",
+    "vite": "5.3.5",
     "vite-plugin-istanbul": "6.0.2",
     "vitest": "1.6.0"
   },
