@@ -214,30 +214,61 @@ public class ChallengeApi extends RestBehavior {
         }
         ChallengeResult challengeResult = tryChallenge(challengeId, input);
         if (challengeResult.getResult()) {
+
+            // Find and update the expectation linked to user
+            InjectExpectation playerExpectation = injectExpectationRepository.findByUserAndExerciseAndChallenge(user.getId(), exerciseId, challengeId);
+            playerExpectation.setScore(playerExpectation.getExpectedScore());
+            InjectExpectationResult expectationResult = InjectExpectationResult.builder()
+                    .sourceId("challenge")
+                    .sourceType("challenge")
+                    .sourceName("Challenge validation")
+                    .result(Instant.now().toString())
+                    .date(Instant.now().toString())
+                    .score(playerExpectation.getExpectedScore())
+                    .build();
+            playerExpectation.getResults().add(expectationResult);
+            playerExpectation.setUpdatedAt(Instant.now());
+            injectExpectationRepository.save(playerExpectation);
+
+            // Process expectation linked to teams where user if part of
             List<String> teamIds = user.getTeams().stream().map(Team::getId).toList();
-            List<InjectExpectation> challengeExpectations = injectExpectationRepository.findChallengeExpectations(exerciseId,
-                    teamIds, challengeId);
+            // Find all expectations linked to teams' user, challenge and exercise
+            List<InjectExpectation> challengeExpectations = injectExpectationRepository.findChallengeExpectations(exerciseId, teamIds, challengeId);
 
+            // Depending on type of validation, we process the parent expectations:
+            challengeExpectations.stream().findAny().ifPresentOrElse(process -> {
+                boolean validationType = process.isExpectationGroup();
 
+                challengeExpectations.forEach(parentExpectation -> {
+                    if (validationType) { // type atLeast
+                        parentExpectation.setScore(injectExpectationRepository.computeAverageScoreWhenValidationTypeIsAtLeastOnePlayerForChallenge(
+                                process.getExercise().getId(),
+                                process.getChallenge().getId(),
+                                parentExpectation.getTeam().getId())
+                        );
+                    } else { // type all
+                        parentExpectation.setScore(injectExpectationRepository.computeAverageScoreWhenValidationTypeIsAllPlayersForChallenge(
+                                process.getExercise().getId(),
+                                process.getChallenge().getId(),
+                                parentExpectation.getTeam().getId())
+                        );
+                    };
+                    InjectExpectationResult result = InjectExpectationResult.builder()
+                            .sourceId("challenge")
+                            .sourceType("challenge")
+                            .sourceName("Challenge validation")
+                            .result(Instant.now().toString())
+                            .date(Instant.now().toString())
+                            .score(process.getExpectedScore())
+                            .build();
 
-            challengeExpectations.forEach(injectExpectationExecution -> {
-                injectExpectationExecution.setUser(user);
-                injectExpectationExecution.setResults(List.of(
-                        InjectExpectationResult.builder()
-                                .sourceId("challenge")
-                                .sourceType("challenge")
-                                .sourceName("Challenge validation")
-                                .result(Instant.now().toString())
-                                .date(Instant.now().toString())
-                                .score(injectExpectationExecution.getExpectedScore())
-                                .build()
-                ));
-                injectExpectationExecution.setScore(injectExpectationExecution.getExpectedScore());
-                injectExpectationExecution.setUpdatedAt(Instant.now());
-                injectExpectationRepository.save(injectExpectationExecution);
-            });
+                    parentExpectation.getResults().clear();
+                    parentExpectation.getResults().add(result);
+                    parentExpectation.setUpdatedAt(Instant.now());
+                    injectExpectationRepository.save(parentExpectation);
+                });
+            }, () -> new ElementNotFoundException());
         }
         return playerChallenges(exerciseId, userId);
     }
-
 }

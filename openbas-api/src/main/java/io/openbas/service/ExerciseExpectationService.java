@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -123,6 +124,7 @@ public class ExerciseExpectationService {
                     .build();
             parentExpectation.getResults().clear();
             parentExpectation.getResults().add(expectationResult);
+            parentExpectation.setUpdatedAt(Instant.now());
             injectExpectationRepository.save(parentExpectation);
         } else {
             // If I update the expectation team: What happens with children? -> update expectation score for all children -> set score from InjectExpectation
@@ -139,6 +141,7 @@ public class ExerciseExpectationService {
                 expectation.getResults().clear();
                 expectation.getResults().add(expectationResult);
                 expectation.setScore(updated.getScore());
+                expectation.setUpdatedAt(Instant.now());
                 injectExpectationRepository.save(expectation);
             }
         }
