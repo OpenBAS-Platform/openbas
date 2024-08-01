@@ -155,7 +155,7 @@ const PaginationComponentV2 = <T extends object>({
           </TablePaginationComponent>
         )}
       </div>
-      {/*Handle Mitre Filter*/}
+      {/* Handle Mitre Filter */}
       {queryableHelpers.filterHelpers && searchPaginationInput.filterGroup && (
         <>
           {!isEmptyFilter(searchPaginationInput.filterGroup, MITRE_FILTER_KEY) && (
@@ -182,7 +182,7 @@ const PaginationComponentV2 = <T extends object>({
           )}
         </>
       )}
-      {/*Handle Category Filter*/}
+      {/* Handle Category Filter */}
       {queryableHelpers.filterHelpers && searchPaginationInput.filterGroup && (
         <Box
           sx={{
