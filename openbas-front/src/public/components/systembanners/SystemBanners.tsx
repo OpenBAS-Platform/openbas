@@ -1,21 +1,26 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { ReportProblem } from '@mui/icons-material';
-import { isEmptyField, isNotEmptyField } from '../../../utils/utils';
-import type { PlatformSettings } from '../../../utils/api-types';
+import { isEmptyField, isNotEmptyField, recordEntries, recordKeys } from '../../../utils/utils';
 import type { Theme } from '../../../components/Theme';
+import type { PlatformSettings } from '../../../utils/api-types';
+import { useFormatter } from '../../../components/i18n';
 
-export const SYSTEM_BANNER_HEIGHT = 34;
+export const SYSTEM_BANNER_HEIGHT_PER_MESSAGE = 18;
 
 export const computeBannerSettings = (settings: PlatformSettings) => {
-  const bannerLevel = settings.platform_banner_level;
-  const bannerText = settings.platform_banner_text;
-  const isBannerActivated = isNotEmptyField(bannerLevel) && isNotEmptyField(bannerText);
-  const bannerHeight = isBannerActivated ? `${SYSTEM_BANNER_HEIGHT}px` : '0';
-  const bannerHeightNumber = isBannerActivated ? SYSTEM_BANNER_HEIGHT : 0;
+  const bannerByLevel = settings.platform_banner_by_level;
+  const isBannerActivated = bannerByLevel !== undefined && isNotEmptyField(recordKeys(bannerByLevel));
+  let numberOfElements = 0;
+  if (settings.platform_banner_by_level !== undefined) {
+    for (const bannerLevel of recordEntries(settings.platform_banner_by_level)) {
+      numberOfElements += bannerLevel[1].length;
+    }
+  }
+  const bannerHeight = isBannerActivated ? `${(SYSTEM_BANNER_HEIGHT_PER_MESSAGE * numberOfElements) + 16}px` : '0';
+  const bannerHeightNumber = isBannerActivated ? (SYSTEM_BANNER_HEIGHT_PER_MESSAGE * numberOfElements) + 16 : 0;
   return {
-    bannerText,
-    bannerLevel,
+    bannerByLevel,
     bannerHeight,
     bannerHeightNumber,
   };
@@ -28,9 +33,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     position: 'fixed',
     zIndex: 2000,
     width: '100%',
-    height: `${SYSTEM_BANNER_HEIGHT}px`,
     alignContent: 'center',
     textAlign: 'center',
+    padding: '5px',
   },
   bannerTop: {
     top: 0,
@@ -64,30 +69,47 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const SystemBanners = (settings: {
   settings: {
-    platform_banner_level: 'debug' | 'info' | 'warn' | 'error' | 'fatal',
-    platform_banner_text: string
+    platform_banner_by_level: Record<'debug' | 'info' | 'warn' | 'error' | 'fatal', string[]>,
   }
 }) => {
   // Standard hooks
+  const { t } = useFormatter();
   const classes = useStyles();
-  const bannerLevel = settings.settings.platform_banner_level;
-  const bannerText = settings.settings.platform_banner_text;
-  if (isEmptyField(bannerLevel) || isEmptyField(bannerText)) {
+  const bannerLevel = settings.settings.platform_banner_by_level;
+  let numberOfElements = 0;
+  if (settings.settings.platform_banner_by_level !== undefined) {
+    for (const currentBannerLevel of recordEntries(settings.settings.platform_banner_by_level)) {
+      numberOfElements += currentBannerLevel[1].length;
+    }
+  }
+  if (isEmptyField(bannerLevel) || numberOfElements === 0) {
     return <></>;
   }
-  const topBannerClasses = [
-    classes.banner,
-    classes.bannerTop,
-    classes[`banner_${bannerLevel}`],
-  ].join(' ');
+
   return (
-    <div className={topBannerClasses}>
-      <div className={classes.container}>
-        <ReportProblem color="error" fontSize="small" style={{ marginRight: 8 }} />
-        <span className={classes.bannerText}>
-          {bannerText}
-        </span>
-      </div>
+    <div>
+      {recordKeys(settings.settings.platform_banner_by_level).map((key) => {
+        const topBannerClasses = [
+          classes.banner,
+          classes.bannerTop,
+          classes[`banner_${key}`],
+        ].join(' ');
+
+        return (
+          <div key={key} className={topBannerClasses}>
+            {settings.settings.platform_banner_by_level[key].map((message) => {
+              return (
+                <div key={`${key}.${message}`} className={classes.container}>
+                  <ReportProblem color="error" fontSize="small" style={{ marginRight: 8 }}/>
+                  <span className={classes.bannerText}>
+                    {t(message)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
     </div>
   );
 };

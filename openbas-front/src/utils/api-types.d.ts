@@ -2331,8 +2331,7 @@ export interface PlatformSettings {
   platform_ai_has_token?: boolean;
   platform_ai_model?: string;
   platform_ai_type?: string;
-  platform_banner_level?: string;
-  platform_banner_text?: string;
+  platform_banner_by_level?: Record<string, string[]>;
   platform_base_url?: string;
   platform_dark_theme?: ThemeInput;
   platform_enterprise_edition?: string;

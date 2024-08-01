@@ -1205,6 +1205,9 @@ const i18n = {
       'Date should be at least today': 'Date should be at least today',
       'Security platform': 'Security platform',
       'Security platforms': 'Security platforms',
+      // Platform Banner
+      'IMAP service is not responding, your injectors may be impacted.': 'Le service IMAP ne réponds pas, vos injecteurs peuvent être impactés.',
+      'Executor Caldera is not responding, your exercises may be impacted.': 'L\'exécuteur Caldera ne réponds pas, vos exercises peuvent être impactés.',
     },
     zh: {
       'Email address': 'email地址',
@@ -2409,6 +2412,9 @@ const i18n = {
       'Date should be at least today': '日期至少是今天',
       'Security platform': '安全平台',
       'Security platforms': '安全平台',
+      // Platform Banner
+      'IMAP service is not responding, your injectors may be impacted.': 'IMAP service is not responding, your injectors may be impacted.',
+      'Executor Caldera is not responding, your exercises may be impacted.': 'Executor Caldera is not responding, your exercises may be impacted.',
     },
     en: {
       openbas_email: 'Email',
@@ -2501,6 +2507,9 @@ const i18n = {
       ABSOLUTE_TIME_WITHOUT_START_DATE: 'Your import contains injects triggered only with the time of the day (e.g.: 9:30) but there is no launch date specified for this scenario. Please specify a launch date for this scenario.',
       // Bulk actions
       'Do you want to delete these {count} injects?': 'Do you want to delete these {count} injects?',
+      // Platform Banner
+      'IMAP service is not responding, your injectors may be impacted.': 'IMAP service is not responding, your injectors may be impacted.',
+      'Executor Caldera is not responding, your exercises may be impacted.': 'Executor Caldera is not responding, your exercises may be impacted.',
     },
   },
 };

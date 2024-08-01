@@ -10,6 +10,14 @@ export const isEmptyField = <T>(
   field: T | null | undefined,
 ): field is null | undefined => !isNotEmptyField(field);
 
+export const recordKeys = <K extends PropertyKey, T>(object: Record<K, T>) => {
+  return Object.keys(object) as (K)[];
+};
+
+export function recordEntries<K extends PropertyKey, T>(object: Record<K, T>) {
+  return Object.entries(object) as ([K, T])[];
+}
+
 export const copyToClipboard = (t: (text: string) => string, text: string) => {
   if ('clipboard' in navigator) {
     navigator.clipboard.writeText(text);

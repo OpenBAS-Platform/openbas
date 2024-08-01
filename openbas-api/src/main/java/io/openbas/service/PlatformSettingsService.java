@@ -3,6 +3,7 @@ package io.openbas.service;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.RabbitmqConfig;
+import io.openbas.database.model.BannerMessage;
 import io.openbas.database.model.Setting;
 import io.openbas.database.model.Theme;
 import io.openbas.database.repository.SettingRepository;
@@ -232,8 +233,18 @@ public class PlatformSettingsService {
     }
 
     // PLATFORM MESSAGE
-    platformSettings.setPlatformBannerLevel(getValueFromMapOfSettings(dbSettings, PLATFORM_BANNER_LEVEL.key()));
-    platformSettings.setPlatformBannerText(getValueFromMapOfSettings(dbSettings, PLATFORM_BANNER_TEXT.key()));
+    Map<String, List<String>> platformBannerByLevel = new HashMap<>();
+    for (BannerMessage.BANNER_KEYS bannerKey : BannerMessage.BANNER_KEYS.values()) {
+      String value = getValueFromMapOfSettings(dbSettings, PLATFORM_BANNER + "." + bannerKey.key());
+      if(value != null) {
+        if(platformBannerByLevel.get(bannerKey.level().name()) == null) {
+          platformBannerByLevel.put(bannerKey.level().name(), new ArrayList<String>(Arrays.asList(bannerKey.message())));
+        } else {
+          platformBannerByLevel.get(bannerKey.level().name()).add(bannerKey.message());
+        }
+      }
+    }
+    platformSettings.setPlatformBannerByLevel(platformBannerByLevel);
 
     return platformSettings;
   }
@@ -329,19 +340,16 @@ public class PlatformSettingsService {
 
   // -- PLATFORM MESSAGE --
 
-  public void cleanMessage() {
-    settingRepository.deleteByKeyIn(List.of(PLATFORM_BANNER_LEVEL.key(), PLATFORM_BANNER_TEXT.key()));
+  public void cleanMessage(@NotBlank final BannerMessage.BANNER_KEYS banner) {
+    settingRepository.deleteByKeyIn(List.of(PLATFORM_BANNER + "." + banner.key()));
   }
 
-  public void errorMessage(@NotBlank final String message) {
-    List<Setting> settingsToSave = new ArrayList<>();
-    Optional<Setting> bannerLevelOpt = this.settingRepository.findByKey(PLATFORM_BANNER_LEVEL.key());
-    Setting bannerLevel = resolve(bannerLevelOpt, PLATFORM_BANNER_LEVEL.key(), BannerLevel.ERROR.name());
-    settingsToSave.add(bannerLevel);
-    Optional<Setting> bannerTextOpt = this.settingRepository.findByKey(PLATFORM_BANNER_TEXT.key());
-    Setting bannerText = resolve(bannerTextOpt, PLATFORM_BANNER_TEXT.key(), message);
-    settingsToSave.add(bannerText);
-    settingRepository.saveAll(settingsToSave);
+  public void errorMessage(@NotBlank final BannerMessage.BANNER_KEYS banner) {
+    Optional<Setting> bannerLevelOpt = this.settingRepository.findByKey(PLATFORM_BANNER + "." + banner.key());
+    if(bannerLevelOpt.isEmpty()) {
+      Setting bannerLevel = resolve(bannerLevelOpt, PLATFORM_BANNER + "." + banner.key(), banner.level().name());
+      settingRepository.save(bannerLevel);
+    }
   }
 
 }
