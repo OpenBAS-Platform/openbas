@@ -1,20 +1,19 @@
 package io.openbas.injectors.email.service;
 
 
-import io.openbas.database.model.Communication;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.Setting;
-import io.openbas.database.model.User;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.CommunicationRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.SettingRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.service.FileService;
+import io.openbas.service.PlatformSettingsService;
 import jakarta.activation.DataSource;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
+import lombok.extern.java.Log;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +33,7 @@ import static java.lang.Integer.parseInt;
 import static java.time.Instant.now;
 
 @Service
+@Log
 public class ImapService {
 
     private static final Logger LOGGER = Logger.getLogger(ImapService.class.getName());
@@ -68,9 +68,17 @@ public class ImapService {
     private CommunicationRepository communicationRepository;
     private SettingRepository settingRepository;
     private FileService fileService;
+    private PlatformSettingsService platformSettingsService;
 
-    public ImapService(Environment env) throws Exception {
-        initStore(env);
+    public ImapService(Environment env, @Autowired PlatformSettingsService platformSettingsService) throws Exception {
+        this.platformSettingsService = platformSettingsService;
+        try {
+            initStore(env);
+            this.platformSettingsService.cleanMessage(BannerMessage.BANNER_KEYS.IMAP_UNAVAILABLE);
+        } catch (Exception e) {
+            log.severe(e.getMessage());
+            this.platformSettingsService.errorMessage(BannerMessage.BANNER_KEYS.IMAP_UNAVAILABLE);
+        }
     }
 
     @Autowired
@@ -96,6 +104,11 @@ public class ImapService {
     @Autowired
     public void setCommunicationRepository(CommunicationRepository communicationRepository) {
         this.communicationRepository = communicationRepository;
+    }
+
+    @Autowired
+    public void setPlatformSettingsService(PlatformSettingsService platformSettingsService) {
+        this.platformSettingsService = platformSettingsService;
     }
 
     private void initStore(Environment env) throws Exception {
@@ -306,7 +319,13 @@ public class ImapService {
     public void connectionListener() throws Exception {
         if (enabled) {
             if (!imapStore.isConnected()) {
-                imapStore.connect(host, port, username, password);
+                try {
+                    imapStore.connect(host, port, username, password);
+                    this.platformSettingsService.cleanMessage(BannerMessage.BANNER_KEYS.IMAP_UNAVAILABLE);
+                } catch (MessagingException e) {
+                    log.severe(e.getMessage());
+                    this.platformSettingsService.errorMessage(BannerMessage.BANNER_KEYS.IMAP_UNAVAILABLE);
+                }
             }
             syncFolders();
         }

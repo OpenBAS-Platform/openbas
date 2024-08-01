@@ -6,7 +6,9 @@ import io.openbas.rest.settings.form.ThemeInput;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.NONE;
@@ -113,17 +115,17 @@ public class PlatformSettings {
   private List<String> disabledDevFeatures = new ArrayList<>();
 
   // PLATFORM MESSAGE
-  @JsonProperty("platform_banner_level")
+  @JsonProperty("platform_banner_by_level")
   @Getter(NONE)
-  private String platformBannerLevel;
+  private Map<String, List<String>> platformBannerByLevel;
 
-  public String getPlatformBannerLevel() {
-    return ofNullable(this.platformBannerLevel)
-        .map(String::toLowerCase)
-        .orElse(null);
+  public Map<String, List<String>> getPlatformBannerByLevel() {
+    Map<String, List<String>> platformBannerByLevelLowerCase = new HashMap<>();
+    if(this.platformBannerByLevel != null) {
+      this.platformBannerByLevel.forEach((key, value) -> platformBannerByLevelLowerCase.put(key.toLowerCase(), value));
+      return platformBannerByLevelLowerCase;
+    }
+    return null;
   }
-
-  @JsonProperty("platform_banner_text")
-  private String platformBannerText;
 
 }

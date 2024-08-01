@@ -1,10 +1,7 @@
 package io.openbas.executors.caldera.service;
 
 import io.openbas.asset.EndpointService;
-import io.openbas.database.model.Asset;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Executor;
-import io.openbas.database.model.Injector;
+import io.openbas.database.model.*;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.model.Agent;
@@ -130,9 +127,9 @@ public class CalderaExecutorService implements Runnable {
                     }
                 }
             });
-            this.platformSettingsService.cleanMessage();
+            this.platformSettingsService.cleanMessage(BannerMessage.BANNER_KEYS.CALDERA_UNAVAILABLE);
         } catch (Exception e) {
-            this.platformSettingsService.errorMessage("Executor Caldera is not responding, your exercises may be impacted.");
+            this.platformSettingsService.errorMessage(BannerMessage.BANNER_KEYS.CALDERA_UNAVAILABLE);
         }
     }
 
