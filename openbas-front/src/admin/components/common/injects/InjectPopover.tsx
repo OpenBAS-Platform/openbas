@@ -6,21 +6,23 @@ import Transition from '../../../../components/common/Transition';
 import type { InjectStore } from '../../../../actions/injects/Inject';
 import { InjectContext, PermissionsContext } from '../Context';
 import type { Inject, InjectStatus, InjectStatusExecution, Tag } from '../../../../utils/api-types';
-import { duplicateInjectForExercise, duplicateInjectForScenario, tryInject } from '../../../../actions/Inject';
+import { duplicateInjectForExercise, duplicateInjectForScenario, tryInject, testInject } from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 
 interface Props {
-  inject: InjectStore;
+  inject: InjectStore & { inject_testable?: boolean }; // FIXME: Inject object coming from multiple endpoints with different properties
   tagsMap: Record<string, Tag>;
   setSelectedInjectId: (injectId: Inject['inject_id']) => void;
   isDisabled: boolean;
+  canBeTested?: boolean;
 }
 
 const InjectPopover: FunctionComponent<Props> = ({
   inject,
   setSelectedInjectId,
   isDisabled,
+  canBeTested = false,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -36,12 +38,14 @@ const InjectPopover: FunctionComponent<Props> = ({
   const [openDelete, setOpenDelete] = useState(false);
   const [duplicate, setDuplicate] = useState(false);
   const [openTry, setOpenTry] = useState(false);
+  const [openTest, setOpenTest] = useState(false);
   const [openEnable, setOpenEnable] = useState(false);
   const [openDisable, setOpenDisable] = useState(false);
   const [openDone, setOpenDone] = useState(false);
   const [openResult, setOpenResult] = useState(false);
   const [openTrigger, setOpenTrigger] = useState(false);
   const [injectResult, setInjectResult] = useState<InjectStatus | null>(null);
+  const [_injectTestResult, setInjectTestResult] = useState<InjectStatus | null>(null);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const handlePopoverOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -98,6 +102,23 @@ const InjectPopover: FunctionComponent<Props> = ({
       setOpenResult(true);
     });
     handleCloseTry();
+  };
+
+  const handleOpenTest = () => {
+    setOpenTest(true);
+    handlePopoverClose();
+  };
+
+  const handleCloseTest = () => {
+    setOpenTest(false);
+    setInjectTestResult(null);
+  };
+
+  const submitTest = () => {
+    testInject(inject.inject_id).then((result: { data: InjectStatus }) => {
+      setInjectTestResult(result.data);
+    });
+    handleCloseTest();
   };
 
   const handleOpenEnable = () => {
@@ -188,6 +209,14 @@ const InjectPopover: FunctionComponent<Props> = ({
             disabled={isDisabled}
           >
             {t('Mark as done')}
+          </MenuItem>
+        )}
+        {inject.inject_testable && canBeTested && (
+          <MenuItem
+            disabled={inject.inject_teams?.length === 0}
+            onClick={handleOpenTest}
+          >
+            {t('Test')}
           </MenuItem>
         )}
         {inject.inject_type !== 'openbas_manual' && onUpdateInjectTrigger && (
@@ -292,6 +321,26 @@ const InjectPopover: FunctionComponent<Props> = ({
           </Button>
           <Button color="secondary" onClick={submitTry}>
             {t('Try')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        TransitionComponent={Transition}
+        open={openTest}
+        onClose={handleCloseTest}
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            <p>{t(`Do you want to test this inject: ${inject.inject_title}?`)}</p>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseTest}>
+            {t('Cancel')}
+          </Button>
+          <Button color="secondary" onClick={submitTest}>
+            {t('Test')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -316,7 +316,7 @@ const Injects = (props) => {
               aria-label="Change view mode"
             >
               {injectContext.onImportInjectFromXls
-              && <ImportUploaderInjectFromXls />}
+                && <ImportUploaderInjectFromXls />}
               {setViewMode
                 && <Tooltip title={t('List view')}>
                   <ToggleButton
@@ -326,7 +326,7 @@ const Injects = (props) => {
                   >
                     <ReorderOutlined fontSize="small" color='inherit' />
                   </ToggleButton>
-                  </Tooltip>
+                </Tooltip>
               }
               {setViewMode
                 && <Tooltip title={t('Distribution view')}>
@@ -337,7 +337,7 @@ const Injects = (props) => {
                   >
                     <BarChartOutlined fontSize="small" color='primary' />
                   </ToggleButton>
-                  </Tooltip>
+                </Tooltip>
               }
             </ToggleButtonGroup>
           </div>
@@ -484,7 +484,7 @@ const Injects = (props) => {
                 <ListItemText
                   primary={
                     <div className={(!injectContract || !isContractExposed
-                        || !inject.inject_enabled) ? classes.disabled : ''}
+                      || !inject.inject_enabled) ? classes.disabled : ''}
                     >
                       <div
                         className={classes.bodyItem}
@@ -496,7 +496,7 @@ const Injects = (props) => {
                             config={injectContract?.config}
                             label={injectorContractName}
                           />
-                        ) : <InjectorContract variant="list" label={t('Deleted')} deleted/>
+                        ) : <InjectorContract variant="list" label={t('Deleted')} deleted />
                         }
                       </div>
                       <div
@@ -555,6 +555,7 @@ const Injects = (props) => {
                 <ListItemSecondaryAction>
                   <InjectPopover
                     inject={inject}
+                    canBeTested
                     tagsMap={tagsMap}
                     setSelectedInjectId={setSelectedInjectId}
                     isDisabled={!injectContract || !isContractExposed}
