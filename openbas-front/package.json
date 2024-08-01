@@ -8,8 +8,8 @@
   "dependencies": {
     "@ckeditor/ckeditor5-react": "6.2.0",
     "@dagrejs/dagre": "1.1.2",
-    "@emotion/react": "11.11.4",
-    "@emotion/styled": "11.11.5",
+    "@emotion/react": "11.13.0",
+    "@emotion/styled": "11.13.0",
     "@fontsource/geologica": "5.0.5",
     "@fontsource/ibm-plex-sans": "5.0.20",
     "@hookform/resolvers": "3.9.0",
