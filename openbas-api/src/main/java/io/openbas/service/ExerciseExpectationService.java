@@ -42,16 +42,16 @@ public class ExerciseExpectationService {
 
         String result = "";
         if (injectExpectation.getType() == EXPECTATION_TYPE.MANUAL) {
-            if (injectExpectation.getTeam() != null && injectExpectation.getUser() == null) { //If It is an expectation of a team
-                result = input.getScore() > 0 ? "Success" : "Failed";
+            if (input.getScore() >= injectExpectation.getExpectedScore()) {
+                result = "Success";
+            } else if (input.getScore() > 0) {
+                result = "Partial";
             } else {
-                if (input.getScore() >= injectExpectation.getExpectedScore()) {
-                    result = "Success";
-                } else if (input.getScore() > 0) {
-                    result = "Partial";
-                } else {
-                    result = "Failed";
-                }
+                result = "Failed";
+            }
+            if(injectExpectation.getTeam() != null){
+                injectExpectation.getResults().clear();
+                exists=Optional.empty();
             }
         } else if (injectExpectation.getType() == EXPECTATION_TYPE.DETECTION) {
             if (input.getScore() >= injectExpectation.getExpectedScore()) {
@@ -97,7 +97,7 @@ public class ExerciseExpectationService {
         injectExpectation.setUpdatedAt(now());
         InjectExpectation updated = this.injectExpectationRepository.save(injectExpectation);
 
-        // If The expectation is type manual we should update expectations for the teams end the players
+        // If The expectation is type manual, we should update expectations for teams and  players
         if (updated.getType() == EXPECTATION_TYPE.MANUAL && updated.getTeam() != null) {
             computeExpectationsForTeamsAndPlayer(updated, result);
         }
@@ -106,21 +106,18 @@ public class ExerciseExpectationService {
     }
 
     private void computeExpectationsForTeamsAndPlayer(InjectExpectation updated, String result) {
-        if (updated.getUser() != null) { //If updated was a player expectation I have to update team expectation using expectation of player (based on validation type)
+        if (updated.getUser() != null) { //If updated was a player expectation We have to update the team expectation using expectation of player (based on validation type)
             InjectExpectation parentExpectation = injectExpectationRepository.findByInjectAndTeamAndExpectationNameAndUserIsNull(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()).orElseThrow();
-            if (updated.isExpectationGroup()) { //If true is at least
+            if (updated.isExpectationGroup()) { //If true is at least one
                 parentExpectation.setScore(injectExpectationRepository.computeAverageScoreWhenValidationTypeIsAtLeastOnePlayer(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()));
-                result = parentExpectation.getScore() > 0 ? "Success" : "Failed";
             } else { // all
                 parentExpectation.setScore(injectExpectationRepository.computeAverageScoreWhenValidationTypeIsAllPlayers(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()));
-                // All players should give an answer
-                result = injectExpectationRepository.countExpectationsWithScoreNullOrZero(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()) == 0 ? "Success" : "Failed";
             }
             InjectExpectationResult expectationResult = InjectExpectationResult.builder()
-                    .sourceId("manual-player-validation")
-                    .sourceType("manual-player-validation")
-                    .sourceName("Manual Player Validation")
-                    .result(result)
+                    .sourceId("player-manual-validation")
+                    .sourceType("player-manual-validation")
+                    .sourceName("Player Manual Validation")
+                    .result(parentExpectation.getScore() >= parentExpectation.getExpectedScore() ? "Success": parentExpectation.getScore() > 0 ? "Partial": "Failed")
                     .date(now().toString())
                     .score(parentExpectation.getScore())
                     .build();
@@ -132,9 +129,9 @@ public class ExerciseExpectationService {
             List<InjectExpectation> toProcess = injectExpectationRepository.findAllByInjectAndTeamAndExpectationNameAndUserIsNotNull(updated.getInject().getId(), updated.getTeam().getId(), updated.getName());
             for (InjectExpectation expectation : toProcess) {
                 InjectExpectationResult expectationResult = InjectExpectationResult.builder()
-                        .sourceId("manual-team-validation")
-                        .sourceType("manual-team-validation")
-                        .sourceName("Manual Team Validation")
+                        .sourceId("team-manual-validation")
+                        .sourceType("team-manual-validation")
+                        .sourceName("Team Manual Validation")
                         .result(result)
                         .date(now().toString())
                         .score(updated.getScore())

@@ -168,7 +168,7 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
             return (<div key={expectationName}></div>);
           }
           return (
-            <ManualExpectations key={expectationName} exerciseId={exerciseId} inject={inject} expectations={es} />
+            <ManualExpectations key={expectationName} exerciseId={exerciseId} inject={inject} expectations={es}/>
           );
         })}
       </List>

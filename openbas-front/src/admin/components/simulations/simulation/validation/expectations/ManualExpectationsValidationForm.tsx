@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import { Button, Chip, TextField as MuiTextField, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -58,6 +58,37 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
   useDataLoader(() => {
     dispatch(fetchUsers());
   });
+  const onSubmit = (data: { expectation_score: number }) => {
+    dispatch(updateInjectExpectation(expectation.inject_expectation_id, {
+      ...data,
+      source_id: 'ui',
+      source_type: 'ui',
+      source_name: 'User input',
+    })).then(() => {
+      onUpdate?.();
+    });
+  };
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<{ expectation_score: number }>({
+    mode: 'onTouched',
+    resolver: zodResolver(zodImplement<{ expectation_score: number }>().with({
+      expectation_score: z.coerce.number(),
+    })),
+    defaultValues: {
+      expectation_score: expectation.inject_expectation_score ?? expectation.inject_expectation_expected_score ?? 0,
+    },
+  });
+  useEffect(() => {
+    reset({
+      expectation_score: expectation.inject_expectation_score ?? expectation.inject_expectation_expected_score ?? 0,
+    });
+  }, [expectation, reset]);
+
   const computeLabel = (e: InjectExpectationsStore) => {
     if (e.inject_expectation_status === 'PENDING') {
       return t('Pending validation');
@@ -92,29 +123,6 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
     }
     return t('Unknown');
   };
-  const onSubmit = (data: { expectation_score: number }) => {
-    dispatch(updateInjectExpectation(expectation.inject_expectation_id, {
-      ...data,
-      source_id: 'ui',
-      source_type: 'ui',
-      source_name: 'User input',
-    })).then(() => {
-      onUpdate?.();
-    });
-  };
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<{ expectation_score: number }>({
-    mode: 'onTouched',
-    resolver: zodResolver(zodImplement<{ expectation_score: number }>().with({
-      expectation_score: z.coerce.number(),
-    })),
-    defaultValues: {
-      expectation_score: expectation.inject_expectation_score ?? expectation.inject_expectation_expected_score ?? 0,
-    },
-  });
 
   return (
     <div style={{ marginTop: 10 }}>

@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
-import { Alert, AlertTitle, Chip, Divider, List, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { Alert, AlertTitle, Chip, Divider, List, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography } from '@mui/material';
 import { AssignmentTurnedIn } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
@@ -46,7 +46,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  exerciseId: string;
   inject: Inject;
   expectations: InjectExpectationsStore[];
 }
@@ -58,11 +57,20 @@ const ManualExpectations: FunctionComponent<Props> = ({
   const classes = useStyles();
   const { t } = useFormatter();
 
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [currentExpectations, setCurrentExpectations] = useState<InjectExpectationsStore[] | null>(null);
+
+  const handleItemClick = (expectationsToUpdate: InjectExpectationsStore[]) => {
+    setSelectedItem(expectationsToUpdate[0]?.inject_expectation_name || null);
+    setCurrentExpectations(expectationsToUpdate);
+  };
+  const handleItemClose = () => {
+    setSelectedItem(null);
+    setCurrentExpectations(null);
+  };
 
   const parentExpectation = expectations.filter((e) => !e.inject_expectation_user)[0];
   const childrenExpectations = expectations.filter((e) => e.inject_expectation_user);
-
   const validatedCount = expectations.filter((v) => !R.isEmpty(v.inject_expectation_results)).length;
   const isAllValidated = validatedCount === expectations.length;
 
@@ -81,7 +89,8 @@ const ManualExpectations: FunctionComponent<Props> = ({
           divider
           sx={{ pl: 8 }}
           classes={{ root: classes.item }}
-          onClick={() => setCurrentExpectations(expectations)}
+          onClick={() => handleItemClick(expectations)}
+          selected={selectedItem === expectations[0].inject_expectation_name}
         >
           <ListItemIcon>
             <AssignmentTurnedIn fontSize="small"/>
@@ -89,7 +98,9 @@ const ManualExpectations: FunctionComponent<Props> = ({
           <ListItemText
             primary={(
               <div className={classes.container}>
-                {expectations[0].inject_expectation_name}
+                <Tooltip title={expectations[0].inject_expectation_description}>
+                  {expectations[0].inject_expectation_name}
+                </Tooltip>
                 <div className={classes.chip}>
                   <Chip
                     classes={{ root: classes.validationType }}
@@ -113,14 +124,14 @@ const ManualExpectations: FunctionComponent<Props> = ({
       </List>
       <Drawer
         open={currentExpectations !== null}
-        handleClose={() => setCurrentExpectations(null)}
+        handleClose={() => handleItemClose()}
         title={t('Expectations of ') + inject.inject_title}
       >
         <>
           <Alert
             severity="warning"
             variant="outlined"
-            style={{ position: 'relative', marginBottom: 10 }}
+            style={{ position: 'relative', marginBottom: 20 }}
           >
             <AlertTitle>
               <ExpandableText
@@ -133,9 +144,22 @@ const ManualExpectations: FunctionComponent<Props> = ({
               />
             </AlertTitle>
           </Alert>
+          <Alert
+            severity="info"
+            variant="outlined"
+            style={{ position: 'relative', marginBottom: 20 }}
+          >
+            <AlertTitle>
+              {t('The score set for the team will also be applied to all players in the team')}
+            </AlertTitle>
+          </Alert>
+          <Typography variant="h5" style={{ fontWeight: 500, margin: '10px' }}>
+            {t('Team')}
+          </Typography>
           <Paper>
             <ManualExpectationsValidationForm key={parentExpectation} expectation={parentExpectation}/>
           </Paper>
+          <Divider style={{ margin: '20px 0' }}/>
           <Typography variant="h5" style={{ fontWeight: 500, margin: '10px' }}>
             {t('Players')}
           </Typography>

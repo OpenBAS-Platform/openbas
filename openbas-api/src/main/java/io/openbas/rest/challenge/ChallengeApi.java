@@ -213,10 +213,13 @@ public class ChallengeApi extends RestBehavior {
             throw new UnsupportedOperationException("User must be logged or dynamic player is required");
         }
         ChallengeResult challengeResult = tryChallenge(challengeId, input);
-        if (challengeResult.getResult()) { //todo
+        if (challengeResult.getResult()) {
             List<String> teamIds = user.getTeams().stream().map(Team::getId).toList();
             List<InjectExpectation> challengeExpectations = injectExpectationRepository.findChallengeExpectations(exerciseId,
                     teamIds, challengeId);
+
+
+
             challengeExpectations.forEach(injectExpectationExecution -> {
                 injectExpectationExecution.setUser(user);
                 injectExpectationExecution.setResults(List.of(
