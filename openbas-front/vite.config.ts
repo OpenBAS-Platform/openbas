@@ -74,7 +74,7 @@ export default ({ mode }: { mode: string }) => {
         'remark-flexible-markers',
         'remark-gfm',
         'remark-parse',
-        'usehook-ts',
+        'usehooks-ts',
         'uuid',
         'xlsx',
         'zod',

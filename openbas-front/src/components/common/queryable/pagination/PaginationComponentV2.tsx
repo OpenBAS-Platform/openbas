@@ -8,7 +8,7 @@ import mitreAttack from '../../../../static/images/misc/attack.png';
 import Drawer from '../../Drawer';
 import MitreFilter, { MITRE_FILTER_KEY } from '../../../../admin/components/common/filters/MitreFilter';
 import { useFormatter } from '../../../i18n';
-import { availableOperators, isEmptyFilter } from '../filter/FilterUtils';
+import { availableOperators, isEmptyFilter, isExistFilter } from '../filter/FilterUtils';
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import { QueryableHelpers } from '../QueryableHelpers';
 import TextSearchComponent from '../textSearch/TextSearchComponent';
@@ -17,6 +17,7 @@ import FilterAutocomplete, { OptionPropertySchema } from '../filter/FilterAutoco
 import useFilterableProperties from '../filter/useFilterableProperties';
 import FilterChips from '../filter/FilterChips';
 import FilterModeChip from '../filter/FilterModeChip';
+import { CATEGORY_FILTER_KEY } from '../../../../admin/components/scenarios/ScenariosCard';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -154,6 +155,7 @@ const PaginationComponentV2 = <T extends object>({
           </TablePaginationComponent>
         )}
       </div>
+      {/*Handle Mitre Filter*/}
       {queryableHelpers.filterHelpers && searchPaginationInput.filterGroup && (
         <>
           {!isEmptyFilter(searchPaginationInput.filterGroup, MITRE_FILTER_KEY) && (
@@ -171,11 +173,34 @@ const PaginationComponentV2 = <T extends object>({
                 onDelete={() => queryableHelpers.filterHelpers.handleRemoveFilterByKey(MITRE_FILTER_KEY)}
               />
               {(searchPaginationInput.filterGroup?.filters?.filter((f) => availableFilterNames?.filter((n) => n !== MITRE_FILTER_KEY).includes(f.key)).length ?? 0) > 0 && (
-                <FilterModeChip mode={'and'} />
+                <FilterModeChip
+                  onClick={queryableHelpers.filterHelpers.handleSwitchMode}
+                  mode={searchPaginationInput.filterGroup.mode}
+                />
               )}
             </Box>
           )}
         </>
+      )}
+      {/*Handle Category Filter*/}
+      {queryableHelpers.filterHelpers && searchPaginationInput.filterGroup && (
+        <Box
+          sx={{
+            padding: '12px 4px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 1,
+          }}
+        >
+          {isExistFilter(searchPaginationInput.filterGroup, CATEGORY_FILTER_KEY)
+            && (searchPaginationInput.filterGroup?.filters?.length ?? 0) > 1
+            && (
+            <FilterModeChip
+              onClick={queryableHelpers.filterHelpers.handleSwitchMode}
+              mode={searchPaginationInput.filterGroup.mode}
+            />
+            )}
+        </Box>
       )}
       <FilterChips
         propertySchemas={properties}
