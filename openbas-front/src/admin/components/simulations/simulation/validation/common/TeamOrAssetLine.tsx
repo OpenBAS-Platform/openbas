@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
-import { Accordion, AccordionDetails, AccordionSummary, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { CastForEducationOutlined, DnsOutlined, ExpandMore, LanOutlined } from '@mui/icons-material';
+import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { CastForEducationOutlined, DnsOutlined, LanOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import ChannelExpectation from '../expectations/ChannelExpectation';
 import ChallengeExpectation from '../expectations/ChallengeExpectation';
@@ -168,7 +168,7 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
             return (<div key={expectationName}></div>);
           }
           return (
-            <ManualExpectations key={expectationName} exerciseId={exerciseId} inject={inject} expectations={es}/>
+            <ManualExpectations key={expectationName} inject={inject} expectations={es}/>
           );
         })}
       </List>

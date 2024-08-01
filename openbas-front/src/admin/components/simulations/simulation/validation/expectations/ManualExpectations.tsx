@@ -157,7 +157,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
             {t('Team')}
           </Typography>
           <Paper>
-            <ManualExpectationsValidationForm key={parentExpectation} expectation={parentExpectation}/>
+            <ManualExpectationsValidationForm key={parentExpectation.targetId} expectation={parentExpectation}/>
           </Paper>
           <Divider style={{ margin: '20px 0' }}/>
           <Typography variant="h5" style={{ fontWeight: 500, margin: '10px' }}>
