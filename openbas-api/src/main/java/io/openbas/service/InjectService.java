@@ -535,7 +535,7 @@ public class InjectService {
         injectTime.setSpecifyDays(relativeDays || injectTime.getFormatter().equals(DateTimeFormatter.ISO_DATE_TIME));
 
         // We get the absolute dates available on our first pass
-        if(!relativeDays && !relativeHour && !relativeMinute && dateTime != null) {
+        if(!injectTime.isRelativeDay() && !injectTime.isRelativeHour() && !injectTime.isRelativeMinute() && dateTime != null) {
             if (dateTime instanceof LocalDateTime) {
                 Instant injectDate = Instant.ofEpochSecond(
                         ((LocalDateTime)dateTime).toEpochSecond(timezoneOffset));
