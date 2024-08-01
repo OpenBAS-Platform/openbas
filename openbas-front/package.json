@@ -110,7 +110,7 @@
     "express": "4.19.2",
     "fs-extra": "11.2.0",
     "globals": "15.0.0",
-    "jsdom": "24.1.0",
+    "jsdom": "24.1.1",
     "nyc": "15.1.0",
     "swagger-typescript-api": "13.0.6",
     "typescript": "5.4.5",
