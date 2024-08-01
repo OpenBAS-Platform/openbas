@@ -1,35 +1,33 @@
 package io.openbas.rest.channel;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
-import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.rest.channel.form.*;
-import io.openbas.rest.channel.model.VirtualArticle;
 import io.openbas.rest.channel.response.ChannelReader;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.service.ChannelService;
 import io.openbas.service.ScenarioService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
 import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
 import static io.openbas.rest.channel.ChannelHelper.enrichArticleWithVirtualPublication;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
 @RestController
+@AllArgsConstructor
 public class ChannelApi extends RestBehavior {
 
     private ExerciseRepository exerciseRepository;
@@ -37,44 +35,8 @@ public class ChannelApi extends RestBehavior {
     private ArticleRepository articleRepository;
     private ChannelRepository channelRepository;
     private DocumentRepository documentRepository;
-    private InjectExpectationRepository injectExpectationExecutionRepository;
     private UserRepository userRepository;
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setArticleRepository(ArticleRepository articleRepository) {
-        this.articleRepository = articleRepository;
-    }
-
-    @Autowired
-    public void setInjectExpectationExecutionRepository(
-            InjectExpectationRepository injectExpectationExecutionRepository) {
-        this.injectExpectationExecutionRepository = injectExpectationExecutionRepository;
-    }
-
-    @Autowired
-    public void setChannelRepository(ChannelRepository channelRepository) {
-        this.channelRepository = channelRepository;
-    }
-
-    @Autowired
-    public void setExerciseRepository(ExerciseRepository exerciseRepository) {
-        this.exerciseRepository = exerciseRepository;
-    }
-
-    @Autowired
-    public void setScenarioService(ScenarioService scenarioService) {
-        this.scenarioService = scenarioService;
-    }
-
-    @Autowired
-    public void setDocumentRepository(DocumentRepository documentRepository) {
-        this.documentRepository = documentRepository;
-    }
+    private ChannelService channelService;
 
     // -- CHANNELS --
 
@@ -157,120 +119,11 @@ public class ChannelApi extends RestBehavior {
             @PathVariable String exerciseId,
             @PathVariable String channelId,
             @RequestParam Optional<String> userId) {
-        ChannelReader channelReader;
-        Channel channel = channelRepository.findById(channelId).orElseThrow(ElementNotFoundException::new);
-        List<Inject> injects;
-
-        Optional<Exercise> exerciseOpt = exerciseRepository.findById(exerciseId);
-        if (exerciseOpt.isPresent()) {
-            Exercise exercise = exerciseOpt.get();
-            channelReader = new ChannelReader(channel, exercise);
-            injects = exercise.getInjects();
-        } else {
-            Scenario scenario = this.scenarioService.scenario(exerciseId);
-            channelReader = new ChannelReader(channel, scenario);
-            injects = scenario.getInjects();
-        }
-
         final User user = impersonateUser(userRepository, userId);
         if (user.getId().equals(ANONYMOUS)) {
             throw new UnsupportedOperationException("User must be logged or dynamic player is required");
         }
-        Map<String, Instant> toPublishArticleIdsMap = injects.stream()
-                .filter(inject -> inject.getInjectorContract()
-                        .map(contract -> contract.getId().equals(CHANNEL_PUBLISH))
-                        .orElse(false))
-                .filter(inject -> inject.getStatus().isPresent())
-                .sorted(Comparator.comparing(inject -> inject.getStatus().get().getTrackingSentDate()))
-                .flatMap(inject -> {
-                    Instant virtualInjectDate = inject.getStatus().get().getTrackingSentDate();
-                    try {
-                        ChannelContent content = mapper.treeToValue(inject.getContent(), ChannelContent.class);
-                        if (content.getArticles() != null) {
-                            return content.getArticles().stream().map(article -> new VirtualArticle(virtualInjectDate, article));
-                        }
-                        return null;
-                    } catch (JsonProcessingException e) {
-                        // Invalid channel content.
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .distinct()
-                .collect(Collectors.toMap(VirtualArticle::id, VirtualArticle::date));
-        if (!toPublishArticleIdsMap.isEmpty()) {
-            List<Article> publishedArticles = fromIterable(articleRepository.findAllById(toPublishArticleIdsMap.keySet()))
-                    .stream().filter(article -> article.getChannel().equals(channel))
-                    .peek(article -> article.setVirtualPublication(toPublishArticleIdsMap.get(article.getId())))
-                    .sorted(Comparator.comparing(Article::getVirtualPublication).reversed())
-                    .toList();
-            channelReader.setChannelArticles(publishedArticles);
-            // Fulfill article expectations
-            List<Inject> finalInjects = injects;
-            List<InjectExpectation> expectationExecutions = publishedArticles.stream()
-                    .flatMap(article -> finalInjects.stream()
-                            .flatMap(inject -> inject.getUserExpectationsForArticle(user, article).stream()))
-                    .filter(exec -> exec.getResults().isEmpty()).toList();
-
-            // Update all expectations linked to player
-            expectationExecutions.forEach(injectExpectationExecution -> {
-                injectExpectationExecution.setUser(user);
-                injectExpectationExecution.setResults(List.of(
-                        InjectExpectationResult.builder()
-                                .sourceId("media-pressure")
-                                .sourceType("media-pressure")
-                                .sourceName("Media pressure read")
-                                .result(Instant.now().toString())
-                                .date(Instant.now().toString())
-                                .score(injectExpectationExecution.getExpectedScore())
-                                .build()
-                ));
-                injectExpectationExecution.setScore(injectExpectationExecution.getExpectedScore());
-                injectExpectationExecution.setUpdatedAt(Instant.now());
-                injectExpectationExecutionRepository.save(injectExpectationExecution);
-            });
-
-            // Process expectation linked to teams where user if part of
-            List<String> injectIds = injects.stream().map(Inject::getId).toList();
-            List<String> teamIds = user.getTeams().stream().map(Team::getId).toList();
-            // Find all expectations linked to teams' user, channel and exercise
-            List<InjectExpectation> channelExpectations = injectExpectationExecutionRepository.findChannelExpectations(injectIds, teamIds, channelId);
-
-            // Depending on type of validation, we process the parent expectations:
-            channelExpectations.stream().findAny().ifPresentOrElse(process -> {
-                boolean validationType = process.isExpectationGroup();
-
-                channelExpectations.forEach(parentExpectation -> {
-                    if (validationType) { // type atLeast
-                        parentExpectation.setScore(injectExpectationExecutionRepository.computeAverageScoreWhenValidationTypeIsAtLeastOnePlayerForChannel(
-                                injectIds,
-                                process.getArticle().getId(),
-                                parentExpectation.getTeam().getId())
-                        );
-                    } else { // type all
-                        parentExpectation.setScore(injectExpectationExecutionRepository.computeAverageScoreWhenValidationTypeIsAllPlayersForChannel(
-                                injectIds,
-                                process.getArticle().getId(),
-                                parentExpectation.getTeam().getId())
-                        );
-                    };
-                    InjectExpectationResult result = InjectExpectationResult.builder()
-                            .sourceId("media-pressure")
-                            .sourceType("media-pressure")
-                            .sourceName("Media pressure read")
-                            .result(Instant.now().toString())
-                            .date(Instant.now().toString())
-                            .score(process.getExpectedScore())
-                            .build();
-
-                    parentExpectation.getResults().clear();
-                    parentExpectation.getResults().add(result);
-                    parentExpectation.setUpdatedAt(Instant.now());
-                    injectExpectationExecutionRepository.save(parentExpectation);
-                });
-            }, ElementNotFoundException::new);
-        }
-        return channelReader;
+        return channelService.validateArticles(exerciseId, channelId, user);
     }
 
     // -- EXERCISES --
