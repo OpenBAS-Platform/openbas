@@ -1,9 +1,5 @@
 package io.openbas.database.model;
 
-import lombok.Data;
-
-
-@Data
 public class BannerMessage {
 
   public enum BANNER_KEYS {

@@ -74,7 +74,7 @@ const SystemBanners = (settings: {
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles(computeBannerSettings(settings.settings).bannerHeightNumber);
+  const classes = useStyles();
   const bannerLevel = settings.settings.platform_banner_by_level;
   let numberOfElements = 0;
   if (settings.settings.platform_banner_by_level !== undefined) {
