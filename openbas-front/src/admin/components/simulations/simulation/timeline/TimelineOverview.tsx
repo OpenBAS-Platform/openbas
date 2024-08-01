@@ -206,7 +206,6 @@ const TimelineOverview = () => {
                         <ListItemSecondaryAction>
                           <InjectPopover
                             inject={inject}
-                            canBeTested={false}
                             tagsMap={tagsMap}
                             setSelectedInjectId={setSelectedInjectId}
                             isDisabled={isDisabled}

@@ -82,29 +82,16 @@ public class InjectStatus implements Base {
 
   public static InjectStatus fromExecution(Execution execution, Inject executedInject) {
     InjectStatus injectStatus = executedInject.getStatus().orElse(new InjectStatus());
-    injectStatus.setTrackingSentDate(Instant.now());
     injectStatus.setInject(executedInject);
-    injectStatus.getTraces().addAll(execution.getTraces());
-    int numberOfElements = execution.getTraces().size();
-    int numberOfError = (int) execution.getTraces().stream().filter(ex -> ex.getStatus().equals(ExecutionStatus.ERROR))
-        .count();
-    int numberOfSuccess = (int) execution.getTraces().stream()
-        .filter(ex -> ex.getStatus().equals(ExecutionStatus.SUCCESS)).count();
-    injectStatus.setTrackingTotalError(numberOfError);
-    injectStatus.setTrackingTotalSuccess(numberOfSuccess);
-    injectStatus.setTrackingTotalCount(
-        execution.getExpectedCount() != null ? execution.getExpectedCount() : numberOfElements);
-    ExecutionStatus globalStatus = numberOfSuccess > 0 ? ExecutionStatus.SUCCESS : ExecutionStatus.ERROR;
-    ExecutionStatus finalStatus = numberOfError > 0 && numberOfSuccess > 0 ? ExecutionStatus.PARTIAL : globalStatus;
-    injectStatus.setName(execution.isAsync() ? ExecutionStatus.PENDING : finalStatus);
-    injectStatus.setTrackingEndDate(Instant.now());
-    injectStatus.setTrackingTotalExecutionTime(
-        Duration.between(injectStatus.getTrackingSentDate(), injectStatus.getTrackingEndDate()).getSeconds());
-    return injectStatus;
+    return fromExecution(execution, injectStatus);
   }
 
   public static InjectStatus fromExecutionTest(Execution execution) {
     InjectStatus injectStatus = new InjectStatus();
+    return fromExecution(execution, injectStatus);
+  }
+
+  private static InjectStatus fromExecution(Execution execution, InjectStatus injectStatus) {
     injectStatus.setTrackingSentDate(Instant.now());
     injectStatus.getTraces().addAll(execution.getTraces());
     int numberOfElements = execution.getTraces().size();
@@ -122,6 +109,7 @@ public class InjectStatus implements Base {
     injectStatus.setTrackingEndDate(Instant.now());
     injectStatus.setTrackingTotalExecutionTime(
         Duration.between(injectStatus.getTrackingSentDate(), injectStatus.getTrackingEndDate()).getSeconds());
+
     return injectStatus;
   }
 

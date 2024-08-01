@@ -49,6 +49,9 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static io.openbas.config.SessionHelper.currentUser;
+
+import io.openbas.execution.Injector;
+
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.CommunicationSpecification.fromInject;
 import static io.openbas.helper.DatabaseHelper.resolveOptionalRelation;
@@ -173,7 +176,7 @@ public class InjectApi extends RestBehavior {
     List<ExecutionContext> userInjectContexts = List.of(
         this.executionContextService.executionContext(user, inject, "Direct test")
     );
-    io.openbas.execution.Injector executor = context.getBean(
+    Injector executor = context.getBean(
         inject.getInjectorContract().map(injectorContract -> injectorContract.getInjector().getType()).orElseThrow(),
         io.openbas.execution.Injector.class);
     ExecutableInject injection = new ExecutableInject(false, true, inject, List.of(), inject.getAssets(),

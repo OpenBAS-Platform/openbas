@@ -11,18 +11,18 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 
 interface Props {
-  inject: InjectStore & { inject_test?: boolean }; // FIXME: Inject object coming from multiple endpoints with different properties
+  inject: InjectStore & { inject_testable?: boolean }; // FIXME: Inject object coming from multiple endpoints with different properties
   tagsMap: Record<string, Tag>;
   setSelectedInjectId: (injectId: Inject['inject_id']) => void;
   isDisabled: boolean;
-  canBeTested: boolean;
+  canBeTested?: boolean;
 }
 
 const InjectPopover: FunctionComponent<Props> = ({
   inject,
   setSelectedInjectId,
   isDisabled,
-  canBeTested,
+  canBeTested = false,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -114,8 +114,8 @@ const InjectPopover: FunctionComponent<Props> = ({
   };
 
   const submitTest = () => {
-    dispatch(testInject(inject.inject_id)).then((result: InjectStatus) => {
-      setInjectTestResult(result);
+    testInject(inject.inject_id).then((result: { data: InjectStatus }) => {
+      setInjectTestResult(result.data);
     });
     handleCloseTest();
   };
@@ -210,8 +210,9 @@ const InjectPopover: FunctionComponent<Props> = ({
             {t('Mark as done')}
           </MenuItem>
         )}
-        {inject.inject_test && canBeTested && (
+        {inject.inject_testable && canBeTested && (
           <MenuItem
+            disabled={inject.inject_teams?.length === 0}
             onClick={handleOpenTest}
           >
             {t('Test')}

@@ -61,7 +61,7 @@ public class InjectOutput {
   @JsonProperty("inject_content")
   private ObjectNode content;
 
-  @JsonProperty("inject_test")
+  @JsonProperty("inject_testable")
   public boolean canBeTested() {
     return this.getInjectType().equals(EmailContract.TYPE) || this.getInjectType().equals(OvhSmsContract.TYPE);
   }

@@ -1,6 +1,5 @@
 /* eslint-disable */
 /* tslint:disable */
-
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -273,7 +272,7 @@ export interface ChallengeFlag {
   /** @format date-time */
   flag_created_at?: string;
   flag_id?: string;
-  flag_type?: 'VALUE' | 'VALUE_CASE' | 'REGEXP';
+  flag_type?: "VALUE" | "VALUE_CASE" | "REGEXP";
   /** @format date-time */
   flag_updated_at?: string;
   flag_value?: string;
@@ -410,7 +409,7 @@ export interface Comcheck {
   comcheck_name?: string;
   /** @format date-time */
   comcheck_start_date?: string;
-  comcheck_state?: 'RUNNING' | 'EXPIRED' | 'FINISHED';
+  comcheck_state?: "RUNNING" | "EXPIRED" | "FINISHED";
   comcheck_statuses?: ComcheckStatus[];
   comcheck_subject?: string;
   /** @format int64 */
@@ -437,7 +436,7 @@ export interface ComcheckStatus {
   comcheckstatus_sent_date?: string;
   /** @format int32 */
   comcheckstatus_sent_retry?: number;
-  comcheckstatus_state?: 'RUNNING' | 'SUCCESS' | 'FAILURE';
+  comcheckstatus_state?: "RUNNING" | "SUCCESS" | "FAILURE";
   comcheckstatus_user?: User;
   listened?: boolean;
   updateAttributes?: object;
@@ -534,16 +533,16 @@ export interface DryInjectStatus {
   listened?: boolean;
   status_id?: string;
   status_name?:
-    | 'DRAFT'
-    | 'INFO'
-    | 'QUEUING'
-    | 'EXECUTING'
-    | 'PENDING'
-    | 'PARTIAL'
-    | 'ERROR'
-    | 'MAYBE_PARTIAL_PREVENTED'
-    | 'MAYBE_PREVENTED'
-    | 'SUCCESS';
+    | "DRAFT"
+    | "INFO"
+    | "QUEUING"
+    | "EXECUTING"
+    | "PENDING"
+    | "PARTIAL"
+    | "ERROR"
+    | "MAYBE_PARTIAL_PREVENTED"
+    | "MAYBE_PREVENTED"
+    | "SUCCESS";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -610,11 +609,11 @@ export interface Endpoint {
   /** @format date-time */
   asset_updated_at?: string;
   endpoint_agent_version?: string;
-  endpoint_arch: 'x86_64' | 'arm64' | 'Unknown';
+  endpoint_arch: "x86_64" | "arm64" | "Unknown";
   endpoint_hostname?: string;
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: 'Linux' | 'Windows' | 'MacOS' | 'Container' | 'Service' | 'Generic' | 'Internal' | 'Unknown';
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
   listened?: boolean;
   updateAttributes?: object;
 }
@@ -626,7 +625,7 @@ export interface EndpointInput {
   asset_name: string;
   asset_tags?: string[];
   endpoint_agent_version?: string;
-  endpoint_arch: 'x86_64' | 'arm64' | 'Unknown';
+  endpoint_arch: "x86_64" | "arm64" | "Unknown";
   endpoint_hostname?: string;
   /**
    * @maxItems 2147483647
@@ -634,7 +633,7 @@ export interface EndpointInput {
    */
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: 'Linux' | 'Windows' | 'MacOS' | 'Container' | 'Service' | 'Generic' | 'Internal' | 'Unknown';
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
 }
 
 export interface EndpointRegisterInput {
@@ -645,7 +644,7 @@ export interface EndpointRegisterInput {
   asset_name: string;
   asset_tags?: string[];
   endpoint_agent_version?: string;
-  endpoint_arch: 'x86_64' | 'arm64' | 'Unknown';
+  endpoint_arch: "x86_64" | "arm64" | "Unknown";
   endpoint_hostname?: string;
   /**
    * @maxItems 2147483647
@@ -653,7 +652,7 @@ export interface EndpointRegisterInput {
    */
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: 'Linux' | 'Windows' | 'MacOS' | 'Container' | 'Service' | 'Generic' | 'Internal' | 'Unknown';
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
 }
 
 export interface Evaluation {
@@ -734,7 +733,7 @@ export interface Exercise {
   exercise_name: string;
   /** @format date-time */
   exercise_next_inject_date?: string;
-  exercise_next_possible_status?: ('SCHEDULED' | 'CANCELED' | 'RUNNING' | 'PAUSED' | 'FINISHED')[];
+  exercise_next_possible_status?: ("SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED")[];
   exercise_observers?: User[];
   exercise_pauses?: Pause[];
   exercise_planners?: User[];
@@ -745,7 +744,7 @@ export interface Exercise {
   exercise_severity?: string;
   /** @format date-time */
   exercise_start_date?: string;
-  exercise_status?: 'SCHEDULED' | 'CANCELED' | 'RUNNING' | 'PAUSED' | 'FINISHED';
+  exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
   exercise_subtitle?: string;
   /** @uniqueItems true */
   exercise_tags?: Tag[];
@@ -807,7 +806,7 @@ export interface ExerciseDetails {
   exercise_name: string;
   /** @format date-time */
   exercise_next_inject_date?: string;
-  exercise_next_possible_status?: ('SCHEDULED' | 'CANCELED' | 'RUNNING' | 'PAUSED' | 'FINISHED')[];
+  exercise_next_possible_status?: ("SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED")[];
   /** @uniqueItems true */
   exercise_observers?: string[];
   /** @uniqueItems true */
@@ -821,7 +820,7 @@ export interface ExerciseDetails {
   exercise_severity?: string;
   /** @format date-time */
   exercise_start_date?: string;
-  exercise_status?: 'SCHEDULED' | 'CANCELED' | 'RUNNING' | 'PAUSED' | 'FINISHED';
+  exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
   exercise_subtitle?: string;
   /** @uniqueItems true */
   exercise_tags?: string[];
@@ -848,7 +847,7 @@ export interface ExerciseSimple {
   exercise_name: string;
   /** @format date-time */
   exercise_start_date?: string;
-  exercise_status?: 'SCHEDULED' | 'CANCELED' | 'RUNNING' | 'PAUSED' | 'FINISHED';
+  exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
   exercise_subtitle?: string;
   /** @uniqueItems true */
   exercise_tags?: Tag[];
@@ -892,7 +891,7 @@ export interface ExerciseUpdateStartDateInput {
 }
 
 export interface ExerciseUpdateStatusInput {
-  exercise_status?: 'SCHEDULED' | 'CANCELED' | 'RUNNING' | 'PAUSED' | 'FINISHED';
+  exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
 }
 
 export interface ExerciseUpdateTagsInput {
@@ -904,9 +903,9 @@ export interface ExerciseUpdateTeamsInput {
 }
 
 export interface ExpectationResultsByType {
-  avgResult: 'FAILED' | 'PENDING' | 'PARTIAL' | 'UNKNOWN' | 'SUCCESS';
+  avgResult: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   distribution: ResultDistribution[];
-  type: 'DETECTION' | 'HUMAN_RESPONSE' | 'PREVENTION';
+  type: "DETECTION" | "HUMAN_RESPONSE" | "PREVENTION";
 }
 
 export interface ExpectationUpdateInput {
@@ -919,14 +918,14 @@ export interface ExpectationUpdateInput {
 
 export interface Filter {
   key: string;
-  mode?: 'and' | 'or';
-  operator?: 'eq' | 'not_eq' | 'contains' | 'not_contains' | 'starts_with' | 'not_starts_with';
+  mode?: "and" | "or";
+  operator?: "eq" | "not_eq" | "contains" | "not_contains" | "starts_with" | "not_starts_with";
   values?: string[];
 }
 
 export interface FilterGroup {
   filters?: Filter[];
-  mode: 'and' | 'or';
+  mode: "and" | "or";
 }
 
 export interface FlagInput {
@@ -953,17 +952,17 @@ export interface Grant {
   grant_exercise?: Exercise;
   grant_group?: Group;
   grant_id?: string;
-  grant_name?: 'OBSERVER' | 'PLANNER';
+  grant_name?: "OBSERVER" | "PLANNER";
   grant_scenario?: Scenario;
   listened?: boolean;
   updateAttributes?: object;
 }
 
 export interface Group {
-  group_default_exercise_assign?: ('OBSERVER' | 'PLANNER')[];
+  group_default_exercise_assign?: ("OBSERVER" | "PLANNER")[];
   group_default_exercise_observer?: boolean;
   group_default_exercise_planner?: boolean;
-  group_default_scenario_assign?: ('OBSERVER' | 'PLANNER')[];
+  group_default_scenario_assign?: ("OBSERVER" | "PLANNER")[];
   group_default_scenario_observer?: boolean;
   group_default_scenario_planner?: boolean;
   group_default_user_assign?: boolean;
@@ -989,7 +988,7 @@ export interface GroupCreateInput {
 
 export interface GroupGrantInput {
   grant_exercise?: string;
-  grant_name?: 'OBSERVER' | 'PLANNER';
+  grant_name?: "OBSERVER" | "PLANNER";
   grant_scenario?: string;
 }
 
@@ -1141,9 +1140,9 @@ export interface InjectExpectation {
   /** @format int32 */
   inject_expectation_score?: number;
   inject_expectation_signatures?: InjectExpectationSignature[];
-  inject_expectation_status?: 'FAILED' | 'PENDING' | 'PARTIAL' | 'UNKNOWN' | 'SUCCESS';
+  inject_expectation_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   inject_expectation_team?: Team;
-  inject_expectation_type: 'TEXT' | 'DOCUMENT' | 'ARTICLE' | 'CHALLENGE' | 'MANUAL' | 'PREVENTION' | 'DETECTION';
+  inject_expectation_type: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: User;
@@ -1246,7 +1245,7 @@ export interface InjectOutput {
   /** @uniqueItems true */
   inject_tags?: string[];
   inject_teams?: string[];
-  inject_test?: boolean;
+  inject_testable?: boolean;
   inject_title?: string;
   inject_type?: string;
 }
@@ -1290,16 +1289,16 @@ export interface InjectStatus {
   listened?: boolean;
   status_id?: string;
   status_name?:
-    | 'DRAFT'
-    | 'INFO'
-    | 'QUEUING'
-    | 'EXECUTING'
-    | 'PENDING'
-    | 'PARTIAL'
-    | 'ERROR'
-    | 'MAYBE_PARTIAL_PREVENTED'
-    | 'MAYBE_PREVENTED'
-    | 'SUCCESS';
+    | "DRAFT"
+    | "INFO"
+    | "QUEUING"
+    | "EXECUTING"
+    | "PENDING"
+    | "PARTIAL"
+    | "ERROR"
+    | "MAYBE_PARTIAL_PREVENTED"
+    | "MAYBE_PREVENTED"
+    | "SUCCESS";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -1325,16 +1324,16 @@ export interface InjectStatusExecution {
   execution_duration?: number;
   execution_message?: string;
   execution_status?:
-    | 'DRAFT'
-    | 'INFO'
-    | 'QUEUING'
-    | 'EXECUTING'
-    | 'PENDING'
-    | 'PARTIAL'
-    | 'ERROR'
-    | 'MAYBE_PARTIAL_PREVENTED'
-    | 'MAYBE_PREVENTED'
-    | 'SUCCESS';
+    | "DRAFT"
+    | "INFO"
+    | "QUEUING"
+    | "EXECUTING"
+    | "PENDING"
+    | "PARTIAL"
+    | "ERROR"
+    | "MAYBE_PARTIAL_PREVENTED"
+    | "MAYBE_PREVENTED"
+    | "SUCCESS";
   /** @format date-time */
   execution_time?: string;
 }
@@ -1344,8 +1343,8 @@ export interface InjectTargetWithResult {
   expectationResultsByTypes?: ExpectationResultsByType[];
   id: string;
   name?: string;
-  platformType?: 'Linux' | 'Windows' | 'MacOS' | 'Container' | 'Service' | 'Generic' | 'Internal' | 'Unknown';
-  targetType?: 'ASSETS' | 'ASSETS_GROUPS' | 'TEAMS';
+  platformType?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
+  targetType?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }
 
 export interface InjectTeamsInput {
@@ -2451,7 +2450,7 @@ export interface PublicChallenge {
 export interface PublicChallengeFlag {
   flag_challenge?: string;
   flag_id?: string;
-  flag_type?: 'VALUE' | 'VALUE_CASE' | 'REGEXP';
+  flag_type?: "VALUE" | "VALUE_CASE" | "REGEXP";
 }
 
 export interface PublicExercise {
@@ -2811,7 +2810,7 @@ export interface SecurityPlatform {
   listened?: boolean;
   security_platform_logo_dark?: Document;
   security_platform_logo_light?: Document;
-  security_platform_type: 'EDR' | 'XDR' | 'SIEM' | 'SOAR' | 'NDR' | 'ISPM';
+  security_platform_type: "EDR" | "XDR" | "SIEM" | "SOAR" | "NDR" | "ISPM";
   updateAttributes?: object;
 }
 
@@ -2823,7 +2822,7 @@ export interface SecurityPlatformInput {
   asset_tags?: string[];
   security_platform_logo_dark?: string;
   security_platform_logo_light?: string;
-  security_platform_type: 'EDR' | 'XDR' | 'SIEM' | 'SOAR' | 'NDR' | 'ISPM';
+  security_platform_type: "EDR" | "XDR" | "SIEM" | "SOAR" | "NDR" | "ISPM";
 }
 
 export interface SecurityPlatformUpsertInput {
@@ -2835,7 +2834,7 @@ export interface SecurityPlatformUpsertInput {
   asset_tags?: string[];
   security_platform_logo_dark?: string;
   security_platform_logo_light?: string;
-  security_platform_type: 'EDR' | 'XDR' | 'SIEM' | 'SOAR' | 'NDR' | 'ISPM';
+  security_platform_type: "EDR" | "XDR" | "SIEM" | "SOAR" | "NDR" | "ISPM";
 }
 
 export interface SettingsEnterpriseEditionUpdateInput {
@@ -3079,7 +3078,7 @@ export interface Variable {
   /** @pattern ^[a-z_]+$ */
   variable_key: string;
   variable_scenario?: Scenario;
-  variable_type: 'String' | 'Object';
+  variable_type: "String" | "Object";
   /** @format date-time */
   variable_updated_at?: string;
   variable_value?: string;
