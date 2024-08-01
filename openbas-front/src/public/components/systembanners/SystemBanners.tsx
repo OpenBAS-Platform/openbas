@@ -4,6 +4,7 @@ import { ReportProblem } from '@mui/icons-material';
 import { isEmptyField, isNotEmptyField, recordEntries, recordKeys } from '../../../utils/utils';
 import type { Theme } from '../../../components/Theme';
 import type { PlatformSettings } from '../../../utils/api-types';
+import { useFormatter } from '../../../components/i18n';
 
 export const SYSTEM_BANNER_HEIGHT_PER_MESSAGE = 18;
 
@@ -16,8 +17,8 @@ export const computeBannerSettings = (settings: PlatformSettings) => {
       numberOfElements += bannerLevel[1].length;
     }
   }
-  const bannerHeight = isBannerActivated ? `${(SYSTEM_BANNER_HEIGHT_PER_MESSAGE * numberOfElements) + 14}px` : '0';
-  const bannerHeightNumber = isBannerActivated ? (SYSTEM_BANNER_HEIGHT_PER_MESSAGE * numberOfElements) + 14 : 0;
+  const bannerHeight = isBannerActivated ? `${(SYSTEM_BANNER_HEIGHT_PER_MESSAGE * numberOfElements) + 16}px` : '0';
+  const bannerHeightNumber = isBannerActivated ? (SYSTEM_BANNER_HEIGHT_PER_MESSAGE * numberOfElements) + 16 : 0;
   return {
     bannerByLevel,
     bannerHeight,
@@ -34,6 +35,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: '100%',
     alignContent: 'center',
     textAlign: 'center',
+    padding: '5px',
   },
   bannerTop: {
     top: 0,
@@ -71,10 +73,16 @@ const SystemBanners = (settings: {
   }
 }) => {
   // Standard hooks
+  const { t } = useFormatter();
   const classes = useStyles(computeBannerSettings(settings.settings).bannerHeightNumber);
   const bannerLevel = settings.settings.platform_banner_by_level;
-  const bannerText = settings.settings.platform_banner_by_level.error;
-  if (isEmptyField(bannerLevel) || isEmptyField(bannerText)) {
+  let numberOfElements = 0;
+  if (settings.settings.platform_banner_by_level !== undefined) {
+    for (const currentBannerLevel of recordEntries(settings.settings.platform_banner_by_level)) {
+      numberOfElements += currentBannerLevel[1].length;
+    }
+  }
+  if (isEmptyField(bannerLevel) || numberOfElements === 0) {
     return <></>;
   }
 
@@ -94,7 +102,7 @@ const SystemBanners = (settings: {
                 <div key={`${key}.${message}`} className={classes.container}>
                   <ReportProblem color="error" fontSize="small" style={{ marginRight: 8 }}/>
                   <span className={classes.bannerText}>
-                    {message}
+                    {t(message)}
                   </span>
                 </div>
               );
