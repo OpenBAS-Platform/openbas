@@ -211,6 +211,8 @@ public class ChannelApi extends RestBehavior {
                     .flatMap(article -> finalInjects.stream()
                             .flatMap(inject -> inject.getUserExpectationsForArticle(user, article).stream()))
                     .filter(exec -> exec.getResults().isEmpty()).toList();
+
+            // Update all expectations linked to player
             expectationExecutions.forEach(injectExpectationExecution -> {
                 injectExpectationExecution.setUser(user);
                 injectExpectationExecution.setResults(List.of(
@@ -226,12 +228,47 @@ public class ChannelApi extends RestBehavior {
                 injectExpectationExecution.setScore(injectExpectationExecution.getExpectedScore());
                 injectExpectationExecution.setUpdatedAt(Instant.now());
                 injectExpectationExecutionRepository.save(injectExpectationExecution);
-
-                //Todo after update expectation player we have to update expectation team
-
-
-
             });
+
+            // Process expectation linked to teams where user if part of
+            List<String> injectIds = injects.stream().map(Inject::getId).toList();
+            List<String> teamIds = user.getTeams().stream().map(Team::getId).toList();
+            // Find all expectations linked to teams' user, channel and exercise
+            List<InjectExpectation> channelExpectations = injectExpectationExecutionRepository.findChannelExpectations(injectIds, teamIds, channelId);
+
+            // Depending on type of validation, we process the parent expectations:
+            channelExpectations.stream().findAny().ifPresentOrElse(process -> {
+                boolean validationType = process.isExpectationGroup();
+
+                channelExpectations.forEach(parentExpectation -> {
+                    if (validationType) { // type atLeast
+                        parentExpectation.setScore(injectExpectationExecutionRepository.computeAverageScoreWhenValidationTypeIsAtLeastOnePlayerForChannel(
+                                injectIds,
+                                process.getArticle().getId(),
+                                parentExpectation.getTeam().getId())
+                        );
+                    } else { // type all
+                        parentExpectation.setScore(injectExpectationExecutionRepository.computeAverageScoreWhenValidationTypeIsAllPlayersForChannel(
+                                injectIds,
+                                process.getArticle().getId(),
+                                parentExpectation.getTeam().getId())
+                        );
+                    };
+                    InjectExpectationResult result = InjectExpectationResult.builder()
+                            .sourceId("media-pressure")
+                            .sourceType("media-pressure")
+                            .sourceName("Media pressure read")
+                            .result(Instant.now().toString())
+                            .date(Instant.now().toString())
+                            .score(process.getExpectedScore())
+                            .build();
+
+                    parentExpectation.getResults().clear();
+                    parentExpectation.getResults().add(result);
+                    parentExpectation.setUpdatedAt(Instant.now());
+                    injectExpectationExecutionRepository.save(parentExpectation);
+                });
+            }, ElementNotFoundException::new);
         }
         return channelReader;
     }
