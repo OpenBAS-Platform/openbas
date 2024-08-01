@@ -68,7 +68,7 @@ public class ImapService {
     private CommunicationRepository communicationRepository;
     private SettingRepository settingRepository;
     private FileService fileService;
-    private PlatformSettingsService platformSettingsService;
+    private final PlatformSettingsService platformSettingsService;
 
     public ImapService(Environment env, @Autowired PlatformSettingsService platformSettingsService) throws Exception {
         this.platformSettingsService = platformSettingsService;
@@ -104,11 +104,6 @@ public class ImapService {
     @Autowired
     public void setCommunicationRepository(CommunicationRepository communicationRepository) {
         this.communicationRepository = communicationRepository;
-    }
-
-    @Autowired
-    public void setPlatformSettingsService(PlatformSettingsService platformSettingsService) {
-        this.platformSettingsService = platformSettingsService;
     }
 
     private void initStore(Environment env) throws Exception {
