@@ -90,7 +90,6 @@ public class ChannelService {
 
             // Update all expectations linked to player
             expectationExecutions.forEach(injectExpectationExecution -> {
-                injectExpectationExecution.setUser(user);
                 injectExpectationExecution.setResults(List.of(
                         InjectExpectationResult.builder()
                                 .sourceId("media-pressure")
@@ -109,28 +108,28 @@ public class ChannelService {
             // Process expectation linked to teams where user if part of
             List<String> injectIds = injects.stream().map(Inject::getId).toList();
             List<String> teamIds = user.getTeams().stream().map(Team::getId).toList();
+            List<String> articleIds = publishedArticles.stream().map(Article::getId).toList();
             // Find all expectations linked to teams' user, channel and exercise
-            List<InjectExpectation> channelExpectations = injectExpectationExecutionRepository.findChannelExpectations(injectIds, teamIds, channelId);
+            List<InjectExpectation> channelExpectations = injectExpectationExecutionRepository.findChannelExpectations(injectIds, teamIds, articleIds);
 
             // Depending on type of validation, we process the parent expectations:
             channelExpectations.stream().findAny().ifPresentOrElse(process -> {
                 boolean validationType = process.isExpectationGroup();
 
                 channelExpectations.forEach(parentExpectation -> {
-                    if (validationType) { // type atLeast
+                    if (validationType) { // Validation type atleast one target
                         parentExpectation.setScore(injectExpectationExecutionRepository.computeAverageScoreWhenValidationTypeIsAtLeastOnePlayerForChannel(
                                 injectIds,
                                 process.getArticle().getId(),
                                 parentExpectation.getTeam().getId())
                         );
-                    } else { // type all
+                    } else { // Validation type all
                         parentExpectation.setScore(injectExpectationExecutionRepository.computeAverageScoreWhenValidationTypeIsAllPlayersForChannel(
                                 injectIds,
                                 process.getArticle().getId(),
                                 parentExpectation.getTeam().getId())
                         );
                     }
-                    ;
                     InjectExpectationResult result = InjectExpectationResult.builder()
                             .sourceId("media-pressure")
                             .sourceType("media-pressure")
