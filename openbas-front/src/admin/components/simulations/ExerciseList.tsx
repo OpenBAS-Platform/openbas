@@ -13,7 +13,6 @@ import type { ExerciseSimple, SearchPaginationInput } from '../../../utils/api-t
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../actions/Tag';
 import { useAppDispatch } from '../../../utils/hooks';
-import ExercisePopover from './simulation/ExercisePopover';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -67,7 +66,8 @@ interface Props {
   searchPaginationInput: SearchPaginationInput;
   setSearchPaginationInput: (datas: SearchPaginationInput) => void;
   hasHeader?: boolean;
-  variant?: string,
+  variant?: string;
+  secondaryAction?: (exercise: ExerciseStore) => React.ReactNode;
 }
 
 const ExerciseList: FunctionComponent<Props> = ({
@@ -76,6 +76,7 @@ const ExerciseList: FunctionComponent<Props> = ({
   setSearchPaginationInput,
   hasHeader = true,
   variant = 'list',
+  secondaryAction,
 }) => {
   // Standard hooks
   const dispatch = useAppDispatch();
@@ -159,14 +160,8 @@ const ExerciseList: FunctionComponent<Props> = ({
         <ListItem
           key={exercise.exercise_id}
           classes={{ root: classes.item }}
-          secondaryAction={
-            <ExercisePopover
-              exercise={exercise}
-              actions={['Duplicate', 'Export']}
-              variantButtonPopover={'icon'}
-            />
-          }
-          disablePadding={true}
+          secondaryAction={secondaryAction && secondaryAction(exercise)}
+          disablePadding
         >
           <ListItemButton
             classes={{ root: classes.item }}

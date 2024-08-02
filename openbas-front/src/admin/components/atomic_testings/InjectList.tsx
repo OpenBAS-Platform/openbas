@@ -189,10 +189,11 @@ const InjectList: FunctionComponent<Props> = ({
                 <AtomicTestingPopover
                   atomic={injectDto}
                   actions={['Duplicate', 'Delete']}
-                  variantButtonPopover={'icon'}
+                  onDelete={(result) => setInjects(injects.filter((e) => (e.inject_id !== result)))}
+                  inList
                 />
                   }
-              disablePadding={true}
+              disablePadding
             >
               <ListItemButton
                 classes={{ root: classes.item }}

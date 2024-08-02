@@ -23,26 +23,30 @@ import { usePermissions } from '../../../../utils/Exercise';
 import Transition from '../../../../components/common/Transition';
 import type { Exercise, ExerciseUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import ButtonPopover, { VariantButtonPopover } from '../../../../components/common/ButtonPopover';
+import ButtonPopover from '../../../../components/common/ButtonPopover';
 import ExerciseUpdateForm from './ExerciseUpdateForm';
 import Drawer from '../../../../components/common/Drawer';
 import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import DialogDelete from '../../../../components/common/DialogDelete';
+import { useHelper } from '../../../../store';
+import type { TagHelper, UserHelper } from '../../../../actions/helper';
 
-export type ExerciseActionPopover = 'Duplicate' | 'Update' | 'Delete' | 'Export' | '';
+export type ExerciseActionPopover = 'Duplicate' | 'Update' | 'Delete' | 'Export';
 
 interface ExercisePopoverProps {
   exercise: Exercise;
   actions: ExerciseActionPopover[];
-  variantButtonPopover?: VariantButtonPopover;
+  onDelete?: (result: string) => void;
+  inList?: boolean;
 }
 
 const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   exercise,
-  actions,
-  variantButtonPopover,
+  actions = [],
+  onDelete,
+  inList = false,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -92,8 +96,10 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const handleCloseDelete = () => setOpenDelete(false);
 
   const submitDelete = () => {
-    dispatch(deleteExercise(exercise.exercise_id)).then(() => handleCloseDelete());
-    navigate('/admin/exercises');
+    dispatch(deleteExercise(exercise.exercise_id)).then(() => {
+      handleCloseDelete();
+      if (onDelete) onDelete(exercise.exercise_id);
+    });
   };
 
   // Duplicate
@@ -149,16 +155,21 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   };
   const permissions = usePermissions(exercise.exercise_id);
 
+  // Fetching data
+  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({
+    userAdmin: helper.getMe()?.user_admin ?? false,
+  }));
+
   // Button Popover
   const entries = [];
   if (actions.includes('Duplicate')) entries.push({ label: 'Duplicate', action: () => handleOpenDuplicate() });
   if (actions.includes('Update')) entries.push({ label: 'Update', action: () => handleOpenEdit(), disabled: !permissions.canWriteBypassStatus });
-  if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete(), disabled: !permissions.canWriteBypassStatus });
+  if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete(), disabled: !userAdmin });
   if (actions.includes('Export')) entries.push({ label: 'Export', action: () => handleOpenExport() });
 
   return (
     <>
-      <ButtonPopover entries={entries} variant={variantButtonPopover}/>
+      <ButtonPopover entries={entries} variant={inList ? 'icon' : 'toggle'} />
       <Drawer
         open={openEdit}
         handleClose={handleCloseEdit}

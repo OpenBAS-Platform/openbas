@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
 import { CancelOutlined, PauseOutlined, PlayArrowOutlined, RestartAltOutlined } from '@mui/icons-material';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { updateExerciseStatus } from '../../../../actions/Exercise';
-import ExercisePopover, { ExerciseActionPopover } from './ExercisePopover';
+import ExercisePopover from './ExercisePopover';
 import { useHelper } from '../../../../store';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
@@ -188,17 +188,17 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
 };
 
 const ExerciseHeader = () => {
+  // Standard hooks
   const theme = useTheme<Theme>();
   const classes = useStyles();
+  const navigate = useNavigate();
+
   const { exerciseId } = useParams() as { exerciseId: ExerciseType['exercise_id'] };
   const { exercise } = useHelper((helper: ExercisesHelper) => {
     return {
       exercise: helper.getExercise(exerciseId),
     };
   });
-
-  // Button Popover
-  const actions: ExerciseActionPopover[] = ['Update', 'Duplicate', 'Export', 'Delete'];
 
   return (
     <>
@@ -213,7 +213,8 @@ const ExerciseHeader = () => {
         <Buttons exerciseId={exercise.exercise_id} exerciseStatus={exercise.exercise_status} exerciseName={exercise.exercise_name} />
         <ExercisePopover
           exercise={exercise}
-          actions={actions}
+          actions={['Update', 'Duplicate', 'Export', 'Delete']}
+          onDelete={() => navigate('/admin/exercises')}
         />
       </div>
       <div className="clearfix" />

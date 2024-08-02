@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
 import { PlayArrowOutlined, SettingsOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
+import { useNavigate } from 'react-router-dom';
 import { fetchInjectResultDto, tryAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import AtomicTestingPopover from './AtomicTestingPopover';
 import { useFormatter } from '../../../../components/i18n';
@@ -10,6 +11,7 @@ import { truncate } from '../../../../utils/String';
 import Loader from '../../../../components/Loader';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
 import type { InjectResultDTO } from '../../../../utils/api-types';
+import AtomicTestingUpdate from './AtomicTestingUpdate';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -26,9 +28,9 @@ const AtomicTestingHeader = () => {
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();
+  const navigate = useNavigate();
 
   const { injectResultDto, updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
-  const [openEditId, setOpenEditId] = useState<string | null>(null);
 
   // Launch atomic testing
   const [open, setOpen] = useState(false);
@@ -50,6 +52,11 @@ const AtomicTestingHeader = () => {
     return <Loader variant="inElement" />;
   }
 
+  // Edition
+  const [edition, setEdition] = useState(false);
+  const handleOpenEdit = () => setEdition(true);
+  const handleCloseEdit = () => setEdition(false);
+
   return (
     <>
       <Tooltip title={injectResultDto.inject_title}>
@@ -65,16 +72,23 @@ const AtomicTestingHeader = () => {
         {/* eslint-disable-next-line no-nested-ternary */}
         {injectResultDto.inject_injector_contract ? (
           !injectResultDto.inject_ready ? (
-            <Button
-              style={{ marginRight: 10 }}
-              startIcon={<SettingsOutlined />}
-              variant="contained"
-              color="warning"
-              size="small"
-              onClick={() => setOpenEditId(injectResultDto.inject_id)}
-            >
-              {t('Configure')}
-            </Button>
+            <>
+              <Button
+                style={{ marginRight: 10 }}
+                startIcon={<SettingsOutlined />}
+                variant="contained"
+                color="warning"
+                size="small"
+                onClick={handleOpenEdit}
+              >
+                {t('Configure')}
+              </Button>
+              <AtomicTestingUpdate
+                open={edition}
+                handleClose={handleCloseEdit}
+                atomic={injectResultDto}
+              />
+            </>
           ) : (
             <Button
               style={{ marginRight: 10 }}
@@ -91,9 +105,8 @@ const AtomicTestingHeader = () => {
         }
         <AtomicTestingPopover
           atomic={injectResultDto}
-          actions={['Duplicate', 'Update', 'Delete']}
-          openEdit={openEditId === injectResultDto.inject_id}
-          setOpenEdit={setOpenEditId}
+          actions={['Update', 'Duplicate', 'Delete']}
+          onDelete={() => navigate('/admin/atomic_testings')}
         />
       </div>
       <Dialog
