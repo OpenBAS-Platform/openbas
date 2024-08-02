@@ -101,7 +101,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   const theme = useTheme<Theme>();
   const { nsdt, t } = useFormatter();
   const [anchorEls, setAnchorEls] = useState<Record<string, Element | null>>({});
-  const [selectedExpectationForCreation, setSelectedExpectationForCreation] = useState<InjectExpectationsStore | null>(null);
+  const [selectedExpectationForCreation, setSelectedExpectationForCreation] = useState<{ injectExpectation: InjectExpectationsStore, sourceIds: string[] } | null>(null);
   const [selectedResultEdition, setSelectedResultEdition] = useState<{ injectExpectation: InjectExpectationsStore, expectationResult: InjectExpectationResult } | null>(null);
   const [selectedResultDeletion, setSelectedResultDeletion] = useState<{ injectExpectation: InjectExpectationsStore, expectationResult: InjectExpectationResult } | null>(null);
   const [initialized, setInitialized] = useState(false);
@@ -174,6 +174,17 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
       return { ...step, status: lastExecutionEndDate ? 'SUCCESS' : 'PENDING' };
     });
   };
+
+  const computeExistingSourceIds = (results: InjectExpectationResult[]) => {
+    const sourceIds: string[] = [];
+    results.forEach((result) => {
+      if (result.sourceId) {
+        sourceIds.push(result.sourceId);
+      }
+    });
+    return sourceIds;
+  };
+
   // Fetching data
   const { injectResultDto, updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
   useEffect(() => {
@@ -461,7 +472,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
               </Typography>
               <Grid container={true} spacing={2}>
                 {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => (
-                  <Grid key={index} item={true} xs={4}>
+                  <Grid key={index} item xs={4}>
                     <Card key={injectExpectation.inject_expectation_id} classes={{ root: classes.resultCard }}>
                       <CardHeader
                         avatar={getAvatar(injectExpectation, expectationResult)}
@@ -502,15 +513,22 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                     </Card>
                   </Grid>
                 ))}
-                {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type) || (injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.length === 0)) && (
-                <Grid item={true} xs={4}>
-                  <Card classes={{ root: classes.resultCardDummy }}>
-                    <CardActionArea classes={{ root: classes.area }} onClick={() => setSelectedExpectationForCreation(injectExpectation)}>
-                      <AddBoxOutlined />
-                    </CardActionArea>
-                  </Card>
-                </Grid>
-                )}
+                {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type)
+                  || (injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.length === 0))
+                  && (
+                  <Grid item xs={4}>
+                    <Card classes={{ root: classes.resultCardDummy }}>
+                      <CardActionArea
+                        classes={{ root: classes.area }}
+                        onClick={() => setSelectedExpectationForCreation(
+                          { injectExpectation, sourceIds: computeExistingSourceIds(injectExpectation.inject_expectation_results ?? []) },
+                        )}
+                      >
+                        <AddBoxOutlined />
+                      </CardActionArea>
+                    </Card>
+                  </Grid>
+                  )}
               </Grid>
               <Divider style={{ marginTop: 20 }} />
             </div>
@@ -526,8 +544,14 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
             <DialogContent>
               {selectedExpectationForCreation && (
                 <>
-                  {selectedExpectationForCreation.inject_expectation_type === 'MANUAL' && <ManualExpectationsValidationForm expectation={selectedExpectationForCreation as InjectExpectationsStore} onUpdate={onUpdateValidation} />}
-                  {['DETECTION', 'PREVENTION'].includes(selectedExpectationForCreation.inject_expectation_type) && <DetectionPreventionExpectationsValidationForm expectation={selectedExpectationForCreation as InjectExpectationsStore} onUpdate={onUpdateValidation} />}
+                  {selectedExpectationForCreation.injectExpectation.inject_expectation_type === 'MANUAL'
+                    && <ManualExpectationsValidationForm expectation={selectedExpectationForCreation.injectExpectation} onUpdate={onUpdateValidation} />}
+                  {['DETECTION', 'PREVENTION'].includes(selectedExpectationForCreation.injectExpectation.inject_expectation_type)
+                    && <DetectionPreventionExpectationsValidationForm
+                      expectation={selectedExpectationForCreation.injectExpectation}
+                      sourceIds={selectedExpectationForCreation.sourceIds}
+                      onUpdate={onUpdateValidation}
+                       />}
                 </>
               )}
             </DialogContent>
@@ -543,8 +567,19 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
             <DialogContent>
               {selectedResultEdition && selectedResultEdition.injectExpectation && (
                 <>
-                  {selectedResultEdition.injectExpectation.inject_expectation_type === 'MANUAL' && <ManualExpectationsValidationForm expectation={selectedResultEdition.injectExpectation as InjectExpectationsStore} onUpdate={onUpdateValidation} />}
-                  {['DETECTION', 'PREVENTION'].includes(selectedResultEdition.injectExpectation.inject_expectation_type) && <DetectionPreventionExpectationsValidationForm expectation={selectedResultEdition.injectExpectation as InjectExpectationsStore} result={selectedResultEdition.expectationResult as InjectExpectationResult} onUpdate={onUpdateValidation} />}
+                  {selectedResultEdition.injectExpectation.inject_expectation_type === 'MANUAL'
+                    && <ManualExpectationsValidationForm
+                      expectation={selectedResultEdition.injectExpectation}
+                      onUpdate={onUpdateValidation}
+                       />
+                  }
+                  {['DETECTION', 'PREVENTION'].includes(selectedResultEdition.injectExpectation.inject_expectation_type)
+                    && <DetectionPreventionExpectationsValidationForm
+                      expectation={selectedResultEdition.injectExpectation}
+                      result={selectedResultEdition.expectationResult}
+                      onUpdate={onUpdateValidation}
+                       />
+                  }
                 </>
               )}
             </DialogContent>

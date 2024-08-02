@@ -31,9 +31,21 @@ interface Props {
   fieldValue: string;
   fieldOnChange: (value: string) => void;
   errors: FieldErrors;
+  filterOptions: (securityPlatform: SecurityPlatform) => boolean;
   style: CSSProperties;
-  onlyManual?: boolean;
+  editing: boolean;
 }
+
+const securityPlatformsToOptions = (securityPlatforms: SecurityPlatform[], filterOptions: (securityPlatform: SecurityPlatform) => boolean) => {
+  return securityPlatforms
+    .filter(filterOptions)
+    .map((n) => ({
+      id: n.asset_id,
+      label: n.asset_name,
+      logo_dark: n.security_platform_logo_dark,
+      logo_light: n.security_platform_logo_light,
+    }));
+};
 
 const SecurityPlatformField: FunctionComponent<Props> = ({
   name,
@@ -41,41 +53,32 @@ const SecurityPlatformField: FunctionComponent<Props> = ({
   fieldValue,
   fieldOnChange,
   errors,
+  filterOptions,
   style,
-  onlyManual,
+  editing,
 }) => {
   // Standard hooks
   const theme = useTheme<Theme>();
   const classes = useStyles();
+  const dispatch = useAppDispatch();
 
   // Fetching data
-  const { securityPlatforms }: { securityPlatforms: [SecurityPlatform]; } = useHelper((helper: SecurityPlatformHelper) => ({
+  const { securityPlatforms }: { securityPlatforms: SecurityPlatform[]; } = useHelper((helper: SecurityPlatformHelper) => ({
     securityPlatforms: helper.getSecurityPlatforms(),
   }));
-  const dispatch = useAppDispatch();
   useDataLoader(() => {
     dispatch(fetchSecurityPlatforms());
   });
 
   // Form
-  const securityPlatformsOptions = securityPlatforms
-    .filter((n) => (onlyManual ? n.asset_external_reference === null : true))
-    .map(
-      (n) => ({
-        id: n.asset_id,
-        label: n.asset_name,
-        logo_dark: n.security_platform_logo_dark,
-        logo_light: n.security_platform_logo_light,
-      }),
-    );
-  const valueResolver = () => {
-    return securityPlatformsOptions.filter((securityPlatform) => fieldValue === securityPlatform.id).at(0);
-  };
+  const securityPlatformsOptions = securityPlatformsToOptions(securityPlatforms, filterOptions);
+
+  const selectedValue = securityPlatformsOptions.find((option) => option.id === fieldValue) || null;
 
   return (
     <div style={{ position: 'relative' }}>
       <MuiAutocomplete
-        value={valueResolver()}
+        value={selectedValue}
         size="small"
         multiple={false}
         selectOnFocus
@@ -83,6 +86,7 @@ const SecurityPlatformField: FunctionComponent<Props> = ({
         clearOnBlur={false}
         clearOnEscape={false}
         options={securityPlatformsOptions}
+        disabled={editing}
         onChange={(_, value) => {
           fieldOnChange(value?.id ?? '');
         }}
