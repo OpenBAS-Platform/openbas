@@ -4,7 +4,6 @@ import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.Executor;
 import io.openbas.database.model.Inject;
-import io.openbas.database.model.Injector;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.service.CalderaExecutorContextService;
 import io.openbas.executors.openbas.service.OpenBASExecutorContextService;

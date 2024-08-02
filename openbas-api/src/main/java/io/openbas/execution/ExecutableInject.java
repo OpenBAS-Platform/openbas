@@ -3,12 +3,10 @@ package io.openbas.execution;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.openbas.database.model.*;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 public class ExecutableInject {

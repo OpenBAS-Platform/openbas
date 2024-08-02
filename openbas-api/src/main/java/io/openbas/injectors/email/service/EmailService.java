@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.openbas.database.model.InjectStatusExecution.*;
-import static io.openbas.helper.TemplateHelper.buildContextualContent;
+import static io.openbas.utils.TemplateHelper.buildContextualContent;
 import static java.util.stream.Collectors.joining;
 
 @Component

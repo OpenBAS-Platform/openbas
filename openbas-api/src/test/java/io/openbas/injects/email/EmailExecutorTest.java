@@ -10,7 +10,6 @@ import io.openbas.database.repository.UserRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
-import io.openbas.injectors.email.EmailContract;
 import io.openbas.injectors.email.EmailExecutor;
 import io.openbas.injectors.email.model.EmailContent;
 import io.openbas.model.ExecutionProcess;
