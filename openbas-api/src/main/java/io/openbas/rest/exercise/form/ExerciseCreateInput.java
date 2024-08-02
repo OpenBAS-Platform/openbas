@@ -1,6 +1,7 @@
 package io.openbas.rest.exercise.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
@@ -42,6 +43,7 @@ public class ExerciseCreateInput {
   @JsonProperty("exercise_description")
   private String description;
 
+  @Schema(nullable = true)
   @JsonProperty("exercise_start_date")
   @FutureOrPresent(message = NOW_FUTURE_MESSAGE)
   @Getter(NONE)

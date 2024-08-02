@@ -28,7 +28,7 @@ const ExerciseCreationForm: FunctionComponent<Props> = ({
     exercise_severity: 'high',
     exercise_subtitle: '',
     exercise_description: '',
-    exercise_start_date: '',
+    exercise_start_date: null,
     exercise_tags: [],
   },
 }) => {
@@ -51,7 +51,7 @@ const ExerciseCreationForm: FunctionComponent<Props> = ({
         exercise_main_focus: z.string().optional(),
         exercise_severity: z.string().optional(),
         exercise_description: z.string().optional(),
-        exercise_start_date: z.string().optional(),
+        exercise_start_date: z.string().datetime().optional().nullable(),
         exercise_tags: z.string().array().optional(),
       }),
     ),
@@ -160,7 +160,7 @@ const ExerciseCreationForm: FunctionComponent<Props> = ({
         name="exercise_start_date"
         render={({ field }) => (
           <MuiDateTimePicker
-            value={field.value ? new Date(field.value) : ''}
+            value={field.value ? new Date(field.value) : null}
             label={t('Start date (optional)')}
             minDateTime={new Date()}
             slotProps={{
@@ -169,14 +169,10 @@ const ExerciseCreationForm: FunctionComponent<Props> = ({
                 fullWidth: true,
                 style: { marginTop: 20 },
                 error: !!errors.exercise_start_date,
-                helperText: errors.exercise_start_date && errors.exercise_start_date?.message,
+                helperText: errors.exercise_start_date?.message,
               },
             }}
-            onChange={(date) => {
-              if (date instanceof Date) {
-                field.onChange(date?.toISOString());
-              }
-            }}
+            onChange={(date) => field.onChange(date?.toISOString())}
             ampm={false}
             format="yyyy-MM-dd HH:mm:ss"
           />

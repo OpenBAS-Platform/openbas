@@ -182,11 +182,9 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
               render={({ field, fieldState }) => (
                 <DateTimePicker
                   views={['year', 'month', 'day']}
-                  value={(field.value)}
-                  minDate={new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()}
-                  onChange={(startDate) => {
-                    return (startDate ? field.onChange(new Date(startDate).toISOString()) : field.onChange(''));
-                  }}
+                  value={field.value ? new Date(field.value) : null}
+                  minDate={new Date(new Date().setUTCHours(0, 0, 0, 0))}
+                  onChange={(startDate) => field.onChange(startDate?.toISOString())}
                   onAccept={() => {
                     clearErrors('time');
                   }}
@@ -194,7 +192,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                     textField: {
                       fullWidth: true,
                       error: !!fieldState.error,
-                      helperText: fieldState.error && fieldState.error?.message,
+                      helperText: fieldState.error?.message,
                     },
                   }}
                   label={t('Start date')}
@@ -276,14 +274,14 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                   skipDisabled
                   thresholdToRenderTimeInASingleColumn={100}
                   closeOnSelect={false}
-                  value={field.value}
-                  minTime={['noRepeat'].includes(selectRecurring) && new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() === new Date(getValues('startDate')).getTime() ? new Date().toISOString() : null}
-                  onChange={(time) => (time ? field.onChange(new Date(time).toISOString()) : field.onChange(''))}
+                  value={field.value ? new Date(field.value) : null}
+                  minTime={['noRepeat'].includes(selectRecurring) && new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() === new Date(getValues('startDate')).getTime() ? new Date() : undefined}
+                  onChange={(time) => (field.onChange(time?.toISOString()))}
                   slotProps={{
                     textField: {
                       fullWidth: true,
                       error: !!fieldState.error,
-                      helperText: fieldState.error && fieldState.error?.message,
+                      helperText: fieldState.error?.message,
                     },
                   }}
                 />
@@ -297,16 +295,16 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                 render={({ field, fieldState }) => (
                   <DateTimePicker
                     views={['year', 'month', 'day']}
-                    value={(field.value || null)}
-                    minDate={new Date(new Date().setUTCHours(24, 0, 0, 0)).toISOString()}
+                    value={field.value ? new Date(field.value) : null}
+                    minDate={new Date(new Date().setUTCHours(24, 0, 0, 0))}
                     onChange={(endDate) => {
-                      return (endDate ? field.onChange(new Date(new Date(endDate).setUTCHours(0, 0, 0, 0)).toISOString()) : field.onChange(''));
+                      return (endDate ? field.onChange(new Date(new Date(endDate).setUTCHours(0, 0, 0, 0)).toISOString()) : null);
                     }}
                     slotProps={{
                       textField: {
                         fullWidth: true,
                         error: !!fieldState.error,
-                        helperText: fieldState.error && fieldState.error?.message,
+                        helperText: fieldState.error?.message,
                       },
                     }}
                     label={t('End date')}

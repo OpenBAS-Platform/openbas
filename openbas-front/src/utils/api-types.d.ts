@@ -621,7 +621,7 @@ export interface Endpoint {
 export interface EndpointInput {
   asset_description?: string;
   /** @format date-time */
-  asset_last_seen?: string;
+  asset_last_seen?: string | null;
   asset_name: string;
   asset_tags?: string[];
   endpoint_agent_version?: string;
@@ -640,7 +640,7 @@ export interface EndpointRegisterInput {
   asset_description?: string;
   asset_external_reference: string;
   /** @format date-time */
-  asset_last_seen?: string;
+  asset_last_seen?: string | null;
   asset_name: string;
   asset_tags?: string[];
   endpoint_agent_version?: string;
@@ -766,7 +766,7 @@ export interface ExerciseCreateInput {
   exercise_name: string;
   exercise_severity?: string;
   /** @format date-time */
-  exercise_start_date?: string;
+  exercise_start_date?: string | null;
   exercise_subtitle?: string;
   exercise_tags?: string[];
 }
@@ -2869,7 +2869,7 @@ export interface SecurityPlatform {
 export interface SecurityPlatformInput {
   asset_description?: string;
   /** @format date-time */
-  asset_last_seen?: string;
+  asset_last_seen?: string | null;
   asset_name: string;
   asset_tags?: string[];
   security_platform_logo_dark?: string;
@@ -2881,7 +2881,7 @@ export interface SecurityPlatformUpsertInput {
   asset_description?: string;
   asset_external_reference?: string;
   /** @format date-time */
-  asset_last_seen?: string;
+  asset_last_seen?: string | null;
   asset_name: string;
   asset_tags?: string[];
   security_platform_logo_dark?: string;
