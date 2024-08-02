@@ -59,7 +59,6 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, inje
         {...props}
       />
     </Drawer>
-
   );
 };
 
