@@ -9,6 +9,7 @@ import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -44,12 +45,13 @@ public class Asset implements Base {
   @Column(name = "asset_type", insertable = false, updatable = false)
   @JsonProperty("asset_type")
   @Setter(NONE)
+  @NotBlank
   private String type;
 
   @Queryable(searchable = true, sortable = true)
-  @NotBlank
   @Column(name = "asset_name")
   @JsonProperty("asset_name")
+  @NotBlank
   private String name;
 
   @Column(name = "asset_description")
@@ -116,10 +118,12 @@ public class Asset implements Base {
 
   @Column(name = "asset_created_at")
   @JsonProperty("asset_created_at")
+  @NotNull
   private Instant createdAt = now();
 
   @Column(name = "asset_updated_at")
   @JsonProperty("asset_updated_at")
+  @NotNull
   private Instant updatedAt = now();
 
   @Override

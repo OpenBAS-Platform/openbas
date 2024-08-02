@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -23,11 +25,13 @@ import static java.time.Instant.now;
 @Table(name = "lessons_categories")
 @EntityListeners(ModelBaseListener.class)
 public class LessonsCategory implements Base {
+
     @Id
     @Column(name = "lessons_category_id")
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("lessonscategory_id")
+    @NotBlank
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,14 +48,17 @@ public class LessonsCategory implements Base {
 
     @Column(name = "lessons_category_created_at")
     @JsonProperty("lessons_category_created_at")
+    @NotNull
     private Instant created = now();
 
     @Column(name = "lessons_category_updated_at")
     @JsonProperty("lessons_category_updated_at")
+    @NotNull
     private Instant updated = now();
 
     @Column(name = "lessons_category_name")
     @JsonProperty("lessons_category_name")
+    @NotBlank
     private String name;
 
     @Column(name = "lessons_category_description")

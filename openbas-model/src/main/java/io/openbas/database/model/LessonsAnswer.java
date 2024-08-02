@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
@@ -12,21 +15,25 @@ import java.util.Objects;
 
 import static java.time.Instant.now;
 
+@Setter
 @Entity
 @Table(name = "lessons_answers")
 @EntityListeners(ModelBaseListener.class)
 public class LessonsAnswer implements Base {
+
     @Id
     @Column(name = "lessons_answer_id")
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("lessonsanswer_id")
+    @NotBlank
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lessons_answer_question")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("lessons_answer_question")
+    @NotNull
     private LessonsQuestion question;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,10 +44,12 @@ public class LessonsAnswer implements Base {
 
     @Column(name = "lessons_answer_created_at")
     @JsonProperty("lessons_answer_created_at")
+    @NotNull
     private Instant created = now();
 
     @Column(name = "lessons_answer_updated_at")
     @JsonProperty("lessons_answer_updated_at")
+    @NotNull
     private Instant updated = now();
 
     @Column(name = "lessons_answer_positive")
@@ -53,6 +62,7 @@ public class LessonsAnswer implements Base {
 
     @Column(name = "lessons_answer_score")
     @JsonProperty("lessons_answer_score")
+    @NotNull
     private Integer score;
 
     @Override
@@ -60,67 +70,35 @@ public class LessonsAnswer implements Base {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public LessonsQuestion getQuestion() {
+  public LessonsQuestion getQuestion() {
         return question;
     }
 
-    public void setQuestion(LessonsQuestion question) {
-        this.question = question;
-    }
-
-    public User getUser() {
+  public User getUser() {
         return user;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Instant getCreated() {
+  public Instant getCreated() {
         return created;
     }
 
-    public void setCreated(Instant created) {
-        this.created = created;
-    }
-
-    public Instant getUpdated() {
+  public Instant getUpdated() {
         return updated;
     }
 
-    public void setUpdated(Instant updated) {
-        this.updated = updated;
-    }
-
-    public String getPositive() {
+  public String getPositive() {
         return positive;
     }
 
-    public void setPositive(String positive) {
-        this.positive = positive;
-    }
-
-    public String getNegative() {
+  public String getNegative() {
         return negative;
     }
 
-    public void setNegative(String negative) {
-        this.negative = negative;
-    }
-
-    public Integer getScore() {
+  public Integer getScore() {
         return score;
     }
 
-    public void setScore(Integer score) {
-        this.score = score;
-    }
-
-    // region transient
+  // region transient
     @JsonProperty("lessons_answer_exercise")
     public String getExercise() {
         return getQuestion().getCategory().getExercise().getId();

@@ -5,6 +5,7 @@ import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -23,6 +24,7 @@ public class KillChainPhase implements Base {
   @GeneratedValue(generator = "UUID")
   @UuidGenerator
   @JsonProperty("phase_id")
+  @NotBlank
   private String id;
 
   @Column(name = "phase_external_id")
@@ -37,15 +39,18 @@ public class KillChainPhase implements Base {
   @Queryable(searchable = true, filterable = true, sortable = true)
   @Column(name = "phase_name")
   @JsonProperty("phase_name")
+  @NotBlank
   private String name;
 
   @Column(name = "phase_shortname")
   @JsonProperty("phase_shortname")
+  @NotBlank
   private String shortName;
 
   @Queryable(searchable = true, sortable = true)
   @Column(name = "phase_kill_chain_name")
   @JsonProperty("phase_kill_chain_name")
+  @NotBlank
   private String killChainName;
 
   @Column(name = "phase_description")
@@ -60,10 +65,12 @@ public class KillChainPhase implements Base {
   @Queryable(sortable = true)
   @Column(name = "phase_created_at")
   @JsonProperty("phase_created_at")
+  @NotNull
   private Instant createdAt = now();
 
   @Column(name = "phase_updated_at")
   @JsonProperty("phase_updated_at")
+  @NotNull
   private Instant updatedAt = now();
 
 }
