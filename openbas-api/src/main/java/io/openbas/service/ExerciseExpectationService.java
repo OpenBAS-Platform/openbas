@@ -6,6 +6,7 @@ import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.model.InjectExpectationResult;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static java.time.Instant.now;
 
@@ -109,15 +107,31 @@ public class ExerciseExpectationService {
     }
 
     private void computeExpectationsForTeamsAndPlayer(InjectExpectation updated, String result) {
-        if (updated.getUser() != null) { //If the updated expectation was a player expectation, We have to update the team expectation using expectation of player (based on validation type)
-            InjectExpectation parentExpectation = injectExpectationRepository.findByInjectAndTeamAndExpectationNameAndUserIsNull(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()).orElseThrow();
+        if (updated.getUser() != null) { //If the updated expectation was a player expectation, We have to update the team expectation using expectation of players (based on validation type)
+            List<InjectExpectation> toProcess = injectExpectationRepository.findAllByInjectAndTeamAndExpectationName(updated.getInject().getId(), updated.getTeam().getId(), updated.getName());
+            InjectExpectation parentExpectation = toProcess.stream().filter(exp -> exp.getUser() == null).findFirst().orElseThrow(ElementNotFoundException::new);
+            int playerSize = toProcess.size() - 1; // Without Parent expectation
+            long nullPlayerResponses = toProcess.stream().filter(exp -> exp.getUser() != null).map(exp -> exp.getScore() == null).count();
+            long zeroPlayerResponses = toProcess.stream().filter(exp -> exp.getUser() != null).map(exp -> exp.getScore() == 0.0).count();
+
             if (updated.isExpectationGroup()) { //If true is at least one
-                parentExpectation.setScore(injectExpectationRepository.computeAverageScoreWhenValidationTypeIsAtLeastOnePlayer(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()));
-                result = parentExpectation.getScore() != null && parentExpectation.getScore() > 0 ? "Success" : "Failed";
+                OptionalDouble avgAtLeastOnePlayer = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp -> exp.getScore() > 0.0).mapToDouble(InjectExpectation::getScore).average();
+                if (avgAtLeastOnePlayer.isPresent()) { //Any response is positive
+                    parentExpectation.setScore(avgAtLeastOnePlayer.getAsDouble());
+                    result = "Success";
+                } else {
+                    if (zeroPlayerResponses == playerSize) { //All players had failed
+                        parentExpectation.setScore(0.0);
+                        result = "Failed";
+                    } else {
+                        parentExpectation.setScore(null);
+                        result = "Pending";
+                    }
+                }
             } else { // all
-                parentExpectation.setScore(injectExpectationRepository.computeAverageScoreWhenValidationTypeIsAllPlayers(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()));
-                // All players should give an answer
-                result = injectExpectationRepository.countExpectationsWithScoreNullOrZero(updated.getInject().getId(), updated.getTeam().getId(), updated.getName()) == 0 ? "Success": "Failed";
+                OptionalDouble avgAllPlayer = toProcess.stream().filter(exp -> exp.getUser() != null).mapToDouble(InjectExpectation::getScore).average();
+                parentExpectation.setScore(nullPlayerResponses == 0 ? avgAllPlayer.getAsDouble() : null);
+                result = nullPlayerResponses == 0 ? avgAllPlayer.getAsDouble() > 0 ? "Success" : "Failed" : "Pending";
             }
             InjectExpectationResult expectationResult = InjectExpectationResult.builder()
                     .sourceId("player-manual-validation")

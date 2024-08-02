@@ -68,17 +68,15 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
     @Query("select ie from InjectExpectation ie " +
             "where ie.inject.id = :injectId " +
             "and ie.team.id = :teamId " +
-            "and ie.name = :expectationName " +
-            "and ie.user is not null")
-    List<InjectExpectation> findAllByInjectAndTeamAndExpectationNameAndUserIsNotNull(final String injectId, final String teamId, final String expectationName);
+            "and ie.name = :expectationName ")
+    List<InjectExpectation> findAllByInjectAndTeamAndExpectationName(final String injectId, final String teamId, final String expectationName);
 
-    @Query("select AVG(ie.score) from InjectExpectation ie " +
+    @Query("select ie from InjectExpectation ie " +
             "where ie.inject.id = :injectId " +
             "and ie.team.id = :teamId " +
             "and ie.name = :expectationName " +
-            "and ie.user is not null " +
-            "and ie.score > 0")
-    Double computeAverageScoreWhenValidationTypeIsAtLeastOnePlayer(final String injectId, final String teamId, final String expectationName);
+            "and ie.user is not null")
+    List<InjectExpectation> findAllByInjectAndTeamAndExpectationNameAndUserIsNotNull(final String injectId, final String teamId, final String expectationName);
 
     @Query("select AVG(ie.score) from InjectExpectation ie " +
             "where ie.exercise.id = :exerciseId " +
@@ -99,13 +97,6 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
     Double computeAverageScoreWhenValidationTypeIsAtLeastOnePlayerForChannel(final List<String> injectIds, final List<String> articleIds, final String teamId);
 
     @Query("select AVG(COALESCE(ie.score, 0)) from InjectExpectation ie " +
-            "where ie.inject.id = :injectId " +
-            "and ie.team.id = :teamId " +
-            "and ie.name = :expectationName " +
-            "and ie.user is not null")
-    Double computeAverageScoreWhenValidationTypeIsAllPlayers(final String injectId, final String teamId, final String expectationName);
-
-    @Query("select AVG(COALESCE(ie.score, 0)) from InjectExpectation ie " +
             "where ie.exercise.id = :exerciseId " +
             "and ie.challenge.id = :challengeId " +
             "and ie.team.id = :teamId " +
@@ -120,13 +111,6 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
             "and ie.user is not null " +
             "and ie.type = 'ARTICLE' ")
     Double computeAverageScoreWhenValidationTypeIsAllPlayersForChannel(final List<String> injectIds, final List<String> articleIds, final String teamId);
-
-    @Query("select count(ie) from InjectExpectation ie where ie.inject.id = :injectId " +
-            "and ie.team.id = :teamId " +
-            "and ie.name = :expectationName " +
-            "and ie.user is not null " +
-            "and (ie.score is null or ie.score = 0)")
-    Integer countExpectationsWithScoreNullOrZero(final String injectId, final String teamId, final String expectationName);
 
     // -- RETRIEVE EXPECTATIONS FOR TEAM AND NOT FOR PLAYERS
     @Query("select ie from InjectExpectation ie where ie.inject.id = :injectId and ie.team.id = :teamId and ie.name = :expectationName and ie.user is null")
