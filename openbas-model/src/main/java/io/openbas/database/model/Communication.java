@@ -7,11 +7,14 @@ import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.UuidGenerator;
-import org.hibernate.annotations.Type;
-
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UuidGenerator;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +22,7 @@ import java.util.Objects;
 
 import static java.time.Instant.now;
 
+@Setter
 @Entity
 @Table(name = "communications")
 @EntityListeners(ModelBaseListener.class)
@@ -29,18 +33,22 @@ public class Communication implements Base {
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("communication_id")
+    @NotBlank
     private String id;
 
     @Column(name = "communication_message_id")
     @JsonProperty("communication_message_id")
+    @NotBlank
     private String identifier;
 
     @Column(name = "communication_received_at")
     @JsonProperty("communication_received_at")
+    @NotNull
     private Instant receivedAt = now();
 
     @Column(name = "communication_sent_at")
     @JsonProperty("communication_sent_at")
+    @NotNull
     private Instant sentAt = now();
 
     @Column(name = "communication_subject")
@@ -84,10 +92,12 @@ public class Communication implements Base {
 
     @Column(name = "communication_from")
     @JsonProperty("communication_from")
+    @NotBlank
     private String from;
 
     @Column(name = "communication_to")
     @JsonProperty("communication_to")
+    @NotBlank
     private String to;
 
     @Override
@@ -95,115 +105,59 @@ public class Communication implements Base {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Instant getReceivedAt() {
+  public Instant getReceivedAt() {
         return receivedAt;
     }
 
-    public void setReceivedAt(Instant receivedAt) {
-        this.receivedAt = receivedAt;
-    }
-
-    public Instant getSentAt() {
+  public Instant getSentAt() {
         return sentAt;
     }
 
-    public void setSentAt(Instant sentAt) {
-        this.sentAt = sentAt;
-    }
-
-    public String getSubject() {
+  public String getSubject() {
         return subject;
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public String getContent() {
+  public String getContent() {
         return content;
     }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getContentHtml() {
+  public String getContentHtml() {
         return contentHtml;
     }
 
-    public void setContentHtml(String contentHtml) {
-        this.contentHtml = contentHtml;
-    }
-
-    public Inject getInject() {
+  public Inject getInject() {
         return inject;
     }
 
-    public void setInject(Inject inject) {
-        this.inject = inject;
-    }
-
-    public List<User> getUsers() {
+  public List<User> getUsers() {
         return users;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
-
-    public String getIdentifier() {
+  public String getIdentifier() {
         return identifier;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
-    }
-
-    public Boolean getAck() {
+  public Boolean getAck() {
         return ack;
     }
 
-    public void setAck(Boolean ack) {
-        this.ack = ack;
-    }
-
-    public Boolean getAnimation() {
+  public Boolean getAnimation() {
         return animation;
     }
 
-    public void setAnimation(Boolean animation) {
-        this.animation = animation;
-    }
-
-    public String getFrom() {
+  public String getFrom() {
         return from;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
-    public String getTo() {
+  public String getTo() {
         return to;
     }
 
-    public void setTo(String to) {
-        this.to = to;
-    }
-
-    public String[] getAttachments() {
+  public String[] getAttachments() {
         return attachments;
     }
 
-    public void setAttachments(String[] attachments) {
-        this.attachments = attachments;
-    }
-
-    @JsonProperty("communication_exercise")
+  @JsonProperty("communication_exercise")
     public String getExercise() {
         return this.inject.getExercise() != null ? this.inject.getExercise().getId() : StringUtils.EMPTY;
     }

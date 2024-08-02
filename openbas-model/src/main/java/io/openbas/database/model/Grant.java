@@ -3,6 +3,8 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -26,11 +28,13 @@ public class Grant implements Base {
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("grant_id")
+    @NotBlank
     private String id;
 
     @Column(name = "grant_name")
     @JsonProperty("grant_name")
     @Enumerated(EnumType.STRING)
+    @NotNull
     private GRANT_TYPE name;
 
     @ManyToOne(fetch = FetchType.LAZY)

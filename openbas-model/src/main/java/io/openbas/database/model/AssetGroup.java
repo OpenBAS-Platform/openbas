@@ -10,6 +10,7 @@ import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.Getter;
 import org.hibernate.annotations.Type;
@@ -44,10 +45,10 @@ public class AssetGroup implements Base {
   @NotBlank
   private String id;
 
-  @NotBlank
   @Column(name = "asset_group_name")
   @JsonProperty("asset_group_name")
   @Queryable(searchable = true, sortable = true)
+  @NotBlank
   private String name;
 
   @Column(name = "asset_group_description")
@@ -96,10 +97,12 @@ public class AssetGroup implements Base {
 
   @Column(name = "asset_group_created_at")
   @JsonProperty("asset_group_created_at")
+  @NotNull
   private Instant createdAt = now();
 
   @Column(name = "asset_group_updated_at")
   @JsonProperty("asset_group_updated_at")
+  @NotNull
   private Instant updatedAt = now();
 
   @Override

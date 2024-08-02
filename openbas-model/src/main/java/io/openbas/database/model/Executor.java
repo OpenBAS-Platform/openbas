@@ -6,6 +6,7 @@ import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -15,50 +16,46 @@ import java.util.Objects;
 
 import static java.time.Instant.now;
 
+@Getter
 @Setter
 @Entity
 @Table(name = "executors")
 @EntityListeners(ModelBaseListener.class)
 public class Executor implements Base {
 
-    @Getter
     @Id
     @Column(name = "executor_id")
     @JsonProperty("executor_id")
     @NotBlank
     private String id;
 
-    @Getter
     @Column(name = "executor_name")
     @JsonProperty("executor_name")
     @NotBlank
     private String name;
 
-    @Getter
     @Column(name = "executor_type")
     @JsonProperty("executor_type")
     @NotBlank
     private String type;
 
-    @Getter
     @Type(StringArrayType.class)
     @Column(name = "executor_platforms", columnDefinition = "text[]")
     @JsonProperty("executor_platforms")
     private String[] platforms = new String[0];
 
-    @Getter
     @Column(name = "executor_doc")
     @JsonProperty("executor_doc")
     private String doc;
 
-    @Getter
     @Column(name = "executor_created_at")
     @JsonProperty("executor_created_at")
+    @NotNull
     private Instant createdAt = now();
 
-    @Getter
     @Column(name = "executor_updated_at")
     @JsonProperty("executor_updated_at")
+    @NotNull
     private Instant updatedAt = now();
 
     @JsonIgnore

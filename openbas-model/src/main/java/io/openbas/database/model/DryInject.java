@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
+@Setter
 @Entity
 @Table(name = "dryinjects")
 @EntityListeners(ModelBaseListener.class)
@@ -25,7 +27,6 @@ public class DryInject implements Base, Injection {
   public static final Comparator<DryInject> executionComparator = Comparator.comparing(o -> o.getDate().orElseThrow());
 
   @Getter
-  @Setter
   @Id
   @Column(name = "dryinject_id")
   @GeneratedValue(generator = "UUID")
@@ -33,13 +34,12 @@ public class DryInject implements Base, Injection {
   @JsonProperty("dryinject_id")
   private String id;
 
-  @Setter
   @Column(name = "dryinject_date")
   @JsonProperty("dryinject_date")
+  @NotNull
   private Instant date;
 
   @Getter
-  @Setter
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "dryinject_dryrun")
   @JsonSerialize(using = MonoIdDeserializer.class)
@@ -47,15 +47,12 @@ public class DryInject implements Base, Injection {
   private Dryrun run;
 
   @Getter
-  @Setter
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "dryinject_inject")
   @JsonProperty("dryinject_inject")
   private Inject inject;
 
   // CascadeType.ALL is required here because dry inject status are embedded
-  @Getter
-  @Setter
   @OneToOne(mappedBy = "dryInject", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonProperty("dryinject_status")
   private DryInjectStatus status;

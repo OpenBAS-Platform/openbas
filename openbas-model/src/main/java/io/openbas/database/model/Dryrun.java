@@ -7,6 +7,9 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
@@ -16,10 +19,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "dryruns")
 @EntityListeners(ModelBaseListener.class)
 public class Dryrun implements Base {
+
     @Id
     @Column(name = "dryrun_id")
     @GeneratedValue(generator = "UUID")
@@ -38,6 +44,7 @@ public class Dryrun implements Base {
 
     @Column(name = "dryrun_date")
     @JsonProperty("dryrun_date")
+    @NotNull
     private Instant date;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -81,68 +88,12 @@ public class Dryrun implements Base {
     }
     // endregion
 
-    public String getId() {
-        return id;
-    }
-
-    @Override
+  @Override
     public boolean isUserHasAccess(User user) {
         return exercise.isUserHasAccess(user);
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Instant getDate() {
-        return date;
-    }
-
-    public void setDate(Instant date) {
-        this.date = date;
-    }
-
-    public int getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
-    public Exercise getExercise() {
-        return exercise;
-    }
-
-    public void setExercise(Exercise exercise) {
-        this.exercise = exercise;
-    }
-
-    public List<DryInject> getInjects() {
-        return injects;
-    }
-
-    public void setInjects(List<DryInject> injects) {
-        this.injects = injects;
-    }
-
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
-
-    @Override
+  @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;

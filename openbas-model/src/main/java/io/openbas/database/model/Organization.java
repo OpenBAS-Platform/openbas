@@ -9,6 +9,7 @@ import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -24,6 +25,7 @@ import static java.util.stream.StreamSupport.stream;
 @Table(name = "organizations")
 @EntityListeners(ModelBaseListener.class)
 public class Organization implements Base {
+
     @Id
     @Column(name = "organization_id")
     @GeneratedValue(generator = "UUID")
@@ -35,6 +37,7 @@ public class Organization implements Base {
     @Column(name = "organization_name")
     @JsonProperty("organization_name")
     @Queryable(searchable = true)
+    @NotBlank
     private String name;
 
     @Column(name = "organization_description")
@@ -43,10 +46,12 @@ public class Organization implements Base {
 
     @Column(name = "organization_created_at")
     @JsonProperty("organization_created_at")
+    @NotNull
     private Instant createdAt = now();
 
     @Column(name = "organization_updated_at")
     @JsonProperty("organization_updated_at")
+    @NotNull
     private Instant updatedAt = now();
 
     @OneToMany(mappedBy = "organization", fetch = FetchType.LAZY)

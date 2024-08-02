@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
-import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +25,13 @@ import static java.time.Instant.now;
 @Table(name = "objectives")
 @EntityListeners(ModelBaseListener.class)
 public class Objective implements Base {
+
     @Id
     @Column(name = "objective_id")
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("objective_id")
+    @NotBlank
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,10 +60,12 @@ public class Objective implements Base {
 
     @Column(name = "objective_created_at")
     @JsonProperty("objective_created_at")
+    @NotNull
     private Instant createdAt = now();
 
     @Column(name = "objective_updated_at")
     @JsonProperty("objective_updated_at")
+    @NotNull
     private Instant updatedAt = now();
 
     @OneToMany(mappedBy = "objective", fetch = FetchType.LAZY)
