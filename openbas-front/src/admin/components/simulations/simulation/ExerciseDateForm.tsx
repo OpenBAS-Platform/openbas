@@ -16,8 +16,8 @@ interface Props {
 }
 
 interface ExerciseStartDateAndTime {
-  date: string;
-  time: string;
+  date: Date;
+  time: Date;
 }
 
 // eslint-disable-next-line no-underscore-dangle
@@ -32,11 +32,11 @@ const ExerciseDateForm: React.FC<Props> = ({
 
   const defaultFormValues = () => {
     if (initialValues?.exercise_start_date) {
-      return ({ date: initialValues.exercise_start_date, time: initialValues.exercise_start_date });
+      return ({ date: new Date(initialValues.exercise_start_date), time: new Date(initialValues.exercise_start_date) });
     }
     return ({
-      date: new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString(),
-      time: minutesInFuture(5).toISOString(),
+      date: new Date(new Date().setUTCHours(0, 0, 0, 0)),
+      time: minutesInFuture(5).toDate(),
     });
   };
 
@@ -49,8 +49,7 @@ const ExerciseDateForm: React.FC<Props> = ({
     if (checked) {
       onSubmit({ exercise_start_date: '' });
     } else {
-      const date = new Date(data.date);
-      const time = new Date(data.time);
+      const { date, time } = data;
       date.setHours(time.getHours());
       date.setMinutes(time.getMinutes());
       date.setSeconds(time.getSeconds());
@@ -67,32 +66,41 @@ const ExerciseDateForm: React.FC<Props> = ({
     defaultValues: defaultFormValues(),
     resolver: zodResolver(
       zodImplement<ExerciseStartDateAndTime>().with({
-        date: z.string().min(1, t('Required')),
-        time: z.string().min(1, t('Required')),
-      }).refine(
-        (data) => {
-          if (!checked && data.date) {
-            return new Date(data.date).getTime() >= new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime();
-          }
-          return true;
-        },
-        {
-          message: t('Date should be at least today'),
-          path: ['date'],
-        },
-      )
-        .refine(
+        date: z.any().refine(
           (data) => {
-            if (!checked && data.time) {
-              return (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < new Date(data.time).getTime();
+            if (!checked) {
+              return !!data;
             }
             return true;
           },
-          {
-            message: t('The time and start date do not match, as the time provided is either too close to the current moment or in the past'),
-            path: ['time'],
+          { message: t('Required') },
+        ).refine(
+          (data) => {
+            if (!checked) {
+              return data instanceof Date && data.getTime() >= new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime();
+            }
+            return true;
           },
+          { message: t('Date should be at least today') },
         ),
+        time: z.any().refine(
+          (data) => {
+            if (!checked) {
+              return !!data;
+            }
+            return true;
+          },
+          { message: t('Required') },
+        ).refine(
+          (data) => {
+            if (!checked) {
+              return data instanceof Date && (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < data.getTime();
+            }
+            return true;
+          },
+          { message: t('The time and start date do not match, as the time provided is either too close to the current moment or in the past') },
+        ),
+      }),
     ),
   });
 
@@ -112,11 +120,9 @@ const ExerciseDateForm: React.FC<Props> = ({
               views={['year', 'month', 'day']}
               label={t('Start date (optional)')}
               disabled={checked}
-              minDate={new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()}
+              minDate={new Date(new Date().setUTCHours(0, 0, 0, 0))}
               value={(field.value)}
-              onChange={(date) => {
-                return (date ? field.onChange(new Date(date).toISOString()) : field.onChange(''));
-              }}
+              onChange={(date) => field.onChange(date)}
               onAccept={() => {
                 clearErrors('time');
               }}
@@ -124,7 +130,7 @@ const ExerciseDateForm: React.FC<Props> = ({
                 textField: {
                   fullWidth: true,
                   error: !!fieldState.error,
-                  helperText: fieldState.error && fieldState.error?.message,
+                  helperText: fieldState.error?.message,
                 },
               }}
             />
@@ -144,13 +150,13 @@ const ExerciseDateForm: React.FC<Props> = ({
               disabled={checked}
               closeOnSelect={false}
               value={field.value}
-              minTime={new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() === new Date(getValues('date')).getTime() ? new Date().toISOString() : null}
-              onChange={(time) => (time ? field.onChange(new Date(time).toISOString()) : field.onChange(''))}
+              minTime={new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() === new Date(getValues('date')).getTime() ? new Date() : undefined}
+              onChange={(time) => field.onChange(time)}
               slotProps={{
                 textField: {
                   fullWidth: true,
                   error: !!fieldState.error,
-                  helperText: fieldState.error && fieldState.error?.message,
+                  helperText: fieldState.error?.message,
                 },
               }}
             />
@@ -160,12 +166,12 @@ const ExerciseDateForm: React.FC<Props> = ({
 
       <div style={{ float: 'right', marginTop: 20 }}>
         {handleClose && (
-          <Button
-            onClick={handleClose.bind(this)}
-            style={{ marginRight: 10 }}
-          >
-            {t('Cancel')}
-          </Button>
+        <Button
+          onClick={handleClose.bind(this)}
+          style={{ marginRight: 10 }}
+        >
+          {t('Cancel')}
+        </Button>
         )}
         <Button
           color="secondary"
@@ -177,5 +183,4 @@ const ExerciseDateForm: React.FC<Props> = ({
     </form>
   );
 };
-
 export default ExerciseDateForm;
