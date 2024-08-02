@@ -43,7 +43,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  mapper_name: {
+  import_mapper_name: {
     width: '30%',
     cursor: 'default',
   },
@@ -57,7 +57,7 @@ const XlsMappers = () => {
   // Headers
   const headers = [
     {
-      field: 'mapper_name',
+      field: 'import_mapper_name',
       label: 'Name',
       isSortable: true,
       value: (mapper: RawPaginationImportMapper) => mapper.import_mapper_name,

@@ -34,9 +34,9 @@ const MapperForm: React.FC<Props> = ({
   onSubmit,
   editing,
   initialValues = {
-    mapper_name: '',
-    mapper_inject_type_column: '',
-    mapper_inject_importers: [],
+    import_mapper_name: '',
+    import_mapper_inject_type_column: '',
+    import_mapper_inject_importers: [],
   },
 }) => {
   // Standard hooks
@@ -52,7 +52,7 @@ const MapperForm: React.FC<Props> = ({
 
   const importerZodObject = z.object({
     inject_importer_type_value: z.string().min(1, { message: t('Should not be empty') }),
-    inject_importer_injector_contract_id: z.string().min(1, { message: t('Should not be empty') }),
+    inject_importer_injector_contract: z.string().min(1, { message: t('Should not be empty') }),
     inject_importer_rule_attributes: z.array(ruleAttributeZodObject).optional(),
   });
 
@@ -60,10 +60,10 @@ const MapperForm: React.FC<Props> = ({
     mode: 'onTouched',
     resolver: zodResolver(
       zodImplement<ImportMapperAddInput>().with({
-        mapper_name: z.string().min(1, { message: t('Should not be empty') }),
-        mapper_inject_importers: z.array(importerZodObject)
+        import_mapper_name: z.string().min(1, { message: t('Should not be empty') }),
+        import_mapper_inject_importers: z.array(importerZodObject)
           .min(1, { message: t('At least one inject type is required') }),
-        mapper_inject_type_column: z.string()
+        import_mapper_inject_type_column: z.string()
           .min(1, { message: t('Should not be empty') }),
       }),
     ),
@@ -74,7 +74,7 @@ const MapperForm: React.FC<Props> = ({
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'mapper_inject_importers',
+    name: 'import_mapper_inject_importers',
   });
 
   const [openTest, setOpenTest] = useState(false);
@@ -87,15 +87,15 @@ const MapperForm: React.FC<Props> = ({
           fullWidth
           label={t('Mapper name')}
           style={{ marginTop: 10 }}
-          error={!!methods.formState.errors.mapper_name}
-          helperText={methods.formState.errors.mapper_name?.message}
-          inputProps={methods.register('mapper_name')}
+          error={!!methods.formState.errors.import_mapper_name}
+          helperText={methods.formState.errors.import_mapper_name?.message}
+          inputProps={methods.register('import_mapper_name')}
           InputLabelProps={{ required: true }}
         />
         <div style={{ marginTop: 20 }}>
           <Controller
             control={control}
-            name={'mapper_inject_type_column'}
+            name={'import_mapper_inject_type_column'}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <RegexComponent
                 label={t('Inject type column')}
@@ -115,14 +115,14 @@ const MapperForm: React.FC<Props> = ({
             color="secondary"
             aria-label="Add"
             onClick={() => {
-              append({ inject_importer_type_value: '', inject_importer_injector_contract_id: '', inject_importer_rule_attributes: [] });
+              append({ inject_importer_type_value: '', inject_importer_injector_contract: '', inject_importer_rule_attributes: [] });
             }}
             size="large"
           >
             <Add fontSize="small" />
           </IconButton>
           <div>
-            <span className={classes.importersErrorMessage}>{methods.formState.errors.mapper_inject_importers?.message}</span>
+            <span className={classes.importersErrorMessage}>{methods.formState.errors.import_mapper_inject_importers?.message}</span>
           </div>
         </div>
 

@@ -17,12 +17,12 @@ const XlsMapperUpdateComponent: FunctionComponent<XlsMapperUpdateComponentProps>
   handleClose,
 }) => {
   const initialValues = {
-    mapper_name: xlsMapper.import_mapper_name ?? '',
-    mapper_inject_type_column: xlsMapper.import_mapper_inject_type_column ?? '',
-    mapper_inject_importers: xlsMapper.inject_importers?.map((i) => ({
-      inject_importer_injector_contract_id: i.inject_importer_injector_contract,
+    import_mapper_name: xlsMapper.import_mapper_name ?? '',
+    import_mapper_inject_type_column: xlsMapper.import_mapper_inject_type_column ?? '',
+    import_mapper_inject_importers: xlsMapper.import_mapper_inject_importers?.map((i) => ({
+      inject_importer_injector_contract: i.inject_importer_injector_contract,
       inject_importer_type_value: i.inject_importer_type_value,
-      inject_importer_rule_attributes: i.rule_attributes?.map((r) => ({
+      inject_importer_rule_attributes: i.inject_importer_rule_attributes?.map((r) => ({
         rule_attribute_name: r.rule_attribute_name,
         rule_attribute_columns: r.rule_attribute_columns,
         rule_attribute_default_value: r.rule_attribute_default_value,

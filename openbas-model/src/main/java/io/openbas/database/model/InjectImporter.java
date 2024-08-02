@@ -46,7 +46,7 @@ public class InjectImporter implements Base {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "attribute_inject_importer_id", nullable = false)
-    @JsonProperty("rule_attributes")
+    @JsonProperty("inject_importer_rule_attributes")
     private List<RuleAttribute> ruleAttributes = new ArrayList<>();
 
     @CreationTimestamp

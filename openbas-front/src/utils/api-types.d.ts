@@ -1004,27 +1004,27 @@ export interface ImportMapper {
   /** @format date-time */
   import_mapper_created_at?: string;
   import_mapper_id: string;
+  import_mapper_inject_importers?: InjectImporter[];
   import_mapper_inject_type_column: string;
   import_mapper_name: string;
   /** @format date-time */
   import_mapper_updated_at?: string;
-  inject_importers?: InjectImporter[];
   listened?: boolean;
   updateAttributes?: object;
 }
 
 export interface ImportMapperAddInput {
-  mapper_inject_importers: InjectImporterAddInput[];
+  import_mapper_inject_importers: InjectImporterAddInput[];
   /** @pattern ^[A-Z]{1,2}$ */
-  mapper_inject_type_column: string;
-  mapper_name: string;
+  import_mapper_inject_type_column: string;
+  import_mapper_name: string;
 }
 
 export interface ImportMapperUpdateInput {
-  mapper_inject_importers: InjectImporterUpdateInput[];
+  import_mapper_inject_importers: InjectImporterUpdateInput[];
   /** @pattern ^[A-Z]{1,2}$ */
-  mapper_inject_type_column: string;
-  mapper_name: string;
+  import_mapper_inject_type_column: string;
+  import_mapper_name: string;
 }
 
 export interface ImportMessage {
@@ -1192,23 +1192,23 @@ export interface InjectImporter {
   inject_importer_created_at?: string;
   inject_importer_id: string;
   inject_importer_injector_contract: InjectorContract;
+  inject_importer_rule_attributes?: RuleAttribute[];
   inject_importer_type_value: string;
   /** @format date-time */
   inject_importer_updated_at?: string;
   listened?: boolean;
-  rule_attributes?: RuleAttribute[];
   updateAttributes?: object;
 }
 
 export interface InjectImporterAddInput {
-  inject_importer_injector_contract_id: string;
+  inject_importer_injector_contract: string;
   inject_importer_rule_attributes?: RuleAttributeAddInput[];
   inject_importer_type_value: string;
 }
 
 export interface InjectImporterUpdateInput {
   inject_importer_id?: string;
-  inject_importer_injector_contract_id: string;
+  inject_importer_injector_contract: string;
   inject_importer_rule_attributes?: RuleAttributeUpdateInput[];
   inject_importer_type_value: string;
 }
@@ -1249,7 +1249,6 @@ export interface InjectOutput {
   /** @uniqueItems true */
   inject_tags?: string[];
   inject_teams?: string[];
-  inject_testable?: boolean;
   inject_title?: string;
   inject_type?: string;
 }

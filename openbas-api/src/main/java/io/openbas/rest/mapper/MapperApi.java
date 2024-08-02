@@ -23,35 +23,24 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 
-import javax.print.attribute.standard.Media;
-import java.io.*;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.zip.ZipOutputStream;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
@@ -95,10 +84,11 @@ public class MapperApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PostMapping(value="/api/mappers/export")
-    public void exportMappers(@RequestBody @Valid final ExportMapperInput exportMapperInput,
-                                                HttpServletResponse response) {
-        List<ImportMapperAddInput> mappers = mapperService.exportMappers(exportMapperInput.getIdsToExport());
+    public void exportMappers(
+        @RequestBody @Valid final ExportMapperInput exportMapperInput,
+        HttpServletResponse response) {
         try {
+            String jsonMappers = mapperService.exportMappers(exportMapperInput.getIdsToExport());
             String rightNow = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now());
             String filename = MessageFormat.format("mappers_{0}.json", rightNow);
 
@@ -106,7 +96,7 @@ public class MapperApi extends RestBehavior {
             response.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpServletResponse.SC_OK);
 
-            response.getOutputStream().write(mapper.writeValueAsString(mappers).getBytes(StandardCharsets.UTF_8));
+            response.getOutputStream().write(jsonMappers.getBytes(StandardCharsets.UTF_8));
             response.getOutputStream().flush();
             response.getOutputStream().close();
         } catch (IOException e) {
