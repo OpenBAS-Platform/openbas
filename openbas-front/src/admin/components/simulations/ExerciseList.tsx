@@ -12,7 +12,6 @@ import type { ExerciseSimple } from '../../../utils/api-types';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../actions/Tag';
 import { useAppDispatch } from '../../../utils/hooks';
-import ExercisePopover from './simulation/ExercisePopover';
 import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
 
