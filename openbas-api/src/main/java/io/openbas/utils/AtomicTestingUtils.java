@@ -183,7 +183,7 @@ public class AtomicTestingUtils {
                                     )
                             )
                             .entrySet().stream()
-                            .map(entry -> new InjectTargetWithResult(TargetType.TEAMS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue(), playerExpectations.isEmpty()? List.of() : calculateChildren(groupedByTeamAndUser.get(entry.getKey())), null))
+                            .map(entry -> new InjectTargetWithResult(TargetType.TEAMS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue(), playerExpectations.isEmpty()? List.of() : calculateResultsforPlayers(groupedByTeamAndUser.get(entry.getKey())), null))
                             .toList()
             );
         }
@@ -279,7 +279,7 @@ public class AtomicTestingUtils {
         return sortResults(targets);
     }
 
-    private static List<InjectTargetWithResult> calculateChildren(Map<User, List<InjectExpectation>> expectationsByUser) {
+    private static List<InjectTargetWithResult> calculateResultsforPlayers(Map<User, List<InjectExpectation>> expectationsByUser) {
         return expectationsByUser.entrySet().stream()
                 .map(userEntry -> new InjectTargetWithResult(
                         TargetType.PLAYER,
@@ -377,13 +377,29 @@ public class AtomicTestingUtils {
                     if( injectExpectation.getScore() == null ) {
                         return null;
                     }
-                    if( injectExpectation.getScore() >= injectExpectation.getExpectedScore() ) {
-                        return 1.0;
+                    if(injectExpectation.getTeam() != null) {
+                        if (injectExpectation.isExpectationGroup()) {
+                            if (injectExpectation.getScore() > 0) {
+                                return 1.0;
+                            } else {
+                                return 0.0;
+                            }
+                        } else {
+                            if (injectExpectation.getScore() >= injectExpectation.getExpectedScore()) {
+                                return 1.0;
+                            } else {
+                                return 0.0;
+                            }
+                        }
+                    }else{
+                        if( injectExpectation.getScore() >= injectExpectation.getExpectedScore() ) {
+                            return 1.0;
+                        }
+                        if( injectExpectation.getScore() == 0 ) {
+                            return 0.0;
+                        }
+                        return 0.5;
                     }
-                    if( injectExpectation.getScore() == 0 ) {
-                        return 0.0;
-                    }
-                    return 0.5;
                 })
                 .toList();
     }
@@ -396,13 +412,29 @@ public class AtomicTestingUtils {
                     if( rawInjectExpectation.getInject_expectation_score() == null ) {
                         return null;
                     }
-                    if( rawInjectExpectation.getInject_expectation_score() >= rawInjectExpectation.getInject_expectation_expected_score() ) {
-                        return 1.0;
+                    if(rawInjectExpectation.getTeam_id() != null) {
+                        if (true) {
+                            if (rawInjectExpectation.getInject_expectation_score() > 0) {
+                                return 1.0;
+                            } else {
+                                return 0.0;
+                            }
+                        } else {
+                            if (rawInjectExpectation.getInject_expectation_score() >= rawInjectExpectation.getInject_expectation_expected_score()) {
+                                return 1.0;
+                            } else {
+                                return 0.0;
+                            }
+                        }
+                    }else{
+                        if( rawInjectExpectation.getInject_expectation_score() >= rawInjectExpectation.getInject_expectation_expected_score() ) {
+                            return 1.0;
+                        }
+                        if( rawInjectExpectation.getInject_expectation_score() == 0 ) {
+                            return 0.0;
+                        }
+                        return 0.5;
                     }
-                    if( rawInjectExpectation.getInject_expectation_score() == 0 ) {
-                        return 0.0;
-                    }
-                    return 0.5;
                 })
                 .toList();
     }

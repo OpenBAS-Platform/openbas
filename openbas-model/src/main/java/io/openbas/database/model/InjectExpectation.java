@@ -90,16 +90,34 @@ public class InjectExpectation implements Base {
 
   @JsonProperty("inject_expectation_status")
   public EXPECTATION_STATUS getResponse() {
+
     if( this.getScore() == null ) {
       return EXPECTATION_STATUS.PENDING;
     }
-    if( this.getScore() >= this.getExpectedScore() ) {
-      return EXPECTATION_STATUS.SUCCESS;
+
+    if (team != null) {
+      if(this.isExpectationGroup()){
+        if( this.getScore() > 0) {
+          return EXPECTATION_STATUS.SUCCESS;
+        }else{
+          return EXPECTATION_STATUS.FAILED;
+        }
+      }else{
+        if( this.getScore() >= this.getExpectedScore()) {
+          return EXPECTATION_STATUS.SUCCESS;
+        }else{
+          return EXPECTATION_STATUS.FAILED;
+        }
+      }
+    }else {
+      if (this.getScore() >= this.getExpectedScore()) {
+        return EXPECTATION_STATUS.SUCCESS;
+      }
+      if (this.getScore() == 0) {
+        return EXPECTATION_STATUS.FAILED;
+      }
+      return EXPECTATION_STATUS.PARTIAL;
     }
-    if( this.getScore() == 0 ) {
-      return EXPECTATION_STATUS.FAILED;
-    }
-    return EXPECTATION_STATUS.PARTIAL;
   }
 
   @Setter

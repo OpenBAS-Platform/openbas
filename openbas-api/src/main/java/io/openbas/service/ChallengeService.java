@@ -148,7 +148,6 @@ public class ChallengeService {
                             .score(process.getExpectedScore())
                             .build();
 
-                    parentExpectation.getResults().clear();
                     parentExpectation.getResults().add(result);
                     parentExpectation.setUpdatedAt(Instant.now());
                     injectExpectationRepository.save(parentExpectation);

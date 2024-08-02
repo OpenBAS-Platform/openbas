@@ -250,6 +250,8 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         }
         return status.every((s) => s === 'SUCCESS') ? 'Attack Detected' : 'Attack Not Detected';
       case 'MANUAL':
+      case 'ARTICLE':
+      case 'CHALLENGE':
         if (status.includes('UNKNOWN')) {
           return 'No Expectation for Manual';
         }
@@ -332,12 +334,21 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   useEffect(() => {
     if (initialized && targetResults && targetResults.length > 0) {
       const groupedBy = groupedByExpectationType(targetResults);
-      const newSteps = Array.from(groupedBy).map(([targetType, targetResult]) => ({
+      const newSteps = Array.from(groupedBy).flatMap(([targetType, results]) => results.sort((a, b) => {
+        if (a.inject_expectation_name && b.inject_expectation_name) {
+          return a.inject_expectation_name.localeCompare(b.inject_expectation_name);
+        } if (a.inject_expectation_name && !b.inject_expectation_name) {
+          return -1; // a comes before b
+        } if (!a.inject_expectation_name && b.inject_expectation_name) {
+          return 1; // b comes before a
+        }
+        return a.inject_expectation_id.localeCompare(b.inject_expectation_id);
+      }).map((expectation: InjectExpectationStore) => ({
         key: 'result',
-        label: getStatusLabel(targetType, targetResult.map((tr: InjectExpectationsStore) => tr.inject_expectation_status)),
+        label: getStatusLabel(targetType, [expectation.inject_expectation_status]),
         type: targetType,
-        status: getStatus(targetResult.map((tr: InjectExpectationsStore) => tr.inject_expectation_status)),
-      }));
+        status: getStatus([expectation.inject_expectation_status]),
+      })));
       const mergedSteps: Steptarget[] = [...computeInitialSteps(initialSteps), ...newSteps];
       // Custom sorting function
       mergedSteps.sort((a, b) => {
@@ -464,7 +475,17 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
       )}
       {Object.keys(sortedGroupedResults).map((targetResult, targetResultIndex) => (
         <div key={targetResultIndex} hidden={activeTab !== targetResultIndex}>
-          {sortedGroupedResults[targetResult].sort((a, b) => { return a.inject_expectation_name.localeCompare(b.inject_expectation_name); })
+          {sortedGroupedResults[targetResult]
+            .toSorted((a, b) => {
+              if (a.inject_expectation_name && b.inject_expectation_name) {
+                return a.inject_expectation_name.localeCompare(b.inject_expectation_name);
+              } if (a.inject_expectation_name && !b.inject_expectation_name) {
+                return -1; // a comes before b
+              } if (!a.inject_expectation_name && b.inject_expectation_name) {
+                return 1; // b comes before a
+              }
+              return a.inject_expectation_id.localeCompare(b.inject_expectation_id);
+            })
             .map((injectExpectation) => (
               <div key={injectExpectation.inject_expectation_id} style={{ marginTop: 20 }}>
                 <Grid container={true} spacing={2}>
@@ -472,7 +493,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                     <Typography variant="h4">
                       {t('Name')}
                     </Typography>
-                    {injectExpectation.inject_expectation_name}
+                    {emptyFilled(injectExpectation.inject_expectation_name)}
                   </Grid>
                   <Grid item={true} xs={4}>
                     <Typography variant="h4">

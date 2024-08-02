@@ -117,16 +117,16 @@ public class ChannelService {
                 boolean validationType = process.isExpectationGroup();
 
                 channelExpectations.forEach(parentExpectation -> {
-                    if (validationType) { // Validation type atleast one target
+                    if (validationType) { // Validation type at least one target
                         parentExpectation.setScore(injectExpectationExecutionRepository.computeAverageScoreWhenValidationTypeIsAtLeastOnePlayerForChannel(
                                 injectIds,
-                                process.getArticle().getId(),
+                                articleIds,
                                 parentExpectation.getTeam().getId())
                         );
                     } else { // Validation type all
                         parentExpectation.setScore(injectExpectationExecutionRepository.computeAverageScoreWhenValidationTypeIsAllPlayersForChannel(
                                 injectIds,
-                                process.getArticle().getId(),
+                                articleIds,
                                 parentExpectation.getTeam().getId())
                         );
                     }
@@ -139,7 +139,6 @@ public class ChannelService {
                             .score(process.getExpectedScore())
                             .build();
 
-                    parentExpectation.getResults().clear();
                     parentExpectation.getResults().add(result);
                     parentExpectation.setUpdatedAt(Instant.now());
                     injectExpectationExecutionRepository.save(parentExpectation);

@@ -91,12 +91,12 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
 
     @Query("select AVG(ie.score) from InjectExpectation ie " +
             "where ie.inject.id in (:injectIds) " +
-            "and ie.article.id = :channelId " +
+            "and ie.article.id in (:articleIds) " +
             "and ie.team.id = :teamId " +
             "and ie.user is not null " +
             "and ie.score > 0 " +
             "and ie.type = 'ARTICLE' ")
-    Double computeAverageScoreWhenValidationTypeIsAtLeastOnePlayerForChannel(final List<String> injectIds, final String channelId, final String teamId);
+    Double computeAverageScoreWhenValidationTypeIsAtLeastOnePlayerForChannel(final List<String> injectIds, final List<String> articleIds, final String teamId);
 
     @Query("select AVG(COALESCE(ie.score, 0)) from InjectExpectation ie " +
             "where ie.inject.id = :injectId " +
@@ -115,12 +115,18 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
 
     @Query("select AVG(COALESCE(ie.score, 0)) from InjectExpectation ie " +
             "where ie.inject.id in (:injectIds) " +
-            "and ie.article.id = :channelId " +
+            "and ie.article.id in (:articleIds) " +
             "and ie.team.id = :teamId " +
             "and ie.user is not null " +
             "and ie.type = 'ARTICLE' ")
-    Double computeAverageScoreWhenValidationTypeIsAllPlayersForChannel(final List<String> injectIds, final String channelId, final String teamId);
+    Double computeAverageScoreWhenValidationTypeIsAllPlayersForChannel(final List<String> injectIds, final List<String> articleIds, final String teamId);
 
+    @Query("select count(ie) from InjectExpectation ie where ie.inject.id = :injectId " +
+            "and ie.team.id = :teamId " +
+            "and ie.name = :expectationName " +
+            "and ie.user is not null " +
+            "and (ie.score is null or ie.score = 0)")
+    Integer countExpectationsWithScoreNullOrZero(final String injectId, final String teamId, final String expectationName);
 
     // -- RETRIEVE EXPECTATIONS FOR TEAM AND NOT FOR PLAYERS
     @Query("select ie from InjectExpectation ie where ie.inject.id = :injectId and ie.team.id = :teamId and ie.name = :expectationName and ie.user is null")
