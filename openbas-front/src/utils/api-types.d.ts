@@ -737,7 +737,7 @@ export interface Exercise {
   exercise_observers?: User[];
   exercise_pauses?: Pause[];
   exercise_planners?: User[];
-  exercise_platforms?: string[];
+  exercise_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   exercise_scenario?: Scenario;
   /** @format double */
   exercise_score?: number;
@@ -924,7 +924,7 @@ export interface ExportMapperInput {
 export interface Filter {
   key: string;
   mode?: "and" | "or";
-  operator?: "eq" | "not_eq" | "contains" | "not_contains" | "starts_with" | "not_starts_with";
+  operator?: "eq" | "not_eq" | "contains" | "not_contains" | "starts_with" | "not_starts_with" | "empty" | "not_empty";
   values?: string[];
 }
 
@@ -1455,7 +1455,16 @@ export interface InjectorContract {
   injector_contract_manual?: boolean;
   injector_contract_needs_executor?: boolean;
   injector_contract_payload?: Payload;
-  injector_contract_platforms?: string[];
+  injector_contract_platforms?: (
+    | "Linux"
+    | "Windows"
+    | "MacOS"
+    | "Container"
+    | "Service"
+    | "Generic"
+    | "Internal"
+    | "Unknown"
+  )[];
   /** @format date-time */
   injector_contract_updated_at: string;
   listened?: boolean;
@@ -1482,7 +1491,7 @@ export interface InjectorContractInput {
   contract_id: string;
   contract_labels?: Record<string, string>;
   contract_manual?: boolean;
-  contract_platforms?: string[];
+  contract_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   is_atomic_testing?: boolean;
 }
 
@@ -1493,7 +1502,16 @@ export interface InjectorContractOutput {
   injector_contract_injector_type?: string;
   injector_contract_labels?: Record<string, string>;
   injector_contract_payload_type?: string;
-  injector_contract_platforms?: string[];
+  injector_contract_platforms?: (
+    | "Linux"
+    | "Windows"
+    | "MacOS"
+    | "Container"
+    | "Service"
+    | "Generic"
+    | "Internal"
+    | "Unknown"
+  )[];
 }
 
 export interface InjectorContractUpdateInput {
@@ -1849,6 +1867,11 @@ export interface ObjectiveInput {
   /** @format int32 */
   objective_priority?: number;
   objective_title?: string;
+}
+
+export interface Option {
+  id?: string;
+  label?: string;
 }
 
 export interface Organization {
@@ -2320,7 +2343,7 @@ export interface Payload {
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
-  payload_platforms?: string[];
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source?: string;
   payload_status?: string;
@@ -2474,6 +2497,7 @@ export interface PolicyInput {
 }
 
 export interface PropertySchemaDTO {
+  schema_property_has_dynamic_value?: boolean;
   schema_property_name: string;
   schema_property_type_array?: boolean;
   schema_property_values?: string[];
@@ -2734,7 +2758,7 @@ export interface Scenario {
   scenario_name: string;
   scenario_observers?: User[];
   scenario_planners?: User[];
-  scenario_platforms?: string[];
+  scenario_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   scenario_recurrence?: string;
   /** @format date-time */
   scenario_recurrence_end?: string;
@@ -2820,13 +2844,13 @@ export interface SearchPaginationInput {
    * @format int32
    * @min 0
    */
-  page?: number;
+  page: number;
   /**
    * Element number by page
    * @format int32
    * @max 1000
    */
-  size?: number;
+  size: number;
   /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
   sorts?: SortField[];
   /** Text to search within searchable attributes */
