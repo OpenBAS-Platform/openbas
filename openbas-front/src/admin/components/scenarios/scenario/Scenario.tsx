@@ -28,12 +28,10 @@ import { isEmptyField } from '../../../../utils/utils';
 import type { EndpointStore } from '../../assets/endpoints/Endpoint';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import ExerciseList from '../../simulations/ExerciseList';
-import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import useQueryable from '../../../../components/common/queryable/useQueryable';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
-import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
-import { buildSearchPagination } from '../../../../components/common/queryable/useQueryable';
 import ExercisePopover from '../../simulations/simulation/ExercisePopover';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
