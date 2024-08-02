@@ -22,7 +22,10 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.OptionalDouble;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -97,7 +100,6 @@ public class ChallengeService {
                                               User user) {
         ChallengeResult challengeResult = tryChallenge(challengeId, input);
         if (challengeResult.getResult()) {
-
             // Find and update the expectations linked to user
             List<InjectExpectation> playerExpectations = injectExpectationRepository.findByUserAndExerciseAndChallenge(user.getId(), exerciseId, challengeId);
             playerExpectations.forEach(playerExpectation -> {
@@ -115,30 +117,43 @@ public class ChallengeService {
                 injectExpectationRepository.save(playerExpectation);
             });
 
-            // Process expectation linked to teams where user if part of
+            // Process expectation linked to teams where user is part of
             List<String> teamIds = user.getTeams().stream().map(Team::getId).toList();
-            // Find all expectations linked to teams' user, challenge and exercise
+            // Find all expectations for this exercise, challenge and teams
             List<InjectExpectation> challengeExpectations = injectExpectationRepository.findChallengeExpectations(exerciseId, teamIds, challengeId);
+            List<InjectExpectation> parentExpectations = challengeExpectations.stream().filter(player -> player.getUser() != null).toList();
+            Map<Team, List<InjectExpectation>> playerByTeam = challengeExpectations.stream().filter(exp -> exp.getUser() != null).collect(Collectors.groupingBy(InjectExpectation::getTeam));
 
             // Depending on type of validation, we process the parent expectations:
             challengeExpectations.stream().findAny().ifPresentOrElse(process -> {
                 boolean validationType = process.isExpectationGroup();
 
-                challengeExpectations.forEach(parentExpectation -> {
+                parentExpectations.forEach(parentExpectation -> {
+                    List<InjectExpectation> toProcess = playerByTeam.get(parentExpectation.getTeam());
+                    int playerSize = toProcess.size(); // Without Parent expectation
+                    long zeroPlayerResponses = toProcess.stream().filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() == 0.0).count();
+                    long nullPlayerResponses = toProcess.stream().filter(exp -> exp.getScore() == null).count();
+
                     if (validationType) { // type atLeast
-                        parentExpectation.setScore(injectExpectationRepository.computeAverageScoreWhenValidationTypeIsAtLeastOnePlayerForChallenge(
-                                process.getExercise().getId(),
-                                process.getChallenge().getId(),
-                                parentExpectation.getTeam().getId())
-                        );
+                        //If true is at least one
+                        OptionalDouble avgAtLeastOnePlayer = toProcess.stream().filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() > 0.0).mapToDouble(InjectExpectation::getScore).average();
+                        if (avgAtLeastOnePlayer.isPresent()) { //Any response is positive
+                            parentExpectation.setScore(avgAtLeastOnePlayer.getAsDouble());
+                        } else {
+                            if (zeroPlayerResponses == playerSize) { //All players had failed
+                                parentExpectation.setScore(0.0);
+                            } else {
+                                parentExpectation.setScore(null);
+                            }
+                        }
                     } else { // type all
-                        parentExpectation.setScore(injectExpectationRepository.computeAverageScoreWhenValidationTypeIsAllPlayersForChallenge(
-                                process.getExercise().getId(),
-                                process.getChallenge().getId(),
-                                parentExpectation.getTeam().getId())
-                        );
+                        if(nullPlayerResponses == 0){
+                            OptionalDouble avgAllPlayer = toProcess.stream().mapToDouble(InjectExpectation::getScore).average();
+                            parentExpectation.setScore(avgAllPlayer.getAsDouble());
+                        }else{
+                            parentExpectation.setScore(null);
+                        }
                     }
-                    ;
                     InjectExpectationResult result = InjectExpectationResult.builder()
                             .sourceId("challenge")
                             .sourceType("challenge")

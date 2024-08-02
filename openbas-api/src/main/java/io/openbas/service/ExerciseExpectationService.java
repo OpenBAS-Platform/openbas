@@ -111,12 +111,12 @@ public class ExerciseExpectationService {
             List<InjectExpectation> toProcess = injectExpectationRepository.findAllByInjectAndTeamAndExpectationName(updated.getInject().getId(), updated.getTeam().getId(), updated.getName());
             InjectExpectation parentExpectation = toProcess.stream().filter(exp -> exp.getUser() == null).findFirst().orElseThrow(ElementNotFoundException::new);
             int playerSize = toProcess.size() - 1; // Without Parent expectation
-            long nullPlayerResponses = toProcess.stream().filter(exp -> exp.getUser() != null).map(exp -> exp.getScore() == null).count();
-            long zeroPlayerResponses = toProcess.stream().filter(exp -> exp.getUser() != null).map(exp -> exp.getScore() == 0.0).count();
+            long zeroPlayerResponses = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() == 0.0).count();
+            long nullPlayerResponses = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp -> exp.getScore() == null).count();
 
             if (updated.isExpectationGroup()) { //If true is at least one
-                OptionalDouble avgAtLeastOnePlayer = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp -> exp.getScore() > 0.0).mapToDouble(InjectExpectation::getScore).average();
-                if (avgAtLeastOnePlayer.isPresent()) { //Any response is positive
+                OptionalDouble avgAtLeastOnePlayer = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() > 0.0).mapToDouble(InjectExpectation::getScore).average();
+                 if (avgAtLeastOnePlayer.isPresent()) { //Any response is positive
                     parentExpectation.setScore(avgAtLeastOnePlayer.getAsDouble());
                     result = "Success";
                 } else {
@@ -129,9 +129,14 @@ public class ExerciseExpectationService {
                     }
                 }
             } else { // all
-                OptionalDouble avgAllPlayer = toProcess.stream().filter(exp -> exp.getUser() != null).mapToDouble(InjectExpectation::getScore).average();
-                parentExpectation.setScore(nullPlayerResponses == 0 ? avgAllPlayer.getAsDouble() : null);
-                result = nullPlayerResponses == 0 ? avgAllPlayer.getAsDouble() > 0 ? "Success" : "Failed" : "Pending";
+                if(nullPlayerResponses == 0){
+                    OptionalDouble avgAllPlayer = toProcess.stream().filter(exp -> exp.getUser() != null).mapToDouble(InjectExpectation::getScore).average();
+                    parentExpectation.setScore(avgAllPlayer.getAsDouble());
+                    result = zeroPlayerResponses > 0 ? "Failed" : "Success";
+                }else{
+                    parentExpectation.setScore(null);
+                    result = "Pending";
+                }
             }
             InjectExpectationResult expectationResult = InjectExpectationResult.builder()
                     .sourceId("player-manual-validation")
