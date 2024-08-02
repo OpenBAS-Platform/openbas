@@ -412,29 +412,13 @@ public class AtomicTestingUtils {
                     if( rawInjectExpectation.getInject_expectation_score() == null ) {
                         return null;
                     }
-                    if(rawInjectExpectation.getTeam_id() != null) {
-                        if (true) {
-                            if (rawInjectExpectation.getInject_expectation_score() > 0) {
-                                return 1.0;
-                            } else {
-                                return 0.0;
-                            }
-                        } else {
-                            if (rawInjectExpectation.getInject_expectation_score() >= rawInjectExpectation.getInject_expectation_expected_score()) {
-                                return 1.0;
-                            } else {
-                                return 0.0;
-                            }
-                        }
-                    }else{
-                        if( rawInjectExpectation.getInject_expectation_score() >= rawInjectExpectation.getInject_expectation_expected_score() ) {
-                            return 1.0;
-                        }
-                        if( rawInjectExpectation.getInject_expectation_score() == 0 ) {
-                            return 0.0;
-                        }
-                        return 0.5;
+                    if( rawInjectExpectation.getInject_expectation_score() >= rawInjectExpectation.getInject_expectation_expected_score() ) {
+                        return 1.0;
                     }
+                    if( rawInjectExpectation.getInject_expectation_score() == 0 ) {
+                        return 0.0;
+                    }
+                    return 0.5;
                 })
                 .toList();
     }
