@@ -19,7 +19,7 @@
         <commons-email.version>1.5</commons-email.version>
         <flyway.version>9.0.3</flyway.version>
         <opensaml.version>4.3.2</opensaml.version>
-        <springdoc.version>2.5.0</springdoc.version>
+        <springdoc.version>2.6.0</springdoc.version>
         <springdoc-plugin.version>1.4</springdoc-plugin.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <apache-poi.version>5.3.0</apache-poi.version>
