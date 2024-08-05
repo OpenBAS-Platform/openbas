@@ -1862,7 +1862,9 @@ const i18n = {
       Failed: '已失败',
       'Pending result': '待定结果',
       'Validation mode': '验证模式',
+      'All players (per team) must validate the expectation': '所有球员(每队)必须验证期望值',
       'All assets (per group) must validate the expectation': '所有资产(每组)必须验证期望值',
+      'At least one player (per team) must validate the expectation': '至少一名球员(每队)必须验证期望值',
       'At least one asset (per group) must validate the expectation': '至少一个资产(每组)必须验证期望值',
       'An isolated asset is considered as a group of one asset': '隔离的资产被视为一组资产',
       // -- Expectation end --
