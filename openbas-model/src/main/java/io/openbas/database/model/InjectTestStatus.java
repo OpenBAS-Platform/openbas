@@ -8,8 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.time.Duration;
 import java.time.Instant;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,8 +17,8 @@ import java.util.Objects;
 @Setter
 @Getter
 @Entity
-@Table(name = "injects_statuses")
-public class InjectStatus implements Base {
+@Table(name = "injects_tests_statuses")
+public class InjectTestStatus implements Base {
 
   @Id
   @Column(name = "status_id")
@@ -80,10 +80,9 @@ public class InjectStatus implements Base {
   }
   // endregion
 
-  public static InjectStatus fromExecution(Execution execution, Inject executedInject) {
-    InjectStatus injectStatus = executedInject.getStatus().orElse(new InjectStatus());
+  public static InjectStatus fromExecutionTest(Execution execution) {
+    InjectStatus injectStatus = new InjectStatus();
     injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setInject(executedInject);
     injectStatus.getTraces().addAll(execution.getTraces());
     int numberOfElements = execution.getTraces().size();
     int numberOfError = (int) execution.getTraces().stream().filter(ex -> ex.getStatus().equals(ExecutionStatus.ERROR))
@@ -125,11 +124,5 @@ public class InjectStatus implements Base {
     return Objects.hash(id);
   }
 
-  // -- UTILS --
 
-  public static InjectStatus draftInjectStatus() {
-    InjectStatus draft = new InjectStatus();
-    draft.setName(ExecutionStatus.DRAFT);
-    return draft;
-  }
 }
