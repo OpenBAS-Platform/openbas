@@ -2513,11 +2513,15 @@ export interface RawPaginationImportMapper {
 }
 
 export interface RawPaginationPlayer {
+  user_phone2?: string;
+  user_country?: string;
   user_email?: string;
   user_firstname?: string;
   user_id?: string;
   user_lastname?: string;
   user_organization?: string;
+  user_pgp_key?: string;
+  user_phone?: string;
   user_tags?: string[];
 }
 
