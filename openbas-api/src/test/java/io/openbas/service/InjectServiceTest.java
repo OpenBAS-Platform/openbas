@@ -159,10 +159,10 @@ class InjectServiceTest {
             verify(teamRepository, times(1)).save(any());
             assertEquals(30 * 24 * 60 * 60, importTestSummary.getInjects().getLast().getDependsDuration());
 
-            ObjectNode jsonNodeMail = (ObjectNode) mapper.readTree("{\"message\":\"message1\",\"expectations\":[{\"expectation_description\":\"expectation\",\"expectation_name\":\"expectation done\",\"expectation_score\":100,\"expectation_type\":\"MANUAL\",\"expectation_expectation_group\":false}]}");
+            ObjectNode jsonNodeMail = (ObjectNode) mapper.readTree("{\"message\":\"message1\",\"expectations\":[{\"expectation_description\":\"expectation\",\"expectation_name\":\"expectation done\",\"expectation_score\":100.0,\"expectation_type\":\"MANUAL\",\"expectation_expectation_group\":false}]}");
             assertEquals(jsonNodeMail, importTestSummary.getInjects().getFirst().getContent());
 
-            ObjectNode jsonNodeSms = (ObjectNode) mapper.readTree("{\"subject\":\"subject\",\"body\":\"message2\",\"expectations\":[{\"expectation_description\":\"expectation\",\"expectation_name\":\"expectation done\",\"expectation_score\":100,\"expectation_type\":\"MANUAL\",\"expectation_expectation_group\":false}]}");
+            ObjectNode jsonNodeSms = (ObjectNode) mapper.readTree("{\"subject\":\"subject\",\"body\":\"message2\",\"expectations\":[{\"expectation_description\":\"expectation\",\"expectation_name\":\"expectation done\",\"expectation_score\":100.0,\"expectation_type\":\"MANUAL\",\"expectation_expectation_group\":false}]}");
             assertEquals(jsonNodeSms, importTestSummary.getInjects().getLast().getContent());
         }
     }
@@ -577,7 +577,7 @@ class InjectServiceTest {
         RuleAttribute ruleAttributeExpectationScore = new RuleAttribute();
         ruleAttributeExpectationScore.setName("expectation_score");
         ruleAttributeExpectationScore.setColumns("J");
-        ruleAttributeExpectationScore.setDefaultValue("500");
+        ruleAttributeExpectationScore.setDefaultValue("500.0");
 
         RuleAttribute ruleAttributeExpectationName = new RuleAttribute();
         ruleAttributeExpectationName.setName("expectation_name");
@@ -637,7 +637,7 @@ class InjectServiceTest {
         RuleAttribute ruleAttributeExpectationScore = new RuleAttribute();
         ruleAttributeExpectationScore.setName("expectation_score");
         ruleAttributeExpectationScore.setColumns("J");
-        ruleAttributeExpectationScore.setDefaultValue("500");
+        ruleAttributeExpectationScore.setDefaultValue("500.0");
 
         RuleAttribute ruleAttributeExpectationName = new RuleAttribute();
         ruleAttributeExpectationName.setName("expectation_name");
