@@ -9,4 +9,5 @@ public interface Expectation {
     default boolean isExpectationGroup() {
         return false;
     }
+    String getName();
 }

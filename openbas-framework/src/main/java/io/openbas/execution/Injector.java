@@ -87,8 +87,14 @@ public abstract class Injector {
         expectationExecution.setExpectedScore(expectation.getScore());
         expectationExecution.setExpectationGroup(expectation.isExpectationGroup());
         switch (expectation.type()) {
-            case ARTICLE -> expectationExecution.setArticle(((ChannelExpectation) expectation).getArticle());
-            case CHALLENGE -> expectationExecution.setChallenge(((ChallengeExpectation) expectation).getChallenge());
+            case ARTICLE -> {
+                expectationExecution.setName(expectation.getName());
+                expectationExecution.setArticle(((ChannelExpectation) expectation).getArticle());
+            }
+            case CHALLENGE -> {
+                expectationExecution.setName(expectation.getName());
+                expectationExecution.setChallenge(((ChallengeExpectation) expectation).getChallenge());
+            }
             case DOCUMENT -> expectationExecution.setType(EXPECTATION_TYPE.DOCUMENT);
             case TEXT -> expectationExecution.setType(EXPECTATION_TYPE.TEXT);
             case DETECTION -> {
