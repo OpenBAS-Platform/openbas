@@ -1,8 +1,11 @@
 import React, { CSSProperties, memo } from 'react';
 import { shallow } from 'zustand/shallow';
-import { useStore, type ReactFlowState, type BackgroundProps, Panel } from '@xyflow/react';
+import { useStore, type ReactFlowState, type BackgroundProps, Panel, Connection } from '@xyflow/react';
 import { makeStyles } from '@mui/styles';
 import moment from 'moment-timezone';
+import { transform } from 'esbuild';
+import type { InjectStore } from '../actions/injects/Inject';
+import type { Scenario } from '../utils/api-types';
 
 const selector = (s: ReactFlowState) => ({ transform: s.transform, patternId: `pattern-${s.rfId}` });
 
@@ -13,12 +16,20 @@ const useStyles = makeStyles(() => ({
     height: '100%',
     margin: '0px 0px 0px 5px !important',
   },
+  dateLabel: {
+    textAnchor: 'middle',
+  },
 }));
+
+interface Props extends BackgroundProps {
+  minutesPerGap: number,
+}
 
 function BackgroundComponent({
   style,
-  gap = 100,
-}: BackgroundProps) {
+  gap = 125,
+  minutesPerGap = 15,
+}: Props) {
   const classes = useStyles();
   const { transform } = useStore(selector, shallow);
   const desiredFontSize = 12;
@@ -30,7 +41,7 @@ function BackgroundComponent({
   const scaledGap: [number, number] = [gapXY[0] * transform[2] || 1, gapXY[1] * transform[2] || 1];
 
   for (let i = 0; i < numberOfIntervals; i += 1) {
-    const date = moment.utc(moment.duration(0, 'd').add(15 * i, 'm').asMilliseconds());
+    const date = moment.utc(moment.duration(0, 'd').add(minutesPerGap * 3 * i, 'm').asMilliseconds());
     parsedDates.push(`${date.dayOfYear() - 1} d, ${date.hour()} h, ${date.minute()} m`);
   }
 
@@ -48,7 +59,7 @@ function BackgroundComponent({
         }
       >
         {parsedDates.map((parsedDate, index) => (
-          <text fill="#ffffff" fontSize={desiredFontSize} fontFamily="Verdana" x={transform[0] + (index * 5 * scaledGap[1])} y={desiredFontSize}>
+          <text key={`date_label_${index}`} fill="#ffffff" className={classes.dateLabel} fontSize={desiredFontSize} fontFamily="Verdana" x={transform[0] + (index * 3 * scaledGap[1])} y={desiredFontSize}>
             {parsedDate}
           </text>
         ))}

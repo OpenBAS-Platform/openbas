@@ -4,6 +4,10 @@ import { shallow } from 'zustand/shallow';
 
 import { useStore, type ReactFlowState, type BackgroundProps, BackgroundVariant } from '@xyflow/react';
 
+interface Props extends BackgroundProps {
+  minutesPerGap: number,
+}
+
 const defaultSize = {
   [BackgroundVariant.Dots]: 1,
   [BackgroundVariant.Lines]: 1,
@@ -16,7 +20,7 @@ function BackgroundComponent({
   id,
   variant = BackgroundVariant.Dots,
   // only used for dots and cross
-  gap = 100,
+  gap = 125,
   // only used for lines and cross
   size,
   lineWidth = 1,
@@ -24,7 +28,8 @@ function BackgroundComponent({
   color,
   style,
   className,
-}: BackgroundProps) {
+  minutesPerGap = 15,
+}: Props) {
   const ref = useRef<SVGSVGElement>(null);
   const { transform, patternId } = useStore(selector, shallow);
   const patternSize = size || 1;

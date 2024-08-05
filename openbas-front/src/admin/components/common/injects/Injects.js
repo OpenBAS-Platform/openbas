@@ -380,6 +380,7 @@ const Injects = (props) => {
               <ChainedTimeline
                 injects={sortedInjects}
                 onConnectInjects={onConnectInjects}
+                exerciseOrScenarioId={exerciseOrScenarioId}
                 onSelectedInject={(inject) => {
                   const injectContract = inject.inject_injector_contract.convertedContent;
                   const isContractExposed = injectContract?.config.expose;

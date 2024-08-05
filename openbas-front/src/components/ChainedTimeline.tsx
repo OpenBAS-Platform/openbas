@@ -1,14 +1,22 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow, Connection, Edge } from '@xyflow/react';
+import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, Connection, Edge } from '@xyflow/react';
+import { XYPosition } from 'reactflow';
+import moment from 'moment-timezone';
 import type { InjectStore } from '../actions/injects/Inject';
 import type { Theme } from './Theme';
 import nodeTypes from './nodes';
-import { useAutoLayoutInject, LayoutOptions } from '../utils/flows/useAutoLayout';
+import { LayoutOptions } from '../utils/flows/useAutoLayout';
 import { CustomTimelineBackground } from './CustomTimelineBackground';
 import { NodeInject } from './nodes/NodeInject';
 import { CustomTimelinePanel } from './CustomTimelinePanel';
-import type { Inject, Scenario } from '../utils/api-types';
+import type { Inject } from '../utils/api-types';
+import { InjectContext } from '../admin/components/common/Context';
+import { useHelper } from '../store';
+import type { InjectHelper } from '../actions/injects/inject-helper';
+import type { ScenariosHelper } from '../actions/scenarios/scenario-helper';
+import { ExercisesHelper } from '../actions/exercises/exercise-helper';
+import { parseCron, ParsedCron } from '../utils/Cron';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -19,32 +27,49 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   injects: InjectStore[],
-  scenario: Scenario,
+  exerciseOrScenarioId: string,
   onConnectInjects(connection: Connection): void,
   onSelectedInject(inject: InjectStore): void,
 }
 
-const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, scenario, onConnectInjects, onSelectedInject }) => {
+const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScenarioId, onConnectInjects, onSelectedInject }) => {
   // Standard hooks
   const classes = useStyles();
+  const minutesPerGap = 5;
+  const gapSize = 125;
   const theme = useTheme<Theme>();
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeInject>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [injectsToShow, setInjectsToShow] = useState<InjectStore[]>([]);
 
   let timer: NodeJS.Timeout;
+  const injectContext = useContext(InjectContext);
+
+  const injectsMap: Inject[] = useHelper((helper: InjectHelper) => {
+    return helper.getInjectsMap();
+  });
+  const scenario = useHelper((helper: ScenariosHelper) => helper.getScenario(exerciseOrScenarioId));
+  const exercise = useHelper((helper: ExercisesHelper) => helper.getExercise(exerciseOrScenarioId));
+
+  let startDate;
+
+  if (scenario !== undefined) {
+    const parsedCron = scenario.scenario_recurrence ? parseCron(scenario.scenario_recurrence) : null;
+    startDate = scenario?.scenario_recurrence_start ? scenario?.scenario_recurrence_start : exercise?.exercise_start_date;
+    if (startDate !== undefined) {
+      startDate = moment(startDate).utc().hour(parsedCron!.h).minute(parsedCron!.m)
+        .second(parsedCron!.m)
+        .format();
+    }
+  }
 
   // Flow
   const layoutOptions: LayoutOptions = {
     algorithm: 'd3-hierarchy',
     direction: 'LR',
-    spacing: [0, 150],
+    spacing: [150, 150],
   };
-  useAutoLayoutInject(layoutOptions, injectsToShow);
-  const { fitView } = useReactFlow();
-  useEffect(() => {
-    fitView();
-  }, [nodes, fitView]);
+  // useAutoLayoutInject(layoutOptions, injectsToShow);
 
   useEffect(() => {
     if (injects.length > 0) {
@@ -60,12 +85,11 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, scenario, onCo
           onConnectInjects,
           isTargeted: false,
           isTargeting: false,
-          injectType: inject.inject_type,
-          injectorContractPayload: inject.inject_injector_contract?.injector_contract_payload,
-          triggerTime: inject.inject_depends_duration,
-          description: inject.inject_description,
+          inject,
+          fixedY: index * 150,
+          startDate,
         },
-        position: { x: 0, y: index * 150 },
+        position: { x: (inject.inject_depends_duration / 60) * ((125 * 3) / 15), y: index * 150 },
       })));
       setEdges(injects.filter((inject) => inject.inject_depends_on != null).map((inject) => {
         return ({
@@ -87,7 +111,28 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, scenario, onCo
     markerEnd: { type: MarkerType.ArrowClosed },
   };
 
-  const moveNewNode = (event: React.MouseEvent) => {
+  const nodeDrag = (event: React.MouseEvent, node: NodeInject, allNodes: Node[]) => {
+    const injectFromMap = injectsMap[node.id];
+    if (injectFromMap !== undefined) {
+      const inject = {
+        inject_id: node.id,
+        inject_title: injectFromMap.inject_title,
+        inject_depends_duration: convertCoordinatesToTime(node.position),
+        inject_created_at: injectFromMap.inject_created_at,
+        inject_updated_at: injectFromMap.inject_updated_at,
+      };
+      injectContext.onUpdateInject(node.id, inject);
+    }
+  };
+
+  const horizontalNodeDrag = (event: React.MouseEvent, node: NodeInject, allNodes: Node[]) => {
+    if (node.data.fixedY !== undefined) {
+      node.position.y = node.data.fixedY;
+      node.data.inject.inject_depends_duration = convertCoordinatesToTime(node.position);
+    }
+  };
+
+  /* const moveNewNode = (event: React.MouseEvent) => {
     const bounds = event.target?.getBoundingClientRect();
     const newX = event.clientX - bounds.left;
     const newY = event.clientY - bounds.top;
@@ -107,13 +152,17 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, scenario, onCo
     };
     nodesList.push(node);
     // setNodes(nodesList);
-  };
+  }; */
 
-  const onMouseMove = (eventMove: React.MouseEvent) => {
+  /* const onMouseMove = (eventMove: React.MouseEvent) => {
     clearTimeout(timer);
     timer = setTimeout(() => {
       moveNewNode(eventMove);
     }, 300);
+  }; */
+
+  const convertCoordinatesToTime = (position: XYPosition) => {
+    return Math.round((position.x / (gapSize / minutesPerGap)) * 60);
   };
 
   const onNodeClick = (event: React.MouseEvent, node: NodeInject) => {
@@ -130,23 +179,32 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, scenario, onCo
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             nodeTypes={nodeTypes}
-            nodesDraggable={false}
+            nodesDraggable={true}
             nodesConnectable={false}
             nodesFocusable={false}
             elementsSelectable={false}
+            onNodeDrag={horizontalNodeDrag}
+            onNodeDragStop={nodeDrag}
               // onEdgeUpdate={edgeUpdate}
               // onEdgeUpdateStart={edgeUpdateStart}
               // onEdgeUpdateEnd={edgeUpdateEnd}
             defaultEdgeOptions={defaultEdgeOptions}
-            onMouseMove={onMouseMove}
+            // onMouseMove={onMouseMove}
             proOptions={proOptions}
-            translateExtent={[[-50, -50], [Infinity, Infinity]]}
+            translateExtent={[[-60, -50], [Infinity, Infinity]]}
             nodeExtent={[[0, 0], [Infinity, Infinity]]}
             onNodeClick={onNodeClick}
+            defaultViewport={{ x: 60, y: 50, zoom: 1 }}
           >
-            <CustomTimelineBackground>
+            <CustomTimelineBackground
+              gap={gapSize}
+              minutesPerGap={minutesPerGap}
+            >
             </CustomTimelineBackground>
-            <CustomTimelinePanel startDate={scenario?.scenario_recurrence_start}>
+            <CustomTimelinePanel
+              gap={gapSize}
+              minutesPerGap={minutesPerGap}
+            >
             </CustomTimelinePanel>
           </ReactFlow>
         </div>
