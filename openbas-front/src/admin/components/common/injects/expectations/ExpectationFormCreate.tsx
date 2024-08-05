@@ -95,7 +95,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
           <MenuItem key={'MANUAL'} value={'MANUAL'}>{t('MANUAL')}</MenuItem>
         </MUISelect>
       </div>
-      {watchType === 'ARTICLE'
+      {(watchType === 'ARTICLE' || watchType === 'CHALLENGE')
         && <Alert
           severity="info"
           className={classes.marginTop_2}

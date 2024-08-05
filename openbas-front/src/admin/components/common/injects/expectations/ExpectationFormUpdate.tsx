@@ -65,7 +65,7 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
           <MenuItem value={getValues().expectation_type}>{t(getValues().expectation_type)}</MenuItem>
         </MUISelect>
       </div>
-      {getValues().expectation_type === 'ARTICLE'
+      {(getValues().expectation_type === 'ARTICLE' || getValues().expectation_type === 'CHALLENGE')
         && <Alert
           severity="info"
           className={classes.marginTop_2}
