@@ -67,7 +67,7 @@ public class ChallengeContract extends Contractor {
                 """;
         Expectation expectation = new Expectation();
         expectation.setType(CHALLENGE);
-        expectation.setName("Expect teams to finish the challenge(s)");
+        expectation.setName("Expect targets to complete the challenge(s)");
         expectation.setScore(0.0);
         ContractExpectations expectationsField = expectationsField(
                 "expectations", "Expectations", List.of(expectation)

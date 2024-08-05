@@ -15,6 +15,7 @@ public class ChallengeExpectation implements Expectation {
   private Double score;
   private Challenge challenge;
   private boolean expectationGroup;
+  private String name;
 
   public ChallengeExpectation(Double score, Challenge challenge) {
     setScore(Objects.requireNonNullElse(score, 100.0));
@@ -24,6 +25,7 @@ public class ChallengeExpectation implements Expectation {
   public ChallengeExpectation(Double score, Challenge challenge, boolean expectationGroup) {
     setScore(Objects.requireNonNullElse(score, 100.0));
     setChallenge(challenge);
+    setName(challenge.getName());
     setExpectationGroup(expectationGroup);
   }
 

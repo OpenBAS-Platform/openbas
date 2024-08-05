@@ -348,8 +348,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         label: (
           <span>
             {getStatusLabel(targetType, [expectation.inject_expectation_status])}
-            <br/>
-            ({expectation.inject_expectation_name ? truncate(expectation.inject_expectation_name, 20) : expectation.inject_expectation_type})
+            <br/>{truncate(expectation.inject_expectation_name, 20)}
           </span>
         ),
         type: targetType,
@@ -375,6 +374,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           background: getColor(step.status).background,
         },
         position: { x: 0, y: 0 },
+
       })));
       setEdges([...Array(mergedSteps.length - 1)].map((_, i) => ({
         id: `result-${i}->result-${i + 1}`,

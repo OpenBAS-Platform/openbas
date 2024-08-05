@@ -15,6 +15,7 @@ public class ChannelExpectation implements Expectation {
   private Double score;
   private Article article;
   private boolean expectationGroup;
+  private String name;
 
   public ChannelExpectation(Double score, Article article) {
     setScore(Objects.requireNonNullElse(score, 100.0));
@@ -24,6 +25,7 @@ public class ChannelExpectation implements Expectation {
   public ChannelExpectation(Double score, Article article, boolean expectationGroup) {
     setScore(Objects.requireNonNullElse(score, 100.0));
     setArticle(article);
+    setName(article.getName());
     setExpectationGroup(expectationGroup);
   }
 

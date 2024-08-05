@@ -346,8 +346,8 @@ const i18n = {
       'Send email': 'Envoyer le mail',
       'Add documents in this media pressure':
         'Ajouter des documents à cette pression médiatique',
-      'Expect teams to read the article(s)':
-        'Les équipes doivent lire le(s) article(s)',
+      'Expect targets to read the article(s)':
+        'Les cibles doivent lire le(s) article(s)',
       'Add media pressure': 'Ajouter de la pression médiatique',
       'Remove from the media pressure': 'Supprimer de la pression médiatique',
       'Raw request data': 'Données brutes de la requête',
@@ -1565,7 +1565,7 @@ const i18n = {
       'Send email': '发送邮件',
       'Add documents in this media pressure':
         '将文档添加到媒体',
-      'Expect teams to read the article(s)':
+      'Expect targets to read the article(s)':
         '希望团队阅读文章',
       'Add media pressure': '添加媒体',
       'Remove from the media pressure': '从媒体移除',
