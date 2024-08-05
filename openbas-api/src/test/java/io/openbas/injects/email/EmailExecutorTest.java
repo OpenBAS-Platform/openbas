@@ -49,7 +49,7 @@ public class EmailExecutorTest {
     content.setBody("A body");
     Expectation expectation = new Expectation();
     expectation.setName("The animation team can validate the audience reaction");
-    expectation.setScore(10);
+    expectation.setScore(10.0);
     expectation.setType(InjectExpectation.EXPECTATION_TYPE.MANUAL);
     content.setExpectations(List.of(expectation));
     Inject inject = new Inject();
