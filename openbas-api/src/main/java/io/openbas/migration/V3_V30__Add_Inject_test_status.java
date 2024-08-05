@@ -15,7 +15,7 @@ public class V3_V30__Add_Inject_test_status extends BaseJavaMigration {
     // Create table
     select.execute("""
              CREATE TABLE inject_test_status (
-               status_id UUID NOT NULL CONSTRAINT import_mappers_pkey PRIMARY KEY,
+               status_id UUID NOT NULL CONSTRAINT inject_test_status_pkey PRIMARY KEY,
                status_name VARCHAR(255) NOT NULL,
                status_executions text,
                tracking_sent_date timestamp,
