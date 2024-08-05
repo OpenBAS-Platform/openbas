@@ -43,8 +43,6 @@ public class ExerciseExpectationService {
         if (injectExpectation.getType() == EXPECTATION_TYPE.MANUAL) {
             if (injectExpectation.getTeam() != null && injectExpectation.getUser() == null) { //If it is a team expectation
                 result = input.getScore() > 0 ? "Success" : "Failed";
-                injectExpectation.getResults().clear();
-                exists = Optional.empty();
             } else {
                 if (input.getScore() >= injectExpectation.getExpectedScore()) {
                     result = "Success";
@@ -54,6 +52,8 @@ public class ExerciseExpectationService {
                     result = "Failed";
                 }
             }
+            injectExpectation.getResults().clear();
+            exists = Optional.empty();
         } else if (injectExpectation.getType() == EXPECTATION_TYPE.DETECTION) {
             if (input.getScore() >= injectExpectation.getExpectedScore()) {
                 result = "Detected";
