@@ -34,6 +34,7 @@ import static java.time.Instant.now;
     )
 })
 public class Team implements Base {
+
     @Id
     @Column(name = "team_id")
     @GeneratedValue(generator = "UUID")
@@ -43,9 +44,9 @@ public class Team implements Base {
     private String id;
 
     @Column(name = "team_name")
-    @NotBlank
     @JsonProperty("team_name")
     @Queryable(searchable = true)
+    @NotBlank
     private String name;
 
     @Column(name = "team_description")
@@ -54,10 +55,12 @@ public class Team implements Base {
 
     @Column(name = "team_created_at")
     @JsonProperty("team_created_at")
+    @NotNull
     private Instant createdAt = now();
 
     @Column(name = "team_updated_at")
     @JsonProperty("team_updated_at")
+    @NotNull
     private Instant updatedAt = now();
 
     @ManyToMany(fetch = FetchType.LAZY)

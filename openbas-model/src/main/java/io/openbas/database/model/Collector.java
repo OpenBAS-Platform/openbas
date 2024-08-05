@@ -2,72 +2,63 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.helper.MonoIdDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import static java.time.Instant.now;
 
+@Getter
 @Setter
 @Entity
 @Table(name = "collectors")
 @EntityListeners(ModelBaseListener.class)
 public class Collector implements Base {
 
-    @Getter
     @Id
     @Column(name = "collector_id")
     @JsonProperty("collector_id")
     @NotBlank
     private String id;
 
-    @Getter
     @Column(name = "collector_name")
     @JsonProperty("collector_name")
     @NotBlank
     private String name;
 
-    @Getter
     @Column(name = "collector_type")
     @JsonProperty("collector_type")
     @NotBlank
     private String type;
 
-    @Getter
     @Column(name = "collector_period")
     @JsonProperty("collector_period")
     private int period;
 
-    @Getter
     @Column(name = "collector_external")
     @JsonProperty("collector_external")
     private boolean external = false;
-    
-    @Getter
+
     @Column(name = "collector_created_at")
     @JsonProperty("collector_created_at")
+    @NotNull
     private Instant createdAt = now();
 
-    @Getter
     @Column(name = "collector_updated_at")
     @JsonProperty("collector_updated_at")
+    @NotNull
     private Instant updatedAt = now();
 
-    @Getter
     @Column(name = "collector_last_execution")
     @JsonProperty("collector_last_execution")
     private Instant lastExecution;
 
-    @Getter
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collector_security_platform")
     @JsonProperty("collector_security_platform")

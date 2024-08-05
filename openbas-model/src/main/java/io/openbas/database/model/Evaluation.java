@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -20,23 +22,27 @@ import static java.time.Instant.now;
 @Table(name = "evaluations")
 @EntityListeners(ModelBaseListener.class)
 public class Evaluation implements Base {
+
     @Id
     @Column(name = "evaluation_id")
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("evaluation_id")
+    @NotBlank
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "evaluation_objective")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("evaluation_objective")
+    @NotNull
     private Objective objective;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "evaluation_user")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("evaluation_user")
+    @NotNull
     private User user;
 
     @Column(name = "evaluation_score")
@@ -45,10 +51,12 @@ public class Evaluation implements Base {
 
     @Column(name = "evaluation_created_at")
     @JsonProperty("evaluation_created_at")
+    @NotNull
     private Instant created = now();
 
     @Column(name = "evaluation_updated_at")
     @JsonProperty("evaluation_updated_at")
+    @NotNull
     private Instant updated = now();
 
     @Override

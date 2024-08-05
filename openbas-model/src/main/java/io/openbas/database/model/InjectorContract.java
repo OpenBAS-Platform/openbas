@@ -75,10 +75,12 @@ public class InjectorContract implements Base {
 
     @Column(name = "injector_contract_created_at")
     @JsonProperty("injector_contract_created_at")
+    @NotNull
     private Instant createdAt = now();
 
     @Column(name = "injector_contract_updated_at")
     @JsonProperty("injector_contract_updated_at")
+    @NotNull
     private Instant updatedAt = now();
 
     @ManyToOne(fetch = FetchType.EAGER)

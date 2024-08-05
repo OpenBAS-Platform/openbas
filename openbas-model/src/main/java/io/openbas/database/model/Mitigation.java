@@ -8,6 +8,7 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MultiIdListDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
@@ -66,11 +67,13 @@ public class Mitigation implements Base {
   @Queryable(sortable = true)
   @Column(name = "mitigation_created_at")
   @JsonProperty("mitigation_created_at")
+  @NotNull
   private Instant createdAt = now();
 
   @Queryable(sortable = true)
   @Column(name = "mitigation_updated_at")
   @JsonProperty("mitigation_updated_at")
+  @NotNull
   private Instant updatedAt = now();
 
   @ManyToMany(fetch = FetchType.LAZY)

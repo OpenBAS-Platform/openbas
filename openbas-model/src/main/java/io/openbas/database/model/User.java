@@ -84,8 +84,8 @@ public class User implements Base {
   @Getter(NONE)
   @Column(name = "user_email")
   @JsonProperty("user_email")
-  @NotBlank
   @Queryable(searchable = true, sortable = true)
+  @NotBlank
   private String email;
 
   @Setter
@@ -117,11 +117,13 @@ public class User implements Base {
   @Setter
   @Column(name = "user_created_at")
   @JsonProperty("user_created_at")
+  @NotNull
   private Instant createdAt = now();
 
   @Setter
   @Column(name = "user_updated_at")
   @JsonProperty("user_updated_at")
+  @NotNull
   private Instant updatedAt = now();
 
   @Setter

@@ -73,10 +73,12 @@ public class Variable implements Base {
 
   @Column(name = "variable_created_at")
   @JsonProperty("variable_created_at")
+  @NotNull
   private Instant createdAt = now();
 
   @Column(name = "variable_updated_at")
   @JsonProperty("variable_updated_at")
+  @NotNull
   private Instant updatedAt = now();
 
 }

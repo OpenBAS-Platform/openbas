@@ -30,6 +30,7 @@ public class Tag implements Base {
   @Column(name = "tag_name")
   @JsonProperty("tag_name")
   @Queryable(searchable = true, sortable = true)
+  @NotBlank
   private String name;
 
   @Getter

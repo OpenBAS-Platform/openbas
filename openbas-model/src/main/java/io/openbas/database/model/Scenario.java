@@ -12,6 +12,7 @@ import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.Getter;
 import org.hibernate.annotations.UuidGenerator;
@@ -49,8 +50,8 @@ public class Scenario implements Base {
 
   @Column(name = "scenario_name")
   @JsonProperty("scenario_name")
-  @NotBlank
   @Queryable(searchable = true)
+  @NotBlank
   private String name;
 
   @Column(name = "scenario_description")
@@ -122,10 +123,12 @@ public class Scenario implements Base {
 
   @Column(name = "scenario_created_at")
   @JsonProperty("scenario_created_at")
+  @NotNull
   private Instant createdAt = now();
 
   @Column(name = "scenario_updated_at")
   @JsonProperty("scenario_updated_at")
+  @NotNull
   private Instant updatedAt = now();
 
   // -- RELATION --
