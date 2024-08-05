@@ -17,4 +17,6 @@ public interface RawInjectExpectation {
     String getInject_expectation_id();
 
     String getExercise_id();
+
+    boolean getInject_expectation_group();
 }

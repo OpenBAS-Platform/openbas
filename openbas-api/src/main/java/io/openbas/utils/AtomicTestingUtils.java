@@ -351,7 +351,7 @@ public class AtomicTestingUtils {
                 .getExpectations()
                 .stream()
                 .filter(expectation -> targetIds.contains(expectation.getTargetId()))
-                .filter(expectation -> expectation.getUser() == null) // Filter expectations linked to players
+                .filter(expectation -> expectation.getUser() == null) // Filter expectations linked to players. For global results, We use Team expectations
                 .toList();
     }
 
@@ -412,13 +412,29 @@ public class AtomicTestingUtils {
                     if( rawInjectExpectation.getInject_expectation_score() == null ) {
                         return null;
                     }
-                    if( rawInjectExpectation.getInject_expectation_score() >= rawInjectExpectation.getInject_expectation_expected_score() ) {
-                        return 1.0;
+                    if(rawInjectExpectation.getTeam_id() != null) {
+                        if (rawInjectExpectation.getInject_expectation_group()) {
+                            if (rawInjectExpectation.getInject_expectation_score() > 0) {
+                                return 1.0;
+                            } else {
+                                return 0.0;
+                            }
+                        } else {
+                            if (rawInjectExpectation.getInject_expectation_score() >= rawInjectExpectation.getInject_expectation_expected_score()) {
+                                return 1.0;
+                            } else {
+                                return 0.0;
+                            }
+                        }
+                    }else{
+                        if( rawInjectExpectation.getInject_expectation_score() >= rawInjectExpectation.getInject_expectation_expected_score() ) {
+                            return 1.0;
+                        }
+                        if( rawInjectExpectation.getInject_expectation_score() == 0 ) {
+                            return 0.0;
+                        }
+                        return 0.5;
                     }
-                    if( rawInjectExpectation.getInject_expectation_score() == 0 ) {
-                        return 0.0;
-                    }
-                    return 0.5;
                 })
                 .toList();
     }

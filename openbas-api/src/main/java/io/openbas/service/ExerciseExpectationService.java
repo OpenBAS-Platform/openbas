@@ -98,7 +98,7 @@ public class ExerciseExpectationService {
         injectExpectation.setUpdatedAt(now());
         InjectExpectation updated = this.injectExpectationRepository.save(injectExpectation);
 
-        // If The expectation is type manual, we should update expectations for teams and  players
+        // If The expectation is type manual, We should update expectations for teams and players
         if (updated.getType() == EXPECTATION_TYPE.MANUAL && updated.getTeam() != null) {
             computeExpectationsForTeamsAndPlayer(updated, result);
         }
@@ -127,8 +127,7 @@ public class ExerciseExpectationService {
         injectExpectation.setUpdatedAt(now());
         InjectExpectation updated = this.injectExpectationRepository.save(injectExpectation);
 
-        // -- VALIDATION TYPE --
-
+        // If The expectation is type manual, We should update expectations for teams and players
         if (updated.getType() == EXPECTATION_TYPE.MANUAL && updated.getTeam() != null) {
             computeExpectationsForTeamsAndPlayer(updated, null);
         }
@@ -136,11 +135,13 @@ public class ExerciseExpectationService {
         return updated;
     }
 
+    // -- VALIDATION TYPE --
     private void computeExpectationsForTeamsAndPlayer(InjectExpectation updated, String result) {
-        if (updated.getUser() != null) { //If the updated expectation was a player expectation, We have to update the team expectation using expectation of players (based on validation type)
+        //If the updated expectation was a player expectation, We have to update the team expectation using player expectations (based on validation type)
+        if (updated.getUser() != null) {
             List<InjectExpectation> toProcess = injectExpectationRepository.findAllByInjectAndTeamAndExpectationName(updated.getInject().getId(), updated.getTeam().getId(), updated.getName());
             InjectExpectation parentExpectation = toProcess.stream().filter(exp -> exp.getUser() == null).findFirst().orElseThrow(ElementNotFoundException::new);
-            int playerSize = toProcess.size() - 1; // Without Parent expectation
+            int playersSize = toProcess.size() - 1; // Without Parent expectation
             long zeroPlayerResponses = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() == 0.0).count();
             long nullPlayerResponses = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp -> exp.getScore() == null).count();
 
@@ -150,7 +151,7 @@ public class ExerciseExpectationService {
                     parentExpectation.setScore(avgAtLeastOnePlayer.getAsDouble());
                     result = "Success";
                 } else {
-                    if (zeroPlayerResponses == playerSize) { //All players had failed
+                    if (zeroPlayerResponses == playersSize) { //All players had failed
                         parentExpectation.setScore(0.0);
                         result = "Failed";
                     } else {
@@ -169,7 +170,7 @@ public class ExerciseExpectationService {
                         result = "Pending";
                     }else{
                         double sumAllPlayer = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp->exp.getScore() != null).mapToDouble(InjectExpectation::getScore).sum();
-                        parentExpectation.setScore(sumAllPlayer/playerSize);
+                        parentExpectation.setScore(sumAllPlayer/playersSize);
                         result = "Failed";
                     }
                 }

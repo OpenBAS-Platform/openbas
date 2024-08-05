@@ -41,7 +41,7 @@ public class InjectHelper {
 
   private List<Team> getInjectTeams(@NotNull final Inject inject) {
     Exercise exercise = inject.getExercise();
-    if(inject.isAllTeams()) {
+    if(inject.isAllTeams()) { // In order to process expectations from players, we also need to load players into teams
       exercise.getTeams().forEach(team -> Hibernate.initialize(team.getUsers()));
       return exercise.getTeams();
     } else {

@@ -126,8 +126,7 @@ public class ChannelService {
                     long zeroPlayerResponses = toProcess.stream().filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() == 0.0).count();
                     long nullPlayerResponses = toProcess.stream().filter(exp -> exp.getScore() == null).count();
 
-                    if (isValidationAtLeastOneTarget) { // type atLeast
-                        //If true is at least one
+                    if (isValidationAtLeastOneTarget) { // Type atLeast
                         OptionalDouble avgAtLeastOnePlayer = toProcess.stream().filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() > 0.0).mapToDouble(InjectExpectation::getScore).average();
                         if (avgAtLeastOnePlayer.isPresent()) { //Any response is positive
                             parentExpectation.setScore(avgAtLeastOnePlayer.getAsDouble());

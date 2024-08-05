@@ -646,7 +646,9 @@ const i18n = {
       Failed: 'Echoué',
       'Pending result': 'Résultat en attente',
       'Validation mode': 'Type de validation',
+      'All players (per team) must validate the expectation': 'Tous les joueurs (par équipe) doivent valider l\'attente',
       'All assets (per group) must validate the expectation': 'Tous les actifs (par groupe) doivent valider l\'attente',
+      'At least one player (per team) must validate the expectation': 'Au moins un joueur (par équipe) doit valider l\'attente',
       'At least one asset (per group) must validate the expectation': 'Au moins un actif (par groupe) doit valider l\'attente',
       'An isolated asset is considered as a group of one asset': 'Un actif isolé est considéré comme un groupe d\'un seul actif',
       // -- Expectation end --

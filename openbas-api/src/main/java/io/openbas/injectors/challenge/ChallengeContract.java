@@ -65,6 +65,7 @@ public class ChallengeContract extends Contractor {
                     Kind regards,<br />
                     The animation team
                 """;
+        // We include the expectations for challenges
         Expectation expectation = new Expectation();
         expectation.setType(CHALLENGE);
         expectation.setName("Expect targets to complete the challenge(s)");

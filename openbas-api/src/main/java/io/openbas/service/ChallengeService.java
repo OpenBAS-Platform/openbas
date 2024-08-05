@@ -100,7 +100,7 @@ public class ChallengeService {
                                               User user) {
         ChallengeResult challengeResult = tryChallenge(challengeId, input);
         if (challengeResult.getResult()) {
-            // Find and update the expectations linked to user
+            // Find and update the expectations linked to the user
             List<InjectExpectation> playerExpectations = injectExpectationRepository.findByUserAndExerciseAndChallenge(user.getId(), exerciseId, challengeId);
             playerExpectations.forEach(playerExpectation -> {
                 playerExpectation.setScore(playerExpectation.getExpectedScore());
@@ -119,36 +119,38 @@ public class ChallengeService {
 
             // -- VALIDATION TYPE --
 
-            // Process expectation linked to teams where user is part of
+            // Process expectations linked to teams where the user is a member
             List<String> teamIds = user.getTeams().stream().map(Team::getId).toList();
             // Find all expectations for this exercise, challenge and teams
             List<InjectExpectation> challengeExpectations = injectExpectationRepository.findChallengeExpectations(exerciseId, teamIds, challengeId);
+            // If user is null then expectation is from a team
             List<InjectExpectation> parentExpectations = challengeExpectations.stream().filter(exp -> exp.getUser() == null).toList();
+            // If user is not null then expectation is from a player
             Map<Team, List<InjectExpectation>> playerByTeam = challengeExpectations.stream().filter(exp -> exp.getUser() != null).collect(Collectors.groupingBy(InjectExpectation::getTeam));
 
-            // Depending on type of validation, we process the parent expectations:
+            // Depending on type of validation, We process the parent expectations:
             challengeExpectations.stream().findAny().ifPresentOrElse(process -> {
                 boolean isValidationAtLeastOneTarget = process.isExpectationGroup();
 
+                // We update team expectations and for that We need to process all player expectations
                 parentExpectations.forEach(parentExpectation -> {
                     List<InjectExpectation> toProcess = playerByTeam.get(parentExpectation.getTeam());
-                    int playerSize = toProcess.size(); // Without Parent expectation
+                    int playersSize = toProcess.size();
                     long zeroPlayerResponses = toProcess.stream().filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() == 0.0).count();
                     long nullPlayerResponses = toProcess.stream().filter(exp -> exp.getScore() == null).count();
 
-                    if (isValidationAtLeastOneTarget) { // type atLeast
-                        //If true is at least one
+                    if (isValidationAtLeastOneTarget) { // Type atLeast
                         OptionalDouble avgAtLeastOnePlayer = toProcess.stream().filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() > 0.0).mapToDouble(InjectExpectation::getScore).average();
                         if (avgAtLeastOnePlayer.isPresent()) { //Any response is positive
                             parentExpectation.setScore(avgAtLeastOnePlayer.getAsDouble());
                         } else {
-                            if (zeroPlayerResponses == playerSize) { //All players had failed
+                            if (zeroPlayerResponses == playersSize) { //All players had failed
                                 parentExpectation.setScore(0.0);
                             } else {
                                 parentExpectation.setScore(null);
                             }
                         }
-                    } else { // type all
+                    } else { // Type all
                         if(nullPlayerResponses == 0){
                             OptionalDouble avgAllPlayer = toProcess.stream().mapToDouble(InjectExpectation::getScore).average();
                             parentExpectation.setScore(avgAllPlayer.getAsDouble());
@@ -157,7 +159,7 @@ public class ChallengeService {
                                 parentExpectation.setScore(null);
                             }else{
                                 double sumAllPlayer = toProcess.stream().filter(exp->exp.getScore() != null).mapToDouble(InjectExpectation::getScore).sum();
-                                parentExpectation.setScore(sumAllPlayer/playerSize);
+                                parentExpectation.setScore(sumAllPlayer/playersSize);
                             }
                         }
                     }
