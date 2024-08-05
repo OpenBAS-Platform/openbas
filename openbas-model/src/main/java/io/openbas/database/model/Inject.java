@@ -32,532 +32,539 @@ import static java.util.Optional.ofNullable;
 @EntityListeners(ModelBaseListener.class)
 @Log
 public class Inject implements Base, Injection {
-    public static final int SPEED_STANDARD = 1; // Standard speed define by the user.
 
-    public static final Comparator<Inject> executionComparator = (o1, o2) -> {
-        if (o1.getDate().isPresent() && o2.getDate().isPresent()) {
-            return o1.getDate().get().compareTo(o2.getDate().get());
-        }
-        return o1.getId().compareTo(o2.getId());
-    };
+  public static final int SPEED_STANDARD = 1; // Standard speed define by the user.
 
-    @Getter
-    @Id
-    @Column(name = "inject_id")
-    @GeneratedValue(generator = "UUID")
-    @UuidGenerator
-    @JsonProperty("inject_id")
-    @NotBlank
-    private String id;
-
-    @Getter
-    @Queryable(searchable = true, filterable = true, sortable = true)
-    @Column(name = "inject_title")
-    @JsonProperty("inject_title")
-    @NotBlank
-    private String title;
-
-    @Getter
-    @Column(name = "inject_description")
-    @JsonProperty("inject_description")
-    private String description;
-
-    @Getter
-    @Column(name = "inject_country")
-    @JsonProperty("inject_country")
-    private String country;
-
-    @Getter
-    @Column(name = "inject_city")
-    @JsonProperty("inject_city")
-    private String city;
-
-    @Getter
-    @Column(name = "inject_enabled")
-    @JsonProperty("inject_enabled")
-    private boolean enabled = true;
-
-    @Getter
-    @Column(name = "inject_content")
-    @Convert(converter = ContentConverter.class)
-    @JsonProperty("inject_content")
-    private ObjectNode content;
-
-    @Getter
-    @Column(name = "inject_created_at")
-    @JsonProperty("inject_created_at")
-    @NotNull
-    private Instant createdAt = now();
-
-    @Getter
-    @Column(name = "inject_updated_at")
-    @Queryable(sortable = true)
-    @JsonProperty("inject_updated_at")
-    @NotNull
-    private Instant updatedAt = now();
-
-    @Getter
-    @Column(name = "inject_all_teams")
-    @JsonProperty("inject_all_teams")
-    private boolean allTeams;
-
-    @Getter
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "inject_exercise")
-    @JsonSerialize(using = MonoIdDeserializer.class)
-    @JsonProperty("inject_exercise")
-    private Exercise exercise;
-
-    @Getter
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "inject_scenario")
-    @JsonSerialize(using = MonoIdDeserializer.class)
-    @JsonProperty("inject_scenario")
-    private Scenario scenario;
-
-    @Getter
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inject_depends_from_another")
-    @JsonSerialize(using = MonoIdDeserializer.class)
-    @JsonProperty("inject_depends_on")
-    private Inject dependsOn;
-
-    @Getter
-    @Column(name = "inject_depends_duration")
-    @JsonProperty("inject_depends_duration")
-    @NotNull
-    @Min(value = 0L, message = "The value must be positive")
-    private Long dependsDuration;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "inject_injector_contract")
-    @JsonProperty("inject_injector_contract")
-    private InjectorContract injectorContract;
-
-    @Getter
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inject_user")
-    @JsonSerialize(using = MonoIdDeserializer.class)
-    @JsonProperty("inject_user")
-    private User user;
-
-    // CascadeType.ALL is required here because inject status are embedded
-    @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonProperty("inject_status")
-    @Queryable(sortable = true, property = "name")
-    private InjectStatus status;
-
-    @Getter
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "injects_tags",
-            joinColumns = @JoinColumn(name = "inject_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    @JsonSerialize(using = MultiIdSetDeserializer.class)
-    @JsonProperty("inject_tags")
-    private Set<Tag> tags = new HashSet<>();
-
-    @Getter
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "injects_teams",
-            joinColumns = @JoinColumn(name = "inject_id"),
-            inverseJoinColumns = @JoinColumn(name = "team_id"))
-    @JsonSerialize(using = MultiIdListDeserializer.class)
-    @JsonProperty("inject_teams")
-    private List<Team> teams = new ArrayList<>();
-
-    @Getter
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "injects_assets",
-            joinColumns = @JoinColumn(name = "inject_id"),
-            inverseJoinColumns = @JoinColumn(name = "asset_id"))
-    @JsonSerialize(using = MultiIdListDeserializer.class)
-    @JsonProperty("inject_assets")
-    private List<Asset> assets = new ArrayList<>();
-
-    @Getter
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "injects_asset_groups",
-            joinColumns = @JoinColumn(name = "inject_id"),
-            inverseJoinColumns = @JoinColumn(name = "asset_group_id"))
-    @JsonSerialize(using = MultiIdListDeserializer.class)
-    @JsonProperty("inject_asset_groups")
-    private List<AssetGroup> assetGroups = new ArrayList<>();
-
-    @Getter
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "injects_payloads",
-            joinColumns = @JoinColumn(name = "inject_id"),
-            inverseJoinColumns = @JoinColumn(name = "payload_id"))
-    @JsonSerialize(using = MultiIdListDeserializer.class)
-    @JsonProperty("inject_payloads")
-    private List<Asset> payloads = new ArrayList<>();
-
-    // CascadeType.ALL is required here because of complex relationships
-    @Getter
-    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonProperty("inject_documents")
-    @JsonSerialize(using = MultiModelDeserializer.class)
-    private List<InjectDocument> documents = new ArrayList<>();
-
-    // CascadeType.ALL is required here because communications are embedded
-    @Getter
-    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonProperty("inject_communications")
-    @JsonSerialize(using = MultiModelDeserializer.class)
-    private List<Communication> communications = new ArrayList<>();
-
-    // CascadeType.ALL is required here because expectations are embedded
-    @Getter
-    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonProperty("inject_expectations")
-    @JsonSerialize(using = MultiModelDeserializer.class)
-    private List<InjectExpectation> expectations = new ArrayList<>();
-
-    @Getter
-    @Setter
-    @Transient
-    private boolean isListened = true;
-
-    // region transient
-    @Transient
-    public String getHeader() {
-        return ofNullable(this.getExercise()).map(Exercise::getHeader).orElse("");
+  public static final Comparator<Inject> executionComparator = (o1, o2) -> {
+    if (o1.getDate().isPresent() && o2.getDate().isPresent()) {
+      return o1.getDate().get().compareTo(o2.getDate().get());
     }
+    return o1.getId().compareTo(o2.getId());
+  };
 
-    @Transient
-    public String getFooter() {
-        return ofNullable(this.getExercise()).map(Exercise::getFooter).orElse("");
+  @Getter
+  @Id
+  @Column(name = "inject_id")
+  @GeneratedValue(generator = "UUID")
+  @UuidGenerator
+  @JsonProperty("inject_id")
+  @NotBlank
+  private String id;
+
+  @Getter
+  @Queryable(searchable = true, filterable = true, sortable = true)
+  @Column(name = "inject_title")
+  @JsonProperty("inject_title")
+  @NotBlank
+  private String title;
+
+  @Getter
+  @Column(name = "inject_description")
+  @JsonProperty("inject_description")
+  private String description;
+
+  @Getter
+  @Column(name = "inject_country")
+  @JsonProperty("inject_country")
+  private String country;
+
+  @Getter
+  @Column(name = "inject_city")
+  @JsonProperty("inject_city")
+  private String city;
+
+  @Getter
+  @Column(name = "inject_enabled")
+  @JsonProperty("inject_enabled")
+  private boolean enabled = true;
+
+  @Getter
+  @Column(name = "inject_content")
+  @Convert(converter = ContentConverter.class)
+  @JsonProperty("inject_content")
+  private ObjectNode content;
+
+  @Getter
+  @Column(name = "inject_created_at")
+  @JsonProperty("inject_created_at")
+  @NotNull
+  private Instant createdAt = now();
+
+  @Getter
+  @Column(name = "inject_updated_at")
+  @Queryable(sortable = true)
+  @JsonProperty("inject_updated_at")
+  @NotNull
+  private Instant updatedAt = now();
+
+  @Getter
+  @Column(name = "inject_all_teams")
+  @JsonProperty("inject_all_teams")
+  private boolean allTeams;
+
+  @Getter
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "inject_exercise")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("inject_exercise")
+  private Exercise exercise;
+
+  @Getter
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "inject_scenario")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("inject_scenario")
+  private Scenario scenario;
+
+  @Getter
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "inject_depends_from_another")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("inject_depends_on")
+  private Inject dependsOn;
+
+  @Getter
+  @Column(name = "inject_depends_duration")
+  @JsonProperty("inject_depends_duration")
+  @NotNull
+  @Min(value = 0L, message = "The value must be positive")
+  private Long dependsDuration;
+
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "inject_injector_contract")
+  @JsonProperty("inject_injector_contract")
+  private InjectorContract injectorContract;
+
+  @Getter
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "inject_user")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("inject_user")
+  private User user;
+
+  // CascadeType.ALL is required here because inject status are embedded
+  @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonProperty("inject_status")
+  @Queryable(sortable = true, property = "name")
+  private InjectStatus status;
+
+  @Getter
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(name = "injects_tags",
+      joinColumns = @JoinColumn(name = "inject_id"),
+      inverseJoinColumns = @JoinColumn(name = "tag_id"))
+  @JsonSerialize(using = MultiIdSetDeserializer.class)
+  @JsonProperty("inject_tags")
+  private Set<Tag> tags = new HashSet<>();
+
+  @Getter
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(name = "injects_teams",
+      joinColumns = @JoinColumn(name = "inject_id"),
+      inverseJoinColumns = @JoinColumn(name = "team_id"))
+  @JsonSerialize(using = MultiIdListDeserializer.class)
+  @JsonProperty("inject_teams")
+  private List<Team> teams = new ArrayList<>();
+
+  @Getter
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(name = "injects_assets",
+      joinColumns = @JoinColumn(name = "inject_id"),
+      inverseJoinColumns = @JoinColumn(name = "asset_id"))
+  @JsonSerialize(using = MultiIdListDeserializer.class)
+  @JsonProperty("inject_assets")
+  private List<Asset> assets = new ArrayList<>();
+
+  @Getter
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(name = "injects_asset_groups",
+      joinColumns = @JoinColumn(name = "inject_id"),
+      inverseJoinColumns = @JoinColumn(name = "asset_group_id"))
+  @JsonSerialize(using = MultiIdListDeserializer.class)
+  @JsonProperty("inject_asset_groups")
+  private List<AssetGroup> assetGroups = new ArrayList<>();
+
+  @Getter
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(name = "injects_payloads",
+      joinColumns = @JoinColumn(name = "inject_id"),
+      inverseJoinColumns = @JoinColumn(name = "payload_id"))
+  @JsonSerialize(using = MultiIdListDeserializer.class)
+  @JsonProperty("inject_payloads")
+  private List<Asset> payloads = new ArrayList<>();
+
+  // CascadeType.ALL is required here because of complex relationships
+  @Getter
+  @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonProperty("inject_documents")
+  @JsonSerialize(using = MultiModelDeserializer.class)
+  private List<InjectDocument> documents = new ArrayList<>();
+
+  // CascadeType.ALL is required here because communications are embedded
+  @Getter
+  @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonProperty("inject_communications")
+  @JsonSerialize(using = MultiModelDeserializer.class)
+  private List<Communication> communications = new ArrayList<>();
+
+  // CascadeType.ALL is required here because expectations are embedded
+  @Getter
+  @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonProperty("inject_expectations")
+  @JsonSerialize(using = MultiModelDeserializer.class)
+  private List<InjectExpectation> expectations = new ArrayList<>();
+
+  @Getter
+  @Setter
+  @Transient
+  private boolean isListened = true;
+
+  // region transient
+  @Transient
+  public String getHeader() {
+    return ofNullable(this.getExercise()).map(Exercise::getHeader).orElse("");
+  }
+
+  @Transient
+  public String getFooter() {
+    return ofNullable(this.getExercise()).map(Exercise::getFooter).orElse("");
+  }
+
+  @JsonIgnore
+  @Override
+  public boolean isUserHasAccess(User user) {
+    return this.getExercise().isUserHasAccess(user);
+  }
+
+  @JsonIgnore
+  public void clean() {
+    this.status = null;
+    this.communications.clear();
+    this.expectations.clear();
+  }
+
+  @JsonProperty("inject_users_number")
+  public long getNumberOfTargetUsers() {
+    if (this.getExercise() == null) {
+      return 0L;
     }
-
-    @JsonIgnore
-    @Override
-    public boolean isUserHasAccess(User user) {
-        return this.getExercise().isUserHasAccess(user);
+    if (this.isAllTeams()) {
+      return this.getExercise().usersNumber();
     }
+    return getTeams().stream()
+        .map(team -> team.getUsersNumberInExercise(getExercise().getId()))
+        .reduce(Long::sum).orElse(0L);
+  }
 
-    @JsonIgnore
-    public void clean() {
-        this.status = null;
-        this.communications.clear();
-        this.expectations.clear();
-    }
+  @JsonProperty("inject_ready")
+  public boolean isReady() {
+    return InjectModelHelper.isReady(
+        getInjectorContract().orElse(null),
+        getContent(),
+        isAllTeams(),
+        getTeams().stream().map(Team::getId).collect(Collectors.toList()),
+        getAssets().stream().map(Asset::getId).collect(Collectors.toList()),
+        getAssetGroups().stream().map(AssetGroup::getId).collect(Collectors.toList())
+    );
+  }
 
-    @JsonProperty("inject_users_number")
-    public long getNumberOfTargetUsers() {
-        if (this.getExercise() == null) {
-            return 0L;
-        }
-        if (this.isAllTeams()) {
-            return this.getExercise().usersNumber();
-        }
-        return getTeams().stream()
-                .map(team -> team.getUsersNumberInExercise(getExercise().getId()))
-                .reduce(Long::sum).orElse(0L);
-    }
+  @JsonIgnore
+  public Instant computeInjectDate(Instant source, int speed) {
+    return InjectModelHelper.computeInjectDate(source, speed, getDependsOn(), getDependsDuration(), getExercise());
+  }
 
-    @JsonProperty("inject_ready")
-    public boolean isReady() {
-        return InjectModelHelper.isReady(
-            getInjectorContract().orElse(null),
-            getContent(),
-            isAllTeams(),
-            getTeams().stream().map(Team::getId).collect(Collectors.toList()),
-            getAssets().stream().map(Asset::getId).collect(Collectors.toList()),
-            getAssetGroups().stream().map(AssetGroup::getId).collect(Collectors.toList())
-        );
-    }
+  @JsonProperty("inject_date")
+  public Optional<Instant> getDate() {
+    return InjectModelHelper.getDate(getExercise(), getScenario(), getDependsOn(), getDependsDuration());
+  }
 
-    @JsonIgnore
-    public Instant computeInjectDate(Instant source, int speed) {
-        return InjectModelHelper.computeInjectDate(source, speed, getDependsOn(), getDependsDuration(), getExercise());
-    }
+  @JsonIgnore
+  public Inject getInject() {
+    return this;
+  }
 
-    @JsonProperty("inject_date")
-    public Optional<Instant> getDate() {
-        return InjectModelHelper.getDate(getExercise(), getScenario(), getDependsOn(), getDependsDuration());
-    }
+  @JsonIgnore
+  public boolean isNotExecuted() {
+    return this.getStatus().isEmpty();
+  }
 
-    @JsonIgnore
-    public Inject getInject() {
-        return this;
-    }
+  @JsonIgnore
+  public boolean isPastInject() {
+    return this.getDate().map(date -> date.isBefore(now())).orElse(false);
+  }
 
-    @JsonIgnore
-    public boolean isNotExecuted() {
-        return this.getStatus().isEmpty();
-    }
+  @JsonIgnore
+  public boolean isFutureInject() {
+    return this.getDate().map(date -> date.isAfter(now())).orElse(false);
+  }
+  // endregion
 
-    @JsonIgnore
-    public boolean isPastInject() {
-        return this.getDate().map(date -> date.isBefore(now())).orElse(false);
-    }
+  public Optional<InjectorContract> getInjectorContract() {
+    return Optional.ofNullable(this.injectorContract);
+  }
 
-    @JsonIgnore
-    public boolean isFutureInject() {
-        return this.getDate().map(date -> date.isAfter(now())).orElse(false);
-    }
-    // endregion
+  public Optional<InjectStatus> getStatus() {
+    return ofNullable(this.status);
+  }
 
-    public Optional<InjectorContract> getInjectorContract() {
-        return Optional.ofNullable(this.injectorContract);
-    }
-
-    public Optional<InjectStatus> getStatus() {
-        return ofNullable(this.status);
-    }
-
-    public List<InjectExpectation> getUserExpectationsForArticle(User user, Article article) {
-        return this.expectations.stream()
-                .filter(execution -> execution.getType().equals(InjectExpectation.EXPECTATION_TYPE.ARTICLE))
-                .filter(execution -> execution.getArticle().equals(article))
-                .filter(execution -> execution.getUser() != null) //We include only the expectations from players, because the validation link is always from a player
+  public List<InjectExpectation> getUserExpectationsForArticle(User user, Article article) {
+    return this.expectations.stream()
+        .filter(execution -> execution.getType().equals(InjectExpectation.EXPECTATION_TYPE.ARTICLE))
+        .filter(execution -> execution.getArticle().equals(article))
+        .filter(execution -> execution.getUser() != null) //We include only the expectations from players, because the validation link is always from a player
                 .filter(execution -> execution.getUser().equals(user))
-                .toList();
+        .toList();
+  }
+
+  @JsonIgnore
+  public DryInject toDryInject(Dryrun run) {
+    DryInject dryInject = new DryInject();
+    dryInject.setRun(run);
+    dryInject.setInject(this);
+    dryInject.setDate(computeInjectDate(run.getDate(), run.getSpeed()));
+    return dryInject;
+  }
+
+  @JsonProperty("inject_communications_number")
+  public long getCommunicationsNumber() {
+    return this.getCommunications().size();
+  }
+
+  @JsonProperty("inject_communications_not_ack_number")
+  public long getCommunicationsNotAckNumber() {
+    return this.getCommunications().stream().filter(communication -> !communication.getAck()).count();
+  }
+
+  @JsonProperty("inject_sent_at")
+  public Instant getSentAt() {
+    return InjectModelHelper.getSentAt(this.getStatus());
+  }
+
+  @JsonProperty("inject_kill_chain_phases")
+  public List<KillChainPhase> getKillChainPhases() {
+    return getInjectorContract()
+        .map(injectorContract ->
+            injectorContract.getAttackPatterns().stream()
+                .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream())
+                .distinct()
+                .collect(Collectors.toList())
+        )
+        .orElseGet(ArrayList::new);
+  }
+
+  @JsonProperty("inject_attack_patterns")
+  public List<AttackPattern> getAttackPatterns() {
+    return getInjectorContract()
+        .map(InjectorContract::getAttackPatterns)
+        .orElseGet(ArrayList::new);
+  }
+
+  @JsonProperty("inject_type")
+  private String getType() {
+    return getInjectorContract()
+        .map(InjectorContract::getInjector)
+        .map(Injector::getType)
+        .orElse(null);
+  }
+
+  @JsonIgnore
+  public boolean isAtomicTesting() {
+    return this.exercise == null && this.scenario == null;
+  }
+
+  @JsonProperty("inject_testable")
+  public boolean canBeTested() {
+    return this.getType().equals("openbas_email") || this.getType().equals("openbas_ovh_sms");
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    @JsonIgnore
-    public DryInject toDryInject(Dryrun run) {
-        DryInject dryInject = new DryInject();
-        dryInject.setRun(run);
-        dryInject.setInject(this);
-        dryInject.setDate(computeInjectDate(run.getDate(), run.getSpeed()));
-        return dryInject;
+    if (o == null || !Base.class.isAssignableFrom(o.getClass())) {
+      return false;
     }
+    Base base = (Base) o;
+    return id.equals(base.getId());
+  }
 
-    @JsonProperty("inject_communications_number")
-    public long getCommunicationsNumber() {
-        return this.getCommunications().size();
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 
-    @JsonProperty("inject_communications_not_ack_number")
-    public long getCommunicationsNotAckNumber() {
-        return this.getCommunications().stream().filter(communication -> !communication.getAck()).count();
-    }
+  /**
+   * Creates an Inject from a Raw Inject
+   *
+   * @param rawInject               the raw inject to convert
+   * @param rawTeams                the map of the teams containing at least the ones linked to this inject
+   * @param rawInjectExpectationMap the map of the expectations containing at least the ones linked to this inject
+   * @param mapOfAssetGroups        the map of the asset groups containing at least the ones linked to this inject
+   * @param mapOfAsset              the map of the asset containing at least the ones linked to this inject and the
+   *                                asset groups linked to it
+   * @return an Inject
+   */
+  public static Inject fromRawInject(RawInject rawInject,
+      Map<String, RawTeam> rawTeams,
+      Map<String, RawInjectExpectation> rawInjectExpectationMap,
+      Map<String, RawAssetGroup> mapOfAssetGroups,
+      Map<String, RawAsset> mapOfAsset) {
+    // Create the object
+    Inject inject = new Inject();
+    inject.setId(rawInject.getInject_id());
 
-    @JsonProperty("inject_sent_at")
-    public Instant getSentAt() {
-        return InjectModelHelper.getSentAt(this.getStatus());
-    }
-
-    @JsonProperty("inject_kill_chain_phases")
-    public List<KillChainPhase> getKillChainPhases() {
-        return getInjectorContract()
-            .map(injectorContract ->
-                injectorContract.getAttackPatterns().stream()
-                    .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream())
-                    .distinct()
-                    .collect(Collectors.toList())
-            )
-            .orElseGet(ArrayList::new);
-    }
-
-    @JsonProperty("inject_attack_patterns")
-    public List<AttackPattern> getAttackPatterns() {
-        return getInjectorContract()
-            .map(InjectorContract::getAttackPatterns)
-            .orElseGet(ArrayList::new);
-    }
-
-    @JsonProperty("inject_type")
-    private String getType() {
-        return getInjectorContract()
-            .map(InjectorContract::getInjector)
-            .map(Injector::getType)
-            .orElse(null);
-    }
-
-    @JsonIgnore
-    public boolean isAtomicTesting() {
-        return this.exercise == null && this.scenario == null;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || !Base.class.isAssignableFrom(o.getClass())) {
-            return false;
-        }
-        Base base = (Base) o;
-        return id.equals(base.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    /**
-     * Creates an Inject from a Raw Inject
-     *
-     * @param rawInject               the raw inject to convert
-     * @param rawTeams                the map of the teams containing at least the ones linked to this inject
-     * @param rawInjectExpectationMap the map of the expectations containing at least the ones linked to this inject
-     * @param mapOfAssetGroups        the map of the asset groups containing at least the ones linked to this inject
-     * @param mapOfAsset              the map of the asset containing at least the ones linked to this inject and the asset groups linked to it
-     * @return an Inject
-     */
-    public static Inject fromRawInject(RawInject rawInject,
-                                       Map<String, RawTeam> rawTeams,
-                                       Map<String, RawInjectExpectation> rawInjectExpectationMap,
-                                       Map<String, RawAssetGroup> mapOfAssetGroups,
-                                       Map<String, RawAsset> mapOfAsset) {
-        // Create the object
-        Inject inject = new Inject();
-        inject.setId(rawInject.getInject_id());
-
-        // Set a list of expectations
-        inject.setExpectations(new ArrayList<>());
-        for (String expectationId : rawInject.getInject_expectations()) {
-            RawInjectExpectation rawInjectExpectation = rawInjectExpectationMap.get(expectationId);
-            if (rawInjectExpectation != null) {
-                // Create a new expectation
-                InjectExpectation expectation = new InjectExpectation();
-                expectation.setId(rawInjectExpectation.getInject_expectation_id());
-                expectation.setType(
-                        InjectExpectation.EXPECTATION_TYPE.valueOf(rawInjectExpectation.getInject_expectation_type()));
-                expectation.setScore(rawInjectExpectation.getInject_expectation_score());
-                expectation.setExpectedScore(rawInjectExpectation.getInject_expectation_expected_score());
+    // Set a list of expectations
+    inject.setExpectations(new ArrayList<>());
+    for (String expectationId : rawInject.getInject_expectations()) {
+      RawInjectExpectation rawInjectExpectation = rawInjectExpectationMap.get(expectationId);
+      if (rawInjectExpectation != null) {
+        // Create a new expectation
+        InjectExpectation expectation = new InjectExpectation();
+        expectation.setId(rawInjectExpectation.getInject_expectation_id());
+        expectation.setType(
+            InjectExpectation.EXPECTATION_TYPE.valueOf(rawInjectExpectation.getInject_expectation_type()));
+        expectation.setScore(rawInjectExpectation.getInject_expectation_score());
+        expectation.setExpectedScore(rawInjectExpectation.getInject_expectation_expected_score());
                 expectation.setExpectationGroup(rawInjectExpectation.getInject_expectation_group());
 
-                // Add the team of the expectation
-                if (rawInjectExpectation.getTeam_id() != null) {
-                    RawTeam rawTeam = rawTeams.get(rawInjectExpectation.getTeam_id());
-                    if (rawTeam != null) {
-                        Team team = new Team();
-                        team.setId(rawInjectExpectation.getTeam_id());
-                        team.setName(rawTeam.getTeam_name());
-                        expectation.setTeam(team);
-                    }
-                }
-
-                // Add the asset group of the expectation
-                if (rawInjectExpectation.getAsset_group_id() != null) {
-                    RawAssetGroup rawAssetGroup = mapOfAssetGroups.get(rawInjectExpectation.getAsset_group_id());
-                    if (rawAssetGroup != null) {
-                        AssetGroup assetGroup = new AssetGroup();
-                        assetGroup.setId(rawAssetGroup.getAsset_group_id());
-                        assetGroup.setName(rawAssetGroup.getAsset_group_name());
-                        assetGroup.setAssets(new ArrayList<>());
-
-                        // We add the assets to the asset group
-                        for (String assetId : rawAssetGroup.getAsset_ids()) {
-                            RawAsset rawAsset = mapOfAsset.get(assetId);
-                            if (rawAsset != null) {
-                                if (rawAsset.getAsset_type().equals(ENDPOINT_TYPE)) {
-                                    Endpoint endpoint = new Endpoint(rawAsset.getAsset_id(),
-                                            rawAsset.getAsset_type(),
-                                            rawAsset.getAsset_name(),
-                                            Endpoint.PLATFORM_TYPE.valueOf(rawAsset.getEndpoint_platform()));
-                                    assetGroup.getAssets().add(endpoint);
-                                } else {
-                                    Asset asset = new Asset(rawAsset.getAsset_id(),
-                                            rawAsset.getAsset_type(),
-                                            rawAsset.getAsset_name());
-                                    assetGroup.getAssets().add(asset);
-                                }
-                            }
-                        }
-                        expectation.setAssetGroup(assetGroup);
-                    }
-                }
-
-                // We add the asset to the expectation
-                if (rawInjectExpectation.getAsset_id() != null) {
-                    RawAsset rawAsset = mapOfAsset.get(rawInjectExpectation.getAsset_id());
-                    if (rawAsset != null) {
-                        if (rawAsset.getAsset_type().equals(ENDPOINT_TYPE)) {
-                            Endpoint endpoint = new Endpoint(rawAsset.getAsset_id(),
-                                    rawAsset.getAsset_type(),
-                                    rawAsset.getAsset_name(),
-                                    Endpoint.PLATFORM_TYPE.valueOf(rawAsset.getEndpoint_platform()));
-                            expectation.setAsset(endpoint);
-                        } else {
-                            Asset asset = new Asset(
-                                    rawAsset.getAsset_id(),
-                                    rawAsset.getAsset_type(),
-                                    rawAsset.getAsset_name()
-                            );
-                            expectation.setAsset(asset);
-                        }
-                    }
-                }
-                inject.getExpectations().add(expectation);
-            }
-        }
-
-        // We add the teams to the inject
-        ArrayList<Team> injectTeams = new ArrayList();
-        for (String injectTeamId : rawInject.getInject_teams()) {
+        // Add the team of the expectation
+        if (rawInjectExpectation.getTeam_id() != null) {
+          RawTeam rawTeam = rawTeams.get(rawInjectExpectation.getTeam_id());
+          if (rawTeam != null) {
             Team team = new Team();
-            team.setId(rawTeams.get(injectTeamId).getTeam_id());
-            team.setName(rawTeams.get(injectTeamId).getTeam_name());
-            injectTeams.add(team);
+            team.setId(rawInjectExpectation.getTeam_id());
+            team.setName(rawTeam.getTeam_name());
+            expectation.setTeam(team);
+          }
         }
-        inject.setTeams(injectTeams);
 
-        // We add the assets to the inject
-        ArrayList<Asset> injectAssets = new ArrayList();
-        for (String injectAssetId : rawInject.getInject_assets()) {
-            RawAsset rawAsset = mapOfAsset.get(injectAssetId);
+        // Add the asset group of the expectation
+        if (rawInjectExpectation.getAsset_group_id() != null) {
+          RawAssetGroup rawAssetGroup = mapOfAssetGroups.get(rawInjectExpectation.getAsset_group_id());
+          if (rawAssetGroup != null) {
+            AssetGroup assetGroup = new AssetGroup();
+            assetGroup.setId(rawAssetGroup.getAsset_group_id());
+            assetGroup.setName(rawAssetGroup.getAsset_group_name());
+            assetGroup.setAssets(new ArrayList<>());
 
-            if (rawAsset == null) {
-                continue; // Skip to the next iteration
+            // We add the assets to the asset group
+            for (String assetId : rawAssetGroup.getAsset_ids()) {
+              RawAsset rawAsset = mapOfAsset.get(assetId);
+              if (rawAsset != null) {
+                if (rawAsset.getAsset_type().equals(ENDPOINT_TYPE)) {
+                  Endpoint endpoint = new Endpoint(rawAsset.getAsset_id(),
+                      rawAsset.getAsset_type(),
+                      rawAsset.getAsset_name(),
+                      Endpoint.PLATFORM_TYPE.valueOf(rawAsset.getEndpoint_platform()));
+                  assetGroup.getAssets().add(endpoint);
+                } else {
+                  Asset asset = new Asset(rawAsset.getAsset_id(),
+                      rawAsset.getAsset_type(),
+                      rawAsset.getAsset_name());
+                  assetGroup.getAssets().add(asset);
+                }
+              }
             }
+            expectation.setAssetGroup(assetGroup);
+          }
+        }
 
-            if ("Endpoint".equals(rawAsset.getAsset_type())) {
-                Endpoint endpoint = new Endpoint(
-                    rawAsset.getAsset_id(),
-                    rawAsset.getAsset_type(),
-                    rawAsset.getAsset_name(),
-                    Endpoint.PLATFORM_TYPE.valueOf(rawAsset.getEndpoint_platform())
-                );
-                injectAssets.add(endpoint);
+        // We add the asset to the expectation
+        if (rawInjectExpectation.getAsset_id() != null) {
+          RawAsset rawAsset = mapOfAsset.get(rawInjectExpectation.getAsset_id());
+          if (rawAsset != null) {
+            if (rawAsset.getAsset_type().equals(ENDPOINT_TYPE)) {
+              Endpoint endpoint = new Endpoint(rawAsset.getAsset_id(),
+                  rawAsset.getAsset_type(),
+                  rawAsset.getAsset_name(),
+                  Endpoint.PLATFORM_TYPE.valueOf(rawAsset.getEndpoint_platform()));
+              expectation.setAsset(endpoint);
             } else {
-                Asset newAsset = new Asset(
-                    rawAsset.getAsset_id(),
-                    rawAsset.getAsset_type(),
-                    rawAsset.getAsset_name()
-                );
-                injectAssets.add(newAsset);
+              Asset asset = new Asset(
+                  rawAsset.getAsset_id(),
+                  rawAsset.getAsset_type(),
+                  rawAsset.getAsset_name()
+              );
+              expectation.setAsset(asset);
             }
+          }
         }
-        inject.setAssets(injectAssets);
-
-        // Add the asset groups to the inject
-        ArrayList<AssetGroup> injectAssetGroups = new ArrayList();
-        for (String injectAssetGroupId : rawInject.getInject_asset_groups()) {
-            Optional<RawAssetGroup> rawAssetGroup = Optional.ofNullable(mapOfAssetGroups.get(injectAssetGroupId));
-            rawAssetGroup.ifPresent(rag -> {
-                AssetGroup assetGroup = new AssetGroup();
-                assetGroup.setName(rag.getAsset_group_name());
-                assetGroup.setId(rag.getAsset_group_id());
-
-                // We add the assets linked to the asset group
-                assetGroup.setAssets(rag.getAsset_ids().stream()
-                    .map(assetId -> {
-                        RawAsset rawAsset = mapOfAsset.get(assetId);
-                        if (rawAsset == null) {
-                            return null;
-                        }
-
-                        if ("Endpoint".equals(rawAsset.getAsset_type())) {
-                            return new Endpoint(rawAsset.getAsset_id(), rawAsset.getAsset_type(), rawAsset.getAsset_name(),
-                                Endpoint.PLATFORM_TYPE.valueOf(rawAsset.getEndpoint_platform()));
-                        } else {
-                            return new Asset(rawAsset.getAsset_id(), rawAsset.getAsset_type(), rawAsset.getAsset_name());
-                        }
-                    })
-                    .filter(Objects::nonNull)
-                    .toList()
-                );
-                injectAssetGroups.add(assetGroup);
-            });
-        }
-
-        inject.setAssetGroups(injectAssetGroups);
-
-        return inject;
+        inject.getExpectations().add(expectation);
+      }
     }
+
+    // We add the teams to the inject
+    ArrayList<Team> injectTeams = new ArrayList();
+    for (String injectTeamId : rawInject.getInject_teams()) {
+      Team team = new Team();
+      team.setId(rawTeams.get(injectTeamId).getTeam_id());
+      team.setName(rawTeams.get(injectTeamId).getTeam_name());
+      injectTeams.add(team);
+    }
+    inject.setTeams(injectTeams);
+
+    // We add the assets to the inject
+    ArrayList<Asset> injectAssets = new ArrayList();
+    for (String injectAssetId : rawInject.getInject_assets()) {
+      RawAsset rawAsset = mapOfAsset.get(injectAssetId);
+
+      if (rawAsset == null) {
+        continue; // Skip to the next iteration
+      }
+
+      if ("Endpoint".equals(rawAsset.getAsset_type())) {
+        Endpoint endpoint = new Endpoint(
+            rawAsset.getAsset_id(),
+            rawAsset.getAsset_type(),
+            rawAsset.getAsset_name(),
+            Endpoint.PLATFORM_TYPE.valueOf(rawAsset.getEndpoint_platform())
+        );
+        injectAssets.add(endpoint);
+      } else {
+        Asset newAsset = new Asset(
+            rawAsset.getAsset_id(),
+            rawAsset.getAsset_type(),
+            rawAsset.getAsset_name()
+        );
+        injectAssets.add(newAsset);
+      }
+    }
+    inject.setAssets(injectAssets);
+
+    // Add the asset groups to the inject
+    ArrayList<AssetGroup> injectAssetGroups = new ArrayList();
+    for (String injectAssetGroupId : rawInject.getInject_asset_groups()) {
+      Optional<RawAssetGroup> rawAssetGroup = Optional.ofNullable(mapOfAssetGroups.get(injectAssetGroupId));
+      rawAssetGroup.ifPresent(rag -> {
+        AssetGroup assetGroup = new AssetGroup();
+        assetGroup.setName(rag.getAsset_group_name());
+        assetGroup.setId(rag.getAsset_group_id());
+
+        // We add the assets linked to the asset group
+        assetGroup.setAssets(rag.getAsset_ids().stream()
+            .map(assetId -> {
+              RawAsset rawAsset = mapOfAsset.get(assetId);
+              if (rawAsset == null) {
+                return null;
+              }
+
+              if ("Endpoint".equals(rawAsset.getAsset_type())) {
+                return new Endpoint(rawAsset.getAsset_id(), rawAsset.getAsset_type(), rawAsset.getAsset_name(),
+                    Endpoint.PLATFORM_TYPE.valueOf(rawAsset.getEndpoint_platform()));
+              } else {
+                return new Asset(rawAsset.getAsset_id(), rawAsset.getAsset_type(), rawAsset.getAsset_name());
+              }
+            })
+            .filter(Objects::nonNull)
+            .toList()
+        );
+        injectAssetGroups.add(assetGroup);
+      });
+    }
+
+    inject.setAssetGroups(injectAssetGroups);
+
+    return inject;
+  }
 }

@@ -182,7 +182,7 @@ public class InjectApi extends RestBehavior {
     ExecutableInject injection = new ExecutableInject(false, true, inject, List.of(), inject.getAssets(),
         inject.getAssetGroups(), userInjectContexts);
     Execution execution = executor.executeInjection(injection);
-    return InjectStatus.fromExecutionTest(execution);
+    return InjectTestStatus.fromExecutionTest(execution);
 
   }
 
