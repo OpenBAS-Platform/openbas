@@ -117,16 +117,18 @@ public class ChallengeService {
                 injectExpectationRepository.save(playerExpectation);
             });
 
+            // -- VALIDATION TYPE --
+
             // Process expectation linked to teams where user is part of
             List<String> teamIds = user.getTeams().stream().map(Team::getId).toList();
             // Find all expectations for this exercise, challenge and teams
             List<InjectExpectation> challengeExpectations = injectExpectationRepository.findChallengeExpectations(exerciseId, teamIds, challengeId);
-            List<InjectExpectation> parentExpectations = challengeExpectations.stream().filter(player -> player.getUser() != null).toList();
+            List<InjectExpectation> parentExpectations = challengeExpectations.stream().filter(exp -> exp.getUser() == null).toList();
             Map<Team, List<InjectExpectation>> playerByTeam = challengeExpectations.stream().filter(exp -> exp.getUser() != null).collect(Collectors.groupingBy(InjectExpectation::getTeam));
 
             // Depending on type of validation, we process the parent expectations:
             challengeExpectations.stream().findAny().ifPresentOrElse(process -> {
-                boolean validationType = process.isExpectationGroup();
+                boolean isValidationAtLeastOneTarget = process.isExpectationGroup();
 
                 parentExpectations.forEach(parentExpectation -> {
                     List<InjectExpectation> toProcess = playerByTeam.get(parentExpectation.getTeam());
@@ -134,7 +136,7 @@ public class ChallengeService {
                     long zeroPlayerResponses = toProcess.stream().filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() == 0.0).count();
                     long nullPlayerResponses = toProcess.stream().filter(exp -> exp.getScore() == null).count();
 
-                    if (validationType) { // type atLeast
+                    if (isValidationAtLeastOneTarget) { // type atLeast
                         //If true is at least one
                         OptionalDouble avgAtLeastOnePlayer = toProcess.stream().filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() > 0.0).mapToDouble(InjectExpectation::getScore).average();
                         if (avgAtLeastOnePlayer.isPresent()) { //Any response is positive
@@ -151,7 +153,12 @@ public class ChallengeService {
                             OptionalDouble avgAllPlayer = toProcess.stream().mapToDouble(InjectExpectation::getScore).average();
                             parentExpectation.setScore(avgAllPlayer.getAsDouble());
                         }else{
-                            parentExpectation.setScore(null);
+                            if(zeroPlayerResponses == 0) {
+                                parentExpectation.setScore(null);
+                            }else{
+                                double sumAllPlayer = toProcess.stream().filter(exp->exp.getScore() != null).mapToDouble(InjectExpectation::getScore).sum();
+                                parentExpectation.setScore(sumAllPlayer/playerSize);
+                            }
                         }
                     }
                     InjectExpectationResult result = InjectExpectationResult.builder()

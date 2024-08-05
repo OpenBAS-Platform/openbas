@@ -36,7 +36,7 @@ import ItemResult from '../../../../components/ItemResult';
 import InjectIcon from '../../common/injects/InjectIcon';
 import { isNotEmptyField } from '../../../../utils/utils';
 import Transition from '../../../../components/common/Transition';
-import { emptyFilled } from '../../../../utils/String';
+import { emptyFilled, truncate } from '../../../../utils/String';
 import DetectionPreventionExpectationsValidationForm from '../../simulations/simulation/validation/expectations/DetectionPreventionExpectationsValidationForm';
 import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -345,7 +345,13 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         return a.inject_expectation_id.localeCompare(b.inject_expectation_id);
       }).map((expectation: InjectExpectationStore) => ({
         key: 'result',
-        label: getStatusLabel(targetType, [expectation.inject_expectation_status]),
+        label: (
+          <span>
+            {getStatusLabel(targetType, [expectation.inject_expectation_status])}
+            <br/>
+            ({expectation.inject_expectation_name ? truncate(expectation.inject_expectation_name, 20) : expectation.inject_expectation_type})
+          </span>
+        ),
         type: targetType,
         status: getStatus([expectation.inject_expectation_status]),
       })));
@@ -450,10 +456,10 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           nodesFocusable={false}
           elementsSelectable={false}
           maxZoom={1}
-          zoomOnScroll={false}
+          zoomOnScroll
           zoomOnPinch={false}
           zoomOnDoubleClick={false}
-          panOnDrag={false}
+          panOnDrag
           defaultEdgeOptions={defaultEdgeOptions}
           proOptions={proOptions}
         />

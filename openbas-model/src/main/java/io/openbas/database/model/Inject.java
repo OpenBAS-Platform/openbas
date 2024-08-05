@@ -310,7 +310,7 @@ public class Inject implements Base, Injection {
         return this.expectations.stream()
                 .filter(execution -> execution.getType().equals(InjectExpectation.EXPECTATION_TYPE.ARTICLE))
                 .filter(execution -> execution.getArticle().equals(article))
-                .filter(execution -> execution.getUser() != null)
+                .filter(execution -> execution.getUser() != null) //Validation automatics are from only players
                 .filter(execution -> execution.getUser().equals(user))
                 .toList();
     }

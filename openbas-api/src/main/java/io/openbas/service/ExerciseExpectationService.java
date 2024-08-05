@@ -43,8 +43,6 @@ public class ExerciseExpectationService {
         if (injectExpectation.getType() == EXPECTATION_TYPE.MANUAL) {
             if (injectExpectation.getTeam() != null && injectExpectation.getUser() == null) { //If it is a team expectation
                 result = input.getScore() > 0 ? "Success" : "Failed";
-                injectExpectation.getResults().clear();
-                exists = Optional.empty();
             } else {
                 if (input.getScore() >= injectExpectation.getExpectedScore()) {
                     result = "Success";
@@ -54,6 +52,8 @@ public class ExerciseExpectationService {
                     result = "Failed";
                 }
             }
+            injectExpectation.getResults().clear();
+            exists = Optional.empty();
         } else if (injectExpectation.getType() == EXPECTATION_TYPE.DETECTION) {
             if (input.getScore() >= injectExpectation.getExpectedScore()) {
                 result = "Detected";
@@ -102,73 +102,7 @@ public class ExerciseExpectationService {
         if (updated.getType() == EXPECTATION_TYPE.MANUAL && updated.getTeam() != null) {
             computeExpectationsForTeamsAndPlayer(updated, result);
         }
-
         return updated;
-    }
-
-    private void computeExpectationsForTeamsAndPlayer(InjectExpectation updated, String result) {
-        if (updated.getUser() != null) { //If the updated expectation was a player expectation, We have to update the team expectation using expectation of players (based on validation type)
-            List<InjectExpectation> toProcess = injectExpectationRepository.findAllByInjectAndTeamAndExpectationName(updated.getInject().getId(), updated.getTeam().getId(), updated.getName());
-            InjectExpectation parentExpectation = toProcess.stream().filter(exp -> exp.getUser() == null).findFirst().orElseThrow(ElementNotFoundException::new);
-            int playerSize = toProcess.size() - 1; // Without Parent expectation
-            long zeroPlayerResponses = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() == 0.0).count();
-            long nullPlayerResponses = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp -> exp.getScore() == null).count();
-
-            if (updated.isExpectationGroup()) { //If true is at least one
-                OptionalDouble avgAtLeastOnePlayer = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() > 0.0).mapToDouble(InjectExpectation::getScore).average();
-                 if (avgAtLeastOnePlayer.isPresent()) { //Any response is positive
-                    parentExpectation.setScore(avgAtLeastOnePlayer.getAsDouble());
-                    result = "Success";
-                } else {
-                    if (zeroPlayerResponses == playerSize) { //All players had failed
-                        parentExpectation.setScore(0.0);
-                        result = "Failed";
-                    } else {
-                        parentExpectation.setScore(null);
-                        result = "Pending";
-                    }
-                }
-            } else { // all
-                if(nullPlayerResponses == 0){
-                    OptionalDouble avgAllPlayer = toProcess.stream().filter(exp -> exp.getUser() != null).mapToDouble(InjectExpectation::getScore).average();
-                    parentExpectation.setScore(avgAllPlayer.getAsDouble());
-                    result = zeroPlayerResponses > 0 ? "Failed" : "Success";
-                }else{
-                    parentExpectation.setScore(null);
-                    result = "Pending";
-                }
-            }
-            InjectExpectationResult expectationResult = InjectExpectationResult.builder()
-                    .sourceId("player-manual-validation")
-                    .sourceType("player-manual-validation")
-                    .sourceName("Player Manual Validation")
-                    .result(result)
-                    .date(now().toString())
-                    .score(parentExpectation.getScore())
-                    .build();
-            parentExpectation.getResults().clear();
-            parentExpectation.getResults().add(expectationResult);
-            parentExpectation.setUpdatedAt(Instant.now());
-            injectExpectationRepository.save(parentExpectation);
-        } else {
-            // If I update the expectation team: What happens with children? -> update expectation score for all children -> set score from InjectExpectation
-            List<InjectExpectation> toProcess = injectExpectationRepository.findAllByInjectAndTeamAndExpectationNameAndUserIsNotNull(updated.getInject().getId(), updated.getTeam().getId(), updated.getName());
-            for (InjectExpectation expectation : toProcess) {
-                InjectExpectationResult expectationResult = InjectExpectationResult.builder()
-                        .sourceId("team-manual-validation")
-                        .sourceType("team-manual-validation")
-                        .sourceName("Team Manual Validation")
-                        .result(result)
-                        .date(now().toString())
-                        .score(updated.getScore())
-                        .build();
-                expectation.getResults().clear();
-                expectation.getResults().add(expectationResult);
-                expectation.setScore(updated.getScore());
-                expectation.setUpdatedAt(Instant.now());
-                injectExpectationRepository.save(expectation);
-            }
-        }
     }
 
     public InjectExpectation deleteInjectExpectationResult(
@@ -191,6 +125,87 @@ public class ExerciseExpectationService {
             }
         }
         injectExpectation.setUpdatedAt(now());
-        return this.injectExpectationRepository.save(injectExpectation);
+        InjectExpectation updated = this.injectExpectationRepository.save(injectExpectation);
+
+        // -- VALIDATION TYPE --
+
+        if (updated.getType() == EXPECTATION_TYPE.MANUAL && updated.getTeam() != null) {
+            computeExpectationsForTeamsAndPlayer(updated, null);
+        }
+
+        return updated;
+    }
+
+    private void computeExpectationsForTeamsAndPlayer(InjectExpectation updated, String result) {
+        if (updated.getUser() != null) { //If the updated expectation was a player expectation, We have to update the team expectation using expectation of players (based on validation type)
+            List<InjectExpectation> toProcess = injectExpectationRepository.findAllByInjectAndTeamAndExpectationName(updated.getInject().getId(), updated.getTeam().getId(), updated.getName());
+            InjectExpectation parentExpectation = toProcess.stream().filter(exp -> exp.getUser() == null).findFirst().orElseThrow(ElementNotFoundException::new);
+            int playerSize = toProcess.size() - 1; // Without Parent expectation
+            long zeroPlayerResponses = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() == 0.0).count();
+            long nullPlayerResponses = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp -> exp.getScore() == null).count();
+
+            if (updated.isExpectationGroup()) { //If true is at least one
+                OptionalDouble avgAtLeastOnePlayer = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() > 0.0).mapToDouble(InjectExpectation::getScore).average();
+                if (avgAtLeastOnePlayer.isPresent()) { //Any response is positive
+                    parentExpectation.setScore(avgAtLeastOnePlayer.getAsDouble());
+                    result = "Success";
+                } else {
+                    if (zeroPlayerResponses == playerSize) { //All players had failed
+                        parentExpectation.setScore(0.0);
+                        result = "Failed";
+                    } else {
+                        parentExpectation.setScore(null);
+                        result = "Pending";
+                    }
+                }
+            } else { // all
+                if(nullPlayerResponses == 0){
+                    OptionalDouble avgAllPlayer = toProcess.stream().filter(exp -> exp.getUser() != null).mapToDouble(InjectExpectation::getScore).average();
+                    parentExpectation.setScore(avgAllPlayer.getAsDouble());
+                    result = zeroPlayerResponses > 0 ? "Failed" : "Success";
+                }else{
+                    if(zeroPlayerResponses == 0) {
+                        parentExpectation.setScore(null);
+                        result = "Pending";
+                    }else{
+                        double sumAllPlayer = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp->exp.getScore() != null).mapToDouble(InjectExpectation::getScore).sum();
+                        parentExpectation.setScore(sumAllPlayer/playerSize);
+                        result = "Failed";
+                    }
+                }
+            }
+            parentExpectation.setUpdatedAt(Instant.now());
+            parentExpectation.getResults().clear();
+            InjectExpectationResult expectationResult = InjectExpectationResult.builder()
+                    .sourceId("player-manual-validation")
+                    .sourceType("player-manual-validation")
+                    .sourceName("Player Manual Validation")
+                    .result(result)
+                    .date(now().toString())
+                    .score(parentExpectation.getScore())
+                    .build();
+            parentExpectation.getResults().add(expectationResult);
+            injectExpectationRepository.save(parentExpectation);
+        } else {
+            // If I update the expectation team: What happens with children? -> update expectation score for all children -> set score from InjectExpectation
+            List<InjectExpectation> toProcess = injectExpectationRepository.findAllByInjectAndTeamAndExpectationNameAndUserIsNotNull(updated.getInject().getId(), updated.getTeam().getId(), updated.getName());
+            for (InjectExpectation expectation : toProcess) {
+                expectation.setScore(updated.getScore());
+                expectation.setUpdatedAt(Instant.now());
+                expectation.getResults().clear();
+                if(result != null) {
+                    InjectExpectationResult expectationResult = InjectExpectationResult.builder()
+                            .sourceId("team-manual-validation")
+                            .sourceType("team-manual-validation")
+                            .sourceName("Team Manual Validation")
+                            .result(result)
+                            .date(now().toString())
+                            .score(updated.getScore())
+                            .build();
+                    expectation.getResults().add(expectationResult);
+                }
+                injectExpectationRepository.save(expectation);
+            }
+        }
     }
 }

@@ -10,6 +10,7 @@ import io.openbas.database.repository.ScenarioRepository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -55,19 +56,21 @@ public class TeamHelper {
                     rawTeam.getTeam_expectations().stream().map(
                             expectation -> {
                                 // We set the inject expectation using the map we generated earlier
-                                RawInjectExpectation raw = mapInjectExpectation.get(expectation);
                                 InjectExpectation injectExpectation = new InjectExpectation();
-                                injectExpectation.setScore(raw.getInject_expectation_score());
-                                injectExpectation.setExpectedScore(raw.getInject_expectation_expected_score());
-                                injectExpectation.setId(raw.getInject_expectation_id());
-                                injectExpectation.setExpectedScore(raw.getInject_expectation_expected_score());
-                                if(raw.getExercise_id() != null) {
-                                    injectExpectation.setExercise(new Exercise());
-                                    injectExpectation.getExercise().setId(raw.getExercise_id());
-                                }
-                                injectExpectation.setTeam(new Team());
-                                injectExpectation.getTeam().setId(rawTeam.getTeam_id());
-                                injectExpectation.setType(InjectExpectation.EXPECTATION_TYPE.valueOf(raw.getInject_expectation_type()));
+                                Optional<RawInjectExpectation> raw = Optional.ofNullable(mapInjectExpectation.get(expectation));
+                                raw.ifPresent(toProcess -> {
+                                    injectExpectation.setScore(toProcess.getInject_expectation_score());
+                                    injectExpectation.setExpectedScore(toProcess.getInject_expectation_expected_score());
+                                    injectExpectation.setId(toProcess.getInject_expectation_id());
+                                    injectExpectation.setExpectedScore(toProcess.getInject_expectation_expected_score());
+                                    if (toProcess.getExercise_id() != null) {
+                                        injectExpectation.setExercise(new Exercise());
+                                        injectExpectation.getExercise().setId(toProcess.getExercise_id());
+                                    }
+                                    injectExpectation.setTeam(new Team());
+                                    injectExpectation.getTeam().setId(rawTeam.getTeam_id());
+                                    injectExpectation.setType(InjectExpectation.EXPECTATION_TYPE.valueOf(toProcess.getInject_expectation_type()));
+                                });
                                 return injectExpectation;
                             }
                     ).toList()

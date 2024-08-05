@@ -111,7 +111,7 @@ public class TeamSimple {
     @JsonProperty("team_injects_expectations_total_expected_score")
     @NotNull
     public double getInjectExceptationsTotalExpectedScore() {
-        return getInjectExpectations().stream().mapToDouble(InjectExpectation::getExpectedScore).sum();
+        return getInjectExpectations().stream() .filter(expectation -> Objects.nonNull(expectation.getExpectedScore())).mapToDouble(InjectExpectation::getExpectedScore).sum();
     }
 
     @JsonProperty("team_injects_expectations_total_expected_score_by_exercise")
