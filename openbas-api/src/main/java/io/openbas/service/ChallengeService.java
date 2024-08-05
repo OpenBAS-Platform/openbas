@@ -13,6 +13,7 @@ import io.openbas.rest.challenge.response.ChallengeInformation;
 import io.openbas.rest.challenge.response.ChallengeResult;
 import io.openbas.rest.challenge.response.ChallengesReader;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.utils.ExpectationUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,7 +24,6 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalDouble;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -118,12 +118,12 @@ public class ChallengeService {
             });
 
             // -- VALIDATION TYPE --
-            processByValidationType(exerciseId, challengeId, user);
+            processByValidationType(exerciseId, challengeId, user, true);
         }
         return playerChallenges(exerciseId, user);
     }
 
-    private void processByValidationType(String exerciseId, String challengeId, User user) {
+    private void processByValidationType(String exerciseId, String challengeId, User user, boolean isaNewExpectationResult) {
         // Process expectations linked to teams where the user is a member
         List<String> teamIds = user.getTeams().stream().map(Team::getId).toList();
         // Find all expectations for this exercise, challenge and teams
@@ -134,54 +134,8 @@ public class ChallengeService {
         Map<Team, List<InjectExpectation>> playerByTeam = challengeExpectations.stream().filter(exp -> exp.getUser() != null).collect(Collectors.groupingBy(InjectExpectation::getTeam));
 
         // Depending on type of validation, We process the parent expectations:
-        challengeExpectations.stream().findAny().ifPresentOrElse(process -> {
-            boolean isValidationAtLeastOneTarget = process.isExpectationGroup();
-
-            // We update team expectations and for that We need to process all player expectations
-            parentExpectations.forEach(parentExpectation -> {
-                List<InjectExpectation> toProcess = playerByTeam.get(parentExpectation.getTeam());
-                int playersSize = toProcess.size();
-                long zeroPlayerResponses = toProcess.stream().filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() == 0.0).count();
-                long nullPlayerResponses = toProcess.stream().filter(exp -> exp.getScore() == null).count();
-
-                if (isValidationAtLeastOneTarget) { // Type atLeast
-                    OptionalDouble avgAtLeastOnePlayer = toProcess.stream().filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() > 0.0).mapToDouble(InjectExpectation::getScore).average();
-                    if (avgAtLeastOnePlayer.isPresent()) { //Any response is positive
-                        parentExpectation.setScore(avgAtLeastOnePlayer.getAsDouble());
-                    } else {
-                        if (zeroPlayerResponses == playersSize) { //All players had failed
-                            parentExpectation.setScore(0.0);
-                        } else {
-                            parentExpectation.setScore(null);
-                        }
-                    }
-                } else { // Type all
-                    if(nullPlayerResponses == 0){
-                        OptionalDouble avgAllPlayer = toProcess.stream().mapToDouble(InjectExpectation::getScore).average();
-                        parentExpectation.setScore(avgAllPlayer.getAsDouble());
-                    }else{
-                        if(zeroPlayerResponses == 0) {
-                            parentExpectation.setScore(null);
-                        }else{
-                            double sumAllPlayer = toProcess.stream().filter(exp->exp.getScore() != null).mapToDouble(InjectExpectation::getScore).sum();
-                            parentExpectation.setScore(sumAllPlayer/playersSize);
-                        }
-                    }
-                }
-                InjectExpectationResult result = InjectExpectationResult.builder()
-                        .sourceId("challenge")
-                        .sourceType("challenge")
-                        .sourceName("Challenge validation")
-                        .result(Instant.now().toString())
-                        .date(Instant.now().toString())
-                        .score(process.getExpectedScore())
-                        .build();
-
-                parentExpectation.getResults().add(result);
-                parentExpectation.setUpdatedAt(Instant.now());
-                injectExpectationRepository.save(parentExpectation);
-            });
-        }, ElementNotFoundException::new);
+        List<InjectExpectation> toUpdate = ExpectationUtils.processByValidationType(isaNewExpectationResult, challengeExpectations, parentExpectations, playerByTeam);
+        injectExpectationRepository.saveAll(toUpdate);
     }
 
     // -- PRIVATE --

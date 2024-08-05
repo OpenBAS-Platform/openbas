@@ -11,6 +11,7 @@ import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.rest.channel.model.VirtualArticle;
 import io.openbas.rest.channel.response.ChannelReader;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.utils.ExpectationUtils;
 import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -106,12 +107,12 @@ public class ChannelService {
             });
 
             // -- VALIDATION TYPE --
-            processByValidationType(user, injects, publishedArticles, expectationExecutions);
+            processByValidationType(user, injects, publishedArticles, expectationExecutions.size()>0);
         }
         return channelReader;
     }
 
-    private void processByValidationType(User user, List<Inject> injects, List<Article> publishedArticles, List<InjectExpectation> expectationExecutions) {
+    private void processByValidationType(User user, List<Inject> injects, List<Article> publishedArticles, boolean isaNewExpectationResult) {
         // Process expectation linked to teams where user if part of
         List<String> injectIds = injects.stream().map(Inject::getId).toList();
         List<String> teamIds = user.getTeams().stream().map(Team::getId).toList();
@@ -122,55 +123,7 @@ public class ChannelService {
         Map<Team, List<InjectExpectation>> playerByTeam = channelExpectations.stream().filter(exp -> exp.getUser() != null).collect(Collectors.groupingBy(InjectExpectation::getTeam));
 
         // Depending on type of validation, we process the parent expectations:
-        channelExpectations.stream().findAny().ifPresentOrElse(process -> {
-            boolean isValidationAtLeastOneTarget = process.isExpectationGroup();
-
-            parentExpectations.forEach(parentExpectation -> {
-                List<InjectExpectation> toProcess = playerByTeam.get(parentExpectation.getTeam());
-                int playerSize = toProcess.size(); // Without Parent expectation
-                long zeroPlayerResponses = toProcess.stream().filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() == 0.0).count();
-                long nullPlayerResponses = toProcess.stream().filter(exp -> exp.getScore() == null).count();
-
-                if (isValidationAtLeastOneTarget) { // Type atLeast
-                    OptionalDouble avgAtLeastOnePlayer = toProcess.stream().filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() > 0.0).mapToDouble(InjectExpectation::getScore).average();
-                    if (avgAtLeastOnePlayer.isPresent()) { //Any response is positive
-                        parentExpectation.setScore(avgAtLeastOnePlayer.getAsDouble());
-                    } else {
-                        if (zeroPlayerResponses == playerSize) { //All players had failed
-                            parentExpectation.setScore(0.0);
-                        } else {
-                            parentExpectation.setScore(null);
-                        }
-                    }
-                } else { // type all
-                    if(nullPlayerResponses == 0){
-                        OptionalDouble avgAllPlayer = toProcess.stream().mapToDouble(InjectExpectation::getScore).average();
-                        parentExpectation.setScore(avgAllPlayer.getAsDouble());
-                    }else{
-                        if(zeroPlayerResponses == 0) {
-                            parentExpectation.setScore(null);
-                        }else{
-                            double sumAllPlayer = toProcess.stream().filter(exp->exp.getScore() != null).mapToDouble(InjectExpectation::getScore).sum();
-                            parentExpectation.setScore(sumAllPlayer/playerSize);
-                        }
-                    }
-                }
-
-                if(expectationExecutions.size()>0) {
-                    InjectExpectationResult result = InjectExpectationResult.builder()
-                            .sourceId("media-pressure")
-                            .sourceType("media-pressure")
-                            .sourceName("Media pressure read")
-                            .result(Instant.now().toString())
-                            .date(Instant.now().toString())
-                            .score(process.getExpectedScore())
-                            .build();
-                    parentExpectation.getResults().add(result);
-                }
-
-                parentExpectation.setUpdatedAt(Instant.now());
-                injectExpectationExecutionRepository.save(parentExpectation);
-            });
-        }, ElementNotFoundException::new);
+        List<InjectExpectation> toUpdate = ExpectationUtils.processByValidationType(isaNewExpectationResult, channelExpectations, parentExpectations, playerByTeam);
+        injectExpectationExecutionRepository.saveAll(toUpdate);
     }
 }
