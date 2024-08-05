@@ -148,6 +148,12 @@ public class Inject implements Base, Injection {
   @Queryable(sortable = true, property = "name")
   private InjectStatus status;
 
+  // Status after testing emails and sms
+  @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonProperty("inject_test_status")
+  @Queryable(sortable = true, property = "name")
+  private InjectStatus testStatus;
+
   @Getter
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "injects_tags",
