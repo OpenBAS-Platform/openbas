@@ -136,6 +136,7 @@ public class ExerciseExpectationService {
     }
 
     // -- VALIDATION TYPE --
+
     private void computeExpectationsForTeamsAndPlayer(InjectExpectation updated, String result) {
         //If the updated expectation was a player expectation, We have to update the team expectation using player expectations (based on validation type)
         if (updated.getUser() != null) {
