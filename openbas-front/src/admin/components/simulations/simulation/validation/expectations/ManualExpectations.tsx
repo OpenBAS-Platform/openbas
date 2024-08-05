@@ -99,7 +99,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
             primary={(
               <div className={classes.container}>
                 <Tooltip title={expectations[0].inject_expectation_description}>
-                  {expectations[0].inject_expectation_name}
+                  {expectations[0].inject_expectation_name ?? 'Manual Expectation'}
                 </Tooltip>
                 <div className={classes.chip}>
                   <Chip

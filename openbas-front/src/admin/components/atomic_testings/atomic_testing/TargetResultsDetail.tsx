@@ -334,7 +334,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   useEffect(() => {
     if (initialized && targetResults && targetResults.length > 0) {
       const groupedBy = groupedByExpectationType(targetResults);
-      const newSteps = Array.from(groupedBy).flatMap(([targetType, results]) => results.sort((a, b) => {
+      const newSteps = Array.from(groupedBy).flatMap(([targetType, results]) => results.sort((a: InjectExpectationsStore, b: InjectExpectationsStore) => {
         if (a.inject_expectation_name && b.inject_expectation_name) {
           return a.inject_expectation_name.localeCompare(b.inject_expectation_name);
         } if (a.inject_expectation_name && !b.inject_expectation_name) {
