@@ -152,7 +152,7 @@ public class Inject implements Base, Injection {
   @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonProperty("inject_test_status")
   @Queryable(sortable = true, property = "name")
-  private InjectStatus testStatus;
+  private InjectTestStatus testStatus;
 
   @Getter
   @ManyToMany(fetch = FetchType.LAZY)
