@@ -223,7 +223,7 @@ const UpdateInjectDetails = ({
   const duration = splitDuration(inject?.inject_depends_duration || 0);
   const initialValues = {
     ...inject,
-    ...inject.inject_content,
+    ...inject?.inject_content,
     inject_tags: tagOptions(inject?.inject_tags, tagsMap),
     inject_depends_duration_days: duration.days,
     inject_depends_duration_hours: duration.hours,
@@ -240,8 +240,8 @@ const UpdateInjectDetails = ({
     'attachments',
     'expectations',
   ];
-  if (isEmptyField(inject.inject_content)) {
-    contractContent.fields
+  if (isEmptyField(inject?.inject_content)) {
+    contractContent?.fields
       .filter((f) => !builtInFields.includes(f.key))
       .forEach((field) => {
         if (!initialValues[field.key]) {
@@ -254,7 +254,7 @@ const UpdateInjectDetails = ({
       });
   }
   // Specific processing for some fields
-  contractContent.fields
+  contractContent?.fields
     .filter((f) => !builtInFields.includes(f.key))
     .forEach((field) => {
       if (
@@ -318,10 +318,11 @@ const UpdateInjectDetails = ({
       <Card elevation={0} classes={{ root: classes.injectorContract }}>
         <CardHeader
           classes={{ root: classes.injectorContractHeader }}
-          avatar={contractContent ? <Avatar sx={{ width: 24, height: 24 }} src={`/api/images/injectors/${contractContent.config.type}`} /> : <Avatar sx={{ width: 24, height: 24 }}><HelpOutlined /></Avatar>}
-          title={contractContent.contract_attack_patterns_external_ids.join(', ')}
+          avatar={contractContent ? <Avatar sx={{ width: 24, height: 24 }} src={`/api/images/injectors/${contractContent.config.type}`} />
+            : <Avatar sx={{ width: 24, height: 24 }}><HelpOutlined /></Avatar>}
+          title={contractContent?.contract_attack_patterns_external_ids.join(', ')}
           action={<div style={{ display: 'flex', alignItems: 'center' }}>
-            {inject.inject_injector_contract?.injector_contract_platforms?.map(
+            {inject?.inject_injector_contract?.injector_contract_platforms?.map(
               (platform) => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
             )}
           </div>}
@@ -349,27 +350,27 @@ const UpdateInjectDetails = ({
               {contractContent && (
                 <div className={classes.details}>
                   {openDetails && (
-                  <InjectDefinition
-                    form={form}
-                    values={values}
-                    submitting={submitting}
-                    inject={initialValues}
-                    injectorContract={contractContent}
-                    handleClose={handleClose}
-                    tagsMap={tagsMap}
-                    permissions={permissions}
-                    teamsFromExerciseOrScenario={teamsFromExerciseOrScenario}
-                    articlesFromExerciseOrScenario={[]}
-                    variablesFromExerciseOrScenario={[]}
-                    onUpdateInject={onUpdateInject}
-                    setInjectDetailsState={setInjectDetailsState}
-                    uriVariable={''}
-                    allUsersNumber={0}
-                    usersNumber={0}
-                    teamsUsers={[]}
-                    isAtomic={isAtomic}
-                    {...props}
-                  />
+                    <InjectDefinition
+                      form={form}
+                      values={values}
+                      submitting={submitting}
+                      inject={initialValues}
+                      injectorContract={contractContent}
+                      handleClose={handleClose}
+                      tagsMap={tagsMap}
+                      permissions={permissions}
+                      teamsFromExerciseOrScenario={teamsFromExerciseOrScenario}
+                      articlesFromExerciseOrScenario={[]}
+                      variablesFromExerciseOrScenario={[]}
+                      onUpdateInject={onUpdateInject}
+                      setInjectDetailsState={setInjectDetailsState}
+                      uriVariable={''}
+                      allUsersNumber={0}
+                      usersNumber={0}
+                      teamsUsers={[]}
+                      isAtomic={isAtomic}
+                      {...props}
+                    />
                   )}
                   <div className={classes.openDetails} onClick={toggleInjectContent}>
                     {openDetails ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}

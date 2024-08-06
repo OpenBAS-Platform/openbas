@@ -47,19 +47,17 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, inje
       }}
       disableEnforceFocus
     >
-      {inject && injectorContract && (
-        <UpdateInjectDetails
-          drawerRef={drawerRef}
-          contractContent={injectorContract}
-          injectId={injectId}
-          inject={inject}
-          handleClose={handleClose}
-          onUpdateInject={onUpdateInject}
-          isAtomic={isAtomic}
-          teamsFromExerciseOrScenario={teamsFromExerciseOrScenario}
-          {...props}
-        />
-      )}
+      <UpdateInjectDetails
+        drawerRef={drawerRef}
+        contractContent={injectorContract}
+        injectId={injectId}
+        inject={inject}
+        handleClose={handleClose}
+        onUpdateInject={onUpdateInject}
+        isAtomic={isAtomic}
+        teamsFromExerciseOrScenario={teamsFromExerciseOrScenario}
+        {...props}
+      />
     </Drawer>
   );
 };
