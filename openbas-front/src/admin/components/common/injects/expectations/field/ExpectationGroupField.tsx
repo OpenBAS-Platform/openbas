@@ -30,8 +30,6 @@ const ExpectationGroupField: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const classes = useStyles();
 
-  const singleTargetType = isTechnicalExpectation ? 'asset' : 'player';
-
   return (
     <Controller
       control={control}
@@ -41,7 +39,9 @@ const ExpectationGroupField: FunctionComponent<Props> = ({
           <FormLabel className={classes.container}>
             {t('Validation mode')}
             <Tooltip
-              title={t(`An isolated ${singleTargetType} is considered as a group of one asset`)}
+              title={isTechnicalExpectation
+                ? t('An isolated asset is considered as a group of one asset')
+                : t('An isolated player is considered as a group of one player')}
             >
               <InfoOutlined
                 fontSize="small"
@@ -57,8 +57,12 @@ const ExpectationGroupField: FunctionComponent<Props> = ({
               onChange((event.target as HTMLInputElement).value === 'true');
             }}
           >
-            <FormControlLabel value={false} control={<Radio />} label={t(`All ${singleTargetType}s (per group) must validate the expectation`)} />
-            <FormControlLabel value={true} control={<Radio />} label={t(`At least one ${singleTargetType} (per group) must validate the expectation`)} />
+            <FormControlLabel value={false} control={<Radio />} label={isTechnicalExpectation ? t('All assets (per group) must validate the expectation')
+              : t('All players (per team) must validate the expectation')}
+            />
+            <FormControlLabel value={true} control={<Radio />} label={isTechnicalExpectation ? t('At least one asset (per group) must validate the expectation')
+              : t('At least one player (per team) must validate the expectation')}
+            />
           </RadioGroup>
         </div>
       )}

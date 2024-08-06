@@ -415,11 +415,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     // eslint-disable-next-line no-nested-ternary
     return isTechnicalExpectation(injectExpectation.inject_expectation_type)
       ? injectExpectation.inject_expectation_group
-        ? 'At least one asset (per group) must validate the expectation'
-        : 'All assets (per group) must validate the expectation'
+        ? t('At least one asset (per group) must validate the expectation')
+        : t('All assets (per group) must validate the expectation')
       : injectExpectation.inject_expectation_group
-        ? 'At least one player (per team) must validate the expectation'
-        : 'All players (per team) must validate the expectation';
+        ? t('At least one player (per team) must validate the expectation')
+        : t('All players (per team) must validate the expectation');
   };
 
   return (
