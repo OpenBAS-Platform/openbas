@@ -133,7 +133,7 @@ const EmailParametersForm: React.FC<Props> = ({
                     label={t('Reply to')}
                     style={{ marginTop: 20 }}
                     error={!!fieldState.error}
-                    helperText={errors.setting_mails_reply_to?.find((value) => value != null).message ?? ''}
+                    helperText={errors.setting_mails_reply_to?.find((value) => value != null)?.message ?? ''}
                   />
                 )}
               />
