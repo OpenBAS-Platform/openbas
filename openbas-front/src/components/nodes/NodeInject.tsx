@@ -1,8 +1,9 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { Handle, NodeProps, Position, Node, OnConnect } from '@xyflow/react';
 import { makeStyles } from '@mui/styles';
 import { Tooltip } from '@mui/material';
 import moment from 'moment';
+import { motion } from 'framer-motion';
 import type { Theme } from '../Theme';
 import { isNotEmptyField } from '../../utils/utils';
 import InjectIcon from '../../admin/components/common/injects/InjectIcon';
@@ -114,55 +115,61 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
   };
 
   return (
-    <div className={classes.node} style={{ backgroundColor: data.background, color: 'white' }}>
-      <div className={classes.icon}>
-        <InjectIcon
-          isPayload={isNotEmptyField(data.inject.inject_injector_contract?.injector_contract_payload)}
-          type={
+    <motion.div
+      layout={'position'}
+          // create new component when animated changes, see issue workaround https://github.com/framer/motion/issues/2238#issue-1809290539
+      key={data.inject.inject_id}
+    >
+      <div className={classes.node} style={{ backgroundColor: data.background, color: 'white' }}>
+        <div className={classes.icon}>
+          <InjectIcon
+            isPayload={isNotEmptyField(data.inject.inject_injector_contract?.injector_contract_payload)}
+            type={
             data.inject.inject_injector_contract?.injector_contract_payload
               ? data.inject.inject_injector_contract?.injector_contract_payload?.payload_collector_type
                   || data.inject.inject_injector_contract?.injector_contract_payload?.payload_type
               : data.inject.inject_type
             }
-        />
-      </div>
-      { data.startDate !== undefined ? (
-        <div
-          className={classes.triggerTime}
-        >{convertToAbsoluteTime(data.startDate, data.inject.inject_depends_duration)}</div>
-
-      ) : (
-        <div
-          className={classes.triggerTime}
-        >{convertToRelativeTime(data.inject.inject_depends_duration)}</div>
-
-      )}
-      <Tooltip title={data.label}>
-        <div className={classes.label}>{data.label}</div>
-      </Tooltip>
-      <div className={classes.footer}>
-        <Tooltip title={data.targets}>
-          <div className={classes.targets}><span>{`${data.targets.slice(0, 3).join(', ')}${data.targets.length > 3 ? ', ...' : ''}`}</span></div>
-        </Tooltip>
-        <div className={classes.popover}>
-          <InjectPopover
-            inject={data.inject}
-            tagsMap={tagsMap}
-            setSelectedInjectId={setSelectedInjectId}
-            isDisabled={false}
           />
         </div>
+        { data.startDate !== undefined ? (
+          <div
+            className={classes.triggerTime}
+          >{convertToAbsoluteTime(data.startDate, data.inject.inject_depends_duration)}</div>
 
+        ) : (
+          <div
+            className={classes.triggerTime}
+          >{convertToRelativeTime(data.inject.inject_depends_duration)}</div>
+
+        )}
+        <Tooltip title={data.label}>
+          <div className={classes.label}>{data.label}</div>
+        </Tooltip>
+        <div className={classes.footer}>
+          <Tooltip title={data.targets}>
+            <div className={classes.targets}><span>{`${data.targets.slice(0, 3).join(', ')}${data.targets.length > 3 ? ', ...' : ''}`}</span></div>
+          </Tooltip>
+          <div className={classes.popover}>
+            <InjectPopover
+              inject={data.inject}
+              tagsMap={tagsMap}
+              setSelectedInjectId={setSelectedInjectId}
+              isDisabled={false}
+            />
+          </div>
+
+        </div>
+        {(data.isTargeted ? (
+          <Handle type="target" id={`target-${data.key}`} position={Position.Left} isConnectable={true}
+            onConnect={data.onConnectInjects}
+          />) : null)}
+        {(data.isTargeting ? (
+          <Handle type="source" id={`source-${data.key}`} position={Position.Right} isConnectable={true}
+            onConnect={data.onConnectInjects}
+          />) : null)}
       </div>
-      {(data.isTargeted ? (
-        <Handle type="target" id={`target-${data.key}`} position={Position.Left} isConnectable={true}
-          onConnect={data.onConnectInjects}
-        />) : null)}
-      {(data.isTargeting ? (
-        <Handle type="source" id={`source-${data.key}`} position={Position.Right} isConnectable={true}
-          onConnect={data.onConnectInjects}
-        />) : null)}
-    </div>
+    </motion.div>
   );
 };
 

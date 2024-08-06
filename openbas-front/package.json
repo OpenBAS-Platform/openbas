@@ -34,6 +34,7 @@
     "elkjs": "0.9.3",
     "final-form": "4.20.10",
     "final-form-arrays": "3.1.0",
+    "framer-motion": "^11.3.21",
     "history": "5.3.0",
     "html-react-parser": "5.1.12",
     "html-to-image": "1.11.11",

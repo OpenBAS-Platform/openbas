@@ -73,29 +73,54 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     return Math.round((position.x / (gapSize / minutesPerGap)) * 60);
   };
 
+  const calculateInjectPosition = (nodeInjects: NodeInject[]) => {
+    nodeInjects.forEach((nodeInject, index) => {
+      let row = 0;
+      let doItAgain = false;
+      do {
+        nodeInjects.slice(0, index)
+          .filter((previousNode) => nodeInject.position.x > previousNode.position.x && nodeInject.position.x < previousNode.position.x + 240)
+          .forEach((previousNodes) => {
+            if (previousNodes.position.y + 150 > row * 150 && previousNodes.position.y <= row * 150) {
+              row += 1;
+              doItAgain = true;
+            } else {
+              nodeInject.position.y = 150 * row;
+              nodeInject.data.fixedY = nodeInject.position.y;
+              doItAgain = false;
+            }
+          });
+      } while (doItAgain);
+    });
+  };
+
   useEffect(() => {
     if (injects.length > 0) {
+      const injectsNodes = injects
+        .sort((a, b) => a.inject_depends_duration - b.inject_depends_duration)
+        .map((inject: InjectStore, index: number) => ({
+          id: `${inject.inject_id}`,
+          type: 'inject',
+          data: {
+            key: inject.inject_id,
+            label: inject.inject_title,
+            color: 'green',
+            background: '#09101e',
+            onConnectInjects,
+            isTargeted: false,
+            isTargeting: false,
+            inject,
+            fixedY: 0,
+            startDate,
+            targets: inject.inject_assets!.map((asset) => asset.asset_name)
+              .concat(inject.inject_asset_groups!.map((assetGroup) => assetGroup.asset_group_name))
+              .concat(inject.inject_teams!.map((team) => teams[team]?.team_name)),
+          },
+          position: { x: (inject.inject_depends_duration / 60) * ((125 * 3) / 15), y: 0 },
+        }));
+      calculateInjectPosition(injectsNodes);
       setInjectsToShow(injects);
-      setNodes(injects.map((inject: InjectStore, index: number) => ({
-        id: `${inject.inject_id}`,
-        type: 'inject',
-        data: {
-          key: inject.inject_id,
-          label: inject.inject_title,
-          color: 'green',
-          background: '#09101e',
-          onConnectInjects,
-          isTargeted: false,
-          isTargeting: false,
-          inject,
-          fixedY: index * 150,
-          startDate,
-          targets: inject.inject_assets!.map((asset) => asset.asset_name)
-            .concat(inject.inject_asset_groups!.map((assetGroup) => assetGroup.asset_group_name))
-            .concat(inject.inject_teams!.map((team) => teams[team]?.team_name)),
-        },
-        position: { x: (inject.inject_depends_duration / 60) * ((125 * 3) / 15), y: index * 150 },
-      })));
+      setNodes(injectsNodes);
       setEdges(injects.filter((inject) => inject.inject_depends_on != null).map((inject) => {
         return ({
           id: `${inject.inject_id}->${inject.inject_depends_on}`,
