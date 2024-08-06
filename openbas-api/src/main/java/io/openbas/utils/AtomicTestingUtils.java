@@ -20,9 +20,9 @@ import java.util.stream.Collectors;
 public class AtomicTestingUtils {
 
     public static List<InjectTargetWithResult> getTargets(
-        final List<Team> teams,
-        final List<Asset> assets,
-        final List<AssetGroup> assetGroups) {
+            final List<Team> teams,
+            final List<Asset> assets,
+            final List<AssetGroup> assetGroups) {
         List<InjectTargetWithResult> targets = new ArrayList<>();
         targets.addAll(teams
                 .stream()
@@ -30,7 +30,7 @@ public class AtomicTestingUtils {
                 .toList());
         targets.addAll(assets
                 .stream()
-                .map(t -> new InjectTargetWithResult(TargetType.ASSETS, t.getId(), t.getName(), List.of(), Objects.equals(t.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(t)).getPlatform(): null))
+                .map(t -> new InjectTargetWithResult(TargetType.ASSETS, t.getId(), t.getName(), List.of(), Objects.equals(t.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(t)).getPlatform() : null))
                 .toList());
         targets.addAll(assetGroups
                 .stream()
@@ -41,22 +41,22 @@ public class AtomicTestingUtils {
     }
 
     public static List<InjectTargetWithResult> getTargetsFromRaw(
-        final List<RawTeam> teams,
-        final List<RawAsset> assets,
-        final List<RawAssetGroup> assetGroups) {
+            final List<RawTeam> teams,
+            final List<RawAsset> assets,
+            final List<RawAssetGroup> assetGroups) {
         List<InjectTargetWithResult> targets = new ArrayList<>();
         targets.addAll(teams
-            .stream()
-            .map(t -> new InjectTargetWithResult(TargetType.TEAMS, t.getTeam_id(), t.getTeam_name(), List.of(), null))
-            .toList());
+                .stream()
+                .map(t -> new InjectTargetWithResult(TargetType.TEAMS, t.getTeam_id(), t.getTeam_name(), List.of(), null))
+                .toList());
         targets.addAll(assets
-            .stream()
-            .map(t -> new InjectTargetWithResult(TargetType.ASSETS, t.getAsset_id(), t.getAsset_name(), List.of(), Objects.equals(t.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(t.getEndpoint_platform()): null))
-            .toList());
+                .stream()
+                .map(t -> new InjectTargetWithResult(TargetType.ASSETS, t.getAsset_id(), t.getAsset_name(), List.of(), Objects.equals(t.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(t.getEndpoint_platform()) : null))
+                .toList());
         targets.addAll(assetGroups
-            .stream()
-            .map(t -> new InjectTargetWithResult(TargetType.ASSETS_GROUPS, t.getAsset_group_id(), t.getAsset_group_name(), List.of(), null))
-            .toList());
+                .stream()
+                .map(t -> new InjectTargetWithResult(TargetType.ASSETS_GROUPS, t.getAsset_group_id(), t.getAsset_group_name(), List.of(), null))
+                .toList());
 
         return targets;
     }
@@ -72,9 +72,9 @@ public class AtomicTestingUtils {
 
         expectations.forEach(expectation -> {
             if (expectation.getTeam() != null) {
-                if(expectation.getUser() != null) {
+                if (expectation.getUser() != null) {
                     playerExpectations.add(expectation);
-                }else{
+                } else {
                     teamExpectations.add(expectation);
                 }
             }
@@ -109,7 +109,7 @@ public class AtomicTestingUtils {
                         team.getName(),
                         defaultExpectationResultsByTypes,
                         null
-                        );
+                );
                 targets.add(target);
             }
         });
@@ -183,7 +183,7 @@ public class AtomicTestingUtils {
                                     )
                             )
                             .entrySet().stream()
-                            .map(entry -> new InjectTargetWithResult(TargetType.TEAMS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue(), playerExpectations.isEmpty()? List.of() : calculateResultsforPlayers(groupedByTeamAndUser.get(entry.getKey())), null))
+                            .map(entry -> new InjectTargetWithResult(TargetType.TEAMS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue(), playerExpectations.isEmpty() ? List.of() : calculateResultsforPlayers(groupedByTeamAndUser.get(entry.getKey())), null))
                             .toList()
             );
         }
@@ -374,10 +374,10 @@ public class AtomicTestingUtils {
                 .stream()
                 .filter(e -> types.contains(e.getType()))
                 .map(injectExpectation -> {
-                    if( injectExpectation.getScore() == null ) {
+                    if (injectExpectation.getScore() == null) {
                         return null;
                     }
-                    if(injectExpectation.getTeam() != null) {
+                    if (injectExpectation.getTeam() != null) {
                         if (injectExpectation.isExpectationGroup()) {
                             if (injectExpectation.getScore() > 0) {
                                 return 1.0;
@@ -391,11 +391,11 @@ public class AtomicTestingUtils {
                                 return 0.0;
                             }
                         }
-                    }else{
-                        if( injectExpectation.getScore() >= injectExpectation.getExpectedScore() ) {
+                    } else {
+                        if (injectExpectation.getScore() >= injectExpectation.getExpectedScore()) {
                             return 1.0;
                         }
-                        if( injectExpectation.getScore() == 0 ) {
+                        if (injectExpectation.getScore() == 0) {
                             return 0.0;
                         }
                         return 0.5;
@@ -409,10 +409,10 @@ public class AtomicTestingUtils {
                 .stream()
                 .filter(e -> types.contains(EXPECTATION_TYPE.valueOf(e.getInject_expectation_type())))
                 .map(rawInjectExpectation -> {
-                    if( rawInjectExpectation.getInject_expectation_score() == null ) {
+                    if (rawInjectExpectation.getInject_expectation_score() == null) {
                         return null;
                     }
-                    if(rawInjectExpectation.getTeam_id() != null) {
+                    if (rawInjectExpectation.getTeam_id() != null) {
                         if (rawInjectExpectation.getInject_expectation_group()) {
                             if (rawInjectExpectation.getInject_expectation_score() > 0) {
                                 return 1.0;
@@ -426,11 +426,11 @@ public class AtomicTestingUtils {
                                 return 0.0;
                             }
                         }
-                    }else{
-                        if( rawInjectExpectation.getInject_expectation_score() >= rawInjectExpectation.getInject_expectation_expected_score() ) {
+                    } else {
+                        if (rawInjectExpectation.getInject_expectation_score() >= rawInjectExpectation.getInject_expectation_expected_score()) {
                             return 1.0;
                         }
-                        if( rawInjectExpectation.getInject_expectation_score() == 0 ) {
+                        if (rawInjectExpectation.getInject_expectation_score() == 0) {
                             return 0.0;
                         }
                         return 0.5;
