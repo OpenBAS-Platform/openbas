@@ -378,9 +378,16 @@ public class Inject implements Base, Injection {
     return this.exercise == null && this.scenario == null;
   }
 
+  private static final Set<String> VALID_TYPES = new HashSet<>();
+
+  static {
+    VALID_TYPES.add("openbas_email");
+    VALID_TYPES.add("openbas_ovh_sms");
+  }
+
   @JsonProperty("inject_testable")
-  public boolean canBeTested() {
-    return this.getType().equals("openbas_email") || this.getType().equals("openbas_ovh_sms");
+  public boolean canBeTested(String type) {
+    return VALID_TYPES.contains(type);
   }
 
   @Override

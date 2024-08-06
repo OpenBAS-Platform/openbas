@@ -216,7 +216,7 @@ const InjectPopover: FunctionComponent<Props> = ({
             disabled={inject.inject_teams?.length === 0}
             onClick={handleOpenTest}
           >
-            {t('Test')}
+            {t('Test the inject')}
           </MenuItem>
         )}
         {inject.inject_type !== 'openbas_manual' && onUpdateInjectTrigger && (

@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
@@ -75,6 +77,16 @@ public class InjectTestStatus implements Base {
   @JoinColumn(name = "status_inject")
   @JsonIgnore
   private Inject inject;
+
+  @CreationTimestamp
+  @Column(name = "status_created_at")
+  @JsonProperty("inject_test_status_created_at")
+  private Instant testCreationDate;
+
+  @UpdateTimestamp
+  @Column(name = "status_updated_at")
+  @JsonProperty("inject_test_status_updated_at")
+  private Instant testUpdateDate;
 
   // region transient
   public List<String> statusIdentifiers() {
