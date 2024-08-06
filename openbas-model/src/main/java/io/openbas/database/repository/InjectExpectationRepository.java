@@ -29,9 +29,9 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
     );
 
     @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId " +
-            "and i.type = 'CHALLENGE' and i.team.id in (:teamIds)")
-    List<InjectExpectation> findChallengeExpectations(@Param("exerciseId") String exerciseId,
-                                                      @Param("teamIds") List<String> teamIds);
+            "and i.type = 'CHALLENGE' and i.user.id = :userId ")
+    List<InjectExpectation> findChallengeExpectationsByExerciseAndUser(@Param("exerciseId") String exerciseId,
+                                                                       @Param("userId") String userId);
 
     @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId " +
             "and i.type = 'CHALLENGE' and i.challenge.id = :challengeId and i.team.id in (:teamIds)")
@@ -41,7 +41,9 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
 
     @Query(value = "select i from InjectExpectation i where i.user.id = :userId and i.exercise.id = :exerciseId " +
             "and i.challenge.id = :challengeId and i.type = 'CHALLENGE' ")
-    List<InjectExpectation> findByUserAndExerciseAndChallenge(final String userId, final String exerciseId, final String challengeId);
+    List<InjectExpectation> findByUserAndExerciseAndChallenge(@Param("userId") String userId,
+                                                              @Param("exerciseId") String exerciseId,
+                                                              @Param("challengeId") String challengeId);
 
     @Query(value = "select i from InjectExpectation i where i.inject.id in (:injectIds) " +
             "and i.article.id in (:articlesIds) and i.team.id in (:teamIds) and i.type = 'ARTICLE'")

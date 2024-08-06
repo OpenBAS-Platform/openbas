@@ -21,9 +21,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -79,10 +77,21 @@ public class ChallengeService {
     public ChallengesReader playerChallenges(String exerciseId, User user) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
         ChallengesReader reader = new ChallengesReader(exercise);
-        List<String> teamIds = user.getTeams().stream().map(Team::getId).toList();
-        List<InjectExpectation> challengeExpectations = injectExpectationRepository.findChallengeExpectations(exerciseId,
-                teamIds);
-        List<ChallengeInformation> challenges = challengeExpectations.stream()
+        List<InjectExpectation> challengeExpectations = injectExpectationRepository.findChallengeExpectationsByExerciseAndUser(exerciseId, user.getId());
+
+        // Filter expectations by unique challenge
+        Set<String> seenChallenges = new HashSet<>();
+        List<InjectExpectation> distinctExpectations = new ArrayList<>();
+
+        for (InjectExpectation expectation : challengeExpectations) {
+            String challengeId = expectation.getChallenge().getId();
+            if (!seenChallenges.contains(challengeId)) {
+                seenChallenges.add(challengeId);
+                distinctExpectations.add(expectation);
+            }
+        }
+
+        List<ChallengeInformation> challenges = distinctExpectations.stream()
                 .map(injectExpectation -> {
                     Challenge challenge = injectExpectation.getChallenge();
                     challenge.setVirtualPublication(injectExpectation.getCreatedAt());
