@@ -2,17 +2,14 @@ import React, { memo, useState } from 'react';
 import { Handle, NodeProps, Position, Node, OnConnect } from '@xyflow/react';
 import { makeStyles } from '@mui/styles';
 import { Tooltip } from '@mui/material';
-import { FlagOutlined, HelpOutlined, ModeStandbyOutlined, ScoreOutlined } from '@mui/icons-material';
 import moment from 'moment';
-import { Theme } from '../Theme';
+import type { Theme } from '../Theme';
 import { isNotEmptyField } from '../../utils/utils';
 import InjectIcon from '../../admin/components/common/injects/InjectIcon';
-import { Inject, Payload } from '../../utils/api-types';
 import InjectPopover from '../../admin/components/common/injects/InjectPopover';
-import { InjectStore } from '../../actions/injects/Inject';
+import type { InjectStore } from '../../actions/injects/Inject';
 import { useHelper } from '../../store';
-import { parseCron, ParsedCron } from '../../utils/Cron';
-import { useFormatter } from '../i18n';
+import type { TagHelper } from '../../actions/helper';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -35,7 +32,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   popover: {
     textAlign: 'right',
-    margin: '10px 0 0px 5px',
+    width: 'md',
   },
   triggerTime: {
     textAlign: 'right',
@@ -52,17 +49,28 @@ const useStyles = makeStyles<Theme>((theme) => ({
     whiteSpace: 'auto',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    height: '40px',
+
   },
-  description: {
-    maxWidth: 100,
-    color:
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.5)'
-        : 'rgba(0, 0, 0, 0.5)',
-    fontSize: 8,
-    whiteSpace: 'nowrap',
+  targets: {
+    display: 'flex',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    margin: '0 0 0 5px',
+    textAlign: 'left',
+    fontSize: 12,
+    whiteSpace: 'auto',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+  },
+  footer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    p: 1,
+    m: 1,
   },
 }));
 
@@ -78,20 +86,21 @@ export type NodeInject = Node<{
   inject: InjectStore,
   fixedY?: number,
   startDate?: string,
+  targets: string[]
 }
 
 >;
 
-const NodeInject = ({ positionAbsoluteX, positionAbsoluteY, data }: NodeProps<NodeInject>) => {
+const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
   const classes = useStyles();
   const {
     tagsMap,
-  } = useHelper((helper) => {
+  } = useHelper((helper: TagHelper) => {
     return {
       tagsMap: helper.getTagsMap(),
     };
   });
-  const [selectedInjectId, setSelectedInjectId] = useState('');
+  const [_selectedInjectId, setSelectedInjectId] = useState('');
 
   const convertToRelativeTime = (durationInSeconds: number) => {
     const date = moment.utc(moment.duration(0, 'd').add(durationInSeconds, 's').asMilliseconds());
@@ -131,19 +140,19 @@ const NodeInject = ({ positionAbsoluteX, positionAbsoluteY, data }: NodeProps<No
       <Tooltip title={data.label}>
         <div className={classes.label}>{data.label}</div>
       </Tooltip>
-      <Tooltip title={data.description}>
-        <div className={classes.description}>{data.description}</div>
-      </Tooltip>
-      <Tooltip title={data.description}>
-        <div className={classes.type}>{data.inject.inject_type}</div>
-      </Tooltip>
-      <div className={classes.popover}>
-        <InjectPopover
-          inject={data.inject}
-          tagsMap={tagsMap}
-          setSelectedInjectId={setSelectedInjectId}
-          isDisabled={false}
-        />
+      <div className={classes.footer}>
+        <Tooltip title={data.targets}>
+          <div className={classes.targets}><span>{`${data.targets.slice(0, 3).join(', ')}${data.targets.length > 3 ? ', ...' : ''}`}</span></div>
+        </Tooltip>
+        <div className={classes.popover}>
+          <InjectPopover
+            inject={data.inject}
+            tagsMap={tagsMap}
+            setSelectedInjectId={setSelectedInjectId}
+            isDisabled={false}
+          />
+        </div>
+
       </div>
       {(data.isTargeted ? (
         <Handle type="target" id={`target-${data.key}`} position={Position.Left} isConnectable={true}
@@ -157,4 +166,4 @@ const NodeInject = ({ positionAbsoluteX, positionAbsoluteY, data }: NodeProps<No
   );
 };
 
-export default memo(NodeInject);
+export default memo(NodeInjectComponent);

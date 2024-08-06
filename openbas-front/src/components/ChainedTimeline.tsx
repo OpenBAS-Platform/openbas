@@ -6,17 +6,16 @@ import moment from 'moment-timezone';
 import type { InjectStore } from '../actions/injects/Inject';
 import type { Theme } from './Theme';
 import nodeTypes from './nodes';
-import { LayoutOptions } from '../utils/flows/useAutoLayout';
 import { CustomTimelineBackground } from './CustomTimelineBackground';
 import { NodeInject } from './nodes/NodeInject';
 import { CustomTimelinePanel } from './CustomTimelinePanel';
-import type { Inject } from '../utils/api-types';
 import { InjectContext } from '../admin/components/common/Context';
 import { useHelper } from '../store';
 import type { InjectHelper } from '../actions/injects/inject-helper';
 import type { ScenariosHelper } from '../actions/scenarios/scenario-helper';
-import { ExercisesHelper } from '../actions/exercises/exercise-helper';
-import { parseCron, ParsedCron } from '../utils/Cron';
+import type { ExercisesHelper } from '../actions/exercises/exercise-helper';
+import { parseCron } from '../utils/Cron';
+import type { TeamsHelper } from '../actions/teams/team-helper';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -45,13 +44,12 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   let timer: NodeJS.Timeout;
   const injectContext = useContext(InjectContext);
 
-  const injectsMap: Inject[] = useHelper((helper: InjectHelper) => {
-    return helper.getInjectsMap();
-  });
+  const injectsMap = useHelper((injectHelper: InjectHelper) => injectHelper.getInjectsMap());
+  const teams = useHelper((teamsHelper: TeamsHelper) => teamsHelper.getTeamsMap());
   const scenario = useHelper((helper: ScenariosHelper) => helper.getScenario(exerciseOrScenarioId));
   const exercise = useHelper((helper: ExercisesHelper) => helper.getExercise(exerciseOrScenarioId));
 
-  let startDate;
+  let startDate: string;
 
   if (scenario !== undefined) {
     const parsedCron = scenario.scenario_recurrence ? parseCron(scenario.scenario_recurrence) : null;
@@ -64,12 +62,16 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   }
 
   // Flow
-  const layoutOptions: LayoutOptions = {
+  /* const layoutOptions: LayoutOptions = {
     algorithm: 'd3-hierarchy',
     direction: 'LR',
     spacing: [150, 150],
   };
-  // useAutoLayoutInject(layoutOptions, injectsToShow);
+  useAutoLayoutInject(layoutOptions, injectsToShow); */
+
+  const convertCoordinatesToTime = (position: XYPosition) => {
+    return Math.round((position.x / (gapSize / minutesPerGap)) * 60);
+  };
 
   useEffect(() => {
     if (injects.length > 0) {
@@ -88,6 +90,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
           inject,
           fixedY: index * 150,
           startDate,
+          targets: inject.inject_assets!.map((asset) => asset.asset_name)
+            .concat(inject.inject_asset_groups!.map((assetGroup) => assetGroup.asset_group_name))
+            .concat(inject.inject_teams!.map((team) => teams[team]?.team_name)),
         },
         position: { x: (inject.inject_depends_duration / 60) * ((125 * 3) / 15), y: index * 150 },
       })));
@@ -111,7 +116,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     markerEnd: { type: MarkerType.ArrowClosed },
   };
 
-  const nodeDrag = (event: React.MouseEvent, node: NodeInject, allNodes: Node[]) => {
+  const nodeDrag = (event: React.MouseEvent, node: NodeInject) => {
     const injectFromMap = injectsMap[node.id];
     if (injectFromMap !== undefined) {
       const inject = {
@@ -125,7 +130,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     }
   };
 
-  const horizontalNodeDrag = (event: React.MouseEvent, node: NodeInject, allNodes: Node[]) => {
+  const horizontalNodeDrag = (event: React.MouseEvent, node: NodeInject) => {
     if (node.data.fixedY !== undefined) {
       node.position.y = node.data.fixedY;
       node.data.inject.inject_depends_duration = convertCoordinatesToTime(node.position);
@@ -160,10 +165,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
       moveNewNode(eventMove);
     }, 300);
   }; */
-
-  const convertCoordinatesToTime = (position: XYPosition) => {
-    return Math.round((position.x / (gapSize / minutesPerGap)) * 60);
-  };
 
   const onNodeClick = (event: React.MouseEvent, node: NodeInject) => {
     onSelectedInject(injects.find((value) => value.inject_id === node.id)!);
