@@ -698,6 +698,13 @@ const i18n = {
       Error: 'Erreur',
       'This page is not found on this OpenBAS application.': 'Cette page est introuvable sur l\'application OpenBAS.',
       'You must be logged to access this page': 'Vous devez être connecté pour accéder à cette page',
+      // Validation Type
+      'Validation type': 'Type de validation',
+      'User input': 'Entrée utilisateur',
+      'Player Manual Validation': 'Validation manuelle du joueur',
+      'Team Manual Validation': 'Validation manuelle de l\'équipe',
+      'Challenge validation': 'Validation du défi',
+      'Media pressure read': 'Pression médiatique',
       // Challenges
       Challenges: 'Challenges',
       // Variables

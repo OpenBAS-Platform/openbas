@@ -551,7 +551,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                               </Menu>
                             </>
                         }
-                          title={expectationResult.sourceName ?? t('Unknown')}
+                          title={expectationResult.sourceName ? t(expectationResult.sourceName) : t('Unknown')}
                           subheader={nsdt(expectationResult.date)}
                         />
                         <CardContent>
