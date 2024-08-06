@@ -24,7 +24,7 @@ const useStyles = makeStyles(() => ({
 
 export interface SettingUpdateInput {
   setting_mail_from?: string;
-  setting_mails_reply_to?: { message: string }[];
+  setting_mails_reply_to?: string[];
   setting_message_header?: string;
 }
 
