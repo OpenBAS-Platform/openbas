@@ -160,12 +160,6 @@ public class InjectApi extends RestBehavior {
     return atomicTestingService.tryInject(injectId);
   }
 
-  @GetMapping(INJECT_URI + "/test/{injectId}")
-  public InjectTestStatus testInject(@PathVariable String injectId) {
-    return injectTestStatusService.testInject(injectId);
-
-  }
-
   @Transactional(rollbackFor = Exception.class)
   @PutMapping(INJECT_URI + "/{exerciseId}/{injectId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")

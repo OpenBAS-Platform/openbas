@@ -16,6 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static io.openbas.config.SessionHelper.currentUser;
 
@@ -50,11 +51,16 @@ public class InjectTestStatusService {
     Execution execution = executor.executeInjection(injection);
 
     //Save inject test status
-    InjectTestStatus injectTestStatus = InjectTestStatus.fromExecutionTest(execution);
-    injectTestStatus.setInject(inject);
-    this.injectTestStatusRepository.save(injectTestStatus);
+    Optional<InjectTestStatus> injectTestStatus = this.injectTestStatusRepository.findByInject(inject);
+    InjectTestStatus injectTestStatusToSave = InjectTestStatus.fromExecutionTest(execution);
+    injectTestStatus.ifPresent(testStatus -> {
+      injectTestStatusToSave.setId(testStatus.getId());
+      injectTestStatusToSave.setTestCreationDate(testStatus.getTestCreationDate());
+    });
+    injectTestStatusToSave.setInject(inject);
+    this.injectTestStatusRepository.save(injectTestStatusToSave);
 
-    return injectTestStatus;
+    return injectTestStatusToSave;
   }
 
 }
