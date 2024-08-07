@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.Date;
+
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 @Data
@@ -21,4 +23,7 @@ public class InjectsImportInput {
   @NotNull(message = MANDATORY_MESSAGE)
   @JsonProperty("timezone_offset")
   private Integer timezoneOffset;
+
+  @JsonProperty("launch_date")
+  private Date launchDate = null;
 }

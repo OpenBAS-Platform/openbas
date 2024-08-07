@@ -1493,6 +1493,8 @@ export interface InjectorUpdateInput {
 
 export interface InjectsImportInput {
   import_mapper_id: string;
+  /** @format date-time */
+  launch_date?: string;
   sheet_name: string;
   /** @format int32 */
   timezone_offset: number;

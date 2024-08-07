@@ -80,6 +80,7 @@ const ImportUploaderInjectFromXls = () => {
             && <ImportUploaderInjectFromXlsInjects
               sheets={sheets}
               handleClose={handleClose}
+              importId={importId}
               handleSubmit={onSubmitImportInjects}
                />
           }

@@ -10,7 +10,7 @@ import {
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { InjectStore } from '../../../../actions/injects/Inject';
-import { fetchScenario, fetchScenarioTeams, importXls } from '../../../../actions/scenarios/scenario-actions';
+import { dryImportXls, fetchScenario, fetchScenarioTeams, importXls } from '../../../../actions/scenarios/scenario-actions';
 
 const injectContextForScenario = (scenario: ScenarioStore) => {
   const dispatch = useAppDispatch();
@@ -38,6 +38,9 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
         dispatch(fetchScenarioTeams(scenario.scenario_id));
         resolve(response.data);
       }));
+    },
+    async onDryImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {
+      return dryImportXls(scenario.scenario_id, importId, input).then((result) => result.data);
     },
     onBulkDeleteInjects(injectIds: string[]): void {
       return dispatch(bulkDeleteInjectsForScenario(scenario.scenario_id, injectIds));

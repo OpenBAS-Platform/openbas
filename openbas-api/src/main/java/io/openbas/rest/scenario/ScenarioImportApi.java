@@ -61,6 +61,10 @@ public class ScenarioImportApi extends RestBehavior {
                                                @Valid @RequestBody final InjectsImportInput input) {
         Scenario scenario = scenarioService.scenario(scenarioId);
 
+        if(input.getLaunchDate() != null) {
+            scenario.setRecurrenceStart(input.getLaunchDate().toInstant());
+        }
+
         // Getting the mapper to use
         ImportMapper importMapper = importMapperRepository
                 .findById(UUID.fromString(input.getImportMapperId()))
