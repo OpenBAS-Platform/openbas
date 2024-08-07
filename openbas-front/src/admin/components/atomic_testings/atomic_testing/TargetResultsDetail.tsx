@@ -126,7 +126,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   const layoutOptions: LayoutOptions = {
     algorithm: 'd3-hierarchy',
     direction: 'LR',
-    spacing: [150, 150],
+    spacing: [350, 350],
   };
   useAutoLayout(layoutOptions, targetResults);
   const { fitView } = useReactFlow();

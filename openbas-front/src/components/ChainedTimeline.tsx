@@ -120,7 +120,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
               .concat(inject.inject_asset_groups!.map((assetGroup) => assetGroup.asset_group_name))
               .concat(inject.inject_teams!.map((team) => teams[team]?.team_name)),
           },
-          position: { x: (inject.inject_depends_duration / 60) * ((125 * 3) / 15), y: 0 },
+          position: { x: (inject.inject_depends_duration / 60) * ((gapSize * 3) / 15), y: 0 },
         }));
       calculateInjectPosition(injectsNodes);
       setInjectsToShow(injects);
@@ -164,7 +164,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
 
   const nodeDragStart = () => {
     clearTimeout(timer);
-    const nodesList = nodes.filter((currentNode) => currentNode.id !== 'fantom');
+    const nodesList = nodes.filter((currentNode) => currentNode.type !== 'phantom');
     setNodes(nodesList);
   };
 
@@ -180,11 +180,11 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   };
 
   const filterNodesAfter = (newX: number, newY: number) => {
-    return (node: NodeInject) => node.id !== 'fantom' && node.position.y === newY && node.position.x > newX;
+    return (node: NodeInject) => node.type !== 'phantom' && node.position.y === newY && node.position.x > newX;
   };
 
   const filterNodesBefore = (newX: number, newY: number) => {
-    return (node: NodeInject) => node.id !== 'fantom' && node.position.y === newY && node.position.x < newX;
+    return (node: NodeInject) => node.type !== 'phantom' && node.position.y === newY && node.position.x < newX;
   };
 
   const moveNewNode = (event: React.MouseEvent) => {
@@ -206,20 +206,20 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
         }
       } while (!foundHorizontalLane);
 
-      const existingFantomNode = nodes.find((currentNode) => currentNode.id === 'fantom');
+      const existingphantomNode = nodes.find((currentNode) => currentNode.type === 'phantom');
 
-      if (newY >= 0 && (existingFantomNode === undefined
-          || ((newX < existingFantomNode?.position.x || newX > existingFantomNode!.position.x + 240
-          || newY < existingFantomNode?.position.y || newY > existingFantomNode!.position.y + 150)))
+      if (newY >= 0 && (existingphantomNode === undefined
+          || ((newX < existingphantomNode?.position.x || newX > existingphantomNode!.position.x + 240
+          || newY < existingphantomNode?.position.y || newY > existingphantomNode!.position.y + 150)))
       ) {
-        const nodesList = nodes.filter((currentNode) => currentNode.id !== 'fantom');
+        const nodesList = nodes.filter((currentNode) => currentNode.type !== 'phantom');
         const node = {
-          id: 'fantom',
+          id: 'phantom',
           type: 'phantom',
           connectable: false,
           data: {
-            key: 'fantom',
-            label: 'fantom',
+            key: 'phantom',
+            label: 'phantom',
             color: 'green',
             background: 'black',
             targets: [],
@@ -240,7 +240,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   };
 
   const onNodeClick = (event: React.MouseEvent, node: NodeInject) => {
-    if (node.id === 'fantom') {
+    if (node.type === 'phantom') {
       const totalMinutes = moment.duration((node.position.x / gapSize) * 5 * 60, 's');
       openCreateInjectDrawer({
         inject_depends_duration_days: totalMinutes.days(),
