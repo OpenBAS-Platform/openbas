@@ -1,9 +1,9 @@
 import { NodeTypes } from '@xyflow/react';
-import NodeInject from './NodeInject';
 import NodePhantom from './NodePhantom';
+import NodeInjectExport from './NodeInject';
 
 const nodeTypes: NodeTypes = {
-  inject: NodeInject,
+  inject: NodeInjectExport,
   phantom: NodePhantom,
 };
 

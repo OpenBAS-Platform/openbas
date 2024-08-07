@@ -1,10 +1,9 @@
 import React, { memo } from 'react';
-import { Handle, Node, NodeProps, OnConnect, Position } from '@xyflow/react';
+import { Handle, Node, NodeProps, Position } from '@xyflow/react';
 import { makeStyles } from '@mui/styles';
 import { Tooltip } from '@mui/material';
 import { FlagOutlined, HelpOutlined, ModeStandbyOutlined, ScoreOutlined } from '@mui/icons-material';
 import type { Theme } from '../../../../../../components/Theme';
-import type { InjectStore } from '../../../../../../actions/injects/Inject';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.

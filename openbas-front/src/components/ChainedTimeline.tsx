@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, Connection, Edge, useReactFlow, Viewport, XYPosition } from '@xyflow/react';
+import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, Connection, Edge, useReactFlow, Viewport, XYPosition, Controls } from '@xyflow/react';
 import moment from 'moment-timezone';
 import type { InjectStore } from '../actions/injects/Inject';
 import type { Theme } from './Theme';
@@ -268,6 +268,11 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             onNodeClick={onNodeClick}
             defaultViewport={{ x: 60, y: 50, zoom: 0.75 }}
           >
+            <Controls
+              showFitView={true}
+              showZoom={false}
+              showInteractive={false}
+            />
             <CustomTimelineBackground
               gap={gapSize}
               minutesPerGap={minutesPerGap}

@@ -15,7 +15,7 @@ import {
   ToggleButtonGroup,
   Tooltip,
 } from '@mui/material';
-import { BarChartOutlined, MoreVert, ReorderOutlined, ViewTimelineOutlined, Link } from '@mui/icons-material';
+import { BarChartOutlined, MoreVert, ReorderOutlined } from '@mui/icons-material';
 import { splitDuration } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
