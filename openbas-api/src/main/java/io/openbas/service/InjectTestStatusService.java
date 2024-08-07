@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,6 +62,32 @@ public class InjectTestStatusService {
     this.injectTestStatusRepository.save(injectTestStatusToSave);
 
     return injectTestStatusToSave;
+  }
+
+  public List<InjectTestStatus> findAllExerciseInjectTests(String exerciseId) {
+    List<Inject> injects = injectRepository.findByExerciseId(exerciseId);
+    List<InjectTestStatus> injectTestStatuses = new ArrayList<>();
+    injects.forEach(inject -> {
+      if (injectTestStatusRepository.findByInject(inject).isPresent()) {
+        injectTestStatuses.add(injectTestStatusRepository.findByInject(inject).get());
+      }
+    });
+    return injectTestStatuses;
+  }
+
+  public List<InjectTestStatus> findAllScenarioInjectTests(String scenarioId) {
+    List<Inject> injects = injectRepository.findByScenarioId(scenarioId);
+    List<InjectTestStatus> injectTestStatuses = new ArrayList<>();
+    injects.forEach(inject -> {
+      if (injectTestStatusRepository.findByInject(inject).isPresent()) {
+        injectTestStatuses.add(injectTestStatusRepository.findByInject(inject).get());
+      }
+    });
+    return injectTestStatuses;
+  }
+
+  public InjectTestStatus findInjectTestStatus(String testId) {
+    return injectTestStatusRepository.findById(testId).orElseThrow();
   }
 
 }

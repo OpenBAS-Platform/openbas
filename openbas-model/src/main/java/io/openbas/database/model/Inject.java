@@ -385,8 +385,15 @@ public class Inject implements Base, Injection {
     VALID_TYPES.add("openbas_ovh_sms");
   }
 
+  @JsonIgnore
+  private transient boolean injectTestable;
+
+  public void setInjectTestable() {
+    this.injectTestable = getInjectTestable(this.getType());
+  }
+
   @JsonProperty("inject_testable")
-  public boolean canBeTested(String type) {
+  public boolean getInjectTestable(String type) {
     return VALID_TYPES.contains(type);
   }
 
