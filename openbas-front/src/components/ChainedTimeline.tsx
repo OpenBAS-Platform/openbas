@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, Connection, Edge, useReactFlow, Viewport } from '@xyflow/react';
-import { XYPosition } from 'reactflow';
+import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, Connection, Edge, useReactFlow, Viewport, XYPosition } from '@xyflow/react';
 import moment from 'moment-timezone';
 import type { InjectStore } from '../actions/injects/Inject';
 import type { Theme } from './Theme';
