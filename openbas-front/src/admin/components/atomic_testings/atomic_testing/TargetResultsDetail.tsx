@@ -43,7 +43,7 @@ import DetectionPreventionExpectationsValidationForm from '../../simulations/sim
 import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { InjectExpectationStore } from '../../../../actions/injects/Inject';
-import { NodeInject } from '../../../../components/nodes/NodeInject';
+import { NodeResultStep } from './types/nodes/NodeResultStep';
 import { isTechnicalExpectation } from '../../common/injects/expectations/ExpectationUtils';
 
 interface Steptarget {
@@ -118,7 +118,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   const [initialized, setInitialized] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [targetResults, setTargetResults] = useState<InjectExpectationsStore[]>([]);
-  const [nodes, setNodes, onNodesChange] = useNodesState<NodeInject>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<NodeResultStep>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const initialSteps = [{ label: t('Attack started'), type: '', key: 'attack-started' }, { label: t('Attack ended'), type: '', key: 'attack-ended' }];
   const sortOrder = ['PREVENTION', 'DETECTION', 'MANUAL'];
