@@ -74,6 +74,7 @@ const UpdateInjectDetails = ({
     dispatch(fetchTeams());
     dispatch(fetchTags());
   });
+
   const toggleInjectContent = () => {
     if (openDetails) {
       // eslint-disable-next-line no-param-reassign

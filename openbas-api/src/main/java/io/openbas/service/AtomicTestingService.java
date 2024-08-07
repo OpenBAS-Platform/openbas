@@ -79,8 +79,8 @@ public class AtomicTestingService {
     private EntityManager entityManager;
 
     public InjectResultDTO findById(String injectId) {
-        Optional<Inject> statusById = injectRepository.findWithStatusById(injectId);
-        return statusById
+        Optional<Inject> inject = injectRepository.findWithStatusById(injectId);
+        return inject
                 .map(AtomicTestingMapper::toDtoWithTargetResults)
                 .orElseThrow(ElementNotFoundException::new);
     }
