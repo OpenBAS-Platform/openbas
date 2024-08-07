@@ -2,16 +2,15 @@ import { Button, Chip, TablePagination, ToggleButtonGroup } from '@mui/material'
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import SearchFilter from '../../SearchFilter';
-import type { Page } from './Page';
-import type { Filter, FilterGroup, SearchPaginationInput } from '../../../utils/api-types';
+import type { Page } from '../queryable/Page';
+import type { Filter, SearchPaginationInput } from '../../../utils/api-types';
 import ExportButton, { ExportProps } from '../ExportButton';
 import mitreAttack from '../../../static/images/misc/attack.png';
-import KillChainPhasesFilter from '../../../admin/components/common/filters/KillChainPhasesFilter';
 import Drawer from '../Drawer';
 import MitreFilter, { MITRE_FILTER_KEY } from '../../../admin/components/common/filters/MitreFilter';
 import { useFormatter } from '../../i18n';
-import { FilterHelpers } from '../filter/FilterHelpers';
-import { isEmptyFilter } from '../filter/FilterUtils';
+import { FilterHelpers } from '../queryable/filter/FilterHelpers';
+import { isEmptyFilter } from '../queryable/filter/FilterUtils';
 import type { AttackPatternStore } from '../../../actions/attack_patterns/AttackPattern';
 
 const useStyles = makeStyles(() => ({
@@ -50,7 +49,6 @@ interface Props<T> {
   entityPrefix?: string;
   availableFilters?: string[];
   helpers?: FilterHelpers;
-  filterGroup?: FilterGroup;
   children?: React.ReactElement | null;
   attackPatterns?: AttackPatternStore[],
 }
@@ -64,7 +62,6 @@ const PaginationComponent = <T extends object>({
   entityPrefix,
   availableFilters,
   helpers,
-  filterGroup,
   attackPatterns,
   children,
 }: Props<T>) => {
@@ -95,7 +92,7 @@ const PaginationComponent = <T extends object>({
   const [textSearch, setTextSearch] = React.useState(searchPaginationInput.textSearch ?? '');
   const handleTextSearch = (value?: string) => {
     setPage(0);
-    setTextSearch(value || '');
+    setTextSearch(value ?? '');
   };
 
   // Filters
@@ -118,7 +115,7 @@ const PaginationComponent = <T extends object>({
 
   // Utils
   const computeAttackPatternNameForFilter = () => {
-    return filterGroup?.filters?.filter(
+    return searchPaginationInput.filterGroup?.filters?.filter(
       (f: Filter) => f.key === MITRE_FILTER_KEY,
     )?.[0]?.values?.map(
       (externalId: string) => attackPatterns?.find(
@@ -143,9 +140,6 @@ const PaginationComponent = <T extends object>({
               onChange={handleTextSearch}
               keyword={textSearch}
             />
-          )}
-          {helpers && availableFilters?.includes(`${entityPrefix}_kill_chain_phases`) && (
-            <KillChainPhasesFilter filterKey={`${entityPrefix}_kill_chain_phases`} helpers={helpers} />
           )}
           {helpers && availableFilters?.includes(`${entityPrefix}_attack_patterns`) && (
             <>
@@ -183,9 +177,9 @@ const PaginationComponent = <T extends object>({
           </div>
         )}
       </div>
-      {helpers && filterGroup && (
+      {helpers && searchPaginationInput.filterGroup && (
         <div className={classes.filters}>
-          {!isEmptyFilter(filterGroup, MITRE_FILTER_KEY) && (
+          {!isEmptyFilter(searchPaginationInput.filterGroup, MITRE_FILTER_KEY) && (
             <Chip
               style={{ borderRadius: 4, marginTop: 5 }}
               label={`Attack Pattern = ${computeAttackPatternNameForFilter()}`}

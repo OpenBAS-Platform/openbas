@@ -1,9 +1,9 @@
 package io.openbas.injectors.caldera;
 
+import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
+import io.openbas.helper.SupportedLanguage;
 import io.openbas.injector_contract.*;
 import io.openbas.injector_contract.fields.*;
-import io.openbas.database.model.Endpoint;
-import io.openbas.helper.SupportedLanguage;
 import io.openbas.injectors.caldera.client.model.Ability;
 import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
 import io.openbas.injectors.caldera.model.Obfuscator;
@@ -21,7 +21,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.DETECTION;
+import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVENTION;
 import static io.openbas.executors.caldera.service.CalderaExecutorService.toPlatform;
+import static io.openbas.helper.SupportedLanguage.en;
+import static io.openbas.helper.SupportedLanguage.fr;
 import static io.openbas.injector_contract.Contract.executableContract;
 import static io.openbas.injector_contract.ContractCardinality.Multiple;
 import static io.openbas.injector_contract.ContractDef.contractBuilder;
@@ -29,10 +33,6 @@ import static io.openbas.injector_contract.fields.ContractAsset.assetField;
 import static io.openbas.injector_contract.fields.ContractAssetGroup.assetGroupField;
 import static io.openbas.injector_contract.fields.ContractExpectations.expectationsField;
 import static io.openbas.injector_contract.fields.ContractSelect.selectFieldWithDefault;
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.DETECTION;
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVENTION;
-import static io.openbas.helper.SupportedLanguage.en;
-import static io.openbas.helper.SupportedLanguage.fr;
 
 @Component
 @RequiredArgsConstructor
@@ -110,7 +110,7 @@ public class CalderaContract extends Contractor {
             builder.mandatoryGroup(assetField, assetGroupField);
             builder.optional(obfuscatorField);
             builder.optional(expectationsField);
-            List<String> platforms = new ArrayList<>();
+            List<PLATFORM_TYPE> platforms = new ArrayList<>();
             ability.getExecutors().forEach(executor -> {
                 String command = executor.getCommand();
                 if (command != null && !command.isEmpty()) {
@@ -122,22 +122,22 @@ public class CalderaContract extends Contractor {
                     }
                 }
                 if (!executor.getPlatform().equals("unknown")) {
-                    String platform = toPlatform(executor.getPlatform()).name();
+                    PLATFORM_TYPE platform = toPlatform(executor.getPlatform());
                     if (!platforms.contains(platform)) {
                         platforms.add(platform);
                     }
                 } else {
                     if (executor.getName().equals("psh")) {
-                        if (!platforms.contains(Endpoint.PLATFORM_TYPE.Windows.name())) {
-                            platforms.add(Endpoint.PLATFORM_TYPE.Windows.name());
+                        if (!platforms.contains(PLATFORM_TYPE.Windows)) {
+                            platforms.add(PLATFORM_TYPE.Windows);
                         }
                     } else if (executor.getName().equals("sh")) {
-                        if (!platforms.contains(Endpoint.PLATFORM_TYPE.Linux.name())) {
-                            platforms.add(Endpoint.PLATFORM_TYPE.Linux.name());
+                        if (!platforms.contains(PLATFORM_TYPE.Linux)) {
+                            platforms.add(PLATFORM_TYPE.Linux);
                         }
                     } else if (executor.getName().equals("cmd")) {
-                        if (!platforms.contains(Endpoint.PLATFORM_TYPE.Windows.name())) {
-                            platforms.add(Endpoint.PLATFORM_TYPE.Windows.name());
+                        if (!platforms.contains(PLATFORM_TYPE.Windows)) {
+                            platforms.add(PLATFORM_TYPE.Windows);
                         }
                     }
                 }

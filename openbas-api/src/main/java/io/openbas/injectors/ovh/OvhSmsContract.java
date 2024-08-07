@@ -66,7 +66,7 @@ public class OvhSmsContract extends Contractor {
                 .optional(expectationsField)
                 .build();
         return List.of(executableContract(contractConfig, OVH_DEFAULT,
-                Map.of(en, "Send a SMS", fr, "Envoyer un SMS"), instance, List.of(Endpoint.PLATFORM_TYPE.Service.name()), false));
+                Map.of(en, "Send a SMS", fr, "Envoyer un SMS"), instance, List.of(Endpoint.PLATFORM_TYPE.Service), false));
     }
     @Override
     public ContractorIcon getIcon() {

@@ -556,7 +556,6 @@ const Injects = (props) => {
                   <InjectPopover
                     inject={inject}
                     canBeTested
-                    tagsMap={tagsMap}
                     setSelectedInjectId={setSelectedInjectId}
                     isDisabled={!injectContract || !isContractExposed}
                   />

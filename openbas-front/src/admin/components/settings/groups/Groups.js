@@ -14,7 +14,7 @@ import GroupPopover from './GroupPopover';
 import SecurityMenu from '../SecurityMenu';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { initSorting } from '../../../../components/common/pagination/Page';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';

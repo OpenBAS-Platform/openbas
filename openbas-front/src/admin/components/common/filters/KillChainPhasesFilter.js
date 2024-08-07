@@ -7,7 +7,7 @@ import * as R from 'ramda';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import { buildEmptyFilter } from '../../../../components/common/filter/FilterUtils';
+import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 
 const useStyles = makeStyles(() => ({
   icon: {

@@ -1,9 +1,6 @@
 package io.openbas.rest.injector_contract;
 
-import io.openbas.database.model.Collector;
-import io.openbas.database.model.Injector;
-import io.openbas.database.model.InjectorContract;
-import io.openbas.database.model.Payload;
+import io.openbas.database.model.*;
 import io.openbas.rest.injector_contract.output.InjectorContractOutput;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -115,7 +112,7 @@ public class InjectorContractService {
             tuple.get("injector_contract_id", String.class),
             tuple.get("injector_contract_labels", Map.class),
             tuple.get("injector_contract_content", String.class),
-            tuple.get("injector_contract_platforms", String[].class),
+            tuple.get("injector_contract_platforms", Endpoint.PLATFORM_TYPE[].class),
             tuple.get("payload_type", String.class),
             tuple.get("collector_type", String.class),
             tuple.get("injector_contract_injector_type", String.class),

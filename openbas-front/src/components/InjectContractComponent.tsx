@@ -3,7 +3,7 @@ import { Autocomplete, SelectChangeEvent, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FieldError } from 'react-hook-form';
 import type { FilterGroup } from '../utils/api-types';
-import { initSorting, Page } from './common/pagination/Page';
+import { initSorting, Page } from './common/queryable/Page';
 import { useFormatter } from './i18n';
 import InjectIcon from '../admin/components/common/injects/InjectIcon';
 import { isNotEmptyField } from '../utils/utils';

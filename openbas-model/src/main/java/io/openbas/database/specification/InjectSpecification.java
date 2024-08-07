@@ -11,6 +11,10 @@ import jakarta.persistence.criteria.Path;
 
 public class InjectSpecification {
 
+    private InjectSpecification() {
+
+    }
+
     public static Specification<Inject> fromExercise(String exerciseId) {
         return (root, query, cb) -> cb.equal(root.get("exercise").get("id"), exerciseId);
     }

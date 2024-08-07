@@ -94,11 +94,9 @@ const SortHeadersComponent: FunctionComponent<Props> = ({
   };
 
   return (
-    <>
-      <div className={classes.headerItems}>
-        {headers.map((header: Header) => (sortHeader(header, inlineStylesHeaders[header.field])))}
-      </div>
-    </>
+    <div className={classes.headerItems}>
+      {headers.map((header: Header) => (sortHeader(header, inlineStylesHeaders[header.field])))}
+    </div>
   );
 };
 

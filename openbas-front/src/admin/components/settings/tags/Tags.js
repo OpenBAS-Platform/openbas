@@ -7,7 +7,7 @@ import { searchTags } from '../../../../actions/Tag';
 import CreateTag from './CreateTag';
 import TagPopover from './TagPopover';
 import TaxonomiesMenu from '../TaxonomiesMenu';
-import { initSorting } from '../../../../components/common/pagination/Page';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import Breadcrumbs from '../../../../components/Breadcrumbs';

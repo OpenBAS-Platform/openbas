@@ -5,13 +5,14 @@ import Breadcrumbs from '../../../components/Breadcrumbs';
 import ExerciseCreation from './simulation/ExerciseCreation';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
 import type { UserHelper } from '../../../actions/helper';
-import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
-import { initSorting } from '../../../components/common/pagination/Page';
-import type { SearchPaginationInput } from '../../../utils/api-types';
+import { initSorting } from '../../../components/common/queryable/Page';
 import type { EndpointStore } from '../assets/endpoints/Endpoint';
 import ExerciseList from './ExerciseList';
 import { searchExercises } from '../../../actions/Exercise';
 import ImportUploaderExercise from './ImportUploaderExercise';
+import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
+import useQueryable from '../../../components/common/queryable/useQueryable';
+import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import ExercisePopover from './simulation/ExercisePopover';
 import type { ExerciseStore } from '../../../actions/exercises/Exercise';
 
@@ -25,9 +26,9 @@ const Exercises = () => {
   }));
 
   const [exercises, setExercises] = useState<EndpointStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+  const { queryableHelpers, searchPaginationInput } = useQueryable('simulations', buildSearchPagination({
     sorts: initSorting('exercise_updated_at', 'DESC'),
-  });
+  }));
 
   // Export
   const exportProps = {
@@ -55,18 +56,20 @@ const Exercises = () => {
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Simulations'), current: true }]} />
-      <PaginationComponent
+      <PaginationComponentV2
         fetch={searchExercises}
         searchPaginationInput={searchPaginationInput}
         setContent={setExercises}
+        entityPrefix="exercise"
+        availableFilterNames={['exercise_kill_chain_phases', 'exercise_scenario', 'exercise_tags']}
+        queryableHelpers={queryableHelpers}
         exportProps={exportProps}
       >
         <ImportUploaderExercise />
-      </PaginationComponent>
+      </PaginationComponentV2>
       <ExerciseList
         exercises={exercises}
-        searchPaginationInput={searchPaginationInput}
-        setSearchPaginationInput={setSearchPaginationInput}
+        queryableHelpers={queryableHelpers}
         secondaryAction={secondaryAction}
       />
       {userAdmin && <ExerciseCreation />}

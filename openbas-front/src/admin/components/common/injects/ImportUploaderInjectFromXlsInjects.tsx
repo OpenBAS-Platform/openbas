@@ -10,7 +10,7 @@ import { zodImplement } from '../../../../utils/Zod';
 import { useFormatter } from '../../../../components/i18n';
 import type { ImportMapper, InjectsImportInput } from '../../../../utils/api-types';
 import { searchMappers } from '../../../../actions/mapper/mapper-actions';
-import type { Page } from '../../../../components/common/pagination/Page';
+import type { Page } from '../../../../components/common/queryable/Page';
 
 const useStyles = makeStyles(() => ({
   container: {

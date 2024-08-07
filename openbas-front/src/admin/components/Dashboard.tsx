@@ -18,7 +18,7 @@ import MitreMatrixDummy from './common/matrix/MitreMatrixDummy';
 import { horizontalBarsChartOptions, polarAreaChartOptions, verticalBarsChartOptions } from '../../utils/Charts';
 import { fetchExercises, searchExercises } from '../../actions/Exercise';
 import type { ExercisesHelper } from '../../actions/exercises/exercise-helper';
-import type { ExerciseSimple, SearchPaginationInput } from '../../utils/api-types';
+import type { ExerciseSimple } from '../../utils/api-types';
 import { daysAgo, fillTimeSeries, getNextWeek, groupBy } from '../../utils/Time';
 import type { AttackPatternHelper } from '../../actions/attack_patterns/attackpattern-helper';
 import type { KillChainPhaseHelper } from '../../actions/kill_chain_phases/killchainphase-helper';
@@ -29,7 +29,7 @@ import Empty from '../../components/Empty';
 import { attackPatternsFakeData, categoriesDataFakeData, categoriesLabelsFakeData, exercisesTimeSeriesFakeData } from '../../utils/fakeData';
 import ExerciseList from './simulations/ExerciseList';
 import type { EndpointStore } from './assets/endpoints/Endpoint';
-import { initSorting, type Page } from '../../components/common/pagination/Page';
+import { initSorting, type Page } from '../../components/common/queryable/Page';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -105,17 +105,17 @@ const Dashboard = () => {
 
   // Exercises
   const [exercises, setExercises] = useState<EndpointStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+  const searchPaginationInput = {
     sorts: initSorting('exercise_start_date'),
     page: 0,
     size: 6,
-  });
+  };
   useEffect(() => {
     searchExercises(searchPaginationInput).then((result: { data: Page<ExerciseSimple> }) => {
       const { data } = result;
       setExercises(data.content);
     });
-  }, [searchPaginationInput]);
+  }, []);
   return (
     <Grid container spacing={3}>
       <Grid item xs={3}>
@@ -220,8 +220,6 @@ const Dashboard = () => {
           {exercises.length === 0 && <Empty message={t('No simulation in this platform yet.')} />}
           <ExerciseList
             exercises={exercises}
-            searchPaginationInput={searchPaginationInput}
-            setSearchPaginationInput={setSearchPaginationInput}
             hasHeader={false}
             variant={'reduced-view'}
           />

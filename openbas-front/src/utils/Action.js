@@ -30,7 +30,7 @@ const buildError = (data) => {
   return errorsExtractor(data);
 };
 
-export const simpleCall = (uri) => api().get(buildUri(uri));
+export const simpleCall = (uri, params) => api().get(buildUri(uri), { params });
 export const simplePostCall = (uri, data) => api().post(buildUri(uri), data)
   .catch((error) => {
     MESSAGING$.notifyError(error.message);

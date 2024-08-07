@@ -59,7 +59,7 @@ public class MastodonContract extends Contractor {
                 .mandatory(textField("token", "Token"))
                 .mandatory(textareaField("status", "Status"))
                 .optional(attachmentField("attachments", "Attachments", Multiple)).build();
-        return List.of(executableContract(contractConfig, MASTODON_DEFAULT, Map.of(en, "Mastodon"), instance, List.of(Endpoint.PLATFORM_TYPE.Service.name()), false));
+        return List.of(executableContract(contractConfig, MASTODON_DEFAULT, Map.of(en, "Mastodon"), instance, List.of(Endpoint.PLATFORM_TYPE.Service), false));
     }
 
     @Override

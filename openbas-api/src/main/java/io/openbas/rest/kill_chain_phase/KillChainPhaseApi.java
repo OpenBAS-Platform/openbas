@@ -7,11 +7,13 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseCreateInput;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseUpdateInput;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseUpsertInput;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
@@ -24,11 +26,15 @@ import java.util.Optional;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.database.specification.KillChainPhaseSpecification.byName;
+import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RestController
 @Secured(ROLE_USER)
 public class KillChainPhaseApi extends RestBehavior {
+
+  public static final String KILL_CHAIN_PHASE_URI = "/api/kill_chain_phases";
 
   private KillChainPhaseRepository killChainPhaseRepository;
 
@@ -117,4 +123,23 @@ public class KillChainPhaseApi extends RestBehavior {
   public void deleteKillChainPhase(@PathVariable String killChainPhaseId) {
     killChainPhaseRepository.deleteById(killChainPhaseId);
   }
+
+  // -- OPTION --
+
+  @GetMapping(KILL_CHAIN_PHASE_URI + "/options")
+  public List<FilterUtilsJpa.Option> optionsByName(@RequestParam(required = false) final String searchText) {
+    return fromIterable(this.killChainPhaseRepository.findAll(byName(searchText), PageRequest.of(0, 10)))
+        .stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
+  }
+
+  @PostMapping(KILL_CHAIN_PHASE_URI + "/options")
+  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+    return fromIterable(this.killChainPhaseRepository.findAllById(ids))
+        .stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
+  }
+
 }

@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.*;
+import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -52,6 +53,7 @@ import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.ExerciseSpecification.findGrantedFor;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.rest.exercise.utils.ExerciseUtils.handleCustomFilter;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_EXERCISE;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
@@ -642,16 +644,23 @@ public class ExerciseApi extends RestBehavior {
 
     @PostMapping(EXERCISE_URI + "/search")
     public Page<ExerciseSimple> exercises(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+        UnaryOperator<Specification<Exercise>> finalSpecification = handleCustomFilter(
+            searchPaginationInput
+        );
+
         if (currentUser().isAdmin()) {
             return buildPaginationCriteriaBuilder(
-                    this.exerciseService::exercises,
+                (Specification<Exercise> specification, Pageable pageable) -> this.exerciseService.exercises(
+                    finalSpecification.apply(specification),
+                    pageable
+                ),
                     searchPaginationInput,
                     Exercise.class
             );
         } else {
             return buildPaginationCriteriaBuilder(
                     (Specification<Exercise> specification, Pageable pageable) -> this.exerciseService.exercises(
-                            findGrantedFor(currentUser().getId()).and(specification),
+                        finalSpecification.apply(findGrantedFor(currentUser().getId()).and(specification)),
                             pageable
                     ),
                     searchPaginationInput,

@@ -68,7 +68,7 @@ public class EmailContract extends Contractor {
                 .optional(expectationsField)
                 .build();
         Contract standardEmail = executableContract(contractConfig, EMAIL_DEFAULT,
-                Map.of(en, "Send individual mails", fr, "Envoyer des mails individuels"), standardInstance, List.of(Endpoint.PLATFORM_TYPE.Service.name()), false);
+                Map.of(en, "Send individual mails", fr, "Envoyer des mails individuels"), standardInstance, List.of(Endpoint.PLATFORM_TYPE.Service), false);
         standardEmail.addVariable(documentUriVariable);
         // Global contract
         List<ContractElement> globalInstance = contractBuilder()
@@ -80,7 +80,7 @@ public class EmailContract extends Contractor {
                 .optional(expectationsField)
                 .build();
         Contract globalEmail = executableContract(contractConfig, EMAIL_GLOBAL,
-                Map.of(en, "Send multi-recipients mail", fr, "Envoyer un mail multi-destinataires"), globalInstance, List.of(Endpoint.PLATFORM_TYPE.Service.name()), false);
+                Map.of(en, "Send multi-recipients mail", fr, "Envoyer un mail multi-destinataires"), globalInstance, List.of(Endpoint.PLATFORM_TYPE.Service), false);
         globalEmail.addVariable(documentUriVariable);
         return List.of(standardEmail, globalEmail);
     }
