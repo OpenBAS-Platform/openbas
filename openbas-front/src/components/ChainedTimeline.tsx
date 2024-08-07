@@ -169,7 +169,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
 
     if (node.data.fixedY !== undefined) {
       node.position.y = node.data.fixedY;
-      node.data.inject.inject_depends_duration = convertCoordinatesToTime(node.position);
+      if (node.data.inject) node.data.inject.inject_depends_duration = convertCoordinatesToTime(node.position);
     }
   };
 
@@ -238,8 +238,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     }
   };
 
-  const panTimeline = (event: React.MouseEvent | React.TouchEvent | null, data: Viewport) => {
-    setViewportData(data);
+  const panTimeline = (_event: MouseEvent | TouchEvent | null, viewport: Viewport) => {
+    setViewportData(viewport);
   };
 
   return (
