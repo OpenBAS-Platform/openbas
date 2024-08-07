@@ -25,6 +25,7 @@ const Comcheck = lazy(() => import('./controls/Comcheck'));
 const Lessons = lazy(() => import('./lessons/Lessons'));
 const ExerciseDefinition = lazy(() => import('./ExerciseDefinition'));
 const Injects = lazy(() => import('./injects/ExerciseInjects'));
+const Tests = lazy(() => import('./tests/ExerciseTests'));
 const TimelineOverview = lazy(() => import('./timeline/TimelineOverview'));
 const Mails = lazy(() => import('./mails/Mails'));
 const MailsInject = lazy(() => import('./mails/Inject'));
@@ -64,6 +65,8 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
     tabValue = `/admin/exercises/${exercise.exercise_id}/animation`;
   } else if (location.pathname.includes(`/admin/exercises/${exercise.exercise_id}/results`)) {
     tabValue = `/admin/exercises/${exercise.exercise_id}/results`;
+  } else if (location.pathname.includes(`/admin/exercises/${exercise.exercise_id}/tests`)) {
+    tabValue = `/admin/exercises/${exercise.exercise_id}/tests`;
   }
   return (
     <PermissionsContext.Provider value={permissionsContext}>
@@ -103,6 +106,12 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
               />
               <Tab
                 component={Link}
+                to={`/admin/exercises/${exercise.exercise_id}/tests`}
+                value={`/admin/exercises/${exercise.exercise_id}/tests`}
+                label={t('Tests')}
+              />
+              <Tab
+                component={Link}
                 to={`/admin/exercises/${exercise.exercise_id}/animation`}
                 value={`/admin/exercises/${exercise.exercise_id}/animation`}
                 label={t('Animation')}
@@ -126,6 +135,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
               <Route path="controls/comchecks/:comcheckId" element={errorWrapper(Comcheck)()} />
               <Route path="definition" element={errorWrapper(ExerciseDefinition)()} />
               <Route path="injects" element={errorWrapper(Injects)()} />
+              <Route path="tests" element={errorWrapper(Tests)()} />
               <Route path="animation" element={<Navigate to="timeline" replace={true} />} />
               <Route path="animation/timeline" element={errorWrapper(TimelineOverview)()} />
               <Route path="animation/mails" element={errorWrapper(Mails)()} />

@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Setter
 @Getter
@@ -77,6 +78,24 @@ public class InjectTestStatus implements Base {
   @JoinColumn(name = "status_inject")
   @JsonIgnore
   private Inject inject;
+
+  @JsonProperty("inject_title")
+  public String getInjectTitle() {
+    return inject.getTitle();
+  }
+
+  @JsonProperty("injector_contract")
+  public Optional<InjectorContract> getInjectContract() {
+    return inject.getInjectorContract();
+  }
+
+  @JsonProperty("inject_type")
+  private String getType() {
+    return inject.getInjectorContract()
+        .map(InjectorContract::getInjector)
+        .map(Injector::getType)
+        .orElse(null);
+  }
 
   @CreationTimestamp
   @Column(name = "status_created_at")
