@@ -17,7 +17,6 @@ import {
   Alert,
   DialogContentText,
   DialogActions,
-  Box,
 } from '@mui/material';
 import {
   SportsScoreOutlined,
