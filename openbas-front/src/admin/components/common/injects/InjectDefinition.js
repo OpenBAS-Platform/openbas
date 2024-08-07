@@ -1443,7 +1443,7 @@ class InjectDefinition extends Component {
               {hasExpectations && (
                 <InjectExpectations
                   predefinedExpectationDatas={predefinedExpectations}
-                  expectationDatas={expectations}
+                  expectationDatas={(expectations && expectations.length > 0) ? expectations : predefinedExpectations}
                   handleExpectations={this.handleExpectations.bind(this)}
                 />
               )}

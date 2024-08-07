@@ -41,6 +41,7 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
 
   const [expectations, setExpectations] = useState(expectationDatas ?? []);
 
+  // Filter predefinedExpectations already included into expectations
   const predefinedExpectations = predefinedExpectationDatas
     .filter((pe) => !expectations.map((e) => e.expectation_type).includes(pe.expectation_type));
 
