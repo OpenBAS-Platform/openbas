@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Date;
 
-import static io.openbas.helper.TemplateHelper.buildContextualContent;
+import static io.openbas.utils.TemplateHelper.buildContextualContent;
 import static java.util.Collections.singletonList;
 
 @Component

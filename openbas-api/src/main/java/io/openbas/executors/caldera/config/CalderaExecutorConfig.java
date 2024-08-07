@@ -1,6 +1,5 @@
 package io.openbas.executors.caldera.config;
 
-import io.openbas.executors.caldera.client.model.Ability;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
