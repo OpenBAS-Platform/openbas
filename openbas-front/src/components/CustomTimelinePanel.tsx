@@ -44,18 +44,21 @@ function BackgroundComponent({
 
   const desiredFontSize = 12;
 
-  const numberOfIntervals = 10;
+  const numberOfIntervals = 6 / transform[2];
 
   useEffect(() => {
-    const offset = Math.round(Math.abs(transform[0]) / 125) * 5;
+    const horizontalGap = scaledGap[0] * 3;
+    const offset = Math.floor(Math.abs(transform[0]) / horizontalGap) * 15;
     const newParsedDates = [];
+
     for (let i = 0; i < numberOfIntervals; i += 1) {
       const date = moment.utc(moment.duration(0, 'd').add((minutesPerGap * 3 * i) + offset, 'm').asMilliseconds());
       newParsedDates.push({
         parsedDate: `${date.dayOfYear() - 1} d, ${date.hour()} h, ${date.minute()} m`,
-        dateIndex: date.unix() / (15 * 60),
+        dateIndex: Math.round(date.unix() / (15 * 60)),
       });
     }
+    console.log(newParsedDates);
     setParsedDates(newParsedDates);
   }, [viewportData]);
 
