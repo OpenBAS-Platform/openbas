@@ -77,19 +77,23 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     nodeInjects.forEach((nodeInject, index) => {
       let row = 0;
       let doItAgain = false;
+      const nodeInjectPosition = nodeInject.position;
+      const nodeInjectData = nodeInject.data;
       do {
-        nodeInjects.slice(0, index)
-          .filter((previousNode) => nodeInject.position.x > previousNode.position.x && nodeInject.position.x < previousNode.position.x + 240)
-          .forEach((previousNodes) => {
-            if (previousNodes.position.y + 150 > row * 150 && previousNodes.position.y <= row * 150) {
-              row += 1;
-              doItAgain = true;
-            } else {
-              nodeInject.position.y = 150 * row;
-              nodeInject.data.fixedY = nodeInject.position.y;
-              doItAgain = false;
-            }
-          });
+        const previousNodes = nodeInjects.slice(0, index)
+          .filter((previousNode) => nodeInject.position.x > previousNode.position.x && nodeInject.position.x < previousNode.position.x + 240);
+
+        for (let i = 0; i < previousNodes.length; i += 1) {
+          const previousNode = previousNodes[i];
+          if (previousNode.position.y + 150 > row * 150 && previousNode.position.y <= row * 150) {
+            row += 1;
+            doItAgain = true;
+          } else {
+            nodeInjectPosition.y = 150 * row;
+            nodeInjectData.fixedY = nodeInject.position.y;
+            doItAgain = false;
+          }
+        }
       } while (doItAgain);
     });
   };
@@ -166,11 +170,21 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
 
   const horizontalNodeDrag = (event: React.MouseEvent, node: NodeInject) => {
     setDraggingOnGoing(true);
+    const { position } = node;
+    const { data } = node;
 
     if (node.data.fixedY !== undefined) {
-      node.position.y = node.data.fixedY;
-      if (node.data.inject) node.data.inject.inject_depends_duration = convertCoordinatesToTime(node.position);
+      position.y = node.data.fixedY;
+      if (data.inject) data.inject.inject_depends_duration = convertCoordinatesToTime(node.position);
     }
+  };
+
+  const filterNodesAfter = (newX: number, newY: number) => {
+    return (node: NodeInject) => node.id !== 'fantom' && node.position.y === newY && node.position.x > newX;
+  };
+
+  const filterNodesBefore = (newX: number, newY: number) => {
+    return (node: NodeInject) => node.id !== 'fantom' && node.position.y === newY && node.position.x < newX;
   };
 
   const moveNewNode = (event: React.MouseEvent) => {
@@ -182,8 +196,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
       let foundHorizontalLane = false;
 
       do {
-        const closestBeforeInX = Math.max(...nodes.filter((node) => node.id !== 'fantom' && node.position.y === newY && node.position.x < newX).map((o) => o.position.x));
-        const closestAfterInX = Math.min(...nodes.filter((node) => node.id !== 'fantom' && node.position.y === newY && node.position.x > newX).map((o) => o.position.x));
+        const closestBeforeInX = Math.max(...nodes.filter(filterNodesBefore(newX, newY)).map((o) => o.position.x));
+        const closestAfterInX = Math.min(...nodes.filter(filterNodesAfter(newX, newY)).map((o) => o.position.x));
 
         if ((closestBeforeInX + 240 < newX && closestAfterInX - 240 > newX) || (closestAfterInX === Infinity && closestBeforeInX === Infinity)) {
           foundHorizontalLane = true;
@@ -195,8 +209,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
       const existingFantomNode = nodes.find((currentNode) => currentNode.id === 'fantom');
 
       if (newY >= 0 && (existingFantomNode === undefined
-          || ((newX < existingFantomNode?.position.x || newX > existingFantomNode?.position.x + 240
-              || newY < existingFantomNode?.position.y || newY > existingFantomNode?.position.y + 150)))
+          || ((newX < existingFantomNode?.position.x || newX > existingFantomNode!.position.x + 240
+          || newY < existingFantomNode?.position.y || newY > existingFantomNode!.position.y + 150)))
       ) {
         const nodesList = nodes.filter((currentNode) => currentNode.id !== 'fantom');
         const node = {
