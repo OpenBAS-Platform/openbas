@@ -103,7 +103,7 @@ const EmailParametersForm: React.FC<Props> = ({
                 value={field.value}
                 onChange={() => {
                   if (undefined !== field.value && inputValue !== '' && !field.value.includes(inputValue)) {
-                    field.onChange([...(field.value || []), inputValue]);
+                    field.onChange([...(field.value || []), inputValue.trim()]);
                   }
                 }}
                 onBlur={field.onBlur}
@@ -133,7 +133,7 @@ const EmailParametersForm: React.FC<Props> = ({
                     label={t('Reply to')}
                     style={{ marginTop: 20 }}
                     error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
+                    helperText={errors.setting_mails_reply_to?.find ? errors.setting_mails_reply_to?.find((value) => value != null)?.message ?? '' : ''}
                   />
                 )}
               />
