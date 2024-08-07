@@ -22,16 +22,8 @@ import {
   Typography,
 } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
-import {
-  Edge,
-  MarkerType,
-  ReactFlow,
-  ReactFlowProvider,
-  useEdgesState,
-  useNodesState,
-  useReactFlow
-} from '@xyflow/react';
-import 'reactflow/dist/style.css';
+import { Edge, MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow } from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
 import { AddBoxOutlined, MoreVertOutlined } from '@mui/icons-material';
 import type { InjectResultDTO, InjectTargetWithResult, InjectExpectationResult } from '../../../../utils/api-types';
 import { fetchInjectResultDto, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
@@ -51,7 +43,7 @@ import DetectionPreventionExpectationsValidationForm from '../../simulations/sim
 import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { InjectExpectationStore } from '../../../../actions/injects/Inject';
-import {NodeInject} from "../../../../components/nodes/NodeInject";
+import { NodeInject } from '../../../../components/nodes/NodeInject';
 import { isTechnicalExpectation } from '../../common/injects/expectations/ExpectationUtils';
 
 interface Steptarget {
