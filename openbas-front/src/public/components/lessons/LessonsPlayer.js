@@ -78,10 +78,11 @@ const LessonsPlayer = () => {
       ]),
     );
     requiredFields.forEach((field) => {
-      if (!values[field]) {
+      if (!values[field] && values[field] !== 0) {
         errors[field] = t('This field is required.');
       }
     });
+
     return errors;
   };
   const submitForm = (data) => {
