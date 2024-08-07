@@ -58,7 +58,6 @@ function BackgroundComponent({
         dateIndex: Math.round(date.unix() / (15 * 60)),
       });
     }
-    console.log(newParsedDates);
     setParsedDates(newParsedDates);
   }, [viewportData]);
 
