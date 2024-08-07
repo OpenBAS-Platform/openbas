@@ -41,6 +41,7 @@ public class ExecutionContextService {
       executionContext.put(CHALLENGES_URI, baseUrl + "/challenges/" + exerciseId + queryParams);
       executionContext.put(SCOREBOARD_URI, baseUrl + "/scoreboard/" + exerciseId + queryParams);
       executionContext.put(LESSONS_URI, baseUrl + "/lessons/" + exerciseId + queryParams);
+      executionContext.put(EXERCISE, injection.getExercise());
       fillDynamicVariable(executionContext, exerciseId);
     }
     return executionContext;
