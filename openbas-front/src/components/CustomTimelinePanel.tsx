@@ -84,4 +84,5 @@ function BackgroundComponent({
 
 BackgroundComponent.displayName = 'CustomTimelinePanel';
 
-export const CustomTimelinePanel = memo(BackgroundComponent);
+const CustomTimelinePanel = memo(BackgroundComponent);
+export default CustomTimelinePanel;
