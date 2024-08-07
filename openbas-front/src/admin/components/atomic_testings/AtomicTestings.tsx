@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as R from 'ramda';
 import { useFormatter } from '../../../components/i18n';
@@ -9,12 +9,14 @@ import type { Inject, InjectResultDTO } from '../../../utils/api-types';
 import { createAtomicTesting, searchAtomicTestings } from '../../../actions/atomic_testings/atomic-testing-actions';
 import CreateInject from '../common/injects/CreateInject';
 import InjectList from './InjectList';
+import ButtonCreate from '../../../components/common/ButtonCreate';
 
 // eslint-disable-next-line consistent-return
 const AtomicTestings = () => {
   // Standard hooks
   const { t } = useFormatter();
   const navigate = useNavigate();
+  const [openCreateDrawer, setOpenCreateDrawer] = useState(false);
 
   const { userAdmin } = useHelper((helper: UserHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
@@ -45,7 +47,17 @@ const AtomicTestings = () => {
         fetchInjects={searchAtomicTestings}
         goTo={(injectId) => `/admin/atomic_testings/${injectId}`}
       />
-      {userAdmin && <CreateInject title={t('Create a new atomic test')} onCreateInject={onCreateAtomicTesting} isAtomic />}
+      {userAdmin && (<>
+        <ButtonCreate onClick={() => setOpenCreateDrawer(true)} />
+        <CreateInject
+          title={t('Create a new atomic test')}
+          onCreateInject={onCreateAtomicTesting}
+          isAtomic
+          open={openCreateDrawer}
+          handleClose={() => setOpenCreateDrawer(false)}
+        />
+      </>)
+      }
     </>
   );
 };

@@ -1,14 +1,12 @@
-import React, { CSSProperties, memo } from 'react';
+import React, { CSSProperties, memo, useEffect, useState } from 'react';
 import { shallow } from 'zustand/shallow';
-import { useStore, type ReactFlowState, type BackgroundProps, Panel, Connection } from '@xyflow/react';
+import { useStore, type ReactFlowState, type BackgroundProps, Panel, Viewport } from '@xyflow/react';
 import { makeStyles } from '@mui/styles';
 import moment from 'moment-timezone';
-import { transform } from 'esbuild';
-import type { InjectStore } from '../actions/injects/Inject';
-import type { Scenario } from '../utils/api-types';
 
 const selector = (s: ReactFlowState) => ({ transform: s.transform, patternId: `pattern-${s.rfId}` });
 
+// @ts-expect-error pointer events is important and can not be removed but is mandatory
 const useStyles = makeStyles(() => ({
   panel: {
     pointerEvents: 'none !important',
@@ -23,27 +21,43 @@ const useStyles = makeStyles(() => ({
 
 interface Props extends BackgroundProps {
   minutesPerGap: number,
+  gap?: number | [number, number],
+  viewportData?: Viewport,
+}
+
+interface TimelineDates {
+  parsedDate: string,
+  dateIndex: number,
 }
 
 function BackgroundComponent({
   style,
   gap = 125,
   minutesPerGap = 15,
+  viewportData,
 }: Props) {
   const classes = useStyles();
   const { transform } = useStore(selector, shallow);
-  const desiredFontSize = 12;
-
-  const numberOfIntervals = 10;
-  const parsedDates: string[] = [];
-
+  const [parsedDates, setParsedDates] = useState<TimelineDates[]>([]);
   const gapXY: [number, number] = Array.isArray(gap) ? gap : [gap, gap];
   const scaledGap: [number, number] = [gapXY[0] * transform[2] || 1, gapXY[1] * transform[2] || 1];
 
-  for (let i = 0; i < numberOfIntervals; i += 1) {
-    const date = moment.utc(moment.duration(0, 'd').add(minutesPerGap * 3 * i, 'm').asMilliseconds());
-    parsedDates.push(`${date.dayOfYear() - 1} d, ${date.hour()} h, ${date.minute()} m`);
-  }
+  const desiredFontSize = 12;
+
+  const numberOfIntervals = 10;
+
+  useEffect(() => {
+    const offset = Math.round(Math.abs(transform[0]) / 125) * 5;
+    const newParsedDates = [];
+    for (let i = 0; i < numberOfIntervals; i += 1) {
+      const date = moment.utc(moment.duration(0, 'd').add((minutesPerGap * 3 * i) + offset, 'm').asMilliseconds());
+      newParsedDates.push({
+        parsedDate: `${date.dayOfYear() - 1} d, ${date.hour()} h, ${date.minute()} m`,
+        dateIndex: date.unix() / (15 * 60),
+      });
+    }
+    setParsedDates(newParsedDates);
+  }, [viewportData]);
 
   return (
     <Panel className={classes.panel}>
@@ -59,8 +73,8 @@ function BackgroundComponent({
         }
       >
         {parsedDates.map((parsedDate, index) => (
-          <text key={`date_label_${index}`} fill="#ffffff" className={classes.dateLabel} fontSize={desiredFontSize} fontFamily="Verdana" x={transform[0] + (index * 3 * scaledGap[1])} y={desiredFontSize}>
-            {parsedDate}
+          <text key={`date_label_${index}`} fill="#ffffff" className={classes.dateLabel} fontSize={desiredFontSize} fontFamily="Verdana" x={transform[0] + (parsedDate.dateIndex * 3 * scaledGap[1])} y={desiredFontSize}>
+            {parsedDate.parsedDate}
           </text>
         ))}
       </svg>

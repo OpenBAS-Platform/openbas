@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, Connection, Edge } from '@xyflow/react';
+import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, Connection, Edge, useReactFlow, Viewport } from '@xyflow/react';
 import { XYPosition } from 'reactflow';
 import moment from 'moment-timezone';
 import type { InjectStore } from '../actions/injects/Inject';
@@ -29,9 +29,14 @@ interface Props {
   exerciseOrScenarioId: string,
   onConnectInjects(connection: Connection): void,
   onSelectedInject(inject: InjectStore): void,
+  openCreateInjectDrawer(data: {
+    inject_depends_duration_days: number,
+    inject_depends_duration_minutes: number,
+    inject_depends_duration_hours: number
+  }): void,
 }
 
-const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScenarioId, onConnectInjects, onSelectedInject }) => {
+const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScenarioId, onConnectInjects, onSelectedInject, openCreateInjectDrawer }) => {
   // Standard hooks
   const classes = useStyles();
   const minutesPerGap = 5;
@@ -40,9 +45,13 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeInject>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [injectsToShow, setInjectsToShow] = useState<InjectStore[]>([]);
+  const [draggingOnGoing, setDraggingOnGoing] = useState<boolean>(false);
+  const [viewportData, setViewportData] = useState<Viewport>();
 
   let timer: NodeJS.Timeout;
   const injectContext = useContext(InjectContext);
+
+  const reactFlow = useReactFlow();
 
   const injectsMap = useHelper((injectHelper: InjectHelper) => injectHelper.getInjectsMap());
   const teams = useHelper((teamsHelper: TeamsHelper) => teamsHelper.getTeamsMap());
@@ -60,14 +69,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
         .format();
     }
   }
-
-  // Flow
-  /* const layoutOptions: LayoutOptions = {
-    algorithm: 'd3-hierarchy',
-    direction: 'LR',
-    spacing: [150, 150],
-  };
-  useAutoLayoutInject(layoutOptions, injectsToShow); */
 
   const convertCoordinatesToTime = (position: XYPosition) => {
     return Math.round((position.x / (gapSize / minutesPerGap)) * 60);
@@ -98,7 +99,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     if (injects.length > 0) {
       const injectsNodes = injects
         .sort((a, b) => a.inject_depends_duration - b.inject_depends_duration)
-        .map((inject: InjectStore, index: number) => ({
+        .map((inject: InjectStore) => ({
           id: `${inject.inject_id}`,
           type: 'inject',
           data: {
@@ -142,6 +143,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   };
 
   const nodeDrag = (event: React.MouseEvent, node: NodeInject) => {
+    setTimeout(() => {
+      setDraggingOnGoing(false);
+    }, 1000);
     const injectFromMap = injectsMap[node.id];
     if (injectFromMap !== undefined) {
       const inject = {
@@ -155,44 +159,88 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     }
   };
 
+  const nodeDragStart = () => {
+    clearTimeout(timer);
+    const nodesList = nodes.filter((currentNode) => currentNode.id !== 'fantom');
+    setNodes(nodesList);
+  };
+
   const horizontalNodeDrag = (event: React.MouseEvent, node: NodeInject) => {
+    setDraggingOnGoing(true);
+
     if (node.data.fixedY !== undefined) {
       node.position.y = node.data.fixedY;
       node.data.inject.inject_depends_duration = convertCoordinatesToTime(node.position);
     }
   };
 
-  /* const moveNewNode = (event: React.MouseEvent) => {
-    const bounds = event.target?.getBoundingClientRect();
-    const newX = event.clientX - bounds.left;
-    const newY = event.clientY - bounds.top;
+  const moveNewNode = (event: React.MouseEvent) => {
+    if (!draggingOnGoing) {
+      const position = reactFlow.screenToFlowPosition({ x: event.clientX, y: event.clientY });
 
-    const nodesList = nodes.filter((currentNode) => currentNode.id !== 'fantom');
-    const node = {
-      id: 'fantom',
-      type: 'default',
-      connectable: false,
-      data: {
-        key: 'fantom',
-        label: 'fantom',
-        color: 'green',
-        background: 'black',
-      },
-      position: { x: newX, y: newY },
-    };
-    nodesList.push(node);
-    // setNodes(nodesList);
-  }; */
+      let newY = 0;
+      const newX = position.x;
+      let foundHorizontalLane = false;
 
-  /* const onMouseMove = (eventMove: React.MouseEvent) => {
+      do {
+        const closestBeforeInX = Math.max(...nodes.filter((node) => node.id !== 'fantom' && node.position.y === newY && node.position.x < newX).map((o) => o.position.x));
+        const closestAfterInX = Math.min(...nodes.filter((node) => node.id !== 'fantom' && node.position.y === newY && node.position.x > newX).map((o) => o.position.x));
+
+        if ((closestBeforeInX + 240 < newX && closestAfterInX - 240 > newX) || (closestAfterInX === Infinity && closestBeforeInX === Infinity)) {
+          foundHorizontalLane = true;
+        } else {
+          newY += 150;
+        }
+      } while (!foundHorizontalLane);
+
+      const existingFantomNode = nodes.find((currentNode) => currentNode.id === 'fantom');
+
+      if (newY >= 0 && (existingFantomNode === undefined
+          || ((newX < existingFantomNode?.position.x || newX > existingFantomNode?.position.x + 240
+              || newY < existingFantomNode?.position.y || newY > existingFantomNode?.position.y + 150)))
+      ) {
+        const nodesList = nodes.filter((currentNode) => currentNode.id !== 'fantom');
+        const node = {
+          id: 'fantom',
+          type: 'phantom',
+          connectable: false,
+          data: {
+            key: 'fantom',
+            label: 'fantom',
+            color: 'green',
+            background: 'black',
+            targets: [],
+          },
+          position: { x: newX, y: newY },
+        };
+        nodesList.push(node);
+        setNodes(nodesList);
+      }
+    }
+  };
+
+  const onMouseMove = (eventMove: React.MouseEvent) => {
     clearTimeout(timer);
     timer = setTimeout(() => {
       moveNewNode(eventMove);
-    }, 300);
-  }; */
+    }, 500);
+  };
 
   const onNodeClick = (event: React.MouseEvent, node: NodeInject) => {
-    onSelectedInject(injects.find((value) => value.inject_id === node.id)!);
+    if (node.id === 'fantom') {
+      const totalMinutes = moment.duration((node.position.x / gapSize) * 5 * 60, 's');
+      openCreateInjectDrawer({
+        inject_depends_duration_days: totalMinutes.days(),
+        inject_depends_duration_hours: totalMinutes.hours(),
+        inject_depends_duration_minutes: totalMinutes.minutes(),
+      });
+    } else {
+      onSelectedInject(injects.find((value) => value.inject_id === node.id)!);
+    }
+  };
+
+  const panTimeline = (event: React.MouseEvent | React.TouchEvent | null, data: Viewport) => {
+    setViewportData(data);
   };
 
   return (
@@ -211,27 +259,25 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             elementsSelectable={false}
             onNodeDrag={horizontalNodeDrag}
             onNodeDragStop={nodeDrag}
-              // onEdgeUpdate={edgeUpdate}
-              // onEdgeUpdateStart={edgeUpdateStart}
-              // onEdgeUpdateEnd={edgeUpdateEnd}
+            onNodeDragStart={nodeDragStart}
             defaultEdgeOptions={defaultEdgeOptions}
-            // onMouseMove={onMouseMove}
+            onMouseMove={onMouseMove}
+            onMove={panTimeline}
             proOptions={proOptions}
             translateExtent={[[-60, -50], [Infinity, Infinity]]}
             nodeExtent={[[0, 0], [Infinity, Infinity]]}
             onNodeClick={onNodeClick}
-            defaultViewport={{ x: 60, y: 50, zoom: 1 }}
+            defaultViewport={{ x: 60, y: 50, zoom: 0.75 }}
           >
             <CustomTimelineBackground
               gap={gapSize}
               minutesPerGap={minutesPerGap}
-            >
-            </CustomTimelineBackground>
+            />
             <CustomTimelinePanel
               gap={gapSize}
               minutesPerGap={minutesPerGap}
-            >
-            </CustomTimelinePanel>
+              viewportData={ viewportData }
+            />
           </ReactFlow>
         </div>
       ) : null

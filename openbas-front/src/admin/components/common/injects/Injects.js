@@ -33,11 +33,11 @@ import { InjectContext, PermissionsContext } from '../Context';
 import CreateInject from './CreateInject';
 import UpdateInject from './UpdateInject';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import Timeline from '../../../../components/Timeline';
 import ChainedTimeline from '../../../../components/ChainedTimeline';
 import { isNotEmptyField } from '../../../../utils/utils';
 import ImportUploaderInjectFromXls from './ImportUploaderInjectFromXls';
 import useExportToXLS from '../../../../utils/hooks/useExportToXLS';
+import ButtonCreate from '../../../../components/common/ButtonCreate';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -199,6 +199,8 @@ const Injects = (props) => {
   const classes = useStyles();
   const { t, tPick } = useFormatter();
   const [selectedInjectId, setSelectedInjectId] = useState(null);
+  const [openCreateDrawer, setOpenCreateDrawer] = useState(false);
+  const [presetCreationValues, setPresetCreationValues] = useState();
   const [showTimeline, setShowTimeline] = useState(
     () => {
       const storedValue = localStorage.getItem(`${exerciseOrScenarioId}_show_injects_timeline`);
@@ -207,7 +209,6 @@ const Injects = (props) => {
   );
   const { permissions } = useContext(PermissionsContext);
   const injectContext = useContext(InjectContext);
-  const [chainMode, setChainMode] = useState('chaining');
 
   // Filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
@@ -343,34 +344,6 @@ const Injects = (props) => {
                 </Tooltip>
               }
             </ToggleButtonGroup>
-            {setChainMode ? (
-              <ToggleButtonGroup
-                size="small"
-                exclusive
-                value={chainMode}
-                style={{ float: 'right' }}
-                aria-label="Change chaining mode"
-              >
-                <Tooltip title={t('Timeline view')}>
-                  <ToggleButton
-                    value='timeline'
-                    onClick={() => setChainMode('timeline')}
-                    aria-label="Timeline view mode"
-                  >
-                    <ViewTimelineOutlined fontSize="small" color='inherit'/>
-                  </ToggleButton>
-                </Tooltip>
-                <Tooltip title={t('Chaining view')}>
-                  <ToggleButton
-                    value='chaining'
-                    onClick={() => setChainMode('chaining')}
-                    aria-label="Chaining view mode"
-                  >
-                    <Link fontSize="small" color='primary'/>
-                  </ToggleButton>
-                </Tooltip>
-              </ToggleButtonGroup>
-            ) : null}
           </div>
           <div className="clearfix" />
         </div>
@@ -381,6 +354,10 @@ const Injects = (props) => {
                 injects={sortedInjects}
                 onConnectInjects={onConnectInjects}
                 exerciseOrScenarioId={exerciseOrScenarioId}
+                openCreateInjectDrawer={(data) => {
+                  setOpenCreateDrawer(true);
+                  setPresetCreationValues(data);
+                }}
                 onSelectedInject={(inject) => {
                   const injectContract = inject.inject_injector_contract.convertedContent;
                   const isContractExposed = injectContract?.config.expose;
@@ -622,9 +599,17 @@ const Injects = (props) => {
                 teamsUsers={teamsUsers}
                  />
             }
+            <ButtonCreate onClick={() => {
+              setOpenCreateDrawer(true);
+              setPresetCreationValues(undefined);
+            }}
+            />
             <CreateInject
               title={t('Create a new inject')}
+              open={openCreateDrawer}
+              handleClose={() => setOpenCreateDrawer(false)}
               onCreateInject={onCreateInject}
+              presetValues={presetCreationValues}
               teamsFromExerciseOrScenario={teams}
               articlesFromExerciseOrScenario={articles}
               variablesFromExerciseOrScenario={variables}

@@ -84,7 +84,7 @@ export type NodeInject = Node<{
   isTargeted?: boolean,
   isTargeting?: boolean,
   onConnectInjects?: OnConnect
-  inject: InjectStore,
+  inject?: InjectStore,
   fixedY?: number,
   startDate?: string,
   targets: string[]
@@ -118,29 +118,29 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
     <motion.div
       layout={'position'}
           // create new component when animated changes, see issue workaround https://github.com/framer/motion/issues/2238#issue-1809290539
-      key={data.inject.inject_id}
+      key={data.inject?.inject_id}
     >
       <div className={classes.node} style={{ backgroundColor: data.background, color: 'white' }}>
         <div className={classes.icon}>
           <InjectIcon
-            isPayload={isNotEmptyField(data.inject.inject_injector_contract?.injector_contract_payload)}
+            isPayload={isNotEmptyField(data.inject?.inject_injector_contract?.injector_contract_payload)}
             type={
-            data.inject.inject_injector_contract?.injector_contract_payload
-              ? data.inject.inject_injector_contract?.injector_contract_payload?.payload_collector_type
-                  || data.inject.inject_injector_contract?.injector_contract_payload?.payload_type
-              : data.inject.inject_type
+            data.inject?.inject_injector_contract?.injector_contract_payload
+              ? data.inject?.inject_injector_contract?.injector_contract_payload?.payload_collector_type
+                  || data.inject?.inject_injector_contract?.injector_contract_payload?.payload_type
+              : data.inject?.inject_type
             }
           />
         </div>
         { data.startDate !== undefined ? (
           <div
             className={classes.triggerTime}
-          >{convertToAbsoluteTime(data.startDate, data.inject.inject_depends_duration)}</div>
+          >{convertToAbsoluteTime(data.startDate, data.inject!.inject_depends_duration)}</div>
 
         ) : (
           <div
             className={classes.triggerTime}
-          >{convertToRelativeTime(data.inject.inject_depends_duration)}</div>
+          >{convertToRelativeTime(data.inject!.inject_depends_duration)}</div>
 
         )}
         <Tooltip title={data.label}>
@@ -152,7 +152,7 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
           </Tooltip>
           <div className={classes.popover}>
             <InjectPopover
-              inject={data.inject}
+              inject={data.inject!}
               tagsMap={tagsMap}
               setSelectedInjectId={setSelectedInjectId}
               isDisabled={false}
