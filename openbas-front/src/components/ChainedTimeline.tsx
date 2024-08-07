@@ -267,11 +267,13 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             nodeExtent={[[0, 0], [Infinity, Infinity]]}
             onNodeClick={onNodeClick}
             defaultViewport={{ x: 60, y: 50, zoom: 0.75 }}
+            minZoom={0.3}
           >
             <Controls
               showFitView={true}
               showZoom={false}
               showInteractive={false}
+              fitViewOptions={{ duration: 500 }}
             />
             <CustomTimelineBackground
               gap={gapSize}

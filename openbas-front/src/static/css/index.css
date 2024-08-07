@@ -144,3 +144,14 @@ input[type="file"] {
 @keyframes detect-scroll {
   from, to { --can-scroll: ; }
 }
+
+.react-flow__controls-button {
+  background: #070d19 !important;
+}
+.react-flow__controls-button:hover {
+  background-color: #0d1626 !important;
+}
+
+.react-flow__controls {
+  border: 1px solid #b5b7ba;
+}
