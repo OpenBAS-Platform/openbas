@@ -289,7 +289,7 @@ const InjectPopover: FunctionComponent<Props> = ({
       >
         <DialogContent>
           <DialogContentText>
-            {t(`Do you want to delete this inject: ${inject.inject_title}?`)}
+            {`${t('Do you want to delete this inject:')} ${inject.inject_title} ?`}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -332,7 +332,7 @@ const InjectPopover: FunctionComponent<Props> = ({
       >
         <DialogContent>
           <DialogContentText>
-            <p>{t(`Do you want to test this inject: ${inject.inject_title}?`)}</p>
+            <p>{`${t('Do you want to test this inject:')} ${inject.inject_title} ?`}</p>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -372,7 +372,7 @@ const InjectPopover: FunctionComponent<Props> = ({
       >
         <DialogContent>
           <DialogContentText>
-            {t(`Do you want to disable this inject: ${inject.inject_title}?`)}
+            {`${t('Do you want to disable this inject:')} ${inject.inject_title} ?`}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
