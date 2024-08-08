@@ -75,6 +75,7 @@ const i18n = {
       Name: 'Nom',
       Subtitle: 'Sous-titre',
       'Please note that if you change the “Reply to” address, the email interaction functionality in the platform will be disabled.': 'Veuillez noter que si vous modifiez l\'adresse « Répondre à », la fonctionnalité d\'interaction par mail dans la plateforme sera désactivée.',
+      'If you remove the default email address, the email reception for this simulation / scenario will be disabled.': 'Si vous supprimez l\'adresse e-mail par défaut, la réception des e-mails pour cette simulation / ce scénario sera désactivée.',
       'Start date': 'Date de début',
       'End date': 'Date de fin',
       To: 'A',
@@ -179,6 +180,7 @@ const i18n = {
       'Do you want to duplicate this atomic testing:': 'Voulez-vous dupliquer cet atomic testing : ',
       'Do you want to delete this atomic testing:': 'Voulez-vous supprimer cet atomic testing : ',
       'Do you want to duplicate this inject:': 'Voulez-vous dupliquer ce stimuli : ',
+      'Do you want to disable this inject:': 'Voulez-vous désactiver cet injecteur : ',
       Delete: 'Supprimer',
       Edition: 'Edition',
       Confirmation: 'Confirmation',
@@ -543,6 +545,8 @@ const i18n = {
         'Souhaitez-vous supprimer cette pression médiatique ?',
       'Do you want to delete this challenge?':
         'Souhaitez-vous supprimer ce challenge ?',
+      'Used challenges (in injects)': 'Défis utilisés (dans les injects)',
+      'No challenge are used in the injects of this simulation.': 'Aucun défi n\'est utilisé dans les injects de cette simulation.',
       'Create a new media pressure': 'Créer une nouvelle pression médiatique',
       'Collaborative lessons learned': "Retour d'expérience collaboratif",
       Answers: 'Réponses',
@@ -599,6 +603,7 @@ const i18n = {
       'No category': 'Aucune catégorie',
       'No challenge in this simulation yet.':
         'Encore aucun challenge dans cette simulation.',
+      'No media pressure article available in this simulation yet.': 'Aucun article sur la pression médiatique disponible dans cette simulation pour l\'instant',
       'Distribution of expectations by team':
         'Distribution des attendus par équipe',
       'Distribution of expectations by inject type':
@@ -773,6 +778,7 @@ const i18n = {
       'Please provide one MAC address per line.': 'Veuillez fournir une adresse MAC par ligne.',
       'Invalid MAC address': 'Mac adresse non valide',
       Platform: 'Plateforme',
+      'Platform(s)': 'Plateforme(s)',
       'Collected by': 'Collecté par',
       'Targeted asets': 'Actifs ciblés',
       'Add assets': 'Ajouter des actifs',
@@ -868,6 +874,7 @@ const i18n = {
       'Validation Failed': "Échec de l'attaque",
       'Attack Unblocked': 'Attaque débloquée',
       'Waiting Response': 'En attente',
+      'Unknown result': 'Résultat inconnu',
       'Inject Execution Status': "Statut d'exécution injecté",
       'Global score': 'Score global',
       'Execution date': 'Date d\'exécution',

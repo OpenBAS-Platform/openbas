@@ -109,7 +109,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   const [targetResults, setTargetResults] = useState<InjectExpectationsStore[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const initialSteps = [{ label: 'Attack started', type: '', key: 'attack-started' }, { label: 'Attack ended', type: '', key: 'attack-ended' }];
+  const initialSteps = [{ label: t('Attack started'), type: '', key: 'attack-started' }, { label: t('Attack ended'), type: '', key: 'attack-ended' }];
   const sortOrder = ['PREVENTION', 'DETECTION', 'MANUAL'];
   // Flow
   const layoutOptions: LayoutOptions = {
@@ -190,7 +190,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   useEffect(() => {
     if (target) {
       setInitialized(false);
-      const steps = [...computeInitialSteps(initialSteps), ...[{ label: 'Unknown result', type: '', status: 'PENDING' }]];
+      const steps = [...computeInitialSteps(initialSteps), ...[{ label: t('Unknown result'), type: '', status: 'PENDING' }]];
       setNodes(steps.map((step: Steptarget, index) => ({
         id: `result-${index}`,
         type: 'result',
