@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { createRef, memo, MouseEventHandler, useState } from 'react';
 import { Handle, NodeProps, Position, Node, OnConnect } from '@xyflow/react';
 import { makeStyles } from '@mui/styles';
 import { Tooltip } from '@mui/material';
@@ -87,7 +87,8 @@ export type NodeInject = Node<{
   inject?: InjectStore,
   fixedY?: number,
   startDate?: string,
-  targets: string[]
+  targets: string[],
+  onSelectedInject(inject?: InjectStore): void,
 }
 
 >;
@@ -114,13 +115,25 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
       .format('MMMM Do, YYYY - h:mmA');
   };
 
+  const onClick = () => {
+    if (data.inject) data.onSelectedInject(data.inject);
+  };
+
+  const preventClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+  };
+
+  const selectedInject = () => {
+    if (data.inject) data.onSelectedInject(data.inject);
+  };
+
   return (
     <motion.div
-      layout={'position'}
+      layout={false}
           // create new component when animated changes, see issue workaround https://github.com/framer/motion/issues/2238#issue-1809290539
       key={data.inject?.inject_id}
     >
-      <div className={classes.node} style={{ backgroundColor: data.background, color: 'white' }}>
+      <div className={classes.node} style={{ backgroundColor: data.background, color: 'white' }} onClick={onClick}>
         <div className={classes.icon}>
           <InjectIcon
             isPayload={isNotEmptyField(data.inject?.inject_injector_contract?.injector_contract_payload)}
@@ -151,12 +164,14 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
             <div className={classes.targets}><span>{`${data.targets.slice(0, 3).join(', ')}${data.targets.length > 3 ? ', ...' : ''}`}</span></div>
           </Tooltip>
           <div className={classes.popover}>
-            <InjectPopover
-              inject={data.inject!}
-              tagsMap={tagsMap}
-              setSelectedInjectId={setSelectedInjectId}
-              isDisabled={false}
-            />
+            <span onClick={preventClick}>
+              <InjectPopover
+                inject={data.inject!}
+                tagsMap={tagsMap}
+                setSelectedInjectId={selectedInject}
+                isDisabled={false}
+              />
+            </span>
           </div>
 
         </div>

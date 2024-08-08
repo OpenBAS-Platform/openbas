@@ -1,7 +1,9 @@
 import React, { memo } from 'react';
 import { makeStyles } from '@mui/styles';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { NodeProps } from '@xyflow/react';
 import type { Theme } from '../Theme';
+import { NodeInject } from './NodeInject';
 
 const useStyles = makeStyles<Theme>(() => ({
   node: {
@@ -32,12 +34,15 @@ const useStyles = makeStyles<Theme>(() => ({
   },
 }));
 
-const NodePhantomComponent = () => {
+const NodePhantomComponent = ({ data }: NodeProps<NodeInject>) => {
   const classes = useStyles();
 
   return (
     <>
-      <div className={classes.node} style={{ color: 'white' }}>
+      <div className={classes.node} style={{ color: 'white' }} onClick={(_) => {
+        data.onSelectedInject();
+      }}
+      >
         <div className={classes.iconContainer}>
           <AddCircleOutlineIcon className={classes.icon} style={{ fontSize: '70px' }}/>
         </div>

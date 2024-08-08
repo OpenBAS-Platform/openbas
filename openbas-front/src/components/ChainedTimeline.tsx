@@ -44,7 +44,7 @@ interface Props {
   injects: InjectStore[],
   exerciseOrScenarioId: string,
   onConnectInjects(connection: Connection): void,
-  onSelectedInject(inject: InjectStore): void,
+  onSelectedInject(inject?: InjectStore): void,
   openCreateInjectDrawer(data: {
     inject_depends_duration_days: number,
     inject_depends_duration_minutes: number,
@@ -99,7 +99,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
       const nodeInjectData = nodeInject.data;
       do {
         const previousNodes = nodeInjects.slice(0, index)
-          .filter((previousNode) => nodeInject.position.x > previousNode.position.x && nodeInject.position.x < previousNode.position.x + 240);
+          .filter((previousNode) => nodeInject.position.x >= previousNode.position.x && nodeInject.position.x < previousNode.position.x + 240);
 
         for (let i = 0; i < previousNodes.length; i += 1) {
           const previousNode = previousNodes[i];
@@ -134,6 +134,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             inject,
             fixedY: 0,
             startDate,
+            onSelectedInject,
             targets: inject.inject_assets!.map((asset) => asset.asset_name)
               .concat(inject.inject_asset_groups!.map((assetGroup) => assetGroup.asset_group_name))
               .concat(inject.inject_teams!.map((team) => teams[team]?.team_name)),
@@ -212,6 +213,18 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     return (node: NodeInject) => node.type !== 'phantom' && node.position.y === newY && node.position.x < newX;
   };
 
+  const onNodePhantomClick = (_: InjectStore) => {
+    const nodePhantom = nodes.find((nodeInCollection) => nodeInCollection.type === 'phantom');
+    if (nodePhantom !== undefined) {
+      const totalMinutes = moment.duration((nodePhantom.position.x / gapSize) * minutesPerGapAllowed[minutesPerGapIndex] * 60, 's');
+      openCreateInjectDrawer({
+        inject_depends_duration_days: totalMinutes.days(),
+        inject_depends_duration_hours: totalMinutes.hours(),
+        inject_depends_duration_minutes: totalMinutes.minutes(),
+      });
+    }
+  };
+
   const moveNewNode = (event: React.MouseEvent) => {
     if (!draggingOnGoing) {
       const position = reactFlow.screenToFlowPosition({ x: event.clientX, y: event.clientY });
@@ -248,6 +261,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             color: 'green',
             background: 'black',
             targets: [],
+            onSelectedInject: onNodePhantomClick,
           },
           position: { x: newX, y: newY },
         };
@@ -262,19 +276,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     timer = setTimeout(() => {
       moveNewNode(eventMove);
     }, 500);
-  };
-
-  const onNodeClick = (event: React.MouseEvent, node: NodeInject) => {
-    if (node.type === 'phantom') {
-      const totalMinutes = moment.duration((node.position.x / gapSize) * minutesPerGapAllowed[minutesPerGapIndex] * 60, 's');
-      openCreateInjectDrawer({
-        inject_depends_duration_days: totalMinutes.days(),
-        inject_depends_duration_hours: totalMinutes.hours(),
-        inject_depends_duration_minutes: totalMinutes.minutes(),
-      });
-    } else {
-      onSelectedInject(injects.find((value) => value.inject_id === node.id)!);
-    }
   };
 
   const panTimeline = (_event: MouseEvent | TouchEvent | null, viewport: Viewport) => {
@@ -315,7 +316,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             proOptions={proOptions}
             translateExtent={[[-60, -50], [Infinity, Infinity]]}
             nodeExtent={[[0, 0], [Infinity, Infinity]]}
-            onNodeClick={onNodeClick}
             defaultViewport={{ x: 60, y: 50, zoom: 0.75 }}
             minZoom={0.3}
           >
