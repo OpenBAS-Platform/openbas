@@ -8,9 +8,7 @@ import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Organization;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.UserRepository;
-import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.exception.FileTooBigException;
-import io.openbas.rest.exception.InputValidationException;
+import io.openbas.rest.exception.*;
 import jakarta.annotation.Resource;
 import lombok.extern.java.Log;
 import org.hibernate.exception.ConstraintViolationException;
@@ -69,6 +67,18 @@ public class RestBehavior {
   @ExceptionHandler(InputValidationException.class)
   public ValidationErrorBag handleInputValidationExceptions(InputValidationException ex) {
     ValidationErrorBag bag = new ValidationErrorBag();
+    ValidationError errors = new ValidationError();
+    Map<String, ValidationContent> errorsBag = new HashMap<>();
+    errorsBag.put(ex.getField(), new ValidationContent(ex.getMessage()));
+    errors.setChildren(errorsBag);
+    bag.setErrors(errors);
+    return bag;
+  }
+
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ExceptionHandler(ImportException.class)
+  public ValidationErrorBag handleBadRequestExceptions(ImportException ex) {
+    ValidationErrorBag bag = new ValidationErrorBag(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     ValidationError errors = new ValidationError();
     Map<String, ValidationContent> errorsBag = new HashMap<>();
     errorsBag.put(ex.getField(), new ValidationContent(ex.getMessage()));

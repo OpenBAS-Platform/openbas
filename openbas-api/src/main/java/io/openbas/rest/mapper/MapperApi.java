@@ -7,6 +7,7 @@ import io.openbas.database.raw.RawPaginationImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.FileTooBigException;
+import io.openbas.rest.exception.ImportException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.mapper.form.ExportMapperInput;
 import io.openbas.rest.mapper.form.ImportMapperAddInput;
@@ -106,9 +107,13 @@ public class MapperApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/mappers/import")
-    public void importMappers(@RequestPart("file") @NotNull MultipartFile file) throws IOException {
-        mapperService.importMappers(mapper.readValue(file.getInputStream().readAllBytes(), new TypeReference<>() {
-        }));
+    public void importMappers(@RequestPart("file") @NotNull MultipartFile file) throws ImportException {
+        try {
+            mapperService.importMappers(mapper.readValue(file.getInputStream().readAllBytes(), new TypeReference<>() {
+            }));
+        } catch (Exception e) {
+            throw new ImportException("Mapper import", "Error during import");
+        }
     }
 
     @Secured(ROLE_ADMIN)
