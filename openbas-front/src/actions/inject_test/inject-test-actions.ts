@@ -12,3 +12,8 @@ export const searchScenarioInjectTests = (scenarioId: string) => {
   const uri = `${INJECT_TEST_URI}/scenario/${scenarioId}`;
   return simpleCall(uri);
 };
+
+export const fetchInjectTestStatus = (testId: string) => {
+  const uri = `${INJECT_TEST_URI}/${testId}`;
+  return simpleCall(uri);
+};

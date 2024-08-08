@@ -164,7 +164,6 @@ const ExerciseTests: FunctionComponent<Props> = ({
         })}
         {!exerciseTests ? (<Empty message={t('No data available')} />) : null}
       </List>
-
     </>
   );
 };
