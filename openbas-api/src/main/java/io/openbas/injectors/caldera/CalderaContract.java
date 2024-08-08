@@ -87,12 +87,12 @@ public class CalderaContract extends Contractor {
         Expectation preventionExpectation = new Expectation();
         preventionExpectation.setType(PREVENTION);
         preventionExpectation.setName("Expect inject to be prevented");
-        preventionExpectation.setScore(0);
+        preventionExpectation.setScore(100);
         // Detection
         Expectation detectionExpectation = new Expectation();
         detectionExpectation.setType(DETECTION);
         detectionExpectation.setName("Expect inject to be detected");
-        detectionExpectation.setScore(0);
+        detectionExpectation.setScore(100);
         return expectationsField("expectations", "Expectations", List.of(preventionExpectation, detectionExpectation));
     }
 

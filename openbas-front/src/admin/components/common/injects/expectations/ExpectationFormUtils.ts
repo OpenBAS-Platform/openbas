@@ -17,7 +17,7 @@ export const formProps = (initialValues: ExpectationInput, t: (key: string) => s
     expectation_type: z.string(),
     expectation_name: z.string().min(1, { message: t('Should not be empty') }),
     expectation_description: z.string().optional(),
-    expectation_score: z.coerce.number(),
+    expectation_score: z.coerce.number().min(1, 'Score must be greater than 0'),
     expectation_expectation_group: z.coerce.boolean(),
   })),
   defaultValues: initialValues,
