@@ -257,6 +257,7 @@ const LessonsPlayer = () => {
                                 step={10}
                                 min={0}
                                 max={100}
+                                defaultValue={0}
                               />
                             </Grid>
                             <Grid item={true} xs={3}>
