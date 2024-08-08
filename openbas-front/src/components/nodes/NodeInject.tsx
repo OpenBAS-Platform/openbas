@@ -1,4 +1,4 @@
-import React, { createRef, memo, MouseEventHandler, useState } from 'react';
+import React, { memo } from 'react';
 import { Handle, NodeProps, Position, Node, OnConnect } from '@xyflow/react';
 import { makeStyles } from '@mui/styles';
 import { Tooltip } from '@mui/material';
@@ -102,7 +102,6 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
       tagsMap: helper.getTagsMap(),
     };
   });
-  const [_selectedInjectId, setSelectedInjectId] = useState('');
 
   const convertToRelativeTime = (durationInSeconds: number) => {
     const date = moment.utc(moment.duration(0, 'd').add(durationInSeconds, 's').asMilliseconds());
