@@ -1,7 +1,21 @@
 import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, Connection, Edge, useReactFlow, Viewport, XYPosition, Controls } from '@xyflow/react';
+import {
+  MarkerType,
+  ReactFlow,
+  ReactFlowProvider,
+  useEdgesState,
+  useNodesState,
+  Connection,
+  Edge,
+  useReactFlow,
+  Viewport,
+  XYPosition,
+  Controls,
+  ControlButton,
+} from '@xyflow/react';
 import moment from 'moment-timezone';
+import { UnfoldLess, UnfoldMore } from '@mui/icons-material';
 import type { InjectStore } from '../actions/injects/Inject';
 import type { Theme } from './Theme';
 import nodeTypes from './nodes';
@@ -21,6 +35,9 @@ const useStyles = makeStyles(() => ({
     marginTop: 60,
     paddingRight: 40,
   },
+  rotatedIcon: {
+    transform: 'rotate(90deg)',
+  },
 }));
 
 interface Props {
@@ -38,7 +55,7 @@ interface Props {
 const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScenarioId, onConnectInjects, onSelectedInject, openCreateInjectDrawer }) => {
   // Standard hooks
   const classes = useStyles();
-  const minutesPerGap = 5;
+  const minutesPerGapAllowed = [5, 20, 20 * 12, 20 * 24];
   const gapSize = 125;
   const theme = useTheme<Theme>();
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeInject>([]);
@@ -46,6 +63,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   const [injectsToShow, setInjectsToShow] = useState<InjectStore[]>([]);
   const [draggingOnGoing, setDraggingOnGoing] = useState<boolean>(false);
   const [viewportData, setViewportData] = useState<Viewport>();
+  const [minutesPerGapIndex, setMinutesPerGapIndex] = useState<number>(0);
 
   let timer: NodeJS.Timeout;
   const injectContext = useContext(InjectContext);
@@ -70,7 +88,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   }
 
   const convertCoordinatesToTime = (position: XYPosition) => {
-    return Math.round((position.x / (gapSize / minutesPerGap)) * 60);
+    return Math.round((position.x / (gapSize / minutesPerGapAllowed[minutesPerGapIndex])) * 60);
   };
 
   const calculateInjectPosition = (nodeInjects: NodeInject[]) => {
@@ -98,7 +116,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     });
   };
 
-  useEffect(() => {
+  const updateNodes = () => {
     if (injects.length > 0) {
       const injectsNodes = injects
         .sort((a, b) => a.inject_depends_duration - b.inject_depends_duration)
@@ -120,7 +138,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
               .concat(inject.inject_asset_groups!.map((assetGroup) => assetGroup.asset_group_name))
               .concat(inject.inject_teams!.map((team) => teams[team]?.team_name)),
           },
-          position: { x: (inject.inject_depends_duration / 60) * ((gapSize * 3) / 15), y: 0 },
+          position: { x: (inject.inject_depends_duration / 60) * (gapSize / minutesPerGapAllowed[minutesPerGapIndex]), y: 0 },
         }));
       calculateInjectPosition(injectsNodes);
       setInjectsToShow(injects);
@@ -138,7 +156,14 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
         });
       }));
     }
-  }, [injects]);
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      updateNodes();
+    }, 500);
+  }, [injects, minutesPerGapIndex]);
+
   const proOptions = { account: 'paid-pro', hideAttribution: true };
   const defaultEdgeOptions = {
     type: 'straight',
@@ -209,8 +234,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
       const existingphantomNode = nodes.find((currentNode) => currentNode.type === 'phantom');
 
       if (newY >= 0 && (existingphantomNode === undefined
-          || ((newX < existingphantomNode?.position.x || newX > existingphantomNode!.position.x + 240
-          || newY < existingphantomNode?.position.y || newY > existingphantomNode!.position.y + 150)))
+          || ((position.x < existingphantomNode?.position.x || position.x > existingphantomNode!.position.x + 240
+          || position.y < existingphantomNode?.position.y || position.y > existingphantomNode!.position.y + 150)))
       ) {
         const nodesList = nodes.filter((currentNode) => currentNode.type !== 'phantom');
         const node = {
@@ -241,7 +266,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
 
   const onNodeClick = (event: React.MouseEvent, node: NodeInject) => {
     if (node.type === 'phantom') {
-      const totalMinutes = moment.duration((node.position.x / gapSize) * 5 * 60, 's');
+      const totalMinutes = moment.duration((node.position.x / gapSize) * minutesPerGapAllowed[minutesPerGapIndex] * 60, 's');
       openCreateInjectDrawer({
         inject_depends_duration_days: totalMinutes.days(),
         inject_depends_duration_hours: totalMinutes.hours(),
@@ -254,6 +279,17 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
 
   const panTimeline = (_event: MouseEvent | TouchEvent | null, viewport: Viewport) => {
     setViewportData(viewport);
+  };
+
+  const updateMinutesPerGap = (incrementIndex: number) => {
+    clearTimeout(timer);
+    const nodesList = nodes.filter((currentNode) => currentNode.type !== 'phantom');
+    setNodes(nodesList);
+    setDraggingOnGoing(true);
+    setMinutesPerGapIndex(minutesPerGapIndex + incrementIndex);
+    setTimeout(() => {
+      setDraggingOnGoing(false);
+    }, 1500);
   };
 
   return (
@@ -288,14 +324,28 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
               showZoom={false}
               showInteractive={false}
               fitViewOptions={{ duration: 500 }}
-            />
+              orientation={'horizontal'}
+            >
+              <ControlButton
+                disabled={minutesPerGapAllowed.length - 1 === minutesPerGapIndex}
+                onClick={() => updateMinutesPerGap(1)}
+              >
+                <UnfoldLess className={classes.rotatedIcon}/>
+              </ControlButton>
+              <ControlButton
+                disabled={minutesPerGapIndex === 0}
+                onClick={() => updateMinutesPerGap(-1)}
+              >
+                <UnfoldMore className={classes.rotatedIcon}/>
+              </ControlButton>
+            </Controls>
             <CustomTimelineBackground
               gap={gapSize}
-              minutesPerGap={minutesPerGap}
+              minutesPerGap={minutesPerGapAllowed[minutesPerGapIndex]}
             />
             <CustomTimelinePanel
               gap={gapSize}
-              minutesPerGap={minutesPerGap}
+              minutesPerGap={minutesPerGapAllowed[minutesPerGapIndex]}
               viewportData={ viewportData }
             />
           </ReactFlow>

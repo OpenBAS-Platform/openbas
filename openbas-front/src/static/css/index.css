@@ -147,6 +147,7 @@ input[type="file"] {
 
 .react-flow__controls-button {
   background: #070d19 !important;
+  border-bottom: none !important;
 }
 .react-flow__controls-button:hover {
   background-color: #0d1626 !important;

@@ -147,7 +147,7 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
           <div className={classes.label}>{data.label}</div>
         </Tooltip>
         <div className={classes.footer}>
-          <Tooltip title={data.targets}>
+          <Tooltip title={`${data.targets.slice(0, 3).join(', ')}`}>
             <div className={classes.targets}><span>{`${data.targets.slice(0, 3).join(', ')}${data.targets.length > 3 ? ', ...' : ''}`}</span></div>
           </Tooltip>
           <div className={classes.popover}>

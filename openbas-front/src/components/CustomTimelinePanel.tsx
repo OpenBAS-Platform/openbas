@@ -33,7 +33,7 @@ interface TimelineDates {
 function BackgroundComponent({
   style,
   gap = 125,
-  minutesPerGap = 15,
+  minutesPerGap = 5,
   viewportData,
 }: Props) {
   const classes = useStyles();
@@ -48,18 +48,18 @@ function BackgroundComponent({
 
   useEffect(() => {
     const horizontalGap = scaledGap[0] * 3;
-    const offset = Math.floor(Math.abs(transform[0]) / horizontalGap) * 15;
+    const offset = Math.floor(Math.abs(transform[0]) / horizontalGap) * minutesPerGap * 3;
     const newParsedDates = [];
 
     for (let i = 0; i < numberOfIntervals; i += 1) {
       const date = moment.utc(moment.duration(0, 'd').add((minutesPerGap * 3 * i) + offset, 'm').asMilliseconds());
       newParsedDates.push({
         parsedDate: `${date.dayOfYear() - 1} d, ${date.hour()} h, ${date.minute()} m`,
-        dateIndex: Math.round(date.unix() / (15 * 60)),
+        dateIndex: Math.round(date.unix() / (minutesPerGap * 3 * 60)),
       });
     }
     setParsedDates(newParsedDates);
-  }, [viewportData]);
+  }, [viewportData, minutesPerGap]);
 
   return (
     <Panel className={classes.panel}>
