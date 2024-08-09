@@ -1,6 +1,20 @@
 import React, { FunctionComponent, useState } from 'react';
-import { Alert, AlertTitle, Chip, Divider, List, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography } from '@mui/material';
-import { AssignmentTurnedIn } from '@mui/icons-material';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Alert,
+  AlertTitle,
+  Chip,
+  Divider,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import { AssignmentTurnedIn, ExpandMore } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
@@ -10,8 +24,15 @@ import colorStyles from '../../../../../../components/Color';
 import Drawer from '../../../../../../components/common/Drawer';
 import ManualExpectationsValidationForm from './ManualExpectationsValidationForm';
 import ExpandableText from '../../../../../../components/common/ExpendableText';
-import type { Inject } from '../../../../../../utils/api-types';
+import type { Inject, Team, User } from '../../../../../../utils/api-types';
 import Paper from '../../../../../../components/common/Paper';
+import { computeColorStyle, computeLabel, resolveUserName, truncate } from '../../../../../../utils/String';
+import { useHelper } from '../../../../../../store';
+import type { TeamsHelper } from '../../../../../../actions/teams/team-helper';
+import type { UserHelper } from '../../../../../../actions/helper';
+import { useAppDispatch } from '../../../../../../utils/hooks';
+import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
+import { fetchUsers } from '../../../../../../actions/User';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -31,6 +52,14 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderRadius: 4,
     textTransform: 'uppercase',
     width: 200,
+  },
+  chipStatusAcc: {
+    height: 30,
+    borderRadius: 4,
+    textTransform: 'uppercase',
+    width: 150,
+    float: 'right',
+    marginLeft: 5,
   },
   points: {
     height: 20,
@@ -60,6 +89,20 @@ const ManualExpectations: FunctionComponent<Props> = ({
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [currentExpectations, setCurrentExpectations] = useState<InjectExpectationsStore[] | null>(null);
 
+  const { teamsMap, usersMap }: {
+    teamsMap: Record<string, Team>,
+    usersMap: Record<string, User>
+  } = useHelper((helper: TeamsHelper & UserHelper) => {
+    return ({
+      teamsMap: helper.getTeamsMap(),
+      usersMap: helper.getUsersMap(),
+    });
+  });
+  const dispatch = useAppDispatch();
+  useDataLoader(() => {
+    dispatch(fetchUsers());
+  });
+
   const handleItemClick = (expectationsToUpdate: InjectExpectationsStore[]) => {
     setSelectedItem(expectationsToUpdate[0]?.inject_expectation_name || null);
     setCurrentExpectations(expectationsToUpdate);
@@ -79,6 +122,16 @@ const ManualExpectations: FunctionComponent<Props> = ({
     : t('Pending validation');
 
   const style = isAllValidated ? colorStyles.green : colorStyles.orange;
+
+  const targetLabel = (expectationToProcess: InjectExpectationsStore) => {
+    if (expectationToProcess.inject_expectation_user && usersMap[expectationToProcess.inject_expectation_user]) {
+      return truncate(resolveUserName(usersMap[expectationToProcess.inject_expectation_user]), 22);
+    }
+    if (expectationToProcess.inject_expectation_team) {
+      return teamsMap[expectationToProcess.inject_expectation_team]?.team_name;
+    }
+    return t('Unknown');
+  };
 
   return (
     <>
@@ -141,7 +194,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
                     expectations[0].inject_expectation_group
                       ? t('At least one player (per team) must validate the expectation')
                       : t('All players (per team) must validate the expectation')
-                }
+                  }
                 limit={120}
               />
             </AlertTitle>
@@ -167,10 +220,28 @@ const ManualExpectations: FunctionComponent<Props> = ({
           </Typography>
           <div style={{ maxHeight: '80vh', overflowY: 'auto', padding: 10 }}>
             {childrenExpectations && childrenExpectations.map((e) => (
-              <div key={e.inject_expectation_id}>
-                <ManualExpectationsValidationForm expectation={e}/>
-                <Divider style={{ margin: '20px 0' }}/>
-              </div>
+              <Accordion key={e.inject_expectation_id}>
+                <AccordionSummary
+                  expandIcon={<ExpandMore/>}
+                  aria-controls={`panel-${e.inject_expectation_id}-content`}
+                  id={`panel-${e.inject_expectation_id}-header`}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                    <Typography>{targetLabel(e)}</Typography>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      {e.inject_expectation_score && (<Chip label={e.inject_expectation_score}/>)}
+                      <Chip
+                        classes={{ root: classes.chipStatusAcc }}
+                        style={computeColorStyle(e.inject_expectation_status)}
+                        label={t(computeLabel(e.inject_expectation_status))}
+                      />
+                    </div>
+                  </div>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <ManualExpectationsValidationForm expectation={e} withSummary={false}/>
+                </AccordionDetails>
+              </Accordion>
             ))}
           </div>
         </>

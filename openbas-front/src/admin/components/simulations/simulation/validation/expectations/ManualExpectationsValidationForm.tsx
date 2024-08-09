@@ -9,15 +9,15 @@ import { useFormatter } from '../../../../../../components/i18n';
 import { updateInjectExpectation } from '../../../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../../../utils/hooks';
 import type { Theme } from '../../../../../../components/Theme';
-import colorStyles from '../../../../../../components/Color';
 import { zodImplement } from '../../../../../../utils/Zod';
 import type { TeamsHelper } from '../../../../../../actions/teams/team-helper';
 import type { UserHelper } from '../../../../../../actions/helper';
 import { useHelper } from '../../../../../../store';
 import type { Team, User } from '../../../../../../utils/api-types';
-import { resolveUserName, truncate } from '../../../../../../utils/String';
+import { resolveUserName, truncate, computeLabel, computeColorStyle } from '../../../../../../utils/String';
 import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
 import { fetchUsers } from '../../../../../../actions/User';
+import { fetchTeams } from '../../../../../../actions/teams/team-actions';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
@@ -40,9 +40,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface FormProps {
   expectation: InjectExpectationsStore;
   onUpdate?: () => void;
+  withSummary?: boolean;
 }
 
-const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expectation, onUpdate }) => {
+const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expectation, onUpdate, withSummary = true }) => {
   const classes = useStyles();
   const { t } = useFormatter();
   const { teamsMap, usersMap }: {
@@ -57,6 +58,7 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
   const dispatch = useAppDispatch();
   useDataLoader(() => {
     dispatch(fetchUsers());
+    dispatch(fetchTeams());
   });
   const onSubmit = (data: { expectation_score: number }) => {
     dispatch(updateInjectExpectation(expectation.inject_expectation_id, {
@@ -89,31 +91,6 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
     });
   }, [expectation, reset]);
 
-  const computeLabel = (e: InjectExpectationsStore) => {
-    if (e.inject_expectation_status === 'PENDING') {
-      return t('Pending validation');
-    }
-    if (e.inject_expectation_status === 'SUCCESS') {
-      return t('Success');
-    }
-    if (e.inject_expectation_status === 'PARTIAL') {
-      return t('Partial');
-    }
-    return t('Failed');
-  };
-  const computeColorStyle = (e: InjectExpectationsStore) => {
-    if (e.inject_expectation_status === 'PENDING') {
-      return colorStyles.blueGrey;
-    }
-    if (e.inject_expectation_status === 'SUCCESS') {
-      return colorStyles.green;
-    }
-    if (e.inject_expectation_status === 'PARTIAL') {
-      return colorStyles.orange;
-    }
-    return colorStyles.red;
-  };
-
   const targetLabel = (expectationToProcess: InjectExpectationsStore) => {
     if (expectationToProcess.inject_expectation_user && usersMap[expectationToProcess.inject_expectation_user]) {
       return truncate(resolveUserName(usersMap[expectationToProcess.inject_expectation_user]), 22);
@@ -127,13 +104,13 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
   return (
     <div style={{ marginTop: 10 }}>
       <form id="expectationForm" onSubmit={handleSubmit(onSubmit)}>
-        <Chip
+        {withSummary && (<Chip
           classes={{ root: classes.chipInList }}
-          style={computeColorStyle(expectation)}
-          label={computeLabel(expectation)}
-        />
-        <Typography variant="h3">{expectation.inject_expectation_user ? t('Player') : t('Team')}</Typography>
-        {targetLabel(expectation)}
+          style={computeColorStyle(expectation.inject_expectation_status)}
+          label={t(computeLabel(expectation.inject_expectation_status))}
+                         />)}
+        {withSummary && (<Typography variant="h3">{expectation.inject_expectation_user ? t('Player') : t('Team')}</Typography>)}
+        {withSummary && targetLabel(expectation)}
         <MuiTextField
           className={classes.marginTop_2}
           variant="standard"
