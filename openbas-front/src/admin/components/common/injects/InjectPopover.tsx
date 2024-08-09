@@ -1,6 +1,7 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import type { InjectStore } from '../../../../actions/injects/Inject';
@@ -11,11 +12,13 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 
 interface Props {
-  inject: InjectStore & { inject_testable?: boolean }; // FIXME: Inject object coming from multiple endpoints with different properties
+  inject: InjectStore;
   tagsMap: Record<string, Tag>;
   setSelectedInjectId: (injectId: Inject['inject_id']) => void;
   isDisabled: boolean;
   canBeTested?: boolean;
+  isExercise?: boolean;
+  exerciseOrScenarioId?: string;
 }
 
 const InjectPopover: FunctionComponent<Props> = ({
@@ -23,9 +26,12 @@ const InjectPopover: FunctionComponent<Props> = ({
   setSelectedInjectId,
   isDisabled,
   canBeTested = false,
+  isExercise,
+  exerciseOrScenarioId,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
   const {
@@ -117,6 +123,11 @@ const InjectPopover: FunctionComponent<Props> = ({
   const submitTest = () => {
     testInject(inject.inject_id).then((result: { data: InjectStatus }) => {
       setInjectTestResult(result.data);
+      if (isExercise) {
+        navigate(`/admin/exercises/${exerciseOrScenarioId}/tests/${result.data.status_id}`);
+      } else {
+        navigate(`/admin/scenarios/${exerciseOrScenarioId}/tests/${result.data.status_id}`);
+      }
     });
     handleCloseTest();
   };
@@ -216,7 +227,7 @@ const InjectPopover: FunctionComponent<Props> = ({
             disabled={inject.inject_teams?.length === 0}
             onClick={handleOpenTest}
           >
-            {t('Test')}
+            {t('Test the inject')}
           </MenuItem>
         )}
         {inject.inject_type !== 'openbas_manual' && onUpdateInjectTrigger && (

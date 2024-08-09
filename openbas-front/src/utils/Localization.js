@@ -619,6 +619,7 @@ const i18n = {
         'Chaque équipe doit uploader un document',
       'Each team should submit a text response':
         'Chaque équipe doit soumettre une réponse texte',
+      'Inject tests': 'Tests de stimuli',
       // -- Expectation start --
       'This expectation is handled automatically by the platform and triggered when team reads articles': 'Cet attendu est géré automatiquement par la plateforme et déclenché lorsque une équipe lit les articles',
       'Add expectations': 'Ajouter des attendus',

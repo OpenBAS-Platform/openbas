@@ -192,6 +192,7 @@ const Injects = (props) => {
     selectAll,
     onToggleShiftEntity,
     handleToggleSelectAll,
+    isExercise,
   } = props;
   // Standard hooks
   const classes = useStyles();
@@ -555,6 +556,8 @@ const Injects = (props) => {
                 <ListItemSecondaryAction>
                   <InjectPopover
                     inject={inject}
+                    isExercise={isExercise}
+                    exerciseOrScenarioId={exerciseOrScenarioId}
                     canBeTested
                     tagsMap={tagsMap}
                     setSelectedInjectId={setSelectedInjectId}
