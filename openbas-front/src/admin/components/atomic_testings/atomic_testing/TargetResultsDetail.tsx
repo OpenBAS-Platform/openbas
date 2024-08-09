@@ -18,6 +18,7 @@ import {
   MenuItem,
   Tab,
   Tabs,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
@@ -562,7 +563,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                         />
                         <CardContent>
                           <ItemResult label={expectationResult.result} status={expectationResult.result} />
-                          <Chip classes={{ root: classes.score }} label={expectationResult.score}/>
+                          <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={expectationResult.score}/></Tooltip>
                         </CardContent>
                       </Card>
                     </Grid>

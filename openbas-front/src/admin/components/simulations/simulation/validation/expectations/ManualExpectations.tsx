@@ -14,7 +14,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { AssignmentTurnedIn, ExpandMore } from '@mui/icons-material';
+import { AssignmentTurnedIn, ExpandMore, PersonOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
@@ -227,9 +227,12 @@ const ManualExpectations: FunctionComponent<Props> = ({
                   id={`panel-${e.inject_expectation_id}-header`}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                    <Typography>{targetLabel(e)}</Typography>
+                    <div style={{ display: 'flex' }}>
+                      <PersonOutlined color="primary" />
+                      <Typography>{targetLabel(e)}</Typography>
+                    </div>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      {e.inject_expectation_score && (<Chip label={e.inject_expectation_score}/>)}
+                      <Chip label={e.inject_expectation_score ?? 0 }/>
                       <Chip
                         classes={{ root: classes.chipStatusAcc }}
                         style={computeColorStyle(e.inject_expectation_status)}
@@ -238,7 +241,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
                     </div>
                   </div>
                 </AccordionSummary>
-                <AccordionDetails>
+                <AccordionDetails style={{ margin: 0 }}>
                   <ManualExpectationsValidationForm expectation={e} withSummary={false}/>
                 </AccordionDetails>
               </Accordion>
