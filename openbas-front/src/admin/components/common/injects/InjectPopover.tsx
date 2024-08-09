@@ -12,7 +12,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 
 interface Props {
-  inject: InjectStore & { inject_testable?: boolean }; // FIXME: Inject object coming from multiple endpoints with different properties
+  inject: InjectStore;
   tagsMap: Record<string, Tag>;
   setSelectedInjectId: (injectId: Inject['inject_id']) => void;
   isDisabled: boolean;
@@ -51,7 +51,7 @@ const InjectPopover: FunctionComponent<Props> = ({
   const [openResult, setOpenResult] = useState(false);
   const [openTrigger, setOpenTrigger] = useState(false);
   const [injectResult, setInjectResult] = useState<InjectStatus | null>(null);
-  const [injectTestResult, setInjectTestResult] = useState<InjectStatus | null>(null);
+  const [_injectTestResult, setInjectTestResult] = useState<InjectStatus | null>(null);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const handlePopoverOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
