@@ -23,6 +23,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
     marginTop: theme.spacing(2),
   },
+  scoreAcc: {
+    margin: 0,
+  },
   buttons: {
     display: 'flex',
     placeContent: 'end',
@@ -112,7 +115,7 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
         {withSummary && (<Typography variant="h3">{expectation.inject_expectation_user ? t('Player') : t('Team')}</Typography>)}
         {withSummary && targetLabel(expectation)}
         <MuiTextField
-          className={classes.marginTop_2}
+          className={withSummary ? classes.marginTop_2 : classes.scoreAcc}
           variant="standard"
           fullWidth
           label={t('Score')}

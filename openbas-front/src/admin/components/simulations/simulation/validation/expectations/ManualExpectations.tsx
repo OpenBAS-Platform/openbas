@@ -88,6 +88,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
 
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [currentExpectations, setCurrentExpectations] = useState<InjectExpectationsStore[] | null>(null);
+  const [expanded, setExpanded] = useState<string | false>(false);
 
   const { teamsMap, usersMap }: {
     teamsMap: Record<string, Team>,
@@ -110,6 +111,10 @@ const ManualExpectations: FunctionComponent<Props> = ({
   const handleItemClose = () => {
     setSelectedItem(null);
     setCurrentExpectations(null);
+  };
+
+  const handleChange = (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
+    setExpanded(isExpanded ? panel : false);
   };
 
   const parentExpectation = expectations.filter((e) => !e.inject_expectation_user)[0];
@@ -218,34 +223,50 @@ const ManualExpectations: FunctionComponent<Props> = ({
           <Typography variant="h5" style={{ fontWeight: 500, margin: '10px' }}>
             {t('Players')}
           </Typography>
-          <div style={{ maxHeight: '80vh', overflowY: 'auto', padding: 10 }}>
-            {childrenExpectations && childrenExpectations.map((e) => (
-              <Accordion key={e.inject_expectation_id}>
-                <AccordionSummary
-                  expandIcon={<ExpandMore/>}
-                  aria-controls={`panel-${e.inject_expectation_id}-content`}
-                  id={`panel-${e.inject_expectation_id}-header`}
+          <div style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+            {childrenExpectations.map((e) => {
+              const panelId = `panel-${e.inject_expectation_id}`;
+
+              return (
+                <Accordion
+                  key={e.inject_expectation_id}
+                  expanded={expanded === panelId}
+                  onChange={handleChange(panelId)}
+                  style={{
+                    boxShadow: 'none', margin: 0,
+                  }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                    <div style={{ display: 'flex' }}>
-                      <PersonOutlined color="primary" />
-                      <Typography>{targetLabel(e)}</Typography>
+                  <AccordionSummary
+                    expandIcon={<ExpandMore/>}
+                    aria-controls={`${panelId}-content`}
+                    id={`${panelId}-header`}
+                    style={{
+                      boxShadow: 'none',
+                      border: 'none',
+                      height: '10px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', margin: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <PersonOutlined color="primary"/>
+                        <Typography style={{ marginLeft: 8 }}>{targetLabel(e)}</Typography>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Chip label={e.inject_expectation_score ?? 0} style={{ marginRight: 8 }}/>
+                        <Chip
+                          classes={{ root: classes.chipStatusAcc }}
+                          style={computeColorStyle(e.inject_expectation_status)}
+                          label={t(computeLabel(e.inject_expectation_status))}
+                        />
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <Chip label={e.inject_expectation_score ?? 0 }/>
-                      <Chip
-                        classes={{ root: classes.chipStatusAcc }}
-                        style={computeColorStyle(e.inject_expectation_status)}
-                        label={t(computeLabel(e.inject_expectation_status))}
-                      />
-                    </div>
-                  </div>
-                </AccordionSummary>
-                <AccordionDetails style={{ margin: 0 }}>
-                  <ManualExpectationsValidationForm expectation={e} withSummary={false}/>
-                </AccordionDetails>
-              </Accordion>
-            ))}
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <ManualExpectationsValidationForm expectation={e} withSummary={false}/>
+                  </AccordionDetails>
+                </Accordion>
+              );
+            })}
           </div>
         </>
       </Drawer>
