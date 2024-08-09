@@ -295,9 +295,7 @@ public class InjectApi extends RestBehavior {
         exercise.getDocuments().add(document.getDocument());
       }
     });
-    Inject savedInject = injectRepository.save(inject);
-    savedInject.setInjectTestable();
-    return savedInject;
+    return injectRepository.save(inject);
   }
 
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
