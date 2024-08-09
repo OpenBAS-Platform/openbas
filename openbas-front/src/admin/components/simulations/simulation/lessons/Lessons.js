@@ -550,11 +550,18 @@ const Lessons = () => {
                   <Typography variant="h4" style={{ marginBottom: 20 }}>
                     {t('Score')}
                   </Typography>
-                  <div style={{ width: '80%' }}>
+                  <div style={{ width: '80%', display: 'flex', alignItems: 'center' }}>
                     <LinearProgress
                       variant="determinate"
                       value={answer.lessons_answer_score}
+                      style={{
+                        flex: 1,
+                        marginRight: 8,
+                      }}
                     />
+                    <Typography variant="body2" color="text.secondary">
+                      {answer.lessons_answer_score}%
+                    </Typography>
                   </div>
                 </Grid>
                 <Grid item={true} xs={3} style={{ marginTop: -10 }}>

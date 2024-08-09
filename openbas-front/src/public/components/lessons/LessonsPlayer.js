@@ -78,10 +78,11 @@ const LessonsPlayer = () => {
       ]),
     );
     requiredFields.forEach((field) => {
-      if (!values[field]) {
+      if (!values[field] && values[field] !== 0) {
         errors[field] = t('This field is required.');
       }
     });
+
     return errors;
   };
   const submitForm = (data) => {
@@ -256,6 +257,7 @@ const LessonsPlayer = () => {
                                 step={10}
                                 min={0}
                                 max={100}
+                                defaultValue={0}
                               />
                             </Grid>
                             <Grid item={true} xs={3}>
