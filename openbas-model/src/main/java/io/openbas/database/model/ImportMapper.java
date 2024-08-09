@@ -42,7 +42,7 @@ public class ImportMapper implements Base {
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
   @JoinColumn(name = "importer_mapper_id", nullable = false)
-  @JsonProperty("inject_importers")
+  @JsonProperty("import_mapper_inject_importers")
   private List<InjectImporter> injectImporters = new ArrayList<>();
 
   @CreationTimestamp

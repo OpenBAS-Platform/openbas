@@ -4,6 +4,6 @@ export type InjectImporterStore = Omit<InjectImporter, 'inject_importer_injector
   inject_importer_injector_contract: string;
 };
 
-export type ImportMapperStore = Omit<ImportMapper, 'inject_importers'> & {
-  inject_importers: InjectImporterStore[];
+export type ImportMapperStore = Omit<ImportMapper, 'import_mapper_inject_importers'> & {
+  import_mapper_inject_importers: InjectImporterStore[];
 };

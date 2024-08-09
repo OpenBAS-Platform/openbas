@@ -1,12 +1,15 @@
 package io.openbas.rest.mapper;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.raw.RawPaginationImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.FileTooBigException;
+import io.openbas.rest.exception.ImportException;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.rest.mapper.form.ExportMapperInput;
 import io.openbas.rest.mapper.form.ImportMapperAddInput;
 import io.openbas.rest.mapper.form.ImportMapperUpdateInput;
 import io.openbas.rest.scenario.form.InjectsImportTestInput;
@@ -16,6 +19,7 @@ import io.openbas.service.InjectService;
 import io.openbas.service.MapperService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -23,12 +27,19 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -70,6 +81,39 @@ public class MapperApi extends RestBehavior {
     @PostMapping("/api/mappers")
     public ImportMapper createImportMapper(@RequestBody @Valid final ImportMapperAddInput importMapperAddInput) {
         return mapperService.createAndSaveImportMapper(importMapperAddInput);
+    }
+
+    @Secured(ROLE_ADMIN)
+    @PostMapping(value="/api/mappers/export")
+    public void exportMappers(
+        @RequestBody @Valid final ExportMapperInput exportMapperInput,
+        HttpServletResponse response) {
+        try {
+            String jsonMappers = mapperService.exportMappers(exportMapperInput.getIdsToExport());
+            String rightNow = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now());
+            String filename = MessageFormat.format("mappers_{0}.json", rightNow);
+
+            response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            response.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpServletResponse.SC_OK);
+
+            response.getOutputStream().write(jsonMappers.getBytes(StandardCharsets.UTF_8));
+            response.getOutputStream().flush();
+            response.getOutputStream().close();
+        } catch (IOException e) {
+            throw new RuntimeException("Error during export", e);
+        }
+    }
+
+    @Secured(ROLE_ADMIN)
+    @PostMapping("/api/mappers/import")
+    public void importMappers(@RequestPart("file") @NotNull MultipartFile file) throws ImportException {
+        try {
+            mapperService.importMappers(mapper.readValue(file.getInputStream().readAllBytes(), new TypeReference<>() {
+            }));
+        } catch (Exception e) {
+            throw new ImportException("Mapper import", "Error during import");
+        }
     }
 
     @Secured(ROLE_ADMIN)

@@ -17,7 +17,7 @@ public class InjectImporterAddInput {
     private String injectTypeValue;
 
     @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("inject_importer_injector_contract_id")
+    @JsonProperty("inject_importer_injector_contract")
     private String injectorContractId;
 
     @JsonProperty("inject_importer_rule_attributes")

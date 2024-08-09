@@ -1,14 +1,19 @@
 package io.openbas.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.model.InjectImporter;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.RuleAttribute;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.database.repository.InjectorContractRepository;
+import io.openbas.helper.ObjectMapperHelper;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.mapper.export.MapperExportMixins;
 import io.openbas.rest.mapper.form.*;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -19,6 +24,8 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import static java.util.stream.StreamSupport.stream;
 
 @RequiredArgsConstructor
 @Service
@@ -101,7 +108,7 @@ public class MapperService {
    * @return The map of injector contracts by ids
    */
   private Map<String, InjectorContract> getMapOfInjectorContracts(List<String> ids) {
-    return StreamSupport.stream(injectorContractRepository.findAllById(ids).spliterator(), false)
+    return stream(injectorContractRepository.findAllById(ids).spliterator(), false)
             .collect(Collectors.toMap(InjectorContract::getId, Function.identity()));
   }
 
@@ -176,4 +183,25 @@ public class MapperService {
     });
   }
 
+  public String exportMappers(@NotNull final List<String> idsToExport) throws JsonProcessingException {
+    ObjectMapper objectMapper = ObjectMapperHelper.openBASJsonMapper();
+    List<ImportMapper> mappersList = StreamSupport.stream(
+        importMapperRepository.findAllById(idsToExport.stream().map(UUID::fromString).toList()).spliterator(), false
+    ).toList();
+
+    objectMapper.addMixIn(ImportMapper.class, MapperExportMixins.ImportMapper.class);
+    objectMapper.addMixIn(InjectImporter.class, MapperExportMixins.InjectImporter.class);
+    objectMapper.addMixIn(RuleAttribute.class, MapperExportMixins.RuleAttribute.class);
+
+    return objectMapper.writeValueAsString(mappersList);
+  }
+
+  public void importMappers(List<ImportMapperAddInput> mappers) {
+    importMapperRepository.saveAll(
+        mappers.stream()
+            .map(this::createImportMapper)
+            .peek((m) -> m.setName(m.getName() + " (Import)"))
+            .toList()
+    );
+  }
 }

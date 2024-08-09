@@ -15,15 +15,15 @@ import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 public class ImportMapperAddInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("mapper_name")
+    @JsonProperty("import_mapper_name")
     private String name;
 
     @Pattern(regexp="^[A-Z]{1,2}$")
-    @JsonProperty("mapper_inject_type_column")
+    @JsonProperty("import_mapper_inject_type_column")
     @NotBlank
     private String injectTypeColumn;
 
-    @JsonProperty("mapper_inject_importers")
+    @JsonProperty("import_mapper_inject_importers")
     @NotNull
     private List<InjectImporterAddInput> importers = new ArrayList<>();
 
