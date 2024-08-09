@@ -26,6 +26,7 @@ public class ResultUtils {
         List<InjectExpectation> expectations = injects
                 .stream()
                 .flatMap(inject -> inject.getExpectations().stream())
+                .filter(expectation -> expectation.getUser() == null) // Filter expectations linked to players
                 .toList();
         return AtomicTestingUtils.getExpectationResultByTypes(expectations);
     }

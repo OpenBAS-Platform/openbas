@@ -149,33 +149,33 @@ public class Team implements Base {
 
     @JsonProperty("team_injects_expectations_total_score")
     @NotNull
-    public long getInjectExceptationsTotalScore() {
+    public double getInjectExceptationsTotalScore() {
         return getInjectExpectations().stream()
             .filter((inject) -> inject.getScore() != null)
-            .mapToLong(InjectExpectation::getScore).sum();
+            .mapToDouble(InjectExpectation::getScore).sum();
     }
     @JsonProperty("team_injects_expectations_total_score_by_exercise")
     @NotNull
-    public Map<String, Long> getInjectExceptationsTotalScoreByExercise() {
+    public Map<String, Double> getInjectExceptationsTotalScoreByExercise() {
         return getInjectExpectations().stream()
             .filter(expectation -> Objects.nonNull(expectation.getExercise()) && Objects.nonNull(expectation.getScore()))
             .collect(Collectors.groupingBy(expectation -> expectation.getExercise().getId(),
-                Collectors.summingLong(InjectExpectation::getScore)));
+                Collectors.summingDouble(InjectExpectation::getScore)));
     }
 
     @JsonProperty("team_injects_expectations_total_expected_score")
     @NotNull
-    public long getInjectExceptationsTotalExpectedScore() {
-        return getInjectExpectations().stream().mapToLong(InjectExpectation::getExpectedScore).sum();
+    public double getInjectExceptationsTotalExpectedScore() {
+        return getInjectExpectations().stream().mapToDouble(InjectExpectation::getExpectedScore).sum();
     }
 
     @JsonProperty("team_injects_expectations_total_expected_score_by_exercise")
     @NotNull
-    public Map<String, Long> getInjectExpectationsTotalExpectedScoreByExercise() {
+    public Map<String, Double> getInjectExpectationsTotalExpectedScoreByExercise() {
         return getInjectExpectations().stream()
             .filter(expectation -> Objects.nonNull(expectation.getExercise()))
             .collect(Collectors.groupingBy(expectation -> expectation.getExercise().getId(),
-                Collectors.summingLong(InjectExpectation::getExpectedScore)));
+                Collectors.summingDouble(InjectExpectation::getExpectedScore)));
     }
     // endregion
 

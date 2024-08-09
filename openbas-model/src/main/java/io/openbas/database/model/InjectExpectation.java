@@ -86,26 +86,44 @@ public class InjectExpectation implements Base {
   @Setter
   @Column(name = "inject_expectation_score")
   @JsonProperty("inject_expectation_score")
-  private Integer score;
+  private Double score;
 
   @JsonProperty("inject_expectation_status")
   public EXPECTATION_STATUS getResponse() {
+
     if( this.getScore() == null ) {
       return EXPECTATION_STATUS.PENDING;
     }
-    if( this.getScore() >= this.getExpectedScore() ) {
-      return EXPECTATION_STATUS.SUCCESS;
+
+    if (team != null) {
+      if(this.isExpectationGroup()){
+        if( this.getScore() > 0) {
+          return EXPECTATION_STATUS.SUCCESS;
+        }else{
+          return EXPECTATION_STATUS.FAILED;
+        }
+      }else{
+        if( this.getScore() >= this.getExpectedScore()) {
+          return EXPECTATION_STATUS.SUCCESS;
+        }else{
+          return EXPECTATION_STATUS.FAILED;
+        }
+      }
+    }else {
+      if (this.getScore() >= this.getExpectedScore()) {
+        return EXPECTATION_STATUS.SUCCESS;
+      }
+      if (this.getScore() == 0) {
+        return EXPECTATION_STATUS.FAILED;
+      }
+      return EXPECTATION_STATUS.PARTIAL;
     }
-    if( this.getScore() == 0 ) {
-      return EXPECTATION_STATUS.FAILED;
-    }
-    return EXPECTATION_STATUS.PARTIAL;
   }
 
   @Setter
   @Column(name = "inject_expectation_expected_score")
   @JsonProperty("inject_expectation_expected_score")
-  private Integer expectedScore;
+  private Double expectedScore;
 
   @Setter
   @Column(name = "inject_expectation_created_at")

@@ -728,10 +728,10 @@ public class InjectService {
                                 Double columnValueExpectation = columns.stream()
                                         .map(column -> getValueAsDouble(row, column))
                                         .reduce(0.0, Double::sum);
-                                expectation.get().setExpectedScore(columnValueExpectation.intValue());
+                                expectation.get().setExpectedScore(columnValueExpectation.doubleValue());
                             } else {
                                 try {
-                                    expectation.get().setExpectedScore(Integer.parseInt(ruleAttribute.getDefaultValue()));
+                                    expectation.get().setExpectedScore(Double.parseDouble(ruleAttribute.getDefaultValue()));
                                 } catch (NumberFormatException exception) {
                                     List<ImportMessage> importMessages = new ArrayList<>();
                                     importMessages.add(new ImportMessage(ImportMessage.MessageLevel.WARN,
@@ -743,7 +743,7 @@ public class InjectService {
                                 }
                             }
                         } else {
-                            expectation.get().setExpectedScore(Integer.parseInt(ruleAttribute.getDefaultValue()));
+                            expectation.get().setExpectedScore(Double.parseDouble(ruleAttribute.getDefaultValue()));
                         }
                     } else if ("name".equals(ruleAttribute.getName().split("_")[1])) {
                         if(ruleAttribute.getColumns() != null) {

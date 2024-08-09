@@ -20,6 +20,6 @@ export const typeIcon = (type: string) => {
   return <AssignmentTurnedIn />;
 };
 
-export const hasExpectationByGroup = (type: string) => {
+export const isTechnicalExpectation = (type: string) => {
   return [ExpectationType.PREVENTION.toString(), ExpectationType.DETECTION.toString()].includes(type);
 };

@@ -23,7 +23,7 @@ public class PublicChallenge {
     private String content;
 
     @JsonProperty("challenge_score")
-    private Integer score;
+    private Double score;
 
     @JsonProperty("challenge_flags")
     private List<PublicChallengeFlag> flags;
@@ -85,11 +85,11 @@ public class PublicChallenge {
         this.content = content;
     }
 
-    public Integer getScore() {
+    public Double getScore() {
         return score;
     }
 
-    public void setScore(Integer score) {
+    public void setScore(Double score) {
         this.score = score;
     }
 

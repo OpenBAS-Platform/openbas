@@ -16,7 +16,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
         : '1px solid rgba(0, 0, 0, 0.12)',
     borderRadius: 4,
     width: 200,
-    height: 100,
+    height: 110,
     padding: '8px 5px 5px 5px',
   },
   icon: {

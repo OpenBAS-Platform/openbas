@@ -57,7 +57,7 @@ public class Challenge implements Base {
 
     @Column(name = "challenge_score")
     @JsonProperty("challenge_score")
-    private Integer score;
+    private Double score;
 
     @Column(name = "challenge_max_attempts")
     @JsonProperty("challenge_max_attempts")

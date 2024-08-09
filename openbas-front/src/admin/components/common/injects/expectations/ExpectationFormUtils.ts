@@ -6,7 +6,10 @@ import type { ExpectationInput } from './Expectation';
 
 export const infoMessage = (type: string, t: (key: string) => string) => {
   if (type === 'ARTICLE') {
-    return t('This expectation is handled automatically by the platform and triggered when team reads articles');
+    return t('This expectation is handled automatically by the platform and triggered when target reads the articles');
+  }
+  if (type === 'CHALLENGE') {
+    return t('This expectation is handled automatically by the platform and triggered when the target completes the challenges');
   }
   return '';
 };

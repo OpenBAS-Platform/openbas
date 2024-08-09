@@ -75,7 +75,7 @@ public class ExerciseExpectationServiceTest {
 
         // -- EXECUTE --
         ExpectationUpdateInput input = new ExpectationUpdateInput();
-        input.setScore(7);
+        input.setScore(7.0);
         InjectExpectation expectation = this.exerciseExpectationService.updateInjectExpectation(id, input);
 
         // -- ASSERT --
@@ -114,7 +114,7 @@ public class ExerciseExpectationServiceTest {
         expectation.setTeam(teamCreated);
         expectation.setType(MANUAL);
         expectation.setName(EXPECTATION_NAME);
-        expectation.setExpectedScore(10);
+        expectation.setExpectedScore(10.0);
         expectation.setExercise(exerciseCreated);
         this.injectExpectationRepository.save(expectation);
     }

@@ -17,7 +17,7 @@ public class Expectation {
   private String description;
 
   @JsonProperty("expectation_score")
-  private Integer score;
+  private Double score;
 
   @JsonProperty("expectation_expectation_group")
   private boolean expectationGroup;

@@ -16,7 +16,7 @@ public class InjectExpectationResult {
 
   private String date;
 
-  private Integer score;
+  private Double score;
 
   @NotBlank
   private String result;

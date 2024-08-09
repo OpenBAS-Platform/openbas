@@ -73,11 +73,13 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
                 </Typography>
                 {
                   injectResultDto.inject_expectations !== undefined && injectResultDto.inject_expectations.length > 0
-                    ? injectResultDto.inject_expectations.map((expectation, index) => (
-                      <Typography key={index} variant="body1">
-                        {expectation.inject_expectation_name}
-                      </Typography>
-                    )) : <Typography variant="body1" gutterBottom>
+                    ? Array.from(new Set(injectResultDto.inject_expectations.map((expectation) => expectation.inject_expectation_name)))
+                      .map((name, index) => (
+                        <Typography key={index} variant="body1">
+                          {name}
+                        </Typography>
+                      ))
+                    : <Typography variant="body1" gutterBottom>
                       {'-'}
                     </Typography>
                 }

@@ -103,7 +103,6 @@ public class AssetGroupService {
                 assetGroup.setDynamicAssets(filteredAssets);
             }
         });
-
         return assetGroups;
     }
 

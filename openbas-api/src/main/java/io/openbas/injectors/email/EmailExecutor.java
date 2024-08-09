@@ -86,7 +86,7 @@ public class EmailExecutor extends Injector {
             .stream()
             .flatMap((entry) -> switch (entry.getType()) {
               case MANUAL ->
-                      Stream.of((Expectation) new ManualExpectation(entry.getScore(), entry.getName(), entry.getDescription()));
+                      Stream.of((Expectation) new ManualExpectation(entry.getScore(), entry.getName(), entry.getDescription(), entry.isExpectationGroup()));
               default -> Stream.of();
             })
             .toList();

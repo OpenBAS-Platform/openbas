@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   iconOverlay: {
     position: 'absolute',
-    top: '43%',
+    top: '37%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     fontSize: 35,
@@ -133,6 +133,7 @@ const ResponsePie: FunctionComponent<Props> = ({
       </div>
     );
   };
+
   return (
     <Grid container={true} spacing={3}>
       <Grid item={true} xs={4}>

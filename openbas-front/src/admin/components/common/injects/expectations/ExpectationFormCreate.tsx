@@ -6,8 +6,8 @@ import type { ExpectationInput } from './Expectation';
 import { formProps, infoMessage } from './ExpectationFormUtils';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
-import { hasExpectationByGroup } from './ExpectationUtils';
 import ExpectationGroupField from './field/ExpectationGroupField';
+import { isTechnicalExpectation } from './ExpectationUtils';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
@@ -95,7 +95,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
           <MenuItem key={'MANUAL'} value={'MANUAL'}>{t('MANUAL')}</MenuItem>
         </MUISelect>
       </div>
-      {watchType === 'ARTICLE'
+      {(watchType === 'ARTICLE' || watchType === 'CHALLENGE')
         && <Alert
           severity="info"
           className={classes.marginTop_2}
@@ -138,11 +138,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         }
         inputProps={register('expectation_score')}
       />
-
-      {hasExpectationByGroup(watchType)
-        && <ExpectationGroupField control={control} />
-      }
-
+      <ExpectationGroupField isTechnicalExpectation={isTechnicalExpectation(watchType)} control={control} />
       <div className={classes.buttons}>
         <Button
           onClick={handleClose}

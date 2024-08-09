@@ -1347,7 +1347,7 @@ export interface InjectTargetWithResult {
   id: string;
   name?: string;
   platformType?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
-  targetType?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
+  targetType?: "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
 }
 
 export interface InjectTeamsInput {

@@ -72,7 +72,7 @@ public class V2_63__InjectExpectation_upgrade extends BaseJavaMigration {
 
     private String message;
     private String expectationType;
-    private Integer expectationScore;
+    private Double expectationScore;
 
     OvhSmsContentNew toNewContent() {
       OvhSmsContentNew content = new OvhSmsContentNew();
@@ -99,7 +99,7 @@ public class V2_63__InjectExpectation_upgrade extends BaseJavaMigration {
     private String inReplyTo;
     private boolean encrypted;
     private String expectationType;
-    private Integer expectationScore;
+    private Double expectationScore;
 
     EmailContent toNewContent() {
       EmailContent content = new EmailContent();
@@ -122,7 +122,7 @@ public class V2_63__InjectExpectation_upgrade extends BaseJavaMigration {
 
     private List<String> articles;
     private boolean expectation;
-    private Integer expectationScore;
+    private Double expectationScore;
     private boolean emailing;
 
     ChannelContent toNewContent() {
