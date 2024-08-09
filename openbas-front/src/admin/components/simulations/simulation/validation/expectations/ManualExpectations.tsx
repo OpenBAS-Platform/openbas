@@ -246,7 +246,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
                       height: '10px',
                     }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', margin: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
                         <PersonOutlined color="primary"/>
                         <Typography style={{ marginLeft: 8 }}>{targetLabel(e)}</Typography>
