@@ -24,11 +24,10 @@ import colorStyles from '../../../../../../components/Color';
 import Drawer from '../../../../../../components/common/Drawer';
 import ManualExpectationsValidationForm from './ManualExpectationsValidationForm';
 import ExpandableText from '../../../../../../components/common/ExpendableText';
-import type { Inject, Team, User } from '../../../../../../utils/api-types';
+import type { Inject, User } from '../../../../../../utils/api-types';
 import Paper from '../../../../../../components/common/Paper';
 import { computeColorStyle, computeLabel, resolveUserName, truncate } from '../../../../../../utils/String';
 import { useHelper } from '../../../../../../store';
-import type { TeamsHelper } from '../../../../../../actions/teams/team-helper';
 import type { UserHelper } from '../../../../../../actions/helper';
 import { useAppDispatch } from '../../../../../../utils/hooks';
 import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
@@ -90,12 +89,10 @@ const ManualExpectations: FunctionComponent<Props> = ({
   const [currentExpectations, setCurrentExpectations] = useState<InjectExpectationsStore[] | null>(null);
   const [expanded, setExpanded] = useState<string | false>(false);
 
-  const { teamsMap, usersMap }: {
-    teamsMap: Record<string, Team>,
+  const { usersMap }: {
     usersMap: Record<string, User>
-  } = useHelper((helper: TeamsHelper & UserHelper) => {
+  } = useHelper((helper: UserHelper) => {
     return ({
-      teamsMap: helper.getTeamsMap(),
       usersMap: helper.getUsersMap(),
     });
   });
@@ -131,9 +128,6 @@ const ManualExpectations: FunctionComponent<Props> = ({
   const targetLabel = (expectationToProcess: InjectExpectationsStore) => {
     if (expectationToProcess.inject_expectation_user && usersMap[expectationToProcess.inject_expectation_user]) {
       return truncate(resolveUserName(usersMap[expectationToProcess.inject_expectation_user]), 22);
-    }
-    if (expectationToProcess.inject_expectation_team) {
-      return teamsMap[expectationToProcess.inject_expectation_team]?.team_name;
     }
     return t('Unknown');
   };
