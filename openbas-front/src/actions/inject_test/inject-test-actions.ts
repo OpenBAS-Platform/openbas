@@ -13,7 +13,7 @@ export const searchScenarioInjectTests = (scenarioId: string) => {
   return simpleCall(uri);
 };
 
-export const fetchInjectTestStatus = (testId: string) => {
+export const fetchInjectTestStatus = (testId: string | undefined) => {
   const uri = `${INJECT_TEST_URI}/${testId}`;
   return simpleCall(uri);
 };

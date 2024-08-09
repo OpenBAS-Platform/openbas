@@ -207,6 +207,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
         <ArticleContext.Provider value={articleContext}>
           <TeamContext.Provider value={teamContext}>
             <Injects
+              isExercise={true}
               exerciseOrScenarioId={exerciseId}
               injects={injects}
               teams={teams}
@@ -253,7 +254,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                 selected={false}
                 aria-label="List view mode"
               >
-                <ReorderOutlined fontSize="small" color="primary"/>
+                <ReorderOutlined fontSize="small" color="primary" />
               </ToggleButton>
             </Tooltip>
             <Tooltip title={t('Distribution view')}>
@@ -263,7 +264,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                 selected={true}
                 aria-label="Distribution view mode"
               >
-                <BarChartOutlined fontSize="small" color="inherit"/>
+                <BarChartOutlined fontSize="small" color="inherit" />
               </ToggleButton>
             </Tooltip>
           </ToggleButtonGroup>
@@ -274,7 +275,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                   {t('Distribution of injects by type')}
                 </Typography>
                 <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                  <InjectDistributionByType exerciseId={exerciseId}/>
+                  <InjectDistributionByType exerciseId={exerciseId} />
                 </Paper>
               </Grid>
               <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -282,7 +283,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                   {t('Distribution of injects by team')}
                 </Typography>
                 <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                  <InjectDistributionByTeam exerciseId={exerciseId}/>
+                  <InjectDistributionByTeam exerciseId={exerciseId} />
                 </Paper>
               </Grid>
               <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -290,7 +291,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                   {t('Distribution of expectations by inject type')} (%)
                 </Typography>
                 <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                  <ExerciseDistributionScoreByTeamInPercentage exerciseId={exerciseId}/>
+                  <ExerciseDistributionScoreByTeamInPercentage exerciseId={exerciseId} />
                 </Paper>
               </Grid>
               <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -298,7 +299,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                   {t('Distribution of expected total score by inject type')}
                 </Typography>
                 <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                  <ExerciseDistributionScoreOverTimeByInjectorContract exerciseId={exerciseId}/>
+                  <ExerciseDistributionScoreOverTimeByInjectorContract exerciseId={exerciseId} />
                 </Paper>
               </Grid>
               <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -306,7 +307,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                   {t('Distribution of expectations by team')}
                 </Typography>
                 <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                  <ExerciseDistributionScoreOverTimeByTeam exerciseId={exerciseId}/>
+                  <ExerciseDistributionScoreOverTimeByTeam exerciseId={exerciseId} />
                 </Paper>
               </Grid>
               <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -314,7 +315,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                   {t('Distribution of expected total score by team')}
                 </Typography>
                 <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                  <ExerciseDistributionScoreOverTimeByTeamInPercentage exerciseId={exerciseId}/>
+                  <ExerciseDistributionScoreOverTimeByTeamInPercentage exerciseId={exerciseId} />
                 </Paper>
               </Grid>
             </Grid>
