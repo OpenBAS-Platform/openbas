@@ -1,9 +1,9 @@
-import { NodeTypes } from 'reactflow';
+import { NodeTypes } from '@xyflow/react';
 
-import NodeResultStep from './NodeResultStep';
+import NodeResult from './NodeResultStep';
 
 const nodeTypes: NodeTypes = {
-  result: NodeResultStep,
+  result: NodeResult,
 };
 
 export default nodeTypes;

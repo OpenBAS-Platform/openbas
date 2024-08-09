@@ -71,7 +71,7 @@ export default ({ mode }: { mode: string }) => {
         'dompurify',
         'react-markdown',
         'remark-flexible-markers',
-        'reactflow',
+        '@xyflow/react',
         'd3-hierarchy',
         '@dagrejs/dagre',
         'react-syntax-highlighter',

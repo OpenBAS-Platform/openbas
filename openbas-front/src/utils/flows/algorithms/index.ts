@@ -1,4 +1,4 @@
-import { type Node, type Edge } from 'reactflow';
+import { type Node, type Edge } from '@xyflow/react';
 
 import dagre from './dagre';
 import d3Hierarchy from './d3-hierarchy';

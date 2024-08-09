@@ -1,4 +1,4 @@
-import { Position } from 'reactflow';
+import { Position } from '@xyflow/react';
 import { Direction } from './algorithms';
 
 // eslint-disable-next-line consistent-return

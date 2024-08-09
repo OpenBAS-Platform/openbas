@@ -33,10 +33,11 @@ import { InjectContext, PermissionsContext } from '../Context';
 import CreateInject from './CreateInject';
 import UpdateInject from './UpdateInject';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import Timeline from '../../../../components/Timeline';
+import ChainedTimeline from '../../../../components/ChainedTimeline';
 import { isNotEmptyField } from '../../../../utils/utils';
 import ImportUploaderInjectFromXls from './ImportUploaderInjectFromXls';
 import useExportToXLS from '../../../../utils/hooks/useExportToXLS';
+import ButtonCreate from '../../../../components/common/ButtonCreate';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -192,11 +193,14 @@ const Injects = (props) => {
     selectAll,
     onToggleShiftEntity,
     handleToggleSelectAll,
+    onConnectInjects,
   } = props;
   // Standard hooks
   const classes = useStyles();
   const { t, tPick } = useFormatter();
   const [selectedInjectId, setSelectedInjectId] = useState(null);
+  const [openCreateDrawer, setOpenCreateDrawer] = useState(false);
+  const [presetCreationValues, setPresetCreationValues] = useState();
   const [showTimeline, setShowTimeline] = useState(
     () => {
       const storedValue = localStorage.getItem(`${exerciseOrScenarioId}_show_injects_timeline`);
@@ -345,12 +349,25 @@ const Injects = (props) => {
         </div>
         {showTimeline && isAtLeastOneValidInject && (
           <div style={{ marginBottom: 50 }}>
-            <Timeline
-              injects={sortedInjects}
-              onSelectInject={(id) => setSelectedInjectId(id)}
-              teams={teams}
-            />
-            <div className="clearfix" />
+            <div>
+              <ChainedTimeline
+                injects={sortedInjects}
+                onConnectInjects={onConnectInjects}
+                exerciseOrScenarioId={exerciseOrScenarioId}
+                openCreateInjectDrawer={(data) => {
+                  setOpenCreateDrawer(true);
+                  setPresetCreationValues(data);
+                }}
+                onSelectedInject={(inject) => {
+                  const injectContract = inject.inject_injector_contract.convertedContent;
+                  const isContractExposed = injectContract?.config.expose;
+                  if (injectContract && isContractExposed) {
+                    setSelectedInjectId(inject.inject_id);
+                  }
+                }}
+              />
+              <div className="clearfix"/>
+            </div>
           </div>
         )}
         <List>
@@ -582,9 +599,17 @@ const Injects = (props) => {
                 teamsUsers={teamsUsers}
                  />
             }
+            <ButtonCreate onClick={() => {
+              setOpenCreateDrawer(true);
+              setPresetCreationValues(undefined);
+            }}
+            />
             <CreateInject
               title={t('Create a new inject')}
+              open={openCreateDrawer}
+              handleClose={() => setOpenCreateDrawer(false)}
               onCreateInject={onCreateInject}
+              presetValues={presetCreationValues}
               teamsFromExerciseOrScenario={teams}
               articlesFromExerciseOrScenario={articles}
               variablesFromExerciseOrScenario={variables}

@@ -1,4 +1,4 @@
-import { type Node, getIncomers } from 'reactflow';
+import { type Node, getIncomers } from '@xyflow/react';
 import { type HierarchyPointNode, stratify, tree } from 'd3-hierarchy';
 import type { Direction, LayoutAlgorithm } from './index';
 

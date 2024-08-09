@@ -2,7 +2,6 @@ import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { Chip, Grid, List, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { KeyboardArrowRight } from '@mui/icons-material';
-import ButtonCreate from '../../../../components/common/ButtonCreate';
 import { useFormatter } from '../../../../components/i18n';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
@@ -72,6 +71,13 @@ interface Props {
   title: string
   onCreateInject: (data: Inject) => Promise<void>
   isAtomic?: boolean
+  open?: boolean
+  handleClose: () => void
+  presetValues?: {
+    inject_depends_duration_days?: number,
+    inject_depends_duration_hours?: number,
+    inject_depends_duration_minutes?: number,
+  }
 }
 
 const atomicFilter: FilterGroup = {
@@ -84,9 +90,8 @@ const atomicFilter: FilterGroup = {
     }],
 };
 
-const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomic = false, ...props }) => {
+const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = false, handleClose, isAtomic = false, presetValues, ...props }) => {
   // Standard hooks
-  const [open, setOpen] = useState(false);
   const classes = useStyles();
   const drawerRef = useRef(null);
   const dispatch = useAppDispatch();
@@ -126,7 +131,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
   };
   const handleCloseDrawer = () => {
     setSelectedContract(null);
-    setOpen(false);
+    handleClose();
   };
   useEffect(() => {
     if (contracts && contracts.length > 0) {
@@ -145,7 +150,6 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
 
   return (
     <>
-      <ButtonCreate onClick={() => setOpen(true)} />
       <Drawer
         open={open}
         handleClose={handleCloseDrawer}
@@ -236,6 +240,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
               handleClose={handleCloseDrawer}
               onCreateInject={onCreateInject}
               isAtomic={isAtomic}
+              presetValues={presetValues}
               {...props}
             />
           </Grid>

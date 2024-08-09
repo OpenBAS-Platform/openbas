@@ -75,6 +75,7 @@ const CreateInjectDetails = ({
   selectedContractKillChainPhase,
   isAtomic = false,
   drawerRef,
+  presetValues,
   ...props
 }) => {
   const { t, tPick } = useFormatter();
@@ -239,9 +240,9 @@ const CreateInjectDetails = ({
   const initialValues = {
     inject_title: contractContent ? tPick(contractContent.label) : '',
     inject_tags: [],
-    inject_depends_duration_days: 0,
-    inject_depends_duration_hours: 0,
-    inject_depends_duration_minutes: 0,
+    inject_depends_duration_days: presetValues?.inject_depends_duration_days ?? 0,
+    inject_depends_duration_hours: presetValues?.inject_depends_duration_hours ?? 0,
+    inject_depends_duration_minutes: presetValues?.inject_depends_duration_minutes ?? 0,
   };
   // Enrich initialValues with default contract value
   if (contractContent) {
