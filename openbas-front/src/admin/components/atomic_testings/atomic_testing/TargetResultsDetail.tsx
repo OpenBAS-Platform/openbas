@@ -6,6 +6,7 @@ import {
   CardActionArea,
   CardContent,
   CardHeader,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -81,6 +82,11 @@ const useStyles = makeStyles<Theme>((theme) => ({
   area: {
     width: '100%',
     height: '100%',
+  },
+  score: {
+    fontSize: '0.75rem',
+    height: '20px',
+    padding: '0 4px',
   },
 }));
 
@@ -556,6 +562,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                         />
                         <CardContent>
                           <ItemResult label={expectationResult.result} status={expectationResult.result} />
+                          <Chip classes={{ root: classes.score }} label={expectationResult.score}/>
                         </CardContent>
                       </Card>
                     </Grid>
