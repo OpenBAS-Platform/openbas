@@ -26,6 +26,7 @@ const Scenario = lazy(() => import('./Scenario'));
 const ScenarioDefinition = lazy(() => import('./ScenarioDefinition'));
 const Injects = lazy(() => import('./injects/ScenarioInjects'));
 const Tests = lazy(() => import('./tests/ScenarioTests'));
+const TestDetail = lazy(() => import('./tests/ScenarioTestStatusDetail'));
 
 // eslint-disable-next-line no-underscore-dangle
 const _MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -170,6 +171,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
               <Route path="definition" element={errorWrapper(ScenarioDefinition)()} />
               <Route path="injects" element={errorWrapper(Injects)()} />
               <Route path="tests" element={errorWrapper(Tests)()} />
+              <Route path="tests/:statusId" element={errorWrapper(TestDetail)()} />
               {/* Not found */}
               <Route path="*" element={<NotFound />} />
             </Routes>

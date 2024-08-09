@@ -1,6 +1,7 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import type { InjectStore } from '../../../../actions/injects/Inject';
@@ -16,6 +17,8 @@ interface Props {
   setSelectedInjectId: (injectId: Inject['inject_id']) => void;
   isDisabled: boolean;
   canBeTested?: boolean;
+  isExercise?: boolean;
+  exerciseOrScenarioId?: string;
 }
 
 const InjectPopover: FunctionComponent<Props> = ({
@@ -23,9 +26,12 @@ const InjectPopover: FunctionComponent<Props> = ({
   setSelectedInjectId,
   isDisabled,
   canBeTested = false,
+  isExercise,
+  exerciseOrScenarioId,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
   const {
@@ -45,7 +51,7 @@ const InjectPopover: FunctionComponent<Props> = ({
   const [openResult, setOpenResult] = useState(false);
   const [openTrigger, setOpenTrigger] = useState(false);
   const [injectResult, setInjectResult] = useState<InjectStatus | null>(null);
-  const [_injectTestResult, setInjectTestResult] = useState<InjectStatus | null>(null);
+  const [injectTestResult, setInjectTestResult] = useState<InjectStatus | null>(null);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const handlePopoverOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -117,6 +123,11 @@ const InjectPopover: FunctionComponent<Props> = ({
   const submitTest = () => {
     testInject(inject.inject_id).then((result: { data: InjectStatus }) => {
       setInjectTestResult(result.data);
+      if (isExercise) {
+        navigate(`/admin/exercises/${exerciseOrScenarioId}/tests/${result.data.status_id}`);
+      } else {
+        navigate(`/admin/scenarios/${exerciseOrScenarioId}/tests/${result.data.status_id}`);
+      }
     });
     handleCloseTest();
   };

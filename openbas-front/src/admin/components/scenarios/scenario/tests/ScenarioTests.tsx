@@ -51,13 +51,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
 };
 
-interface Props {
-  goTo?: (testId: string) => string;
-}
-
-const ScenarioTests: FunctionComponent<Props> = ({
-  goTo,
-}) => {
+const ScenarioTests: FunctionComponent = () => {
   // Standard hooks
   const classes = useStyles();
   const { t, fldt } = useFormatter();
@@ -130,7 +124,7 @@ const ScenarioTests: FunctionComponent<Props> = ({
             >
               <ListItemButton
                 classes={{ root: classes.item }}
-                // href={goTo(scenarioTest.status_id)}
+                href={`/admin/scenarios/${scenarioId}/tests/${scenarioTest.status_id}`}
               >
                 <ListItemIcon>
                   <InjectIcon
