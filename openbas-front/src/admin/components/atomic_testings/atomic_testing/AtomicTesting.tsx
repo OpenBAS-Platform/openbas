@@ -43,19 +43,23 @@ const AtomicTesting = () => {
   const classes = useStyles();
   const { t, tPick, fldt } = useFormatter();
   const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
+  const [currentParentTarget, setCurrentParentTarget] = useState<InjectTargetWithResult>();
   const filtering = useSearchAnFilter('', 'name', ['name']);
 
   // Fetching data
   const { injectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
   useEffect(() => {
-    setSelectedTarget(injectResultDto?.inject_targets[0]);
+    setSelectedTarget(currentParentTarget || injectResultDto?.inject_targets[0]);
   }, [injectResultDto]);
 
   const sortedTargets: InjectTargetWithResult[] = filtering.filterAndSort(injectResultDto?.inject_targets ?? []);
 
   // Handles
-  const handleTargetClick = (target: InjectTargetWithResult) => {
+  const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult) => {
     setSelectedTarget(target);
+    if (currentParent) {
+      setCurrentParentTarget(currentParent);
+    }
   };
 
   if (!injectResultDto) {
@@ -225,10 +229,12 @@ const AtomicTesting = () => {
             <List>
               {sortedTargets.map((target) => (
                 <div key={target?.id} style={{ marginBottom: 15 }}>
-                  <TargetListItem onClick={handleTargetClick} target={target} selected={selectedTarget?.id === target.id} />
+                  <TargetListItem onClick={() => handleTargetClick(target)} target={target} selected={selectedTarget?.id === target.id} />
                   <List component="div" disablePadding>
                     {target?.children?.map((child) => (
-                      <TargetListItem key={child?.id} isChild onClick={handleTargetClick} target={child} selected={selectedTarget?.id === child.id} />
+                      <TargetListItem key={child?.id} isChild onClick={() => handleTargetClick(child, target)}
+                        target={child} selected={selectedTarget?.id === child.id && currentParentTarget?.id === target.id}
+                      />
                     ))}
                   </List>
                 </div>
@@ -246,8 +252,9 @@ const AtomicTesting = () => {
         <Paper classes={{ root: classes.paper }} variant="outlined" style={{ marginTop: 18 }}>
           {selectedTarget && !!injectResultDto.inject_type && (
           <TargetResultsDetail
-            target={selectedTarget}
             inject={injectResultDto}
+            parentTargetId={currentParentTarget?.id}
+            target={selectedTarget}
             lastExecutionStartDate={injectResultDto.inject_status?.tracking_sent_date || ''}
             lastExecutionEndDate={injectResultDto.inject_status?.tracking_end_date || ''}
           />

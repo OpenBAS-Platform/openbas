@@ -310,7 +310,8 @@ public class Inject implements Base, Injection {
         return this.expectations.stream()
                 .filter(execution -> execution.getType().equals(InjectExpectation.EXPECTATION_TYPE.ARTICLE))
                 .filter(execution -> execution.getArticle().equals(article))
-                .filter(execution -> execution.getTeam().getUsers().contains(user))
+                .filter(execution -> execution.getUser() != null) //We include only the expectations from players, because the validation link is always from a player
+                .filter(execution -> execution.getUser().equals(user))
                 .toList();
     }
 
@@ -418,6 +419,7 @@ public class Inject implements Base, Injection {
                         InjectExpectation.EXPECTATION_TYPE.valueOf(rawInjectExpectation.getInject_expectation_type()));
                 expectation.setScore(rawInjectExpectation.getInject_expectation_score());
                 expectation.setExpectedScore(rawInjectExpectation.getInject_expectation_expected_score());
+                expectation.setExpectationGroup(rawInjectExpectation.getInject_expectation_group());
 
                 // Add the team of the expectation
                 if (rawInjectExpectation.getTeam_id() != null) {

@@ -558,7 +558,7 @@ public class V1_DataImporter implements Importer {
     challenge.setName(nodeChallenge.get("challenge_name").textValue());
     challenge.setCategory(nodeChallenge.get("challenge_category").textValue());
     challenge.setContent(nodeChallenge.get("challenge_content").textValue());
-    challenge.setScore(nodeChallenge.get("challenge_score").asInt(0));
+    challenge.setScore(nodeChallenge.get("challenge_score").asDouble(0.0));
     challenge.setMaxAttempts(nodeChallenge.get("challenge_max_attempts").asInt(0));
     challenge.setDocuments(
         resolveJsonIds(nodeChallenge, "challenge_documents")

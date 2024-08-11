@@ -91,13 +91,13 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
   const asset: EndpointStore = assetsMap[id];
   const assetGroup: AssetGroupStore = assetGroupsMap[id];
 
-  const groupedByExpectationType = (es: InjectExpectationsStore[]) => {
+  const groupByExpectationName = (es: InjectExpectationsStore[]) => {
     return es.reduce((group, expectation) => {
-      const { inject_expectation_type } = expectation;
-      if (inject_expectation_type) {
-        const values = group.get(inject_expectation_type) ?? [];
+      const { inject_expectation_name } = expectation;
+      if (inject_expectation_name) {
+        const values = group.get(inject_expectation_name) ?? [];
         values.push(expectation);
-        group.set(inject_expectation_type, values);
+        group.set(inject_expectation_name, values);
       }
       return group;
     }, new Map());
@@ -124,28 +124,28 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
         />
       </ListItem>
       <List component="div" disablePadding>
-        {Array.from(groupedByExpectationType(expectations)).map(([expectationType, es]) => {
-          if (expectationType === 'ARTICLE') {
+        {Array.from(groupByExpectationName(expectations)).map(([expectationName, es]) => {
+          if (es === 'ARTICLE') {
             const expectation = es[0];
             const article = articlesMap[expectation.inject_expectation_article] || {};
             const channel = channelsMap[article.article_channel] || {};
             return (
-              <ChannelExpectation key={expectationType} channel={channel} article={article} expectation={expectation} />
+              <ChannelExpectation key={expectationName} channel={channel} article={article} expectation={expectation} />
             );
           }
-          if (expectationType === 'CHALLENGE') {
+          if (es === 'CHALLENGE') {
             const expectation = es[0];
             const challenge = challengesMap[expectation.inject_expectation_challenge] || {};
             return (
-              <ChallengeExpectation key={expectationType} challenge={challenge} expectation={expectation} />
+              <ChallengeExpectation key={expectationName} challenge={challenge} expectation={expectation} />
             );
           }
-          if (expectationType === 'PREVENTION' || expectationType === 'DETECTION') {
+          if (es === 'PREVENTION' || es === 'DETECTION') {
             const expectation = es[0];
             if (asset) {
               return (
                 <TechnicalExpectationAsset
-                  key={expectationType}
+                  key={expectationName}
                   expectation={expectation}
                   injectContract={injectContract}
                 />
@@ -156,7 +156,7 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
 
               return (
                 <TechnicalExpectationAssetGroup
-                  key={expectationType}
+                  key={expectationName}
                   expectation={expectation}
                   injectContract={injectContract}
                   relatedExpectations={relatedExpectations}
@@ -165,10 +165,10 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
                 />
               );
             }
-            return (<div key={expectationType}></div>);
+            return (<div key={expectationName}></div>);
           }
           return (
-            <ManualExpectations key={expectationType} exerciseId={exerciseId} inject={inject} expectations={es} />
+            <ManualExpectations key={expectationName} inject={inject} expectations={es}/>
           );
         })}
       </List>

@@ -55,7 +55,7 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
      * @param from the max date of creation
      * @return the list of expectations
      */
-    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score, ie.inject_expectation_expected_score " +
+    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_group, ie.inject_expectation_score, ie.inject_expectation_expected_score " +
             "FROM injects_expectations ie " +
             "INNER JOIN injects ON ie.inject_id = injects.inject_id " +
             "INNER JOIN exercises ON injects.inject_exercise = exercises.exercise_id " +
@@ -68,7 +68,7 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
      * @param userId the id of the user
      * @return the list of expectations
      */
-    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score, ie.inject_expectation_expected_score " +
+    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_group, ie.inject_expectation_score, ie.inject_expectation_expected_score " +
             "FROM injects_expectations ie " +
             "INNER JOIN injects ON ie.inject_id = injects.inject_id " +
             "INNER JOIN exercises e ON injects.inject_exercise = e.exercise_id " +

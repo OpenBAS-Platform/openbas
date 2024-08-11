@@ -51,8 +51,8 @@ public class InjectExpectationService {
             computeResult(expectation, sourceId, sourceType, sourceName, result, expectation.getExpectedScore());
             expectation.setScore(expectation.getExpectedScore());
         } else if (expectation.getScore() == null) {
-            computeResult(expectation, sourceId, sourceType, sourceName, result, 0);
-            expectation.setScore(0);
+            computeResult(expectation, sourceId, sourceType, sourceName, result, 0.0);
+            expectation.setScore(0.0);
         }
         return this.update(expectation);
     }
@@ -71,7 +71,7 @@ public class InjectExpectationService {
             success = expectationAssets.stream().allMatch((e) -> e.getExpectedScore().equals(e.getScore()));
         }
         computeResult(expectationAssetGroup, sourceId, sourceType, sourceName, success ? "SUCCESS" : "FAILED", success ? expectationAssetGroup.getExpectedScore() : 0);
-        expectationAssetGroup.setScore(success ? expectationAssetGroup.getExpectedScore() : 0);
+        expectationAssetGroup.setScore(success ? expectationAssetGroup.getExpectedScore() : 0.0);
         this.update(expectationAssetGroup);
     }
 
@@ -176,11 +176,13 @@ public class InjectExpectationService {
     public List<InjectExpectation> findExpectationsByInjectAndTargetAndTargetType(
             @NotBlank final String injectId,
             @NotBlank final String targetId,
+            @NotBlank final String parentTargetId,
             @NotBlank final String targetType) {
         try {
             TargetType targetTypeEnum = TargetType.valueOf(targetType);
             return switch (targetTypeEnum) {
                 case TEAMS -> injectExpectationRepository.findAllByInjectAndTeam(injectId, targetId);
+                case PLAYER -> injectExpectationRepository.findAllByInjectAndTeamAndPlayer(injectId, parentTargetId, targetId);
                 case ASSETS -> injectExpectationRepository.findAllByInjectAndAsset(injectId, targetId);
                 case ASSETS_GROUPS -> injectExpectationRepository.findAllByInjectAndAssetGroup(injectId, targetId);
             };

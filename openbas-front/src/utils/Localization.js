@@ -346,8 +346,8 @@ const i18n = {
       'Send email': 'Envoyer le mail',
       'Add documents in this media pressure':
         'Ajouter des documents à cette pression médiatique',
-      'Expect teams to read the article(s)':
-        'Les équipes doivent lire le(s) article(s)',
+      'Expect targets to read the article(s)':
+        'Les cibles doivent lire le(s) article(s)',
       'Add media pressure': 'Ajouter de la pression médiatique',
       'Remove from the media pressure': 'Supprimer de la pression médiatique',
       'Raw request data': 'Données brutes de la requête',
@@ -620,7 +620,8 @@ const i18n = {
       'Each team should submit a text response':
         'Chaque équipe doit soumettre une réponse texte',
       // -- Expectation start --
-      'This expectation is handled automatically by the platform and triggered when team reads articles': 'Cet attendu est géré automatiquement par la plateforme et déclenché lorsque une équipe lit les articles',
+      'This expectation is handled automatically by the platform and triggered when target reads the articles': 'Cet attendu est géré automatiquement par la plateforme et déclenché lorsque une cible lit les articles',
+      'This expectation is handled automatically by the platform and triggered when the target completes the challenges': 'Cette attente est gérée automatiquement par la plateforme et est déclenchée lorsque la cible termine les défis',
       'Add expectations': 'Ajouter des attendus',
       'Add expectation in this inject': 'Ajouter des attendus dans ce stimuli',
       'Update the expectation': 'Modifier l\'attendu',
@@ -628,7 +629,7 @@ const i18n = {
       'Number of expectations': "Nombre d'attendus",
       'Inject expectations': 'Attendus du stimuli',
       'Manual expectations': 'Attendus manuels',
-      'Expectations of ': 'Attendus de',
+      'Expectations of ': 'Attendus de ',
       MANUAL: 'Manuel',
       ARTICLE: 'Automatique - Déclenché lorsque l\'équipe a lu l\'article',
       DETECTION: 'Automatique - Detection: Déclenché lorsque l\'injection est traitée',
@@ -646,9 +647,13 @@ const i18n = {
       Failed: 'Echoué',
       'Pending result': 'Résultat en attente',
       'Validation mode': 'Type de validation',
+      'All players (per team) must validate the expectation': 'Tous les joueurs (par équipe) doivent valider l\'attente',
       'All assets (per group) must validate the expectation': 'Tous les actifs (par groupe) doivent valider l\'attente',
+      'At least one player (per team) must validate the expectation': 'Au moins un joueur (par équipe) doit valider l\'attente',
       'At least one asset (per group) must validate the expectation': 'Au moins un actif (par groupe) doit valider l\'attente',
       'An isolated asset is considered as a group of one asset': 'Un actif isolé est considéré comme un groupe d\'un seul actif',
+      'An isolated player is considered as a group of one player': 'Un jouer isolé est considéré comme un groupe d\'un seul jouer',
+      'The score set for the team will also be applied to all players in the team': 'Le score attribué à l\'équipe sera également appliqué à tous les joueurs de l\'équipe',
       // -- Expectation end --
       'Distribution of expected total score by team':
         'Distribution du score total attendu par équipe',
@@ -696,6 +701,13 @@ const i18n = {
       Error: 'Erreur',
       'This page is not found on this OpenBAS application.': 'Cette page est introuvable sur l\'application OpenBAS.',
       'You must be logged to access this page': 'Vous devez être connecté pour accéder à cette page',
+      // Validation Type
+      'Validation type': 'Type de validation',
+      'User input': 'Entrée utilisateur',
+      'Player Manual Validation': 'Validation manuelle du joueur',
+      'Team Manual Validation': 'Validation manuelle de l\'équipe',
+      'Challenge validation': 'Validation du défi',
+      'Media pressure read': 'Pression médiatique',
       // Challenges
       Challenges: 'Challenges',
       // Variables
@@ -729,6 +741,7 @@ const i18n = {
       'Token key': 'Token',
       Example: 'Exemple',
       Score: 'Score',
+      'Expected score': 'Score attendu',
       Message: 'Message',
       'New control': 'Nouveau contrôle',
       'Percent of reached score': 'Pourcentage du score atteint',
@@ -742,6 +755,8 @@ const i18n = {
       Order: 'Ordre',
       Details: 'Détails',
       Team: 'Equipe',
+      Player: 'Jouer',
+      player: 'jouer',
       Template: 'Modèle',
       Questionnaire: 'Questionnaire',
       User: 'Utilisateur',
@@ -767,6 +782,7 @@ const i18n = {
       'Should not be empty': 'Ne doit pas être vide',
       // Assets
       Endpoints: 'Endpoints',
+      asset: 'actif',
       'Teams of players': 'Equipes de joueurs',
       'Create a new endpoint': 'Créer un nouvel endpoint',
       'Update the endpoint': 'Modifier l\'endpoint',
@@ -1565,7 +1581,7 @@ const i18n = {
       'Send email': '发送邮件',
       'Add documents in this media pressure':
         '将文档添加到媒体',
-      'Expect teams to read the article(s)':
+      'Expect targets to read the article(s)':
         '希望团队阅读文章',
       'Add media pressure': '添加媒体',
       'Remove from the media pressure': '从媒体移除',
@@ -1860,7 +1876,9 @@ const i18n = {
       Failed: '已失败',
       'Pending result': '待定结果',
       'Validation mode': '验证模式',
+      'All players (per team) must validate the expectation': '所有球员(每队)必须验证期望值',
       'All assets (per group) must validate the expectation': '所有资产(每组)必须验证期望值',
+      'At least one player (per team) must validate the expectation': '至少一名球员(每队)必须验证期望值',
       'At least one asset (per group) must validate the expectation': '至少一个资产(每组)必须验证期望值',
       'An isolated asset is considered as a group of one asset': '隔离的资产被视为一组资产',
       // -- Expectation end --
@@ -2467,7 +2485,7 @@ const i18n = {
       REGEXP: 'Regular expression',
       '-': 'None',
       MANUAL: 'Manual',
-      ARTICLE: 'Automatic - Triggered when team reads articles',
+      ARTICLE: 'Automatic - Triggered when target reads the articles',
       DETECTION: 'Automatic - Detection: Triggered when inject is processed',
       PREVENTION: 'Automatic - Prevention: Triggered when inject is processed',
       TYPE_ARTICLE: 'Article',

@@ -7,7 +7,7 @@ import type { ExpectationInput } from './Expectation';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import ExpectationGroupField from './field/ExpectationGroupField';
-import { hasExpectationByGroup } from './ExpectationUtils';
+import { isTechnicalExpectation } from './ExpectationUtils';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
@@ -65,7 +65,7 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
           <MenuItem value={getValues().expectation_type}>{t(getValues().expectation_type)}</MenuItem>
         </MUISelect>
       </div>
-      {getValues().expectation_type === 'ARTICLE'
+      {(getValues().expectation_type === 'ARTICLE' || getValues().expectation_type === 'CHALLENGE')
         && <Alert
           severity="info"
           className={classes.marginTop_2}
@@ -108,11 +108,7 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
         }
         inputProps={register('expectation_score')}
       />
-
-      {hasExpectationByGroup(initialValues.expectation_type)
-        && <ExpectationGroupField control={control} />
-      }
-
+      <ExpectationGroupField isTechnicalExpectation={isTechnicalExpectation(getValues().expectation_type)} control={control} />
       <div className={classes.buttons}>
         <Button
           onClick={handleClose}

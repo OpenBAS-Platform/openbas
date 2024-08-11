@@ -1,4 +1,5 @@
 import { isNotEmptyField } from './utils';
+import colorStyles from '../components/Color';
 
 export const truncate = (str, limit) => {
   if (str === undefined || str === null || str.length <= limit) {
@@ -51,4 +52,32 @@ export const getLabelOfRemainingItems = (items, start, property) => {
 // Calculate the number of remaining items
 export const getRemainingItemsCount = (items, visibleItems) => {
   return (items && visibleItems && items.length - visibleItems.length) || null;
+};
+
+// Compute label for status
+export const computeLabel = (status) => {
+  if (status === 'PENDING') {
+    return 'Pending validation';
+  }
+  if (status === 'SUCCESS') {
+    return 'Success';
+  }
+  if (status === 'PARTIAL') {
+    return 'Partial';
+  }
+  return 'Failed';
+};
+
+// compute color for status
+export const computeColorStyle = (status) => {
+  if (status === 'PENDING') {
+    return colorStyles.blueGrey;
+  }
+  if (status === 'SUCCESS') {
+    return colorStyles.green;
+  }
+  if (status === 'PARTIAL') {
+    return colorStyles.orange;
+  }
+  return colorStyles.red;
 };

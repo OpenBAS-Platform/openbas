@@ -5,8 +5,9 @@ import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 public interface Expectation {
 
     EXPECTATION_TYPE type();
-    Integer getScore();
+    Double getScore();
     default boolean isExpectationGroup() {
         return false;
     }
+    String getName();
 }

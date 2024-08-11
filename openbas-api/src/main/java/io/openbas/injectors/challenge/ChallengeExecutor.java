@@ -12,7 +12,7 @@ import io.openbas.injectors.email.service.EmailService;
 import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ChallengeExpectation;
-import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.model.expectation.ManualExpectation;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.openbas.database.model.InjectStatusExecution.traceError;
 import static io.openbas.database.model.InjectStatusExecution.traceSuccess;
@@ -102,7 +103,21 @@ public class ChallengeExecutor extends Injector {
                 });
                 // Return expectations
                 List<Expectation> expectations = new ArrayList<>();
-                challenges.forEach(challenge -> expectations.add(new ChallengeExpectation(challenge.getScore(), challenge)));
+                if (!content.getExpectations().isEmpty()) {
+                    expectations.addAll(
+                            content.getExpectations()
+                                    .stream()
+                                    .flatMap((entry) -> switch (entry.getType()) {
+                                        case MANUAL -> Stream.of(
+                                                (Expectation) new ManualExpectation(entry.getScore(), entry.getName(), entry.getDescription(), entry.isExpectationGroup())
+                                        );
+                                        case CHALLENGE -> challenges.stream()
+                                                .map(challenge -> (Expectation) new ChallengeExpectation(entry.getScore(), challenge, entry.isExpectationGroup()));
+                                        default -> Stream.of();
+                                    })
+                                    .toList()
+                    );
+                }
                 return new ExecutionProcess(false, expectations);
             } else {
                 throw new UnsupportedOperationException("Unknown contract " + contract);

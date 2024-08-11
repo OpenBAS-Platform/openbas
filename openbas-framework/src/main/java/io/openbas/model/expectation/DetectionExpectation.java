@@ -20,7 +20,7 @@ import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.DETEC
 @Setter
 public class DetectionExpectation implements Expectation {
 
-    private Integer score;
+    private Double score;
     private String name;
     private String description;
     private Asset asset;
@@ -37,7 +37,7 @@ public class DetectionExpectation implements Expectation {
     }
 
     public static DetectionExpectation detectionExpectationForAsset(
-            @Nullable final Integer score,
+            @Nullable final Double score,
             @NotBlank final String name,
             final String description,
             @NotNull final Asset asset,
@@ -45,7 +45,7 @@ public class DetectionExpectation implements Expectation {
             final List<InjectExpectationSignature> expectationSignatures
     ) {
         DetectionExpectation detectionExpectation = new DetectionExpectation();
-        detectionExpectation.setScore(Objects.requireNonNullElse(score, 100));
+        detectionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
         detectionExpectation.setName(name);
         detectionExpectation.setDescription(description);
         detectionExpectation.setAsset(asset);
@@ -55,7 +55,7 @@ public class DetectionExpectation implements Expectation {
     }
 
     public static DetectionExpectation detectionExpectationForAssetGroup(
-            @Nullable final Integer score,
+            @Nullable final Double score,
             @NotBlank final String name,
             final String description,
             @NotNull final AssetGroup assetGroup,
@@ -63,7 +63,7 @@ public class DetectionExpectation implements Expectation {
             final List<InjectExpectationSignature> expectationSignatures
     ) {
         DetectionExpectation detectionExpectation = new DetectionExpectation();
-        detectionExpectation.setScore(Objects.requireNonNullElse(score, 100));
+        detectionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
         detectionExpectation.setName(name);
         detectionExpectation.setDescription(description);
         detectionExpectation.setAssetGroup(assetGroup);

@@ -20,7 +20,7 @@ import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVE
 @Setter
 public class PreventionExpectation implements Expectation {
 
-    private Integer score;
+    private Double score;
     private String name;
     private String description;
     private Asset asset;
@@ -37,7 +37,7 @@ public class PreventionExpectation implements Expectation {
     }
 
     public static PreventionExpectation preventionExpectationForAsset(
-            @Nullable final Integer score,
+            @Nullable final Double score,
             @NotBlank final String name,
             final String description,
             @NotNull final Asset asset,
@@ -45,7 +45,7 @@ public class PreventionExpectation implements Expectation {
             final List<InjectExpectationSignature> expectationSignatures
     ) {
         PreventionExpectation preventionExpectation = new PreventionExpectation();
-        preventionExpectation.setScore(Objects.requireNonNullElse(score, 100));
+        preventionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
         preventionExpectation.setName(name);
         preventionExpectation.setDescription(description);
         preventionExpectation.setAsset(asset);
@@ -55,7 +55,7 @@ public class PreventionExpectation implements Expectation {
     }
 
     public static PreventionExpectation preventionExpectationForAssetGroup(
-            @Nullable final Integer score,
+            @Nullable final Double score,
             @NotBlank final String name,
             final String description,
             @NotNull final AssetGroup assetGroup,
@@ -63,7 +63,7 @@ public class PreventionExpectation implements Expectation {
             final List<InjectExpectationSignature> expectationSignatures
     ) {
         PreventionExpectation preventionExpectation = new PreventionExpectation();
-        preventionExpectation.setScore(Objects.requireNonNullElse(score, 100));
+        preventionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
         preventionExpectation.setName(name);
         preventionExpectation.setDescription(description);
         preventionExpectation.setAssetGroup(assetGroup);
