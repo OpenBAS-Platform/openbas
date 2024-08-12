@@ -90,8 +90,11 @@ public class MapperApi extends RestBehavior {
         HttpServletResponse response) {
         try {
             String jsonMappers = mapperService.exportMappers(exportMapperInput.getIdsToExport());
-            String rightNow = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now());
-            String filename = MessageFormat.format("mappers_{0}.json", rightNow);
+
+            String rightNow = DateTimeFormatter.ofPattern("yyyyMMdd").format(LocalDateTime.now());
+            String name = exportMapperInput.getName().replace("(Import)", "").replace(" ", "");
+            String exportFileName = name.length() > 15 ? name.substring(0, 15) : name;
+            String filename = MessageFormat.format("{0}-{1}.json", exportFileName, rightNow);
 
             response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
             response.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
