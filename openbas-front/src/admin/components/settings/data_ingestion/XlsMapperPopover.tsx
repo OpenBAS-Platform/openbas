@@ -47,6 +47,7 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
   const exportMapperAction = () => {
     exportMapper({
       ids_to_export: [mapper.import_mapper_id],
+      export_mapper_name: mapper.import_mapper_name,
     }).then(
       (result:{ data: string, filename: string }) => {
         download(JSON.stringify(result.data, null, 2), result.filename, 'application/json');

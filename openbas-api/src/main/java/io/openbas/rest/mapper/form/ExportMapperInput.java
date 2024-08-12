@@ -11,6 +11,9 @@ import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 @Data
 public class ExportMapperInput {
 
+    @JsonProperty("export_mapper_name")
+    private String name;
+
     @NotNull(message = MANDATORY_MESSAGE)
     @JsonProperty("ids_to_export")
     private List<String> idsToExport;
