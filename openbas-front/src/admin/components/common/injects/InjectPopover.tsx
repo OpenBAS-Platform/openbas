@@ -10,6 +10,8 @@ import type { Inject, InjectStatus, InjectStatusExecution, Tag } from '../../../
 import { duplicateInjectForExercise, duplicateInjectForScenario, tryInject, testInject } from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
+import { useHelper } from '../../../../store';
+import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 
 interface Props {
   inject: InjectStore;
@@ -17,7 +19,6 @@ interface Props {
   setSelectedInjectId: (injectId: Inject['inject_id']) => void;
   isDisabled: boolean;
   canBeTested?: boolean;
-  isExercise?: boolean;
   exerciseOrScenarioId?: string;
 }
 
@@ -26,7 +27,6 @@ const InjectPopover: FunctionComponent<Props> = ({
   setSelectedInjectId,
   isDisabled,
   canBeTested = false,
-  isExercise,
   exerciseOrScenarioId,
 }) => {
   // Standard hooks
@@ -53,6 +53,8 @@ const InjectPopover: FunctionComponent<Props> = ({
   const [injectResult, setInjectResult] = useState<InjectStatus | null>(null);
   const [_injectTestResult, setInjectTestResult] = useState<InjectStatus | null>(null);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+
+  const isExercise = useHelper((helper: ExercisesHelper) => helper.getExercisesMap()[exerciseOrScenarioId!] === undefined);
 
   const handlePopoverOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -124,9 +126,9 @@ const InjectPopover: FunctionComponent<Props> = ({
     testInject(inject.inject_id).then((result: { data: InjectStatus }) => {
       setInjectTestResult(result.data);
       if (isExercise) {
-        navigate(`/admin/exercises/${exerciseOrScenarioId}/tests/${result.data.status_id}`);
-      } else {
         navigate(`/admin/scenarios/${exerciseOrScenarioId}/tests/${result.data.status_id}`);
+      } else {
+        navigate(`/admin/exercises/${exerciseOrScenarioId}/tests/${result.data.status_id}`);
       }
     });
     handleCloseTest();

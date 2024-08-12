@@ -1,19 +1,17 @@
 import { simpleCall } from '../../utils/Action';
 
-const INJECT_TEST_URI = '/api/inject_test_status';
-
 // eslint-disable-next-line import/prefer-default-export
 export const searchExerciseInjectTests = (exerciseId: string) => {
-  const uri = `${INJECT_TEST_URI}/exercise/${exerciseId}`;
+  const uri = `api/exercise/${exerciseId}/injects/test`;
   return simpleCall(uri);
 };
 
 export const searchScenarioInjectTests = (scenarioId: string) => {
-  const uri = `${INJECT_TEST_URI}/scenario/${scenarioId}`;
+  const uri = `api/scenario/${scenarioId}/injects/test`;
   return simpleCall(uri);
 };
 
 export const fetchInjectTestStatus = (testId: string | undefined) => {
-  const uri = `${INJECT_TEST_URI}/${testId}`;
+  const uri = `/api/injects/test/${testId}`;
   return simpleCall(uri);
 };

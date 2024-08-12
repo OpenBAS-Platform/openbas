@@ -13,29 +13,28 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/inject_test_status")
 @PreAuthorize("isAdmin()")
 @RequiredArgsConstructor
 public class InjectTestStatusApi extends RestBehavior {
 
   private final InjectTestStatusService injectTestStatusService;
 
-  @GetMapping("/test/{injectId}")
+  @GetMapping("/api/injects/{injectId}/test")
   public InjectTestStatus testInject(@PathVariable String injectId) {
     return injectTestStatusService.testInject(injectId);
   }
 
-  @GetMapping("/exercise/{exerciseId}")
+  @GetMapping("/api/exercise/{exerciseId}/injects/test")
   public List<InjectTestStatus> findAllExerciseInjectTests(@PathVariable String exerciseId) {
     return injectTestStatusService.findAllExerciseInjectTests(exerciseId);
   }
 
-  @GetMapping("/scenario/{scenarioId}")
+  @GetMapping("/api/scenario/{scenarioId}/injects/test")
   public List<InjectTestStatus> findAllScenarioInjectTests(@PathVariable String scenarioId) {
     return injectTestStatusService.findAllScenarioInjectTests(scenarioId);
   }
 
-  @GetMapping("/{testId}")
+  @GetMapping("/api/injects/test/{testId}")
   public InjectTestStatus findInjectTestStatus(@PathVariable String testId) {
     return injectTestStatusService.findInjectTestStatus(testId);
   }

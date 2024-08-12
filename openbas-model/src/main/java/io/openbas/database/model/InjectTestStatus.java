@@ -75,7 +75,7 @@ public class InjectTestStatus implements Base {
   // endregion
 
   @OneToOne
-  @JoinColumn(name = "status_inject")
+  @JoinColumn(name = "status_inject_inject_id")
   @JsonIgnore
   private Inject inject;
 

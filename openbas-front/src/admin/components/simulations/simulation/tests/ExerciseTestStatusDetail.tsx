@@ -3,7 +3,7 @@ import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Grid, Paper, Typography } from '@mui/material';
 import { useFormatter } from '../../../../../components/i18n';
-import { InjectTestStatus } from '../../../../../utils/api-types';
+import type { InjectTestStatus } from '../../../../../utils/api-types';
 import { fetchInjectTestStatus } from '../../../../../actions/inject_test/inject-test-actions';
 import ItemStatus from '../../../../../components/ItemStatus';
 
