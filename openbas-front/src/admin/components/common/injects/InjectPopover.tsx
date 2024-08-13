@@ -126,9 +126,9 @@ const InjectPopover: FunctionComponent<Props> = ({
     testInject(inject.inject_id).then((result: { data: InjectStatus }) => {
       setInjectTestResult(result.data);
       if (isExercise) {
-        navigate(`/admin/scenarios/${exerciseOrScenarioId}/tests/${result.data.status_id}`);
+        navigate(`/admin/scenarios/${exerciseOrScenarioId}/tests`);
       } else {
-        navigate(`/admin/exercises/${exerciseOrScenarioId}/tests/${result.data.status_id}`);
+        navigate(`/admin/exercises/${exerciseOrScenarioId}/tests`);
       }
     });
     handleCloseTest();

@@ -6,7 +6,7 @@ import org.flywaydb.core.api.migration.Context;
 import java.sql.Connection;
 import java.sql.Statement;
 
-public class V3_30__Add_Injects_tests_statuses extends BaseJavaMigration {
+public class V3_31__Add_Injects_tests_statuses extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
@@ -29,7 +29,7 @@ public class V3_30__Add_Injects_tests_statuses extends BaseJavaMigration {
                status_created_at timestamp not null default now(),
                status_updated_at timestamp not null default now()
              );
-             CREATE INDEX idx_inject_test_status ON injects_tests_statuses(status_id);
+             CREATE INDEX idx_inject_test_inject ON injects_tests_statuses(status_inject_inject_id);
         """);
   }
 

@@ -12,6 +12,7 @@ import SortHeadersComponent from '../../../../../components/common/pagination/So
 import InjectIcon from '../../../common/injects/InjectIcon';
 import { isNotEmptyField } from '../../../../../utils/utils';
 import Empty from '../../../../../components/Empty';
+import InjectTestDetail from '../../../injects/InjectTestDetail';
 
 const useStyles = makeStyles(() => ({
   bodyItems: {
@@ -57,6 +58,7 @@ const ScenarioTests: FunctionComponent = () => {
   const { t, fldt } = useFormatter();
 
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
+  const [selectedTest, setSelectedTest] = useState<InjectTestStatus | null>(null);
 
   // Headers
   const headers = [
@@ -124,7 +126,7 @@ const ScenarioTests: FunctionComponent = () => {
             >
               <ListItemButton
                 classes={{ root: classes.item }}
-                href={`/admin/scenarios/${scenarioId}/tests/${scenarioTest.status_id}`}
+                onClick={() => setSelectedTest(scenarioTest)}
               >
                 <ListItemIcon>
                   <InjectIcon
@@ -159,6 +161,10 @@ const ScenarioTests: FunctionComponent = () => {
         })}
         {!scenarioTests ? (<Empty message={t('No data available')} />) : null}
       </List>
+      {
+        selectedTest !== null
+        && <InjectTestDetail open handleClose={() => setSelectedTest(null)} statusId={selectedTest.status_id} />
+      }
     </>
   );
 };

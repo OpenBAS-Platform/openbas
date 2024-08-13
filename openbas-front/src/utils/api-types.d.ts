@@ -1252,6 +1252,7 @@ export interface InjectOutput {
   /** @uniqueItems true */
   inject_tags?: string[];
   inject_teams?: string[];
+  inject_testable?: boolean;
   inject_title?: string;
   inject_type?: string;
 }
@@ -1350,7 +1351,7 @@ export interface InjectTargetWithResult {
   id: string;
   name?: string;
   platformType?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
-  targetType?: "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
+  targetType?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }
 
 export interface InjectTeamsInput {
@@ -1538,6 +1539,8 @@ export interface InjectorUpdateInput {
 
 export interface InjectsImportInput {
   import_mapper_id: string;
+  /** @format date-time */
+  launch_date?: string;
   sheet_name: string;
   /** @format int32 */
   timezone_offset: number;

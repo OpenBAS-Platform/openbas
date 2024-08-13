@@ -192,7 +192,6 @@ const Injects = (props) => {
     selectAll,
     onToggleShiftEntity,
     handleToggleSelectAll,
-    isExercise,
   } = props;
   // Standard hooks
   const classes = useStyles();

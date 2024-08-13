@@ -1,7 +1,7 @@
 import { makeStyles } from '@mui/styles';
 import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { useParams } from 'react-router-dom';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Exercise, InjectTestStatus, SearchPaginationInput } from '../../../../../utils/api-types';
 import { initSorting } from '../../../../../components/common/pagination/Page';
@@ -11,6 +11,7 @@ import SortHeadersComponent from '../../../../../components/common/pagination/So
 import Empty from '../../../../../components/Empty';
 import InjectIcon from '../../../common/injects/InjectIcon';
 import { isNotEmptyField } from '../../../../../utils/utils';
+import InjectTestDetail from '../../../injects/InjectTestDetail';
 
 const useStyles = makeStyles(() => ({
   bodyItems: {
@@ -56,6 +57,7 @@ const ExerciseTests: FunctionComponent = () => {
   const { t, fldt } = useFormatter();
 
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
+  const [selectedTest, setSelectedTest] = useState<InjectTestStatus | null>(null);
 
   // Headers
   const headers = [
@@ -123,7 +125,7 @@ const ExerciseTests: FunctionComponent = () => {
             >
               <ListItemButton
                 classes={{ root: classes.item }}
-                href={`/admin/exercises/${exerciseId}/tests/${exerciseTest.status_id}`}
+                onClick={() => setSelectedTest(exerciseTest)}
               >
                 <ListItemIcon>
                   <InjectIcon
@@ -158,6 +160,10 @@ const ExerciseTests: FunctionComponent = () => {
         })}
         {!exerciseTests ? (<Empty message={t('No data available')} />) : null}
       </List>
+      {
+        selectedTest !== null
+        && <InjectTestDetail open handleClose={() => setSelectedTest(null)} statusId={selectedTest.status_id} />
+      }
     </>
   );
 };

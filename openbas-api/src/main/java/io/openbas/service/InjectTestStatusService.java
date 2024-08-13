@@ -65,25 +65,11 @@ public class InjectTestStatusService {
   }
 
   public List<InjectTestStatus> findAllExerciseInjectTests(String exerciseId) {
-    List<Inject> injects = injectRepository.findByExerciseId(exerciseId);
-    List<InjectTestStatus> injectTestStatuses = new ArrayList<>();
-    injects.forEach(inject -> {
-      if (injectTestStatusRepository.findByInject(inject).isPresent()) {
-        injectTestStatuses.add(injectTestStatusRepository.findByInject(inject).get());
-      }
-    });
-    return injectTestStatuses;
+    return injectTestStatusRepository.findAllExerciseInjectTests(exerciseId);
   }
 
   public List<InjectTestStatus> findAllScenarioInjectTests(String scenarioId) {
-    List<Inject> injects = injectRepository.findByScenarioId(scenarioId);
-    List<InjectTestStatus> injectTestStatuses = new ArrayList<>();
-    injects.forEach(inject -> {
-      if (injectTestStatusRepository.findByInject(inject).isPresent()) {
-        injectTestStatuses.add(injectTestStatusRepository.findByInject(inject).get());
-      }
-    });
-    return injectTestStatuses;
+    return injectTestStatusRepository.findAllScenarioInjectTests(scenarioId);
   }
 
   public InjectTestStatus findInjectTestStatus(String testId) {

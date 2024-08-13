@@ -26,7 +26,6 @@ const Lessons = lazy(() => import('./lessons/Lessons'));
 const ExerciseDefinition = lazy(() => import('./ExerciseDefinition'));
 const Injects = lazy(() => import('./injects/ExerciseInjects'));
 const Tests = lazy(() => import('./tests/ExerciseTests'));
-const TestDetail = lazy(() => import('./tests/ExerciseTestStatusDetail'));
 const TimelineOverview = lazy(() => import('./timeline/TimelineOverview'));
 const Mails = lazy(() => import('./mails/Mails'));
 const MailsInject = lazy(() => import('./mails/Inject'));
@@ -137,7 +136,6 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
               <Route path="definition" element={errorWrapper(ExerciseDefinition)()} />
               <Route path="injects" element={errorWrapper(Injects)()} />
               <Route path="tests" element={errorWrapper(Tests)()} />
-              <Route path="tests/:statusId" element={errorWrapper(TestDetail)()} />
               <Route path="animation" element={<Navigate to="timeline" replace={true} />} />
               <Route path="animation/timeline" element={errorWrapper(TimelineOverview)()} />
               <Route path="animation/mails" element={errorWrapper(Mails)()} />
