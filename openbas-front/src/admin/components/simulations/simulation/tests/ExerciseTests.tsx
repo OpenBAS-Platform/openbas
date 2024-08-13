@@ -56,18 +56,17 @@ const ExerciseTests: FunctionComponent = () => {
   const classes = useStyles();
   const { t, fldt } = useFormatter();
 
-  const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
+  const { exerciseId, statusId } = useParams() as { exerciseId: Exercise['exercise_id'], statusId: InjectTestStatus['status_id'] };
   const [selectedTest, setSelectedTest] = useState<InjectTestStatus | null>(null);
-  const location = useLocation();
 
   // Fetching data
   useEffect(() => {
-    if (location !== null && location.state !== null && location.state.statusId !== null && location.state.statusId !== undefined) {
-      fetchInjectTestStatus(location.state.statusId).then((result: { data: InjectTestStatus }) => {
+    if (statusId !== null && statusId !== undefined) {
+      fetchInjectTestStatus(statusId).then((result: { data: InjectTestStatus }) => {
         setSelectedTest(result.data);
       });
     }
-  }, [location.state]);
+  }, [statusId]);
 
   // Headers
   const headers = [

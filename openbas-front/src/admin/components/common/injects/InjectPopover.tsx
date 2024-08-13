@@ -127,23 +127,11 @@ const InjectPopover: FunctionComponent<Props> = ({
       setInjectTestResult(result.data);
       if (isExercise) {
         navigate(
-          `/admin/scenarios/${exerciseOrScenarioId}/tests`,
-          {
-            state: {
-              statusId:
-              result.data.status_id,
-            },
-          },
+          `/admin/scenarios/${exerciseOrScenarioId}/tests/${result.data.status_id}`,
         );
       } else {
         navigate(
-          `/admin/exercises/${exerciseOrScenarioId}/tests`,
-          {
-            state: {
-              statusId:
-              result.data.status_id,
-            },
-          },
+          `/admin/exercises/${exerciseOrScenarioId}/tests/${result.data.status_id}`,
         );
       }
     });

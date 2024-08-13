@@ -57,18 +57,17 @@ const ScenarioTests: FunctionComponent = () => {
   const classes = useStyles();
   const { t, fldt } = useFormatter();
 
-  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
+  const { scenarioId, statusId } = useParams() as { scenarioId: ScenarioStore['scenario_id'], statusId: InjectTestStatus['status_id'] };
   const [selectedTest, setSelectedTest] = useState<InjectTestStatus | null>(null);
-  const location = useLocation();
 
   // Fetching data
   useEffect(() => {
-    if (location !== null && location.state !== null && location.state.statusId !== null && location.state.statusId !== undefined) {
-      fetchInjectTestStatus(location.state.statusId).then((result: { data: InjectTestStatus }) => {
+    if (statusId !== null && statusId !== undefined) {
+      fetchInjectTestStatus(statusId).then((result: { data: InjectTestStatus }) => {
         setSelectedTest(result.data);
       });
     }
-  }, [location.state]);
+  }, [statusId]);
 
   // Headers
   const headers = [
