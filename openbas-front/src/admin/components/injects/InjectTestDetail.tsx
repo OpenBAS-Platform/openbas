@@ -42,24 +42,16 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   open: boolean;
   handleClose: () => void;
-  statusId: string | undefined;
+  test: InjectTestStatus | undefined;
 }
 
 const InjectTestDetail: FunctionComponent<Props> = ({
   open,
   handleClose,
-  statusId,
+  test,
 }) => {
   const classes = useStyles();
   const { t } = useFormatter();
-
-  // Fetching data
-  const [test, setTest] = useState<InjectTestStatus | null>();
-  useEffect(() => {
-    fetchInjectTestStatus(statusId).then((result: { data: InjectTestStatus }) => {
-      setTest(result.data);
-    });
-  }, []);
 
   return (
     <Drawer

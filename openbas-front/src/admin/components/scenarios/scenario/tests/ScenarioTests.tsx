@@ -1,13 +1,13 @@
 import { makeStyles } from '@mui/styles';
 import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import { useFormatter } from '../../../../../components/i18n';
 import ItemStatus from '../../../../../components/ItemStatus';
 import type { InjectTestStatus, SearchPaginationInput } from '../../../../../utils/api-types';
 import { initSorting } from '../../../../../components/common/pagination/Page';
-import { searchScenarioInjectTests } from '../../../../../actions/inject_test/inject-test-actions';
+import { fetchInjectTestStatus, searchScenarioInjectTests } from '../../../../../actions/inject_test/inject-test-actions';
 import SortHeadersComponent from '../../../../../components/common/pagination/SortHeadersComponent';
 import InjectIcon from '../../../common/injects/InjectIcon';
 import { isNotEmptyField } from '../../../../../utils/utils';
@@ -59,6 +59,16 @@ const ScenarioTests: FunctionComponent = () => {
 
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
   const [selectedTest, setSelectedTest] = useState<InjectTestStatus | null>(null);
+  const location = useLocation();
+
+  // Fetching data
+  useEffect(() => {
+    if (location !== null && location.state !== null && location.state.statusId !== null && location.state.statusId !== undefined) {
+      fetchInjectTestStatus(location.state.statusId).then((result: { data: InjectTestStatus }) => {
+        setSelectedTest(result.data);
+      });
+    }
+  }, [location.state]);
 
   // Headers
   const headers = [
@@ -163,7 +173,7 @@ const ScenarioTests: FunctionComponent = () => {
       </List>
       {
         selectedTest !== null
-        && <InjectTestDetail open handleClose={() => setSelectedTest(null)} statusId={selectedTest.status_id} />
+        && <InjectTestDetail open handleClose={() => setSelectedTest(null)} test={selectedTest} />
       }
     </>
   );

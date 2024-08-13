@@ -1,12 +1,12 @@
 import { makeStyles } from '@mui/styles';
 import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Exercise, InjectTestStatus, SearchPaginationInput } from '../../../../../utils/api-types';
 import { initSorting } from '../../../../../components/common/pagination/Page';
 import ItemStatus from '../../../../../components/ItemStatus';
-import { searchExerciseInjectTests } from '../../../../../actions/inject_test/inject-test-actions';
+import { fetchInjectTestStatus, searchExerciseInjectTests } from '../../../../../actions/inject_test/inject-test-actions';
 import SortHeadersComponent from '../../../../../components/common/pagination/SortHeadersComponent';
 import Empty from '../../../../../components/Empty';
 import InjectIcon from '../../../common/injects/InjectIcon';
@@ -58,6 +58,16 @@ const ExerciseTests: FunctionComponent = () => {
 
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const [selectedTest, setSelectedTest] = useState<InjectTestStatus | null>(null);
+  const location = useLocation();
+
+  // Fetching data
+  useEffect(() => {
+    if (location !== null && location.state !== null && location.state.statusId !== null && location.state.statusId !== undefined) {
+      fetchInjectTestStatus(location.state.statusId).then((result: { data: InjectTestStatus }) => {
+        setSelectedTest(result.data);
+      });
+    }
+  }, [location.state]);
 
   // Headers
   const headers = [
@@ -162,7 +172,7 @@ const ExerciseTests: FunctionComponent = () => {
       </List>
       {
         selectedTest !== null
-        && <InjectTestDetail open handleClose={() => setSelectedTest(null)} statusId={selectedTest.status_id} />
+        && <InjectTestDetail open handleClose={() => setSelectedTest(null)} test={selectedTest} />
       }
     </>
   );
