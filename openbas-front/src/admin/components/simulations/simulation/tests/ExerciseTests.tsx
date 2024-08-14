@@ -1,7 +1,7 @@
 import { makeStyles } from '@mui/styles';
 import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Exercise, InjectTestStatus, SearchPaginationInput } from '../../../../../utils/api-types';
 import { initSorting } from '../../../../../components/common/pagination/Page';

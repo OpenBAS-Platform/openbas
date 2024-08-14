@@ -1,9 +1,8 @@
 import { makeStyles } from '@mui/styles';
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent } from 'react';
 import { Card, CardContent, CardHeader, Grid, Paper, Typography } from '@mui/material';
 import { useFormatter } from '../../../components/i18n';
 import type { InjectTestStatus } from '../../../utils/api-types';
-import { fetchInjectTestStatus } from '../../../actions/inject_test/inject-test-actions';
 import ItemStatus from '../../../components/ItemStatus';
 import Drawer from '../../../components/common/Drawer';
 import { isNotEmptyField } from '../../../utils/utils';

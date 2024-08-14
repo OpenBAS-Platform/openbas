@@ -1,6 +1,6 @@
 import { makeStyles } from '@mui/styles';
 import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import { useFormatter } from '../../../../../components/i18n';
