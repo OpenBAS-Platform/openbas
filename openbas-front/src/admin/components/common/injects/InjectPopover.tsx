@@ -1,7 +1,22 @@
-import React, { FunctionComponent, useContext, useState } from 'react';
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableRow } from '@mui/material';
+import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
+import {
+  Alert,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  IconButton,
+  Menu,
+  MenuItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  SnackbarCloseReason,
+  Link,
+} from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import type { InjectStore } from '../../../../actions/injects/Inject';
@@ -31,7 +46,6 @@ const InjectPopover: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
   const {
@@ -122,17 +136,35 @@ const InjectPopover: FunctionComponent<Props> = ({
     setInjectTestResult(null);
   };
 
+  const [openDialog, setOpenDialog] = React.useState<boolean>(false);
+  const handleCloseDialog = (
+    event?: React.SyntheticEvent | Event,
+    reason?: SnackbarCloseReason,
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenDialog(false);
+  };
+  const [detailsLink, setDetailsLink] = React.useState<string>('');
+
+  useEffect(() => {
+    if (openDialog) {
+      setTimeout(() => {
+        handleCloseDialog();
+        setDetailsLink('');
+      }, 6000);
+    }
+  }, [openDialog]);
+
   const submitTest = () => {
     testInject(inject.inject_id).then((result: { data: InjectStatus }) => {
       setInjectTestResult(result.data);
+      setOpenDialog(true);
       if (isExercise) {
-        navigate(
-          `/admin/scenarios/${exerciseOrScenarioId}/tests/${result.data.status_id}`,
-        );
+        setDetailsLink(`/admin/scenarios/${exerciseOrScenarioId}/tests/${result.data.status_id}`);
       } else {
-        navigate(
-          `/admin/exercises/${exerciseOrScenarioId}/tests/${result.data.status_id}`,
-        );
+        setDetailsLink(`/admin/exercises/${exerciseOrScenarioId}/tests/${result.data.status_id}`);
       }
     });
     handleCloseTest();
@@ -197,6 +229,31 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   return (
     <>
+      <Dialog open={openDialog}
+        slotProps={{
+          backdrop: {
+            sx: {
+              backgroundColor: 'transparent',
+            },
+          },
+        }}
+        PaperProps={{
+          sx: {
+            position: 'fixed',
+            top: '20px',
+            left: '660px',
+            margin: 0,
+          },
+        }}
+      >
+        <Alert
+          onClose={handleCloseDialog}
+          severity="success"
+          sx={{ width: '100%' }}
+        >
+          {t('Inject test has been sent, you can view test logs details on ')} <Link href={detailsLink} underline="hover">{t('its dedicated page.')}</Link>
+        </Alert>
+      </Dialog>
       <IconButton
         onClick={handlePopoverOpen}
         aria-haspopup="true"

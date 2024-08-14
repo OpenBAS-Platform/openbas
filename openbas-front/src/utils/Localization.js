@@ -1242,6 +1242,9 @@ const i18n = {
       // Platform Banner
       'IMAP service is not responding, your injectors may be impacted.': 'Le service IMAP ne réponds pas, vos injecteurs peuvent être impactés.',
       'Executor Caldera is not responding, your exercises may be impacted.': 'L\'exécuteur Caldera ne réponds pas, vos exercises peuvent être impactés.',
+      // Inject test
+      'Inject test has been sent, you can view test logs details on ': 'Le test de l\'inject a été envoyé, vous pouvez visualiser les logs de test sur  ',
+      'its dedicated page.': 'sa page dédiée',
     },
     zh: {
       'Email address': 'email地址',
