@@ -64,15 +64,15 @@ public class InjectTestStatusService {
     return injectTestStatusToSave;
   }
 
-  public List<InjectTestStatus> findAllExerciseInjectTests(String exerciseId) {
+  public List<InjectTestStatus> findAllInjectTestsByExerciseId(String exerciseId) {
     return injectTestStatusRepository.findAllExerciseInjectTests(exerciseId);
   }
 
-  public List<InjectTestStatus> findAllScenarioInjectTests(String scenarioId) {
+  public List<InjectTestStatus> findAllInjectTestsByScenarioId(String scenarioId) {
     return injectTestStatusRepository.findAllScenarioInjectTests(scenarioId);
   }
 
-  public InjectTestStatus findInjectTestStatus(String testId) {
+  public InjectTestStatus findInjectTestStatusById(String testId) {
     return injectTestStatusRepository.findById(testId).orElseThrow();
   }
 

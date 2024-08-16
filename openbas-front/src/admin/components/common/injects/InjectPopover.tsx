@@ -68,7 +68,7 @@ const InjectPopover: FunctionComponent<Props> = ({
   const [_injectTestResult, setInjectTestResult] = useState<InjectStatus | null>(null);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
-  const isExercise = useHelper((helper: ExercisesHelper) => helper.getExercisesMap()[exerciseOrScenarioId!] === undefined);
+  const isExercise = useHelper((helper: ExercisesHelper) => helper.getExercisesMap()[exerciseOrScenarioId!] !== undefined);
 
   const handlePopoverOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -162,9 +162,9 @@ const InjectPopover: FunctionComponent<Props> = ({
       setInjectTestResult(result.data);
       setOpenDialog(true);
       if (isExercise) {
-        setDetailsLink(`/admin/scenarios/${exerciseOrScenarioId}/tests/${result.data.status_id}`);
-      } else {
         setDetailsLink(`/admin/exercises/${exerciseOrScenarioId}/tests/${result.data.status_id}`);
+      } else {
+        setDetailsLink(`/admin/scenarios/${exerciseOrScenarioId}/tests/${result.data.status_id}`);
       }
     });
     handleCloseTest();
