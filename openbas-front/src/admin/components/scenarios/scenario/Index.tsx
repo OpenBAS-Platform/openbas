@@ -169,7 +169,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
               <Route path="" element={errorWrapper(Scenario)({ setOpenScenarioRecurringFormDialog })} />
               <Route path="definition" element={errorWrapper(ScenarioDefinition)()} />
               <Route path="injects" element={errorWrapper(Injects)()} />
-              <Route path="tests" element={errorWrapper(Tests)()} />
+              <Route path="tests/:statusId?" element={errorWrapper(Tests)()} />
               {/* Not found */}
               <Route path="*" element={<NotFound />} />
             </Routes>
