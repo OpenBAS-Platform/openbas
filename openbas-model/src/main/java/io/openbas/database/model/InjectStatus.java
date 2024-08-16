@@ -18,7 +18,7 @@ import java.util.Objects;
 @Getter
 @Entity
 @Table(name = "injects_statuses")
-public class InjectStatus extends BaseInjectStatus implements Base {
+public class InjectStatus extends BaseInjectStatus {
 
   public static InjectStatus fromExecution(Execution execution, Inject executedInject) {
     InjectStatus injectStatus = executedInject.getStatus().orElse(new InjectStatus());

@@ -30,7 +30,7 @@ public class InjectTestStatusApi extends RestBehavior {
   }
 
   @GetMapping("/api/scenario/{scenarioId}/injects/test")
-  public List<InjectTestStatus> findAllScenarioInjectTests(@PathVariable String scenarioId) {
+  public List<InjectTestStatus> findAllScenarioInjectTests(@PathVariable @NotBlank String scenarioId) {
     return injectTestStatusService.findAllInjectTestsByScenarioId(scenarioId);
   }
 

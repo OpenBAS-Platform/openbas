@@ -101,4 +101,5 @@ public abstract class BaseInjectStatus implements Base {
   public int hashCode() {
     return Objects.hash(id);
   }
+
 }
