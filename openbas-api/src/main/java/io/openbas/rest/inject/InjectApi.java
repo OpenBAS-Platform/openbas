@@ -21,6 +21,7 @@ import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.AtomicTestingService;
 import io.openbas.service.InjectService;
+import io.openbas.service.InjectTestStatusService;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.AtomicTestingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -29,8 +30,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -49,9 +48,6 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static io.openbas.config.SessionHelper.currentUser;
-
-import io.openbas.execution.Injector;
-
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.CommunicationSpecification.fromInject;
 import static io.openbas.helper.DatabaseHelper.resolveOptionalRelation;
@@ -77,7 +73,6 @@ public class InjectApi extends RestBehavior {
 
   private final Executor executor;
   private final InjectorContractRepository injectorContractRepository;
-  private ApplicationContext context;
   private final CommunicationRepository communicationRepository;
   private final ExerciseRepository exerciseRepository;
   private final UserRepository userRepository;
@@ -93,11 +88,6 @@ public class InjectApi extends RestBehavior {
   private final InjectService injectService;
   private final AtomicTestingService atomicTestingService;
   private final InjectDuplicateService injectDuplicateService;
-
-  @Autowired
-  public void setContext(ApplicationContext context) {
-    this.context = context;
-  }
 
   // -- INJECTS --
 
@@ -167,23 +157,6 @@ public class InjectApi extends RestBehavior {
   @GetMapping("/api/injects/try/{injectId}")
   public Inject tryInject(@PathVariable String injectId) {
     return atomicTestingService.tryInject(injectId);
-  }
-
-  @GetMapping(INJECT_URI + "/test/{injectId}")
-  public InjectStatus testInject(@PathVariable String injectId) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-    User user = this.userRepository.findById(currentUser().getId()).orElseThrow();
-    List<ExecutionContext> userInjectContexts = List.of(
-        this.executionContextService.executionContext(user, inject, "Direct test")
-    );
-    Injector executor = context.getBean(
-        inject.getInjectorContract().map(injectorContract -> injectorContract.getInjector().getType()).orElseThrow(),
-        io.openbas.execution.Injector.class);
-    ExecutableInject injection = new ExecutableInject(false, true, inject, List.of(), inject.getAssets(),
-        inject.getAssetGroups(), userInjectContexts);
-    Execution execution = executor.executeInjection(injection);
-    return InjectStatus.fromExecutionTest(execution);
-
   }
 
   @Transactional(rollbackFor = Exception.class)

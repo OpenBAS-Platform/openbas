@@ -619,6 +619,7 @@ const i18n = {
         'Chaque équipe doit uploader un document',
       'Each team should submit a text response':
         'Chaque équipe doit soumettre une réponse texte',
+      'Inject tests': 'Tests de stimuli',
       // -- Expectation start --
       'This expectation is handled automatically by the platform and triggered when target reads the articles': 'Cet attendu est géré automatiquement par la plateforme et déclenché lorsque une cible lit les articles',
       'This expectation is handled automatically by the platform and triggered when the target completes the challenges': 'Cette attente est gérée automatiquement par la plateforme et est déclenchée lorsque la cible termine les défis',
@@ -1241,6 +1242,9 @@ const i18n = {
       // Platform Banner
       'IMAP service is not responding, your injectors may be impacted.': 'Le service IMAP ne réponds pas, vos injecteurs peuvent être impactés.',
       'Executor Caldera is not responding, your exercises may be impacted.': 'L\'exécuteur Caldera ne réponds pas, vos exercises peuvent être impactés.',
+      // Inject test
+      'Inject test has been sent, you can view test logs details on ': 'Le test de l\'inject a été envoyé, vous pouvez visualiser les logs de test sur  ',
+      'its dedicated page.': 'sa page dédiée',
     },
     zh: {
       'Email address': 'email地址',

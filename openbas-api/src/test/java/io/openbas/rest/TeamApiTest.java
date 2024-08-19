@@ -130,7 +130,7 @@ public class TeamApiTest {
   void addPlayerOnTeamOnScenarioTest() throws Exception {
     // -- PREPARE --
     User user = new User();
-    user.setEmail("test@gmail.com");
+    user.setEmail("testfiligran@gmail.com");
     user = this.userRepository.save(user);
     USER_ID = user.getId();
     ScenarioTeamPlayersEnableInput input = new ScenarioTeamPlayersEnableInput();

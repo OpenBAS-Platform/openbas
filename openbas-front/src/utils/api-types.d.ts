@@ -1095,6 +1095,8 @@ export interface Inject {
   /** @uniqueItems true */
   inject_tags?: Tag[];
   inject_teams?: Team[];
+  inject_test_status?: InjectTestStatus;
+  inject_testable?: boolean;
   inject_title: string;
   inject_type?: string;
   /** @format date-time */
@@ -1250,6 +1252,7 @@ export interface InjectOutput {
   /** @uniqueItems true */
   inject_tags?: string[];
   inject_teams?: string[];
+  inject_testable?: boolean;
   inject_title?: string;
   inject_type?: string;
 }
@@ -1348,11 +1351,50 @@ export interface InjectTargetWithResult {
   id: string;
   name?: string;
   platformType?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
-  targetType?: "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
+  targetType?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }
 
 export interface InjectTeamsInput {
   inject_teams?: string[];
+}
+
+export interface InjectTestStatus {
+  /** @format date-time */
+  inject_test_status_created_at?: string;
+  /** @format date-time */
+  inject_test_status_updated_at?: string;
+  inject_title?: string;
+  inject_type?: string;
+  injector_contract?: InjectorContract;
+  listened?: boolean;
+  status_id?: string;
+  status_name:
+    | "DRAFT"
+    | "INFO"
+    | "QUEUING"
+    | "EXECUTING"
+    | "PENDING"
+    | "PARTIAL"
+    | "ERROR"
+    | "MAYBE_PARTIAL_PREVENTED"
+    | "MAYBE_PREVENTED"
+    | "SUCCESS";
+  status_traces?: InjectStatusExecution[];
+  /** @format date-time */
+  tracking_ack_date?: string;
+  /** @format date-time */
+  tracking_end_date?: string;
+  /** @format date-time */
+  tracking_sent_date?: string;
+  /** @format int32 */
+  tracking_total_count?: number;
+  /** @format int32 */
+  tracking_total_error?: number;
+  /** @format int64 */
+  tracking_total_execution_time?: number;
+  /** @format int32 */
+  tracking_total_success?: number;
+  updateAttributes?: object;
 }
 
 export interface InjectUpdateActivationInput {

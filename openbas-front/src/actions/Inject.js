@@ -14,7 +14,7 @@ export const tryInject = (injectId) => (dispatch) => {
 };
 
 export const testInject = (injectId) => {
-  const uri = `/api/injects/test/${injectId}`;
+  const uri = `/api/injects/${injectId}/test`;
   return simpleCall(uri);
 };
 

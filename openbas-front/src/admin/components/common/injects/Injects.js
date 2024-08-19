@@ -555,6 +555,7 @@ const Injects = (props) => {
                 <ListItemSecondaryAction>
                   <InjectPopover
                     inject={inject}
+                    exerciseOrScenarioId={exerciseOrScenarioId}
                     canBeTested
                     tagsMap={tagsMap}
                     setSelectedInjectId={setSelectedInjectId}
