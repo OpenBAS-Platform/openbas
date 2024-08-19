@@ -54,7 +54,6 @@ public class Payload implements Base {
   @Column(name = "payload_type", insertable = false, updatable = false)
   @JsonProperty("payload_type")
   @Setter(NONE)
-  @NotBlank
   private String type;
 
   @Queryable(searchable = true, sortable = true)
