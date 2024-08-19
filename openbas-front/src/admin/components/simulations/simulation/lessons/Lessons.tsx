@@ -55,6 +55,11 @@ import { fetchPlayers } from '../../../../../actions/User';
 import LessonsObjectives from './LessonsObjectives';
 import LessonsCategories from './LessonsCategories';
 import CreateLessonsTemplate from '../../../components/lessons/CreateLessonsTemplate';
+import { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
+import { TeamsHelper } from '../../../../../actions/teams/team-helper';
+import { UserHelper } from '../../../../../actions/helper';
+import { InjectHelper } from '../../../../../actions/injects/inject-helper';
+import { LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
 
 const useStyles = makeStyles((theme) => ({
   metric: {
@@ -111,7 +116,7 @@ const Lessons = () => {
   const handleChange = (event) => {
     setTemplateValue(event.target.value);
   };
-  // Fetching data
+    // Fetching data
   const { exerciseId } = useParams();
   const {
     exercise,
@@ -123,7 +128,7 @@ const Lessons = () => {
     lessonsAnswers,
     lessonsTemplates,
     usersMap,
-  } = useHelper((helper) => {
+  } = useHelper((helper: ExercisesHelper & InjectHelper & LessonsTemplatesHelper & TeamsHelper & UserHelper) => {
     return {
       exercise: helper.getExercise(exerciseId),
       objectives: helper.getExerciseObjectives(exerciseId),
@@ -267,7 +272,7 @@ const Lessons = () => {
                       onChange={() => setOpenAnonymize(true)}
                       name="anonymized"
                     />
-                  }
+                                    }
                   label={t('Anonymize answers')}
                 />
               </Grid>
@@ -424,10 +429,10 @@ const Lessons = () => {
                         </Typography>
                         <Typography variant="body2">
                           {template.lessons_template_description
-                            || t('No description')}
+                                                        || t('No description')}
                         </Typography>
                       </div>
-                    }
+                                        }
                   />
                 );
               })}

@@ -8,4 +8,8 @@ export interface ExercisesHelper {
   getExercisesMap: () => Record<string, ExerciseStore>;
   getExerciseTeams: (exerciseId: string) => TeamStore[];
   getExerciseInjectExpectations: (exerciseId: Exercise['exercise_id']) => InjectExpectation[];
+  getExerciseObjectives: (exerciseId: string) => ;
+  getExerciseLessonsCategories: (exerciseId: string) => ;
+  getExerciseLessonsQuestions: (exerciseId: string) => ;
+  getExerciseLessonsAnswers: (exerciseId: string) => ;
 }
