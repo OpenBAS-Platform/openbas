@@ -116,7 +116,7 @@ export interface Asset {
   asset_process_name?: string;
   /** @uniqueItems true */
   asset_tags?: Tag[];
-  asset_type: string;
+  asset_type?: string;
   /** @format date-time */
   asset_updated_at: string;
   listened?: boolean;
@@ -242,7 +242,7 @@ export interface Challenge {
   challenge_max_attempts?: number;
   challenge_name?: string;
   challenge_scenarios?: string[];
-  /** @format int32 */
+  /** @format double */
   challenge_score?: number;
   /** @uniqueItems true */
   challenge_tags?: Tag[];
@@ -605,7 +605,7 @@ export interface Endpoint {
   asset_process_name?: string;
   /** @uniqueItems true */
   asset_tags?: Tag[];
-  asset_type: string;
+  asset_type?: string;
   /** @format date-time */
   asset_updated_at: string;
   endpoint_agent_version?: string;
@@ -909,7 +909,7 @@ export interface ExpectationResultsByType {
 }
 
 export interface ExpectationUpdateInput {
-  /** @format int32 */
+  /** @format double */
   expectation_score: number;
   source_id: string;
   source_name: string;
@@ -917,8 +917,8 @@ export interface ExpectationUpdateInput {
 }
 
 export interface ExportMapperInput {
-  ids_to_export: string[];
   export_mapper_name?: string;
+  ids_to_export: string[];
 }
 
 export interface Filter {
@@ -1137,14 +1137,14 @@ export interface InjectExpectation {
   inject_expectation_created_at?: string;
   inject_expectation_description?: string;
   inject_expectation_exercise?: Exercise;
-  /** @format int32 */
+  /** @format double */
   inject_expectation_expected_score?: number;
   inject_expectation_group?: boolean;
   inject_expectation_id: string;
   inject_expectation_inject?: Inject;
   inject_expectation_name?: string;
   inject_expectation_results?: InjectExpectationResult[];
-  /** @format int32 */
+  /** @format double */
   inject_expectation_score?: number;
   inject_expectation_signatures?: InjectExpectationSignature[];
   inject_expectation_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
@@ -1161,7 +1161,7 @@ export interface InjectExpectation {
 export interface InjectExpectationResult {
   date?: string;
   result: string;
-  /** @format int32 */
+  /** @format double */
   score?: number;
   sourceId?: string;
   sourceName?: string;
@@ -1295,7 +1295,7 @@ export interface InjectResultDTO {
 export interface InjectStatus {
   listened?: boolean;
   status_id?: string;
-  status_name?:
+  status_name:
     | "DRAFT"
     | "INFO"
     | "QUEUING"
@@ -1351,7 +1351,7 @@ export interface InjectTargetWithResult {
   id: string;
   name?: string;
   platformType?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
-  targetType?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
+  targetType?: "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
 }
 
 export interface InjectTeamsInput {
@@ -2326,7 +2326,7 @@ export interface Payload {
   payload_status?: string;
   /** @uniqueItems true */
   payload_tags?: Tag[];
-  payload_type: string;
+  payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
   updateAttributes?: object;
@@ -2488,7 +2488,7 @@ export interface PublicChallenge {
   /** @format int32 */
   challenge_max_attempts?: number;
   challenge_name?: string;
-  /** @format int32 */
+  /** @format double */
   challenge_score?: number;
   challenge_tags?: string[];
   /** @format date-time */
@@ -2856,7 +2856,7 @@ export interface SecurityPlatform {
   asset_process_name?: string;
   /** @uniqueItems true */
   asset_tags?: Tag[];
-  asset_type: string;
+  asset_type?: string;
   /** @format date-time */
   asset_updated_at: string;
   listened?: boolean;
@@ -2958,10 +2958,10 @@ export interface Team {
   team_inject_expectations?: InjectExpectation[];
   /** @format int64 */
   team_injects_expectations_number?: number;
-  /** @format int64 */
+  /** @format double */
   team_injects_expectations_total_expected_score: number;
   team_injects_expectations_total_expected_score_by_exercise: Record<string, number>;
-  /** @format int64 */
+  /** @format double */
   team_injects_expectations_total_score: number;
   team_injects_expectations_total_score_by_exercise: Record<string, number>;
   team_name: string;
