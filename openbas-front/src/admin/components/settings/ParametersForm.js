@@ -52,6 +52,9 @@ const ParametersForm = (props) => {
             <MenuItem key="fr" value="fr">
               {t('French')}
             </MenuItem>
+            <MenuItem key="zh" value="zh">
+              {t('Chinese')}
+            </MenuItem>
           </OldSelectField>
           <div style={{ marginTop: 20 }}>
             <Button
