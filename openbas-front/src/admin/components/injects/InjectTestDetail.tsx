@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginBottom: 8,
   },
   injectorContract: {
-    margin: '10px 0 20px 0',
+    margin: '20px 0 20px 15px',
     width: '100%',
     border: `1px solid ${theme.palette.divider}`,
     borderRadius: 4,
@@ -86,7 +86,7 @@ const InjectTestDetail: FunctionComponent<Props> = ({
             {truncate(test?.inject_title, 80)}
           </CardContent>
         </Card>
-        <Grid item xs={12} style={{ marginBottom: 30 }}>
+        <Grid item xs={12}>
           <Typography variant="h4">{t('Execution logs')}</Typography>
           {test ? (
             <Paper variant="outlined" classes={{ root: classes.paper }}>
