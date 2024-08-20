@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
@@ -22,15 +23,18 @@ import java.util.Objects;
 @Table(name = "groups")
 @EntityListeners(ModelBaseListener.class)
 public class Group implements Base {
+
     @Id
     @Column(name = "group_id")
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("group_id")
+    @NotBlank
     private String id;
 
     @Column(name = "group_name")
     @JsonProperty("group_name")
+    @NotBlank
     private String name;
 
     @Column(name = "group_description")

@@ -9,6 +9,7 @@ import io.openbas.helper.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -40,8 +41,8 @@ public class Exercise implements Base {
   @Getter
   @Column(name = "exercise_name")
   @JsonProperty("exercise_name")
-  @NotBlank
   @Queryable(searchable = true, sortable = true)
+  @NotBlank
   private String name;
 
   @Getter
@@ -54,6 +55,7 @@ public class Exercise implements Base {
   @JsonProperty("exercise_status")
   @Enumerated(EnumType.STRING)
   @Queryable(sortable = true)
+  @NotNull
   private ExerciseStatus status = ExerciseStatus.SCHEDULED;
 
   @Getter
@@ -149,11 +151,13 @@ public class Exercise implements Base {
   @Getter
   @Column(name = "exercise_created_at")
   @JsonProperty("exercise_created_at")
+  @NotNull
   private Instant createdAt = now();
 
   @Getter
   @Column(name = "exercise_updated_at")
   @JsonProperty("exercise_updated_at")
+  @NotNull
   private Instant updatedAt = now();
 
   // -- RELATION --

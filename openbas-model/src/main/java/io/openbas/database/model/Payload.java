@@ -11,6 +11,7 @@ import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -56,9 +57,9 @@ public class Payload implements Base {
   private String type;
 
   @Queryable(searchable = true, sortable = true)
-  @NotBlank
   @Column(name = "payload_name")
   @JsonProperty("payload_name")
+  @NotBlank
   private String name;
 
   @Column(name = "payload_description")
@@ -140,10 +141,12 @@ public class Payload implements Base {
 
   @Column(name = "payload_created_at")
   @JsonProperty("payload_created_at")
+  @NotNull
   private Instant createdAt = now();
 
   @Column(name = "payload_updated_at")
   @JsonProperty("payload_updated_at")
+  @NotNull
   private Instant updatedAt = now();
 
   @JsonProperty("payload_collector_type")

@@ -41,8 +41,8 @@ public class Document implements Base {
 
     @Column(name = "document_name")
     @JsonProperty("document_name")
-    @NotBlank
     @Queryable(searchable = true, sortable = true)
+    @NotBlank
     private String name;
 
     @Column(name = "document_target")
@@ -57,6 +57,7 @@ public class Document implements Base {
     @Column(name = "document_type")
     @JsonProperty("document_type")
     @Queryable(searchable = true, sortable = true)
+    @NotBlank
     private String type;
 
     @ManyToMany(fetch = FetchType.LAZY)

@@ -3,6 +3,8 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -11,6 +13,7 @@ import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.Objects;
 
+@Setter
 @Getter
 @Entity
 @Table(name = "tokens")
@@ -18,29 +21,28 @@ public class Token implements Base {
 
     public static final String ADMIN_TOKEN_UUID = "0d17ce9a-f3a8-4c6d-9721-c98dc3dc023f";
 
-    @Setter
     @Id
     @Column(name = "token_id")
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("token_id")
+    @NotBlank
     private String id;
 
-    @Setter
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "token_user")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("token_user")
     private User user;
 
-    @Setter
     @Column(name = "token_value")
     @JsonProperty("token_value")
+    @NotBlank
     private String value;
 
-    @Setter
     @Column(name = "token_created_at")
     @JsonProperty("token_created_at")
+    @NotNull
     private Instant created;
 
     @Override

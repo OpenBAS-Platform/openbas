@@ -6,6 +6,9 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
@@ -14,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "comchecks")
 @EntityListeners(ModelBaseListener.class)
@@ -39,10 +44,12 @@ public class Comcheck implements Base {
 
     @Column(name = "comcheck_start_date")
     @JsonProperty("comcheck_start_date")
+    @NotNull
     private Instant start;
 
     @Column(name = "comcheck_end_date")
     @JsonProperty("comcheck_end_date")
+    @NotNull
     private Instant end;
 
     @Column(name = "comcheck_state")
@@ -77,84 +84,12 @@ public class Comcheck implements Base {
     }
     // endregion
 
-    public String getId() {
-        return id;
-    }
-
-    @Override
+  @Override
     public boolean isUserHasAccess(User user) {
         return exercise.isUserHasAccess(user);
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Instant getStart() {
-        return start;
-    }
-
-    public void setStart(Instant start) {
-        this.start = start;
-    }
-
-    public Instant getEnd() {
-        return end;
-    }
-
-    public void setEnd(Instant end) {
-        this.end = end;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public Exercise getExercise() {
-        return exercise;
-    }
-
-    public void setExercise(Exercise exercise) {
-        this.exercise = exercise;
-    }
-
-    public COMCHECK_STATUS getState() {
-        return state;
-    }
-
-    public void setState(COMCHECK_STATUS state) {
-        this.state = state;
-    }
-
-    public List<ComcheckStatus> getComcheckStatus() {
-        return comcheckStatus;
-    }
-
-    public void setComcheckStatus(List<ComcheckStatus> comcheckStatus) {
-        this.comcheckStatus = comcheckStatus;
-    }
-
-    @Override
+  @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;

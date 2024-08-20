@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -24,29 +26,35 @@ import static java.time.Instant.now;
 @Table(name = "lessons_questions")
 @EntityListeners(ModelBaseListener.class)
 public class LessonsQuestion implements Base {
+
     @Id
     @Column(name = "lessons_question_id")
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("lessonsquestion_id")
+    @NotBlank
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lessons_question_category")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("lessons_question_category")
+    @NotNull
     private LessonsCategory category;
 
     @Column(name = "lessons_question_created_at")
     @JsonProperty("lessons_question_created_at")
+    @NotNull
     private Instant created = now();
 
     @Column(name = "lessons_question_updated_at")
     @JsonProperty("lessons_question_updated_at")
+    @NotNull
     private Instant updated = now();
 
     @Column(name = "lessons_question_content")
     @JsonProperty("lessons_question_content")
+    @NotBlank
     private String content;
 
     @Column(name = "lessons_question_explanation")

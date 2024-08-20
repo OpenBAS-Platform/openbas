@@ -6,6 +6,9 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
@@ -15,15 +18,18 @@ import java.util.Set;
 
 import static java.time.Instant.now;
 
+@Setter
 @Entity
 @Table(name = "logs")
 @EntityListeners(ModelBaseListener.class)
 public class Log implements Base {
+
     @Id
     @Column(name = "log_id")
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("log_id")
+    @NotBlank
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,18 +46,22 @@ public class Log implements Base {
 
     @Column(name = "log_title")
     @JsonProperty("log_title")
+    @NotBlank
     private String title;
 
     @Column(name = "log_content")
     @JsonProperty("log_content")
+    @NotBlank
     private String content;
 
     @Column(name = "log_created_at")
     @JsonProperty("log_created_at")
+    @NotNull
     private Instant created = now();
 
     @Column(name = "log_updated_at")
     @JsonProperty("log_updated_at")
+    @NotNull
     private Instant updated = now();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -72,67 +82,35 @@ public class Log implements Base {
         return exercise.isUserHasAccess(user);
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Exercise getExercise() {
+  public Exercise getExercise() {
         return exercise;
     }
 
-    public void setExercise(Exercise exercise) {
-        this.exercise = exercise;
-    }
-
-    public User getUser() {
+  public User getUser() {
         return user;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getTitle() {
+  public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
+  public String getContent() {
         return content;
     }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Set<Tag> getTags() {
+  public Set<Tag> getTags() {
         return tags;
     }
 
-    public void setTags(Set<Tag> tags) {
-        this.tags = tags;
-    }
-
-    public Instant getCreated() {
+  public Instant getCreated() {
         return created;
     }
 
-    public void setCreated(Instant created) {
-        this.created = created;
-    }
-
-    public Instant getUpdated() {
+  public Instant getUpdated() {
         return updated;
     }
 
-    public void setUpdated(Instant updated) {
-        this.updated = updated;
-    }
-
-    @Override
+  @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
