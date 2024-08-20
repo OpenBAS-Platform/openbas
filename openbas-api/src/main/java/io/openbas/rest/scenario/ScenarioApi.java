@@ -256,4 +256,12 @@ public class ScenarioApi {
             .toList();
     }
 
+    @GetMapping(SCENARIO_URI + "/category/options")
+    public List<FilterUtilsJpa.Option> categoryOptionsByName(@RequestParam(required = false) final String searchText) {
+        return this.scenarioRepository.findDistinctCategoriesBySearchTerm(searchText, PageRequest.of(0, 10))
+            .stream()
+            .map(i -> new FilterUtilsJpa.Option(i, i))
+            .toList();
+    }
+
 }

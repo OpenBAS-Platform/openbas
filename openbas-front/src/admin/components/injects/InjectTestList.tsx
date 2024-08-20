@@ -4,12 +4,13 @@ import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui
 import type { InjectTestStatus, SearchPaginationInput } from '../../../utils/api-types';
 import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
-import { initSorting } from '../../../components/common/pagination/Page';
+import { initSorting } from '../../../components/common/queryable/Page';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
 import InjectIcon from '../common/injects/InjectIcon';
 import { isNotEmptyField } from '../../../utils/utils';
 import Empty from '../../../components/Empty';
 import InjectTestDetail from './InjectTestDetail';
+import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 
 const useStyles = makeStyles(() => ({
   bodyItems: {
@@ -103,9 +104,9 @@ const InjectTestList: FunctionComponent<Props> = ({
 
   // Filter and sort hook
   const [tests, setTests] = useState<InjectTestStatus[] | null>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
     sorts: initSorting('inject_title'),
-  });
+  }));
 
   // Fetch tests list
   useEffect(() => {

@@ -10,13 +10,11 @@ import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import ScenarioCreation from './ScenarioCreation';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { initSorting } from '../../../components/common/queryable/Page';
-import type { FilterGroup } from '../../../utils/api-types';
 import ItemTags from '../../../components/ItemTags';
 import ItemSeverity from '../../../components/ItemSeverity';
 import PlatformIcon from '../../../components/PlatformIcon';
 import ItemCategory from '../../../components/ItemCategory';
 import ImportUploaderScenario from './ImportUploaderScenario';
-import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
 import ScenarioStatus from './scenario/ScenarioStatus';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../actions/Tag';
@@ -25,7 +23,6 @@ import useQueryable from '../../../components/common/queryable/useQueryable';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import ScenarioPopover from './scenario/ScenarioPopover';
 import { fetchStatistics } from '../../../actions/Application';
-import ScenariosCard, { CATEGORY_FILTER_KEY } from './ScenariosCard';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 
@@ -156,14 +153,8 @@ const Scenarios = () => {
 
   const [scenarios, setScenarios] = useState<ScenarioStore[]>([]);
 
-  // Category filter
-  const scenarioFilter: FilterGroup = {
-    mode: 'and',
-    filters: [buildEmptyFilter(CATEGORY_FILTER_KEY, 'eq')],
-  };
   const { queryableHelpers, searchPaginationInput } = useQueryable('scenarios', buildSearchPagination({
     sorts: initSorting('scenario_updated_at', 'DESC'),
-    filterGroup: scenarioFilter,
   }));
 
   // Export
@@ -185,13 +176,12 @@ const Scenarios = () => {
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Scenarios'), current: true }]} />
-      <ScenariosCard helpers={queryableHelpers.filterHelpers} searchPaginationInput={searchPaginationInput} />
       <PaginationComponentV2
         fetch={searchScenarios}
         searchPaginationInput={searchPaginationInput}
         setContent={setScenarios}
         entityPrefix="scenario"
-        availableFilterNames={['scenario_kill_chain_phases', 'scenario_tags']}
+        availableFilterNames={['scenario_category', 'scenario_kill_chain_phases', 'scenario_tags']}
         queryableHelpers={queryableHelpers}
         exportProps={exportProps}
       >

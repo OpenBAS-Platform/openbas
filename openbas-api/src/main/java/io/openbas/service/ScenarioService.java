@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
+import io.openbas.database.criteria.GenericCriteria;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.raw.RawScenario;
@@ -53,6 +54,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.database.specification.ScenarioSpecification.findGrantedFor;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.rest.scenario.utils.ScenarioUtils.handleCustomFilter;
@@ -220,10 +222,7 @@ public class ScenarioService {
         .toList();
 
     // -- Count Query --
-    CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-    Root<Scenario> countRoot = countQuery.from(Scenario.class);
-    countQuery.select(cb.count(countRoot));
-    Long total = entityManager.createQuery(countQuery).getSingleResult();
+    Long total = countQuery(cb, this.entityManager, Scenario.class, specification);
 
     return new PageImpl<>(scenarios, pageable, total);
   }

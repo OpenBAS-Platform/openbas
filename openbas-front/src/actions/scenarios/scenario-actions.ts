@@ -186,3 +186,8 @@ export const searchScenarioAsOption = (searchText: string = '') => {
 export const searchScenarioByIdAsOption = (ids: string[]) => {
   return simplePostCall(`${SCENARIO_URI}/options`, ids);
 };
+
+export const searchScenarioCategoryAsOption = (searchText: string = '') => {
+  const params = { searchText };
+  return simpleCall(`${SCENARIO_URI}/category/options`, params);
+};

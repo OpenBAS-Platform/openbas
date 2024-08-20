@@ -65,7 +65,7 @@ public class Scenario implements Base {
 
   @Column(name = "scenario_category")
   @JsonProperty("scenario_category")
-  @Queryable(filterable = true)
+  @Queryable(filterable = true, dynamicValues = true)
   private String category;
 
   @Column(name = "scenario_main_focus")

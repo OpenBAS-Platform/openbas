@@ -856,6 +856,7 @@ const i18n = {
       injector_contract_injector: 'Injector',
       injector_contract_platforms: 'Platforms',
       // Scenario
+      scenario_category: 'Catégorie',
       scenario_kill_chain_phases: 'Phases de kill chain',
       scenario_tags: 'Tags',
       // Exercise
@@ -2532,6 +2533,7 @@ const i18n = {
       injector_contract_injector: 'Injector',
       injector_contract_platforms: 'Platforms',
       // Scenario
+      scenario_category: 'Category',
       scenario_kill_chain_phases: 'Kill chain phases',
       scenario_tags: 'Tags',
       // Exercise

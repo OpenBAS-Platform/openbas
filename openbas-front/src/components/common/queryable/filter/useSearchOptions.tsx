@@ -3,7 +3,7 @@ import { searchInjectorsByNameAsOption } from '../../../../actions/injectors/inj
 import { Option } from '../../../../utils/Option';
 import { searchKillChainPhasesByNameAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
 import { searchTagAsOption } from '../../../../actions/tags/tag-action';
-import { searchScenarioAsOption } from '../../../../actions/scenarios/scenario-actions';
+import { searchScenarioAsOption, searchScenarioCategoryAsOption } from '../../../../actions/scenarios/scenario-actions';
 
 const useSearchOptions = () => {
   const [options, setOptions] = useState<Option[]>([]);
@@ -30,6 +30,11 @@ const useSearchOptions = () => {
         break;
       case 'exercise_scenario':
         searchScenarioAsOption(search).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'scenario_category':
+        searchScenarioCategoryAsOption(search).then((response) => {
           setOptions(response.data);
         });
         break;
