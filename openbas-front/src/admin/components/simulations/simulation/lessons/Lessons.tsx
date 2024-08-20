@@ -1,35 +1,35 @@
 import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import {
-  Grid,
-  Paper,
-  Typography,
-  Switch,
-  LinearProgress,
+  Alert,
+  Button,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  LinearProgress,
+  Paper,
   Radio,
   RadioGroup,
-  FormControlLabel,
-  FormControl,
-  Button,
-  Alert,
-  DialogContentText,
-  DialogActions,
+  Switch,
+  Typography,
 } from '@mui/material';
 import {
-  SportsScoreOutlined,
-  SpeakerNotesOutlined,
   BallotOutlined,
   ContactMailOutlined,
   ContentPasteGoOutlined,
   DeleteSweepOutlined,
+  SpeakerNotesOutlined,
+  SportsScoreOutlined,
   VisibilityOutlined,
 } from '@mui/icons-material';
 import { Link, useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
+import { useAppDispatch } from '../../utils/hooks';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
@@ -60,6 +60,7 @@ import { TeamsHelper } from '../../../../../actions/teams/team-helper';
 import { UserHelper } from '../../../../../actions/helper';
 import { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import { LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
+import { LessonsQuestion, LessonsSendInput } from '../../../../../utils/api-types';
 
 const useStyles = makeStyles((theme) => ({
   metric: {
@@ -98,26 +99,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Lessons = () => {
+const Lessons: React.FC = () => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const theme = useTheme();
   const { t, nsdt } = useFormatter();
 
-  const [selectedObjective, setSelectedObjective] = useState(null);
-  const [openApplyTemplate, setOpenApplyTemplate] = useState(false);
-  const [openResetAnswers, setOpenResetAnswers] = useState(false);
-  const [openEmptyLessons, setOpenEmptyLessons] = useState(false);
-  const [openSendLessons, setOpenSendLessons] = useState(false);
-  const [openAnonymize, setOpenAnonymize] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] = useState(null);
-  const [templateValue, setTemplateValue] = useState(null);
-  const handleChange = (event) => {
+  const [selectedObjective, setSelectedObjective] = useState<string | null>(null);
+  const [openApplyTemplate, setOpenApplyTemplate] = useState<boolean>(false);
+  const [openResetAnswers, setOpenResetAnswers] = useState<boolean>(false);
+  const [openEmptyLessons, setOpenEmptyLessons] = useState<boolean>(false);
+  const [openSendLessons, setOpenSendLessons] = useState<boolean>(false);
+  const [openAnonymize, setOpenAnonymize] = useState<boolean>(false);
+  const [selectedQuestion, setSelectedQuestion] = useState<LessonsQuestion | null>(null);
+  const [templateValue, setTemplateValue] = useState<string | null>(null);
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTemplateValue(event.target.value);
   };
     // Fetching data
-  const { exerciseId } = useParams();
+  const { exerciseId } = useParams<{ exerciseId: string }>();
   const {
     exercise,
     objectives,
@@ -168,16 +169,16 @@ const Lessons = () => {
     ).then(() => setOpenAnonymize(false));
   };
 
-  const handleSubmitSendLessons = (data) => {
+  const handleSubmitSendLessons = (data: LessonsSendInput) => {
     return dispatch(sendLessons(exerciseId, data)).then(() => setOpenSendLessons(false));
   };
   const answers = R.groupBy(R.prop('lessons_answer_question'), lessonsAnswers);
-  const selectedQuestionAnswers = selectedQuestion && answers[selectedQuestion.lessonsquestion_id]
-    ? answers[selectedQuestion.lessonsquestion_id]
+  const selectedQuestionAnswers = selectedQuestion && selectedQuestion.lessonsquestion_id
+    ? answers[selectedQuestion.lessonsquestion_id] || []
     : [];
-  const getHoursDiff = (startDate, endDate) => {
+  const getHoursDiff = (startDate: Date, endDate: Date): number => {
     const msInHour = 1000 * 60 * 60;
-    return Math.round(Math.abs(endDate - startDate) / msInHour);
+    return Math.round(Math.abs(endDate.getTime() - startDate.getTime()) / msInHour);
   };
   return (
     <div>
@@ -185,7 +186,7 @@ const Lessons = () => {
         <Grid item={true} xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
-              <SportsScoreOutlined color="primary" sx={{ fontSize: 50 }} />
+              <SportsScoreOutlined color="primary" sx={{ fontSize: 50 }}/>
             </div>
             <div className={classes.title}>{t('Overall objectives score')}</div>
             <div className={classes.number}>{exercise.exercise_score}%</div>
@@ -194,7 +195,7 @@ const Lessons = () => {
         <Grid item={true} xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
-              <SpeakerNotesOutlined color="primary" sx={{ fontSize: 50 }} />
+              <SpeakerNotesOutlined color="primary" sx={{ fontSize: 50 }}/>
             </div>
             <div className={classes.title}>{t('Simulation logs')}</div>
             <div className={classes.number}>
@@ -205,7 +206,7 @@ const Lessons = () => {
         <Grid item={true} xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
-              <BallotOutlined color="primary" sx={{ fontSize: 50 }} />
+              <BallotOutlined color="primary" sx={{ fontSize: 50 }}/>
             </div>
             <div className={classes.title}>{t('Poll replies')}</div>
             <div className={classes.number}>
@@ -216,7 +217,7 @@ const Lessons = () => {
         <Grid item={true} xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
-              <ContactMailOutlined color="primary" sx={{ fontSize: 50 }} />
+              <ContactMailOutlined color="primary" sx={{ fontSize: 50 }}/>
             </div>
             <div className={classes.title}>{t('Messages')}</div>
             <div className={classes.number}>
@@ -225,7 +226,7 @@ const Lessons = () => {
           </Paper>
         </Grid>
       </Grid>
-      <br />
+      <br/>
       <Grid container={true} spacing={3}>
         <Grid item={true} xs={4}>
           <Typography variant="h4">{t('Details')}</Typography>
@@ -267,11 +268,11 @@ const Lessons = () => {
                 <FormControlLabel
                   control={
                     <Switch
-                      disabled={exercise.exercise_lessons_anonymized}
-                      checked={exercise.exercise_lessons_anonymized}
-                      onChange={() => setOpenAnonymize(true)}
-                      name="anonymized"
-                    />
+                        disabled={exercise.exercise_lessons_anonymized}
+                        checked={exercise.exercise_lessons_anonymized}
+                        onChange={() => setOpenAnonymize(true)}
+                        name="anonymized"
+                      />
                                     }
                   label={t('Anonymize answers')}
                 />
@@ -279,7 +280,7 @@ const Lessons = () => {
               <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('Template')}</Typography>
                 <Button
-                  startIcon={<ContentPasteGoOutlined />}
+                  startIcon={<ContentPasteGoOutlined/>}
                   color="primary"
                   variant="contained"
                   onClick={() => setOpenApplyTemplate(true)}
@@ -290,7 +291,7 @@ const Lessons = () => {
               <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('Check')}</Typography>
                 <Button
-                  startIcon={<VisibilityOutlined />}
+                  startIcon={<VisibilityOutlined/>}
                   color="secondary"
                   variant="contained"
                   component={Link}
@@ -304,7 +305,7 @@ const Lessons = () => {
                   {t('Categories and questions')}
                 </Typography>
                 <Button
-                  startIcon={<DeleteSweepOutlined />}
+                  startIcon={<DeleteSweepOutlined/>}
                   color="error"
                   variant="contained"
                   onClick={() => setOpenEmptyLessons(true)}
@@ -327,7 +328,7 @@ const Lessons = () => {
               <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('Questionnaire')}</Typography>
                 <Button
-                  startIcon={<ContentPasteGoOutlined />}
+                  startIcon={<ContentPasteGoOutlined/>}
                   color="success"
                   variant="contained"
                   onClick={() => setOpenSendLessons(true)}
@@ -338,7 +339,7 @@ const Lessons = () => {
               <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('Answers')}</Typography>
                 <Button
-                  startIcon={<ContentPasteGoOutlined />}
+                  startIcon={<ContentPasteGoOutlined/>}
                   color="error"
                   variant="contained"
                   onClick={() => setOpenResetAnswers(true)}
@@ -350,13 +351,14 @@ const Lessons = () => {
           </Paper>
         </Grid>
       </Grid>
-      <br />
-      <br />
+      <br/>
+      <br/>
       <LessonsObjectives
         objectives={objectives}
         injects={injects}
         setSelectedObjective={setSelectedObjective}
         exercise={exercise}
+        isReport={false}
       />
       <LessonsCategories
         exerciseId={exerciseId}
@@ -365,6 +367,7 @@ const Lessons = () => {
         setSelectedQuestion={setSelectedQuestion}
         lessonsQuestions={lessonsQuestions}
         teamsMap={teamsMap}
+        isReport={false}
       />
       <Dialog
         TransitionComponent={Transition}
@@ -412,34 +415,34 @@ const Lessons = () => {
                   <FormControlLabel
                     key={template.lessonstemplate_id}
                     style={{
-                      width: '100%',
-                      borderBottom: `1px solid ${theme.palette.background.paper}`,
-                      margin: 0,
-                    }}
+                        width: '100%',
+                        borderBottom: `1px solid ${theme.palette.background.paper}`,
+                        margin: 0,
+                      }}
                     value={template.lessonstemplate_id}
-                    control={<Radio />}
+                    control={<Radio/>}
                     label={
-                      <div
-                        style={{
-                          margin: '15px 0 15px 10px',
-                        }}
-                      >
-                        <Typography variant="h4">
-                          {template.lessons_template_name}
-                        </Typography>
-                        <Typography variant="body2">
-                          {template.lessons_template_description
+                        <div
+                            style={{
+                                margin: '15px 0 15px 10px',
+                              }}
+                          >
+                            <Typography variant="h4">
+                                {template.lessons_template_name}
+                              </Typography>
+                            <Typography variant="body2">
+                                {template.lessons_template_description
                                                         || t('No description')}
-                        </Typography>
-                      </div>
+                              </Typography>
+                          </div>
                                         }
                   />
                 );
               })}
             </RadioGroup>
           </FormControl>
-          <CreateLessonsTemplate inline />
-          <div className="clearfix" />
+          <CreateLessonsTemplate inline/>
+          <div className="clearfix"/>
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button
               onClick={() => setOpenApplyTemplate(false)}
@@ -557,16 +560,16 @@ const Lessons = () => {
                   </Typography>
                   <div style={{ width: '80%', display: 'flex', alignItems: 'center' }}>
                     <LinearProgress
-                      variant="determinate"
-                      value={answer.lessons_answer_score}
-                      style={{
-                        flex: 1,
-                        marginRight: 8,
-                      }}
-                    />
+                        variant="determinate"
+                        value={answer.lessons_answer_score}
+                        style={{
+                            flex: 1,
+                            marginRight: 8,
+                          }}
+                      />
                     <Typography variant="body2" color="text.secondary">
-                      {answer.lessons_answer_score}%
-                    </Typography>
+                        {answer.lessons_answer_score}%
+                      </Typography>
                   </div>
                 </Grid>
                 <Grid item={true} xs={3} style={{ marginTop: -10 }}>
@@ -612,7 +615,7 @@ const Lessons = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      <CreateLessonsCategory exerciseId={exerciseId} />
+      <CreateLessonsCategory exerciseId={exerciseId}/>
     </div>
   );
 };
