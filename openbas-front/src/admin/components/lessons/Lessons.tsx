@@ -26,6 +26,7 @@ import {
   Radio,
   RadioGroup,
   Switch,
+  Theme,
   Typography,
   useTheme,
 } from '@mui/material';
@@ -56,14 +57,13 @@ import { fetchPlayers } from '../../../../../actions/User';
 import LessonsObjectives from './LessonsObjectives';
 import LessonsCategories from './LessonsCategories';
 import CreateLessonsTemplate from '../../../components/lessons/CreateLessonsTemplate';
-import type { Theme } from '../../../../../components/Theme';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import type { LessonsQuestion, LessonsSendInput } from '../../../../../utils/api-types';
-import { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import { InjectHelper } from '../../../../../actions/injects/inject-helper';
-import { LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
-import { TeamsHelper } from '../../../../../actions/teams/team-helper';
-import { UserHelper } from '../../../../../actions/helper';
+import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
+import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
+import type { LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
+import type { UserHelper } from '../../../../../actions/helper';
+import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
 
 const useStyles = makeStyles((theme: Theme) => ({
   metric: {
@@ -76,7 +76,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     textTransform: 'uppercase',
     fontSize: 12,
     fontWeight: 500,
-    color: theme.palette.secondary,
+    color: theme.palette.secondary.main,
   },
   number: {
     fontSize: 30,
