@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { makeStyles, useTheme } from '@mui/styles';
+import {
+  BallotOutlined,
+  ContactMailOutlined,
+  ContentPasteGoOutlined,
+  DeleteSweepOutlined,
+  SpeakerNotesOutlined,
+  SportsScoreOutlined,
+  VisibilityOutlined,
+} from '@mui/icons-material';
+import * as R from 'ramda';
 import {
   Alert,
   Button,
@@ -12,24 +21,16 @@ import {
   FormControlLabel,
   Grid,
   LinearProgress,
+  Link,
   Paper,
   Radio,
   RadioGroup,
   Switch,
   Typography,
+  useTheme,
 } from '@mui/material';
-import {
-  BallotOutlined,
-  ContactMailOutlined,
-  ContentPasteGoOutlined,
-  DeleteSweepOutlined,
-  SpeakerNotesOutlined,
-  SportsScoreOutlined,
-  VisibilityOutlined,
-} from '@mui/icons-material';
-import { Link, useParams } from 'react-router-dom';
-import * as R from 'ramda';
-import { useAppDispatch } from '../../utils/hooks';
+import { makeStyles } from '@mui/styles';
+import { useParams } from 'react-router-dom';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
@@ -55,14 +56,16 @@ import { fetchPlayers } from '../../../../../actions/User';
 import LessonsObjectives from './LessonsObjectives';
 import LessonsCategories from './LessonsCategories';
 import CreateLessonsTemplate from '../../../components/lessons/CreateLessonsTemplate';
+import type { Theme } from '../../../../../components/Theme';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import type { LessonsQuestion, LessonsSendInput } from '../../../../../utils/api-types';
 import { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import { TeamsHelper } from '../../../../../actions/teams/team-helper';
-import { UserHelper } from '../../../../../actions/helper';
 import { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import { LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
-import { LessonsQuestion, LessonsSendInput } from '../../../../../utils/api-types';
+import { TeamsHelper } from '../../../../../actions/teams/team-helper';
+import { UserHelper } from '../../../../../actions/helper';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   metric: {
     position: 'relative',
     padding: 20,
@@ -73,7 +76,7 @@ const useStyles = makeStyles((theme) => ({
     textTransform: 'uppercase',
     fontSize: 12,
     fontWeight: 500,
-    color: theme.palette.text.secondary,
+    color: theme.palette.secondary,
   },
   number: {
     fontSize: 30,
@@ -268,11 +271,11 @@ const Lessons: React.FC = () => {
                 <FormControlLabel
                   control={
                     <Switch
-                        disabled={exercise.exercise_lessons_anonymized}
-                        checked={exercise.exercise_lessons_anonymized}
-                        onChange={() => setOpenAnonymize(true)}
-                        name="anonymized"
-                      />
+                      disabled={exercise.exercise_lessons_anonymized}
+                      checked={exercise.exercise_lessons_anonymized}
+                      onChange={() => setOpenAnonymize(true)}
+                      name="anonymized"
+                    />
                                     }
                   label={t('Anonymize answers')}
                 />
@@ -391,7 +394,7 @@ const Lessons: React.FC = () => {
         keepMounted={false}
         open={openApplyTemplate}
         onClose={() => setOpenApplyTemplate(false)}
-        fullWidth={true}
+        fullWidth
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
@@ -415,27 +418,22 @@ const Lessons: React.FC = () => {
                   <FormControlLabel
                     key={template.lessonstemplate_id}
                     style={{
-                        width: '100%',
-                        borderBottom: `1px solid ${theme.palette.background.paper}`,
-                        margin: 0,
-                      }}
+                      width: '100%',
+                      borderBottom: `1px solid ${theme.palette.background.paper}`,
+                      margin: 0,
+                    }}
                     value={template.lessonstemplate_id}
                     control={<Radio/>}
                     label={
-                        <div
-                            style={{
-                                margin: '15px 0 15px 10px',
-                              }}
-                          >
-                            <Typography variant="h4">
-                                {template.lessons_template_name}
-                              </Typography>
-                            <Typography variant="body2">
-                                {template.lessons_template_description
-                                                        || t('No description')}
-                              </Typography>
-                          </div>
-                                        }
+                      <div style={{ margin: '15px 0 15px 10px' }}>
+                        <Typography variant="h4">
+                          {template.lessons_template_name}
+                        </Typography>
+                        <Typography variant="body2">
+                          {template.lessons_template_description || t('No description')}
+                        </Typography>
+                      </div>
+                    }
                   />
                 );
               })}
@@ -560,16 +558,16 @@ const Lessons: React.FC = () => {
                   </Typography>
                   <div style={{ width: '80%', display: 'flex', alignItems: 'center' }}>
                     <LinearProgress
-                        variant="determinate"
-                        value={answer.lessons_answer_score}
-                        style={{
-                            flex: 1,
-                            marginRight: 8,
-                          }}
-                      />
+                      variant="determinate"
+                      value={answer.lessons_answer_score}
+                      style={{
+                        flex: 1,
+                        marginRight: 8,
+                      }}
+                    />
                     <Typography variant="body2" color="text.secondary">
-                        {answer.lessons_answer_score}%
-                      </Typography>
+                      {answer.lessons_answer_score}%
+                    </Typography>
                   </div>
                 </Grid>
                 <Grid item={true} xs={3} style={{ marginTop: -10 }}>
