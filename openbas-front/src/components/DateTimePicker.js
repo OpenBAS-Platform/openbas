@@ -7,7 +7,7 @@ const dateFormatsMap = {
   'en-us': 'yyyy-MM-dd',
   'fr-fr': 'dd/MM/yyyy',
   'es-es': 'dd/MM/yyyy',
-  'zg-cn': 'yyyy-MM-dd',
+  'zh-cn': 'yyyy-MM-dd',
 };
 
 const DateTimePickerBase = ({
