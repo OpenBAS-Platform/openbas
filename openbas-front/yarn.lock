@@ -1781,6 +1781,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.25.0":
+  version: 7.25.0
+  resolution: "@babel/runtime@npm:7.25.0"
+  dependencies:
+    regenerator-runtime: "npm:^0.14.0"
+  checksum: 10c0/bd3faf246170826cef2071a94d7b47b49d532351360ecd17722d03f6713fd93a3eb3dbd9518faa778d5e8ccad7392a7a604e56bd37aaad3f3aa68d619ccd983d
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.22.15, @babel/template@npm:^7.24.0":
   version: 7.24.0
   resolution: "@babel/template@npm:7.24.0"
@@ -3442,7 +3451,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/base@npm:5.0.0-beta.40, @mui/base@npm:^5.0.0-beta.22":
+"@mui/base@npm:5.0.0-beta.40":
   version: 5.0.0-beta.40
   resolution: "@mui/base@npm:5.0.0-beta.40"
   dependencies:
@@ -3718,7 +3727,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/utils@npm:^5.14.16, @mui/utils@npm:^5.15.14":
+"@mui/utils@npm:^5.15.14":
   version: 5.15.14
   resolution: "@mui/utils@npm:5.15.14"
   dependencies:
@@ -3736,24 +3745,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/x-date-pickers@npm:6.20.2":
-  version: 6.20.2
-  resolution: "@mui/x-date-pickers@npm:6.20.2"
+"@mui/x-date-pickers@npm:7.12.0":
+  version: 7.12.0
+  resolution: "@mui/x-date-pickers@npm:7.12.0"
   dependencies:
-    "@babel/runtime": "npm:^7.23.2"
-    "@mui/base": "npm:^5.0.0-beta.22"
-    "@mui/utils": "npm:^5.14.16"
-    "@types/react-transition-group": "npm:^4.4.8"
-    clsx: "npm:^2.0.0"
+    "@babel/runtime": "npm:^7.25.0"
+    "@mui/system": "npm:^5.16.5"
+    "@mui/utils": "npm:^5.16.5"
+    "@types/react-transition-group": "npm:^4.4.10"
+    clsx: "npm:^2.1.1"
     prop-types: "npm:^15.8.1"
     react-transition-group: "npm:^4.4.5"
   peerDependencies:
     "@emotion/react": ^11.9.0
     "@emotion/styled": ^11.8.1
-    "@mui/material": ^5.8.6
-    "@mui/system": ^5.8.0
+    "@mui/material": ^5.15.14
     date-fns: ^2.25.0 || ^3.2.0
-    date-fns-jalali: ^2.13.0-0
+    date-fns-jalali: ^2.13.0-0 || ^3.2.0-0
     dayjs: ^1.10.7
     luxon: ^3.0.2
     moment: ^2.29.4
@@ -3780,7 +3788,7 @@ __metadata:
       optional: true
     moment-jalaali:
       optional: true
-  checksum: 10c0/1e1d414776564d9f6aed36ec61382a74f5002e829178af0fb1a308633a9acfe3f1a78d95bdbcd3f4b5d44c0194d940743dacb66074ee68c051f05fd0de56e239
+  checksum: 10c0/926624d4a9f05b892c794700ca36fd2d02cba36b34fe8f6100f2db97f48b2770785e631ce7590e7f212b9b8d988c29b71c7564882e798e499c5a3c34b9dd297e
   languageName: node
   linkType: hard
 
@@ -4772,7 +4780,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-transition-group@npm:^4.4.10, @types/react-transition-group@npm:^4.4.8":
+"@types/react-transition-group@npm:^4.4.10":
   version: 4.4.10
   resolution: "@types/react-transition-group@npm:4.4.10"
   dependencies:
@@ -5652,9 +5660,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"apexcharts@npm:3.52.0":
-  version: 3.52.0
-  resolution: "apexcharts@npm:3.52.0"
+"apexcharts@npm:3.51.0":
+  version: 3.51.0
+  resolution: "apexcharts@npm:3.51.0"
   dependencies:
     "@yr/monotone-cubic-spline": "npm:^1.0.3"
     svg.draggable.js: "npm:^2.2.2"
@@ -5663,7 +5671,7 @@ __metadata:
     svg.pathmorphing.js: "npm:^0.1.3"
     svg.resize.js: "npm:^1.4.3"
     svg.select.js: "npm:^3.0.1"
-  checksum: 10c0/a60f6a37104c16b2137b4eabdb20466d95f95f7ed42f3c277a9cdbe79474f9bad4822d3601bb4d45d60f9b04b1b1a154c08239cbd65a9d9496639bb12a3088d0
+  checksum: 10c0/52e0d65fefe3df006fbe9de1e888407fb7e2bdbfdc92e4aa72c38291e6422b64dc3a3440a6657b0593c1f8e1e6746db607dda1666a5851d710e33cc78a969d8a
   languageName: node
   linkType: hard
 
@@ -6573,7 +6581,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clsx@npm:^2.0.0, clsx@npm:^2.1.0":
+"clsx@npm:^2.1.0":
   version: 2.1.0
   resolution: "clsx@npm:2.1.0"
   checksum: 10c0/c09c00ad14f638366ca814097e6cab533dfa1972a358da5b557be487168acbb25b4c1395e89ffa842a8a61ba87a462d2b4885bc9d4f8410b598f3cb339599cdb
@@ -12333,7 +12341,7 @@ __metadata:
     "@mui/material": "npm:5.16.7"
     "@mui/styles": "npm:5.16.7"
     "@mui/utils": "npm:5.16.6"
-    "@mui/x-date-pickers": "npm:6.20.2"
+    "@mui/x-date-pickers": "npm:7.12.0"
     "@playwright/test": "npm:1.45.3"
     "@redux-devtools/extension": "npm:3.3.0"
     "@stylistic/eslint-plugin": "npm:1.8.1"
@@ -12350,7 +12358,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:7.18.0"
     "@uiw/react-md-editor": "npm:4.0.4"
     "@vitejs/plugin-react": "npm:4.3.0"
-    apexcharts: "npm:3.52.0"
+    apexcharts: "npm:3.51.0"
     axios: "npm:1.7.4"
     chokidar: "npm:3.6.0"
     ckeditor5-custom-build: "link:packages/ckeditor5-custom-build"

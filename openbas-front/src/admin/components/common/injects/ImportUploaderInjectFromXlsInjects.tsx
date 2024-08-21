@@ -221,11 +221,9 @@ const ImportUploaderInjectFromXlsInjects: FunctionComponent<Props> = ({
           render={({ field, fieldState }) => (
             <DateTimePicker
               views={['year', 'month', 'day']}
-              value={(field.value)}
-              minDate={new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()}
-              onChange={(startDate) => {
-                return (startDate ? field.onChange(new Date(startDate).toISOString()) : field.onChange(''));
-              }}
+              value={field.value ? new Date(field.value) : null}
+              minDate={new Date(new Date().setUTCHours(0, 0, 0, 0))}
+              onChange={(startDate) => field.onChange(startDate?.toISOString())}
               slotProps={{
                 textField: {
                   fullWidth: true,
