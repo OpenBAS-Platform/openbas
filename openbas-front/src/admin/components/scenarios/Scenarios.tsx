@@ -44,17 +44,14 @@ const useStyles = makeStyles((theme: Theme) => ({
     height: '100%',
   },
   itemHead: {
-    paddingLeft: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
   item: {
-    paddingLeft: 10,
     height: 50,
   },
   bodyItems: {
     display: 'flex',
-    alignItems: 'center',
   },
   bodyItem: {
     height: 20,
@@ -236,18 +233,9 @@ const Scenarios = () => {
           classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
+          secondaryAction={<>&nbsp;</>}
         >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
-              &nbsp;
-            </span>
-          </ListItemIcon>
+          <ListItemIcon />
           <ListItemText
             primary={
               <SortHeadersComponent
@@ -265,6 +253,7 @@ const Scenarios = () => {
             <ListItem
               key={scenario.scenario_id}
               classes={{ root: classes.item }}
+              divider
               secondaryAction={
                 <ScenarioPopover
                   scenario={scenario}
@@ -276,8 +265,6 @@ const Scenarios = () => {
               disablePadding
             >
               <ListItemButton
-                classes={{ root: classes.item }}
-                divider
                 href={`/admin/scenarios/${scenario.scenario_id}`}
               >
                 <ListItemIcon>

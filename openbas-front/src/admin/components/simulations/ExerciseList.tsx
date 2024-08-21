@@ -25,7 +25,6 @@ const useStyles = makeStyles(() => ({
   },
   bodyItems: {
     display: 'flex',
-    alignItems: 'center',
   },
   bodyItem: {
     height: 20,
@@ -142,6 +141,7 @@ const ExerciseList: FunctionComponent<Props> = ({
           classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
+          secondaryAction={<>&nbsp;</>}
            >
           <ListItemIcon />
           <ListItemText
@@ -162,10 +162,9 @@ const ExerciseList: FunctionComponent<Props> = ({
           classes={{ root: classes.item }}
           secondaryAction={secondaryAction && secondaryAction(exercise)}
           disablePadding
+          divider
         >
           <ListItemButton
-            classes={{ root: classes.item }}
-            divider
             href={`/admin/exercises/${exercise.exercise_id}`}
           >
             <ListItemIcon>
