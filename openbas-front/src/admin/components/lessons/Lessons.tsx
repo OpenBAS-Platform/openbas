@@ -271,11 +271,11 @@ const Lessons: React.FC = () => {
                 <FormControlLabel
                   control={
                     <Switch
-                      disabled={exercise.exercise_lessons_anonymized}
-                      checked={exercise.exercise_lessons_anonymized}
-                      onChange={() => setOpenAnonymize(true)}
-                      name="anonymized"
-                    />
+                        disabled={exercise.exercise_lessons_anonymized}
+                        checked={exercise.exercise_lessons_anonymized}
+                        onChange={() => setOpenAnonymize(true)}
+                        name="anonymized"
+                      />
                                     }
                   label={t('Anonymize answers')}
                 />
@@ -418,22 +418,22 @@ const Lessons: React.FC = () => {
                   <FormControlLabel
                     key={template.lessonstemplate_id}
                     style={{
-                      width: '100%',
-                      borderBottom: `1px solid ${theme.palette.background.paper}`,
-                      margin: 0,
-                    }}
+                        width: '100%',
+                        borderBottom: `1px solid ${theme.palette.background.paper}`,
+                        margin: 0,
+                      }}
                     value={template.lessonstemplate_id}
                     control={<Radio/>}
                     label={
-                      <div style={{ margin: '15px 0 15px 10px' }}>
-                        <Typography variant="h4">
-                          {template.lessons_template_name}
-                        </Typography>
-                        <Typography variant="body2">
-                          {template.lessons_template_description || t('No description')}
-                        </Typography>
-                      </div>
-                    }
+                        <div style={{ margin: '15px 0 15px 10px' }}>
+                            <Typography variant="h4">
+                                {template.lessons_template_name}
+                              </Typography>
+                            <Typography variant="body2">
+                                {template.lessons_template_description || t('No description')}
+                              </Typography>
+                          </div>
+                                        }
                   />
                 );
               })}
@@ -558,16 +558,16 @@ const Lessons: React.FC = () => {
                   </Typography>
                   <div style={{ width: '80%', display: 'flex', alignItems: 'center' }}>
                     <LinearProgress
-                      variant="determinate"
-                      value={answer.lessons_answer_score}
-                      style={{
-                        flex: 1,
-                        marginRight: 8,
-                      }}
-                    />
+                        variant="determinate"
+                        value={answer.lessons_answer_score}
+                        style={{
+                            flex: 1,
+                            marginRight: 8,
+                          }}
+                      />
                     <Typography variant="body2" color="text.secondary">
-                      {answer.lessons_answer_score}%
-                    </Typography>
+                        {answer.lessons_answer_score}%
+                      </Typography>
                   </div>
                 </Grid>
                 <Grid item={true} xs={3} style={{ marginTop: -10 }}>
