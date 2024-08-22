@@ -39,7 +39,7 @@ import LessonsObjectives from './LessonsObjectives';
 import LessonsCategories from './LessonsCategories';
 import { useAppDispatch } from '../../../utils/hooks';
 import { useFormatter } from '../../../components/i18n';
-import type { Exercise, LessonsAnswer, LessonsQuestion, LessonsSendInput, LessonsTemplate } from '../../../utils/api-types';
+import type { Exercise, LessonsAnswer, LessonsQuestion, LessonsSendInput, LessonsTemplate, Scenario } from '../../../utils/api-types';
 import { useHelper } from '../../../store';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
 import type { InjectHelper } from '../../../actions/injects/inject-helper';
@@ -59,11 +59,13 @@ import {
 } from '../../../actions/Lessons';
 import { fetchObjectives } from '../../../actions/Objective';
 import { fetchExerciseTeams, updateExerciseLessons } from '../../../actions/Exercise';
-import { fetchExerciseInjects } from '../../../actions/Inject';
+import { fetchExerciseInjects, fetchScenarioInjects } from '../../../actions/Inject';
 import { fetchPlayers } from '../../../actions/User';
 import Transition from '../../../components/common/Transition';
 import CreateLessonsTemplate from '../components/lessons/CreateLessonsTemplate';
 import { resolveUserName } from '../../../utils/String';
+import { fetchScenarioTeams } from '../../../actions/scenarios/scenario-actions';
+import { ScenariosHelper } from '../../../actions/scenarios/scenario-helper';
 
 const useStyles = makeStyles((theme: Theme) => ({
   metric: {
@@ -121,7 +123,10 @@ const Lessons: React.FC = () => {
     setTemplateValue(event.target.value);
   };
     // Fetching data
-  const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
+  const { exerciseId, scenarioId } = useParams() as {
+    exerciseId: Exercise['exercise_id'],
+    scenarioId: Scenario['scenario_id']
+  };
   const {
     exercise,
     objectives,
@@ -132,7 +137,7 @@ const Lessons: React.FC = () => {
     lessonsAnswers,
     lessonsTemplates,
     usersMap,
-  } = useHelper((helper: ExercisesHelper & InjectHelper & LessonsTemplatesHelper & TeamsHelper & UserHelper) => {
+  } = useHelper((helper: ExercisesHelper & InjectHelper & LessonsTemplatesHelper & ScenariosHelper & TeamsHelper & UserHelper) => {
     return {
       exercise: helper.getExercise(exerciseId),
       objectives: helper.getExerciseObjectives(exerciseId),
@@ -147,13 +152,22 @@ const Lessons: React.FC = () => {
   });
   useDataLoader(() => {
     dispatch(fetchLessonsTemplates());
-    dispatch(fetchLessonsCategories(exerciseId));
-    dispatch(fetchLessonsQuestions(exerciseId));
-    dispatch(fetchLessonsAnswers(exerciseId));
-    dispatch(fetchObjectives(exerciseId));
-    dispatch(fetchExerciseInjects(exerciseId));
-    dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchPlayers());
+    if (exerciseId) {
+      dispatch(fetchLessonsCategories(exerciseId));
+      dispatch(fetchLessonsQuestions(exerciseId));
+      dispatch(fetchLessonsAnswers(exerciseId));
+      dispatch(fetchObjectives(exerciseId));
+      dispatch(fetchExerciseInjects(exerciseId));
+      dispatch(fetchExerciseTeams(exerciseId));
+    } else if (scenarioId) {
+      dispatch(fetchLessonsCategories(scenarioId));
+      dispatch(fetchLessonsQuestions(scenarioId));
+      dispatch(fetchLessonsAnswers(scenarioId));
+      dispatch(fetchObjectives(scenarioId));
+      dispatch(fetchScenarioInjects(scenarioId));
+      dispatch(fetchScenarioTeams(scenarioId));
+    }
   });
   const applyTemplate = () => {
     return dispatch(applyLessonsTemplate(exerciseId, templateValue)).then(() => setOpenApplyTemplate(false));
@@ -433,7 +447,7 @@ const Lessons: React.FC = () => {
                           {template.lessons_template_description || t('No description')}
                         </Typography>
                       </div>
-                    }
+                                        }
                   />
                 );
               })}

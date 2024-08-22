@@ -143,7 +143,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
               <Route path="animation/logs" element={errorWrapper(Logs)()} />
               <Route path="animation/chat" element={errorWrapper(Chat)()} />
               <Route path="animation/validations" element={errorWrapper(Validations)()} />
-              <Route path="lessons" element={errorWrapper(Lessons)()} />
+              <Route path="lessons/:exerciseId?" element={errorWrapper(Lessons)()} />
               {/* Not found */}
               <Route path="*" element={<NotFound />} />
             </Routes>
