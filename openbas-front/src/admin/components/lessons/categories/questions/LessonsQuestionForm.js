@@ -1,8 +1,8 @@
 import React from 'react';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import OldTextField from '../../../../../../../components/fields/OldTextField';
-import { useFormatter } from '../../../../../../../components/i18n';
+import OldTextField from '../../../../../components/fields/OldTextField';
+import { useFormatter } from '../../../../../components/i18n';
 
 const LessonsQuestionForm = (props) => {
   const { t } = useFormatter();

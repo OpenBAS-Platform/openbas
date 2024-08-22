@@ -3,9 +3,9 @@ import { useDispatch } from 'react-redux';
 import { IconButton, Dialog, DialogTitle, DialogContent, Slide, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../../../../../../../components/i18n';
+import { useFormatter } from '../../../../../components/i18n';
 import LessonsQuestionForm from './LessonsQuestionForm';
-import { addLessonsQuestion } from '../../../../../../../actions/Lessons';
+import { addLessonsQuestion } from '../../../../../actions/Lessons';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
