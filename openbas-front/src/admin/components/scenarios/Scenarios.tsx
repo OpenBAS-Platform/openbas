@@ -28,17 +28,14 @@ import PaginationComponentV2 from '../../../components/common/queryable/paginati
 
 const useStyles = makeStyles(() => ({
   itemHead: {
-    paddingLeft: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
   item: {
-    paddingLeft: 10,
     height: 50,
   },
   bodyItems: {
     display: 'flex',
-    alignItems: 'center',
   },
   bodyItem: {
     height: 20,
@@ -192,6 +189,7 @@ const Scenarios = () => {
           classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
+          secondaryAction={<>&nbsp;</>}
         >
           <ListItemIcon />
           <ListItemText
@@ -209,6 +207,7 @@ const Scenarios = () => {
             <ListItem
               key={scenario.scenario_id}
               classes={{ root: classes.item }}
+              divider
               secondaryAction={
                 <ScenarioPopover
                   scenario={scenario}
@@ -220,8 +219,6 @@ const Scenarios = () => {
               disablePadding
             >
               <ListItemButton
-                classes={{ root: classes.item }}
-                divider
                 href={`/admin/scenarios/${scenario.scenario_id}`}
               >
                 <ListItemIcon>

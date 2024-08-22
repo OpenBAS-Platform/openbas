@@ -19,7 +19,6 @@ import { buildSearchPagination } from '../../../components/common/queryable/Quer
 const useStyles = makeStyles(() => ({
   bodyItems: {
     display: 'flex',
-    alignItems: 'center',
   },
   bodyItem: {
     height: 20,
@@ -30,13 +29,11 @@ const useStyles = makeStyles(() => ({
     paddingRight: 10,
   },
   itemHead: {
-    paddingLeft: 10,
     marginBottom: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
   item: {
-    paddingLeft: 10,
     height: 50,
   },
 }));
@@ -166,6 +163,7 @@ const InjectList: FunctionComponent<Props> = ({
           classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
+          secondaryAction={<>&nbsp;</>}
         >
           <ListItemIcon />
           <ListItemText
@@ -197,7 +195,6 @@ const InjectList: FunctionComponent<Props> = ({
               disablePadding
             >
               <ListItemButton
-                classes={{ root: classes.item }}
                 href={goTo(injectDto.inject_id)}
               >
                 <ListItemIcon>
