@@ -536,53 +536,56 @@ const Lessons: React.FC = () => {
       >
         <DialogTitle>{selectedQuestion?.lessons_question_content}</DialogTitle>
         <DialogContent style={{ paddingTop: 20 }}>
-          {selectedQuestionAnswers.map((answer: LessonsAnswer) => (
-            <div
-              key={answer.lessonsanswer_id}
-              style={{
-                marginBottom: 70,
-                borderBottom: `1px solid ${theme.palette.background.paper}`,
-                paddingBottom: 10,
-              }}
-            >
-              <Grid container={true} spacing={3}>
-                <Grid item={true} xs={3} style={{ marginTop: -10 }}>
-                  <Typography variant="h4">{t('User')}</Typography>
-                  {exercise.exercise_lessons_anonymized
-                    ? t('Anonymized')
-                    : resolveUserName('test t')}
-                </Grid>
-                <Grid item={true} xs={3} style={{ marginTop: -10 }}>
-                  <Typography variant="h4" style={{ marginBottom: 20 }}>
-                    {t('Score')}
-                  </Typography>
-                  <div style={{ width: '80%', display: 'flex', alignItems: 'center' }}>
-                    <LinearProgress
-                      variant="determinate"
-                      value={answer.lessons_answer_score}
-                      style={{
-                        flex: 1,
-                        marginRight: 8,
-                      }}
-                    />
-                    <Typography variant="body2" color="text.secondary">
-                      {answer.lessons_answer_score}%
+          {selectedQuestionAnswers.map((answer: LessonsAnswer) => {
+            const getUserName = answer.lessons_answer_user ? resolveUserName(usersMap[answer.lessons_answer_user.user_id]) : '-';
+            return (
+              <div
+                key={answer.lessonsanswer_id}
+                style={{
+                  marginBottom: 70,
+                  borderBottom: `1px solid ${theme.palette.background.paper}`,
+                  paddingBottom: 10,
+                }}
+              >
+                <Grid container={true} spacing={3}>
+                  <Grid item={true} xs={3} style={{ marginTop: -10 }}>
+                    <Typography variant="h4">{t('User')}</Typography>
+                    {exercise.exercise_lessons_anonymized
+                      ? t('Anonymized')
+                      : getUserName}
+                  </Grid>
+                  <Grid item={true} xs={3} style={{ marginTop: -10 }}>
+                    <Typography variant="h4" style={{ marginBottom: 20 }}>
+                      {t('Score')}
                     </Typography>
-                  </div>
+                    <div style={{ width: '80%', display: 'flex', alignItems: 'center' }}>
+                      <LinearProgress
+                        variant="determinate"
+                        value={answer.lessons_answer_score}
+                        style={{
+                          flex: 1,
+                          marginRight: 8,
+                        }}
+                      />
+                      <Typography variant="body2" color="text.secondary">
+                        {answer.lessons_answer_score}%
+                      </Typography>
+                    </div>
+                  </Grid>
+                  <Grid item={true} xs={3} style={{ marginTop: -10 }}>
+                    <Typography variant="h4">{t('What worked well')}</Typography>
+                    {answer.lessons_answer_positive}
+                  </Grid>
+                  <Grid item={true} xs={3} style={{ marginTop: -10 }}>
+                    <Typography variant="h4">
+                      {t("What didn't work well")}
+                    </Typography>
+                    {answer.lessons_answer_negative}
+                  </Grid>
                 </Grid>
-                <Grid item={true} xs={3} style={{ marginTop: -10 }}>
-                  <Typography variant="h4">{t('What worked well')}</Typography>
-                  {answer.lessons_answer_positive}
-                </Grid>
-                <Grid item={true} xs={3} style={{ marginTop: -10 }}>
-                  <Typography variant="h4">
-                    {t("What didn't work well")}
-                  </Typography>
-                  {answer.lessons_answer_negative}
-                </Grid>
-              </Grid>
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setSelectedQuestion(null)}>
