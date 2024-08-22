@@ -96,8 +96,14 @@ public class InjectTestStatusService {
     );
   }
 
-  public List<InjectTestStatus> findAllInjectTestsByScenarioId(String scenarioId) {
-    return injectTestStatusRepository.findAllScenarioInjectTests(scenarioId);
+  public Page<InjectTestStatus> findAllInjectTestsByScenarioId(String scenarioId,
+      SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+        (Specification<InjectTestStatus> specification, Pageable pageable) -> injectTestStatusRepository.findAll(
+            InjectTestSpecification.findInjectTestInScenario(scenarioId).and(specification), pageable),
+        searchPaginationInput,
+        InjectTestStatus.class
+    );
   }
 
   public InjectTestStatus findInjectTestStatusById(String testId) {

@@ -25,7 +25,7 @@ public class InjectTestStatusApi extends RestBehavior {
     return injectTestStatusService.testInject(injectId);
   }
 
-  @GetMapping("/api/injects/bulk/test")
+  @PostMapping("/api/injects/bulk/test")
   public List<InjectTestStatus> bulkTestInjects(@RequestBody List<String> injectIds) {
     return injectTestStatusService.bulkTestInjects(injectIds);
   }
@@ -37,9 +37,11 @@ public class InjectTestStatusApi extends RestBehavior {
     return injectTestStatusService.findAllInjectTestsByExerciseId(exerciseId, searchPaginationInput);
   }
 
-  @GetMapping("/api/scenario/{scenarioId}/injects/test")
-  public List<InjectTestStatus> findAllScenarioInjectTests(@PathVariable @NotBlank String scenarioId) {
-    return injectTestStatusService.findAllInjectTestsByScenarioId(scenarioId);
+  @PostMapping("/api/scenario/{scenarioId}/injects/test")
+  public Page<InjectTestStatus> findAllScenarioInjectTests(@PathVariable @NotBlank String scenarioId,
+      @RequestBody @Valid
+      SearchPaginationInput searchPaginationInput) {
+    return injectTestStatusService.findAllInjectTestsByScenarioId(scenarioId, searchPaginationInput);
   }
 
   @GetMapping("/api/injects/test/{testId}")

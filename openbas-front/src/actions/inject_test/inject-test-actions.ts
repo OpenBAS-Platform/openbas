@@ -7,9 +7,9 @@ export const searchExerciseInjectTests = (exerciseId: string, searchPaginationIn
   return simplePostCall(uri, searchPaginationInput);
 };
 
-export const searchScenarioInjectTests = (scenarioId: string) => {
+export const searchScenarioInjectTests = (scenarioId: string, searchPaginationInput: SearchPaginationInput) => {
   const uri = `/api/scenario/${scenarioId}/injects/test`;
-  return simpleCall(uri);
+  return simplePostCall(uri, searchPaginationInput);
 };
 
 export const fetchInjectTestStatus = (testId: string | undefined) => {

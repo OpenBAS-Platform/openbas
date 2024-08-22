@@ -22,8 +22,5 @@ public interface InjectTestStatusRepository extends CrudRepository<InjectTestSta
   Optional<InjectTestStatus> findById(@NotNull String id);
 
   Optional<InjectTestStatus> findByInject(@NotNull Inject inject);
-  
 
-  @Query(value = "select its.* from injects_tests_statuses its inner join injects i on its.status_inject = i.inject_id where i.inject_scenario = :scenarioId", nativeQuery = true)
-  List<InjectTestStatus> findAllScenarioInjectTests(@Param("scenarioId") String scenarioId);
 }

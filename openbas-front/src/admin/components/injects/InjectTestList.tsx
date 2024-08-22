@@ -11,6 +11,7 @@ import { isNotEmptyField } from '../../../utils/utils';
 import Empty from '../../../components/Empty';
 import InjectTestDetail from './InjectTestDetail';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
+import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 
 const useStyles = makeStyles(() => ({
   bodyItems: {
