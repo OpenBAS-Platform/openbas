@@ -5,15 +5,15 @@ import * as R from 'ramda';
 import { Button, Chip, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, Box, ListItemIcon, Grid, IconButton } from '@mui/material';
 import { Add, CastForEducationOutlined } from '@mui/icons-material';
 import { withStyles } from '@mui/styles';
-import SearchFilter from '../../../../../../components/SearchFilter';
-import inject18n from '../../../../../../components/i18n';
-import { storeHelper } from '../../../../../../actions/Schema';
-import { fetchTeams } from '../../../../../../actions/teams/team-actions';
-import CreateTeam from '../../../../components/teams/CreateTeam';
-import { truncate } from '../../../../../../utils/String';
-import TagsFilter from '../../../../common/filters/TagsFilter';
-import ItemTags from '../../../../../../components/ItemTags';
-import Transition from '../../../../../../components/common/Transition';
+import SearchFilter from '../../../../components/SearchFilter';
+import inject18n from '../../../../components/i18n';
+import { storeHelper } from '../../../../actions/Schema';
+import { fetchTeams } from '../../../../actions/teams/team-actions';
+import CreateTeam from '../../components/teams/CreateTeam';
+import { truncate } from '../../../../utils/String';
+import TagsFilter from '../../common/filters/TagsFilter';
+import ItemTags from '../../../../components/ItemTags';
+import Transition from '../../../../components/common/Transition';
 
 const styles = (theme) => ({
   createButton: {

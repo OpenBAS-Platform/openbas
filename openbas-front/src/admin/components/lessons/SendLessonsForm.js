@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import OldTextField from '../../../../../components/fields/OldTextField';
-import inject18n from '../../../../../components/i18n';
-import RichTextField from '../../../../../components/fields/RichTextField';
+import OldTextField from '../../../components/fields/OldTextField';
+import inject18n from '../../../components/i18n';
+import RichTextField from '../../../components/fields/RichTextField';
 
 class SendLessonsForm extends Component {
   validate(values) {

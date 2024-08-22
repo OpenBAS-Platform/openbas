@@ -4,11 +4,11 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { updateObjective, deleteObjective } from '../../../../../actions/Objective';
+import { updateObjective, deleteObjective } from '../../../actions/Objective';
 import ObjectiveForm from './ObjectiveForm';
-import inject18n from '../../../../../components/i18n';
-import Transition from '../../../../../components/common/Transition';
-import { isExerciseReadOnly } from '../../../../../utils/Exercise';
+import inject18n from '../../../components/i18n';
+import Transition from '../../../components/common/Transition';
+import { isExerciseReadOnly } from '../../../utils/Exercise';
 
 class ObjectivePopover extends Component {
   constructor(props) {

@@ -6,9 +6,9 @@ import { withStyles } from '@mui/styles';
 import { IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import ObjectiveForm from './ObjectiveForm';
-import { addObjective } from '../../../../../actions/Objective';
-import inject18n from '../../../../../components/i18n';
-import Transition from '../../../../../components/common/Transition';
+import { addObjective } from '../../../actions/Objective';
+import inject18n from '../../../components/i18n';
+import Transition from '../../../components/common/Transition';
 
 const styles = () => ({
   createButton: {

@@ -3,10 +3,10 @@ import { useDispatch } from 'react-redux';
 import { Dialog, DialogContent, DialogTitle, ListItem, ListItemIcon, ListItemText, Slide } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../../../../../../components/i18n';
+import { useFormatter } from '../../../../components/i18n';
 import LessonsCategoryForm from './LessonsCategoryForm';
-import { addLessonsCategory } from '../../../../../../actions/Lessons';
-import ButtonCreate from '../../../../../../components/common/ButtonCreate';
+import { addLessonsCategory } from '../../../../actions/Lessons';
+import ButtonCreate from '../../../../components/common/ButtonCreate';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

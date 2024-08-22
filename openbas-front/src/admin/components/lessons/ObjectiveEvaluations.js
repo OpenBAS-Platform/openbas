@@ -4,13 +4,13 @@ import { HowToVoteOutlined } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
-import { useFormatter } from '../../../../../components/i18n';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { addEvaluation, fetchEvaluations, updateEvaluation } from '../../../../../actions/Evaluation';
-import { resolveUserName } from '../../../../../utils/String';
-import Loader from '../../../../../components/Loader';
-import { isExerciseUpdatable } from '../../../../../utils/Exercise';
+import { useFormatter } from '../../../components/i18n';
+import { useHelper } from '../../../store';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
+import { addEvaluation, fetchEvaluations, updateEvaluation } from '../../../actions/Evaluation';
+import { resolveUserName } from '../../../utils/String';
+import Loader from '../../../components/Loader';
+import { isExerciseUpdatable } from '../../../utils/Exercise';
 
 const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
   const dispatch = useDispatch();

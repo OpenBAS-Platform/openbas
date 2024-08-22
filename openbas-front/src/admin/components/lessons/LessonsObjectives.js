@@ -5,11 +5,11 @@ import { FlagOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
 import Chart from 'react-apexcharts';
 import CreateObjective from './CreateObjective';
-import { useFormatter } from '../../../../../components/i18n';
-import Empty from '../../../../../components/Empty';
+import Empty from '../../../components/Empty';
 import ObjectivePopover from './ObjectivePopover';
-import { isExerciseUpdatable } from '../../../../../utils/Exercise';
-import { areaChartOptions } from '../../../../../utils/Charts';
+import { isExerciseUpdatable } from '../../../utils/Exercise';
+import { areaChartOptions } from '../../../utils/Charts';
+import { useFormatter } from '../../../components/i18n';
 
 const useStyles = makeStyles(() => ({
   paper: {
