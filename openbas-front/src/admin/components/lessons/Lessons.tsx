@@ -32,14 +32,21 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
-import { useFormatter } from '../../../../../components/i18n';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { fetchObjectives } from '../../../../../actions/Objective';
-import Transition from '../../../../../components/common/Transition';
 import ObjectiveEvaluations from './ObjectiveEvaluations';
-import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import CreateLessonsCategory from './categories/CreateLessonsCategory';
+import SendLessonsForm from './SendLessonsForm';
+import LessonsObjectives from './LessonsObjectives';
+import LessonsCategories from './LessonsCategories';
+import { useAppDispatch } from '../../../utils/hooks';
+import { useFormatter } from '../../../components/i18n';
+import { LessonsAnswer, LessonsQuestion, LessonsSendInput, LessonsTemplate } from '../../../utils/api-types';
+import { useHelper } from '../../../store';
+import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
+import type { InjectHelper } from '../../../actions/injects/inject-helper';
+import type { LessonsTemplatesHelper } from '../../../actions/lessons/lesson-helper';
+import type { TeamsHelper } from '../../../actions/teams/team-helper';
+import type { UserHelper } from '../../../actions/helper';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
 import {
   applyLessonsTemplate,
   emptyLessonsCategories,
@@ -49,21 +56,14 @@ import {
   fetchLessonsTemplates,
   resetLessonsAnswers,
   sendLessons,
-} from '../../../../../actions/Lessons';
-import { resolveUserName } from '../../../../../utils/String';
-import { fetchExerciseTeams, updateExerciseLessons } from '../../../../../actions/Exercise';
-import SendLessonsForm from './SendLessonsForm';
-import { fetchPlayers } from '../../../../../actions/User';
-import LessonsObjectives from './LessonsObjectives';
-import LessonsCategories from './LessonsCategories';
-import CreateLessonsTemplate from '../../../components/lessons/CreateLessonsTemplate';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import type { LessonsQuestion, LessonsSendInput } from '../../../../../utils/api-types';
-import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
-import type { LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
-import type { UserHelper } from '../../../../../actions/helper';
-import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
+} from '../../../actions/Lessons';
+import { fetchObjectives } from '../../../actions/Objective';
+import { fetchExerciseTeams, updateExerciseLessons } from '../../../actions/Exercise';
+import { fetchExerciseInjects } from '../../../actions/Inject';
+import { fetchPlayers } from '../../../actions/User';
+import Transition from '../../../components/common/Transition';
+import CreateLessonsTemplate from '../components/lessons/CreateLessonsTemplate';
+import { resolveUserName } from '../../../utils/String';
 
 const useStyles = makeStyles((theme: Theme) => ({
   metric: {
@@ -413,7 +413,7 @@ const Lessons: React.FC = () => {
               value={templateValue}
               onChange={handleChange}
             >
-              {lessonsTemplates.map((template) => {
+              {lessonsTemplates.map((template: LessonsTemplate) => {
                 return (
                   <FormControlLabel
                     key={template.lessonstemplate_id}
@@ -536,7 +536,7 @@ const Lessons: React.FC = () => {
       >
         <DialogTitle>{selectedQuestion?.lessons_question_content}</DialogTitle>
         <DialogContent style={{ paddingTop: 20 }}>
-          {selectedQuestionAnswers.map((answer) => (
+          {selectedQuestionAnswers.map((answer: LessonsAnswer) => (
             <div
               key={answer.lessonsanswer_id}
               style={{
