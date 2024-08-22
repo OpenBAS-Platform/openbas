@@ -557,7 +557,6 @@ const Injects = (props) => {
                     inject={inject}
                     exerciseOrScenarioId={exerciseOrScenarioId}
                     canBeTested
-                    tagsMap={tagsMap}
                     setSelectedInjectId={setSelectedInjectId}
                     isDisabled={!injectContract || !isContractExposed}
                   />

@@ -6,23 +6,30 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.tag.form.TagCreateInput;
 import io.openbas.rest.tag.form.TagUpdateInput;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.database.specification.TagSpecification.byName;
+import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RestController
 public class TagApi extends RestBehavior {
+
+    public static final String TAG_URI = "/api/tags";
 
     private TagRepository tagRepository;
 
@@ -83,5 +90,23 @@ public class TagApi extends RestBehavior {
     @DeleteMapping("/api/tags/{tagId}")
     public void deleteTag(@PathVariable String tagId) {
         tagRepository.deleteById(tagId);
+    }
+
+    // -- OPTION --
+
+    @GetMapping(TAG_URI + "/options")
+    public List<FilterUtilsJpa.Option> optionsByName(@RequestParam(required = false) final String searchText) {
+        return fromIterable(this.tagRepository.findAll(byName(searchText), PageRequest.of(0, 10)))
+            .stream()
+            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+            .toList();
+    }
+
+    @PostMapping(TAG_URI + "/options")
+    public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+        return fromIterable(this.tagRepository.findAllById(ids))
+            .stream()
+            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+            .toList();
     }
 }

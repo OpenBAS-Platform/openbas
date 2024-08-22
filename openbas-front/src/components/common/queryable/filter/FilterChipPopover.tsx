@@ -1,8 +1,8 @@
 import React, { FunctionComponent } from 'react';
 import { MenuItem, Popover, Select, SelectChangeEvent } from '@mui/material';
-import { useFormatter } from '../../i18n';
+import { useFormatter } from '../../../i18n';
 import { FilterHelpers } from './FilterHelpers';
-import type { Filter, PropertySchemaDTO } from '../../../utils/api-types';
+import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
 import { availableOperators, OperatorKeyValues } from './FilterUtils';
 import { FilterChipPopoverInput } from './FilterChipPopoverInput';
 

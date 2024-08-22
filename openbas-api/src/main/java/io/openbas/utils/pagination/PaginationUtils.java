@@ -14,6 +14,10 @@ import static io.openbas.utils.pagination.SortUtilsJpa.toSortJpa;
 
 public class PaginationUtils {
 
+  private PaginationUtils() {
+
+  }
+
   // -- JPA --
 
   public static <T> Page<T> buildPaginationJPA(

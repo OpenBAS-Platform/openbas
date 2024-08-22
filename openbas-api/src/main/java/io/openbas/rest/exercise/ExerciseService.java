@@ -3,6 +3,7 @@ package io.openbas.rest.exercise;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
+import io.openbas.database.criteria.GenericCriteria;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ArticleRepository;
 import io.openbas.database.repository.ExerciseRepository;
@@ -33,7 +34,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static io.openbas.database.criteria.ExerciseCriteria.countQuery;
+import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.AtomicTestingUtils.getExpectationResultByTypes;
 import static io.openbas.utils.Constants.ARTICLES;
@@ -127,7 +128,7 @@ public class ExerciseService {
         }
 
         // -- Count Query --
-        Long total = countQuery(cb, this.entityManager);
+        Long total = countQuery(cb, this.entityManager, Exercise.class, specification);
 
         return new PageImpl<>(exercises, pageable, total);
     }

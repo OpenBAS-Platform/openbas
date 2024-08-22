@@ -304,7 +304,7 @@ const Lessons = () => {
                   variant="contained"
                   onClick={() => setOpenEmptyLessons(true)}
                 >
-                  {t('Empty')}
+                  {t('Clear out')}
                 </Button>
               </Grid>
             </Grid>
@@ -490,7 +490,7 @@ const Lessons = () => {
             {t('Cancel')}
           </Button>
           <Button color="secondary" onClick={emptyLessons}>
-            {t('Empty')}
+            {t('Clear out')}
           </Button>
         </DialogActions>
       </Dialog>

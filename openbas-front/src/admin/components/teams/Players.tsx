@@ -12,7 +12,7 @@ import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
 import Breadcrumbs from '../../../components/Breadcrumbs';
-import { initSorting } from '../../../components/common/pagination/Page';
+import { initSorting } from '../../../components/common/queryable/Page';
 import type { OrganizationHelper, UserHelper } from '../../../actions/helper';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
@@ -20,6 +20,7 @@ import type { UserStore } from './players/Player';
 import type { SearchPaginationInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import { fetchTags } from '../../../actions/Tag';
+import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 
 const useStyles = makeStyles(() => ({
   itemHeader: {
@@ -84,10 +85,10 @@ const Players = () => {
   ];
 
   const [players, setPlayers] = useState<UserStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
     sorts: initSorting('user_email'),
     textSearch: search,
-  });
+  }));
 
   // Fetching data
   const { isPlanner, organizationsMap } = useHelper((helper: UserHelper & OrganizationHelper) => ({

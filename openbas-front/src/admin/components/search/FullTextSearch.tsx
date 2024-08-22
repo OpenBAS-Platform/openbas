@@ -14,6 +14,7 @@ import useEntityIcon from '../../../utils/hooks/useEntityIcon';
 import type { Theme } from '../../../components/Theme';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import ItemTags from '../../../components/ItemTags';
+import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -158,9 +159,9 @@ const FullTextSearch = () => {
 
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
-  const [searchPaginationInput, setSearchPaginationInput] = useState({
+  const [searchPaginationInput, setSearchPaginationInput] = useState(buildSearchPagination({
     textSearch: search,
-  });
+  }));
 
   const [results, setResults] = useState<Record<string, FullTextSearchCountResult>>({});
 
@@ -168,7 +169,7 @@ const FullTextSearch = () => {
     fullTextSearch(search).then((result: { data: Record<string, FullTextSearchCountResult> }) => {
       setResults(result.data);
     });
-    setSearchPaginationInput({ textSearch: search });
+    setSearchPaginationInput(buildSearchPagination({ textSearch: search }));
   }, [search]);
 
   // Tabs

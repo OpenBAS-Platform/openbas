@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import io.openbas.helper.InjectStatisticsHelper;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
@@ -64,7 +65,7 @@ public class Scenario implements Base {
 
   @Column(name = "scenario_category")
   @JsonProperty("scenario_category")
-  @Queryable(filterable = true)
+  @Queryable(filterable = true, dynamicValues = true)
   private String category;
 
   @Column(name = "scenario_main_focus")
@@ -170,6 +171,7 @@ public class Scenario implements Base {
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("scenario_tags")
+  @Queryable(filterable = true, dynamicValues = true)
   private Set<Tag> tags = new HashSet<>();
 
   @ManyToMany(fetch = FetchType.LAZY)
@@ -253,7 +255,7 @@ public class Scenario implements Base {
 
   // -- PLATFORMS --
   @JsonProperty("scenario_platforms")
-  public List<String> getPlatforms() {
+  public List<PLATFORM_TYPE> getPlatforms() {
     return getInjects().stream()
         .flatMap(inject -> inject.getInjectorContract()
             .map(InjectorContract::getPlatforms)

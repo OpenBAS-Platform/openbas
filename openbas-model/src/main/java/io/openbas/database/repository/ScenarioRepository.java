@@ -75,6 +75,11 @@ public interface ScenarioRepository extends CrudRepository<Scenario, String>,
           "GROUP BY sce.scenario_id", nativeQuery = true)
   List<RawScenario> rawInjectsFromScenarios(@Param("ids") List<String> ids);
 
+  // -- CATEGORY --
+
+  @Query("SELECT DISTINCT s.category FROM Scenario s WHERE LOWER(s.category) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+  List<String> findDistinctCategoriesBySearchTerm(@Param("searchTerm") final String searchTerm, Pageable pageable);
+
   // -- PAGINATION --
 
   @NotNull

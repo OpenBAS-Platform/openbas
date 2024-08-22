@@ -1,17 +1,20 @@
 package io.openbas.injector_contract;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
+import io.openbas.helper.SupportedLanguage;
 import io.openbas.injector_contract.fields.ContractElement;
 import io.openbas.injector_contract.variables.VariableHelper;
-import io.openbas.database.model.Endpoint;
-import io.openbas.helper.SupportedLanguage;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 public class Contract {
@@ -56,7 +59,7 @@ public class Contract {
 
     @Setter
     @JsonProperty("platforms")
-    private List<String> platforms = new ArrayList<>();
+    private List<PLATFORM_TYPE> platforms = new ArrayList<>();
 
     private Contract(
         @NotNull final ContractConfig config,
@@ -64,7 +67,7 @@ public class Contract {
         @NotEmpty final Map<SupportedLanguage, String> label,
         final boolean manual,
         @NotEmpty final List<ContractElement> fields,
-        final List<String> platforms,
+        final List<PLATFORM_TYPE> platforms,
         final boolean needsExecutor
     ) {
         this.config = config;
@@ -91,9 +94,9 @@ public class Contract {
         @NotBlank final String id,
         @NotEmpty final Map<SupportedLanguage, String> label,
         @NotEmpty final List<ContractElement> fields,
-        final List<String> platforms,
+        final List<PLATFORM_TYPE> platforms,
         final boolean needsExecutor) {
-        Contract contract = new Contract(config, id, label, true, fields, platforms == null ? List.of(Endpoint.PLATFORM_TYPE.Generic.name()) : platforms, needsExecutor);
+        Contract contract = new Contract(config, id, label, true, fields, platforms == null ? List.of(PLATFORM_TYPE.Generic) : platforms, needsExecutor);
         contract.setAtomicTesting(false);
         return contract;
     }
@@ -103,10 +106,10 @@ public class Contract {
         @NotBlank final String id,
         @NotEmpty final Map<SupportedLanguage, String> label,
         @NotEmpty final List<ContractElement> fields,
-        final List<String> platforms,
+        final List<PLATFORM_TYPE> platforms,
         final boolean needsExecutor
         ) {
-        return new Contract(config, id, label, false, fields, platforms == null ? List.of(Endpoint.PLATFORM_TYPE.Generic.name()) : platforms, needsExecutor);
+        return new Contract(config, id, label, false, fields, platforms == null ? List.of(PLATFORM_TYPE.Generic) : platforms, needsExecutor);
     }
 
     public void addContext(String key, String value) {

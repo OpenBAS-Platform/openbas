@@ -21,7 +21,7 @@ import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import type { InjectStore } from '../../../../actions/injects/Inject';
 import { InjectContext, PermissionsContext } from '../Context';
-import type { Inject, InjectStatus, InjectStatusExecution, Tag } from '../../../../utils/api-types';
+import type { Inject, InjectStatus, InjectStatusExecution } from '../../../../utils/api-types';
 import { duplicateInjectForExercise, duplicateInjectForScenario, tryInject, testInject } from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
@@ -30,7 +30,6 @@ import type { ExercisesHelper } from '../../../../actions/exercises/exercise-hel
 
 interface Props {
   inject: InjectStore;
-  tagsMap: Record<string, Tag>;
   setSelectedInjectId: (injectId: Inject['inject_id']) => void;
   isDisabled: boolean;
   canBeTested?: boolean;

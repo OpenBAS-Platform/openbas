@@ -16,7 +16,7 @@ import DocumentType from './DocumentType';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { initSorting } from '../../../../components/common/pagination/Page';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { useHelper } from '../../../../store';

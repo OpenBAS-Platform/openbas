@@ -6,11 +6,11 @@ import io.openbas.database.model.Filters.FilterMode;
 import io.openbas.database.model.Filters.FilterOperator;
 import io.openbas.utils.schema.PropertySchema;
 import io.openbas.utils.schema.SchemaUtils;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -26,6 +26,14 @@ import static io.openbas.utils.schema.SchemaUtils.getFilterableProperties;
 import static io.openbas.utils.schema.SchemaUtils.retrieveProperty;
 
 public class FilterUtilsJpa {
+
+  private FilterUtilsJpa() {
+
+  }
+
+  public record Option(String id, String label) {
+
+  }
 
   private static final Specification<?> EMPTY_SPECIFICATION = (root, query, cb) -> cb.conjunction();
 
@@ -66,19 +74,44 @@ public class FilterUtilsJpa {
       return (Specification<T>) EMPTY_SPECIFICATION;
     }
     String filterKey = filter.getKey();
-    List<String> filterValues = filter.getValues();
 
-    if (!filterValues.isEmpty()) {
-      return (root, query, cb) -> {
-        List<PropertySchema> propertySchemas = SchemaUtils.schema(root.getJavaType());
-        List<PropertySchema> filterableProperties = getFilterableProperties(propertySchemas);
-        PropertySchema filterableProperty = retrieveProperty(filterableProperties, filterKey);
-        Expression<String> paths = toPath(filterableProperty, root, cb);
-        // In case of join table, we will use ID so type is String
-        return toPredicate(paths, filter, cb, filterableProperty.getJoinTable() != null ? String.class : filterableProperty.getType());
-      };
+    return (root, query, cb) -> {
+      List<PropertySchema> propertySchemas = SchemaUtils.schema(root.getJavaType());
+      List<PropertySchema> filterableProperties = getFilterableProperties(propertySchemas);
+      PropertySchema filterableProperty = retrieveProperty(filterableProperties, filterKey);
+      Expression<String> paths = toPath(filterableProperty, root);
+      // In case of join table, we will use ID so type is String
+      return toPredicate(
+          paths, filter, cb, filterableProperty.getJoinTable() != null ? String.class : filterableProperty.getType()
+      );
+    };
+  }
+
+  /**
+   * Allows to manage deep paths not currently managed by the queryable annotation Next step: improvement of the
+   * queryable annotation in order to directly manage filters on deep properties as well as having several possible
+   * filters on these properties
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> Specification<T> computeFilterFromSpecificPath(
+      @Nullable final Filter filter,
+      @NotBlank final String jsonPath) {
+    if (filter == null) {
+      return (Specification<T>) EMPTY_SPECIFICATION;
     }
-    return (Specification<T>) EMPTY_SPECIFICATION;
+
+    String[] jsonPaths = jsonPath.split("\\.");
+    return (root, query, cb) -> {
+      if (jsonPaths.length > 0) {
+        Join<Object, Object> paths = root.join(jsonPaths[0], JoinType.LEFT);
+        for (int i = 1; i < jsonPaths.length - 1; i++) {
+          paths = paths.join(jsonPaths[i], JoinType.LEFT);
+        }
+        Path<String> finalPath = paths.get(jsonPaths[jsonPaths.length - 1]);
+        return toPredicate(finalPath, filter, cb, String.class);
+      }
+      throw new IllegalArgumentException();
+    };
   }
 
   private static Predicate toPredicate(
@@ -86,7 +119,9 @@ public class FilterUtilsJpa {
       @NotNull final Filter filter,
       @NotNull final CriteriaBuilder cb,
       @NotNull final Class<?> type) {
-    BiFunction<Expression<String>, List<String>, Predicate> operation = computeOperation(filter.getOperator(), cb, type);
+    BiFunction<Expression<String>, List<String>, Predicate> operation = computeOperation(
+        filter.getOperator(), cb, type
+    );
     return operation.apply(paths, filter.getValues());
   }
 
@@ -101,16 +136,30 @@ public class FilterUtilsJpa {
       return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.equalsTexts(paths, cb, texts, type);
     }
     if (operator.equals(FilterOperator.not_contains)) {
-      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.notContainsTexts(paths, cb, texts, type);
+      return (Expression<String> paths, List<String> texts) -> {
+        if (CollectionUtils.isEmpty(texts)) {
+          return null;
+        }
+        return OperationUtilsJpa.notContainsTexts(paths, cb, texts, type);
+      };
     } else if (operator.equals(FilterOperator.contains)) {
-      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.containsTexts(paths, cb, texts, type);
+      return (Expression<String> paths, List<String> texts) -> {
+        if (CollectionUtils.isEmpty(texts)) {
+          return null;
+        }
+        return OperationUtilsJpa.containsTexts(paths, cb, texts, type);
+      };
     } else if (operator.equals(FilterOperator.not_starts_with)) {
       return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.notStartWithTexts(paths, cb, texts);
     } else if (operator.equals(FilterOperator.starts_with)) {
       return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.startWithTexts(paths, cb, texts);
     } else if (operator.equals(FilterOperator.not_eq)) {
       return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.notEqualsTexts(paths, cb, texts, type);
-    } else { // Default case
+    } else if (operator.equals(FilterOperator.empty)) {
+      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.empty(paths, cb, type);
+    } else if (operator.equals(FilterOperator.not_empty)) {
+      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.notEmpty(paths, cb, type);
+    } else { // Default case -> equals
       return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.equalsTexts(paths, cb, texts, type);
     }
   }

@@ -12,11 +12,12 @@ import ItemTags from '../../../../components/ItemTags';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
-import { initSorting } from '../../../../components/common/pagination/Page';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import type { SearchPaginationInput } from '../../../../utils/api-types';
 import { searchSecurityPlatforms } from '../../../../actions/assets/securityPlatform-actions';
 import type { Theme } from '../../../../components/Theme';
 import { isNotEmptyField } from '../../../../utils/utils';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -83,10 +84,10 @@ const SecurityPlatforms = () => {
   ];
 
   const [securityPlatforms, setSecurityPlatforms] = useState<SecurityPlatformStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
     sorts: initSorting('asset_name'),
     textSearch: search,
-  });
+  }));
 
   // Export
   const exportProps = {

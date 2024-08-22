@@ -3,6 +3,7 @@ package io.openbas.injectors.caldera.service;
 import io.openbas.config.OpenBASAdminConfig;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
+import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import io.openbas.injectors.caldera.client.CalderaInjectorClient;
 import io.openbas.injectors.caldera.client.model.*;
 import io.openbas.injectors.caldera.model.Obfuscator;
@@ -64,7 +65,7 @@ public class CalderaInjectorService {
                 Command payloadCommand = (Command) Hibernate.unproxy(payload);
                 Arrays.stream(payloadCommand.getPlatforms()).forEach(platform -> {
                     Map<String, Object> executor = new HashMap<>();
-                    executor.put("platform", platform.equalsIgnoreCase("macos") ? "darwin" : platform.toLowerCase());
+                    executor.put("platform", platform.equals(PLATFORM_TYPE.MacOS) ? "darwin" : platform.name().toLowerCase());
                     executor.put("name", payloadCommand.getExecutor().equals("bash") ? "sh" : payloadCommand.getExecutor());
                     executor.put("command", payloadCommand.getContent());
                     executor.put("cleanup", cleanupCommands);
@@ -75,11 +76,11 @@ public class CalderaInjectorService {
                 Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
                 Arrays.stream(payloadExecutable.getPlatforms()).forEach(platform -> {
                     Map<String, Object> executor = new HashMap<>();
-                    executor.put("platform", platform.equalsIgnoreCase("macos") ? "darwin" : platform.toLowerCase());
-                    executor.put("name", platform.equals(Endpoint.PLATFORM_TYPE.Windows.name()) ? "psh" : "sh");
+                    executor.put("platform", platform.equals(PLATFORM_TYPE.MacOS) ? "darwin" : platform.name().toLowerCase());
+                    executor.put("name", platform.equals(PLATFORM_TYPE.Windows.name()) ? "psh" : "sh");
                     String windowsCommand = "Invoke-WebRequest -Method GET -Uri " + openBASConfig.getBaseUrl() + "/api/documents/" + payloadExecutable.getExecutableFile().getId() + "/file -Headers @{'Authorization' = 'Bearer " + openBASAdminConfig.getToken() + "'} -OutFile " + payloadExecutable.getExecutableFile().getName() + "; " + payloadExecutable.getExecutableFile().getName() + ";";
                     String unixCommand = "curl -H \"Authorization: Bearer " + openBASAdminConfig.getToken() + "\" " + openBASConfig.getBaseUrl() + "/api/documents/" + payloadExecutable.getExecutableFile().getId() + "/file -o " + payloadExecutable.getExecutableFile().getName() + ";./" + payloadExecutable.getExecutableFile().getName() + ";";
-                    executor.put("command", platform.equals(Endpoint.PLATFORM_TYPE.Windows.name()) ? windowsCommand : unixCommand);
+                    executor.put("command", platform.equals(PLATFORM_TYPE.Windows.name()) ? windowsCommand : unixCommand);
                     executor.put("cleanup", cleanupCommands);
                     executors.add(executor);
                 });
@@ -88,11 +89,11 @@ public class CalderaInjectorService {
                 FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
                 Arrays.stream(payloadFileDrop.getPlatforms()).forEach(platform -> {
                     Map<String, Object> executor = new HashMap<>();
-                    executor.put("platform", platform.equalsIgnoreCase("macos") ? "darwin" : platform.toLowerCase());
-                    executor.put("name", platform.equals(Endpoint.PLATFORM_TYPE.Windows.name()) ? "psh" : "sh");
+                    executor.put("platform", platform.equals(PLATFORM_TYPE.MacOS) ? "darwin" : platform.name().toLowerCase());
+                    executor.put("name", platform.equals(PLATFORM_TYPE.Windows) ? "psh" : "sh");
                     String windowsCommand = "Invoke-WebRequest -Method GET -Uri " + openBASConfig.getBaseUrl() + "/api/documents/" + payloadFileDrop.getFileDropFile().getId() + "/file -Headers @{'Authorization' = 'Bearer " + openBASAdminConfig.getToken() + "'} -OutFile " + payloadFileDrop.getFileDropFile().getName();
                     String unixCommand = "curl -H \"Authorization: Bearer " + openBASAdminConfig.getToken() + "\" " + openBASConfig.getBaseUrl() + "/api/documents/" + payloadFileDrop.getFileDropFile().getId() + "/file -o " + payloadFileDrop.getFileDropFile().getName();
-                    executor.put("command", platform.equals(Endpoint.PLATFORM_TYPE.Windows.name()) ? windowsCommand : unixCommand);
+                    executor.put("command", platform.equals(PLATFORM_TYPE.Windows) ? windowsCommand : unixCommand);
                     executor.put("cleanup", cleanupCommands);
                     executors.add(executor);
                 });
@@ -101,8 +102,8 @@ public class CalderaInjectorService {
                 DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
                 Arrays.stream(payloadDnsResolution.getPlatforms()).forEach(platform -> {
                     Map<String, Object> executor = new HashMap<>();
-                    executor.put("platform", platform.equals(Endpoint.PLATFORM_TYPE.MacOS.name()) ? "darwin" : platform.toLowerCase());
-                    executor.put("name", platform.equals(Endpoint.PLATFORM_TYPE.Windows.name()) ? "psh" : "sh");
+                    executor.put("platform", platform.equals(PLATFORM_TYPE.MacOS) ? "darwin" : platform.name().toLowerCase());
+                    executor.put("name", platform.equals(PLATFORM_TYPE.Windows) ? "psh" : "sh");
                     AtomicReference<String> command = new AtomicReference<>("");
                     Arrays.stream(payloadDnsResolution.getHostname().split("\\r?\\n")).forEach(s -> {
                         command.set(command + "nslookup " + s + ";");

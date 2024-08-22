@@ -70,4 +70,16 @@ public class OperationUtilsRuntime {
   public static boolean startWithText(@NotNull final Object value, @NotBlank final String text) {
     return ((String) value).toLowerCase().startsWith(text.toLowerCase());
   }
+
+  // -- NOT START WITH --
+
+  public static boolean notEmpty(@NotNull final Object value) {
+    return !empty(value);
+  }
+
+  // -- START WITH --
+
+  public static boolean empty(@NotNull final Object value) {
+    return value == null || ((String) value).isBlank();
+  }
 }

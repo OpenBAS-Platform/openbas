@@ -9,10 +9,11 @@ import { searchLessonsTemplates } from '../../../../actions/Lessons';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { useFormatter } from '../../../../components/i18n';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent.js';
-import { initSorting } from '../../../../components/common/pagination/Page';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import type { LessonsTemplate, SearchPaginationInput } from '../../../../utils/api-types';
 import type { UserHelper } from '../../../../actions/helper';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -75,9 +76,9 @@ const LessonsTemplates = () => {
   ];
 
   const [lessonTemplates, setLessonTemplates] = useState<LessonsTemplate[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
     sorts: initSorting('lessons_template_name'),
-  });
+  }));
 
   return (
     <>

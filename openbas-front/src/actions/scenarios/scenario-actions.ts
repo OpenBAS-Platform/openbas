@@ -175,3 +175,19 @@ export const dryImportXls = (scenarioId: Scenario['scenario_id'], importId: stri
       return response;
     });
 };
+
+// -- OPTION --
+
+export const searchScenarioAsOption = (searchText: string = '') => {
+  const params = { searchText };
+  return simpleCall(`${SCENARIO_URI}/options`, params);
+};
+
+export const searchScenarioByIdAsOption = (ids: string[]) => {
+  return simplePostCall(`${SCENARIO_URI}/options`, ids);
+};
+
+export const searchScenarioCategoryAsOption = (searchText: string = '') => {
+  const params = { searchText };
+  return simpleCall(`${SCENARIO_URI}/category/options`, params);
+};

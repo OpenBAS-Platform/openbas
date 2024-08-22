@@ -11,7 +11,7 @@ import type { SearchPaginationInput } from '../../../../utils/api-types';
 import { searchTeams } from '../../../../actions/teams/team-actions';
 import TeamPlayers from './TeamPlayers';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
-import { initSorting } from '../../../../components/common/pagination/Page';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import CreateTeam from './CreateTeam';
@@ -21,6 +21,7 @@ import type { TagHelper, UserHelper } from '../../../../actions/helper';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../../actions/Tag';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -99,10 +100,10 @@ const Teams = () => {
   ];
 
   const [teams, setTeams] = useState<TeamStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
     sorts: initSorting('team_name'),
     textSearch: search,
-  });
+  }));
 
   // Export
   const exportProps = {

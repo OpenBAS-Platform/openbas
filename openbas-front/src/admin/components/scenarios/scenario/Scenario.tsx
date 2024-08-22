@@ -21,15 +21,17 @@ import ItemMainFocus from '../../../../components/ItemMainFocus';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import ItemSeverity from '../../../../components/ItemSeverity';
-import type { KillChainPhase, SearchPaginationInput } from '../../../../utils/api-types';
+import type { KillChainPhase } from '../../../../utils/api-types';
 import { fetchScenarioExercises, searchScenarioExercises } from '../../../../actions/scenarios/scenario-actions';
 import type { Theme } from '../../../../components/Theme';
 import { isEmptyField } from '../../../../utils/utils';
 import type { EndpointStore } from '../../assets/endpoints/Endpoint';
-import { initSorting } from '../../../../components/common/pagination/Page';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import ExerciseList from '../../simulations/ExerciseList';
-import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
+import useQueryable from '../../../../components/common/queryable/useQueryable';
+import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import ExercisePopover from '../../simulations/simulation/ExercisePopover';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -74,9 +76,9 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
 
   // Exercises
   const [exercises, setExercises] = useState<EndpointStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+  const { queryableHelpers, searchPaginationInput } = useQueryable(`scenario-${scenarioId}-simulations`, buildSearchPagination({
     sorts: initSorting('exercise_start_date'),
-  });
+  }));
   const secondaryAction = (exercise: ExerciseStore) => (
     <ExercisePopover
       exercise={exercise}
@@ -85,7 +87,6 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
       inList
     />
   );
-
   return (
     <>
       <Grid
@@ -215,16 +216,18 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
               {t('Simulations')}
             </Typography>
             <Paper classes={{ root: classes.paper }} variant="outlined">
-              <PaginationComponent
+              <PaginationComponentV2
                 fetch={(input) => searchScenarioExercises(scenarioId, input)}
                 searchPaginationInput={searchPaginationInput}
                 setContent={setExercises}
+                entityPrefix="exercise"
+                availableFilterNames={['exercise_kill_chain_phases', 'exercise_scenario', 'exercise_tags']}
+                queryableHelpers={queryableHelpers}
                 searchEnable={false}
               />
               <ExerciseList
                 exercises={exercises}
-                searchPaginationInput={searchPaginationInput}
-                setSearchPaginationInput={setSearchPaginationInput}
+                queryableHelpers={queryableHelpers}
                 secondaryAction={secondaryAction}
               />
             </Paper>

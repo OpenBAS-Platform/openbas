@@ -73,7 +73,7 @@ public class OpenCTIContract extends Contractor {
         .optional(expectationsField)
         .build();
     Contract createCase = executableContract(contractConfig, OPENCTI_CREATE_CASE,
-        Map.of(en, "Create a new case", fr, "Créer un nouveau case"), createCaseInstance, List.of(Endpoint.PLATFORM_TYPE.Service.name()), false);
+        Map.of(en, "Create a new case", fr, "Créer un nouveau case"), createCaseInstance, List.of(Endpoint.PLATFORM_TYPE.Service), false);
     createCase.addVariable(documentUriVariable);
     List<ContractElement> createReportInstance = contractBuilder()
         .mandatory(textField("name", "Name"))
@@ -82,7 +82,7 @@ public class OpenCTIContract extends Contractor {
         .optional(expectationsField)
         .build();
     Contract createReport = executableContract(contractConfig, OPENCTI_CREATE_REPORT,
-        Map.of(en, "Create a new report", fr, "Créer un nouveau rapport"), createReportInstance, List.of(Endpoint.PLATFORM_TYPE.Service.name()), false);
+        Map.of(en, "Create a new report", fr, "Créer un nouveau rapport"), createReportInstance, List.of(Endpoint.PLATFORM_TYPE.Service), false);
     createReport.addVariable(documentUriVariable);
     return List.of(createCase, createReport);
   }
