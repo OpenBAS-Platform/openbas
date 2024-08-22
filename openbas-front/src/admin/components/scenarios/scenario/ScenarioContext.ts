@@ -10,7 +10,7 @@ import {
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { InjectStore } from '../../../../actions/injects/Inject';
-import { dryImportXls, fetchScenario, fetchScenarioTeams, importXls } from '../../../../actions/scenarios/scenario-actions';
+import { dryImportXlsForScenario, fetchScenario, fetchScenarioTeams, importXlsForScenario } from '../../../../actions/scenarios/scenario-actions';
 
 const injectContextForScenario = (scenario: ScenarioStore) => {
   const dispatch = useAppDispatch();
@@ -32,7 +32,7 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
       return dispatch(deleteInjectScenario(scenario.scenario_id, injectId));
     },
     onImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {
-      return importXls(scenario.scenario_id, importId, input).then((response) => new Promise((resolve, _reject) => {
+      return importXlsForScenario(scenario.scenario_id, importId, input).then((response) => new Promise((resolve, _reject) => {
         dispatch(fetchScenarioInjects(scenario.scenario_id));
         dispatch(fetchScenario(scenario.scenario_id));
         dispatch(fetchScenarioTeams(scenario.scenario_id));
@@ -40,7 +40,7 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
       }));
     },
     async onDryImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {
-      return dryImportXls(scenario.scenario_id, importId, input).then((result) => result.data);
+      return dryImportXlsForScenario(scenario.scenario_id, importId, input).then((result) => result.data);
     },
     onBulkDeleteInjects(injectIds: string[]): void {
       return dispatch(bulkDeleteInjectsForScenario(scenario.scenario_id, injectIds));
