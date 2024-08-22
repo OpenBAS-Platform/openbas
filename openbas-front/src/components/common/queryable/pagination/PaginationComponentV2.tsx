@@ -125,7 +125,7 @@ const PaginationComponentV2 = <T extends object>({
             setPristine={setPristine}
             style={{ marginLeft: searchEnable ? 10 : 0 }}
           />
-          {queryableHelpers.filterHelpers && availableFilterNames?.includes(`${entityPrefix}_attack_patterns`) && (
+          {queryableHelpers.filterHelpers && availableFilterNames?.includes('injector_contract_attack_patterns') && (
             <>
               <div style={{ cursor: 'pointer' }} onClick={() => setOpenMitreFilter(true)}>
                 <Button variant="outlined" style={{ marginLeft: searchEnable ? 10 : 0, border: '1px solid #c74227' }}>

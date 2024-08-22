@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.converter.InjectStatusExecutionConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +19,6 @@ import java.util.Objects;
 @Getter
 @MappedSuperclass
 public abstract class BaseInjectStatus implements Base {
-
 
   @Id
   @Column(name = "status_id")
@@ -70,6 +70,7 @@ public abstract class BaseInjectStatus implements Base {
   private Integer trackingTotalSuccess;
   // endregion
 
+  @Queryable(searchable = true, property = "title")
   @OneToOne
   @JoinColumn(name = "status_inject")
   @JsonIgnore

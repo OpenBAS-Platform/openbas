@@ -67,6 +67,7 @@ public class Payload implements Base {
   @JsonProperty("payload_description")
   private String description;
 
+  @Queryable(filterable = true, searchable = true)
   @Type(StringArrayType.class)
   @Column(name = "payload_platforms", columnDefinition = "text[]")
   @JsonProperty("payload_platforms")
@@ -79,7 +80,7 @@ public class Payload implements Base {
           inverseJoinColumns = @JoinColumn(name = "attack_pattern_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("payload_attack_patterns")
-  @Queryable(searchable = true, filterable = true, property = "externalId")
+  @Queryable(searchable = true, filterable = true, dynamicValues = true)
   private List<AttackPattern> attackPatterns = new ArrayList<>();
 
   @Setter

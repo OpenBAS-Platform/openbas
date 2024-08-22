@@ -15,7 +15,6 @@ const useStyles = makeStyles(() => ({
   },
   headerItems: {
     display: 'flex',
-    alignItems: 'center',
   },
   headerItem: {
     display: 'flex',

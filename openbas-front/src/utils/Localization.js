@@ -863,6 +863,9 @@ const i18n = {
       exercise_kill_chain_phases: 'Phases de kill chain',
       exercise_scenario: 'Scenario',
       exercise_tags: 'Tags',
+      // Payload
+      payload_attack_patterns: 'Modèles d\'attaque',
+      payload_platforms: 'Plateformes',
       Recurrence: 'Récurrence',
       'Does not repeat': 'Ne se répète pas',
       Daily: 'Quotidien',
@@ -2559,6 +2562,9 @@ const i18n = {
       exercise_kill_chain_phases: 'Kill chain phases',
       exercise_scenario: 'Scenario',
       exercise_tags: 'Tags',
+      // Payload
+      payload_attack_patterns: 'Attack patterns',
+      payload_platforms: 'Plateforms',
       recurrence_The: 'The',
       recurrence_at: 'at',
       recurrence_from: 'from',

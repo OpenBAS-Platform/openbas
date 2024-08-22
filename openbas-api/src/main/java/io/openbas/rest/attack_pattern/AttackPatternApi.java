@@ -3,8 +3,8 @@ package io.openbas.rest.attack_pattern;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.KillChainPhase;
-import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.raw.RawAttackPattern;
+import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.KillChainPhaseRepository;
 import io.openbas.database.specification.InjectorContractSpecification;
@@ -13,12 +13,14 @@ import io.openbas.rest.attack_pattern.form.AttackPatternUpdateInput;
 import io.openbas.rest.attack_pattern.form.AttackPatternUpsertInput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
@@ -31,6 +33,7 @@ import java.util.Optional;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.database.specification.AttackPatternSpecification.byName;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
@@ -38,6 +41,8 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 @RestController
 @Secured(ROLE_USER)
 public class AttackPatternApi extends RestBehavior {
+
+    public static final String ATTACK_PATTERN_URI = "/api/attack_patterns";
 
     private AttackPatternRepository attackPatternRepository;
 
@@ -166,5 +171,23 @@ public class AttackPatternApi extends RestBehavior {
     @Transactional(rollbackOn = Exception.class)
     public void deleteAttackPattern(@PathVariable String attackPatternId) {
         attackPatternRepository.deleteById(attackPatternId);
+    }
+
+    // -- OPTION --
+
+    @GetMapping(ATTACK_PATTERN_URI + "/options")
+    public List<FilterUtilsJpa.Option> optionsByName(@RequestParam(required = false) final String searchText) {
+        return fromIterable(this.attackPatternRepository.findAll(byName(searchText), PageRequest.of(0, 10)))
+            .stream()
+            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+            .toList();
+    }
+
+    @PostMapping(ATTACK_PATTERN_URI + "/options")
+    public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+        return fromIterable(this.attackPatternRepository.findAllById(ids))
+            .stream()
+            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+            .toList();
     }
 }
