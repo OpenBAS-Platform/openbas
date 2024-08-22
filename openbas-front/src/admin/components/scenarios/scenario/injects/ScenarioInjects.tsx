@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as R from 'ramda';
 import { ArticleContext, TeamContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
@@ -12,7 +12,7 @@ import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
-import type { Inject, Scenario } from '../../../../../utils/api-types';
+import type { Inject, InjectStatus, Scenario } from '../../../../../utils/api-types';
 import Injects from '../../../common/injects/Injects';
 import { articleContextForScenario } from '../articles/ScenarioArticles';
 import { teamContextForScenario } from '../teams/ScenarioTeams';
@@ -21,6 +21,7 @@ import ToolBar from '../../../common/ToolBar';
 import { isNotEmptyField } from '../../../../../utils/utils';
 import injectContextForScenario from '../ScenarioContext';
 import { fetchScenarioInjectsSimple } from '../../../../../actions/injects/inject-action';
+import { bulkTestInjects } from '../../../../../actions/Inject';
 
 interface Props {
 
@@ -28,6 +29,7 @@ interface Props {
 
 const ScenarioInjects: FunctionComponent<Props> = () => {
   // Standard hooks
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
 
@@ -170,6 +172,17 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
     injectContext.onBulkDeleteInjects(injectsToProcess.map((inject: Inject) => inject.inject_id));
   };
 
+  const massTestInjects = () => {
+    bulkTestInjects(injectsToProcess.map((inject: Inject) => inject.inject_id)).then((result: { data: InjectStatus }) => {
+      if (numberOfSelectedElements === 1) {
+        // @ts-expect-error Data is an array with one element
+        navigate(`/admin/scenarios/${scenario.scenario_id}/tests/${result.data[0].status_id}`);
+      } else {
+        navigate(`/admin/scenarios/${scenario.scenario_id}/tests`);
+      }
+    });
+  };
+
   return (
     <ArticleContext.Provider value={articleContext}>
       <TeamContext.Provider value={teamContext}>
@@ -201,6 +214,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
           id={scenario.scenario_id}
           handleUpdate={massUpdateInjects}
           handleBulkDelete={bulkDeleteInjects}
+          handleBulkTest={massTestInjects}
         />
       </TeamContext.Provider>
     </ArticleContext.Provider>

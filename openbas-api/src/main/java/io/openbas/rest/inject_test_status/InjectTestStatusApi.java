@@ -3,12 +3,13 @@ package io.openbas.rest.inject_test_status;
 import io.openbas.database.model.InjectTestStatus;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.InjectTestStatusService;
+import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,9 +25,16 @@ public class InjectTestStatusApi extends RestBehavior {
     return injectTestStatusService.testInject(injectId);
   }
 
-  @GetMapping("/api/exercise/{exerciseId}/injects/test")
-  public List<InjectTestStatus> findAllExerciseInjectTests(@PathVariable @NotBlank String exerciseId) {
-    return injectTestStatusService.findAllInjectTestsByExerciseId(exerciseId);
+  @GetMapping("/api/injects/bulk/test")
+  public List<InjectTestStatus> bulkTestInjects(@RequestBody List<String> injectIds) {
+    return injectTestStatusService.bulkTestInjects(injectIds);
+  }
+
+  @PostMapping("/api/exercise/{exerciseId}/injects/test")
+  public Page<InjectTestStatus> findAllExerciseInjectTests(@PathVariable @NotBlank String exerciseId,
+      @RequestBody @Valid
+      SearchPaginationInput searchPaginationInput) {
+    return injectTestStatusService.findAllInjectTestsByExerciseId(exerciseId, searchPaginationInput);
   }
 
   @GetMapping("/api/scenario/{scenarioId}/injects/test")

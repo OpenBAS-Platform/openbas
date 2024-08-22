@@ -4,13 +4,13 @@ import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui
 import type { InjectTestStatus, SearchPaginationInput } from '../../../utils/api-types';
 import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
-import { initSorting } from '../../../components/common/queryable/Page';
+import { initSorting, Page } from '../../../components/common/queryable/Page';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
 import InjectIcon from '../common/injects/InjectIcon';
 import { isNotEmptyField } from '../../../utils/utils';
 import Empty from '../../../components/Empty';
 import InjectTestDetail from './InjectTestDetail';
-import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
+import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 
 const useStyles = makeStyles(() => ({
   bodyItems: {
@@ -51,7 +51,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  searchInjectTests: (exerciseOrScenarioId: string) => Promise<{ data: InjectTestStatus[] }>;
+  searchInjectTests: (exerciseOrScenarioId: string, input: SearchPaginationInput) => Promise<{ data: Page<InjectTestStatus> }>;
   searchInjectTest: (testId: string) => Promise<{ data: InjectTestStatus }>;
   exerciseOrScenarioId: string;
   statusId: string | undefined;
@@ -105,19 +105,24 @@ const InjectTestList: FunctionComponent<Props> = ({
   // Filter and sort hook
   const [tests, setTests] = useState<InjectTestStatus[] | null>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
-    sorts: initSorting('inject_title'),
+    // sorts: initSorting('inject_title', 'DESC'),
   }));
 
   // Fetch tests list
-  useEffect(() => {
+  /* useEffect(() => {
     searchInjectTests(exerciseOrScenarioId).then((result: { data: InjectTestStatus[] }) => {
       setTests(result.data);
     });
-  }, []);
+  }, []); */
 
   return (
     <>
-      <List>
+      <PaginationComponent
+        fetch={(input) => searchInjectTests(exerciseOrScenarioId, input)}
+        searchPaginationInput={searchPaginationInput}
+        setContent={setTests}
+      />
+      <List style={{ marginTop: 40 }}>
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
@@ -146,6 +151,7 @@ const InjectTestList: FunctionComponent<Props> = ({
               <ListItemButton
                 classes={{ root: classes.item }}
                 onClick={() => setSelectedTest(test)}
+                selected={test.status_id === selectedTest?.status_id}
               >
                 <ListItemIcon>
                   <InjectIcon

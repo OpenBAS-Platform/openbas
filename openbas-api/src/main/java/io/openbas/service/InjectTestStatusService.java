@@ -4,15 +4,20 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectTestStatusRepository;
 import io.openbas.database.repository.UserRepository;
+import io.openbas.database.specification.InjectTestSpecification;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Injector;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @Service
 @Log
@@ -64,8 +70,30 @@ public class InjectTestStatusService {
     return injectTestStatusToSave;
   }
 
-  public List<InjectTestStatus> findAllInjectTestsByExerciseId(String exerciseId) {
-    return injectTestStatusRepository.findAllExerciseInjectTests(exerciseId);
+  @Transactional
+  public List<InjectTestStatus> bulkTestInjects(List<String> injectIds) {
+    Iterable<Inject> injectIterable = injectRepository.findAllById(injectIds);
+    List<Inject> injects = new ArrayList<>();
+    injectIterable.forEach(iterable -> {
+      if (iterable.getInjectTestable() && !iterable.getTeams().isEmpty()) {
+        injects.add(iterable);
+      }
+    });
+    List<InjectTestStatus> results = new ArrayList<>();
+    injects.forEach(inject -> {
+      results.add(testInject(inject.getId()));
+    });
+    return results;
+  }
+
+  public Page<InjectTestStatus> findAllInjectTestsByExerciseId(String exerciseId,
+      SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+        (Specification<InjectTestStatus> specification, Pageable pageable) -> injectTestStatusRepository.findAll(
+            InjectTestSpecification.findInjectTestInExercise(exerciseId).and(specification), pageable),
+        searchPaginationInput,
+        InjectTestStatus.class
+    );
   }
 
   public List<InjectTestStatus> findAllInjectTestsByScenarioId(String scenarioId) {

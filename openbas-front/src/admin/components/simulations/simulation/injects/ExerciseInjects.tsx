@@ -1,10 +1,10 @@
 import React, { FunctionComponent, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { BarChartOutlined, ReorderOutlined } from '@mui/icons-material';
 import { Grid, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
-import type { Exercise, Inject } from '../../../../../utils/api-types';
+import type { Exercise, Inject, InjectStatus, InjectTestStatus } from '../../../../../utils/api-types';
 import { ArticleContext, TeamContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
@@ -32,6 +32,7 @@ import ToolBar from '../../../common/ToolBar';
 import { isNotEmptyField } from '../../../../../utils/utils';
 import { fetchExerciseInjectsSimple } from '../../../../../actions/injects/inject-action';
 import injectContextForExercise from '../ExerciseContext';
+import { bulkTestInjects } from '../../../../../actions/Inject';
 
 const useStyles = makeStyles(() => ({
   paperChart: {
@@ -50,6 +51,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
 
@@ -201,6 +203,17 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
     injectContext.onBulkDeleteInjects(injectsToProcess.map((inject: Inject) => inject.inject_id));
   };
 
+  const massTestInjects = () => {
+    bulkTestInjects(injectsToProcess.map((inject: Inject) => inject.inject_id)).then((result: { data: InjectTestStatus }) => {
+      if (numberOfSelectedElements === 1) {
+        // @ts-expect-error Data is an array with one element
+        navigate(`/admin/exercises/${exercise.exercise_id}/tests/${result.data[0].status_id}`);
+      } else {
+        navigate(`/admin/exercises/${exercise.exercise_id}/tests`);
+      }
+    });
+  };
+
   return (
     <>
       {viewMode === 'list' && (
@@ -235,6 +248,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
               id={exercise.exercise_id}
               handleUpdate={massUpdateInjects}
               handleBulkDelete={bulkDeleteInjects}
+              handleBulkTest={massTestInjects}
             />
           </TeamContext.Provider>
         </ArticleContext.Provider>

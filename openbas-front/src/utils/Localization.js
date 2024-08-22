@@ -1194,6 +1194,11 @@ const i18n = {
       'Attribute mapping configuration': 'Configuration d\'attribut de mapper',
       'The imported file contains absolute dates (ex.: 9h30). A starting date must be provided for the Scenario to be build': 'Le fichier importé contient des dates absolues (ex.: 9h30). Une date de début doit être fournie pour que le scénario puisse être créé',
       Test: 'Test',
+      'Do you want to test this inject?':
+        'Souhaitez-vous tester ce stimuli?',
+      'Do you want to test these {count} injects?':
+        'Souhaitez-vous tester ces {count} stimulis?',
+      'Only SMS and emails related injects with teams defined will be tested': 'Uniquement les stimulis de types email et SMS avec des équipes définies seront testés',
       'Do you want to delete this XLS mapper ?': 'Voulez-vous supprimer ce mappage XLS ?',
       Expectation_name: 'Nom de l\'attendu',
       Expectation_description: 'Description de l\'attendu',
@@ -2591,6 +2596,8 @@ const i18n = {
       ABSOLUTE_TIME_WITHOUT_START_DATE: 'Your import contains injects triggered only with the time of the day (e.g.: 9:30) but there is no launch date specified for this scenario. Please specify a launch date for this scenario.',
       // Bulk actions
       'Do you want to delete these {count} injects?': 'Do you want to delete these {count} injects?',
+      'Do you want to test these {count} injects?':
+        'Do you want to test these {count} injects?',
       // Platform Banner
       'IMAP service is not responding, your injectors may be impacted.': 'IMAP service is not responding, your injectors may be impacted.',
       'Executor Caldera is not responding, your exercises may be impacted.': 'Executor Caldera is not responding, your exercises may be impacted.',
