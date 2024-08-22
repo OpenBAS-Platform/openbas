@@ -23,8 +23,8 @@ import Loader from '../../../../../components/Loader';
 import ReportPopover from './ReportPopover';
 import { fetchLessonsAnswers, fetchLessonsCategories, fetchLessonsQuestions } from '../../../../../actions/Lessons';
 import { fetchObjectives } from '../../../../../actions/Objective';
-import LessonsObjectives from '../lessons/LessonsObjectives';
-import LessonsCategories from '../lessons/LessonsCategories';
+import LessonsObjectives from '../../../lessons/LessonsObjectives';
+import LessonsCategories from '../../../lessons/LessonsCategories';
 import ExportButtons from '../../../../../components/ExportButtons';
 
 const useStyles = makeStyles((theme) => ({

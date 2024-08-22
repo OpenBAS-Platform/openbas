@@ -1,16 +1,16 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
-import { Box, Grid, Paper, Typography, List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, LinearProgress, Tooltip, Chip } from '@mui/material';
+import { Box, Chip, Grid, LinearProgress, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
 import { CastForEducationOutlined, HelpOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
-import { useFormatter } from '../../../../../components/i18n';
 import LessonsCategoryPopover from './categories/LessonsCategoryPopover';
 import LessonsQuestionPopover from './categories/questions/LessonsQuestionPopover';
 import CreateLessonsQuestion from './categories/questions/CreateLessonsQuestion';
 import LessonsCategoryAddTeams from './categories/LessonsCategoryAddTeams';
-import { truncate } from '../../../../../utils/String';
-import { updateLessonsCategoryTeams } from '../../../../../actions/Lessons';
+import { updateLessonsCategoryTeams } from '../../../actions/Lessons';
+import { useFormatter } from '../../../components/i18n';
+import { truncate } from '../../../utils/String';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -75,7 +75,7 @@ const LessonsCategories = ({
           number: n[1].length,
           comments: R.filter(
             (o) => o.lessons_answer_positive !== null
-              || o.lessons_answer_negative !== null,
+                            || o.lessons_answer_negative !== null,
             n[1],
           ).length,
         },
@@ -97,12 +97,12 @@ const LessonsCategories = ({
               {category.lessons_category_name}
             </Typography>
             {!isReport && (
-              <LessonsCategoryPopover
-                exerciseId={exerciseId}
-                lessonsCategory={category}
-              />
+            <LessonsCategoryPopover
+              exerciseId={exerciseId}
+              lessonsCategory={category}
+            />
             )}
-            <div className="clearfix" />
+            <div className="clearfix"/>
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={4} style={{ marginTop: -10 }}>
                 <Typography variant="h4">{t('Questions')}</Typography>
@@ -118,33 +118,33 @@ const LessonsCategories = ({
                         divider={true}
                       >
                         <ListItemIcon>
-                          <HelpOutlined />
+                          <HelpOutlined/>
                         </ListItemIcon>
                         <ListItemText
                           style={{ width: '50%' }}
                           primary={question.lessons_question_content}
                           secondary={
-                            question.lessons_question_explanation
-                            || t('No explanation')
-                          }
+                                                        question.lessons_question_explanation
+                                                        || t('No explanation')
+                                                    }
                         />
                         {!isReport && (
-                          <ListItemSecondaryAction>
-                            <LessonsQuestionPopover
-                              exerciseId={exerciseId}
-                              lessonsCategoryId={category.lessonscategory_id}
-                              lessonsQuestion={question}
-                            />
-                          </ListItemSecondaryAction>
+                        <ListItemSecondaryAction>
+                          <LessonsQuestionPopover
+                            exerciseId={exerciseId}
+                            lessonsCategoryId={category.lessonscategory_id}
+                            lessonsQuestion={question}
+                          />
+                        </ListItemSecondaryAction>
                         )}
                       </ListItem>
                     ))}
                     {!isReport && (
-                      <CreateLessonsQuestion
-                        inline={true}
-                        exerciseId={exerciseId}
-                        lessonsCategoryId={category.lessonscategory_id}
-                      />
+                    <CreateLessonsQuestion
+                      inline={true}
+                      exerciseId={exerciseId}
+                      lessonsCategoryId={category.lessonscategory_id}
+                    />
                     )}
                   </List>
                 </Paper>
@@ -167,7 +167,7 @@ const LessonsCategories = ({
                           divider={true}
                           button={true}
                           onClick={() => setSelectedQuestion && setSelectedQuestion(question)
-                          }
+                                                    }
                         >
                           <ListItemText
                             style={{ width: '50%' }}
@@ -212,16 +212,16 @@ const LessonsCategories = ({
                   {t('Targeted teams')}
                 </Typography>
                 {!isReport && (
-                  <LessonsCategoryAddTeams
-                    exerciseId={exerciseId}
-                    lessonsCategoryId={category.lessonscategory_id}
-                    lessonsCategoryTeamsIds={
-                      category.lessons_category_teams
-                    }
-                    handleUpdateTeams={handleUpdateTeams}
-                  />
+                <LessonsCategoryAddTeams
+                  exerciseId={exerciseId}
+                  lessonsCategoryId={category.lessonscategory_id}
+                  lessonsCategoryTeamsIds={
+                                            category.lessons_category_teams
+                                        }
+                  handleUpdateTeams={handleUpdateTeams}
+                />
                 )}
-                <div className="clearfix" />
+                <div className="clearfix"/>
                 <Paper
                   variant="outlined"
                   classes={{ root: classes.paperPadding }}
@@ -235,18 +235,18 @@ const LessonsCategories = ({
                       >
                         <Chip
                           onDelete={
-                            isReport
-                              ? undefined
-                              : () => handleUpdateTeams(
-                                category.lessonscategory_id,
-                                R.filter(
-                                  (n) => n !== teamId,
-                                  category.lessons_category_teams,
-                                ),
-                              )
-                          }
+                                                        isReport
+                                                          ? undefined
+                                                          : () => handleUpdateTeams(
+                                                            category.lessonscategory_id,
+                                                            R.filter(
+                                                              (n) => n !== teamId,
+                                                              category.lessons_category_teams,
+                                                            ),
+                                                          )
+                                                    }
                           label={truncate(team?.team_name || '', 30)}
-                          icon={<CastForEducationOutlined />}
+                          icon={<CastForEducationOutlined/>}
                           classes={{ root: classes.chip }}
                         />
                       </Tooltip>

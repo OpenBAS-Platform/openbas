@@ -26,7 +26,7 @@ const Scenario = lazy(() => import('./Scenario'));
 const ScenarioDefinition = lazy(() => import('./ScenarioDefinition'));
 const Injects = lazy(() => import('./injects/ScenarioInjects'));
 const Tests = lazy(() => import('./tests/ScenarioTests'));
-const Lessons = lazy(() => import('../../simulations/simulation/lessons/Lessons'));
+const Lessons = lazy(() => import('../../lessons/Lessons'));
 
 // eslint-disable-next-line no-underscore-dangle
 const _MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -138,12 +138,12 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
                 value={`/admin/scenarios/${scenario.scenario_id}/injects`}
                 label={t('Injects')}
               />
-            <Tab
+              <Tab
                 component={Link}
                 to={`/admin/scenarios/${scenario.scenario_id}/tests`}
                 value={`/admin/scenarios/${scenario.scenario_id}/tests`}
                 label={t('Tests')}
-            />
+              />
               <Tab
                 component={Link}
                 to={`/admin/scenarios/${scenario.scenario_id}/lessons`}
