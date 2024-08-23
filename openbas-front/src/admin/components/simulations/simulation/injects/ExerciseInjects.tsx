@@ -4,7 +4,7 @@ import { BarChartOutlined, ReorderOutlined } from '@mui/icons-material';
 import { Grid, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
-import type { Exercise, Inject, InjectStatus, InjectTestStatus } from '../../../../../utils/api-types';
+import type { Exercise, Inject, InjectTestStatus } from '../../../../../utils/api-types';
 import { ArticleContext, TeamContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';

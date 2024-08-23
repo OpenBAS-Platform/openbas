@@ -4,7 +4,7 @@ import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui
 import type { InjectTestStatus, SearchPaginationInput } from '../../../utils/api-types';
 import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
-import { initSorting, Page } from '../../../components/common/queryable/Page';
+import { Page } from '../../../components/common/queryable/Page';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
 import InjectIcon from '../common/injects/InjectIcon';
 import { isNotEmptyField } from '../../../utils/utils';
@@ -105,16 +105,7 @@ const InjectTestList: FunctionComponent<Props> = ({
 
   // Filter and sort hook
   const [tests, setTests] = useState<InjectTestStatus[] | null>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
-    // sorts: initSorting('inject_title', 'DESC'),
-  }));
-
-  // Fetch tests list
-  /* useEffect(() => {
-    searchInjectTests(exerciseOrScenarioId).then((result: { data: InjectTestStatus[] }) => {
-      setTests(result.data);
-    });
-  }, []); */
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({}));
 
   return (
     <>
