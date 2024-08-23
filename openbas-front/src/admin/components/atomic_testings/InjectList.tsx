@@ -1,4 +1,4 @@
-import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
+import React, { CSSProperties, FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useFormatter } from '../../../components/i18n';
@@ -84,14 +84,8 @@ const InjectList: FunctionComponent<Props> = ({
     sorts: initSorting('inject_updated_at', 'DESC'),
   }));
 
-  // Fetch injects on initial render and when pagination input changes
-  useEffect(() => {
-    fetchInjects(searchPaginationInput)
-      .then((response) => setInjects(response.data.content));
-  }, [fetchInjects, searchPaginationInput]);
-
   // Headers
-  const headers = [
+  const headers = useMemo(() => [
     {
       field: 'inject_type',
       label: 'Type',
@@ -122,7 +116,7 @@ const InjectList: FunctionComponent<Props> = ({
       label: 'Status',
       isSortable: true,
       value: (injectDto: InjectResultDTO) => {
-        return (<ItemStatus isInject={true} status={injectDto.inject_status?.status_name} label={t(injectDto.inject_status?.status_name)} variant="inList" />);
+        return (<ItemStatus isInject status={injectDto.inject_status?.status_name} label={t(injectDto.inject_status?.status_name)} variant="inList" />);
       },
     },
     {
@@ -149,7 +143,7 @@ const InjectList: FunctionComponent<Props> = ({
       isSortable: true,
       value: (injectDto: InjectResultDTO) => nsdt(injectDto.inject_updated_at),
     },
-  ];
+  ], []);
 
   return (
     <>
