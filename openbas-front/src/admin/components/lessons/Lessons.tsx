@@ -46,6 +46,7 @@ import type { InjectHelper } from '../../../actions/injects/inject-helper';
 import type { LessonsTemplatesHelper } from '../../../actions/lessons/lesson-helper';
 import type { TeamsHelper } from '../../../actions/teams/team-helper';
 import type { UserHelper } from '../../../actions/helper';
+import type { ScenariosHelper } from '../../../actions/scenarios/scenario-helper';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import {
   applyLessonsTemplate,
@@ -65,7 +66,6 @@ import Transition from '../../../components/common/Transition';
 import CreateLessonsTemplate from '../components/lessons/CreateLessonsTemplate';
 import { resolveUserName } from '../../../utils/String';
 import { fetchScenarioTeams } from '../../../actions/scenarios/scenario-actions';
-import { ScenariosHelper } from '../../../actions/scenarios/scenario-helper';
 
 const useStyles = makeStyles((theme: Theme) => ({
   metric: {
@@ -129,6 +129,7 @@ const Lessons: React.FC = () => {
   };
   const {
     exercise,
+    scenario,
     objectives,
     injects,
     teamsMap,
@@ -140,6 +141,7 @@ const Lessons: React.FC = () => {
   } = useHelper((helper: ExercisesHelper & InjectHelper & LessonsTemplatesHelper & ScenariosHelper & TeamsHelper & UserHelper) => {
     return {
       exercise: helper.getExercise(exerciseId),
+      scenario: helper.getScenario(scenarioId),
       objectives: exerciseId ? helper.getExerciseObjectives(exerciseId) : helper.getScenarioObjectives(scenarioId),
       injects: exerciseId ? helper.getExerciseInjects(exerciseId) : helper.getScenarioInjects(scenarioId),
       lessonsCategories: exerciseId ? helper.getExerciseLessonsCategories(exerciseId) : helper.getScenarioLessonsCategories(scenarioId),
@@ -206,7 +208,7 @@ const Lessons: React.FC = () => {
               <SportsScoreOutlined color="primary" sx={{ fontSize: 50 }}/>
             </div>
             <div className={classes.title}>{t('Overall objectives score')}</div>
-            <div className={classes.number}>{exercise.exercise_score}%</div>
+            <div className={classes.number}>{exerciseId ? exercise.exercise_score : scenario.scenario_score}%</div>
           </Paper>
         </Grid>
         <Grid item={true} xs={3} style={{ marginTop: -14 }}>
@@ -216,7 +218,7 @@ const Lessons: React.FC = () => {
             </div>
             <div className={classes.title}>{t('Simulation logs')}</div>
             <div className={classes.number}>
-              {exercise.exercise_logs_number}
+              {exerciseId ? exercise.exercise_logs_number : scenario.scenario_logs_number}
             </div>
           </Paper>
         </Grid>
@@ -227,7 +229,7 @@ const Lessons: React.FC = () => {
             </div>
             <div className={classes.title}>{t('Poll replies')}</div>
             <div className={classes.number}>
-              {exercise.exercise_lessons_answers_number}
+              {exerciseId ? exercise.exercise_lessons_answers_number : scenario.scenario_lessons_answers_number}
             </div>
           </Paper>
         </Grid>
@@ -238,7 +240,7 @@ const Lessons: React.FC = () => {
             </div>
             <div className={classes.title}>{t('Messages')}</div>
             <div className={classes.number}>
-              {exercise.exercise_communications_number}
+              {exerciseId ? exercise.exercise_communications_number : scenario.scenario_communications_number}
             </div>
           </Paper>
         </Grid>
@@ -251,11 +253,11 @@ const Lessons: React.FC = () => {
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('Start date')}</Typography>
-                {nsdt(exercise.exercise_start_date)}
+                {nsdt(exerciseId ? exercise.exercise_start_date : scenario.scenario_start_date)}
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('End date')}</Typography>
-                {nsdt(exercise.exercise_end_date)}
+                {nsdt(exerciseId ? exercise.exercise_end_date : scenario.scenario_end_date)}
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('Duration')}</Typography>
@@ -271,7 +273,7 @@ const Lessons: React.FC = () => {
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('Team')}</Typography>
-                {exercise.exercise_users_number} {t('players')}
+                {exerciseId ? exercise.exercise_users_number : scenario.scenario_users_number} {t('players')}
               </Grid>
             </Grid>
           </Paper>
@@ -285,8 +287,8 @@ const Lessons: React.FC = () => {
                 <FormControlLabel
                   control={
                     <Switch
-                      disabled={exercise.exercise_lessons_anonymized}
-                      checked={exercise.exercise_lessons_anonymized}
+                      disabled={exerciseId ? exercise.exercise_lessons_anonymized : scenario.scenario_lessons_anonymized}
+                      checked={exerciseId ? exercise.exercise_lessons_anonymized : scenario.scenario_lessons_anonymized}
                       onChange={() => setOpenAnonymize(true)}
                       name="anonymized"
                     />
@@ -528,7 +530,7 @@ const Lessons: React.FC = () => {
             onSubmit={handleSubmitSendLessons}
             initialValues={{
               // eslint-disable-next-line no-template-curly-in-string
-              subject: t('[${exercise.name}] Lessons learned questionnaire'),
+              subject: exerciseId ? t('[${exercise.name}] Lessons learned questionnaire') : t('[${scenario.name}] Lessons learned questionnaire'),
               body: `${t('Hello')},<br /><br />${t(
                 // eslint-disable-next-line no-template-curly-in-string
                 'We would like thank your for your participation in this simulation. You are kindly requested to fill this lessons learned questionnaire: <a href="${lessons_uri}">${lessons_uri}</a>.',
@@ -564,9 +566,14 @@ const Lessons: React.FC = () => {
                 <Grid container={true} spacing={3}>
                   <Grid item={true} xs={3} style={{ marginTop: -10 }}>
                     <Typography variant="h4">{t('User')}</Typography>
-                    {exercise.exercise_lessons_anonymized
-                      ? t('Anonymized')
-                      : getUserName}
+                    {exerciseId
+                      ? exercise.exercise_lessons_anonymized
+                        ? t('Anonymized')
+                        : getUserName
+                      : scenario.scenario_lessons_anonymized
+                        ? t('Anonymized')
+                        : getUserName
+                    }
                   </Grid>
                   <Grid item={true} xs={3} style={{ marginTop: -10 }}>
                     <Typography variant="h4" style={{ marginBottom: 20 }}>
