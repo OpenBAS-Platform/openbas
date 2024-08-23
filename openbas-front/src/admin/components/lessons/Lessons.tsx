@@ -140,13 +140,13 @@ const Lessons: React.FC = () => {
   } = useHelper((helper: ExercisesHelper & InjectHelper & LessonsTemplatesHelper & ScenariosHelper & TeamsHelper & UserHelper) => {
     return {
       exercise: helper.getExercise(exerciseId),
-      objectives: helper.getExerciseObjectives(exerciseId),
-      injects: helper.getExerciseInjects(exerciseId),
-      teamsMap: helper.getTeamsMap(),
-      lessonsCategories: helper.getExerciseLessonsCategories(exerciseId),
-      lessonsQuestions: helper.getExerciseLessonsQuestions(exerciseId),
-      lessonsAnswers: helper.getExerciseLessonsAnswers(exerciseId),
+      objectives: exerciseId ? helper.getExerciseObjectives(exerciseId) : helper.getScenarioObjectives(scenarioId),
+      injects: exerciseId ? helper.getExerciseInjects(exerciseId) : helper.getScenarioInjects(scenarioId),
+      lessonsCategories: exerciseId ? helper.getExerciseLessonsCategories(exerciseId) : helper.getScenarioLessonsCategories(exerciseId),
+      lessonsQuestions: exerciseId ? helper.getExerciseLessonsQuestions(exerciseId) : helper.getScenarioLessonsQuestions(exerciseId),
+      lessonsAnswers: exerciseId ? helper.getExerciseLessonsAnswers(exerciseId) : helper.getScenarioLessonsAnswers(exerciseId),
       lessonsTemplates: helper.getLessonsTemplates(),
+      teamsMap: helper.getTeamsMap(),
       usersMap: helper.getUsersMap(),
     };
   });
