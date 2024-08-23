@@ -260,14 +260,22 @@ const Lessons: React.FC = () => {
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('Duration')}</Typography>
-                {getHoursDiff(
+                {exerciseId ? getHoursDiff(
                   exercise.exercise_start_date
                     ? new Date(exercise.exercise_start_date)
                     : new Date(),
                   exercise.exercise_end_date
                     ? new Date(exercise.exercise_end_date)
                     : new Date(),
-                )}{' '}
+                )
+                  : getHoursDiff(
+                    scenario.scenario_start_date
+                      ? new Date(scenario.scenario_start_date)
+                      : new Date(),
+                    scenario.scenario_end_date
+                      ? new Date(scenario.scenario_end_date)
+                      : new Date(),
+                  )}{' '}
                 {t('hours')}
               </Grid>
               <Grid item={true} xs={6}>
