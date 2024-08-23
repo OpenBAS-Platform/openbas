@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
-import io.openbas.database.criteria.GenericCriteria;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.raw.RawScenario;
@@ -86,16 +85,18 @@ public class ScenarioService {
   private EntityManager entityManager;
 
   private final ScenarioRepository scenarioRepository;
+  private final TeamRepository teamRepository;
+  private final UserRepository userRepository;
+  private final DocumentRepository documentRepository;
+  private final ScenarioTeamUserRepository scenarioTeamUserRepository;
+  private final ArticleRepository articleRepository;
+
   private final GrantService grantService;
   private final VariableService variableService;
   private final ChallengeService challengeService;
-  private final DocumentRepository documentRepository;
-  private final TeamRepository teamRepository;
-  private final UserRepository userRepository;
-  private final ScenarioTeamUserRepository scenarioTeamUserRepository;
+  private final TeamService teamService;
   private final FileService fileService;
   private final InjectDuplicateService injectDuplicateService;
-  private final ArticleRepository articleRepository;
 
   @Transactional
   public Scenario createScenario(@NotNull final Scenario scenario) {
@@ -485,11 +486,41 @@ public class ScenarioService {
       Scenario scenario = copyScenario(scenarioOrigin);
       Scenario scenarioDuplicate = scenarioRepository.save(scenario);
       getListOfDuplicatedInjects(scenarioDuplicate, scenarioOrigin);
+      getListOfScenarioTeams(scenarioDuplicate, scenarioOrigin);
       getListOfArticles(scenarioDuplicate, scenarioOrigin);
       getListOfVariables(scenarioDuplicate, scenarioOrigin);
       return scenarioRepository.save(scenario);
     }
     throw new ElementNotFoundException();
+  }
+
+  private void getListOfScenarioTeams(@NotNull Scenario scenario, @NotNull Scenario scenarioOrigin) {
+    Map<String, Team> contextualTeams = new HashMap<>();
+    List<Team> scenarioTeams = new ArrayList<>();
+    scenarioOrigin.getTeams().forEach(scenarioTeam -> {
+      if (scenarioTeam.getContextual()) {
+        Team team = teamService.copyContextualTeam(scenarioTeam);
+        Team teamSaved = this.teamRepository.save(team);
+        scenarioTeams.add(teamSaved);
+        contextualTeams.put(scenarioTeam.getId(), teamSaved);
+      } else {
+        scenarioTeams.add(scenarioTeam);
+      }
+    });
+    scenario.setTeams(new ArrayList<>(scenarioTeams));
+
+    List<Inject> scenarioInjects = scenario.getInjects();
+    scenarioInjects.forEach(scenarioInject -> {
+      List<Team> teams = new ArrayList<>();
+      scenarioInject.getTeams().forEach(team -> {
+        if (team.getContextual()) {
+          teams.add(contextualTeams.get(team.getId()));
+        } else {
+          teams.add(team);
+        }
+      });
+      scenarioInject.setTeams(teams);
+    });
   }
 
   private Scenario copyScenario(Scenario scenario) {
@@ -507,7 +538,6 @@ public class ScenarioService {
     scenarioDuplicate.setInjects(new HashSet<>(scenario.getInjects()));
     scenarioDuplicate.setExternalReference(scenario.getExternalReference());
     scenarioDuplicate.setTeamUsers(new ArrayList<>(scenario.getTeamUsers()));
-    scenarioDuplicate.setTeams(new ArrayList<>(scenario.getTeams()));
     scenarioDuplicate.setReplyTos(new ArrayList<>(scenario.getReplyTos()));
     scenarioDuplicate.setLessonsCategories(new ArrayList<>(scenario.getLessonsCategories()));
     scenarioDuplicate.setObjectives(new ArrayList<>(scenario.getObjectives()));
