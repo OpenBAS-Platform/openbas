@@ -57,12 +57,13 @@ public class Payload implements Base {
   @Setter(NONE)
   private String type;
 
-  @Queryable(searchable = true, sortable = true)
+  @Queryable(filterable = true, searchable = true, sortable = true)
   @Column(name = "payload_name")
   @JsonProperty("payload_name")
   @NotBlank
   private String name;
 
+  @Queryable(filterable = true)
   @Column(name = "payload_description")
   @JsonProperty("payload_description")
   private String description;
@@ -110,15 +111,19 @@ public class Payload implements Base {
   @JsonProperty("payload_external_id")
   private String externalId;
 
+  @Queryable(filterable = true)
   @Setter
   @Column(name = "payload_source")
+  @Enumerated(EnumType.STRING)
   @JsonProperty("payload_source")
-  private String source;
+  private PAYLOAD_SOURCE source;
 
+  @Queryable(filterable = true)
   @Setter
   @Column(name = "payload_status")
+  @Enumerated(EnumType.STRING)
   @JsonProperty("payload_status")
-  private String status;
+  private PAYLOAD_STATUS status;
 
   // -- COLLECTOR --
 
@@ -130,7 +135,7 @@ public class Payload implements Base {
 
   // -- TAG --
 
-  @Queryable(sortable = true)
+  @Queryable(filterable = true, sortable = true, dynamicValues = true)
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "payloads_tags",
       joinColumns = @JoinColumn(name = "payload_id"),
@@ -146,6 +151,7 @@ public class Payload implements Base {
   @NotNull
   private Instant createdAt = now();
 
+  @Queryable(filterable = true)
   @Column(name = "payload_updated_at")
   @JsonProperty("payload_updated_at")
   @NotNull

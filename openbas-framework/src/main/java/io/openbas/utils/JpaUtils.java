@@ -14,7 +14,7 @@ public class JpaUtils {
 
   }
 
-  public static <T> Expression<String> toPath(
+  public static <T> Expression<Object> toPath(
       @NotNull final PropertySchema propertySchema,
       @NotNull final Root<T> root) {
     // Join

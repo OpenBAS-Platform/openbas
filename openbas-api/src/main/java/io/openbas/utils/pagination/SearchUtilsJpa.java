@@ -35,7 +35,7 @@ public class SearchUtilsJpa {
       List<PropertySchema> searchableProperties = getSearchableProperties(propertySchemas);
       List<Predicate> predicates = searchableProperties.stream()
           .map(propertySchema -> {
-            Expression<String> paths = toPath(propertySchema, root);
+            Expression<Object> paths = toPath(propertySchema, root);
             return toPredicate(paths, search, cb, propertySchema.getType());
           })
           .toList();
@@ -44,7 +44,7 @@ public class SearchUtilsJpa {
   }
 
   private static Predicate toPredicate(
-      @NotNull final Expression<String> paths,
+      @NotNull final Expression<Object> paths,
       @NotNull final String search,
       @NotNull final CriteriaBuilder cb,
       @NotNull final Class<?> type) {

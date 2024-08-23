@@ -79,7 +79,7 @@ public class FilterUtilsJpa {
       List<PropertySchema> propertySchemas = SchemaUtils.schema(root.getJavaType());
       List<PropertySchema> filterableProperties = getFilterableProperties(propertySchemas);
       PropertySchema filterableProperty = retrieveProperty(filterableProperties, filterKey);
-      Expression<String> paths = toPath(filterableProperty, root);
+      Expression<Object> paths = toPath(filterableProperty, root);
       // In case of join table, we will use ID so type is String
       return toPredicate(
           paths, filter, cb, filterableProperty.getJoinTable() != null ? String.class : filterableProperty.getType()
@@ -107,7 +107,7 @@ public class FilterUtilsJpa {
         for (int i = 1; i < jsonPaths.length - 1; i++) {
           paths = paths.join(jsonPaths[i], JoinType.LEFT);
         }
-        Path<String> finalPath = paths.get(jsonPaths[jsonPaths.length - 1]);
+        Path<Object> finalPath = paths.get(jsonPaths[jsonPaths.length - 1]);
         return toPredicate(finalPath, filter, cb, String.class);
       }
       throw new IllegalArgumentException();
@@ -115,11 +115,11 @@ public class FilterUtilsJpa {
   }
 
   private static Predicate toPredicate(
-      @NotNull final Expression<String> paths,
+      @NotNull final Expression<Object> paths,
       @NotNull final Filter filter,
       @NotNull final CriteriaBuilder cb,
       @NotNull final Class<?> type) {
-    BiFunction<Expression<String>, List<String>, Predicate> operation = computeOperation(
+    BiFunction<Expression<Object>, List<String>, Predicate> operation = computeOperation(
         filter.getOperator(), cb, type
     );
     return operation.apply(paths, filter.getValues());
@@ -127,40 +127,48 @@ public class FilterUtilsJpa {
 
   // -- OPERATOR --
 
-  private static BiFunction<Expression<String>, List<String>, Predicate> computeOperation(
+  private static BiFunction<Expression<Object>, List<String>, Predicate> computeOperation(
       @NotNull final FilterOperator operator,
       @NotNull final CriteriaBuilder cb,
       @NotNull final Class<?> type) {
     if (operator == null) {
       // Default case
-      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.equalsTexts(paths, cb, texts, type);
+      return (Expression<Object> paths, List<String> texts) -> OperationUtilsJpa.equalsTexts(paths, cb, texts, type);
     }
     if (operator.equals(FilterOperator.not_contains)) {
-      return (Expression<String> paths, List<String> texts) -> {
+      return (Expression<Object> paths, List<String> texts) -> {
         if (CollectionUtils.isEmpty(texts)) {
           return null;
         }
         return OperationUtilsJpa.notContainsTexts(paths, cb, texts, type);
       };
     } else if (operator.equals(FilterOperator.contains)) {
-      return (Expression<String> paths, List<String> texts) -> {
+      return (Expression<Object> paths, List<String> texts) -> {
         if (CollectionUtils.isEmpty(texts)) {
           return null;
         }
         return OperationUtilsJpa.containsTexts(paths, cb, texts, type);
       };
     } else if (operator.equals(FilterOperator.not_starts_with)) {
-      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.notStartWithTexts(paths, cb, texts);
+      return (Expression<Object> paths, List<String> texts) -> OperationUtilsJpa.notStartWithTexts(paths, cb, texts);
     } else if (operator.equals(FilterOperator.starts_with)) {
-      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.startWithTexts(paths, cb, texts);
-    } else if (operator.equals(FilterOperator.not_eq)) {
-      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.notEqualsTexts(paths, cb, texts, type);
+      return (Expression<Object> paths, List<String> texts) -> OperationUtilsJpa.startWithTexts(paths, cb, texts);
     } else if (operator.equals(FilterOperator.empty)) {
-      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.empty(paths, cb, type);
+      return (Expression<Object> paths, List<String> texts) -> OperationUtilsJpa.empty(paths, cb, type);
     } else if (operator.equals(FilterOperator.not_empty)) {
-      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.notEmpty(paths, cb, type);
+      return (Expression<Object> paths, List<String> texts) -> OperationUtilsJpa.notEmpty(paths, cb, type);
+    } else if (operator.equals(FilterOperator.gt)) {
+      return (Expression<Object> paths, List<String> texts) -> OperationUtilsJpa.greaterThanTexts(paths, cb, texts);
+    } else if (operator.equals(FilterOperator.gte)) {
+      return (Expression<Object> paths, List<String> texts) -> OperationUtilsJpa.greaterThanOrEqualTexts(paths, cb, texts);
+    } else if (operator.equals(FilterOperator.lt)) {
+      return (Expression<Object> paths, List<String> texts) -> OperationUtilsJpa.lessThanTexts(paths, cb, texts);
+    } else if (operator.equals(FilterOperator.lte)) {
+      return (Expression<Object> paths, List<String> texts) -> OperationUtilsJpa.lessThanOrEqualTexts(paths, cb, texts);
+    } else if (operator.equals(FilterOperator.not_eq)) {
+      return (Expression<Object> paths, List<String> texts) -> OperationUtilsJpa.notEqualsTexts(paths, cb, texts, type);
     } else { // Default case -> equals
-      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.equalsTexts(paths, cb, texts, type);
+      return (Expression<Object> paths, List<String> texts) -> OperationUtilsJpa.equalsTexts(paths, cb, texts, type);
     }
   }
 

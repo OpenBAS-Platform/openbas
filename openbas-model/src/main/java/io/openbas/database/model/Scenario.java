@@ -51,7 +51,7 @@ public class Scenario implements Base {
 
   @Column(name = "scenario_name")
   @JsonProperty("scenario_name")
-  @Queryable(searchable = true)
+  @Queryable(searchable = true, filterable = true)
   @NotBlank
   private String name;
 

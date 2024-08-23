@@ -22,6 +22,10 @@ public class Filters {
     not_contains,
     starts_with,
     not_starts_with,
+    gt,
+    gte,
+    lt,
+    lte,
     empty,
     not_empty,
   }
