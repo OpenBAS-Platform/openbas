@@ -140,8 +140,7 @@ const Lessons: React.FC = () => {
     usersMap,
   } = useHelper((helper: ExercisesHelper & InjectHelper & LessonsTemplatesHelper & ScenariosHelper & TeamsHelper & UserHelper) => {
     return {
-      exercise: helper.getExercise(exerciseId),
-      scenario: helper.getScenario(scenarioId),
+      ...(exerciseId ? { exercise: helper.getExercise(exerciseId) } : { scenario: helper.getScenario(scenarioId) }),
       objectives: exerciseId ? helper.getExerciseObjectives(exerciseId) : helper.getScenarioObjectives(scenarioId),
       injects: exerciseId ? helper.getExerciseInjects(exerciseId) : helper.getScenarioInjects(scenarioId),
       lessonsCategories: exerciseId ? helper.getExerciseLessonsCategories(exerciseId) : helper.getScenarioLessonsCategories(scenarioId),
