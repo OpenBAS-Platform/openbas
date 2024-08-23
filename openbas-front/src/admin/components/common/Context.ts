@@ -71,9 +71,10 @@ export type InjectContextType = {
 export type AtomicTestingContextType = {
   onAddAtomicTesting: (inject: Inject) => Promise<{ result: string }>,
 };
-
 export type AtomicTestingResultContextType = {
   onLaunchAtomicTesting: () => void;
+};
+export type LessonContextType = {
 };
 
 export const PermissionsContext = createContext<PermissionsContextType>({
@@ -150,14 +151,14 @@ export const InjectContext = createContext<InjectContextType>({
     });
   },
 });
-
 export const AtomicTestingContext = createContext<AtomicTestingContextType>({
   onAddAtomicTesting(_inject: Inject): Promise<{ result: string }> {
     return Promise.resolve({ result: '' });
   },
 });
-
 export const AtomicTestingResultContext = createContext<AtomicTestingResultContextType>({
   onLaunchAtomicTesting: () => {
   },
+});
+export const LessonContext = createContext<LessonContextType>({
 });
