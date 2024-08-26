@@ -10,9 +10,16 @@ public class TeamFixture {
   public static final String TEAM_NAME = "My team";
 
   public static Team getTeam(final User user) {
+    return getTeam(user, TEAM_NAME, false); // Call the other method with default value
+  }
+
+  public static Team getTeam(final User user, String name, Boolean isContextualTeam ) {
     Team team = new Team();
-    team.setName(TEAM_NAME);
-    team.setUsers(new ArrayList<>(){{add(user);}});
+    team.setName(name);
+    team.setContextual(isContextualTeam);
+    if (user != null) {
+      team.setUsers(new ArrayList<>(){{add(user);}});
+    }
     return team;
   }
 

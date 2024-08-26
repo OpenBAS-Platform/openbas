@@ -4,7 +4,6 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotBlank;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import static io.openbas.utils.fixtures.TeamFixture.getTeam;
+import static io.openbas.utils.fixtures.ScenarioFixture.getScenario;
 
 import java.util.*;
 
@@ -68,12 +69,16 @@ public class ScenarioServiceTest {
     void createNewContextualTeamsDuringScenarioDuplication(){
         // -- PREPARE --
         List<Team> scenarioTeams = new ArrayList<>();;
-        Team contextualTeam = createTeam("fakeTeamName1", true);
+        Team contextualTeam = this.teamRepository.save(getTeam(null, "fakeTeamName1", true));
         scenarioTeams.add(contextualTeam);
-        Team noContextualTeam = createTeam("fakeTeamName2",false);
+        Team noContextualTeam = this.teamRepository.save(getTeam(null, "fakeTeamName2",false));
         scenarioTeams.add(noContextualTeam);
 
-        Scenario scenario = createScenario(scenarioTeams);
+        Inject inject = new Inject();
+        inject.setTeams(scenarioTeams);
+        Set<Inject> scenarioInjects = new HashSet<>();
+        scenarioInjects.add(this.injectRepository.save(inject));
+        Scenario scenario = this.scenarioRepository.save(getScenario(scenarioTeams, scenarioInjects));
 
         // -- EXECUTE --
         Scenario scenarioDuplicated = scenarioService.getDuplicateScenario(scenario.getId());
@@ -103,25 +108,5 @@ public class ScenarioServiceTest {
                 assertEquals(noContextualTeam.getId(), injectTeam.getId());
             }
         });
-    }
-
-    private Team createTeam(@NotBlank String name, Boolean isContextualTeam){
-        Team team = new Team();
-        team.setName(name);
-        team.setContextual(isContextualTeam);
-        return this.teamRepository.save(team);
-    }
-
-    private Scenario createScenario(List<Team> scenarioTeams){
-        Scenario scenario = new Scenario();
-        scenario.setName("Scenario name");
-        scenario.setFrom("test@mail.fr");
-        scenario.setTeams(scenarioTeams);
-        Inject inject = new Inject();
-        inject.setTeams(scenarioTeams);
-        Set<Inject> injects = new HashSet<>();
-        injects.add(this.injectRepository.save(inject));
-        scenario.setInjects(injects);
-        return this.scenarioRepository.save(scenario);
     }
 }
