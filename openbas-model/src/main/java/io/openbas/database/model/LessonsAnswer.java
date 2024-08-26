@@ -103,7 +103,8 @@ public class LessonsAnswer implements Base {
     public String getExercise() {
         return getQuestion().getCategory().getExercise().getId();
     }
-    @JsonProperty("lessons_answer_exercise")
+
+    @JsonProperty("lessons_answer_scenario")
     public String getScenario() {
         return getQuestion().getCategory().getScenario().getId();
     }
