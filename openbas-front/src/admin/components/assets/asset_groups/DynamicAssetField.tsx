@@ -19,7 +19,7 @@ const DynamicAssetField: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
 
-  const [filterGroup, helpers] = useFiltersState(value ?? emptyFilterGroup, onChange);
+  const [filterGroup, helpers] = useFiltersState(value ?? emptyFilterGroup, undefined, onChange);
 
   return (
     <div style={{ marginTop: 20 }}>

@@ -28,7 +28,7 @@ const useQueryable = (localStorageKey: string, initSearchPaginationInput: Partia
   }));
 
   // Filters
-  const [__, filterHelpers] = useFiltersState(searchPaginationInput.filterGroup, (filterGroup: FilterGroup) => setSearchPaginationInput({
+  const [__, filterHelpers] = useFiltersState(searchPaginationInput.filterGroup, initSearchPaginationInput.filterGroup, (filterGroup: FilterGroup) => setSearchPaginationInput({
     ...searchPaginationInput,
     filterGroup,
   }));

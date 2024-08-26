@@ -40,7 +40,7 @@ public class OperationUtilsJpa {
       Expression<Object> paths, CriteriaBuilder cb,
       List<String> texts,
       Class<?> type) {
-    if (texts == null || texts.isEmpty()) {
+    if (isEmpty(texts)) {
       return cb.conjunction();
     }
 
@@ -73,7 +73,7 @@ public class OperationUtilsJpa {
   // -- NOT EQUALS --
 
   public static Predicate notEqualsTexts(Expression<Object> paths, CriteriaBuilder cb, List<String> texts, Class<?> type) {
-    if (texts == null || texts.isEmpty() || texts.stream().anyMatch(s -> !hasText(s))) {
+    if (isEmpty(texts)) {
       return cb.conjunction();
     }
 
@@ -91,7 +91,7 @@ public class OperationUtilsJpa {
   // -- EQUALS --
 
   public static Predicate equalsTexts(Expression<Object> paths, CriteriaBuilder cb, List<String> texts, Class<?> type) {
-    if (texts == null || texts.isEmpty() || texts.stream().anyMatch(s -> !hasText(s))) {
+    if (isEmpty(texts)) {
       return cb.conjunction();
     }
 
@@ -121,7 +121,7 @@ public class OperationUtilsJpa {
   // -- NOT START WITH --
 
   public static Predicate notStartWithTexts(Expression<Object> paths, CriteriaBuilder cb, List<String> texts) {
-    if (texts == null || texts.isEmpty() || texts.stream().anyMatch(s -> !hasText(s))) {
+    if (isEmpty(texts)) {
       return cb.conjunction();
     }
 
@@ -137,7 +137,7 @@ public class OperationUtilsJpa {
   // -- START WITH --
 
   public static Predicate startWithTexts(Expression<Object> paths, CriteriaBuilder cb, List<String> texts) {
-    if (texts == null || texts.isEmpty() || texts.stream().anyMatch(s -> !hasText(s))) {
+    if (isEmpty(texts)) {
       return cb.conjunction();
     }
 
@@ -175,7 +175,7 @@ public class OperationUtilsJpa {
   // -- DATE --
 
   public static Predicate greaterThanTexts(Expression<Object> paths, CriteriaBuilder cb, List<String> texts) {
-    if (texts == null || texts.isEmpty()) {
+    if (isEmpty(texts)) {
       return cb.conjunction();
     }
 
@@ -191,7 +191,7 @@ public class OperationUtilsJpa {
   }
 
   public static Predicate greaterThanOrEqualTexts(Expression<Object> paths, CriteriaBuilder cb, List<String> texts) {
-    if (texts == null || texts.isEmpty()) {
+    if (isEmpty(texts)) {
       return cb.conjunction();
     }
 
@@ -207,7 +207,7 @@ public class OperationUtilsJpa {
   }
 
   public static Predicate lessThanTexts(Expression<Object> paths, CriteriaBuilder cb, List<String> texts) {
-    if (texts == null || texts.isEmpty()) {
+    if (isEmpty(texts)) {
       return cb.conjunction();
     }
 
@@ -223,7 +223,7 @@ public class OperationUtilsJpa {
   }
 
   public static Predicate lessThanOrEqualTexts(Expression<Object> paths, CriteriaBuilder cb, List<String> texts) {
-    if (texts == null || texts.isEmpty()) {
+    if (isEmpty(texts)) {
       return cb.conjunction();
     }
 
@@ -265,6 +265,10 @@ public class OperationUtilsJpa {
 
   private static Expression<String[]> avals(Expression<Object> paths, CriteriaBuilder cb)  {
     return cb.function("avals", String[].class, paths);
+  }
+
+  private static boolean isEmpty(List<String> texts) {
+    return texts == null || texts.isEmpty() || texts.stream().anyMatch(s -> !hasText(s));
   }
 
 }

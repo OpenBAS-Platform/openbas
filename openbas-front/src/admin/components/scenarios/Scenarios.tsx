@@ -178,7 +178,7 @@ const Scenarios = () => {
         searchPaginationInput={searchPaginationInput}
         setContent={setScenarios}
         entityPrefix="scenario"
-        availableFilterNames={['scenario_category', 'scenario_kill_chain_phases', 'scenario_tags']}
+        availableFilterNames={['scenario_category', 'scenario_kill_chain_phases', 'scenario_tags', 'scenario_name']}
         queryableHelpers={queryableHelpers}
         exportProps={exportProps}
       >

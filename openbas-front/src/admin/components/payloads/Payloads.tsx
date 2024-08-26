@@ -25,6 +25,7 @@ import type { DocumentHelper } from '../../../actions/helper';
 import type { CollectorHelper } from '../../../actions/collectors/collector-helper';
 import { useAppDispatch } from '../../../utils/hooks';
 import type { PayloadStore } from '../../../actions/payloads/Payload';
+import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -166,12 +167,12 @@ const Payloads = () => {
       field: 'payload_status',
       label: 'Status',
       isSortable: true,
-      value: (payload:PayloadStore) => <Chip
+      value: (payload: PayloadStore) => <Chip
         variant="outlined"
         classes={{ root: classes.chipInList2 }}
         color={payload.payload_status === 'VERIFIED' ? 'success' : 'warning'}
         label={t(payload.payload_status ?? 'UNVERIFIED')}
-                                       />,
+                                        />,
     },
     {
       field: 'payload_updated_at',
@@ -184,6 +185,13 @@ const Payloads = () => {
   const [payloads, setPayloads] = useState<PayloadStore[]>([]);
   const { queryableHelpers, searchPaginationInput } = useQueryable('payloads', buildSearchPagination({
     sorts: initSorting('payload_name'),
+    filterGroup: {
+      mode: 'and',
+      filters: [
+        buildEmptyFilter('payload_attack_patterns', 'contains'),
+        buildEmptyFilter('payload_platforms', 'contains'),
+      ],
+    },
   }));
 
   // Export
@@ -210,7 +218,9 @@ const Payloads = () => {
         searchPaginationInput={searchPaginationInput}
         setContent={setPayloads}
         entityPrefix="payload"
-        availableFilterNames={['payload_attack_patterns', 'payload_platforms']}
+        availableFilterNames={
+        ['payload_attack_patterns', 'payload_description', 'payload_name', 'payload_platforms', 'payload_source', 'payload_status', 'payload_tags', 'payload_updated_at']
+      }
         queryableHelpers={queryableHelpers}
         exportProps={exportProps}
       />

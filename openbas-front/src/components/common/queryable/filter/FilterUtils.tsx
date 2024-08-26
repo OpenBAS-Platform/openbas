@@ -52,6 +52,14 @@ export const convertOperatorToIcon = (t: (text: string) => string, operator: Fil
       return t('starts with');
     case 'not_starts_with':
       return t('not starts with');
+    case 'gt':
+      return <>&nbsp;&#62;</>;
+    case 'gte':
+      return <>&nbsp;&#8805;</>;
+    case 'lt':
+      return <>&nbsp;&#60;</>;
+    case 'lte':
+      return <>&nbsp;&#8804;</>;
     case 'empty':
       return t('is empty');
     case 'not_empty':
@@ -70,11 +78,19 @@ export const OperatorKeyValues: {
   not_contains: 'Not contains',
   starts_with: 'Starts with',
   not_starts_with: 'Not starts with',
+  gt: 'Greater than',
+  gte: 'Greater than/ Equals',
+  lt: 'Lower than',
+  lte: 'Lower than/ Equals',
   empty: 'Empty',
   not_empty: 'Not empty',
 };
 
 export const availableOperators = (propertySchema: PropertySchemaDTO) => {
+  // Date
+  if (propertySchema.schema_property_type.includes('instant')) {
+    return ['gt', 'gte', 'lt', 'lte', 'empty', 'not_empty'];
+  }
   // Array
   if (propertySchema.schema_property_type_array) {
     return ['contains', 'not_contains', 'empty', 'not_empty'];
