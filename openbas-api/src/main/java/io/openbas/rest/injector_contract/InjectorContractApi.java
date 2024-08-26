@@ -39,6 +39,7 @@ public class InjectorContractApi extends RestBehavior {
     private final InjectorRepository injectorRepository;
 
     private final InjectorContractRepository injectorContractRepository;
+
     private final InjectorContractService injectorContractService;
 
     @GetMapping("/api/injector_contracts")
