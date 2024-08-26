@@ -9,13 +9,7 @@ import { useAppDispatch } from '../../../utils/hooks';
 import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import type { UserHelper } from '../../../actions/helper';
 import type { ScenariosHelper } from '../../../actions/scenarios/scenario-helper';
-import {
-  addLessonsAnswers,
-  fetchLessonsCategories,
-  fetchLessonsQuestions,
-  fetchPlayerLessonsAnswers,
-  fetchScenario,
-} from '../../../actions/scenarios/scenario-actions';
+import { addLessonsAnswers, fetchLessonsCategories, fetchLessonsQuestions, fetchPlayerLessonsAnswers, fetchScenario } from '../../../actions/scenarios/scenario-actions';
 import useScenarioPermissions from '../../../utils/Scenario';
 
 const ScenarioViewLessons = () => {
@@ -52,8 +46,8 @@ const ScenarioViewLessons = () => {
       lessonsCategories: helper.getScenarioLessonsCategories(scenarioId),
       lessonsQuestions: helper.getScenarioLessonsQuestions(scenarioId),
       lessonsAnswers: helper.getScenarioUserLessonsAnswers(
-          scenarioId,
-          userId && userId !== 'null' ? userId : currentUser?.user_id,
+        scenarioId,
+        userId && userId !== 'null' ? userId : currentUser?.user_id,
       ),
     };
   });

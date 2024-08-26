@@ -39,13 +39,12 @@ import type {
   LessonsCategoryUpdateInput,
   LessonsQuestionCreateInput,
   LessonsQuestionUpdateInput,
-  LessonsSendInput,
   ObjectiveInput,
 } from '../../../../../utils/api-types';
 import { addScenarioObjective, deleteScenarioObjective, updateScenarioObjective } from '../../../../../actions/Objective';
 import { isScenarioReadOnly, isScenarioUpdatable } from '../../../../../utils/Scenario';
 import { addScenarioEvaluation, fetchScenarioEvaluations, updateScenarioEvaluation } from '../../../../../actions/Evaluation';
-import {fetchTeams} from "../../../../../actions/teams/team-actions";
+import { fetchTeams } from '../../../../../actions/teams/team-actions';
 
 const ScenarioLessons = () => {
   const dispatch = useAppDispatch();

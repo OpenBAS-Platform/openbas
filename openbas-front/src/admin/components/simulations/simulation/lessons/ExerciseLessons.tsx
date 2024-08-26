@@ -46,7 +46,7 @@ import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import { isExerciseReadOnly, isExerciseUpdatable } from '../../../../../utils/Exercise';
 import { addExerciseObjective, deleteExerciseObjective, updateExerciseObjective } from '../../../../../actions/Objective';
 import { addExerciseEvaluation, fetchExerciseEvaluations, updateExerciseEvaluation } from '../../../../../actions/Evaluation';
-import { fetchTeams } from "../../../../../actions/teams/team-actions";
+import { fetchTeams } from '../../../../../actions/teams/team-actions';
 
 const ExerciseLessons = () => {
   const dispatch = useAppDispatch();

@@ -10,7 +10,6 @@ import type {
   LessonsInput,
   LessonsQuestionCreateInput,
   LessonsQuestionUpdateInput,
-  LessonsSendInput,
   Scenario,
   ScenarioInformationInput,
   ScenarioInput,

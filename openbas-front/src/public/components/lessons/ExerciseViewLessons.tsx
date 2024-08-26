@@ -56,8 +56,8 @@ const ExerciseViewLessons = () => {
       lessonsCategories: helper.getExerciseLessonsCategories(exerciseId),
       lessonsQuestions: helper.getExerciseLessonsQuestions(exerciseId),
       lessonsAnswers: helper.getExerciseUserLessonsAnswers(
-          exerciseId,
-          userId && userId !== 'null' ? userId : currentUser?.user_id,
+        exerciseId,
+        userId && userId !== 'null' ? userId : currentUser?.user_id,
       ),
     };
   });

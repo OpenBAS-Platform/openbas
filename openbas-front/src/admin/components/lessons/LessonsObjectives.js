@@ -1,13 +1,12 @@
 import React from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { Box, Grid, Paper, Typography, List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, LinearProgress } from '@mui/material';
+import { Box, Grid, LinearProgress, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
 import { FlagOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
 import Chart from 'react-apexcharts';
 import CreateObjective from './CreateObjective';
 import Empty from '../../../components/Empty';
 import ObjectivePopover from './ObjectivePopover';
-import { isExerciseUpdatable } from '../../../utils/Exercise';
 import { areaChartOptions } from '../../../utils/Charts';
 import { useFormatter } from '../../../components/i18n';
 
@@ -67,9 +66,9 @@ const LessonsObjectives = ({
           {t('Objectives')}
         </Typography>
         {source.isUpdatable && !isReport && (
-          <CreateObjective />
+        <CreateObjective/>
         )}
-        <div className="clearfix" />
+        <div className="clearfix"/>
         <Paper variant="outlined" classes={{ root: classes.paper }}>
           {sortedObjectives.length > 0 ? (
             <List style={{ padding: 0 }}>
@@ -79,11 +78,11 @@ const LessonsObjectives = ({
                   divider={true}
                   button={true}
                   onClick={() => setSelectedObjective
-                    && setSelectedObjective(objective.objective_id)
-                  }
+                                        && setSelectedObjective(objective.objective_id)
+                                    }
                 >
                   <ListItemIcon>
-                    <FlagOutlined />
+                    <FlagOutlined/>
                   </ListItemIcon>
                   <ListItemText
                     style={{ width: '50%' }}
@@ -113,7 +112,7 @@ const LessonsObjectives = ({
                   {!isReport && (
                     <ListItemSecondaryAction>
                       <ObjectivePopover
-                        isReadOnly = {source.isReadOnly}
+                        isReadOnly={source.isReadOnly}
                         objective={objective}
                       />
                     </ListItemSecondaryAction>
@@ -122,7 +121,7 @@ const LessonsObjectives = ({
               ))}
             </List>
           ) : (
-            <Empty message={t(`No objectives in this ${source.type}.`)} />
+            <Empty message={t(`No objectives in this ${source.type}.`)}/>
           )}
         </Paper>
       </Grid>
