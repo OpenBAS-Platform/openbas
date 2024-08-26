@@ -42,7 +42,6 @@ import Transition from '../../../components/common/Transition';
 import CreateLessonsTemplate from '../components/lessons/CreateLessonsTemplate';
 import { resolveUserName } from '../../../utils/String';
 import { LessonContext } from '../common/Context';
-import { isExerciseReadOnly, isExerciseUpdatable } from '../../../utils/Exercise';
 
 const useStyles = makeStyles((theme: Theme) => ({
   metric: {

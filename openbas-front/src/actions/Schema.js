@@ -492,7 +492,7 @@ export const storeHelper = (state) => ({
   getTeamScenarioInjects: (id) => entities('injects', state).filter((i) => (entity(id, 'teams', state) || {}).team_scenario_injects?.includes(
     i.inject_id,
   )),
-  getScenarioObjectives: (id) => entities('objectives', state).filter((o) => o.objective_exercise === id),
+  getScenarioObjectives: (id) => entities('objectives', state).filter((o) => o.objective_scenario === id),
   getScenarioLessonsCategories: (id) => entities('lessonscategorys', state).filter(
     (l) => l.lessons_category_scenario === id,
   ),
@@ -501,5 +501,9 @@ export const storeHelper = (state) => ({
   ),
   getScenarioLessonsAnswers: (id) => entities('lessonsanswers', state).filter(
     (l) => l.lessons_answer_scenario === id,
+  ),
+  getScenarioUserLessonsAnswers: (scenarioId, userId) => entities('lessonsanswers', state).filter(
+    (l) => l.lessons_answer_scenario === scenarioId
+          && l.lessons_answer_user === userId,
   ),
 });

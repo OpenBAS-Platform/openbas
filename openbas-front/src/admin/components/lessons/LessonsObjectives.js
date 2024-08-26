@@ -66,7 +66,7 @@ const LessonsObjectives = ({
         <Typography variant="h4" style={{ float: 'left' }}>
           {t('Objectives')}
         </Typography>
-        {isExerciseUpdatable(source, true) && !isReport && (
+        {source.isUpdatable && !isReport && (
           <CreateObjective />
         )}
         <div className="clearfix" />
