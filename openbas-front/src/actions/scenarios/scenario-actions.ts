@@ -268,11 +268,6 @@ export const emptyLessonsCategories = (scenarioId: string) => (dispatch: Dispatc
   return postReferential(schema.arrayOfLessonsCategories, uri, {})(dispatch);
 };
 
-export const sendLessons = (scenarioId: string, data: LessonsSendInput) => (dispatch: Dispatch) => {
-  const uri = `/api/scenarios/${scenarioId}/lessons_send`;
-  return postReferential(schema.arrayOfLessonsCategories, uri, data)(dispatch);
-};
-
 export const fetchLessonsAnswers = (scenarioId: string) => (dispatch: Dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/lessons_answers`;
   return getReferential(schema.arrayOfLessonsAnswers, uri)(dispatch);

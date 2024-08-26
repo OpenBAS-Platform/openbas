@@ -35,6 +35,7 @@ const LessonsCategories = ({
   lessonsQuestions,
   setSelectedQuestion,
   teamsMap,
+  teams,
   isReport,
 }) => {
   const classes = useStyles();
@@ -211,6 +212,8 @@ const LessonsCategories = ({
                   lessonsCategoryId={category.lessonscategory_id}
                   lessonsCategoryTeamsIds={ category.lessons_category_teams }
                   handleUpdateTeams={handleUpdateTeams}
+                  teams={teams}
+                  teamsMap={teamsMap}
                 />
                 )}
                 <div className="clearfix"/>

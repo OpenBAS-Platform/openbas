@@ -101,6 +101,7 @@ interface Props {
   objectives: Objective[],
   injects: Inject[],
   teamsMap: Record<string, Team>,
+  teams: Team[],
   lessonsCategories: LessonsCategory[],
   lessonsQuestions: LessonsQuestion[],
   lessonsAnswers: LessonsAnswer[],
@@ -112,6 +113,7 @@ const Lessons: React.FC<Props> = ({
   source,
   objectives,
   injects,
+  teams,
   teamsMap,
   lessonsCategories,
   lessonsQuestions,
@@ -363,6 +365,7 @@ const Lessons: React.FC<Props> = ({
         setSelectedQuestion={setSelectedQuestion}
         lessonsQuestions={lessonsQuestions}
         teamsMap={teamsMap}
+        teams={teams}
         isReport={false}
       />
       <Dialog

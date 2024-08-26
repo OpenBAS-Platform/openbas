@@ -1,20 +1,16 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Button, Chip, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, Box, ListItemIcon, Grid, IconButton } from '@mui/material';
 import { Add, CastForEducationOutlined } from '@mui/icons-material';
 import { withStyles } from '@mui/styles';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
-import { storeHelper } from '../../../../actions/Schema';
-import { fetchTeams } from '../../../../actions/teams/team-actions';
 import CreateTeam from '../../components/teams/CreateTeam';
 import { truncate } from '../../../../utils/String';
 import TagsFilter from '../../common/filters/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
 import Transition from '../../../../components/common/Transition';
-import { LessonContext } from '../../common/Context';
 
 const styles = (theme) => ({
   createButton: {
@@ -50,12 +46,6 @@ class LessonsCategoryAddTeams extends Component {
       teamsIds: [],
       tags: [],
     };
-  }
-
-  static contextType = LessonContext;
-
-  componentDidMount() {
-    this.props.fetchTeams();
   }
 
   handleOpen() {
@@ -280,21 +270,14 @@ LessonsCategoryAddTeams.propTypes = {
   fetchTeams: PropTypes.func,
   handleUpdateTeams: PropTypes.func,
   organizations: PropTypes.array,
+  teamsMap: PropTypes.array,
   teams: PropTypes.array,
   lessonsCategoryId: PropTypes.string,
   lessonsCategoryTeamsIds: PropTypes.array,
   attachment: PropTypes.bool,
 };
 
-const select = (state) => {
-  const helper = storeHelper(state);
-  const teams = helper.getExerciseTeams('exerciseId');
-  const teamsMap = helper.getTeamsMap();
-  return { teams, teamsMap };
-};
-
 export default R.compose(
-  connect(select, { fetchTeams }),
   inject18n,
   withStyles(styles),
 )(LessonsCategoryAddTeams);

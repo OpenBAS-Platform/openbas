@@ -46,6 +46,7 @@ import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import { isExerciseReadOnly, isExerciseUpdatable } from '../../../../../utils/Exercise';
 import { addExerciseObjective, deleteExerciseObjective, updateExerciseObjective } from '../../../../../actions/Objective';
 import { addExerciseEvaluation, fetchExerciseEvaluations, updateExerciseEvaluation } from '../../../../../actions/Evaluation';
+import { fetchTeams } from "../../../../../actions/teams/team-actions";
 
 const ExerciseLessons = () => {
   const dispatch = useAppDispatch();
@@ -74,6 +75,7 @@ const ExerciseLessons = () => {
     source,
     objectives,
     injects,
+    teams,
     teamsMap,
     lessonsCategories,
     lessonsQuestions,
@@ -90,12 +92,14 @@ const ExerciseLessons = () => {
       lessonsAnswers: helper.getExerciseLessonsAnswers(exerciseId),
       lessonsTemplates: helper.getLessonsTemplates(),
       teamsMap: helper.getTeamsMap(),
+      teams: helper.getExerciseTeams(exerciseId),
       usersMap: helper.getUsersMap(),
     };
   });
   useDataLoader(() => {
     dispatch(fetchLessonsTemplates());
     dispatch(fetchPlayers());
+    dispatch(fetchTeams());
     dispatch(fetchLessonsCategories(exerciseId));
     dispatch(fetchLessonsQuestions(exerciseId));
     dispatch(fetchLessonsAnswers(exerciseId));
@@ -152,6 +156,7 @@ const ExerciseLessons = () => {
         objectives={objectives}
         injects={injects}
         teamsMap={teamsMap}
+        teams={teams}
         lessonsCategories={lessonsCategories}
         lessonsQuestions={lessonsQuestions}
         lessonsAnswers={lessonsAnswers}
