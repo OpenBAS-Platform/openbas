@@ -9,7 +9,14 @@ import { useAppDispatch } from '../../../utils/hooks';
 import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import type { UserHelper } from '../../../actions/helper';
 import type { ScenariosHelper } from '../../../actions/scenarios/scenario-helper';
-import { addLessonsAnswers, fetchLessonsCategories, fetchLessonsQuestions, fetchPlayerLessonsAnswers, fetchScenario } from '../../../actions/scenarios/scenario-actions';
+import {
+  addLessonsAnswers,
+  fetchLessonsAnswers,
+  fetchLessonsCategories,
+  fetchLessonsQuestions,
+  fetchPlayerLessonsAnswers,
+  fetchScenario,
+} from '../../../actions/scenarios/scenario-actions';
 import useScenarioPermissions from '../../../utils/Scenario';
 
 const ScenarioViewLessons = () => {
@@ -59,10 +66,12 @@ const ScenarioViewLessons = () => {
     dispatch(fetchScenario(scenarioId));
     dispatch(fetchLessonsCategories(scenarioId));
     dispatch(fetchLessonsQuestions(scenarioId));
+    dispatch(fetchLessonsAnswers(scenarioId));
   }, [dispatch, scenarioId, userId, finalUserId]);
 
   // Pass the full scenario because the scenario is never loaded in the store at this point
   const permissions = useScenarioPermissions(scenarioId, scenario);
+
   const context: ViewLessonContextType = {
     onAddLessonsAnswers: (questionCategory, lessonsQuestionId, answerData) => dispatch(
       addLessonsAnswers(

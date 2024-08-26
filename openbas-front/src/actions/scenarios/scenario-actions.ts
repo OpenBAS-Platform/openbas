@@ -272,16 +272,6 @@ export const fetchLessonsAnswers = (scenarioId: string) => (dispatch: Dispatch) 
   return getReferential(schema.arrayOfLessonsAnswers, uri)(dispatch);
 };
 
-export const fetchPlayerLessonsCategories = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
-  const uri = `/api/player/lessons/scenario/${scenarioId}/lessons_categories?userId=${userId}`;
-  return getReferential(schema.arrayOfLessonsCategories, uri)(dispatch);
-};
-
-export const fetchPlayerLessonsQuestions = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
-  const uri = `/api/player/lessons/scenario/${scenarioId}/lessons_questions?userId=${userId}`;
-  return getReferential(schema.arrayOfLessonsQuestions, uri)(dispatch);
-};
-
 export const fetchPlayerLessonsAnswers = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
   const uri = `/api/player/lessons/scenario/${scenarioId}/lessons_answers?userId=${userId}`;
   return getReferential(schema.arrayOfLessonsAnswers, uri)(dispatch);
@@ -296,9 +286,4 @@ export const addLessonsAnswers = (
 ) => (dispatch: Dispatch) => {
   const uri = `/api/player/lessons/scenario/${scenarioId}/lessons_categories/${lessonsCategoryId}/lessons_questions/${lessonsQuestionId}/lessons_answers?userId=${userId}`;
   return postReferential(schema.arrayOfLessonsAnswers, uri, data)(dispatch);
-};
-
-export const fetchPlayerScenario = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
-  const uri = `/api/player/scenarios/scenario/${scenarioId}?userId=${userId}`;
-  return getReferential(scenario, uri)(dispatch);
 };

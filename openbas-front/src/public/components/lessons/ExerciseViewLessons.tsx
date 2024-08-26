@@ -7,26 +7,22 @@ import LessonsPlayer from './LessonsPlayer';
 import LessonsPreview from './LessonsPreview';
 import { fetchMe } from '../../../actions/Application';
 import { fetchPlayerExercise } from '../../../actions/Exercise';
-import {
-  addLessonsAnswers,
-  fetchLessonsCategories,
-  fetchLessonsQuestions,
-  fetchPlayerLessonsAnswers,
-  fetchPlayerLessonsCategories,
-  fetchPlayerLessonsQuestions,
-} from '../../../actions/exercises/exercise-action';
+import { addLessonsAnswers, fetchPlayerLessonsAnswers, fetchPlayerLessonsCategories, fetchPlayerLessonsQuestions } from '../../../actions/exercises/exercise-action';
 import { ViewLessonContext, ViewLessonContextType } from '../../../admin/components/common/Context';
 import type { Exercise } from '../../../utils/api-types';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
 import type { UserHelper } from '../../../actions/helper';
 import type { ExerciseStore } from '../../../actions/exercises/Exercise';
 import { useHelper } from '../../../store';
+import { fetchLessonsAnswers, fetchLessonsCategories, fetchLessonsQuestions } from '../../../actions/scenarios/scenario-actions';
 
 const ExerciseViewLessons = () => {
   const dispatch = useAppDispatch();
   const [preview] = useQueryParameter(['preview']);
   const [userId] = useQueryParameter(['user']);
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
+
+  const isPreview = preview === 'true';
 
   const processToGenericSource = (exercise: ExerciseStore | undefined) => {
     if (!exercise) return undefined;
@@ -67,15 +63,20 @@ const ExerciseViewLessons = () => {
   useEffect(() => {
     dispatch(fetchMe());
     dispatch(fetchPlayerExercise(exerciseId, userId));
-    dispatch(fetchPlayerLessonsCategories(exerciseId, finalUserId));
-    dispatch(fetchPlayerLessonsQuestions(exerciseId, finalUserId));
-    dispatch(fetchPlayerLessonsAnswers(exerciseId, finalUserId));
-    dispatch(fetchLessonsCategories(exerciseId));
-    dispatch(fetchLessonsQuestions(exerciseId));
+    if (isPreview) {
+      dispatch(fetchLessonsCategories(exerciseId));
+      dispatch(fetchLessonsQuestions(exerciseId));
+      dispatch(fetchLessonsAnswers(exerciseId));
+    } else {
+      dispatch(fetchPlayerLessonsCategories(exerciseId, finalUserId));
+      dispatch(fetchPlayerLessonsQuestions(exerciseId, finalUserId));
+      dispatch(fetchPlayerLessonsAnswers(exerciseId, finalUserId));
+    }
   }, [dispatch, exerciseId, userId, finalUserId]);
 
   // Pass the full exercise because the exercise is never loaded in the store at this point
   const permissions = usePermissions(exerciseId, exercise);
+
   const context: ViewLessonContextType = {
     onAddLessonsAnswers: (questionCategory, lessonsQuestionId, answerData) => dispatch(
       addLessonsAnswers(
@@ -91,7 +92,7 @@ const ExerciseViewLessons = () => {
 
   return (
     <ViewLessonContext.Provider value={context}>
-      {preview === 'true' ? (
+      {isPreview ? (
         <LessonsPreview
           source={{ ...source, finalUserId }}
           lessonsCategories={lessonsCategories}

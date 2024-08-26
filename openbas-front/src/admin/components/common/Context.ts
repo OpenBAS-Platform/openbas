@@ -3,18 +3,22 @@ import type { ArticleStore, FullArticleStore } from '../../../actions/channels/A
 import type {
   ArticleCreateInput,
   ArticleUpdateInput,
+  Evaluation,
   EvaluationInput,
   ImportTestSummary,
   Inject,
   InjectsImportInput,
+  LessonsAnswer,
   LessonsAnswerCreateInput,
   LessonsCategory,
   LessonsCategoryCreateInput,
   LessonsCategoryTeamsInput,
   LessonsCategoryUpdateInput,
+  LessonsQuestion,
   LessonsQuestionCreateInput,
   LessonsQuestionUpdateInput,
   LessonsSendInput,
+  Objective,
   ObjectiveInput,
   Team,
   TeamCreateInput,
@@ -89,26 +93,24 @@ export type LessonContextType = {
   onResetLessonsAnswers: () => Promise<LessonsCategory[]>,
   onEmptyLessonsCategories: () => Promise<LessonsCategory[]>,
   onUpdateSourceLessons: (data: boolean) => Promise<LessonsCategory>,
-  onSendLessons?: (data: LessonsSendInput) => Promise<{ result: string }>,
-  onAddLessonsCategory: (data: LessonsCategoryCreateInput) => Promise<{ result: string }>,
+  onSendLessons?: (data: LessonsSendInput) => void,
+  onAddLessonsCategory: (data: LessonsCategoryCreateInput) => Promise<LessonsCategory>,
   onDeleteLessonsCategory: (data: string) => void,
-  onUpdateLessonsCategory: (lessonCategoryId: string, data: LessonsCategoryUpdateInput) => Promise<LessonsCategory>
-  onUpdateLessonsCategoryTeams: (lessonCategoryId: string, data: LessonsCategoryTeamsInput) => Promise<LessonsCategory>
-  onDeleteLessonsQuestion: (lessonsCategoryId: string, lessonsQuestionId: string) => Promise<{ result: string }>,
-  onUpdateLessonsQuestion: (lessonsCategoryId: string, lessonsQuestionId: string, data: LessonsQuestionUpdateInput) => Promise<{
-    result: string
-  }>,
-  onAddLessonsQuestion: (lessonsCategoryId: string, data: LessonsQuestionCreateInput) => Promise<{ result: string }>,
-  onAddObjective: (data: ObjectiveInput) => Promise<{ result: string }>,
-  onUpdateObjective: (objectiveId: string, data: ObjectiveInput) => Promise<{ result: string }>,
-  onDeleteObjective: (objectiveId: string) => Promise<{ result: string }>,
-  onAddEvaluation: (objectiveId: string, data: EvaluationInput) => Promise<{ result: string }>,
-  onUpdateEvaluation: (objectiveId: string, evaluationId: string, data: EvaluationInput) => Promise<{ result: string }>,
-  onFetchEvaluation: (objectiveId: string) => void,
+  onUpdateLessonsCategory: (lessonCategoryId: string, data: LessonsCategoryUpdateInput) => Promise<LessonsCategory>,
+  onUpdateLessonsCategoryTeams: (lessonCategoryId: string, data: LessonsCategoryTeamsInput) => Promise<LessonsCategory>,
+  onDeleteLessonsQuestion: (lessonsCategoryId: string, lessonsQuestionId: string) => void,
+  onUpdateLessonsQuestion: (lessonsCategoryId: string, lessonsQuestionId: string, data: LessonsQuestionUpdateInput) => Promise<LessonsQuestion>,
+  onAddLessonsQuestion: (lessonsCategoryId: string, data: LessonsQuestionCreateInput) => Promise<LessonsQuestion>,
+  onAddObjective: (data: ObjectiveInput) => Promise<Objective>,
+  onUpdateObjective: (objectiveId: string, data: ObjectiveInput) => Promise<Objective>,
+  onDeleteObjective: (objectiveId: string) => void,
+  onAddEvaluation: (objectiveId: string, data: EvaluationInput) => Promise<Evaluation>,
+  onUpdateEvaluation: (objectiveId: string, evaluationId: string, data: EvaluationInput) => Promise<Evaluation>,
+  onFetchEvaluation: (objectiveId: string) => Promise<Evaluation[]>,
 };
 export type ViewLessonContextType = {
-  onAddLessonsAnswers: (questionCategory: string, lessonsQuestionId: string, answerData: LessonsAnswerCreateInput) => void,
-  onFetchPlayerLessonsAnswers: () => void,
+  onAddLessonsAnswers: (questionCategory: string, lessonsQuestionId: string, answerData: LessonsAnswerCreateInput) => Promise<LessonsAnswer>,
+  onFetchPlayerLessonsAnswers: () => Promise<LessonsAnswer[]>,
 };
 
 export const PermissionsContext = createContext<PermissionsContextType>({
@@ -190,63 +192,77 @@ export const InjectContext = createContext<InjectContextType>({
 });
 export const LessonContext = createContext<LessonContextType>({
   onApplyLessonsTemplate(_data: string): Promise<LessonsCategory[]> {
-    return new Promise<LessonsCategory[]>(() => {});
+    return new Promise<LessonsCategory[]>(() => {
+    });
   },
   onResetLessonsAnswers(): Promise<LessonsCategory[]> {
-    return new Promise<LessonsCategory[]>(() => {});
+    return new Promise<LessonsCategory[]>(() => {
+    });
   },
   onEmptyLessonsCategories(): Promise<LessonsCategory[]> {
-    return new Promise<LessonsCategory[]>(() => {});
+    return new Promise<LessonsCategory[]>(() => {
+    });
   },
   onUpdateSourceLessons(_data: boolean): Promise<LessonsCategory> {
-    return new Promise<LessonsCategory>(() => {});
+    return new Promise<LessonsCategory>(() => {
+    });
   },
-  onSendLessons(_data: LessonsSendInput): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  onSendLessons(_data: LessonsSendInput): void {
   },
-  onAddLessonsCategory(_data: LessonsCategoryCreateInput): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  onAddLessonsCategory(_data: LessonsCategoryCreateInput): Promise<LessonsCategory> {
+    return new Promise<LessonsCategory>(() => {
+    });
   },
   onDeleteLessonsCategory(_data: string): void {
   },
   onUpdateLessonsCategory(_lessonCategoryId: string, _data: LessonsCategoryUpdateInput): Promise<LessonsCategory> {
-    return new Promise<LessonsCategory>(() => {});
+    return new Promise<LessonsCategory>(() => {
+    });
   },
   onUpdateLessonsCategoryTeams(_lessonCategoryId: string, _data: LessonsCategoryTeamsInput): Promise<LessonsCategory> {
-    return new Promise<LessonsCategory>(() => {});
+    return new Promise<LessonsCategory>(() => {
+    });
   },
-  onDeleteLessonsQuestion(_lessonsCategoryId: string, _lessonsQuestionId: string): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  onDeleteLessonsQuestion(_lessonsCategoryId: string, _lessonsQuestionId: string): void {
   },
-  onUpdateLessonsQuestion(_lessonsCategoryId: string, _lessonsQuestionId: string, _data: LessonsQuestionUpdateInput): Promise<{
-    result: string
-  }> {
-    return Promise.resolve({ result: '' });
+  onUpdateLessonsQuestion(_lessonsCategoryId: string, _lessonsQuestionId: string, _data: LessonsQuestionUpdateInput): Promise<LessonsQuestion> {
+    return new Promise<LessonsQuestion>(() => {
+    });
   },
-  onAddLessonsQuestion(_lessonsCategoryId: string, _data: LessonsQuestionCreateInput): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  onAddLessonsQuestion(_lessonsCategoryId: string, _data: LessonsQuestionCreateInput): Promise<LessonsQuestion> {
+    return new Promise<LessonsQuestion>(() => {
+    });
   },
-  onAddObjective(_data: ObjectiveInput): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  onAddObjective(_data: ObjectiveInput): Promise<Objective> {
+    return new Promise<Objective>(() => {
+    });
   },
-  onUpdateObjective(_objectiveId: string, _data: ObjectiveInput): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  onUpdateObjective(_objectiveId: string, _data: ObjectiveInput): Promise<Objective> {
+    return new Promise<Objective>(() => {
+    });
   },
-  onDeleteObjective(_objectiveId: string): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  onDeleteObjective(_objectiveId: string): void {
   },
-  onAddEvaluation(_objectiveId: string, _data: EvaluationInput): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  onAddEvaluation(_objectiveId: string, _data: EvaluationInput): Promise<Evaluation> {
+    return new Promise<Evaluation>(() => {
+    });
   },
-  onUpdateEvaluation(_objectiveId: string, _evaluationId: string, _data: EvaluationInput): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  onUpdateEvaluation(_objectiveId: string, _evaluationId: string, _data: EvaluationInput): Promise<Evaluation> {
+    return new Promise<Evaluation>(() => {
+    });
   },
-  onFetchEvaluation(_objectiveId: string): void {
+  onFetchEvaluation(_objectiveId: string): Promise<Evaluation[]> {
+    return new Promise<Evaluation[]>(() => {
+    });
   },
 });
 export const ViewLessonContext = createContext<ViewLessonContextType>({
-  onAddLessonsAnswers(_questionCategory: string, _lessonsQuestionId: string, _answerData: LessonsAnswerCreateInput): void {
+  onAddLessonsAnswers(_questionCategory: string, _lessonsQuestionId: string, _answerData: LessonsAnswerCreateInput): Promise<LessonsAnswer> {
+    return new Promise<LessonsAnswer>(() => {
+    });
   },
-  onFetchPlayerLessonsAnswers(): void {
+  onFetchPlayerLessonsAnswers(): Promise<LessonsAnswer[]> {
+    return new Promise<LessonsAnswer[]>(() => {
+    });
   },
 });
