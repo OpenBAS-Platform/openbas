@@ -186,18 +186,6 @@ public class ScenarioLessonsApi extends RestBehavior {
     lessonsQuestionRepository.deleteById(lessonsQuestionId);
   }
 
-  @PostMapping(SCENARIO_URI + "{scenarioId}/lessons_send")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  @Transactional(rollbackOn = Exception.class)
-  public void sendScenarioLessons(@PathVariable String scenarioId, @Valid @RequestBody LessonsSendInput input) {
-    Scenario scenario = scenarioRepository.findById(scenarioId).orElseThrow(ElementNotFoundException::new);
-    List<LessonsCategory> lessonsCategories = lessonsCategoryRepository.findAll(
-            LessonsCategorySpecification.fromScenario(scenarioId)).stream().toList();
-    List<User> users = lessonsCategories.stream().flatMap(lessonsCategory -> lessonsCategory.getTeams().stream()
-            .flatMap(team -> team.getUsers().stream())).distinct().toList();
-    mailingService.sendEmail(input.getSubject(), input.getBody(), users, Optional.empty(), Optional.of(scenario));
-  }
-
   @GetMapping(SCENARIO_URI + "{scenarioId}/lessons_answers")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public List<LessonsAnswer> scenarioLessonsAnswers(@PathVariable String scenarioId,

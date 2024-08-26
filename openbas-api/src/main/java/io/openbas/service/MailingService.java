@@ -60,7 +60,7 @@ public class MailingService {
         this.executionContextService = executionContextService;
     }
 
-    public void sendEmail(String subject, String body, List<User> users, Optional<Exercise> exercise, Optional<Scenario> scenario) {
+    public void sendEmail(String subject, String body, List<User> users, Optional<Exercise> exercise) {
         EmailContent emailContent = new EmailContent();
         emailContent.setSubject(subject);
         emailContent.setBody(body);
@@ -73,7 +73,6 @@ public class MailingService {
             inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow());
 
             exercise.ifPresent(inject::setExercise);
-            scenario.ifPresent(inject::setScenario);
 
             List<ExecutionContext> userInjectContexts = users.stream().distinct()
                     .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
@@ -84,6 +83,6 @@ public class MailingService {
     }
 
     public void sendEmail(String subject, String body, List<User> users) {
-        sendEmail(subject, body, users, Optional.empty(), Optional.empty());
+        sendEmail(subject, body, users, Optional.empty());
     }
 }
