@@ -1628,6 +1628,7 @@ export interface LessonsAnswer {
   lessons_answer_negative?: string;
   lessons_answer_positive?: string;
   lessons_answer_question: LessonsQuestion;
+  lessons_answer_scenario?: string;
   /** @format int32 */
   lessons_answer_score: number;
   /** @format date-time */
@@ -1696,6 +1697,7 @@ export interface LessonsQuestion {
   lessons_question_explanation?: string;
   /** @format int32 */
   lessons_question_order?: number;
+  lessons_question_scenario?: string;
   /** @format date-time */
   lessons_question_updated_at: string;
   lessonsquestion_id: string;
