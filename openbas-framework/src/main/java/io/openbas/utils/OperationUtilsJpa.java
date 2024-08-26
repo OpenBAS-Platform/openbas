@@ -19,8 +19,12 @@ public class OperationUtilsJpa {
   // -- NOT CONTAINS --
 
   public static Predicate notContainsTexts(
-      Expression<Object> paths, CriteriaBuilder cb,
+      Expression<String> paths, CriteriaBuilder cb,
       List<String> texts, Class<?> type) {
+    if (isEmpty(texts)) {
+      return cb.conjunction();
+    }
+
     Predicate[] predicates = texts.stream()
         .map(text -> notContainsText(paths, cb, text, type))
         .toArray(Predicate[]::new);
@@ -29,7 +33,7 @@ public class OperationUtilsJpa {
   }
 
   public static Predicate notContainsText(
-      Expression<Object> paths, CriteriaBuilder cb,
+      Expression<String> paths, CriteriaBuilder cb,
       String text, Class<?> type) {
     return containsText(paths, cb, text, type).not();
   }
@@ -37,7 +41,7 @@ public class OperationUtilsJpa {
   // -- CONTAINS --
 
   public static Predicate containsTexts(
-      Expression<Object> paths, CriteriaBuilder cb,
+      Expression<String> paths, CriteriaBuilder cb,
       List<String> texts,
       Class<?> type) {
     if (isEmpty(texts)) {
@@ -49,30 +53,30 @@ public class OperationUtilsJpa {
     return cb.or(predicates);
   }
 
-  public static Predicate containsText(Expression<Object> paths, CriteriaBuilder cb, String text, Class<?> type) {
+  public static Predicate containsText(Expression<String> paths, CriteriaBuilder cb, String text, Class<?> type) {
     if (text == null) {
       return cb.conjunction();
     }
 
     if (type.isAssignableFrom(Map.class) || type.getName().contains("ImmutableCollections")) {
-      Expression<Object> values = lower(arrayToString(avals(paths, cb), cb), cb);
-      return cb.like(values.as(String.class), "%" + text.toLowerCase() + "%");
+      Expression<String> values = lower(arrayToString(avals(paths, cb), cb), cb);
+      return cb.like(values, "%" + text.toLowerCase() + "%");
     }
     if (type.isArray()) {
       return cb.like(
-          lower(arrayToString(paths, cb), cb).as(String.class),
+          lower(arrayToString(paths, cb), cb),
           "%" + text.toLowerCase() + "%"
       );
     }
     return cb.and(
-        cb.like(cb.lower(paths.as(String.class)), "%" + text.toLowerCase() + "%"),
+        cb.like(cb.lower(paths), "%" + text.toLowerCase() + "%"),
         cb.isNotNull(paths)
     );
   }
 
   // -- NOT EQUALS --
 
-  public static Predicate notEqualsTexts(Expression<Object> paths, CriteriaBuilder cb, List<String> texts, Class<?> type) {
+  public static Predicate notEqualsTexts(Expression<String> paths, CriteriaBuilder cb, List<String> texts, Class<?> type) {
     if (isEmpty(texts)) {
       return cb.conjunction();
     }
@@ -84,13 +88,13 @@ public class OperationUtilsJpa {
     return cb.or(predicates);
   }
 
-  private static Predicate notEqualsText(Expression<Object> paths, CriteriaBuilder cb, String text, Class<?> type) {
+  private static Predicate notEqualsText(Expression<String> paths, CriteriaBuilder cb, String text, Class<?> type) {
     return equalsText(paths, cb, text, type).not();
   }
 
   // -- EQUALS --
 
-  public static Predicate equalsTexts(Expression<Object> paths, CriteriaBuilder cb, List<String> texts, Class<?> type) {
+  public static Predicate equalsTexts(Expression<String> paths, CriteriaBuilder cb, List<String> texts, Class<?> type) {
     if (isEmpty(texts)) {
       return cb.conjunction();
     }
@@ -102,7 +106,7 @@ public class OperationUtilsJpa {
     return cb.or(predicates);
   }
 
-  private static Predicate equalsText(Expression<Object> paths, CriteriaBuilder cb, String text, Class<?> type) {
+  private static Predicate equalsText(Expression<String> paths, CriteriaBuilder cb, String text, Class<?> type) {
     if (text == null) {
       return cb.conjunction();
     }
@@ -114,13 +118,13 @@ public class OperationUtilsJpa {
     if (text.equalsIgnoreCase("true") || text.equalsIgnoreCase("false")) {
       return cb.equal(paths, Boolean.valueOf(text));
     } else {
-      return cb.equal(cb.lower(paths.as(String.class)), text.toLowerCase());
+      return cb.equal(cb.lower(paths), text.toLowerCase());
     }
   }
 
   // -- NOT START WITH --
 
-  public static Predicate notStartWithTexts(Expression<Object> paths, CriteriaBuilder cb, List<String> texts) {
+  public static Predicate notStartWithTexts(Expression<String> paths, CriteriaBuilder cb, List<String> texts) {
     if (isEmpty(texts)) {
       return cb.conjunction();
     }
@@ -130,13 +134,13 @@ public class OperationUtilsJpa {
     return cb.or(predicates);
   }
 
-  public static Predicate notStartWithText(Expression<Object> paths, CriteriaBuilder cb, String text) {
+  public static Predicate notStartWithText(Expression<String> paths, CriteriaBuilder cb, String text) {
     return startWithText(paths, cb, text).not();
   }
 
   // -- START WITH --
 
-  public static Predicate startWithTexts(Expression<Object> paths, CriteriaBuilder cb, List<String> texts) {
+  public static Predicate startWithTexts(Expression<String> paths, CriteriaBuilder cb, List<String> texts) {
     if (isEmpty(texts)) {
       return cb.conjunction();
     }
@@ -146,20 +150,20 @@ public class OperationUtilsJpa {
     return cb.or(predicates);
   }
 
-  public static Predicate startWithText(Expression<Object> paths, CriteriaBuilder cb, String text) {
-    return cb.like(cb.lower(paths.as(String.class)), text.toLowerCase() + "%");
+  public static Predicate startWithText(Expression<String> paths, CriteriaBuilder cb, String text) {
+    return cb.like(cb.lower(paths), text.toLowerCase() + "%");
   }
 
   // -- NOT EMPTY --
 
-  public static Predicate notEmpty(Expression<Object> paths, CriteriaBuilder cb, Class<?> type) {
+  public static Predicate notEmpty(Expression<String> paths, CriteriaBuilder cb, Class<?> type) {
     return empty(paths, cb, type).not();
   }
 
   // -- EMPTY --
 
-  public static Predicate empty(Expression<Object> paths, CriteriaBuilder cb, Class<?> type) {
-    Expression<Object> finalPaths;
+  public static Predicate empty(Expression<String> paths, CriteriaBuilder cb, Class<?> type) {
+    Expression<String> finalPaths;
     if (type.isArray()) {
       finalPaths = arrayToString(paths, cb);
     } else {
@@ -174,7 +178,7 @@ public class OperationUtilsJpa {
 
   // -- DATE --
 
-  public static Predicate greaterThanTexts(Expression<Object> paths, CriteriaBuilder cb, List<String> texts) {
+  public static Predicate greaterThanTexts(Expression<Instant> paths, CriteriaBuilder cb, List<String> texts) {
     if (isEmpty(texts)) {
       return cb.conjunction();
     }
@@ -186,11 +190,11 @@ public class OperationUtilsJpa {
     return cb.or(predicates);
   }
 
-  public static Predicate greaterThanText(Expression<Object> paths, CriteriaBuilder cb, String text) {
-    return cb.greaterThan(paths.as(Instant.class), Instant.parse(text));
+  public static Predicate greaterThanText(Expression<Instant> paths, CriteriaBuilder cb, String text) {
+    return cb.greaterThan(paths, Instant.parse(text));
   }
 
-  public static Predicate greaterThanOrEqualTexts(Expression<Object> paths, CriteriaBuilder cb, List<String> texts) {
+  public static Predicate greaterThanOrEqualTexts(Expression<Instant> paths, CriteriaBuilder cb, List<String> texts) {
     if (isEmpty(texts)) {
       return cb.conjunction();
     }
@@ -202,11 +206,11 @@ public class OperationUtilsJpa {
     return cb.or(predicates);
   }
 
-  public static Predicate greaterThanOrEqualText(Expression<Object> paths, CriteriaBuilder cb, String text) {
-    return cb.greaterThanOrEqualTo(paths.as(Instant.class), Instant.parse(text));
+  public static Predicate greaterThanOrEqualText(Expression<Instant> paths, CriteriaBuilder cb, String text) {
+    return cb.greaterThanOrEqualTo(paths, Instant.parse(text));
   }
 
-  public static Predicate lessThanTexts(Expression<Object> paths, CriteriaBuilder cb, List<String> texts) {
+  public static Predicate lessThanTexts(Expression<Instant> paths, CriteriaBuilder cb, List<String> texts) {
     if (isEmpty(texts)) {
       return cb.conjunction();
     }
@@ -218,11 +222,11 @@ public class OperationUtilsJpa {
     return cb.or(predicates);
   }
 
-  public static Predicate lessThanText(Expression<Object> paths, CriteriaBuilder cb, String text) {
-    return cb.lessThan(paths.as(Instant.class), Instant.parse(text));
+  public static Predicate lessThanText(Expression<Instant> paths, CriteriaBuilder cb, String text) {
+    return cb.lessThan(paths, Instant.parse(text));
   }
 
-  public static Predicate lessThanOrEqualTexts(Expression<Object> paths, CriteriaBuilder cb, List<String> texts) {
+  public static Predicate lessThanOrEqualTexts(Expression<Instant> paths, CriteriaBuilder cb, List<String> texts) {
     if (isEmpty(texts)) {
       return cb.conjunction();
     }
@@ -234,15 +238,15 @@ public class OperationUtilsJpa {
     return cb.or(predicates);
   }
 
-  public static Predicate lessThanOrEqualText(Expression<Object> paths, CriteriaBuilder cb, String text) {
-    return cb.lessThanOrEqualTo(paths.as(Instant.class), Instant.parse(text));
+  public static Predicate lessThanOrEqualText(Expression<Instant> paths, CriteriaBuilder cb, String text) {
+    return cb.lessThanOrEqualTo(paths, Instant.parse(text));
   }
 
 
   // -- CUSTOM FUNCTION --
 
   private static Expression<String[]> lowerArray(Expression<?> paths, CriteriaBuilder cb)  {
-    return stringToArray(lower(arrayToString(paths, cb), cb).as(String.class), cb);
+    return stringToArray(lower(arrayToString(paths, cb), cb), cb);
   }
 
   // -- BASE FUNCTION --
@@ -251,19 +255,19 @@ public class OperationUtilsJpa {
     return cb.function("array_position", Boolean.class, paths, text);
   }
 
-  private static Expression<Object> lower(Expression<Object> paths, CriteriaBuilder cb)  {
-    return cb.function("lower", Object.class, paths);
+  private static Expression<String> lower(Expression<String> paths, CriteriaBuilder cb)  {
+    return cb.function("lower", String.class, paths);
   }
 
   private static Expression<String[]> stringToArray(Expression<String> paths, CriteriaBuilder cb)  {
     return cb.function("string_to_array", String[].class, paths, cb.literal(" && "));
   }
 
-  private static Expression<Object> arrayToString(Expression<?> paths, CriteriaBuilder cb)  {
-    return cb.function("array_to_string", Object.class, paths, cb.literal(" && "));
+  private static Expression<String> arrayToString(Expression<?> paths, CriteriaBuilder cb)  {
+    return cb.function("array_to_string", String.class, paths, cb.literal(" && "));
   }
 
-  private static Expression<String[]> avals(Expression<Object> paths, CriteriaBuilder cb)  {
+  private static Expression<String[]> avals(Expression<String> paths, CriteriaBuilder cb)  {
     return cb.function("avals", String[].class, paths);
   }
 
