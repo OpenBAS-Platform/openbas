@@ -137,7 +137,7 @@ const LessonsCategories = ({
                     ))}
                     {!isReport && (
                     <CreateLessonsQuestion
-                      inline={true}
+                      inline
                       lessonsCategoryId={category.lessonscategory_id}
                     />
                     )}

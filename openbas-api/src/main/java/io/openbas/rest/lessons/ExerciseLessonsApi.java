@@ -207,14 +207,14 @@ public class ExerciseLessonsApi extends RestBehavior {
         .toList();
   }
 
-  @GetMapping("/api/player/lessons/{exerciseId}/lessons_categories")
+  @GetMapping("/api/player/lessons/exercise/{exerciseId}/lessons_categories")
   public List<LessonsCategory> playerLessonsCategories(@PathVariable String exerciseId,
       @RequestParam Optional<String> userId) {
     impersonateUser(userRepository, userId); // Protection for ?
     return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId));
   }
 
-  @GetMapping("/api/player/lessons/{exerciseId}/lessons_questions")
+  @GetMapping("/api/player/lessons/exercise/{exerciseId}/lessons_questions")
   public List<LessonsQuestion> playerLessonsQuestions(@PathVariable String exerciseId,
       @RequestParam Optional<String> userId) {
     impersonateUser(userRepository, userId); // Protection for ?
@@ -223,7 +223,7 @@ public class ExerciseLessonsApi extends RestBehavior {
             LessonsQuestionSpecification.fromCategory(lessonsCategory.getId())).stream()).toList();
   }
 
-  @GetMapping("/api/player/lessons/{exerciseId}/lessons_answers")
+  @GetMapping("/api/player/lessons/exercise/{exerciseId}/lessons_answers")
   public List<LessonsAnswer> playerLessonsAnswers(@PathVariable String exerciseId,
       @RequestParam Optional<String> userId) {
     impersonateUser(userRepository, userId); // Protection for ?
@@ -235,7 +235,7 @@ public class ExerciseLessonsApi extends RestBehavior {
         .toList();
   }
 
-  @PostMapping("/api/player/lessons/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}/lessons_answers")
+  @PostMapping("/api/player/lessons/exercise/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}/lessons_answers")
   public LessonsAnswer createExerciseLessonsQuestion(@PathVariable String exerciseId,
       @PathVariable String lessonsQuestionId, @Valid @RequestBody LessonsAnswerCreateInput input,
       @RequestParam Optional<String> userId) {

@@ -210,14 +210,14 @@ public class ScenarioLessonsApi extends RestBehavior {
             .toList();
   }
 
-  @GetMapping("/api/player/lessons/{scenarioId}/lessons_categories")
+  @GetMapping("/api/player/lessons/scenario/{scenarioId}/lessons_categories")
   public List<LessonsCategory> playerLessonsCategories(@PathVariable String scenarioId,
                                                        @RequestParam Optional<String> userId) {
     impersonateUser(userRepository, userId); // Protection for ?
     return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromScenario(scenarioId));
   }
 
-  @GetMapping("/api/player/lessons/{scenarioId}/lessons_questions")
+  @GetMapping("/api/player/lessons/scenario/{scenarioId}/lessons_questions")
   public List<LessonsQuestion> playerLessonsQuestions(@PathVariable String scenarioId,
                                                       @RequestParam Optional<String> userId) {
     impersonateUser(userRepository, userId); // Protection for ?
@@ -226,7 +226,7 @@ public class ScenarioLessonsApi extends RestBehavior {
                     LessonsQuestionSpecification.fromCategory(lessonsCategory.getId())).stream()).toList();
   }
 
-  @GetMapping("/api/player/lessons/{scenarioId}/lessons_answers")
+  @GetMapping("/api/player/lessons/scenario/{scenarioId}/lessons_answers")
   public List<LessonsAnswer> playerLessonsAnswers(@PathVariable String scenarioId,
                                                   @RequestParam Optional<String> userId) {
     impersonateUser(userRepository, userId); // Protection for ?
@@ -238,7 +238,7 @@ public class ScenarioLessonsApi extends RestBehavior {
             .toList();
   }
 
-  @PostMapping("/api/player/lessons/{scenarioId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}/lessons_answers")
+  @PostMapping("/api/player/lessons/scenario/{scenarioId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}/lessons_answers")
   public LessonsAnswer createScenarioLessonsQuestion(@PathVariable String scenarioId,
                                                      @PathVariable String lessonsQuestionId,
                                                      @Valid @RequestBody LessonsAnswerCreateInput input,

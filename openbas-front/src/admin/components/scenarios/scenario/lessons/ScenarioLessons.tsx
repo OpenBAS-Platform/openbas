@@ -38,6 +38,7 @@ import type {
   LessonsCategoryCreateInput,
   LessonsCategoryTeamsInput,
   LessonsCategoryUpdateInput,
+  LessonsQuestionCreateInput,
   LessonsQuestionUpdateInput,
   LessonsSendInput,
   ObjectiveInput,
@@ -132,7 +133,7 @@ const ScenarioLessons = () => {
         data,
       ),
     ),
-    onAddLessonsQuestion: (lessonsCategoryId: string, data: LessonsQuestionUpdateInput) => dispatch(
+    onAddLessonsQuestion: (lessonsCategoryId: string, data: LessonsQuestionCreateInput) => dispatch(
       dispatch(
         addLessonsQuestion(scenarioId, lessonsCategoryId, data),
       ),

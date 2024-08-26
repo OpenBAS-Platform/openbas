@@ -129,17 +129,17 @@ export const fetchLessonsAnswers = (exerciseId: string) => (dispatch: Dispatch) 
 };
 
 export const fetchPlayerLessonsCategories = (exerciseId: string, userId: string) => (dispatch: Dispatch) => {
-  const uri = `/api/player/lessons/${exerciseId}/lessons_categories?userId=${userId}`;
+  const uri = `/api/player/lessons/exercise/${exerciseId}/lessons_categories?userId=${userId}`;
   return getReferential(schema.arrayOfLessonsCategories, uri)(dispatch);
 };
 
 export const fetchPlayerLessonsQuestions = (exerciseId: string, userId: string) => (dispatch: Dispatch) => {
-  const uri = `/api/player/lessons/${exerciseId}/lessons_questions?userId=${userId}`;
+  const uri = `/api/player/lessons/exercise/${exerciseId}/lessons_questions?userId=${userId}`;
   return getReferential(schema.arrayOfLessonsQuestions, uri)(dispatch);
 };
 
 export const fetchPlayerLessonsAnswers = (exerciseId: string, userId: string) => (dispatch: Dispatch) => {
-  const uri = `/api/player/lessons/${exerciseId}/lessons_answers?userId=${userId}`;
+  const uri = `/api/player/lessons/exercise/${exerciseId}/lessons_answers?userId=${userId}`;
   return getReferential(schema.arrayOfLessonsAnswers, uri)(dispatch);
 };
 
@@ -150,6 +150,6 @@ export const addLessonsAnswers = (
   data: LessonsAnswerCreateInput,
   userId: string,
 ) => (dispatch: Dispatch) => {
-  const uri = `/api/player/lessons/${exerciseId}/lessons_categories/${lessonsCategoryId}/lessons_questions/${lessonsQuestionId}/lessons_answers?userId=${userId}`;
+  const uri = `/api/player/lessons/exercise/${exerciseId}/lessons_categories/${lessonsCategoryId}/lessons_questions/${lessonsQuestionId}/lessons_answers?userId=${userId}`;
   return postReferential(schema.arrayOfLessonsAnswers, uri, data)(dispatch);
 };

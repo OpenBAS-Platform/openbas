@@ -11,6 +11,7 @@ import type {
   LessonsCategoryCreateInput,
   LessonsCategoryTeamsInput,
   LessonsCategoryUpdateInput,
+  LessonsQuestionCreateInput,
   LessonsQuestionUpdateInput,
   LessonsSendInput,
   ObjectiveInput,
@@ -100,7 +101,7 @@ export type LessonContextType = {
   onUpdateLessonsQuestion: (lessonsCategoryId: string, lessonsQuestionId: string, data: LessonsQuestionUpdateInput) => Promise<{
     result: string
   }>,
-  onAddLessonsQuestion: (lessonsCategoryId: string, data: LessonsQuestionUpdateInput) => Promise<{ result: string }>,
+  onAddLessonsQuestion: (lessonsCategoryId: string, data: LessonsQuestionCreateInput) => Promise<{ result: string }>,
   onAddObjective: (data: ObjectiveInput) => Promise<{ result: string }>,
   onUpdateObjective: (objectiveId: string, data: ObjectiveInput) => Promise<{ result: string }>,
   onDeleteObjective: (objectiveId: string) => Promise<{ result: string }>,
@@ -228,7 +229,7 @@ export const LessonContext = createContext<LessonContextType>({
   }> {
     return Promise.resolve({ result: '' });
   },
-  onAddLessonsQuestion(_lessonsCategoryId: string, _data: LessonsQuestionUpdateInput): Promise<{ result: string }> {
+  onAddLessonsQuestion(_lessonsCategoryId: string, _data: LessonsQuestionCreateInput): Promise<{ result: string }> {
     return Promise.resolve({ result: '' });
   },
   onAddObjective(_data: ObjectiveInput): Promise<{ result: string }> {
