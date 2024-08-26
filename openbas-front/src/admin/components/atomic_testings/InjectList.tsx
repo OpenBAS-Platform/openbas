@@ -1,4 +1,4 @@
-import React, { CSSProperties, FunctionComponent, useEffect, useMemo, useState } from 'react';
+import React, { CSSProperties, FunctionComponent, useMemo, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useFormatter } from '../../../components/i18n';
