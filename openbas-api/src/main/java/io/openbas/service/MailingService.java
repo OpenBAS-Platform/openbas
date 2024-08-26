@@ -3,6 +3,7 @@ package io.openbas.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.Scenario;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.UserRepository;
@@ -59,7 +60,7 @@ public class MailingService {
         this.executionContextService = executionContextService;
     }
 
-    public void sendEmail(String subject, String body, List<User> users, Optional<Exercise> exercise) {
+    public void sendEmail(String subject, String body, List<User> users, Optional<Exercise> exercise, Optional<Scenario> scenario) {
         EmailContent emailContent = new EmailContent();
         emailContent.setSubject(subject);
         emailContent.setBody(body);
@@ -72,6 +73,7 @@ public class MailingService {
             inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow());
 
             exercise.ifPresent(inject::setExercise);
+            scenario.ifPresent(inject::setScenario);
 
             List<ExecutionContext> userInjectContexts = users.stream().distinct()
                     .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
@@ -82,6 +84,6 @@ public class MailingService {
     }
 
     public void sendEmail(String subject, String body, List<User> users) {
-        sendEmail(subject, body, users, Optional.empty());
+        sendEmail(subject, body, users, Optional.empty(), Optional.empty());
     }
 }

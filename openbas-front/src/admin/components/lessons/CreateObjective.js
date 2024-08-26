@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { withStyles } from '@mui/styles';
-import { IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import { Add } from '@mui/icons-material';
-import ObjectiveForm from './ObjectiveForm';
-import { addObjective } from '../../../actions/Objective';
 import inject18n from '../../../components/i18n';
+import { LessonContext } from '../common/Context';
+import ObjectiveForm from './ObjectiveForm';
 import Transition from '../../../components/common/Transition';
 
 const styles = () => ({
@@ -23,6 +22,9 @@ class CreateObjective extends Component {
     this.state = { open: false };
   }
 
+  // Context
+  static contextType = LessonContext;
+
   handleOpen() {
     this.setState({ open: true });
   }
@@ -31,11 +33,16 @@ class CreateObjective extends Component {
     this.setState({ open: false });
   }
 
-  onSubmit(data) {
-    return this.props
-      .addObjective(this.props.exerciseId, data)
-      .then((result) => (result.result ? this.handleClose() : result));
-  }
+  onSubmit = (data) => {
+    const { onAddObjective } = this.context;
+    return onAddObjective(data)
+      .then((result) => {
+        if (result.result) {
+          this.handleClose();
+        }
+        return result;
+      });
+  };
 
   render() {
     const { classes, t } = this.props;
@@ -48,7 +55,7 @@ class CreateObjective extends Component {
           classes={{ root: classes.createButton }}
           size="large"
         >
-          <Add fontSize="small" />
+          <Add fontSize="small"/>
         </IconButton>
         <Dialog
           open={this.state.open}
@@ -75,12 +82,10 @@ class CreateObjective extends Component {
 CreateObjective.propTypes = {
   classes: PropTypes.object,
   t: PropTypes.func,
-  exerciseId: PropTypes.string,
   addObjective: PropTypes.func,
 };
 
 export default R.compose(
-  connect(null, { addObjective }),
   inject18n,
   withStyles(styles),
 )(CreateObjective);

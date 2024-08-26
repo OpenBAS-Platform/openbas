@@ -11,7 +11,7 @@ import io.openbas.rest.lessons.form.*;
 import io.openbas.service.MailingService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +22,10 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
 
 @RestController
-public class LessonsApi extends RestBehavior {
+@AllArgsConstructor
+public class ExerciseLessonsApi extends RestBehavior {
+
+  public static final String EXERCISE_URL = "/api/exercises/";
 
   private ExerciseRepository exerciseRepository;
   private TeamRepository teamRepository;
@@ -33,53 +36,14 @@ public class LessonsApi extends RestBehavior {
   private UserRepository userRepository;
   private MailingService mailingService;
 
-  @Autowired
-  public void setMailingService(MailingService mailingService) {
-    this.mailingService = mailingService;
-  }
 
-  @Autowired
-  public void setUserRepository(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
-
-  @Autowired
-  public void setExerciseRepository(ExerciseRepository exerciseRepository) {
-    this.exerciseRepository = exerciseRepository;
-  }
-
-  @Autowired
-  public void setTeamRepository(TeamRepository teamRepository) {
-    this.teamRepository = teamRepository;
-  }
-
-  @Autowired
-  public void setLessonsTemplateRepository(LessonsTemplateRepository lessonsTemplateRepository) {
-    this.lessonsTemplateRepository = lessonsTemplateRepository;
-  }
-
-  @Autowired
-  public void setLessonsCategoryRepository(LessonsCategoryRepository lessonsCategoryRepository) {
-    this.lessonsCategoryRepository = lessonsCategoryRepository;
-  }
-
-  @Autowired
-  public void setLessonsQuestionRepository(LessonsQuestionRepository lessonsQuestionRepository) {
-    this.lessonsQuestionRepository = lessonsQuestionRepository;
-  }
-
-  @Autowired
-  public void setLessonsAnswerRepository(LessonsAnswerRepository lessonsAnswerRepository) {
-    this.lessonsAnswerRepository = lessonsAnswerRepository;
-  }
-
-  @GetMapping("/api/exercises/{exerciseId}/lessons_categories")
+  @GetMapping(EXERCISE_URL + "{exerciseId}/lessons_categories")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<LessonsCategory> exerciseLessonsCategories(@PathVariable String exerciseId) {
     return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId));
   }
 
-  @PostMapping("/api/exercises/{exerciseId}/lessons_apply_template/{lessonsTemplateId}")
+  @PostMapping(EXERCISE_URL + "{exerciseId}/lessons_apply_template/{lessonsTemplateId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> applyExerciseLessonsTemplate(@PathVariable String exerciseId,
@@ -108,7 +72,7 @@ public class LessonsApi extends RestBehavior {
     return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId));
   }
 
-  @PostMapping("/api/exercises/{exerciseId}/lessons_categories")
+  @PostMapping(EXERCISE_URL + "{exerciseId}/lessons_categories")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory createExerciseLessonsCategory(@PathVariable String exerciseId,
@@ -120,7 +84,7 @@ public class LessonsApi extends RestBehavior {
     return lessonsCategoryRepository.save(lessonsCategory);
   }
 
-  @PostMapping("/api/exercises/{exerciseId}/lessons_answers_reset")
+  @PostMapping(EXERCISE_URL + "{exerciseId}/lessons_answers_reset")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> resetExerciseLessonsAnswers(@PathVariable String exerciseId) {
@@ -135,7 +99,7 @@ public class LessonsApi extends RestBehavior {
     return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream().toList();
   }
 
-  @PostMapping("/api/exercises/{exerciseId}/lessons_empty")
+  @PostMapping(EXERCISE_URL + "{exerciseId}/lessons_empty")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> emptyExerciseLessons(@PathVariable String exerciseId) {
@@ -147,7 +111,7 @@ public class LessonsApi extends RestBehavior {
     return lessonsCategories;
   }
 
-  @PutMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}")
+  @PutMapping(EXERCISE_URL + "{exerciseId}/lessons_categories/{lessonsCategoryId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory updateExerciseLessonsCategory(@PathVariable String exerciseId,
@@ -158,14 +122,14 @@ public class LessonsApi extends RestBehavior {
     return lessonsCategoryRepository.save(lessonsTemplateCategory);
   }
 
-  @DeleteMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}")
+  @DeleteMapping(EXERCISE_URL + "{exerciseId}/lessons_categories/{lessonsCategoryId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public void deleteExerciseLessonsCategory(@PathVariable String exerciseId, @PathVariable String lessonsCategoryId) {
     lessonsCategoryRepository.deleteById(lessonsCategoryId);
   }
 
-  @PutMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/teams")
+  @PutMapping(EXERCISE_URL + "{exerciseId}/lessons_categories/{lessonsCategoryId}/teams")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory updateExerciseLessonsCategoryTeams(@PathVariable String exerciseId,
@@ -176,7 +140,7 @@ public class LessonsApi extends RestBehavior {
     return lessonsCategoryRepository.save(lessonsCategory);
   }
 
-  @GetMapping("/api/exercises/{exerciseId}/lessons_questions")
+  @GetMapping(EXERCISE_URL + "{exerciseId}/lessons_questions")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<LessonsQuestion> exerciseLessonsQuestions(@PathVariable String exerciseId) {
     return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream()
@@ -184,14 +148,14 @@ public class LessonsApi extends RestBehavior {
             LessonsQuestionSpecification.fromCategory(lessonsCategory.getId())).stream()).toList();
   }
 
-  @GetMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions")
+  @GetMapping(EXERCISE_URL + "{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<LessonsQuestion> exerciseLessonsCategoryQuestions(@PathVariable String exerciseId,
       @PathVariable String lessonsCategoryId) {
     return lessonsQuestionRepository.findAll(LessonsQuestionSpecification.fromCategory(lessonsCategoryId));
   }
 
-  @PostMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions")
+  @PostMapping(EXERCISE_URL + "{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public LessonsQuestion createExerciseLessonsQuestion(@PathVariable String exerciseId,
       @PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsQuestionCreateInput input) {
@@ -202,7 +166,7 @@ public class LessonsApi extends RestBehavior {
     return lessonsQuestionRepository.save(lessonsQuestion);
   }
 
-  @PutMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}")
+  @PutMapping(EXERCISE_URL + "{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public LessonsQuestion updateExerciseLessonsQuestion(@PathVariable String exerciseId,
       @PathVariable String lessonsQuestionId, @Valid @RequestBody LessonsQuestionUpdateInput input) {
@@ -212,14 +176,14 @@ public class LessonsApi extends RestBehavior {
     return lessonsQuestionRepository.save(lessonsQuestion);
   }
 
-  @DeleteMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}")
+  @DeleteMapping(EXERCISE_URL + "{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public void deleteExerciseLessonsQuestion(@PathVariable String exerciseId, @PathVariable String lessonsQuestionId) {
     lessonsQuestionRepository.deleteById(lessonsQuestionId);
   }
 
-  @PostMapping("/api/exercises/{exerciseId}/lessons_send")
+  @PostMapping(EXERCISE_URL + "{exerciseId}/lessons_send")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public void sendExerciseLessons(@PathVariable String exerciseId, @Valid @RequestBody LessonsSendInput input) {
@@ -228,10 +192,10 @@ public class LessonsApi extends RestBehavior {
         LessonsCategorySpecification.fromExercise(exerciseId)).stream().toList();
     List<User> users = lessonsCategories.stream().flatMap(lessonsCategory -> lessonsCategory.getTeams().stream()
         .flatMap(team -> team.getUsers().stream())).distinct().toList();
-    mailingService.sendEmail(input.getSubject(), input.getBody(), users, Optional.of(exercise));
+    mailingService.sendEmail(input.getSubject(), input.getBody(), users, Optional.of(exercise), Optional.empty());
   }
 
-  @GetMapping("/api/exercises/{exerciseId}/lessons_answers")
+  @GetMapping(EXERCISE_URL + "{exerciseId}/lessons_answers")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public List<LessonsAnswer> exerciseLessonsAnswers(@PathVariable String exerciseId,
       @RequestParam Optional<String> userId) {

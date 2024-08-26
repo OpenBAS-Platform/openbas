@@ -1,22 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useContext, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Form } from 'react-final-form';
-import { Paper, Grid, Button, Typography, Dialog, DialogContent, DialogContentText, DialogActions } from '@mui/material';
-import { useHelper } from '../../../store';
-import { useQueryParameter } from '../../../utils/Environment';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid, Paper, Typography } from '@mui/material';
 import { useFormatter } from '../../../components/i18n';
-import { usePermissions } from '../../../utils/Exercise';
-import { fetchMe } from '../../../actions/Application';
 import Loader from '../../../components/Loader';
 import Empty from '../../../components/Empty';
-import { addLessonsAnswers, fetchPlayerLessonsAnswers, fetchPlayerLessonsCategories, fetchPlayerLessonsQuestions } from '../../../actions/Lessons';
-import { fetchPlayerExercise } from '../../../actions/Exercise';
 import SliderField from '../../../components/fields/SliderField';
 import OldTextField from '../../../components/fields/OldTextField';
 import Transition from '../../../components/common/Transition';
+import { ViewLessonContext } from '../../../admin/components/common/Context';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -39,37 +33,26 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const LessonsPlayer = () => {
+const LessonsPlayer = (props) => {
+  const {
+    source,
+    lessonsCategories,
+    lessonsQuestions,
+    lessonsAnswers,
+    permissions,
+  } = props;
+
   const theme = useTheme();
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { t } = useFormatter();
-  const { exerciseId } = useParams();
   const [openValidate, setOpenValidate] = useState(false);
-  const [userId] = useQueryParameter(['user']);
-  const { me, exercise, lessonsCategories, lessonsQuestions, lessonsAnswers } = useHelper((helper) => {
-    const currentUser = helper.getMe();
-    return {
-      me: currentUser,
-      exercise: helper.getExercise(exerciseId),
-      lessonsCategories: helper.getExerciseLessonsCategories(exerciseId),
-      lessonsQuestions: helper.getExerciseLessonsQuestions(exerciseId),
-      lessonsAnswers: helper.getExerciseUserLessonsAnswers(
-        exerciseId,
-        userId && userId !== 'null' ? userId : currentUser?.user_id,
-      ),
-    };
-  });
-  const finalUserId = userId && userId !== 'null' ? userId : me?.user_id;
-  // Pass the full exercise because the exercise is never loaded in the store at this point
-  const permissions = usePermissions(exerciseId, exercise);
-  useEffect(() => {
-    dispatch(fetchMe());
-    dispatch(fetchPlayerExercise(exerciseId, userId));
-    dispatch(fetchPlayerLessonsCategories(exerciseId, finalUserId));
-    dispatch(fetchPlayerLessonsQuestions(exerciseId, finalUserId));
-    dispatch(fetchPlayerLessonsAnswers(exerciseId, finalUserId));
-  }, []);
+
+  // Context
+  const {
+    onAddLessonsAnswers,
+    onFetchPlayerLessonsAnswers,
+  } = useContext(ViewLessonContext);
+
   const validate = (values) => {
     const errors = {};
     const requiredFields = R.flatten(
@@ -90,24 +73,18 @@ const LessonsPlayer = () => {
       lessonsQuestions.map((question) => {
         const answerData = {
           lessons_answer_score: data[`${question.lessonsquestion_id}_score`],
-          lessons_answer_positive:
-            data[`${question.lessonsquestion_id}_positive`],
-          lessons_answer_negative:
-            data[`${question.lessonsquestion_id}_nagative`],
+          lessons_answer_positive: data[`${question.lessonsquestion_id}_positive`],
+          lessons_answer_negative: data[`${question.lessonsquestion_id}_negative`], // Corrected typo from 'nagative'
         };
-        return dispatch(
-          addLessonsAnswers(
-            exerciseId,
-            question.lessons_question_category,
-            question.lessonsquestion_id,
-            answerData,
-            finalUserId,
-          ),
+        return onAddLessonsAnswers(
+          question.lessons_question_category,
+          question.lessonsquestion_id,
+          answerData,
         );
       }),
     ).then(() => {
       setOpenValidate(false);
-      dispatch(fetchPlayerLessonsAnswers(exerciseId, finalUserId));
+      onFetchPlayerLessonsAnswers();
     });
   };
   const sortCategories = R.sortWith([
@@ -118,7 +95,7 @@ const LessonsPlayer = () => {
   ]);
   const sortedCategories = sortCategories(
     R.filter(
-      (n) => n.lessons_category_users.includes(finalUserId),
+      (n) => n.lessons_category_users.includes(source.finalUserId),
       lessonsCategories,
     ),
   );
@@ -130,34 +107,34 @@ const LessonsPlayer = () => {
     })),
     R.mergeAll,
   )(lessonsAnswers);
-  if (exercise) {
+  if (source) {
     return (
       <div className={classes.root}>
         {permissions.isLoggedIn && permissions.canRead && (
-          <Button
-            color="secondary"
-            variant="outlined"
-            component={Link}
-            to={`/lessons/${exerciseId}?user=${finalUserId}&preview=true`}
-            style={{ position: 'absolute', top: 20, right: 20 }}
-          >
-            {t('Switch to preview mode')}
-          </Button>
+        <Button
+          color="secondary"
+          variant="outlined"
+          component={Link}
+          to={`/lessons/${source.id}?user=${source.finalUserId}&preview=true`}
+          style={{ position: 'absolute', top: 20, right: 20 }}
+        >
+          {t('Switch to preview mode')}
+        </Button>
         )}
         {permissions.isLoggedIn && permissions.canRead && (
-          <Button
-            color="primary"
-            variant="outlined"
-            component={Link}
-            to={`/admin/exercises/${exerciseId}/lessons`}
-            style={{ position: 'absolute', top: 20, left: 20 }}
-          >
-            {t('Back to administration')}
-          </Button>
+        <Button
+          color="primary"
+          variant="outlined"
+          component={Link}
+          to={`/admin/${source.type}/${source.id}/lessons`}
+          style={{ position: 'absolute', top: 20, left: 20 }}
+        >
+          {t('Back to administration')}
+        </Button>
         )}
         <div className={classes.container}>
           <div style={{ margin: '0 auto', textAlign: 'center' }}>
-            <img src={theme.logo} alt="logo" className={classes.logo} />
+            <img src={theme.logo} alt="logo" className={classes.logo}/>
           </div>
           <Typography
             variant="h1"
@@ -166,7 +143,7 @@ const LessonsPlayer = () => {
               fontSize: 40,
             }}
           >
-            {exercise.exercise_name}
+            {source.name}
           </Typography>
           <Typography
             variant="h2"
@@ -174,16 +151,16 @@ const LessonsPlayer = () => {
               textAlign: 'center',
             }}
           >
-            {exercise.exercise_subtitle}
+            {source.subtitle}
           </Typography>
           {lessonsCategories.length === 0 && (
-            <div style={{ marginTop: 150 }}>
-              <Empty
-                message={t(
-                  'No lessons learned categories in this exercise yet.',
-                )}
-              />
-            </div>
+          <div style={{ marginTop: 150 }}>
+            <Empty
+              message={t(
+                `No lessons learned categories in this ${source.type} yet.`,
+              )}
+            />
+          </div>
           )}
         </div>
         <Form
@@ -197,8 +174,7 @@ const LessonsPlayer = () => {
               {sortedCategories.map((category) => {
                 const questions = sortQuestions(
                   lessonsQuestions.filter(
-                    (n) => n.lessons_question_category
-                      === category.lessonscategory_id,
+                    (n) => n.lessons_question_category === category.lessonscategory_id,
                   ),
                 );
                 return (
@@ -235,8 +211,7 @@ const LessonsPlayer = () => {
                                 </strong>
                               </Typography>
                               <Typography variant="body2">
-                                {question.lessons_question_explanation
-                                  || t('No explanation')}
+                                {question.lessons_question_explanation || t('No explanation')}
                               </Typography>
                             </Grid>
                             <Grid item={true} xs={3}>
@@ -301,10 +276,10 @@ const LessonsPlayer = () => {
                   variant="contained"
                   onClick={() => setOpenValidate(true)}
                   disabled={
-                    lessonsAnswers.length > 0
-                    || submitting
-                    || Object.keys(errors).length > 0
-                  }
+                                        lessonsAnswers.length > 0
+                                        || submitting
+                                        || Object.keys(errors).length > 0
+                                    }
                   size="large"
                 >
                   {t('Submit')}
@@ -345,7 +320,7 @@ const LessonsPlayer = () => {
       </div>
     );
   }
-  return <Loader />;
+  return <Loader/>;
 };
 
 export default LessonsPlayer;

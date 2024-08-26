@@ -1,19 +1,12 @@
-import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import React from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Form } from 'react-final-form';
-import { Paper, Grid, Button, Typography } from '@mui/material';
-import { useHelper } from '../../../store';
-import { useQueryParameter } from '../../../utils/Environment';
+import { Button, Grid, Paper, Typography } from '@mui/material';
 import { useFormatter } from '../../../components/i18n';
-import { usePermissions } from '../../../utils/Exercise';
-import { fetchMe } from '../../../actions/Application';
 import Loader from '../../../components/Loader';
 import Empty from '../../../components/Empty';
-import { fetchLessonsCategories, fetchLessonsQuestions } from '../../../actions/Lessons';
-import { fetchExercise } from '../../../actions/Exercise';
 import SliderField from '../../../components/fields/SliderField';
 import OldTextField from '../../../components/fields/OldTextField';
 
@@ -38,28 +31,18 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const LessonsPlayer = () => {
+const LessonsPreview = (props) => {
+  const {
+    source,
+    lessonsCategories,
+    lessonsQuestions,
+    permissions,
+  } = props;
+
   const theme = useTheme();
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { t } = useFormatter();
-  const [userId] = useQueryParameter(['user']);
-  const { exerciseId } = useParams();
-  const { exercise, lessonsCategories, lessonsQuestions } = useHelper(
-    (helper) => ({
-      exercise: helper.getExercise(exerciseId),
-      lessonsCategories: helper.getExerciseLessonsCategories(exerciseId),
-      lessonsQuestions: helper.getExerciseLessonsQuestions(exerciseId),
-    }),
-  );
-  // Pass the full exercise because the exercise is never loaded in the store at this point
-  const permissions = usePermissions(exerciseId, exercise);
-  useEffect(() => {
-    dispatch(fetchMe());
-    dispatch(fetchExercise(exerciseId));
-    dispatch(fetchLessonsCategories(exerciseId));
-    dispatch(fetchLessonsQuestions(exerciseId));
-  }, []);
+
   const validate = (values) => {
     const errors = {};
     const requiredFields = R.flatten(
@@ -74,7 +57,8 @@ const LessonsPlayer = () => {
     });
     return errors;
   };
-  const submitForm = () => {};
+  const submitForm = () => {
+  };
   const sortCategories = R.sortWith([
     R.ascend(R.prop('lessons_category_order')),
   ]);
@@ -83,34 +67,34 @@ const LessonsPlayer = () => {
   ]);
   const sortedCategories = sortCategories(lessonsCategories);
   const initialValues = {};
-  if (exercise) {
+  if (source) {
     return (
       <div className={classes.root}>
         {permissions.isLoggedIn && permissions.canRead && (
-          <Button
-            color="secondary"
-            variant="outlined"
-            component={Link}
-            to={`/lessons/${exerciseId}?user=${userId}&preview=false`}
-            style={{ position: 'absolute', top: 20, right: 20 }}
-          >
-            {t('Switch to player mode')}
-          </Button>
+        <Button
+          color="secondary"
+          variant="outlined"
+          component={Link}
+          to={`/lessons/${source.id}?user=${source.userId}&preview=false`}
+          style={{ position: 'absolute', top: 20, right: 20 }}
+        >
+          {t('Switch to player mode')}
+        </Button>
         )}
         {permissions.isLoggedIn && permissions.canRead && (
-          <Button
-            color="primary"
-            variant="outlined"
-            component={Link}
-            to={`/admin/exercises/${exerciseId}/lessons`}
-            style={{ position: 'absolute', top: 20, left: 20 }}
-          >
-            {t('Back to administration')}
-          </Button>
+        <Button
+          color="primary"
+          variant="outlined"
+          component={Link}
+          to={`/admin/${source.type}/${source.id}/lessons`}
+          style={{ position: 'absolute', top: 20, left: 20 }}
+        >
+          {t('Back to administration')}
+        </Button>
         )}
         <div className={classes.container}>
           <div style={{ margin: '0 auto', textAlign: 'center' }}>
-            <img src={theme.logo} alt="logo" className={classes.logo} />
+            <img src={theme.logo} alt="logo" className={classes.logo}/>
           </div>
           <Typography
             variant="h1"
@@ -119,7 +103,7 @@ const LessonsPlayer = () => {
               fontSize: 40,
             }}
           >
-            {exercise.exercise_name}
+            {source.name}
           </Typography>
           <Typography
             variant="h2"
@@ -127,16 +111,16 @@ const LessonsPlayer = () => {
               textAlign: 'center',
             }}
           >
-            {exercise.exercise_subtitle}
+            {source.subtitle}
           </Typography>
           {lessonsCategories.length === 0 && (
-            <div style={{ marginTop: 150 }}>
-              <Empty
-                message={t(
-                  'No lessons learned categories in this exercise yet.',
-                )}
-              />
-            </div>
+          <div style={{ marginTop: 150 }}>
+            <Empty
+              message={t(
+                `No lessons learned categories in this ${source.type} yet.`,
+              )}
+            />
+          </div>
           )}
         </div>
         <Form
@@ -150,8 +134,7 @@ const LessonsPlayer = () => {
               {sortedCategories.map((category) => {
                 const questions = sortQuestions(
                   lessonsQuestions.filter(
-                    (n) => n.lessons_question_category
-                      === category.lessonscategory_id,
+                    (n) => n.lessons_question_category === category.lessonscategory_id,
                   ),
                 );
                 return (
@@ -189,7 +172,7 @@ const LessonsPlayer = () => {
                               </Typography>
                               <Typography variant="body2">
                                 {question.lessons_question_explanation
-                                  || t('No explanation')}
+                                                                    || t('No explanation')}
                               </Typography>
                             </Grid>
                             <Grid item={true} xs={3}>
@@ -255,7 +238,7 @@ const LessonsPlayer = () => {
       </div>
     );
   }
-  return <Loader />;
+  return <Loader/>;
 };
 
-export default LessonsPlayer;
+export default LessonsPreview;

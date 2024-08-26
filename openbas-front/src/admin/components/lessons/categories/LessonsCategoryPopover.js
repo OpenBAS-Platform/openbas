@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as R from 'ramda';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Slide, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Slide } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { useDispatch } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 import LessonsCategoryForm from './LessonsCategoryForm';
 import { useFormatter } from '../../../../components/i18n';
-import { deleteLessonsCategory, updateLessonsCategory } from '../../../../actions/Lessons';
+import { LessonContext } from '../../common/Context';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -20,16 +19,21 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const LessonsCategoryPopover = ({ exerciseId, lessonsCategory }) => {
+const LessonsCategoryPopover = ({ lessonsCategory }) => {
   // utils
-  const dispatch = useDispatch();
   const classes = useStyles();
   const { t } = useFormatter();
   // states
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  // popover management
+
+  // Context
+  const {
+    onDeleteLessonsCategory,
+    onUpdateLessonsCategory,
+  } = useContext(LessonContext);
+    // popover management
   const handlePopoverOpen = (event) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
@@ -42,26 +46,21 @@ const LessonsCategoryPopover = ({ exerciseId, lessonsCategory }) => {
   };
   const handleCloseEdit = () => setOpenEdit(false);
   const onSubmitEdit = (data) => {
-    return dispatch(
-      updateLessonsCategory(
-        exerciseId,
-        lessonsCategory.lessonscategory_id,
-        data,
-      ),
+    return onUpdateLessonsCategory(
+      lessonsCategory.lessonscategory_id,
+      data,
     ).then(() => handleCloseEdit());
   };
-  // Delete action
+    // Delete action
   const handleOpenDelete = () => {
     setOpenDelete(true);
     handlePopoverClose();
   };
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
-    dispatch(
-      deleteLessonsCategory(exerciseId, lessonsCategory.lessonscategory_id),
-    ).then(() => handleCloseDelete());
+    onDeleteLessonsCategory(lessonsCategory.lessonscategory_id).then(() => handleCloseDelete());
   };
-  // Rendering
+    // Rendering
   const initialValues = R.pipe(
     R.pick([
       'lessons_category_name',
@@ -77,7 +76,7 @@ const LessonsCategoryPopover = ({ exerciseId, lessonsCategory }) => {
         aria-haspopup="true"
         size="large"
       >
-        <MoreVert />
+        <MoreVert/>
       </IconButton>
       <Menu
         anchorEl={anchorEl}

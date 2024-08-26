@@ -10,4 +10,5 @@ export interface ScenariosHelper {
   getScenarioLessonsCategories: (scenarioId: string) => LessonsCategory[];
   getScenarioLessonsQuestions: (scenarioId: string) => LessonsQuestion[];
   getScenarioLessonsAnswers: (scenarioId: string) => LessonsAnswer[];
+  getScenarioUserLessonsAnswers: (scenarioId: string, userId: string) => LessonsAnswer[];
 }

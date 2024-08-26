@@ -200,6 +200,13 @@ public class Scenario implements Base {
   @JsonProperty("scenario_exercises")
   private List<Exercise> exercises;
 
+  // -- LESSONS --
+
+  @Getter
+  @Column(name = "scenario_lessons_anonymized")
+  @JsonProperty("scenario_lessons_anonymized")
+  private boolean lessonsAnonymized = false;
+
   // -- SECURITY --
 
   @JsonProperty("scenario_planners")
@@ -276,6 +283,19 @@ public class Scenario implements Base {
             .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream()))
         .distinct()
         .toList();
+  }
+
+  @JsonProperty("scenario_score")
+  public Double getEvaluationAverage() {
+    double evaluationAverage = getObjectives().stream().mapToDouble(Objective::getEvaluationAverage).average()
+            .orElse(0D);
+    return Math.round(evaluationAverage * 100.0) / 100.0;
+  }
+
+  @JsonProperty("scenario_lessons_answers_number")
+  public Long getLessonsAnswersNumbers() {
+    return getLessonsCategories().stream().flatMap(lessonsCategory -> lessonsCategory.getQuestions()
+            .stream().flatMap(lessonsQuestion -> lessonsQuestion.getAnswers().stream())).count();
   }
 
   @Override

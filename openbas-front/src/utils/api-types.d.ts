@@ -836,10 +836,6 @@ export interface ExerciseDetails {
   exercise_users_number?: number;
 }
 
-export interface ExerciseLessonsInput {
-  exercise_lessons_anonymized?: boolean;
-}
-
 export interface ExerciseSimple {
   exercise_category?: string;
   exercise_global_score?: ExpectationResultsByType[];
@@ -1684,6 +1680,10 @@ export interface LessonsCategoryUpdateInput {
   lessons_category_name: string;
   /** @format int32 */
   lessons_category_order?: number;
+}
+
+export interface LessonsInput {
+  lessons_anonymized?: boolean;
 }
 
 export interface LessonsQuestion {
@@ -2762,6 +2762,9 @@ export interface Scenario {
   scenario_injects?: Inject[];
   scenario_injects_statistics?: Record<string, number>;
   scenario_kill_chain_phases?: KillChainPhase[];
+  scenario_lessons_anonymized?: boolean;
+  /** @format int64 */
+  scenario_lessons_answers_number?: number;
   scenario_lessons_categories?: LessonsCategory[];
   scenario_mail_from: string;
   scenario_mails_reply_to?: string[];
@@ -2777,6 +2780,8 @@ export interface Scenario {
   scenario_recurrence_end?: string;
   /** @format date-time */
   scenario_recurrence_start?: string;
+  /** @format double */
+  scenario_score?: number;
   scenario_severity?: string;
   scenario_subtitle?: string;
   /** @uniqueItems true */

@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as R from 'ramda';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Slide, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { useDispatch } from 'react-redux';
 import LessonsQuestionForm from './LessonsQuestionForm';
 import { useFormatter } from '../../../../../components/i18n';
-import { deleteLessonsQuestion, updateLessonsQuestion } from '../../../../../actions/Lessons';
+import { LessonContext } from '../../../common/Context';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -13,17 +12,22 @@ const Transition = React.forwardRef((props, ref) => (
 Transition.displayName = 'TransitionSlide';
 
 const LessonsQuestionPopover = ({
-  exerciseId,
   lessonsCategoryId,
   lessonsQuestion,
 }) => {
   // utils
-  const dispatch = useDispatch();
   const { t } = useFormatter();
   // states
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+
+  // Context
+  const {
+    onDeleteLessonsQuestion,
+    onUpdateLessonsQuestion,
+  } = useContext(LessonContext);
+
   // popover management
   const handlePopoverOpen = (event) => {
     event.stopPropagation();
@@ -37,13 +41,10 @@ const LessonsQuestionPopover = ({
   };
   const handleCloseEdit = () => setOpenEdit(false);
   const onSubmitEdit = (data) => {
-    return dispatch(
-      updateLessonsQuestion(
-        exerciseId,
-        lessonsCategoryId,
-        lessonsQuestion.lessonsquestion_id,
-        data,
-      ),
+    return onUpdateLessonsQuestion(
+      lessonsCategoryId,
+      lessonsQuestion.lessonsquestion_id,
+      data,
     ).then(() => handleCloseEdit());
   };
   // Delete action
@@ -53,12 +54,9 @@ const LessonsQuestionPopover = ({
   };
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
-    dispatch(
-      deleteLessonsQuestion(
-        exerciseId,
-        lessonsCategoryId,
-        lessonsQuestion.lessonsquestion_id,
-      ),
+    onDeleteLessonsQuestion(
+      lessonsCategoryId,
+      lessonsQuestion.lessonsquestion_id,
     ).then(() => handleCloseDelete());
   };
   // Rendering

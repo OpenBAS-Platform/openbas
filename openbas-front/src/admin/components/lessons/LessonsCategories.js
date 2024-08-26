@@ -1,16 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { makeStyles } from '@mui/styles';
 import { Box, Chip, Grid, LinearProgress, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
 import { CastForEducationOutlined, HelpOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
-import { useDispatch } from 'react-redux';
 import LessonsCategoryPopover from './categories/LessonsCategoryPopover';
 import LessonsQuestionPopover from './categories/questions/LessonsQuestionPopover';
 import CreateLessonsQuestion from './categories/questions/CreateLessonsQuestion';
 import LessonsCategoryAddTeams from './categories/LessonsCategoryAddTeams';
-import { updateLessonsCategoryTeams } from '../../../actions/Lessons';
 import { useFormatter } from '../../../components/i18n';
 import { truncate } from '../../../utils/String';
+import { LessonContext } from '../common/Context';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -31,7 +30,6 @@ const useStyles = makeStyles(() => ({
 }));
 
 const LessonsCategories = ({
-  exerciseId,
   lessonsCategories,
   lessonsAnswers,
   lessonsQuestions,
@@ -40,8 +38,13 @@ const LessonsCategories = ({
   isReport,
 }) => {
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { t } = useFormatter();
+
+  // Context
+  const {
+    onUpdateLessonsCategoryTeams,
+  } = useContext(LessonContext);
+
   const sortCategories = R.sortWith([
     R.ascend(R.prop('lessons_category_order')),
   ]);
@@ -51,9 +54,7 @@ const LessonsCategories = ({
   const sortedCategories = sortCategories(lessonsCategories);
   const handleUpdateTeams = (lessonsCategoryId, teamsIds) => {
     const data = { lessons_category_teams: teamsIds };
-    return dispatch(
-      updateLessonsCategoryTeams(exerciseId, lessonsCategoryId, data),
-    );
+    return onUpdateLessonsCategoryTeams(lessonsCategoryId, data);
   };
   const consolidatedAnswers = R.pipe(
     R.groupBy(R.prop('lessons_answer_question')),
@@ -98,7 +99,6 @@ const LessonsCategories = ({
             </Typography>
             {!isReport && (
             <LessonsCategoryPopover
-              exerciseId={exerciseId}
               lessonsCategory={category}
             />
             )}
@@ -123,15 +123,11 @@ const LessonsCategories = ({
                         <ListItemText
                           style={{ width: '50%' }}
                           primary={question.lessons_question_content}
-                          secondary={
-                                                        question.lessons_question_explanation
-                                                        || t('No explanation')
-                                                    }
+                          secondary={question.lessons_question_explanation || t('No explanation')}
                         />
                         {!isReport && (
                         <ListItemSecondaryAction>
                           <LessonsQuestionPopover
-                            exerciseId={exerciseId}
                             lessonsCategoryId={category.lessonscategory_id}
                             lessonsQuestion={question}
                           />
@@ -142,7 +138,6 @@ const LessonsCategories = ({
                     {!isReport && (
                     <CreateLessonsQuestion
                       inline={true}
-                      exerciseId={exerciseId}
                       lessonsCategoryId={category.lessonscategory_id}
                     />
                     )}
@@ -213,11 +208,8 @@ const LessonsCategories = ({
                 </Typography>
                 {!isReport && (
                 <LessonsCategoryAddTeams
-                  exerciseId={exerciseId}
                   lessonsCategoryId={category.lessonscategory_id}
-                  lessonsCategoryTeamsIds={
-                                            category.lessons_category_teams
-                                        }
+                  lessonsCategoryTeamsIds={ category.lessons_category_teams }
                   handleUpdateTeams={handleUpdateTeams}
                 />
                 )}

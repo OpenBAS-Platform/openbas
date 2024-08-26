@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useContext, useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, ListItem, ListItemIcon, ListItemText, Slide } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
 import LessonsCategoryForm from './LessonsCategoryForm';
-import { addLessonsCategory } from '../../../../actions/Lessons';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
+import { LessonContext } from '../../common/Context';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -22,15 +21,20 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CreateLessonsCategory = (props) => {
-  const { onCreate, inline, exerciseId } = props;
+  const { onCreate, inline } = props;
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { t } = useFormatter();
   const [open, setOpen] = useState(false);
+
+  // Context
+  const {
+    onAddLessonsCategory,
+  } = useContext(LessonContext);
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const onSubmit = (data) => {
-    return dispatch(addLessonsCategory(exerciseId, data)).then((result) => {
+    return onAddLessonsCategory(data).then((result) => {
       if (result.result) {
         if (onCreate) {
           onCreate(result.result);
@@ -50,7 +54,7 @@ const CreateLessonsCategory = (props) => {
           color="primary"
         >
           <ListItemIcon color="primary">
-            <ControlPointOutlined color="primary" />
+            <ControlPointOutlined color="primary"/>
           </ListItemIcon>
           <ListItemText
             primary={t('Create a new lessons learned category')}
@@ -58,7 +62,7 @@ const CreateLessonsCategory = (props) => {
           />
         </ListItem>
       ) : (
-        <ButtonCreate onClick={handleOpen} />
+        <ButtonCreate onClick={handleOpen}/>
       )}
       <Dialog
         open={open}

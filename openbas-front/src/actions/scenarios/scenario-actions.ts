@@ -3,6 +3,14 @@ import { delReferential, getReferential, postReferential, putReferential, simple
 import { arrayOfScenarios, scenario } from './scenario-schema';
 import type {
   InjectsImportInput,
+  LessonsAnswerCreateInput,
+  LessonsCategoryCreateInput,
+  LessonsCategoryTeamsInput,
+  LessonsCategoryUpdateInput,
+  LessonsInput,
+  LessonsQuestionCreateInput,
+  LessonsQuestionUpdateInput,
+  LessonsSendInput,
   Scenario,
   ScenarioInformationInput,
   ScenarioInput,
@@ -190,4 +198,113 @@ export const searchScenarioByIdAsOption = (ids: string[]) => {
 export const searchScenarioCategoryAsOption = (searchText: string = '') => {
   const params = { searchText };
   return simpleCall(`${SCENARIO_URI}/category/options`, params);
+};
+
+// -- LESSONS --
+
+export const updateScenarioLessons = (scenarioId: string, data: LessonsInput) => (dispatch: Dispatch) => putReferential(
+  scenario,
+  `/api/scenarios/${scenarioId}/lessons`,
+  data,
+)(dispatch);
+
+export const fetchLessonsCategories = (scenarioId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/lessons_categories`;
+  return getReferential(schema.arrayOfLessonsCategories, uri)(dispatch);
+};
+
+export const updateLessonsCategory = (scenarioId: string, lessonsCategoryId: string, data: LessonsCategoryUpdateInput) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/lessons_categories/${lessonsCategoryId}`;
+  return putReferential(schema.lessonsCategory, uri, data)(dispatch);
+};
+
+export const updateLessonsCategoryTeams = (scenarioId: string, lessonsCategoryId: string, data: LessonsCategoryTeamsInput) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/lessons_categories/${lessonsCategoryId}/teams`;
+  return putReferential(schema.lessonsCategory, uri, data)(dispatch);
+};
+
+export const addLessonsCategory = (scenarioId: string, data: LessonsCategoryCreateInput) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/lessons_categories`;
+  return postReferential(schema.lessonsCategory, uri, data)(dispatch);
+};
+
+export const deleteLessonsCategory = (scenarioId: string, lessonsCategoryId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/lessons_categories/${lessonsCategoryId}`;
+  return delReferential(uri, 'lessonscategorys', lessonsCategoryId)(dispatch);
+};
+
+export const applyLessonsTemplate = (scenarioId: string, lessonsTemplateId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/lessons_apply_template/${lessonsTemplateId}`;
+  return postReferential(schema.arrayOfLessonsCategories, uri, {})(dispatch);
+};
+
+export const fetchLessonsQuestions = (scenarioId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/lessons_questions`;
+  return getReferential(schema.arrayOfLessonsQuestions, uri)(dispatch);
+};
+
+export const updateLessonsQuestion = (scenarioId: string, lessonsCategoryId: string, lessonsQuestionId: string, data: LessonsQuestionUpdateInput) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/lessons_categories/${lessonsCategoryId}/lessons_questions/${lessonsQuestionId}`;
+  return putReferential(schema.lessonsQuestion, uri, data)(dispatch);
+};
+
+export const addLessonsQuestion = (scenarioId: string, lessonsCategoryId: string, data: LessonsQuestionCreateInput) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/lessons_categories/${lessonsCategoryId}/lessons_questions`;
+  return postReferential(schema.lessonsQuestion, uri, data)(dispatch);
+};
+
+export const deleteLessonsQuestion = (scenarioId: string, lessonsCategoryId: string, lessonsQuestionId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/lessons_categories/${lessonsCategoryId}/lessons_questions/${lessonsQuestionId}`;
+  return delReferential(uri, 'lessonsquestions', lessonsQuestionId)(dispatch);
+};
+
+export const resetLessonsAnswers = (scenarioId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/lessons_answers_reset`;
+  return postReferential(schema.arrayOfLessonsCategories, uri, {})(dispatch);
+};
+
+export const emptyLessonsCategories = (scenarioId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/lessons_empty`;
+  return postReferential(schema.arrayOfLessonsCategories, uri, {})(dispatch);
+};
+
+export const sendLessons = (scenarioId: string, data: LessonsSendInput) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/lessons_send`;
+  return postReferential(schema.arrayOfLessonsCategories, uri, data)(dispatch);
+};
+
+export const fetchLessonsAnswers = (scenarioId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/lessons_answers`;
+  return getReferential(schema.arrayOfLessonsAnswers, uri)(dispatch);
+};
+
+export const fetchPlayerLessonsCategories = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/player/lessons/${scenarioId}/lessons_categories?userId=${userId}`;
+  return getReferential(schema.arrayOfLessonsCategories, uri)(dispatch);
+};
+
+export const fetchPlayerLessonsQuestions = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/player/lessons/${scenarioId}/lessons_questions?userId=${userId}`;
+  return getReferential(schema.arrayOfLessonsQuestions, uri)(dispatch);
+};
+
+export const fetchPlayerLessonsAnswers = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/player/lessons/${scenarioId}/lessons_answers?userId=${userId}`;
+  return getReferential(schema.arrayOfLessonsAnswers, uri)(dispatch);
+};
+
+export const addLessonsAnswers = (
+  scenarioId: string,
+  lessonsCategoryId: string,
+  lessonsQuestionId: string,
+  data: LessonsAnswerCreateInput,
+  userId: string,
+) => (dispatch: Dispatch) => {
+  const uri = `/api/player/lessons/${scenarioId}/lessons_categories/${lessonsCategoryId}/lessons_questions/${lessonsQuestionId}/lessons_answers?userId=${userId}`;
+  return postReferential(schema.arrayOfLessonsAnswers, uri, data)(dispatch);
+};
+
+export const fetchPlayerScenario = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/player/scenarios/${scenarioId}?userId=${userId}`;
+  return getReferential(scenario, uri)(dispatch);
 };

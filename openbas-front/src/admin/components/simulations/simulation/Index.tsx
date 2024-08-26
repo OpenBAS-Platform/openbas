@@ -22,7 +22,7 @@ import injectContextForExercise from './ExerciseContext';
 const Exercise = lazy(() => import('./overview/Exercise'));
 const Dryrun = lazy(() => import('./controls/Dryrun'));
 const Comcheck = lazy(() => import('./controls/Comcheck'));
-const Lessons = lazy(() => import('../../lessons/Lessons'));
+const Lessons = lazy(() => import('./lessons/ExerciseLessons'));
 const ExerciseDefinition = lazy(() => import('./ExerciseDefinition'));
 const Injects = lazy(() => import('./injects/ExerciseInjects'));
 const Tests = lazy(() => import('./tests/ExerciseTests'));
@@ -143,7 +143,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
               <Route path="animation/logs" element={errorWrapper(Logs)()} />
               <Route path="animation/chat" element={errorWrapper(Chat)()} />
               <Route path="animation/validations" element={errorWrapper(Validations)()} />
-              <Route path="lessons/:exerciseId?" element={errorWrapper(Lessons)()} />
+              <Route path="lessons" element={errorWrapper(Lessons)()} />
               {/* Not found */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -256,6 +256,8 @@ public class ExerciseService {
         exerciseDuplicate.setReplyTos(new ArrayList<>(exerciseOrigin.getReplyTos()));
         exerciseDuplicate.setDocuments(new ArrayList<>(exerciseOrigin.getDocuments()));
         exerciseDuplicate.setObjectives(new ArrayList<>(exerciseOrigin.getObjectives()));
+        exerciseDuplicate.setLessonsAnonymized(exerciseOrigin.isLessonsAnonymized());
+        exerciseDuplicate.setLessonsCategories(new ArrayList<>(exerciseOrigin.getLessonsCategories()));
         return exerciseDuplicate;
     }
 

@@ -3,13 +3,21 @@ import type { ArticleStore, FullArticleStore } from '../../../actions/channels/A
 import type {
   ArticleCreateInput,
   ArticleUpdateInput,
+  EvaluationInput,
+  ImportTestSummary,
   Inject,
   InjectsImportInput,
+  LessonsAnswerCreateInput,
+  LessonsCategoryCreateInput,
+  LessonsCategoryTeamsInput,
+  LessonsCategoryUpdateInput,
+  LessonsQuestionUpdateInput,
+  LessonsSendInput,
+  ObjectiveInput,
   Team,
   TeamCreateInput,
   Variable,
   VariableInput,
-  ImportTestSummary,
 } from '../../../utils/api-types';
 import type { UserStore } from '../teams/players/Player';
 import type { InjectStore } from '../../../actions/injects/Inject';
@@ -75,6 +83,34 @@ export type AtomicTestingResultContextType = {
   onLaunchAtomicTesting: () => void;
 };
 export type LessonContextType = {
+  onApplyLessonsTemplate: (data: string) => Promise<{ result: string }>,
+  onResetLessonsAnswers: () => Promise<{ result: string }>,
+  onEmptyLessonsCategories: () => Promise<{ result: string }>,
+  onUpdateSourceLessons: (data: boolean) => Promise<{ result: string }>,
+  onSendLessons: (data: LessonsSendInput) => Promise<{ result: string }>,
+  onAddLessonsCategory: (data: LessonsCategoryCreateInput) => Promise<{ result: string }>,
+  onDeleteLessonsCategory: (data: string) => Promise<{ result: string }>,
+  onUpdateLessonsCategory: (lessonCategoryId: string, data: LessonsCategoryUpdateInput) => Promise<{
+    result: string
+  }>,
+  onUpdateLessonsCategoryTeams: (lessonCategoryId: string, data: LessonsCategoryTeamsInput) => Promise<{
+    result: string
+  }>,
+  onDeleteLessonsQuestion: (lessonsCategoryId: string, lessonsQuestionId: string) => Promise<{ result: string }>,
+  onUpdateLessonsQuestion: (lessonsCategoryId: string, lessonsQuestionId: string, data: LessonsQuestionUpdateInput) => Promise<{
+    result: string
+  }>,
+  onAddLessonsQuestion: (lessonsCategoryId: string, data: LessonsQuestionUpdateInput) => Promise<{ result: string }>,
+  onAddObjective: (data: ObjectiveInput) => Promise<{ result: string }>,
+  onUpdateObjective: (objectiveId: string, data: ObjectiveInput) => Promise<{ result: string }>,
+  onDeleteObjective: (objectiveId: string) => Promise<{ result: string }>,
+  onAddEvaluation: (objectiveId: string, data: EvaluationInput) => Promise<{ result: string }>,
+  onUpdateEvaluation: (objectiveId: string, evaluationId: string, data: EvaluationInput) => Promise<{ result: string }>,
+  onFetchEvaluation: (objectiveId: string) => void,
+};
+export type ViewLessonContextType = {
+  onAddLessonsAnswers: (questionCategory: string, lessonsQuestionId: string, answerData: LessonsAnswerCreateInput) => void,
+  onFetchPlayerLessonsAnswers: () => void,
 };
 
 export const PermissionsContext = createContext<PermissionsContextType>({
@@ -100,7 +136,11 @@ export const ChallengeContext = createContext<ChallengeContextType>({
   },
 });
 export const DocumentContext = createContext<DocumentContextType>({
-  onInitDocument(): { document_tags: { id: string; label: string }[]; document_exercises: { id: string; label: string }[]; document_scenarios: { id: string; label: string }[] } {
+  onInitDocument(): {
+    document_tags: { id: string; label: string }[];
+    document_exercises: { id: string; label: string }[];
+    document_scenarios: { id: string; label: string }[]
+  } {
     return { document_exercises: [], document_scenarios: [], document_tags: [] };
   },
 });
@@ -122,7 +162,6 @@ export const TeamContext = createContext<TeamContextType>({
     });
   },
 });
-
 export const InjectContext = createContext<InjectContextType>({
   onAddInject(_inject: Inject): Promise<{ result: string }> {
     return Promise.resolve({ result: '' });
@@ -151,14 +190,68 @@ export const InjectContext = createContext<InjectContextType>({
     });
   },
 });
-export const AtomicTestingContext = createContext<AtomicTestingContextType>({
-  onAddAtomicTesting(_inject: Inject): Promise<{ result: string }> {
+export const LessonContext = createContext<LessonContextType>({
+  onApplyLessonsTemplate(_data: string): Promise<{ result: string }> {
     return Promise.resolve({ result: '' });
   },
-});
-export const AtomicTestingResultContext = createContext<AtomicTestingResultContextType>({
-  onLaunchAtomicTesting: () => {
+  onResetLessonsAnswers(): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
+  },
+  onEmptyLessonsCategories(): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
+  },
+  onUpdateSourceLessons(_data: boolean): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
+  },
+  onSendLessons(_data: LessonsSendInput): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
+  },
+  onAddLessonsCategory(_data: LessonsCategoryCreateInput): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
+  },
+  onDeleteLessonsCategory(_data: string): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
+  },
+  onUpdateLessonsCategory(_lessonCategoryId: string, _data: LessonsCategoryUpdateInput): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
+  },
+  onUpdateLessonsCategoryTeams(_lessonCategoryId: string, _data: LessonsCategoryTeamsInput): Promise<{
+    result: string
+  }> {
+    return Promise.resolve({ result: '' });
+  },
+  onDeleteLessonsQuestion(_lessonsCategoryId: string, _lessonsQuestionId: string): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
+  },
+  onUpdateLessonsQuestion(_lessonsCategoryId: string, _lessonsQuestionId: string, _data: LessonsQuestionUpdateInput): Promise<{
+    result: string
+  }> {
+    return Promise.resolve({ result: '' });
+  },
+  onAddLessonsQuestion(_lessonsCategoryId: string, _data: LessonsQuestionUpdateInput): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
+  },
+  onAddObjective(_data: ObjectiveInput): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
+  },
+  onUpdateObjective(_objectiveId: string, _data: ObjectiveInput): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
+  },
+  onDeleteObjective(_objectiveId: string): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
+  },
+  onAddEvaluation(_objectiveId: string, _data: EvaluationInput): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
+  },
+  onUpdateEvaluation(_objectiveId: string, _evaluationId: string, _data: EvaluationInput): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
+  },
+  onFetchEvaluation(_objectiveId: string): void {
   },
 });
-export const LessonContext = createContext<LessonContextType>({
+export const ViewLessonContext = createContext<ViewLessonContextType>({
+  onAddLessonsAnswers(_questionCategory: string, _lessonsQuestionId: string, _answerData: LessonsAnswerCreateInput): void {
+  },
+  onFetchPlayerLessonsAnswers(): void {
+  },
 });

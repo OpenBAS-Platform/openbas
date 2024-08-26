@@ -1,12 +1,10 @@
 package io.openbas.rest.scenario;
 
-import io.openbas.database.model.Scenario;
-import io.openbas.database.model.Team;
-import io.openbas.database.model.TeamSimple;
-import io.openbas.database.model.User;
+import io.openbas.database.model.*;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.exercise.form.LessonsInput;
 import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
 import io.openbas.rest.helper.TeamHelper;
 import io.openbas.rest.scenario.form.*;
@@ -262,6 +260,17 @@ public class ScenarioApi {
             .stream()
             .map(i -> new FilterUtilsJpa.Option(i, i))
             .toList();
+    }
+
+    // -- LESSON --
+    @PutMapping(SCENARIO_URI + "/{scenarioId}/lessons")
+    @PreAuthorize("isScenarioPlanner(#scenarioId)")
+    @Transactional(rollbackOn = Exception.class)
+    public Scenario updateScenarioLessons(@PathVariable String scenarioId,
+                                          @Valid @RequestBody LessonsInput input) {
+        Scenario scenario = this.scenarioService.scenario(scenarioId);
+        scenario.setLessonsAnonymized(input.isLessonsAnonymized());
+        return scenarioRepository.save(scenario);
     }
 
 }

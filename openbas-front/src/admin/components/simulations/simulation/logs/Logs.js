@@ -8,7 +8,6 @@ import * as R from 'ramda';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { fetchObjectives } from '../../../../../actions/Objective';
 import { addLog, fetchLogs } from '../../../../../actions/Log';
 import LogPopover from './LogPopover';
 import { resolveUserName } from '../../../../../utils/String';
@@ -16,6 +15,8 @@ import ItemTags from '../../../../../components/ItemTags';
 import LogForm from './LogForm';
 import { isExerciseUpdatable } from '../../../../../utils/Exercise';
 import AnimationMenu from '../AnimationMenu';
+import { fetchExercise } from '../../../../../actions/Exercise.js';
+import { fetchExerciseObjectives } from '../../../../../actions/Inject.js';
 
 const useStyles = makeStyles(() => ({
   card: {
@@ -48,7 +49,7 @@ const Logs = () => {
     };
   });
   useDataLoader(() => {
-    dispatch(fetchObjectives(exerciseId));
+    dispatch(fetchExerciseObjectives(exerciseId));
     dispatch(fetchLogs(exerciseId));
   });
   const scrollToBottom = () => {

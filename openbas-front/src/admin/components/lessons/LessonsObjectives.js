@@ -28,7 +28,7 @@ const useStyles = makeStyles(() => ({
 
 const LessonsObjectives = ({
   objectives,
-  exercise,
+  source,
   injects,
   setSelectedObjective,
   isReport,
@@ -66,8 +66,8 @@ const LessonsObjectives = ({
         <Typography variant="h4" style={{ float: 'left' }}>
           {t('Objectives')}
         </Typography>
-        {isExerciseUpdatable(exercise, true) && !isReport && (
-          <CreateObjective exerciseId={exercise.exercise_id} />
+        {isExerciseUpdatable(source, true) && !isReport && (
+          <CreateObjective />
         )}
         <div className="clearfix" />
         <Paper variant="outlined" classes={{ root: classes.paper }}>
@@ -113,7 +113,7 @@ const LessonsObjectives = ({
                   {!isReport && (
                     <ListItemSecondaryAction>
                       <ObjectivePopover
-                        exercise={exercise}
+                        isReadOnly = {source.isReadOnly}
                         objective={objective}
                       />
                     </ListItemSecondaryAction>

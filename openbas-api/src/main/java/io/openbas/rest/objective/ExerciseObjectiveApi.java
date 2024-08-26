@@ -15,7 +15,7 @@ import io.openbas.rest.objective.form.EvaluationInput;
 import io.openbas.rest.objective.form.ObjectiveInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,41 +24,24 @@ import static io.openbas.helper.DatabaseHelper.resolveRelation;
 import static java.time.Instant.now;
 
 @RestController
-public class ObjectiveApi extends RestBehavior {
+@AllArgsConstructor
+public class ExerciseObjectiveApi extends RestBehavior {
+
+  public static final String EXERCISE_URI = "/api/exercises/";
 
   private ExerciseRepository exerciseRepository;
   private ObjectiveRepository objectiveRepository;
   private EvaluationRepository evaluationRepository;
   private UserRepository userRepository;
 
-  @Autowired
-  public void setUserRepository(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
-
-  @Autowired
-  public void setEvaluationRepository(EvaluationRepository evaluationRepository) {
-    this.evaluationRepository = evaluationRepository;
-  }
-
-  @Autowired
-  public void setExerciseRepository(ExerciseRepository exerciseRepository) {
-    this.exerciseRepository = exerciseRepository;
-  }
-
-  @Autowired
-  public void setObjectiveRepository(ObjectiveRepository objectiveRepository) {
-    this.objectiveRepository = objectiveRepository;
-  }
-
   // region objectives
-  @GetMapping("/api/exercises/{exerciseId}/objectives")
+  @GetMapping(EXERCISE_URI + "{exerciseId}/objectives")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Objective> getMainObjectives(@PathVariable String exerciseId) {
     return objectiveRepository.findAll(ObjectiveSpecification.fromExercise(exerciseId));
   }
 
-  @PostMapping("/api/exercises/{exerciseId}/objectives")
+  @PostMapping(EXERCISE_URI + "{exerciseId}/objectives")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Objective createObjective(@PathVariable String exerciseId,
@@ -70,7 +53,7 @@ public class ObjectiveApi extends RestBehavior {
     return objectiveRepository.save(objective);
   }
 
-  @PutMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}")
+  @PutMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Objective updateObjective(@PathVariable String exerciseId,
       @PathVariable String objectiveId,
@@ -80,7 +63,7 @@ public class ObjectiveApi extends RestBehavior {
     return objectiveRepository.save(objective);
   }
 
-  @DeleteMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}")
+  @DeleteMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public void deleteObjective(@PathVariable String exerciseId, @PathVariable String objectiveId) {
     objectiveRepository.deleteById(objectiveId);
@@ -88,19 +71,19 @@ public class ObjectiveApi extends RestBehavior {
   // endregion
 
   // region evaluations
-  @GetMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
+  @GetMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Evaluation getEvaluation(@PathVariable String exerciseId, @PathVariable String evaluationId) {
     return evaluationRepository.findById(evaluationId).orElseThrow(ElementNotFoundException::new);
   }
 
-  @GetMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations")
+  @GetMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Evaluation> getEvaluations(@PathVariable String exerciseId, @PathVariable String objectiveId) {
     return evaluationRepository.findAll(EvaluationSpecification.fromObjective(objectiveId));
   }
 
-  @PostMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations")
+  @PostMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Evaluation createEvaluation(@PathVariable String exerciseId,
@@ -120,7 +103,7 @@ public class ObjectiveApi extends RestBehavior {
     return result;
   }
 
-  @PutMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
+  @PutMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Evaluation updateEvaluation(@PathVariable String exerciseId,
       @PathVariable String objectiveId,
@@ -138,7 +121,7 @@ public class ObjectiveApi extends RestBehavior {
     return result;
   }
 
-  @DeleteMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
+  @DeleteMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public void deleteEvaluation(@PathVariable String exerciseId, @PathVariable String evaluationId) {
     evaluationRepository.deleteById(evaluationId);

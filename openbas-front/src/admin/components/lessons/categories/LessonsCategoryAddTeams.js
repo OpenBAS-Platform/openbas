@@ -14,6 +14,7 @@ import { truncate } from '../../../../utils/String';
 import TagsFilter from '../../common/filters/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
 import Transition from '../../../../components/common/Transition';
+import { LessonContext } from '../../common/Context';
 
 const styles = (theme) => ({
   createButton: {
@@ -51,8 +52,10 @@ class LessonsCategoryAddTeams extends Component {
     };
   }
 
+  static contextType = LessonContext;
+
   componentDidMount() {
-    this.props.fetchTeams(this.props.exerciseId);
+    this.props.fetchTeams();
   }
 
   handleOpen() {
@@ -123,7 +126,6 @@ class LessonsCategoryAddTeams extends Component {
       t,
       teams,
       lessonsCategoryTeamsIds,
-      exerciseId,
       teamsMap,
     } = this.props;
     const { keyword, teamsIds, tags } = this.state;
@@ -235,7 +237,6 @@ class LessonsCategoryAddTeams extends Component {
                     );
                   })}
                   <CreateTeam
-                    exerciseId={exerciseId}
                     inline={true}
                     onCreate={this.onCreate.bind(this)}
                   />
@@ -276,7 +277,6 @@ class LessonsCategoryAddTeams extends Component {
 
 LessonsCategoryAddTeams.propTypes = {
   t: PropTypes.func,
-  exerciseId: PropTypes.string,
   fetchTeams: PropTypes.func,
   handleUpdateTeams: PropTypes.func,
   organizations: PropTypes.array,
@@ -286,10 +286,9 @@ LessonsCategoryAddTeams.propTypes = {
   attachment: PropTypes.bool,
 };
 
-const select = (state, ownProps) => {
+const select = (state) => {
   const helper = storeHelper(state);
-  const { exerciseId } = ownProps;
-  const teams = helper.getExerciseTeams(exerciseId);
+  const teams = helper.getExerciseTeams('exerciseId');
   const teamsMap = helper.getTeamsMap();
   return { teams, teamsMap };
 };
