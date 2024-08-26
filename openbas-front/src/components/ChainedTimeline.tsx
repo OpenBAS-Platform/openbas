@@ -180,7 +180,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
         inject_created_at: injectFromMap.inject_created_at,
         inject_updated_at: injectFromMap.inject_updated_at,
       };
-      console.log('plop');
       injectContext.onUpdateInject(node.id, inject);
     }
   };
