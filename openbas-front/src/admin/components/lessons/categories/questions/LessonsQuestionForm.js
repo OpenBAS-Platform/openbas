@@ -37,20 +37,20 @@ const LessonsQuestionForm = (props) => {
           <OldTextField
             variant="standard"
             name="lessons_question_content"
-            fullWidth={true}
+            fullWidth
             label={t('Content')}
           />
           <OldTextField
             variant="standard"
             name="lessons_question_explanation"
-            fullWidth={true}
+            fullWidth
             label={t('Explanation')}
             style={{ marginTop: 20 }}
           />
           <OldTextField
             variant="standard"
             name="lessons_question_order"
-            fullWidth={true}
+            fullWidth
             label={t('Order')}
             type="number"
             style={{ marginTop: 20 }}

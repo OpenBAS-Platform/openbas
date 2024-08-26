@@ -44,9 +44,8 @@ import type {
   ObjectiveInput,
 } from '../../../../../utils/api-types';
 import { addScenarioObjective, deleteScenarioObjective, updateScenarioObjective } from '../../../../../actions/Objective';
-import { isExerciseReadOnly, isExerciseUpdatable } from '../../../../../utils/Exercise';
 import { isScenarioReadOnly, isScenarioUpdatable } from '../../../../../utils/Scenario';
-import { addScenarioEvaluation, fetchExerciseEvaluations, fetchScenarioEvaluations, updateExerciseEvaluation, updateScenarioEvaluation } from '../../../../../actions/Evaluation';
+import { addScenarioEvaluation, fetchScenarioEvaluations, updateScenarioEvaluation } from '../../../../../actions/Evaluation';
 
 const ScenarioLessons = () => {
   const dispatch = useAppDispatch();
@@ -133,11 +132,7 @@ const ScenarioLessons = () => {
         data,
       ),
     ),
-    onAddLessonsQuestion: (lessonsCategoryId: string, data: LessonsQuestionCreateInput) => dispatch(
-      dispatch(
-        addLessonsQuestion(scenarioId, lessonsCategoryId, data),
-      ),
-    ),
+    onAddLessonsQuestion: (lessonsCategoryId: string, data: LessonsQuestionCreateInput) => dispatch(addLessonsQuestion(scenarioId, lessonsCategoryId, data)),
     // Objectives
     onAddObjective: (data: ObjectiveInput) => dispatch(addScenarioObjective(scenarioId, data)),
     onUpdateObjective: (objectiveId: string, data: ObjectiveInput) => dispatch(updateScenarioObjective(scenarioId, objectiveId, data)),

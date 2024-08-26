@@ -50,8 +50,8 @@ const CreateLessonsQuestion = (props) => {
     <div>
       {inline === true ? (
         <ListItem
-          button={true}
-          divider={true}
+          button
+          divider
           onClick={handleOpen}
           color="primary"
         >
@@ -78,7 +78,7 @@ const CreateLessonsQuestion = (props) => {
         open={open}
         TransitionComponent={Transition}
         onClose={handleClose}
-        fullWidth={true}
+        fullWidth
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >

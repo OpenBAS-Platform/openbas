@@ -134,9 +134,7 @@ const ExerciseLessons = () => {
       ),
     ),
     onAddLessonsQuestion: (lessonsCategoryId: string, data: LessonsQuestionCreateInput) => dispatch(
-      dispatch(
-        addLessonsQuestion(exerciseId, lessonsCategoryId, data),
-      ),
+      addLessonsQuestion(exerciseId, lessonsCategoryId, data),
     ),
     // Objectives
     onAddObjective: (data: ObjectiveInput) => dispatch(addExerciseObjective(exerciseId, data)),
