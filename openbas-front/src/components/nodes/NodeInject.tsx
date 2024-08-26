@@ -9,8 +9,6 @@ import { isNotEmptyField } from '../../utils/utils';
 import InjectIcon from '../../admin/components/common/injects/InjectIcon';
 import InjectPopover from '../../admin/components/common/injects/InjectPopover';
 import type { InjectStore } from '../../actions/injects/Inject';
-import { useHelper } from '../../store';
-import type { TagHelper } from '../../actions/helper';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -95,13 +93,6 @@ export type NodeInject = Node<{
 
 const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
   const classes = useStyles();
-  const {
-    tagsMap,
-  } = useHelper((helper: TagHelper) => {
-    return {
-      tagsMap: helper.getTagsMap(),
-    };
-  });
 
   const convertToRelativeTime = (durationInSeconds: number) => {
     const date = moment.utc(moment.duration(0, 'd').add(durationInSeconds, 's').asMilliseconds());
@@ -166,7 +157,6 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
             <span onClick={preventClick}>
               <InjectPopover
                 inject={data.inject!}
-                tagsMap={tagsMap}
                 setSelectedInjectId={selectedInject}
                 isDisabled={false}
               />
