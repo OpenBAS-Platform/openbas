@@ -233,6 +233,36 @@ const RulesContractContent: React.FC<Props> = ({
             )}
           />
           {rulesFields.map((ruleField, rulesIndex) => {
+            let cogIcon;
+            if (ruleField.rule_attribute_name === 'trigger_time') {
+              cogIcon = <Badge
+                color="secondary" variant="dot"
+                invisible={(!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
+                          || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0)
+                      && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern`)
+                          || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.timePattern?.length === 0)}
+                        >
+                <CogOutline />
+              </Badge>;
+            } else if (ruleField.rule_attribute_name === 'teams') {
+              cogIcon = <Badge
+                color="secondary" variant="dot"
+                invisible={(!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
+                          || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0)
+                      && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.allTeamsValue`)
+                          || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.allTeamsValue?.length === 0)}
+                        >
+                <CogOutline />
+              </Badge>;
+            } else {
+              cogIcon = <Badge
+                color="secondary" variant="dot"
+                invisible={!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
+                        || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0}
+                        >
+                <CogOutline />
+              </Badge>;
+            }
             return (
               <div key={ruleField.id} style={{ marginTop: 20 }}>
                 <div className={classes.rulesArray}>
@@ -261,26 +291,7 @@ const RulesContractContent: React.FC<Props> = ({
                     color="primary"
                     onClick={() => handleDefaultValueOpen(rulesIndex)}
                   >
-                    {(ruleField.rule_attribute_name === 'trigger_time')
-                      ? (
-                        <Badge
-                          color="secondary" variant="dot"
-                          invisible={(!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
-                            || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0)
-                            && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern`)
-                            || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.timePattern?.length === 0)}
-                        >
-                          <CogOutline />
-                        </Badge>
-                      ) : (
-                        <Badge
-                          color="secondary" variant="dot"
-                          invisible={!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
-                              || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0}
-                        >
-                          <CogOutline />
-                        </Badge>)
-                    }
+                    {cogIcon}
                   </IconButton>
                 </div>
                 {currentRuleIndex !== null
@@ -319,6 +330,27 @@ const RulesContractContent: React.FC<Props> = ({
                             />
                           </Tooltip>
                         </div>
+                      }
+                      {currentRuleIndex === rulesFields.findIndex((r) => r.rule_attribute_name === 'teams')
+                          && <div style={{ display: 'flex', alignItems: 'end', gap: '8px' }}>
+                            <TextField
+                              label={t('All teams value')}
+                              fullWidth
+                              style={{ marginTop: 10 }}
+                              inputProps={methods.register(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_additional_config.allTeamsValue`)}
+                            />
+                            <Tooltip
+                              title={t(
+                                'Value that signifies all teams are targeted. A regex can be used.',
+                              )}
+                            >
+                              <InformationOutline
+                                fontSize="medium"
+                                color="primary"
+                                style={{ cursor: 'default' }}
+                              />
+                            </Tooltip>
+                          </div>
                       }
                     </DialogContent>
                     <DialogActions>
