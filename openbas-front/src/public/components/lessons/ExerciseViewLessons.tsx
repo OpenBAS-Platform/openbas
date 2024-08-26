@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQueryParameter } from '../../../utils/Environment';
+import { useQueryParameter } from 'utils/Environment';
+import { usePermissions } from 'utils/Exercise';
+import { useAppDispatch } from 'utils/hooks';
 import LessonsPlayer from './LessonsPlayer';
 import LessonsPreview from './LessonsPreview';
-import { usePermissions } from '../../../utils/Exercise';
 import { fetchMe } from '../../../actions/Application';
-import { fetchExercise, fetchPlayerExercise } from '../../../actions/Exercise';
+import { fetchPlayerExercise } from '../../../actions/Exercise';
 import {
   addLessonsAnswers,
   fetchLessonsCategories,
@@ -15,7 +16,6 @@ import {
   fetchPlayerLessonsQuestions,
 } from '../../../actions/exercises/exercise-action';
 import { ViewLessonContext, ViewLessonContextType } from '../../../admin/components/common/Context';
-import { useAppDispatch } from '../../../utils/hooks';
 import type { Exercise } from '../../../utils/api-types';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
 import type { UserHelper } from '../../../actions/helper';
@@ -61,7 +61,6 @@ const ExerciseViewLessons = () => {
   const finalUserId = userId && userId !== 'null' ? userId : me?.user_id;
 
   useEffect(() => {
-    console.log('in hook');
     dispatch(fetchMe());
     dispatch(fetchPlayerExercise(exerciseId, userId));
     dispatch(fetchPlayerLessonsCategories(exerciseId, finalUserId));
