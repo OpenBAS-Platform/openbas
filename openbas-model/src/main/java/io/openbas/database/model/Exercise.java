@@ -190,7 +190,7 @@ public class Exercise implements Base {
   private List<ExerciseTeamUser> teamUsers = new ArrayList<>();
 
   @Getter
-  @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JsonIgnore
   private List<Objective> objectives = new ArrayList<>();
 
@@ -231,7 +231,7 @@ public class Exercise implements Base {
   private List<Article> articles = new ArrayList<>();
 
   @Getter
-  @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("exercise_lessons_categories")
   private List<LessonsCategory> lessonsCategories = new ArrayList<>();

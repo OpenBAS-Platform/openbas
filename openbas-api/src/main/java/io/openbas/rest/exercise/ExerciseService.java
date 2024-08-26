@@ -233,6 +233,8 @@ public class ExerciseService {
         getListOfExerciseTeams(exerciseDuplicate, exerciseOrigin);
         getListOfArticles(exerciseDuplicate, exerciseOrigin);
         getListOfVariables(exerciseDuplicate, exerciseOrigin);
+        getObjectives(exerciseDuplicate, exerciseOrigin);
+        getLessonsCategories(exerciseDuplicate, exerciseOrigin);
         return exerciseRepository.save(exercise);
     }
 
@@ -255,9 +257,7 @@ public class ExerciseService {
         exerciseDuplicate.setTeamUsers(new ArrayList<>(exerciseOrigin.getTeamUsers()));
         exerciseDuplicate.setReplyTos(new ArrayList<>(exerciseOrigin.getReplyTos()));
         exerciseDuplicate.setDocuments(new ArrayList<>(exerciseOrigin.getDocuments()));
-        exerciseDuplicate.setObjectives(new ArrayList<>(exerciseOrigin.getObjectives()));
         exerciseDuplicate.setLessonsAnonymized(exerciseOrigin.isLessonsAnonymized());
-        exerciseDuplicate.setLessonsCategories(new ArrayList<>(exerciseOrigin.getLessonsCategories()));
         return exerciseDuplicate;
     }
 
@@ -345,6 +345,66 @@ public class ExerciseService {
             return variable1;
         }).toList();
         variableService.createVariables(variableList);
+    }
+
+    private void getLessonsCategories(Exercise duplicatedExercise, Exercise originalExercise){
+        List<LessonsCategory> duplicatedCategories = new ArrayList<>();
+        for (LessonsCategory originalCategory : originalExercise.getLessonsCategories()) {
+            LessonsCategory duplicatedCategory = new LessonsCategory();
+            duplicatedCategory.setName(originalCategory.getName());
+            duplicatedCategory.setDescription(originalCategory.getDescription());
+            duplicatedCategory.setOrder(originalCategory.getOrder());
+            duplicatedCategory.setExercise(duplicatedExercise);
+            duplicatedCategory.setTeams(new ArrayList<>(originalCategory.getTeams()));
+
+            List<LessonsQuestion> duplicatedQuestions = new ArrayList<>();
+            for (LessonsQuestion originalQuestion : originalCategory.getQuestions()) {
+                LessonsQuestion duplicatedQuestion = new LessonsQuestion();
+                duplicatedQuestion.setCategory(originalQuestion.getCategory());
+                duplicatedQuestion.setContent(originalQuestion.getContent());
+                duplicatedQuestion.setExplanation(originalQuestion.getExplanation());
+                duplicatedQuestion.setOrder(originalQuestion.getOrder());
+                duplicatedQuestion.setCategory(duplicatedCategory);
+
+                List<LessonsAnswer> duplicatedAnswers = new ArrayList<>();
+                for (LessonsAnswer originalAnswer : originalQuestion.getAnswers()) {
+                    LessonsAnswer duplicatedAnswer = new LessonsAnswer();
+                    duplicatedAnswer.setUser(originalAnswer.getUser());
+                    duplicatedAnswer.setScore(originalAnswer.getScore());
+                    duplicatedAnswer.setPositive(originalAnswer.getPositive());
+                    duplicatedAnswer.setNegative(originalAnswer.getNegative());
+                    duplicatedAnswer.setQuestion(duplicatedQuestion);
+                    duplicatedAnswers.add(duplicatedAnswer);
+                }
+                duplicatedQuestion.setAnswers(duplicatedAnswers);
+                duplicatedQuestions.add(duplicatedQuestion);
+            }
+            duplicatedCategory.setQuestions(duplicatedQuestions);
+            duplicatedCategories.add(duplicatedCategory);
+        }
+        duplicatedExercise.setLessonsCategories(duplicatedCategories);
+    }
+
+    private void getObjectives(Exercise duplicatedExercise, Exercise originalExercise){
+        List<Objective> duplicatedObjectives = new ArrayList<>();
+        for (Objective originalObjective : originalExercise.getObjectives()) {
+            Objective duplicatedObjective = new Objective();
+            duplicatedObjective.setTitle(originalObjective.getTitle());
+            duplicatedObjective.setDescription(originalObjective.getDescription());
+            duplicatedObjective.setPriority(originalObjective.getPriority());
+            List<Evaluation> duplicatedEvaluations = new ArrayList<>();
+            for (Evaluation originalEvaluation : originalObjective.getEvaluations()) {
+                Evaluation duplicatedEvaluation = new Evaluation();
+                duplicatedEvaluation.setScore(originalEvaluation.getScore());
+                duplicatedEvaluation.setUser(originalEvaluation.getUser());
+                duplicatedEvaluation.setObjective(duplicatedObjective);
+                duplicatedEvaluations.add(duplicatedEvaluation);
+            }
+            duplicatedObjective.setEvaluations(duplicatedEvaluations);
+            duplicatedObjective.setExercise(duplicatedExercise);
+            duplicatedObjectives.add(duplicatedObjective);
+        }
+        duplicatedExercise.setObjectives(duplicatedObjectives);
     }
 
 }
