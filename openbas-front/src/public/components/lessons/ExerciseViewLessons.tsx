@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQueryParameter } from 'utils/Environment';
-import { usePermissions } from 'utils/Exercise';
-import { useAppDispatch } from 'utils/hooks';
+import { useQueryParameter } from '../../../utils/Environment';
+import { usePermissions } from '../../../utils/Exercise';
+import { useAppDispatch } from '../../../utils/hooks';
 import LessonsPlayer from './LessonsPlayer';
 import LessonsPreview from './LessonsPreview';
 import { fetchMe } from '../../../actions/Application';
@@ -28,7 +28,8 @@ const ExerciseViewLessons = () => {
   const [userId] = useQueryParameter(['user']);
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
 
-  const processToGenericSource = (exercise: ExerciseStore) => {
+  const processToGenericSource = (exercise: ExerciseStore | undefined) => {
+    if (!exercise) return undefined;
     return {
       id: exerciseId,
       type: 'exercise',
@@ -37,6 +38,7 @@ const ExerciseViewLessons = () => {
       userId,
     };
   };
+
   const {
     me,
     exercise,
@@ -46,18 +48,20 @@ const ExerciseViewLessons = () => {
     lessonsAnswers,
   } = useHelper((helper: ExercisesHelper & UserHelper) => {
     const currentUser = helper.getMe();
+    const exerciseData = helper.getExercise(exerciseId);
     return {
       me: currentUser,
-      exercise: helper.getExercise(exerciseId),
-      source: processToGenericSource(helper.getExercise(exerciseId)),
+      exercise: exerciseData,
+      source: processToGenericSource(exerciseData),
       lessonsCategories: helper.getExerciseLessonsCategories(exerciseId),
       lessonsQuestions: helper.getExerciseLessonsQuestions(exerciseId),
       lessonsAnswers: helper.getExerciseUserLessonsAnswers(
-        exerciseId,
-        userId && userId !== 'null' ? userId : currentUser?.user_id,
+          exerciseId,
+          userId && userId !== 'null' ? userId : currentUser?.user_id,
       ),
     };
   });
+
   const finalUserId = userId && userId !== 'null' ? userId : me?.user_id;
 
   useEffect(() => {
@@ -68,7 +72,8 @@ const ExerciseViewLessons = () => {
     dispatch(fetchPlayerLessonsAnswers(exerciseId, finalUserId));
     dispatch(fetchLessonsCategories(exerciseId));
     dispatch(fetchLessonsQuestions(exerciseId));
-  }, [exerciseId]);
+  }, [dispatch, exerciseId, userId, finalUserId]);
+
   // Pass the full exercise because the exercise is never loaded in the store at this point
   const permissions = usePermissions(exerciseId, exercise);
   const context: ViewLessonContextType = {

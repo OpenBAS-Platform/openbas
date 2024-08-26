@@ -27,7 +27,8 @@ const ScenarioViewLessons = () => {
   const [userId] = useQueryParameter(['user']);
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
 
-  const processToGenericSource = (scenario: ScenarioStore) => {
+  const processToGenericSource = (scenario: ScenarioStore | undefined) => {
+    if (!scenario) return undefined;
     return {
       id: scenarioId,
       type: 'scenario',
@@ -36,6 +37,7 @@ const ScenarioViewLessons = () => {
       userId,
     };
   };
+
   const {
     me,
     scenario,
@@ -45,18 +47,20 @@ const ScenarioViewLessons = () => {
     lessonsAnswers,
   } = useHelper((helper: ScenariosHelper & UserHelper) => {
     const currentUser = helper.getMe();
+    const scenarioData = helper.getScenario(scenarioId);
     return {
       me: currentUser,
-      scenario: helper.getScenario(scenarioId),
-      source: processToGenericSource(helper.getScenario(scenarioId)),
+      scenario: scenarioData,
+      source: processToGenericSource(scenarioData),
       lessonsCategories: helper.getScenarioLessonsCategories(scenarioId),
       lessonsQuestions: helper.getScenarioLessonsQuestions(scenarioId),
       lessonsAnswers: helper.getScenarioUserLessonsAnswers(
-        scenarioId,
-        userId && userId !== 'null' ? userId : currentUser?.user_id,
+          scenarioId,
+          userId && userId !== 'null' ? userId : currentUser?.user_id,
       ),
     };
   });
+
   const finalUserId = userId && userId !== 'null' ? userId : me?.user_id;
 
   useEffect(() => {
@@ -67,7 +71,8 @@ const ScenarioViewLessons = () => {
     dispatch(fetchPlayerLessonsAnswers(scenarioId, finalUserId));
     dispatch(fetchLessonsCategories(scenarioId));
     dispatch(fetchLessonsQuestions(scenarioId));
-  }, []);
+  }, [dispatch, scenarioId, userId, finalUserId]);
+
   // Pass the full scenario because the scenario is never loaded in the store at this point
   const permissions = useScenarioPermissions(scenarioId, scenario);
   const context: ViewLessonContextType = {
