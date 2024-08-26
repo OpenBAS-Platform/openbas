@@ -161,7 +161,7 @@ public class Scenario implements Base {
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<ScenarioTeamUser> teamUsers = new ArrayList<>();
 
-  @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JsonIgnore
   private List<Objective> objectives = new ArrayList<>();
 
@@ -187,7 +187,7 @@ public class Scenario implements Base {
   @JsonProperty("scenario_articles")
   private List<Article> articles = new ArrayList<>();
 
-  @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("scenario_lessons_categories")
   private List<LessonsCategory> lessonsCategories = new ArrayList<>();
