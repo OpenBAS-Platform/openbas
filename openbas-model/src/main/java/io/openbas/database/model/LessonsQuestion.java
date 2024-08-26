@@ -75,6 +75,11 @@ public class LessonsQuestion implements Base {
     public String getExercise() {
         return Optional.ofNullable(getCategory().getExercise()).map(Exercise::getId).orElse(null);
     }
+
+    @JsonProperty("lessons_question_scenario")
+    public String getScenario() {
+        return Optional.ofNullable(getCategory().getScenario()).map(Scenario::getId).orElse(null);
+    }
     // endregion
 
     @Override
