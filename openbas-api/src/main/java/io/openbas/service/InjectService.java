@@ -300,7 +300,7 @@ public class InjectService {
             Map<String, Pattern> mapPatternByInjectImport = importMapper
                 .getInjectImporters().stream().collect(
                     Collectors.toMap(InjectImporter::getId,
-                            injectImporter -> Pattern.compile(injectImporter.getImportTypeValue())
+                        injectImporter -> Pattern.compile(injectImporter.getImportTypeValue())
                     ));
 
             Map<String, Pattern> mapPatternByAllTeams = importMapper.getInjectImporters().stream()
