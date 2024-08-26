@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQueryParameter } from '../../../utils/Environment';
-import LessonsPlayer from './LessonsPlayer';
 import LessonsPreview from './LessonsPreview';
 import { useHelper } from '../../../store';
 import { fetchMe } from '../../../actions/Application';
@@ -15,9 +14,7 @@ import {
   fetchLessonsCategories,
   fetchLessonsQuestions,
   fetchPlayerLessonsAnswers,
-  fetchPlayerLessonsCategories,
-  fetchPlayerLessonsQuestions,
-  fetchPlayerScenario,
+  fetchScenario,
 } from '../../../actions/scenarios/scenario-actions';
 import useScenarioPermissions from '../../../utils/Scenario';
 
@@ -65,10 +62,7 @@ const ScenarioViewLessons = () => {
 
   useEffect(() => {
     dispatch(fetchMe());
-    dispatch(fetchPlayerScenario(scenarioId, userId));
-    dispatch(fetchPlayerLessonsCategories(scenarioId, finalUserId));
-    dispatch(fetchPlayerLessonsQuestions(scenarioId, finalUserId));
-    dispatch(fetchPlayerLessonsAnswers(scenarioId, finalUserId));
+    dispatch(fetchScenario(scenarioId));
     dispatch(fetchLessonsCategories(scenarioId));
     dispatch(fetchLessonsQuestions(scenarioId));
   }, [dispatch, scenarioId, userId, finalUserId]);
@@ -90,16 +84,8 @@ const ScenarioViewLessons = () => {
 
   return (
     <ViewLessonContext.Provider value={context}>
-      {preview === 'true' ? (
+      {preview === 'true' && (
         <LessonsPreview
-          source={{ ...source, finalUserId }}
-          lessonsCategories={lessonsCategories}
-          lessonsQuestions={lessonsQuestions}
-          lessonsAnswers={lessonsAnswers}
-          permissions={permissions}
-        />
-      ) : (
-        <LessonsPlayer
           source={{ ...source, finalUserId }}
           lessonsCategories={lessonsCategories}
           lessonsQuestions={lessonsQuestions}

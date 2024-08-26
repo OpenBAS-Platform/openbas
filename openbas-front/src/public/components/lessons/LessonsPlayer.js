@@ -115,7 +115,7 @@ const LessonsPlayer = (props) => {
           color="secondary"
           variant="outlined"
           component={Link}
-          to={`/lessons/${source.id}?user=${source.finalUserId}&preview=true`}
+          to={`/lessons/${source.type}/${source.id}?user=${source.finalUserId}&preview=true`}
           style={{ position: 'absolute', top: 20, right: 20 }}
         >
           {t('Switch to preview mode')}

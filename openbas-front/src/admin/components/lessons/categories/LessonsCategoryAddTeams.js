@@ -270,7 +270,6 @@ LessonsCategoryAddTeams.propTypes = {
   fetchTeams: PropTypes.func,
   handleUpdateTeams: PropTypes.func,
   organizations: PropTypes.array,
-  teamsMap: PropTypes.array,
   teams: PropTypes.array,
   lessonsCategoryId: PropTypes.string,
   lessonsCategoryTeamsIds: PropTypes.array,

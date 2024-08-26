@@ -27,7 +27,6 @@ import {
   fetchLessonsQuestions,
   fetchScenarioTeams,
   resetLessonsAnswers,
-  sendLessons,
   updateLessonsCategory,
   updateLessonsCategoryTeams,
   updateLessonsQuestion,
@@ -46,6 +45,7 @@ import type {
 import { addScenarioObjective, deleteScenarioObjective, updateScenarioObjective } from '../../../../../actions/Objective';
 import { isScenarioReadOnly, isScenarioUpdatable } from '../../../../../utils/Scenario';
 import { addScenarioEvaluation, fetchScenarioEvaluations, updateScenarioEvaluation } from '../../../../../actions/Evaluation';
+import {fetchTeams} from "../../../../../actions/teams/team-actions";
 
 const ScenarioLessons = () => {
   const dispatch = useAppDispatch();
@@ -73,6 +73,7 @@ const ScenarioLessons = () => {
     source,
     objectives,
     injects,
+    teams,
     teamsMap,
     lessonsCategories,
     lessonsQuestions,
@@ -89,12 +90,14 @@ const ScenarioLessons = () => {
       lessonsAnswers: helper.getScenarioLessonsAnswers(scenarioId),
       lessonsTemplates: helper.getLessonsTemplates(),
       teamsMap: helper.getTeamsMap(),
+      teams: helper.getScenarioTeams(scenarioId),
       usersMap: helper.getUsersMap(),
     };
   });
   useDataLoader(() => {
     dispatch(fetchLessonsTemplates());
     dispatch(fetchPlayers());
+    dispatch(fetchTeams());
     dispatch(fetchLessonsCategories(scenarioId));
     dispatch(fetchLessonsQuestions(scenarioId));
     dispatch(fetchLessonsAnswers(scenarioId));
@@ -110,7 +113,6 @@ const ScenarioLessons = () => {
     onUpdateSourceLessons: (data: boolean) => dispatch(updateScenarioLessons(scenarioId, {
       lessons_anonymized: !data,
     })),
-    onSendLessons: (data: LessonsSendInput) => dispatch(sendLessons(scenarioId, data)),
     // Categories
     onAddLessonsCategory: (data: LessonsCategoryCreateInput) => dispatch(addLessonsCategory(scenarioId, data)),
     onDeleteLessonsCategory: (data: string) => dispatch(deleteLessonsCategory(scenarioId, data)),
@@ -149,6 +151,7 @@ const ScenarioLessons = () => {
         objectives={objectives}
         injects={injects}
         teamsMap={teamsMap}
+        teams={teams}
         lessonsCategories={lessonsCategories}
         lessonsQuestions={lessonsQuestions}
         lessonsAnswers={lessonsAnswers}

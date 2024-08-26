@@ -122,7 +122,7 @@ const LessonsObjectives = ({
               ))}
             </List>
           ) : (
-            <Empty message={t('No objectives in this simulation.')} />
+            <Empty message={t(`No objectives in this ${source.type}.`)} />
           )}
         </Paper>
       </Grid>

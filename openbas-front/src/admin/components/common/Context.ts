@@ -7,7 +7,7 @@ import type {
   ImportTestSummary,
   Inject,
   InjectsImportInput,
-  LessonsAnswerCreateInput,
+  LessonsAnswerCreateInput, LessonsCategory,
   LessonsCategoryCreateInput,
   LessonsCategoryTeamsInput,
   LessonsCategoryUpdateInput,
@@ -84,19 +84,15 @@ export type AtomicTestingResultContextType = {
   onLaunchAtomicTesting: () => void;
 };
 export type LessonContextType = {
-  onApplyLessonsTemplate: (data: string) => Promise<{ result: string }>,
-  onResetLessonsAnswers: () => Promise<{ result: string }>,
-  onEmptyLessonsCategories: () => Promise<{ result: string }>,
-  onUpdateSourceLessons: (data: boolean) => Promise<{ result: string }>,
-  onSendLessons: (data: LessonsSendInput) => Promise<{ result: string }>,
+  onApplyLessonsTemplate: (data: string) => Promise<LessonsCategory[]>,
+  onResetLessonsAnswers: () => Promise<LessonsCategory[]>,
+  onEmptyLessonsCategories: () => Promise<LessonsCategory[]>,
+  onUpdateSourceLessons: (data: boolean) => Promise<LessonsCategory>,
+  onSendLessons?: (data: LessonsSendInput) => Promise<{ result: string }>,
   onAddLessonsCategory: (data: LessonsCategoryCreateInput) => Promise<{ result: string }>,
-  onDeleteLessonsCategory: (data: string) => Promise<{ result: string }>,
-  onUpdateLessonsCategory: (lessonCategoryId: string, data: LessonsCategoryUpdateInput) => Promise<{
-    result: string
-  }>,
-  onUpdateLessonsCategoryTeams: (lessonCategoryId: string, data: LessonsCategoryTeamsInput) => Promise<{
-    result: string
-  }>,
+  onDeleteLessonsCategory: (data: string) => void,
+  onUpdateLessonsCategory: (lessonCategoryId: string, data: LessonsCategoryUpdateInput) => Promise<LessonsCategory>
+  onUpdateLessonsCategoryTeams: (lessonCategoryId: string, data: LessonsCategoryTeamsInput) => Promise<LessonsCategory>
   onDeleteLessonsQuestion: (lessonsCategoryId: string, lessonsQuestionId: string) => Promise<{ result: string }>,
   onUpdateLessonsQuestion: (lessonsCategoryId: string, lessonsQuestionId: string, data: LessonsQuestionUpdateInput) => Promise<{
     result: string
@@ -192,17 +188,17 @@ export const InjectContext = createContext<InjectContextType>({
   },
 });
 export const LessonContext = createContext<LessonContextType>({
-  onApplyLessonsTemplate(_data: string): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  onApplyLessonsTemplate(_data: string): Promise<LessonsCategory[]> {
+    return new Promise<LessonsCategory[]>(() => {});
   },
-  onResetLessonsAnswers(): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  onResetLessonsAnswers(): Promise<LessonsCategory[]> {
+    return new Promise<LessonsCategory[]>(() => {});
   },
-  onEmptyLessonsCategories(): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  onEmptyLessonsCategories(): Promise<LessonsCategory[]> {
+    return new Promise<LessonsCategory[]>(() => {});
   },
-  onUpdateSourceLessons(_data: boolean): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  onUpdateSourceLessons(_data: boolean): Promise<LessonsCategory> {
+    return new Promise<LessonsCategory>(() => {});
   },
   onSendLessons(_data: LessonsSendInput): Promise<{ result: string }> {
     return Promise.resolve({ result: '' });
@@ -210,16 +206,13 @@ export const LessonContext = createContext<LessonContextType>({
   onAddLessonsCategory(_data: LessonsCategoryCreateInput): Promise<{ result: string }> {
     return Promise.resolve({ result: '' });
   },
-  onDeleteLessonsCategory(_data: string): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  onDeleteLessonsCategory(_data: string): void {
   },
-  onUpdateLessonsCategory(_lessonCategoryId: string, _data: LessonsCategoryUpdateInput): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  onUpdateLessonsCategory(_lessonCategoryId: string, _data: LessonsCategoryUpdateInput): Promise<LessonsCategory> {
+    return new Promise<LessonsCategory>(() => {});
   },
-  onUpdateLessonsCategoryTeams(_lessonCategoryId: string, _data: LessonsCategoryTeamsInput): Promise<{
-    result: string
-  }> {
-    return Promise.resolve({ result: '' });
+  onUpdateLessonsCategoryTeams(_lessonCategoryId: string, _data: LessonsCategoryTeamsInput): Promise<LessonsCategory> {
+    return new Promise<LessonsCategory>(() => {});
   },
   onDeleteLessonsQuestion(_lessonsCategoryId: string, _lessonsQuestionId: string): Promise<{ result: string }> {
     return Promise.resolve({ result: '' });
