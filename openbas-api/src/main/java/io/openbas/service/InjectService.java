@@ -306,7 +306,7 @@ public class InjectService {
             Map<String, Pattern> mapPatternByAllTeams = importMapper.getInjectImporters().stream()
                     .flatMap(injectImporter -> injectImporter.getRuleAttributes().stream())
                     .filter(ruleAttribute -> Objects.equals(ruleAttribute.getName(), "teams"))
-                    .filter(ruleAttribute ->  !Strings.isBlank(ruleAttribute.getAdditionalConfig().get("allTeamsValue")))
+                    .filter(ruleAttribute ->  ruleAttribute.getAdditionalConfig() != null && !Strings.isBlank(ruleAttribute.getAdditionalConfig().get("allTeamsValue")))
                     .collect(
                             Collectors.toMap(ruleAttribute -> ruleAttribute.getAdditionalConfig().get("allTeamsValue"),
                                     ruleAttribute -> Pattern.compile(ruleAttribute.getAdditionalConfig().get("allTeamsValue")),
@@ -678,7 +678,7 @@ public class InjectService {
                 // If the rule type is on a team field, we split by "+" if there is a concatenation of columns
                 // and then joins the result, split again by "," and use the list of results to get the teams by their name
                 List<String> columnValues = new ArrayList<>();
-                String allTeamsValue = ruleAttribute.getAdditionalConfig().get("allTeamsValue");
+                String allTeamsValue = ruleAttribute.getAdditionalConfig() != null ? ruleAttribute.getAdditionalConfig().get("allTeamsValue") : null;
                 if(ruleAttribute.getColumns() != null) {
                     columnValues = Arrays.stream(Arrays.stream(ruleAttribute.getColumns().split("\\+"))
                                     .map(column -> getValueAsString(row, column))
