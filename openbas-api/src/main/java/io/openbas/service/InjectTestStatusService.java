@@ -79,6 +79,9 @@ public class InjectTestStatusService {
         injects.add(iterable);
       }
     });
+    if (injects.isEmpty()) {
+      throw new IllegalArgumentException("No IDs match the requirements");
+    }
     List<InjectTestStatus> results = new ArrayList<>();
     injects.forEach(inject -> {
       results.add(testInject(inject.getId()));

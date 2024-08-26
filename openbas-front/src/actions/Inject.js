@@ -1,5 +1,6 @@
 import * as schema from './Schema';
 import { bulkDeleteReferential, delReferential, getReferential, postReferential, putReferential, simpleCall, simplePostCall } from '../utils/Action';
+import { MESSAGING$ } from '../utils/Environment';
 
 // -- INJECTS --
 
@@ -11,17 +12,6 @@ export const fetchInject = (injectId) => (dispatch) => {
 export const tryInject = (injectId) => (dispatch) => {
   const uri = `/api/injects/try/${injectId}`;
   return getReferential(null, uri, null)(dispatch);
-};
-
-export const testInject = (injectId) => {
-  const uri = `/api/injects/${injectId}/test`;
-  return simpleCall(uri);
-};
-
-export const bulkTestInjects = (injectIds) => {
-  const data = injectIds;
-  const uri = '/api/injects/bulk/test';
-  return simplePostCall(uri, data);
 };
 
 // -- EXERCISES --

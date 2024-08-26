@@ -1,7 +1,7 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BarChartOutlined, ReorderOutlined } from '@mui/icons-material';
-import { Grid, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
+import { Alert, Dialog, Grid, Link, Paper, SnackbarCloseReason, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import type { Exercise, Inject, InjectTestStatus } from '../../../../../utils/api-types';
@@ -30,9 +30,8 @@ import { useFormatter } from '../../../../../components/i18n';
 import useEntityToggle from '../../../../../utils/hooks/useEntityToggle';
 import ToolBar from '../../../common/ToolBar';
 import { isNotEmptyField } from '../../../../../utils/utils';
-import { fetchExerciseInjectsSimple } from '../../../../../actions/injects/inject-action';
+import { fetchExerciseInjectsSimple, bulkTestInjects } from '../../../../../actions/injects/inject-action';
 import injectContextForExercise from '../ExerciseContext';
-import { bulkTestInjects } from '../../../../../actions/Inject';
 
 const useStyles = makeStyles(() => ({
   paperChart: {
@@ -203,11 +202,32 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
     injectContext.onBulkDeleteInjects(injectsToProcess.map((inject: Inject) => inject.inject_id));
   };
 
+  const [openDialog, setOpenDialog] = React.useState<boolean>(false);
+  const handleCloseDialog = (
+    event?: React.SyntheticEvent | Event,
+    reason?: SnackbarCloseReason,
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenDialog(false);
+  };
+  const [detailsLink, setDetailsLink] = React.useState<string>('');
+
+  useEffect(() => {
+    if (openDialog) {
+      setTimeout(() => {
+        handleCloseDialog();
+        setDetailsLink('');
+      }, 6000);
+    }
+  }, [openDialog]);
+
   const massTestInjects = () => {
-    bulkTestInjects(injectsToProcess.map((inject: Inject) => inject.inject_id)).then((result: { data: InjectTestStatus }) => {
+    bulkTestInjects(injectsToProcess.map((inject: Inject) => inject.inject_id)).then((result: { data: InjectTestStatus[] }) => {
       if (numberOfSelectedElements === 1) {
-        // @ts-expect-error Data is an array with one element
-        navigate(`/admin/exercises/${exercise.exercise_id}/tests/${result.data[0].status_id}`);
+        setDetailsLink(`/admin/exercises/${exercise.exercise_id}/tests/${result.data[0].status_id}`);
+        setOpenDialog(true);
       } else {
         navigate(`/admin/exercises/${exercise.exercise_id}/tests`);
       }
@@ -216,6 +236,31 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
 
   return (
     <>
+      <Dialog open={openDialog}
+        slotProps={{
+          backdrop: {
+            sx: {
+              backgroundColor: 'transparent',
+            },
+          },
+        }}
+        PaperProps={{
+          sx: {
+            position: 'fixed',
+            top: '20px',
+            left: '660px',
+            margin: 0,
+          },
+        }}
+      >
+        <Alert
+          onClose={handleCloseDialog}
+          severity="success"
+          sx={{ width: '100%' }}
+        >
+          {t('Inject test has been sent, you can view test logs details on ')} <Link href={detailsLink} underline="hover">{t('its dedicated page.')}</Link>
+        </Alert>
+      </Dialog>
       {viewMode === 'list' && (
         <ArticleContext.Provider value={articleContext}>
           <TeamContext.Provider value={teamContext}>
