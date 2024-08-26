@@ -42,9 +42,9 @@ import type {
   ObjectiveInput,
 } from '../../../../../utils/api-types';
 import { addScenarioObjective, deleteScenarioObjective, updateScenarioObjective } from '../../../../../actions/Objective';
-import { isScenarioReadOnly, isScenarioUpdatable } from '../../../../../utils/Scenario';
 import { addScenarioEvaluation, fetchScenarioEvaluations, updateScenarioEvaluation } from '../../../../../actions/Evaluation';
 import { fetchTeams } from '../../../../../actions/teams/team-actions';
+import { usePermissions } from '../../../../../utils/Exercise';
 
 const ScenarioLessons = () => {
   const dispatch = useAppDispatch();
@@ -63,12 +63,11 @@ const ScenarioLessons = () => {
       end_date: scenario.scenario_recurrence_end,
       users_number: scenario.scenario_users_number,
       lessons_anonymized: scenario.scenario_lessons_anonymized,
-      isReadOnly: isScenarioReadOnly(scenario, true),
-      isUpdatable: isScenarioUpdatable(scenario, true),
     };
   };
 
   const {
+    scenario,
     source,
     objectives,
     injects,
@@ -80,7 +79,9 @@ const ScenarioLessons = () => {
     lessonsTemplates,
     usersMap,
   } = useHelper((helper: ExercisesHelper & InjectHelper & LessonsTemplatesHelper & ScenariosHelper & TeamsHelper & UserHelper) => {
+    const scenarioData = helper.getScenario(scenarioId);
     return {
+      scenario: scenarioData,
       source: processToGenericSource(helper.getScenario(scenarioId)),
       objectives: helper.getScenarioObjectives(scenarioId),
       injects: helper.getScenarioInjects(scenarioId),
@@ -104,6 +105,8 @@ const ScenarioLessons = () => {
     dispatch(fetchScenarioInjects(scenarioId));
     dispatch(fetchScenarioTeams(scenarioId));
   });
+
+  const permissions = usePermissions(scenarioId, scenario);
 
   const context: LessonContextType = {
     onApplyLessonsTemplate: (data: string) => dispatch(applyLessonsTemplate(scenarioId, data)),
@@ -146,7 +149,7 @@ const ScenarioLessons = () => {
 
   return (
     <LessonContext.Provider value={context}>
-      <Lessons source={source}
+      <Lessons source={{ ...source, isReadOnly: permissions.readOnly, isUpdatable: permissions.canWrite }}
         objectives={objectives}
         injects={injects}
         teamsMap={teamsMap}

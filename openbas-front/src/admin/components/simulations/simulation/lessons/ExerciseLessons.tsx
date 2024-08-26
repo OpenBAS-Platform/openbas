@@ -43,7 +43,7 @@ import {
   updateLessonsQuestion,
 } from '../../../../../actions/exercises/exercise-action';
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import { isExerciseReadOnly, isExerciseUpdatable } from '../../../../../utils/Exercise';
+import { usePermissions } from '../../../../../utils/Exercise';
 import { addExerciseObjective, deleteExerciseObjective, updateExerciseObjective } from '../../../../../actions/Objective';
 import { addExerciseEvaluation, fetchExerciseEvaluations, updateExerciseEvaluation } from '../../../../../actions/Evaluation';
 import { fetchTeams } from '../../../../../actions/teams/team-actions';
@@ -66,12 +66,11 @@ const ExerciseLessons = () => {
       users_number: exercise.exercise_users_number,
       logs_number: exercise.exercise_logs_number,
       lessons_anonymized: exercise.exercise_lessons_anonymized,
-      isReadOnly: isExerciseReadOnly(exercise, true),
-      isUpdatable: isExerciseUpdatable(exercise, true),
     };
   };
 
   const {
+    exercise,
     source,
     objectives,
     injects,
@@ -83,8 +82,10 @@ const ExerciseLessons = () => {
     lessonsTemplates,
     usersMap,
   } = useHelper((helper: ExercisesHelper & InjectHelper & LessonsTemplatesHelper & ScenariosHelper & TeamsHelper & UserHelper) => {
+    const exerciseData = helper.getExercise(exerciseId);
     return {
-      source: processToGenericSource(helper.getExercise(exerciseId)),
+      exercise: exerciseData,
+      source: processToGenericSource(exerciseData),
       objectives: helper.getExerciseObjectives(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
       lessonsCategories: helper.getExerciseLessonsCategories(exerciseId),
@@ -107,6 +108,8 @@ const ExerciseLessons = () => {
     dispatch(fetchExerciseInjects(exerciseId));
     dispatch(fetchExerciseTeams(exerciseId));
   });
+
+  const permissions = usePermissions(exerciseId, exercise);
 
   const context: LessonContextType = {
     onApplyLessonsTemplate: (data: string) => dispatch(applyLessonsTemplate(exerciseId, data)),
@@ -152,7 +155,7 @@ const ExerciseLessons = () => {
 
   return (
     <LessonContext.Provider value={context}>
-      <Lessons source={source}
+      <Lessons source={{ ...source, isReadOnly: permissions.readOnly, isUpdatable: permissions.canWrite }}
         objectives={objectives}
         injects={injects}
         teamsMap={teamsMap}
