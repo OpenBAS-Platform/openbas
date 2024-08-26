@@ -160,9 +160,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      updateNodes();
-    }, 500);
+    updateNodes();
   }, [injects, minutesPerGapIndex]);
 
   const proOptions = { account: 'paid-pro', hideAttribution: true };
@@ -172,9 +170,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   };
 
   const nodeDrag = (event: React.MouseEvent, node: NodeInject) => {
-    setTimeout(() => {
-      setDraggingOnGoing(false);
-    }, 1000);
+    setDraggingOnGoing(false);
     const injectFromMap = injectsMap[node.id];
     if (injectFromMap !== undefined) {
       const inject = {
@@ -184,6 +180,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
         inject_created_at: injectFromMap.inject_created_at,
         inject_updated_at: injectFromMap.inject_updated_at,
       };
+      console.log('plop');
       injectContext.onUpdateInject(node.id, inject);
     }
   };
@@ -246,7 +243,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
 
       const existingphantomNode = nodes.find((currentNode) => currentNode.type === 'phantom');
 
-      if (newY >= 0 && (existingphantomNode === undefined
+      if (newY >= 0 && (existingphantomNode === undefined || existingphantomNode.position === undefined
           || ((position.x < existingphantomNode?.position.x || position.x > existingphantomNode!.position.x + 240
           || position.y < existingphantomNode?.position.y || position.y > existingphantomNode!.position.y + 150)))
       ) {
@@ -288,9 +285,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     setNodes(nodesList);
     setDraggingOnGoing(true);
     setMinutesPerGapIndex(minutesPerGapIndex + incrementIndex);
-    setTimeout(() => {
-      setDraggingOnGoing(false);
-    }, 1500);
+    setDraggingOnGoing(false);
   };
 
   return (
