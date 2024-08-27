@@ -20,7 +20,7 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose, isUpdatable }) => {
     onUpdateEvaluation,
     onFetchEvaluation,
   } = useContext(LessonContext);
-    // Fetching data
+  // Fetching data
   const { me, objective, evaluations, usersMap } = useHelper(
     (helper) => {
       return {
@@ -64,16 +64,16 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose, isUpdatable }) => {
     );
   };
   if (!objective) {
-    return <Loader/>;
+    return <Loader />;
   }
   return (
     <div>
       {evaluations.length > 0 ? (
         <List style={{ padding: 0 }}>
           {evaluations.map((evaluation) => (
-            <ListItem key={evaluation.evaluation_id} divider={true}>
+            <ListItem key={evaluation.evaluation_id} divider>
               <ListItemIcon>
-                <HowToVoteOutlined/>
+                <HowToVoteOutlined />
               </ListItemIcon>
               <ListItemText
                 style={{ width: '50%' }}
@@ -104,15 +104,15 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose, isUpdatable }) => {
         </List>
       ) : (
         <List style={{ padding: 0 }}>
-          <ListItem divider={true}>
+          <ListItem divider>
             <ListItemIcon>
-              <HowToVoteOutlined/>
+              <HowToVoteOutlined />
             </ListItemIcon>
             <ListItemText
               style={{ width: '50%' }}
               primary={
                 <i>{t('There is no evaluation for this objective yet')}</i>
-                            }
+              }
             />
             <Box
               sx={{
@@ -123,7 +123,7 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose, isUpdatable }) => {
               }}
             >
               <Box sx={{ width: '100%', mr: 1 }}>
-                <LinearProgress variant="determinate" value={0}/>
+                <LinearProgress variant="determinate" value={0} />
               </Box>
               <Box sx={{ minWidth: 35 }}>
                 <Typography variant="body2" color="text.secondary">
@@ -146,14 +146,14 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose, isUpdatable }) => {
           <Slider
             aria-label={t('Score')}
             value={
-                            value === null
-                              ? currentUserEvaluation?.evaluation_score || 10
-                              : value
-                        }
+              value === null
+                ? currentUserEvaluation?.evaluation_score || 10
+                : value
+            }
             onChange={(_, val) => setValue(val)}
             valueLabelDisplay="auto"
             step={5}
-            marks={true}
+            marks
             min={10}
             max={100}
           />
@@ -168,13 +168,13 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose, isUpdatable }) => {
           {isUpdatable ? t('Cancel') : t('Close')}
         </Button>
         {isUpdatable && (
-        <Button
-          color="secondary"
-          onClick={submitEvaluation}
-          disabled={submitting}
-        >
-          {t('Evaluate')}
-        </Button>
+          <Button
+            color="secondary"
+            onClick={submitEvaluation}
+            disabled={submitting}
+          >
+            {t('Evaluate')}
+          </Button>
         )}
       </div>
     </div>

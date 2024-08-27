@@ -27,7 +27,7 @@ const LessonsQuestionForm = (props) => {
   // Rendering
   return (
     <Form
-      keepDirtyOnReinitialize={true}
+      keepDirtyOnReinitialize
       initialValues={initialValues}
       onSubmit={submitForm}
       validate={validate}

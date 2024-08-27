@@ -17,13 +17,13 @@ const styles = () => ({
 });
 
 class CreateObjective extends Component {
+  // Context
+  static contextType = LessonContext;
+
   constructor(props) {
     super(props);
     this.state = { open: false };
   }
-
-  // Context
-  static contextType = LessonContext;
 
   handleOpen() {
     this.setState({ open: true });
@@ -55,13 +55,13 @@ class CreateObjective extends Component {
           classes={{ root: classes.createButton }}
           size="large"
         >
-          <Add fontSize="small"/>
+          <Add fontSize="small" />
         </IconButton>
         <Dialog
           open={this.state.open}
           TransitionComponent={Transition}
           onClose={this.handleClose.bind(this)}
-          fullWidth={true}
+          fullWidth
           maxWidth="md"
           PaperProps={{ elevation: 1 }}
         >

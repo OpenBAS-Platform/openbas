@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import { Button, Chip, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, Box, ListItemIcon, Grid, IconButton } from '@mui/material';
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, CastForEducationOutlined } from '@mui/icons-material';
 import { withStyles } from '@mui/styles';
 import SearchFilter from '../../../../components/SearchFilter';
@@ -151,7 +151,7 @@ class LessonsCategoryAddTeams extends Component {
           open={this.state.open}
           TransitionComponent={Transition}
           onClose={this.handleClose.bind(this)}
-          fullWidth={true}
+          fullWidth
           maxWidth="lg"
           PaperProps={{
             elevation: 1,
@@ -176,21 +176,21 @@ class LessonsCategoryAddTeams extends Component {
             </div>
           </DialogTitle>
           <DialogContent>
-            <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
-              <Grid item={true} xs={8}>
-                <Grid container={true} spacing={3}>
-                  <Grid item={true} xs={6}>
+            <Grid container spacing={3} style={{ marginTop: -15 }}>
+              <Grid item xs={8}>
+                <Grid container spacing={3}>
+                  <Grid item xs={6}>
                     <SearchFilter
                       onChange={this.handleSearchTeams.bind(this)}
-                      fullWidth={true}
+                      fullWidth
                     />
                   </Grid>
-                  <Grid item={true} xs={6}>
+                  <Grid item xs={6}>
                     <TagsFilter
                       onAddTag={this.handleAddTag.bind(this)}
                       onClearTag={this.handleClearTag.bind(this)}
                       currentTags={tags}
-                      fullWidth={true}
+                      fullWidth
                     />
                   </Grid>
                 </Grid>
@@ -204,9 +204,9 @@ class LessonsCategoryAddTeams extends Component {
                       <ListItem
                         key={team.team_id}
                         disabled={disabled}
-                        button={true}
-                        divider={true}
-                        dense={true}
+                        button
+                        divider
+                        dense
                         onClick={this.addTeam.bind(
                           this,
                           team.team_id,
@@ -227,12 +227,12 @@ class LessonsCategoryAddTeams extends Component {
                     );
                   })}
                   <CreateTeam
-                    inline={true}
+                    inline
                     onCreate={this.onCreate.bind(this)}
                   />
                 </List>
               </Grid>
-              <Grid item={true} xs={4}>
+              <Grid item xs={4}>
                 <Box className={classes.box}>
                   {this.state.teamsIds.map((teamId) => {
                     const team = teamsMap[teamId];

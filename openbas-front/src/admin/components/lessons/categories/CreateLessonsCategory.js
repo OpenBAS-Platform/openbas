@@ -48,13 +48,13 @@ const CreateLessonsCategory = (props) => {
     <div>
       {inline === true ? (
         <ListItem
-          button={true}
-          divider={true}
+          button
+          divider
           onClick={handleOpen}
           color="primary"
         >
           <ListItemIcon color="primary">
-            <ControlPointOutlined color="primary"/>
+            <ControlPointOutlined color="primary" />
           </ListItemIcon>
           <ListItemText
             primary={t('Create a new lessons learned category')}
@@ -62,13 +62,13 @@ const CreateLessonsCategory = (props) => {
           />
         </ListItem>
       ) : (
-        <ButtonCreate onClick={handleOpen}/>
+        <ButtonCreate onClick={handleOpen} />
       )}
       <Dialog
         open={open}
         TransitionComponent={Transition}
         onClose={handleClose}
-        fullWidth={true}
+        fullWidth
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >

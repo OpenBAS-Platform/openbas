@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import * as R from 'ramda';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Slide, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Slide } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import LessonsQuestionForm from './LessonsQuestionForm';
 import { useFormatter } from '../../../../../components/i18n';
@@ -102,14 +102,14 @@ const LessonsQuestionPopover = ({
         TransitionComponent={Transition}
         open={openEdit}
         onClose={handleCloseEdit}
-        fullWidth={true}
+        fullWidth
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
         <DialogTitle>{t('Update the lessons learned question')}</DialogTitle>
         <DialogContent>
           <LessonsQuestionForm
-            editing={true}
+            editing
             onSubmit={onSubmitEdit}
             handleClose={handleCloseEdit}
             initialValues={initialValues}

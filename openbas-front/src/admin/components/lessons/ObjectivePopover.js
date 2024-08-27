@@ -9,6 +9,9 @@ import Transition from '../../../components/common/Transition';
 import { LessonContext } from '../common/Context';
 
 class ObjectivePopover extends Component {
+  // Context
+  static contextType = LessonContext;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -17,9 +20,6 @@ class ObjectivePopover extends Component {
       openPopover: false,
     };
   }
-
-  // Context
-  static contextType = LessonContext;
 
   handlePopoverOpen(event) {
     event.stopPropagation();
@@ -79,7 +79,7 @@ class ObjectivePopover extends Component {
           size="large"
           disabled={this.props.isReadOnly}
         >
-          <MoreVert/>
+          <MoreVert />
         </IconButton>
         <Menu
           anchorEl={this.state.anchorEl}
@@ -117,7 +117,7 @@ class ObjectivePopover extends Component {
           TransitionComponent={Transition}
           open={this.state.openEdit}
           onClose={this.handleCloseEdit.bind(this)}
-          fullWidth={true}
+          fullWidth
           maxWidth="md"
           PaperProps={{ elevation: 1 }}
         >
@@ -125,7 +125,7 @@ class ObjectivePopover extends Component {
           <DialogContent>
             <ObjectiveForm
               initialValues={initialValues}
-              editing={true}
+              editing
               onSubmit={this.onSubmitEdit.bind(this)}
               handleClose={this.handleCloseEdit.bind(this)}
             />

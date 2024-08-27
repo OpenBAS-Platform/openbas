@@ -36,14 +36,14 @@ class ObjectiveForm extends Component {
             <OldTextField
               variant="standard"
               name="objective_title"
-              fullWidth={true}
+              fullWidth
               label={t('Title')}
             />
             <OldTextField
               variant="standard"
               name="objective_description"
-              fullWidth={true}
-              multiline={true}
+              fullWidth
+              multiline
               rows={2}
               label={t('Description')}
               style={{ marginTop: 20 }}
@@ -51,7 +51,7 @@ class ObjectiveForm extends Component {
             <OldTextField
               variant="standard"
               name="objective_priority"
-              fullWidth={true}
+              fullWidth
               label={t('Priority')}
               style={{ marginTop: 20 }}
               type="number"

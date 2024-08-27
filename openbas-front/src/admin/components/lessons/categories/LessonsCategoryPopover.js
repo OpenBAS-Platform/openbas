@@ -33,7 +33,7 @@ const LessonsCategoryPopover = ({ lessonsCategory }) => {
     onDeleteLessonsCategory,
     onUpdateLessonsCategory,
   } = useContext(LessonContext);
-    // popover management
+  // popover management
   const handlePopoverOpen = (event) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
@@ -51,7 +51,7 @@ const LessonsCategoryPopover = ({ lessonsCategory }) => {
       data,
     ).then(() => handleCloseEdit());
   };
-    // Delete action
+  // Delete action
   const handleOpenDelete = () => {
     setOpenDelete(true);
     handlePopoverClose();
@@ -60,7 +60,7 @@ const LessonsCategoryPopover = ({ lessonsCategory }) => {
   const submitDelete = () => {
     onDeleteLessonsCategory(lessonsCategory.lessonscategory_id).then(() => handleCloseDelete());
   };
-    // Rendering
+  // Rendering
   const initialValues = R.pipe(
     R.pick([
       'lessons_category_name',
@@ -76,7 +76,7 @@ const LessonsCategoryPopover = ({ lessonsCategory }) => {
         aria-haspopup="true"
         size="large"
       >
-        <MoreVert/>
+        <MoreVert />
       </IconButton>
       <Menu
         anchorEl={anchorEl}
@@ -108,14 +108,14 @@ const LessonsCategoryPopover = ({ lessonsCategory }) => {
         TransitionComponent={Transition}
         open={openEdit}
         onClose={handleCloseEdit}
-        fullWidth={true}
+        fullWidth
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
         <DialogTitle>{t('Update the lessons learned category')}</DialogTitle>
         <DialogContent>
           <LessonsCategoryForm
-            editing={true}
+            editing
             onSubmit={onSubmitEdit}
             handleClose={handleCloseEdit}
             initialValues={initialValues}
