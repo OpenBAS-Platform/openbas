@@ -104,7 +104,7 @@ interface Props {
   teams: Team[],
   lessonsCategories: LessonsCategory[],
   lessonsQuestions: LessonsQuestion[],
-  lessonsAnswers?: LessonsAnswer[],
+  lessonsAnswers: LessonsAnswer[],
   lessonsTemplates: LessonsTemplate[],
   usersMap: Record<string, User>,
 }
@@ -165,7 +165,9 @@ const Lessons: React.FC<Props> = ({
     return setOpenEmptyLessons(false);
   };
   const toggleAnonymize = async () => {
-    await onUpdateSourceLessons(!source.lessons_anonymized);
+    const updatedSource = { ...source };
+    await onUpdateSourceLessons(!updatedSource.lessons_anonymized);
+    updatedSource.lessons_anonymized = !updatedSource.lessons_anonymized;
     return setOpenAnonymize(false);
   };
 

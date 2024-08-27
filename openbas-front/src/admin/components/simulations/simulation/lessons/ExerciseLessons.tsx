@@ -108,7 +108,6 @@ const ExerciseLessons = () => {
     dispatch(fetchExerciseInjects(exerciseId));
     dispatch(fetchExerciseTeams(exerciseId));
   });
-
   const permissions = usePermissions(exerciseId, exercise);
 
   const context: LessonContextType = {
@@ -116,7 +115,7 @@ const ExerciseLessons = () => {
     onResetLessonsAnswers: () => dispatch(resetLessonsAnswers(exerciseId)),
     onEmptyLessonsCategories: () => dispatch(emptyLessonsCategories(exerciseId)),
     onUpdateSourceLessons: (data: boolean) => dispatch(updateExerciseLessons(exerciseId, {
-      lessons_anonymized: !data,
+      lessons_anonymized: data,
     })),
     onSendLessons: (data: LessonsSendInput) => dispatch(sendLessons(exerciseId, data)),
     // Categories

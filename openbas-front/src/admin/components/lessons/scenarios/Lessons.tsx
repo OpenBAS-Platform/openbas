@@ -116,7 +116,9 @@ const Lessons: React.FC<Props> = ({
     return setOpenEmptyLessons(false);
   };
   const toggleAnonymize = async () => {
-    await onUpdateSourceLessons(!source.lessons_anonymized);
+    const updatedSource = { ...source };
+    await onUpdateSourceLessons(!updatedSource.lessons_anonymized);
+    updatedSource.lessons_anonymized = !updatedSource.lessons_anonymized;
     return setOpenAnonymize(false);
   };
   return (

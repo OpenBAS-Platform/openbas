@@ -107,7 +107,7 @@ const ScenarioLessons = () => {
     onApplyLessonsTemplate: (data: string) => dispatch(applyLessonsTemplate(scenarioId, data)),
     onEmptyLessonsCategories: () => dispatch(emptyLessonsCategories(scenarioId)),
     onUpdateSourceLessons: (data: boolean) => dispatch(updateScenarioLessons(scenarioId, {
-      lessons_anonymized: !data,
+      lessons_anonymized: data,
     })),
     // Categories
     onAddLessonsCategory: (data: LessonsCategoryCreateInput) => dispatch(addLessonsCategory(scenarioId, data)),

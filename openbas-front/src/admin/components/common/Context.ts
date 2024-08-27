@@ -81,18 +81,11 @@ export type InjectContextType = {
   onImportInjectFromXls?: (importId: string, input: InjectsImportInput) => Promise<ImportTestSummary>
   onDryImportInjectFromXls?: (importId: string, input: InjectsImportInput) => Promise<ImportTestSummary>
 };
-
-export type AtomicTestingContextType = {
-  onAddAtomicTesting: (inject: Inject) => Promise<{ result: string }>,
-};
-export type AtomicTestingResultContextType = {
-  onLaunchAtomicTesting: () => void;
-};
 export type LessonContextType = {
   onApplyLessonsTemplate: (data: string) => Promise<LessonsCategory[]>,
   onResetLessonsAnswers?: () => Promise<LessonsCategory[]>,
   onEmptyLessonsCategories: () => Promise<LessonsCategory[]>,
-  onUpdateSourceLessons: (data: boolean) => Promise<LessonsCategory>,
+  onUpdateSourceLessons: (data: boolean) => Promise<{ result: string }>,
   onSendLessons?: (data: LessonsSendInput) => void,
   onAddLessonsCategory: (data: LessonsCategoryCreateInput) => Promise<LessonsCategory>,
   onDeleteLessonsCategory: (data: string) => void,
@@ -203,9 +196,8 @@ export const LessonContext = createContext<LessonContextType>({
     return new Promise<LessonsCategory[]>(() => {
     });
   },
-  onUpdateSourceLessons(_data: boolean): Promise<LessonsCategory> {
-    return new Promise<LessonsCategory>(() => {
-    });
+  onUpdateSourceLessons(_data: boolean): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
   },
   onSendLessons(_data: LessonsSendInput): void {
   },
