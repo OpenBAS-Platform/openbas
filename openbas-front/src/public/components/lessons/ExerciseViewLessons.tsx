@@ -6,7 +6,7 @@ import { useAppDispatch } from '../../../utils/hooks';
 import LessonsPlayer from './LessonsPlayer';
 import LessonsPreview from './LessonsPreview';
 import { fetchMe } from '../../../actions/Application';
-import { fetchPlayerExercise } from '../../../actions/Exercise';
+import { fetchExercise, fetchPlayerExercise } from '../../../actions/Exercise';
 import {
   addLessonsAnswers,
   fetchLessonsAnswers,
@@ -69,12 +69,13 @@ const ExerciseViewLessons = () => {
 
   useEffect(() => {
     dispatch(fetchMe());
-    dispatch(fetchPlayerExercise(exerciseId, userId));
     if (isPreview) {
+      dispatch(fetchExercise(exerciseId));
       dispatch(fetchLessonsCategories(exerciseId));
       dispatch(fetchLessonsQuestions(exerciseId));
       dispatch(fetchLessonsAnswers(exerciseId));
     } else {
+      dispatch(fetchPlayerExercise(exerciseId, userId));
       dispatch(fetchPlayerLessonsCategories(exerciseId, finalUserId));
       dispatch(fetchPlayerLessonsQuestions(exerciseId, finalUserId));
       dispatch(fetchPlayerLessonsAnswers(exerciseId, finalUserId));
@@ -104,7 +105,6 @@ const ExerciseViewLessons = () => {
           source={{ ...source, finalUserId }}
           lessonsCategories={lessonsCategories}
           lessonsQuestions={lessonsQuestions}
-          lessonsAnswers={lessonsAnswers}
           permissions={permissions}
         />
       ) : (

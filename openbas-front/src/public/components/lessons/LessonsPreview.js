@@ -75,7 +75,7 @@ const LessonsPreview = (props) => {
             color="secondary"
             variant="outlined"
             component={Link}
-            to={`/lessons/${source.type}s/${source.id}?user=${source.userId}&preview=false`}
+            to={`/lessons/${source.type}/${source.id}?user=${source.userId}&preview=false`}
             style={{ position: 'absolute', top: 20, right: 20 }}
           >
             {t('Switch to player mode')}

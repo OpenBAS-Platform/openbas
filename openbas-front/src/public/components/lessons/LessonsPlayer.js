@@ -14,16 +14,22 @@ import { ViewLessonContext } from '../../../admin/components/common/Context';
 
 const useStyles = makeStyles(() => ({
   root: {
-    position: 'relative', flexGrow: 1, padding: 20,
+    position: 'relative',
+    flexGrow: 1,
+    padding: 20,
   },
   logo: {
-    width: 100, margin: '0px 0px 10px 0px',
+    width: 100,
+    margin: '0px 0px 10px 0px',
   },
   container: {
-    margin: '0 auto', width: '90%',
+    margin: '0 auto',
+    width: '90%',
   },
   paper: {
-    position: 'relative', padding: '10px 15px 20px 15px', overflow: 'hidden',
+    position: 'relative',
+    padding: '10px 15px 20px 15px',
+    overflow: 'hidden',
   },
 }));
 
@@ -80,7 +86,7 @@ const LessonsPlayer = (props) => {
         color="secondary"
         variant="outlined"
         component={Link}
-        to={`/lessons/${source.type}s/${source.id}?user=${source.finalUserId}&preview=true`}
+        to={`/lessons/${source.type}/${source.id}?user=${source.finalUserId}&preview=true`}
         style={{ position: 'absolute', top: 20, right: 20 }}
                                                          >
         {t('Switch to preview mode')}
