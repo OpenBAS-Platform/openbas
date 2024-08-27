@@ -1,19 +1,15 @@
-import React, { memo } from 'react';
+import React, { FunctionComponent, memo } from 'react';
 import { makeStyles } from '@mui/styles';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { NodeProps } from '@xyflow/react';
 import type { Theme } from '../Theme';
-import { NodeInject } from './NodeInject';
 
 const useStyles = makeStyles<Theme>(() => ({
   node: {
-    position: 'relative',
     border: '2px solid rgba(255, 255, 255, 0.12)',
     borderStyle: 'dashed',
     borderRadius: 4,
-    width: 240,
-    minHeight: '143px',
-    height: 'auto',
+    width: 50,
+    height: 50,
     padding: '8px 5px 5px 5px',
     display: 'flex',
     alignItems: 'center',
@@ -21,7 +17,7 @@ const useStyles = makeStyles<Theme>(() => ({
     textAlign: 'center',
     backgroundColor: '#09101e',
     color: 'white',
-    cursor: 'pointer',
+    cursor: 'none !important',
     '&:hover': {
       backgroundColor: '#0d1626',
     },
@@ -32,20 +28,31 @@ const useStyles = makeStyles<Theme>(() => ({
   icon: {
     textAlign: 'center',
   },
+  time: {
+    position: 'relative',
+    left: 60,
+    top: -34,
+  },
 }));
 
-const NodePhantomComponent = ({ data }: NodeProps<NodeInject>) => {
+interface Props {
+  time: string,
+}
+
+const NodePhantomComponent: FunctionComponent<Props> = (props) => {
   const classes = useStyles();
 
   return (
     <>
-      <div className={classes.node} style={{ color: 'white' }} onClick={(_) => {
-        data.onSelectedInject();
-      }}
-      >
-        <div className={classes.iconContainer}>
-          <AddCircleOutlineIcon className={classes.icon} style={{ fontSize: '70px' }}/>
+      <div style={{ width: '500px', height: '50px' }}>
+        <div className={classes.node} style={{ color: 'white' }}>
+          <div className={classes.iconContainer}>
+            <AddCircleOutlineIcon className={classes.icon} style={{ fontSize: '30px' }}/>
+          </div>
         </div>
+        <span className={classes.time}>
+          {props.time}
+        </span>
       </div>
     </>
   );

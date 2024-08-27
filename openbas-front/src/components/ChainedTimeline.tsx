@@ -29,6 +29,7 @@ import type { ScenariosHelper } from '../actions/scenarios/scenario-helper';
 import type { ExercisesHelper } from '../actions/exercises/exercise-helper';
 import { parseCron } from '../utils/Cron';
 import type { TeamsHelper } from '../actions/teams/team-helper';
+import NodePhantom from './nodes/NodePhantom';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -37,6 +38,12 @@ const useStyles = makeStyles(() => ({
   },
   rotatedIcon: {
     transform: 'rotate(90deg)',
+  },
+  newBox: {
+    position: 'relative',
+    zIndex: 1,
+    pointerEvents: 'none',
+    cursor: 'none',
   },
 }));
 
@@ -64,6 +71,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   const [viewportData, setViewportData] = useState<Viewport>();
   const [minutesPerGapIndex, setMinutesPerGapIndex] = useState<number>(0);
   const [currentUpdatedNode, setCurrentUpdatedNode] = useState<NodeInject | null>(null);
+  const [currentMousePosition, setCurrentMousePosition] = useState<XYPosition>({ x: 0, y: 0 });
+  const [newNodeCursorVisibility, setNewNodeCursorVisibility] = useState('hidden');
+  const [currentMouseTime, setCurrentMouseTime] = useState<string>('');
 
   let timer: NodeJS.Timeout;
   const injectContext = useContext(InjectContext);
@@ -117,7 +127,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   };
 
   const updateNodes = () => {
-    console.log(injects);
     if (injects.length > 0) {
       const injectsNodes = injects
         .sort((a, b) => a.inject_depends_duration - b.inject_depends_duration)
@@ -211,81 +220,41 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     }
   };
 
-  const filterNodesAfter = (newX: number, newY: number) => {
-    return (node: NodeInject) => node.type !== 'phantom' && node.position.y === newY && node.position.x > newX;
-  };
+  const onNodePhantomClick = (event: React.MouseEvent) => {
+    const position = reactFlow.screenToFlowPosition({ x: event.clientX, y: event.clientY });
 
-  const filterNodesBefore = (newX: number, newY: number) => {
-    return (node: NodeInject) => node.type !== 'phantom' && node.position.y === newY && node.position.x < newX;
-  };
-
-  const onNodePhantomClick = (_: InjectStore) => {
-    const nodePhantom = nodes.find((nodeInCollection) => nodeInCollection.type === 'phantom');
-    if (nodePhantom !== undefined) {
-      const totalMinutes = moment.duration((nodePhantom.position.x / gapSize) * minutesPerGapAllowed[minutesPerGapIndex] * 60, 's');
-      openCreateInjectDrawer({
-        inject_depends_duration_days: totalMinutes.days(),
-        inject_depends_duration_hours: totalMinutes.hours(),
-        inject_depends_duration_minutes: totalMinutes.minutes(),
-      });
-    }
-  };
-
-  const moveNewNode = (event: React.MouseEvent) => {
-    if (!draggingOnGoing) {
-      const position = reactFlow.screenToFlowPosition({ x: event.clientX, y: event.clientY });
-
-      let newY = 0;
-      const newX = position.x;
-      let foundHorizontalLane = false;
-
-      do {
-        const closestBeforeInX = Math.max(...nodes.filter(filterNodesBefore(newX, newY)).map((o) => o.position.x));
-        const closestAfterInX = Math.min(...nodes.filter(filterNodesAfter(newX, newY)).map((o) => o.position.x));
-
-        if ((closestBeforeInX + 240 < newX && closestAfterInX - 240 > newX) || (closestAfterInX === Infinity && closestBeforeInX === Infinity)) {
-          foundHorizontalLane = true;
-        } else {
-          newY += 150;
-        }
-      } while (!foundHorizontalLane);
-
-      const existingphantomNode = nodes.find((currentNode) => currentNode.type === 'phantom');
-
-      if (newY >= 0 && (existingphantomNode === undefined || existingphantomNode.position === undefined
-          || ((position.x < existingphantomNode?.position.x || position.x > existingphantomNode!.position.x + 240
-          || position.y < existingphantomNode?.position.y || position.y > existingphantomNode!.position.y + 150)))
-      ) {
-        const nodesList = nodes.filter((currentNode) => currentNode.type !== 'phantom');
-        const node = {
-          id: 'phantom',
-          type: 'phantom',
-          connectable: false,
-          data: {
-            key: 'phantom',
-            label: 'phantom',
-            color: 'green',
-            background: 'black',
-            targets: [],
-            onSelectedInject: onNodePhantomClick,
-          },
-          position: { x: newX, y: newY },
-        };
-        nodesList.push(node);
-        setNodes(nodesList);
-      }
-    }
+    const totalMinutes = moment.duration((position.x / gapSize) * minutesPerGapAllowed[minutesPerGapIndex] * 60, 's');
+    openCreateInjectDrawer({
+      inject_depends_duration_days: totalMinutes.days(),
+      inject_depends_duration_hours: totalMinutes.hours(),
+      inject_depends_duration_minutes: totalMinutes.minutes(),
+    });
   };
 
   const onMouseMove = (eventMove: React.MouseEvent) => {
     clearTimeout(timer);
-    timer = setTimeout(() => {
-      moveNewNode(eventMove);
-    }, 500);
+    if (!draggingOnGoing) {
+      eventMove.persist();
+      const position = reactFlow.screenToFlowPosition({ x: eventMove.clientX, y: eventMove.clientY }, { snapToGrid: false });
+
+      const viewPort = reactFlow.getViewport();
+      setCurrentMousePosition({ x: (position.x + viewPort.x - 25), y: (position.y + viewPort.y + 25) });
+      const momentOfTime = moment.utc(moment.duration(convertCoordinatesToTime({ x: position.x - 25, y: position.y }), 's').asMilliseconds());
+
+      setCurrentMouseTime(`${momentOfTime.dayOfYear() - 1} d, ${momentOfTime.hour()} h, ${momentOfTime.minute()} m`);
+    }
   };
 
   const panTimeline = (_event: MouseEvent | TouchEvent | null, viewport: Viewport) => {
     setViewportData(viewport);
+  };
+
+  const nodeMouseEnter = () => {
+    setNewNodeCursorVisibility('hidden');
+  };
+
+  const nodeMouseLeave = () => {
+    setNewNodeCursorVisibility('visible');
   };
 
   const updateMinutesPerGap = (incrementIndex: number) => {
@@ -300,7 +269,20 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   return (
     <>
       {injects.length > 0 ? (
-        <div className={classes.container} style={{ width: '100%', height: 350 }}>
+        <div className={classes.container} style={{ width: '100%', height: 350 }}
+          onClick={onNodePhantomClick}
+        >
+          <div className={classes.newBox}
+            style={{
+              top: currentMousePosition.y,
+              left: currentMousePosition.x,
+              visibility: newNodeCursorVisibility,
+            }}
+          >
+            <NodePhantom
+              time={currentMouseTime}
+            />
+          </div>
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -314,13 +296,15 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             onNodeDrag={horizontalNodeDrag}
             onNodeDragStop={nodeDragStop}
             onNodeDragStart={nodeDragStart}
+            onNodeMouseEnter={nodeMouseEnter}
+            onNodeMouseLeave={nodeMouseLeave}
             defaultEdgeOptions={defaultEdgeOptions}
             onMouseMove={onMouseMove}
             onMove={panTimeline}
             proOptions={proOptions}
             translateExtent={[[-60, -50], [Infinity, Infinity]]}
             nodeExtent={[[0, 0], [Infinity, Infinity]]}
-            defaultViewport={{ x: 60, y: 50, zoom: 0.75 }}
+            defaultViewport={{ x: 60, y: 50, zoom: 1 }}
             minZoom={0.3}
           >
             <Controls

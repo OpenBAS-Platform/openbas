@@ -24,6 +24,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     minHeight: '100px',
     height: 'auto',
     padding: '8px 5px 5px 5px',
+    zIndex: 10,
   },
   icon: {
     textAlign: 'left',
