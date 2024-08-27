@@ -2,7 +2,6 @@ package io.openbas.rest.lessons;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
-import io.openbas.database.specification.LessonsAnswerSpecification;
 import io.openbas.database.specification.LessonsCategorySpecification;
 import io.openbas.database.specification.LessonsQuestionSpecification;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -15,7 +14,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
@@ -80,21 +78,6 @@ public class ScenarioLessonsApi extends RestBehavior {
         lessonsCategory.setUpdateAttributes(input);
         lessonsCategory.setScenario(scenario);
         return lessonsCategoryRepository.save(lessonsCategory);
-    }
-
-    @PostMapping(SCENARIO_URI + "{scenarioId}/lessons_answers_reset")
-    @PreAuthorize("isScenarioPlanner(#scenarioId)")
-    @Transactional(rollbackOn = Exception.class)
-    public Iterable<LessonsCategory> resetScenarioLessonsAnswers(@PathVariable String scenarioId) {
-        List<LessonsAnswer> lessonsAnswers = lessonsCategoryRepository.findAll(
-                        LessonsCategorySpecification.fromScenario(scenarioId)).stream()
-                .flatMap(lessonsCategory -> lessonsQuestionRepository.findAll(
-                                LessonsQuestionSpecification.fromCategory(lessonsCategory.getId())).stream()
-                        .flatMap(lessonsQuestion -> lessonsAnswerRepository.findAll(
-                                LessonsAnswerSpecification.fromQuestion(lessonsQuestion.getId())).stream()))
-                .toList();
-        lessonsAnswerRepository.deleteAll(lessonsAnswers);
-        return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromScenario(scenarioId)).stream().toList();
     }
 
     @PostMapping(SCENARIO_URI + "{scenarioId}/lessons_empty")
@@ -182,45 +165,5 @@ public class ScenarioLessonsApi extends RestBehavior {
     @Transactional(rollbackOn = Exception.class)
     public void deleteScenarioLessonsQuestion(@PathVariable String scenarioId, @PathVariable String lessonsQuestionId) {
         lessonsQuestionRepository.deleteById(lessonsQuestionId);
-    }
-
-    @GetMapping(SCENARIO_URI + "{scenarioId}/lessons_answers")
-    @PreAuthorize("isScenarioObserver(#scenarioId)")
-    public List<LessonsAnswer> scenarioLessonsAnswers(@PathVariable String scenarioId,
-                                                      @RequestParam Optional<String> userId) {
-        return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromScenario(scenarioId)).stream()
-                .flatMap(lessonsCategory -> lessonsQuestionRepository.findAll(
-                                LessonsQuestionSpecification.fromCategory(lessonsCategory.getId())).stream()
-                        .flatMap(lessonsQuestion -> lessonsAnswerRepository.findAll(
-                                LessonsAnswerSpecification.fromQuestion(lessonsQuestion.getId())).stream()))
-                .toList();
-    }
-
-    @GetMapping("/api/player/lessons/scenario/{scenarioId}/lessons_answers")
-    public List<LessonsAnswer> playerLessonsAnswers(@PathVariable String scenarioId,
-                                                    @RequestParam Optional<String> userId) {
-        impersonateUser(userRepository, userId); // Protection for ?
-        return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromScenario(scenarioId)).stream()
-                .flatMap(lessonsCategory -> lessonsQuestionRepository.findAll(
-                                LessonsQuestionSpecification.fromCategory(lessonsCategory.getId())).stream()
-                        .flatMap(lessonsQuestion -> lessonsAnswerRepository.findAll(
-                                LessonsAnswerSpecification.fromQuestion(lessonsQuestion.getId())).stream()))
-                .toList();
-    }
-
-    @PostMapping("/api/player/lessons/scenario/{scenarioId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}/lessons_answers")
-    public LessonsAnswer createScenarioLessonsQuestion(@PathVariable String scenarioId,
-                                                       @PathVariable String lessonsQuestionId,
-                                                       @Valid @RequestBody LessonsAnswerCreateInput input,
-                                                       @RequestParam Optional<String> userId) {
-        User user = impersonateUser(userRepository, userId);
-        LessonsQuestion lessonsQuestion = lessonsQuestionRepository.findById(lessonsQuestionId).orElseThrow(ElementNotFoundException::new);
-        LessonsAnswer lessonsAnswer = new LessonsAnswer();
-        lessonsAnswer.setQuestion(lessonsQuestion);
-        lessonsAnswer.setScore(input.getScore());
-        lessonsAnswer.setPositive(input.getPositive());
-        lessonsAnswer.setNegative(input.getNegative());
-        lessonsAnswer.setUser(user);
-        return lessonsAnswerRepository.save(lessonsAnswer);
     }
 }

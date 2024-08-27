@@ -1,6 +1,6 @@
 import type { ScenarioStore } from './Scenario';
 import type { TeamStore } from '../teams/Team';
-import type { LessonsAnswer, LessonsCategory, LessonsQuestion, Objective } from '../../utils/api-types';
+import type { LessonsCategory, LessonsQuestion, Objective } from '../../utils/api-types';
 
 export interface ScenariosHelper {
   getScenario: (scenarioId: string) => ScenarioStore;
@@ -9,6 +9,4 @@ export interface ScenariosHelper {
   getScenarioObjectives: (scenarioId: string) => Objective[];
   getScenarioLessonsCategories: (scenarioId: string) => LessonsCategory[];
   getScenarioLessonsQuestions: (scenarioId: string) => LessonsQuestion[];
-  getScenarioLessonsAnswers: (scenarioId: string) => LessonsAnswer[];
-  getScenarioUserLessonsAnswers: (scenarioId: string, userId: string) => LessonsAnswer[];
 }

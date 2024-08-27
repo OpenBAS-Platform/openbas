@@ -80,7 +80,7 @@ const LessonsPlayer = (props) => {
         color="secondary"
         variant="outlined"
         component={Link}
-        to={`/lessons/${source.type}/${source.id}?user=${source.finalUserId}&preview=true`}
+        to={`/lessons/${source.id}?user=${source.finalUserId}&preview=true`}
         style={{ position: 'absolute', top: 20, right: 20 }}
                                                          >
         {t('Switch to preview mode')}
@@ -89,7 +89,7 @@ const LessonsPlayer = (props) => {
         color="primary"
         variant="outlined"
         component={Link}
-        to={`/admin/${source.type}/${source.id}/lessons`}
+        to={`/admin/${source.type}s/${source.id}/lessons`}
         style={{ position: 'absolute', top: 20, left: 20 }}
                                                          >
         {t('Back to administration')}
@@ -150,66 +150,66 @@ const LessonsPlayer = (props) => {
                   >
                     <Grid item={true} xs={3}>
                       <Typography
-                        variant="h4"
-                        style={{ marginBottom: 15 }}
-                      >
-                        {t('Question')}
-                      </Typography>
+                            variant="h4"
+                            style={{ marginBottom: 15 }}
+                          >
+                            {t('Question')}
+                          </Typography>
                       <Typography variant="body1">
-                        <strong>
-                          {question.lessons_question_content}
-                        </strong>
-                      </Typography>
+                            <strong>
+                                {question.lessons_question_content}
+                              </strong>
+                          </Typography>
                       <Typography variant="body2">
-                        {question.lessons_question_explanation || t('No explanation')}
-                      </Typography>
+                            {question.lessons_question_explanation || t('No explanation')}
+                          </Typography>
                     </Grid>
                     <Grid item={true} xs={3}>
                       <Typography
-                        variant="h4"
-                        style={{ marginBottom: 15 }}
-                      >
-                        {t('Global evaluation')}
-                      </Typography>
+                            variant="h4"
+                            style={{ marginBottom: 15 }}
+                          >
+                            {t('Global evaluation')}
+                          </Typography>
                       <Typography variant="body1">
-                        {t('Your overall evaluation about this question.')}
-                      </Typography>
+                            {t('Your overall evaluation about this question.')}
+                          </Typography>
                       <SliderField
-                        disabled={lessonsAnswers.length > 0}
-                        name={`${question.lessonsquestion_id}_score`}
-                        step={10}
-                        min={0}
-                        max={100}
-                        defaultValue={0}
-                      />
+                            disabled={lessonsAnswers.length > 0}
+                            name={`${question.lessonsquestion_id}_score`}
+                            step={10}
+                            min={0}
+                            max={100}
+                            defaultValue={0}
+                          />
                     </Grid>
                     <Grid item={true} xs={3}>
                       <Typography variant="h4">
-                        {t('What worked well')}
-                      </Typography>
+                            {t('What worked well')}
+                          </Typography>
                       <OldTextField
-                        disabled={lessonsAnswers.length > 0}
-                        style={{ marginTop: 10 }}
-                        name={`${question.lessonsquestion_id}_positive`}
-                        label={t('Comment (optional)')}
-                        multiline={true}
-                        rows={2}
-                        fullWidth={true}
-                      />
+                            disabled={lessonsAnswers.length > 0}
+                            style={{ marginTop: 10 }}
+                            name={`${question.lessonsquestion_id}_positive`}
+                            label={t('Comment (optional)')}
+                            multiline={true}
+                            rows={2}
+                            fullWidth={true}
+                          />
                     </Grid>
                     <Grid item={true} xs={3}>
                       <Typography variant="h4">
-                        {t("What didn't work well")}
-                      </Typography>
+                            {t("What didn't work well")}
+                          </Typography>
                       <OldTextField
-                        disabled={lessonsAnswers.length > 0}
-                        style={{ marginTop: 10 }}
-                        name={`${question.lessonsquestion_id}_negative`}
-                        label={t('Comment (optional)')}
-                        multiline={true}
-                        fullWidth={true}
-                        rows={2}
-                      />
+                            disabled={lessonsAnswers.length > 0}
+                            style={{ marginTop: 10 }}
+                            name={`${question.lessonsquestion_id}_negative`}
+                            label={t('Comment (optional)')}
+                            multiline={true}
+                            fullWidth={true}
+                            rows={2}
+                          />
                     </Grid>
                   </Grid>
                 </Paper>);

@@ -332,7 +332,7 @@ export const storeHelper = (state) => ({
   ),
   getExerciseUserLessonsAnswers: (exerciseId, userId) => entities('lessonsanswers', state).filter(
     (l) => l.lessons_answer_exercise === exerciseId
-      && l.lessons_answer_user === userId,
+            && l.lessons_answer_user === userId,
   ),
   getExerciseReports: (exerciseId) => entities('reports', state).filter((l) => l.report_exercise === exerciseId),
   // report
@@ -498,12 +498,5 @@ export const storeHelper = (state) => ({
   ),
   getScenarioLessonsQuestions: (id) => entities('lessonsquestions', state).filter(
     (l) => l.lessons_question_scenario === id,
-  ),
-  getScenarioLessonsAnswers: (id) => entities('lessonsanswers', state).filter(
-    (l) => l.lessons_answer_scenario === id,
-  ),
-  getScenarioUserLessonsAnswers: (scenarioId, userId) => entities('lessonsanswers', state).filter(
-    (l) => l.lessons_answer_scenario === scenarioId
-          && l.lessons_answer_user === userId,
   ),
 });

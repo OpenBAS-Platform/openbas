@@ -22,7 +22,6 @@ import {
   deleteLessonsCategory,
   deleteLessonsQuestion,
   emptyLessonsCategories,
-  fetchLessonsAnswers,
   fetchLessonsCategories,
   fetchLessonsQuestions,
   fetchScenarioTeams,
@@ -75,7 +74,6 @@ const ScenarioLessons = () => {
     teamsMap,
     lessonsCategories,
     lessonsQuestions,
-    lessonsAnswers,
     lessonsTemplates,
     usersMap,
   } = useHelper((helper: ExercisesHelper & InjectHelper & LessonsTemplatesHelper & ScenariosHelper & TeamsHelper & UserHelper) => {
@@ -87,7 +85,6 @@ const ScenarioLessons = () => {
       injects: helper.getScenarioInjects(scenarioId),
       lessonsCategories: helper.getScenarioLessonsCategories(scenarioId),
       lessonsQuestions: helper.getScenarioLessonsQuestions(scenarioId),
-      lessonsAnswers: helper.getScenarioLessonsAnswers(scenarioId),
       lessonsTemplates: helper.getLessonsTemplates(),
       teamsMap: helper.getTeamsMap(),
       teams: helper.getScenarioTeams(scenarioId),
@@ -100,7 +97,6 @@ const ScenarioLessons = () => {
     dispatch(fetchTeams());
     dispatch(fetchLessonsCategories(scenarioId));
     dispatch(fetchLessonsQuestions(scenarioId));
-    dispatch(fetchLessonsAnswers(scenarioId));
     dispatch(fetchScenarioObjectives(scenarioId));
     dispatch(fetchScenarioInjects(scenarioId));
     dispatch(fetchScenarioTeams(scenarioId));
@@ -156,7 +152,6 @@ const ScenarioLessons = () => {
         teams={teams}
         lessonsCategories={lessonsCategories}
         lessonsQuestions={lessonsQuestions}
-        lessonsAnswers={lessonsAnswers}
         lessonsTemplates={lessonsTemplates}
         usersMap={usersMap}
       ></Lessons>

@@ -9,14 +9,7 @@ import { useAppDispatch } from '../../../utils/hooks';
 import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import type { UserHelper } from '../../../actions/helper';
 import type { ScenariosHelper } from '../../../actions/scenarios/scenario-helper';
-import {
-  addLessonsAnswers,
-  fetchLessonsAnswers,
-  fetchLessonsCategories,
-  fetchLessonsQuestions,
-  fetchPlayerLessonsAnswers,
-  fetchScenario,
-} from '../../../actions/scenarios/scenario-actions';
+import { fetchLessonsCategories, fetchLessonsQuestions, fetchScenario } from '../../../actions/scenarios/scenario-actions';
 import useScenarioPermissions from '../../../utils/Scenario';
 
 const ScenarioViewLessons = () => {
@@ -42,7 +35,6 @@ const ScenarioViewLessons = () => {
     source,
     lessonsCategories,
     lessonsQuestions,
-    lessonsAnswers,
   } = useHelper((helper: ScenariosHelper & UserHelper) => {
     const currentUser = helper.getMe();
     const scenarioData = helper.getScenario(scenarioId);
@@ -52,10 +44,6 @@ const ScenarioViewLessons = () => {
       source: processToGenericSource(scenarioData),
       lessonsCategories: helper.getScenarioLessonsCategories(scenarioId),
       lessonsQuestions: helper.getScenarioLessonsQuestions(scenarioId),
-      lessonsAnswers: helper.getScenarioUserLessonsAnswers(
-        scenarioId,
-        userId && userId !== 'null' ? userId : currentUser?.user_id,
-      ),
     };
   });
 
@@ -66,24 +54,12 @@ const ScenarioViewLessons = () => {
     dispatch(fetchScenario(scenarioId));
     dispatch(fetchLessonsCategories(scenarioId));
     dispatch(fetchLessonsQuestions(scenarioId));
-    dispatch(fetchLessonsAnswers(scenarioId));
   }, [dispatch, scenarioId, userId, finalUserId]);
 
   // Pass the full scenario because the scenario is never loaded in the store at this point
   const permissions = useScenarioPermissions(scenarioId, scenario);
 
-  const context: ViewLessonContextType = {
-    onAddLessonsAnswers: (questionCategory, lessonsQuestionId, answerData) => dispatch(
-      addLessonsAnswers(
-        scenarioId,
-        questionCategory,
-        lessonsQuestionId,
-        answerData,
-        finalUserId,
-      ),
-    ),
-    onFetchPlayerLessonsAnswers: () => dispatch(fetchPlayerLessonsAnswers(scenarioId, finalUserId)),
-  };
+  const context: ViewLessonContextType = {};
 
   return (
     <ViewLessonContext.Provider value={context}>
@@ -92,7 +68,6 @@ const ScenarioViewLessons = () => {
           source={{ ...source, finalUserId }}
           lessonsCategories={lessonsCategories}
           lessonsQuestions={lessonsQuestions}
-          lessonsAnswers={lessonsAnswers}
           permissions={permissions}
         />
       )}

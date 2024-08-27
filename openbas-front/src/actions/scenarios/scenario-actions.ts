@@ -3,7 +3,6 @@ import { delReferential, getReferential, postReferential, putReferential, simple
 import { arrayOfScenarios, scenario } from './scenario-schema';
 import type {
   InjectsImportInput,
-  LessonsAnswerCreateInput,
   LessonsCategoryCreateInput,
   LessonsCategoryTeamsInput,
   LessonsCategoryUpdateInput,
@@ -257,33 +256,7 @@ export const deleteLessonsQuestion = (scenarioId: string, lessonsCategoryId: str
   return delReferential(uri, 'lessonsquestions', lessonsQuestionId)(dispatch);
 };
 
-export const resetLessonsAnswers = (scenarioId: string) => (dispatch: Dispatch) => {
-  const uri = `/api/scenarios/${scenarioId}/lessons_answers_reset`;
-  return postReferential(schema.arrayOfLessonsCategories, uri, {})(dispatch);
-};
-
 export const emptyLessonsCategories = (scenarioId: string) => (dispatch: Dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/lessons_empty`;
   return postReferential(schema.arrayOfLessonsCategories, uri, {})(dispatch);
-};
-
-export const fetchLessonsAnswers = (scenarioId: string) => (dispatch: Dispatch) => {
-  const uri = `/api/scenarios/${scenarioId}/lessons_answers`;
-  return getReferential(schema.arrayOfLessonsAnswers, uri)(dispatch);
-};
-
-export const fetchPlayerLessonsAnswers = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
-  const uri = `/api/player/lessons/scenario/${scenarioId}/lessons_answers?userId=${userId}`;
-  return getReferential(schema.arrayOfLessonsAnswers, uri)(dispatch);
-};
-
-export const addLessonsAnswers = (
-  scenarioId: string,
-  lessonsCategoryId: string,
-  lessonsQuestionId: string,
-  data: LessonsAnswerCreateInput,
-  userId: string,
-) => (dispatch: Dispatch) => {
-  const uri = `/api/player/lessons/scenario/${scenarioId}/lessons_categories/${lessonsCategoryId}/lessons_questions/${lessonsQuestionId}/lessons_answers?userId=${userId}`;
-  return postReferential(schema.arrayOfLessonsAnswers, uri, data)(dispatch);
 };

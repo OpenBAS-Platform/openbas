@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
-import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.Objects;
 
@@ -70,43 +70,38 @@ public class LessonsAnswer implements Base {
         return id;
     }
 
-  public LessonsQuestion getQuestion() {
+    public LessonsQuestion getQuestion() {
         return question;
     }
 
-  public User getUser() {
+    public User getUser() {
         return user;
     }
 
-  public Instant getCreated() {
+    public Instant getCreated() {
         return created;
     }
 
-  public Instant getUpdated() {
+    public Instant getUpdated() {
         return updated;
     }
 
-  public String getPositive() {
+    public String getPositive() {
         return positive;
     }
 
-  public String getNegative() {
+    public String getNegative() {
         return negative;
     }
 
-  public Integer getScore() {
+    public Integer getScore() {
         return score;
     }
 
-  // region transient
+    // region transient
     @JsonProperty("lessons_answer_exercise")
     public String getExercise() {
         return getQuestion().getCategory().getExercise().getId();
-    }
-
-    @JsonProperty("lessons_answer_scenario")
-    public String getScenario() {
-        return getQuestion().getCategory().getScenario().getId();
     }
     // endregion
 

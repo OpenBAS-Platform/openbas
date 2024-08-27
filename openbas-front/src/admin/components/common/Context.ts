@@ -109,8 +109,8 @@ export type LessonContextType = {
   onFetchEvaluation: (objectiveId: string) => Promise<Evaluation[]>,
 };
 export type ViewLessonContextType = {
-  onAddLessonsAnswers: (questionCategory: string, lessonsQuestionId: string, answerData: LessonsAnswerCreateInput) => Promise<LessonsAnswer>,
-  onFetchPlayerLessonsAnswers: () => Promise<LessonsAnswer[]>,
+  onAddLessonsAnswers?: (questionCategory: string, lessonsQuestionId: string, answerData: LessonsAnswerCreateInput) => Promise<LessonsAnswer>,
+  onFetchPlayerLessonsAnswers?: () => Promise<LessonsAnswer[]>,
 };
 
 export const PermissionsContext = createContext<PermissionsContextType>({
