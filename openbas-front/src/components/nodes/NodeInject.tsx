@@ -158,6 +158,7 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
               <InjectPopover
                 inject={data.inject!}
                 setSelectedInjectId={selectedInject}
+                canBeTested={data.inject?.inject_testable}
                 isDisabled={false}
               />
             </span>

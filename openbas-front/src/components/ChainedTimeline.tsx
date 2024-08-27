@@ -60,10 +60,10 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   const theme = useTheme<Theme>();
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeInject>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-  const [injectsToShow, setInjectsToShow] = useState<InjectStore[]>([]);
   const [draggingOnGoing, setDraggingOnGoing] = useState<boolean>(false);
   const [viewportData, setViewportData] = useState<Viewport>();
   const [minutesPerGapIndex, setMinutesPerGapIndex] = useState<number>(0);
+  const [currentUpdatedNode, setCurrentUpdatedNode] = useState<NodeInject | null>(null);
 
   let timer: NodeJS.Timeout;
   const injectContext = useContext(InjectContext);
@@ -117,6 +117,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   };
 
   const updateNodes = () => {
+    console.log(injects);
     if (injects.length > 0) {
       const injectsNodes = injects
         .sort((a, b) => a.inject_depends_duration - b.inject_depends_duration)
@@ -139,10 +140,19 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
               .concat(inject.inject_asset_groups!.map((assetGroup) => assetGroup.asset_group_name))
               .concat(inject.inject_teams!.map((team) => teams[team]?.team_name)),
           },
-          position: { x: (inject.inject_depends_duration / 60) * (gapSize / minutesPerGapAllowed[minutesPerGapIndex]), y: 0 },
+          position: {
+            x: (inject.inject_depends_duration / 60) * (gapSize / minutesPerGapAllowed[minutesPerGapIndex]),
+            y: 0,
+          },
         }));
+
+      if (currentUpdatedNode !== null) {
+        injectsNodes.find((inject) => inject.id === currentUpdatedNode.id)!.position.x = currentUpdatedNode.position.x;
+      }
+
+      setCurrentUpdatedNode(null);
+      setTimeout(() => setDraggingOnGoing(false), 500);
       calculateInjectPosition(injectsNodes);
-      setInjectsToShow(injects);
       setNodes(injectsNodes);
       setEdges(injects.filter((inject) => inject.inject_depends_on != null).map((inject) => {
         return ({
@@ -169,8 +179,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     markerEnd: { type: MarkerType.ArrowClosed },
   };
 
-  const nodeDrag = (event: React.MouseEvent, node: NodeInject) => {
-    setDraggingOnGoing(false);
+  const nodeDragStop = (event: React.MouseEvent, node: NodeInject) => {
     const injectFromMap = injectsMap[node.id];
     if (injectFromMap !== undefined) {
       const inject = {
@@ -181,6 +190,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
         inject_updated_at: injectFromMap.inject_updated_at,
       };
       injectContext.onUpdateInject(node.id, inject);
+      setCurrentUpdatedNode(node);
     }
   };
 
@@ -289,7 +299,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
 
   return (
     <>
-      {injectsToShow.length > 0 ? (
+      {injects.length > 0 ? (
         <div className={classes.container} style={{ width: '100%', height: 350 }}>
           <ReactFlow
             nodes={nodes}
@@ -302,7 +312,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             nodesFocusable={false}
             elementsSelectable={false}
             onNodeDrag={horizontalNodeDrag}
-            onNodeDragStop={nodeDrag}
+            onNodeDragStop={nodeDragStop}
             onNodeDragStart={nodeDragStart}
             defaultEdgeOptions={defaultEdgeOptions}
             onMouseMove={onMouseMove}
