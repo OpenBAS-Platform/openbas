@@ -185,8 +185,8 @@ const Lessons: React.FC<Props> = ({
   };
   return (
     <div style={{ marginBottom: '30px' }}>
-      <Grid container={true} spacing={3} style={{ marginTop: -14, marginBottom: '30px' }}>
-        <Grid item={true} xs={3} style={{ marginTop: -14 }}>
+      <Grid container spacing={3} style={{ marginTop: -14, marginBottom: '30px' }}>
+        <Grid item xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
               <SportsScoreOutlined color="primary" sx={{ fontSize: 50 }} />
@@ -195,7 +195,7 @@ const Lessons: React.FC<Props> = ({
             <div className={classes.number}>{source.score}%</div>
           </Paper>
         </Grid>
-        <Grid item={true} xs={3} style={{ marginTop: -14 }}>
+        <Grid item xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
               <SpeakerNotesOutlined color="primary" sx={{ fontSize: 50 }} />
@@ -206,7 +206,7 @@ const Lessons: React.FC<Props> = ({
             </div>
           </Paper>
         </Grid>
-        <Grid item={true} xs={3} style={{ marginTop: -14 }}>
+        <Grid item xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
               <BallotOutlined color="primary" sx={{ fontSize: 50 }} />
@@ -217,7 +217,7 @@ const Lessons: React.FC<Props> = ({
             </div>
           </Paper>
         </Grid>
-        <Grid item={true} xs={3} style={{ marginTop: -14 }}>
+        <Grid item xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
               <ContactMailOutlined color="primary" sx={{ fontSize: 50 }} />
@@ -229,20 +229,20 @@ const Lessons: React.FC<Props> = ({
           </Paper>
         </Grid>
       </Grid>
-      <Grid container={true} spacing={3} style={{ marginBottom: '50px' }}>
-        <Grid item={true} xs={4}>
+      <Grid container spacing={3} style={{ marginBottom: '50px' }}>
+        <Grid item xs={4}>
           <Typography variant="h4">{t('Details')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
-            <Grid container={true} spacing={3}>
-              <Grid item={true} xs={6}>
+            <Grid container spacing={3}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('Start date')}</Typography>
                 {nsdt(source.start_date)}
               </Grid>
-              <Grid item={true} xs={6}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('End date')}</Typography>
                 {nsdt(source.end_date)}
               </Grid>
-              <Grid item={true} xs={6}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('Duration')}</Typography>
                 {getHoursDiff(
                   source.start_date
@@ -254,18 +254,18 @@ const Lessons: React.FC<Props> = ({
                 )}{' '}
                 {t('hours')}
               </Grid>
-              <Grid item={true} xs={6}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('Team')}</Typography>
                 {source.users_number} {t('players')}
               </Grid>
             </Grid>
           </Paper>
         </Grid>
-        <Grid item={true} xs={4}>
+        <Grid item xs={4}>
           <Typography variant="h4">{t('Parameters')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
-            <Grid container={true} spacing={3}>
-              <Grid item={true} xs={6}>
+            <Grid container spacing={3}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('Questionnaire mode')}</Typography>
                 <FormControlLabel
                   control={
@@ -279,7 +279,7 @@ const Lessons: React.FC<Props> = ({
                   label={t('Anonymize answers')}
                 />
               </Grid>
-              <Grid item={true} xs={6}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('Template')}</Typography>
                 <Button
                   startIcon={<ContentPasteGoOutlined />}
@@ -290,7 +290,7 @@ const Lessons: React.FC<Props> = ({
                   {t('Apply')}
                 </Button>
               </Grid>
-              <Grid item={true} xs={6}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('Check')}</Typography>
                 <Button
                   startIcon={<VisibilityOutlined />}
@@ -302,7 +302,7 @@ const Lessons: React.FC<Props> = ({
                   {t('Preview')}
                 </Button>
               </Grid>
-              <Grid item={true} xs={6}>
+              <Grid item xs={6}>
                 <Typography variant="h3">
                   {t('Categories and questions')}
                 </Typography>
@@ -318,7 +318,7 @@ const Lessons: React.FC<Props> = ({
             </Grid>
           </Paper>
         </Grid>
-        <Grid item={true} xs={4}>
+        <Grid item xs={4}>
           <Typography variant="h4">{t('Control')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
             <Alert severity="info">
@@ -326,8 +326,8 @@ const Lessons: React.FC<Props> = ({
                 'Sending the questionnaire will emit an email to each player with a unique link to access and fill it.',
               )}
             </Alert>
-            <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
-              <Grid item={true} xs={6}>
+            <Grid container spacing={3} style={{ marginTop: 0 }}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('Questionnaire')}</Typography>
                 <Button
                   startIcon={<ContentPasteGoOutlined />}
@@ -338,7 +338,7 @@ const Lessons: React.FC<Props> = ({
                   {t('Send')}
                 </Button>
               </Grid>
-              <Grid item={true} xs={6}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('Answers')}</Typography>
                 <Button
                   startIcon={<ContentPasteGoOutlined />}
@@ -375,7 +375,7 @@ const Lessons: React.FC<Props> = ({
         keepMounted={false}
         open={selectedObjective !== null}
         onClose={() => setSelectedObjective(null)}
-        fullWidth={true}
+        fullWidth
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
@@ -503,7 +503,7 @@ const Lessons: React.FC<Props> = ({
         open={openSendLessons}
         TransitionComponent={Transition}
         onClose={() => setOpenSendLessons(false)}
-        fullWidth={true}
+        fullWidth
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
@@ -531,7 +531,7 @@ const Lessons: React.FC<Props> = ({
         onClose={() => setSelectedQuestion(null)}
         PaperProps={{ elevation: 1 }}
         maxWidth="lg"
-        fullWidth={true}
+        fullWidth
       >
         <DialogTitle>{selectedQuestion?.lessons_question_content}</DialogTitle>
         <DialogContent style={{ paddingTop: 20 }}>
@@ -546,15 +546,15 @@ const Lessons: React.FC<Props> = ({
                   paddingBottom: 10,
                 }}
               >
-                <Grid container={true} spacing={3}>
-                  <Grid item={true} xs={3} style={{ marginTop: -10 }}>
+                <Grid container spacing={3}>
+                  <Grid item xs={3} style={{ marginTop: -10 }}>
                     <Typography variant="h4">{t('User')}</Typography>
                     {source.lessons_anonymized
                       ? t('Anonymized')
                       : getUserName
                     }
                   </Grid>
-                  <Grid item={true} xs={3} style={{ marginTop: -10 }}>
+                  <Grid item xs={3} style={{ marginTop: -10 }}>
                     <Typography variant="h4" style={{ marginBottom: 20 }}>
                       {t('Score')}
                     </Typography>
@@ -572,11 +572,11 @@ const Lessons: React.FC<Props> = ({
                       </Typography>
                     </div>
                   </Grid>
-                  <Grid item={true} xs={3} style={{ marginTop: -10 }}>
+                  <Grid item xs={3} style={{ marginTop: -10 }}>
                     <Typography variant="h4">{t('What worked well')}</Typography>
                     {answer.lessons_answer_positive}
                   </Grid>
-                  <Grid item={true} xs={3} style={{ marginTop: -10 }}>
+                  <Grid item xs={3} style={{ marginTop: -10 }}>
                     <Typography variant="h4">
                       {t('What didn\'t work well')}
                     </Typography>

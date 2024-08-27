@@ -104,8 +104,8 @@ const LessonsCategories = ({
               />
             )}
             <div className="clearfix" />
-            <Grid container={true} spacing={3}>
-              <Grid item={true} xs={4} style={{ marginTop: -10 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={4} style={{ marginTop: -10 }}>
                 <Typography variant="h4">{t('Questions')}</Typography>
                 <Paper
                   variant="outlined"
@@ -116,7 +116,7 @@ const LessonsCategories = ({
                     {questions.map((question) => (
                       <ListItem
                         key={question.lessonsquestion_id}
-                        divider={true}
+                        divider
                       >
                         <ListItemIcon>
                           <HelpOutlined />
@@ -145,7 +145,7 @@ const LessonsCategories = ({
                   </List>
                 </Paper>
               </Grid>
-              <Grid item={true} xs={5} style={{ marginTop: -10 }}>
+              <Grid item xs={5} style={{ marginTop: -10 }}>
                 <Typography variant="h4">{t('Results')}</Typography>
                 <Paper
                   variant="outlined"
@@ -160,8 +160,8 @@ const LessonsCategories = ({
                       return (
                         <ListItem
                           key={question.lessonsquestion_id}
-                          divider={true}
-                          button={true}
+                          divider
+                          button
                           onClick={() => setSelectedQuestion && setSelectedQuestion(question)
                           }
                         >
@@ -203,7 +203,7 @@ const LessonsCategories = ({
                   </List>
                 </Paper>
               </Grid>
-              <Grid item={true} xs={3} style={{ marginTop: -10 }}>
+              <Grid item xs={3} style={{ marginTop: -10 }}>
                 <Typography variant="h4" style={{ float: 'left' }}>
                   {t('Targeted teams')}
                 </Typography>

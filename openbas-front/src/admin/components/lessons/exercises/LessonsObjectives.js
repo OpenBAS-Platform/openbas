@@ -60,8 +60,8 @@ const LessonsObjectives = ({
     },
   ];
   return (
-    <Grid container={true} spacing={3} style={{ marginTop: -10 }}>
-      <Grid item={true} xs={6}>
+    <Grid container spacing={3} style={{ marginTop: -10 }}>
+      <Grid item xs={6}>
         <Typography variant="h4" style={{ float: 'left' }}>
           {t('Objectives')}
         </Typography>
@@ -75,8 +75,8 @@ const LessonsObjectives = ({
               {sortedObjectives.map((objective) => (
                 <ListItem
                   key={objective.objective_id}
-                  divider={true}
-                  button={true}
+                  divider
+                  button
                   onClick={() => setSelectedObjective
                     && setSelectedObjective(objective.objective_id)
                   }
@@ -125,7 +125,7 @@ const LessonsObjectives = ({
           )}
         </Paper>
       </Grid>
-      <Grid item={true} xs={6}>
+      <Grid item xs={6}>
         <Typography variant="h4">
           {t('Crisis intensity (injects by hour)')}
         </Typography>
