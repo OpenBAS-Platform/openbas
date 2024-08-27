@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import * as R from 'ramda';
 import { Alert, Dialog, Link, SnackbarCloseReason } from '@mui/material';
 import { ArticleContext, TeamContext } from '../../../common/Context';
@@ -31,7 +31,6 @@ interface Props {
 const ScenarioInjects: FunctionComponent<Props> = () => {
   // Standard hooks
   const { t } = useFormatter();
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
 

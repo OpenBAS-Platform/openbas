@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { BarChartOutlined, ReorderOutlined } from '@mui/icons-material';
 import { Alert, Dialog, Grid, Link, Paper, SnackbarCloseReason, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -50,7 +50,6 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
 
