@@ -80,7 +80,7 @@ const LessonsPlayer = (props) => {
         color="secondary"
         variant="outlined"
         component={Link}
-        to={`/lessons/${source.id}?user=${source.finalUserId}&preview=true`}
+        to={`/lessons/${source.type}s/${source.id}?user=${source.finalUserId}&preview=true`}
         style={{ position: 'absolute', top: 20, right: 20 }}
                                                          >
         {t('Switch to preview mode')}
@@ -96,7 +96,7 @@ const LessonsPlayer = (props) => {
       </Button>)}
       <div className={classes.container}>
         <div style={{ margin: '0 auto', textAlign: 'center' }}>
-          <img src={theme.logo} alt="logo" className={classes.logo}/>
+          <img src={theme.logo} alt="logo" className={classes.logo} />
         </div>
         <Typography
           variant="h1"
@@ -258,7 +258,7 @@ const LessonsPlayer = (props) => {
       </Form>
     </div>);
   }
-  return <Loader/>;
+  return <Loader />;
 };
 
 export default LessonsPlayer;

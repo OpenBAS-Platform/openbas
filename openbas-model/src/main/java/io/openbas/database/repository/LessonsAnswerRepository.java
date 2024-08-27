@@ -15,5 +15,5 @@ public interface LessonsAnswerRepository extends CrudRepository<LessonsAnswer, S
   @NotNull
   Optional<LessonsAnswer> findById(@NotNull String id);
 
-  Optional<LessonsAnswer> findByUserAndQuestion(@NotNull String userId, @NotNull String questionId);
+  Optional<LessonsAnswer> findByUserIdAndQuestionId(@NotNull String userId, @NotNull String questionId);
 }

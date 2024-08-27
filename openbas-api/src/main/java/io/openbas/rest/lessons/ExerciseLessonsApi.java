@@ -250,7 +250,7 @@ public class ExerciseLessonsApi extends RestBehavior {
     LessonsQuestion lessonsQuestion = lessonsQuestionRepository.findById(lessonsQuestionId)
         .orElseThrow(ElementNotFoundException::new);
 
-    Optional<LessonsAnswer> optionalAnswer = lessonsAnswerRepository.findByUserAndQuestion(user.getId(),
+    Optional<LessonsAnswer> optionalAnswer = lessonsAnswerRepository.findByUserIdAndQuestionId(user.getId(),
         lessonsQuestionId);
     LessonsAnswer lessonsAnswer = optionalAnswer.orElseGet(() -> {
       LessonsAnswer newAnswer = new LessonsAnswer();
