@@ -72,7 +72,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   const [minutesPerGapIndex, setMinutesPerGapIndex] = useState<number>(0);
   const [currentUpdatedNode, setCurrentUpdatedNode] = useState<NodeInject | null>(null);
   const [currentMousePosition, setCurrentMousePosition] = useState<XYPosition>({ x: 0, y: 0 });
-  const [newNodeCursorVisibility, setNewNodeCursorVisibility] = useState<'visible' | 'hidden'>('hidden');
+  const [newNodeCursorVisibility, setNewNodeCursorVisibility] = useState<'visible' | 'hidden'>('visible');
   const [currentMouseTime, setCurrentMouseTime] = useState<string>('');
 
   let timer: NodeJS.Timeout;
