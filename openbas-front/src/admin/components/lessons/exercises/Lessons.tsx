@@ -31,17 +31,17 @@ import {
   useTheme,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import ObjectiveEvaluations from './ObjectiveEvaluations';
-import CreateLessonsCategory from './categories/CreateLessonsCategory';
-import SendLessonsForm from './SendLessonsForm';
+import ObjectiveEvaluations from '../ObjectiveEvaluations';
+import CreateLessonsCategory from '../categories/CreateLessonsCategory';
+import SendLessonsForm from '../SendLessonsForm';
 import LessonsObjectives from './LessonsObjectives';
 import LessonsCategories from './LessonsCategories';
-import { useFormatter } from '../../../components/i18n';
-import type { Inject, LessonsAnswer, LessonsCategory, LessonsQuestion, LessonsSendInput, LessonsTemplate, Objective, Team, User } from '../../../utils/api-types';
-import Transition from '../../../components/common/Transition';
-import CreateLessonsTemplate from '../components/lessons/CreateLessonsTemplate';
-import { resolveUserName } from '../../../utils/String';
-import { LessonContext } from '../common/Context';
+import { useFormatter } from '../../../../components/i18n';
+import type { Inject, LessonsAnswer, LessonsCategory, LessonsQuestion, LessonsSendInput, LessonsTemplate, Objective, Team, User } from '../../../../utils/api-types';
+import Transition from '../../../../components/common/Transition';
+import CreateLessonsTemplate from '../../components/lessons/CreateLessonsTemplate';
+import { resolveUserName } from '../../../../utils/String';
+import { LessonContext } from '../../common/Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   metric: {
@@ -155,7 +155,9 @@ const Lessons: React.FC<Props> = ({
     return setOpenApplyTemplate(true);
   };
   const resetAnswers = async () => {
-    await onResetLessonsAnswers();
+    if (onResetLessonsAnswers) {
+      await onResetLessonsAnswers();
+    }
     return setOpenResetAnswers(false);
   };
   const emptyLessons = async () => {
@@ -187,7 +189,7 @@ const Lessons: React.FC<Props> = ({
         <Grid item={true} xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
-              <SportsScoreOutlined color="primary" sx={{ fontSize: 50 }}/>
+              <SportsScoreOutlined color="primary" sx={{ fontSize: 50 }} />
             </div>
             <div className={classes.title}>{t('Overall objectives score')}</div>
             <div className={classes.number}>{source.score}%</div>
@@ -196,7 +198,7 @@ const Lessons: React.FC<Props> = ({
         <Grid item={true} xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
-              <SpeakerNotesOutlined color="primary" sx={{ fontSize: 50 }}/>
+              <SpeakerNotesOutlined color="primary" sx={{ fontSize: 50 }} />
             </div>
             <div className={classes.title}>{t('Simulation logs')}</div>
             <div className={classes.number}>
@@ -207,7 +209,7 @@ const Lessons: React.FC<Props> = ({
         <Grid item={true} xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
-              <BallotOutlined color="primary" sx={{ fontSize: 50 }}/>
+              <BallotOutlined color="primary" sx={{ fontSize: 50 }} />
             </div>
             <div className={classes.title}>{t('Poll replies')}</div>
             <div className={classes.number}>
@@ -218,7 +220,7 @@ const Lessons: React.FC<Props> = ({
         <Grid item={true} xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
-              <ContactMailOutlined color="primary" sx={{ fontSize: 50 }}/>
+              <ContactMailOutlined color="primary" sx={{ fontSize: 50 }} />
             </div>
             <div className={classes.title}>{t('Messages')}</div>
             <div className={classes.number}>
@@ -273,14 +275,14 @@ const Lessons: React.FC<Props> = ({
                       onChange={() => setOpenAnonymize(true)}
                       name="anonymized"
                     />
-                                    }
+                  }
                   label={t('Anonymize answers')}
                 />
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('Template')}</Typography>
                 <Button
-                  startIcon={<ContentPasteGoOutlined/>}
+                  startIcon={<ContentPasteGoOutlined />}
                   color="primary"
                   variant="contained"
                   onClick={() => setOpenApplyTemplate(true)}
@@ -291,7 +293,7 @@ const Lessons: React.FC<Props> = ({
               <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('Check')}</Typography>
                 <Button
-                  startIcon={<VisibilityOutlined/>}
+                  startIcon={<VisibilityOutlined />}
                   color="secondary"
                   variant="contained"
                   component={Link}
@@ -305,7 +307,7 @@ const Lessons: React.FC<Props> = ({
                   {t('Categories and questions')}
                 </Typography>
                 <Button
-                  startIcon={<DeleteSweepOutlined/>}
+                  startIcon={<DeleteSweepOutlined />}
                   color="error"
                   variant="contained"
                   onClick={() => setOpenEmptyLessons(true)}
@@ -328,7 +330,7 @@ const Lessons: React.FC<Props> = ({
               <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('Questionnaire')}</Typography>
                 <Button
-                  startIcon={<ContentPasteGoOutlined/>}
+                  startIcon={<ContentPasteGoOutlined />}
                   color="success"
                   variant="contained"
                   onClick={() => setOpenSendLessons(true)}
@@ -339,7 +341,7 @@ const Lessons: React.FC<Props> = ({
               <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('Answers')}</Typography>
                 <Button
-                  startIcon={<ContentPasteGoOutlined/>}
+                  startIcon={<ContentPasteGoOutlined />}
                   color="error"
                   variant="contained"
                   onClick={() => setOpenResetAnswers(true)}
@@ -367,7 +369,7 @@ const Lessons: React.FC<Props> = ({
         teams={teams}
         isReport={false}
       />
-      <CreateLessonsCategory/>
+      <CreateLessonsCategory />
       <Dialog
         TransitionComponent={Transition}
         keepMounted={false}
@@ -420,7 +422,7 @@ const Lessons: React.FC<Props> = ({
                       margin: 0,
                     }}
                     value={template.lessonstemplate_id}
-                    control={<Radio/>}
+                    control={<Radio />}
                     label={
                       <div style={{ margin: '15px 0 15px 10px' }}>
                         <Typography variant="h4">
@@ -430,14 +432,14 @@ const Lessons: React.FC<Props> = ({
                           {template.lessons_template_description || t('No description')}
                         </Typography>
                       </div>
-                                        }
+                    }
                   />
                 );
               })}
             </RadioGroup>
           </FormControl>
-          <CreateLessonsTemplate inline/>
-          <div className="clearfix"/>
+          <CreateLessonsTemplate inline />
+          <div className="clearfix" />
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button
               onClick={() => setOpenApplyTemplate(false)}
@@ -534,7 +536,7 @@ const Lessons: React.FC<Props> = ({
         <DialogTitle>{selectedQuestion?.lessons_question_content}</DialogTitle>
         <DialogContent style={{ paddingTop: 20 }}>
           {selectedQuestionAnswers.map((answer: LessonsAnswer) => {
-            const getUserName = answer.lessons_answer_user ? resolveUserName(usersMap[answer.lessons_answer_user]) : '-';
+            const getUserName = answer.lessons_answer_user ? resolveUserName(usersMap[answer.lessons_answer_user.user_id]) : '-';
             return (
               <div
                 key={answer.lessonsanswer_id}
@@ -550,7 +552,7 @@ const Lessons: React.FC<Props> = ({
                     {source.lessons_anonymized
                       ? t('Anonymized')
                       : getUserName
-                                        }
+                    }
                   </Grid>
                   <Grid item={true} xs={3} style={{ marginTop: -10 }}>
                     <Typography variant="h4" style={{ marginBottom: 20 }}>
@@ -576,7 +578,7 @@ const Lessons: React.FC<Props> = ({
                   </Grid>
                   <Grid item={true} xs={3} style={{ marginTop: -10 }}>
                     <Typography variant="h4">
-                      {t("What didn't work well")}
+                      {t('What didn\'t work well')}
                     </Typography>
                     {answer.lessons_answer_negative}
                   </Grid>

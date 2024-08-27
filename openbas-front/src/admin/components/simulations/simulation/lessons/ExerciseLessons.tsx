@@ -25,7 +25,7 @@ import { fetchLessonsTemplates } from '../../../../../actions/Lessons';
 import { fetchPlayers } from '../../../../../actions/User';
 import { fetchExerciseInjects, fetchExerciseObjectives } from '../../../../../actions/Inject';
 import { fetchExerciseTeams, updateExerciseLessons } from '../../../../../actions/Exercise';
-import Lessons from '../../../lessons/Lessons';
+import Lessons from '../../../lessons/exercises/Lessons';
 import {
   addLessonsCategory,
   addLessonsQuestion,

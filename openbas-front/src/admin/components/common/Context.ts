@@ -90,7 +90,7 @@ export type AtomicTestingResultContextType = {
 };
 export type LessonContextType = {
   onApplyLessonsTemplate: (data: string) => Promise<LessonsCategory[]>,
-  onResetLessonsAnswers: () => Promise<LessonsCategory[]>,
+  onResetLessonsAnswers?: () => Promise<LessonsCategory[]>,
   onEmptyLessonsCategories: () => Promise<LessonsCategory[]>,
   onUpdateSourceLessons: (data: boolean) => Promise<LessonsCategory>,
   onSendLessons?: (data: LessonsSendInput) => void,

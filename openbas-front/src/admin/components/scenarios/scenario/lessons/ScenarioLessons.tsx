@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
-import Lessons from '../../../lessons/Lessons';
+import Lessons from '../../../lessons/scenarios/Lessons';
 import { LessonContext, LessonContextType } from '../../../common/Context';
 import { fetchLessonsTemplates } from '../../../../../actions/Lessons';
 import { fetchScenarioInjects, fetchScenarioObjectives } from '../../../../../actions/Inject';
@@ -25,7 +25,6 @@ import {
   fetchLessonsCategories,
   fetchLessonsQuestions,
   fetchScenarioTeams,
-  resetLessonsAnswers,
   updateLessonsCategory,
   updateLessonsCategoryTeams,
   updateLessonsQuestion,
@@ -106,7 +105,6 @@ const ScenarioLessons = () => {
 
   const context: LessonContextType = {
     onApplyLessonsTemplate: (data: string) => dispatch(applyLessonsTemplate(scenarioId, data)),
-    onResetLessonsAnswers: () => dispatch(resetLessonsAnswers(scenarioId)),
     onEmptyLessonsCategories: () => dispatch(emptyLessonsCategories(scenarioId)),
     onUpdateSourceLessons: (data: boolean) => dispatch(updateScenarioLessons(scenarioId, {
       lessons_anonymized: !data,
