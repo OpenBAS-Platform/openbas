@@ -1,13 +1,11 @@
 package io.openbas.rest.scenario;
 
-import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Scenario;
-import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.exercise.response.PublicExercise;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.rest.scenario.response.PublicScenario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,10 +24,10 @@ public class ScenarioPlayerApi extends RestBehavior {
   private final ScenarioRepository scenarioRepository;
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}")
-  public PublicExercise playerScenario(@PathVariable String scenarioId, @RequestParam Optional<String> userId) {
+  public PublicScenario playerScenario(@PathVariable String scenarioId, @RequestParam Optional<String> userId) {
     impersonateUser(this.userRepository, userId);
     Scenario scenario = this.scenarioRepository.findById(scenarioId).orElseThrow(ElementNotFoundException::new);
-    return null;
+    return new PublicScenario(scenario);
   }
 
 }

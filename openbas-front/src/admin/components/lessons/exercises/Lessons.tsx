@@ -528,7 +528,7 @@ const Lessons: React.FC<Props> = ({
         </DialogContent>
       </Dialog>
       <Dialog
-        open={selectedQuestion !== null}
+        open={selectedQuestion !== null && selectedQuestion?.lessons_question_answers?.length > 0}
         TransitionComponent={Transition}
         onClose={() => setSelectedQuestion(null)}
         PaperProps={{ elevation: 1 }}
@@ -538,7 +538,9 @@ const Lessons: React.FC<Props> = ({
         <DialogTitle>{selectedQuestion?.lessons_question_content}</DialogTitle>
         <DialogContent style={{ paddingTop: 20 }}>
           {selectedQuestionAnswers.map((answer: LessonsAnswer) => {
-            const getUserName = answer.lessons_answer_user ? resolveUserName(usersMap[answer.lessons_answer_user.user_id]) : '-';
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            const getUserName = answer.lessons_answer_user ? resolveUserName(usersMap[answer.lessons_answer_user]) : '-';
             return (
               <div
                 key={answer.lessonsanswer_id}

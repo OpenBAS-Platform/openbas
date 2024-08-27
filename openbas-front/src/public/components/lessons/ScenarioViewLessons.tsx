@@ -9,14 +9,23 @@ import { useAppDispatch } from '../../../utils/hooks';
 import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import type { UserHelper } from '../../../actions/helper';
 import type { ScenariosHelper } from '../../../actions/scenarios/scenario-helper';
-import { fetchLessonsCategories, fetchLessonsQuestions, fetchScenario } from '../../../actions/scenarios/scenario-actions';
+import {
+  fetchLessonsCategories,
+  fetchLessonsQuestions,
+  fetchPlayerLessonsCategories,
+  fetchPlayerLessonsQuestions,
+  fetchPlayerScenario,
+  fetchScenario,
+} from '../../../actions/scenarios/scenario-actions';
 import useScenarioPermissions from '../../../utils/Scenario';
+import LessonsPlayer from './LessonsPlayer';
 
 const ScenarioViewLessons = () => {
   const dispatch = useAppDispatch();
   const [preview] = useQueryParameter(['preview']);
   const [userId] = useQueryParameter(['user']);
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
+  const isPreview = preview === 'true';
 
   const processToGenericSource = (scenario: ScenarioStore | undefined) => {
     if (!scenario) return undefined;
@@ -51,9 +60,15 @@ const ScenarioViewLessons = () => {
 
   useEffect(() => {
     dispatch(fetchMe());
-    dispatch(fetchScenario(scenarioId));
-    dispatch(fetchLessonsCategories(scenarioId));
-    dispatch(fetchLessonsQuestions(scenarioId));
+    if (isPreview) {
+      dispatch(fetchScenario(scenarioId));
+      dispatch(fetchLessonsCategories(scenarioId));
+      dispatch(fetchLessonsQuestions(scenarioId));
+    } else {
+      dispatch(fetchPlayerScenario(scenarioId, userId));
+      dispatch(fetchPlayerLessonsCategories(scenarioId, finalUserId));
+      dispatch(fetchPlayerLessonsQuestions(scenarioId, finalUserId));
+    }
   }, [dispatch, scenarioId, userId, finalUserId]);
 
   // Pass the full scenario because the scenario is never loaded in the store at this point
@@ -63,11 +78,19 @@ const ScenarioViewLessons = () => {
 
   return (
     <ViewLessonContext.Provider value={context}>
-      {preview === 'true' && (
+      {isPreview ? (
         <LessonsPreview
           source={{ ...source, finalUserId }}
           lessonsCategories={lessonsCategories}
           lessonsQuestions={lessonsQuestions}
+          permissions={permissions}
+        />
+      ) : (
+        <LessonsPlayer
+          source={{ ...source, finalUserId }}
+          lessonsCategories={lessonsCategories}
+          lessonsQuestions={lessonsQuestions}
+          lessonsAnswers={[]}
           permissions={permissions}
         />
       )}

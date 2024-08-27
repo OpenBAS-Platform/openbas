@@ -260,3 +260,18 @@ export const emptyLessonsCategories = (scenarioId: string) => (dispatch: Dispatc
   const uri = `/api/scenarios/${scenarioId}/lessons_empty`;
   return postReferential(schema.arrayOfLessonsCategories, uri, {})(dispatch);
 };
+
+export const fetchPlayerLessonsCategories = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/player/lessons/scenario/${scenarioId}/lessons_categories?userId=${userId}`;
+  return getReferential(schema.arrayOfLessonsCategories, uri)(dispatch);
+};
+
+export const fetchPlayerLessonsQuestions = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/player/lessons/scenario/${scenarioId}/lessons_questions?userId=${userId}`;
+  return getReferential(schema.arrayOfLessonsQuestions, uri)(dispatch);
+};
+
+export const fetchPlayerScenario = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/player/scenarios/${scenarioId}?userId=${userId}`;
+  return getReferential(scenario, uri)(dispatch);
+};

@@ -48,26 +48,20 @@ const LessonsPlayer = (props) => {
     onAddLessonsAnswers, onFetchPlayerLessonsAnswers,
   } = useContext(ViewLessonContext);
 
-  const validate = (values) => {
-    const errors = {};
-    const requiredFields = R.flatten(lessonsQuestions.map((question) => [`${question.lessonsquestion_id}_score`]));
-    requiredFields.forEach((field) => {
-      if (!values[field] && values[field] !== 0) {
-        errors[field] = t('This field is required.');
-      }
-    });
-
-    return errors;
-  };
   const submitForm = (data) => {
-    return Promise.all(lessonsQuestions.map((question) => {
-      const answerData = {
-        lessons_answer_score: data[`${question.lessonsquestion_id}_score`],
-        lessons_answer_positive: data[`${question.lessonsquestion_id}_positive`],
-        lessons_answer_negative: data[`${question.lessonsquestion_id}_negative`], // Corrected typo from 'nagative'
-      };
-      return onAddLessonsAnswers(question.lessons_question_category, question.lessonsquestion_id, answerData);
-    })).then(() => {
+    const idsArray = Array.from(new Set(Object.keys(data).map((key) => key.split('_')[0])));
+    return Promise.all(
+      lessonsQuestions
+        .filter((question) => idsArray.includes(question.lessonsquestion_id)) // Filter questions
+        .map((question) => {
+          const answerData = {
+            lessons_answer_score: data[`${question.lessonsquestion_id}_score`],
+            lessons_answer_positive: data[`${question.lessonsquestion_id}_positive`],
+            lessons_answer_negative: data[`${question.lessonsquestion_id}_negative`],
+          };
+          return onAddLessonsAnswers(question.lessons_question_category, question.lessonsquestion_id, answerData);
+        }),
+    ).then(() => {
       setOpenValidate(false);
       onFetchPlayerLessonsAnswers();
     });
@@ -75,10 +69,11 @@ const LessonsPlayer = (props) => {
   const sortCategories = R.sortWith([R.ascend(R.prop('lessons_category_order'))]);
   const sortQuestions = R.sortWith([R.ascend(R.prop('lessons_question_order'))]);
   const sortedCategories = sortCategories(R.filter((n) => n.lessons_category_users.includes(source.finalUserId), lessonsCategories));
+
   const initialValues = R.pipe(R.map((n) => ({
-    [`${n.lessons_answer_question}_score`]: n.lessons_answer_score,
-    [`${n.lessons_answer_question}_positive`]: n.lessons_answer_positive,
-    [`${n.lessons_answer_question}_negative`]: n.lessons_answer_negative,
+    [`${n.lessons_answer_question}_score`]: n.lessons_answer_score || 0,
+    [`${n.lessons_answer_question}_positive`]: n.lessons_answer_positive || 0,
+    [`${n.lessons_answer_question}_negative`]: n.lessons_answer_negative || 0,
   })), R.mergeAll)(lessonsAnswers);
   if (source) {
     return (<div className={classes.root}>
@@ -127,140 +122,142 @@ const LessonsPlayer = (props) => {
         </div>)}
       </div>
       <Form
-        keepDirtyOnReinitialize={true}
+        keepDirtyOnReinitialize
         initialValues={initialValues}
         onSubmit={submitForm}
-        validate={validate}
       >
-        {({ handleSubmit, submitting, errors }) => (<form id="lessonsAnswersForm" onSubmit={handleSubmit}>
-          {sortedCategories.map((category) => {
-            const questions = sortQuestions(lessonsQuestions.filter((n) => n.lessons_question_category === category.lessonscategory_id));
-            return (<div
-              key={category.lessonscategory_id}
-              style={{ marginTop: 70 }}
+        {({ handleSubmit, submitting }) => {
+          const isUserAbsent = source.userId === 'null';
+          return (<form id="lessonsAnswersForm" onSubmit={handleSubmit}>
+            {sortedCategories.map((category) => {
+              const questions = sortQuestions(lessonsQuestions.filter((n) => n.lessons_question_category === category.lessonscategory_id));
+              return (<div
+                key={category.lessonscategory_id}
+                style={{ marginTop: 70 }}
+                      >
+                <Typography variant="h2">
+                  {category.lessons_category_name}
+                </Typography>
+                {questions.map((question) => {
+                  return (<Paper
+                    key={question.lessonsquestion_id}
+                    variant="outlined"
+                    classes={{ root: classes.paper }}
+                    style={{ marginTop: 14 }}
+                          >
+                    <Grid
+                      container
+                      spacing={3}
+                      style={{ marginTop: -10 }}
                     >
-              <Typography variant="h2">
-                {category.lessons_category_name}
-              </Typography>
-              {questions.map((question) => {
-                return (<Paper
-                  key={question.lessonsquestion_id}
-                  variant="outlined"
-                  classes={{ root: classes.paper }}
-                  style={{ marginTop: 14 }}
+                      <Grid item xs={3}>
+                        <Typography
+                          variant="h4"
+                          style={{ marginBottom: 15 }}
                         >
-                  <Grid
-                    container={true}
-                    spacing={3}
-                    style={{ marginTop: -10 }}
-                  >
-                    <Grid item={true} xs={3}>
-                      <Typography
-                        variant="h4"
-                        style={{ marginBottom: 15 }}
-                      >
-                        {t('Question')}
-                      </Typography>
-                      <Typography variant="body1">
-                        <strong>
-                          {question.lessons_question_content}
-                        </strong>
-                      </Typography>
-                      <Typography variant="body2">
-                        {question.lessons_question_explanation || t('No explanation')}
-                      </Typography>
+                          {t('Question')}
+                        </Typography>
+                        <Typography variant="body1">
+                          <strong>
+                            {question.lessons_question_content}
+                          </strong>
+                        </Typography>
+                        <Typography variant="body2">
+                          {question.lessons_question_explanation || t('No explanation')}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={3}>
+                        <Typography
+                          variant="h4"
+                          style={{ marginBottom: 15 }}
+                        >
+                          {t('Global evaluation')}
+                        </Typography>
+                        <Typography variant="body1">
+                          {t('Your overall evaluation about this question.')}
+                        </Typography>
+                        <SliderField
+                          disabled={lessonsAnswers.length > 0}
+                          name={`${question.lessonsquestion_id}_score`}
+                          step={10}
+                          min={0}
+                          max={100}
+                          defaultValue={0}
+                        />
+                      </Grid>
+                      <Grid item xs={3}>
+                        <Typography variant="h4">
+                          {t('What worked well')}
+                        </Typography>
+                        <OldTextField
+                          disabled={lessonsAnswers.length > 0}
+                          style={{ marginTop: 10 }}
+                          name={`${question.lessonsquestion_id}_positive`}
+                          label={t('Comment (optional)')}
+                          multiline
+                          rows={2}
+                          fullWidth
+                        />
+                      </Grid>
+                      <Grid item xs={3}>
+                        <Typography variant="h4">
+                          {t("What didn't work well")}
+                        </Typography>
+                        <OldTextField
+                          disabled={lessonsAnswers.length > 0}
+                          style={{ marginTop: 10 }}
+                          name={`${question.lessonsquestion_id}_negative`}
+                          label={t('Comment (optional)')}
+                          multiline
+                          fullWidth
+                          rows={2}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item={true} xs={3}>
-                      <Typography
-                        variant="h4"
-                        style={{ marginBottom: 15 }}
-                      >
-                        {t('Global evaluation')}
-                      </Typography>
-                      <Typography variant="body1">
-                        {t('Your overall evaluation about this question.')}
-                      </Typography>
-                      <SliderField
-                        disabled={lessonsAnswers.length > 0}
-                        name={`${question.lessonsquestion_id}_score`}
-                        step={10}
-                        min={0}
-                        max={100}
-                        defaultValue={0}
-                      />
-                    </Grid>
-                    <Grid item={true} xs={3}>
-                      <Typography variant="h4">
-                        {t('What worked well')}
-                      </Typography>
-                      <OldTextField
-                        disabled={lessonsAnswers.length > 0}
-                        style={{ marginTop: 10 }}
-                        name={`${question.lessonsquestion_id}_positive`}
-                        label={t('Comment (optional)')}
-                        multiline={true}
-                        rows={2}
-                        fullWidth={true}
-                      />
-                    </Grid>
-                    <Grid item={true} xs={3}>
-                      <Typography variant="h4">
-                        {t("What didn't work well")}
-                      </Typography>
-                      <OldTextField
-                        disabled={lessonsAnswers.length > 0}
-                        style={{ marginTop: 10 }}
-                        name={`${question.lessonsquestion_id}_negative`}
-                        label={t('Comment (optional)')}
-                        multiline={true}
-                        fullWidth={true}
-                        rows={2}
-                      />
-                    </Grid>
-                  </Grid>
-                </Paper>);
-              })}
-            </div>);
-          })}
-          <div style={{ margin: '50px auto', textAlign: 'center' }}>
-            <Button
-              color="secondary"
-              variant="contained"
-              onClick={() => setOpenValidate(true)}
-              disabled={lessonsAnswers.length > 0 || submitting || Object.keys(errors).length > 0}
-              size="large"
-            >
-              {t('Submit')}
-            </Button>
-          </div>
-          <Dialog
-            open={openValidate}
-            TransitionComponent={Transition}
-            onClose={() => setOpenValidate(false)}
-            PaperProps={{ elevation: 1 }}
-          >
-            <DialogContent>
-              <DialogContentText>
-                {t('Do you want to submit your answers? You will not be able to change them later.')}
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                onClick={() => setOpenValidate(false)}
-                disabled={submitting}
-              >
-                {t('Cancel')}
-              </Button>
+                  </Paper>);
+                })}
+              </div>);
+            })}
+            {sortedCategories.length > 0 && (<div style={{ margin: '50px auto', textAlign: 'center' }}>
               <Button
                 color="secondary"
-                onClick={handleSubmit}
-                disabled={submitting || Object.keys(errors).length > 0}
+                variant="contained"
+                onClick={() => setOpenValidate(true)}
+                disabled={lessonsAnswers.length > 0 || submitting || isUserAbsent}
+                size="large"
               >
                 {t('Submit')}
               </Button>
-            </DialogActions>
-          </Dialog>
-        </form>)}
+            </div>)}
+            <Dialog
+              open={openValidate}
+              TransitionComponent={Transition}
+              onClose={() => setOpenValidate(false)}
+              PaperProps={{ elevation: 1 }}
+            >
+              <DialogContent>
+                <DialogContentText>
+                  {t('Do you want to submit your answers? You will not be able to change them later.')}
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  onClick={() => setOpenValidate(false)}
+                  disabled={submitting}
+                >
+                  {t('Cancel')}
+                </Button>
+                <Button
+                  color="secondary"
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                >
+                  {t('Submit')}
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </form>);
+        }}
       </Form>
     </div>);
   }

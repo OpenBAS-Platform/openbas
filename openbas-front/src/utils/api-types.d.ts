@@ -1628,7 +1628,6 @@ export interface LessonsAnswer {
   lessons_answer_negative?: string;
   lessons_answer_positive?: string;
   lessons_answer_question: LessonsQuestion;
-  lessons_answer_scenario?: string;
   /** @format int32 */
   lessons_answer_score: number;
   /** @format date-time */
@@ -2544,6 +2543,12 @@ export interface PublicExercise {
   exercise_description?: string;
   exercise_id?: string;
   exercise_name?: string;
+}
+
+export interface PublicScenario {
+  scenario_description?: string;
+  scenario_id?: string;
+  scenario_name?: string;
 }
 
 export interface RawAttackPattern {

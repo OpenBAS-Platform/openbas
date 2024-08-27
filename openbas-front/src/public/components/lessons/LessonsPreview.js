@@ -75,7 +75,7 @@ const LessonsPreview = (props) => {
             color="secondary"
             variant="outlined"
             component={Link}
-            to={`/lessons/${source.type}/${source.id}?user=${source.userId}&preview=false`}
+            to={`/lessons/${source.type}/${source.id}?user=${source.finalUserId}&preview=false`}
             style={{ position: 'absolute', top: 20, right: 20 }}
           >
             {t('Switch to player mode')}
@@ -124,7 +124,7 @@ const LessonsPreview = (props) => {
           )}
         </div>
         <Form
-          keepDirtyOnReinitialize={true}
+          keepDirtyOnReinitialize
           initialValues={initialValues}
           onSubmit={submitForm}
           validate={validate}
@@ -154,11 +154,11 @@ const LessonsPreview = (props) => {
                           style={{ marginTop: 14 }}
                         >
                           <Grid
-                            container={true}
+                            container
                             spacing={3}
                             style={{ marginTop: -10 }}
                           >
-                            <Grid item={true} xs={3}>
+                            <Grid item xs={3}>
                               <Typography
                                 variant="h4"
                                 style={{ marginBottom: 15 }}
@@ -175,7 +175,7 @@ const LessonsPreview = (props) => {
                                   || t('No explanation')}
                               </Typography>
                             </Grid>
-                            <Grid item={true} xs={3}>
+                            <Grid item xs={3}>
                               <Typography
                                 variant="h4"
                                 style={{ marginBottom: 15 }}
@@ -195,7 +195,7 @@ const LessonsPreview = (props) => {
                                 defaultValue={0}
                               />
                             </Grid>
-                            <Grid item={true} xs={3}>
+                            <Grid item xs={3}>
                               <Typography variant="h4">
                                 {t('What worked well')}
                               </Typography>
@@ -203,12 +203,12 @@ const LessonsPreview = (props) => {
                                 style={{ marginTop: 10 }}
                                 name={`${question.lessonsquestion_id}_positive`}
                                 label={t('Comment (optional)')}
-                                multiline={true}
+                                multiline
                                 rows={2}
-                                fullWidth={true}
+                                fullWidth
                               />
                             </Grid>
-                            <Grid item={true} xs={3}>
+                            <Grid item xs={3}>
                               <Typography variant="h4">
                                 {t("What didn't work well")}
                               </Typography>
@@ -216,8 +216,8 @@ const LessonsPreview = (props) => {
                                 style={{ marginTop: 10 }}
                                 name={`${question.lessonsquestion_id}_negative`}
                                 label={t('Comment (optional)')}
-                                multiline={true}
-                                fullWidth={true}
+                                multiline
+                                fullWidth
                                 rows={2}
                               />
                             </Grid>
@@ -229,7 +229,7 @@ const LessonsPreview = (props) => {
                 );
               })}
               <div style={{ margin: '50px auto', textAlign: 'center' }}>
-                <Button color="secondary" variant="contained" disabled={true}>
+                <Button color="secondary" variant="contained" disabled>
                   {t('Submit')}
                 </Button>
               </div>

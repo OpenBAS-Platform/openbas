@@ -28,7 +28,6 @@ const ExerciseViewLessons = () => {
   const [preview] = useQueryParameter(['preview']);
   const [userId] = useQueryParameter(['user']);
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
-
   const isPreview = preview === 'true';
 
   const processToGenericSource = (exercise: ExerciseStore | undefined) => {
