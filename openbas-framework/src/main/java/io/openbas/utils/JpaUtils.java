@@ -24,7 +24,7 @@ public class JpaUtils {
           .get(Optional.ofNullable(propertySchema.getPropertyRepresentative()).orElse("id"));
     }
     // Search on child
-    else if (propertySchema.isFilterable() && hasText(propertySchema.getPropertyRepresentative())) {
+    else if (hasText(propertySchema.getPropertyRepresentative())) {
       return root.get(propertySchema.getName()).get(propertySchema.getPropertyRepresentative());
       // Direct property
     } else {

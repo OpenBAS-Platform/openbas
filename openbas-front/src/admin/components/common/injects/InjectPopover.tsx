@@ -21,12 +21,14 @@ import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import type { InjectStore } from '../../../../actions/injects/Inject';
 import { InjectContext, PermissionsContext } from '../Context';
-import type { Inject, InjectStatus, InjectStatusExecution } from '../../../../utils/api-types';
-import { duplicateInjectForExercise, duplicateInjectForScenario, tryInject, testInject } from '../../../../actions/Inject';
+import type { Inject, InjectStatus, InjectStatusExecution, InjectTestStatus } from '../../../../utils/api-types';
+import { duplicateInjectForExercise, duplicateInjectForScenario, tryInject } from '../../../../actions/Inject';
+import { testInject } from '../../../../actions/injects/inject-action';
 import { useAppDispatch } from '../../../../utils/hooks';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import { useHelper } from '../../../../store';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
+import DialogTest from '../../../../components/common/DialogTest';
 
 interface Props {
   inject: InjectStore;
@@ -64,7 +66,7 @@ const InjectPopover: FunctionComponent<Props> = ({
   const [openResult, setOpenResult] = useState(false);
   const [openTrigger, setOpenTrigger] = useState(false);
   const [injectResult, setInjectResult] = useState<InjectStatus | null>(null);
-  const [_injectTestResult, setInjectTestResult] = useState<InjectStatus | null>(null);
+  const [_injectTestResult, setInjectTestResult] = useState<InjectTestStatus | null>(null);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const isExercise = useHelper((helper: ExercisesHelper) => helper.getExercisesMap()[exerciseOrScenarioId!] !== undefined);
@@ -157,7 +159,7 @@ const InjectPopover: FunctionComponent<Props> = ({
   }, [openDialog]);
 
   const submitTest = () => {
-    testInject(inject.inject_id).then((result: { data: InjectStatus }) => {
+    testInject(inject.inject_id).then((result: { data: InjectTestStatus }) => {
       setInjectTestResult(result.data);
       setOpenDialog(true);
       if (isExercise) {
@@ -397,26 +399,12 @@ const InjectPopover: FunctionComponent<Props> = ({
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog
-        TransitionComponent={Transition}
+      <DialogTest
         open={openTest}
-        onClose={handleCloseTest}
-        PaperProps={{ elevation: 1 }}
-      >
-        <DialogContent>
-          <DialogContentText>
-            <p>{`${t('Do you want to test this inject:')} ${inject.inject_title} ?`}</p>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseTest}>
-            {t('Cancel')}
-          </Button>
-          <Button color="secondary" onClick={submitTest}>
-            {t('Test')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        handleClose={handleCloseTest}
+        handleSubmit={submitTest}
+        text={`${t('Do you want to test this inject:')} ${inject.inject_title} ?`}
+      />
       <Dialog
         TransitionComponent={Transition}
         open={openEnable}

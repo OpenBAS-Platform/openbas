@@ -31,9 +31,13 @@ const buildError = (data) => {
 };
 
 export const simpleCall = (uri, params) => api().get(buildUri(uri), { params });
-export const simplePostCall = (uri, data) => api().post(buildUri(uri), data)
+export const simplePostCall = (uri, data, errorMessage) => api().post(buildUri(uri), data)
   .catch((error) => {
-    MESSAGING$.notifyError(error.message);
+    if (error.message) {
+      MESSAGING$.notifyError(error.message);
+    } else if (errorMessage) {
+      MESSAGING$.notifyError(errorMessage);
+    }
     throw error;
   });
 export const simplePutCall = (uri, data) => api().put(buildUri(uri), data)

@@ -1,7 +1,18 @@
 import { Dispatch } from 'redux';
-import { getReferential } from '../../utils/Action';
+import { getReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import type { Exercise, Scenario } from '../../utils/api-types';
 import * as schema from '../Schema';
+
+export const testInject = (injectId: string) => {
+  const uri = `/api/injects/${injectId}/test`;
+  return simpleCall(uri);
+};
+
+export const bulkTestInjects = (injectIds: string[]) => {
+  const data = injectIds;
+  const uri = '/api/injects/bulk/test';
+  return simplePostCall(uri, data, 'The inject does not have any team defined');
+};
 
 // -- EXERCISES --
 

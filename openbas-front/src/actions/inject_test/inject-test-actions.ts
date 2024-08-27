@@ -1,14 +1,15 @@
-import { simpleCall } from '../../utils/Action';
+import { simpleCall, simplePostCall } from '../../utils/Action';
+import type { SearchPaginationInput } from '../../utils/api-types';
 
 // eslint-disable-next-line import/prefer-default-export
-export const searchExerciseInjectTests = (exerciseId: string) => {
+export const searchExerciseInjectTests = (exerciseId: string, searchPaginationInput: SearchPaginationInput) => {
   const uri = `/api/exercise/${exerciseId}/injects/test`;
-  return simpleCall(uri);
+  return simplePostCall(uri, searchPaginationInput);
 };
 
-export const searchScenarioInjectTests = (scenarioId: string) => {
+export const searchScenarioInjectTests = (scenarioId: string, searchPaginationInput: SearchPaginationInput) => {
   const uri = `/api/scenario/${scenarioId}/injects/test`;
-  return simpleCall(uri);
+  return simplePostCall(uri, searchPaginationInput);
 };
 
 export const fetchInjectTestStatus = (testId: string | undefined) => {

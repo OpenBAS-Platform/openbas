@@ -6,9 +6,7 @@ import io.openbas.service.InjectTestStatusService;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,16 +22,11 @@ public class InjectTestStatusApi extends RestBehavior {
     return injectTestStatusService.testInject(injectId);
   }
 
-  @GetMapping("/api/exercise/{exerciseId}/injects/test")
-  public List<InjectTestStatus> findAllExerciseInjectTests(@PathVariable @NotBlank String exerciseId) {
-    return injectTestStatusService.findAllInjectTestsByExerciseId(exerciseId);
+  @PostMapping("/api/injects/bulk/test")
+  public List<InjectTestStatus> bulkTestInjects(@RequestBody List<String> injectIds) {
+    return injectTestStatusService.bulkTestInjects(injectIds);
   }
-
-  @GetMapping("/api/scenario/{scenarioId}/injects/test")
-  public List<InjectTestStatus> findAllScenarioInjectTests(@PathVariable @NotBlank String scenarioId) {
-    return injectTestStatusService.findAllInjectTestsByScenarioId(scenarioId);
-  }
-
+  
   @GetMapping("/api/injects/test/{testId}")
   public InjectTestStatus findInjectTestStatus(@PathVariable @NotBlank String testId) {
     return injectTestStatusService.findInjectTestStatusById(testId);

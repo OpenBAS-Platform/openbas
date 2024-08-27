@@ -3,7 +3,17 @@ import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { withStyles, withTheme } from '@mui/styles';
 import { Autocomplete, Button, Drawer, FormControl, Grid, IconButton, InputLabel, MenuItem, Select, Slide, TextField, Toolbar, Tooltip, Typography } from '@mui/material';
-import { AddOutlined, BrushOutlined, CancelOutlined, ClearOutlined, CloseOutlined, DeleteOutlined, DevicesOtherOutlined, GroupsOutlined } from '@mui/icons-material';
+import {
+  AddOutlined,
+  BrushOutlined,
+  CancelOutlined,
+  ClearOutlined,
+  CloseOutlined,
+  DeleteOutlined,
+  DevicesOtherOutlined,
+  ForwardToInbox,
+  GroupsOutlined,
+} from '@mui/icons-material';
 import { SelectGroup } from 'mdi-material-ui';
 import { connect } from 'react-redux';
 import inject18n from '../../../components/i18n';
@@ -13,6 +23,7 @@ import { fetchEndpoints } from '../../../actions/assets/endpoint-actions';
 import { storeHelper } from '../../../actions/Schema';
 import { fetchTeams } from '../../../actions/teams/team-actions';
 import DialogDelete from '../../../components/common/DialogDelete';
+import DialogTest from '../../../components/common/DialogTest';
 
 const styles = (theme) => ({
   bottomNav: {
@@ -145,6 +156,7 @@ class ToolBar extends Component {
     this.state = {
       displayUpdate: false,
       displayBulkDelete: false,
+      displayBulkTest: false,
       actions: [],
       actionsInputs: [{}],
       navOpen: localStorage.getItem('navOpen') === 'true',
@@ -171,6 +183,20 @@ class ToolBar extends Component {
   handleCloseUpdate() {
     this.setState({ displayUpdate: false, actionsInputs: [{}] });
   }
+
+  handleOpenBulkTest() {
+    this.setState({ displayBulkTest: true });
+  }
+
+  handleCloseBulkTest() {
+    this.setState({ displayBulkTest: false, actionsInputs: [{}] });
+  }
+
+  handleSubmitBulkTest = () => {
+    this.handleCloseBulkTest();
+    this.props.handleClearSelectedElements();
+    this.props.handleBulkTest(this.state.actionsInputs);
+  };
 
   handleAddStep() {
     this.setState({ actionsInputs: R.append({}, this.state.actionsInputs) });
@@ -485,6 +511,11 @@ class ToolBar extends Component {
         ? t('Do you want to delete this inject?')
         : t('Do you want to delete these {count} injects?', { count: numberOfSelectedElements });
     };
+    const testConfirmationText = () => {
+      return numberOfSelectedElements === 1
+        ? t('Do you want to test this inject?')
+        : t('Do you want to test these {count} injects?', { count: numberOfSelectedElements });
+    };
     return (
       <>
         <Drawer
@@ -517,13 +548,13 @@ class ToolBar extends Component {
               <IconButton
                 aria-label="clear"
                 disabled={
-                      numberOfSelectedElements === 0 || this.state.processing
-                    }
+                  numberOfSelectedElements === 0 || this.state.processing
+                }
                 onClick={handleClearSelectedElements.bind(this)}
                 size="small"
                 color="primary"
               >
-                <ClearOutlined fontSize="small"/>
+                <ClearOutlined fontSize="small" />
               </IconButton>
             </Typography>
             <Tooltip title={t('Update')}>
@@ -531,14 +562,30 @@ class ToolBar extends Component {
                 <IconButton
                   aria-label="update"
                   disabled={
-                          numberOfSelectedElements === 0
-                          || this.state.processing
-                        }
+                    numberOfSelectedElements === 0
+                    || this.state.processing
+                  }
                   onClick={this.handleOpenUpdate.bind(this)}
                   color="primary"
                   size="small"
                 >
-                  <BrushOutlined fontSize="small"/>
+                  <BrushOutlined fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title={t('Test')}>
+              <span>
+                <IconButton
+                  aria-label="test"
+                  disabled={
+                    numberOfSelectedElements === 0
+                    || this.state.processing
+                  }
+                  onClick={this.handleOpenBulkTest.bind(this)}
+                  color="primary"
+                  size="small"
+                >
+                  <ForwardToInbox fontSize="small" />
                 </IconButton>
               </span>
             </Tooltip>
@@ -547,14 +594,14 @@ class ToolBar extends Component {
                 <IconButton
                   aria-label="delete"
                   disabled={
-                          numberOfSelectedElements === 0
-                          || this.state.processing
-                        }
+                    numberOfSelectedElements === 0
+                    || this.state.processing
+                  }
                   onClick={this.handleOpenBulkDelete.bind(this)}
                   color="primary"
                   size="small"
                 >
-                  <DeleteOutlined fontSize="small"/>
+                  <DeleteOutlined fontSize="small" />
                 </IconButton>
               </span>
             </Tooltip>
@@ -575,7 +622,7 @@ class ToolBar extends Component {
                 size="large"
                 color="primary"
               >
-                <CloseOutlined fontSize="small" color="primary"/>
+                <CloseOutlined fontSize="small" color="primary" />
               </IconButton>
               <Typography variant="h6">{t('Update objects')}</Typography>
             </div>
@@ -591,7 +638,7 @@ class ToolBar extends Component {
                       onClick={this.handleRemoveStep.bind(this, i)}
                       size="small"
                     >
-                      <CancelOutlined fontSize="small"/>
+                      <CancelOutlined fontSize="small" />
                     </IconButton>
                     <Grid container={true} spacing={3}>
                       <Grid item={true} xs={3}>
@@ -635,7 +682,7 @@ class ToolBar extends Component {
                   onClick={this.handleAddStep.bind(this)}
                   classes={{ root: classes.buttonAdd }}
                 >
-                  <AddOutlined fontSize="small"/>
+                  <AddOutlined fontSize="small" />
                 </Button>
               </div>
               <div className={classes.buttons}>
@@ -657,6 +704,13 @@ class ToolBar extends Component {
           handleClose={this.handleCloseBulkDelete.bind(this)}
           handleSubmit={this.handleSubmitBulkDelete.bind(this)}
           text={confirmationText()}
+        />
+        <DialogTest
+          open={this.state.displayBulkTest}
+          handleClose={this.handleCloseBulkTest.bind(this)}
+          handleSubmit={this.handleSubmitBulkTest.bind(this)}
+          text={testConfirmationText()}
+          alertText={t('Only SMS and emails related injects with teams defined will be tested')}
         />
       </>
     );

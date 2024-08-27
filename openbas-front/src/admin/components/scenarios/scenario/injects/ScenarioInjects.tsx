@@ -1,6 +1,7 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import * as R from 'ramda';
+import { Alert, Dialog, Link, SnackbarCloseReason } from '@mui/material';
 import { ArticleContext, TeamContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
@@ -12,7 +13,7 @@ import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
-import type { Inject, Scenario } from '../../../../../utils/api-types';
+import type { Inject, InjectStatus, Scenario } from '../../../../../utils/api-types';
 import Injects from '../../../common/injects/Injects';
 import { articleContextForScenario } from '../articles/ScenarioArticles';
 import { teamContextForScenario } from '../teams/ScenarioTeams';
@@ -20,7 +21,8 @@ import useEntityToggle from '../../../../../utils/hooks/useEntityToggle';
 import ToolBar from '../../../common/ToolBar';
 import { isNotEmptyField } from '../../../../../utils/utils';
 import injectContextForScenario from '../ScenarioContext';
-import { fetchScenarioInjectsSimple } from '../../../../../actions/injects/inject-action';
+import { fetchScenarioInjectsSimple, bulkTestInjects } from '../../../../../actions/injects/inject-action';
+import { useFormatter } from '../../../../../components/i18n';
 
 interface Props {
 
@@ -28,6 +30,7 @@ interface Props {
 
 const ScenarioInjects: FunctionComponent<Props> = () => {
   // Standard hooks
+  const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
 
@@ -170,40 +173,102 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
     injectContext.onBulkDeleteInjects(injectsToProcess.map((inject: Inject) => inject.inject_id));
   };
 
+  const [openDialog, setOpenDialog] = React.useState<boolean>(false);
+  const handleCloseDialog = (
+    event?: React.SyntheticEvent | Event,
+    reason?: SnackbarCloseReason,
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenDialog(false);
+  };
+  const [detailsLink, setDetailsLink] = React.useState<string>('');
+
+  useEffect(() => {
+    if (openDialog) {
+      setTimeout(() => {
+        handleCloseDialog();
+        setDetailsLink('');
+      }, 6000);
+    }
+  }, [openDialog]);
+
+  const massTestInjects = () => {
+    bulkTestInjects(injectsToProcess.map((inject: Inject) => inject.inject_id)).then((result: { data: InjectStatus[] }) => {
+      if (numberOfSelectedElements === 1) {
+        setDetailsLink(`/admin/scenarios/${scenario.scenario_id}/tests/${result.data[0].status_id}`);
+        setOpenDialog(true);
+      } else {
+        setDetailsLink(`/admin/scenarios/${scenario.scenario_id}/tests`);
+        setOpenDialog(true);
+      }
+    });
+  };
+
   return (
-    <ArticleContext.Provider value={articleContext}>
-      <TeamContext.Provider value={teamContext}>
-        <Injects
-          isExercise={false}
-          exerciseOrScenarioId={scenarioId}
-          injects={injects}
-          teams={teams}
-          articles={articles}
-          variables={variables}
-          uriVariable={`/admin/scenarios/${scenarioId}/definition/variables`}
-          allUsersNumber={scenario.scenario_all_users_number}
-          usersNumber={scenario.scenario_users_number}
-          teamsUsers={scenario.scenario_teams_users}
-          onToggleEntity={onToggleEntity}
-          onToggleShiftEntity={onRowShiftClick}
-          handleToggleSelectAll={handleToggleSelectAll}
-          selectedElements={selectedElements}
-          deSelectedElements={deSelectedElements}
-          selectAll={selectAll}
-        />
-        <ToolBar
-          numberOfSelectedElements={numberOfSelectedElements}
-          selectedElements={selectedElements}
-          deSelectedElements={deSelectedElements}
-          selectAll={selectAll}
-          handleClearSelectedElements={handleClearSelectedElements}
-          context="scenario"
-          id={scenario.scenario_id}
-          handleUpdate={massUpdateInjects}
-          handleBulkDelete={bulkDeleteInjects}
-        />
-      </TeamContext.Provider>
-    </ArticleContext.Provider>
+    <>
+      <Dialog open={openDialog}
+        slotProps={{
+          backdrop: {
+            sx: {
+              backgroundColor: 'transparent',
+            },
+          },
+        }}
+        PaperProps={{
+          sx: {
+            position: 'fixed',
+            top: '20px',
+            left: '660px',
+            margin: 0,
+          },
+        }}
+      >
+        <Alert
+          onClose={handleCloseDialog}
+          severity="success"
+          sx={{ width: '100%' }}
+        >
+          {t('Inject test has been sent, you can view test logs details on ')} <Link href={detailsLink} underline="hover">{t('its dedicated page.')}</Link>
+        </Alert>
+      </Dialog>
+      <ArticleContext.Provider value={articleContext}>
+        <TeamContext.Provider value={teamContext}>
+          <Injects
+            isExercise={false}
+            exerciseOrScenarioId={scenarioId}
+            injects={injects}
+            teams={teams}
+            articles={articles}
+            variables={variables}
+            uriVariable={`/admin/scenarios/${scenarioId}/definition/variables`}
+            allUsersNumber={scenario.scenario_all_users_number}
+            usersNumber={scenario.scenario_users_number}
+            teamsUsers={scenario.scenario_teams_users}
+            onToggleEntity={onToggleEntity}
+            onToggleShiftEntity={onRowShiftClick}
+            handleToggleSelectAll={handleToggleSelectAll}
+            selectedElements={selectedElements}
+            deSelectedElements={deSelectedElements}
+            selectAll={selectAll}
+          />
+          <ToolBar
+            numberOfSelectedElements={numberOfSelectedElements}
+            selectedElements={selectedElements}
+            deSelectedElements={deSelectedElements}
+            selectAll={selectAll}
+            handleClearSelectedElements={handleClearSelectedElements}
+            context="scenario"
+            id={scenario.scenario_id}
+            handleUpdate={massUpdateInjects}
+            handleBulkDelete={bulkDeleteInjects}
+            handleBulkTest={massTestInjects}
+          />
+        </TeamContext.Provider>
+      </ArticleContext.Provider>
+    </>
+
   );
 };
 

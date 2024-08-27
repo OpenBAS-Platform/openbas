@@ -59,6 +59,8 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
   let tabValue = location.pathname;
   if (location.pathname.includes(`/admin/scenarios/${scenario.scenario_id}/definition`)) {
     tabValue = `/admin/scenarios/${scenario.scenario_id}/definition`;
+  } else if (location.pathname.includes(`/admin/scenarios/${scenario.scenario_id}/tests`)) {
+    tabValue = `/admin/scenarios/${scenario.scenario_id}/tests`;
   }
   const [openScenarioRecurringFormDialog, setOpenScenarioRecurringFormDialog] = useState<boolean>(false);
   const [selectRecurring, setSelectRecurring] = useState('noRepeat');
