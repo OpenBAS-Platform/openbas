@@ -201,7 +201,8 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
         setDetailsLink(`/admin/scenarios/${scenario.scenario_id}/tests/${result.data[0].status_id}`);
         setOpenDialog(true);
       } else {
-        navigate(`/admin/scenarios/${scenario.scenario_id}/tests`);
+        setDetailsLink(`/admin/scenarios/${scenario.scenario_id}/tests`);
+        setOpenDialog(true);
       }
     });
   };

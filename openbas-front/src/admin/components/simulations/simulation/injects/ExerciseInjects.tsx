@@ -229,7 +229,8 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
         setDetailsLink(`/admin/exercises/${exercise.exercise_id}/tests/${result.data[0].status_id}`);
         setOpenDialog(true);
       } else {
-        navigate(`/admin/exercises/${exercise.exercise_id}/tests`);
+        setDetailsLink(`/admin/exercises/${exercise.exercise_id}/tests`);
+        setOpenDialog(true);
       }
     });
   };
