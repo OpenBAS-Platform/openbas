@@ -7,6 +7,7 @@ import io.openbas.helper.MonoIdDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -15,6 +16,7 @@ import java.util.Objects;
 
 import static java.time.Instant.now;
 
+@Getter
 @Setter
 @Entity
 @Table(name = "lessons_answers")
@@ -65,39 +67,6 @@ public class LessonsAnswer implements Base {
     @NotNull
     private Integer score;
 
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    public LessonsQuestion getQuestion() {
-        return question;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public Instant getCreated() {
-        return created;
-    }
-
-    public Instant getUpdated() {
-        return updated;
-    }
-
-    public String getPositive() {
-        return positive;
-    }
-
-    public String getNegative() {
-        return negative;
-    }
-
-    public Integer getScore() {
-        return score;
-    }
-
     // region transient
     @JsonProperty("lessons_answer_exercise")
     public String getExercise() {
@@ -122,4 +91,5 @@ public class LessonsAnswer implements Base {
     public int hashCode() {
         return Objects.hash(id);
     }
+
 }

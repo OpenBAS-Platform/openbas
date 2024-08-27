@@ -147,82 +147,82 @@ const LessonsPreview = (props) => {
                     </Typography>
                     {questions.map((question) => {
                       return (
-                            <Paper
-                                key={question.lessonsquestion_id}
-                                variant="outlined"
-                                classes={{ root: classes.paper }}
-                                style={{ marginTop: 14 }}
+                        <Paper
+                          key={question.lessonsquestion_id}
+                          variant="outlined"
+                          classes={{ root: classes.paper }}
+                          style={{ marginTop: 14 }}
+                        >
+                          <Grid
+                            container={true}
+                            spacing={3}
+                            style={{ marginTop: -10 }}
+                          >
+                            <Grid item={true} xs={3}>
+                              <Typography
+                                variant="h4"
+                                style={{ marginBottom: 15 }}
                               >
-                                <Grid
-                                    container={true}
-                                    spacing={3}
-                                    style={{ marginTop: -10 }}
-                                  >
-                                    <Grid item={true} xs={3}>
-                                        <Typography
-                                            variant="h4"
-                                            style={{ marginBottom: 15 }}
-                                          >
-                                            {t('Question')}
-                                          </Typography>
-                                        <Typography variant="body1">
-                                            <strong>
-                                                {question.lessons_question_content}
-                                              </strong>
-                                          </Typography>
-                                        <Typography variant="body2">
-                                            {question.lessons_question_explanation
+                                {t('Question')}
+                              </Typography>
+                              <Typography variant="body1">
+                                <strong>
+                                  {question.lessons_question_content}
+                                </strong>
+                              </Typography>
+                              <Typography variant="body2">
+                                {question.lessons_question_explanation
                                                                     || t('No explanation')}
-                                          </Typography>
-                                      </Grid>
-                                    <Grid item={true} xs={3}>
-                                        <Typography
-                                            variant="h4"
-                                            style={{ marginBottom: 15 }}
-                                          >
-                                            {t('Global evaluation')}
-                                          </Typography>
-                                        <Typography variant="body1">
-                                            {t(
-                                                'Your overall evaluation about this question.',
-                                              )}
-                                          </Typography>
-                                        <SliderField
-                                            name={`${question.lessonsquestion_id}_score`}
-                                            step={10}
-                                            min={0}
-                                            max={100}
-                                            defaultValue={0}
-                                          />
-                                      </Grid>
-                                    <Grid item={true} xs={3}>
-                                        <Typography variant="h4">
-                                            {t('What worked well')}
-                                          </Typography>
-                                        <OldTextField
-                                            style={{ marginTop: 10 }}
-                                            name={`${question.lessonsquestion_id}_positive`}
-                                            label={t('Comment (optional)')}
-                                            multiline={true}
-                                            rows={2}
-                                            fullWidth={true}
-                                          />
-                                      </Grid>
-                                    <Grid item={true} xs={3}>
-                                        <Typography variant="h4">
-                                            {t("What didn't work well")}
-                                          </Typography>
-                                        <OldTextField
-                                            style={{ marginTop: 10 }}
-                                            name={`${question.lessonsquestion_id}_negative`}
-                                            label={t('Comment (optional)')}
-                                            multiline={true}
-                                            fullWidth={true}
-                                            rows={2}
-                                          />
-                                      </Grid>
-                                  </Grid>
-                              </Paper>
+                              </Typography>
+                            </Grid>
+                            <Grid item={true} xs={3}>
+                              <Typography
+                                variant="h4"
+                                style={{ marginBottom: 15 }}
+                              >
+                                {t('Global evaluation')}
+                              </Typography>
+                              <Typography variant="body1">
+                                {t(
+                                  'Your overall evaluation about this question.',
+                                )}
+                              </Typography>
+                              <SliderField
+                                name={`${question.lessonsquestion_id}_score`}
+                                step={10}
+                                min={0}
+                                max={100}
+                                defaultValue={0}
+                              />
+                            </Grid>
+                            <Grid item={true} xs={3}>
+                              <Typography variant="h4">
+                                {t('What worked well')}
+                              </Typography>
+                              <OldTextField
+                                style={{ marginTop: 10 }}
+                                name={`${question.lessonsquestion_id}_positive`}
+                                label={t('Comment (optional)')}
+                                multiline={true}
+                                rows={2}
+                                fullWidth={true}
+                              />
+                            </Grid>
+                            <Grid item={true} xs={3}>
+                              <Typography variant="h4">
+                                {t("What didn't work well")}
+                              </Typography>
+                              <OldTextField
+                                style={{ marginTop: 10 }}
+                                name={`${question.lessonsquestion_id}_negative`}
+                                label={t('Comment (optional)')}
+                                multiline={true}
+                                fullWidth={true}
+                                rows={2}
+                              />
+                            </Grid>
+                          </Grid>
+                        </Paper>
                       );
                     })}
                   </div>

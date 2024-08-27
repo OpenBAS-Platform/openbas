@@ -7,14 +7,21 @@ import LessonsPlayer from './LessonsPlayer';
 import LessonsPreview from './LessonsPreview';
 import { fetchMe } from '../../../actions/Application';
 import { fetchPlayerExercise } from '../../../actions/Exercise';
-import { addLessonsAnswers, fetchPlayerLessonsAnswers, fetchPlayerLessonsCategories, fetchPlayerLessonsQuestions } from '../../../actions/exercises/exercise-action';
+import {
+  addLessonsAnswers,
+  fetchLessonsAnswers,
+  fetchLessonsCategories,
+  fetchLessonsQuestions,
+  fetchPlayerLessonsAnswers,
+  fetchPlayerLessonsCategories,
+  fetchPlayerLessonsQuestions,
+} from '../../../actions/exercises/exercise-action';
 import { ViewLessonContext, ViewLessonContextType } from '../../../admin/components/common/Context';
 import type { Exercise } from '../../../utils/api-types';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
 import type { UserHelper } from '../../../actions/helper';
 import type { ExerciseStore } from '../../../actions/exercises/Exercise';
 import { useHelper } from '../../../store';
-import { fetchLessonsAnswers, fetchLessonsCategories, fetchLessonsQuestions } from '../../../actions/scenarios/scenario-actions';
 
 const ExerciseViewLessons = () => {
   const dispatch = useAppDispatch();
