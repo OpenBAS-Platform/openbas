@@ -14,7 +14,7 @@ const useStyles = makeStyles(() => ({
   root: {
     position: 'relative',
     flexGrow: 1,
-    padding: 20,
+    padding: 60,
   },
   logo: {
     width: 100,
