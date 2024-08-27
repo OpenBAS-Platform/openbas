@@ -1,6 +1,5 @@
 import * as schema from './Schema';
-import { bulkDeleteReferential, delReferential, getReferential, postReferential, putReferential, simpleCall, simplePostCall } from '../utils/Action';
-import { MESSAGING$ } from '../utils/Environment';
+import { bulkDeleteReferential, delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
 
 // -- INJECTS --
 

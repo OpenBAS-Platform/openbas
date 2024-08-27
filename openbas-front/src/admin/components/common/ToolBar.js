@@ -6,12 +6,12 @@ import { Autocomplete, Button, Drawer, FormControl, Grid, IconButton, InputLabel
 import {
   AddOutlined,
   BrushOutlined,
-  BugReportOutlined,
   CancelOutlined,
   ClearOutlined,
   CloseOutlined,
   DeleteOutlined,
   DevicesOtherOutlined,
+  ForwardToInbox,
   GroupsOutlined,
 } from '@mui/icons-material';
 import { SelectGroup } from 'mdi-material-ui';
@@ -585,7 +585,7 @@ class ToolBar extends Component {
                   color="primary"
                   size="small"
                 >
-                  <BugReportOutlined fontSize="small" />
+                  <ForwardToInbox fontSize="small" />
                 </IconButton>
               </span>
             </Tooltip>
