@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { CSSProperties, useMemo, useState } from 'react';
 import { Chip, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { searchPayloads } from '../../../actions/Payload';
@@ -7,43 +6,46 @@ import CreatePayload from './CreatePayload';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../store';
 import PayloadPopover from './PayloadPopover';
-import { fetchKillChainPhases } from '../../../actions/KillChainPhase';
-import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
-import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../components/common/queryable/Page';
 import { useFormatter } from '../../../components/i18n';
 import Breadcrumbs from '../../../components/Breadcrumbs';
-import { fetchTags } from '../../../actions/Tag';
 import ItemTags from '../../../components/ItemTags';
-import { fetchAttackPatterns } from '../../../actions/AttackPattern';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { fetchDocuments } from '../../../actions/Document';
-import PayloadIcon from '../../../components/PayloadIcon';
 import { fetchCollectors } from '../../../actions/Collector';
 import Drawer from '../../../components/common/Drawer';
 import ItemCopy from '../../../components/ItemCopy';
 import { emptyFilled } from '../../../utils/String';
+import useQueryable from '../../../components/common/queryable/useQueryable';
+import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
+import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
+import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
+import PayloadIcon from '../../../components/PayloadIcon';
+import type { DocumentHelper } from '../../../actions/helper';
+import type { CollectorHelper } from '../../../actions/collectors/collector-helper';
+import { useAppDispatch } from '../../../utils/hooks';
+import type { PayloadStore } from '../../../actions/payloads/Payload';
+import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
-    paddingLeft: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
   item: {
-    paddingLeft: 10,
     height: 50,
   },
   bodyItems: {
     display: 'flex',
-    alignItems: 'center',
   },
   bodyItem: {
+    height: 20,
     fontSize: 13,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     paddingRight: 10,
+    boxSizing: 'content-box',
   },
   chipInList: {
     fontSize: 12,
@@ -63,9 +65,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const inlineStyles = {
+const inlineStyles: Record<string, CSSProperties> = {
   payload_type: {
-    width: '12%',
+    width: '10%',
     cursor: 'default',
   },
   payload_name: {
@@ -76,7 +78,7 @@ const inlineStyles = {
     cursor: 'default',
   },
   payload_description: {
-    width: '15%',
+    width: '10%',
   },
   payload_tags: {
     width: '20%',
@@ -95,40 +97,102 @@ const inlineStyles = {
 const Payloads = () => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useDispatch();
-  const [selectedPayload, setSelectedPayload] = useState(null);
+  const dispatch = useAppDispatch();
+
+  const [selectedPayload, setSelectedPayload] = useState<PayloadStore | null>(null);
   const { t, nsdt } = useFormatter();
-  const { documentsMap, tagsMap, attackPatternsMap, killChainPhasesMap, collectorsMap } = useHelper((helper) => ({
+  const { documentsMap, collectorsMap } = useHelper((helper: DocumentHelper & CollectorHelper) => ({
     documentsMap: helper.getDocumentsMap(),
-    attackPatternsMap: helper.getAttackPatternsMap(),
-    killChainPhasesMap: helper.getKillChainPhasesMap(),
-    tagsMap: helper.getTagsMap(),
     collectorsMap: helper.getCollectorsMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchDocuments());
-    dispatch(fetchTags());
-    dispatch(fetchAttackPatterns());
-    dispatch(fetchKillChainPhases());
     dispatch(fetchCollectors());
   });
 
   // Headers
-  const headers = [
-    { field: 'payload_type', label: 'Type', isSortable: false },
-    { field: 'payload_name', label: 'Name', isSortable: true },
-    { field: 'payload_platforms', label: 'Platforms', isSortable: true },
-    { field: 'payload_description', label: 'Description', isSortable: true },
-    { field: 'payload_tags', label: 'Tags', isSortable: true },
-    { field: 'payload_source', label: 'Source', isSortable: true },
-    { field: 'payload_status', label: 'Status', isSortable: true },
-    { field: 'payload_updated_at', label: 'Updated', isSortable: true },
-  ];
+  const headers = useMemo(() => [
+    {
+      field: 'payload_type',
+      label: 'Type',
+      isSortable: false,
+      value: (payload: PayloadStore) => <Chip
+        variant="outlined"
+        classes={{ root: classes.chipInList }}
+        color="primary"
+        label={t(payload.payload_type)}
+                                        />,
+    },
+    {
+      field: 'payload_name',
+      label: 'Name',
+      isSortable: true,
+      value: (payload: PayloadStore) => payload.payload_name,
+    },
+    {
+      field: 'payload_platforms',
+      label: 'Platforms',
+      isSortable: true,
+      value: (payload: PayloadStore) => payload.payload_platforms?.map(
+        (platform) => <PlatformIcon key={platform} platform={platform} tooltip={true} width={20} marginRight={10} />,
+      ),
+    },
+    {
+      field: 'payload_description',
+      label: 'Description',
+      isSortable: true,
+      value: (payload: PayloadStore) => payload.payload_description,
+    },
+    {
+      field: 'payload_tags',
+      label: 'Tags',
+      isSortable: true,
+      value: (payload: PayloadStore) => <ItemTags
+        variant="reduced-view"
+        tags={payload.payload_tags}
+                                        />,
+    },
+    {
+      field: 'payload_source',
+      label: 'Source',
+      isSortable: true,
+      value: (payload: PayloadStore) => <Chip
+        variant="outlined"
+        classes={{ root: classes.chipInList2 }}
+        color="primary"
+        label={t(payload.payload_source ?? 'MANUAL')}
+                                        />,
+    },
+    {
+      field: 'payload_status',
+      label: 'Status',
+      isSortable: true,
+      value: (payload: PayloadStore) => <Chip
+        variant="outlined"
+        classes={{ root: classes.chipInList2 }}
+        color={payload.payload_status === 'VERIFIED' ? 'success' : 'warning'}
+        label={t(payload.payload_status ?? 'UNVERIFIED')}
+                                        />,
+    },
+    {
+      field: 'payload_updated_at',
+      label: 'Updated',
+      isSortable: true,
+      value: (payload: PayloadStore) => nsdt(payload.payload_updated_at),
+    },
+  ], []);
 
-  const [payloads, setPayloads] = useState([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState({
+  const [payloads, setPayloads] = useState<PayloadStore[]>([]);
+  const { queryableHelpers, searchPaginationInput } = useQueryable('payloads', buildSearchPagination({
     sorts: initSorting('payload_name'),
-  });
+    filterGroup: {
+      mode: 'and',
+      filters: [
+        buildEmptyFilter('payload_attack_patterns', 'contains'),
+        buildEmptyFilter('payload_platforms', 'contains'),
+      ],
+    },
+  }));
 
   // Export
   const exportProps = {
@@ -149,10 +213,15 @@ const Payloads = () => {
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Components') }, { label: t('Payloads'), current: true }]} />
-      <PaginationComponent
+      <PaginationComponentV2
         fetch={searchPayloads}
         searchPaginationInput={searchPaginationInput}
         setContent={setPayloads}
+        entityPrefix="payload"
+        availableFilterNames={
+        ['payload_attack_patterns', 'payload_description', 'payload_name', 'payload_platforms', 'payload_source', 'payload_status', 'payload_tags', 'payload_updated_at']
+      }
+        queryableHelpers={queryableHelpers}
         exportProps={exportProps}
       />
       <List>
@@ -161,37 +230,26 @@ const Payloads = () => {
           divider={false}
           style={{ paddingTop: 0 }}
         >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
-              &nbsp;
-            </span>
-          </ListItemIcon>
+          <ListItemIcon />
           <ListItemText
             primary={
-              <SortHeadersComponent
+              <SortHeadersComponentV2
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
-                searchPaginationInput={searchPaginationInput}
-                setSearchPaginationInput={setSearchPaginationInput}
+                sortHelpers={queryableHelpers.sortHelpers}
               />
             }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {payloads.map((payload) => {
+        {payloads.map((payload: PayloadStore) => {
           const collector = payload.payload_collector ? collectorsMap[payload.payload_collector] : null;
           return (
             <ListItem
               key={payload.payload_id}
               classes={{ root: classes.item }}
-              divider={true}
-              button={true}
+              button
+              divider
               onClick={() => setSelectedPayload(payload)}
             >
               <ListItemIcon>
@@ -208,93 +266,31 @@ const Payloads = () => {
                     }}
                   />
                 ) : (
-                  <PayloadIcon payloadType={payload.payload_type} />
+                  <PayloadIcon payloadType={payload.payload_type ?? ''} />
                 )}
               </ListItemIcon>
               <ListItemText
                 primary={
                   <div className={classes.bodyItems}>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.payload_type}
-                    >
-                      <Chip
-                        variant="outlined"
-                        classes={{ root: classes.chipInList }}
-                        color="primary"
-                        label={t(payload.payload_type)}
-                      />
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.payload_name}
-                    >
-                      {payload.payload_name}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.payload_platforms}
-                    >
-                      {payload.payload_platforms?.map(
-                        (platform) => <PlatformIcon key={platform} platform={platform} tooltip={true} width={20} marginRight={10} />,
-                      )}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.payload_description}
-                    >
-                      {payload.payload_description}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.payload_tags}
-                    >
-                      <ItemTags
-                        variant="reduced-view"
-                        tags={payload.payload_tags}
-                      />
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.payload_source}
-                    >
-                      <Chip
-                        variant="outlined"
-                        classes={{ root: classes.chipInList2 }}
-                        color="primary"
-                        label={t(payload.payload_source ?? 'MANUAL')}
-                      />
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.payload_status}
-                    >
-                      <Chip
-                        variant="outlined"
-                        classes={{ root: classes.chipInList2 }}
-                        color={payload.payload_status === 'VERIFIED' ? 'success' : 'warning'}
-                        label={t(payload.payload_status ?? 'UNVERIFIED')}
-                      />
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.payload_updated_at}
-                    >
-                      {nsdt(payload.payload_updated_at)}
-                    </div>
+                    {headers.map((header) => (
+                      <div
+                        key={header.field}
+                        className={classes.bodyItem}
+                        style={inlineStyles[header.field]}
+                      >
+                        {header.value(payload)}
+                      </div>
+                    ))}
                   </div>
-              }
+                }
               />
               <ListItemSecondaryAction>
                 <PayloadPopover
-                  tagsMap={tagsMap}
                   documentsMap={documentsMap}
-                  attackPatternsMap={attackPatternsMap}
-                  killChainPhasesMap={killChainPhasesMap}
                   payload={payload}
-                  onUpdate={(result) => setPayloads(payloads.map((a) => (a.payload_id !== result.payload_id ? a : result)))}
-                  onDuplicate={(result) => setPayloads([result, ...payloads])}
-                  onDelete={(result) => setPayloads(payloads.filter((a) => (a.payload_id !== result)))}
+                  onUpdate={(result: PayloadStore) => setPayloads(payloads.map((a) => (a.payload_id !== result.payload_id ? a : result)))}
+                  onDuplicate={(result: PayloadStore) => setPayloads([result, ...payloads])}
+                  onDelete={(result: string) => setPayloads(payloads.filter((a) => (a.payload_id !== result)))}
                   disabled={collector !== null}
                 />
               </ListItemSecondaryAction>
@@ -303,7 +299,7 @@ const Payloads = () => {
         })}
       </List>
       <CreatePayload
-        onCreate={(result) => setPayloads([result, ...payloads])}
+        onCreate={(result: PayloadStore) => setPayloads([result, ...payloads])}
       />
       <Drawer
         open={selectedPayload !== null}
@@ -361,7 +357,7 @@ const Payloads = () => {
             </Typography>
             <pre>
               <ItemCopy content={
-                selectedPayload?.command_content ?? selectedPayload?.dns_resolution_hostname ?? selectedPayload?.file_drop_file ?? selectedPayload?.executable_file
+                selectedPayload?.command_content ?? selectedPayload?.dns_resolution_hostname ?? selectedPayload?.file_drop_file ?? selectedPayload?.executable_file ?? ''
               }
               />
             </pre>
@@ -372,7 +368,8 @@ const Payloads = () => {
             >
               {t('Cleanup command')}
             </Typography>
-            {selectedPayload?.payload_cleanup_command && selectedPayload?.payload_cleanup_command.length > 0 ? <pre><ItemCopy content={selectedPayload?.payload_cleanup_command} /></pre> : '-'}
+            {selectedPayload?.payload_cleanup_command && selectedPayload?.payload_cleanup_command.length > 0
+              ? <pre><ItemCopy content={selectedPayload?.payload_cleanup_command} /></pre> : '-'}
           </Grid>
         </Grid>
       </Drawer>

@@ -16,7 +16,11 @@ interface Props {
   latestAddFilterId?: string
 }
 
-const useFiltersState = (initFilters: FilterGroup = emptyFilterGroup, onChange?: (value: FilterGroup) => void): [FilterGroup, FilterHelpers] => {
+const useFiltersState = (
+  initFilters: FilterGroup = emptyFilterGroup,
+  defaultFilters: FilterGroup = emptyFilterGroup,
+  onChange?: (value: FilterGroup) => void,
+): [FilterGroup, FilterHelpers] => {
   const [filtersState, setFiltersState] = useState<Props>({
     filters: initFilters,
   });
@@ -58,7 +62,7 @@ const useFiltersState = (initFilters: FilterGroup = emptyFilterGroup, onChange?:
     },
     // Clear all filters
     handleClearAllFilters: () => {
-      setFiltersState({ filters: emptyFilterGroup });
+      setFiltersState({ filters: defaultFilters });
     },
     // Remove a Filter
     handleRemoveFilterByKey: (key: string) => {

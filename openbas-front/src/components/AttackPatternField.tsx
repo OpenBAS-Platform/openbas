@@ -14,6 +14,7 @@ import { useHelper } from '../store';
 import type { AttackPatternHelper } from '../actions/attack_patterns/attackpattern-helper';
 import type { KillChainPhaseHelper } from '../actions/kill_chain_phases/killchainphase-helper';
 import type { UserHelper } from '../actions/helper';
+import { Option } from '../utils/Option';
 
 const useStyles = makeStyles(() => ({
   icon: {
@@ -36,6 +37,8 @@ interface Props {
   useExternalId?: string;
   onChange: (id: string[]) => void;
 }
+
+type AttackPatternCreateInputForm = Omit<AttackPatternCreateInput, 'attack_pattern_kill_chain_phases'> & { attack_pattern_kill_chain_phases?: Option[] };
 
 const AttackPatternField: FunctionComponent<Props> = ({
   fieldValues,
@@ -69,8 +72,12 @@ const AttackPatternField: FunctionComponent<Props> = ({
     setAttackPatternCreation(false);
   };
 
-  const onSubmit = ((data: AttackPatternCreateInput) => {
-    dispatch(addAttackPattern(data)).then((result: { result: string, entities: { attackpatterns: Record<string, AttackPattern> } }) => {
+  const onSubmit = ((data: AttackPatternCreateInputForm) => {
+    const inputValues: AttackPatternCreateInput = {
+      ...data,
+      attack_pattern_kill_chain_phases: data.attack_pattern_kill_chain_phases?.map((k) => k.id),
+    };
+    dispatch(addAttackPattern(inputValues)).then((result: { result: string, entities: { attackpatterns: Record<string, AttackPattern> } }) => {
       if (result.result) {
         const newAttackPattern = result.entities.attackpatterns[result.result];
         const newAttackPatterns = [...fieldValues, useExternalId ? newAttackPattern.attack_pattern_external_id : newAttackPattern.attack_pattern_id];

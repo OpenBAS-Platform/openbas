@@ -4,6 +4,7 @@ import { Option } from '../../../../utils/Option';
 import { searchKillChainPhasesByNameAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
 import { searchTagAsOption } from '../../../../actions/tags/tag-action';
 import { searchScenarioAsOption, searchScenarioCategoryAsOption } from '../../../../actions/scenarios/scenario-actions';
+import { searchAttackPatternsByNameAsOption } from '../../../../actions/AttackPattern';
 
 const useSearchOptions = () => {
   const [options, setOptions] = useState<Option[]>([]);
@@ -19,6 +20,11 @@ const useSearchOptions = () => {
       case 'scenario_kill_chain_phases':
       case 'exercise_kill_chain_phases':
         searchKillChainPhasesByNameAsOption(search).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'payload_attack_patterns':
+        searchAttackPatternsByNameAsOption(search).then((response) => {
           setOptions(response.data);
         });
         break;

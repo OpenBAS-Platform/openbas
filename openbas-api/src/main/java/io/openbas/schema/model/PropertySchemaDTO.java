@@ -18,6 +18,10 @@ public class PropertySchemaDTO {
   @JsonProperty("schema_property_name")
   private String jsonName;
 
+  @NotNull
+  @JsonProperty("schema_property_type")
+  private String type;
+
   @JsonProperty("schema_property_type_array")
   private boolean isArray;
   @JsonProperty("schema_property_values")
@@ -30,6 +34,7 @@ public class PropertySchemaDTO {
     this.setArray(propertySchema.getType().isArray() || Collection.class.isAssignableFrom(propertySchema.getType()));
     this.setValues(propertySchema.getAvailableValues());
     this.setDynamicValues(propertySchema.isDynamicValues());
+    this.setType(propertySchema.getType().getSimpleName().toLowerCase());
   }
 
 }

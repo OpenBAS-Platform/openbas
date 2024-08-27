@@ -1,5 +1,6 @@
 import { Autocomplete, Checkbox, TextField } from '@mui/material';
 import React, { FunctionComponent, useEffect } from 'react';
+import { DateTimePicker } from '@mui/x-date-pickers';
 import { useFormatter } from '../../../i18n';
 import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
 import { FilterHelpers } from './FilterHelpers';
@@ -113,18 +114,53 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
   );
 };
 
+export const BasicFilterDate: FunctionComponent<Props> = ({
+  filter,
+  helpers,
+}) => {
+  // Standard hooks
+  const { t } = useFormatter();
+
+  return (
+    <DateTimePicker
+      label={t(filter.key)}
+      onChange={(date) => {
+        if (date) {
+          helpers.handleAddSingleValueFilter(
+            filter.key,
+            date.toISOString(),
+          );
+        }
+      }}
+      slotProps={{
+        textField: {
+          variant: 'outlined',
+          fullWidth: true,
+        },
+      }}
+    />
+  );
+};
+
 export const FilterChipPopoverInput: FunctionComponent<Props & { propertySchema: PropertySchemaDTO }> = ({
   propertySchema,
   filter,
   helpers,
 }) => {
   const choice = () => {
+    // Date field
+    if (propertySchema.schema_property_type.includes('instant')) {
+      return (<BasicFilterDate filter={filter} helpers={helpers} />);
+    }
+    // Emptiness
     if (filter?.operator && ['empty', 'not_empty'].includes(filter.operator)) {
       return null;
     }
+    // Select field
     if (propertySchema.schema_property_values || propertySchema.schema_property_has_dynamic_value) {
       return (<BasicSelectInput propertySchema={propertySchema} filter={filter} helpers={helpers} />);
     }
+    // Simple text field
     return (<BasicTextInput filter={filter} helpers={helpers} />);
   };
   return (choice());

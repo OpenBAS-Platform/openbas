@@ -188,8 +188,8 @@ public class PayloadService {
         duplicate.setAttackPatterns(new ArrayList<>(origin.getAttackPatterns()));
         duplicate.setTags(new HashSet<>(origin.getTags()));
         duplicate.setExternalId(null);
-        duplicate.setSource(MANUAL.name());
-        duplicate.setStatus(VERIFIED.name());
+        duplicate.setSource(MANUAL);
+        duplicate.setStatus(VERIFIED);
         duplicate.setCollector(null);
     }
 }

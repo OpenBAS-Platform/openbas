@@ -1,11 +1,33 @@
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { Chip, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { FilterHelpers } from './FilterHelpers';
 import FilterChipPopover from './FilterChipPopover';
 import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
 import { convertOperatorToIcon } from './FilterUtils';
 import { useFormatter } from '../../../i18n';
 import useRetrieveOptions from './useRetrieveOptions';
+import { Option } from '../../../../utils/Option';
+import type { Theme } from '../../../Theme';
+
+const useStyles = makeStyles((theme: Theme) => ({
+  container: {
+    display: 'flex',
+    gap: '4px',
+    alignItems: 'center',
+    lineHeight: '32px',
+  },
+  mode: {
+    display: 'inline-block',
+    height: '100%',
+    // borderRadius: 4,
+    // fontFamily: 'Consolas, monaco, monospace',
+    backgroundColor: theme.palette.action?.selected,
+    padding: '0 4px',
+    // display: 'flex',
+    // alignItems: 'center',
+  },
+}));
 
 interface Props {
   filter: Filter;
@@ -21,9 +43,10 @@ const FilterChip: FunctionComponent<Props> = ({
   pristine,
 }) => {
   // Standard hooks
-  const { t } = useFormatter();
+  const { t, fldt } = useFormatter();
+  const classes = useStyles();
 
-  const chipRef = useRef<HTMLAnchorElement>(null);
+  const chipRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(!pristine);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -42,9 +65,24 @@ const FilterChip: FunctionComponent<Props> = ({
     }
   }, [filter]);
 
+  const toValues = (opts: Option[]) => {
+    return opts.map((o, idx) => {
+      let or = <></>;
+      if (idx > 0) {
+        or = <div className={classes.mode}> {t('OR')} </div>;
+      }
+      if (propertySchema.schema_property_type.includes('instant')) {
+        return (
+          <span key={o.id}>{or} {fldt(o.label)}</span>
+        );
+      }
+      return (<span key={o.id}>{or} {o.label}</span>);
+    });
+  };
+
   const title = () => {
     return (
-      <><strong>{t(filter.key)}</strong> {convertOperatorToIcon(t, filter.operator)} {options.map((o) => o.label).join(', ')}</>
+      <span className={classes.container}><strong>{t(filter.key)}</strong> {convertOperatorToIcon(t, filter.operator)} {toValues(options)}</span>
     );
   };
 
@@ -57,7 +95,7 @@ const FilterChip: FunctionComponent<Props> = ({
           label={title()}
           onClick={handleOpen}
           onDelete={handleRemoveFilter}
-          component="a"
+          component="div"
           ref={chipRef}
         />
       </Tooltip>

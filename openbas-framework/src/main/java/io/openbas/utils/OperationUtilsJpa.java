@@ -4,8 +4,11 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+
+import static org.springframework.util.StringUtils.hasText;
 
 public class OperationUtilsJpa {
 
@@ -18,6 +21,10 @@ public class OperationUtilsJpa {
   public static Predicate notContainsTexts(
       Expression<String> paths, CriteriaBuilder cb,
       List<String> texts, Class<?> type) {
+    if (isEmpty(texts)) {
+      return cb.conjunction();
+    }
+
     Predicate[] predicates = texts.stream()
         .map(text -> notContainsText(paths, cb, text, type))
         .toArray(Predicate[]::new);
@@ -37,7 +44,7 @@ public class OperationUtilsJpa {
       Expression<String> paths, CriteriaBuilder cb,
       List<String> texts,
       Class<?> type) {
-    if (texts == null || texts.isEmpty()) {
+    if (isEmpty(texts)) {
       return cb.conjunction();
     }
 
@@ -70,6 +77,10 @@ public class OperationUtilsJpa {
   // -- NOT EQUALS --
 
   public static Predicate notEqualsTexts(Expression<String> paths, CriteriaBuilder cb, List<String> texts, Class<?> type) {
+    if (isEmpty(texts)) {
+      return cb.conjunction();
+    }
+
     Predicate[] predicates = texts.stream().map(text -> notEqualsText(
         paths, cb, text, type
     )).toArray(Predicate[]::new);
@@ -84,7 +95,7 @@ public class OperationUtilsJpa {
   // -- EQUALS --
 
   public static Predicate equalsTexts(Expression<String> paths, CriteriaBuilder cb, List<String> texts, Class<?> type) {
-    if (texts == null || texts.isEmpty()) {
+    if (isEmpty(texts)) {
       return cb.conjunction();
     }
 
@@ -114,6 +125,10 @@ public class OperationUtilsJpa {
   // -- NOT START WITH --
 
   public static Predicate notStartWithTexts(Expression<String> paths, CriteriaBuilder cb, List<String> texts) {
+    if (isEmpty(texts)) {
+      return cb.conjunction();
+    }
+
     Predicate[] predicates = texts.stream().map(text -> notStartWithText(paths, cb, text)).toArray(Predicate[]::new);
 
     return cb.or(predicates);
@@ -126,6 +141,10 @@ public class OperationUtilsJpa {
   // -- START WITH --
 
   public static Predicate startWithTexts(Expression<String> paths, CriteriaBuilder cb, List<String> texts) {
+    if (isEmpty(texts)) {
+      return cb.conjunction();
+    }
+
     Predicate[] predicates = texts.stream().map(text -> startWithText(paths, cb, text)).toArray(Predicate[]::new);
 
     return cb.or(predicates);
@@ -157,6 +176,73 @@ public class OperationUtilsJpa {
     );
   }
 
+  // -- DATE --
+
+  public static Predicate greaterThanTexts(Expression<Instant> paths, CriteriaBuilder cb, List<String> texts) {
+    if (isEmpty(texts)) {
+      return cb.conjunction();
+    }
+
+    Predicate[] predicates = texts.stream()
+        .map(value -> greaterThanText(paths, cb, value))
+        .toArray(Predicate[]::new);
+
+    return cb.or(predicates);
+  }
+
+  public static Predicate greaterThanText(Expression<Instant> paths, CriteriaBuilder cb, String text) {
+    return cb.greaterThan(paths, Instant.parse(text));
+  }
+
+  public static Predicate greaterThanOrEqualTexts(Expression<Instant> paths, CriteriaBuilder cb, List<String> texts) {
+    if (isEmpty(texts)) {
+      return cb.conjunction();
+    }
+
+    Predicate[] predicates = texts.stream()
+        .map(value -> greaterThanOrEqualText(paths, cb, value))
+        .toArray(Predicate[]::new);
+
+    return cb.or(predicates);
+  }
+
+  public static Predicate greaterThanOrEqualText(Expression<Instant> paths, CriteriaBuilder cb, String text) {
+    return cb.greaterThanOrEqualTo(paths, Instant.parse(text));
+  }
+
+  public static Predicate lessThanTexts(Expression<Instant> paths, CriteriaBuilder cb, List<String> texts) {
+    if (isEmpty(texts)) {
+      return cb.conjunction();
+    }
+
+    Predicate[] predicates = texts.stream()
+        .map(value -> lessThanText(paths, cb, value))
+        .toArray(Predicate[]::new);
+
+    return cb.or(predicates);
+  }
+
+  public static Predicate lessThanText(Expression<Instant> paths, CriteriaBuilder cb, String text) {
+    return cb.lessThan(paths, Instant.parse(text));
+  }
+
+  public static Predicate lessThanOrEqualTexts(Expression<Instant> paths, CriteriaBuilder cb, List<String> texts) {
+    if (isEmpty(texts)) {
+      return cb.conjunction();
+    }
+
+    Predicate[] predicates = texts.stream()
+        .map(value -> lessThanOrEqualText(paths, cb, value))
+        .toArray(Predicate[]::new);
+
+    return cb.or(predicates);
+  }
+
+  public static Predicate lessThanOrEqualText(Expression<Instant> paths, CriteriaBuilder cb, String text) {
+    return cb.lessThanOrEqualTo(paths, Instant.parse(text));
+  }
+
+
   // -- CUSTOM FUNCTION --
 
   private static Expression<String[]> lowerArray(Expression<?> paths, CriteriaBuilder cb)  {
@@ -183,6 +269,10 @@ public class OperationUtilsJpa {
 
   private static Expression<String[]> avals(Expression<String> paths, CriteriaBuilder cb)  {
     return cb.function("avals", String[].class, paths);
+  }
+
+  private static boolean isEmpty(List<String> texts) {
+    return texts == null || texts.isEmpty() || texts.stream().anyMatch(s -> !hasText(s));
   }
 
 }

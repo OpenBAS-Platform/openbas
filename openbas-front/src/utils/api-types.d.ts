@@ -924,7 +924,19 @@ export interface ExportMapperInput {
 export interface Filter {
   key: string;
   mode?: "and" | "or";
-  operator?: "eq" | "not_eq" | "contains" | "not_contains" | "starts_with" | "not_starts_with" | "empty" | "not_empty";
+  operator?:
+    | "eq"
+    | "not_eq"
+    | "contains"
+    | "not_contains"
+    | "starts_with"
+    | "not_starts_with"
+    | "gt"
+    | "gte"
+    | "lt"
+    | "lte"
+    | "empty"
+    | "not_empty";
   values?: string[];
 }
 
@@ -2345,8 +2357,8 @@ export interface Payload {
   payload_name: string;
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
-  payload_source?: string;
-  payload_status?: string;
+  payload_source?: "COMMUNITY" | "FILIGRAN" | "MANUAL";
+  payload_status?: "UNVERIFIED" | "VERIFIED";
   /** @uniqueItems true */
   payload_tags?: Tag[];
   payload_type?: string;
@@ -2374,7 +2386,7 @@ export interface PayloadCreateInput {
   payload_cleanup_executor?: string;
   payload_description?: string;
   payload_name: string;
-  payload_platforms: string[];
+  payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: string;
   payload_status: string;
@@ -2401,7 +2413,7 @@ export interface PayloadUpdateInput {
   payload_cleanup_executor?: string;
   payload_description?: string;
   payload_name: string;
-  payload_platforms?: string[];
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_tags?: string[];
 }
@@ -2499,6 +2511,7 @@ export interface PolicyInput {
 export interface PropertySchemaDTO {
   schema_property_has_dynamic_value?: boolean;
   schema_property_name: string;
+  schema_property_type: string;
   schema_property_type_array?: boolean;
   schema_property_values?: string[];
 }

@@ -12,6 +12,7 @@ const useFilterableProperties: (entityPrefix: string, filterNames: string[]) => 
         schema_property_type_array: true,
         schema_property_values: [],
         schema_property_has_dynamic_value: true,
+        schema_property_type: 'string',
       });
     }
     return propertySchemas;
