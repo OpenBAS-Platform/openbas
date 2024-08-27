@@ -19,6 +19,9 @@ const useStyles = makeStyles<Theme>((theme) => ({
       theme.palette.mode === 'dark'
         ? '1px solid rgba(255, 255, 255, 0.12)'
         : '1px solid rgba(0, 0, 0, 0.12)',
+    borderLeft: theme.palette.mode === 'dark'
+      ? '1px solid rgba(255, 255, 255, 0.7)'
+      : '1px solid rgba(0, 0, 0, 0.7)',
     borderRadius: 4,
     width: 240,
     minHeight: '100px',

@@ -60,11 +60,9 @@ function BackgroundComponent({
           transform: `scale(${transform[2]})`,
         }} xmlns="http://www.w3.org/2000/svg"
         >
-          <rect
-            width="100%"
-            height="100%"
+          <path
+            d="M0,0 L0,1000"
             stroke="#121823"
-            fill='#070d19'
             strokeWidth={3}
           />
         </svg>
