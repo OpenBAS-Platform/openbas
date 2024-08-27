@@ -51,7 +51,7 @@ public interface TeamRepository extends CrudRepository<Team, String>,
 
   @Query(value="SELECT teams.team_id, teams.team_name, teams.team_description, teams.team_created_at, teams.team_updated_at, teams.team_organization, " +
           "       team_contextual, " +
-          "       coalesce(array_agg(DISTINCT teams_tags.team_id) FILTER ( WHERE teams_tags.team_id IS NOT NULL ), '{}') as team_tags, " +
+          "       coalesce(array_agg(DISTINCT teams_tags.tag_id) FILTER ( WHERE teams_tags.tag_id IS NOT NULL ), '{}') as team_tags, " +
           "       coalesce(array_agg(DISTINCT users_teams.user_id) FILTER ( WHERE users_teams.user_id IS NOT NULL ), '{}') as team_users, " +
           "       coalesce(array_agg(DISTINCT exercises_teams.exercise_id) FILTER ( WHERE exercises_teams.exercise_id IS NOT NULL ), '{}') as team_exercises, " +
           "       coalesce(array_agg(DISTINCT scenarios_teams.scenario_id) FILTER ( WHERE scenarios_teams.scenario_id IS NOT NULL ), '{}') as team_scenarios, " +
@@ -73,7 +73,7 @@ public interface TeamRepository extends CrudRepository<Team, String>,
 
   @Query(value="SELECT teams.team_id, teams.team_name, teams.team_description, teams.team_created_at, teams.team_updated_at, teams.team_organization, " +
           "       team_contextual, " +
-          "       coalesce(array_agg(DISTINCT teams_tags.team_id) FILTER ( WHERE teams_tags.team_id IS NOT NULL ), '{}') as team_tags, " +
+          "       coalesce(array_agg(DISTINCT teams_tags.tag_id) FILTER ( WHERE teams_tags.tag_id IS NOT NULL ), '{}') as team_tags, " +
           "       coalesce(array_agg(DISTINCT users_teams.user_id) FILTER ( WHERE users_teams.user_id IS NOT NULL ), '{}') as team_users, " +
           "       coalesce(array_agg(DISTINCT exercises_teams.exercise_id) FILTER ( WHERE exercises_teams.exercise_id IS NOT NULL ), '{}') as team_exercises, " +
           "       coalesce(array_agg(DISTINCT scenarios_teams.scenario_id) FILTER ( WHERE scenarios_teams.scenario_id IS NOT NULL ), '{}') as team_scenarios, " +
@@ -100,7 +100,7 @@ public interface TeamRepository extends CrudRepository<Team, String>,
 
   @Query(value="SELECT teams.team_id, teams.team_name, teams.team_description, teams.team_created_at, teams.team_updated_at, teams.team_organization, " +
           "       team_contextual, " +
-          "       coalesce(array_agg(DISTINCT teams_tags.team_id) FILTER ( WHERE teams_tags.team_id IS NOT NULL ), '{}') as team_tags, " +
+          "       coalesce(array_agg(DISTINCT teams_tags.tag_id) FILTER ( WHERE teams_tags.tag_id IS NOT NULL ), '{}') as team_tags, " +
           "       coalesce(array_agg(DISTINCT users_teams.user_id) FILTER ( WHERE users_teams.user_id IS NOT NULL ), '{}') as team_users, " +
           "       coalesce(array_agg(DISTINCT exercises_teams.exercise_id) FILTER ( WHERE exercises_teams.exercise_id IS NOT NULL ), '{}') as team_exercises, " +
           "       coalesce(array_agg(DISTINCT scenarios_teams.scenario_id) FILTER ( WHERE scenarios_teams.scenario_id IS NOT NULL ), '{}') as team_scenarios, " +
@@ -122,7 +122,7 @@ public interface TeamRepository extends CrudRepository<Team, String>,
 
   @Query(value="SELECT teams.team_id, teams.team_name, teams.team_description, teams.team_created_at, teams.team_updated_at, teams.team_organization, " +
           "       team_contextual, " +
-          "       coalesce(array_agg(DISTINCT teams_tags.team_id) FILTER ( WHERE teams_tags.team_id IS NOT NULL ), '{}') as team_tags, " +
+          "       coalesce(array_agg(DISTINCT teams_tags.tag_id) FILTER ( WHERE teams_tags.tag_id IS NOT NULL ), '{}') as team_tags, " +
           "       coalesce(array_agg(DISTINCT users_teams.user_id) FILTER ( WHERE users_teams.user_id IS NOT NULL ), '{}') as team_users, " +
           "       coalesce(array_agg(DISTINCT exercises_teams.exercise_id) FILTER ( WHERE exercises_teams.exercise_id IS NOT NULL ), '{}') as team_exercises, " +
           "       coalesce(array_agg(DISTINCT scenarios_teams.scenario_id) FILTER ( WHERE scenarios_teams.scenario_id IS NOT NULL ), '{}') as team_scenarios, " +

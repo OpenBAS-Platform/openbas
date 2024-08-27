@@ -6,6 +6,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.injectors.channel.ChannelContract;
 import io.openbas.injectors.channel.model.ChannelContent;
+import io.openbas.utils.CopyObjectListUtils;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
@@ -37,6 +38,7 @@ public class ScenarioToExerciseService {
     private final LessonsQuestionRepository lessonsQuestionRepository;
     private final InjectRepository injectRepository;
     private final InjectDocumentRepository injectDocumentRepository;
+    private final TeamService teamService;
     private final VariableService variableService;
 
     @Transactional(rollbackFor = Exception.class)
@@ -58,7 +60,7 @@ public class ScenarioToExerciseService {
         exercise.setStart(start);
 
         // Tags
-        exercise.setTags(copy(scenario.getTags(), Tag.class));
+        exercise.setTags(CopyObjectListUtils.copy(scenario.getTags(), Tag.class));
 
         Exercise exerciseSaved = this.exerciseRepository.save(exercise);
 
@@ -78,17 +80,10 @@ public class ScenarioToExerciseService {
         Map<String, Team> contextualTeams = new HashMap<>();
         scenario.getTeams().forEach(scenarioTeam -> {
             if (scenarioTeam.getContextual()) {
-                Team team = new Team();
-                team.setName(scenarioTeam.getName());
-                team.setDescription(scenarioTeam.getDescription());
-                team.setTags(copy(scenarioTeam.getTags(), Tag.class));
-                team.setOrganization(scenarioTeam.getOrganization());
-
-                team.setUsers(copy(scenarioTeam.getUsers(), User.class));
+                Team team = teamService.copyContextualTeam(scenarioTeam);
                 team.setExercises(new ArrayList<>() {{
                     add(exerciseSaved);
                 }});
-                team.setContextual(scenarioTeam.getContextual());
                 Team teamSaved = this.teamRepository.save(team);
                 contextualTeams.put(scenarioTeam.getId(), teamSaved);
             } else {
@@ -198,7 +193,7 @@ public class ScenarioToExerciseService {
             exerciseInject.setDependsDuration(scenarioInject.getDependsDuration());
             exerciseInject.setUser(scenarioInject.getUser());
             exerciseInject.setStatus(scenarioInject.getStatus().orElse(null));
-            exerciseInject.setTags(copy(scenarioInject.getTags(), Tag.class));
+            exerciseInject.setTags(CopyObjectListUtils.copy(scenarioInject.getTags(), Tag.class));
             exerciseInject.setContent(scenarioInject.getContent());
 
             // Content
@@ -223,8 +218,8 @@ public class ScenarioToExerciseService {
             exerciseInject.setTeams(teams);
 
             // Assets & Asset Groups
-            exerciseInject.setAssets(copy(scenarioInject.getAssets(), Asset.class));
-            exerciseInject.setAssetGroups(copy(scenarioInject.getAssetGroups(), AssetGroup.class));
+            exerciseInject.setAssets(CopyObjectListUtils.copy(scenarioInject.getAssets(), Asset.class));
+            exerciseInject.setAssetGroups(CopyObjectListUtils.copy(scenarioInject.getAssetGroups(), AssetGroup.class));
             Inject injectSaved = this.injectRepository.save(exerciseInject);
 
             // Documents
@@ -257,35 +252,7 @@ public class ScenarioToExerciseService {
         return exerciseSaved;
     }
 
-    private <T extends Base> List<T> copy(@NotNull final List<T> origins, Class<T> clazz) {
-        List<T> destinations = new ArrayList<>();
-        origins.forEach(origin -> {
-            try {
-                T destination = clazz.getDeclaredConstructor().newInstance();
-                BeanUtils.copyProperties(destination, origin);
-                destinations.add(destination);
-            } catch (IllegalAccessException | InvocationTargetException | InstantiationException |
-                     NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        return destinations;
-    }
 
-    private <T extends Base> Set<T> copy(@NotNull final Set<T> origins, Class<T> clazz) {
-        Set<T> destinations = new HashSet<>();
-        origins.forEach(origin -> {
-            try {
-                T destination = clazz.getDeclaredConstructor().newInstance();
-                BeanUtils.copyProperties(destination, origin);
-                destinations.add(destination);
-            } catch (IllegalAccessException | InvocationTargetException | InstantiationException |
-                     NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        return destinations;
-    }
 
     private List<Document> addExerciseToDocuments(
             @NotNull final List<Document> origDocuments,
