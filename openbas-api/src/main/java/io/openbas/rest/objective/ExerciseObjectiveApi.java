@@ -15,7 +15,7 @@ import io.openbas.rest.objective.form.EvaluationInput;
 import io.openbas.rest.objective.form.ObjectiveInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,107 +24,107 @@ import static io.openbas.helper.DatabaseHelper.resolveRelation;
 import static java.time.Instant.now;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ExerciseObjectiveApi extends RestBehavior {
 
-  public static final String EXERCISE_URI = "/api/exercises/";
+    public static final String EXERCISE_URI = "/api/exercises/";
 
-  private ExerciseRepository exerciseRepository;
-  private ObjectiveRepository objectiveRepository;
-  private EvaluationRepository evaluationRepository;
-  private UserRepository userRepository;
+    private ExerciseRepository exerciseRepository;
+    private ObjectiveRepository objectiveRepository;
+    private EvaluationRepository evaluationRepository;
+    private UserRepository userRepository;
 
-  // region objectives
-  @GetMapping(EXERCISE_URI + "{exerciseId}/objectives")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Iterable<Objective> getMainObjectives(@PathVariable String exerciseId) {
-    return objectiveRepository.findAll(ObjectiveSpecification.fromExercise(exerciseId));
-  }
+    // region objectives
+    @GetMapping(EXERCISE_URI + "{exerciseId}/objectives")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
+    public Iterable<Objective> getMainObjectives(@PathVariable String exerciseId) {
+        return objectiveRepository.findAll(ObjectiveSpecification.fromExercise(exerciseId));
+    }
 
-  @PostMapping(EXERCISE_URI + "{exerciseId}/objectives")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  @Transactional(rollbackOn = Exception.class)
-  public Objective createObjective(@PathVariable String exerciseId,
-      @Valid @RequestBody ObjectiveInput input) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    Objective objective = new Objective();
-    objective.setUpdateAttributes(input);
-    objective.setExercise(exercise);
-    return objectiveRepository.save(objective);
-  }
+    @PostMapping(EXERCISE_URI + "{exerciseId}/objectives")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    @Transactional(rollbackOn = Exception.class)
+    public Objective createObjective(@PathVariable String exerciseId,
+                                     @Valid @RequestBody ObjectiveInput input) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+        Objective objective = new Objective();
+        objective.setUpdateAttributes(input);
+        objective.setExercise(exercise);
+        return objectiveRepository.save(objective);
+    }
 
-  @PutMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Objective updateObjective(@PathVariable String exerciseId,
-      @PathVariable String objectiveId,
-      @Valid @RequestBody ObjectiveInput input) {
-    Objective objective = objectiveRepository.findById(objectiveId).orElseThrow(ElementNotFoundException::new);
-    objective.setUpdateAttributes(input);
-    return objectiveRepository.save(objective);
-  }
+    @PutMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Objective updateObjective(@PathVariable String exerciseId,
+                                     @PathVariable String objectiveId,
+                                     @Valid @RequestBody ObjectiveInput input) {
+        Objective objective = objectiveRepository.findById(objectiveId).orElseThrow(ElementNotFoundException::new);
+        objective.setUpdateAttributes(input);
+        return objectiveRepository.save(objective);
+    }
 
-  @DeleteMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public void deleteObjective(@PathVariable String exerciseId, @PathVariable String objectiveId) {
-    objectiveRepository.deleteById(objectiveId);
-  }
-  // endregion
+    @DeleteMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public void deleteObjective(@PathVariable String exerciseId, @PathVariable String objectiveId) {
+        objectiveRepository.deleteById(objectiveId);
+    }
+    // endregion
 
-  // region evaluations
-  @GetMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Evaluation getEvaluation(@PathVariable String exerciseId, @PathVariable String evaluationId) {
-    return evaluationRepository.findById(evaluationId).orElseThrow(ElementNotFoundException::new);
-  }
+    // region evaluations
+    @GetMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
+    public Evaluation getEvaluation(@PathVariable String exerciseId, @PathVariable String evaluationId) {
+        return evaluationRepository.findById(evaluationId).orElseThrow(ElementNotFoundException::new);
+    }
 
-  @GetMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Iterable<Evaluation> getEvaluations(@PathVariable String exerciseId, @PathVariable String objectiveId) {
-    return evaluationRepository.findAll(EvaluationSpecification.fromObjective(objectiveId));
-  }
+    @GetMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
+    public Iterable<Evaluation> getEvaluations(@PathVariable String exerciseId, @PathVariable String objectiveId) {
+        return evaluationRepository.findAll(EvaluationSpecification.fromObjective(objectiveId));
+    }
 
-  @PostMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  @Transactional(rollbackOn = Exception.class)
-  public Evaluation createEvaluation(@PathVariable String exerciseId,
-      @PathVariable String objectiveId,
-      @Valid @RequestBody EvaluationInput input) {
-    Evaluation evaluation = new Evaluation();
-    evaluation.setUpdateAttributes(input);
-    Objective objective = resolveRelation(objectiveId, objectiveRepository);
-    evaluation.setObjective(objective);
-    evaluation.setUser(userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
-    Evaluation result = evaluationRepository.save(evaluation);
-    objective.setUpdatedAt(now());
-    objectiveRepository.save(objective);
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    exercise.setUpdatedAt(now());
-    exerciseRepository.save(exercise);
-    return result;
-  }
+    @PostMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    @Transactional(rollbackOn = Exception.class)
+    public Evaluation createEvaluation(@PathVariable String exerciseId,
+                                       @PathVariable String objectiveId,
+                                       @Valid @RequestBody EvaluationInput input) {
+        Evaluation evaluation = new Evaluation();
+        evaluation.setUpdateAttributes(input);
+        Objective objective = resolveRelation(objectiveId, objectiveRepository);
+        evaluation.setObjective(objective);
+        evaluation.setUser(userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
+        Evaluation result = evaluationRepository.save(evaluation);
+        objective.setUpdatedAt(now());
+        objectiveRepository.save(objective);
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+        exercise.setUpdatedAt(now());
+        exerciseRepository.save(exercise);
+        return result;
+    }
 
-  @PutMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Evaluation updateEvaluation(@PathVariable String exerciseId,
-      @PathVariable String objectiveId,
-      @PathVariable String evaluationId,
-      @Valid @RequestBody EvaluationInput input) {
-    Evaluation evaluation = evaluationRepository.findById(evaluationId).orElseThrow(ElementNotFoundException::new);
-    evaluation.setUpdateAttributes(input);
-    Evaluation result = evaluationRepository.save(evaluation);
-    Objective objective = objectiveRepository.findById(objectiveId).orElseThrow(ElementNotFoundException::new);
-    objective.setUpdatedAt(now());
-    objectiveRepository.save(objective);
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    exercise.setUpdatedAt(now());
-    exerciseRepository.save(exercise);
-    return result;
-  }
+    @PutMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Evaluation updateEvaluation(@PathVariable String exerciseId,
+                                       @PathVariable String objectiveId,
+                                       @PathVariable String evaluationId,
+                                       @Valid @RequestBody EvaluationInput input) {
+        Evaluation evaluation = evaluationRepository.findById(evaluationId).orElseThrow(ElementNotFoundException::new);
+        evaluation.setUpdateAttributes(input);
+        Evaluation result = evaluationRepository.save(evaluation);
+        Objective objective = objectiveRepository.findById(objectiveId).orElseThrow(ElementNotFoundException::new);
+        objective.setUpdatedAt(now());
+        objectiveRepository.save(objective);
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+        exercise.setUpdatedAt(now());
+        exerciseRepository.save(exercise);
+        return result;
+    }
 
-  @DeleteMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public void deleteEvaluation(@PathVariable String exerciseId, @PathVariable String evaluationId) {
-    evaluationRepository.deleteById(evaluationId);
-  }
-  // endregion
+    @DeleteMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public void deleteEvaluation(@PathVariable String exerciseId, @PathVariable String evaluationId) {
+        evaluationRepository.deleteById(evaluationId);
+    }
+    // endregion
 }

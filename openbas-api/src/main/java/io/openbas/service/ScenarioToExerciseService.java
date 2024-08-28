@@ -20,8 +20,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.util.*;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class ScenarioToExerciseService {
 
     private final ExerciseRepository exerciseRepository;

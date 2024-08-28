@@ -17,7 +17,7 @@ import io.openbas.utils.ExpectationUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -30,7 +30,7 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ChallengeService {
 
     @Resource
