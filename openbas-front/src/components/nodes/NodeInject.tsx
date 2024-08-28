@@ -94,13 +94,28 @@ export type NodeInject = Node<{
 
 >;
 
+/**
+ * The node used to represent an inject
+ * @param data the props used
+ * @constructor
+ */
 const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
   const classes = useStyles();
 
+  /**
+   * Converts the duration in second to a string representing the relative time
+   * @param durationInSeconds the duration in seconds
+   */
   const convertToRelativeTime = (durationInSeconds: number) => {
     const date = moment.utc(moment.duration(0, 'd').add(durationInSeconds, 's').asMilliseconds());
     return `${date.dayOfYear() - 1} d, ${date.hour()} h, ${date.minute()} m`;
   };
+
+  /**
+   * Converts the duration in second and a start date into an absolute time
+   * @param startDate the start date
+   * @param durationInSeconds the duration in seconds
+   */
   const convertToAbsoluteTime = (startDate: string, durationInSeconds: number) => {
     return moment.utc(startDate)
       .add(durationInSeconds, 's')
@@ -108,14 +123,24 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
       .format('MMMM Do, YYYY - h:mmA');
   };
 
+  /**
+   * Actions on click on the node
+   */
   const onClick = () => {
     if (data.inject) data.onSelectedInject(data.inject);
   };
 
+  /**
+   * Prevent click to avoid double actions to be raised
+   * @param event the event to prevent
+   */
   const preventClick = (event: React.MouseEvent) => {
     event.stopPropagation();
   };
 
+  /**
+   * Actions if a node is selected (clicked)
+   */
   const selectedInject = () => {
     if (data.inject) data.onSelectedInject(data.inject);
   };

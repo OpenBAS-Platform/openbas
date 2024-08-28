@@ -37,15 +37,23 @@ const useStyles = makeStyles<Theme>(() => ({
 
 interface Props {
   time: string,
+  newNodeSize: number,
 }
 
+/**
+ * The 'button' to create a new node when clicking on the timeline.
+ * This is a fake button, as no actions are made from here, we just display a div that moves with the mouse.
+ * The new node actions is triggered when clicking on the timeline (but not on a node or controls)
+ * @param props the props
+ * @constructor
+ */
 const NodePhantomComponent: FunctionComponent<Props> = (props) => {
   const classes = useStyles();
 
   return (
     <>
       <div style={{ width: '500px', height: '50px' }}>
-        <div className={classes.node} style={{ color: 'white' }}>
+        <div className={classes.node} style={{ color: 'white', height: props.newNodeSize, width: props.newNodeSize }}>
           <div className={classes.iconContainer}>
             <AddCircleOutline className={classes.icon} style={{ fontSize: '30px' }}/>
           </div>

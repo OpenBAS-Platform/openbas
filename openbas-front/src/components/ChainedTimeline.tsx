@@ -62,13 +62,6 @@ interface Props {
 const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScenarioId, onConnectInjects, onSelectedInject, openCreateInjectDrawer }) => {
   // Standard hooks
   const classes = useStyles();
-  const minutesPerGapAllowed = [
-    5, // 5 minutes per gap
-    20, // 20 so that each vertical lines indicates 1h
-    20 * 12, // 20*12 so that each vertical line indicates half a day
-    20 * 24, // 20*24 so that each vertical line indicates a full day
-  ];
-  const gapSize = 125;
   const theme = useTheme<Theme>();
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeInject>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -77,7 +70,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   const [minutesPerGapIndex, setMinutesPerGapIndex] = useState<number>(0);
   const [currentUpdatedNode, setCurrentUpdatedNode] = useState<NodeInject | null>(null);
   const [currentMousePosition, setCurrentMousePosition] = useState<XYPosition>({ x: 0, y: 0 });
-  const [newNodeCursorVisibility, setNewNodeCursorVisibility] = useState<'visible' | 'hidden'>('visible');
+  const [newNodeCursorVisibility, setNewNodeCursorVisibility] = useState<'visible' | 'hidden'>('hidden');
   const [newNodeCursorClickable, setNewNodeCursorClickable] = useState<boolean>(true);
   const [currentMouseTime, setCurrentMouseTime] = useState<string>('');
 
@@ -88,6 +81,21 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   const teams = useHelper((teamsHelper: TeamsHelper) => teamsHelper.getTeamsMap());
   const scenario = useHelper((helper: ScenariosHelper) => helper.getScenario(exerciseOrScenarioId));
   const exercise = useHelper((helper: ExercisesHelper) => helper.getExercise(exerciseOrScenarioId));
+
+  const proOptions = { account: 'paid-pro', hideAttribution: true };
+  const defaultEdgeOptions = {
+    type: 'straight',
+    markerEnd: { type: MarkerType.ArrowClosed },
+  };
+
+  const minutesPerGapAllowed = [
+    5, // 5 minutes per gap
+    20, // 20 so that each vertical lines indicates 1h
+    20 * 12, // 20*12 so that each vertical line indicates half a day
+    20 * 24, // 20*24 so that each vertical line indicates a full day
+  ];
+  const gapSize = 125;
+  const newNodeSize = 50;
 
   let startDate: string | undefined;
 
@@ -177,7 +185,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
       }
 
       setCurrentUpdatedNode(null);
-      setTimeout(() => setDraggingOnGoing(false), 500);
+      setDraggingOnGoing(false);
       calculateInjectPosition(injectsNodes);
       setNodes(injectsNodes);
       setEdges(injects.filter((inject) => inject.inject_depends_on != null).map((inject) => {
@@ -199,13 +207,12 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     updateNodes();
   }, [injects, minutesPerGapIndex]);
 
-  const proOptions = { account: 'paid-pro', hideAttribution: true };
-  const defaultEdgeOptions = {
-    type: 'straight',
-    markerEnd: { type: MarkerType.ArrowClosed },
-  };
-
-  const nodeDragStop = (event: React.MouseEvent, node: NodeInject) => {
+  /**
+   * Take care of updates when the node drag is starting
+   * @param _event the mouse event (unused for now)
+   * @param node the node to update
+   */
+  const nodeDragStop = (_event: React.MouseEvent, node: NodeInject) => {
     const injectFromMap = injectsMap[node.id];
     if (injectFromMap !== undefined) {
       const inject = {
@@ -220,12 +227,20 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     }
   };
 
+  /**
+   * Small function to do some stuff when draggind is starting
+   */
   const nodeDragStart = () => {
     const nodesList = nodes.filter((currentNode) => currentNode.type !== 'phantom');
     setNodes(nodesList);
   };
 
-  const horizontalNodeDrag = (event: React.MouseEvent, node: NodeInject) => {
+  /**
+   * Actions to do during node drag, especially keeping it horizontal
+   * @param _event the mouse event
+   * @param node the node that is being dragged
+   */
+  const nodeDrag = (_event: React.MouseEvent, node: NodeInject) => {
     setDraggingOnGoing(true);
     const { position } = node;
     const { data } = node;
@@ -236,9 +251,13 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     }
   };
 
-  const onNodePhantomClick = (event: React.MouseEvent) => {
+  /**
+   * Actions when clicking the new node 'button'
+   * @param event
+   */
+  const onNewNodeClick = (event: React.MouseEvent) => {
     if (newNodeCursorClickable) {
-      const position = reactFlow.screenToFlowPosition({ x: event.clientX - 25, y: event.clientY });
+      const position = reactFlow.screenToFlowPosition({ x: event.clientX - (newNodeSize / 2), y: event.clientY });
 
       const totalMinutes = position.x > 0
         ? moment.duration((position.x / gapSize) * minutesPerGapAllowed[minutesPerGapIndex] * 60, 's')
@@ -251,13 +270,26 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     }
   };
 
+  /**
+   * Actions to do when the mouse move
+   * @param eventMove the mouse event
+   */
   const onMouseMove = (eventMove: React.MouseEvent) => {
     if (!draggingOnGoing) {
-      const position = reactFlow.screenToFlowPosition({ x: eventMove.clientX, y: eventMove.clientY }, { snapToGrid: false });
-      const sidePosition = reactFlow.screenToFlowPosition({ x: eventMove.clientX - 25, y: eventMove.clientY }, { snapToGrid: false });
+      const position = reactFlow.screenToFlowPosition({
+        x: eventMove.clientX,
+        y: eventMove.clientY,
+      }, { snapToGrid: false });
+      const sidePosition = reactFlow.screenToFlowPosition({
+        x: eventMove.clientX - (newNodeSize / 2),
+        y: eventMove.clientY,
+      }, { snapToGrid: false });
 
       const viewPort = reactFlow.getViewport();
-      setCurrentMousePosition({ x: ((position.x * reactFlow.getZoom()) + viewPort.x - 25), y: ((position.y * reactFlow.getZoom()) + viewPort.y - 25) });
+      setCurrentMousePosition({
+        x: ((position.x * reactFlow.getZoom()) + viewPort.x - (newNodeSize / 2)),
+        y: ((position.y * reactFlow.getZoom()) + viewPort.y - (newNodeSize / 2)),
+      });
 
       if (startDate === undefined) {
         const momentOfTime = moment.utc(
@@ -277,20 +309,35 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     }
   };
 
+  /**
+   * Taking care of the panning of the timeline
+   * @param _event the mouse event
+   * @param viewport the updated viewport
+   */
   const panTimeline = (_event: MouseEvent | TouchEvent | null, viewport: Viewport) => {
     setViewportData(viewport);
   };
 
-  const nodeMouseEnter = () => {
+  /**
+   * Actions to hide the new node 'button'
+   */
+  const hideNewNode = () => {
     setNewNodeCursorVisibility('hidden');
     setNewNodeCursorClickable(false);
   };
 
-  const nodeMouseLeave = () => {
+  /**
+   * Actions to show the new node 'button'
+   */
+  const showNewNode = () => {
     setNewNodeCursorVisibility('visible');
     setNewNodeCursorClickable(true);
   };
 
+  /**
+   * Updating the time between each gap
+   * @param incrementIndex increment or decrement the index to get the current minutesPerGap
+   */
   const updateMinutesPerGap = (incrementIndex: number) => {
     const nodesList = nodes.filter((currentNode) => currentNode.type !== 'phantom');
     setNodes(nodesList);
@@ -313,11 +360,11 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             nodesConnectable={false}
             nodesFocusable={false}
             elementsSelectable={false}
-            onNodeDrag={horizontalNodeDrag}
+            onNodeDrag={nodeDrag}
             onNodeDragStop={nodeDragStop}
             onNodeDragStart={nodeDragStart}
-            onNodeMouseEnter={nodeMouseEnter}
-            onNodeMouseLeave={nodeMouseLeave}
+            onNodeMouseEnter={hideNewNode}
+            onNodeMouseLeave={showNewNode}
             defaultEdgeOptions={defaultEdgeOptions}
             onMouseMove={onMouseMove}
             onMove={panTimeline}
@@ -326,9 +373,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             nodeExtent={[[0, 0], [Infinity, Infinity]]}
             defaultViewport={{ x: 60, y: 50, zoom: 0.75 }}
             minZoom={0.3}
-            onClick={onNodePhantomClick}
-            onMouseEnter={nodeMouseLeave}
-            onMouseLeave={nodeMouseEnter}
+            onClick={onNewNodeClick}
+            onMouseEnter={showNewNode}
+            onMouseLeave={hideNewNode}
           >
             <div className={classes.newBox}
               style={{
@@ -339,11 +386,12 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             >
               <NodePhantom
                 time={currentMouseTime}
+                newNodeSize={newNodeSize}
               />
             </div>
             <div
-              onMouseEnter={nodeMouseEnter}
-              onMouseLeave={nodeMouseLeave}
+              onMouseEnter={hideNewNode}
+              onMouseLeave={showNewNode}
             >
               <Controls
                 showFitView={true}

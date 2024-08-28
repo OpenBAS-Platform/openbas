@@ -10,26 +10,32 @@ interface Props extends BackgroundProps {
 
 const selector = (s: ReactFlowState) => ({ transform: s.transform, patternId: `pattern-${s.rfId}` });
 
+/**
+ * Custom background for the timeline
+ * @param id id of the pattern
+ * @param gap the default gap size
+ * @param size
+ * @param offset
+ * @param style
+ * @param className
+ * @constructor
+ */
 function BackgroundComponent({
-  id,
-  // only used for dots and cross
+  id = '',
   gap = 125,
-  // only used for lines and cross
-  size,
+  size = 1,
   offset = 2,
   style,
   className,
 }: Props) {
   const ref = useRef<SVGSVGElement>(null);
   const { transform, patternId } = useStore(selector, shallow);
-  const patternSize = size || 1;
+
   const gapXY: [number, number] = Array.isArray(gap) ? gap : [gap, gap * 2];
   const scaledGap: [number, number] = [gapXY[0] * transform[2] || 1, gapXY[1] * transform[2] || 1];
-  const scaledSize = patternSize * transform[2];
-
+  const scaledSize = size * transform[2];
   const patternOffset = [scaledSize / offset, scaledSize / offset];
-
-  const modifiedPatternId = `${patternId}${id || ''}`;
+  const modifiedPatternId = `${patternId}${id}`;
 
   return (
     <svg

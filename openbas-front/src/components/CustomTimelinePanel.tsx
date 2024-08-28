@@ -6,7 +6,7 @@ import moment from 'moment-timezone';
 
 const selector = (s: ReactFlowState) => ({ transform: s.transform, patternId: `pattern-${s.rfId}` });
 
-// @ts-expect-error pointer events is important and can not be removed but is mandatory
+// @ts-expect-error pointer events is important and is mandatory
 const useStyles = makeStyles(() => ({
   panel: {
     pointerEvents: 'none !important',
@@ -31,6 +31,15 @@ interface TimelineDates {
   dateIndex: number,
 }
 
+/**
+ * Panel used to display the date for each vertical lines
+ * @param style the style of the panel
+ * @param gap the size of the gaps
+ * @param minutesPerGap the number of minutes per gap
+ * @param viewportData viewport datas
+ * @param startDate the start date
+ * @constructor
+ */
 function BackgroundComponent({
   style,
   gap = 125,
@@ -39,13 +48,13 @@ function BackgroundComponent({
   startDate = undefined,
 }: Props) {
   const classes = useStyles();
+
   const { transform } = useStore(selector, shallow);
   const [parsedDates, setParsedDates] = useState<TimelineDates[]>([]);
+
   const gapXY: [number, number] = Array.isArray(gap) ? gap : [gap, gap];
   const scaledGap: [number, number] = [gapXY[0] * transform[2] || 1, gapXY[1] * transform[2] || 1];
-
   const desiredFontSize = 12;
-
   const numberOfIntervals = 6 / transform[2];
 
   useEffect(() => {
