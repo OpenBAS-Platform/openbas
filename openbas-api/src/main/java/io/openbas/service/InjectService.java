@@ -386,7 +386,7 @@ public class InjectService {
                 throw new IllegalArgumentException("At least one of exercise or scenario should be present");
               }
               ImportRow rowSummary = importRow(
-                  row, importMapper, start, mapPatternByInjectImport, mapTeamByName, zoneOffset
+                  row, importMapper, start, mapPatternByInjectImport, mapTeamByName, mapPatternByAllTeams, zoneOffset
               );
               // We set the exercise or scenario
               Inject inject = rowSummary.getInject();
@@ -396,8 +396,7 @@ public class InjectService {
                 inject.setExercise(exercise);
               }
               rowSummary.setInject(inject);
-                ImportRow rowSummary = importRow(row, importMapper, scenario, mapPatternByInjectImport, mapTeamByName,
-                    mapPatternByAllTeams, zoneOffset);
+
                 importTestSummary.getImportMessage().addAll(rowSummary.getImportMessages());
                 if(rowSummary.getInject() != null) {
                     importTestSummary.getInjects().add(rowSummary.getInject());
