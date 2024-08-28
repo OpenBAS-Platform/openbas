@@ -1,6 +1,6 @@
 import React, { FunctionComponent, memo } from 'react';
 import { makeStyles } from '@mui/styles';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { AddCircleOutline } from '@mui/icons-material';
 import type { Theme } from '../Theme';
 
 const useStyles = makeStyles<Theme>(() => ({
@@ -47,7 +47,7 @@ const NodePhantomComponent: FunctionComponent<Props> = (props) => {
       <div style={{ width: '500px', height: '50px' }}>
         <div className={classes.node} style={{ color: 'white' }}>
           <div className={classes.iconContainer}>
-            <AddCircleOutlineIcon className={classes.icon} style={{ fontSize: '30px' }}/>
+            <AddCircleOutline className={classes.icon} style={{ fontSize: '30px' }}/>
           </div>
         </div>
         <span className={classes.time}>
