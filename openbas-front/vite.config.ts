@@ -74,7 +74,6 @@ export default ({ mode }: { mode: string }) => {
         'd3-hierarchy',
         '@dagrejs/dagre',
         'react-syntax-highlighter',
-        'reactflow',
         'remark-flexible-markers',
         'remark-gfm',
         'remark-parse',

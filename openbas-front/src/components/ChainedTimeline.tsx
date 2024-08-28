@@ -85,7 +85,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   const scenario = useHelper((helper: ScenariosHelper) => helper.getScenario(exerciseOrScenarioId));
   const exercise = useHelper((helper: ExercisesHelper) => helper.getExercise(exerciseOrScenarioId));
 
-  let startDate: string;
+  let startDate: string | undefined;
 
   if (scenario !== undefined) {
     const parsedCron = scenario.scenario_recurrence ? parseCron(scenario.scenario_recurrence) : null;
@@ -98,7 +98,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   }
 
   const convertCoordinatesToTime = (position: XYPosition) => {
-    return Math.round((position.x / (gapSize / minutesPerGapAllowed[minutesPerGapIndex])) * 60);
+    return Math.round(((position.x) / (gapSize / minutesPerGapAllowed[minutesPerGapIndex])) * 60);
   };
 
   const calculateInjectPosition = (nodeInjects: NodeInject[]) => {
@@ -236,10 +236,15 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     if (!draggingOnGoing) {
       eventMove.persist();
       const position = reactFlow.screenToFlowPosition({ x: eventMove.clientX, y: eventMove.clientY }, { snapToGrid: false });
+      const sidePosition = reactFlow.screenToFlowPosition({ x: eventMove.clientX - 25, y: eventMove.clientY }, { snapToGrid: false });
 
       const viewPort = reactFlow.getViewport();
-      setCurrentMousePosition({ x: (position.x + viewPort.x - 25), y: (position.y + viewPort.y + 25) });
-      const momentOfTime = moment.utc(moment.duration(convertCoordinatesToTime({ x: position.x - 25, y: position.y }), 's').asMilliseconds());
+      setCurrentMousePosition({ x: ((position.x * reactFlow.getZoom()) + viewPort.x - 25), y: ((position.y * reactFlow.getZoom()) + viewPort.y + 25) });
+      const momentOfTime = moment.utc(
+        moment.duration(convertCoordinatesToTime(
+          { x: sidePosition.x, y: sidePosition.y },
+        ), 's').asMilliseconds(),
+      );
 
       setCurrentMouseTime(`${momentOfTime.dayOfYear() - 1} d, ${momentOfTime.hour()} h, ${momentOfTime.minute()} m`);
     }
@@ -269,9 +274,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   return (
     <>
       {injects.length > 0 ? (
-        <div className={classes.container} style={{ width: '100%', height: 350 }}
-          onClick={onNodePhantomClick}
-        >
+        <div className={classes.container} style={{ width: '100%', height: 350 }}>
           <div className={classes.newBox}
             style={{
               top: currentMousePosition.y,
@@ -304,38 +307,48 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             proOptions={proOptions}
             translateExtent={[[-60, -50], [Infinity, Infinity]]}
             nodeExtent={[[0, 0], [Infinity, Infinity]]}
-            defaultViewport={{ x: 60, y: 50, zoom: 1 }}
+            defaultViewport={{ x: 60, y: 50, zoom: 0.75 }}
             minZoom={0.3}
           >
-            <Controls
-              showFitView={true}
-              showZoom={false}
-              showInteractive={false}
-              fitViewOptions={{ duration: 500 }}
-              orientation={'horizontal'}
+            <div
+              onMouseEnter={nodeMouseEnter}
+              onMouseLeave={nodeMouseLeave}
             >
-              <ControlButton
-                disabled={minutesPerGapAllowed.length - 1 === minutesPerGapIndex}
-                onClick={() => updateMinutesPerGap(1)}
+              <Controls
+                showFitView={true}
+                showZoom={false}
+                showInteractive={false}
+                fitViewOptions={{ duration: 500 }}
+                orientation={'horizontal'}
               >
-                <UnfoldLess className={classes.rotatedIcon}/>
-              </ControlButton>
-              <ControlButton
-                disabled={minutesPerGapIndex === 0}
-                onClick={() => updateMinutesPerGap(-1)}
-              >
-                <UnfoldMore className={classes.rotatedIcon}/>
-              </ControlButton>
-            </Controls>
-            <CustomTimelineBackground
-              gap={gapSize}
-              minutesPerGap={minutesPerGapAllowed[minutesPerGapIndex]}
-            />
-            <CustomTimelinePanel
-              gap={gapSize}
-              minutesPerGap={minutesPerGapAllowed[minutesPerGapIndex]}
-              viewportData={ viewportData }
-            />
+                <ControlButton
+                  disabled={minutesPerGapAllowed.length - 1 === minutesPerGapIndex}
+                  onClick={() => updateMinutesPerGap(1)}
+                >
+                  <UnfoldLess className={classes.rotatedIcon}/>
+                </ControlButton>
+                <ControlButton
+                  disabled={minutesPerGapIndex === 0}
+                  onClick={() => updateMinutesPerGap(-1)}
+                >
+                  <UnfoldMore className={classes.rotatedIcon}/>
+                </ControlButton>
+              </Controls>
+            </div>
+            <div
+              onClick={onNodePhantomClick}
+            >
+              <CustomTimelineBackground
+                gap={gapSize}
+                minutesPerGap={minutesPerGapAllowed[minutesPerGapIndex]}
+              />
+              <CustomTimelinePanel
+                gap={gapSize}
+                minutesPerGap={minutesPerGapAllowed[minutesPerGapIndex]}
+                viewportData={ viewportData }
+                startDate={ startDate }
+              />
+            </div>
           </ReactFlow>
         </div>
       ) : null

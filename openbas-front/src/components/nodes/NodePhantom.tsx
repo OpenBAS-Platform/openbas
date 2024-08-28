@@ -5,8 +5,8 @@ import type { Theme } from '../Theme';
 
 const useStyles = makeStyles<Theme>(() => ({
   node: {
-    border: '2px solid rgba(255, 255, 255, 0.12)',
-    borderStyle: 'dashed',
+    border: '2px dashed rgba(255, 255, 255, 0.12)',
+    borderLeft: '2px solid rgba(255, 255, 255, 0.3)',
     borderRadius: 4,
     width: 50,
     height: 50,
