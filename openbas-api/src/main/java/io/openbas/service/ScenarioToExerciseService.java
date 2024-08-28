@@ -24,22 +24,21 @@ import java.util.*;
 @Service
 public class ScenarioToExerciseService {
 
-  @Resource
-  protected ObjectMapper mapper;
-
-  private final ExerciseRepository exerciseRepository;
-  private final GrantRepository grantRepository;
-  private final TeamRepository teamRepository;
-  private final ExerciseTeamUserRepository exerciseTeamUserRepository;
-  private final ObjectiveRepository objectiveRepository;
-  private final DocumentRepository documentRepository;
-  private final ArticleRepository articleRepository;
-  private final LessonsCategoryRepository lessonsCategoryRepository;
-  private final LessonsQuestionRepository lessonsQuestionRepository;
-  private final InjectRepository injectRepository;
-  private final InjectDocumentRepository injectDocumentRepository;
-  private final VariableService variableService;
-
+    private final ExerciseRepository exerciseRepository;
+    private final GrantRepository grantRepository;
+    private final TeamRepository teamRepository;
+    private final ExerciseTeamUserRepository exerciseTeamUserRepository;
+    private final ObjectiveRepository objectiveRepository;
+    private final DocumentRepository documentRepository;
+    private final ArticleRepository articleRepository;
+    private final LessonsCategoryRepository lessonsCategoryRepository;
+    private final LessonsQuestionRepository lessonsQuestionRepository;
+    private final InjectRepository injectRepository;
+    private final InjectDocumentRepository injectDocumentRepository;
+    private final VariableService variableService;
+    private final TeamService teamService;
+    @Resource
+    protected ObjectMapper mapper;
 
     @Transactional(rollbackFor = Exception.class)
     public Exercise toExercise(
@@ -147,39 +146,39 @@ public class ScenarioToExerciseService {
                 .toList();
         this.articleRepository.saveAll(exerciseArticles);
 
-    // Lessons
-    exercise.setLessonsAnonymized(scenario.isLessonsAnonymized());
+        // Lessons
+        exercise.setLessonsAnonymized(scenario.isLessonsAnonymized());
 
-    // Lessons categories
-    List<LessonsCategory> scenarioLessonCategories = scenario.getLessonsCategories();
-    scenarioLessonCategories.forEach(scenarioLessonCategory -> {
-      LessonsCategory exerciseLessonCategory = new LessonsCategory();
-      exerciseLessonCategory.setExercise(exerciseSaved);
-      exerciseLessonCategory.setName(scenarioLessonCategory.getName());
-      exerciseLessonCategory.setDescription(scenarioLessonCategory.getDescription());
-      exerciseLessonCategory.setOrder(scenarioLessonCategory.getOrder());
+        // Lessons categories
+        List<LessonsCategory> scenarioLessonCategories = scenario.getLessonsCategories();
+        scenarioLessonCategories.forEach(scenarioLessonCategory -> {
+            LessonsCategory exerciseLessonCategory = new LessonsCategory();
+            exerciseLessonCategory.setExercise(exerciseSaved);
+            exerciseLessonCategory.setName(scenarioLessonCategory.getName());
+            exerciseLessonCategory.setDescription(scenarioLessonCategory.getDescription());
+            exerciseLessonCategory.setOrder(scenarioLessonCategory.getOrder());
 
-      // Teams
-      List<Team> teams = new ArrayList<>();
-      scenarioLessonCategory.getTeams().forEach(team -> teams.add(computeTeam(team, contextualTeams)));
-      exerciseLessonCategory.setTeams(teams);
+            // Teams
+            List<Team> teams = new ArrayList<>();
+            scenarioLessonCategory.getTeams().forEach(team -> teams.add(computeTeam(team, contextualTeams)));
+            exerciseLessonCategory.setTeams(teams);
 
-      LessonsCategory exerciseLessonCategorySaved = this.lessonsCategoryRepository.save(exerciseLessonCategory);
+            LessonsCategory exerciseLessonCategorySaved = this.lessonsCategoryRepository.save(exerciseLessonCategory);
 
-      // Lessons questions
-      List<LessonsQuestion> exerciseLessonsQuestions = scenarioLessonCategory.getQuestions()
-          .stream()
-          .map(scenarioLessonsQuestion -> {
-            LessonsQuestion exerciseLessonsQuestion = new LessonsQuestion();
-            exerciseLessonsQuestion.setContent(scenarioLessonsQuestion.getContent());
-            exerciseLessonsQuestion.setExplanation(scenarioLessonsQuestion.getExplanation());
-            exerciseLessonsQuestion.setOrder(scenarioLessonsQuestion.getOrder());
-            exerciseLessonsQuestion.setCategory(exerciseLessonCategorySaved);
-            return exerciseLessonsQuestion;
-          })
-          .toList();
-      this.lessonsQuestionRepository.saveAll(exerciseLessonsQuestions);
-    });
+            // Lessons questions
+            List<LessonsQuestion> exerciseLessonsQuestions = scenarioLessonCategory.getQuestions()
+                    .stream()
+                    .map(scenarioLessonsQuestion -> {
+                        LessonsQuestion exerciseLessonsQuestion = new LessonsQuestion();
+                        exerciseLessonsQuestion.setContent(scenarioLessonsQuestion.getContent());
+                        exerciseLessonsQuestion.setExplanation(scenarioLessonsQuestion.getExplanation());
+                        exerciseLessonsQuestion.setOrder(scenarioLessonsQuestion.getOrder());
+                        exerciseLessonsQuestion.setCategory(exerciseLessonCategorySaved);
+                        return exerciseLessonsQuestion;
+                    })
+                    .toList();
+            this.lessonsQuestionRepository.saveAll(exerciseLessonsQuestions);
+        });
 
         // Injects
         List<Inject> scenarioInjects = scenario.getInjects();
@@ -254,7 +253,6 @@ public class ScenarioToExerciseService {
 
         return exerciseSaved;
     }
-
 
 
     private List<Document> addExerciseToDocuments(
