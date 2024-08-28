@@ -3,7 +3,6 @@ package io.openbas.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
-import io.openbas.database.model.Scenario;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.UserRepository;

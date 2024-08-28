@@ -15,7 +15,7 @@ import ItemTags from '../../../../../components/ItemTags';
 import LogForm from './LogForm';
 import { isExerciseUpdatable } from '../../../../../utils/Exercise';
 import AnimationMenu from '../AnimationMenu';
-import { fetchExerciseObjectives } from '../../../../../actions/Inject';
+import { fetchExerciseObjectives } from '../../../../../actions/Objective';
 
 const useStyles = makeStyles(() => ({
   card: {
@@ -110,28 +110,28 @@ const Logs = () => {
                 <div>
                   <div
                     style={{
-                      float: 'left',
-                      fontDecoration: 'none',
-                      textTransform: 'none',
-                      paddingTop: 7,
-                      fontSize: 15,
-                    }}
+                        float: 'left',
+                        fontDecoration: 'none',
+                        textTransform: 'none',
+                        paddingTop: 7,
+                        fontSize: 15,
+                      }}
                   >
                     <strong>
-                      {resolveUserName(usersMap[log.log_user] ?? {})}
-                    </strong>
+                        {resolveUserName(usersMap[log.log_user] ?? {})}
+                      </strong>
                                         &nbsp;
                     <span style={{ color: theme.palette.text.secondary }}>
-                      {t('added an entry on')} {nsdt(log.log_created_at)}
-                    </span>
+                        {t('added an entry on')} {nsdt(log.log_created_at)}
+                      </span>
                   </div>
                   <div
                     style={{
-                      float: 'left',
-                      margin: '4px 0 0 20px',
-                      fontDecoration: 'none',
-                      textTransform: 'none',
-                    }}
+                        float: 'left',
+                        margin: '4px 0 0 20px',
+                        fontDecoration: 'none',
+                        textTransform: 'none',
+                      }}
                   >
                     <ItemTags tags={log.log_tags}/>
                   </div>

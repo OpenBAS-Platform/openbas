@@ -25,11 +25,6 @@ export const fetchInjectTeams = (exerciseId, injectId) => (dispatch) => {
   return getReferential(schema.arrayOfTeams, uri)(dispatch);
 };
 
-export const fetchExerciseObjectives = (exerciseId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/objectives`;
-  return getReferential(schema.arrayOfObjectives, uri)(dispatch);
-};
-
 export const updateInjectForExercise = (exerciseId, injectId, data) => (dispatch) => {
   const uri = `/api/injects/${exerciseId}/${injectId}`;
   return putReferential(schema.inject, uri, data)(dispatch);
@@ -95,11 +90,6 @@ export const duplicateInjectForScenario = (scenarioId, injectId) => (dispatch) =
 export const fetchScenarioInjects = (scenarioId) => (dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/injects`;
   return getReferential(schema.arrayOfInjects, uri)(dispatch);
-};
-
-export const fetchScenarioObjectives = (scenarioId) => (dispatch) => {
-  const uri = `/api/scenarios/${scenarioId}/objectives`;
-  return getReferential(schema.arrayOfObjectives, uri)(dispatch);
 };
 
 export const updateInjectForScenario = (scenarioId, injectId, data) => (dispatch) => {

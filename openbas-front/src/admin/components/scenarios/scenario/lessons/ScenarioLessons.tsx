@@ -5,7 +5,7 @@ import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import Lessons from '../../../lessons/scenarios/Lessons';
 import { LessonContext, LessonContextType } from '../../../common/Context';
 import { fetchLessonsTemplates } from '../../../../../actions/Lessons';
-import { fetchScenarioInjects, fetchScenarioObjectives } from '../../../../../actions/Inject';
+import { fetchScenarioInjects } from '../../../../../actions/Inject';
 import { useHelper } from '../../../../../store';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
@@ -39,7 +39,7 @@ import type {
   LessonsQuestionUpdateInput,
   ObjectiveInput,
 } from '../../../../../utils/api-types';
-import { addScenarioObjective, deleteScenarioObjective, updateScenarioObjective } from '../../../../../actions/Objective';
+import { addScenarioObjective, deleteScenarioObjective, fetchScenarioObjectives, updateScenarioObjective } from '../../../../../actions/Objective';
 import { addScenarioEvaluation, fetchScenarioEvaluations, updateScenarioEvaluation } from '../../../../../actions/Evaluation';
 import { fetchTeams } from '../../../../../actions/teams/team-actions';
 import { usePermissions } from '../../../../../utils/Exercise';

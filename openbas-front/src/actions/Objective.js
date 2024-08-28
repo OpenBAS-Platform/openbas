@@ -1,5 +1,10 @@
 import * as schema from './Schema';
-import { delReferential, postReferential, putReferential } from '../utils/Action';
+import { delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
+
+export const fetchExerciseObjectives = (exerciseId) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/objectives`;
+  return getReferential(schema.arrayOfObjectives, uri)(dispatch);
+};
 
 export const updateExerciseObjective = (exerciseId, objectiveId, data) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/objectives/${objectiveId}`;
@@ -14,6 +19,11 @@ export const addExerciseObjective = (exerciseId, data) => (dispatch) => {
 export const deleteExerciseObjective = (exerciseId, objectiveId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/objectives/${objectiveId}`;
   return delReferential(uri, 'objectives', objectiveId)(dispatch);
+};
+
+export const fetchScenarioObjectives = (scenarioId) => (dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/objectives`;
+  return getReferential(schema.arrayOfObjectives, uri)(dispatch);
 };
 
 export const updateScenarioObjective = (scenarioId, objectiveId, data) => (dispatch) => {
