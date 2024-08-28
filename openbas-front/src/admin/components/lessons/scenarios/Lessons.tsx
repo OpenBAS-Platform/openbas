@@ -49,8 +49,6 @@ interface GenericSource {
   id: string;
   type: string;
   name: string;
-  score: number;
-  lessons_answers_number: number;
   communications_number: number;
   start_date: string;
   end_date: string;

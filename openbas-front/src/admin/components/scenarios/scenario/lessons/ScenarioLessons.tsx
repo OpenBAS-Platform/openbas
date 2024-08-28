@@ -54,8 +54,6 @@ const ScenarioLessons = () => {
       id: scenario.scenario_id,
       type: 'scenario',
       name: scenario.scenario_name,
-      score: scenario.scenario_score,
-      lessons_answers_number: scenario.scenario_lessons_answers_number,
       communications_number: scenario.scenario_communications_number,
       start_date: scenario.scenario_recurrence_start,
       end_date: scenario.scenario_recurrence_end,
