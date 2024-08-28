@@ -27,15 +27,13 @@ import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
 @RequiredArgsConstructor
 public class ChannelService {
 
+    private final InjectExpectationRepository injectExpectationExecutionRepository;
+    private final ExerciseRepository exerciseRepository;
+    private final ScenarioService scenarioService;
+    private final ArticleRepository articleRepository;
+    private final ChannelRepository channelRepository;
     @Resource
     protected ObjectMapper mapper;
-
-    private InjectExpectationRepository injectExpectationExecutionRepository;
-    private ExerciseRepository exerciseRepository;
-    private ScenarioService scenarioService;
-    private ArticleRepository articleRepository;
-    private ChannelRepository channelRepository;
-
 
     public ChannelReader validateArticles(String exerciseId, String channelId, User user) {
         ChannelReader channelReader;

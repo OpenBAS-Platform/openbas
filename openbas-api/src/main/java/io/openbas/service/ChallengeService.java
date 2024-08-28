@@ -33,13 +33,12 @@ import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH
 @RequiredArgsConstructor
 public class ChallengeService {
 
+    private final ExerciseRepository exerciseRepository;
+    private final ChallengeRepository challengeRepository;
+    private final InjectRepository injectRepository;
+    private final InjectExpectationRepository injectExpectationRepository;
     @Resource
     protected ObjectMapper mapper;
-
-    private ExerciseRepository exerciseRepository;
-    private ChallengeRepository challengeRepository;
-    private InjectRepository injectRepository;
-    private InjectExpectationRepository injectExpectationRepository;
 
     public Challenge enrichChallengeWithExercisesOrScenarios(@NotNull Challenge challenge) {
         List<Inject> injects = fromIterable(this.injectRepository.findAllForChallengeId("%" + challenge.getId() + "%"));
