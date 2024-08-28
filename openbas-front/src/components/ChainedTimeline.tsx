@@ -223,9 +223,11 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
 
   const onNodePhantomClick = (event: React.MouseEvent) => {
     if (newNodeCursorClickable) {
-      const position = reactFlow.screenToFlowPosition({ x: event.clientX, y: event.clientY });
+      const position = reactFlow.screenToFlowPosition({ x: event.clientX - 25, y: event.clientY });
 
-      const totalMinutes = moment.duration((position.x / gapSize) * minutesPerGapAllowed[minutesPerGapIndex] * 60, 's');
+      const totalMinutes = position.x > 0
+        ? moment.duration((position.x / gapSize) * minutesPerGapAllowed[minutesPerGapIndex] * 60, 's')
+        : moment.duration(0);
       openCreateInjectDrawer({
         inject_depends_duration_days: totalMinutes.days(),
         inject_depends_duration_hours: totalMinutes.hours(),
@@ -246,7 +248,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
       if (startDate === undefined) {
         const momentOfTime = moment.utc(
           moment.duration(convertCoordinatesToTime(
-            { x: sidePosition.x, y: sidePosition.y },
+            { x: sidePosition.x > 0 ? sidePosition.x : 0, y: sidePosition.y },
           ), 's').asMilliseconds(),
         );
 
@@ -254,7 +256,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
       } else {
         const momentOfTime = moment.utc(startDate)
           .add(-new Date().getTimezoneOffset() / 60, 'h')
-          .add(convertCoordinatesToTime({ x: sidePosition.x, y: sidePosition.y }), 's');
+          .add(convertCoordinatesToTime({ x: sidePosition.x > 0 ? sidePosition.x : 0, y: sidePosition.y }), 's');
 
         setCurrentMouseTime(momentOfTime.format('MMMM Do, YYYY - h:mmA'));
       }
