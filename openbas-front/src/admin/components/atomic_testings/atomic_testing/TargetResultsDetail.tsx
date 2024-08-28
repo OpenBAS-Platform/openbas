@@ -23,7 +23,6 @@ import {
 } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { Edge, MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow } from '@xyflow/react';
-import '@xyflow/react/dist/style.css';
 import { AddBoxOutlined, MoreVertOutlined } from '@mui/icons-material';
 import type { InjectResultDTO, InjectTargetWithResult, InjectExpectationResult } from '../../../../utils/api-types';
 import { fetchInjectResultDto, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
