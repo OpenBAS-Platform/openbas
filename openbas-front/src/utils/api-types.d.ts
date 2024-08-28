@@ -2564,12 +2564,6 @@ export interface PublicExercise {
   exercise_name?: string;
 }
 
-export interface PublicScenario {
-  scenario_description?: string;
-  scenario_id?: string;
-  scenario_name?: string;
-}
-
 export interface RawAttackPattern {
   attack_pattern_created_at?: string;
   attack_pattern_description?: string;
