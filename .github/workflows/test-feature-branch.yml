@@ -87,8 +87,8 @@ jobs:
           ansible-tower-user: ${{ secrets.AWX_USER }}
           ansible-tower-pass: ${{ secrets.AWX_PASSWORD }}
           ansible-tower-url: ${{ secrets.AWX_URL }}
-          template-id: "19"
+          template-id: "65"
           additional-vars: |
             { "openbas_version": "${{steps.meta.outputs.version}}", "openbas_config": ${{ inputs.openbas_config }} }
       - name: display URL
-        run: echo "https://${{steps.meta.outputs.version}}.oex.dev.filigran.io"
+        run: echo "https://${{steps.meta.outputs.version}}.obas.dev.filigran.io"
