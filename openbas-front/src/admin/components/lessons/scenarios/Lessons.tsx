@@ -131,19 +131,25 @@ const Lessons: React.FC<Props> = ({
                 <FormControlLabel
                   control={
                     <Switch
-                      disabled={source.lessons_anonymized}
+                      disabled={false}
                       checked={source.lessons_anonymized}
-                      onChange={() => setOpenAnonymize(true)}
+                      onChange={() => {
+                        if (!source.lessons_anonymized) {
+                          setOpenAnonymize(true);
+                        } else {
+                          toggleAnonymize();
+                        }
+                      }}
                       name="anonymized"
                     />
-                  }
+                                    }
                   label={t('Anonymize answers')}
                 />
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="h3">{t('Template')}</Typography>
                 <Button
-                  startIcon={<ContentPasteGoOutlined />}
+                  startIcon={<ContentPasteGoOutlined/>}
                   color="primary"
                   variant="contained"
                   onClick={() => setOpenApplyTemplate(true)}
@@ -154,7 +160,7 @@ const Lessons: React.FC<Props> = ({
               <Grid item xs={6}>
                 <Typography variant="h3">{t('Check')}</Typography>
                 <Button
-                  startIcon={<VisibilityOutlined />}
+                  startIcon={<VisibilityOutlined/>}
                   color="secondary"
                   variant="contained"
                   component={Link}
@@ -168,7 +174,7 @@ const Lessons: React.FC<Props> = ({
                   {t('Categories and questions')}
                 </Typography>
                 <Button
-                  startIcon={<DeleteSweepOutlined />}
+                  startIcon={<DeleteSweepOutlined/>}
                   color="error"
                   variant="contained"
                   onClick={() => setOpenEmptyLessons(true)}
@@ -195,7 +201,7 @@ const Lessons: React.FC<Props> = ({
         teams={teams}
         isReport={false}
       />
-      <CreateLessonsCategory />
+      <CreateLessonsCategory/>
       <Dialog
         TransitionComponent={Transition}
         keepMounted={false}
@@ -248,7 +254,7 @@ const Lessons: React.FC<Props> = ({
                       margin: 0,
                     }}
                     value={template.lessonstemplate_id}
-                    control={<Radio />}
+                    control={<Radio/>}
                     label={
                       <div style={{ margin: '15px 0 15px 10px' }}>
                         <Typography variant="h4">
@@ -258,14 +264,14 @@ const Lessons: React.FC<Props> = ({
                           {template.lessons_template_description || t('No description')}
                         </Typography>
                       </div>
-                    }
+                                        }
                   />
                 );
               })}
             </RadioGroup>
           </FormControl>
-          <CreateLessonsTemplate inline />
-          <div className="clearfix" />
+          <CreateLessonsTemplate inline/>
+          <div className="clearfix"/>
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button
               onClick={() => setOpenApplyTemplate(false)}
@@ -315,9 +321,6 @@ const Lessons: React.FC<Props> = ({
           <DialogContentText>
             {t('Do you want to anonymize lessons learned questionnaire?')}
           </DialogContentText>
-          <Alert severity="warning" style={{ marginTop: 10 }}>
-            {t('You will not be able to change this setting later.')}
-          </Alert>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenEmptyLessons(false)}>
