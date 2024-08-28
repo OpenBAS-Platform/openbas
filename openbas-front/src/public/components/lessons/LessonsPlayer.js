@@ -97,7 +97,7 @@ const LessonsPlayer = (props) => {
       </Button>)}
       <div className={classes.container}>
         <div style={{ margin: '0 auto', textAlign: 'center' }}>
-          <img src={theme.logo} alt="logo" className={classes.logo} />
+          <img src={theme.logo} alt="logo" className={classes.logo}/>
         </div>
         <Typography
           variant="h1"
@@ -127,7 +127,6 @@ const LessonsPlayer = (props) => {
         onSubmit={submitForm}
       >
         {({ handleSubmit, submitting }) => {
-          const isUserAbsent = source.userId === 'null';
           return (<form id="lessonsAnswersForm" onSubmit={handleSubmit}>
             {sortedCategories.map((category) => {
               const questions = sortQuestions(lessonsQuestions.filter((n) => n.lessons_question_category === category.lessonscategory_id));
@@ -223,7 +222,7 @@ const LessonsPlayer = (props) => {
                 color="secondary"
                 variant="contained"
                 onClick={() => setOpenValidate(true)}
-                disabled={lessonsAnswers.length > 0 || submitting || isUserAbsent}
+                disabled={lessonsAnswers.length > 0 || submitting || source.isUserAbsent}
                 size="large"
               >
                 {t('Submit')}
@@ -261,7 +260,7 @@ const LessonsPlayer = (props) => {
       </Form>
     </div>);
   }
-  return <Loader />;
+  return <Loader/>;
 };
 
 export default LessonsPlayer;

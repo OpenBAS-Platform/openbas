@@ -38,6 +38,8 @@ const ExerciseViewLessons = () => {
       name: exercise.exercise_name,
       subtitle: exercise.exercise_subtitle,
       userId,
+      isUserAbsent: userId === 'null',
+      isPlayerViewAvailable: true,
     };
   };
 

@@ -70,31 +70,31 @@ const LessonsPreview = (props) => {
   if (source) {
     return (
       <div className={classes.root}>
-        {permissions.isLoggedIn && permissions.canRead && (
-          <Button
-            color="secondary"
-            variant="outlined"
-            component={Link}
-            to={`/lessons/${source.type}/${source.id}?user=${source.finalUserId}&preview=false`}
-            style={{ position: 'absolute', top: 20, right: 20 }}
-          >
-            {t('Switch to player mode')}
-          </Button>
+        {permissions.isLoggedIn && permissions.canRead && source.isPlayerViewAvailable && (
+        <Button
+          color="secondary"
+          variant="outlined"
+          component={Link}
+          to={`/lessons/${source.type}/${source.id}?user=${source.finalUserId}&preview=false`}
+          style={{ position: 'absolute', top: 20, right: 20 }}
+        >
+          {t('Switch to player mode')}
+        </Button>
         )}
         {permissions.isLoggedIn && permissions.canRead && (
-          <Button
-            color="primary"
-            variant="outlined"
-            component={Link}
-            to={`/admin/${source.type}s/${source.id}/lessons`}
-            style={{ position: 'absolute', top: 20, left: 20 }}
-          >
-            {t('Back to administration')}
-          </Button>
+        <Button
+          color="primary"
+          variant="outlined"
+          component={Link}
+          to={`/admin/${source.type}s/${source.id}/lessons`}
+          style={{ position: 'absolute', top: 20, left: 20 }}
+        >
+          {t('Back to administration')}
+        </Button>
         )}
         <div className={classes.container}>
           <div style={{ margin: '0 auto', textAlign: 'center' }}>
-            <img src={theme.logo} alt="logo" className={classes.logo} />
+            <img src={theme.logo} alt="logo" className={classes.logo}/>
           </div>
           <Typography
             variant="h1"
@@ -114,13 +114,13 @@ const LessonsPreview = (props) => {
             {source.subtitle}
           </Typography>
           {lessonsCategories.length === 0 && (
-            <div style={{ marginTop: 150 }}>
-              <Empty
-                message={t(
-                  `No lessons learned categories in this ${source.type} yet.`,
-                )}
-              />
-            </div>
+          <div style={{ marginTop: 150 }}>
+            <Empty
+              message={t(
+                `No lessons learned categories in this ${source.type} yet.`,
+              )}
+            />
+          </div>
           )}
         </div>
         <Form
@@ -172,7 +172,7 @@ const LessonsPreview = (props) => {
                               </Typography>
                               <Typography variant="body2">
                                 {question.lessons_question_explanation
-                                  || t('No explanation')}
+                                                                    || t('No explanation')}
                               </Typography>
                             </Grid>
                             <Grid item xs={3}>
@@ -239,7 +239,7 @@ const LessonsPreview = (props) => {
       </div>
     );
   }
-  return <Loader />;
+  return <Loader/>;
 };
 
 export default LessonsPreview;

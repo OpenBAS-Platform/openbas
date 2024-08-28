@@ -14,7 +14,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
@@ -175,20 +174,4 @@ public class ScenarioLessonsApi extends RestBehavior {
         lessonsQuestionRepository.deleteById(lessonsQuestionId);
     }
 
-
-    @GetMapping("/api/player/lessons/scenario/{scenarioId}/lessons_categories")
-    public List<LessonsCategory> playerLessonsCategories(@PathVariable String scenarioId,
-                                                         @RequestParam Optional<String> userId) {
-        impersonateUser(userRepository, userId); // Protection for ?
-        return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromScenario(scenarioId));
-    }
-
-    @GetMapping("/api/player/lessons/scenario/{scenarioId}/lessons_questions")
-    public List<LessonsQuestion> playerLessonsQuestions(@PathVariable String scenarioId,
-                                                        @RequestParam Optional<String> userId) {
-        impersonateUser(userRepository, userId); // Protection for ?
-        return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromScenario(scenarioId)).stream()
-                .flatMap(lessonsCategory -> lessonsQuestionRepository.findAll(
-                        LessonsQuestionSpecification.fromCategory(lessonsCategory.getId())).stream()).toList();
-    }
 }

@@ -9,16 +9,8 @@ import { useAppDispatch } from '../../../utils/hooks';
 import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import type { UserHelper } from '../../../actions/helper';
 import type { ScenariosHelper } from '../../../actions/scenarios/scenario-helper';
-import {
-  fetchLessonsCategories,
-  fetchLessonsQuestions,
-  fetchPlayerLessonsCategories,
-  fetchPlayerLessonsQuestions,
-  fetchPlayerScenario,
-  fetchScenario,
-} from '../../../actions/scenarios/scenario-actions';
+import { fetchLessonsCategories, fetchLessonsQuestions, fetchScenario } from '../../../actions/scenarios/scenario-actions';
 import useScenarioPermissions from '../../../utils/Scenario';
-import LessonsPlayer from './LessonsPlayer';
 
 const ScenarioViewLessons = () => {
   const dispatch = useAppDispatch();
@@ -35,6 +27,7 @@ const ScenarioViewLessons = () => {
       name: scenario.scenario_name,
       subtitle: scenario.scenario_subtitle,
       userId,
+      isPlayerViewAvailable: false,
     };
   };
 
@@ -64,10 +57,6 @@ const ScenarioViewLessons = () => {
       dispatch(fetchScenario(scenarioId));
       dispatch(fetchLessonsCategories(scenarioId));
       dispatch(fetchLessonsQuestions(scenarioId));
-    } else {
-      dispatch(fetchPlayerScenario(scenarioId, userId));
-      dispatch(fetchPlayerLessonsCategories(scenarioId, finalUserId));
-      dispatch(fetchPlayerLessonsQuestions(scenarioId, finalUserId));
     }
   }, [dispatch, scenarioId, userId, finalUserId]);
 
@@ -78,19 +67,11 @@ const ScenarioViewLessons = () => {
 
   return (
     <ViewLessonContext.Provider value={context}>
-      {isPreview ? (
+      {isPreview && (
         <LessonsPreview
           source={{ ...source, finalUserId }}
           lessonsCategories={lessonsCategories}
           lessonsQuestions={lessonsQuestions}
-          permissions={permissions}
-        />
-      ) : (
-        <LessonsPlayer
-          source={{ ...source, finalUserId }}
-          lessonsCategories={lessonsCategories}
-          lessonsQuestions={lessonsQuestions}
-          lessonsAnswers={[]}
           permissions={permissions}
         />
       )}
