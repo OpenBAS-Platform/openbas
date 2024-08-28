@@ -60,25 +60,16 @@ const LessonsCategories = ({
   const consolidatedAnswers = R.pipe(
     R.groupBy(R.prop('lessons_answer_question')),
     R.toPairs,
-    R.map((n) => {
-      let totalScore = 0;
+    R.map(([key, values]) => {
+      const totalScore = R.sum(R.map((o) => o.lessons_answer_score, values));
       return [
-        n[0],
+        key,
         {
-          score: Math.round(
-            R.pipe(
-              R.map((o) => {
-                totalScore += o.lessons_answer_score;
-                return totalScore;
-              }),
-              R.sum,
-            )(n[1]) / n[1].length,
-          ),
-          number: n[1].length,
+          score: Math.round(totalScore / values.length), // Calculate average directly
+          number: values.length,
           comments: R.filter(
-            (o) => o.lessons_answer_positive !== null
-                            || o.lessons_answer_negative !== null,
-            n[1],
+            (o) => o.lessons_answer_positive !== null || o.lessons_answer_negative !== null,
+            values,
           ).length,
         },
       ];
