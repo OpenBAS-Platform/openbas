@@ -41,7 +41,7 @@ const useStyles = makeStyles(() => ({
   },
   newBox: {
     position: 'relative',
-    zIndex: 1,
+    zIndex: 4,
     pointerEvents: 'none',
     cursor: 'none',
   },
@@ -62,7 +62,12 @@ interface Props {
 const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScenarioId, onConnectInjects, onSelectedInject, openCreateInjectDrawer }) => {
   // Standard hooks
   const classes = useStyles();
-  const minutesPerGapAllowed = [5, 20, 20 * 12, 20 * 24];
+  const minutesPerGapAllowed = [
+    5, // 5 minutes per gap
+    20, // 20 so that each vertical lines indicates 1h
+    20 * 12, // 20*12 so that each vertical line indicates half a day
+    20 * 24, // 20*24 so that each vertical line indicates a full day
+  ];
   const gapSize = 125;
   const theme = useTheme<Theme>();
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeInject>([]);
@@ -76,9 +81,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   const [newNodeCursorClickable, setNewNodeCursorClickable] = useState<boolean>(true);
   const [currentMouseTime, setCurrentMouseTime] = useState<string>('');
 
-  let timer: NodeJS.Timeout;
   const injectContext = useContext(InjectContext);
-
   const reactFlow = useReactFlow();
 
   const injectsMap = useHelper((injectHelper: InjectHelper) => injectHelper.getInjectsMap());
@@ -96,16 +99,26 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
         .second(parsedCron!.m)
         .format();
     }
+  } else if (exercise !== undefined) {
+    startDate = exercise.exercise_start_date != null ? exercise.exercise_start_date : undefined;
   }
 
+  /**
+   * Convert reactflow coordinates to time
+   * @param position the reactflow coordinates
+   */
   const convertCoordinatesToTime = (position: XYPosition) => {
     return Math.round(((position.x) / (gapSize / minutesPerGapAllowed[minutesPerGapIndex])) * 60);
   };
 
+  /**
+   * Calculate injects position when dragging stopped
+   * @param nodeInjects the list of injects
+   */
   const calculateInjectPosition = (nodeInjects: NodeInject[]) => {
     nodeInjects.forEach((nodeInject, index) => {
       let row = 0;
-      let doItAgain = false;
+      let rowFound = true;
       const nodeInjectPosition = nodeInject.position;
       const nodeInjectData = nodeInject.data;
       do {
@@ -116,17 +129,20 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
           const previousNode = previousNodes[i];
           if (previousNode.position.y + 150 > row * 150 && previousNode.position.y <= row * 150) {
             row += 1;
-            doItAgain = true;
+            rowFound = false;
           } else {
             nodeInjectPosition.y = 150 * row;
             nodeInjectData.fixedY = nodeInject.position.y;
-            doItAgain = false;
+            rowFound = true;
           }
         }
-      } while (doItAgain);
+      } while (!rowFound);
     });
   };
 
+  /**
+   * Update all nodes
+   */
   const updateNodes = () => {
     if (injects.length > 0) {
       const injectsNodes = injects
@@ -205,7 +221,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   };
 
   const nodeDragStart = () => {
-    clearTimeout(timer);
     const nodesList = nodes.filter((currentNode) => currentNode.type !== 'phantom');
     setNodes(nodesList);
   };
@@ -237,7 +252,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   };
 
   const onMouseMove = (eventMove: React.MouseEvent) => {
-    clearTimeout(timer);
     if (!draggingOnGoing) {
       const position = reactFlow.screenToFlowPosition({ x: eventMove.clientX, y: eventMove.clientY }, { snapToGrid: false });
       const sidePosition = reactFlow.screenToFlowPosition({ x: eventMove.clientX - 25, y: eventMove.clientY }, { snapToGrid: false });
@@ -278,7 +292,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   };
 
   const updateMinutesPerGap = (incrementIndex: number) => {
-    clearTimeout(timer);
     const nodesList = nodes.filter((currentNode) => currentNode.type !== 'phantom');
     setNodes(nodesList);
     setDraggingOnGoing(true);
@@ -314,6 +327,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             defaultViewport={{ x: 60, y: 50, zoom: 0.75 }}
             minZoom={0.3}
             onClick={onNodePhantomClick}
+            onMouseEnter={nodeMouseLeave}
+            onMouseLeave={nodeMouseEnter}
           >
             <div className={classes.newBox}
               style={{
