@@ -25,13 +25,13 @@ public class ScenarioLessonsApi extends RestBehavior {
 
     public static final String SCENARIO_URI = "/api/scenarios/";
 
-    private ScenarioRepository scenarioRepository;
-    private TeamRepository teamRepository;
-    private LessonsTemplateRepository lessonsTemplateRepository;
-    private LessonsCategoryRepository lessonsCategoryRepository;
-    private LessonsQuestionRepository lessonsQuestionRepository;
-    private LessonsAnswerRepository lessonsAnswerRepository;
-    private UserRepository userRepository;
+    private final ScenarioRepository scenarioRepository;
+    private final TeamRepository teamRepository;
+    private final LessonsTemplateRepository lessonsTemplateRepository;
+    private final LessonsCategoryRepository lessonsCategoryRepository;
+    private final LessonsQuestionRepository lessonsQuestionRepository;
+    private final LessonsAnswerRepository lessonsAnswerRepository;
+    private final UserRepository userRepository;
 
 
     @GetMapping(SCENARIO_URI + "{scenarioId}/lessons_categories")

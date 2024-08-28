@@ -27,14 +27,14 @@ public class ExerciseLessonsApi extends RestBehavior {
 
     public static final String EXERCISE_URL = "/api/exercises/";
 
-    private ExerciseRepository exerciseRepository;
-    private TeamRepository teamRepository;
-    private LessonsTemplateRepository lessonsTemplateRepository;
-    private LessonsCategoryRepository lessonsCategoryRepository;
-    private LessonsQuestionRepository lessonsQuestionRepository;
-    private LessonsAnswerRepository lessonsAnswerRepository;
-    private UserRepository userRepository;
-    private MailingService mailingService;
+    private final ExerciseRepository exerciseRepository;
+    private final TeamRepository teamRepository;
+    private final LessonsTemplateRepository lessonsTemplateRepository;
+    private final LessonsCategoryRepository lessonsCategoryRepository;
+    private final LessonsQuestionRepository lessonsQuestionRepository;
+    private final LessonsAnswerRepository lessonsAnswerRepository;
+    private final UserRepository userRepository;
+    private final MailingService mailingService;
 
 
     @GetMapping(EXERCISE_URL + "{exerciseId}/lessons_categories")

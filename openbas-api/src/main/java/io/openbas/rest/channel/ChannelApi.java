@@ -30,13 +30,13 @@ import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 @RequiredArgsConstructor
 public class ChannelApi extends RestBehavior {
 
-    private ExerciseRepository exerciseRepository;
-    private ScenarioService scenarioService;
-    private ArticleRepository articleRepository;
-    private ChannelRepository channelRepository;
-    private DocumentRepository documentRepository;
-    private UserRepository userRepository;
-    private ChannelService channelService;
+    private final ExerciseRepository exerciseRepository;
+    private final ScenarioService scenarioService;
+    private final ArticleRepository articleRepository;
+    private final ChannelRepository channelRepository;
+    private final DocumentRepository documentRepository;
+    private final UserRepository userRepository;
+    private final ChannelService channelService;
 
     // -- CHANNELS --
 

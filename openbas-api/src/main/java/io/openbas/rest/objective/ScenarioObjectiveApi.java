@@ -29,10 +29,10 @@ public class ScenarioObjectiveApi extends RestBehavior {
 
     public static final String SCENARIO_URI = "/api/scenarios/";
 
-    private ScenarioRepository scenarioRepository;
-    private ObjectiveRepository objectiveRepository;
-    private EvaluationRepository evaluationRepository;
-    private UserRepository userRepository;
+    private final ScenarioRepository scenarioRepository;
+    private final ObjectiveRepository objectiveRepository;
+    private final EvaluationRepository evaluationRepository;
+    private final UserRepository userRepository;
 
     // region objectives
     @GetMapping(SCENARIO_URI + "{scenarioId}/objectives")

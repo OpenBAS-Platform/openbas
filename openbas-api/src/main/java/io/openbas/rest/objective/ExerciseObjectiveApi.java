@@ -29,10 +29,10 @@ public class ExerciseObjectiveApi extends RestBehavior {
 
     public static final String EXERCISE_URI = "/api/exercises/";
 
-    private ExerciseRepository exerciseRepository;
-    private ObjectiveRepository objectiveRepository;
-    private EvaluationRepository evaluationRepository;
-    private UserRepository userRepository;
+    private final ExerciseRepository exerciseRepository;
+    private final ObjectiveRepository objectiveRepository;
+    private final EvaluationRepository evaluationRepository;
+    private final UserRepository userRepository;
 
     // region objectives
     @GetMapping(EXERCISE_URI + "{exerciseId}/objectives")

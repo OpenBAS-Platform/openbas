@@ -35,13 +35,13 @@ import static io.openbas.helper.StreamHelper.iterableToSet;
 @RequiredArgsConstructor
 public class ChallengeApi extends RestBehavior {
 
-    private ChallengeRepository challengeRepository;
-    private ChallengeFlagRepository challengeFlagRepository;
-    private TagRepository tagRepository;
-    private DocumentRepository documentRepository;
-    private ExerciseRepository exerciseRepository;
-    private ChallengeService challengeService;
-    private UserRepository userRepository;
+    private final ChallengeRepository challengeRepository;
+    private final ChallengeFlagRepository challengeFlagRepository;
+    private final TagRepository tagRepository;
+    private final DocumentRepository documentRepository;
+    private final ExerciseRepository exerciseRepository;
+    private final ChallengeService challengeService;
+    private final UserRepository userRepository;
 
     @GetMapping("/api/challenges")
     public Iterable<Challenge> challenges() {
