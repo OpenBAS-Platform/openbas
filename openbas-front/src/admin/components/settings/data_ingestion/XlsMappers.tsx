@@ -129,6 +129,7 @@ const XlsMappers = () => {
                 <ListItemSecondaryAction>
                   <XlsMapperPopover
                     mapper={mapper}
+                    onDuplicate={(result) => setMappers([result, ...mappers])}
                     onUpdate={(result) => setMappers(mappers.map((existing) => (existing.import_mapper_id !== result.import_mapper_id ? existing : result)))}
                     onDelete={(result) => setMappers(mappers.filter((existing) => (existing.import_mapper_id !== result)))}
                   />

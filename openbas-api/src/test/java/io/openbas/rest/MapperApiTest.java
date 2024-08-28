@@ -147,6 +147,29 @@ public class MapperApiTest {
     assertEquals(JsonPath.read(response, "$.import_mapper_id"), importMapper.getId());
   }
 
+  @DisplayName("Test duplicate a mapper")
+  @Test
+  void duplicateMapper() throws Exception {
+    // -- PREPARE --
+    ImportMapper importMapper = MockMapperUtils.createImportMapper();
+    ImportMapper importMapperDuplicated = MockMapperUtils.createImportMapper();
+    when(mapperService.getDuplicateImportMapper(any())).thenReturn(importMapperDuplicated);
+
+    // -- EXECUTE --
+    String response = this.mvc
+            .perform(MockMvcRequestBuilders.post("/api/mappers/"+ importMapper.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(importMapper)))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // -- ASSERT --
+    assertNotNull(response);
+    assertEquals(JsonPath.read(response, "$.import_mapper_id"), importMapperDuplicated.getId());
+  }
+
   @DisplayName("Test delete a specific mapper")
   @Test
   void deleteSpecificMapper() throws Exception {

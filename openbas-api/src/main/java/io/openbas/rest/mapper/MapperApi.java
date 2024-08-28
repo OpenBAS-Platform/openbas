@@ -120,6 +120,13 @@ public class MapperApi extends RestBehavior {
     }
 
     @Secured(ROLE_ADMIN)
+    @PostMapping("/api/mappers/{mapperId}")
+    @Operation(summary = "Duplicate XLS mapper by id")
+    public ImportMapper duplicateMapper(@PathVariable @NotBlank final String mapperId) {
+        return mapperService.getDuplicateImportMapper(mapperId);
+    }
+
+    @Secured(ROLE_ADMIN)
     @PutMapping("/api/mappers/{mapperId}")
     public ImportMapper updateImportMapper(@PathVariable String mapperId, @Valid @RequestBody ImportMapperUpdateInput importMapperUpdateInput) {
         return mapperService.updateImportMapper(mapperId, importMapperUpdateInput);

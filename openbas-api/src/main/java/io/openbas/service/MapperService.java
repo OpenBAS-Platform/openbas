@@ -2,29 +2,28 @@ package io.openbas.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.database.model.ImportMapper;
-import io.openbas.database.model.InjectImporter;
-import io.openbas.database.model.InjectorContract;
-import io.openbas.database.model.RuleAttribute;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.helper.ObjectMapperHelper;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.mapper.export.MapperExportMixins;
 import io.openbas.rest.mapper.form.*;
+import io.openbas.utils.CopyObjectListUtils;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static io.openbas.utils.StringUtils.duplicateString;
 import static java.util.stream.StreamSupport.stream;
 
 @RequiredArgsConstructor
@@ -52,31 +51,54 @@ public class MapperService {
     importMapper.setInjectImporters(new ArrayList<>());
 
     Map<String, InjectorContract> mapInjectorContracts = getMapOfInjectorContracts(
-            importMapperAddInput.getImporters()
-                    .stream()
-                    .map(InjectImporterAddInput::getInjectorContractId)
-                    .toList()
+      importMapperAddInput.getImporters()
+              .stream()
+              .map(InjectImporterAddInput::getInjectorContractId)
+              .toList()
     );
 
     importMapperAddInput.getImporters().forEach(
-            injectImporterInput -> {
-              InjectImporter injectImporter = new InjectImporter();
-              injectImporter.setInjectorContract(mapInjectorContracts.get(injectImporterInput.getInjectorContractId()));
-              injectImporter.setImportTypeValue(injectImporterInput.getInjectTypeValue());
-              injectImporter.setRuleAttributes(new ArrayList<>());
-              injectImporterInput.getRuleAttributes().forEach(ruleAttributeInput -> {
-                RuleAttribute ruleAttribute = new RuleAttribute();
-                ruleAttribute.setColumns(ruleAttributeInput.getColumns());
-                ruleAttribute.setName(ruleAttributeInput.getName());
-                ruleAttribute.setDefaultValue(ruleAttributeInput.getDefaultValue());
-                ruleAttribute.setAdditionalConfig(ruleAttributeInput.getAdditionalConfig());
-                injectImporter.getRuleAttributes().add(ruleAttribute);
-              });
-              importMapper.getInjectImporters().add(injectImporter);
-            }
+      injectImporterInput -> {
+        InjectImporter injectImporter = new InjectImporter();
+        injectImporter.setInjectorContract(mapInjectorContracts.get(injectImporterInput.getInjectorContractId()));
+        injectImporter.setImportTypeValue(injectImporterInput.getInjectTypeValue());
+
+        injectImporter.setRuleAttributes(new ArrayList<>());
+        injectImporterInput.getRuleAttributes().forEach(ruleAttributeInput -> {
+            injectImporter.getRuleAttributes().add(CopyObjectListUtils.copyObjectWithoutId(ruleAttributeInput, RuleAttribute.class));
+        });
+        importMapper.getInjectImporters().add(injectImporter);
+      }
     );
 
     return importMapper;
+  }
+
+  /**
+   * Duplicate importMapper by id
+   * @param importMapperId id of the mapper that need to be duplicated
+   * @return The duplicated ImportMapper
+   */
+  @Transactional
+  public ImportMapper getDuplicateImportMapper(@NotBlank String importMapperId) {
+    if (StringUtils.isNotBlank(importMapperId)) {
+      ImportMapper importMapperOrigin = importMapperRepository.findById(UUID.fromString(importMapperId)).orElseThrow();
+      ImportMapper importMapper = CopyObjectListUtils.copyObjectWithoutId(importMapperOrigin, ImportMapper.class);
+      importMapper.setName(duplicateString(importMapperOrigin.getName()));
+      List<InjectImporter> injectImporters = getInjectImportersDuplicated(importMapperOrigin.getInjectImporters());
+      importMapper.setInjectImporters(injectImporters);
+      return importMapperRepository.save(importMapper);
+    }
+    throw new ElementNotFoundException();
+  }
+
+  private List<InjectImporter> getInjectImportersDuplicated(List<InjectImporter> injectImportersOrigin) {
+    List<InjectImporter> injectImporters = CopyObjectListUtils.copyWithoutIds(injectImportersOrigin, InjectImporter.class);
+    injectImporters.forEach(injectImport -> {
+      List<RuleAttribute> ruleAttributes = CopyObjectListUtils.copyWithoutIds(injectImport.getRuleAttributes(), RuleAttribute.class);
+      injectImport.setRuleAttributes(ruleAttributes);
+    });
+    return injectImporters;
   }
 
   /**
