@@ -156,3 +156,7 @@ input[type="file"] {
 .react-flow__controls {
   border: 1px solid #b5b7ba;
 }
+
+.react-flow__pane.draggable:not(.react-flow__pane.draggable.dragging) {
+  cursor: none !important;
+}

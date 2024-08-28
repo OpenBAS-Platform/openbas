@@ -33,7 +33,7 @@ import NodePhantom from './nodes/NodePhantom';
 
 const useStyles = makeStyles(() => ({
   container: {
-    marginTop: 60,
+    marginTop: 30,
     paddingRight: 40,
   },
   rotatedIcon: {
@@ -73,6 +73,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   const [currentUpdatedNode, setCurrentUpdatedNode] = useState<NodeInject | null>(null);
   const [currentMousePosition, setCurrentMousePosition] = useState<XYPosition>({ x: 0, y: 0 });
   const [newNodeCursorVisibility, setNewNodeCursorVisibility] = useState<'visible' | 'hidden'>('visible');
+  const [newNodeCursorClickable, setNewNodeCursorClickable] = useState<boolean>(true);
   const [currentMouseTime, setCurrentMouseTime] = useState<string>('');
 
   let timer: NodeJS.Timeout;
@@ -221,32 +222,42 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   };
 
   const onNodePhantomClick = (event: React.MouseEvent) => {
-    const position = reactFlow.screenToFlowPosition({ x: event.clientX, y: event.clientY });
+    if (newNodeCursorClickable) {
+      const position = reactFlow.screenToFlowPosition({ x: event.clientX, y: event.clientY });
 
-    const totalMinutes = moment.duration((position.x / gapSize) * minutesPerGapAllowed[minutesPerGapIndex] * 60, 's');
-    openCreateInjectDrawer({
-      inject_depends_duration_days: totalMinutes.days(),
-      inject_depends_duration_hours: totalMinutes.hours(),
-      inject_depends_duration_minutes: totalMinutes.minutes(),
-    });
+      const totalMinutes = moment.duration((position.x / gapSize) * minutesPerGapAllowed[minutesPerGapIndex] * 60, 's');
+      openCreateInjectDrawer({
+        inject_depends_duration_days: totalMinutes.days(),
+        inject_depends_duration_hours: totalMinutes.hours(),
+        inject_depends_duration_minutes: totalMinutes.minutes(),
+      });
+    }
   };
 
   const onMouseMove = (eventMove: React.MouseEvent) => {
     clearTimeout(timer);
     if (!draggingOnGoing) {
-      eventMove.persist();
       const position = reactFlow.screenToFlowPosition({ x: eventMove.clientX, y: eventMove.clientY }, { snapToGrid: false });
       const sidePosition = reactFlow.screenToFlowPosition({ x: eventMove.clientX - 25, y: eventMove.clientY }, { snapToGrid: false });
 
       const viewPort = reactFlow.getViewport();
-      setCurrentMousePosition({ x: ((position.x * reactFlow.getZoom()) + viewPort.x - 25), y: ((position.y * reactFlow.getZoom()) + viewPort.y + 25) });
-      const momentOfTime = moment.utc(
-        moment.duration(convertCoordinatesToTime(
-          { x: sidePosition.x, y: sidePosition.y },
-        ), 's').asMilliseconds(),
-      );
+      setCurrentMousePosition({ x: ((position.x * reactFlow.getZoom()) + viewPort.x - 25), y: ((position.y * reactFlow.getZoom()) + viewPort.y - 25) });
 
-      setCurrentMouseTime(`${momentOfTime.dayOfYear() - 1} d, ${momentOfTime.hour()} h, ${momentOfTime.minute()} m`);
+      if (startDate === undefined) {
+        const momentOfTime = moment.utc(
+          moment.duration(convertCoordinatesToTime(
+            { x: sidePosition.x, y: sidePosition.y },
+          ), 's').asMilliseconds(),
+        );
+
+        setCurrentMouseTime(`${momentOfTime.dayOfYear() - 1} d, ${momentOfTime.hour()} h, ${momentOfTime.minute()} m`);
+      } else {
+        const momentOfTime = moment.utc(startDate)
+          .add(-new Date().getTimezoneOffset() / 60, 'h')
+          .add(convertCoordinatesToTime({ x: sidePosition.x, y: sidePosition.y }), 's');
+
+        setCurrentMouseTime(momentOfTime.format('MMMM Do, YYYY - h:mmA'));
+      }
     }
   };
 
@@ -256,10 +267,12 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
 
   const nodeMouseEnter = () => {
     setNewNodeCursorVisibility('hidden');
+    setNewNodeCursorClickable(false);
   };
 
   const nodeMouseLeave = () => {
     setNewNodeCursorVisibility('visible');
+    setNewNodeCursorClickable(true);
   };
 
   const updateMinutesPerGap = (incrementIndex: number) => {
@@ -275,17 +288,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     <>
       {injects.length > 0 ? (
         <div className={classes.container} style={{ width: '100%', height: 350 }}>
-          <div className={classes.newBox}
-            style={{
-              top: currentMousePosition.y,
-              left: currentMousePosition.x,
-              visibility: newNodeCursorVisibility,
-            }}
-          >
-            <NodePhantom
-              time={currentMouseTime}
-            />
-          </div>
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -309,7 +311,19 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             nodeExtent={[[0, 0], [Infinity, Infinity]]}
             defaultViewport={{ x: 60, y: 50, zoom: 0.75 }}
             minZoom={0.3}
+            onClick={onNodePhantomClick}
           >
+            <div className={classes.newBox}
+              style={{
+                top: currentMousePosition.y,
+                left: currentMousePosition.x,
+                visibility: newNodeCursorVisibility,
+              }}
+            >
+              <NodePhantom
+                time={currentMouseTime}
+              />
+            </div>
             <div
               onMouseEnter={nodeMouseEnter}
               onMouseLeave={nodeMouseLeave}
@@ -335,20 +349,16 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
                 </ControlButton>
               </Controls>
             </div>
-            <div
-              onClick={onNodePhantomClick}
-            >
-              <CustomTimelineBackground
-                gap={gapSize}
-                minutesPerGap={minutesPerGapAllowed[minutesPerGapIndex]}
-              />
-              <CustomTimelinePanel
-                gap={gapSize}
-                minutesPerGap={minutesPerGapAllowed[minutesPerGapIndex]}
-                viewportData={ viewportData }
-                startDate={ startDate }
-              />
-            </div>
+            <CustomTimelineBackground
+              gap={gapSize}
+              minutesPerGap={minutesPerGapAllowed[minutesPerGapIndex]}
+            />
+            <CustomTimelinePanel
+              gap={gapSize}
+              minutesPerGap={minutesPerGapAllowed[minutesPerGapIndex]}
+              viewportData={viewportData}
+              startDate={startDate}
+            />
           </ReactFlow>
         </div>
       ) : null

@@ -61,16 +61,18 @@ function BackgroundComponent({
           dateIndex: Math.round(date.unix() / (minutesPerGap * 3 * 60)),
         });
       } else {
-        const date = moment.utc(startDate)
+        const beginningDate = moment.utc(startDate)
+          .add(-new Date().getTimezoneOffset() / 60, 'h');
+        const date = moment.utc(beginningDate)
           .add((minutesPerGap * 3 * i) + offset, 'm');
         newParsedDates.push({
           parsedDate: date.format('MMMM Do, YYYY - h:mmA'),
-          dateIndex: Math.round(date.unix() / (minutesPerGap * 3 * 60)),
+          dateIndex: Math.round((date.unix() - beginningDate.unix()) / (minutesPerGap * 3 * 60)),
         });
       }
     }
     setParsedDates(newParsedDates);
-  }, [viewportData, minutesPerGap]);
+  }, [viewportData, minutesPerGap, startDate]);
 
   return (
     <Panel className={classes.panel}>
