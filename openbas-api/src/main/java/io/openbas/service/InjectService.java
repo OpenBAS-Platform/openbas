@@ -287,7 +287,7 @@ public class InjectService {
         try {
             // We open the previously saved file
             String tmpdir = System.getProperty("java.io.tmpdir");
-            java.nio.file.Path file = Files.list(Path.of(tmpdir, pathSeparator, importId, pathSeparator)).findFirst().orElseThrow();
+            Path file = Files.list(Path.of(tmpdir, pathSeparator, importId, pathSeparator)).findFirst().orElseThrow();
 
             // We open the file and convert it to an apache POI object
             InputStream xlsFile = Files.newInputStream(file);
@@ -300,7 +300,17 @@ public class InjectService {
             Map<String, Pattern> mapPatternByInjectImport = importMapper
                 .getInjectImporters().stream().collect(
                     Collectors.toMap(InjectImporter::getId,
-                            injectImporter -> Pattern.compile(injectImporter.getImportTypeValue())
+                        injectImporter -> Pattern.compile(injectImporter.getImportTypeValue())
+                    ));
+
+            Map<String, Pattern> mapPatternByAllTeams = importMapper.getInjectImporters().stream()
+                    .flatMap(injectImporter -> injectImporter.getRuleAttributes().stream())
+                    .filter(ruleAttribute -> Objects.equals(ruleAttribute.getName(), "teams"))
+                    .filter(ruleAttribute ->  ruleAttribute.getAdditionalConfig() != null && !Strings.isBlank(ruleAttribute.getAdditionalConfig().get("allTeamsValue")))
+                    .collect(
+                            Collectors.toMap(ruleAttribute -> ruleAttribute.getAdditionalConfig().get("allTeamsValue"),
+                                    ruleAttribute -> Pattern.compile(ruleAttribute.getAdditionalConfig().get("allTeamsValue")),
+                                    (first, second) -> first
                     ));
 
             // We also get the list of teams into a map to be able to get them easily later on
@@ -321,7 +331,7 @@ public class InjectService {
 
             // For each rows of the selected sheet
             selectedSheet.rowIterator().forEachRemaining(row -> {
-                ImportRow rowSummary = importRow(row, importMapper, scenario, mapPatternByInjectImport, mapTeamByName,
+                ImportRow rowSummary = importRow(row, importMapper, scenario, mapPatternByInjectImport, mapTeamByName, mapPatternByAllTeams,
                         zoneOffset);
                 importTestSummary.getImportMessage().addAll(rowSummary.getImportMessages());
                 if(rowSummary.getInject() != null) {
@@ -366,7 +376,7 @@ public class InjectService {
 
     private ImportRow importRow(Row row, ImportMapper importMapper, Scenario scenario,
                                 Map<String, Pattern> mapPatternByInjectImport, Map<String, Team> mapTeamByName,
-                                ZoneOffset timezoneOffset) {
+                                Map<String, Pattern> mapPatternByAllTeams, ZoneOffset timezoneOffset) {
         ImportRow importTestSummary = new ImportRow();
         // The column that differenciate the importer is the same for all so we get it right now
         int colTypeIdx = CellReference.convertColStringToIndex(importMapper.getInjectTypeColumn());
@@ -574,10 +584,8 @@ public class InjectService {
         matchingInjectImporter.getRuleAttributes().forEach(ruleAttribute -> {
             importTestSummary.getImportMessages().addAll(
                     addFields(inject, ruleAttribute,
-                            row, mapTeamByName, expectation, importMapper));
+                            row, mapTeamByName, expectation, importMapper, mapPatternByAllTeams));
         });
-        // This is by default at false
-        inject.setAllTeams(false);
         // The user is the one doing the import
         inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
         // No exercise yet
@@ -630,7 +638,8 @@ public class InjectService {
     private List<ImportMessage> addFields(Inject inject, RuleAttribute ruleAttribute,
                                           Row row, Map<String, Team> mapTeamByName,
                                           AtomicReference<InjectExpectation> expectation,
-                                          ImportMapper importMapper) {
+                                          ImportMapper importMapper,
+                                          Map<String, Pattern> mapPatternByAllTeams) {
         // If it's a reserved field, it's already taken care of
         if(importReservedField.contains(ruleAttribute.getName())) {
             return Collections.emptyList();
@@ -668,8 +677,8 @@ public class InjectService {
             case "team":
                 // If the rule type is on a team field, we split by "+" if there is a concatenation of columns
                 // and then joins the result, split again by "," and use the list of results to get the teams by their name
-
                 List<String> columnValues = new ArrayList<>();
+                String allTeamsValue = ruleAttribute.getAdditionalConfig() != null ? ruleAttribute.getAdditionalConfig().get("allTeamsValue") : null;
                 if(ruleAttribute.getColumns() != null) {
                     columnValues = Arrays.stream(Arrays.stream(ruleAttribute.getColumns().split("\\+"))
                                     .map(column -> getValueAsString(row, column))
@@ -687,7 +696,14 @@ public class InjectService {
                 } else {
                     List<ImportMessage> importMessages = new ArrayList<>();
                     columnValues.forEach(teamName -> {
-                        if(mapTeamByName.containsKey(teamName)) {
+                        inject.setAllTeams(false);
+                        Matcher allTeamsMatcher = null;
+                        if(mapPatternByAllTeams.get(allTeamsValue) != null) {
+                            allTeamsMatcher = mapPatternByAllTeams.get(allTeamsValue).matcher(teamName);
+                        }
+                        if (allTeamsValue != null && allTeamsMatcher != null && allTeamsMatcher.find()) {
+                            inject.setAllTeams(true);
+                        } else if(mapTeamByName.containsKey(teamName)) {
                             inject.getTeams().add(mapTeamByName.get(teamName));
                         } else {
                             // The team does not exist, we create a new one

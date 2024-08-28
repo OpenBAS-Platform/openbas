@@ -1285,6 +1285,7 @@ const i18n = {
       // Inject test
       'Inject test has been sent, you can view test logs details on ': 'Le test de l\'inject a été envoyé, vous pouvez visualiser les logs de test sur  ',
       'its dedicated page.': 'sa page dédiée',
+      'Value that signifies that all teams are targeted. A regex can be used.': 'Valeur indiquant que l\'injecteur s\'applique à toutes les équipes. Il est possible d\'utiliser une expression régulière.',
     },
     zh: {
       'Email address': 'email地址',
@@ -2501,6 +2502,7 @@ const i18n = {
       // Platform Banner
       'IMAP service is not responding, your injectors may be impacted.': 'IMAP service is not responding, your injectors may be impacted.',
       'Executor Caldera is not responding, your exercises may be impacted.': 'Executor Caldera is not responding, your exercises may be impacted.',
+      'Value that signifies that all teams are targeted. A regex can be used.': 'Value that signifies that all teams are targeted. A regex can be used.',
     },
     en: {
       openbas_email: 'Email',
@@ -2619,6 +2621,7 @@ const i18n = {
       // Platform Banner
       'IMAP service is not responding, your injectors may be impacted.': 'IMAP service is not responding, your injectors may be impacted.',
       'Executor Caldera is not responding, your exercises may be impacted.': 'Executor Caldera is not responding, your exercises may be impacted.',
+      'Value that signifies that all teams are targeted. A regex can be used.': 'Value that signifies that all teams are targeted. A regex can be used.',
     },
   },
 };
