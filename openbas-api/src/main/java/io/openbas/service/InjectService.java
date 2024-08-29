@@ -22,7 +22,6 @@ import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FilenameUtils;
@@ -30,10 +29,11 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,9 +74,9 @@ public class InjectService {
     private final AssetRepository assetRepository;
     private final AssetGroupRepository assetGroupRepository;
     private final ScenarioTeamUserRepository scenarioTeamUserRepository;
+    private final ExerciseTeamUserRepository exerciseTeamUserRepository;
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
-    private final ScenarioService scenarioService;
 
     private final List<String> importReservedField = List.of("description", "title", "trigger_time");
 
@@ -237,8 +237,16 @@ public class InjectService {
     }
 
     public ImportTestSummary importInjectIntoScenarioFromXLS(Scenario scenario, ImportMapper importMapper, String importId, String sheetName, int timezoneOffset, boolean saveAll) {
+        return importInjectIntoFromXLS(scenario, null, importMapper, importId, sheetName, timezoneOffset, saveAll);
+    }
+
+    public ImportTestSummary importInjectIntoExerciseFromXLS(Exercise exercise, ImportMapper importMapper, String importId, String sheetName, int timezoneOffset, boolean saveAll) {
+        return importInjectIntoFromXLS(null, exercise, importMapper, importId, sheetName, timezoneOffset, saveAll);
+    }
+
+    public ImportTestSummary importInjectIntoFromXLS(Scenario scenario, Exercise exercise, ImportMapper importMapper, String importId, String sheetName, int timezoneOffset, boolean saveAll) {
         // We call the inject service to get the injects to create as well as messages on how things went
-        ImportTestSummary importTestSummary = importXls(importId, scenario, importMapper, sheetName, timezoneOffset);
+        ImportTestSummary importTestSummary = importXls(importId, scenario, exercise, importMapper, sheetName, timezoneOffset);
         Optional<ImportMessage> hasCritical = importTestSummary.getImportMessage().stream()
                 .filter(importMessage -> importMessage.getMessageLevel() == ImportMessage.MessageLevel.CRITICAL)
                 .findAny();
@@ -254,25 +262,13 @@ public class InjectService {
                 return inject;
             }).toList());
             Iterable<Inject> newInjects = injectRepository.saveAll(importTestSummary.getInjects());
-            newInjects.forEach(inject -> {
-                scenario.getInjects().add(inject);
-                inject.getTeams().forEach(team -> {
-                    if (!scenario.getTeams().contains(team)) {
-                        scenario.getTeams().add(team);
-                    }
-                });
-                inject.getTeams().forEach(team -> team.getUsers().forEach(user -> {
-                    if(!scenario.getTeamUsers().contains(user)) {
-                        ScenarioTeamUser scenarioTeamUser = new ScenarioTeamUser();
-                        scenarioTeamUser.setScenario(scenario);
-                        scenarioTeamUser.setTeam(team);
-                        scenarioTeamUser.setUser(user);
-                        scenarioTeamUserRepository.save(scenarioTeamUser);
-                        scenario.getTeamUsers().add(scenarioTeamUser);
-                    }
-                }));
-            });
-            scenarioService.updateScenario(scenario);
+            if (exercise != null) {
+                computeInjectInExercise(exercise, newInjects);
+            } else if (scenario != null) {
+                computeInjectInScenario(scenario, newInjects);
+            } else {
+                throw new IllegalArgumentException("At least one of exercise or scenario should be present");
+            }
             importTestSummary.setInjects(new ArrayList<>());
         } else {
             importTestSummary.setInjects(importTestSummary.getInjects().stream().limit(5).toList());
@@ -281,7 +277,49 @@ public class InjectService {
         return importTestSummary;
     }
 
-    private ImportTestSummary importXls(String importId, Scenario scenario, ImportMapper importMapper, String sheetName, int timezoneOffset) {
+    private void computeInjectInExercise(@NotNull Exercise exercise, @NotNull Iterable<Inject> newInjects) {
+        newInjects.forEach(inject -> {
+            exercise.getInjects().add(inject);
+            inject.getTeams().forEach(team -> {
+                if (!exercise.getTeams().contains(team)) {
+                    exercise.getTeams().add(team);
+                }
+            });
+            inject.getTeams().forEach(team -> team.getUsers().forEach(user -> {
+                if(!exercise.getTeamUsers().contains(user)) {
+                    ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
+                    exerciseTeamUser.setExercise(exercise);
+                    exerciseTeamUser.setTeam(team);
+                    exerciseTeamUser.setUser(user);
+                    exerciseTeamUserRepository.save(exerciseTeamUser);
+                    exercise.getTeamUsers().add(exerciseTeamUser);
+                }
+            }));
+        });
+    }
+
+    private void computeInjectInScenario(@NotNull Scenario scenario, @NotNull Iterable<Inject> newInjects) {
+        newInjects.forEach(inject -> {
+            scenario.getInjects().add(inject);
+            inject.getTeams().forEach(team -> {
+                if (!scenario.getTeams().contains(team)) {
+                    scenario.getTeams().add(team);
+                }
+            });
+            inject.getTeams().forEach(team -> team.getUsers().forEach(user -> {
+                if(!scenario.getTeamUsers().contains(user)) {
+                    ScenarioTeamUser scenarioTeamUser = new ScenarioTeamUser();
+                    scenarioTeamUser.setScenario(scenario);
+                    scenarioTeamUser.setTeam(team);
+                    scenarioTeamUser.setUser(user);
+                    scenarioTeamUserRepository.save(scenarioTeamUser);
+                    scenario.getTeamUsers().add(scenarioTeamUser);
+                }
+            }));
+        });
+    }
+
+    private ImportTestSummary importXls(String importId, Scenario scenario, Exercise exercise, ImportMapper importMapper, String sheetName, int timezoneOffset) {
         ImportTestSummary importTestSummary = new ImportTestSummary();
 
         try {
@@ -321,8 +359,16 @@ public class InjectService {
                             .collect(Collectors.toMap(Team::getName, Function.identity(), (first, second) -> first));
 
             // Then we add the contextual teams of the scenario
+            List<Team> teams;
+            if (exercise != null) {
+                teams = exercise.getTeams();
+            } else if (scenario != null) {
+                teams = scenario.getTeams();
+            } else {
+                throw new IllegalArgumentException("At least one of exercise or scenario should be present");
+            }
             mapTeamByName.putAll(
-                scenario.getTeams().stream()
+                teams.stream()
                     .filter(Team::getContextual)
                     .collect(Collectors.toMap(Team::getName, Function.identity(), (first, second) -> first))
             );
@@ -331,8 +377,26 @@ public class InjectService {
 
             // For each rows of the selected sheet
             selectedSheet.rowIterator().forEachRemaining(row -> {
-                ImportRow rowSummary = importRow(row, importMapper, scenario, mapPatternByInjectImport, mapTeamByName, mapPatternByAllTeams,
-                        zoneOffset);
+              Instant start;
+              if (scenario != null) {
+                start = scenario.getRecurrenceStart();
+              } else if(exercise != null) {
+                start = exercise.getStart().orElse(null);
+              } else {
+                throw new IllegalArgumentException("At least one of exercise or scenario should be present");
+              }
+              ImportRow rowSummary = importRow(
+                  row, importMapper, start, mapPatternByInjectImport, mapTeamByName, mapPatternByAllTeams, zoneOffset
+              );
+              // We set the exercise or scenario
+              Inject inject = rowSummary.getInject();
+              if (scenario != null && inject != null) {
+                inject.setScenario(scenario);
+              } else if (exercise != null && inject != null) {
+                inject.setExercise(exercise);
+              }
+              rowSummary.setInject(inject);
+
                 importTestSummary.getImportMessage().addAll(rowSummary.getImportMessages());
                 if(rowSummary.getInject() != null) {
                     importTestSummary.getInjects().add(rowSummary.getInject());
@@ -352,15 +416,21 @@ public class InjectService {
                     .filter(Objects::nonNull)
                     .min(Comparator.naturalOrder());
 
-            // If there is one, we update the scenario date
+            // If there is one, we update the date
             earliestDate.ifPresent(date -> {
                 ZonedDateTime zonedDateTime = date.atZone(ZoneId.of("UTC"));
                 Instant dayOfStart = ZonedDateTime.of(
                         zonedDateTime.getYear(), zonedDateTime.getMonthValue(), zonedDateTime.getDayOfMonth(),
                         0, 0, 0, 0, ZoneId.of("UTC")).toInstant();
-                scenario.setRecurrenceStart(dayOfStart);
-                scenario.setRecurrence("0 " + zonedDateTime.getMinute() + " " + zonedDateTime.getHour() + " * * *"); // Every day now + 1 hour
-                scenario.setRecurrenceEnd(dayOfStart.plus(1, ChronoUnit.DAYS));
+                if (scenario != null) {
+                    scenario.setRecurrenceStart(dayOfStart);
+                    scenario.setRecurrence("0 " + zonedDateTime.getMinute() + " " + zonedDateTime.getHour() + " * * *"); // Every day now + 1 hour
+                    scenario.setRecurrenceEnd(dayOfStart.plus(1, ChronoUnit.DAYS));
+                } else if(exercise != null) {
+                    exercise.setStart(dayOfStart);
+                } else {
+                    throw new IllegalArgumentException("At least one of exercise or scenario should be present");
+                }
             });
         } catch (IOException ex) {
             log.severe("Error while importing an xls file");
@@ -374,20 +444,21 @@ public class InjectService {
         return importTestSummary;
     }
 
-    private ImportRow importRow(Row row, ImportMapper importMapper, Scenario scenario,
-                                Map<String, Pattern> mapPatternByInjectImport, Map<String, Team> mapTeamByName,
-                                Map<String, Pattern> mapPatternByAllTeams, ZoneOffset timezoneOffset) {
+    private ImportRow importRow(
+        Row row, ImportMapper importMapper, Instant start,
+        Map<String, Pattern> mapPatternByInjectImport, Map<String, Team> mapTeamByName,
+        Map<String, Pattern> mapPatternByAllTeams,ZoneOffset timezoneOffset) {
         ImportRow importTestSummary = new ImportRow();
         // The column that differenciate the importer is the same for all so we get it right now
         int colTypeIdx = CellReference.convertColStringToIndex(importMapper.getInjectTypeColumn());
         if (colTypeIdx < 0) {
             // If there are no values, we add an info message so they know there is a potential issue here
             importTestSummary.getImportMessages().add(
-                    new ImportMessage(ImportMessage.MessageLevel.INFO,
-                            ImportMessage.ErrorCode.NO_POTENTIAL_MATCH_FOUND,
-                            Map.of("column_type_num", importMapper.getInjectTypeColumn(),
-                                    "row_num", String.valueOf(row.getRowNum()))
-                    )
+                new ImportMessage(ImportMessage.MessageLevel.INFO,
+                    ImportMessage.ErrorCode.NO_POTENTIAL_MATCH_FOUND,
+                    Map.of("column_type_num", importMapper.getInjectTypeColumn(),
+                        "row_num", String.valueOf(row.getRowNum()))
+                )
             );
             return importTestSummary;
         }
@@ -396,15 +467,15 @@ public class InjectService {
         if (InjectUtils.checkIfRowIsEmpty(row)) {
             return importTestSummary;
         }
-        // First of all, we get the value of the differenciation cell
+        // First of all, we get the value of the differentiation cell
         Cell typeCell = row.getCell(colTypeIdx);
         if (typeCell == null) {
             // If there are no values, we add an info message so they know there is a potential issue here
             importTestSummary.getImportMessages().add(
                 new ImportMessage(ImportMessage.MessageLevel.INFO,
-                        ImportMessage.ErrorCode.NO_POTENTIAL_MATCH_FOUND,
+                    ImportMessage.ErrorCode.NO_POTENTIAL_MATCH_FOUND,
                     Map.of("column_type_num", importMapper.getInjectTypeColumn(),
-                            "row_num", String.valueOf(row.getRowNum()))
+                        "row_num", String.valueOf(row.getRowNum()))
                 )
             );
             return importTestSummary;
@@ -414,7 +485,7 @@ public class InjectService {
         List<InjectImporter> matchingInjectImporters = importMapper.getInjectImporters().stream()
             .filter(injectImporter -> {
                 Matcher matcher = mapPatternByInjectImport.get(injectImporter.getId())
-                        .matcher(getValueAsString(row, importMapper.getInjectTypeColumn()));
+                    .matcher(getValueAsString(row, importMapper.getInjectTypeColumn()));
                 return matcher.find();
             }).toList();
 
@@ -422,9 +493,9 @@ public class InjectService {
         if (matchingInjectImporters.isEmpty()) {
             importTestSummary.getImportMessages().add(
                 new ImportMessage(ImportMessage.MessageLevel.INFO,
-                        ImportMessage.ErrorCode.NO_POTENTIAL_MATCH_FOUND,
+                    ImportMessage.ErrorCode.NO_POTENTIAL_MATCH_FOUND,
                     Map.of("column_type_num", importMapper.getInjectTypeColumn(),
-                            "row_num", String.valueOf(row.getRowNum()))
+                        "row_num", String.valueOf(row.getRowNum()))
                 )
             );
             return importTestSummary;
@@ -435,10 +506,10 @@ public class InjectService {
             String listMatchers = matchingInjectImporters.stream().map(InjectImporter::getImportTypeValue).collect(Collectors.joining(", "));
             importTestSummary.getImportMessages().add(
                 new ImportMessage(ImportMessage.MessageLevel.WARN,
-                        ImportMessage.ErrorCode.SEVERAL_MATCHES,
+                    ImportMessage.ErrorCode.SEVERAL_MATCHES,
                     Map.of("column_type_num", importMapper.getInjectTypeColumn(),
-                            "row_num", String.valueOf(row.getRowNum()),
-                            "possible_matches", listMatchers)
+                        "row_num", String.valueOf(row.getRowNum()),
+                        "possible_matches", listMatchers)
                 )
             );
             return importTestSummary;
@@ -463,7 +534,7 @@ public class InjectService {
             .findFirst().orElseGet(() -> {
                 RuleAttribute ruleAttributeDefault = new RuleAttribute();
                 ruleAttributeDefault.setAdditionalConfig(
-                        Map.of("timePattern", "")
+                    Map.of("timePattern", "")
                 );
                 return ruleAttributeDefault;
             });
@@ -473,8 +544,8 @@ public class InjectService {
         String dateAsString = Strings.EMPTY;
         if(triggerTimeRuleAttribute.getColumns() != null) {
             dateAsString = Arrays.stream(triggerTimeRuleAttribute.getColumns().split("\\+"))
-                    .map(column -> getDateAsStringFromCell(row, column, timePattern))
-                    .collect(Collectors.joining());
+                .map(column -> getDateAsStringFromCell(row, column, timePattern))
+                .collect(Collectors.joining());
         }
         if (dateAsString.isBlank()) {
             dateAsString = triggerTimeRuleAttribute.getDefaultValue();
@@ -522,10 +593,9 @@ public class InjectService {
                     }
                 }
                 if(date != null) {
-                    if(scenario.getRecurrenceStart() != null) {
+                    if(start != null) {
                         injectTime.setDate(
-                            scenario.getRecurrenceStart()
-                                .atZone(timezoneOffset).toLocalDateTime()
+                            start.atZone(timezoneOffset).toLocalDateTime()
                                 .withHour(date.get(ChronoField.HOUR_OF_DAY))
                                 .withMinute(date.get(ChronoField.MINUTE_OF_HOUR))
                                 .toInstant(timezoneOffset)
@@ -535,7 +605,7 @@ public class InjectService {
                             new ImportMessage(ImportMessage.MessageLevel.CRITICAL,
                                 ImportMessage.ErrorCode.ABSOLUTE_TIME_WITHOUT_START_DATE,
                                 Map.of("column_type_num", importMapper.getInjectTypeColumn(),
-                                        "row_num", String.valueOf(row.getRowNum()))
+                                    "row_num", String.valueOf(row.getRowNum()))
                             )
                         );
                     }
@@ -548,21 +618,21 @@ public class InjectService {
         if(!injectTime.isRelativeDay() && !injectTime.isRelativeHour() && !injectTime.isRelativeMinute() && dateTime != null) {
             if (dateTime instanceof LocalDateTime) {
                 Instant injectDate = Instant.ofEpochSecond(
-                        ((LocalDateTime)dateTime).toEpochSecond(timezoneOffset));
+                    ((LocalDateTime)dateTime).toEpochSecond(timezoneOffset));
                 injectTime.setDate(injectDate);
             } else if (dateTime instanceof LocalTime) {
-                if(scenario.getRecurrenceStart() != null) {
-                    injectTime.setDate(scenario.getRecurrenceStart()
-                            .atZone(timezoneOffset)
-                            .withHour(((LocalTime) dateTime).getHour())
-                            .withMinute(((LocalTime) dateTime).getMinute())
-                            .toInstant());
+                if(start != null) {
+                    injectTime.setDate(start
+                        .atZone(timezoneOffset)
+                        .withHour(((LocalTime) dateTime).getHour())
+                        .withMinute(((LocalTime) dateTime).getMinute())
+                        .toInstant());
                 } else {
                     importTestSummary.getImportMessages().add(
                         new ImportMessage(ImportMessage.MessageLevel.CRITICAL,
                             ImportMessage.ErrorCode.ABSOLUTE_TIME_WITHOUT_START_DATE,
                             Map.of("column_type_num", importMapper.getInjectTypeColumn(),
-                                    "row_num", String.valueOf(row.getRowNum()))
+                                "row_num", String.valueOf(row.getRowNum()))
                         )
                     );
                     return importTestSummary;
@@ -583,7 +653,7 @@ public class InjectService {
         // For each rule attributes of the importer
         matchingInjectImporter.getRuleAttributes().forEach(ruleAttribute -> {
             importTestSummary.getImportMessages().addAll(
-                    addFields(inject, ruleAttribute,
+                addFields(inject, ruleAttribute,
                             row, mapTeamByName, expectation, importMapper, mapPatternByAllTeams));
         });
         // The user is the one doing the import
@@ -605,9 +675,6 @@ public class InjectService {
             expectationsNode.add(expectationNode);
             inject.getContent().set("expectations", expectationsNode);
         }
-
-        // We set the scenario
-        inject.setScenario(scenario);
 
         importTestSummary.setInject(inject);
         importTestSummary.setInjectTime(injectTime);

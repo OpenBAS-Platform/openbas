@@ -60,9 +60,9 @@ class InjectServiceTest {
     @Mock
     ScenarioTeamUserRepository scenarioTeamUserRepository;
     @Mock
-    UserRepository userRepository;
+    ExerciseTeamUserRepository exerciseTeamUserRepository;
     @Mock
-    ScenarioService scenarioService;
+    UserRepository userRepository;
     @Mock
     ImportMapperRepository importMapperRepository;
     @InjectMocks
@@ -79,7 +79,7 @@ class InjectServiceTest {
     @BeforeEach
     void setUp() {
         injectService = new InjectService(injectRepository, injectDocumentRepository, injectExpectationRepository,
-                assetRepository, assetGroupRepository, scenarioTeamUserRepository, teamRepository, userRepository, scenarioService);
+                assetRepository, assetGroupRepository, scenarioTeamUserRepository, exerciseTeamUserRepository, teamRepository, userRepository);
 
         mockedScenario = new Scenario();
         mapper = new ObjectMapper();

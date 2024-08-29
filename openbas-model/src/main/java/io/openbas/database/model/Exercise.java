@@ -17,6 +17,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static io.openbas.database.model.Grant.GRANT_TYPE.OBSERVER;
 import static io.openbas.database.model.Grant.GRANT_TYPE.PLANNER;
@@ -366,7 +367,7 @@ public class Exercise implements Base {
   }
 
   public List<Inject> getInjects() {
-      return injects.stream().sorted(Inject.executionComparator).toList();
+      return injects.stream().sorted(Inject.executionComparator).collect(Collectors.toList()); // Should be modifiable
   }
 
   public List<Article> getArticlesForChannel(Channel channel) {

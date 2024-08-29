@@ -1,10 +1,11 @@
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { Inject } from '../../../../utils/api-types';
+import type { ImportTestSummary, Inject, InjectsImportInput } from '../../../../utils/api-types';
 import {
   addInjectForExercise,
   bulkDeleteInjectsForExercise,
   deleteInjectForExercise,
+  fetchExerciseInjects,
   injectDone,
   updateInjectActivationForExercise,
   updateInjectForExercise,
@@ -12,6 +13,8 @@ import {
 } from '../../../../actions/Inject';
 import { secondsFromToNow } from '../../../../utils/Exercise';
 import type { InjectStore } from '../../../../actions/injects/Inject';
+import { dryImportXlsForExercise, importXlsForExercise } from '../../../../actions/exercises/exercise-action';
+import { fetchExercise, fetchExerciseTeams } from '../../../../actions/Exercise';
 
 const injectContextForExercise = (exercise: ExerciseStore) => {
   const dispatch = useAppDispatch();
@@ -40,6 +43,17 @@ const injectContextForExercise = (exercise: ExerciseStore) => {
     },
     onDeleteInject(injectId: Inject['inject_id']): void {
       return dispatch(deleteInjectForExercise(exercise.exercise_id, injectId));
+    },
+    onImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {
+      return importXlsForExercise(exercise.exercise_id, importId, input).then((response) => new Promise((resolve, _reject) => {
+        dispatch(fetchExerciseInjects(exercise.exercise_id));
+        dispatch(fetchExercise(exercise.exercise_id));
+        dispatch(fetchExerciseTeams(exercise.exercise_id));
+        resolve(response.data);
+      }));
+    },
+    async onDryImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {
+      return dryImportXlsForExercise(exercise.exercise_id, importId, input).then((result) => result.data);
     },
     onBulkDeleteInjects(injectIds: string[]): void {
       return dispatch(bulkDeleteInjectsForExercise(exercise.exercise_id, injectIds));

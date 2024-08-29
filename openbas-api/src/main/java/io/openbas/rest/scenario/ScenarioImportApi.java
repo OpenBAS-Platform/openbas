@@ -70,6 +70,9 @@ public class ScenarioImportApi extends RestBehavior {
                 .findById(UUID.fromString(input.getImportMapperId()))
                 .orElseThrow(() -> new ElementNotFoundException(String.format("The import mapper %s was not found", input.getImportMapperId())));
 
-        return injectService.importInjectIntoScenarioFromXLS(scenario, importMapper, importId, input.getName(), input.getTimezoneOffset(), true);
+        ImportTestSummary importTestSummary = injectService.importInjectIntoScenarioFromXLS(scenario, importMapper, importId,
+            input.getName(), input.getTimezoneOffset(), true);
+        scenarioService.updateScenario(scenario);
+        return importTestSummary;
     }
 }

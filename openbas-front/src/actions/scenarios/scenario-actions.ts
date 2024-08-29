@@ -154,7 +154,7 @@ export const fetchScenarioStatistic = () => {
 
 // -- IMPORT --
 
-export const importXls = (scenarioId: Scenario['scenario_id'], importId: string, input: InjectsImportInput) => {
+export const importXlsForScenario = (scenarioId: Scenario['scenario_id'], importId: string, input: InjectsImportInput) => {
   const uri = `${SCENARIO_URI}/${scenarioId}/xls/${importId}/import`;
   return simplePostCall(uri, input)
     .then((response) => {
@@ -168,7 +168,7 @@ export const importXls = (scenarioId: Scenario['scenario_id'], importId: string,
     });
 };
 
-export const dryImportXls = (scenarioId: Scenario['scenario_id'], importId: string, input: InjectsImportInput) => {
+export const dryImportXlsForScenario = (scenarioId: Scenario['scenario_id'], importId: string, input: InjectsImportInput) => {
   const uri = `${SCENARIO_URI}/${scenarioId}/xls/${importId}/dry`;
   return simplePostCall(uri, input)
     .then((response) => {

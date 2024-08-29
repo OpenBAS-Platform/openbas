@@ -6,6 +6,7 @@ import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ArticleRepository;
 import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
@@ -21,8 +22,8 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -43,6 +44,7 @@ import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.ResultUtils.computeTargetResults;
 import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
+import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -204,6 +206,20 @@ public class ExerciseService {
             }
             this.grantService.computeGrant(exercise);
             return exerciseRepository.save(exercise);
+    }
+
+    // -- READ --
+
+    public Exercise exercise(@NotBlank final String exerciseId) {
+        return this.exerciseRepository.findById(exerciseId)
+            .orElseThrow(() -> new ElementNotFoundException("Exercise not found"));
+    }
+
+    // -- UPDATE --
+
+    public Exercise updateExercise(@NotNull final Exercise exercise) {
+        exercise.setUpdatedAt(now());
+        return this.exerciseRepository.save(exercise);
     }
 
     // -- DUPLICATION --
