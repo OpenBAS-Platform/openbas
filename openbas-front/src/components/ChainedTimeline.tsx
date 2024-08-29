@@ -107,9 +107,10 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     const parsedCron = scenario.scenario_recurrence ? parseCron(scenario.scenario_recurrence) : null;
     startDate = scenario?.scenario_recurrence_start ? scenario?.scenario_recurrence_start : exercise?.exercise_start_date;
     if (startDate !== undefined) {
-      startDate = moment(startDate).utc().hour(parsedCron!.h).minute(parsedCron!.m)
-        .second(parsedCron!.m)
-        .format();
+      startDate = parsedCron !== null
+        ? moment(startDate).utc().hour(parsedCron.h).minute(parsedCron.m)
+          .format()
+        : moment(startDate).utc().format();
     }
   } else if (exercise !== undefined) {
     startDate = exercise.exercise_start_date != null ? exercise.exercise_start_date : undefined;
