@@ -34,7 +34,7 @@ const ExerciseDateForm: React.FC<Props> = ({
     if (initialValues?.exercise_start_date) {
       const date = new Date(initialValues.exercise_start_date);
       return ({
-        date: new Date(new Date(date).setUTCHours(0, 0, 0, 0)).toISOString(),
+        date: new Date(new Date(date).setHours(0, 0, 0, 0)).toISOString(),
         time: new Date(new Date().setHours(date.getHours(), date.getMinutes(), date.getSeconds(), 0)).toISOString(),
       });
     }
@@ -78,14 +78,6 @@ const ExerciseDateForm: React.FC<Props> = ({
             return true;
           },
           { message: t('Required') },
-        ).refine(
-          (data) => {
-            if (!checked) {
-              return new Date(data).getTime() >= new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime();
-            }
-            return true;
-          },
-          { message: t('Date should be at least today') },
         ),
 
         time: z.any().refine(
@@ -97,19 +89,31 @@ const ExerciseDateForm: React.FC<Props> = ({
           },
           { message: t('Required') },
         ),
-      }).refine(
-        (data) => {
-          if (!checked) {
-            return new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() !== new Date(data.date).getTime()
-                  || (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < new Date(data.time).getTime();
-          }
-          return true;
-        },
-        {
-          message: t('The time and start date do not match, as the time provided is either too close to the current moment or in the past'),
-          path: ['time'],
-        },
-      ),
+      })
+        .refine(
+          (data) => {
+            if (!checked) {
+              return new Date(new Date().setHours(0, 0, 0, 0)).getTime() !== new Date(data.date).getTime()
+                          || (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < new Date(data.time).getTime();
+            }
+            return true;
+          },
+          {
+            message: t('The time and start date do not match, as the time provided is either too close to the current moment or in the past'),
+            path: ['time'],
+          },
+        )
+        .refine(
+          (data) => {
+            if (!checked) {
+              const time = new Date(data.time);
+              return new Date(new Date(data.date).setHours(time.getHours(), time.getMinutes(), time.getSeconds(), 0)).getTime()
+                  >= new Date(new Date().setHours(0, 0, 0, 0)).getTime();
+            }
+            return true;
+          },
+          { message: t('Date should be at least today'), path: ['date'] },
+        ),
     ),
   });
 
