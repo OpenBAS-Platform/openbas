@@ -269,6 +269,7 @@ const i18n = {
       'Update the simulation': 'Modifier la simulation',
       'Update the scenario': 'Modifier le scenario',
       'Update the inject': 'Modifier le stimuli',
+      'Update simulation start date and time': 'Mettre à jour la date et l\'heure de début de la simulation',
       'Do you want to remove the player from the team?':
         'Souhaitez-vous retirer le joueur de cette équipe ?',
       'Add players in this team': 'Ajouter des joueurs dans cette équipe',
@@ -1507,6 +1508,7 @@ const i18n = {
       'Update the simulation': '更新模拟',
       'Update the scenario': '更新场景',
       'Update the inject': '更新注入',
+      'Update simulation start date and time': '更新模拟开始日期和时间',
       'Do you want to remove the player from the team?':
         '你想要从团队移除选手么?',
       'Add players in this team': '添加选手到这个团队',
