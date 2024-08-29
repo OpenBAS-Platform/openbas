@@ -48,9 +48,11 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   'inject_status.tracking_sent_date': {
     width: '15%',
+    cursor: 'default',
   },
   inject_status: {
     width: '10%',
+    cursor: 'default',
   },
   inject_targets: {
     width: '20%',
