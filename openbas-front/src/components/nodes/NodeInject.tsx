@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { Handle, NodeProps, Position, Node, OnConnect } from '@xyflow/react';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import { Tooltip } from '@mui/material';
 import moment from 'moment';
 import type { Theme } from '../Theme';
@@ -18,9 +18,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
       theme.palette.mode === 'dark'
         ? '1px solid rgba(255, 255, 255, 0.12)'
         : '1px solid rgba(0, 0, 0, 0.12)',
-    borderLeft: theme.palette.mode === 'dark'
-      ? '1px solid rgba(255, 255, 255, 0.7)'
-      : '1px solid rgba(0, 0, 0, 0.7)',
     borderRadius: 4,
     width: 240,
     minHeight: '100px',
@@ -102,6 +99,7 @@ export type NodeInject = Node<{
  */
 const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
   const classes = useStyles();
+  const theme: Theme = useTheme();
 
   /**
    * Converts the duration in second to a string representing the relative time
@@ -148,8 +146,18 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
 
   const isDisabled = !data.inject?.inject_injector_contract.injector_contract_content_parsed?.config.expose;
 
+  let borderLeftColor = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)';
+  if (!data.inject?.inject_enabled) {
+    borderLeftColor = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)';
+  }
+
   return (
-    <div className={classes.node} style={{ backgroundColor: data.background, color: 'white' }} onClick={onClick}>
+    <div className={classes.node} style={{
+      backgroundColor: data.background,
+      color: 'white',
+      borderLeftColor,
+    }} onClick={onClick}
+    >
       <div className={classes.icon} style={{ opacity: data.inject?.inject_enabled ? '1' : '0.3' }}>
         <InjectIcon
           isPayload={isNotEmptyField(data.inject?.inject_injector_contract?.injector_contract_payload)}
