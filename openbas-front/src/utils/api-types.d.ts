@@ -1367,6 +1367,7 @@ export interface InjectTeamsInput {
 }
 
 export interface InjectTestStatus {
+  inject_id?: string;
   /** @format date-time */
   inject_test_status_created_at?: string;
   /** @format date-time */

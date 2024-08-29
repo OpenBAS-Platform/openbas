@@ -1228,6 +1228,10 @@ const i18n = {
         'Souhaitez-vous tester ce stimuli?',
       'Do you want to test these {count} injects?':
         'Souhaitez-vous tester ces {count} stimulis?',
+      'Do you want to delete this test?': 'Souhaitez-vous supprimer ce test?',
+      'Do you want to replay this test?': 'Souhaitez-vous rejouer ce test?',
+      'Replay all the tests': 'Rejouer tous les tests',
+      'Do you want to replay all these tests?': 'Souhaitez-vous rejouer tous ces tests?',
       'Only SMS and emails related injects will be tested': 'Uniquement les stimulis de types email et SMS seront testés',
       'Do you want to delete this XLS mapper ?': 'Voulez-vous supprimer ce mappage XLS ?',
       'Do you want to duplicate this XLS mapper :': 'Voulez-vous dupliquer ce mappage XLS :',

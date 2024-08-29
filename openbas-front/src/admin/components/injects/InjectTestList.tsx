@@ -1,6 +1,6 @@
 import { makeStyles } from '@mui/styles';
 import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import type { InjectTestStatus, SearchPaginationInput } from '../../../utils/api-types';
 import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
@@ -12,6 +12,8 @@ import Empty from '../../../components/Empty';
 import InjectTestDetail from './InjectTestDetail';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
+import InjectTestPopover from './InjectTestPopover';
+import InjectTestReplayAll from './InjectTestReplayAll';
 
 const useStyles = makeStyles(() => ({
   bodyItems: {
@@ -79,6 +81,7 @@ const InjectTestList: FunctionComponent<Props> = ({
     }
   }, [statusId]);
 
+
   // Headers
   const headers = [
     {
@@ -113,7 +116,9 @@ const InjectTestList: FunctionComponent<Props> = ({
         fetch={(input) => searchInjectTests(exerciseOrScenarioId, input)}
         searchPaginationInput={searchPaginationInput}
         setContent={setTests}
-      />
+      >
+        <InjectTestReplayAll tests={tests} />
+      </PaginationComponent>
       <List style={{ marginTop: 40 }}>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -173,6 +178,9 @@ const InjectTestList: FunctionComponent<Props> = ({
                   }
                 />
               </ListItemButton>
+              <ListItemSecondaryAction>
+                <InjectTestPopover injectTestStatus={test} />
+              </ListItemSecondaryAction>
             </ListItem>
           );
         })}

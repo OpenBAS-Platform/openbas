@@ -24,6 +24,11 @@ import java.util.Optional;
 @Table(name = "injects_tests_statuses")
 public class InjectTestStatus extends BaseInjectStatus implements Base {
 
+  @JsonProperty("inject_id")
+  public String getInjectId() {
+    return inject.getId();
+  }
+
   @JsonProperty("inject_title")
   public String getInjectTitle() {
     return inject.getTitle();
