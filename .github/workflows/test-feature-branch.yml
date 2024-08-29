@@ -94,9 +94,9 @@ jobs:
           additional-vars: |
             { "openbas_version": "${{steps.meta.outputs.version}}", "openbas_config": ${{ inputs.openbas_config }}, "image_digest": "${{ needs.openbas-platform.outputs.dockerBuildDigest }}" }
       - name: Forge URL to match playbook limitations
-        id: url_forge
+        id: urlforge
         run: |
-          url=$(echo ${{steps.meta.outputs.version}} | cut -c 1-20 | sed 's/-*$//')
-          echo "url=$url" >> $env:GITHUB_OUTPUT
+          url=$(echo "${{steps.meta.outputs.version}}" | cut -c 1-20 | sed 's/-*$//')
+          echo "url=$url" >> $GITHUB_OUTPUT
       - name: display URL
-        run: echo "https://${{steps.url_forge.outputs.url}}.obas.dev.filigran.io"
+        run: echo "https://${{steps.urlforge.outputs.url}}.obas.dev.filigran.io"
