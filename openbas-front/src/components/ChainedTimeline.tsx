@@ -14,8 +14,9 @@ import {
   Controls,
   ControlButton,
 } from '@xyflow/react';
+import { Tooltip } from '@mui/material';
 import moment from 'moment-timezone';
-import { UnfoldLess, UnfoldMore } from '@mui/icons-material';
+import { UnfoldLess, UnfoldMore, CropFree } from '@mui/icons-material';
 import type { InjectStore } from '../actions/injects/Inject';
 import type { Theme } from './Theme';
 import nodeTypes from './nodes';
@@ -30,6 +31,7 @@ import type { ExercisesHelper } from '../actions/exercises/exercise-helper';
 import { parseCron } from '../utils/Cron';
 import type { TeamsHelper } from '../actions/teams/team-helper';
 import NodePhantom from './nodes/NodePhantom';
+import { useFormatter } from './i18n';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -81,6 +83,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   const teams = useHelper((teamsHelper: TeamsHelper) => teamsHelper.getTeamsMap());
   const scenario = useHelper((helper: ScenariosHelper) => helper.getScenario(exerciseOrScenarioId));
   const exercise = useHelper((helper: ExercisesHelper) => helper.getExercise(exerciseOrScenarioId));
+
+  const { t } = useFormatter();
 
   const proOptions = { account: 'paid-pro', hideAttribution: true };
   const defaultEdgeOptions = {
@@ -394,24 +398,40 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
               onMouseLeave={showNewNode}
             >
               <Controls
-                showFitView={true}
+                showFitView={false}
                 showZoom={false}
                 showInteractive={false}
-                fitViewOptions={{ duration: 500 }}
                 orientation={'horizontal'}
               >
-                <ControlButton
-                  disabled={minutesPerGapAllowed.length - 1 === minutesPerGapIndex}
-                  onClick={() => updateMinutesPerGap(1)}
-                >
-                  <UnfoldLess className={classes.rotatedIcon}/>
-                </ControlButton>
-                <ControlButton
-                  disabled={minutesPerGapIndex === 0}
-                  onClick={() => updateMinutesPerGap(-1)}
-                >
-                  <UnfoldMore className={classes.rotatedIcon}/>
-                </ControlButton>
+                <Tooltip title={t('Fit view')}>
+                  <div>
+                    <ControlButton
+                      onClick={() => reactFlow.fitView({ duration: 500 })}
+                    >
+                      <CropFree/>
+                    </ControlButton>
+                  </div>
+                </Tooltip>
+                <Tooltip title={t('Increase time interval')}>
+                  <div>
+                    <ControlButton
+                      disabled={minutesPerGapAllowed.length - 1 === minutesPerGapIndex}
+                      onClick={() => updateMinutesPerGap(1)}
+                    >
+                      <UnfoldLess className={classes.rotatedIcon}/>
+                    </ControlButton>
+                  </div>
+                </Tooltip>
+                <Tooltip title={t('Reduce time interval')}>
+                  <div>
+                    <ControlButton
+                      disabled={minutesPerGapIndex === 0}
+                      onClick={() => updateMinutesPerGap(-1)}
+                    >
+                      <UnfoldMore className={classes.rotatedIcon}/>
+                    </ControlButton>
+                  </div>
+                </Tooltip>
               </Controls>
             </div>
             <CustomTimelineBackground
