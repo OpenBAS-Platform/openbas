@@ -150,7 +150,7 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
 
   return (
     <div className={classes.node} style={{ backgroundColor: data.background, color: 'white' }} onClick={onClick}>
-      <div className={classes.icon}>
+      <div className={classes.icon} style={{ opacity: data.inject?.inject_enabled ? '1' : '0.3' }}>
         <InjectIcon
           isPayload={isNotEmptyField(data.inject?.inject_injector_contract?.injector_contract_payload)}
           type={
@@ -164,20 +164,24 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
       { data.startDate !== undefined ? (
         <div
           className={classes.triggerTime}
+          style={{ opacity: data.inject?.inject_enabled ? '1' : '0.3' }}
         >{convertToAbsoluteTime(data.startDate, data.inject!.inject_depends_duration)}</div>
 
       ) : (
         <div
           className={classes.triggerTime}
+          style={{ opacity: data.inject?.inject_enabled ? '1' : '0.3' }}
         >{convertToRelativeTime(data.inject!.inject_depends_duration)}</div>
 
       )}
-      <Tooltip title={data.label}>
+      <Tooltip title={data.label} style={{ opacity: data.inject?.inject_enabled ? '1' : '0.3' }}>
         <div className={classes.label}>{data.label}</div>
       </Tooltip>
       <div className={classes.footer}>
         <Tooltip title={`${data.targets.slice(0, 3).join(', ')}`}>
-          <div className={classes.targets}><span>{`${data.targets.slice(0, 3).join(', ')}${data.targets.length > 3 ? ', ...' : ''}`}</span></div>
+          <div className={classes.targets} style={{ opacity: data.inject?.inject_enabled ? '1' : '0.3' }}>
+            <span>{`${data.targets.slice(0, 3).join(', ')}${data.targets.length > 3 ? ', ...' : ''}`}</span>
+          </div>
         </Tooltip>
         <div className={classes.popover}>
           <span onClick={preventClick}>
