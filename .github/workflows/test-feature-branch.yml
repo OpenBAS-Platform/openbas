@@ -58,6 +58,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
+        id: buildpush
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -65,6 +66,8 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+    outputs:
+      dockerBuildDigest: ${{ steps.buildpush.outputs.digest }}
 
   deploy:
     name: deploy
@@ -89,6 +92,6 @@ jobs:
           ansible-tower-url: ${{ secrets.AWX_URL }}
           template-id: "65"
           additional-vars: |
-            { "openbas_version": "${{steps.meta.outputs.version}}", "openbas_config": ${{ inputs.openbas_config }} }
+            { "openbas_version": "${{ needs.openbas-platform.outputs.dockerBuildDigest }}", "openbas_config": ${{ inputs.openbas_config }} }
       - name: display URL
         run: echo "https://${{steps.meta.outputs.version}}.obas.dev.filigran.io"
