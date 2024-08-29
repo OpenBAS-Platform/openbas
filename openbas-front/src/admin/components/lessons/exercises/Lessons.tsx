@@ -1,62 +1,49 @@
-import React, { useState } from 'react';
-import { makeStyles, useTheme } from '@mui/styles';
+import React, { useContext, useState } from 'react';
 import {
-  Grid,
-  Paper,
-  Typography,
-  Switch,
-  LinearProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-  Button,
-  Alert,
-  DialogContentText,
-  DialogActions,
-} from '@mui/material';
-import {
-  SportsScoreOutlined,
-  SpeakerNotesOutlined,
   BallotOutlined,
   ContactMailOutlined,
   ContentPasteGoOutlined,
   DeleteSweepOutlined,
+  SpeakerNotesOutlined,
+  SportsScoreOutlined,
   VisibilityOutlined,
 } from '@mui/icons-material';
-import { Link, useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
-import { useFormatter } from '../../../../../components/i18n';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { fetchObjectives } from '../../../../../actions/Objective';
-import Transition from '../../../../../components/common/Transition';
-import ObjectiveEvaluations from './ObjectiveEvaluations';
-import { fetchExerciseInjects } from '../../../../../actions/Inject';
-import CreateLessonsCategory from './categories/CreateLessonsCategory';
 import {
-  applyLessonsTemplate,
-  emptyLessonsCategories,
-  fetchLessonsAnswers,
-  fetchLessonsCategories,
-  fetchLessonsQuestions,
-  fetchLessonsTemplates,
-  resetLessonsAnswers,
-  sendLessons,
-} from '../../../../../actions/Lessons';
-import { resolveUserName } from '../../../../../utils/String';
-import { fetchExerciseTeams, updateExerciseLessons } from '../../../../../actions/Exercise';
-import SendLessonsForm from './SendLessonsForm';
-import { fetchPlayers } from '../../../../../actions/User';
+  Alert,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  LinearProgress,
+  Link,
+  Paper,
+  Radio,
+  RadioGroup,
+  Switch,
+  Theme,
+  Typography,
+  useTheme,
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import ObjectiveEvaluations from '../ObjectiveEvaluations';
+import CreateLessonsCategory from '../categories/CreateLessonsCategory';
+import SendLessonsForm from '../SendLessonsForm';
 import LessonsObjectives from './LessonsObjectives';
 import LessonsCategories from './LessonsCategories';
-import CreateLessonsTemplate from '../../../components/lessons/CreateLessonsTemplate';
+import { useFormatter } from '../../../../components/i18n';
+import type { Inject, LessonsAnswer, LessonsCategory, LessonsQuestion, LessonsSendInput, LessonsTemplate, Objective, Team, User } from '../../../../utils/api-types';
+import Transition from '../../../../components/common/Transition';
+import CreateLessonsTemplate from '../../components/lessons/CreateLessonsTemplate';
+import { resolveUserName } from '../../../../utils/String';
+import { LessonContext } from '../../common/Context';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   metric: {
     position: 'relative',
     padding: 20,
@@ -67,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
     textTransform: 'uppercase',
     fontSize: 12,
     fontWeight: 500,
-    color: theme.palette.text.secondary,
+    color: theme.palette.secondary.main,
   },
   number: {
     fontSize: 30,
@@ -93,188 +80,211 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Lessons = () => {
+interface GenericSource {
+  id: string;
+  type: string;
+  name: string;
+  score: number;
+  lessons_answers_number: number;
+  communications_number: number;
+  start_date: string;
+  end_date: string;
+  users_number: number;
+  logs_number: number;
+  lessons_anonymized: boolean;
+  isReadOnly: boolean;
+  isUpdatable: boolean;
+}
+
+interface Props {
+  source: GenericSource,
+  objectives: Objective[],
+  injects: Inject[],
+  teamsMap: Record<string, Team>,
+  teams: Team[],
+  lessonsCategories: LessonsCategory[],
+  lessonsQuestions: LessonsQuestion[],
+  lessonsAnswers: LessonsAnswer[],
+  lessonsTemplates: LessonsTemplate[],
+  usersMap: Record<string, User>,
+}
+
+const Lessons: React.FC<Props> = ({
+  source,
+  objectives,
+  injects,
+  teams,
+  teamsMap,
+  lessonsCategories,
+  lessonsQuestions,
+  lessonsAnswers,
+  lessonsTemplates,
+  usersMap,
+}) => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useDispatch();
   const theme = useTheme();
   const { t, nsdt } = useFormatter();
 
-  const [selectedObjective, setSelectedObjective] = useState(null);
-  const [openApplyTemplate, setOpenApplyTemplate] = useState(false);
-  const [openResetAnswers, setOpenResetAnswers] = useState(false);
-  const [openEmptyLessons, setOpenEmptyLessons] = useState(false);
-  const [openSendLessons, setOpenSendLessons] = useState(false);
-  const [openAnonymize, setOpenAnonymize] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] = useState(null);
-  const [templateValue, setTemplateValue] = useState(null);
-  const handleChange = (event) => {
+  const [selectedObjective, setSelectedObjective] = useState<string | null>(null);
+  const [openApplyTemplate, setOpenApplyTemplate] = useState<boolean>(false);
+  const [openResetAnswers, setOpenResetAnswers] = useState<boolean>(false);
+  const [openEmptyLessons, setOpenEmptyLessons] = useState<boolean>(false);
+  const [openSendLessons, setOpenSendLessons] = useState<boolean>(false);
+  const [openAnonymize, setOpenAnonymize] = useState<boolean>(false);
+  const [selectedQuestion, setSelectedQuestion] = useState<LessonsQuestion | null>(null);
+  const [templateValue, setTemplateValue] = useState<string | null>(null);
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTemplateValue(event.target.value);
   };
-  // Fetching data
-  const { exerciseId } = useParams();
+
+  // Context
   const {
-    exercise,
-    objectives,
-    injects,
-    teamsMap,
-    lessonsCategories,
-    lessonsQuestions,
-    lessonsAnswers,
-    lessonsTemplates,
-    usersMap,
-  } = useHelper((helper) => {
-    return {
-      exercise: helper.getExercise(exerciseId),
-      objectives: helper.getExerciseObjectives(exerciseId),
-      injects: helper.getExerciseInjects(exerciseId),
-      teamsMap: helper.getTeamsMap(),
-      lessonsCategories: helper.getExerciseLessonsCategories(exerciseId),
-      lessonsQuestions: helper.getExerciseLessonsQuestions(exerciseId),
-      lessonsAnswers: helper.getExerciseLessonsAnswers(exerciseId),
-      lessonsTemplates: helper.getLessonsTemplates(),
-      usersMap: helper.getUsersMap(),
-    };
-  });
-  useDataLoader(() => {
-    dispatch(fetchLessonsTemplates());
-    dispatch(fetchLessonsCategories(exerciseId));
-    dispatch(fetchLessonsQuestions(exerciseId));
-    dispatch(fetchLessonsAnswers(exerciseId));
-    dispatch(fetchObjectives(exerciseId));
-    dispatch(fetchExerciseInjects(exerciseId));
-    dispatch(fetchExerciseTeams(exerciseId));
-    dispatch(fetchPlayers());
-  });
-  const applyTemplate = () => {
-    return dispatch(applyLessonsTemplate(exerciseId, templateValue)).then(() => setOpenApplyTemplate(false));
+    onApplyLessonsTemplate,
+    onResetLessonsAnswers,
+    onEmptyLessonsCategories,
+    onUpdateSourceLessons,
+    onSendLessons,
+  } = useContext(LessonContext);
+
+  const applyTemplate = async () => {
+    if (templateValue !== null) {
+      await onApplyLessonsTemplate(templateValue);
+      return setOpenApplyTemplate(false);
+    }
+    return setOpenApplyTemplate(true);
   };
-  const resetAnswers = () => {
-    return dispatch(resetLessonsAnswers(exerciseId)).then(() => setOpenResetAnswers(false));
+  const resetAnswers = async () => {
+    if (onResetLessonsAnswers) {
+      await onResetLessonsAnswers();
+    }
+    return setOpenResetAnswers(false);
   };
-  const emptyLessons = () => {
-    return dispatch(emptyLessonsCategories(exerciseId)).then(() => setOpenEmptyLessons(false));
+  const emptyLessons = async () => {
+    await onEmptyLessonsCategories();
+    return setOpenEmptyLessons(false);
   };
-  const toggleAnonymize = () => {
-    return dispatch(
-      updateExerciseLessons(exerciseId, {
-        exercise_lessons_anonymized: !exercise.exercise_lessons_anonymized,
-      }),
-    ).then(() => setOpenAnonymize(false));
+  const toggleAnonymize = async () => {
+    const updatedSource = { ...source };
+    await onUpdateSourceLessons(!updatedSource.lessons_anonymized);
+    updatedSource.lessons_anonymized = !updatedSource.lessons_anonymized;
+    return setOpenAnonymize(false);
   };
 
-  const handleSubmitSendLessons = (data) => {
-    return dispatch(sendLessons(exerciseId, data)).then(() => setOpenSendLessons(false));
+  const handleSubmitSendLessons = async (data: LessonsSendInput) => {
+    if (onSendLessons) {
+      await onSendLessons(data);
+    }
+    return setOpenSendLessons(false);
   };
   const answers = R.groupBy(R.prop('lessons_answer_question'), lessonsAnswers);
-  const selectedQuestionAnswers = selectedQuestion && answers[selectedQuestion.lessonsquestion_id]
-    ? answers[selectedQuestion.lessonsquestion_id]
+  const selectedQuestionAnswers = selectedQuestion && selectedQuestion.lessonsquestion_id
+    ? answers[selectedQuestion.lessonsquestion_id] || []
     : [];
-  const getHoursDiff = (startDate, endDate) => {
+  const getHoursDiff = (startDate: Date, endDate: Date): number => {
     const msInHour = 1000 * 60 * 60;
-    return Math.round(Math.abs(endDate - startDate) / msInHour);
+    return Math.round(Math.abs(endDate.getTime() - startDate.getTime()) / msInHour);
   };
   return (
-    <div>
-      <Grid container={true} spacing={3} style={{ marginTop: -14 }}>
-        <Grid item={true} xs={3} style={{ marginTop: -14 }}>
+    <div style={{ marginBottom: '30px' }}>
+      <Grid container spacing={3} style={{ marginTop: -14, marginBottom: '30px' }}>
+        <Grid item xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
-              <SportsScoreOutlined color="primary" sx={{ fontSize: 50 }} />
+              <SportsScoreOutlined color="primary" sx={{ fontSize: 50 }}/>
             </div>
             <div className={classes.title}>{t('Overall objectives score')}</div>
-            <div className={classes.number}>{exercise.exercise_score}%</div>
+            <div className={classes.number}>{source.score}%</div>
           </Paper>
         </Grid>
-        <Grid item={true} xs={3} style={{ marginTop: -14 }}>
+        <Grid item xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
-              <SpeakerNotesOutlined color="primary" sx={{ fontSize: 50 }} />
+              <SpeakerNotesOutlined color="primary" sx={{ fontSize: 50 }}/>
             </div>
             <div className={classes.title}>{t('Simulation logs')}</div>
             <div className={classes.number}>
-              {exercise.exercise_logs_number}
+              {source.logs_number}
             </div>
           </Paper>
         </Grid>
-        <Grid item={true} xs={3} style={{ marginTop: -14 }}>
+        <Grid item xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
-              <BallotOutlined color="primary" sx={{ fontSize: 50 }} />
+              <BallotOutlined color="primary" sx={{ fontSize: 50 }}/>
             </div>
             <div className={classes.title}>{t('Poll replies')}</div>
             <div className={classes.number}>
-              {exercise.exercise_lessons_answers_number}
+              {source.lessons_answers_number}
             </div>
           </Paper>
         </Grid>
-        <Grid item={true} xs={3} style={{ marginTop: -14 }}>
+        <Grid item xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
-              <ContactMailOutlined color="primary" sx={{ fontSize: 50 }} />
+              <ContactMailOutlined color="primary" sx={{ fontSize: 50 }}/>
             </div>
             <div className={classes.title}>{t('Messages')}</div>
             <div className={classes.number}>
-              {exercise.exercise_communications_number}
+              {source.communications_number}
             </div>
           </Paper>
         </Grid>
       </Grid>
-      <br />
-      <Grid container={true} spacing={3}>
-        <Grid item={true} xs={4}>
+      <Grid container spacing={3} style={{ marginBottom: '50px' }}>
+        <Grid item xs={4}>
           <Typography variant="h4">{t('Details')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
-            <Grid container={true} spacing={3}>
-              <Grid item={true} xs={6}>
+            <Grid container spacing={3}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('Start date')}</Typography>
-                {nsdt(exercise.exercise_start_date)}
+                {nsdt(source.start_date)}
               </Grid>
-              <Grid item={true} xs={6}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('End date')}</Typography>
-                {nsdt(exercise.exercise_end_date)}
+                {nsdt(source.end_date)}
               </Grid>
-              <Grid item={true} xs={6}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('Duration')}</Typography>
                 {getHoursDiff(
-                  exercise.exercise_start_date
-                    ? new Date(exercise.exercise_start_date)
+                  source.start_date
+                    ? new Date(source.start_date)
                     : new Date(),
-                  exercise.exercise_end_date
-                    ? new Date(exercise.exercise_end_date)
+                  source.end_date
+                    ? new Date(source.end_date)
                     : new Date(),
                 )}{' '}
                 {t('hours')}
               </Grid>
-              <Grid item={true} xs={6}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('Team')}</Typography>
-                {exercise.exercise_users_number} {t('players')}
+                {source.users_number} {t('players')}
               </Grid>
             </Grid>
           </Paper>
         </Grid>
-        <Grid item={true} xs={4}>
+        <Grid item xs={4}>
           <Typography variant="h4">{t('Parameters')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
-            <Grid container={true} spacing={3}>
-              <Grid item={true} xs={6}>
+            <Grid container spacing={3}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('Questionnaire mode')}</Typography>
                 <FormControlLabel
                   control={
                     <Switch
-                      disabled={exercise.exercise_lessons_anonymized}
-                      checked={exercise.exercise_lessons_anonymized}
+                      disabled={source.lessons_anonymized}
+                      checked={source.lessons_anonymized}
                       onChange={() => setOpenAnonymize(true)}
                       name="anonymized"
                     />
-                  }
+                                    }
                   label={t('Anonymize answers')}
                 />
               </Grid>
-              <Grid item={true} xs={6}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('Template')}</Typography>
                 <Button
-                  startIcon={<ContentPasteGoOutlined />}
+                  startIcon={<ContentPasteGoOutlined/>}
                   color="primary"
                   variant="contained"
                   onClick={() => setOpenApplyTemplate(true)}
@@ -282,24 +292,24 @@ const Lessons = () => {
                   {t('Apply')}
                 </Button>
               </Grid>
-              <Grid item={true} xs={6}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('Check')}</Typography>
                 <Button
-                  startIcon={<VisibilityOutlined />}
+                  startIcon={<VisibilityOutlined/>}
                   color="secondary"
                   variant="contained"
                   component={Link}
-                  to={`/lessons/${exerciseId}?preview=true`}
+                  href={`/lessons/${source.type}/${source.id}?preview=true`}
                 >
                   {t('Preview')}
                 </Button>
               </Grid>
-              <Grid item={true} xs={6}>
+              <Grid item xs={6}>
                 <Typography variant="h3">
                   {t('Categories and questions')}
                 </Typography>
                 <Button
-                  startIcon={<DeleteSweepOutlined />}
+                  startIcon={<DeleteSweepOutlined/>}
                   color="error"
                   variant="contained"
                   onClick={() => setOpenEmptyLessons(true)}
@@ -310,7 +320,7 @@ const Lessons = () => {
             </Grid>
           </Paper>
         </Grid>
-        <Grid item={true} xs={4}>
+        <Grid item xs={4}>
           <Typography variant="h4">{t('Control')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
             <Alert severity="info">
@@ -318,11 +328,11 @@ const Lessons = () => {
                 'Sending the questionnaire will emit an email to each player with a unique link to access and fill it.',
               )}
             </Alert>
-            <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
-              <Grid item={true} xs={6}>
+            <Grid container spacing={3} style={{ marginTop: 0 }}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('Questionnaire')}</Typography>
                 <Button
-                  startIcon={<ContentPasteGoOutlined />}
+                  startIcon={<ContentPasteGoOutlined/>}
                   color="success"
                   variant="contained"
                   onClick={() => setOpenSendLessons(true)}
@@ -330,10 +340,10 @@ const Lessons = () => {
                   {t('Send')}
                 </Button>
               </Grid>
-              <Grid item={true} xs={6}>
+              <Grid item xs={6}>
                 <Typography variant="h3">{t('Answers')}</Typography>
                 <Button
-                  startIcon={<ContentPasteGoOutlined />}
+                  startIcon={<ContentPasteGoOutlined/>}
                   color="error"
                   variant="contained"
                   onClick={() => setOpenResetAnswers(true)}
@@ -345,28 +355,29 @@ const Lessons = () => {
           </Paper>
         </Grid>
       </Grid>
-      <br />
-      <br />
       <LessonsObjectives
         objectives={objectives}
         injects={injects}
         setSelectedObjective={setSelectedObjective}
-        exercise={exercise}
+        source={source}
+        isReport={false}
       />
       <LessonsCategories
-        exerciseId={exerciseId}
         lessonsCategories={lessonsCategories}
         lessonsAnswers={lessonsAnswers}
         setSelectedQuestion={setSelectedQuestion}
         lessonsQuestions={lessonsQuestions}
         teamsMap={teamsMap}
+        teams={teams}
+        isReport={false}
       />
+      <CreateLessonsCategory/>
       <Dialog
         TransitionComponent={Transition}
         keepMounted={false}
         open={selectedObjective !== null}
         onClose={() => setSelectedObjective(null)}
-        fullWidth={true}
+        fullWidth
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
@@ -374,6 +385,7 @@ const Lessons = () => {
         <DialogContent>
           <ObjectiveEvaluations
             objectiveId={selectedObjective}
+            isUpdatable={source.isUpdatable}
             handleClose={() => setSelectedObjective(null)}
           />
         </DialogContent>
@@ -383,7 +395,7 @@ const Lessons = () => {
         keepMounted={false}
         open={openApplyTemplate}
         onClose={() => setOpenApplyTemplate(false)}
-        fullWidth={true}
+        fullWidth
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
@@ -391,7 +403,7 @@ const Lessons = () => {
         <DialogContent>
           <Alert severity="info">
             {t(
-              'Applying a template will add all categories and questions of the selectedtemplate to this exercise.',
+              `Applying a template will add all categories and questions of the selectedtemplate to this ${source.type}.`,
             )}
           </Alert>
           <FormControl style={{ margin: '10px 0 0 5px', width: '100%' }}>
@@ -402,7 +414,7 @@ const Lessons = () => {
               value={templateValue}
               onChange={handleChange}
             >
-              {lessonsTemplates.map((template) => {
+              {lessonsTemplates.map((template: LessonsTemplate) => {
                 return (
                   <FormControlLabel
                     key={template.lessonstemplate_id}
@@ -412,29 +424,24 @@ const Lessons = () => {
                       margin: 0,
                     }}
                     value={template.lessonstemplate_id}
-                    control={<Radio />}
+                    control={<Radio/>}
                     label={
-                      <div
-                        style={{
-                          margin: '15px 0 15px 10px',
-                        }}
-                      >
+                      <div style={{ margin: '15px 0 15px 10px' }}>
                         <Typography variant="h4">
                           {template.lessons_template_name}
                         </Typography>
                         <Typography variant="body2">
-                          {template.lessons_template_description
-                            || t('No description')}
+                          {template.lessons_template_description || t('No description')}
                         </Typography>
                       </div>
-                    }
+                                        }
                   />
                 );
               })}
             </RadioGroup>
           </FormControl>
-          <CreateLessonsTemplate inline />
-          <div className="clearfix" />
+          <CreateLessonsTemplate inline/>
+          <div className="clearfix"/>
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button
               onClick={() => setOpenApplyTemplate(false)}
@@ -498,7 +505,7 @@ const Lessons = () => {
         open={openSendLessons}
         TransitionComponent={Transition}
         onClose={() => setOpenSendLessons(false)}
-        fullWidth={true}
+        fullWidth
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
@@ -525,58 +532,64 @@ const Lessons = () => {
         TransitionComponent={Transition}
         onClose={() => setSelectedQuestion(null)}
         PaperProps={{ elevation: 1 }}
-        maxWidth="ld"
-        fullWidth={true}
+        maxWidth="lg"
+        fullWidth
       >
         <DialogTitle>{selectedQuestion?.lessons_question_content}</DialogTitle>
         <DialogContent style={{ paddingTop: 20 }}>
-          {selectedQuestionAnswers.map((answer) => (
-            <div
-              key={answer.lessonsanswer_id}
-              style={{
-                marginBottom: 70,
-                borderBottom: `1px solid ${theme.palette.background.paper}`,
-                paddingBottom: 10,
-              }}
-            >
-              <Grid container={true} spacing={3}>
-                <Grid item={true} xs={3} style={{ marginTop: -10 }}>
-                  <Typography variant="h4">{t('User')}</Typography>
-                  {exercise.exercise_lessons_anonymized
-                    ? t('Anonymized')
-                    : resolveUserName(usersMap[answer.lessons_answer_user])}
-                </Grid>
-                <Grid item={true} xs={3} style={{ marginTop: -10 }}>
-                  <Typography variant="h4" style={{ marginBottom: 20 }}>
-                    {t('Score')}
-                  </Typography>
-                  <div style={{ width: '80%', display: 'flex', alignItems: 'center' }}>
-                    <LinearProgress
-                      variant="determinate"
-                      value={answer.lessons_answer_score}
-                      style={{
-                        flex: 1,
-                        marginRight: 8,
-                      }}
-                    />
-                    <Typography variant="body2" color="text.secondary">
-                      {answer.lessons_answer_score}%
+          {selectedQuestionAnswers.map((answer: LessonsAnswer) => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            const getUserName = answer.lessons_answer_user ? resolveUserName(usersMap[answer.lessons_answer_user]) : '-';
+            return (
+              <div
+                key={answer.lessonsanswer_id}
+                style={{
+                  marginBottom: 70,
+                  borderBottom: `1px solid ${theme.palette.background.paper}`,
+                  paddingBottom: 10,
+                }}
+              >
+                <Grid container spacing={3}>
+                  <Grid item xs={3} style={{ marginTop: -10 }}>
+                    <Typography variant="h4">{t('User')}</Typography>
+                    {source.lessons_anonymized
+                      ? t('Anonymized')
+                      : getUserName
+                                        }
+                  </Grid>
+                  <Grid item xs={3} style={{ marginTop: -10 }}>
+                    <Typography variant="h4" style={{ marginBottom: 20 }}>
+                      {t('Score')}
                     </Typography>
-                  </div>
+                    <div style={{ width: '80%', display: 'flex', alignItems: 'center' }}>
+                      <LinearProgress
+                        variant="determinate"
+                        value={answer.lessons_answer_score}
+                        style={{
+                          flex: 1,
+                          marginRight: 8,
+                        }}
+                      />
+                      <Typography variant="body2" color="text.secondary">
+                        {answer.lessons_answer_score}%
+                      </Typography>
+                    </div>
+                  </Grid>
+                  <Grid item xs={3} style={{ marginTop: -10 }}>
+                    <Typography variant="h4">{t('What worked well')}</Typography>
+                    {answer.lessons_answer_positive}
+                  </Grid>
+                  <Grid item xs={3} style={{ marginTop: -10 }}>
+                    <Typography variant="h4">
+                      {t('What didn\'t work well')}
+                    </Typography>
+                    {answer.lessons_answer_negative}
+                  </Grid>
                 </Grid>
-                <Grid item={true} xs={3} style={{ marginTop: -10 }}>
-                  <Typography variant="h4">{t('What worked well')}</Typography>
-                  {answer.lessons_answer_positive}
-                </Grid>
-                <Grid item={true} xs={3} style={{ marginTop: -10 }}>
-                  <Typography variant="h4">
-                    {t("What didn't work well")}
-                  </Typography>
-                  {answer.lessons_answer_negative}
-                </Grid>
-              </Grid>
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setSelectedQuestion(null)}>
@@ -599,7 +612,7 @@ const Lessons = () => {
           </Alert>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEmptyLessons(false)}>
+          <Button onClick={() => setOpenAnonymize(false)}>
             {t('Cancel')}
           </Button>
           <Button color="secondary" onClick={toggleAnonymize}>
@@ -607,7 +620,6 @@ const Lessons = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      <CreateLessonsCategory exerciseId={exerciseId} />
     </div>
   );
 };

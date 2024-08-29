@@ -489,6 +489,8 @@ public class ScenarioService {
       getListOfScenarioTeams(scenarioDuplicate, scenarioOrigin);
       getListOfArticles(scenarioDuplicate, scenarioOrigin);
       getListOfVariables(scenarioDuplicate, scenarioOrigin);
+      getObjectives(scenarioDuplicate, scenarioOrigin);
+      getLessonsCategories(scenarioDuplicate, scenarioOrigin);
       return scenarioRepository.save(scenario);
     }
     throw new ElementNotFoundException();
@@ -539,8 +541,7 @@ public class ScenarioService {
     scenarioDuplicate.setExternalReference(scenario.getExternalReference());
     scenarioDuplicate.setTeamUsers(new ArrayList<>(scenario.getTeamUsers()));
     scenarioDuplicate.setReplyTos(new ArrayList<>(scenario.getReplyTos()));
-    scenarioDuplicate.setLessonsCategories(new ArrayList<>(scenario.getLessonsCategories()));
-    scenarioDuplicate.setObjectives(new ArrayList<>(scenario.getObjectives()));
+    scenarioDuplicate.setLessonsAnonymized(scenario.isLessonsAnonymized());
     scenarioDuplicate.setDocuments(new ArrayList<>(scenario.getDocuments()));
     scenarioDuplicate.setGrants(new ArrayList<>(scenario.getGrants()));
     return scenarioDuplicate;
@@ -602,6 +603,66 @@ public class ScenarioService {
       return variable1;
     }).toList();
     variableService.createVariables(variableList);
+  }
+
+  private void getLessonsCategories(Scenario duplicatedScenario, Scenario originalScenario){
+    List<LessonsCategory> duplicatedCategories = new ArrayList<>();
+    for (LessonsCategory originalCategory : originalScenario.getLessonsCategories()) {
+      LessonsCategory duplicatedCategory = new LessonsCategory();
+      duplicatedCategory.setName(originalCategory.getName());
+      duplicatedCategory.setDescription(originalCategory.getDescription());
+      duplicatedCategory.setOrder(originalCategory.getOrder());
+      duplicatedCategory.setScenario(duplicatedScenario);
+      duplicatedCategory.setTeams(new ArrayList<>(originalCategory.getTeams()));
+
+      List<LessonsQuestion> duplicatedQuestions = new ArrayList<>();
+      for (LessonsQuestion originalQuestion : originalCategory.getQuestions()) {
+        LessonsQuestion duplicatedQuestion = new LessonsQuestion();
+        duplicatedQuestion.setCategory(originalQuestion.getCategory());
+        duplicatedQuestion.setContent(originalQuestion.getContent());
+        duplicatedQuestion.setExplanation(originalQuestion.getExplanation());
+        duplicatedQuestion.setOrder(originalQuestion.getOrder());
+        duplicatedQuestion.setCategory(duplicatedCategory);
+
+        List<LessonsAnswer> duplicatedAnswers = new ArrayList<>();
+        for (LessonsAnswer originalAnswer : originalQuestion.getAnswers()) {
+          LessonsAnswer duplicatedAnswer = new LessonsAnswer();
+          duplicatedAnswer.setUser(originalAnswer.getUser());
+          duplicatedAnswer.setScore(originalAnswer.getScore());
+          duplicatedAnswer.setPositive(originalAnswer.getPositive());
+          duplicatedAnswer.setNegative(originalAnswer.getNegative());
+          duplicatedAnswer.setQuestion(duplicatedQuestion);
+          duplicatedAnswers.add(duplicatedAnswer);
+        }
+        duplicatedQuestion.setAnswers(duplicatedAnswers);
+        duplicatedQuestions.add(duplicatedQuestion);
+      }
+      duplicatedCategory.setQuestions(duplicatedQuestions);
+      duplicatedCategories.add(duplicatedCategory);
+    }
+    duplicatedScenario.setLessonsCategories(duplicatedCategories);
+  }
+
+  private void getObjectives(Scenario scenario, Scenario scenarioOrigin){
+    List<Objective> duplicatedObjectives = new ArrayList<>();
+    for (Objective originalObjective : scenarioOrigin.getObjectives()) {
+      Objective duplicatedObjective = new Objective();
+      duplicatedObjective.setTitle(originalObjective.getTitle());
+      duplicatedObjective.setDescription(originalObjective.getDescription());
+      duplicatedObjective.setPriority(originalObjective.getPriority());
+      List<Evaluation> duplicatedEvaluations = new ArrayList<>();
+      for (Evaluation originalEvaluation : originalObjective.getEvaluations()) {
+        Evaluation duplicatedEvaluation = new Evaluation();
+        duplicatedEvaluation.setScore(originalEvaluation.getScore());
+        duplicatedEvaluation.setUser(originalEvaluation.getUser());
+        duplicatedEvaluation.setObjective(duplicatedObjective);
+        duplicatedEvaluations.add(duplicatedEvaluation);
+      }
+      duplicatedObjective.setEvaluations(duplicatedEvaluations);
+      duplicatedObjective.setScenario(scenario);
+      duplicatedObjectives.add(duplicatedObjective);
+    }
+    scenario.setObjectives(duplicatedObjectives);
   }
 
 }

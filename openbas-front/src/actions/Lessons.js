@@ -1,5 +1,5 @@
 import * as schema from './Schema';
-import { getReferential, putReferential, postReferential, delReferential, simplePostCall } from '../utils/Action';
+import { delReferential, getReferential, postReferential, putReferential, simplePostCall } from '../utils/Action';
 
 export const fetchLessonsTemplates = () => (dispatch) => {
   const uri = '/api/lessons_templates';
@@ -84,94 +84,4 @@ export const deleteLessonsTemplateQuestion = (lessonsTemplateId, lessonsTemplate
     'lessonstemplatequestions',
     lessonsTemplateQuestionId,
   )(dispatch);
-};
-
-export const fetchLessonsCategories = (exerciseId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/lessons_categories`;
-  return getReferential(schema.arrayOfLessonsCategories, uri)(dispatch);
-};
-
-export const updateLessonsCategory = (exerciseId, lessonsCategoryId, data) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/lessons_categories/${lessonsCategoryId}`;
-  return putReferential(schema.lessonsCategory, uri, data)(dispatch);
-};
-
-export const updateLessonsCategoryTeams = (exerciseId, lessonsCategoryId, data) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/lessons_categories/${lessonsCategoryId}/teams`;
-  return putReferential(schema.lessonsCategory, uri, data)(dispatch);
-};
-
-export const addLessonsCategory = (exerciseId, data) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/lessons_categories`;
-  return postReferential(schema.lessonsCategory, uri, data)(dispatch);
-};
-
-export const deleteLessonsCategory = (exerciseId, lessonsCategoryId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/lessons_categories/${lessonsCategoryId}`;
-  return delReferential(uri, 'lessonscategorys', lessonsCategoryId)(dispatch);
-};
-
-export const applyLessonsTemplate = (exerciseId, lessonsTemplateId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/lessons_apply_template/${lessonsTemplateId}`;
-  return postReferential(schema.arrayOfLessonsCategories, uri, {})(dispatch);
-};
-
-export const fetchLessonsQuestions = (exerciseId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/lessons_questions`;
-  return getReferential(schema.arrayOfLessonsQuestions, uri)(dispatch);
-};
-
-export const updateLessonsQuestion = (exerciseId, lessonsCategoryId, lessonsQuestionId, data) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/lessons_categories/${lessonsCategoryId}/lessons_questions/${lessonsQuestionId}`;
-  return putReferential(schema.lessonsQuestion, uri, data)(dispatch);
-};
-
-export const addLessonsQuestion = (exerciseId, lessonsCategoryId, data) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/lessons_categories/${lessonsCategoryId}/lessons_questions`;
-  return postReferential(schema.lessonsQuestion, uri, data)(dispatch);
-};
-
-export const deleteLessonsQuestion = (exerciseId, lessonsCategoryId, lessonsQuestionId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/lessons_categories/${lessonsCategoryId}/lessons_questions/${lessonsQuestionId}`;
-  return delReferential(uri, 'lessonsquestions', lessonsQuestionId)(dispatch);
-};
-
-export const resetLessonsAnswers = (exerciseId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/lessons_answers_reset`;
-  return postReferential(schema.arrayOfLessonsCategories, uri, {})(dispatch);
-};
-
-export const emptyLessonsCategories = (exerciseId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/lessons_empty`;
-  return postReferential(schema.arrayOfLessonsCategories, uri, {})(dispatch);
-};
-
-export const sendLessons = (exerciseId, data) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/lessons_send`;
-  return postReferential(schema.arrayOfLessonsCategories, uri, data)(dispatch);
-};
-
-export const fetchLessonsAnswers = (exerciseId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/lessons_answers`;
-  return getReferential(schema.arrayOfLessonsAnswers, uri)(dispatch);
-};
-
-export const fetchPlayerLessonsCategories = (exerciseId, userId) => (dispatch) => {
-  const uri = `/api/player/lessons/${exerciseId}/lessons_categories?userId=${userId}`;
-  return getReferential(schema.arrayOfLessonsCategories, uri)(dispatch);
-};
-
-export const fetchPlayerLessonsQuestions = (exerciseId, userId) => (dispatch) => {
-  const uri = `/api/player/lessons/${exerciseId}/lessons_questions?userId=${userId}`;
-  return getReferential(schema.arrayOfLessonsQuestions, uri)(dispatch);
-};
-
-export const fetchPlayerLessonsAnswers = (exerciseId, userId) => (dispatch) => {
-  const uri = `/api/player/lessons/${exerciseId}/lessons_answers?userId=${userId}`;
-  return getReferential(schema.arrayOfLessonsAnswers, uri)(dispatch);
-};
-
-export const addLessonsAnswers = (exerciseId, lessonsCategoryId, lessonsQuestionId, data, userId) => (dispatch) => {
-  const uri = `/api/player/lessons/${exerciseId}/lessons_categories/${lessonsCategoryId}/lessons_questions/${lessonsQuestionId}/lessons_answers?userId=${userId}`;
-  return postReferential(schema.arrayOfLessonsAnswers, uri, data)(dispatch);
 };

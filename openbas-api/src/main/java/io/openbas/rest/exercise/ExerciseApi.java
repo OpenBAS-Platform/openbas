@@ -381,9 +381,9 @@ public class ExerciseApi extends RestBehavior {
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackOn = Exception.class)
     public Exercise updateExerciseLessons(@PathVariable String exerciseId,
-                                          @Valid @RequestBody ExerciseLessonsInput input) {
+                                          @Valid @RequestBody LessonsInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-        exercise.setLessonsAnonymized(input.getLessonsAnonymized());
+        exercise.setLessonsAnonymized(input.isLessonsAnonymized());
         return exerciseRepository.save(exercise);
     }
 

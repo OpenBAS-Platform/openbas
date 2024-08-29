@@ -17,7 +17,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ChallengeService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -32,16 +32,16 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ChallengeApi extends RestBehavior {
 
-    private ChallengeRepository challengeRepository;
-    private ChallengeFlagRepository challengeFlagRepository;
-    private TagRepository tagRepository;
-    private DocumentRepository documentRepository;
-    private ExerciseRepository exerciseRepository;
-    private ChallengeService challengeService;
-    private UserRepository userRepository;
+    private final ChallengeRepository challengeRepository;
+    private final ChallengeFlagRepository challengeFlagRepository;
+    private final TagRepository tagRepository;
+    private final DocumentRepository documentRepository;
+    private final ExerciseRepository exerciseRepository;
+    private final ChallengeService challengeService;
+    private final UserRepository userRepository;
 
     @GetMapping("/api/challenges")
     public Iterable<Challenge> challenges() {

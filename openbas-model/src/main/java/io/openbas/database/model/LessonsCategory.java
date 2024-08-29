@@ -77,7 +77,7 @@ public class LessonsCategory implements Base {
     @JsonProperty("lessons_category_teams")
     private List<Team> teams = new ArrayList<>();
 
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonProperty("lessons_category_questions")
     @JsonSerialize(using = MultiIdListDeserializer.class)
     private List<LessonsQuestion> questions = new ArrayList<>();

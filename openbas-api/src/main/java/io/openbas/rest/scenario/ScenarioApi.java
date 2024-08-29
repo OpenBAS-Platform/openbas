@@ -7,6 +7,7 @@ import io.openbas.database.model.User;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.exercise.form.LessonsInput;
 import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
 import io.openbas.rest.helper.TeamHelper;
 import io.openbas.rest.scenario.form.*;
@@ -48,7 +49,6 @@ public class ScenarioApi {
     private final ScenarioService scenarioService;
     private final TagRepository tagRepository;
     private final ImportService importService;
-
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final InjectExpectationRepository injectExpectationRepository;
@@ -243,25 +243,36 @@ public class ScenarioApi {
     @GetMapping(SCENARIO_URI + "/options")
     public List<FilterUtilsJpa.Option> optionsByName(@RequestParam(required = false) final String searchText) {
         return fromIterable(this.scenarioRepository.findAll(byName(searchText), PageRequest.of(0, 10)))
-            .stream()
-            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
-            .toList();
+                .stream()
+                .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+                .toList();
     }
 
     @PostMapping(SCENARIO_URI + "/options")
     public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
         return fromIterable(this.scenarioRepository.findAllById(ids))
-            .stream()
-            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
-            .toList();
+                .stream()
+                .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+                .toList();
     }
 
     @GetMapping(SCENARIO_URI + "/category/options")
     public List<FilterUtilsJpa.Option> categoryOptionsByName(@RequestParam(required = false) final String searchText) {
         return this.scenarioRepository.findDistinctCategoriesBySearchTerm(searchText, PageRequest.of(0, 10))
-            .stream()
-            .map(i -> new FilterUtilsJpa.Option(i, i))
-            .toList();
+                .stream()
+                .map(i -> new FilterUtilsJpa.Option(i, i))
+                .toList();
+    }
+
+    // -- LESSON --
+    @PutMapping(SCENARIO_URI + "/{scenarioId}/lessons")
+    @PreAuthorize("isScenarioPlanner(#scenarioId)")
+    @Transactional(rollbackOn = Exception.class)
+    public Scenario updateScenarioLessons(@PathVariable String scenarioId,
+                                          @Valid @RequestBody LessonsInput input) {
+        Scenario scenario = this.scenarioService.scenario(scenarioId);
+        scenario.setLessonsAnonymized(input.isLessonsAnonymized());
+        return scenarioRepository.save(scenario);
     }
 
 }

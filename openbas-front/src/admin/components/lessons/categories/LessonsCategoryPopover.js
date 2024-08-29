@@ -1,29 +1,38 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as R from 'ramda';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Slide, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Slide } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { useDispatch } from 'react-redux';
-import LessonsQuestionForm from './LessonsQuestionForm';
-import { useFormatter } from '../../../../../../../components/i18n';
-import { deleteLessonsQuestion, updateLessonsQuestion } from '../../../../../../../actions/Lessons';
+import { makeStyles } from '@mui/styles';
+import LessonsCategoryForm from './LessonsCategoryForm';
+import { useFormatter } from '../../../../components/i18n';
+import { LessonContext } from '../../common/Context';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';
 
-const LessonsQuestionPopover = ({
-  exerciseId,
-  lessonsCategoryId,
-  lessonsQuestion,
-}) => {
+const useStyles = makeStyles(() => ({
+  button: {
+    float: 'left',
+    margin: '-15px 0 0 5px',
+  },
+}));
+
+const LessonsCategoryPopover = ({ lessonsCategory }) => {
   // utils
-  const dispatch = useDispatch();
+  const classes = useStyles();
   const { t } = useFormatter();
   // states
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+
+  // Context
+  const {
+    onDeleteLessonsCategory,
+    onUpdateLessonsCategory,
+  } = useContext(LessonContext);
   // popover management
   const handlePopoverOpen = (event) => {
     event.stopPropagation();
@@ -37,13 +46,9 @@ const LessonsQuestionPopover = ({
   };
   const handleCloseEdit = () => setOpenEdit(false);
   const onSubmitEdit = (data) => {
-    return dispatch(
-      updateLessonsQuestion(
-        exerciseId,
-        lessonsCategoryId,
-        lessonsQuestion.lessonsquestion_id,
-        data,
-      ),
+    return onUpdateLessonsCategory(
+      lessonsCategory.lessonscategory_id,
+      data,
     ).then(() => handleCloseEdit());
   };
   // Delete action
@@ -53,25 +58,24 @@ const LessonsQuestionPopover = ({
   };
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
-    dispatch(
-      deleteLessonsQuestion(
-        exerciseId,
-        lessonsCategoryId,
-        lessonsQuestion.lessonsquestion_id,
-      ),
-    ).then(() => handleCloseDelete());
+    onDeleteLessonsCategory(lessonsCategory.lessonscategory_id).then(() => handleCloseDelete());
   };
   // Rendering
   const initialValues = R.pipe(
     R.pick([
-      'lessons_question_content',
-      'lessons_question_explanation',
-      'lessons_question_order',
+      'lessons_category_name',
+      'lessons_category_description',
+      'lessons_category_order',
     ]),
-  )(lessonsQuestion);
+  )(lessonsCategory);
   return (
     <div>
-      <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large">
+      <IconButton
+        classes={{ root: classes.button }}
+        onClick={handlePopoverOpen}
+        aria-haspopup="true"
+        size="large"
+      >
         <MoreVert />
       </IconButton>
       <Menu
@@ -90,7 +94,7 @@ const LessonsQuestionPopover = ({
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to delete this lessons learned question?')}
+            {t('Do you want to delete this lessons learned category?')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -104,14 +108,14 @@ const LessonsQuestionPopover = ({
         TransitionComponent={Transition}
         open={openEdit}
         onClose={handleCloseEdit}
-        fullWidth={true}
+        fullWidth
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
-        <DialogTitle>{t('Update the lessons learned question')}</DialogTitle>
+        <DialogTitle>{t('Update the lessons learned category')}</DialogTitle>
         <DialogContent>
-          <LessonsQuestionForm
-            editing={true}
+          <LessonsCategoryForm
+            editing
             onSubmit={onSubmitEdit}
             handleClose={handleCloseEdit}
             initialValues={initialValues}
@@ -122,4 +126,4 @@ const LessonsQuestionPopover = ({
   );
 };
 
-export default LessonsQuestionPopover;
+export default LessonsCategoryPopover;

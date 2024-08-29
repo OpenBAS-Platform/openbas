@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useContext, useState } from 'react';
 import { IconButton, Dialog, DialogTitle, DialogContent, Slide, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../../../../../../../components/i18n';
+import { useFormatter } from '../../../../../components/i18n';
 import LessonsQuestionForm from './LessonsQuestionForm';
-import { addLessonsQuestion } from '../../../../../../../actions/Lessons';
+import { LessonContext } from '../../../common/Context';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -25,32 +24,34 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CreateLessonsQuestion = (props) => {
-  const { onCreate, inline, exerciseId, lessonsCategoryId } = props;
+  const { onCreate, inline, lessonsCategoryId } = props;
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { t } = useFormatter();
   const [open, setOpen] = useState(false);
+
+  // Context
+  const {
+    onAddLessonsQuestion,
+  } = useContext(LessonContext);
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const onSubmit = (data) => {
-    return dispatch(
-      addLessonsQuestion(exerciseId, lessonsCategoryId, data),
-    ).then((result) => {
-      if (result.result) {
-        if (onCreate) {
-          onCreate(result.result);
-        }
-        return handleClose();
+  const onSubmit = async (data) => {
+    const result = await onAddLessonsQuestion(lessonsCategoryId, data);
+    if (result.result) {
+      if (onCreate) {
+        onCreate(result.result);
       }
-      return result;
-    });
+      return handleClose();
+    }
+    return result;
   };
   return (
     <div>
       {inline === true ? (
         <ListItem
-          button={true}
-          divider={true}
+          button
+          divider
           onClick={handleOpen}
           color="primary"
         >
@@ -77,7 +78,7 @@ const CreateLessonsQuestion = (props) => {
         open={open}
         TransitionComponent={Transition}
         onClose={handleClose}
-        fullWidth={true}
+        fullWidth
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >

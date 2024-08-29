@@ -17,7 +17,7 @@ import io.openbas.utils.ExpectationUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -30,16 +30,15 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ChallengeService {
 
+    private final ExerciseRepository exerciseRepository;
+    private final ChallengeRepository challengeRepository;
+    private final InjectRepository injectRepository;
+    private final InjectExpectationRepository injectExpectationRepository;
     @Resource
     protected ObjectMapper mapper;
-
-    private ExerciseRepository exerciseRepository;
-    private ChallengeRepository challengeRepository;
-    private InjectRepository injectRepository;
-    private InjectExpectationRepository injectExpectationRepository;
 
     public Challenge enrichChallengeWithExercisesOrScenarios(@NotNull Challenge challenge) {
         List<Inject> injects = fromIterable(this.injectRepository.findAllForChallengeId("%" + challenge.getId() + "%"));

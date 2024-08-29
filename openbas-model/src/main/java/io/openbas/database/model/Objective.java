@@ -68,7 +68,7 @@ public class Objective implements Base {
     @NotNull
     private Instant updatedAt = now();
 
-    @OneToMany(mappedBy = "objective", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "objective", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonSerialize(using = MultiIdListDeserializer.class)
     @JsonProperty("objective_evaluations")
     private List<Evaluation> evaluations = new ArrayList<>();

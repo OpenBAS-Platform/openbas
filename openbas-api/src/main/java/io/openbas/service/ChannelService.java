@@ -13,7 +13,7 @@ import io.openbas.rest.channel.response.ChannelReader;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.ExpectationUtils;
 import jakarta.annotation.Resource;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -24,18 +24,16 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ChannelService {
 
+    private final InjectExpectationRepository injectExpectationExecutionRepository;
+    private final ExerciseRepository exerciseRepository;
+    private final ScenarioService scenarioService;
+    private final ArticleRepository articleRepository;
+    private final ChannelRepository channelRepository;
     @Resource
     protected ObjectMapper mapper;
-
-    private InjectExpectationRepository injectExpectationExecutionRepository;
-    private ExerciseRepository exerciseRepository;
-    private ScenarioService scenarioService;
-    private ArticleRepository articleRepository;
-    private ChannelRepository channelRepository;
-
 
     public ChannelReader validateArticles(String exerciseId, String channelId, User user) {
         ChannelReader channelReader;
@@ -107,7 +105,7 @@ public class ChannelService {
             });
 
             // -- VALIDATION TYPE --
-            processByValidationType(user, injects, publishedArticles, expectationExecutions.size()>0);
+            processByValidationType(user, injects, publishedArticles, expectationExecutions.size() > 0);
         }
         return channelReader;
     }

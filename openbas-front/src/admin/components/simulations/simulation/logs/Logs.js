@@ -1,14 +1,13 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { RateReviewOutlined, ExpandMoreOutlined, EditOutlined } from '@mui/icons-material';
-import { Card, CardHeader, CardContent, Typography, Accordion, AccordionDetails, AccordionSummary, IconButton } from '@mui/material';
+import { EditOutlined, ExpandMoreOutlined, RateReviewOutlined } from '@mui/icons-material';
+import { Accordion, AccordionDetails, AccordionSummary, Card, CardContent, CardHeader, IconButton, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { fetchObjectives } from '../../../../../actions/Objective';
 import { addLog, fetchLogs } from '../../../../../actions/Log';
 import LogPopover from './LogPopover';
 import { resolveUserName } from '../../../../../utils/String';
@@ -16,6 +15,7 @@ import ItemTags from '../../../../../components/ItemTags';
 import LogForm from './LogForm';
 import { isExerciseUpdatable } from '../../../../../utils/Exercise';
 import AnimationMenu from '../AnimationMenu';
+import { fetchExerciseObjectives } from '../../../../../actions/Objective';
 
 const useStyles = makeStyles(() => ({
   card: {
@@ -48,7 +48,7 @@ const Logs = () => {
     };
   });
   useDataLoader(() => {
-    dispatch(fetchObjectives(exerciseId));
+    dispatch(fetchExerciseObjectives(exerciseId));
     dispatch(fetchLogs(exerciseId));
   });
   const scrollToBottom = () => {
@@ -78,20 +78,20 @@ const Logs = () => {
   };
   return (
     <div style={{ marginTop: -13 }}>
-      <AnimationMenu exerciseId={exerciseId} />
+      <AnimationMenu exerciseId={exerciseId}/>
       <div>
         <Typography variant="h4" style={{ float: 'left' }}>
           {t('Simulation logs')}
         </Typography>
         {isExerciseUpdatable(exercise, true) && (
-          <IconButton
-            color="secondary"
-            onClick={handleToggleWrite}
-            size="large"
-            style={{ margin: '-15px 0 0 5px' }}
-          >
-            <EditOutlined fontSize="small" />
-          </IconButton>
+        <IconButton
+          color="secondary"
+          onClick={handleToggleWrite}
+          size="large"
+          style={{ margin: '-15px 0 0 5px' }}
+        >
+          <EditOutlined fontSize="small"/>
+        </IconButton>
         )}
         {logs.map((log) => (
           <Card
@@ -105,7 +105,7 @@ const Logs = () => {
                 padding: '7px 10px 2px 15px',
                 borderBottom: `1px solid ${theme.palette.divider}`,
               }}
-              action={<LogPopover exerciseId={exerciseId} log={log} />}
+              action={<LogPopover exerciseId={exerciseId} log={log}/>}
               title={
                 <div>
                   <div
@@ -120,7 +120,7 @@ const Logs = () => {
                     <strong>
                       {resolveUserName(usersMap[log.log_user] ?? {})}
                     </strong>
-                    &nbsp;
+                                        &nbsp;
                     <span style={{ color: theme.palette.text.secondary }}>
                       {t('added an entry on')} {nsdt(log.log_created_at)}
                     </span>
@@ -133,10 +133,10 @@ const Logs = () => {
                       textTransform: 'none',
                     }}
                   >
-                    <ItemTags tags={log.log_tags} />
+                    <ItemTags tags={log.log_tags}/>
                   </div>
                 </div>
-              }
+                            }
             />
             <CardContent>
               <strong>{log.log_title}</strong>
@@ -145,30 +145,30 @@ const Logs = () => {
           </Card>
         ))}
         {isExerciseUpdatable(exercise, true) && (
-          <Accordion
-            style={{ margin: `${logs.length > 0 ? '30' : '5'}px 0 30px 0` }}
-            expanded={openCreateLog}
-            onChange={handleToggleWrite}
-            variant="outlined"
-          >
-            <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
-              <Typography className={classes.heading}>
-                <RateReviewOutlined />
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                <span style={{ fontWeight: 500 }}>{t('Write an entry')}</span>
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails style={{ width: '100%', paddingBottom: 80 }}>
-              <LogForm
-                initialValues={{ log_tags: [] }}
-                onSubmit={submitCreateLog}
-                handleClose={() => setOpenCreateLog(false)}
-              />
-            </AccordionDetails>
-          </Accordion>
+        <Accordion
+          style={{ margin: `${logs.length > 0 ? '30' : '5'}px 0 30px 0` }}
+          expanded={openCreateLog}
+          onChange={handleToggleWrite}
+          variant="outlined"
+        >
+          <AccordionSummary expandIcon={<ExpandMoreOutlined/>}>
+            <Typography className={classes.heading}>
+              <RateReviewOutlined/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+              <span style={{ fontWeight: 500 }}>{t('Write an entry')}</span>
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails style={{ width: '100%', paddingBottom: 80 }}>
+            <LogForm
+              initialValues={{ log_tags: [] }}
+              onSubmit={submitCreateLog}
+              handleClose={() => setOpenCreateLog(false)}
+            />
+          </AccordionDetails>
+        </Accordion>
         )}
-        <div style={{ marginTop: 100 }} />
-        <div ref={bottomRef} />
+        <div style={{ marginTop: 100 }}/>
+        <div ref={bottomRef}/>
       </div>
     </div>
   );

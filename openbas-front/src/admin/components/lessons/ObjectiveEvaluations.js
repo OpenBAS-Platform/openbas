@@ -1,37 +1,38 @@
-import React, { useState } from 'react';
-import { Box, Typography, Slider, List, ListItem, ListItemIcon, ListItemText, LinearProgress, Button } from '@mui/material';
+import React, { useContext, useState } from 'react';
+import { Box, Button, LinearProgress, List, ListItem, ListItemIcon, ListItemText, Slider, Typography } from '@mui/material';
 import { HowToVoteOutlined } from '@mui/icons-material';
-import { useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
-import { useFormatter } from '../../../../../components/i18n';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { addEvaluation, fetchEvaluations, updateEvaluation } from '../../../../../actions/Evaluation';
-import { resolveUserName } from '../../../../../utils/String';
-import Loader from '../../../../../components/Loader';
-import { isExerciseUpdatable } from '../../../../../utils/Exercise';
+import { useFormatter } from '../../../components/i18n';
+import { useHelper } from '../../../store';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
+import { resolveUserName } from '../../../utils/String';
+import Loader from '../../../components/Loader';
+import { LessonContext } from '../common/Context';
 
-const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
-  const dispatch = useDispatch();
+const ObjectiveEvaluations = ({ objectiveId, handleClose, isUpdatable }) => {
   const { t } = useFormatter();
   const [value, setValue] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Context
+  const {
+    onAddEvaluation,
+    onUpdateEvaluation,
+    onFetchEvaluation,
+  } = useContext(LessonContext);
   // Fetching data
-  const { exerciseId } = useParams();
-  const { me, exercise, objective, evaluations, usersMap } = useHelper(
+  const { me, objective, evaluations, usersMap } = useHelper(
     (helper) => {
       return {
         me: helper.getMe(),
         usersMap: helper.getUsersMap(),
-        exercise: helper.getExercise(exerciseId),
         objective: helper.getObjective(objectiveId),
         evaluations: helper.getObjectiveEvaluations(objectiveId),
       };
     },
   );
   useDataLoader(() => {
-    dispatch(fetchEvaluations(exerciseId, objectiveId));
+    onFetchEvaluation(objectiveId);
   });
   const currentUserEvaluation = R.head(
     R.filter((n) => n.evaluation_user === me.user_id, evaluations),
@@ -42,13 +43,10 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
       evaluation_score: value,
     };
     if (currentUserEvaluation) {
-      return dispatch(
-        updateEvaluation(
-          exerciseId,
-          objectiveId,
-          currentUserEvaluation.evaluation_id,
-          data,
-        ),
+      return onUpdateEvaluation(
+        objectiveId,
+        currentUserEvaluation.evaluation_id,
+        data,
       ).then((result) => {
         if (result.result) {
           return handleClose();
@@ -56,7 +54,7 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
         return result;
       });
     }
-    return dispatch(addEvaluation(exerciseId, objectiveId, data)).then(
+    return onAddEvaluation(objectiveId, data).then(
       (result) => {
         if (result.result) {
           return handleClose();
@@ -73,7 +71,7 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
       {evaluations.length > 0 ? (
         <List style={{ padding: 0 }}>
           {evaluations.map((evaluation) => (
-            <ListItem key={evaluation.evaluation_id} divider={true}>
+            <ListItem key={evaluation.evaluation_id} divider>
               <ListItemIcon>
                 <HowToVoteOutlined />
               </ListItemIcon>
@@ -106,7 +104,7 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
         </List>
       ) : (
         <List style={{ padding: 0 }}>
-          <ListItem divider={true}>
+          <ListItem divider>
             <ListItemIcon>
               <HowToVoteOutlined />
             </ListItemIcon>
@@ -136,7 +134,7 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
           </ListItem>
         </List>
       )}
-      {isExerciseUpdatable(exercise, true) && (
+      {isUpdatable && (
         <Box
           sx={{
             width: '100%',
@@ -155,7 +153,7 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
             onChange={(_, val) => setValue(val)}
             valueLabelDisplay="auto"
             step={5}
-            marks={true}
+            marks
             min={10}
             max={100}
           />
@@ -164,12 +162,12 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button
           onClick={handleClose}
-          style={{ marginRight: isExerciseUpdatable(exercise, true) ? 10 : 0 }}
+          style={{ marginRight: isUpdatable ? 10 : 0 }}
           disabled={submitting}
         >
-          {isExerciseUpdatable(exercise, true) ? t('Cancel') : t('Close')}
+          {isUpdatable ? t('Cancel') : t('Close')}
         </Button>
-        {isExerciseUpdatable(exercise, true) && (
+        {isUpdatable && (
           <Button
             color="secondary"
             onClick={submitEvaluation}

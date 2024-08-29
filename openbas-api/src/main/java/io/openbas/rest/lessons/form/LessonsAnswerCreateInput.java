@@ -1,7 +1,11 @@
 package io.openbas.rest.lessons.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class LessonsAnswerCreateInput {
 
     @JsonProperty("lessons_answer_score")
@@ -12,28 +16,4 @@ public class LessonsAnswerCreateInput {
 
     @JsonProperty("lessons_answer_negative")
     private String negative;
-
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    public String getPositive() {
-        return positive;
-    }
-
-    public void setPositive(String positive) {
-        this.positive = positive;
-    }
-
-    public String getNegative() {
-        return negative;
-    }
-
-    public void setNegative(String negative) {
-        this.negative = negative;
-    }
 }

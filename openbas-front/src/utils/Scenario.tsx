@@ -22,11 +22,11 @@ const useScenarioPermissions = (scenarioId: string, fullScenario = null) => {
     };
   }
   const canRead = logged.admin
-    || (scenario || fullScenario).scenario_observers?.includes(me.user_id);
+        || (scenario || fullScenario).scenario_observers?.includes(me.user_id);
   const canWrite = logged.admin
-    || (scenario || fullScenario).scenario_planners?.includes(me.user_id);
+        || (scenario || fullScenario).scenario_planners?.includes(me.user_id);
   const canPlay = logged.admin
-    || (scenario || fullScenario).scenario_users?.includes(me.user_id);
+        || (scenario || fullScenario).scenario_users?.includes(me.user_id);
   return {
     canRead,
     canWrite,

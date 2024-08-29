@@ -20,12 +20,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.util.*;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class ScenarioToExerciseService {
-
-    @Resource
-    protected ObjectMapper mapper;
 
     private final ExerciseRepository exerciseRepository;
     private final GrantRepository grantRepository;
@@ -38,8 +35,10 @@ public class ScenarioToExerciseService {
     private final LessonsQuestionRepository lessonsQuestionRepository;
     private final InjectRepository injectRepository;
     private final InjectDocumentRepository injectDocumentRepository;
-    private final TeamService teamService;
     private final VariableService variableService;
+    private final TeamService teamService;
+    @Resource
+    protected ObjectMapper mapper;
 
     @Transactional(rollbackFor = Exception.class)
     public Exercise toExercise(
@@ -147,6 +146,9 @@ public class ScenarioToExerciseService {
                 .toList();
         this.articleRepository.saveAll(exerciseArticles);
 
+        // Lessons
+        exercise.setLessonsAnonymized(scenario.isLessonsAnonymized());
+
         // Lessons categories
         List<LessonsCategory> scenarioLessonCategories = scenario.getLessonsCategories();
         scenarioLessonCategories.forEach(scenarioLessonCategory -> {
@@ -251,7 +253,6 @@ public class ScenarioToExerciseService {
 
         return exerciseSaved;
     }
-
 
 
     private List<Document> addExerciseToDocuments(

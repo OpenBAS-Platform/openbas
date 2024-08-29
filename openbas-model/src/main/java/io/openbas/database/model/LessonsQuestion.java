@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
-import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +65,7 @@ public class LessonsQuestion implements Base {
     @JsonProperty("lessons_question_order")
     private int order;
 
-    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonProperty("lessons_question_answers")
     @JsonSerialize(using = MultiIdListDeserializer.class)
     private List<LessonsAnswer> answers = new ArrayList<>();
@@ -74,6 +74,11 @@ public class LessonsQuestion implements Base {
     @JsonProperty("lessons_question_exercise")
     public String getExercise() {
         return Optional.ofNullable(getCategory().getExercise()).map(Exercise::getId).orElse(null);
+    }
+
+    @JsonProperty("lessons_question_scenario")
+    public String getScenario() {
+        return Optional.ofNullable(getCategory().getScenario()).map(Scenario::getId).orElse(null);
     }
     // endregion
 

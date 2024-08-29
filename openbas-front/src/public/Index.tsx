@@ -11,7 +11,8 @@ const Login = lazy(() => import('./components/login/Login'));
 const Comcheck = lazy(() => import('./components/comcheck/Comcheck'));
 const Channel = lazy(() => import('./components/channels/Channel'));
 const Challenges = lazy(() => import('./components/challenges/Challenges'));
-const Lessons = lazy(() => import('./components/lessons/Lessons'));
+const ExerciseViewLessons = lazy(() => import('./components/lessons/ExerciseViewLessons'));
+const ScenarioViewLessons = lazy(() => import('./components/lessons/ScenarioViewLessons'));
 
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {
@@ -40,7 +41,8 @@ const Index = () => {
             <Route path="reset" element={errorWrapper(Reset)()} />
             <Route path="channels/:exerciseId/:channelId" element={errorWrapper(Channel)()} />
             <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()} />
-            <Route path="lessons/:exerciseId" element={errorWrapper(Lessons)()} />
+            <Route path="lessons/exercise/:exerciseId" element={errorWrapper(ExerciseViewLessons)()} />
+            <Route path="lessons/scenario/:scenarioId" element={errorWrapper(ScenarioViewLessons)()} />
             <Route path="*" element={<Login />} />
           </Routes>
         </Suspense>

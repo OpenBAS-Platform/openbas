@@ -11,7 +11,7 @@ import io.openbas.service.ScenarioService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -27,16 +27,16 @@ import static io.openbas.rest.channel.ChannelHelper.enrichArticleWithVirtualPubl
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ChannelApi extends RestBehavior {
 
-    private ExerciseRepository exerciseRepository;
-    private ScenarioService scenarioService;
-    private ArticleRepository articleRepository;
-    private ChannelRepository channelRepository;
-    private DocumentRepository documentRepository;
-    private UserRepository userRepository;
-    private ChannelService channelService;
+    private final ExerciseRepository exerciseRepository;
+    private final ScenarioService scenarioService;
+    private final ArticleRepository articleRepository;
+    private final ChannelRepository channelRepository;
+    private final DocumentRepository documentRepository;
+    private final UserRepository userRepository;
+    private final ChannelService channelService;
 
     // -- CHANNELS --
 

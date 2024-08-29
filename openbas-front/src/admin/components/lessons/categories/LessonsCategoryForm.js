@@ -1,8 +1,8 @@
 import React from 'react';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import OldTextField from '../../../../../../components/fields/OldTextField';
-import { useFormatter } from '../../../../../../components/i18n';
+import OldTextField from '../../../../components/fields/OldTextField';
+import { useFormatter } from '../../../../components/i18n';
 
 const LessonsCategoryForm = (props) => {
   const { t } = useFormatter();
@@ -24,7 +24,7 @@ const LessonsCategoryForm = (props) => {
   // Rendering
   return (
     <Form
-      keepDirtyOnReinitialize={true}
+      keepDirtyOnReinitialize
       initialValues={initialValues}
       onSubmit={submitForm}
       validate={validate}
@@ -34,20 +34,20 @@ const LessonsCategoryForm = (props) => {
           <OldTextField
             variant="standard"
             name="lessons_category_name"
-            fullWidth={true}
+            fullWidth
             label={t('Name')}
           />
           <OldTextField
             variant="standard"
             name="lessons_category_description"
-            fullWidth={true}
+            fullWidth
             label={t('Description')}
             style={{ marginTop: 20 }}
           />
           <OldTextField
             variant="standard"
             name="lessons_category_order"
-            fullWidth={true}
+            fullWidth
             label={t('Order')}
             type="number"
             style={{ marginTop: 20 }}

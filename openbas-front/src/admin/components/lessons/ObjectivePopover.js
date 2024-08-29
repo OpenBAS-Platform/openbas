@@ -1,16 +1,17 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { updateObjective, deleteObjective } from '../../../../../actions/Objective';
 import ObjectiveForm from './ObjectiveForm';
-import inject18n from '../../../../../components/i18n';
-import Transition from '../../../../../components/common/Transition';
-import { isExerciseReadOnly } from '../../../../../utils/Exercise';
+import inject18n from '../../../components/i18n';
+import Transition from '../../../components/common/Transition';
+import { LessonContext } from '../common/Context';
 
 class ObjectivePopover extends Component {
+  // Context
+  static contextType = LessonContext;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -39,12 +40,11 @@ class ObjectivePopover extends Component {
   }
 
   onSubmitEdit(data) {
-    return this.props
-      .updateObjective(
-        this.props.exerciseId,
-        this.props.objective.objective_id,
-        data,
-      )
+    const { onUpdateObjective } = this.context;
+    return onUpdateObjective(
+      this.props.objective.objective_id,
+      data,
+    )
       .then(() => this.handleCloseEdit());
   }
 
@@ -58,15 +58,15 @@ class ObjectivePopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteObjective(
-      this.props.exerciseId,
+    const { onDeleteObjective } = this.context;
+    onDeleteObjective(
       this.props.objective.objective_id,
     );
     this.handleCloseDelete();
   }
 
   render() {
-    const { t, objective, exercise } = this.props;
+    const { t, objective } = this.props;
     const initialValues = R.pick(
       ['objective_title', 'objective_description', 'objective_priority'],
       objective,
@@ -77,7 +77,7 @@ class ObjectivePopover extends Component {
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
           size="large"
-          disabled={isExerciseReadOnly(exercise, true)}
+          disabled={this.props.isReadOnly}
         >
           <MoreVert />
         </IconButton>
@@ -117,7 +117,7 @@ class ObjectivePopover extends Component {
           TransitionComponent={Transition}
           open={this.state.openEdit}
           onClose={this.handleCloseEdit.bind(this)}
-          fullWidth={true}
+          fullWidth
           maxWidth="md"
           PaperProps={{ elevation: 1 }}
         >
@@ -125,7 +125,7 @@ class ObjectivePopover extends Component {
           <DialogContent>
             <ObjectiveForm
               initialValues={initialValues}
-              editing={true}
+              editing
               onSubmit={this.onSubmitEdit.bind(this)}
               handleClose={this.handleCloseEdit.bind(this)}
             />
@@ -138,13 +138,12 @@ class ObjectivePopover extends Component {
 
 ObjectivePopover.propTypes = {
   t: PropTypes.func,
-  exercise: PropTypes.object,
+  isReadOnly: PropTypes.bool,
   objective: PropTypes.object,
   updateObjective: PropTypes.func,
   deleteObjective: PropTypes.func,
 };
 
 export default R.compose(
-  connect(null, { updateObjective, deleteObjective }),
   inject18n,
 )(ObjectivePopover);

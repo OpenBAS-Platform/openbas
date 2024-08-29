@@ -836,10 +836,6 @@ export interface ExerciseDetails {
   exercise_users_number?: number;
 }
 
-export interface ExerciseLessonsInput {
-  exercise_lessons_anonymized?: boolean;
-}
-
 export interface ExerciseSimple {
   exercise_category?: string;
   exercise_global_score?: ExpectationResultsByType[];
@@ -1686,6 +1682,10 @@ export interface LessonsCategoryUpdateInput {
   lessons_category_order?: number;
 }
 
+export interface LessonsInput {
+  lessons_anonymized?: boolean;
+}
+
 export interface LessonsQuestion {
   lessons_question_answers?: LessonsAnswer[];
   lessons_question_category: LessonsCategory;
@@ -1696,6 +1696,7 @@ export interface LessonsQuestion {
   lessons_question_explanation?: string;
   /** @format int32 */
   lessons_question_order?: number;
+  lessons_question_scenario?: string;
   /** @format date-time */
   lessons_question_updated_at: string;
   lessonsquestion_id: string;
@@ -2035,6 +2036,25 @@ export interface PageGroup {
 
 export interface PageInjectResultDTO {
   content?: InjectResultDTO[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageInjectTestStatus {
+  content?: InjectTestStatus[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -2762,6 +2782,7 @@ export interface Scenario {
   scenario_injects?: Inject[];
   scenario_injects_statistics?: Record<string, number>;
   scenario_kill_chain_phases?: KillChainPhase[];
+  scenario_lessons_anonymized?: boolean;
   scenario_lessons_categories?: LessonsCategory[];
   scenario_mail_from: string;
   scenario_mails_reply_to?: string[];

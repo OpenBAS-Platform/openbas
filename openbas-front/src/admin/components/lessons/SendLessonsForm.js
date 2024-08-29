@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import OldTextField from '../../../../../components/fields/OldTextField';
-import inject18n from '../../../../../components/i18n';
-import RichTextField from '../../../../../components/fields/RichTextField';
+import OldTextField from '../../../components/fields/OldTextField';
+import inject18n from '../../../components/i18n';
+import RichTextField from '../../../components/fields/RichTextField';
 
 class SendLessonsForm extends Component {
   validate(values) {
@@ -23,7 +23,7 @@ class SendLessonsForm extends Component {
     const { t, onSubmit, handleClose, initialValues } = this.props;
     return (
       <Form
-        keepDirtyOnReinitialize={true}
+        keepDirtyOnReinitialize
         initialValues={initialValues}
         onSubmit={onSubmit}
         validate={this.validate.bind(this)}
@@ -38,14 +38,14 @@ class SendLessonsForm extends Component {
             <OldTextField
               variant="standard"
               name="subject"
-              fullWidth={true}
+              fullWidth
               label={t('Subject')}
               style={{ marginTop: 20 }}
             />
             <RichTextField
               name="body"
               label={t('Message')}
-              fullWidth={true}
+              fullWidth
               style={{ marginTop: 20, height: 300 }}
             />
             <div style={{ float: 'right', marginTop: 20 }}>
