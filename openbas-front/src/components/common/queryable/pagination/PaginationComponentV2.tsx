@@ -67,9 +67,6 @@ const PaginationComponentV2 = <T extends object>({
   const [_options, setOptions] = useState<OptionPropertySchema[]>([]);
 
   useEffect(() => {
-    // Retrieve input from uri
-    // queryableHelpers.uriHelpers.retrieveFromUri();
-
     if (entityPrefix) {
       useFilterableProperties(entityPrefix, availableFilterNames).then((propertySchemas: PropertySchemaDTO[]) => {
         const newOptions = propertySchemas.filter((property) => property.schema_property_name !== MITRE_FILTER_KEY)
@@ -83,9 +80,6 @@ const PaginationComponentV2 = <T extends object>({
   }, []);
 
   useEffect(() => {
-    // Modify URI
-    // queryableHelpers.uriHelpers.updateUri();
-
     // Fetch datas
     fetch(searchPaginationInput).then((result: { data: Page<T> }) => {
       const { data } = result;
@@ -118,13 +112,6 @@ const PaginationComponentV2 = <T extends object>({
               textSearchHelpers={queryableHelpers.textSearchHelpers}
             />
           )}
-          {/* <FilterAutocomplete */}
-          {/*  filterGroup={searchPaginationInput.filterGroup} */}
-          {/*  helpers={queryableHelpers.filterHelpers} */}
-          {/*  options={options} */}
-          {/*  setPristine={setPristine} */}
-          {/*  style={{ marginLeft: searchEnable ? 10 : 0 }} */}
-          {/* /> */}
           {availableFilterNames?.includes(`${entityPrefix}_kill_chain_phases`) && (
             <KillChainPhasesFilter filterKey={`${entityPrefix}_kill_chain_phases`} helpers={queryableHelpers.filterHelpers} />
           )}
@@ -184,13 +171,6 @@ const PaginationComponentV2 = <T extends object>({
           )}
         </>
       )}
-      {/* <FilterChips */}
-      {/*  propertySchemas={properties} */}
-      {/*  filterGroup={searchPaginationInput.filterGroup} */}
-      {/*  availableFilterNames={availableFilterNames?.filter((n) => n !== MITRE_FILTER_KEY)} */}
-      {/*  helpers={queryableHelpers.filterHelpers} */}
-      {/*  pristine={pristine} */}
-      {/* /> */}
     </>
   );
 };
