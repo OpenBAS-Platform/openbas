@@ -612,7 +612,7 @@ const Lessons: React.FC<Props> = ({
           </Alert>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEmptyLessons(false)}>
+          <Button onClick={() => setOpenAnonymize(false)}>
             {t('Cancel')}
           </Button>
           <Button color="secondary" onClick={toggleAnonymize}>
