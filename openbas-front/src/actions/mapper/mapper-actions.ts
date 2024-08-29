@@ -30,6 +30,10 @@ export const createMapper = (data: ImportMapperAddInput) => {
   return simplePostCall(XLS_MAPPER_URI, data);
 };
 
+export const duplicateMapper = (mapperId: string) => {
+  return simplePostCall(`${XLS_MAPPER_URI}/${mapperId}`, mapperId);
+};
+
 export const updateMapper = (mapperId: string, data: ImportMapperUpdateInput) => {
   const uri = `${XLS_MAPPER_URI}/${mapperId}`;
   return simplePutCall(uri, data);

@@ -10,15 +10,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
 
+import static io.openbas.utils.StringUtils.duplicateString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -77,6 +80,40 @@ public class MapperServiceTest {
     assertNotNull(importMapperResponse);
     assertEquals(importMapperResponse.getId(), importMapper.getId());
   }
+
+    @DisplayName("Test duplicate a mapper")
+    @Test
+    void duplicateMapper() throws Exception {
+        // -- PREPARE --
+        ImportMapper importMapper = MockMapperUtils.createImportMapper();
+        when(importMapperRepository.findById(any())).thenReturn(Optional.of(importMapper));
+        ImportMapper importMapperSaved = MockMapperUtils.createImportMapper();
+        when(importMapperRepository.save(any(ImportMapper.class))).thenReturn(importMapperSaved);
+
+        // -- EXECUTE --
+        ImportMapper response = mapperService.getDuplicateImportMapper(importMapper.getId());
+
+        // -- ASSERT --
+        ArgumentCaptor<ImportMapper> importMapperCaptor = ArgumentCaptor.forClass(ImportMapper.class);
+        verify(importMapperRepository).save(importMapperCaptor.capture());
+
+        ImportMapper capturedImportMapper= importMapperCaptor.getValue();
+        // verify importMapper
+        assertEquals(duplicateString(importMapper.getName()), capturedImportMapper.getName());
+        assertEquals(importMapper.getInjectTypeColumn(), capturedImportMapper.getInjectTypeColumn());
+        assertEquals(importMapper.getInjectImporters().size(), capturedImportMapper.getInjectImporters().size());
+        // verify injectImporter
+        assertEquals("", capturedImportMapper.getInjectImporters().get(0).getId());
+        assertEquals(importMapper.getInjectImporters().get(0).getImportTypeValue(), capturedImportMapper.getInjectImporters().get(0).getImportTypeValue());
+        assertEquals(importMapper.getInjectImporters().get(0).getRuleAttributes().size(),
+                capturedImportMapper.getInjectImporters().get(0).getRuleAttributes().size());
+        // verify ruleAttribute
+        assertEquals("", capturedImportMapper.getInjectImporters().get(0).getRuleAttributes().get(0).getId());
+        assertEquals(importMapper.getInjectImporters().get(0).getRuleAttributes().get(0).getName(),
+                capturedImportMapper.getInjectImporters().get(0).getRuleAttributes().get(0).getName());
+
+        assertEquals(response.getId(), importMapperSaved.getId());
+    }
 
   @DisplayName("Test update a specific mapper by using new rule attributes and new inject importer")
   @Test

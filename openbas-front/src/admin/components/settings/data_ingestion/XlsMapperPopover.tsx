@@ -2,15 +2,17 @@ import React, { FunctionComponent, useState } from 'react';
 import { PopoverEntry } from '../../../../components/common/ButtonPopover';
 import IconPopover from '../../../../components/common/IconPopover';
 import type { RawPaginationImportMapper } from '../../../../utils/api-types';
-import { deleteMapper, exportMapper } from '../../../../actions/mapper/mapper-actions';
+import { deleteMapper, duplicateMapper, exportMapper } from '../../../../actions/mapper/mapper-actions';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../components/i18n';
 import Drawer from '../../../../components/common/Drawer';
 import XlsMapperUpdate from './xls_mapper/XlsMapperUpdate';
 import { download } from '../../../../utils/utils';
+import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 
 interface Props {
   mapper: RawPaginationImportMapper;
+  onDuplicate?: (result: RawPaginationImportMapper) => void;
   onUpdate?: (result: RawPaginationImportMapper) => void;
   onDelete?: (result: string) => void;
   onExport?: (result: string) => void;
@@ -18,12 +20,27 @@ interface Props {
 
 const XlsMapperPopover: FunctionComponent<Props> = ({
   mapper,
+  onDuplicate,
   onUpdate,
   onDelete,
   onExport,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
+
+  // Duplication
+  const [openDuplicate, setOpenDuplicate] = useState(false);
+  const handleOpenDuplicate = () => setOpenDuplicate(true);
+  const handleCloseDuplicate = () => setOpenDuplicate(false);
+  const submitDuplicate = () => {
+    duplicateMapper(mapper.import_mapper_id).then(
+      (result: { data: RawPaginationImportMapper }) => {
+        onDuplicate?.(result.data);
+        return result;
+      },
+    );
+    handleCloseDuplicate();
+  };
 
   // Edition
   const [openEdit, setOpenEdit] = useState(false);
@@ -59,6 +76,7 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
   };
 
   const entries: PopoverEntry[] = [
+    { label: 'Duplicate', action: handleOpenDuplicate },
     { label: 'Update', action: handleOpenEdit },
     { label: 'Delete', action: handleOpenDelete },
     { label: 'Export', action: exportMapperAction },
@@ -78,6 +96,12 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
           handleClose={handleCloseEdit}
         />
       </Drawer>
+      <DialogDuplicate
+        open={openDuplicate}
+        handleClose={handleCloseDuplicate}
+        handleSubmit={submitDuplicate}
+        text={`${t('Do you want to duplicate this XLS mapper :')} ${mapper.import_mapper_name} ?`}
+      />
       <DialogDelete
         open={openDelete}
         handleClose={handleCloseDelete}
