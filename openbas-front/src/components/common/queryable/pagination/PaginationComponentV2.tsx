@@ -89,7 +89,6 @@ const PaginationComponentV2 = <T extends object>({
   }, [searchPaginationInput]);
 
   // Filters
-  // const [pristine, setPristine] = useState(true);
   const [openMitreFilter, setOpenMitreFilter] = React.useState(false);
 
   const computeAttackPatternNameForFilter = () => {
