@@ -19,7 +19,6 @@ const LoginForm = (props) => {
   };
   return (
     <div style={{ padding: 15 }}>
-      <h1>Hello world !</h1>
       <Form onSubmit={onSubmit} validate={validate}>
         {({ handleSubmit, submitting, pristine }) => (
           <form onSubmit={handleSubmit}>
