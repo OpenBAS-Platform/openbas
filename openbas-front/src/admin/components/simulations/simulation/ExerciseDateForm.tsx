@@ -16,8 +16,8 @@ interface Props {
 }
 
 interface ExerciseStartDateAndTime {
-  date: Date;
-  time: Date;
+  date: string;
+  time: string;
 }
 
 // eslint-disable-next-line no-underscore-dangle
@@ -32,11 +32,15 @@ const ExerciseDateForm: React.FC<Props> = ({
 
   const defaultFormValues = () => {
     if (initialValues?.exercise_start_date) {
-      return ({ date: new Date(initialValues.exercise_start_date), time: new Date(initialValues.exercise_start_date) });
+      const date = new Date(initialValues.exercise_start_date);
+      return ({
+        date: new Date(new Date(date).setUTCHours(0, 0, 0, 0)).toISOString(),
+        time: new Date(new Date().setHours(date.getHours(), date.getMinutes(), date.getSeconds(), 0)).toISOString(),
+      });
     }
     return ({
-      date: new Date(new Date().setUTCHours(0, 0, 0, 0)),
-      time: minutesInFuture(5).toDate(),
+      date: new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString(),
+      time: minutesInFuture(5).toDate().toISOString(),
     });
   };
 
@@ -50,10 +54,10 @@ const ExerciseDateForm: React.FC<Props> = ({
       onSubmit({ exercise_start_date: '' });
     } else {
       const { date, time } = data;
-      date.setHours(time.getHours());
-      date.setMinutes(time.getMinutes());
-      date.setSeconds(time.getSeconds());
-      onSubmit({ exercise_start_date: date.toISOString() });
+      const newDate = new Date(date);
+      const newTime = new Date(time);
+      newDate.setHours(newTime.getHours(), newTime.getMinutes(), newTime.getSeconds());
+      onSubmit({ exercise_start_date: newDate.toISOString() });
     }
   };
 
@@ -66,7 +70,7 @@ const ExerciseDateForm: React.FC<Props> = ({
     defaultValues: defaultFormValues(),
     resolver: zodResolver(
       zodImplement<ExerciseStartDateAndTime>().with({
-        date: z.any().refine(
+        date: z.string().refine(
           (data) => {
             if (!checked) {
               return !!data;
@@ -77,12 +81,13 @@ const ExerciseDateForm: React.FC<Props> = ({
         ).refine(
           (data) => {
             if (!checked) {
-              return data instanceof Date && data.getTime() >= new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime();
+              return new Date(data).getTime() >= new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime();
             }
             return true;
           },
           { message: t('Date should be at least today') },
         ),
+
         time: z.any().refine(
           (data) => {
             if (!checked) {
@@ -91,16 +96,20 @@ const ExerciseDateForm: React.FC<Props> = ({
             return true;
           },
           { message: t('Required') },
-        ).refine(
-          (data) => {
-            if (!checked) {
-              return data instanceof Date && (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < data.getTime();
-            }
-            return true;
-          },
-          { message: t('The time and start date do not match, as the time provided is either too close to the current moment or in the past') },
         ),
-      }),
+      }).refine(
+        (data) => {
+          if (!checked) {
+            return new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() !== new Date(data.date).getTime()
+                  || (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < new Date(data.time).getTime();
+          }
+          return true;
+        },
+        {
+          message: t('The time and start date do not match, as the time provided is either too close to the current moment or in the past'),
+          path: ['time'],
+        },
+      ),
     ),
   });
 
@@ -121,8 +130,8 @@ const ExerciseDateForm: React.FC<Props> = ({
               label={t('Start date (optional)')}
               disabled={checked}
               minDate={new Date(new Date().setUTCHours(0, 0, 0, 0))}
-              value={(field.value)}
-              onChange={(date) => field.onChange(date)}
+              value={field.value ? new Date(field.value) : null}
+              onChange={(date) => field.onChange(date?.toISOString())}
               onAccept={() => {
                 clearErrors('time');
               }}
@@ -149,9 +158,9 @@ const ExerciseDateForm: React.FC<Props> = ({
               thresholdToRenderTimeInASingleColumn={100}
               disabled={checked}
               closeOnSelect={false}
-              value={field.value}
+              value={field.value ? new Date(field.value) : null}
               minTime={new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() === new Date(getValues('date')).getTime() ? new Date() : undefined}
-              onChange={(time) => field.onChange(time)}
+              onChange={(time) => (field.onChange(time?.toISOString()))}
               slotProps={{
                 textField: {
                   fullWidth: true,

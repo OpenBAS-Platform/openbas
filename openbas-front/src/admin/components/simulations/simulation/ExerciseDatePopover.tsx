@@ -38,7 +38,7 @@ const ExerciseDatePopover: React.FC<Props> = ({ exercise }) => {
         maxWidth="xs"
         fullWidth
       >
-        <DialogTitle>{t('Update the simulation')}</DialogTitle>
+        <DialogTitle>{t('Update simulation start date and time')}</DialogTitle>
         <DialogContent>
           <ExerciseDateForm
             initialValues={initialValues}
