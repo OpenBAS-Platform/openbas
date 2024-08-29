@@ -1,7 +1,8 @@
 import { Dispatch } from 'redux';
 import { delReferential, getReferential, postReferential, putReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import type {
-  Exercise, InjectsImportInput,
+  Exercise,
+  InjectsImportInput,
   LessonsAnswerCreateInput,
   LessonsCategoryCreateInput,
   LessonsCategoryTeamsInput,
