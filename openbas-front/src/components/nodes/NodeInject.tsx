@@ -89,6 +89,7 @@ export type NodeInject = Node<{
   fixedY?: number,
   startDate?: string,
   targets: string[],
+  exerciseOrScenarioId: string,
   onSelectedInject(inject?: InjectStore): void,
 }
 
@@ -145,6 +146,8 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
     if (data.inject) data.onSelectedInject(data.inject);
   };
 
+  const isDisabled = !data.inject?.inject_injector_contract.injector_contract_content_parsed?.config.expose;
+
   return (
     <div className={classes.node} style={{ backgroundColor: data.background, color: 'white' }} onClick={onClick}>
       <div className={classes.icon}>
@@ -182,7 +185,8 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
               inject={data.inject!}
               setSelectedInjectId={selectedInject}
               canBeTested={data.inject?.inject_testable}
-              isDisabled={false}
+              isDisabled={isDisabled}
+              exerciseOrScenarioId={data.exerciseOrScenarioId}
             />
           </span>
         </div>

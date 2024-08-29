@@ -178,6 +178,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             targets: inject.inject_assets!.map((asset) => asset.asset_name)
               .concat(inject.inject_asset_groups!.map((assetGroup) => assetGroup.asset_group_name))
               .concat(inject.inject_teams!.map((team) => teams[team]?.team_name)),
+            exerciseOrScenarioId,
           },
           position: {
             x: (inject.inject_depends_duration / 60) * (gapSize / minutesPerGapAllowed[minutesPerGapIndex]),
