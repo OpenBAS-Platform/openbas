@@ -1,15 +1,15 @@
 import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Card, CardActionArea, CardContent, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { MovieFilterOutlined } from '@mui/icons-material';
-import React, { CSSProperties, useMemo, useState } from 'react';
+import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
+import classNames from 'classnames';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import type { TagHelper, UserHelper } from '../../../actions/helper';
-import { searchScenarios } from '../../../actions/scenarios/scenario-actions';
+import { fetchScenarioStatistic, searchScenarios } from '../../../actions/scenarios/scenario-actions';
 import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import ScenarioCreation from './ScenarioCreation';
 import Breadcrumbs from '../../../components/Breadcrumbs';
-import { initSorting } from '../../../components/common/queryable/Page';
 import ItemTags from '../../../components/ItemTags';
 import ItemSeverity from '../../../components/ItemSeverity';
 import PlatformIcon from '../../../components/PlatformIcon';
@@ -22,11 +22,28 @@ import { useAppDispatch } from '../../../utils/hooks';
 import useQueryable from '../../../components/common/queryable/useQueryable';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import ScenarioPopover from './scenario/ScenarioPopover';
-import { fetchStatistics } from '../../../actions/Application';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
+import type { Theme } from '../../../components/Theme';
+import type { FilterGroup, ScenarioStatistic } from '../../../utils/api-types';
+import { scenarioCategories } from './ScenarioForm';
+import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
+import { initSorting } from '../../../components/common/queryable/Page';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme: Theme) => ({
+  card: {
+    overflow: 'hidden',
+    width: 250,
+    height: 100,
+    marginRight: 20,
+  },
+  cardSelected: {
+    border: `1px solid ${theme.palette.secondary.main}`,
+  },
+  area: {
+    width: '100%',
+    height: '100%',
+  },
   itemHead: {
     textTransform: 'uppercase',
     cursor: 'pointer',
@@ -66,6 +83,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   scenario_tags: {
     width: '18%',
+    cursor: 'default',
   },
   scenario_updated_at: {
     width: '10%',
@@ -150,9 +168,66 @@ const Scenarios = () => {
 
   const [scenarios, setScenarios] = useState<ScenarioStore[]>([]);
 
+  // Category filter
+  const CATEGORY_FILTER_KEY = 'scenario_category';
+  const scenarioFilter: FilterGroup = {
+    mode: 'and',
+    filters: [buildEmptyFilter(CATEGORY_FILTER_KEY, 'eq')],
+  };
   const { queryableHelpers, searchPaginationInput } = useQueryable('scenarios', buildSearchPagination({
     sorts: initSorting('scenario_updated_at', 'DESC'),
+    filterGroup: scenarioFilter,
   }));
+
+  const handleOnClickCategory = (category?: string) => {
+    if (!category) {
+      // Clear filter
+      queryableHelpers.filterHelpers.handleAddMultipleValueFilter(
+        CATEGORY_FILTER_KEY,
+        [],
+      );
+    } else {
+      queryableHelpers.filterHelpers.handleAddSingleValueFilter(
+        CATEGORY_FILTER_KEY,
+        category,
+      );
+    }
+  };
+  const getCategoryValue = () => searchPaginationInput.filterGroup?.filters?.find((f) => f.key === CATEGORY_FILTER_KEY)?.values;
+  const hasCategory = (category: string) => getCategoryValue()?.includes(category);
+  const noCategory = () => getCategoryValue()?.length === 0;
+
+  // Statistic
+  const [statistic, setStatistic] = useState<ScenarioStatistic>();
+  const fetchStatistics = () => {
+    fetchScenarioStatistic().then((result: { data: ScenarioStatistic }) => setStatistic(result.data));
+  };
+  useEffect(() => {
+    fetchStatistics();
+  }, []);
+
+  const categoryCard = (category: string, count: number) => (
+    <Card
+      key={category}
+      classes={{ root: classes.card }} variant="outlined"
+      onClick={() => handleOnClickCategory(category)}
+      className={classNames({ [classes.cardSelected]: hasCategory(category) })}
+    >
+      <CardActionArea classes={{ root: classes.area }}>
+        <CardContent>
+          <div style={{ marginBottom: 10 }}>
+            <ItemCategory category={category} size="small" />
+          </div>
+          <div style={{ fontSize: 15, fontWeight: 600 }}>
+            {t(scenarioCategories.get(category) ?? category)}
+          </div>
+          <div style={{ marginTop: 10, fontSize: 12, fontWeight: 500 }}>
+            {count} {t('scenarios')}
+          </div>
+        </CardContent>
+      </CardActionArea>
+    </Card>
+  );
 
   // Export
   const exportProps = {
@@ -173,6 +248,31 @@ const Scenarios = () => {
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Scenarios'), current: true }]} />
+      <div style={{ display: 'flex', marginBottom: 30 }}>
+        <Card
+          key="all"
+          classes={{ root: classes.card }} variant="outlined"
+          onClick={() => handleOnClickCategory()}
+          className={classNames({ [classes.cardSelected]: noCategory() })}
+        >
+          <CardActionArea classes={{ root: classes.area }}>
+            <CardContent>
+              <div style={{ marginBottom: 10 }}>
+                <ItemCategory category="all" size="small" />
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 600 }}>
+                {t('All categories')}
+              </div>
+              <div style={{ marginTop: 10, fontSize: 12, fontWeight: 500 }}>
+                {statistic?.scenarios_global_count ?? '-'} {t('scenarios')}
+              </div>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+        {Object.entries(statistic?.scenarios_attack_scenario_count ?? {}).map(([key, value]) => (
+          categoryCard(key, value)
+        ))}
+      </div>
       <PaginationComponentV2
         fetch={searchScenarios}
         searchPaginationInput={searchPaginationInput}
