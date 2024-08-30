@@ -11,10 +11,14 @@ import DialogTest from '../../../components/common/DialogTest';
 
 interface Props {
   injectTestStatus: InjectTestStatus;
+  onTest?: (result: InjectTestStatus) => void;
+  onDelete?: (result: string) => void;
 }
 
 const InjectTestPopover: FunctionComponent<Props> = ({
   injectTestStatus,
+  onDelete,
+  onTest,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -38,6 +42,9 @@ const InjectTestPopover: FunctionComponent<Props> = ({
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
     deleteInjectTest(injectTestStatus.status_id);
+    if (onDelete) {
+      onDelete(injectTestStatus.status_id!);
+    }
     handleCloseDelete();
   };
 
@@ -53,7 +60,8 @@ const InjectTestPopover: FunctionComponent<Props> = ({
 
   const submitTest = () => {
     testInject(injectTestStatus.inject_id!).then((result: { data: InjectTestStatus }) => {
-      setInjectTestResult(result.data);
+      onTest?.(result.data);
+      return result;
     });
     handleCloseTest();
   };

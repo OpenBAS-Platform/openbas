@@ -1,6 +1,6 @@
 import { makeStyles } from '@mui/styles';
 import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import type { InjectTestStatus, SearchPaginationInput } from '../../../utils/api-types';
 import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
@@ -81,7 +81,6 @@ const InjectTestList: FunctionComponent<Props> = ({
     }
   }, [statusId]);
 
-
   // Headers
   const headers = [
     {
@@ -117,7 +116,7 @@ const InjectTestList: FunctionComponent<Props> = ({
         searchPaginationInput={searchPaginationInput}
         setContent={setTests}
       >
-        <InjectTestReplayAll tests={tests} />
+        <InjectTestReplayAll injectIds={tests?.map((test: InjectTestStatus) => test.inject_id!)} onTest={(result) => setTests(result)} />
       </PaginationComponent>
       <List style={{ marginTop: 40 }}>
         <ListItem
@@ -179,7 +178,11 @@ const InjectTestList: FunctionComponent<Props> = ({
                 />
               </ListItemButton>
               <ListItemSecondaryAction>
-                <InjectTestPopover injectTestStatus={test} />
+                <InjectTestPopover
+                  injectTestStatus={test}
+                  onTest={(result) => setTests(tests?.map((existing) => (existing.status_id !== result.status_id ? existing : result)))}
+                  onDelete={(result) => setTests(tests.filter((existing) => (existing.status_id !== result)))}
+                />
               </ListItemSecondaryAction>
             </ListItem>
           );

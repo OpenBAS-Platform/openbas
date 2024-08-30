@@ -7,11 +7,13 @@ import { bulkTestInjects } from '../../../actions/injects/inject-action';
 import DialogTest from '../../../components/common/DialogTest';
 
 interface Props {
-  tests: InjectTestStatus[] | null;
+  injectIds: string[] | undefined;
+  onTest?: (result: InjectTestStatus[]) => void;
 }
 
 const ImportUploaderMapper: FunctionComponent<Props> = ({
-  tests,
+  injectIds,
+  onTest,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -26,8 +28,9 @@ const ImportUploaderMapper: FunctionComponent<Props> = ({
   };
 
   const handleSubmitAllTest = () => {
-    bulkTestInjects(tests!.map((test: InjectTestStatus) => test.inject_id!)).then((result: { data: InjectTestStatus[] }) => {
-      console.log(result);
+    bulkTestInjects(injectIds!).then((result: { data: InjectTestStatus[] }) => {
+      onTest?.(result.data);
+      return result;
     });
     handleCloseAllTest();
   };
@@ -39,7 +42,7 @@ const ImportUploaderMapper: FunctionComponent<Props> = ({
           <IconButton
             aria-label="test"
             disabled={
-              tests?.length === 0
+              injectIds?.length === 0
             }
             onClick={handleOpenAllTest}
             color="primary"
