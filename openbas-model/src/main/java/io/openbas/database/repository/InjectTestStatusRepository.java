@@ -2,7 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectTestStatus;
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 
