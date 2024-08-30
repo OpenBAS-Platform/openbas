@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { type Node, type Edge, useReactFlow, useNodesInitialized, useStore } from 'reactflow';
+import { type Node, type Edge, useReactFlow, useNodesInitialized, useStore } from '@xyflow/react';
 
 import { getSourceHandlePosition, getTargetHandlePosition } from './utils';
 import layoutAlgorithms, { type LayoutAlgorithmOptions } from './algorithms';
@@ -13,7 +13,7 @@ function useAutoLayout(options: LayoutOptions, targetResults: InjectExpectations
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
   const elements = useStore(
     (state) => ({
-      nodeMap: state.nodeInternals,
+      nodeMap: state.nodeLookup,
       edgeMap: state.edges.reduce(
         (acc, edge) => acc.set(edge.id, edge),
         new Map(),

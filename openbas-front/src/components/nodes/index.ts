@@ -1,9 +1,8 @@
 import { NodeTypes } from '@xyflow/react';
-
-import NodeResult from './NodeResultStep';
+import NodeInjectExport from './NodeInject';
 
 const nodeTypes: NodeTypes = {
-  result: NodeResult,
+  inject: NodeInjectExport,
 };
 
 export default nodeTypes;

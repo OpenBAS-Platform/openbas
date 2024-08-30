@@ -1,6 +1,7 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import * as R from 'ramda';
+import { Connection } from '@xyflow/react';
 import { Alert, Dialog, Link, SnackbarCloseReason } from '@mui/material';
 import { ArticleContext, TeamContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
@@ -113,6 +114,17 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
     : injects.filter(
       (inject: Inject) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id),
     );
+
+  const handleConnectInjects = async (connection: Connection) => {
+    const updateFields = [
+      'inject_title',
+      'inject_depends_from_another',
+      'inject_depends_duration',
+    ];
+    const sourceInject = injects.find((inject: Inject) => inject.inject_id === connection.source);
+    sourceInject.inject_depends_from_another = connection.target;
+    await injectContext.onUpdateInject(sourceInject.inject_id, R.pick(updateFields, sourceInject));
+  };
 
   const massUpdateInjects = async (actions: { field: string, type: string, values: { value: string }[] }[]) => {
     const updateFields = [
@@ -252,6 +264,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
             selectedElements={selectedElements}
             deSelectedElements={deSelectedElements}
             selectAll={selectAll}
+            onConnectInjects={handleConnectInjects}
           />
           <ToolBar
             numberOfSelectedElements={numberOfSelectedElements}

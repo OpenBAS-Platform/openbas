@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { Handle, NodeProps, Position } from 'reactflow';
+import { Handle, Node, NodeProps, Position } from '@xyflow/react';
 import { makeStyles } from '@mui/styles';
 import { Tooltip } from '@mui/material';
 import { FlagOutlined, HelpOutlined, ModeStandbyOutlined, ScoreOutlined } from '@mui/icons-material';
@@ -57,7 +57,20 @@ const renderIcon = (icon: string) => {
   }
 };
 
-const NodeResultStep = ({ data }: NodeProps) => {
+export type NodeResultStep = Node<{
+  background?: string,
+  color?: string,
+  key: string,
+  label: string,
+  description?: string,
+  end: boolean,
+  middle: boolean,
+  start: boolean,
+}
+
+>;
+
+const NodeResultStepComponent = ({ data }: NodeProps<NodeResultStep>) => {
   const classes = useStyles();
   return (
     <div className={classes.node} style={{ backgroundColor: data.background, color: data.color }}>
@@ -76,4 +89,4 @@ const NodeResultStep = ({ data }: NodeProps) => {
   );
 };
 
-export default memo(NodeResultStep);
+export default memo(NodeResultStepComponent);
