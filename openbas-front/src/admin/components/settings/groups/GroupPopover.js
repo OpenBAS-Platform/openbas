@@ -152,10 +152,10 @@ class GroupPopover extends Component {
     this.setState({ openUsers: false, keyword: '' });
   }
 
-  submitAddUsers() {
+  submitUpdateUsers() {
     this.props.updateGroupUsers(this.props.group.group_id, {
       group_users: this.state.usersIds,
-    });
+    }).then(this.fetchAndUpdateGroup.bind(this));
     this.handleCloseUsers();
   }
 
@@ -432,7 +432,7 @@ class GroupPopover extends Component {
               <Button variant="contained" style={{ marginRight: 10 }} onClick={this.handleCloseUsers.bind(this)}>
                 {t('Cancel')}
               </Button>
-              <Button variant="contained" color="secondary" onClick={this.submitAddUsers.bind(this)}>
+              <Button variant="contained" color="secondary" onClick={this.submitUpdateUsers.bind(this)}>
                 {t('Update')}
               </Button>
             </div>
