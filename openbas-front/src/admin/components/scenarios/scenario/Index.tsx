@@ -1,6 +1,6 @@
 import React, { FunctionComponent, lazy, Suspense, useState } from 'react';
 import { Link, Route, Routes, useLocation, useParams } from 'react-router-dom';
-import { Box, IconButton, Tab, Tabs, Tooltip } from '@mui/material';
+import { Alert, AlertTitle, Box, IconButton, Tab, Tabs, Tooltip } from '@mui/material';
 import cronstrue from 'cronstrue';
 import { makeStyles, useTheme } from '@mui/styles';
 import { UpdateOutlined } from '@mui/icons-material';
@@ -193,17 +193,28 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
 const Index = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
+  const [loading, setLoading] = useState(true);
+  const { t } = useFormatter();
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
   const scenario = useHelper((helper: ScenariosHelper) => helper.getScenario(scenarioId));
   useDataLoader(() => {
-    dispatch(fetchScenario(scenarioId));
+    setLoading(true);
+    dispatch(fetchScenario(scenarioId)).finally(() => setLoading(false));
   });
 
   const scenarioInjectContext = injectContextForScenario(scenario);
 
-  if (!scenario) {
+  if (loading) {
     return <Loader />;
+  }
+  if (!loading && !scenario) {
+    return (
+      <Alert severity="warning">
+        <AlertTitle>{t('Warning')}</AlertTitle>
+        {t('Scenario is currently unavailable or you do not have sufficient permissions to access it.')}
+      </Alert>
+    );
   }
   return (
     <InjectContext.Provider value={scenarioInjectContext}>
