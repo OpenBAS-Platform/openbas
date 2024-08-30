@@ -8,6 +8,8 @@ import jakarta.persistence.criteria.Path;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -70,7 +72,9 @@ public class InjectSpecification {
         return (root, query, cb) -> cb.equal(root.get("injectorContract").get("id"), contract);
     }
 
-    public static final Set<String> VALID_TESTABLE_TYPES = Set.of("openbas_email", "openbas_ovh_sms");
+    public static final Set<String> VALID_TESTABLE_TYPES = new HashSet<>(
+        Arrays.asList("openbas_email", "openbas_ovh_sms")
+    );
 
     public static Specification<Inject> byIds(List<String> injectIds) {
         return (root, query, cb) -> root.get("id").in(injectIds);
