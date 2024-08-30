@@ -107,7 +107,7 @@ public class CalderaExecutor extends Injector {
                 try {
                     Endpoint executionEndpoint = this.findAndRegisterAssetForExecution(injection.getInjection().getInject(), asset);
                     if (executionEndpoint != null) {
-                        if (Arrays.stream(injectorContract.getPlatforms()).anyMatch(s -> s.equals(executionEndpoint.getPlatform().name()))) {
+                        if (Arrays.stream(injectorContract.getPlatforms()).anyMatch(s -> s.equals(executionEndpoint.getPlatform()))) {
                             String result = this.calderaService.exploit(obfuscator, executionEndpoint.getExternalReference(), contract, additionalFields);
                             if (result.contains("complete")) {
                                 ExploitResult exploitResult = this.calderaService.exploitResult(executionEndpoint.getExternalReference(), contract);
