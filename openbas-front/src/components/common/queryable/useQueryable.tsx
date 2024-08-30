@@ -1,4 +1,4 @@
-import { useLocalStorage } from 'usehooks-ts';
+import { useState } from 'react';
 import useFiltersState from './filter/useFiltersState';
 import type { FilterGroup, SearchPaginationInput, SortField } from '../../../utils/api-types';
 import useTextSearchState from './textSearch/useTextSearchState';
@@ -8,10 +8,10 @@ import useSortState from './sort/useSortState';
 import useUriState from './uri/useUriState';
 import { buildSearchPagination } from './QueryableUtils';
 
-const useQueryable = (localStorageKey: string, initSearchPaginationInput: Partial<SearchPaginationInput>) => {
+const useQueryable = (_localStorageKey: string, initSearchPaginationInput: Partial<SearchPaginationInput>) => {
   const finalSearchPaginationInput: SearchPaginationInput = buildSearchPagination(initSearchPaginationInput);
 
-  const [searchPaginationInput, setSearchPaginationInput] = useLocalStorage<SearchPaginationInput>(localStorageKey, finalSearchPaginationInput);
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(finalSearchPaginationInput);
 
   // Text Search
   const textSearchHelpers = useTextSearchState(searchPaginationInput.textSearch, (textSearch: string, page: number) => setSearchPaginationInput({
