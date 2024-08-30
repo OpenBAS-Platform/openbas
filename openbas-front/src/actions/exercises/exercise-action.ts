@@ -36,7 +36,7 @@ export const searchExerciseInjects = (exerciseId: Exercise['exercise_id'], searc
 // -- IMPORT --
 
 export const importXlsForExercise = (exerciseId: Exercise['exercise_id'], importId: string, input: InjectsImportInput) => {
-  const uri = `${EXERCISE_URI}/${exerciseId}/xls/${importId}/import`;
+  const uri = `${EXERCISE_URI}${exerciseId}/xls/${importId}/import`;
   return simplePostCall(uri, input)
     .then((response) => {
       const injectCount = response.data.total_injects;
@@ -50,7 +50,7 @@ export const importXlsForExercise = (exerciseId: Exercise['exercise_id'], import
 };
 
 export const dryImportXlsForExercise = (exerciseId: Exercise['exercise_id'], importId: string, input: InjectsImportInput) => {
-  const uri = `${EXERCISE_URI}/${exerciseId}/xls/${importId}/dry`;
+  const uri = `${EXERCISE_URI}${exerciseId}/xls/${importId}/dry`;
   return simplePostCall(uri, input)
     .then((response) => {
       return response;
