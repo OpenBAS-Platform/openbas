@@ -1,6 +1,9 @@
 package io.openbas.service;
 
-import io.openbas.database.model.*;
+import io.openbas.database.model.Execution;
+import io.openbas.database.model.Inject;
+import io.openbas.database.model.InjectTestStatus;
+import io.openbas.database.model.User;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectTestStatusRepository;
 import io.openbas.database.repository.UserRepository;
@@ -10,6 +13,7 @@ import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Injector;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -22,9 +26,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.specification.InjectSpecification.byIds;
+import static io.openbas.database.specification.InjectSpecification.testable;
+import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @Service
@@ -45,47 +51,28 @@ public class InjectTestStatusService {
 
   @Transactional
   public InjectTestStatus testInject(String injectId) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-    User user = this.userRepository.findById(currentUser().getId()).orElseThrow();
-    List<ExecutionContext> userInjectContexts = List.of(
-        this.executionContextService.executionContext(user, inject, "Direct test")
-    );
-    Injector executor = context.getBean(
-        inject.getInjectorContract().map(injectorContract -> injectorContract.getInjector().getType()).orElseThrow(),
-        io.openbas.execution.Injector.class);
-    ExecutableInject injection = new ExecutableInject(false, true, inject, List.of(), inject.getAssets(),
-        inject.getAssetGroups(), userInjectContexts);
-    Execution execution = executor.executeInjection(injection);
+    Inject inject = this.injectRepository.findById(injectId).orElseThrow(() -> new EntityNotFoundException("Inject not found"));
 
-    //Save inject test status
-    Optional<InjectTestStatus> injectTestStatus = this.injectTestStatusRepository.findByInject(inject);
-    InjectTestStatus injectTestStatusToSave = InjectTestStatus.fromExecutionTest(execution);
-    injectTestStatus.ifPresent(testStatus -> {
-      injectTestStatusToSave.setId(testStatus.getId());
-      injectTestStatusToSave.setTestCreationDate(testStatus.getTestCreationDate());
-    });
-    injectTestStatusToSave.setInject(inject);
-    this.injectTestStatusRepository.save(injectTestStatusToSave);
+    if (!inject.getInjectTestable()) {
+      throw new IllegalArgumentException("Inject: " + injectId + " is not testable");
+    }
 
-    return injectTestStatusToSave;
+    User user = this.userRepository.findById(currentUser().getId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+    return testInject(inject, user);
   }
+
 
   @Transactional
   public List<InjectTestStatus> bulkTestInjects(List<String> injectIds) {
-    Iterable<Inject> injectIterable = injectRepository.findAllById(injectIds);
-    List<Inject> injects = new ArrayList<>();
-    injectIterable.forEach(iterable -> {
-      if (iterable.getInjectTestable() && !iterable.getTeams().isEmpty()) {
-        injects.add(iterable);
-      }
-    });
+    List<Inject> injects = fromIterable(this.injectRepository.findAll(byIds(injectIds).and(testable())));
     if (injects.isEmpty()) {
-      throw new IllegalArgumentException("No IDs match the requirements");
+      throw new IllegalArgumentException("No inject ID is testable");
     }
+    User user = this.userRepository.findById(currentUser().getId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
+
     List<InjectTestStatus> results = new ArrayList<>();
-    injects.forEach(inject -> {
-      results.add(testInject(inject.getId()));
-    });
+    injects.forEach(inject -> results.add(testInject(inject, user)));
     return results;
   }
 
@@ -111,6 +98,42 @@ public class InjectTestStatusService {
 
   public InjectTestStatus findInjectTestStatusById(String testId) {
     return injectTestStatusRepository.findById(testId).orElseThrow();
+  }
+
+  // -- PRIVATE --
+
+  private InjectTestStatus testInject(Inject inject, User user) {
+    ExecutionContext userInjectContext = this.executionContextService.executionContext(user, inject, "Direct test");
+
+    Injector executor = context.getBean(
+        inject.getInjectorContract()
+            .map(contract -> contract.getInjector().getType())
+            .orElseThrow(() -> new EntityNotFoundException("Injector contract not found")),
+        Injector.class
+    );
+
+    ExecutableInject injection = new ExecutableInject(
+        false, true, inject, List.of(),
+        inject.getAssets(), inject.getAssetGroups(),
+        List.of(userInjectContext)
+    );
+    Execution execution = executor.executeInjection(injection);
+
+    InjectTestStatus injectTestStatus = this.injectTestStatusRepository.findByInject(inject)
+        .map(existingStatus -> {
+          InjectTestStatus updatedStatus = InjectTestStatus.fromExecutionTest(execution);
+          updatedStatus.setId(existingStatus.getId());
+          updatedStatus.setTestCreationDate(existingStatus.getTestCreationDate());
+          updatedStatus.setInject(inject);
+          return updatedStatus;
+        })
+        .orElseGet(() -> {
+          InjectTestStatus newStatus = InjectTestStatus.fromExecutionTest(execution);
+          newStatus.setInject(inject);
+          return newStatus;
+        });
+
+    return this.injectTestStatusRepository.save(injectTestStatus);
   }
 
 }

@@ -287,10 +287,7 @@ const InjectPopover: FunctionComponent<Props> = ({
           </MenuItem>
         )}
         {inject.inject_testable && canBeTested && (
-          <MenuItem
-            disabled={inject.inject_teams?.length === 0}
-            onClick={handleOpenTest}
-          >
+          <MenuItem onClick={handleOpenTest}>
             {t('Test')}
           </MenuItem>
         )}
