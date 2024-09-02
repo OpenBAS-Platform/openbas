@@ -284,7 +284,10 @@ public class V1_DataImporter implements Importer {
     scenario.setSubtitle(scenarioNode.get("scenario_subtitle").textValue());
     scenario.setCategory(scenarioNode.get("scenario_category").textValue());
     scenario.setMainFocus(scenarioNode.get("scenario_main_focus").textValue());
-    scenario.setSeverity(scenarioNode.get("scenario_severity").textValue());
+    if (scenarioNode.get("scenario_severity") != null) {
+      String severity = scenarioNode.get("scenario_severity").textValue();
+      scenario.setSeverity(Scenario.SEVERITY.valueOf(severity));
+    }
     if (scenarioNode.get("scenario_recurrence") != null) {
       scenario.setRecurrence(scenarioNode.get("scenario_recurrence").textValue());
     }

@@ -30,6 +30,9 @@ import org.apache.logging.log4j.util.Strings;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -59,8 +62,10 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.JpaUtils.createLeftJoin;
+import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static java.time.Instant.now;
 
 @RequiredArgsConstructor
@@ -163,6 +168,41 @@ public class InjectService {
     // -- EXECUTION --
     return execInject(query);
   }
+
+    public Page<InjectOutput> injects(Specification<Inject> specification, Pageable pageable) {
+        CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+
+        CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+        Root<Inject> injectRoot = cq.from(Inject.class);
+        selectForInject(cb, cq, injectRoot);
+
+        // -- Text Search and Filters --
+        if (specification != null) {
+            Predicate predicate = specification.toPredicate(injectRoot, cq, cb);
+            if (predicate != null) {
+                cq.where(predicate);
+            }
+        }
+
+        // -- Sorting --
+        List<Order> orders = toSortCriteriaBuilder(cb, injectRoot, pageable.getSort());
+        cq.orderBy(orders);
+
+        // Type Query
+        TypedQuery<Tuple> query = this.entityManager.createQuery(cq);
+
+        // -- Pagination --
+        query.setFirstResult((int) pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+
+        // -- EXECUTION --
+        List<InjectOutput> injects = execInject(query);
+
+        // -- Count Query --
+        Long total = countQuery(cb, this.entityManager, Inject.class, specification);
+
+        return new PageImpl<>(injects, pageable, total);
+    }
 
     /**
      * Create inject programmatically based on rawInject, rawInjectExpectation, rawAsset, rawAssetGroup, rawTeam

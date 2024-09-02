@@ -40,7 +40,7 @@ const useQueryable = (_localStorageKey: string, initSearchPaginationInput: Parti
   }));
 
   // Uri
-  const uriHelpers = useUriState(searchPaginationInput, (input: SearchPaginationInput) => setSearchPaginationInput(input));
+  const uriHelpers = useUriState(localStorageKey, searchPaginationInput, (input: SearchPaginationInput) => setSearchPaginationInput(input));
 
   const queryableHelpers: QueryableHelpers = {
     textSearchHelpers,

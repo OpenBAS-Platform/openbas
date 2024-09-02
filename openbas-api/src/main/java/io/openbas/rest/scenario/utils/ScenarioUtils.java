@@ -1,36 +1,55 @@
 package io.openbas.rest.scenario.utils;
 
+import io.openbas.database.model.Filters;
 import io.openbas.database.model.Scenario;
-import io.openbas.utils.CustomFilterUtils;
+import io.openbas.database.specification.ScenarioSpecification;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-public class ScenarioUtils {
+import static io.openbas.utils.CustomFilterUtils.computeMode;
+import static java.util.Optional.ofNullable;
 
-  private static final String SCENARIO_KILL_CHAIN_PHASES_FILTER = "scenario_kill_chain_phases";
-  private static final Map<String, String> CORRESPONDENCE_MAP = Collections.singletonMap(
-      SCENARIO_KILL_CHAIN_PHASES_FILTER, "injects.injectorContract.attackPatterns.killChainPhases.id"
-  );
+public class ScenarioUtils {
 
   private ScenarioUtils() {
 
   }
 
+  private static final String SCENARIO_RECURRENCE_FILTER = "scenario_recurrence";
+
   /**
    * Manage filters that are not directly managed by the generic mechanics -> scenario_kill_chain_phases
    */
-  public static UnaryOperator<Specification<Scenario>> handleCustomFilter(
+  public static Function<Specification<Scenario>, Specification<Scenario>> handleDeepFilter(
       @NotNull final SearchPaginationInput searchPaginationInput) {
-    return CustomFilterUtils.handleCustomFilter(
-        searchPaginationInput,
-        SCENARIO_KILL_CHAIN_PHASES_FILTER,
-        CORRESPONDENCE_MAP
-    );
+    return handleCustomFilter(searchPaginationInput);
+  }
+
+  private static UnaryOperator<Specification<Scenario>> handleCustomFilter(
+      @NotNull final SearchPaginationInput searchPaginationInput) {
+    // Existence of the filter
+    Optional<Filters.Filter> scenarioRecurrenceFilterOpt = ofNullable(searchPaginationInput.getFilterGroup())
+        .flatMap(f -> f.findByKey(SCENARIO_RECURRENCE_FILTER));
+
+    if (scenarioRecurrenceFilterOpt.isPresent()) {
+      // Purge filter
+      searchPaginationInput.getFilterGroup().removeByKey(SCENARIO_RECURRENCE_FILTER);
+      Specification<Scenario> customSpecification = null;
+      if (scenarioRecurrenceFilterOpt.get().getValues().contains("Scheduled")) {
+        customSpecification = ScenarioSpecification.isRecurring();
+      } else if (scenarioRecurrenceFilterOpt.get().getValues().contains("Not planned")) {
+        customSpecification = ScenarioSpecification.noRecurring();
+      }
+      // Final specification
+      return computeMode(searchPaginationInput, customSpecification);
+    } else {
+      return (Specification<Scenario> specification) -> specification;
+    }
   }
 
 }

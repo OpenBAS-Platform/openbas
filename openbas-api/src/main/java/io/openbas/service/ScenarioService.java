@@ -46,7 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.*;
-import java.util.function.UnaryOperator;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -56,7 +56,7 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.database.specification.ScenarioSpecification.findGrantedFor;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.rest.scenario.utils.ScenarioUtils.handleCustomFilter;
+import static io.openbas.rest.scenario.utils.ScenarioUtils.handleDeepFilter;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_SCENARIO;
 import static io.openbas.utils.Constants.ARTICLES;
@@ -122,10 +122,7 @@ public class ScenarioService {
   }
 
   public Page<RawPaginationScenario> scenarios(@NotNull final SearchPaginationInput searchPaginationInput) {
-    UnaryOperator<Specification<Scenario>> finalSpecification = handleCustomFilter(
-        searchPaginationInput
-    );
-
+    Function<Specification<Scenario>, Specification<Scenario>> finalSpecification = handleDeepFilter(searchPaginationInput);
     if (currentUser().isAdmin()) {
       return buildPaginationCriteriaBuilder(
           (Specification<Scenario> specification, Pageable pageable) -> this.findAllWithCriteriaBuilder(
@@ -138,7 +135,7 @@ public class ScenarioService {
     } else {
       return buildPaginationCriteriaBuilder(
           (Specification<Scenario> specification, Pageable pageable) -> this.findAllWithCriteriaBuilder(
-              finalSpecification.apply(findGrantedFor(currentUser().getId()).and(specification)),
+              findGrantedFor(currentUser().getId()).and(finalSpecification.apply(specification)),
               pageable
           ),
           searchPaginationInput,
@@ -213,7 +210,7 @@ public class ScenarioService {
         .map(tuple -> new RawPaginationScenario(
             tuple.get("scenario_id", String.class),
             tuple.get("scenario_name", String.class),
-            tuple.get("scenario_severity", String.class),
+            tuple.get("scenario_severity", Scenario.SEVERITY.class),
             tuple.get("scenario_category", String.class),
             tuple.get("scenario_recurrence", String.class),
             tuple.get("scenario_updated_at", Instant.class),

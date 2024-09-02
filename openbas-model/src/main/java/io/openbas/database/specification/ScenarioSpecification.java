@@ -18,6 +18,10 @@ public class ScenarioSpecification {
     return (root, query, cb) -> cb.isNotNull(root.get("recurrence"));
   }
 
+  public static Specification<Scenario> noRecurring() {
+    return (root, query, cb) -> cb.isNull(root.get("recurrence"));
+  }
+
   public static Specification<Scenario> recurrenceStartDateBefore(@NotNull final Instant startDate) {
     return (root, query, cb) -> cb.or(
         cb.isNull(root.get("recurrenceStart")),

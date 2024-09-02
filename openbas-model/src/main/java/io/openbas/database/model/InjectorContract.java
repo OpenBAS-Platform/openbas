@@ -89,7 +89,7 @@ public class InjectorContract implements Base {
     @JoinColumn(name = "injector_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("injector_contract_injector")
-    @Queryable(filterable = true, property = "id", dynamicValues = true)
+    @Queryable(filterable = true, dynamicValues = true)
     @NotNull
     private Injector injector;
 
@@ -100,7 +100,7 @@ public class InjectorContract implements Base {
             inverseJoinColumns = @JoinColumn(name = "attack_pattern_id"))
     @JsonSerialize(using = MultiIdListDeserializer.class)
     @JsonProperty("injector_contract_attack_patterns")
-    @Queryable(searchable = true, filterable = true, property = "externalId")
+    @Queryable(searchable = true, filterable = true, path = "attackPatterns.externalId")
     private List<AttackPattern> attackPatterns = new ArrayList<>();
 
     @Column(name = "injector_contract_atomic_testing")
@@ -116,6 +116,17 @@ public class InjectorContract implements Base {
     @JsonProperty("injector_contract_injector_type")
     private String getInjectorType() {
         return this.getInjector() != null ? this.getInjector().getType() : null;
+    }
+
+    @JsonIgnore
+    @JsonProperty("injector_contract_kill_chain_phases")
+    @Queryable(filterable = true, dynamicValues = true, path = "attackPatterns.killChainPhases.id")
+    public List<KillChainPhase> getKillChainPhases() {
+        return getAttackPatterns()
+                .stream()
+                .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream())
+            .distinct()
+            .toList();
     }
 
     @JsonIgnore

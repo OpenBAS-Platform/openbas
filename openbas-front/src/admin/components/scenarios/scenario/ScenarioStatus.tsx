@@ -30,6 +30,9 @@ interface Props {
   variant?: 'list';
 }
 
+export const SCENARIO_SCHEDULED_STATUS = 'Scheduled';
+export const SCENARIO_NOT_SCHEDULED_STATUS = 'Not planned';
+
 const scenarioStatus: FunctionComponent<Props> = ({
   scenario,
   variant,
@@ -37,13 +40,14 @@ const scenarioStatus: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();
+
   const style = variant === 'list' ? classes.chipInList : classes.chip;
   if (scenario.scenario_recurrence) {
     return (
       <Chip
         classes={{ root: style }}
         style={inlineStylesColors.green}
-        label={t('Scheduled')}
+        label={t(SCENARIO_SCHEDULED_STATUS)}
       />
     );
   }
@@ -51,7 +55,7 @@ const scenarioStatus: FunctionComponent<Props> = ({
     <Chip
       classes={{ root: style }}
       style={inlineStylesColors.grey}
-      label={t('Not planned')}
+      label={t(SCENARIO_NOT_SCHEDULED_STATUS)}
     />
   );
 };

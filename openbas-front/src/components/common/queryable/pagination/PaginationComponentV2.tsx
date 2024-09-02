@@ -16,6 +16,7 @@ import TablePaginationComponent from './TablePaginationComponent';
 import { OptionPropertySchema } from '../filter/FilterAutocomplete';
 import useFilterableProperties from '../filter/useFilterableProperties';
 import FilterModeChip from '../filter/FilterModeChip';
+import InjectorContractSwitchFilter from '../../../../admin/components/common/filters/InjectorContractSwitchFilter';
 import KillChainPhasesFilter from '../../../../admin/components/common/filters/KillChainPhasesFilter';
 
 const useStyles = makeStyles(() => ({
@@ -130,6 +131,11 @@ const PaginationComponentV2 = <T extends object>({
                 <MitreFilter helpers={queryableHelpers.filterHelpers} onClick={() => setOpenMitreFilter(false)} />
               </Drawer>
             </>
+          )}
+          {availableFilterNames?.includes('injector_contract_players') && (
+            <div style={{ marginLeft: 10 }}>
+              <InjectorContractSwitchFilter filterHelpers={queryableHelpers.filterHelpers} filterGroup={searchPaginationInput.filterGroup}/>
+            </div>
           )}
         </div>
         {!disablePagination && (

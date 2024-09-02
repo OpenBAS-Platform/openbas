@@ -36,7 +36,7 @@ public class SortUtilsJpa {
                 .filter(p -> p.getJsonName().equals(property))
                 .findFirst()
                 .map(PropertySchema::getName)
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalArgumentException("Property not sortable: " + property + " for class " + clazz));
             return new Sort.Order(direction, javaProperty);
           }).toList();
     }

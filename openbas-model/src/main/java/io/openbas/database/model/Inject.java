@@ -53,7 +53,7 @@ public class Inject implements Base, Injection {
   private String id;
 
   @Getter
-    @Queryable(searchable = true, sortable = true)
+  @Queryable(filterable = true, searchable = true, sortable = true)
   @Column(name = "inject_title")
   @JsonProperty("inject_title")
   @NotBlank
@@ -93,7 +93,7 @@ public class Inject implements Base, Injection {
 
   @Getter
   @Column(name = "inject_updated_at")
-  @Queryable(sortable = true)
+  @Queryable(filterable = true, sortable = true)
   @JsonProperty("inject_updated_at")
   @NotNull
   private Instant updatedAt = now();
@@ -134,6 +134,7 @@ public class Inject implements Base, Injection {
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "inject_injector_contract")
   @JsonProperty("inject_injector_contract")
+  @Queryable(filterable = true, path = "injectorContract.injector.id")
   private InjectorContract injectorContract;
 
   @Getter
@@ -146,7 +147,7 @@ public class Inject implements Base, Injection {
   // CascadeType.ALL is required here because inject status are embedded
   @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonProperty("inject_status")
-  @Queryable(sortable = true, property = "name")
+  @Queryable(filterable = true, sortable = true)
   private InjectStatus status;
 
   @Getter
@@ -156,6 +157,7 @@ public class Inject implements Base, Injection {
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("inject_tags")
+  @Queryable(filterable = true, dynamicValues = true)
   private Set<Tag> tags = new HashSet<>();
 
   @Getter
@@ -342,6 +344,7 @@ public class Inject implements Base, Injection {
   }
 
   @JsonProperty("inject_kill_chain_phases")
+  @Queryable(filterable = true, dynamicValues = true, path = "injectorContract.attackPatterns.killChainPhases.id")
   public List<KillChainPhase> getKillChainPhases() {
     return getInjectorContract()
         .map(injectorContract ->
@@ -363,11 +366,20 @@ public class Inject implements Base, Injection {
   }
 
   @JsonProperty("inject_type")
+  @Queryable(filterable = true, path = "injectorContract.labels", clazz = Map.class)
   private String getType() {
     return getInjectorContract()
         .map(InjectorContract::getInjector)
         .map(Injector::getType)
         .orElse(null);
+  }
+
+  @JsonIgnore
+  @JsonProperty("inject_platforms")
+  @Queryable(filterable = true, dynamicValues = true, path = "injectorContract.platforms", clazz = String[].class)
+  private Optional<Endpoint.PLATFORM_TYPE[]> getPlatforms() {
+    return getInjectorContract()
+        .map(InjectorContract::getPlatforms);
   }
 
   @JsonIgnore

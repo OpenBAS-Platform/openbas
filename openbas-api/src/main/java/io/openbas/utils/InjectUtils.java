@@ -7,19 +7,23 @@ import org.apache.poi.ss.usermodel.Row;
 
 public class InjectUtils {
 
-    public static boolean checkIfRowIsEmpty(Row row) {
-        if (row == null) {
-            return true;
-        }
-        if (row.getLastCellNum() <= 0) {
-            return true;
-        }
-        for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
-            Cell cell = row.getCell(cellNum);
-            if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
-                return false;
-            }
-        }
-        return true;
+  private InjectUtils() {
+
+  }
+
+  public static boolean checkIfRowIsEmpty(Row row) {
+    if (row == null) {
+      return true;
     }
+    if (row.getLastCellNum() <= 0) {
+      return true;
+    }
+    for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
+      Cell cell = row.getCell(cellNum);
+      if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

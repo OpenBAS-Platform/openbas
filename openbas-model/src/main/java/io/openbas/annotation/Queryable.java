@@ -6,11 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.METHOD})
 public @interface Queryable {
   boolean searchable() default false;
   boolean filterable() default false;
   boolean dynamicValues() default false;
   boolean sortable() default false;
-  String property() default "";
+
+  String path() default "";
+  Class clazz() default String.class;
 }

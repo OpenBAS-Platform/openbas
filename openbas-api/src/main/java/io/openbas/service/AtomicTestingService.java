@@ -266,7 +266,7 @@ public class AtomicTestingService {
 
     // -- PAGINATION --
 
-    public Page<AtomicTestingOutput> findAllAtomicTestings(SearchPaginationInput searchPaginationInput) {
+    public Page<AtomicTestingOutput> findAllAtomicTestings(@NotNull final SearchPaginationInput searchPaginationInput) {
         Specification<Inject> customSpec = Specification.where((root, query, cb) -> {
             Predicate predicate = cb.conjunction();
             predicate = cb.and(predicate, cb.isNull(root.get("scenario")));
@@ -275,7 +275,7 @@ public class AtomicTestingService {
         });
         return buildPaginationCriteriaBuilder(
                 (Specification<Inject> specification, Pageable pageable) -> this.atomicTestings(
-                        specification.and(customSpec), pageable),
+                    customSpec.and(specification), pageable),
                 searchPaginationInput,
                 Inject.class
         );

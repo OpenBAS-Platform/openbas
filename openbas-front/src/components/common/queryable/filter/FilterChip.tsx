@@ -1,6 +1,7 @@
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { Chip, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import classNames from 'classnames';
 import { FilterHelpers } from './FilterHelpers';
 import FilterChipPopover from './FilterChipPopover';
 import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
@@ -80,19 +81,21 @@ const FilterChip: FunctionComponent<Props> = ({
     });
   };
 
-  const title = () => {
+  const title = (withStyle: boolean) => {
     return (
-      <span className={classes.container}><strong>{t(filter.key)}</strong> {convertOperatorToIcon(t, filter.operator)} {toValues(options)}</span>
+      <span className={classNames({ [classes.container]: withStyle })}>
+        <strong>{t(filter.key)}</strong> {convertOperatorToIcon(t, filter.operator)} {toValues(options)}
+      </span>
     );
   };
 
   return (
     <>
       <Tooltip
-        title={title()}
+        title={title(false)}
       >
         <Chip
-          label={title()}
+          label={title(true)}
           onClick={handleOpen}
           onDelete={handleRemoveFilter}
           component="div"

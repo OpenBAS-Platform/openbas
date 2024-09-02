@@ -21,7 +21,10 @@ import PlatformIcon from '../../../../../components/PlatformIcon';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import InjectList from '../../../atomic_testings/InjectList';
+import InjectDtoList from '../../../atomic_testings/InjectDtoList';
+import useQueryable from '../../../../../components/common/queryable/useQueryable';
+import { buildSearchPagination } from '../../../../../components/common/queryable/QueryableUtils';
+import { initSorting } from '../../../../../components/common/queryable/Page';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -75,6 +78,10 @@ const Exercise = () => {
     );
   }
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
+
+  const { queryableHelpers, searchPaginationInput } = useQueryable('simulation-injects-results', buildSearchPagination({
+    sorts: initSorting('inject_updated_at', 'DESC'),
+  }));
   return (
     <>
       <Grid
@@ -201,9 +208,11 @@ const Exercise = () => {
               {t('Injects Results')}
             </Typography>
             <Paper classes={{ root: classes.paper }} variant="outlined">
-              <InjectList
+              <InjectDtoList
                 fetchInjects={(input) => searchExerciseInjects(exerciseId, input)}
                 goTo={(injectId) => `/admin/exercises/${exerciseId}/injects/${injectId}`}
+                queryableHelpers={queryableHelpers}
+                searchPaginationInput={searchPaginationInput}
               />
             </Paper>
           </Grid>

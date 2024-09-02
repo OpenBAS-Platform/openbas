@@ -75,7 +75,6 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   payload_platforms: {
     width: '10%',
-    cursor: 'default',
   },
   payload_description: {
     width: '10%',

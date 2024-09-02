@@ -6,8 +6,9 @@ import io.openbas.database.model.Filters.FilterMode;
 import io.openbas.database.model.Filters.FilterOperator;
 import io.openbas.utils.schema.PropertySchema;
 import io.openbas.utils.schema.SchemaUtils;
-import jakarta.persistence.criteria.*;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.validation.constraints.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.jpa.domain.Specification;
@@ -88,33 +89,6 @@ public class FilterUtilsJpa {
     };
   }
 
-  /**
-   * Allows to manage deep paths not currently managed by the queryable annotation Next step: improvement of the
-   * queryable annotation in order to directly manage filters on deep properties as well as having several possible
-   * filters on these properties
-   */
-  @SuppressWarnings("unchecked")
-  public static <T> Specification<T> computeFilterFromSpecificPath(
-      @Nullable final Filter filter,
-      @NotBlank final String jsonPath) {
-    if (filter == null) {
-      return (Specification<T>) EMPTY_SPECIFICATION;
-    }
-
-    String[] jsonPaths = jsonPath.split("\\.");
-    return (root, query, cb) -> {
-      if (jsonPaths.length > 0) {
-        Join<Object, Object> paths = root.join(jsonPaths[0], JoinType.LEFT);
-        for (int i = 1; i < jsonPaths.length - 1; i++) {
-          paths = paths.join(jsonPaths[i], JoinType.LEFT);
-        }
-        Path<Object> finalPath = paths.get(jsonPaths[jsonPaths.length - 1]);
-        return toPredicate(finalPath, filter, cb, String.class);
-      }
-      throw new IllegalArgumentException();
-    };
-  }
-
   private static <U> Predicate toPredicate(
       @NotNull final Expression<U> paths,
       @NotNull final Filter filter,
@@ -140,9 +114,9 @@ public class FilterUtilsJpa {
     } else if (operator.equals(FilterOperator.contains)) {
       return (Expression<U> paths, List<String> texts) -> containsTexts((Expression<String>) paths, cb, texts, type);
     } else if (operator.equals(FilterOperator.not_starts_with)) {
-      return (Expression<U> paths, List<String> texts) -> notStartWithTexts((Expression<String>) paths, cb, texts);
+      return (Expression<U> paths, List<String> texts) -> notStartWithTexts((Expression<String>) paths, cb, texts, type);
     } else if (operator.equals(FilterOperator.starts_with)) {
-      return (Expression<U> paths, List<String> texts) -> startWithTexts((Expression<String>) paths, cb, texts);
+      return (Expression<U> paths, List<String> texts) -> startWithTexts((Expression<String>) paths, cb, texts, type);
     } else if (operator.equals(FilterOperator.empty)) {
       return (Expression<U> paths, List<String> texts) -> empty((Expression<String>) paths, cb, type);
     } else if (operator.equals(FilterOperator.not_empty)) {

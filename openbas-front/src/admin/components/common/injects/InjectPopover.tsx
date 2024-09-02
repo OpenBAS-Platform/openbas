@@ -7,19 +7,18 @@ import {
   DialogContent,
   DialogContentText,
   IconButton,
+  Link,
   Menu,
   MenuItem,
+  SnackbarCloseReason,
   Table,
   TableBody,
   TableCell,
   TableRow,
-  SnackbarCloseReason,
-  Link,
 } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
-import type { InjectStore } from '../../../../actions/injects/Inject';
 import { InjectContext, PermissionsContext } from '../Context';
 import type { Inject, InjectStatus, InjectStatusExecution, InjectTestStatus } from '../../../../utils/api-types';
 import { duplicateInjectForExercise, duplicateInjectForScenario, tryInject } from '../../../../actions/Inject';
@@ -30,8 +29,20 @@ import { useHelper } from '../../../../store';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import DialogTest from '../../../../components/common/DialogTest';
 
+type InjectPopoverType = {
+  inject_id: string,
+  inject_exercise?: string,
+  inject_scenario?: string,
+  inject_status?: InjectStatus,
+  inject_testable?: boolean,
+  inject_teams?: string[],
+  inject_type?: string,
+  inject_enabled?: boolean,
+  inject_title?: string,
+};
+
 interface Props {
-  inject: InjectStore;
+  inject: InjectPopoverType;
   setSelectedInjectId: (injectId: Inject['inject_id']) => void;
   isDisabled: boolean;
   canBeTested?: boolean;

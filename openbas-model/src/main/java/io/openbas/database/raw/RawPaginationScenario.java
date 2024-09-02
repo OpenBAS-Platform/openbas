@@ -1,5 +1,6 @@
 package io.openbas.database.raw;
 
+import io.openbas.database.model.Scenario.SEVERITY;
 import lombok.Data;
 
 import java.time.Instant;
@@ -12,7 +13,7 @@ public class RawPaginationScenario {
 
   private String scenario_id;
   private String scenario_name;
-  private String scenario_severity;
+  private SEVERITY scenario_severity;
   private String scenario_category;
   private String scenario_recurrence;
   private Instant scenario_updated_at;
@@ -22,7 +23,7 @@ public class RawPaginationScenario {
   public RawPaginationScenario(
       String id,
       String name,
-      String severity,
+      SEVERITY severity,
       String category,
       String recurrence,
       Instant updatedAt,

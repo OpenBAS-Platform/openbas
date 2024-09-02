@@ -16,18 +16,14 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
-import java.util.function.UnaryOperator;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.rest.injector_contract.utils.InjectorContractUtils.handleCustomFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
 @RequiredArgsConstructor
@@ -49,15 +45,8 @@ public class InjectorContractApi extends RestBehavior {
 
     @PostMapping("/api/injector_contracts/search")
     public Page<InjectorContractOutput> injectorContracts(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-        UnaryOperator<Specification<InjectorContract>> finalSpecification = handleCustomFilter(
-            searchPaginationInput
-        );
-
         return buildPaginationCriteriaBuilder(
-            (Specification<InjectorContract> specification, Pageable pageable) -> this.injectorContractService.injectorContracts(
-                finalSpecification.apply(specification),
-                pageable
-            ),
+            this.injectorContractService::injectorContracts,
                 searchPaginationInput,
                 InjectorContract.class
         );
