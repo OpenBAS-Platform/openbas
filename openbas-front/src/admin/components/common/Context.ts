@@ -69,8 +69,8 @@ export type TeamContextType = {
 };
 
 export type InjectContextType = {
-  onAddInject: (inject: Inject) => Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }>,
-  onUpdateInject: (injectId: Inject['inject_id'], inject: Inject) => Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }>,
+  onAddInject: (inject: Inject) => Promise<{ result: string }>,
+  onUpdateInject: (injectId: Inject['inject_id'], inject: Inject) => Promise<{ result: string }>,
   onUpdateInjectTrigger?: (injectId: Inject['inject_id']) => void,
   onUpdateInjectActivation: (injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }) => Promise<{
     result: string,
@@ -156,11 +156,11 @@ export const TeamContext = createContext<TeamContextType>({
   },
 });
 export const InjectContext = createContext<InjectContextType>({
-  onAddInject(_inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
-    return Promise.resolve({ result: '', entities: { injects: {} } });
+  onAddInject(_inject: Inject): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
   },
-  onUpdateInject(_injectId: Inject['inject_id'], _inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
-    return Promise.resolve({ result: '', entities: { injects: {} } });
+  onUpdateInject(_injectId: Inject['inject_id'], _inject: Inject): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
   },
   onUpdateInjectTrigger(_injectId: Inject['inject_id']): void {
   },

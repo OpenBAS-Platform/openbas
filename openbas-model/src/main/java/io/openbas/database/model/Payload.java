@@ -81,7 +81,7 @@ public class Payload implements Base {
           inverseJoinColumns = @JoinColumn(name = "attack_pattern_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("payload_attack_patterns")
-  @Queryable(filterable = true, searchable = true, dynamicValues = true, path = "attackPatterns")
+  @Queryable(filterable = true, searchable = true, dynamicValues = true, path = "attackPatterns.id")
   private List<AttackPattern> attackPatterns = new ArrayList<>();
 
   @Setter

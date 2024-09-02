@@ -4,6 +4,7 @@ import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.service.ScenarioService;
+import io.openbas.utils.fixtures.ScenarioFixture;
 import org.junit.jupiter.api.*;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,7 @@ class ScenarioExecutionJobTest {
     ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"));
     int hourToStart = (zonedDateTime.getHour() + 1) % 24;
 
-    Scenario scenario = getScenario();
+    Scenario scenario = ScenarioFixture.getScenario();
     scenario.setRecurrence("0 " + zonedDateTime.getMinute() + " " + hourToStart + " * * *"); // Every day now + 1 hour
     Scenario scenarioSaved = this.scenarioService.createScenario(scenario);
     SCENARIO_ID_1 = scenarioSaved.getId();
@@ -79,7 +80,7 @@ class ScenarioExecutionJobTest {
     // -- PREPARE --
     ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"));
 
-    Scenario scenario = getScenario();
+    Scenario scenario = ScenarioFixture.getScenario();
     int minuteToStart = (zonedDateTime.getMinute() + 1) % 60;
     scenario.setRecurrence("0 " + minuteToStart + " " + zonedDateTime.getHour() + " * * *"); // Every day now + 1 minute
     Scenario scenarioSaved = this.scenarioService.createScenario(scenario);
@@ -125,7 +126,7 @@ class ScenarioExecutionJobTest {
     // -- PREPARE --
     ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"));
 
-    Scenario scenario = getScenario();
+    Scenario scenario = ScenarioFixture.getScenario();
     int minuteToStart = (zonedDateTime.getMinute() + 1) % 60;
     scenario.setRecurrence("0 " + minuteToStart + " " + zonedDateTime.getHour() + " * * *"); // Every day now + 1 minute
     scenario.setRecurrenceEnd(Instant.now().minus(0, ChronoUnit.DAYS));

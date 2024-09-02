@@ -1,10 +1,11 @@
-package io.openbas.scenario;
+package io.openbas.rest.scenario;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.service.LoadService;
 import io.openbas.service.ScenarioService;
 import io.openbas.service.ScenarioToExerciseService;
+import io.openbas.utils.fixtures.ScenarioFixture;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -99,7 +100,7 @@ class ScenarioToExerciseServiceTest {
   void scenarioToExerciseTest() {
     // -- PREPARE --
     // Base
-    Scenario scenario = getScenario();
+    Scenario scenario = ScenarioFixture.getScenario();
     String name = scenario.getName();
     // User & Teams
     User user = getUser();
