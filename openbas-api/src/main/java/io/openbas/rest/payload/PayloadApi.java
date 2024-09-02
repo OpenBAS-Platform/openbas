@@ -72,11 +72,6 @@ public class PayloadApi extends RestBehavior {
         this.documentRepository = documentRepository;
     }
 
-    @GetMapping("/api/payloads")
-    public Iterable<Payload> payloads() {
-        return payloadRepository.findAll();
-    }
-
     @PostMapping("/api/payloads/search")
     public Page<Payload> payloads(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
         return buildPaginationJPA(

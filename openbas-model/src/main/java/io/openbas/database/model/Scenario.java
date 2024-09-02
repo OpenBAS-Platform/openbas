@@ -62,7 +62,7 @@ public class Scenario implements Base {
 
   @Column(name = "scenario_name")
   @JsonProperty("scenario_name")
-  @Queryable(searchable = true, filterable = true)
+  @Queryable(filterable = true, searchable = true, sortable = true)
   @NotBlank
   private String name;
 
@@ -76,7 +76,7 @@ public class Scenario implements Base {
 
   @Column(name = "scenario_category")
   @JsonProperty("scenario_category")
-  @Queryable(filterable = true, dynamicValues = true)
+  @Queryable(filterable = true, sortable = true, dynamicValues = true)
   private String category;
 
   @Column(name = "scenario_main_focus")
@@ -86,7 +86,7 @@ public class Scenario implements Base {
   @Column(name = "scenario_severity")
   @Enumerated(EnumType.STRING)
   @JsonProperty("scenario_severity")
-  @Queryable(filterable = true)
+  @Queryable(filterable = true, sortable = true)
   private SEVERITY severity;
 
   @Column(name = "scenario_external_reference")
@@ -144,7 +144,7 @@ public class Scenario implements Base {
   @Column(name = "scenario_updated_at")
   @JsonProperty("scenario_updated_at")
   @NotNull
-  @Queryable(filterable = true)
+  @Queryable(filterable = true, sortable = true)
   private Instant updatedAt = now();
 
   // -- RELATION --
@@ -277,7 +277,7 @@ public class Scenario implements Base {
 
   // -- PLATFORMS --
   @JsonProperty("scenario_platforms")
-  @Queryable(filterable = true, path = "injects.injectorContract.platforms")
+  @Queryable(filterable = true, path = "injects.injectorContract.platforms", clazz = String[].class)
   public List<PLATFORM_TYPE> getPlatforms() {
     return getInjects().stream()
         .flatMap(inject -> inject.getInjectorContract()

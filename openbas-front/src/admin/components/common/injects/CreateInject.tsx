@@ -5,7 +5,7 @@ import { KeyboardArrowRight } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
 import computeAttackPatterns from '../../../../utils/injector_contract/InjectorContractUtils';
-import type { ExerciseTeamUser, FilterGroup, Inject, InjectorContractOutput, KillChainPhase, Variable } from '../../../../utils/api-types';
+import type { FilterGroup, Inject, InjectorContractOutput, KillChainPhase } from '../../../../utils/api-types';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -25,8 +25,6 @@ import { isNotEmptyField } from '../../../../utils/utils';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import useQueryable from '../../../../components/common/queryable/useQueryable';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
-import type { TeamStore } from '../../../../actions/teams/Team';
-import type { ArticleStore } from '../../../../actions/channels/Article';
 
 const useStyles = makeStyles(() => ({
   itemHead: {

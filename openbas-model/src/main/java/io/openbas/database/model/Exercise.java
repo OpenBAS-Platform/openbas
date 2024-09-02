@@ -162,7 +162,7 @@ public class Exercise implements Base {
   @Column(name = "exercise_updated_at")
   @JsonProperty("exercise_updated_at")
   @NotNull
-  @Queryable(filterable = true)
+  @Queryable(filterable = true, sortable = true)
   private Instant updatedAt = now();
 
   // -- RELATION --

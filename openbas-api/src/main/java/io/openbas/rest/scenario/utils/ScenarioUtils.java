@@ -45,8 +45,10 @@ public class ScenarioUtils {
       } else if (scenarioRecurrenceFilterOpt.get().getValues().contains("Not planned")) {
         customSpecification = ScenarioSpecification.noRecurring();
       }
-      // Final specification
-      return computeMode(searchPaginationInput, customSpecification);
+      if (customSpecification != null) {
+        return computeMode(searchPaginationInput, customSpecification);
+      }
+      return (Specification<Scenario> specification) -> specification;
     } else {
       return (Specification<Scenario> specification) -> specification;
     }

@@ -17,9 +17,7 @@ import SortHeadersComponentV2 from '../../../components/common/queryable/sort/So
 
 const useStyles = makeStyles(() => ({
   itemHead: {
-    paddingLeft: 17,
     textTransform: 'uppercase',
-    cursor: 'pointer',
   },
   item: {
     height: 50,

@@ -17,6 +17,12 @@ import PaginationComponentV2 from '../../../components/common/queryable/paginati
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
 
 const useStyles = makeStyles(() => ({
+  itemHead: {
+    textTransform: 'uppercase',
+  },
+  item: {
+    height: 50,
+  },
   bodyItems: {
     display: 'flex',
   },
@@ -28,39 +34,26 @@ const useStyles = makeStyles(() => ({
     textOverflow: 'ellipsis',
     paddingRight: 10,
   },
-  itemHead: {
-    marginBottom: 10,
-    textTransform: 'uppercase',
-    cursor: 'pointer',
-  },
-  item: {
-    height: 50,
-  },
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
   inject_type: {
     width: '10%',
-    cursor: 'default',
   },
   inject_title: {
     width: '20%',
   },
   'inject_status.tracking_sent_date': {
     width: '15%',
-    cursor: 'default',
   },
   inject_status: {
     width: '10%',
-    cursor: 'default',
   },
   inject_targets: {
     width: '20%',
-    cursor: 'default',
   },
   inject_expectations: {
     width: '10%',
-    cursor: 'default',
   },
   inject_updated_at: {
     width: '15%',

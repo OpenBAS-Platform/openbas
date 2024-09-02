@@ -8,6 +8,8 @@ import org.springframework.data.domain.Sort;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import static io.openbas.utils.schema.SchemaUtils.getSortableProperties;
+
 public class SortUtilsJpa {
 
   private SortUtilsJpa() {
@@ -15,7 +17,7 @@ public class SortUtilsJpa {
   }
 
   public static <T> Sort toSortJpa(@Nullable final List<SortField> sorts, @NotNull final Class<T> clazz) {
-    List<PropertySchema> propertySchemas = SchemaUtils.schema(clazz);
+    List<PropertySchema> propertySchemas = getSortableProperties(SchemaUtils.schema(clazz));
 
     List<Sort.Order> orders;
 

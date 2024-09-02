@@ -31,7 +31,6 @@ import { buildEmptyFilter } from '../../../components/common/queryable/filter/Fi
 const useStyles = makeStyles(() => ({
   itemHead: {
     textTransform: 'uppercase',
-    cursor: 'pointer',
   },
   item: {
     height: 50,
@@ -64,11 +63,9 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   scenario_platforms: {
     width: '10%',
-    cursor: 'default',
   },
   scenario_tags: {
     width: '18%',
-    cursor: 'default',
   },
   scenario_updated_at: {
     width: '10%',
@@ -105,7 +102,7 @@ const Scenarios = () => {
         label={t(scenario.scenario_severity ?? 'Unknown')}
         severity={scenario.scenario_severity ?? 'Unknown'}
         variant="inList"
-      />,
+                                          />,
     },
     {
       field: 'scenario_category',
@@ -115,7 +112,7 @@ const Scenarios = () => {
         category={scenario.scenario_category ?? 'Unknown'}
         label={t(scenario.scenario_category ?? 'Unknown')}
         size="medium"
-      />,
+                                          />,
     },
     {
       field: 'scenario_recurrence',
@@ -274,7 +271,7 @@ const Scenarios = () => {
           setScenarios([result, ...scenarios]);
           fetchStatistics();
         }}
-      />
+                    />
       }
     </>
   );

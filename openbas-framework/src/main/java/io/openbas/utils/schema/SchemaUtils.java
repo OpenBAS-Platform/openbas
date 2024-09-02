@@ -12,6 +12,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +20,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import static org.springframework.util.StringUtils.hasText;
 
 public class SchemaUtils {
 
@@ -88,7 +91,8 @@ public class SchemaUtils {
         .multiple(field.getType().isArray() || Collection.class.isAssignableFrom(field.getType()));
 
     if (field.getType().isEnum() || (field.getType().isArray() && field.getType().getComponentType().isEnum())) {
-      builder.availableValues(getEnumNames(field.getType().isArray() ? field.getType().getComponentType() : field.getType()));
+      builder.availableValues(
+          getEnumNames(field.getType().isArray() ? field.getType().getComponentType() : field.getType()));
     }
 
     for (Annotation annotation : field.getDeclaredAnnotations()) {
@@ -115,10 +119,15 @@ public class SchemaUtils {
     if (method.getReturnType().isEnum()) {
       builder.availableValues(getEnumNames(method.getReturnType()));
     } else if (method.getReturnType().isArray() || method.getGenericReturnType() instanceof ParameterizedType) {
-      Class enumType = method.getReturnType().isArray()
-          ? method.getReturnType().getComponentType()
-          : ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0].getClass();
-
+      Class enumType = null;
+      if (method.getReturnType().isArray()) {
+        enumType = method.getReturnType().getComponentType();
+      } else {
+        Type typeArgument = ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0];
+        if (typeArgument instanceof Class<?>) {
+          enumType = (Class<?>) typeArgument;
+        }
+      }
       if (enumType != null && enumType.isEnum()) {
         builder.availableValues(getEnumNames(enumType));
       }
@@ -157,8 +166,12 @@ public class SchemaUtils {
             .filterable(queryable.filterable())
             .dynamicValues(queryable.dynamicValues())
             .sortable(queryable.sortable())
-            .path(queryable.path())
-            .type(queryable.clazz());
+            .path(queryable.path());
+        if (member instanceof Method) {
+          builder.type(queryable.clazz()); // Override
+        } else if (member instanceof Field && hasText(queryable.path())) {
+          builder.type(queryable.clazz()); // Override
+        }
       }
     } else if (annotation.annotationType().equals(JoinTable.class)) {
       builder.joinTable(PropertySchema.JoinTable.builder().joinOn(((Field) member).getName()).build());
@@ -173,7 +186,8 @@ public class SchemaUtils {
     return propertySchemas.stream()
         .filter(p -> jsonFieldPath.equals(p.getJsonName()))
         .findFirst()
-        .orElseThrow(() -> new IllegalArgumentException("This path is not handled by Queryable annotation: " + jsonFieldPath));
+        .orElseThrow(
+            () -> new IllegalArgumentException("This path is not handled by Queryable annotation: " + jsonFieldPath));
   }
 
   public static List<PropertySchema> getSearchableProperties(List<PropertySchema> propertySchemas) {
