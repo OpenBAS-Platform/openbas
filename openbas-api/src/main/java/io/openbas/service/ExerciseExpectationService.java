@@ -198,6 +198,9 @@ public class ExerciseExpectationService {
     }
 
     private String transformExpectationResultTypeToName(String type){
+        if (type==null) {
+            return "";
+        }
         String[] words = type.split("-");
 
         // Capitalize each word and join them with a space
@@ -207,7 +210,6 @@ public class ExerciseExpectationService {
                     .append(word.substring(1))
                     .append(" ");
         }
-
         return result.toString().trim();
     }
 }

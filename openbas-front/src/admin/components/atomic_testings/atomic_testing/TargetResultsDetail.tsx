@@ -558,7 +558,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                           title={expectationResult.sourceName ? t(expectationResult.sourceName) : t('Unknown')}
                           subheader={nsdt(expectationResult.date)}
                         />
-                        <CardContent sx={{display: 'flex', alignItems: 'center'}}>
+                        <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
                           <ItemResult label={expectationResult.result} status={expectationResult.result} />
                           <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={expectationResult.score}/></Tooltip>
                         </CardContent>
