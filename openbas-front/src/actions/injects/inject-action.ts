@@ -11,7 +11,7 @@ export const testInject = (injectId: string) => {
 export const bulkTestInjects = (injectIds: string[]) => {
   const data = injectIds;
   const uri = '/api/injects/bulk/test';
-  return simplePostCall(uri, data, 'The inject does not have any team defined');
+  return simplePostCall(uri, data, "This inject can't be test");
 };
 
 // -- EXERCISES --
