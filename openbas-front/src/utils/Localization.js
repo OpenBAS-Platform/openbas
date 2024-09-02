@@ -1291,6 +1291,7 @@ const i18n = {
       'Fit view': 'Ajuster la vue',
       'Increase time interval': 'Augmenter l\'intervalle de temps',
       'Reduce time interval': 'Réduire l\'intervalle de temps',
+      "Can't be tested": 'Ne peut pas être testé',
     },
     zh: {
       'Email address': 'email地址',
