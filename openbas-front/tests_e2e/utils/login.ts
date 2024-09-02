@@ -9,7 +9,7 @@ const login = async (page: Page) => {
   const loginPage = new LoginPage(page);
   await expect(loginPage.getLoginPage()).toBeVisible();
 
-  await loginPage.getEmailInput().fill('admin@openbas.io');
+  await loginPage.getLoginInput().fill('admin@openbas.io');
   await loginPage.getPasswordInput().fill('admin');
   await loginPage.getSignInButton().click();
 
