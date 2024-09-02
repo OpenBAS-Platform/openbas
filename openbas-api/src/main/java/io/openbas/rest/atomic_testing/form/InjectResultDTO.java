@@ -63,6 +63,7 @@ public class InjectResultDTO {
 
   @JsonProperty("inject_status")
   private InjectStatus status;
+
   @Schema(
       description = "Specifies the categories of targetResults for atomic testing.",
       example = "assets, asset groups, teams, players"

@@ -1208,7 +1208,7 @@ const i18n = {
         'Souhaitez-vous tester ce stimuli?',
       'Do you want to test these {count} injects?':
         'Souhaitez-vous tester ces {count} stimulis?',
-      'Only SMS and emails related injects with teams defined will be tested': 'Uniquement les stimulis de types email et SMS avec des équipes définies seront testés',
+      'Only SMS and emails related injects will be tested': 'Uniquement les stimulis de types email et SMS seront testés',
       'Do you want to delete this XLS mapper ?': 'Voulez-vous supprimer ce mappage XLS ?',
       'Do you want to duplicate this XLS mapper :': 'Voulez-vous dupliquer ce mappage XLS :',
       Expectation_name: 'Nom de l\'attendu',
@@ -1291,6 +1291,7 @@ const i18n = {
       'Fit view': 'Ajuster la vue',
       'Increase time interval': 'Augmenter l\'intervalle de temps',
       'Reduce time interval': 'Réduire l\'intervalle de temps',
+      "Can't be tested": 'Ne peut pas être testé',
     },
     zh: {
       'Email address': 'email地址',

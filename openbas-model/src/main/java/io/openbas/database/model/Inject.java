@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.openbas.database.model.Endpoint.ENDPOINT_TYPE;
+import static io.openbas.database.specification.InjectSpecification.VALID_TESTABLE_TYPES;
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
 
@@ -147,12 +148,6 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_status")
   @Queryable(sortable = true, property = "name")
   private InjectStatus status;
-
-  // Status after testing emails and sms
-  @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
-  @JsonProperty("inject_test_status")
-  @Queryable(sortable = true, property = "name")
-  private InjectTestStatus testStatus;
 
   @Getter
   @ManyToMany(fetch = FetchType.LAZY)
@@ -380,16 +375,9 @@ public class Inject implements Base, Injection {
     return this.exercise == null && this.scenario == null;
   }
 
-  private static final Set<String> VALID_TYPES = new HashSet<>();
-
-  static {
-    VALID_TYPES.add("openbas_email");
-    VALID_TYPES.add("openbas_ovh_sms");
-  }
-
   @JsonProperty("inject_testable")
   public boolean getInjectTestable() {
-    return VALID_TYPES.contains(this.getType());
+    return VALID_TESTABLE_TYPES.contains(this.getType());
   }
 
   @Override
