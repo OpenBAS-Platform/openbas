@@ -710,7 +710,7 @@ class ToolBar extends Component {
           handleClose={this.handleCloseBulkTest.bind(this)}
           handleSubmit={this.handleSubmitBulkTest.bind(this)}
           text={testConfirmationText()}
-          alertText={t('Only SMS and emails related injects with teams defined will be tested')}
+          alertText={t('Only SMS and emails related injects will be tested')}
         />
       </>
     );
