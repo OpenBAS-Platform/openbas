@@ -132,7 +132,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
       value: (contract: InjectorContractOutput, _: KillChainPhase, contractAttackPatterns: Record<string, AttackPatternStore>) => contractAttackPatterns
         .map((contractAttackPattern: AttackPatternStore) => (
           <Chip
-            key={`${contract.injector_contract_id}-${contractAttackPattern.attack_pattern_id}`}
+            key={`${contract.injector_contract_id}-${contractAttackPattern.attack_pattern_id}-${Math.random()}`}
             variant="outlined"
             classes={{ root: classes.chipInList }}
             color="primary"
