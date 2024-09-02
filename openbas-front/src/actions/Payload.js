@@ -1,5 +1,5 @@
 import * as schema from './Schema';
-import { getReferential, putReferential, postReferential, delReferential, simplePostCall } from '../utils/Action';
+import { delReferential, postReferential, putReferential, simplePostCall } from '../utils/Action';
 
 export const searchPayloads = (paginationInput) => {
   const data = paginationInput;

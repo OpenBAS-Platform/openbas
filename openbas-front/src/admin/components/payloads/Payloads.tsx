@@ -179,7 +179,7 @@ const Payloads = () => {
     },
   ], []);
 
-  let availableFilterNames = [
+  const availableFilterNames = [
     'payload_attack_patterns',
     'payload_description',
     'payload_name',
@@ -187,7 +187,7 @@ const Payloads = () => {
     'payload_source',
     'payload_status',
     'payload_tags',
-    'payload_updated_at'
+    'payload_updated_at',
   ];
   const [payloads, setPayloads] = useState<PayloadStore[]>([]);
   const { queryableHelpers, searchPaginationInput } = useQueryable('payloads', buildSearchPagination({
