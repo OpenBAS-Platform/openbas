@@ -8,8 +8,8 @@ class LoginPage {
     return this.page.getByTestId('login-page');
   }
 
-  getEmailInput() {
-    return this.page.getByLabel('Email address');
+  getLoginInput() {
+    return this.page.getByLabel('Login');
   }
 
   getPasswordInput() {

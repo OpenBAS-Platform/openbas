@@ -26,7 +26,7 @@ const LoginForm = (props) => {
               name="username"
               type="text"
               variant="standard"
-              label={t('Email address')}
+              label={t('Login')}
               fullWidth={true}
               style={{ marginTop: 5 }}
             />
