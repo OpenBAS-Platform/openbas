@@ -378,18 +378,10 @@ public class AtomicTestingUtils {
                         return null;
                     }
                     if (injectExpectation.getTeam() != null) {
-                        if (injectExpectation.isExpectationGroup()) {
-                            if (injectExpectation.getScore() > 0) {
-                                return 1.0;
-                            } else {
-                                return 0.0;
-                            }
+                        if (injectExpectation.getScore() >= injectExpectation.getExpectedScore()) {
+                            return 1.0;
                         } else {
-                            if (injectExpectation.getScore() >= injectExpectation.getExpectedScore()) {
-                                return 1.0;
-                            } else {
-                                return 0.0;
-                            }
+                            return 0.0;
                         }
                     } else {
                         if (injectExpectation.getScore() >= injectExpectation.getExpectedScore()) {

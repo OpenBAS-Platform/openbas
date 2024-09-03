@@ -41,17 +41,7 @@ public class ExerciseExpectationService {
 
         String result = "";
         if (injectExpectation.getType() == EXPECTATION_TYPE.MANUAL) {
-            if (injectExpectation.getTeam() != null && injectExpectation.getUser() == null) { //If it is a team expectation
-                result = input.getScore() > 0 ? "Success" : "Failed";
-            } else {
-                if (input.getScore() >= injectExpectation.getExpectedScore()) {
-                    result = "Success";
-                } else if (input.getScore() > 0) {
-                    result = "Partial";
-                } else {
-                    result = "Failed";
-                }
-            }
+            result = input.getScore() >= injectExpectation.getExpectedScore() ? "Success" : "Failed";
             injectExpectation.getResults().clear();
             exists = Optional.empty();
         } else if (injectExpectation.getType() == EXPECTATION_TYPE.DETECTION) {
@@ -76,15 +66,9 @@ public class ExerciseExpectationService {
             exists.get().setScore(input.getScore());
             exists.get().setDate(now().toString());
         } else {
-            InjectExpectationResult expectationResult = InjectExpectationResult.builder()
-                    .sourceId(input.getSourceId())
-                    .sourceType(input.getSourceType())
-                    .sourceName(input.getSourceName())
-                    .result(result)
-                    .date(now().toString())
-                    .score(input.getScore())
-                    .build();
-            injectExpectation.getResults().add(expectationResult);
+            injectExpectation.getResults().add(
+                    buildInjectExpectationResult(input.getSourceType(),result,  input.getScore())
+            );
         }
         if (injectExpectation.getScore() == null) {
             injectExpectation.setScore(input.getScore());
@@ -136,58 +120,56 @@ public class ExerciseExpectationService {
     }
 
     // -- VALIDATION TYPE --
-
     private void computeExpectationsForTeamsAndPlayer(InjectExpectation updated, String result) {
         //If the updated expectation was a player expectation, We have to update the team expectation using player expectations (based on validation type)
         if (updated.getUser() != null) {
             List<InjectExpectation> toProcess = injectExpectationRepository.findAllByInjectAndTeamAndExpectationName(updated.getInject().getId(), updated.getTeam().getId(), updated.getName());
             InjectExpectation parentExpectation = toProcess.stream().filter(exp -> exp.getUser() == null).findFirst().orElseThrow(ElementNotFoundException::new);
-            int playersSize = toProcess.size() - 1; // Without Parent expectation
-            long zeroPlayerResponses = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() == 0.0).count();
-            long nullPlayerResponses = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp -> exp.getScore() == null).count();
+            List<InjectExpectation> playersExpectations = toProcess.stream().filter(exp -> exp.getUser() != null).toList();
+            List<InjectExpectation> playersAnsweredExpectations = playersExpectations.stream().filter(exp -> exp.getScore() != null).toList();
 
-            if (updated.isExpectationGroup()) { //If true is at least one
-                OptionalDouble avgAtLeastOnePlayer = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() > 0.0).mapToDouble(InjectExpectation::getScore).average();
-                if (avgAtLeastOnePlayer.isPresent()) { //Any response is positive
-                    parentExpectation.setScore(avgAtLeastOnePlayer.getAsDouble());
+            if (updated.isExpectationGroup()) { // If At least one player
+                List<InjectExpectation> successPlayerExpectations = playersExpectations.stream().filter(exp -> exp.getScore() != null).filter(exp -> exp.getScore() >= updated.getExpectedScore()).toList();
+
+                if(!successPlayerExpectations.isEmpty()){ // At least one player success
                     result = "Success";
+                    OptionalDouble avgSuccessPlayer = successPlayerExpectations.stream().mapToDouble(InjectExpectation::getScore).average();
+                    parentExpectation.setScore(avgSuccessPlayer.getAsDouble());
+                } else if (playersAnsweredExpectations.size() == playersExpectations.size()){ // All players had answers and no one success
+                    result = "Failed";
+                    parentExpectation.setScore(0.0);
                 } else {
-                    if (zeroPlayerResponses == playersSize) { //All players had failed
-                        parentExpectation.setScore(0.0);
-                        result = "Failed";
-                    } else {
-                        parentExpectation.setScore(null);
-                        result = "Pending";
-                    }
+                    result = "Pending";
+                    parentExpectation.setScore(null);
                 }
-            } else { // all
-                if(nullPlayerResponses == 0){
-                    OptionalDouble avgAllPlayer = toProcess.stream().filter(exp -> exp.getUser() != null).mapToDouble(InjectExpectation::getScore).average();
-                    parentExpectation.setScore(avgAllPlayer.getAsDouble());
-                    result = zeroPlayerResponses > 0 ? "Failed" : "Success";
-                }else{
-                    if(zeroPlayerResponses == 0) {
-                        parentExpectation.setScore(null);
-                        result = "Pending";
-                    }else{
-                        double sumAllPlayer = toProcess.stream().filter(exp -> exp.getUser() != null).filter(exp->exp.getScore() != null).mapToDouble(InjectExpectation::getScore).sum();
-                        parentExpectation.setScore(sumAllPlayer/playersSize);
-                        result = "Failed";
-                    }
+
+            } else { // All Player
+                boolean hasFailedPlayer = playersExpectations.stream()
+                        .filter(exp -> exp.getScore() != null)
+                        .anyMatch(exp -> exp.getScore() < updated.getExpectedScore());
+
+                if (hasFailedPlayer) {
+                    result = "Failed";
+                } else if (playersAnsweredExpectations.size() == playersExpectations.size()) { // All players answered and no failures
+                    result = "Success";
+                } else { // Some players haven't answered yet
+                    result = "Pending";
+                    parentExpectation.setScore(null);
+                }
+
+                if (!result.equals("Pending")){
+                    OptionalDouble avgAllPlayer = playersAnsweredExpectations.stream().mapToDouble(InjectExpectation::getScore).average();
+                    parentExpectation.setScore(avgAllPlayer.orElse(0.0));
                 }
             }
+
             parentExpectation.setUpdatedAt(Instant.now());
             parentExpectation.getResults().clear();
-            InjectExpectationResult expectationResult = InjectExpectationResult.builder()
-                    .sourceId("player-manual-validation")
-                    .sourceType("player-manual-validation")
-                    .sourceName("Player Manual Validation")
-                    .result(result)
-                    .date(now().toString())
-                    .score(parentExpectation.getScore())
-                    .build();
-            parentExpectation.getResults().add(expectationResult);
+            parentExpectation.getResults().add(
+                    buildInjectExpectationResult("player-manual-validation", result, parentExpectation.getScore())
+            );
             injectExpectationRepository.save(parentExpectation);
+
         } else {
             // If I update the expectation team: What happens with children? -> update expectation score for all children -> set score from InjectExpectation
             List<InjectExpectation> toProcess = injectExpectationRepository.findAllByInjectAndTeamAndExpectationNameAndUserIsNotNull(updated.getInject().getId(), updated.getTeam().getId(), updated.getName());
@@ -196,18 +178,38 @@ public class ExerciseExpectationService {
                 expectation.setUpdatedAt(Instant.now());
                 expectation.getResults().clear();
                 if(result != null) {
-                    InjectExpectationResult expectationResult = InjectExpectationResult.builder()
-                            .sourceId("team-manual-validation")
-                            .sourceType("team-manual-validation")
-                            .sourceName("Team Manual Validation")
-                            .result(result)
-                            .date(now().toString())
-                            .score(updated.getScore())
-                            .build();
-                    expectation.getResults().add(expectationResult);
+                    expectation.getResults().add(
+                            buildInjectExpectationResult("team-manual-validation", result, updated.getScore()));
                 }
                 injectExpectationRepository.save(expectation);
             }
         }
+    }
+
+    private InjectExpectationResult buildInjectExpectationResult(String type, String resultStatus, Double score ){
+        return InjectExpectationResult.builder()
+                .sourceId(type)
+                .sourceType(type)
+                .sourceName(transformExpectationResultTypeToName(type))
+                .result(resultStatus)
+                .date(now().toString())
+                .score(score)
+                .build();
+    }
+
+    private String transformExpectationResultTypeToName(String type){
+        if (type==null) {
+            return "";
+        }
+        String[] words = type.split("-");
+
+        // Capitalize each word and join them with a space
+        StringBuilder result = new StringBuilder();
+        for (String word : words) {
+            result.append(Character.toUpperCase(word.charAt(0)))
+                    .append(word.substring(1))
+                    .append(" ");
+        }
+        return result.toString().trim();
     }
 }

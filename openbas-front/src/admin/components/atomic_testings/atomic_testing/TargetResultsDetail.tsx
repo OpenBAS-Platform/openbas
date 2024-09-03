@@ -67,9 +67,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     padding: '10px 20px 0 20px',
     textAlign: 'center',
   },
-  resultCard: {
-    height: 120,
-  },
   resultCardDummy: {
     height: 120,
     border: `1px dashed ${theme.palette.divider}`,
@@ -527,7 +524,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                 <Grid container={true} spacing={2}>
                   {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => (
                     <Grid key={index} item xs={4}>
-                      <Card key={injectExpectation.inject_expectation_id} classes={{ root: classes.resultCard }}>
+                      <Card key={injectExpectation.inject_expectation_id} >
                         <CardHeader
                           avatar={getAvatar(injectExpectation, expectationResult)}
                           action={
@@ -561,7 +558,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                           title={expectationResult.sourceName ? t(expectationResult.sourceName) : t('Unknown')}
                           subheader={nsdt(expectationResult.date)}
                         />
-                        <CardContent>
+                        <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
                           <ItemResult label={expectationResult.result} status={expectationResult.result} />
                           <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={expectationResult.score}/></Tooltip>
                         </CardContent>
