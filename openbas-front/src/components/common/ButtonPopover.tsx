@@ -15,12 +15,14 @@ interface Props {
   entries: PopoverEntry[];
   buttonProps?: ToggleButtonProps;
   variant?: VariantButtonPopover;
+  disabled?: boolean;
 }
 
 const ButtonPopover: FunctionComponent<Props> = ({
   entries,
   buttonProps,
   variant = 'toggle',
+  disabled = false,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -39,8 +41,9 @@ const ButtonPopover: FunctionComponent<Props> = ({
             setAnchorEl(ev.currentTarget);
           }}
           style={{ ...buttonProps }}
+          disabled={disabled}
            >
-          <MoreVert fontSize="small" color="primary" />
+          <MoreVert fontSize="small" color={disabled ? 'disabled' : 'primary'} />
         </ToggleButton>
       }
       {variant === 'icon'
@@ -53,8 +56,9 @@ const ButtonPopover: FunctionComponent<Props> = ({
             setAnchorEl(ev.currentTarget);
           }}
           style={{ ...buttonProps }}
+          disabled={disabled}
            >
-          <MoreVert />
+          <MoreVert fontSize="small" color={disabled ? 'disabled' : 'primary'} />
         </IconButton>
       }
       <Menu

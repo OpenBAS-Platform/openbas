@@ -14,15 +14,15 @@ import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
 import type { Inject, InjectStatus, Scenario } from '../../../../../utils/api-types';
-import Injects from '../../../common/injects/Injects';
 import { articleContextForScenario } from '../articles/ScenarioArticles';
 import { teamContextForScenario } from '../teams/ScenarioTeams';
 import useEntityToggle from '../../../../../utils/hooks/useEntityToggle';
 import ToolBar from '../../../common/ToolBar';
 import { isNotEmptyField } from '../../../../../utils/utils';
 import injectContextForScenario from '../ScenarioContext';
-import { fetchScenarioInjectsSimple, bulkTestInjects } from '../../../../../actions/injects/inject-action';
+import { bulkTestInjects, fetchScenarioInjectsSimple } from '../../../../../actions/injects/inject-action';
 import { useFormatter } from '../../../../../components/i18n';
+import Injects from '../../../common/injects/Injects';
 import { MESSAGING$ } from '../../../../../utils/Environment';
 
 interface Props {
@@ -65,8 +65,8 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
     handleToggleSelectAll,
     onToggleEntity,
     numberOfSelectedElements,
-  } = useEntityToggle('inject', injects.length);
-  const onRowShiftClick = (currentIndex: number, currentEntity: Inject, event: React.SyntheticEvent | null = null) => {
+  } = useEntityToggle<{ inject_id: string }>('inject', injects.length);
+  const onRowShiftClick = (currentIndex: number, currentEntity: { inject_id: string }, event: React.SyntheticEvent | null = null) => {
     if (event) {
       event.stopPropagation();
       event.preventDefault();
@@ -204,15 +204,14 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
       <ArticleContext.Provider value={articleContext}>
         <TeamContext.Provider value={teamContext}>
           <Injects
-            isExercise={false}
             exerciseOrScenarioId={scenarioId}
-            injects={injects}
             teams={teams}
             articles={articles}
             variables={variables}
             uriVariable={`/admin/scenarios/${scenarioId}/definition/variables`}
             allUsersNumber={scenario.scenario_all_users_number}
             usersNumber={scenario.scenario_users_number}
+            // @ts-expect-error typing
             teamsUsers={scenario.scenario_teams_users}
             onToggleEntity={onToggleEntity}
             onToggleShiftEntity={onRowShiftClick}

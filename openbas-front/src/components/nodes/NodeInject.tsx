@@ -7,7 +7,7 @@ import type { Theme } from '../Theme';
 import { isNotEmptyField } from '../../utils/utils';
 import InjectIcon from '../../admin/components/common/injects/InjectIcon';
 import InjectPopover from '../../admin/components/common/injects/InjectPopover';
-import type { InjectStore } from '../../actions/injects/Inject';
+import type { InjectOutputType } from '../../actions/injects/Inject';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -82,12 +82,12 @@ export type NodeInject = Node<{
   isTargeted?: boolean,
   isTargeting?: boolean,
   onConnectInjects?: OnConnect
-  inject?: InjectStore,
+  inject?: InjectOutputType,
   fixedY?: number,
   startDate?: string,
   targets: string[],
   exerciseOrScenarioId: string,
-  onSelectedInject(inject?: InjectStore): void,
+  onSelectedInject(inject?: InjectOutputType): void,
 }
 
 >;

@@ -1,5 +1,5 @@
 import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
 import { MovieFilterOutlined } from '@mui/icons-material';
 import React, { CSSProperties, useMemo, useState } from 'react';
 import { useFormatter } from '../../../components/i18n';
@@ -27,6 +27,7 @@ import SortHeadersComponentV2 from '../../../components/common/queryable/sort/So
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import type { FilterGroup } from '../../../utils/api-types';
 import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
+import ExportButton from '../../../components/common/ExportButton';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -202,10 +203,13 @@ const Scenarios = () => {
         entityPrefix="scenario"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
-        exportProps={exportProps}
-      >
-        <ImportUploaderScenario />
-      </PaginationComponentV2>
+        topBarButtons={
+          <ToggleButtonGroup value="fake" exclusive>
+            <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
+            <ImportUploaderScenario />
+          </ToggleButtonGroup>
+        }
+      />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}

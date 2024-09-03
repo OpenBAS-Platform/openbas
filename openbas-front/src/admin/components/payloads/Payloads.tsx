@@ -26,6 +26,7 @@ import type { CollectorHelper } from '../../../actions/collectors/collector-help
 import { useAppDispatch } from '../../../utils/hooks';
 import type { PayloadStore } from '../../../actions/payloads/Payload';
 import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
+import ExportButton from '../../../components/common/ExportButton';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -227,7 +228,9 @@ const Payloads = () => {
         entityPrefix="payload"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
-        exportProps={exportProps}
+        topBarButtons={
+          <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
+        }
       />
       <List>
         <ListItem

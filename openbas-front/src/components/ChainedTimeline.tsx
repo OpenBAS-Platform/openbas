@@ -17,7 +17,7 @@ import {
 import { Tooltip } from '@mui/material';
 import moment from 'moment-timezone';
 import { UnfoldLess, UnfoldMore, CropFree } from '@mui/icons-material';
-import type { InjectStore } from '../actions/injects/Inject';
+import type { InjectOutputType } from '../actions/injects/Inject';
 import type { Theme } from './Theme';
 import nodeTypes from './nodes';
 import CustomTimelineBackground from './CustomTimelineBackground';
@@ -32,6 +32,8 @@ import { parseCron } from '../utils/Cron';
 import type { TeamsHelper } from '../actions/teams/team-helper';
 import NodePhantom from './nodes/NodePhantom';
 import { useFormatter } from './i18n';
+import type { AssetGroupsHelper } from '../actions/asset_groups/assetgroup-helper';
+import type { EndpointHelper } from '../actions/assets/asset-helper';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -50,10 +52,10 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  injects: InjectStore[],
+  injects: InjectOutputType[],
   exerciseOrScenarioId: string,
   onConnectInjects(connection: Connection): void,
-  onSelectedInject(inject?: InjectStore): void,
+  onSelectedInject(inject?: InjectOutputType): void,
   openCreateInjectDrawer(data: {
     inject_depends_duration_days: number,
     inject_depends_duration_minutes: number,
@@ -81,6 +83,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
 
   const injectsMap = useHelper((injectHelper: InjectHelper) => injectHelper.getInjectsMap());
   const teams = useHelper((teamsHelper: TeamsHelper) => teamsHelper.getTeamsMap());
+  const assets = useHelper((endpointHelper: EndpointHelper) => endpointHelper.getEndpointsMap());
+  const assetGroups = useHelper((assetGroupsHelper: AssetGroupsHelper) => assetGroupsHelper.getAssetGroupMaps());
   const scenario = useHelper((helper: ScenariosHelper) => helper.getScenario(exerciseOrScenarioId));
   const exercise = useHelper((helper: ExercisesHelper) => helper.getExercise(exerciseOrScenarioId));
 
@@ -160,7 +164,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     if (injects.length > 0) {
       const injectsNodes = injects
         .sort((a, b) => a.inject_depends_duration - b.inject_depends_duration)
-        .map((inject: InjectStore) => ({
+        .map((inject: InjectOutputType) => ({
           id: `${inject.inject_id}`,
           type: 'inject',
           data: {
@@ -175,8 +179,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             fixedY: 0,
             startDate,
             onSelectedInject,
-            targets: inject.inject_assets!.map((asset) => asset.asset_name)
-              .concat(inject.inject_asset_groups!.map((assetGroup) => assetGroup.asset_group_name))
+            targets: inject.inject_assets!.map((asset) => assets[asset]?.asset_name)
+              .concat(inject.inject_asset_groups!.map((assetGroup) => assetGroups[assetGroup]?.asset_group_name))
               .concat(inject.inject_teams!.map((team) => teams[team]?.team_name)),
             exerciseOrScenarioId,
           },

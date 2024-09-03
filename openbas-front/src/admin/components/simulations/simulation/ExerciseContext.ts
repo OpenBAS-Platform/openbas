@@ -1,6 +1,6 @@
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { ImportTestSummary, Inject, InjectsImportInput } from '../../../../utils/api-types';
+import type { ImportTestSummary, Inject, InjectsImportInput, SearchPaginationInput } from '../../../../utils/api-types';
 import {
   addInjectForExercise,
   bulkDeleteInjectsForExercise,
@@ -12,18 +12,23 @@ import {
   updateInjectTriggerForExercise,
 } from '../../../../actions/Inject';
 import { secondsFromToNow } from '../../../../utils/Exercise';
-import type { InjectStore } from '../../../../actions/injects/Inject';
+import type { InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
 import { dryImportXlsForExercise, importXlsForExercise } from '../../../../actions/exercises/exercise-action';
 import { fetchExercise, fetchExerciseTeams } from '../../../../actions/Exercise';
+import { Page } from '../../../../components/common/queryable/Page';
+import { searchExerciseInjectsSimple } from '../../../../actions/injects/inject-action';
 
 const injectContextForExercise = (exercise: ExerciseStore) => {
   const dispatch = useAppDispatch();
 
   return {
-    onAddInject(inject: Inject): Promise<{ result: string }> {
+    searchInjects(input: SearchPaginationInput): Promise<{ data: Page<InjectOutputType> }> {
+      return searchExerciseInjectsSimple(exercise.exercise_id, input);
+    },
+    onAddInject(inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
       return dispatch(addInjectForExercise(exercise.exercise_id, inject));
     },
-    onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string }> {
+    onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
       return dispatch(updateInjectForExercise(exercise.exercise_id, injectId, inject));
     },
     onUpdateInjectTrigger(injectId: Inject['inject_id']): void {
