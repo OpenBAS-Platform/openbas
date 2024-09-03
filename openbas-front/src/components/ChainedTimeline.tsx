@@ -107,6 +107,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
 
   let startDate: string | undefined;
 
+  // If we have a scenario, we find the startdate using the cron info
   if (scenario !== undefined) {
     const parsedCron = scenario.scenario_recurrence ? parseCron(scenario.scenario_recurrence) : null;
     startDate = scenario?.scenario_recurrence_start ? scenario?.scenario_recurrence_start : exercise?.exercise_start_date;
@@ -117,6 +118,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
         : moment(startDate).utc().format();
     }
   } else if (exercise !== undefined) {
+    // Otherwise, we're in a simulation and we use the start_date
     startDate = exercise.exercise_start_date != null ? exercise.exercise_start_date : undefined;
   }
 
