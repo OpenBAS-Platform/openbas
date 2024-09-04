@@ -41,7 +41,7 @@ public class ScenarioInjectApi extends RestBehavior {
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/simple")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   @Transactional(readOnly = true)
-  public Iterable<InjectOutput> exerciseInjectsSimple(
+  public Iterable<InjectOutput> scenarioInjectsSimple(
       @PathVariable @NotBlank final String scenarioId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationCriteriaBuilder(

@@ -21,7 +21,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { deleteExercise, duplicateExercise, updateExercise } from '../../../../actions/Exercise';
 import { usePermissions } from '../../../../utils/Exercise';
 import Transition from '../../../../components/common/Transition';
-import type { Exercise, ExerciseUpdateInput } from '../../../../utils/api-types';
+import type { ExerciseUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import ExerciseUpdateForm from './ExerciseUpdateForm';
@@ -36,7 +36,7 @@ import type { TagHelper, UserHelper } from '../../../../actions/helper';
 export type ExerciseActionPopover = 'Duplicate' | 'Update' | 'Delete' | 'Export';
 
 interface ExercisePopoverProps {
-  exercise: Exercise;
+  exercise: ExerciseStore;
   actions: ExerciseActionPopover[];
   onDelete?: (result: string) => void;
   inList?: boolean;
@@ -141,11 +141,12 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   // Form
   const initialValues: ExerciseUpdateInput = {
     exercise_name: exercise.exercise_name,
-    exercise_subtitle: exercise.exercise_subtitle,
+    exercise_subtitle: exercise.exercise_subtitle ?? '',
     exercise_description: exercise.exercise_description,
     exercise_category: exercise.exercise_category ?? 'attack-scenario',
     exercise_main_focus: exercise.exercise_main_focus ?? 'incident-response',
     exercise_severity: exercise.exercise_severity ?? 'high',
+    exercise_tags: exercise.exercise_tags ?? [],
   };
   const initialValuesEmailParameters = {
     setting_mail_from: exercise.exercise_mail_from,

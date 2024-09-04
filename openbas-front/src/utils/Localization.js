@@ -871,7 +871,7 @@ const i18n = {
       scenario_name: 'Nom',
       scenario_platforms: 'Plateformes',
       scenario_recurrence: 'Récurrence',
-      scenario_severity: 'Severité',
+      scenario_severity: 'Sévérité',
       scenario_tags: 'Tags',
       scenario_updated_at: 'Mis à jour à',
       // Exercise
