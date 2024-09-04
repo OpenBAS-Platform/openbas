@@ -1294,6 +1294,8 @@ const i18n = {
       'Increase time interval': 'Augmenter l\'intervalle de temps',
       'Reduce time interval': 'Réduire l\'intervalle de temps',
       "Can't be tested": 'Ne peut pas être testé',
+      'Simulation is currently unavailable or you do not have sufficient permissions to access it.': 'La simulation est actuellement indisponible ou vous n\'avez pas les autorisations nécessaires pour y accéder.',
+      'Scenario is currently unavailable or you do not have sufficient permissions to access it.': 'Le scenario est actuellement indisponible ou vous n\'avez pas les autorisations nécessaires pour y accéder.',
     },
     zh: {
       'Email address': 'email地址',
@@ -2518,6 +2520,9 @@ const i18n = {
       'Fit view': '适合视图',
       'Increase time interval': '增加时间间隔',
       'Reduce time interval': '减少时间间隔',
+      'Simulation is currently unavailable or you do not have sufficient permissions to access it.': '模拟当前不可用，或您没有足够的权限进行访问。',
+      'Scenario is currently unavailable or you do not have sufficient permissions to access it.': '"场景当前不可用，或您没有足够的权限进行访问。',
+
     },
     en: {
       openbas_email: 'Email',
