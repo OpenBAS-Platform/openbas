@@ -7,6 +7,7 @@ import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.UserRepository;
+import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.injectors.email.model.EmailContent;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -23,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.Collections;
 import java.util.List;
 
+import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,7 +52,9 @@ public class InjectTestStatusServiceTest {
 
   private Inject INJECT1;
   private Inject INJECT2;
+  private Inject INJECT3;
   private Exercise EXERCISE;
+
 
   @BeforeAll
   void beforeAll() {
@@ -82,12 +86,23 @@ public class InjectTestStatusServiceTest {
     inject2.setContent(this.mapper.valueToTree(content2));
     INJECT2 = this.injectRepository.save(inject2);
 
+    Inject inject3 = new Inject();
+    inject3.setTitle("test3");
+    inject3.setInjectorContract(this.injectorContractRepository.findById(CHANNEL_PUBLISH).orElseThrow());
+    inject3.setExercise(EXERCISE);
+    inject3.setDependsDuration(0L);
+    ChannelContent content3 = new ChannelContent();
+    content3.setSubject("Subject email");
+    content3.setBody("A body");
+    inject3.setContent(this.mapper.valueToTree(content3));
+    INJECT3 = this.injectRepository.save(inject3);
   }
 
   @AfterAll
   void afterAll() {
     this.injectRepository.delete(INJECT1);
     this.injectRepository.delete(INJECT2);
+    this.injectRepository.delete(INJECT3);
     this.exerciseRepository.delete(EXERCISE);
   }
 
@@ -106,6 +121,33 @@ public class InjectTestStatusServiceTest {
 
     // -- CLEAN --
     this.injectTestStatusService.deleteInjectTest(test.getId());
+  }
+
+  @DisplayName("Test a channel inject")
+  @Test
+  void testNonMailInject() {
+    // Mock the UserDetails with a custom ID
+    User user = this.userRepository.findByEmailIgnoreCase("admin@openbas.io").orElseThrow();
+    OpenBASOidcUser oidcUser = new OpenBASOidcUser(user);
+    Authentication auth = new UsernamePasswordAuthenticationToken(oidcUser, "password", Collections.EMPTY_LIST);
+    SecurityContextHolder.getContext().setAuthentication(auth);
+
+    // -- EXECUTE --
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+      injectTestStatusService.testInject(INJECT3.getId());
+    });
+
+    String expectedMessage = "Inject: " + INJECT3.getId() + " is not testable";
+    String actualMessage = exception.getMessage();
+    assertTrue(actualMessage.contains(expectedMessage));
+
+    // -- CLEAN --
+    SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
+        .size(1110)
+        .build();
+    Page<InjectTestStatus> tests = injectTestStatusService.findAllInjectTestsByExerciseId(EXERCISE.getId(),
+        searchPaginationInput);
+    tests.stream().forEach(test -> this.injectTestStatusService.deleteInjectTest(test.getId()));
   }
 
   @DisplayName("Test multiple injects")
