@@ -1311,6 +1311,8 @@ const i18n = {
       'Executor Caldera is not responding, your exercises may be impacted.': 'L\'exécuteur Caldera ne réponds pas, vos exercises peuvent être impactés.',
       // Inject test
       'Inject test has been sent, you can view test logs details on ': 'Le test de l\'inject a été envoyé, vous pouvez visualiser les logs de test sur  ',
+      'Inject test has been sent': 'Le test de l\'inject a été envoyé',
+      'Tests were sent': 'Les tests ont été envoyé',
       'its dedicated page.': 'sa page dédiée',
       'Value that signifies that all teams are targeted. A regex can be used.': 'Valeur indiquant que l\'injecteur s\'applique à toutes les équipes. Il est possible d\'utiliser une expression régulière.',
       'Fit view': 'Ajuster la vue',
