@@ -167,6 +167,33 @@ public class InjectTestStatusServiceTest {
     tests.forEach(test -> this.injectTestStatusService.deleteInjectTest(test.getId()));
   }
 
+  @DisplayName("Bulk test with non testable injects")
+  @Test
+  void bulkTestNonMailInject() {
+    // Mock the UserDetails with a custom ID
+    User user = this.userRepository.findByEmailIgnoreCase("admin@openbas.io").orElseThrow();
+    OpenBASOidcUser oidcUser = new OpenBASOidcUser(user);
+    Authentication auth = new UsernamePasswordAuthenticationToken(oidcUser, "password", Collections.EMPTY_LIST);
+    SecurityContextHolder.getContext().setAuthentication(auth);
+
+    // -- EXECUTE --
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+      injectTestStatusService.bulkTestInjects(Collections.singletonList(INJECT3.getId()));
+    });
+
+    String expectedMessage = "No inject ID is testable";
+    String actualMessage = exception.getMessage();
+    assertTrue(actualMessage.contains(expectedMessage));
+
+    // -- CLEAN --
+    SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
+        .size(1110)
+        .build();
+    Page<InjectTestStatus> tests = injectTestStatusService.findAllInjectTestsByExerciseId(EXERCISE.getId(),
+        searchPaginationInput);
+    tests.stream().forEach(test -> this.injectTestStatusService.deleteInjectTest(test.getId()));
+  }
+
   @DisplayName("Check the number of tests of an exercise")
   @Test
   void findAllInjectTestsByExerciseId() {
