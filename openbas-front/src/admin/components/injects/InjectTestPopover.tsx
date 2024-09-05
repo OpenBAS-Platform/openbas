@@ -85,7 +85,7 @@ const InjectTestPopover: FunctionComponent<Props> = ({
         <MenuItem
           onClick={handleOpenTest}
         >
-          {t('Test')}
+          {t('Replay test')}
         </MenuItem>
         <MenuItem onClick={handleOpenDelete}>
           {t('Delete')}

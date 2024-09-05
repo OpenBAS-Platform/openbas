@@ -1224,6 +1224,7 @@ const i18n = {
       'Attribute mapping configuration': 'Configuration d\'attribut de mapper',
       'The imported file contains absolute dates (ex.: 9h30). A starting date must be provided for the Scenario to be build': 'Le fichier importé contient des dates absolues (ex.: 9h30). Une date de début doit être fournie pour que le scénario puisse être créé',
       Test: 'Test',
+      'Replay test': 'Rejouer le test',
       'Do you want to test this inject?':
         'Souhaitez-vous tester ce stimuli?',
       'Do you want to test these {count} injects?':
