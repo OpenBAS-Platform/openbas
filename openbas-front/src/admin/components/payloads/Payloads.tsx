@@ -30,7 +30,6 @@ import { buildEmptyFilter } from '../../../components/common/queryable/filter/Fi
 const useStyles = makeStyles(() => ({
   itemHead: {
     textTransform: 'uppercase',
-    cursor: 'pointer',
   },
   item: {
     height: 50,
@@ -68,14 +67,12 @@ const useStyles = makeStyles(() => ({
 const inlineStyles: Record<string, CSSProperties> = {
   payload_type: {
     width: '10%',
-    cursor: 'default',
   },
   payload_name: {
     width: '20%',
   },
   payload_platforms: {
     width: '10%',
-    cursor: 'default',
   },
   payload_description: {
     width: '10%',
@@ -97,10 +94,10 @@ const inlineStyles: Record<string, CSSProperties> = {
 const Payloads = () => {
   // Standard hooks
   const classes = useStyles();
+  const { t, nsdt } = useFormatter();
   const dispatch = useAppDispatch();
 
   const [selectedPayload, setSelectedPayload] = useState<PayloadStore | null>(null);
-  const { t, nsdt } = useFormatter();
   const { documentsMap, collectorsMap } = useHelper((helper: DocumentHelper & CollectorHelper) => ({
     documentsMap: helper.getDocumentsMap(),
     collectorsMap: helper.getCollectorsMap(),
@@ -132,7 +129,7 @@ const Payloads = () => {
     {
       field: 'payload_platforms',
       label: 'Platforms',
-      isSortable: true,
+      isSortable: false,
       value: (payload: PayloadStore) => payload.payload_platforms?.map(
         (platform) => <PlatformIcon key={platform} platform={platform} tooltip={true} width={20} marginRight={10} />,
       ),
@@ -146,7 +143,7 @@ const Payloads = () => {
     {
       field: 'payload_tags',
       label: 'Tags',
-      isSortable: true,
+      isSortable: false,
       value: (payload: PayloadStore) => <ItemTags
         variant="reduced-view"
         tags={payload.payload_tags}
@@ -166,7 +163,7 @@ const Payloads = () => {
     {
       field: 'payload_status',
       label: 'Status',
-      isSortable: true,
+      isSortable: false,
       value: (payload: PayloadStore) => <Chip
         variant="outlined"
         classes={{ root: classes.chipInList2 }}
@@ -182,6 +179,16 @@ const Payloads = () => {
     },
   ], []);
 
+  const availableFilterNames = [
+    'payload_attack_patterns',
+    'payload_description',
+    'payload_name',
+    'payload_platforms',
+    'payload_source',
+    'payload_status',
+    'payload_tags',
+    'payload_updated_at',
+  ];
   const [payloads, setPayloads] = useState<PayloadStore[]>([]);
   const { queryableHelpers, searchPaginationInput } = useQueryable('payloads', buildSearchPagination({
     sorts: initSorting('payload_name'),
@@ -218,9 +225,7 @@ const Payloads = () => {
         searchPaginationInput={searchPaginationInput}
         setContent={setPayloads}
         entityPrefix="payload"
-        availableFilterNames={
-        ['payload_attack_patterns', 'payload_description', 'payload_name', 'payload_platforms', 'payload_source', 'payload_status', 'payload_tags', 'payload_updated_at']
-      }
+        availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
         exportProps={exportProps}
       />
@@ -229,6 +234,7 @@ const Payloads = () => {
           classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
+          secondaryAction={<>&nbsp;</>}
         >
           <ListItemIcon />
           <ListItemText
@@ -240,7 +246,6 @@ const Payloads = () => {
               />
             }
           />
-          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
         {payloads.map((payload: PayloadStore) => {
           const collector = payload.payload_collector ? collectorsMap[payload.payload_collector] : null;

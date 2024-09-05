@@ -13,10 +13,11 @@ import type { AttackPatternStore } from '../../../../actions/attack_patterns/Att
 import { QueryableHelpers } from '../QueryableHelpers';
 import TextSearchComponent from '../textSearch/TextSearchComponent';
 import TablePaginationComponent from './TablePaginationComponent';
-import { OptionPropertySchema } from '../filter/FilterAutocomplete';
+import FilterAutocomplete, { OptionPropertySchema } from '../filter/FilterAutocomplete';
 import useFilterableProperties from '../filter/useFilterableProperties';
+import FilterChips from '../filter/FilterChips';
 import FilterModeChip from '../filter/FilterModeChip';
-import KillChainPhasesFilter from '../../../../admin/components/common/filters/KillChainPhasesFilter';
+import InjectorContractSwitchFilter from '../../../../admin/components/common/filters/InjectorContractSwitchFilter';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -63,10 +64,13 @@ const PaginationComponentV2 = <T extends object>({
   const classes = useStyles();
   const { t } = useFormatter();
 
-  const [_properties, setProperties] = useState<PropertySchemaDTO[]>([]);
-  const [_options, setOptions] = useState<OptionPropertySchema[]>([]);
+  const [properties, setProperties] = useState<PropertySchemaDTO[]>([]);
+  const [options, setOptions] = useState<OptionPropertySchema[]>([]);
 
   useEffect(() => {
+    // Retrieve input from uri
+    queryableHelpers.uriHelpers.retrieveFromUri();
+
     if (entityPrefix) {
       useFilterableProperties(entityPrefix, availableFilterNames).then((propertySchemas: PropertySchemaDTO[]) => {
         const newOptions = propertySchemas.filter((property) => property.schema_property_name !== MITRE_FILTER_KEY)
@@ -80,6 +84,9 @@ const PaginationComponentV2 = <T extends object>({
   }, []);
 
   useEffect(() => {
+    // Modify URI
+    queryableHelpers.uriHelpers.updateUri();
+
     // Fetch datas
     fetch(searchPaginationInput).then((result: { data: Page<T> }) => {
       const { data } = result;
@@ -89,6 +96,7 @@ const PaginationComponentV2 = <T extends object>({
   }, [searchPaginationInput]);
 
   // Filters
+  const [pristine, setPristine] = useState(true);
   const [openMitreFilter, setOpenMitreFilter] = React.useState(false);
 
   const computeAttackPatternNameForFilter = () => {
@@ -111,9 +119,13 @@ const PaginationComponentV2 = <T extends object>({
               textSearchHelpers={queryableHelpers.textSearchHelpers}
             />
           )}
-          {availableFilterNames?.includes(`${entityPrefix}_kill_chain_phases`) && (
-            <KillChainPhasesFilter filterKey={`${entityPrefix}_kill_chain_phases`} helpers={queryableHelpers.filterHelpers} />
-          )}
+          <FilterAutocomplete
+            filterGroup={searchPaginationInput.filterGroup}
+            helpers={queryableHelpers.filterHelpers}
+            options={options}
+            setPristine={setPristine}
+            style={{ marginLeft: searchEnable ? 10 : 0 }}
+          />
           {queryableHelpers.filterHelpers && availableFilterNames?.includes('injector_contract_attack_patterns') && (
             <>
               <div style={{ cursor: 'pointer' }} onClick={() => setOpenMitreFilter(true)}>
@@ -130,6 +142,11 @@ const PaginationComponentV2 = <T extends object>({
                 <MitreFilter helpers={queryableHelpers.filterHelpers} onClick={() => setOpenMitreFilter(false)} />
               </Drawer>
             </>
+          )}
+          {availableFilterNames?.includes('injector_contract_players') && (
+            <div style={{ marginLeft: 10 }}>
+              <InjectorContractSwitchFilter filterHelpers={queryableHelpers.filterHelpers} filterGroup={searchPaginationInput.filterGroup}/>
+            </div>
           )}
         </div>
         {!disablePagination && (
@@ -170,6 +187,13 @@ const PaginationComponentV2 = <T extends object>({
           )}
         </>
       )}
+      <FilterChips
+        propertySchemas={properties}
+        filterGroup={searchPaginationInput.filterGroup}
+        availableFilterNames={availableFilterNames?.filter((n) => n !== MITRE_FILTER_KEY)}
+        helpers={queryableHelpers.filterHelpers}
+        pristine={pristine}
+      />
     </>
   );
 };

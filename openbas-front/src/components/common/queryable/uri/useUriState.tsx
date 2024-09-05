@@ -7,7 +7,7 @@ import { UriHelpers } from './UriHelpers';
 import type { SearchPaginationInput } from '../../../../utils/api-types';
 import { buildSearchPagination, SearchPaginationInputSchema } from '../QueryableUtils';
 
-const useUriState = (initSearchPaginationInput: SearchPaginationInput, onChange: (input: SearchPaginationInput) => void) => {
+const useUriState = (localStorageKey: string, initSearchPaginationInput: SearchPaginationInput, onChange: (input: SearchPaginationInput) => void) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -17,8 +17,8 @@ const useUriState = (initSearchPaginationInput: SearchPaginationInput, onChange:
     retrieveFromUri: () => {
       const encodedParams = location.search?.startsWith('?') ? location.search.substring(1) : '';
       const params = atob(encodedParams);
-      const paramsJson = qs.parse(params) as unknown as SearchPaginationInput;
-      if (!R.isEmpty(paramsJson)) {
+      const paramsJson = qs.parse(params) as unknown as SearchPaginationInput & { key: string };
+      if (!R.isEmpty(paramsJson) && paramsJson.key === localStorageKey) {
         try {
           const parse = SearchPaginationInputSchema.parse(paramsJson);
           setInput(buildSearchPagination(parse));
@@ -31,7 +31,7 @@ const useUriState = (initSearchPaginationInput: SearchPaginationInput, onChange:
       }
     },
     updateUri: () => {
-      const params = qs.stringify(initSearchPaginationInput);
+      const params = qs.stringify({ key: localStorageKey, ...initSearchPaginationInput });
       const encodedParams = btoa(params);
       navigate(`?${encodedParams}`);
     },

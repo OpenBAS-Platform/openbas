@@ -1,4 +1,4 @@
-package io.openbas.scenario;
+package io.openbas.rest.scenario;
 
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;

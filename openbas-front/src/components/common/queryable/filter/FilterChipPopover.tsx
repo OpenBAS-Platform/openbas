@@ -5,6 +5,7 @@ import { FilterHelpers } from './FilterHelpers';
 import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
 import { availableOperators, OperatorKeyValues } from './FilterUtils';
 import { FilterChipPopoverInput } from './FilterChipPopoverInput';
+import ScenarioStatusFilter from './specific/ScenarioStatusFilter';
 
 interface Props {
   filter: Filter;
@@ -31,6 +32,11 @@ const FilterChipPopover: FunctionComponent<Props> = ({
   };
 
   const displayOperatorAndFilter = () => {
+    // Specific field
+    if (propertySchema.schema_property_name === 'scenario_recurrence') {
+      return (<ScenarioStatusFilter propertySchema={propertySchema} helpers={helpers}/>);
+    }
+
     const operators = availableOperators(propertySchema);
     return (
       <>

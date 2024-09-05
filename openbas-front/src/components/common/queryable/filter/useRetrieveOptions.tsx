@@ -12,6 +12,7 @@ const useRetrieveOptions = () => {
   const searchOptions = (filterKey: string, ids: string[]) => {
     switch (filterKey) {
       case 'injector_contract_injector':
+      case 'inject_injector_contract':
         searchInjectorByIdAsOptions(ids).then((response) => {
           setOptions(response.data);
         });
@@ -19,6 +20,7 @@ const useRetrieveOptions = () => {
       case 'injector_contract_kill_chain_phases':
       case 'scenario_kill_chain_phases':
       case 'exercise_kill_chain_phases':
+      case 'inject_kill_chain_phases':
         searchKillChainPhasesByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
@@ -30,6 +32,7 @@ const useRetrieveOptions = () => {
         break;
       case 'scenario_tags':
       case 'exercise_tags':
+      case 'inject_tags':
         searchTagByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });

@@ -3,6 +3,7 @@ package io.openbas.service;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.inject.service.InjectDuplicateService;
+import io.openbas.utils.fixtures.ScenarioFixture;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -78,7 +79,7 @@ public class ScenarioServiceTest {
         inject.setTeams(scenarioTeams);
         Set<Inject> scenarioInjects = new HashSet<>();
         scenarioInjects.add(this.injectRepository.save(inject));
-        Scenario scenario = this.scenarioRepository.save(getScenario(scenarioTeams, scenarioInjects));
+        Scenario scenario = this.scenarioRepository.save(ScenarioFixture.getScenario(scenarioTeams, scenarioInjects));
 
         // -- EXECUTE --
         Scenario scenarioDuplicated = scenarioService.getDuplicateScenario(scenario.getId());

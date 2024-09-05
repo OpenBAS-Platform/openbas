@@ -10,12 +10,16 @@ import jakarta.validation.constraints.NotNull;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static org.springframework.util.StringUtils.hasText;
 
@@ -57,19 +61,16 @@ public class SchemaUtils {
   // -- SCHEMA --
 
   public static List<PropertySchema> schema(@NotNull Class<?> clazz) {
-    List<PropertySchema> properties = cacheMap.get(clazz);
+    return cacheMap.computeIfAbsent(clazz, SchemaUtils::computeSchema);
+  }
 
-    if (properties == null) {
-      Field[] fields = clazz.getDeclaredFields();
-      properties = new ArrayList<>(computeProperties(fields));
+  private static List<PropertySchema> computeSchema(Class<?> clazz) {
+    List<PropertySchema> properties = new ArrayList<>();
 
-      while (clazz.getSuperclass() != null) {
-        clazz = clazz.getSuperclass();
-        fields = clazz.getDeclaredFields();
-        properties.addAll(computeProperties(fields));
-      }
-
-      cacheMap.put(clazz, properties);
+    while (clazz != null) {
+      properties.addAll(computeProperties(clazz.getDeclaredFields()));
+      properties.addAll(computeMethods(clazz.getDeclaredMethods()));
+      clazz = clazz.getSuperclass();
     }
 
     return properties;
@@ -77,48 +78,104 @@ public class SchemaUtils {
 
   // -- PROPERTIES --
 
-  private static List<PropertySchema> computeProperties(
-      @NotNull final Field[] fields) {
-    return Arrays.stream(fields).map(field -> {
-      PropertySchema.PropertySchemaBuilder builder = PropertySchema.builder()
-          .name(field.getName())
-          .type(field.getType())
-          .multiple(field.getType().isArray() || Collection.class.isAssignableFrom(field.getType()));
+  private static List<PropertySchema> computeProperties(@NotNull Field[] fields) {
+    return Arrays.stream(fields)
+        .map(SchemaUtils::buildPropertySchemaFromField)
+        .collect(Collectors.toList());
+  }
 
-      // Enum type -> compute available values
-      if (field.getType().isEnum()) {
-        Object[] enumValues = field.getType().getEnumConstants();
-        List<String> enumNames = new ArrayList<>();
-        for (Object enumValue : enumValues) {
-          enumNames.add(enumValue.toString());
+  private static PropertySchema buildPropertySchemaFromField(Field field) {
+    PropertySchema.PropertySchemaBuilder builder = PropertySchema.builder()
+        .name(field.getName())
+        .type(field.getType())
+        .multiple(field.getType().isArray() || Collection.class.isAssignableFrom(field.getType()));
+
+    if (field.getType().isEnum() || (field.getType().isArray() && field.getType().getComponentType().isEnum())) {
+      builder.availableValues(
+          getEnumNames(field.getType().isArray() ? field.getType().getComponentType() : field.getType()));
+    }
+
+    for (Annotation annotation : field.getDeclaredAnnotations()) {
+      processAnnotations(builder, annotation, field);
+    }
+
+    return builder.build();
+  }
+
+  // -- METHODS --
+
+  private static List<PropertySchema> computeMethods(@NotNull Method[] methods) {
+    return Arrays.stream(methods)
+        .map(SchemaUtils::buildPropertySchemaFromMethod)
+        .collect(Collectors.toList());
+  }
+
+  private static PropertySchema buildPropertySchemaFromMethod(Method method) {
+    PropertySchema.PropertySchemaBuilder builder = PropertySchema.builder()
+        .name(method.getName())
+        .type(method.getReturnType())
+        .multiple(method.getReturnType().isArray() || Collection.class.isAssignableFrom(method.getReturnType()));
+
+    if (method.getReturnType().isEnum()) {
+      builder.availableValues(getEnumNames(method.getReturnType()));
+    } else if (method.getReturnType().isArray() || method.getGenericReturnType() instanceof ParameterizedType) {
+      Class enumType = null;
+      if (method.getReturnType().isArray()) {
+        enumType = method.getReturnType().getComponentType();
+      } else {
+        Type typeArgument = ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0];
+        if (typeArgument instanceof Class<?>) {
+          enumType = (Class<?>) typeArgument;
         }
-        builder.availableValues(enumNames);
       }
-      if (field.getType().isArray() && field.getType().getComponentType().isEnum()) {
-        Object[] enumValues = field.getType().getComponentType().getEnumConstants();
-        List<String> enumNames = new ArrayList<>();
-        for (Object enumValue : enumValues) {
-          enumNames.add(enumValue.toString());
+      if (enumType != null && enumType.isEnum()) {
+        builder.availableValues(getEnumNames(enumType));
+      }
+    }
+
+    for (Annotation annotation : method.getDeclaredAnnotations()) {
+      processAnnotations(builder, annotation, method);
+    }
+
+    return builder.build();
+  }
+
+  private static List<String> getEnumNames(Class<?> enumType) {
+    return Arrays.stream(enumType.getEnumConstants())
+        .map(Object::toString)
+        .collect(Collectors.toList());
+  }
+
+  private static void processAnnotations(
+      @NotNull final PropertySchema.PropertySchemaBuilder builder,
+      @NotNull final Annotation annotation,
+      @NotNull final Object member) {
+
+    if (annotation.annotationType().equals(JsonProperty.class)) {
+      builder.jsonName(((JsonProperty) annotation).value());
+    } else if (annotation.annotationType().equals(Column.class)) {
+      builder.unicity(((Column) annotation).unique());
+    } else if (REQUIRED_ANNOTATIONS.contains(annotation.annotationType())) {
+      builder.mandatory(true);
+    } else if (annotation.annotationType().equals(Queryable.class)) {
+      Queryable queryable = member instanceof Field
+          ? ((Field) member).getAnnotation(Queryable.class)
+          : ((Method) member).getAnnotation(Queryable.class);
+      if (queryable != null) {
+        builder.searchable(queryable.searchable())
+            .filterable(queryable.filterable())
+            .dynamicValues(queryable.dynamicValues())
+            .sortable(queryable.sortable())
+            .path(queryable.path());
+        if (member instanceof Method) {
+          builder.type(queryable.clazz()); // Override
+        } else if (member instanceof Field && hasText(queryable.path())) {
+          builder.type(queryable.clazz()); // Override
         }
-        builder.availableValues(enumNames);
       }
-
-      Annotation[] annotations = field.getDeclaredAnnotations();
-      for (Annotation annotation : annotations) {
-        // Json property name
-        computeJsonName(builder, annotation);
-        // Unicity
-        computeUnicity(builder, annotation);
-        // Required
-        computeRequired(builder, annotation);
-        // Queryable
-        computeQueryable(builder, annotation, field);
-        // Join table
-        computeJoinTable(builder, annotation, field);
-      }
-
-      return builder.build();
-    }).toList();
+    } else if (annotation.annotationType().equals(JoinTable.class)) {
+      builder.joinTable(PropertySchema.JoinTable.builder().joinOn(((Field) member).getName()).build());
+    }
   }
 
   public static PropertySchema retrieveProperty(List<PropertySchema> propertySchemas, String jsonFieldPath) {
@@ -129,74 +186,19 @@ public class SchemaUtils {
     return propertySchemas.stream()
         .filter(p -> jsonFieldPath.equals(p.getJsonName()))
         .findFirst()
-        .orElseThrow();
+        .orElseThrow(
+            () -> new IllegalArgumentException("This path is not handled by Queryable annotation: " + jsonFieldPath));
   }
 
   public static List<PropertySchema> getSearchableProperties(List<PropertySchema> propertySchemas) {
-    return propertySchemas.stream().filter(PropertySchema::isSearchable).toList();
+    return propertySchemas.stream().filter(PropertySchema::isSearchable).collect(Collectors.toList());
   }
 
   public static List<PropertySchema> getFilterableProperties(List<PropertySchema> propertySchemas) {
-    return propertySchemas.stream().filter(PropertySchema::isFilterable).toList();
+    return propertySchemas.stream().filter(PropertySchema::isFilterable).collect(Collectors.toList());
   }
 
   public static List<PropertySchema> getSortableProperties(List<PropertySchema> propertySchemas) {
-    return propertySchemas.stream().filter(PropertySchema::isSortable).toList();
+    return propertySchemas.stream().filter(PropertySchema::isSortable).collect(Collectors.toList());
   }
-
-  // -- PRIVATE --
-
-  private static void computeJsonName(
-      @NotNull final PropertySchema.PropertySchemaBuilder builder,
-      @NotNull final Annotation annotation) {
-    if (annotation.annotationType().equals(JsonProperty.class)) {
-      builder.jsonName(((JsonProperty) annotation).value());
-    }
-  }
-
-  private static void computeUnicity(
-      @NotNull final PropertySchema.PropertySchemaBuilder builder,
-      @NotNull final Annotation annotation) {
-    if (annotation.annotationType().equals(Column.class)) {
-      builder.unicity(((Column) annotation).unique());
-    }
-  }
-
-  private static void computeRequired(
-      @NotNull final PropertySchema.PropertySchemaBuilder builder,
-      @NotNull final Annotation annotation) {
-    if (REQUIRED_ANNOTATIONS.contains(annotation.annotationType())) {
-      builder.mandatory(true);
-    }
-  }
-
-  private static void computeQueryable(
-      @NotNull final PropertySchema.PropertySchemaBuilder builder,
-      @NotNull final Annotation annotation,
-      @NotNull final Field field) {
-    if (annotation.annotationType().equals(Queryable.class)) {
-      Queryable queryable = field.getAnnotation(Queryable.class);
-      builder.searchable(queryable.searchable());
-      builder.filterable(queryable.filterable());
-      builder.dynamicValues(queryable.dynamicValues());
-      builder.sortable(queryable.sortable());
-      String propertyValue = queryable.property();
-      if (hasText(propertyValue)) {
-        builder.propertyRepresentative(propertyValue);
-      }
-    }
-  }
-
-  private static void computeJoinTable(
-      @NotNull final PropertySchema.PropertySchemaBuilder builder,
-      @NotNull final Annotation annotation,
-      @NotNull final Field field) {
-    if (annotation.annotationType().equals(JoinTable.class)) {
-      PropertySchema.JoinTable joinTableProperty = PropertySchema.JoinTable.builder()
-          .joinOn(field.getName())
-          .build();
-      builder.joinTable(joinTableProperty);
-    }
-  }
-
 }

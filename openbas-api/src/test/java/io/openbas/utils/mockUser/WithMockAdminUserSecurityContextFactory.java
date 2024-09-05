@@ -1,10 +1,6 @@
 package io.openbas.utils.mockUser;
 
 import io.openbas.database.model.User;
-import io.openbas.database.repository.UserRepository;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;

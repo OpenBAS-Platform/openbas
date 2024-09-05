@@ -70,7 +70,7 @@ public abstract class BaseInjectStatus implements Base {
   private Integer trackingTotalSuccess;
   // endregion
 
-  @Queryable(searchable = true, property = "title")
+  @Queryable(searchable = true, path = "inject.title")
   @OneToOne
   @JoinColumn(name = "status_inject")
   @JsonIgnore

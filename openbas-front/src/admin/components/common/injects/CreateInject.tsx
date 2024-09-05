@@ -1,13 +1,13 @@
-import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
-import { Chip, Grid, List, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import React, { CSSProperties, FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
+import { Chip, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { KeyboardArrowRight } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
 import computeAttackPatterns from '../../../../utils/injector_contract/InjectorContractUtils';
-import type { FilterGroup, Inject, InjectorContractOutput } from '../../../../utils/api-types';
+import type { FilterGroup, Inject, InjectorContractOutput, KillChainPhase } from '../../../../utils/api-types';
 import { initSorting } from '../../../../components/common/queryable/Page';
-import { emptyFilterGroup } from '../../../../components/common/queryable/filter/FilterUtils';
+import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
@@ -24,19 +24,22 @@ import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import { isNotEmptyField } from '../../../../utils/utils';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import useQueryable from '../../../../components/common/queryable/useQueryable';
+import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
 
 const useStyles = makeStyles(() => ({
-  container: {
-    height: 30,
-    display: 'flex',
-    alignItems: 'center',
+  itemHead: {
+    textTransform: 'uppercase',
   },
-  containerItem: {
-    float: 'left',
+  bodyItems: {
+    display: 'flex',
+  },
+  bodyItem: {
+    height: 20,
+    fontSize: 13,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    paddingRight: 20,
+    paddingRight: 10,
   },
   chipInList: {
     fontSize: 12,
@@ -52,17 +55,17 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const inlineStyles = {
-  killChainPhase: {
+const inlineStyles: Record<string, CSSProperties> = {
+  kill_chain_phase: {
     width: '20%',
   },
-  label: {
+  injector_contract_labels: {
     width: '45%',
   },
-  platform: {
-    width: '12%',
+  injector_contract_platforms: {
+    width: '15%',
   },
-  attackPatterns: {
+  attack_patterns: {
     width: '20%',
   },
 };
@@ -79,16 +82,6 @@ interface Props {
     inject_depends_duration_minutes?: number,
   };
 }
-
-const atomicFilter: FilterGroup = {
-  mode: 'and',
-  filters: [
-    {
-      key: 'injector_contract_atomic_testing',
-      operator: 'eq',
-      values: ['true'],
-    }],
-};
 
 const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = false, handleClose, isAtomic = false, presetValues, ...props }) => {
   // Standard hooks
@@ -108,6 +101,84 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
     dispatch(fetchAttackPatterns());
   });
 
+  // Headers
+  const headers = useMemo(() => [
+    {
+      field: 'kill_chain_phase',
+      label: 'Kill chain phase',
+      isSortable: false,
+      value: (_: InjectorContractOutput, killChainPhase: KillChainPhase, __: Record<string, AttackPatternStore>) => (killChainPhase ? killChainPhase.phase_name : t('Unknown')),
+    },
+    {
+      field: 'injector_contract_labels',
+      label: 'Label',
+      isSortable: false,
+      value: (contract: InjectorContractOutput, _: KillChainPhase, __: Record<string, AttackPatternStore>) => <Tooltip title={tPick(contract.injector_contract_labels)}>
+        {tPick(contract.injector_contract_labels)}
+      </Tooltip>,
+    },
+    {
+      field: 'injector_contract_platforms',
+      label: 'Platforms',
+      isSortable: false,
+      value: (contract: InjectorContractOutput, _: KillChainPhase, __: Record<string, AttackPatternStore>) => contract.injector_contract_platforms?.map(
+        (platform: string) => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
+      ),
+    },
+    {
+      field: 'attack_patterns',
+      label: 'Attack patterns',
+      isSortable: false,
+      value: (contract: InjectorContractOutput, _: KillChainPhase, contractAttackPatterns: Record<string, AttackPatternStore>) => contractAttackPatterns
+        .map((contractAttackPattern: AttackPatternStore) => (
+          <Chip
+            key={`${contract.injector_contract_id}-${contractAttackPattern.attack_pattern_id}-${Math.random()}`}
+            variant="outlined"
+            classes={{ root: classes.chipInList }}
+            color="primary"
+            label={contractAttackPattern.attack_pattern_external_id}
+          />
+        )),
+    },
+  ], []);
+
+  // Filters
+  const quickFilter: FilterGroup = {
+    mode: 'and',
+    filters: [
+      buildEmptyFilter('injector_contract_kill_chain_phases', 'contains'),
+      buildEmptyFilter('injector_contract_injector', 'contains'),
+      buildEmptyFilter('injector_contract_platforms', 'contains'),
+    ],
+  };
+
+  const addAtomicFilter = (filterGroup: FilterGroup) => {
+    const filters = filterGroup.filters ?? [];
+    if (filters.map((f) => f.key).includes('injector_contract_atomic_testing')) {
+      return filterGroup;
+    }
+
+    filters.push({
+      key: 'injector_contract_atomic_testing',
+      operator: 'eq',
+      values: ['true'],
+    });
+
+    return {
+      ...filterGroup,
+      filters,
+    };
+  };
+
+  const availableFilterNames = [
+    'injector_contract_attack_patterns',
+    'injector_contract_injector',
+    'injector_contract_kill_chain_phases',
+    'injector_contract_labels',
+    'injector_contract_platforms',
+    'injector_contract_players',
+  ];
+
   // Contracts
   const [contracts, setContracts] = useState<InjectorContractOutput[]>([]);
   // as we don't know the type of the content of a contract we need to put any here
@@ -116,7 +187,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
   const initSearchPaginationInput = () => {
     return ({
       sorts: initSorting('injector_contract_labels'),
-      filterGroup: isAtomic ? atomicFilter : emptyFilterGroup,
+      filterGroup: isAtomic ? addAtomicFilter(quickFilter) : quickFilter,
       size: 100,
       page: 0,
     });
@@ -169,12 +240,29 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
               searchPaginationInput={searchPaginationInput}
               setContent={setContracts}
               entityPrefix="injector_contract"
-              availableFilterNames={['injector_contract_attack_patterns', 'injector_contract_platforms', 'injector_contract_injector', 'injector_contract_kill_chain_phases']}
+              availableFilterNames={availableFilterNames}
               queryableHelpers={queryableHelpers}
               disablePagination
               attackPatterns={attackPatterns}
             />
             <List>
+              <ListItem
+                classes={{ root: classes.itemHead }}
+                divider={false}
+                style={{ paddingTop: 0 }}
+                secondaryAction={<>&nbsp;</>}
+              >
+                <ListItemIcon />
+                <ListItemText
+                  primary={
+                    <SortHeadersComponentV2
+                      headers={headers}
+                      inlineStylesHeaders={inlineStyles}
+                      sortHelpers={queryableHelpers.sortHelpers}
+                    />
+                  }
+                />
+              </ListItem>
               {contracts.map((contract, index) => {
                 const contractAttackPatterns = computeAttackPatterns(contract, attackPatternsMap);
                 // eslint-disable-next-line max-len
@@ -196,29 +284,16 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
                     </ListItemIcon>
                     <ListItemText
                       primary={
-                        <div className={classes.container}>
-                          <div className={classes.containerItem} style={inlineStyles.killChainPhase}>
-                            {resolvedContractKillChainPhase ? resolvedContractKillChainPhase.phase_name : t('Unknown')}
-                          </div>
-                          <Tooltip title={tPick(contract.injector_contract_labels)}>
-                            <div className={classes.containerItem} style={inlineStyles.label}>
-                              {tPick(contract.injector_contract_labels)}
+                        <div className={classes.bodyItems}>
+                          {headers.map((header) => (
+                            <div
+                              key={header.field}
+                              className={classes.bodyItem}
+                              style={inlineStyles[header.field]}
+                            >
+                              {header.value(contract, resolvedContractKillChainPhase, contractAttackPatterns)}
                             </div>
-                          </Tooltip>
-                          <div className={classes.containerItem} style={inlineStyles.platform}>
-                            {contract.injector_contract_platforms?.map((platform) => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />)}
-                          </div>
-                          <div className={classes.containerItem} style={inlineStyles.attackPatterns}>
-                            {contractAttackPatterns.map((contractAttackPattern) => (
-                              <Chip
-                                key={`${contract.injector_contract_id}-${contractAttackPattern.attackPatternId}`}
-                                variant="outlined"
-                                classes={{ root: classes.chipInList }}
-                                color="primary"
-                                label={contractAttackPattern.attack_pattern_external_id}
-                              />
-                            ))}
-                          </div>
+                          ))}
                         </div>
                       }
                     />

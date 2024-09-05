@@ -15,6 +15,8 @@ import useQueryable from '../../../components/common/queryable/useQueryable';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import ExercisePopover from './simulation/ExercisePopover';
 import type { ExerciseStore } from '../../../actions/exercises/Exercise';
+import type { FilterGroup } from '../../../utils/api-types';
+import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
 
 const Exercises = () => {
   // Standard hooks
@@ -26,8 +28,29 @@ const Exercises = () => {
   }));
 
   const [exercises, setExercises] = useState<EndpointStore[]>([]);
+
+  // Filters
+  const availableFilterNames = [
+    'exercise_kill_chain_phases',
+    'exercise_name',
+    'exercise_scenario',
+    'exercise_start_date',
+    'exercise_status',
+    'exercise_tags',
+    'exercise_updated_at',
+  ];
+
+  const quickFilter: FilterGroup = {
+    mode: 'and',
+    filters: [
+      buildEmptyFilter('exercise_kill_chain_phases', 'contains'),
+      buildEmptyFilter('exercise_scenario', 'contains'),
+      buildEmptyFilter('exercise_tags', 'contains'),
+    ],
+  };
   const { queryableHelpers, searchPaginationInput } = useQueryable('simulations', buildSearchPagination({
     sorts: initSorting('exercise_updated_at', 'DESC'),
+    filterGroup: quickFilter,
   }));
 
   // Export
@@ -61,7 +84,7 @@ const Exercises = () => {
         searchPaginationInput={searchPaginationInput}
         setContent={setExercises}
         entityPrefix="exercise"
-        availableFilterNames={['exercise_kill_chain_phases', 'exercise_scenario', 'exercise_tags']}
+        availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
         exportProps={exportProps}
       >

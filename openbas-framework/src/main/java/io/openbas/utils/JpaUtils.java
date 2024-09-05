@@ -4,8 +4,6 @@ import io.openbas.utils.schema.PropertySchema;
 import jakarta.persistence.criteria.*;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.Optional;
-
 import static org.springframework.util.StringUtils.hasText;
 
 public class JpaUtils {
@@ -17,16 +15,21 @@ public class JpaUtils {
   public static <T, U> Expression<U> toPath(
       @NotNull final PropertySchema propertySchema,
       @NotNull final Root<T> root) {
+    // Path
+    if (hasText(propertySchema.getPath())) {
+      String[] jsonPaths = propertySchema.getPath().split("\\.");
+      if (jsonPaths.length > 0) {
+        Join<Object, Object> paths = root.join(jsonPaths[0], JoinType.LEFT);
+        for (int i = 1; i < jsonPaths.length - 1; i++) {
+          paths = paths.join(jsonPaths[i], JoinType.LEFT);
+        }
+        return paths.get(jsonPaths[jsonPaths.length - 1]);
+      }
+    }
     // Join
     if (propertySchema.getJoinTable() != null) {
       PropertySchema.JoinTable joinTable = propertySchema.getJoinTable();
-      return root.join(joinTable.getJoinOn(), JoinType.LEFT)
-          .get(Optional.ofNullable(propertySchema.getPropertyRepresentative()).orElse("id"));
-    }
-    // Search on child
-    else if (hasText(propertySchema.getPropertyRepresentative())) {
-      return root.get(propertySchema.getName()).get(propertySchema.getPropertyRepresentative());
-      // Direct property
+      return root.join(joinTable.getJoinOn(), JoinType.LEFT).get("id");
     } else {
       return root.get(propertySchema.getName());
     }

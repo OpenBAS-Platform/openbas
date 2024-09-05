@@ -1,4 +1,4 @@
-package io.openbas.scenario;
+package io.openbas.rest.scenario;
 
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.database.repository.ScenarioRepository;
