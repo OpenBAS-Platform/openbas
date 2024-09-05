@@ -5,6 +5,7 @@ import { useFormatter } from '../../../components/i18n';
 import type { InjectTestStatus } from '../../../utils/api-types';
 import { bulkTestInjects } from '../../../actions/injects/inject-action';
 import DialogTest from '../../../components/common/DialogTest';
+import { MESSAGING$ } from '../../../utils/Environment';
 
 interface Props {
   injectIds: string[] | undefined;
@@ -49,7 +50,7 @@ const ImportUploaderMapper: FunctionComponent<Props> = ({
   const handleSubmitAllTest = () => {
     bulkTestInjects(injectIds!).then((result: { data: InjectTestStatus[] }) => {
       onTest?.(result.data);
-      setOpenDialog(true);
+      MESSAGING$.notifySuccess(`${injectIds?.length} test(s) sent`);
       return result;
     });
     handleCloseAllTest();

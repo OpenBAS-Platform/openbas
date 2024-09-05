@@ -1225,6 +1225,7 @@ const i18n = {
       'The imported file contains absolute dates (ex.: 9h30). A starting date must be provided for the Scenario to be build': 'Le fichier importé contient des dates absolues (ex.: 9h30). Une date de début doit être fournie pour que le scénario puisse être créé',
       Test: 'Test',
       'Replay test': 'Rejouer le test',
+      'Delete test': 'Supprimer le test',
       'Do you want to test this inject?':
         'Souhaitez-vous tester ce stimuli?',
       'Do you want to test these {count} injects?':
@@ -1310,10 +1311,14 @@ const i18n = {
       'IMAP service is not responding, your injectors may be impacted.': 'Le service IMAP ne réponds pas, vos injecteurs peuvent être impactés.',
       'Executor Caldera is not responding, your exercises may be impacted.': 'L\'exécuteur Caldera ne réponds pas, vos exercises peuvent être impactés.',
       // Inject test
-      'Inject test has been sent, you can view test logs details on ': 'Le test de l\'inject a été envoyé, vous pouvez visualiser les logs de test sur  ',
-      'Inject test has been sent': 'Le test de l\'inject a été envoyé',
-      'Tests were sent': 'Les tests ont été envoyé',
-      'its dedicated page.': 'sa page dédiée',
+      'Inject title': 'Titre du stimuli',
+      'Test execution time': 'Heure d\'execution du test',
+      'Test status': 'Statut du test',
+      'Inject test has been sent, you can view test logs details on {itsDedicatedPage}.': 'Le test du stimuli a été envoyé, vous pouvez visualiser les logs de test sur {itsDedicatedPage}.',
+      'its dedicated page': 'sa page dédiée',
+      'Test for': 'Le test pour le stimuli',
+      'has been sent': 'a été envoyé',
+      'test(s) sent': 'test(s) envoyé(s)',
       'Value that signifies that all teams are targeted. A regex can be used.': 'Valeur indiquant que l\'injecteur s\'applique à toutes les équipes. Il est possible d\'utiliser une expression régulière.',
       'Fit view': 'Ajuster la vue',
       'Increase time interval': 'Augmenter l\'intervalle de temps',
@@ -2681,6 +2686,8 @@ const i18n = {
       'Do you want to delete these {count} injects?': 'Do you want to delete these {count} injects?',
       'Do you want to test these {count} injects?':
         'Do you want to test these {count} injects?',
+      'Inject test has been sent, you can view test logs details on {itsDedicatedPage}.': 'Inject test has been sent, you can view test logs details on {itsDedicatedPage}.',
+      'its dedicated page': 'its dedicated page',
       // Platform Banner
       'IMAP service is not responding, your injectors may be impacted.': 'IMAP service is not responding, your injectors may be impacted.',
       'Executor Caldera is not responding, your exercises may be impacted.': 'Executor Caldera is not responding, your exercises may be impacted.',
