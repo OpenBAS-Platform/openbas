@@ -222,11 +222,10 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     const injectFromMap = injectsMap[node.id];
     if (injectFromMap !== undefined) {
       const inject = {
+        ...injectFromMap,
+        inject_injector_contract: injectFromMap.inject_injector_contract.injector_contract_id,
         inject_id: node.id,
-        inject_title: injectFromMap.inject_title,
         inject_depends_duration: convertCoordinatesToTime(node.position),
-        inject_created_at: injectFromMap.inject_created_at,
-        inject_updated_at: injectFromMap.inject_updated_at,
       };
       injectContext.onUpdateInject(node.id, inject);
       setCurrentUpdatedNode(node);
