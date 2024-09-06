@@ -37,7 +37,6 @@ class Message extends Component {
   }
 
   render() {
-    const { t } = this.props;
     const { text, error, open, sticky } = this.state;
     return (
       <Snackbar
