@@ -1,34 +1,18 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { SelectGroup } from 'mdi-material-ui';
-import * as R from 'ramda';
-import { makeStyles } from '@mui/styles';
 import Transition from '../../../../components/common/Transition';
-import SearchFilter from '../../../../components/SearchFilter';
-import TagsFilter from '../../common/filters/TagsFilter';
-import ItemTags from '../../../../components/ItemTags';
-import { truncate } from '../../../../utils/String';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import type { AssetGroupsHelper } from '../../../../actions/asset_groups/assetgroup-helper';
-import { fetchAssetGroups } from '../../../../actions/asset_groups/assetgroup-action';
+import { fetchAssetGroups, searchAssetGroups } from '../../../../actions/asset_groups/assetgroup-action';
 import type { AssetGroupStore } from './AssetGroup';
-import AssetGroupCreation from './AssetGroupCreation';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
-
-const useStyles = makeStyles(() => ({
-  box: {
-    width: '100%',
-    minHeight: '100%',
-    padding: 20,
-    border: '1px dashed rgba(255, 255, 255, 0.3)',
-  },
-  chip: {
-    margin: '0 10px 10px 0',
-  },
-}));
+import SelectList, { SelectListElements } from '../../../../components/common/SelectList';
+import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 
 interface Props {
   initialState: string[];
@@ -44,12 +28,8 @@ const AssetGroupDialogAdding: FunctionComponent<Props> = ({
   onSubmit,
 }) => {
   // Standard hooks
-  const classes = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
-
-  // Filter and sort hook
-  const filtering = useSearchAnFilter('asset_group', 'name', ['name']);
 
   // Fetching data
   const { assetGroupsMap } = useHelper((helper: AssetGroupsHelper) => ({
@@ -59,30 +39,59 @@ const AssetGroupDialogAdding: FunctionComponent<Props> = ({
     dispatch(fetchAssetGroups());
   });
 
-  const sortedAssetGroups: AssetGroupStore[] = filtering.filterAndSort(R.values(assetGroupsMap));
-
-  const [assetGroupIds, setAssetGroupIds] = useState<string[]>(initialState);
+  const [assetGroupValues, setAssetGroupValues] = useState<AssetGroupStore[]>(initialState.map((id) => assetGroupsMap[id]));
   useEffect(() => {
-    setAssetGroupIds(initialState);
+    setAssetGroupValues(initialState.map((id) => assetGroupsMap[id]));
   }, [open, initialState]);
 
   const addAssetGroup = (assetGroupId: string) => {
-    setAssetGroupIds([...assetGroupIds, assetGroupId]);
+    setAssetGroupValues([...assetGroupValues, assetGroupsMap[assetGroupId]]);
   };
   const removeAssetGroup = (assetGroupId: string) => {
-    setAssetGroupIds(assetGroupIds.filter((id) => id !== assetGroupId));
+    setAssetGroupValues(assetGroupValues.filter((v) => v.asset_group_id !== assetGroupId));
   };
 
   // Dialog
   const handleClose = () => {
-    setAssetGroupIds([]);
+    setAssetGroupValues([]);
     onClose();
   };
 
   const handleSubmit = () => {
-    onSubmit(assetGroupIds);
+    onSubmit(assetGroupValues.map((v) => v.asset_group_id));
     handleClose();
   };
+
+  // Headers
+  const elements: SelectListElements<AssetGroupStore> = useMemo(() => ({
+    icon: {
+      value: () => <SelectGroup color="primary" />,
+    },
+    headers: [
+      {
+        field: 'asset_group_name',
+        value: (assetGroup: AssetGroupStore) => <>{assetGroup.asset_group_name}</>,
+        width: 100,
+      },
+    ],
+  }), []);
+
+  // Pagination
+  const [assetGroups, setAssetGroups] = useState<AssetGroupStore[]>([]);
+
+  const availableFilterNames = [
+    'asset_group_tags',
+  ];
+  const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({}));
+
+  const paginationComponent = <PaginationComponentV2
+    fetch={searchAssetGroups}
+    searchPaginationInput={searchPaginationInput}
+    setContent={setAssetGroups}
+    entityPrefix="asset_group"
+    availableFilterNames={availableFilterNames}
+    queryableHelpers={queryableHelpers}
+                              />;
 
   return (
     <Dialog
@@ -101,69 +110,17 @@ const AssetGroupDialogAdding: FunctionComponent<Props> = ({
     >
       <DialogTitle>{t('Add asset groups in this inject')}</DialogTitle>
       <DialogContent>
-        <Grid container spacing={3} style={{ marginTop: -15 }}>
-          <Grid item xs={8}>
-            <Grid container spacing={3}>
-              <Grid item xs={6}>
-                <SearchFilter
-                  fullWidth
-                  onChange={filtering.handleSearch}
-                  keyword={filtering.keyword}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TagsFilter
-                  fullWidth
-                  onAddTag={filtering.handleAddTag}
-                  onRemoveTag={filtering.handleRemoveTag}
-                  currentTags={filtering.tags}
-                />
-              </Grid>
-            </Grid>
-            <List>
-              {sortedAssetGroups.map((assetGroup) => {
-                const disabled = assetGroupIds.includes(assetGroup.asset_group_id);
-                return (
-                  <ListItemButton
-                    key={assetGroup.asset_group_id}
-                    disabled={disabled}
-                    divider
-                    dense
-                    onClick={() => addAssetGroup(assetGroup.asset_group_id)}
-                  >
-                    <ListItemIcon>
-                      <SelectGroup color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={assetGroup.asset_group_name}
-                      secondary={truncate(assetGroup.asset_group_description, 30)}
-                    />
-                    <ItemTags variant="reduced-view" tags={assetGroup.asset_group_tags} />
-                  </ListItemButton>
-                );
-              })}
-              <AssetGroupCreation
-                inline
-                onCreate={(result) => addAssetGroup(result.asset_group_id)}
-              />
-            </List>
-          </Grid>
-          <Grid item xs={4}>
-            <Box className={classes.box}>
-              {assetGroupIds.map((assetGroupId) => {
-                const assetGroup: AssetGroupStore = assetGroupsMap[assetGroupId];
-                return (
-                  <Chip
-                    key={assetGroupId}
-                    onDelete={() => removeAssetGroup(assetGroupId)}
-                    label={truncate(assetGroup?.asset_group_name, 22)}
-                    classes={{ root: classes.chip }}
-                  />
-                );
-              })}
-            </Box>
-          </Grid>
-        </Grid>
+        <Box sx={{ marginTop: 2 }}>
+          <SelectList
+            values={assetGroups}
+            selectedValues={assetGroupValues}
+            elements={elements}
+            prefix="asset_group"
+            onSelect={addAssetGroup}
+            onDelete={removeAssetGroup}
+            paginationComponent={paginationComponent}
+          />
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>{t('Cancel')}</Button>

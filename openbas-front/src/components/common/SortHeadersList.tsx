@@ -18,7 +18,7 @@ export interface Header {
   label: string;
   isSortable: boolean;
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  value?: (value: any) => React.ReactElement;
+  value?: (...values: any[]) => React.ReactElement;
 }
 
 interface Props {

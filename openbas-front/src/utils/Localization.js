@@ -848,6 +848,9 @@ const i18n = {
       'Clear filters': 'Supprimer les filtres',
       AND: 'ET',
       OR: 'OU',
+      // Asset
+      asset_tags: 'Tags',
+      asset_group_tags: 'Tags',
       // Endpoint
       endpoint_hostname: 'Nom d\'hôte',
       endpoint_ips: 'Addresse Ips',
@@ -2608,6 +2611,9 @@ const i18n = {
       Exercise: 'Simulation',
       Scheduling_time: 'Time',
       // -- FILTERS --
+      // Asset
+      asset_tags: 'Tags',
+      asset_group_tags: 'Tags',
       // Endpoint
       endpoint_hostname: 'Hostname',
       endpoint_ips: 'IP addresses',

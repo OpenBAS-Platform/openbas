@@ -19,7 +19,7 @@ import ScenarioStatus from './scenario/ScenarioStatus';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../actions/Tag';
 import { useAppDispatch } from '../../../utils/hooks';
-import useQueryable from '../../../components/common/queryable/useQueryable';
+import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import ScenarioPopover from './scenario/ScenarioPopover';
 import { fetchStatistics } from '../../../actions/Application';
@@ -169,7 +169,7 @@ const Scenarios = () => {
     ],
   };
 
-  const { queryableHelpers, searchPaginationInput } = useQueryable('scenarios', buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('scenarios', buildSearchPagination({
     sorts: initSorting('scenario_updated_at', 'DESC'),
     filterGroup: quickFilter,
   }));

@@ -22,7 +22,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import InjectDtoList from '../../../atomic_testings/InjectDtoList';
-import useQueryable from '../../../../../components/common/queryable/useQueryable';
+import { useQueryableWithLocalStorage } from '../../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { buildSearchPagination } from '../../../../../components/common/queryable/QueryableUtils';
 import { initSorting } from '../../../../../components/common/queryable/Page';
 
@@ -79,7 +79,7 @@ const Exercise = () => {
   }
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
 
-  const { queryableHelpers, searchPaginationInput } = useQueryable('simulation-injects-results', buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('simulation-injects-results', buildSearchPagination({
     sorts: initSorting('inject_updated_at', 'DESC'),
   }));
   return (

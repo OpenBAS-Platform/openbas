@@ -92,7 +92,7 @@ export const availableOperators = (propertySchema: PropertySchemaDTO) => {
     return ['gt', 'gte', 'lt', 'lte', 'empty', 'not_empty'];
   }
   // Array
-  if (propertySchema.schema_property_type_array) {
+  if (propertySchema.schema_property_type_array || propertySchema.schema_property_values) {
     return ['contains', 'not_contains', 'empty', 'not_empty'];
   }
   // Enum & not array

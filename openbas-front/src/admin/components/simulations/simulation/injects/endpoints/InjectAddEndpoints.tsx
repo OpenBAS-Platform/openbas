@@ -5,7 +5,6 @@ import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../../../components/i18n';
 import type { Theme } from '../../../../../../components/Theme';
 import EndpointsDialogAdding from '../../../../assets/endpoints/EndpointsDialogAdding';
-import type { EndpointStore } from '../../../../assets/endpoints/Endpoint';
 import { PermissionsContext } from '../../../../common/Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -25,7 +24,6 @@ interface Props {
   endpointIds: string[];
   onSubmit: (endpointIds: string[]) => void;
   platforms?: string[];
-  filter: (endpoint: EndpointStore) => boolean;
 }
 
 const InjectAddEndpoints: FunctionComponent<Props> = ({
@@ -33,7 +31,6 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
   endpointIds,
   onSubmit,
   platforms,
-  filter,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -65,7 +62,6 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
       <EndpointsDialogAdding initialState={endpointIds} open={openDialog} platforms={platforms}
         onClose={handleClose} onSubmit={onSubmit}
         title={t('Add assets in this inject')}
-        filter={filter}
       />
     </>
   );
