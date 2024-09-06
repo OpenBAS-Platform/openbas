@@ -47,14 +47,14 @@ class Message extends Component {
       >
         {error ? (
           <Alert severity="error" onClose={this.handleCloseMessage.bind(this)}>
-            {text.length > 0 && (text)}
+            {text.length > 0 && text}
           </Alert>
         ) : (
           <Alert
             severity="success"
             onClose={this.handleCloseMessage.bind(this)}
           >
-            {text.length > 0 && (text)}
+            {text.length > 0 && text}
           </Alert>
         )}
       </Snackbar>

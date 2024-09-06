@@ -28,7 +28,6 @@ const InjectTestPopover: FunctionComponent<Props> = ({
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [openTest, setOpenTest] = useState(false);
-  const [_injectTestResult, setInjectTestResult] = useState<InjectTestStatus | null>(null);
 
   const handlePopoverOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -56,13 +55,12 @@ const InjectTestPopover: FunctionComponent<Props> = ({
 
   const handleCloseTest = () => {
     setOpenTest(false);
-    setInjectTestResult(null);
   };
 
   const submitTest = () => {
     testInject(injectTestStatus.inject_id!).then((result: { data: InjectTestStatus }) => {
       onTest?.(result.data);
-      MESSAGING$.notifySuccess(`Test for ${injectTestStatus.inject_title} has been sent`);
+      MESSAGING$.notifySuccess(t(`Test for ${injectTestStatus.inject_title} has been sent`));
       return result;
     });
     handleCloseTest();
