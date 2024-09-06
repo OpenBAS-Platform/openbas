@@ -146,6 +146,8 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
 
   const isDisabled = !data.inject?.inject_injector_contract.injector_contract_content_parsed?.config.expose;
 
+  const dimNode = !data.inject?.inject_enabled || !data.inject?.inject_injector_contract.injector_contract_content_parsed?.config.expose;
+
   let borderLeftColor = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)';
   if (!data.inject?.inject_enabled) {
     borderLeftColor = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)';
@@ -158,7 +160,7 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
       borderLeftColor,
     }} onClick={onClick}
     >
-      <div className={classes.icon} style={{ opacity: data.inject?.inject_enabled ? '1' : '0.3' }}>
+      <div className={classes.icon} style={{ opacity: dimNode ? '0.3' : '1' }}>
         <InjectIcon
           isPayload={isNotEmptyField(data.inject?.inject_injector_contract?.injector_contract_payload)}
           type={
@@ -172,22 +174,22 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
       { data.startDate !== undefined ? (
         <div
           className={classes.triggerTime}
-          style={{ opacity: data.inject?.inject_enabled ? '1' : '0.3' }}
+          style={{ opacity: dimNode ? '0.3' : '1' }}
         >{convertToAbsoluteTime(data.startDate, data.inject!.inject_depends_duration)}</div>
 
       ) : (
         <div
           className={classes.triggerTime}
-          style={{ opacity: data.inject?.inject_enabled ? '1' : '0.3' }}
+          style={{ opacity: dimNode ? '0.3' : '1' }}
         >{convertToRelativeTime(data.inject!.inject_depends_duration)}</div>
 
       )}
-      <Tooltip title={data.label} style={{ opacity: data.inject?.inject_enabled ? '1' : '0.3' }}>
+      <Tooltip title={data.label} style={{ opacity: dimNode ? '0.3' : '1' }}>
         <div className={classes.label}>{data.label}</div>
       </Tooltip>
       <div className={classes.footer}>
         <Tooltip title={`${data.targets.slice(0, 3).join(', ')}`}>
-          <div className={classes.targets} style={{ opacity: data.inject?.inject_enabled ? '1' : '0.3' }}>
+          <div className={classes.targets} style={{ opacity: dimNode ? '0.3' : '1' }}>
             <span>{`${data.targets.slice(0, 3).join(', ')}${data.targets.length > 3 ? ', ...' : ''}`}</span>
           </div>
         </Tooltip>

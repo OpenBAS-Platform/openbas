@@ -1,18 +1,19 @@
 import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import {
+  Connection,
+  ConnectionLineType,
+  ControlButton,
+  Controls,
+  Edge,
   MarkerType,
   ReactFlow,
   ReactFlowProvider,
   useEdgesState,
   useNodesState,
-  Connection,
-  Edge,
   useReactFlow,
   Viewport,
   XYPosition,
-  Controls,
-  ControlButton,
 } from '@xyflow/react';
 import { Tooltip } from '@mui/material';
 import moment from 'moment-timezone';
@@ -77,6 +78,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   const [newNodeCursorVisibility, setNewNodeCursorVisibility] = useState<'visible' | 'hidden'>('hidden');
   const [newNodeCursorClickable, setNewNodeCursorClickable] = useState<boolean>(true);
   const [currentMouseTime, setCurrentMouseTime] = useState<string>('');
+  const [connectOnGoing, setConnectOnGoing] = useState<boolean>(false);
 
   const injectContext = useContext(InjectContext);
   const reactFlow = useReactFlow();
@@ -92,8 +94,11 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
 
   const proOptions = { account: 'paid-pro', hideAttribution: true };
   const defaultEdgeOptions = {
-    type: 'straight',
-    markerEnd: { type: MarkerType.ArrowClosed },
+    type: 'smoothstep',
+    markerEnd: { type: MarkerType.ArrowClosed,
+      width: 30,
+      height: 30,
+    },
   };
 
   const minutesPerGapAllowed = [
@@ -175,8 +180,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             color: 'green',
             background: '#09101e',
             onConnectInjects,
-            isTargeted: false,
-            isTargeting: false,
+            isTargeted: injects.find((anyInject) => anyInject.inject_id === inject.inject_id) !== undefined,
+            isTargeting: inject.inject_depends_on !== undefined,
             inject,
             fixedY: 0,
             startDate,
@@ -200,24 +205,45 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
       setDraggingOnGoing(false);
       calculateInjectPosition(injectsNodes);
       setNodes(injectsNodes);
-      setEdges(injects.filter((inject) => inject.inject_depends_on != null).map((inject) => {
+      const newEdges = injects.filter((inject) => inject.inject_depends_on != null).map((inject) => {
         return ({
           id: `${inject.inject_id}->${inject.inject_depends_on}`,
-          source: `${inject.inject_id}`,
-          sourceHandle: `source-${inject.inject_id}`,
-          target: `${inject.inject_depends_on}`,
-          targetHandle: `target-${inject.inject_depends_on}`,
+          target: `${inject.inject_id}`,
+          targetHandle: `target-${inject.inject_id}`,
+          source: `${inject.inject_depends_on}`,
+          sourceHandle: `source-${inject.inject_depends_on}`,
           label: '',
           labelShowBg: false,
           labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
         });
-      }));
+      });
+      setEdges(newEdges);
     }
   };
 
   useEffect(() => {
     updateNodes();
   }, [injects, minutesPerGapIndex]);
+
+  /**
+   * Actions to hide the new node 'button'
+   */
+  const hideNewNode = () => {
+    if (!connectOnGoing) {
+      setNewNodeCursorVisibility('hidden');
+      setNewNodeCursorClickable(false);
+    }
+  };
+
+  /**
+   * Actions to show the new node 'button'
+   */
+  const showNewNode = () => {
+    if (!connectOnGoing) {
+      setNewNodeCursorVisibility('visible');
+      setNewNodeCursorClickable(true);
+    }
+  };
 
   /**
    * Take care of updates when the node drag is starting
@@ -247,6 +273,39 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   };
 
   /**
+   * Small function to do some stuff when draggind is starting
+   */
+  const connectStart = () => {
+    setConnectOnGoing(true);
+    hideNewNode();
+  };
+
+  /**
+   * Small function to do some stuff when draggind is starting
+   */
+  const connectEnd = () => {
+    setTimeout(() => {
+      setConnectOnGoing(false);
+      showNewNode();
+    }, 100);
+  };
+
+  const connect = (connection: Connection) => {
+    const inject = injects.find((currentInject) => currentInject.inject_id === connection.target);
+    if (inject !== undefined) {
+      const injectToUpdate = {
+        inject_id: inject.inject_id,
+        inject_title: inject.inject_title,
+        inject_depends_duration: inject.inject_depends_duration,
+        inject_created_at: inject.inject_created_at,
+        inject_updated_at: inject.inject_updated_at,
+        inject_depends_on: connection.source,
+      };
+      injectContext.onUpdateInject(inject.inject_id, injectToUpdate);
+    }
+  };
+
+  /**
    * Actions to do during node drag, especially keeping it horizontal
    * @param _event the mouse event
    * @param node the node that is being dragged
@@ -255,6 +314,11 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     setDraggingOnGoing(true);
     const { position } = node;
     const { data } = node;
+    const dependsOn = nodes.find((currentNode) => (currentNode.id === data.inject?.inject_depends_on));
+    const aSecond = gapSize / (minutesPerGapAllowed[minutesPerGapIndex] * 60);
+    if (dependsOn?.position && position.x <= dependsOn?.position.x) {
+      position.x = dependsOn.position.x + aSecond;
+    }
 
     if (node.data.fixedY !== undefined) {
       position.y = node.data.fixedY;
@@ -330,22 +394,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   };
 
   /**
-   * Actions to hide the new node 'button'
-   */
-  const hideNewNode = () => {
-    setNewNodeCursorVisibility('hidden');
-    setNewNodeCursorClickable(false);
-  };
-
-  /**
-   * Actions to show the new node 'button'
-   */
-  const showNewNode = () => {
-    setNewNodeCursorVisibility('visible');
-    setNewNodeCursorClickable(true);
-  };
-
-  /**
    * Updating the time between each gap
    * @param incrementIndex increment or decrement the index to get the current minutesPerGap
    */
@@ -368,7 +416,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             onEdgesChange={onEdgesChange}
             nodeTypes={nodeTypes}
             nodesDraggable={true}
-            nodesConnectable={false}
+            nodesConnectable={true}
             nodesFocusable={false}
             elementsSelectable={false}
             onNodeDrag={nodeDrag}
@@ -376,7 +424,13 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             onNodeDragStart={nodeDragStart}
             onNodeMouseEnter={hideNewNode}
             onNodeMouseLeave={showNewNode}
+            onConnectStart={connectStart}
+            onConnectEnd={connectEnd}
+            onConnect={connect}
+            onEdgeMouseEnter={hideNewNode}
+            onEdgeMouseLeave={showNewNode}
             defaultEdgeOptions={defaultEdgeOptions}
+            connectionLineType={ConnectionLineType.SmoothStep}
             onMouseMove={onMouseMove}
             onMove={panTimeline}
             proOptions={proOptions}
@@ -388,7 +442,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             onMouseEnter={showNewNode}
             onMouseLeave={hideNewNode}
           >
-            <div className={classes.newBox}
+            <div id={'newBox'} className={!connectOnGoing ? classes.newBox : ''}
               style={{
                 top: currentMousePosition.y,
                 left: currentMousePosition.x,
