@@ -294,11 +294,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     const inject = injects.find((currentInject) => currentInject.inject_id === connection.target);
     if (inject !== undefined) {
       const injectToUpdate = {
+        ...inject,
         inject_id: inject.inject_id,
-        inject_title: inject.inject_title,
-        inject_depends_duration: inject.inject_depends_duration,
-        inject_created_at: inject.inject_created_at,
-        inject_updated_at: inject.inject_updated_at,
         inject_depends_on: connection.source,
       };
       injectContext.onUpdateInject(inject.inject_id, injectToUpdate);
