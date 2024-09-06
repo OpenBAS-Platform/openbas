@@ -1,21 +1,6 @@
-import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
-import {
-  Alert,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  IconButton,
-  Link,
-  Menu,
-  MenuItem,
-  SnackbarCloseReason,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from '@mui/material';
+import React, { FunctionComponent, useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
@@ -28,6 +13,7 @@ import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import { useHelper } from '../../../../store';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import DialogTest from '../../../../components/common/DialogTest';
+import { MESSAGING$ } from '../../../../utils/Environment';
 
 type InjectPopoverType = {
   inject_id: string,
@@ -77,7 +63,6 @@ const InjectPopover: FunctionComponent<Props> = ({
   const [openResult, setOpenResult] = useState(false);
   const [openTrigger, setOpenTrigger] = useState(false);
   const [injectResult, setInjectResult] = useState<InjectStatus | null>(null);
-  const [_injectTestResult, setInjectTestResult] = useState<InjectTestStatus | null>(null);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const isExercise = useHelper((helper: ExercisesHelper) => helper.getExercisesMap()[exerciseOrScenarioId!] !== undefined);
@@ -145,38 +130,18 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const handleCloseTest = () => {
     setOpenTest(false);
-    setInjectTestResult(null);
   };
-
-  const [openDialog, setOpenDialog] = React.useState<boolean>(false);
-  const handleCloseDialog = (
-    event?: React.SyntheticEvent | Event,
-    reason?: SnackbarCloseReason,
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpenDialog(false);
-  };
-  const [detailsLink, setDetailsLink] = React.useState<string>('');
-
-  useEffect(() => {
-    if (openDialog) {
-      setTimeout(() => {
-        handleCloseDialog();
-        setDetailsLink('');
-      }, 6000);
-    }
-  }, [openDialog]);
 
   const submitTest = () => {
     testInject(inject.inject_id).then((result: { data: InjectTestStatus }) => {
-      setInjectTestResult(result.data);
-      setOpenDialog(true);
       if (isExercise) {
-        setDetailsLink(`/admin/exercises/${exerciseOrScenarioId}/tests/${result.data.status_id}`);
+        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
+          itsDedicatedPage: <Link to={`/admin/exercises/${exerciseOrScenarioId}/tests/${result.data.status_id}`}>{t('its dedicated page')}</Link>,
+        }));
       } else {
-        setDetailsLink(`/admin/scenarios/${exerciseOrScenarioId}/tests/${result.data.status_id}`);
+        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
+          itsDedicatedPage: <Link to={`/admin/scenarios/${exerciseOrScenarioId}/tests/${result.data.status_id}`}>{t('its dedicated page')}</Link>,
+        }));
       }
     });
     handleCloseTest();
@@ -241,31 +206,6 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   return (
     <>
-      <Dialog open={openDialog}
-        slotProps={{
-          backdrop: {
-            sx: {
-              backgroundColor: 'transparent',
-            },
-          },
-        }}
-        PaperProps={{
-          sx: {
-            position: 'fixed',
-            top: '20px',
-            left: '660px',
-            margin: 0,
-          },
-        }}
-      >
-        <Alert
-          onClose={handleCloseDialog}
-          severity="success"
-          sx={{ width: '100%' }}
-        >
-          {t('Inject test has been sent, you can view test logs details on ')} <Link href={detailsLink} underline="hover">{t('its dedicated page.')}</Link>
-        </Alert>
-      </Dialog>
       <IconButton
         onClick={handlePopoverOpen}
         aria-haspopup="true"

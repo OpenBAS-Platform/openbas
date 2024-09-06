@@ -1223,7 +1223,7 @@ const i18n = {
       'Trigger time': 'Heure de lancement',
       'Attribute mapping configuration': 'Configuration d\'attribut de mapper',
       'The imported file contains absolute dates (ex.: 9h30). A starting date must be provided for the Scenario to be build': 'Le fichier importé contient des dates absolues (ex.: 9h30). Une date de début doit être fournie pour que le scénario puisse être créé',
-      Test: 'Test',
+      Test: 'Tester',
       'Replay test': 'Rejouer le test',
       'Delete test': 'Supprimer le test',
       'Do you want to test this inject?':
