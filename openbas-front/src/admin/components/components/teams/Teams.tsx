@@ -60,9 +60,11 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   team_users_number: {
     width: '10%',
+    cursor: 'default',
   },
   team_tags: {
     width: '25%',
+    cursor: 'default',
   },
   team_updated_at: {
     width: '20%',
@@ -94,8 +96,8 @@ const Teams = () => {
   const headers = [
     { field: 'team_name', label: 'Name', isSortable: true },
     { field: 'team_description', label: 'Description', isSortable: true },
-    { field: 'team_users_number', label: 'Players', isSortable: true },
-    { field: 'team_tags', label: 'Tags', isSortable: true },
+    { field: 'team_users_number', label: 'Players', isSortable: false },
+    { field: 'team_tags', label: 'Tags', isSortable: false },
     { field: 'team_updated_at', label: 'Updated', isSortable: true },
   ];
 

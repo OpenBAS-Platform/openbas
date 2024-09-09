@@ -44,7 +44,7 @@ public class Mitigation implements Base {
   @NotBlank
   private String name;
 
-  @Queryable(searchable = true)
+  @Queryable(searchable = true, sortable = true)
   @Column(name = "mitigation_description")
   @JsonProperty("mitigation_description")
   private String description;

@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
@@ -32,6 +33,7 @@ public class Group implements Base {
     @NotBlank
     private String id;
 
+    @Queryable(sortable = true)
     @Column(name = "group_name")
     @JsonProperty("group_name")
     @NotBlank
@@ -41,6 +43,7 @@ public class Group implements Base {
     @JsonProperty("group_description")
     private String description;
 
+    @Queryable(sortable = true)
     @Column(name = "group_default_user_assign")
     @JsonProperty("group_default_user_assign")
     private boolean defaultUserAssignation;

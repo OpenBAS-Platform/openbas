@@ -53,6 +53,7 @@ public class Asset implements Base {
   @NotBlank
   private String name;
 
+  @Queryable(sortable = true)
   @Column(name = "asset_description")
   @JsonProperty("asset_description")
   private String description;

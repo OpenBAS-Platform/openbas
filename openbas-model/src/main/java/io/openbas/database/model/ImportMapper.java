@@ -1,6 +1,7 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -30,6 +31,7 @@ public class ImportMapper implements Base {
   @NotNull
   private UUID id;
 
+  @Queryable(sortable = true)
   @Column(name = "mapper_name")
   @JsonProperty("import_mapper_name")
   @NotBlank

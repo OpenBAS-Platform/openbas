@@ -117,7 +117,7 @@ const Scenarios = () => {
     {
       field: 'scenario_recurrence',
       label: 'Status',
-      isSortable: true,
+      isSortable: false,
       value: (scenario: ScenarioStore) => <ScenarioStatus scenario={scenario} variant="list" />,
     },
     {

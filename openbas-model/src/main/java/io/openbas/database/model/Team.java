@@ -45,10 +45,11 @@ public class Team implements Base {
 
     @Column(name = "team_name")
     @JsonProperty("team_name")
-    @Queryable(searchable = true, sortable = true)
+    @Queryable(searchable = true)
     @NotBlank
     private String name;
 
+    @Queryable(sortable = true)
     @Column(name = "team_description")
     @JsonProperty("team_description")
     private String description;
@@ -58,6 +59,7 @@ public class Team implements Base {
     @NotNull
     private Instant createdAt = now();
 
+    @Queryable(sortable = true)
     @Column(name = "team_updated_at")
     @JsonProperty("team_updated_at")
     @NotNull
