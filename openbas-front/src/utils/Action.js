@@ -105,6 +105,9 @@ export const postReferential = (schema, uri, data) => (dispatch) => {
       if (error.status === 500) {
         MESSAGING$.notifyError('Internal error');
       }
+      if (error.status === 400) {
+        MESSAGING$.notifyError(error.message);
+      }
       return buildError(error);
     });
 };

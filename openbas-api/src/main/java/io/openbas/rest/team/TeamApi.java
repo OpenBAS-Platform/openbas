@@ -8,6 +8,7 @@ import io.openbas.database.model.User;
 import io.openbas.database.raw.RawPaginationTeam;
 import io.openbas.database.raw.RawTeam;
 import io.openbas.database.repository.*;
+import io.openbas.rest.exception.AlreadyExistingException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.helper.TeamHelper;
@@ -16,6 +17,7 @@ import io.openbas.rest.team.form.TeamUpdateInput;
 import io.openbas.rest.team.form.UpdateUsersTeamInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +42,7 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.time.Instant.now;
+import static org.springframework.util.StringUtils.hasText;
 
 @RestController
 @Secured(ROLE_USER)
@@ -169,13 +172,7 @@ public class TeamApi extends RestBehavior {
     @PreAuthorize("isPlanner()")
     @Transactional(rollbackFor = Exception.class)
     public Team createTeam(@Valid @RequestBody TeamCreateInput input) {
-        if (TRUE.equals(input.getContextual()) && input.getExerciseIds().toArray().length > 1) {
-            throw new UnsupportedOperationException("Contextual team can only be associated to one exercise");
-        }
-        Optional<Team> existingTeam = teamRepository.findByName(input.getName());
-        if (existingTeam.isPresent() && FALSE.equals(input.getContextual())) {
-            throw new UnsupportedOperationException("Global teams (non contextual) cannot have the same name (already exists)");
-        }
+        isTeamAlreadyExists(input);
         Team team = new Team();
         team.setUpdateAttributes(input);
         team.setOrganization(updateRelation(input.getOrganizationId(), team.getOrganization(), organizationRepository));
@@ -235,5 +232,27 @@ public class TeamApi extends RestBehavior {
         Iterable<User> teamUsers = userRepository.findAllById(input.getUserIds());
         team.setUsers(fromIterable(teamUsers));
         return teamRepository.save(team);
+    }
+
+    // -- PRIVATE --
+
+    private void isTeamAlreadyExists(@NotNull final TeamCreateInput input) {
+        List<Team> teams = this.teamRepository.findAllByNameIgnoreCase(input.getName());
+        if (teams.isEmpty()) return;
+
+        if (FALSE.equals(input.getContextual()) && teams.stream().anyMatch(t -> FALSE.equals(t.getContextual()))) {
+            throw new AlreadyExistingException("Global teams (non contextual) cannot have the same name (already exists)");
+        }
+        if (TRUE.equals(input.getContextual())) {
+            String exerciseId = input.getExerciseIds().stream().findFirst().orElse(null);
+            if (hasText(exerciseId) && teams.stream().anyMatch(t -> TRUE.equals(t.getContextual()) && t.getExercises().stream().anyMatch((e) -> exerciseId.equals(e.getId())))) {
+                throw new AlreadyExistingException("A contextual team with the same name already exists on this simulation");
+            }
+            String scenarioId = input.getScenarioIds().stream().findFirst().orElse(null);
+            if (hasText(scenarioId) && teams.stream().anyMatch(t -> TRUE.equals(t.getContextual()) && t.getScenarios().stream().anyMatch((e) -> scenarioId.equals(e.getId())))) {
+                throw new AlreadyExistingException("A contextual team with the same name already exists on this scenario");
+            }
+        }
+
     }
 }
