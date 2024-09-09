@@ -45,7 +45,7 @@ public class Team implements Base {
 
     @Column(name = "team_name")
     @JsonProperty("team_name")
-    @Queryable(searchable = true)
+    @Queryable(searchable = true, sortable = true)
     @NotBlank
     private String name;
 
