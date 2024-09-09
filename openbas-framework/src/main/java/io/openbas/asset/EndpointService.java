@@ -1,5 +1,6 @@
 package io.openbas.asset;
 
+import io.openbas.config.OpenBASAgentConfig;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.EndpointRepository;
@@ -32,6 +33,9 @@ public class EndpointService {
 
   @Resource
   private OpenBASConfig openBASConfig;
+
+  @Resource
+  private OpenBASAgentConfig openBASAgentConfig;
 
   @Value("${openbas.admin.token:#{null}}")
   private String adminToken;
@@ -103,13 +107,15 @@ public class EndpointService {
     String filename = file +  "-" + version + "." + extension;
     String resourcePath = "/openbas-agent/" + platform.toLowerCase() + "/";
     InputStream in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
-    if (in == null) { // Dev mode, get from artifactory
+    if (null == in) { // Dev mode, get from artifactory
       filename = file + "-latest." + extension;
       in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
     }
     return IOUtils.toString(in, StandardCharsets.UTF_8)
             .replace("${OPENBAS_URL}", openBASConfig.getBaseUrl())
-            .replace("${OPENBAS_TOKEN}", adminToken);
+            .replace("${OPENBAS_TOKEN}", adminToken)
+            .replace("${NON_SYSTEM_USER}", openBASAgentConfig.getNonSystemUser())
+            .replace("${NON_SYSTEM_PWD}", openBASAgentConfig.getNonSystemPwd());
   }
 
   public String generateInstallCommand(String platform, String token) throws IOException {

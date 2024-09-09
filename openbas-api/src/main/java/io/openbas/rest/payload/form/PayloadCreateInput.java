@@ -1,7 +1,7 @@
 package io.openbas.rest.payload.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
+import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.PayloadArgument;
 import io.openbas.database.model.PayloadPrerequisite;
 import jakarta.validation.constraints.NotBlank;
@@ -36,7 +36,7 @@ public class PayloadCreateInput {
 
   @NotEmpty(message = MANDATORY_MESSAGE)
   @JsonProperty("payload_platforms")
-  private PLATFORM_TYPE[] platforms;
+  private Endpoint.PLATFORM_TYPE[] platforms;
 
   @JsonProperty("payload_description")
   private String description;
@@ -73,6 +73,9 @@ public class PayloadCreateInput {
 
   @JsonProperty("payload_attack_patterns")
   private List<String> attackPatternsIds = new ArrayList<>();
+
+  @JsonProperty("payload_elevation_required")
+  private boolean elevationRequired;
 }
 
 
