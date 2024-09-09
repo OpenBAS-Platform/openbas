@@ -136,4 +136,8 @@ public class InjectTestStatusService {
     return this.injectTestStatusRepository.save(injectTestStatus);
   }
 
+  public void deleteInjectTest(String testId) {
+    injectTestStatusRepository.deleteById(testId);
+  }
+
 }

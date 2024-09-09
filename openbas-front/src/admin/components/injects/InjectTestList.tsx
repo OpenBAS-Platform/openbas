@@ -12,6 +12,8 @@ import Empty from '../../../components/Empty';
 import InjectTestDetail from './InjectTestDetail';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
+import InjectTestPopover from './InjectTestPopover';
+import InjectTestReplayAll from './InjectTestReplayAll';
 
 const useStyles = makeStyles(() => ({
   bodyItems: {
@@ -83,7 +85,7 @@ const InjectTestList: FunctionComponent<Props> = ({
   const headers = [
     {
       field: 'inject_title',
-      label: 'Inject Title',
+      label: 'Inject title',
       isSortable: true,
       value: (test: InjectTestStatus) => test.inject_title,
     },
@@ -95,7 +97,7 @@ const InjectTestList: FunctionComponent<Props> = ({
     },
     {
       field: 'status_name',
-      label: 'Status',
+      label: 'Test status',
       isSortable: true,
       value: (test: InjectTestStatus) => {
         return (<ItemStatus isInject={true} status={test.status_name} label={t(test.status_name)} variant="inList" />);
@@ -113,12 +115,15 @@ const InjectTestList: FunctionComponent<Props> = ({
         fetch={(input) => searchInjectTests(exerciseOrScenarioId, input)}
         searchPaginationInput={searchPaginationInput}
         setContent={setTests}
-      />
+      >
+        <InjectTestReplayAll injectIds={tests?.map((test: InjectTestStatus) => test.inject_id!)} onTest={(result) => setTests(result)} />
+      </PaginationComponent>
       <List style={{ marginTop: 40 }}>
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
+          secondaryAction={<>&nbsp;</>}
         >
           <ListItemIcon />
           <ListItemText
@@ -139,6 +144,14 @@ const InjectTestList: FunctionComponent<Props> = ({
               key={test.status_id}
               classes={{ root: classes.item }}
               divider
+              secondaryAction={
+                <InjectTestPopover
+                  injectTestStatus={test}
+                  onTest={(result) => setTests(tests?.map((existing) => (existing.status_id !== result.status_id ? existing : result)))}
+                  onDelete={(result) => setTests(tests.filter((existing) => (existing.status_id !== result)))}
+                />
+              }
+              disablePadding
             >
               <ListItemButton
                 classes={{ root: classes.item }}

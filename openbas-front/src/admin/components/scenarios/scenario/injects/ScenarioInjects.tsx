@@ -1,8 +1,7 @@
-import React, { FunctionComponent, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { FunctionComponent } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import * as R from 'ramda';
 import { Connection } from '@xyflow/react';
-import { Alert, Dialog, Link, SnackbarCloseReason } from '@mui/material';
 import { ArticleContext, TeamContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
@@ -24,6 +23,7 @@ import { isNotEmptyField } from '../../../../../utils/utils';
 import injectContextForScenario from '../ScenarioContext';
 import { fetchScenarioInjectsSimple, bulkTestInjects } from '../../../../../actions/injects/inject-action';
 import { useFormatter } from '../../../../../components/i18n';
+import { MESSAGING$ } from '../../../../../utils/Environment';
 
 interface Props {
 
@@ -185,66 +185,22 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
     injectContext.onBulkDeleteInjects(injectsToProcess.map((inject: Inject) => inject.inject_id));
   };
 
-  const [openDialog, setOpenDialog] = React.useState<boolean>(false);
-  const handleCloseDialog = (
-    event?: React.SyntheticEvent | Event,
-    reason?: SnackbarCloseReason,
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpenDialog(false);
-  };
-  const [detailsLink, setDetailsLink] = React.useState<string>('');
-
-  useEffect(() => {
-    if (openDialog) {
-      setTimeout(() => {
-        handleCloseDialog();
-        setDetailsLink('');
-      }, 6000);
-    }
-  }, [openDialog]);
-
   const massTestInjects = () => {
     bulkTestInjects(injectsToProcess.map((inject: Inject) => inject.inject_id)).then((result: { data: InjectStatus[] }) => {
       if (numberOfSelectedElements === 1) {
-        setDetailsLink(`/admin/scenarios/${scenario.scenario_id}/tests/${result.data[0].status_id}`);
-        setOpenDialog(true);
+        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
+          itsDedicatedPage: <Link to={`/admin/scenarios/${scenario.scenario_id}/tests/${result.data[0].status_id}`}>{t('its dedicated page')}</Link>,
+        }));
       } else {
-        setDetailsLink(`/admin/scenarios/${scenario.scenario_id}/tests`);
-        setOpenDialog(true);
+        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
+          itsDedicatedPage: <Link to={`/admin/scenarios/${scenario.scenario_id}/tests`}>{t('its dedicated page')}</Link>,
+        }));
       }
     });
   };
 
   return (
     <>
-      <Dialog open={openDialog}
-        slotProps={{
-          backdrop: {
-            sx: {
-              backgroundColor: 'transparent',
-            },
-          },
-        }}
-        PaperProps={{
-          sx: {
-            position: 'fixed',
-            top: '20px',
-            left: '660px',
-            margin: 0,
-          },
-        }}
-      >
-        <Alert
-          onClose={handleCloseDialog}
-          severity="success"
-          sx={{ width: '100%' }}
-        >
-          {t('Inject test has been sent, you can view test logs details on ')} <Link href={detailsLink} underline="hover">{t('its dedicated page.')}</Link>
-        </Alert>
-      </Dialog>
       <ArticleContext.Provider value={articleContext}>
         <TeamContext.Provider value={teamContext}>
           <Injects

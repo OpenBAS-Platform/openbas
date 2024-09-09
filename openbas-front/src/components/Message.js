@@ -37,7 +37,6 @@ class Message extends Component {
   }
 
   render() {
-    const { t } = this.props;
     const { text, error, open, sticky } = this.state;
     return (
       <Snackbar
@@ -48,14 +47,14 @@ class Message extends Component {
       >
         {error ? (
           <Alert severity="error" onClose={this.handleCloseMessage.bind(this)}>
-            {text.length > 0 && t(text)}
+            {text.length > 0 && text}
           </Alert>
         ) : (
           <Alert
             severity="success"
             onClose={this.handleCloseMessage.bind(this)}
           >
-            {text.length > 0 && t(text)}
+            {text.length > 0 && text}
           </Alert>
         )}
       </Snackbar>
