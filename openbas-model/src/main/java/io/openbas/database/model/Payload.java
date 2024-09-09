@@ -6,7 +6,6 @@ import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
@@ -14,6 +13,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
@@ -72,7 +72,7 @@ public class Payload implements Base {
   @Type(StringArrayType.class)
   @Column(name = "payload_platforms", columnDefinition = "text[]")
   @JsonProperty("payload_platforms")
-  private PLATFORM_TYPE[] platforms = new PLATFORM_TYPE[0];
+  private Endpoint.PLATFORM_TYPE[] platforms = new Endpoint.PLATFORM_TYPE[0];
 
   @Setter
   @ManyToMany(fetch = FetchType.EAGER)
@@ -93,6 +93,11 @@ public class Payload implements Base {
   @Column(name = "payload_cleanup_command")
   @JsonProperty("payload_cleanup_command")
   private String cleanupCommand;
+
+  @Getter
+  @Column(name = "payload_elevation_required")
+  @JsonProperty("payload_elevation_required")
+  private boolean elevationRequired;
 
   @Setter
   @Type(JsonType.class)
@@ -159,7 +164,7 @@ public class Payload implements Base {
 
   @JsonProperty("payload_collector_type")
   private String getCollectorType() {
-    return this.getCollector() != null ? this.getCollector().getType() : null;
+    return null != collector ? this.collector.getType() : null;
   }
 
   @Override

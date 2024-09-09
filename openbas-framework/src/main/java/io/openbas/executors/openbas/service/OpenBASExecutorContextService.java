@@ -27,15 +27,15 @@ public class OpenBASExecutorContextService {
             .orElseThrow(() -> new UnsupportedOperationException("Inject does not have a contract"));
 
         switch (platform) {
-            case Endpoint.PLATFORM_TYPE.Windows -> {
+            case Windows -> {
                 return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Windows.name() + "." + arch.name())
                         .replace("#{inject}", inject.getId());
             }
-            case Endpoint.PLATFORM_TYPE.Linux -> {
+            case Linux -> {
                 return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Linux.name() + "." + arch.name())
                         .replace("#{inject}", inject.getId());
             }
-            case Endpoint.PLATFORM_TYPE.MacOS -> {
+            case MacOS -> {
                 return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.MacOS.name() + "." + arch.name())
                         .replace("#{inject}", inject.getId());
             }
@@ -46,17 +46,23 @@ public class OpenBASExecutorContextService {
     public void launchExecutorSubprocess(@NotNull final Inject inject, @NotNull final Asset asset) {
         Endpoint.PLATFORM_TYPE platform = Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null;
         Endpoint.PLATFORM_ARCH arch = Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getArch() : null;
-        if (platform == null) {
+        if (null == platform) {
             throw new RuntimeException("Unsupported null platform");
         }
         AssetAgentJob assetAgentJob = new AssetAgentJob();
         assetAgentJob.setCommand(computeCommand(inject, platform, arch));
         assetAgentJob.setAsset(asset);
         assetAgentJob.setInject(inject);
-        assetAgentJobRepository.save(assetAgentJob);
+        assetAgentJob.setElevationRequired(this.isElevationRequired(inject));
+      assetAgentJobRepository.save(assetAgentJob);
     }
 
     public void launchExecutorClear(@NotNull final Injector injector, @NotNull final Asset asset) {
         // TODO
+    }
+
+    private boolean isElevationRequired(final Inject inject) {
+        // Fix me add also for caldera
+        return inject.getInjectorContract().map(injectorContract -> injectorContract.getPayload().isElevationRequired()).orElse(false).booleanValue();
     }
 }

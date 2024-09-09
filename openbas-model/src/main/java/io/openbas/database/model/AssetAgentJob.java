@@ -46,26 +46,31 @@ public class AssetAgentJob implements Base {
     @NotBlank
     private String command;
 
+    @Getter
+    @Column(name = "asset_agent_elevation_required")
+    @JsonProperty("asset_agent_elevation_required")
+    private boolean elevationRequired;
+
     @Override
     public String toString() {
-        return id;
+        return this.id;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
-        if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
-        Base base = (Base) o;
-        return id.equals(base.getId());
+        if (null == o || !Base.class.isAssignableFrom(o.getClass())) return false;
+        final Base base = (Base) o;
+        return this.id.equals(base.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(this.id);
     }
 
     @Override
     public String getId() {
-        return id;
+        return this.id;
     }
 }
