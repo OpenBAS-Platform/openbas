@@ -62,6 +62,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   asset_group_assets: {
     width: '35%',
+    cursor: 'default',
   },
   asset_group_tags: {
     width: '25%',

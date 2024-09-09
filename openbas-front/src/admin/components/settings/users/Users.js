@@ -57,6 +57,7 @@ const inlineStyles = {
   },
   user_organization: {
     width: '15%',
+    cursor: 'default',
   },
   user_admin: {
     width: '10%',
@@ -85,7 +86,7 @@ const Users = () => {
     { field: 'user_email', label: 'Email address', isSortable: true },
     { field: 'user_firstname', label: 'Firstname', isSortable: true },
     { field: 'user_lastname', label: 'Lastname', isSortable: true },
-    { field: 'user_organization', label: 'Organization', isSortable: true },
+    { field: 'user_organization', label: 'Organization', isSortable: false },
     { field: 'user_admin', label: 'Administrator', isSortable: true },
     { field: 'user_tags', label: 'Tags', isSortable: true },
   ];

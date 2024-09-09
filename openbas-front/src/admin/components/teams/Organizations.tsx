@@ -72,7 +72,6 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
     width: '40%',
     fontSize: 12,
     fontWeight: '700',
-    cursor: 'default',
   },
   organization_tags: {
     width: '30%',

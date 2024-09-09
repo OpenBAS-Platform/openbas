@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -39,11 +40,13 @@ public class LessonsTemplate implements Base {
     @NotNull
     private Instant updated = now();
 
+    @Queryable(sortable = true)
     @Column(name = "lessons_template_name")
     @JsonProperty("lessons_template_name")
     @NotBlank
     private String name;
 
+    @Queryable(sortable = true)
     @Column(name = "lessons_template_description")
     @JsonProperty("lessons_template_description")
     private String description;
