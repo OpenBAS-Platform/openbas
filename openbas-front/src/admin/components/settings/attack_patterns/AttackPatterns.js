@@ -46,6 +46,7 @@ const useStyles = makeStyles(() => ({
 const inlineStyles = {
   kill_chain_phase: {
     width: '20%',
+    cursor: 'default',
   },
   attack_pattern_external_id: {
     width: '15%',

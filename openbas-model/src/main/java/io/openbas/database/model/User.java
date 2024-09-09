@@ -136,7 +136,7 @@ public class User implements Base {
   @Setter
   @Column(name = "user_admin")
   @JsonProperty("user_admin")
-  @Queryable(filterable = true)
+  @Queryable(filterable = true, sortable = true)
   private boolean admin = false;
 
   @Setter
