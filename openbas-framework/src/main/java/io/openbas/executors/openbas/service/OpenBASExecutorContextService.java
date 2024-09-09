@@ -54,7 +54,7 @@ public class OpenBASExecutorContextService {
         assetAgentJob.setAsset(asset);
         assetAgentJob.setInject(inject);
         assetAgentJob.setElevationRequired(this.isElevationRequired(inject));
-      assetAgentJobRepository.save(assetAgentJob);
+        assetAgentJobRepository.save(assetAgentJob);
     }
 
     public void launchExecutorClear(@NotNull final Injector injector, @NotNull final Asset asset) {
