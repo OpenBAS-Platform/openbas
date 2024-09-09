@@ -14,6 +14,7 @@ import io.openbas.rest.inject.output.InjectOutput;
 import io.openbas.rest.scenario.response.ImportMessage;
 import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
+import io.openbas.telemetry.Tracing;
 import io.openbas.utils.InjectUtils;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -144,6 +145,7 @@ public class InjectService {
     }
   }
 
+  @Tracing(name = "Fetch injects with criteria builder", layer = "service", operation = "GET")
   public List<InjectOutput> injects(Specification<Inject> specification) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
