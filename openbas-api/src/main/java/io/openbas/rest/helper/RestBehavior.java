@@ -136,6 +136,13 @@ public class RestBehavior {
     return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
   }
 
+  @ExceptionHandler(AlreadyExistingException.class)
+  public ResponseEntity<ErrorMessage> handleAlreadyExistingException(AlreadyExistingException ex) {
+    ErrorMessage message = new ErrorMessage(ex.getMessage());
+    log.warning("AlreadyExistingException: " + ex.getMessage());
+    return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+  }
+
   // --- Open channel access
   public User impersonateUser(UserRepository userRepository, Optional<String> userId) {
     if (currentUser().getId().equals(ANONYMOUS)) {

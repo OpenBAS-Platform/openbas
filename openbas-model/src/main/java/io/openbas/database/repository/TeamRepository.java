@@ -28,6 +28,9 @@ public interface TeamRepository extends CrudRepository<Team, String>,
   @NotNull
   Optional<Team> findByName(@NotNull final String name);
 
+  @NotNull
+  List<Team> findAllByNameIgnoreCase(@NotNull final String name);
+
   @Query("SELECT team FROM Team team where lower(team.name) = lower(:name) and team.contextual = false")
   List<Team> findByNameIgnoreCaseAndNotContextual(@NotNull final String name);
 
