@@ -8,6 +8,7 @@ import io.openbas.database.model.User;
 import io.openbas.database.raw.RawPaginationTeam;
 import io.openbas.database.raw.RawTeam;
 import io.openbas.database.repository.*;
+import io.openbas.rest.exception.AlreadyExistingException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.helper.TeamHelper;
@@ -236,20 +237,20 @@ public class TeamApi extends RestBehavior {
     // -- PRIVATE --
 
     private void isTeamAlreadyExists(@NotNull final TeamCreateInput input) {
-        List<Team> teams = this.teamRepository.findAllByName(input.getName());
-        // 1. input is not contextual and a not contextual team already exist
+        List<Team> teams = this.teamRepository.findAllByNameIgnoreCase(input.getName());
+        if (teams.isEmpty()) return;
+
         if (FALSE.equals(input.getContextual()) && teams.stream().anyMatch(t -> FALSE.equals(t.getContextual()))) {
-            throw new UnsupportedOperationException("Global teams (non contextual) cannot have the same name (already exists)");
+            throw new AlreadyExistingException("Global teams (non contextual) cannot have the same name (already exists)");
         }
-        // 2. input is contextual and a contextual team on the same exercise or scenario already exist
         if (TRUE.equals(input.getContextual())) {
             String exerciseId = input.getExerciseIds().stream().findFirst().orElse(null);
             if (hasText(exerciseId) && teams.stream().anyMatch(t -> TRUE.equals(t.getContextual()) && t.getExercises().stream().anyMatch((e) -> exerciseId.equals(e.getId())))) {
-                throw new UnsupportedOperationException("A contextual team with the same name already exists on this simulation");
+                throw new AlreadyExistingException("A contextual team with the same name already exists on this simulation");
             }
             String scenarioId = input.getScenarioIds().stream().findFirst().orElse(null);
             if (hasText(scenarioId) && teams.stream().anyMatch(t -> TRUE.equals(t.getContextual()) && t.getScenarios().stream().anyMatch((e) -> scenarioId.equals(e.getId())))) {
-                throw new UnsupportedOperationException("A contextual team with the same name already exists on this simulation");
+                throw new AlreadyExistingException("A contextual team with the same name already exists on this scenario");
             }
         }
 
