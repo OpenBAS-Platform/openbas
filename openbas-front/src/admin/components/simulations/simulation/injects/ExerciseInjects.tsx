@@ -9,7 +9,6 @@ import { ArticleContext, TeamContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import Injects from '../../../common/injects/Injects';
 import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
@@ -32,6 +31,7 @@ import ToolBar from '../../../common/ToolBar';
 import { isNotEmptyField } from '../../../../../utils/utils';
 import { fetchExerciseInjectsSimple, bulkTestInjects } from '../../../../../actions/injects/inject-action';
 import injectContextForExercise from '../ExerciseContext';
+import Injects from '../../../common/injects/Injects';
 import { MESSAGING$ } from '../../../../../utils/Environment';
 
 const useStyles = makeStyles(() => ({
@@ -87,8 +87,8 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
     handleToggleSelectAll,
     onToggleEntity,
     numberOfSelectedElements,
-  } = useEntityToggle('inject', injects.length);
-  const onRowShiftClick = (currentIndex: number, currentEntity: Inject, event: React.SyntheticEvent | null = null) => {
+  } = useEntityToggle<{ inject_id: string }>('inject', injects.length);
+  const onRowShiftClick = (currentIndex: number, currentEntity: { inject_id: string }, event: React.SyntheticEvent | null = null) => {
     if (event) {
       event.stopPropagation();
       event.preventDefault();
@@ -231,6 +231,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
               uriVariable={`/admin/exercises/${exerciseId}/definition/variables`}
               allUsersNumber={exercise.exercise_all_users_number}
               usersNumber={exercise.exercise_users_number}
+              // @ts-expect-error typing
               teamsUsers={exercise.exercise_teams_users}
               setViewMode={setViewMode}
               onToggleEntity={onToggleEntity}

@@ -741,7 +741,7 @@ export interface Exercise {
   exercise_scenario?: Scenario;
   /** @format double */
   exercise_score?: number;
-  exercise_severity?: string;
+  exercise_severity?: "low" | "medium" | "high" | "critical";
   /** @format date-time */
   exercise_start_date?: string;
   exercise_status: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
@@ -1085,7 +1085,7 @@ export interface Inject {
    * @min 0
    */
   inject_depends_duration: number;
-  inject_depends_on?: string;
+  inject_depends_on?: Inject;
   inject_description?: string;
   inject_documents?: InjectDocument[];
   inject_enabled?: boolean;
@@ -1103,7 +1103,6 @@ export interface Inject {
   /** @uniqueItems true */
   inject_tags?: Tag[];
   inject_teams?: Team[];
-  inject_test_status?: InjectTestStatus;
   inject_testable?: boolean;
   inject_title: string;
   inject_type?: string;
@@ -1251,6 +1250,7 @@ export interface InjectOutput {
    * @min 0
    */
   inject_depends_duration: number;
+  inject_depends_on?: string;
   inject_enabled?: boolean;
   inject_exercise?: string;
   inject_id: string;
@@ -1261,7 +1261,7 @@ export interface InjectOutput {
   inject_tags?: string[];
   inject_teams?: string[];
   inject_testable?: boolean;
-  inject_title?: string;
+  inject_title: string;
   inject_type?: string;
 }
 
@@ -2638,7 +2638,7 @@ export interface RawPaginationScenario {
   /** @uniqueItems true */
   scenario_platforms?: string[];
   scenario_recurrence?: string;
-  scenario_severity?: string;
+  scenario_severity?: "low" | "medium" | "high" | "critical";
   /** @uniqueItems true */
   scenario_tags?: string[];
   /** @format date-time */
@@ -2799,7 +2799,7 @@ export interface Scenario {
   scenario_recurrence_end?: string;
   /** @format date-time */
   scenario_recurrence_start?: string;
-  scenario_severity?: string;
+  scenario_severity?: "low" | "medium" | "high" | "critical";
   scenario_subtitle?: string;
   /** @uniqueItems true */
   scenario_tags?: Tag[];

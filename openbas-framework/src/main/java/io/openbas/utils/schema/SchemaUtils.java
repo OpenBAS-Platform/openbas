@@ -13,7 +13,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,27 +33,6 @@ public class SchemaUtils {
       NotBlank.class,
       Email.class
   );
-
-  public static final Class<?>[] BASE_CLASSES = {
-      byte.class,
-      short.class,
-      int.class,
-      long.class,
-      float.class,
-      double.class,
-      char.class,
-      boolean.class,
-      Byte.class,
-      Short.class,
-      Integer.class,
-      Long.class,
-      Float.class,
-      Double.class,
-      Character.class,
-      Boolean.class,
-      String.class,
-      Instant.class,
-  };
 
   private static final ConcurrentHashMap<Class<?>, List<PropertySchema>> cacheMap = new ConcurrentHashMap<>();
 

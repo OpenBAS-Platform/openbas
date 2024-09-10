@@ -20,13 +20,15 @@ import type {
   LessonsSendInput,
   Objective,
   ObjectiveInput,
+  SearchPaginationInput,
   Team,
   TeamCreateInput,
   Variable,
   VariableInput,
 } from '../../../utils/api-types';
 import type { UserStore } from '../teams/players/Player';
-import type { InjectStore } from '../../../actions/injects/Inject';
+import type { InjectOutputType, InjectStore } from '../../../actions/injects/Inject';
+import { Page } from '../../../components/common/queryable/Page';
 
 export type PermissionsContextType = {
   permissions: { readOnly: boolean, canWrite: boolean, isRunning: boolean }
@@ -69,8 +71,9 @@ export type TeamContextType = {
 };
 
 export type InjectContextType = {
-  onAddInject: (inject: Inject) => Promise<{ result: string }>,
-  onUpdateInject: (injectId: Inject['inject_id'], inject: Inject) => Promise<{ result: string }>,
+  searchInjects: (input: SearchPaginationInput) => Promise<{ data: Page<InjectOutputType> }>,
+  onAddInject: (inject: Inject) => Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }>,
+  onUpdateInject: (injectId: Inject['inject_id'], inject: Inject) => Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }>,
   onUpdateInjectTrigger?: (injectId: Inject['inject_id']) => void,
   onUpdateInjectActivation: (injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }) => Promise<{
     result: string,
@@ -156,11 +159,15 @@ export const TeamContext = createContext<TeamContextType>({
   },
 });
 export const InjectContext = createContext<InjectContextType>({
-  onAddInject(_inject: Inject): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  searchInjects(_: SearchPaginationInput): Promise<{ data: Page<InjectOutputType> }> {
+    return new Promise<{ data: Page<InjectOutputType> }>(() => {
+    });
   },
-  onUpdateInject(_injectId: Inject['inject_id'], _inject: Inject): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
+  onAddInject(_inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
+    return Promise.resolve({ result: '', entities: { injects: {} } });
+  },
+  onUpdateInject(_injectId: Inject['inject_id'], _inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
+    return Promise.resolve({ result: '', entities: { injects: {} } });
   },
   onUpdateInjectTrigger(_injectId: Inject['inject_id']): void {
   },

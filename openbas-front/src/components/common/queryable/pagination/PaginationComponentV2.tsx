@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import type { Page } from '../Page';
 import type { Filter, PropertySchemaDTO, SearchPaginationInput } from '../../../../utils/api-types';
-import { ExportProps } from '../../ExportButton';
 import mitreAttack from '../../../../static/images/misc/attack.png';
 import Drawer from '../../Drawer';
 import MitreFilter, { MITRE_FILTER_KEY } from '../../../../admin/components/common/filters/MitreFilter';
@@ -12,14 +11,18 @@ import { availableOperators, isEmptyFilter } from '../filter/FilterUtils';
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import { QueryableHelpers } from '../QueryableHelpers';
 import TextSearchComponent from '../textSearch/TextSearchComponent';
-import TablePaginationComponent from './TablePaginationComponent';
 import FilterAutocomplete, { OptionPropertySchema } from '../filter/FilterAutocomplete';
 import useFilterableProperties from '../filter/useFilterableProperties';
 import FilterChips from '../filter/FilterChips';
 import FilterModeChip from '../filter/FilterModeChip';
 import InjectorContractSwitchFilter from '../../../../admin/components/common/filters/InjectorContractSwitchFilter';
+import TablePaginationComponentV2 from './TablePaginationComponentV2';
 
 const useStyles = makeStyles(() => ({
+  topbar: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   parameters: {
     marginTop: -10,
     display: 'flex',
@@ -37,13 +40,12 @@ interface Props<T> {
   fetch: (input: SearchPaginationInput) => Promise<{ data: Page<T> }>;
   searchPaginationInput: SearchPaginationInput;
   setContent: (data: T[]) => void;
-  exportProps?: ExportProps<T>;
   searchEnable?: boolean;
   disablePagination?: boolean;
   entityPrefix?: string;
   availableFilterNames?: string[];
   queryableHelpers: QueryableHelpers;
-  children?: React.ReactElement | null;
+  topBarButtons?: React.ReactElement | null;
   attackPatterns?: AttackPatternStore[],
 }
 
@@ -51,14 +53,13 @@ const PaginationComponentV2 = <T extends object>({
   fetch,
   searchPaginationInput,
   setContent,
-  exportProps,
   searchEnable = true,
   disablePagination,
   entityPrefix,
   availableFilterNames = [],
   queryableHelpers,
   attackPatterns,
-  children,
+  topBarButtons,
 }: Props<T>) => {
   // Standard hooks
   const classes = useStyles();
@@ -109,6 +110,12 @@ const PaginationComponentV2 = <T extends object>({
     );
   };
 
+  // TopBarChildren
+  let topBarButtonComponent;
+  if (topBarButtons) {
+    topBarButtonComponent = React.cloneElement(topBarButtons as React.ReactElement);
+  }
+
   return (
     <>
       <div className={disablePagination ? classes.parametersWithoutPagination : classes.parameters}>
@@ -145,20 +152,20 @@ const PaginationComponentV2 = <T extends object>({
           )}
           {availableFilterNames?.includes('injector_contract_players') && (
             <div style={{ marginLeft: 10 }}>
-              <InjectorContractSwitchFilter filterHelpers={queryableHelpers.filterHelpers} filterGroup={searchPaginationInput.filterGroup}/>
+              <InjectorContractSwitchFilter filterHelpers={queryableHelpers.filterHelpers} filterGroup={searchPaginationInput.filterGroup} />
             </div>
           )}
         </div>
-        {!disablePagination && (
-          <TablePaginationComponent
-            page={searchPaginationInput.page}
-            size={searchPaginationInput.size}
-            paginationHelpers={queryableHelpers.paginationHelpers}
-            exportProps={exportProps}
-          >
-            {children}
-          </TablePaginationComponent>
-        )}
+        <div className={classes.topbar}>
+          {!disablePagination && (
+            <TablePaginationComponentV2
+              page={searchPaginationInput.page}
+              size={searchPaginationInput.size}
+              paginationHelpers={queryableHelpers.paginationHelpers}
+            />
+          )}
+          {!!topBarButtonComponent && topBarButtonComponent}
+        </div>
       </div>
       {/* Handle Mitre Filter */}
       {queryableHelpers.filterHelpers && searchPaginationInput.filterGroup && (

@@ -81,6 +81,7 @@ export default ({ mode }: { mode: string }) => {
         'uuid',
         'xlsx',
         'zod',
+        'zustand/shallow',
       ],
     },
 

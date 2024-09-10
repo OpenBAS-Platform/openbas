@@ -129,12 +129,13 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_depends_duration")
   @NotNull
   @Min(value = 0L, message = "The value must be positive")
+  @Queryable(sortable = true)
   private Long dependsDuration;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "inject_injector_contract")
   @JsonProperty("inject_injector_contract")
-  @Queryable(filterable = true, path = "injectorContract.injector.id")
+  @Queryable(filterable = true, dynamicValues = true, path = "injectorContract.injector.id")
   private InjectorContract injectorContract;
 
   @Getter
@@ -376,10 +377,11 @@ public class Inject implements Base, Injection {
 
   @JsonIgnore
   @JsonProperty("inject_platforms")
-  @Queryable(filterable = true, dynamicValues = true, path = "injectorContract.platforms", clazz = String[].class)
-  private Optional<Endpoint.PLATFORM_TYPE[]> getPlatforms() {
+  @Queryable(filterable = true, path = "injectorContract.platforms", clazz = String[].class)
+  private Endpoint.PLATFORM_TYPE[] getPlatforms() {
     return getInjectorContract()
-        .map(InjectorContract::getPlatforms);
+        .map(InjectorContract::getPlatforms)
+        .orElse(new Endpoint.PLATFORM_TYPE[0]);
   }
 
   @JsonIgnore

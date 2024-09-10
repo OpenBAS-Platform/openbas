@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ToggleButtonGroup } from '@mui/material';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import Breadcrumbs from '../../../components/Breadcrumbs';
@@ -17,6 +18,7 @@ import ExercisePopover from './simulation/ExercisePopover';
 import type { ExerciseStore } from '../../../actions/exercises/Exercise';
 import type { FilterGroup } from '../../../utils/api-types';
 import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
+import ExportButton from '../../../components/common/ExportButton';
 
 const Exercises = () => {
   // Standard hooks
@@ -86,10 +88,13 @@ const Exercises = () => {
         entityPrefix="exercise"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
-        exportProps={exportProps}
-      >
-        <ImportUploaderExercise />
-      </PaginationComponentV2>
+        topBarButtons={
+          <ToggleButtonGroup value="fake" exclusive>
+            <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
+            <ImportUploaderExercise />
+          </ToggleButtonGroup>
+        }
+      />
       <ExerciseList
         exercises={exercises}
         queryableHelpers={queryableHelpers}

@@ -21,6 +21,7 @@ public class InjectOutput {
   private String id;
 
   @JsonProperty("inject_title")
+  @NotBlank
   private String title;
 
   @JsonProperty("inject_enabled")

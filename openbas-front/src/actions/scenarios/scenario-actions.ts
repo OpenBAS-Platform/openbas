@@ -14,7 +14,6 @@ import type {
   ScenarioInput,
   ScenarioRecurrenceInput,
   ScenarioTeamPlayersEnableInput,
-  ScenarioUpdateTagsInput,
   ScenarioUpdateTeamsInput,
   SearchPaginationInput,
   Team,
@@ -76,13 +75,6 @@ export const importScenario = (formData: FormData) => (dispatch: Dispatch) => {
 export const duplicateScenario = (scenarioId: string) => (dispatch: Dispatch) => {
   const uri = `${SCENARIO_URI}/${scenarioId}`;
   return postReferential(scenario, uri, null)(dispatch);
-};
-
-// -- TAGS --
-
-export const updateScenarioTags = (scenarioId: Scenario['scenario_id'], data: ScenarioUpdateTagsInput) => {
-  const uri = `${SCENARIO_URI}/${scenarioId}/tags`;
-  return putReferential(scenario, uri, data);
 };
 
 // -- TEAMS --

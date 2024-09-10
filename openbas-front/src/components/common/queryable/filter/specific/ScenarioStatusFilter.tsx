@@ -17,8 +17,8 @@ const ScenarioStatusFilter: FunctionComponent<{ propertySchema: PropertySchemaDT
   const operators = ['eq'];
 
   const options: Option[] = [
-    { id: SCENARIO_SCHEDULED_STATUS, label: SCENARIO_SCHEDULED_STATUS },
-    { id: SCENARIO_NOT_SCHEDULED_STATUS, label: SCENARIO_NOT_SCHEDULED_STATUS },
+    { id: SCENARIO_SCHEDULED_STATUS, label: t(SCENARIO_SCHEDULED_STATUS) },
+    { id: SCENARIO_NOT_SCHEDULED_STATUS, label: t(SCENARIO_NOT_SCHEDULED_STATUS) },
   ];
 
   const onChange = (newValue: Option | null) => {

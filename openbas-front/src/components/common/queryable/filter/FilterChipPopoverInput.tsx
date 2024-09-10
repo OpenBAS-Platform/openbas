@@ -54,7 +54,7 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
   const { options, setOptions, searchOptions } = useSearchOptions();
   useEffect(() => {
     if (propertySchema.schema_property_values && propertySchema.schema_property_values?.length > 0) {
-      setOptions(propertySchema.schema_property_values.map((v) => ({ id: v, label: v })));
+      setOptions(propertySchema.schema_property_values.map((v) => ({ id: v, label: t(v.charAt(0).toUpperCase() + v.slice(1).toLowerCase()) })));
     } else {
       searchOptions(filter.key);
     }

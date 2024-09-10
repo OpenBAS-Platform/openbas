@@ -1,4 +1,4 @@
-import type { Inject, InjectsImportInput, ImportTestSummary } from '../../../../utils/api-types';
+import type { ImportTestSummary, Inject, InjectsImportInput, SearchPaginationInput } from '../../../../utils/api-types';
 import {
   addInjectForScenario,
   bulkDeleteInjectsForScenario,
@@ -9,17 +9,22 @@ import {
 } from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
-import type { InjectStore } from '../../../../actions/injects/Inject';
+import type { InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
 import { dryImportXlsForScenario, fetchScenario, fetchScenarioTeams, importXlsForScenario } from '../../../../actions/scenarios/scenario-actions';
+import { Page } from '../../../../components/common/queryable/Page';
+import { searchScenarioInjectsSimple } from '../../../../actions/injects/inject-action';
 
 const injectContextForScenario = (scenario: ScenarioStore) => {
   const dispatch = useAppDispatch();
 
   return {
-    onAddInject(inject: Inject): Promise<{ result: string }> {
+    searchInjects(input: SearchPaginationInput): Promise<{ data: Page<InjectOutputType> }> {
+      return searchScenarioInjectsSimple(scenario.scenario_id, input);
+    },
+    onAddInject(inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
       return dispatch(addInjectForScenario(scenario.scenario_id, inject));
     },
-    onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string }> {
+    onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
       return dispatch(updateInjectForScenario(scenario.scenario_id, injectId, inject));
     },
     onUpdateInjectActivation(injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }): Promise<{
