@@ -19,7 +19,7 @@ interface Props {
   injectId: string;
   isAtomic?: boolean;
   teamsFromExerciseOrScenario: TeamStore[];
-  injects: Inject[];
+  injects?: Inject[];
 }
 
 const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, injectId, isAtomic = false, teamsFromExerciseOrScenario, injects, ...props }) => {
@@ -59,6 +59,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, inje
       disableEnforceFocus
     >
       <>
+        {!isAtomic && (
         <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">
           {availableTabs.map((tab) => {
             return (
@@ -66,7 +67,8 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, inje
             );
           })}
         </Tabs>
-        {activeTab === 'Inject details' && (
+        )}
+        {(isAtomic || activeTab === 'Inject details') && (
           <UpdateInjectDetails
             drawerRef={drawerRef}
             contractContent={injectorContract}
@@ -79,7 +81,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, inje
             {...props}
           />
         )}
-        {activeTab === 'Logical chains' && (
+        {(!isAtomic && activeTab === 'Logical chains') && (
           <UpdateInjectLogicalChains
             inject={inject}
             handleClose={handleClose}
