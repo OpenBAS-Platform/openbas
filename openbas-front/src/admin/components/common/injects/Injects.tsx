@@ -97,6 +97,8 @@ interface Props {
   setViewMode?: (mode: string) => void
   onConnectInjects: (connection: Connection) => void
 
+  availableButtons: string[]
+
   teams: TeamStore[]
   articles: ArticleStore[]
   variables: Variable[]
@@ -109,6 +111,7 @@ interface Props {
 const Injects: FunctionComponent<Props> = ({
   exerciseOrScenarioId,
   setViewMode,
+  availableButtons,
   onConnectInjects,
   teams,
   articles,
@@ -123,6 +126,12 @@ const Injects: FunctionComponent<Props> = ({
   const { t, tPick } = useFormatter();
   const injectContext = useContext(InjectContext);
   const { permissions } = useContext(PermissionsContext);
+  const [viewMode, setViewModeInternal] = useState('list');
+
+  const setViewModeInject = (mode: string) => {
+    setViewModeInternal(mode);
+    if (setViewMode) setViewMode(mode);
+  };
 
   // Headers
   const headers = useMemo(() => [
@@ -462,10 +471,16 @@ const Injects: FunctionComponent<Props> = ({
         queryableHelpers={queryableHelpers}
         disablePagination
         topBarButtons={
-          <InjectsListButtons injects={injects} setViewMode={setViewMode} showTimeline={showTimeline} handleShowTimeline={handleShowTimeline} />
+          <InjectsListButtons
+            injects={injects}
+            availableButtons={availableButtons}
+            setViewMode={setViewModeInject}
+            showTimeline={showTimeline}
+            handleShowTimeline={handleShowTimeline}
+          />
         }
       />
-      {showTimeline && (
+      {viewMode === 'chain' && (
         <div style={{ marginBottom: 50 }}>
           <div>
             <ChainedTimeline
@@ -485,6 +500,7 @@ const Injects: FunctionComponent<Props> = ({
           </div>
         </div>
       )}
+      {viewMode === 'list' && (
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -591,6 +607,7 @@ const Injects: FunctionComponent<Props> = ({
           );
         })}
       </List>
+      )}
       {permissions.canWrite && (
         <>
           {selectedInjectId !== null

@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import * as R from 'ramda';
 import { Connection } from '@xyflow/react';
@@ -50,6 +50,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
   const teamContext = teamContextForScenario(scenarioId, []);
 
   const injectContext = injectContextForScenario(scenario);
+  const [_viewMode, setViewMode] = useState('list');
 
   const handleConnectInjects = async (connection: Connection) => {
     const updateFields = [
@@ -77,6 +78,8 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
             // @ts-expect-error typing
             teamsUsers={scenario.scenario_teams_users}
             onConnectInjects={handleConnectInjects}
+            setViewMode={setViewMode}
+            availableButtons={['chain', 'list']}
           />
         </TeamContext.Provider>
       </ArticleContext.Provider>

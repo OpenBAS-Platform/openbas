@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { BarChartOutlined, ReorderOutlined } from '@mui/icons-material';
 import { Grid, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -74,7 +74,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
 
   return (
     <>
-      {viewMode === 'list' && (
+      {(viewMode === 'list' || viewMode === 'chain') && (
         <ArticleContext.Provider value={articleContext}>
           <TeamContext.Provider value={teamContext}>
             <Injects
@@ -90,6 +90,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
               // @ts-expect-error typing
               teamsUsers={exercise.exercise_teams_users}
               setViewMode={setViewMode}
+              availableButtons={['chain', 'list', 'distribution']}
             />
           </TeamContext.Provider>
         </ArticleContext.Provider>
@@ -110,6 +111,16 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                 aria-label="List view mode"
               >
                 <ReorderOutlined fontSize="small" color="primary" />
+              </ToggleButton>
+            </Tooltip>
+            <Tooltip title={t('Interactive view')}>
+              <ToggleButton
+                value="chain"
+                onClick={() => setViewMode('chain')}
+                selected={false}
+                aria-label="Interactive view mode"
+              >
+                <ViewTimelineOutlined fontSize="small" color="primary" />
               </ToggleButton>
             </Tooltip>
             <Tooltip title={t('Distribution view')}>

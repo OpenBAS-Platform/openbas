@@ -423,7 +423,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   return (
     <>
       {injects.length > 0 ? (
-        <div className={classes.container} style={{ width: '100%', height: 350 }}>
+        <div className={classes.container} style={{ width: '100%', height: 490 }}>
           <ReactFlow
             nodes={nodes}
             edges={edges}
