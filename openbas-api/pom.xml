@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.openbas</groupId>
         <artifactId>openbas-platform</artifactId>
-        <version>1.5.0</version>
+        <version>1.5.1</version>
     </parent>
 
     <artifactId>openbas-api</artifactId>
@@ -35,7 +35,7 @@
         <dependency>
             <groupId>io.openbas</groupId>
             <artifactId>openbas-framework</artifactId>
-            <version>1.5.0</version>
+            <version>1.5.1</version>
         </dependency>
         <dependency>
             <groupId>com.rabbitmq</groupId>
