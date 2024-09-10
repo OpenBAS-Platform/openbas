@@ -419,7 +419,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
       }
     }
   };
-
   return (
     <>
       {injects.length > 0 ? (
@@ -457,6 +456,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             onMouseEnter={showNewNode}
             onMouseLeave={hideNewNode}
             onReconnect={() => {}}
+            // @ts-expect-error for some reason, the signature here is not well defined
             onReconnectEnd={onReconnectEnd}
             edgesReconnectable={true}
           >
