@@ -456,7 +456,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             onClick={onNewNodeClick}
             onMouseEnter={showNewNode}
             onMouseLeave={hideNewNode}
-            onReconnect
+            onReconnect={() => {}}
             onReconnectEnd={onReconnectEnd}
             edgesReconnectable={true}
           >

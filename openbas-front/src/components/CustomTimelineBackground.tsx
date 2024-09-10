@@ -34,7 +34,8 @@ function BackgroundComponent({
   const gapXY: [number, number] = Array.isArray(gap) ? gap : [gap, gap * 2];
   const scaledGap: [number, number] = [gapXY[0] * transform[2] || 1, gapXY[1] * transform[2] || 1];
   const scaledSize = size * transform[2];
-  const patternOffset = [scaledSize / offset, scaledSize / offset];
+  const computedOffset = Array.isArray(offset) ? offset : [offset, offset];
+  const patternOffset = offset ? [scaledSize / computedOffset[0], scaledSize / computedOffset[1]] : [scaledSize, scaledSize];
   const modifiedPatternId = `${patternId}${id}`;
 
   return (

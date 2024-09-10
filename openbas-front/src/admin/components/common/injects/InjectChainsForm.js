@@ -259,7 +259,7 @@ const InjectForm = ({
                     })}
                 </Select>
               </FormControl>
-              <FormControl style={{ width: '100%' }}>
+              <FormControl style={{ width: '100%', marginTop: '15px' }}>
                 <InputLabel id="condition">{t('Condition')}</InputLabel>
                 <Select
                   labelId="condition"
