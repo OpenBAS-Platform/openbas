@@ -75,7 +75,7 @@ function BackgroundComponent({
         const date = moment.utc(beginningDate)
           .add((minutesPerGap * 3 * i) + offset, 'm');
         newParsedDates.push({
-          parsedDate: viewportData !== undefined && viewportData?.zoom > 0.45
+          parsedDate: viewportData === undefined || viewportData?.zoom > 0.5
             ? date.format('MMMM Do, YYYY - h:mmA') : date.format('l-h:mmA'),
           dateIndex: Math.round((date.unix() - beginningDate.unix()) / (minutesPerGap * 3 * 60)),
         });
