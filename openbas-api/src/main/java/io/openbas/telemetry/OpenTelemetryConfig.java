@@ -27,7 +27,7 @@ import java.util.UUID;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static java.util.Objects.requireNonNull;
 
-@ConditionalOnProperty(prefix = "telemetry.exporter.jaeger", name = "enable")
+@ConditionalOnProperty(prefix = "telemetry", name = "enable")
 @Log
 @Service
 @RequiredArgsConstructor
