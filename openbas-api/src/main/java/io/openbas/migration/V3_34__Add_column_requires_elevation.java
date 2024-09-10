@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Statement;
 
 @Component
-public class V3_33__Add_column_requires_elevation extends BaseJavaMigration {
+public class V3_34__Add_column_requires_elevation extends BaseJavaMigration {
 
     @Override
     public void migrate(final Context context) throws Exception {
