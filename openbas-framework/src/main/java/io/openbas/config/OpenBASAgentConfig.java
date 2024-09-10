@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 @Data
 public class OpenBASAgentConfig {
 
-    @JsonProperty("non_system_user")
+    @JsonProperty("non-system-user")
     private String nonSystemUser;
 
-    @JsonProperty("non_system_pwd")
+    @JsonProperty("non-system-pwd")
     private String nonSystemPwd;
 
 }
