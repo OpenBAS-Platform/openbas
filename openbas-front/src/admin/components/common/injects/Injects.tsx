@@ -15,7 +15,6 @@ import type { FilterGroup, Inject, Variable } from '../../../../utils/api-types'
 import type { InjectorContractConvertedContent, InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
 import { InjectContext, PermissionsContext } from '../Context';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
-import useQueryable from '../../../../components/common/queryable/useQueryable';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
 import InjectsListButtons from './InjectsListButtons';
@@ -27,6 +26,7 @@ import CreateInject from './CreateInject';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import type { ArticleStore } from '../../../../actions/channels/Article';
 import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
+import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 
 const useStyles = makeStyles(() => ({
   disabled: {
@@ -154,7 +154,7 @@ const Injects: FunctionComponent<Props> = ({
       field: 'inject_title',
       label: 'Title',
       isSortable: true,
-      value: (inject: InjectOutputType, _: InjectorContractConvertedContent) => inject.inject_title,
+      value: (inject: InjectOutputType, _: InjectorContractConvertedContent) => <>{inject.inject_title}</>,
     },
     {
       field: 'inject_depends_duration',
@@ -177,14 +177,15 @@ const Injects: FunctionComponent<Props> = ({
       field: 'inject_platforms',
       label: 'Platform(s)',
       isSortable: false,
-      value: (inject: InjectOutputType, _: InjectorContractConvertedContent) => inject.inject_injector_contract?.injector_contract_platforms?.map(
-        (platform) => <PlatformIcon
-          key={platform}
-          width={20}
-          platform={platform}
-          marginRight={10}
-                      />,
-      ),
+      value: (inject: InjectOutputType, _: InjectorContractConvertedContent) => <>{
+        inject.inject_injector_contract?.injector_contract_platforms?.map(
+          (platform) => <PlatformIcon
+            key={platform}
+            width={20}
+            platform={platform}
+            marginRight={10}
+                        />,
+        )}</>,
     },
     {
       field: 'inject_enabled',
@@ -283,7 +284,7 @@ const Injects: FunctionComponent<Props> = ({
     ],
   };
 
-  const { queryableHelpers, searchPaginationInput } = useQueryable(`${exerciseOrScenarioId}-injects`, buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`${exerciseOrScenarioId}-injects`, buildSearchPagination({
     sorts: initSorting('inject_depends_duration', 'ASC'),
     filterGroup: quickFilter,
     size: 100,
