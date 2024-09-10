@@ -893,6 +893,8 @@ const i18n = {
       payload_status: 'Statut',
       payload_tags: 'Tags',
       payload_updated_at: 'Mis à jour à',
+      Unverified: 'Non vérifié',
+      Verified: 'Vérifié',
       Recurrence: 'Récurrence',
       'Does not repeat': 'Ne se répète pas',
       Daily: 'Quotidien',
