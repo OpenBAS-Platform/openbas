@@ -546,11 +546,11 @@ const Injects: FunctionComponent<Props> = ({
               </ListItemIcon>
               <ListItemIcon style={{ paddingTop: 5 }}>
                 <InjectIcon
-                  isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
+                  isPayload={isNotEmptyField(inject.inject_injector_contract?.injector_contract_payload)}
                   type={
-                    inject.inject_injector_contract.injector_contract_payload
-                      ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
-                      || inject.inject_injector_contract.injector_contract_payload?.payload_type
+                    inject.inject_injector_contract?.injector_contract_payload
+                      ? inject.inject_injector_contract?.injector_contract_payload?.payload_collector_type
+                      || inject.inject_injector_contract?.injector_contract_payload?.payload_type
                       : inject.inject_type
                   }
                   disabled={!injectContract || !isContractExposed || !inject.inject_enabled}
@@ -603,10 +603,12 @@ const Injects: FunctionComponent<Props> = ({
               // @ts-expect-error typing
               articlesFromExerciseOrScenario={articles}
               variablesFromExerciseOrScenario={variables}
+              exerciseOrScenarioId={exerciseOrScenarioId}
               uriVariable={uriVariable}
               allUsersNumber={allUsersNumber}
               usersNumber={usersNumber}
               teamsUsers={teamsUsers}
+              injects={injects}
                />
           }
           <ButtonCreate onClick={() => {

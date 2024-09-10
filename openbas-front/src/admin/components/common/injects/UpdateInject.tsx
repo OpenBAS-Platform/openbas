@@ -11,6 +11,7 @@ import { fetchInject } from '../../../../actions/Inject';
 import { useHelper } from '../../../../store';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import UpdateInjectLogicalChains from './UpdateInjectLogicalChains';
+import type { InjectOutputType } from '../../../../actions/injects/Inject';
 
 interface Props {
   open: boolean;
@@ -19,7 +20,7 @@ interface Props {
   injectId: string;
   isAtomic?: boolean;
   teamsFromExerciseOrScenario: TeamStore[];
-  injects?: Inject[];
+  injects?: InjectOutputType[];
 }
 
 const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, injectId, isAtomic = false, teamsFromExerciseOrScenario, injects, ...props }) => {

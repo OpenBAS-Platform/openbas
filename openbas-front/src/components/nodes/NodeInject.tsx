@@ -144,9 +144,9 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
     if (data.inject) data.onSelectedInject(data.inject);
   };
 
-  const isDisabled = !data.inject?.inject_injector_contract.injector_contract_content_parsed?.config.expose;
+  const isDisabled = !data.inject?.inject_injector_contract?.injector_contract_content_parsed?.config.expose;
 
-  const dimNode = !data.inject?.inject_enabled || !data.inject?.inject_injector_contract.injector_contract_content_parsed?.config.expose;
+  const dimNode = !data.inject?.inject_enabled || !data.inject?.inject_injector_contract?.convertedContent?.config.expose;
 
   let borderLeftColor = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)';
   if (!data.inject?.inject_enabled) {
