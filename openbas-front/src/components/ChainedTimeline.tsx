@@ -263,6 +263,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
       };
       injectContext.onUpdateInject(node.id, inject);
       setCurrentUpdatedNode(node);
+      setDraggingOnGoing(false);
     }
   };
 
