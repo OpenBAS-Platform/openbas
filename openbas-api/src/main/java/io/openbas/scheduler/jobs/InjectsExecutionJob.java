@@ -150,7 +150,12 @@ public class InjectsExecutionJob implements Job {
                 && inject.getDependsOn().getStatus().isPresent()
                 && ( inject.getDependsOn().getStatus().get().getName().equals(ExecutionStatus.ERROR)
                     || executionStatusesNotReady.contains(inject.getDependsOn().getStatus().get().getName()))) {
-            InjectStatus status = inject.getStatus().get();
+            InjectStatus status = new InjectStatus();
+            if (inject.getStatus().isEmpty()) {
+                status.setInject(inject);
+            } else {
+                status = inject.getStatus().get();
+            }
             String errorMsg = inject.getDependsOn().getStatus().get().getName().equals(ExecutionStatus.ERROR) ?
                     "The inject is depending on another inject that failed"
                     : "The inject is depending on another inject that is not executed yet";
