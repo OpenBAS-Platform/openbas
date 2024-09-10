@@ -253,6 +253,15 @@ const Injects: FunctionComponent<Props> = ({
     }
   };
 
+  const onUpdateInjectSimpler = async (data: Inject) => {
+    await injectContext.onUpdateInject(data.inject_id, data).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+      if (result.entities) {
+        const updated = result.entities.injects[result.result];
+        setInjects(injects.map((i) => (i.inject_id !== updated.inject_id ? i as InjectOutputType : (updated as InjectOutputType))));
+      }
+    });
+  };
+
   const [openCreateDrawer, setOpenCreateDrawer] = useState(false);
   const [presetCreationValues, setPresetCreationValues] = useState<{
     inject_depends_duration_days?: number,
@@ -487,6 +496,7 @@ const Injects: FunctionComponent<Props> = ({
               injects={injects}
               onConnectInjects={onConnectInjects}
               exerciseOrScenarioId={exerciseOrScenarioId}
+              onUpdateInject={onUpdateInjectSimpler}
               openCreateInjectDrawer={openCreateInjectDrawer}
               onSelectedInject={(inject) => {
                 const injectContract = inject?.inject_injector_contract.convertedContent;

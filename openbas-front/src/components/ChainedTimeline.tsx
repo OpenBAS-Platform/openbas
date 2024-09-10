@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import {
   Connection,
@@ -26,7 +26,6 @@ import nodeTypes from './nodes';
 import CustomTimelineBackground from './CustomTimelineBackground';
 import { NodeInject } from './nodes/NodeInject';
 import CustomTimelinePanel from './CustomTimelinePanel';
-import { InjectContext } from '../admin/components/common/Context';
 import { useHelper } from '../store';
 import type { InjectHelper } from '../actions/injects/inject-helper';
 import type { ScenariosHelper } from '../actions/scenarios/scenario-helper';
@@ -37,6 +36,7 @@ import NodePhantom from './nodes/NodePhantom';
 import { useFormatter } from './i18n';
 import type { AssetGroupsHelper } from '../actions/asset_groups/assetgroup-helper';
 import type { EndpointHelper } from '../actions/assets/asset-helper';
+import type { Inject } from '../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -64,9 +64,10 @@ interface Props {
     inject_depends_duration_minutes: number,
     inject_depends_duration_hours: number
   }): void,
+  onUpdateInject: (data: Inject) => void
 }
 
-const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScenarioId, onConnectInjects, onSelectedInject, openCreateInjectDrawer }) => {
+const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScenarioId, onConnectInjects, onSelectedInject, openCreateInjectDrawer, onUpdateInject }) => {
   // Standard hooks
   const classes = useStyles();
   const theme = useTheme<Theme>();
@@ -82,7 +83,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   const [currentMouseTime, setCurrentMouseTime] = useState<string>('');
   const [connectOnGoing, setConnectOnGoing] = useState<boolean>(false);
 
-  const injectContext = useContext(InjectContext);
   const reactFlow = useReactFlow();
 
   const injectsMap = useHelper((injectHelper: InjectHelper) => injectHelper.getInjectsMap());
@@ -166,6 +166,22 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     });
   };
 
+  const updateEdges = () => {
+    const newEdges = injects.filter((inject) => inject.inject_depends_on != null).map((inject) => {
+      return ({
+        id: `${inject.inject_id}->${inject.inject_depends_on}`,
+        target: `${inject.inject_id}`,
+        targetHandle: `target-${inject.inject_id}`,
+        source: `${inject.inject_depends_on}`,
+        sourceHandle: `source-${inject.inject_depends_on}`,
+        label: '',
+        labelShowBg: false,
+        labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
+      });
+    });
+    setEdges(newEdges);
+  };
+
   /**
    * Update all nodes
    */
@@ -207,19 +223,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
       setDraggingOnGoing(false);
       calculateInjectPosition(injectsNodes);
       setNodes(injectsNodes);
-      const newEdges = injects.filter((inject) => inject.inject_depends_on != null).map((inject) => {
-        return ({
-          id: `${inject.inject_id}->${inject.inject_depends_on}`,
-          target: `${inject.inject_id}`,
-          targetHandle: `target-${inject.inject_id}`,
-          source: `${inject.inject_depends_on}`,
-          sourceHandle: `source-${inject.inject_depends_on}`,
-          label: '',
-          labelShowBg: false,
-          labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
-        });
-      });
-      setEdges(newEdges);
+      updateEdges();
     }
   };
 
@@ -261,7 +265,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
         inject_id: node.id,
         inject_depends_duration: convertCoordinatesToTime(node.position),
       };
-      injectContext.onUpdateInject(node.id, inject);
+      onUpdateInject(inject);
       setCurrentUpdatedNode(node);
       setDraggingOnGoing(false);
     }
@@ -302,7 +306,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
         inject_id: inject.inject_id,
         inject_depends_on: connection.source,
       };
-      injectContext.onUpdateInject(inject.inject_id, injectToUpdate);
+      onUpdateInject(injectToUpdate);
     }
   };
 
@@ -416,9 +420,10 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
           inject_id: inject.inject_id,
           inject_depends_on: undefined,
         };
-        injectContext.onUpdateInject(inject.inject_id, injectToUpdate);
+        onUpdateInject(injectToUpdate);
       }
     }
+    updateNodes();
   };
   return (
     <>
