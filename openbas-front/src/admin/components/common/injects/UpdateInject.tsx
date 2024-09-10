@@ -81,7 +81,6 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, inje
         )}
         {activeTab === 'Logical chains' && (
           <UpdateInjectLogicalChains
-            injectId={injectId}
             inject={inject}
             handleClose={handleClose}
             onUpdateInject={onUpdateInject}

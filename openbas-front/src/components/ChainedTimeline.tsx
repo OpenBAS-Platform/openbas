@@ -14,6 +14,8 @@ import {
   useReactFlow,
   Viewport,
   XYPosition,
+  MiniMap,
+  ConnectionState,
 } from '@xyflow/react';
 import { Tooltip } from '@mui/material';
 import moment from 'moment-timezone';
@@ -295,6 +297,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     if (inject !== undefined) {
       const injectToUpdate = {
         ...injectsMap[inject.inject_id],
+        inject_injector_contract: inject.inject_injector_contract.injector_contract_id,
         inject_id: inject.inject_id,
         inject_depends_on: connection.source,
       };
@@ -402,6 +405,21 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
     setDraggingOnGoing(false);
   };
 
+  const onReconnectEnd = (event: React.MouseEvent, edge: Edge, handleType: 'source' | 'target', connectionState: Omit<ConnectionState, 'inProgress'>) => {
+    if (!connectionState.isValid) {
+      const inject = injects.find((currentInject) => currentInject.inject_id === edge.target);
+      if (inject !== undefined) {
+        const injectToUpdate = {
+          ...injectsMap[inject.inject_id],
+          inject_injector_contract: inject.inject_injector_contract.injector_contract_id,
+          inject_id: inject.inject_id,
+          inject_depends_on: undefined,
+        };
+        injectContext.onUpdateInject(inject.inject_id, injectToUpdate);
+      }
+    }
+  };
+
   return (
     <>
       {injects.length > 0 ? (
@@ -438,6 +456,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
             onClick={onNewNodeClick}
             onMouseEnter={showNewNode}
             onMouseLeave={hideNewNode}
+            onReconnect
+            onReconnectEnd={onReconnectEnd}
+            edgesReconnectable={true}
           >
             <div id={'newBox'} className={!connectOnGoing ? classes.newBox : ''}
               style={{
@@ -502,6 +523,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
               viewportData={viewportData}
               startDate={startDate}
             />
+
+            <MiniMap/>
           </ReactFlow>
         </div>
       ) : null

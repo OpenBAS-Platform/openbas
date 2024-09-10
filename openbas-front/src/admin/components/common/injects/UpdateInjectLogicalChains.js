@@ -44,41 +44,46 @@ const UpdateInjectLogicalChains = ({
 
   const onSubmit = async (data) => {
     const injectUpdate = {
-      inject_title: data.inject_title,
+      ...data,
+      inject_id: data.inject_id,
       inject_injector_contract: data.inject_injector_contract.injector_contract_id,
-      inject_description: data.inject_description,
-      inject_tags: data.inject_tags,
-      inject_content: data.inject_content,
-      inject_all_teams: data.inject_all_teams,
-      inject_teams: data.inject_teams,
-      inject_assets: data.inject_assets,
-      inject_asset_groups: data.inject_asset_groups,
-      inject_documents: data.inject_documents,
-      inject_depends_duration: data.inject_depends_duration,
       inject_depends_on: data.inject_depends_on,
     };
     await onUpdateInject(injectUpdate);
 
+    const injectsToUpdate = [];
+
     const childrenIds = data.inject_depends_to;
+
+    const injectsWithoutDependencies = injects
+      .filter((currentInject) => currentInject.inject_depends_on === data.inject_id
+        && !childrenIds.includes(currentInject.inject_id))
+      .map((currentInject) => {
+        return {
+          ...currentInject,
+          inject_id: currentInject.inject_id,
+          inject_injector_contract: currentInject.inject_injector_contract.injector_contract_id,
+          inject_depends_on: undefined,
+        };
+      });
+
+    injectsToUpdate.push(...injectsWithoutDependencies);
+
     childrenIds.forEach((childrenId) => {
       const children = injects.find((currentInject) => currentInject.inject_id === childrenId);
       if (children !== undefined) {
         const injectChildrenUpdate = {
-          inject_title: children.inject_title,
+          ...children,
+          inject_id: children.inject_id,
           inject_injector_contract: children.inject_injector_contract.injector_contract_id,
-          inject_description: children.inject_description,
-          inject_tags: children.inject_tags,
-          inject_content: children.inject_content,
-          inject_all_teams: children.inject_all_teams,
-          inject_teams: children.inject_teams,
-          inject_assets: children.inject_assets,
-          inject_asset_groups: children.inject_asset_groups,
-          inject_documents: children.inject_documents,
-          inject_depends_duration: children.inject_depends_duration,
           inject_depends_on: inject.inject_id,
         };
-        injectContext.onUpdateInject(children.inject_id, injectChildrenUpdate);
+        injectsToUpdate.push(injectChildrenUpdate);
       }
+    });
+
+    injectsToUpdate.forEach((injectToUpdate) => {
+      injectContext.onUpdateInject(injectToUpdate.inject_id, injectToUpdate);
     });
 
     handleClose();
