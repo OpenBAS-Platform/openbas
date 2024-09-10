@@ -17,7 +17,6 @@ const useStyles = makeStyles(() => ({
 }));
 
 const InjectForm = ({
-  props,
   values,
   form,
   injects,
