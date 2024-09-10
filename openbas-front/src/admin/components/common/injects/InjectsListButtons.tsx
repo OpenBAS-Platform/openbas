@@ -44,7 +44,7 @@ const InjectsListButtons: FunctionComponent<Props> = ({
     tagsMap: helper.getTagsMap(),
   }));
 
-  const isAtLeastOneValidInject = injects.some((inject) => inject.inject_injector_contract?.injector_contract_content_parsed !== null);
+  const isAtLeastOneValidInject = injects.some((inject) => !inject.inject_injector_contract?.injector_contract_content_parsed);
 
   const exportInjects = exportData(
     'inject',
