@@ -27,14 +27,13 @@ const DialogTest: FunctionComponent<DialogTestProps> = ({
       TransitionComponent={Transition}
     >
       <DialogContent>
-        <DialogContentText style={{ textAlign: 'center' }}>
+        <DialogContentText component="span" style={{ textAlign: 'center' }}>
           {text}
-          {alertText && (
+          {!!alertText && (
             <Alert variant="outlined" severity="warning" style={{ marginTop: 20 }}>
               {alertText}
             </Alert>
-          )
-          }
+          )}
         </DialogContentText>
       </DialogContent>
       <DialogActions>

@@ -76,7 +76,7 @@ const i18n = {
       Stop: 'Arrêter',
       Name: 'Nom',
       Subtitle: 'Sous-titre',
-      'Please note that if you change the “Reply to” address, the email interaction functionality in the platform will be disabled.': 'Veuillez noter que si vous modifiez l\'adresse « Répondre à », la fonctionnalité d\'interaction par mail dans la plateforme sera désactivée.',
+      'Please note that if you change the "Reply to" address, the email interaction functionality in the platform will be disabled.': 'Veuillez noter que si vous modifiez l\'adresse « Répondre à », la fonctionnalité d\'interaction par mail dans la plateforme sera désactivée.',
       'If you remove the default email address, the email reception for this simulation / scenario will be disabled.': 'Si vous supprimez l\'adresse e-mail par défaut, la réception des e-mails pour cette simulation / ce scénario sera désactivée.',
       'Start date': 'Date de début',
       'End date': 'Date de fin',
@@ -522,6 +522,7 @@ const i18n = {
       'Export the simulation': 'Exporter cette simulation',
       'Export the scenario': 'Exporter ce scenario',
       'Do you want to delete the scenario?': 'Voulez-vous supprimer ce scénario?',
+      'A simulation will be launched based on this scenario and will start immediately. Are you sure you want to proceed?': 'Une simulation sera lancée à partir de ce scénario et commencera immédiatement. Êtes-vous sûr de vouloir continuer ?',
       'Reset to default values': 'Réinitialiser les valeurs par défaut',
       Elements: 'Eléments',
       'Scenario (including attached files)':
@@ -1335,6 +1336,10 @@ const i18n = {
       "Can't be tested": 'Ne peut pas être testé',
       'Simulation is currently unavailable or you do not have sufficient permissions to access it.': 'La simulation est actuellement indisponible ou vous n\'avez pas les autorisations nécessaires pour y accéder.',
       'Scenario is currently unavailable or you do not have sufficient permissions to access it.': 'Le scenario est actuellement indisponible ou vous n\'avez pas les autorisations nécessaires pour y accéder.',
+      'New simulation successfully created and started. Click {here} to view the simulation.': 'Nouvelle simulation créée et démarrée avec succès. Cliquez {here} pour voir la simulation.',
+      here: 'ici',
+      'This scenario has never run, schedule or run it now!': 'Ce scénario n\'a jamais été exécuté, planifiez-le ou exécutez-le maintenant !',
+      'Something went wrong. Please refresh the page or try again later.': 'Une erreur s\'est produite. Veuillez actualiser la page ou réessayer plus tard.',
     },
     zh: {
       'Email address': 'email地址',
@@ -1410,7 +1415,7 @@ const i18n = {
       Stop: '停止',
       Name: '名称',
       Subtitle: '小标题',
-      'Please note that if you change the “Reply to” address, the email interaction functionality in the platform will be disabled.': '请注意，如果您更改了\'回复 \'地址，平台中的电子邮件互动功能将被禁用。',
+      'Please note that if you change the "Reply to" address, the email interaction functionality in the platform will be disabled.': '请注意，如果您更改了\'回复 \'地址，平台中的电子邮件互动功能将被禁用。',
       'Start date': '开始日期',
       'End date': '结束日期',
       To: '收件人',
@@ -1850,6 +1855,7 @@ const i18n = {
       'Export the simulation': '导出模拟',
       'Export the scenario': '导出场景',
       'Do you want to delete the scenario?': '你想要删除场景么?',
+      'A simulation will be launched based on this scenario and will start immediately. Are you sure you want to proceed?': '基于此场景的模拟将立即启动。您确定要继续吗？',
       'Reset to default values': '恢复默认值',
       Elements: '元素',
       'Scenario (including attached files)':
@@ -2565,7 +2571,10 @@ const i18n = {
       'Reduce time interval': '减少时间间隔',
       'Simulation is currently unavailable or you do not have sufficient permissions to access it.': '模拟当前不可用，或您没有足够的权限进行访问。',
       'Scenario is currently unavailable or you do not have sufficient permissions to access it.': '"场景当前不可用，或您没有足够的权限进行访问。',
-
+      'New simulation successfully created and started. Click {here} to view the simulation.': '新模拟已成功创建并启动。点击{here}查看模拟。',
+      here: '此处',
+      'This scenario has never run, schedule or run it now!': '此场景从未运行，立即安排或运行它吧！',
+      'Something went wrong. Please refresh the page or try again later.': '发生错误。请刷新页面或稍后再试。',
     },
     en: {
       openbas_email: 'Email',
@@ -2710,6 +2719,7 @@ const i18n = {
       'IMAP service is not responding, your injectors may be impacted.': 'IMAP service is not responding, your injectors may be impacted.',
       'Executor Caldera is not responding, your exercises may be impacted.': 'Executor Caldera is not responding, your exercises may be impacted.',
       'Value that signifies that all teams are targeted. A regex can be used.': 'Value that signifies that all teams are targeted. A regex can be used.',
+      'New simulation successfully created and started. Click {here} to view the simulation.': 'New simulation successfully created and started. Click {here} to view the simulation.',
     },
   },
 };

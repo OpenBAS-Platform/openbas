@@ -24,7 +24,6 @@ import static io.openbas.utils.fixtures.DocumentFixture.getDocumentJpeg;
 import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
 import static io.openbas.utils.fixtures.ObjectiveFixture.OBJECTIVE_NAME;
 import static io.openbas.utils.fixtures.ObjectiveFixture.getObjective;
-import static io.openbas.utils.fixtures.ScenarioFixture.getScenario;
 import static io.openbas.utils.fixtures.TagFixture.getTag;
 import static io.openbas.utils.fixtures.TeamFixture.getTeam;
 import static io.openbas.utils.fixtures.UserFixture.getUser;
@@ -220,7 +219,7 @@ class ScenarioToExerciseServiceTest {
     VARIABLE_ID = variableSaved.getId();
 
     // -- EXECUTE --
-    Exercise exercise = this.scenarioToExerciseService.toExercise(scenario, null);
+    Exercise exercise = this.scenarioToExerciseService.toExercise(scenario, null, null);
     EXERCISE_ID = exercise.getId();
     Exercise exerciseSaved = this.loadService.exercise(EXERCISE_ID);
 

@@ -64,6 +64,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
     tabValue = `/admin/scenarios/${scenario.scenario_id}/tests`;
   }
   const [openScenarioRecurringFormDialog, setOpenScenarioRecurringFormDialog] = useState<boolean>(false);
+  const [openInstantiateSimulationAndStart, setOpenInstantiateSimulationAndStart] = useState<boolean>(false);
   const [selectRecurring, setSelectRecurring] = useState('noRepeat');
   const [cronExpression, setCronExpression] = useState<string | null>(scenario.scenario_recurrence || null);
   const [parsedCronExpression, setParsedCronExpression] = useState<ParsedCron | null>(scenario.scenario_recurrence ? parseCron(scenario.scenario_recurrence) : null);
@@ -74,7 +75,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
     if (!cronExpression || !parsedCronExpression) {
       return null;
     }
-    let sentence = '';
+    let sentence: string;
     if (noRepeat) {
       sentence = `${fld(scenario.scenario_recurrence_start)} ${t('recurrence_at')} ${ft(new Date().setUTCHours(parsedCronExpression.h, parsedCronExpression.m, 0))}`;
     } else {
@@ -110,6 +111,8 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
             selectRecurring={selectRecurring}
             setOpenScenarioRecurringFormDialog={setOpenScenarioRecurringFormDialog}
             openScenarioRecurringFormDialog={openScenarioRecurringFormDialog}
+            setOpenInstantiateSimulationAndStart={setOpenInstantiateSimulationAndStart}
+            openInstantiateSimulationAndStart={openInstantiateSimulationAndStart}
             noRepeat={noRepeat}
           />
           <Box
@@ -175,7 +178,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
           </Box>
           <Suspense fallback={<Loader />}>
             <Routes>
-              <Route path="" element={errorWrapper(Scenario)({ setOpenScenarioRecurringFormDialog })} />
+              <Route path="" element={errorWrapper(Scenario)({ setOpenInstantiateSimulationAndStart })} />
               <Route path="definition" element={errorWrapper(ScenarioDefinition)()} />
               <Route path="injects" element={errorWrapper(Injects)()} />
               <Route path="tests/:statusId?" element={errorWrapper(Tests)()} />

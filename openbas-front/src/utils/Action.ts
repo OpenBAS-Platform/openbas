@@ -1,6 +1,9 @@
 import Immutable from 'seamless-immutable';
 import { FORM_ERROR } from 'final-form';
 import * as R from 'ramda';
+import { AxiosError } from 'axios';
+import type { Schema } from 'normalizr';
+import { Dispatch } from 'redux';
 import * as Constants from '../constants/ActionTypes';
 import { api } from '../network';
 import { MESSAGING$ } from './Environment';
@@ -9,13 +12,13 @@ const isEmptyPath = R.isNil(window.BASE_PATH) || R.isEmpty(window.BASE_PATH);
 const contextPath = isEmptyPath || window.BASE_PATH === '/' ? '' : window.BASE_PATH;
 export const APP_BASE_PATH = isEmptyPath || contextPath.startsWith('/') ? contextPath : `/${contextPath}`;
 
-export const buildUri = (uri) => `${APP_BASE_PATH}${uri}`;
+export const buildUri = (uri: string) => `${APP_BASE_PATH}${uri}`;
 
-const buildError = (data) => {
+const buildError = (data: AxiosError) => {
   const errorsExtractor = R.pipe(
     R.pathOr({}, ['errors', 'children']),
     R.toPairs(),
-    R.map((elem) => {
+    R.map((elem: unknown) => {
       const extractErrorsPipe = R.pipe(
         R.tail(),
         R.head(),
@@ -30,34 +33,50 @@ const buildError = (data) => {
   return errorsExtractor(data);
 };
 
-export const simpleCall = (uri, params) => api().get(buildUri(uri), { params });
-export const simplePostCall = (uri, data, errorMessage) => api().post(buildUri(uri), data)
+const notifyError = (error: AxiosError) => {
+  if (error.status === 409) {
+    MESSAGING$.notifyError('The element already exists');
+  } else if (error.status === 500) {
+    MESSAGING$.notifyError('Internal error');
+  } else if (error.message) {
+    MESSAGING$.notifyError(error.message);
+  } else {
+    MESSAGING$.notifyError('Something went wrong. Please refresh the page or try again later.');
+  }
+};
+
+const simpleApi = api();
+
+export const simpleCall = (uri: string, params?: unknown, defaultErrorBehavior: boolean = true) => simpleApi.get(buildUri(uri), { params }).catch((error) => {
+  if (defaultErrorBehavior) {
+    notifyError(error);
+  }
+  throw error;
+});
+export const simplePostCall = (uri: string, data?: unknown, defaultNotifyErrorBehavior: boolean = true) => simpleApi.post(buildUri(uri), data)
   .catch((error) => {
-    if (error.message) {
-      MESSAGING$.notifyError(error.message);
-    } else if (errorMessage) {
-      MESSAGING$.notifyError(errorMessage);
+    if (defaultNotifyErrorBehavior) {
+      notifyError(error);
     }
     throw error;
   });
-export const simplePutCall = (uri, data) => api().put(buildUri(uri), data)
-  .then((response) => {
-    MESSAGING$.notifySuccess('The element has been updated');
-    return response;
-  })
+export const simplePutCall = (uri: string, data?: unknown, defaultNotifyErrorBehavior: boolean = true) => simpleApi.put(buildUri(uri), data)
   .catch((error) => {
-    MESSAGING$.notifyError(error.message);
+    if (defaultNotifyErrorBehavior) {
+      notifyError(error);
+    }
     throw error;
   });
-export const simpleDelCall = (uri, data) => api().delete(buildUri(uri), data)
+export const simpleDelCall = (uri: string, defaultNotifyErrorBehavior: boolean = true) => simpleApi.delete(buildUri(uri))
   .catch((error) => {
-    MESSAGING$.notifyError(error.message);
+    if (defaultNotifyErrorBehavior) {
+      notifyError(error);
+    }
     throw error;
   });
-export const getReferential = (schema, uri, noloading) => (dispatch) => {
-  if (noloading !== true) {
-    dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
-  }
+
+export const getReferential = (schema: Schema, uri: string) => (dispatch: Dispatch) => {
+  dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
   return api(schema)
     .get(buildUri(uri))
     .then((response) => {
@@ -66,11 +85,12 @@ export const getReferential = (schema, uri, noloading) => (dispatch) => {
     })
     .catch((error) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });
+      notifyError(error);
       throw error;
     });
 };
 
-export const putReferential = (schema, uri, data) => (dispatch) => {
+export const putReferential = (schema: Schema, uri: string, data: unknown) => (dispatch: Dispatch) => {
   dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
   return api(schema)
     .put(buildUri(uri), data)
@@ -80,16 +100,14 @@ export const putReferential = (schema, uri, data) => (dispatch) => {
       MESSAGING$.notifySuccess('The element has been updated');
       return response.data;
     })
-    .catch((error) => {
+    .catch((error: AxiosError) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });
-      if (error.status === 409) {
-        MESSAGING$.notifyError('The element already exists');
-      }
+      notifyError(error);
       return buildError(error);
     });
 };
 
-export const postReferential = (schema, uri, data) => (dispatch) => {
+export const postReferential = (schema: Schema | null, uri: string, data: unknown) => (dispatch: Dispatch) => {
   dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
   return api(schema)
     .post(buildUri(uri), data)
@@ -99,20 +117,12 @@ export const postReferential = (schema, uri, data) => (dispatch) => {
     })
     .catch((error) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });
-      if (error.status === 409) {
-        MESSAGING$.notifyError('The element already exists');
-      }
-      if (error.status === 500) {
-        MESSAGING$.notifyError('Internal error');
-      }
-      if (error.status === 400) {
-        MESSAGING$.notifyError(error.message);
-      }
+      notifyError(error);
       return buildError(error);
     });
 };
 
-export const delReferential = (uri, type, id) => (dispatch) => {
+export const delReferential = (uri: string, type: string, id: string) => (dispatch: Dispatch) => {
   dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
   return api()
     .delete(buildUri(uri))
@@ -124,11 +134,12 @@ export const delReferential = (uri, type, id) => (dispatch) => {
     })
     .catch((error) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });
+      notifyError(error);
       throw error;
     });
 };
 
-export const bulkDeleteReferential = (uri, type, data) => (dispatch) => {
+export const bulkDeleteReferential = (uri: string, type: string, data: unknown) => (dispatch: Dispatch) => {
   dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
   return api()
     .delete(buildUri(uri), { data })
@@ -140,6 +151,7 @@ export const bulkDeleteReferential = (uri, type, data) => (dispatch) => {
     })
     .catch((error) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });
+      notifyError(error);
       throw error;
     });
 };

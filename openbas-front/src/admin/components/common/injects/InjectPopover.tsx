@@ -1,12 +1,12 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableRow } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import { InjectContext, PermissionsContext } from '../Context';
 import type { Inject, InjectStatus, InjectStatusExecution, InjectTestStatus } from '../../../../utils/api-types';
-import { duplicateInjectForExercise, duplicateInjectForScenario, tryInject } from '../../../../actions/Inject';
+import { duplicateInjectForExercise, duplicateInjectForScenario } from '../../../../actions/Inject';
 import { testInject } from '../../../../actions/injects/inject-action';
 import { useAppDispatch } from '../../../../utils/hooks';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
@@ -62,7 +62,6 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const [openDelete, setOpenDelete] = useState(false);
   const [duplicate, setDuplicate] = useState(false);
-  const [openTry, setOpenTry] = useState(false);
   const [openTest, setOpenTest] = useState(false);
   const [openEnable, setOpenEnable] = useState(false);
   const [openDisable, setOpenDisable] = useState(false);
@@ -114,20 +113,9 @@ const InjectPopover: FunctionComponent<Props> = ({
     });
   };
 
-  const handleCloseTry = () => setOpenTry(false);
-
   const handleCloseResult = () => {
     setOpenResult(false);
     setInjectResult(null);
-  };
-
-  const submitTry = () => {
-    // FIXME: remove try possibility
-    dispatch(tryInject(inject.inject_id)).then((payload: InjectStatus) => {
-      setInjectResult(payload);
-      setOpenResult(true);
-    });
-    handleCloseTry();
   };
 
   const handleOpenTest = () => {
@@ -254,15 +242,6 @@ const InjectPopover: FunctionComponent<Props> = ({
             {t('Trigger now')}
           </MenuItem>
         )}
-        {/* TODO create an atomic testing when using this button */}
-        {/* {inject.inject_type !== 'openbas_manual' && ( */}
-        {/*  <MenuItem */}
-        {/*    onClick={handleOpenTry} */}
-        {/*    disabled={isDisabled} */}
-        {/*  > */}
-        {/*    {t('Try the inject')} */}
-        {/*  </MenuItem> */}
-        {/* )} */}
         {inject.inject_enabled ? (
           <MenuItem
             onClick={handleOpenDisable}
@@ -325,29 +304,6 @@ const InjectPopover: FunctionComponent<Props> = ({
           </Button>
           <Button color="secondary" onClick={submitDelete}>
             {t('Delete')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        TransitionComponent={Transition}
-        open={openTry}
-        onClose={handleCloseTry}
-        PaperProps={{ elevation: 1 }}
-      >
-        <DialogContent>
-          <DialogContentText>
-            <p>{t(`Do you want to try this inject: ${inject.inject_title}?`)}</p>
-            <Alert severity="info">
-              {t('The inject will only be sent to you.')}
-            </Alert>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseTry}>
-            {t('Cancel')}
-          </Button>
-          <Button color="secondary" onClick={submitTry}>
-            {t('Try')}
           </Button>
         </DialogActions>
       </Dialog>

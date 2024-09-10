@@ -77,6 +77,13 @@ export const duplicateScenario = (scenarioId: string) => (dispatch: Dispatch) =>
   return postReferential(scenario, uri, null)(dispatch);
 };
 
+// -- SCENARIO TO EXERCISE
+
+export const createRunningExerciseFromScenario = (scenarioId: string) => {
+  const uri = `${SCENARIO_URI}/${scenarioId}/exercise/running`;
+  return simplePostCall(uri);
+};
+
 // -- TEAMS --
 
 export const fetchScenarioTeams = (scenarioId: Scenario['scenario_id']) => (dispatch: Dispatch) => {

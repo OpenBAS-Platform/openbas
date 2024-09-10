@@ -4,6 +4,7 @@ import { fetchMapper, updateMapper } from '../../../../../actions/mapper/mapper-
 import type { ImportMapperUpdateInput, RawPaginationImportMapper } from '../../../../../utils/api-types';
 import Loader from '../../../../../components/Loader';
 import { ImportMapperStore } from '../../../../../actions/mapper/mapper';
+import { MESSAGING$ } from '../../../../../utils/Environment';
 
 interface XlsMapperUpdateComponentProps {
   xlsMapper: ImportMapperStore;
@@ -34,6 +35,7 @@ const XlsMapperUpdateComponent: FunctionComponent<XlsMapperUpdateComponentProps>
   const onSubmit = ((data: ImportMapperUpdateInput) => {
     updateMapper(xlsMapper.import_mapper_id, data).then(
       (result: { data: RawPaginationImportMapper }) => {
+        MESSAGING$.notifySuccess('The element has been updated');
         onUpdate?.(result.data);
         return result;
       },

@@ -56,7 +56,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecurringFormDialog: React.Dispatch<React.SetStateAction<boolean>> }) => {
+const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiateSimulationAndStart: React.Dispatch<React.SetStateAction<boolean>> }) => {
   // Standard hooks
   const classes = useStyles();
   const theme = useTheme<Theme>();
@@ -245,9 +245,9 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
             variant="contained"
             color="primary"
             size="large"
-            onClick={() => setOpenScenarioRecurringFormDialog(true)}
+            onClick={() => setOpenInstantiateSimulationAndStart(true)}
           >
-            {t('Simulate Now')}
+            {t('Launch simulation now')}
           </Button>
         </div>
       )}
