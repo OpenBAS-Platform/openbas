@@ -32,9 +32,6 @@ const useStyles = makeStyles(() => ({
   itemHead: {
     textTransform: 'uppercase',
   },
-  item: {
-    height: 50,
-  },
   bodyItems: {
     display: 'flex',
   },
@@ -228,7 +225,6 @@ const Scenarios = () => {
           return (
             <ListItem
               key={scenario.scenario_id}
-              classes={{ root: classes.item }}
               divider
               secondaryAction={
                 <ScenarioPopover
