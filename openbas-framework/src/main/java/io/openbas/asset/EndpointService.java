@@ -103,7 +103,7 @@ public class EndpointService {
     String filename = file +  "-" + version + "." + extension;
     String resourcePath = "/openbas-agent/" + platform.toLowerCase() + "/";
     InputStream in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
-    if (null == in) { // Dev mode, get from artifactory
+    if (in == null) { // Dev mode, get from artifactory
       filename = file + "-latest." + extension;
       in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
     }

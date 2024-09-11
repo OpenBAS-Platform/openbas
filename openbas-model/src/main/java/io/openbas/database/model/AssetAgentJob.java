@@ -48,24 +48,24 @@ public class AssetAgentJob implements Base {
 
     @Override
     public String toString() {
-        return this.id;
+        return id;
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
-        if (null == o || !Base.class.isAssignableFrom(o.getClass())) return false;
-        final Base base = (Base) o;
-        return this.id.equals(base.getId());
+        if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
+        Base base = (Base) o;
+        return id.equals(base.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.id);
+        return Objects.hash(id);
     }
 
     @Override
     public String getId() {
-        return this.id;
+        return id;
     }
 }

@@ -27,15 +27,15 @@ public class OpenBASExecutorContextService {
             .orElseThrow(() -> new UnsupportedOperationException("Inject does not have a contract"));
 
         switch (platform) {
-            case Windows -> {
+            case Endpoint.PLATFORM_TYPE.Windows -> {
                 return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Windows.name() + "." + arch.name())
                         .replace("#{inject}", inject.getId());
             }
-            case Linux -> {
+            case Endpoint.PLATFORM_TYPE.Linux -> {
                 return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Linux.name() + "." + arch.name())
                         .replace("#{inject}", inject.getId());
             }
-            case MacOS -> {
+            case Endpoint.PLATFORM_TYPE.MacOS -> {
                 return injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.MacOS.name() + "." + arch.name())
                         .replace("#{inject}", inject.getId());
             }
@@ -46,7 +46,7 @@ public class OpenBASExecutorContextService {
     public void launchExecutorSubprocess(@NotNull final Inject inject, @NotNull final Asset asset) {
         Endpoint.PLATFORM_TYPE platform = Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null;
         Endpoint.PLATFORM_ARCH arch = Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getArch() : null;
-        if (null == platform) {
+        if (platform == null) {
             throw new RuntimeException("Unsupported null platform");
         }
         AssetAgentJob assetAgentJob = new AssetAgentJob();
