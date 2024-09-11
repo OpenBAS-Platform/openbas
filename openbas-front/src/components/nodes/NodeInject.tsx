@@ -52,7 +52,9 @@ const useStyles = makeStyles<Theme>((theme) => ({
     WebkitLineClamp: 2,
     WebkitBoxOrient: 'vertical',
     height: '40px',
-
+    color: theme.palette.mode === 'dark'
+      ? 'white'
+      : 'black',
   },
   targets: {
     display: 'flex',

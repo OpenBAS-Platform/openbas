@@ -1,11 +1,11 @@
-import React, { FunctionComponent, useContext, useState } from 'react';
+import React, { FunctionComponent, useContext } from 'react';
 import { ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { BarChartOutlined, ReorderOutlined, ViewTimelineOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import type { InjectOutputType } from '../../../../actions/injects/Inject';
 import { exportData } from '../../../../utils/Environment';
 import { useFormatter } from '../../../../components/i18n';
-import { InjectContext } from '../Context';
+import { InjectContext, ViewModeContext } from '../Context';
 import ImportUploaderInjectFromXls from './ImportUploaderInjectFromXls';
 import useExportToXLS from '../../../../utils/hooks/useExportToXLS';
 import { useHelper } from '../../../../store';
@@ -41,12 +41,7 @@ const InjectsListButtons: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const injectContext = useContext(InjectContext);
 
-  const [viewMode, setViewModeInternal] = useState('list');
-
-  const setViewModeInject = (mode: string) => {
-    setViewModeInternal(mode);
-    if (setViewMode) setViewMode(mode);
-  };
+  const viewModeContext = useContext(ViewModeContext);
 
   // Fetching data
   const { tagsMap } = useHelper((helper: TagHelper) => ({
@@ -99,11 +94,11 @@ const InjectsListButtons: FunctionComponent<Props> = ({
           && <Tooltip title={t('List view')}>
             <ToggleButton
               value="list"
-              onClick={() => setViewModeInject('list')}
-              selected={viewMode === 'list'}
+              onClick={() => setViewMode('list')}
+              selected={viewModeContext === 'list'}
               aria-label="List view mode"
             >
-              <ReorderOutlined fontSize="small" color={viewMode === 'list' ? 'inherit' : 'primary'} />
+              <ReorderOutlined fontSize="small" color={viewModeContext === 'list' ? 'inherit' : 'primary'} />
             </ToggleButton>
           </Tooltip>
         }
@@ -111,11 +106,11 @@ const InjectsListButtons: FunctionComponent<Props> = ({
           && <Tooltip title={t('Interactive view')}>
             <ToggleButton
               value="chain"
-              onClick={() => setViewModeInject('chain')}
-              selected={viewMode === 'chain'}
+              onClick={() => setViewMode('chain')}
+              selected={viewModeContext === 'chain'}
               aria-label="Interactive view mode"
             >
-              <ViewTimelineOutlined fontSize="small" color={viewMode === 'chain' ? 'inherit' : 'primary'} />
+              <ViewTimelineOutlined fontSize="small" color={viewModeContext === 'chain' ? 'inherit' : 'primary'} />
             </ToggleButton>
           </Tooltip>
         }

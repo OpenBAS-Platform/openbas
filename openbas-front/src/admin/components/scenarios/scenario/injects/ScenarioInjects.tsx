@@ -2,7 +2,7 @@ import React, { FunctionComponent, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import * as R from 'ramda';
 import { Connection } from '@xyflow/react';
-import { ArticleContext, TeamContext } from '../../../common/Context';
+import { ArticleContext, TeamContext, ViewModeContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
@@ -49,8 +49,17 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
   const articleContext = articleContextForScenario(scenarioId);
   const teamContext = teamContextForScenario(scenarioId, []);
 
+  const [viewMode, setViewMode] = useState(() => {
+    const storedValue = localStorage.getItem('scenario_view_mode');
+    return storedValue === null ? 'list' : storedValue;
+  });
+
+  const handleViewMode = (mode: string) => {
+    setViewMode(mode);
+    localStorage.setItem('scenario_view_mode', mode);
+  };
+
   const injectContext = injectContextForScenario(scenario);
-  const [_viewMode, setViewMode] = useState('list');
 
   const handleConnectInjects = async (connection: Connection) => {
     const updateFields = [
@@ -65,24 +74,26 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
 
   return (
     <>
-      <ArticleContext.Provider value={articleContext}>
-        <TeamContext.Provider value={teamContext}>
-          <Injects
-            exerciseOrScenarioId={scenarioId}
-            teams={teams}
-            articles={articles}
-            variables={variables}
-            uriVariable={`/admin/scenarios/${scenarioId}/definition/variables`}
-            allUsersNumber={scenario.scenario_all_users_number}
-            usersNumber={scenario.scenario_users_number}
-            // @ts-expect-error typing
-            teamsUsers={scenario.scenario_teams_users}
-            onConnectInjects={handleConnectInjects}
-            setViewMode={setViewMode}
-            availableButtons={['chain', 'list']}
-          />
-        </TeamContext.Provider>
-      </ArticleContext.Provider>
+      <ViewModeContext.Provider value={viewMode}>
+        <ArticleContext.Provider value={articleContext}>
+          <TeamContext.Provider value={teamContext}>
+            <Injects
+              exerciseOrScenarioId={scenarioId}
+              teams={teams}
+              articles={articles}
+              variables={variables}
+              uriVariable={`/admin/scenarios/${scenarioId}/definition/variables`}
+              allUsersNumber={scenario.scenario_all_users_number}
+              usersNumber={scenario.scenario_users_number}
+              // @ts-expect-error typing
+              teamsUsers={scenario.scenario_teams_users}
+              onConnectInjects={handleConnectInjects}
+              setViewMode={handleViewMode}
+              availableButtons={['chain', 'list']}
+            />
+          </TeamContext.Provider>
+        </ArticleContext.Provider>
+      </ViewModeContext.Provider>
     </>
 
   );

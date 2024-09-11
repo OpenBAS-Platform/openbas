@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import arrayMutators from 'final-form-arrays';
 import { Form } from 'react-final-form';
 import { makeStyles } from '@mui/styles';
@@ -7,7 +7,6 @@ import { HelpOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import InjectChainsForm from './InjectChainsForm';
-import { InjectContext } from '../Context';
 
 const useStyles = makeStyles((theme) => ({
   injectorContract: {
@@ -33,7 +32,6 @@ const UpdateInjectLogicalChains = ({
 }) => {
   const { t, tPick } = useFormatter();
   const classes = useStyles();
-  const injectContext = useContext(InjectContext);
 
   const initialValues = {
     ...inject,
@@ -49,7 +47,6 @@ const UpdateInjectLogicalChains = ({
       inject_injector_contract: data.inject_injector_contract.injector_contract_id,
       inject_depends_on: data.inject_depends_on,
     };
-    await onUpdateInject(injectUpdate);
 
     const injectsToUpdate = [];
 
@@ -82,9 +79,7 @@ const UpdateInjectLogicalChains = ({
       }
     });
 
-    injectsToUpdate.forEach((injectToUpdate) => {
-      injectContext.onUpdateInject(injectToUpdate.inject_id, injectToUpdate);
-    });
+    await onUpdateInject([injectUpdate, ...injectsToUpdate]);
 
     handleClose();
   };

@@ -1,10 +1,10 @@
 import React, { FunctionComponent, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { BarChartOutlined, ReorderOutlined } from '@mui/icons-material';
+import { useParams } from 'react-router-dom';
+import { BarChartOutlined, ReorderOutlined, ViewTimelineOutlined } from '@mui/icons-material';
 import { Grid, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import type { Exercise } from '../../../../../utils/api-types';
-import { ArticleContext, TeamContext } from '../../../common/Context';
+import { ArticleContext, TeamContext, ViewModeContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
@@ -48,6 +48,16 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
   const dispatch = useAppDispatch();
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
 
+  const [viewMode, setViewMode] = useState(() => {
+    const storedValue = localStorage.getItem('exercise_view_mode');
+    return storedValue === null ? 'list' : storedValue;
+  });
+
+  const handleViewMode = (mode: string) => {
+    setViewMode(mode);
+    localStorage.setItem('exercise_view_mode', mode);
+  };
+
   const { injects, exercise, teams, articles, variables } = useHelper(
     (helper: InjectHelper & ExercisesHelper & ArticlesHelper & ChallengeHelper & VariablesHelper) => {
       return {
@@ -70,11 +80,10 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
   const articleContext = articleContextForExercise(exerciseId);
   const teamContext = teamContextForExercise(exerciseId, []);
 
-  const [viewMode, setViewMode] = useState('list');
-
   return (
     <>
-      {(viewMode === 'list' || viewMode === 'chain') && (
+      <ViewModeContext.Provider value={viewMode}>
+        {(viewMode === 'list' || viewMode === 'chain') && (
         <ArticleContext.Provider value={articleContext}>
           <TeamContext.Provider value={teamContext}>
             <Injects
@@ -89,13 +98,13 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
               usersNumber={exercise.exercise_users_number}
               // @ts-expect-error typing
               teamsUsers={exercise.exercise_teams_users}
-              setViewMode={setViewMode}
+              setViewMode={handleViewMode}
               availableButtons={['chain', 'list', 'distribution']}
             />
           </TeamContext.Provider>
         </ArticleContext.Provider>
-      )}
-      {viewMode === 'distribution' && (
+        )}
+        {viewMode === 'distribution' && (
         <div style={{ marginTop: -12 }}>
           <ToggleButtonGroup
             size="small"
@@ -187,7 +196,8 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
             </Grid>
           </Grid>
         </div>
-      )}
+        )}
+      </ViewModeContext.Provider>
     </>
   );
 };

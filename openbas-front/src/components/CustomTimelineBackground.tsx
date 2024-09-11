@@ -3,6 +3,8 @@ import cc from 'classcat';
 import { shallow } from 'zustand/shallow';
 
 import { useStore, type ReactFlowState, type BackgroundProps } from '@xyflow/react';
+import { useTheme } from '@mui/styles';
+import type { Theme } from './Theme';
 
 interface Props extends BackgroundProps {
   minutesPerGap: number,
@@ -28,6 +30,7 @@ function BackgroundComponent({
   style,
   className,
 }: Props) {
+  const theme: Theme = useTheme();
   const ref = useRef<SVGSVGElement>(null);
   const { transform, patternId } = useStore(selector, shallow);
 
@@ -42,15 +45,15 @@ function BackgroundComponent({
     <svg
       className={cc(['react-flow__background', className])}
       style={
-                {
-                  ...style,
-                  position: 'absolute',
-                  width: '100%',
-                  height: '100%',
-                  top: 0,
-                  left: 0,
-                } as CSSProperties
-            }
+        {
+          ...style,
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          top: 0,
+          left: 0,
+        } as CSSProperties
+      }
       ref={ref}
       data-testid="rf__background"
     >
@@ -69,7 +72,7 @@ function BackgroundComponent({
         >
           <path
             d="M0,0 L0,1000"
-            stroke="#121823"
+            stroke={theme.palette.mode === 'dark' ? '#121823' : '#ccc'}
             strokeWidth={3}
           />
         </svg>

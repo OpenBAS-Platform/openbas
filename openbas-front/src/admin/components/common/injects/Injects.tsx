@@ -15,7 +15,7 @@ import { isNotEmptyField } from '../../../../utils/utils';
 import { useFormatter } from '../../../../components/i18n';
 import type { FilterGroup, Inject, InjectTestStatus, Variable } from '../../../../utils/api-types';
 import type { InjectorContractConvertedContent, InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
-import { InjectContext, PermissionsContext } from '../Context';
+import { InjectContext, PermissionsContext, ViewModeContext } from '../Context';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
@@ -125,13 +125,8 @@ const Injects: FunctionComponent<Props> = ({
   const classes = useStyles();
   const { t, tPick } = useFormatter();
   const injectContext = useContext(InjectContext);
+  const viewModeContext = useContext(ViewModeContext);
   const { permissions } = useContext(PermissionsContext);
-  const [viewMode, setViewModeInternal] = useState('list');
-
-  const setViewModeInject = (mode: string) => {
-    setViewModeInternal(mode);
-    if (setViewMode) setViewMode(mode);
-  };
 
   // Headers
   const headers = useMemo(() => [
@@ -253,11 +248,25 @@ const Injects: FunctionComponent<Props> = ({
     }
   };
 
-  const onUpdateInjectSimpler = async (data: Inject) => {
-    await injectContext.onUpdateInject(data.inject_id, data).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
-      if (result.entities) {
-        const updated = result.entities.injects[result.result];
-        setInjects(injects.map((i) => (i.inject_id !== updated.inject_id ? i as InjectOutputType : (updated as InjectOutputType))));
+  const massUpdateInject = async (data: Inject[]) => {
+    const promises: Promise<InjectStore | undefined>[] = [];
+    data.forEach((inject) => {
+      promises.push(injectContext.onUpdateInject(inject.inject_id, inject).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+        if (result.entities) {
+          const updated = result.entities.injects[result.result];
+          return updated;
+        }
+        return undefined;
+      }));
+    });
+
+    Promise.all(promises).then((values) => {
+      if (values !== undefined) {
+        const updatedInjects = injects
+          .map((inject) => (values.find((value) => value !== undefined && value.inject_id === inject.inject_id)
+            ? (values.find((value) => value !== undefined && value?.inject_id === inject.inject_id) as InjectOutputType)
+            : inject as InjectOutputType));
+        setInjects(updatedInjects);
       }
     });
   };
@@ -483,20 +492,20 @@ const Injects: FunctionComponent<Props> = ({
           <InjectsListButtons
             injects={injects}
             availableButtons={availableButtons}
-            setViewMode={setViewModeInject}
+            setViewMode={setViewMode}
             showTimeline={showTimeline}
             handleShowTimeline={handleShowTimeline}
           />
         }
       />
-      {viewMode === 'chain' && (
+      {viewModeContext === 'chain' && (
         <div style={{ marginBottom: 50 }}>
           <div>
             <ChainedTimeline
               injects={injects}
               onConnectInjects={onConnectInjects}
               exerciseOrScenarioId={exerciseOrScenarioId}
-              onUpdateInject={onUpdateInjectSimpler}
+              onUpdateInject={massUpdateInject}
               openCreateInjectDrawer={openCreateInjectDrawer}
               onSelectedInject={(inject) => {
                 const injectContract = inject?.inject_injector_contract.convertedContent;
@@ -510,7 +519,7 @@ const Injects: FunctionComponent<Props> = ({
           </div>
         </div>
       )}
-      {viewMode === 'list' && (
+      {viewModeContext === 'list' && (
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -625,6 +634,7 @@ const Injects: FunctionComponent<Props> = ({
               open
               handleClose={() => setSelectedInjectId(null)}
               onUpdateInject={onUpdateInject}
+              massUpdateInject={massUpdateInject}
               injectId={selectedInjectId}
               teamsFromExerciseOrScenario={teams}
               // @ts-expect-error typing

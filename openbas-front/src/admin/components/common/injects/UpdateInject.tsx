@@ -17,13 +17,14 @@ interface Props {
   open: boolean;
   handleClose: () => void;
   onUpdateInject: (data: Inject) => Promise<void>;
+  massUpdateInject: (data: Inject[]) => Promise<void>;
   injectId: string;
   isAtomic?: boolean;
   teamsFromExerciseOrScenario: TeamStore[];
   injects?: InjectOutputType[];
 }
 
-const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, injectId, isAtomic = false, teamsFromExerciseOrScenario, injects, ...props }) => {
+const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, massUpdateInject, injectId, isAtomic = false, teamsFromExerciseOrScenario, injects, ...props }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const drawerRef = useRef(null);
@@ -86,7 +87,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, inje
           <UpdateInjectLogicalChains
             inject={inject}
             handleClose={handleClose}
-            onUpdateInject={onUpdateInject}
+            onUpdateInject={massUpdateInject}
             injects={injects}
             {...props}
           />
