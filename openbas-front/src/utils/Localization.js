@@ -1180,6 +1180,7 @@ const i18n = {
       'Select the template': 'Sélectionnez le modèle',
       'Supporting payloads': 'Charges utiles prises en charge',
       'Command Line': 'Ligne de commande',
+      'Command Lines': 'Lignes de commande',
       Executable: 'Exécutable',
       'File Drop': 'Dépôt de fichier',
       'DNS Resolution': 'Résolution DNS',
