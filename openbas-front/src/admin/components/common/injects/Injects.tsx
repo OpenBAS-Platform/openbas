@@ -219,21 +219,35 @@ const Injects: FunctionComponent<Props> = ({
   const [injects, setInjects] = useState<InjectOutputType[]>([]);
   const [selectedInjectId, setSelectedInjectId] = useState<string | null>(null);
 
+  // Optimistic update
+  const onCreate = (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+    if (result.entities) {
+      const created = result.entities.injects[result.result];
+      setInjects([created as InjectOutputType, ...injects]);
+    }
+  };
+  const onUpdate = (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+    if (result.entities) {
+      const updated = result.entities.injects[result.result];
+      setInjects(injects.map((i) => (i.inject_id !== updated.inject_id ? i as InjectOutputType : (updated as InjectOutputType))));
+    }
+  };
+
+  const onDelete = (result: string) => {
+    if (result) {
+      setInjects(injects.filter((i) => (i.inject_id !== result)));
+    }
+  };
+
   const onCreateInject = async (data: Inject) => {
     await injectContext.onAddInject(data).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
-      if (result.entities) {
-        const created = result.entities.injects[result.result];
-        setInjects([created as InjectOutputType, ...injects]);
-      }
+      onCreate(result);
     });
   };
   const onUpdateInject = async (data: Inject) => {
     if (selectedInjectId) {
       await injectContext.onUpdateInject(selectedInjectId, data).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
-        if (result.entities) {
-          const updated = result.entities.injects[result.result];
-          setInjects(injects.map((i) => (i.inject_id !== updated.inject_id ? i as InjectOutputType : (updated as InjectOutputType))));
-        }
+        onUpdate(result);
       });
     }
   };
@@ -421,6 +435,9 @@ const Injects: FunctionComponent<Props> = ({
                   canBeTested
                   setSelectedInjectId={setSelectedInjectId}
                   isDisabled={!injectContract || !isContractExposed}
+                  onCreate={onCreate}
+                  onUpdate={onUpdate}
+                  onDelete={onDelete}
                 />
               </ListItemSecondaryAction>
             </ListItem>

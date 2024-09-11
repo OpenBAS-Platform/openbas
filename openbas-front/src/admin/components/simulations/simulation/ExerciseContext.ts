@@ -31,7 +31,7 @@ const injectContextForExercise = (exercise: ExerciseStore) => {
     onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
       return dispatch(updateInjectForExercise(exercise.exercise_id, injectId, inject));
     },
-    onUpdateInjectTrigger(injectId: Inject['inject_id']): void {
+    onUpdateInjectTrigger(injectId: Inject['inject_id']): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
       const injectDependsDuration = secondsFromToNow(
         exercise.exercise_start_date,
       );
@@ -43,10 +43,10 @@ const injectContextForExercise = (exercise: ExerciseStore) => {
     }> {
       return dispatch(updateInjectActivationForExercise(exercise.exercise_id, injectId, injectEnabled));
     },
-    onInjectDone(injectId: Inject['inject_id']): void {
+    onInjectDone(injectId: Inject['inject_id']): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
       return dispatch(injectDone(exercise.exercise_id, injectId));
     },
-    onDeleteInject(injectId: Inject['inject_id']): void {
+    onDeleteInject(injectId: Inject['inject_id']): Promise<void> {
       return dispatch(deleteInjectForExercise(exercise.exercise_id, injectId));
     },
     onImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {

@@ -14,6 +14,7 @@ import { useHelper } from '../../../../store';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import DialogTest from '../../../../components/common/DialogTest';
 import { MESSAGING$ } from '../../../../utils/Environment';
+import type { InjectStore } from '../../../../actions/injects/Inject';
 
 type InjectPopoverType = {
   inject_id: string,
@@ -33,6 +34,9 @@ interface Props {
   isDisabled: boolean;
   canBeTested?: boolean;
   exerciseOrScenarioId?: string;
+  onCreate?: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void;
+  onUpdate?: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void;
+  onDelete?: (result: string) => void;
 }
 
 const InjectPopover: FunctionComponent<Props> = ({
@@ -41,6 +45,9 @@ const InjectPopover: FunctionComponent<Props> = ({
   isDisabled,
   canBeTested = false,
   exerciseOrScenarioId,
+  onCreate,
+  onUpdate,
+  onDelete,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -78,33 +85,33 @@ const InjectPopover: FunctionComponent<Props> = ({
     setDuplicate(true);
     handlePopoverClose();
   };
-
   const handleCloseDuplicate = () => setDuplicate(false);
 
   const submitDuplicate = () => {
     if (inject.inject_exercise) {
-      dispatch(duplicateInjectForExercise(inject.inject_exercise, inject.inject_id));
+      dispatch(duplicateInjectForExercise(inject.inject_exercise, inject.inject_id)).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+        onCreate?.(result);
+      });
     }
     if (inject.inject_scenario) {
-      dispatch(duplicateInjectForScenario(inject.inject_scenario, inject.inject_id));
+      dispatch(duplicateInjectForScenario(inject.inject_scenario, inject.inject_id)).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+        onCreate?.(result);
+      });
     }
     handleCloseDuplicate();
-  };
-
-  const submitDuplicateHandler = () => {
-    submitDuplicate();
   };
 
   const handleOpenDelete = () => {
     setOpenDelete(true);
     handlePopoverClose();
   };
-
   const handleCloseDelete = () => setOpenDelete(false);
 
   const submitDelete = () => {
-    onDeleteInject(inject.inject_id);
-    handleCloseDelete();
+    onDeleteInject(inject.inject_id).then(() => {
+      onDelete?.(inject.inject_id);
+      handleCloseDelete();
+    });
   };
 
   const handleCloseTry = () => setOpenTry(false);
@@ -127,10 +134,7 @@ const InjectPopover: FunctionComponent<Props> = ({
     setOpenTest(true);
     handlePopoverClose();
   };
-
-  const handleCloseTest = () => {
-    setOpenTest(false);
-  };
+  const handleCloseTest = () => setOpenTest(false);
 
   const submitTest = () => {
     testInject(inject.inject_id).then((result: { data: InjectTestStatus }) => {
@@ -151,11 +155,11 @@ const InjectPopover: FunctionComponent<Props> = ({
     setOpenEnable(true);
     handlePopoverClose();
   };
-
   const handleCloseEnable = () => setOpenEnable(false);
 
   const submitEnable = () => {
-    onUpdateInjectActivation(inject.inject_id, { inject_enabled: true }).then(() => {
+    onUpdateInjectActivation(inject.inject_id, { inject_enabled: true }).then((result) => {
+      onUpdate?.(result);
       handleCloseEnable();
     });
   };
@@ -164,13 +168,11 @@ const InjectPopover: FunctionComponent<Props> = ({
     setOpenDisable(true);
     handlePopoverClose();
   };
-
-  const handleCloseDisable = () => {
-    setOpenDisable(false);
-  };
+  const handleCloseDisable = () => setOpenDisable(false);
 
   const submitDisable = () => {
-    onUpdateInjectActivation(inject.inject_id, { inject_enabled: false }).then(() => {
+    onUpdateInjectActivation(inject.inject_id, { inject_enabled: false }).then((result) => {
+      onUpdate?.(result);
       handleCloseDisable();
     });
   };
@@ -179,12 +181,13 @@ const InjectPopover: FunctionComponent<Props> = ({
     setOpenDone(true);
     handlePopoverClose();
   };
-
   const handleCloseDone = () => setOpenDone(false);
 
   const submitDone = () => {
-    onInjectDone?.(inject.inject_id);
-    handleCloseDone();
+    onInjectDone?.(inject.inject_id).then((result) => {
+      onUpdate?.(result);
+      handleCloseDone();
+    });
   };
 
   const handleOpenEditContent = () => {
@@ -196,12 +199,13 @@ const InjectPopover: FunctionComponent<Props> = ({
     setOpenTrigger(true);
     handlePopoverClose();
   };
-
   const handleCloseTrigger = () => setOpenTrigger(false);
 
   const submitTrigger = () => {
-    onUpdateInjectTrigger?.(inject.inject_id);
-    handleCloseTrigger();
+    onUpdateInjectTrigger?.(inject.inject_id).then((result) => {
+      onUpdate?.(result);
+      handleCloseTrigger();
+    });
   };
 
   return (
@@ -281,7 +285,7 @@ const InjectPopover: FunctionComponent<Props> = ({
       <DialogDuplicate
         open={duplicate}
         handleClose={handleCloseDuplicate}
-        handleSubmit={submitDuplicateHandler}
+        handleSubmit={submitDuplicate}
         text={`${t('Do you want to duplicate this inject:')} ${inject.inject_title} ?`}
       />
       <Dialog
