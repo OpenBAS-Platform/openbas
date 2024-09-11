@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import * as R from 'ramda';
-import { Connection } from '@xyflow/react';
 import { ArticleContext, TeamContext, ViewModeContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';

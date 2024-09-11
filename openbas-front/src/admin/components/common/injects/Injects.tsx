@@ -112,7 +112,6 @@ const Injects: FunctionComponent<Props> = ({
   exerciseOrScenarioId,
   setViewMode,
   availableButtons,
-  onConnectInjects,
   teams,
   articles,
   variables,
@@ -503,7 +502,6 @@ const Injects: FunctionComponent<Props> = ({
           <div>
             <ChainedTimeline
               injects={injects}
-              onConnectInjects={onConnectInjects}
               exerciseOrScenarioId={exerciseOrScenarioId}
               onUpdateInject={massUpdateInject}
               openCreateInjectDrawer={openCreateInjectDrawer}

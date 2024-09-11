@@ -57,7 +57,6 @@ const useStyles = makeStyles(() => ({
 interface Props {
   injects: InjectOutputType[],
   exerciseOrScenarioId: string,
-  onConnectInjects(connection: Connection): void,
   onSelectedInject(inject?: InjectOutputType): void,
   openCreateInjectDrawer(data: {
     inject_depends_duration_days: number,
@@ -67,7 +66,7 @@ interface Props {
   onUpdateInject: (data: Inject[]) => void
 }
 
-const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScenarioId, onConnectInjects, onSelectedInject, openCreateInjectDrawer, onUpdateInject }) => {
+const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScenarioId, onSelectedInject, openCreateInjectDrawer, onUpdateInject }) => {
   // Standard hooks
   const classes = useStyles();
   const theme = useTheme<Theme>();
@@ -200,7 +199,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
                 theme.palette.mode === 'dark'
                   ? '#09101e'
                   : '#e5e5e5',
-            onConnectInjects,
             isTargeted: injects.find((anyInject) => anyInject.inject_id === inject.inject_id) !== undefined,
             isTargeting: inject.inject_depends_on !== undefined,
             inject,
@@ -420,6 +418,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   };
 
   const onReconnectEnd = (event: React.MouseEvent, edge: Edge, handleType: 'source' | 'target', connectionState: Omit<ConnectionState, 'inProgress'>) => {
+    console.log(edge);
+    console.log(handleType);
+    console.log(connectionState);
     if (!connectionState.isValid) {
       const inject = injects.find((currentInject) => currentInject.inject_id === edge.target);
       if (inject !== undefined) {
@@ -583,6 +584,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
               pannable={true}
               onMouseEnter={hideNewNode}
               onMouseLeave={showNewNode}
+              ariaLabel={null}
             />
           </ReactFlow>
         </div>
