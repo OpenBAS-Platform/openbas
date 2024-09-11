@@ -170,7 +170,7 @@ input[type="file"] {
   --xy-background-color: #070d19;
   --xy-background-color-props: #070d19;
   --xy-background-color-default:#070d19;
-  --xy-minimap-mask-background-color-default: rgba(255, 255, 255, 0.8);
+  --xy-minimap-mask-background-color-default: rgba(80, 80, 80, 0.8);
   --xy-controls-button-background-color-default: #070d19;
 }
 
