@@ -25,7 +25,7 @@ const checkLanguageSupport = (lang) => {
   const match = (filePath) => {
     try {
       const data = fs.readFileSync(filePath, { encoding: 'utf8' });
-      const regexp = /t\('([\w\s]+)'\)/g;
+      const regexp = /(?<![a-zA-Z])t\('([\w\s]+)'\)/g;
       const matches = [...data.matchAll(regexp)];
       matches.forEach((m) => {
         const regexWithQuote = `'${m[1]}':`;
@@ -57,16 +57,22 @@ const checkLanguageSupport = (lang) => {
 
 const run = () => {
   const languages = ['fr', 'zh'];
-  const _missingKeys = {};
+  const missingKeys = {};
 
   languages.forEach((lang) => {
     const keys = checkLanguageSupport(lang);
     if (keys.length > 0) {
-      _missingKeys[lang] = keys;
+      missingKeys[lang] = keys;
     }
   });
 
-  return _missingKeys;
+  if (Object.keys(missingKeys).length) {
+    // eslint-disable-next-line no-console
+    console.error('Missing keys :', missingKeys);
+    process.exit(1);
+  } else {
+    process.exit(0);
+  }
 };
 
-const _missingKeys = run();
+run();

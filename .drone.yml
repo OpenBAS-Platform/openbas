@@ -19,15 +19,15 @@ steps:
   - name: frontend-tests
     image: node:20-alpine
     volumes:
-    - name: cache-node-frontend
-      path: /drone/src/openbas-front/node_modules
+      - name: cache-node-frontend
+        path: /drone/src/openbas-front/node_modules
     commands:
       - cd openbas-front
       - yarn install
       - yarn build
       - yarn check-ts
       - yarn lint
-    # - yarn i18n-checker
+      - yarn i18n-checker
       - NODE_OPTIONS=--max_old_space_size=8192 yarn test
 
   - name: app-e2e
@@ -66,8 +66,8 @@ steps:
   - name: frontend-e2e-tests
     image: node:20.16.0
     volumes:
-    - name: cache-node-frontend-e2e
-      path: /drone/src/openbas-front/node_modules
+      - name: cache-node-frontend-e2e
+        path: /drone/src/openbas-front/node_modules
     commands:
       - apt update
       - apt -y install netcat-traditional
