@@ -58,9 +58,6 @@ public class PayloadUpdateInput {
 
     @JsonProperty("payload_attack_patterns")
     private List<String> attackPatternsIds = new ArrayList<>();
-
-    @JsonProperty("payload_elevation_required")
-    private boolean elevationRequired;
 }
 
 
