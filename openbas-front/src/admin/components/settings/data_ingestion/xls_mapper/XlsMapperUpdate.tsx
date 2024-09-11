@@ -35,7 +35,6 @@ const XlsMapperUpdateComponent: FunctionComponent<XlsMapperUpdateComponentProps>
   const onSubmit = ((data: ImportMapperUpdateInput) => {
     updateMapper(xlsMapper.import_mapper_id, data).then(
       (result: { data: RawPaginationImportMapper }) => {
-        MESSAGING$.notifySuccess('The element has been updated');
         onUpdate?.(result.data);
         return result;
       },

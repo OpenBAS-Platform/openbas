@@ -70,7 +70,7 @@ public class ScenarioExecutionJob implements Job {
         .filter(scenario -> !alreadyExistIds.contains(scenario.getId()))
         // Create simulation with start date provided by cron
         .forEach(scenario -> this.scenarioToExerciseService.toExercise(scenario, cronToDate(scenario.getRecurrence()),
-            null));
+            false));
   }
 
   private void cleanOutdatedRecurringScenario() {

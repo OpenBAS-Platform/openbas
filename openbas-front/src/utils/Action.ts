@@ -60,14 +60,26 @@ export const simplePostCall = (uri: string, data?: unknown, defaultNotifyErrorBe
     }
     throw error;
   });
-export const simplePutCall = (uri: string, data?: unknown, defaultNotifyErrorBehavior: boolean = true) => simpleApi.put(buildUri(uri), data)
+export const simplePutCall = (uri: string, data?: unknown, defaultNotifyErrorBehavior: boolean = true, defaultSuccessBehavior: boolean = true) => simpleApi.put(buildUri(uri), data)
+  .then((response) => {
+    if (defaultSuccessBehavior) {
+      MESSAGING$.notifySuccess('The element has been updated');
+    }
+    return response;
+  })
   .catch((error) => {
     if (defaultNotifyErrorBehavior) {
       notifyError(error);
     }
     throw error;
   });
-export const simpleDelCall = (uri: string, defaultNotifyErrorBehavior: boolean = true) => simpleApi.delete(buildUri(uri))
+export const simpleDelCall = (uri: string, defaultNotifyErrorBehavior: boolean = true, defaultSuccessBehavior: boolean = true) => simpleApi.delete(buildUri(uri))
+  .then((response) => {
+    if (defaultSuccessBehavior) {
+      MESSAGING$.notifySuccess('The element has been deleted');
+    }
+    return response;
+  })
   .catch((error) => {
     if (defaultNotifyErrorBehavior) {
       notifyError(error);
@@ -131,6 +143,7 @@ export const delReferential = (uri: string, type: string, id: string) => (dispat
         type: Constants.DATA_DELETE_SUCCESS,
         payload: Immutable({ type, id }),
       });
+      MESSAGING$.notifySuccess('The element has been deleted');
     })
     .catch((error) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });

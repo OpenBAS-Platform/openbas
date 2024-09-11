@@ -44,7 +44,7 @@ public class ScenarioToExerciseService {
   public Exercise toExercise(
       @NotBlank final Scenario scenario,
       @Nullable final Instant start,
-      @Nullable final Boolean isRunning) {
+      final boolean isRunning) {
     Exercise exercise = new Exercise();
     exercise.setScenario(scenario);
     exercise.setName(scenario.getName());
@@ -58,7 +58,7 @@ public class ScenarioToExerciseService {
     exercise.setFrom(scenario.getFrom());
     exercise.addReplyTos(scenario.getReplyTos());
     exercise.setStart(start);
-    if (isRunning != null && isRunning) {
+    if (isRunning) {
       exercise.setStatus(ExerciseStatus.RUNNING);
     }
 

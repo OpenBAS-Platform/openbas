@@ -219,7 +219,7 @@ class ScenarioToExerciseServiceTest {
     VARIABLE_ID = variableSaved.getId();
 
     // -- EXECUTE --
-    Exercise exercise = this.scenarioToExerciseService.toExercise(scenario, null, null);
+    Exercise exercise = this.scenarioToExerciseService.toExercise(scenario, null, false);
     EXERCISE_ID = exercise.getId();
     Exercise exerciseSaved = this.loadService.exercise(EXERCISE_ID);
 
