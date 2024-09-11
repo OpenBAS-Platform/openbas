@@ -418,9 +418,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
   };
 
   const onReconnectEnd = (event: React.MouseEvent, edge: Edge, handleType: 'source' | 'target', connectionState: Omit<ConnectionState, 'inProgress'>) => {
-    console.log(edge);
-    console.log(handleType);
-    console.log(connectionState);
     if (!connectionState.isValid) {
       const inject = injects.find((currentInject) => currentInject.inject_id === edge.target);
       if (inject !== undefined) {
