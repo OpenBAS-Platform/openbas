@@ -16,7 +16,7 @@ import { fetchCollectors } from '../../../actions/Collector';
 import Drawer from '../../../components/common/Drawer';
 import ItemCopy from '../../../components/ItemCopy';
 import { emptyFilled } from '../../../utils/String';
-import useQueryable from '../../../components/common/queryable/useQueryable';
+import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
@@ -27,6 +27,7 @@ import { useAppDispatch } from '../../../utils/hooks';
 import type { PayloadStore } from '../../../actions/payloads/Payload';
 import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
 import ExportButton from '../../../components/common/ExportButton';
+import { Header } from '../../../components/common/SortHeadersList';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -109,7 +110,7 @@ const Payloads = () => {
   });
 
   // Headers
-  const headers = useMemo(() => [
+  const headers: Header[] = useMemo(() => [
     {
       field: 'payload_type',
       label: 'Type',
@@ -125,21 +126,21 @@ const Payloads = () => {
       field: 'payload_name',
       label: 'Name',
       isSortable: true,
-      value: (payload: PayloadStore) => payload.payload_name,
+      value: (payload: PayloadStore) => <>{payload.payload_name}</>,
     },
     {
       field: 'payload_platforms',
       label: 'Platforms',
       isSortable: false,
-      value: (payload: PayloadStore) => payload.payload_platforms?.map(
-        (platform) => <PlatformIcon key={platform} platform={platform} tooltip={true} width={20} marginRight={10} />,
-      ),
+      value: (payload: PayloadStore) => <>{payload.payload_platforms?.map(
+        (platform) => <PlatformIcon key={platform} platform={platform} tooltip width={20} marginRight={10} />,
+      )}</>,
     },
     {
       field: 'payload_description',
       label: 'Description',
       isSortable: true,
-      value: (payload: PayloadStore) => payload.payload_description,
+      value: (payload: PayloadStore) => <>{payload.payload_description}</>,
     },
     {
       field: 'payload_tags',
@@ -176,7 +177,7 @@ const Payloads = () => {
       field: 'payload_updated_at',
       label: 'Updated',
       isSortable: true,
-      value: (payload: PayloadStore) => nsdt(payload.payload_updated_at),
+      value: (payload: PayloadStore) => <>{nsdt(payload.payload_updated_at)}</>,
     },
   ], []);
 
@@ -191,7 +192,7 @@ const Payloads = () => {
     'payload_updated_at',
   ];
   const [payloads, setPayloads] = useState<PayloadStore[]>([]);
-  const { queryableHelpers, searchPaginationInput } = useQueryable('payloads', buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('payloads', buildSearchPagination({
     sorts: initSorting('payload_name'),
     filterGroup: {
       mode: 'and',
@@ -286,7 +287,7 @@ const Payloads = () => {
                         className={classes.bodyItem}
                         style={inlineStyles[header.field]}
                       >
-                        {header.value(payload)}
+                        {header.value?.(payload)}
                       </div>
                     ))}
                   </div>

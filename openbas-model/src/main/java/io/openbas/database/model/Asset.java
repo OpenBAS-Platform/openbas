@@ -76,7 +76,7 @@ public class Asset implements Base {
 
   // -- TAG --
 
-  @Queryable(sortable = true)
+  @Queryable(filterable = true, sortable = true, dynamicValues = true, path = "tags.id")
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "assets_tags",
       joinColumns = @JoinColumn(name = "asset_id"),

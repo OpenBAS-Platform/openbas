@@ -23,8 +23,9 @@ import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import { isNotEmptyField } from '../../../../utils/utils';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
-import useQueryable from '../../../../components/common/queryable/useQueryable';
+import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
+import { Header } from '../../../../components/common/SortHeadersList';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -102,12 +103,14 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
   });
 
   // Headers
-  const headers = useMemo(() => [
+  const headers: Header[] = useMemo(() => [
     {
       field: 'kill_chain_phase',
       label: 'Kill chain phase',
       isSortable: false,
-      value: (_: InjectorContractOutput, killChainPhase: KillChainPhase, __: Record<string, AttackPatternStore>) => (killChainPhase ? killChainPhase.phase_name : t('Unknown')),
+      value: (_: InjectorContractOutput, killChainPhase: KillChainPhase, __: Record<string, AttackPatternStore>) => {
+        return <>{(killChainPhase ? killChainPhase.phase_name : t('Unknown'))}</>;
+      },
     },
     {
       field: 'injector_contract_labels',
@@ -193,7 +196,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
     });
   };
 
-  const { queryableHelpers, searchPaginationInput } = useQueryable('injector-contracts', initSearchPaginationInput());
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('injector-contracts', initSearchPaginationInput());
 
   const [selectedContract, setSelectedContract] = useState<number | null>(null);
   const selectContract = (contract: number) => {
@@ -291,7 +294,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
                               className={classes.bodyItem}
                               style={inlineStyles[header.field]}
                             >
-                              {header.value(contract, resolvedContractKillChainPhase, contractAttackPatterns)}
+                              {header.value?.(contract, resolvedContractKillChainPhase, contractAttackPatterns)}
                             </div>
                           ))}
                         </div>

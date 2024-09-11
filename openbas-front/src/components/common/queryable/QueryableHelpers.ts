@@ -9,5 +9,5 @@ export interface QueryableHelpers {
   paginationHelpers: PaginationHelpers;
   filterHelpers: FilterHelpers;
   sortHelpers: SortHelpers;
-  uriHelpers: UriHelpers;
+  uriHelpers?: UriHelpers;
 }

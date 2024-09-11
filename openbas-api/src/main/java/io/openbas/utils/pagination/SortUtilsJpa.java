@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 import static io.openbas.utils.schema.SchemaUtils.getSortableProperties;
+import static org.springframework.util.StringUtils.hasText;
 
 public class SortUtilsJpa {
 
@@ -25,6 +26,7 @@ public class SortUtilsJpa {
       orders = List.of();
     } else {
       orders = sorts.stream()
+          .filter(s -> hasText(s.property()))
           .map(field -> {
             String property = field.property();
             Sort.Direction direction = Sort.DEFAULT_DIRECTION;

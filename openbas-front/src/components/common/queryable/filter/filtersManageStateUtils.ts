@@ -37,7 +37,7 @@ export const handleAddMultipleValueFilterUtil = (filters: FilterGroup, key: stri
 };
 
 export const handleChangeOperatorFiltersUtil = (filters: FilterGroup, key: string, operator: Filter['operator']) => {
-  return updateFilters(filters, (f) => (f.key === key ? { ...f, operator, values: [] } : f));
+  return updateFilters(filters, (f) => (f.key === key ? { ...f, operator, values: operator && ['empty', 'not_empty'].includes(operator) ? [] : f.values } : f));
 };
 
 export const handleRemoveFilterUtil = (filters: FilterGroup, key: string) => {

@@ -10,7 +10,7 @@ import { createAtomicTesting, searchAtomicTestings } from '../../../actions/atom
 import CreateInject from '../common/injects/CreateInject';
 import InjectDtoList from './InjectDtoList';
 import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
-import useQueryable from '../../../components/common/queryable/useQueryable';
+import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import { initSorting } from '../../../components/common/queryable/Page';
 import ButtonCreate from '../../../components/common/ButtonCreate';
@@ -59,7 +59,7 @@ const AtomicTestings = () => {
       buildEmptyFilter('inject_tags', 'contains'),
     ],
   };
-  const { queryableHelpers, searchPaginationInput } = useQueryable('atomic-testing', buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('atomic-testing', buildSearchPagination({
     sorts: initSorting('inject_updated_at', 'DESC'),
     filterGroup: quickFilter,
   }));

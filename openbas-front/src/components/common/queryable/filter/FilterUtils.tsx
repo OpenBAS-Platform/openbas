@@ -41,9 +41,9 @@ export const isEmptyFilter = (filterGroup: FilterGroup, key: string) => {
 export const convertOperatorToIcon = (t: (text: string) => string, operator: Filter['operator']) => {
   switch (operator) {
     case 'eq':
-      return <>&nbsp;=</>;
+      return <>=</>;
     case 'not_eq':
-      return <>&nbsp;&#8800;</>;
+      return <>&#8800;</>;
     case 'not_contains':
       return t('not contains');
     case 'contains':
@@ -53,13 +53,13 @@ export const convertOperatorToIcon = (t: (text: string) => string, operator: Fil
     case 'not_starts_with':
       return t('not starts with');
     case 'gt':
-      return <>&nbsp;&#62;</>;
+      return <>&#62;</>;
     case 'gte':
-      return <>&nbsp;&#8805;</>;
+      return <>&#8805;</>;
     case 'lt':
-      return <>&nbsp;&#60;</>;
+      return <>&#60;</>;
     case 'lte':
-      return <>&nbsp;&#8804;</>;
+      return <>&#8804;</>;
     case 'empty':
       return t('is empty');
     case 'not_empty':
@@ -92,7 +92,7 @@ export const availableOperators = (propertySchema: PropertySchemaDTO) => {
     return ['gt', 'gte', 'lt', 'lte', 'empty', 'not_empty'];
   }
   // Array
-  if (propertySchema.schema_property_type_array) {
+  if (propertySchema.schema_property_type_array || propertySchema.schema_property_values) {
     return ['contains', 'not_contains', 'empty', 'not_empty'];
   }
   // Enum & not array

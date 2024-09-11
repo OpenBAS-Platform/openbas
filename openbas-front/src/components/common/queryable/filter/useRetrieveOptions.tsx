@@ -30,6 +30,8 @@ const useRetrieveOptions = () => {
           setOptions(response.data);
         });
         break;
+      case 'asset_tags':
+      case 'asset_group_tags':
       case 'scenario_tags':
       case 'exercise_tags':
       case 'inject_tags':

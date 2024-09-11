@@ -28,7 +28,7 @@ import { isEmptyField } from '../../../../utils/utils';
 import type { EndpointStore } from '../../assets/endpoints/Endpoint';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import ExerciseList from '../../simulations/ExerciseList';
-import useQueryable from '../../../../components/common/queryable/useQueryable';
+import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import ExercisePopover from '../../simulations/simulation/ExercisePopover';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
@@ -76,7 +76,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
 
   // Exercises
   const [exercises, setExercises] = useState<EndpointStore[]>([]);
-  const { queryableHelpers, searchPaginationInput } = useQueryable(`scenario-${scenarioId}-simulations`, buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`scenario-${scenarioId}-simulations`, buildSearchPagination({
     sorts: initSorting('exercise_start_date'),
   }));
   const secondaryAction = (exercise: ExerciseStore) => (

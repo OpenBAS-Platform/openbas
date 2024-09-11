@@ -14,6 +14,7 @@ import { fetchTags } from '../../../actions/Tag';
 import { useAppDispatch } from '../../../utils/hooks';
 import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
+import { Header } from '../../../components/common/SortHeadersList';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -89,18 +90,18 @@ const ExerciseList: FunctionComponent<Props> = ({
   });
 
   // Headers
-  const headers = [
+  const headers: Header[] = [
     {
       field: 'exercise_name',
       label: 'Name',
       isSortable: true,
-      value: (exercise: ExerciseSimple) => exercise.exercise_name,
+      value: (exercise: ExerciseSimple) => <>{exercise.exercise_name}</>,
     },
     {
       field: 'exercise_start_date',
       label: 'Start date',
       isSortable: true,
-      value: (exercise: ExerciseSimple) => (exercise.exercise_start_date ? (nsdt(exercise.exercise_start_date)) : ('-')),
+      value: (exercise: ExerciseSimple) => <>{(exercise.exercise_start_date ? (nsdt(exercise.exercise_start_date)) : ('-'))}</>,
     },
     {
       field: 'exercise_status',
@@ -130,7 +131,7 @@ const ExerciseList: FunctionComponent<Props> = ({
       field: 'exercise_updated_at',
       label: 'Updated',
       isSortable: true,
-      value: (exercise: ExerciseSimple) => nsdt(exercise.exercise_updated_at),
+      value: (exercise: ExerciseSimple) => <>{nsdt(exercise.exercise_updated_at)}</>,
     },
   ];
 
@@ -177,7 +178,7 @@ const ExerciseList: FunctionComponent<Props> = ({
                       className={classes.bodyItem}
                       style={inlineStyles[header.field]}
                     >
-                      {header.value(exercise)}
+                      {header.value?.(exercise)}
                     </div>
                   ))}
                 </div>
