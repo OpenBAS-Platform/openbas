@@ -40,6 +40,9 @@ public class InjectResultDTO {
   @JsonProperty("inject_content")
   private ObjectNode content;
 
+  @JsonProperty("inject_commands_lines")
+  private InjectStatusCommandLine commandsLines;
+
   @JsonProperty("inject_expectations")
   private List<InjectExpectation> expectations;
 
