@@ -4,7 +4,6 @@ import { fetchMapper, updateMapper } from '../../../../../actions/mapper/mapper-
 import type { ImportMapperUpdateInput, RawPaginationImportMapper } from '../../../../../utils/api-types';
 import Loader from '../../../../../components/Loader';
 import { ImportMapperStore } from '../../../../../actions/mapper/mapper';
-import { MESSAGING$ } from '../../../../../utils/Environment';
 
 interface XlsMapperUpdateComponentProps {
   xlsMapper: ImportMapperStore;

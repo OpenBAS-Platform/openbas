@@ -1347,7 +1347,6 @@ const i18n = {
       'Launch simulation now': 'Lancer la simulation maintenant',
       'Launch now': 'Lancer maintenant',
       'All teams value': 'Valeur de toutes les équipes',
-      'not starts with': 'ne commence pas par',
     },
     zh: {
       'Email address': 'email地址',
