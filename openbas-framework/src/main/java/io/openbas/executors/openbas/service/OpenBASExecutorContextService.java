@@ -62,7 +62,6 @@ public class OpenBASExecutorContextService {
     }
 
     private boolean isElevationRequired(final Inject inject) {
-        // Fix me add also for caldera
-        return inject.getInjectorContract().map(injectorContract -> injectorContract.getPayload().isElevationRequired()).orElse(false).booleanValue();
+        return inject.getInjectorContract().map(injectorContract -> injectorContract.getPayload()).map(payload->payload.isElevationRequired()).orElse(false).booleanValue();
     }
 }
