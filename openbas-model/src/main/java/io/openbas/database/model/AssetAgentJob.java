@@ -46,11 +46,6 @@ public class AssetAgentJob implements Base {
     @NotBlank
     private String command;
 
-    @Getter
-    @Column(name = "asset_agent_elevation_required")
-    @JsonProperty("asset_agent_elevation_required")
-    private boolean elevationRequired;
-
     @Override
     public String toString() {
         return this.id;

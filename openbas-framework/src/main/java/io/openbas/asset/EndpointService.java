@@ -1,6 +1,5 @@
 package io.openbas.asset;
 
-import io.openbas.config.OpenBASAgentConfig;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.EndpointRepository;
@@ -33,9 +32,6 @@ public class EndpointService {
 
   @Resource
   private OpenBASConfig openBASConfig;
-
-  @Resource
-  private OpenBASAgentConfig openBASAgentConfig;
 
   @Value("${openbas.admin.token:#{null}}")
   private String adminToken;
@@ -113,9 +109,7 @@ public class EndpointService {
     }
     return IOUtils.toString(in, StandardCharsets.UTF_8)
             .replace("${OPENBAS_URL}", openBASConfig.getBaseUrlForAgent())
-            .replace("${OPENBAS_TOKEN}", adminToken)
-            .replace("${NON_SYSTEM_USER}", openBASAgentConfig.getNonSystemUser())
-            .replace("${NON_SYSTEM_PWD}", openBASAgentConfig.getNonSystemPwd());
+            .replace("${OPENBAS_TOKEN}", adminToken);
   }
 
   public String generateInstallCommand(String platform, String token) throws IOException {

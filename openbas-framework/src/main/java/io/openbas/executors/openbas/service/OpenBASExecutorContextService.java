@@ -53,15 +53,10 @@ public class OpenBASExecutorContextService {
         assetAgentJob.setCommand(computeCommand(inject, platform, arch));
         assetAgentJob.setAsset(asset);
         assetAgentJob.setInject(inject);
-        assetAgentJob.setElevationRequired(this.isElevationRequired(inject));
         assetAgentJobRepository.save(assetAgentJob);
     }
 
     public void launchExecutorClear(@NotNull final Injector injector, @NotNull final Asset asset) {
         // TODO
-    }
-
-    private boolean isElevationRequired(final Inject inject) {
-        return inject.getInjectorContract().map(injectorContract -> injectorContract.getPayload()).map(payload->payload.isElevationRequired()).orElse(false).booleanValue();
     }
 }
