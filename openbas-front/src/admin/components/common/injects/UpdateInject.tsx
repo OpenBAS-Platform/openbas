@@ -17,7 +17,7 @@ interface Props {
   open: boolean;
   handleClose: () => void;
   onUpdateInject: (data: Inject) => Promise<void>;
-  massUpdateInject: (data: Inject[]) => Promise<void>;
+  massUpdateInject?: (data: Inject[]) => Promise<void>;
   injectId: string;
   isAtomic?: boolean;
   teamsFromExerciseOrScenario: TeamStore[];

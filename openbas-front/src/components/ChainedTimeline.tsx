@@ -581,7 +581,11 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
               startDate={startDate}
             />
 
-            <MiniMap/>
+            <MiniMap
+              pannable={true}
+              onMouseEnter={hideNewNode}
+              onMouseLeave={showNewNode}
+            />
           </ReactFlow>
         </div>
       ) : null
