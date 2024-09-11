@@ -8,6 +8,7 @@ import type {
   ImportTestSummary,
   Inject,
   InjectsImportInput,
+  InjectTestStatus,
   LessonsAnswer,
   LessonsAnswerCreateInput,
   LessonsCategory,
@@ -83,6 +84,8 @@ export type InjectContextType = {
   onDeleteInject: (injectId: Inject['inject_id']) => Promise<void>,
   onImportInjectFromXls?: (importId: string, input: InjectsImportInput) => Promise<ImportTestSummary>
   onDryImportInjectFromXls?: (importId: string, input: InjectsImportInput) => Promise<ImportTestSummary>
+  onBulkDeleteInjects: (injectIds: string[]) => void
+  bulkTestInjects: (injectIds: string[]) => Promise<{ uri: string, data: InjectTestStatus[] }>
 };
 export type LessonContextType = {
   onApplyLessonsTemplate: (data: string) => Promise<LessonsCategory[]>,
@@ -190,6 +193,12 @@ export const InjectContext = createContext<InjectContextType>({
   },
   onDryImportInjectFromXls(_importId: string, _input: InjectsImportInput): Promise<ImportTestSummary> {
     return new Promise<ImportTestSummary>(() => {
+    });
+  },
+  onBulkDeleteInjects(_injectIds: string[]): void {
+  },
+  bulkTestInjects(_injectIds: string[]): Promise<{ uri: string, data: InjectTestStatus[] }> {
+    return new Promise<{ uri: string, data: InjectTestStatus[] }>(() => {
     });
   },
 });

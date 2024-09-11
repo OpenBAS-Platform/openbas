@@ -1,4 +1,4 @@
-import type { ImportTestSummary, Inject, InjectsImportInput, SearchPaginationInput } from '../../../../utils/api-types';
+import type { ImportTestSummary, Inject, InjectsImportInput, InjectTestStatus, SearchPaginationInput } from '../../../../utils/api-types';
 import {
   addInjectForScenario,
   bulkDeleteInjectsForScenario,
@@ -12,7 +12,7 @@ import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
 import { dryImportXlsForScenario, fetchScenario, fetchScenarioTeams, importXlsForScenario } from '../../../../actions/scenarios/scenario-actions';
 import { Page } from '../../../../components/common/queryable/Page';
-import { searchScenarioInjectsSimple } from '../../../../actions/injects/inject-action';
+import { bulkTestInjects, searchScenarioInjectsSimple } from '../../../../actions/injects/inject-action';
 
 const injectContextForScenario = (scenario: ScenarioStore) => {
   const dispatch = useAppDispatch();
@@ -49,6 +49,12 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
     },
     onBulkDeleteInjects(injectIds: string[]): void {
       return dispatch(bulkDeleteInjectsForScenario(scenario.scenario_id, injectIds));
+    },
+    bulkTestInjects(injectIds: string[]): Promise<{ uri: string, data: InjectTestStatus[] }> {
+      return bulkTestInjects(injectIds).then((result) => ({
+        uri: `/admin/scenarios/${scenario.scenario_id}/tests`,
+        data: result.data,
+      }));
     },
   };
 };

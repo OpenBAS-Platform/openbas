@@ -1,6 +1,6 @@
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { ImportTestSummary, Inject, InjectsImportInput, SearchPaginationInput } from '../../../../utils/api-types';
+import type { ImportTestSummary, Inject, InjectsImportInput, InjectTestStatus, SearchPaginationInput } from '../../../../utils/api-types';
 import {
   addInjectForExercise,
   bulkDeleteInjectsForExercise,
@@ -16,7 +16,7 @@ import type { InjectOutputType, InjectStore } from '../../../../actions/injects/
 import { dryImportXlsForExercise, importXlsForExercise } from '../../../../actions/exercises/exercise-action';
 import { fetchExercise, fetchExerciseTeams } from '../../../../actions/Exercise';
 import { Page } from '../../../../components/common/queryable/Page';
-import { searchExerciseInjectsSimple } from '../../../../actions/injects/inject-action';
+import { bulkTestInjects, searchExerciseInjectsSimple } from '../../../../actions/injects/inject-action';
 
 const injectContextForExercise = (exercise: ExerciseStore) => {
   const dispatch = useAppDispatch();
@@ -62,6 +62,12 @@ const injectContextForExercise = (exercise: ExerciseStore) => {
     },
     onBulkDeleteInjects(injectIds: string[]): void {
       return dispatch(bulkDeleteInjectsForExercise(exercise.exercise_id, injectIds));
+    },
+    bulkTestInjects(injectIds: string[]): Promise<{ uri: string, data: InjectTestStatus[] }> {
+      return bulkTestInjects(injectIds).then((result) => ({
+        uri: `/admin/exercises/${exercise.exercise_id}/tests`,
+        data: result.data,
+      }));
     },
   };
 };
