@@ -89,7 +89,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
           if (['noRepeat'].includes(selectRecurring)) {
             if (data.time) {
               return new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() !== new Date(data.startDate).getTime()
-                || (new Date(minutesInFuture(1).toISOString()).getTime()) < new Date(data.time).getTime();
+                || new Date(new Date(minutesInFuture(1).toISOString()).setSeconds(0, 0)).getTime() < new Date(data.time).getTime();
             }
           }
           return true;
