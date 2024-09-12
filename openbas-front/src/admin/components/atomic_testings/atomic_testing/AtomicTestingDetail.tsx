@@ -113,27 +113,33 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
       <Grid item xs={6} style={{ marginBottom: 30 }}>
         <Typography variant="h4">{t('Command Lines')}</Typography>
         {injectResultDto ? (
-        <Paper variant="outlined" classes={{ root: classes.paper }}>
-          <Typography variant="subtitle1" className={classes.header} gutterBottom>
-            {t('Content')}
-          </Typography>
-          <Typography variant="body1" gutterBottom>
-            {injectResultDto.inject_commands_lines?.content || '-'}
-          </Typography>
-          <Typography variant="subtitle1" className={classes.header} gutterBottom>
-            {t('Cleanup command')}
-          </Typography>
-          <Typography variant="body1" gutterBottom>
-            {injectResultDto.inject_commands_lines?.cleanup_command || '-'}
-          </Typography>
-          <Typography variant="subtitle1" className={classes.header} gutterBottom>
-            {t('External ID')}
-          </Typography>
-          <Typography variant="body1" gutterBottom>
-            {injectResultDto.inject_commands_lines?.external_id || '-'}
-          </Typography>
-        </Paper>
-        ) : (
+            <Paper variant="outlined" classes={{root: classes.paper}}>
+              <Typography variant="subtitle1" className={classes.header} gutterBottom>
+                {t('Content')}
+              </Typography>
+              {injectResultDto.inject_commands_lines?.content ? <pre>
+                <Typography variant="body1" gutterBottom>
+                   {injectResultDto.inject_commands_lines?.content}
+                </Typography>
+              </pre> : '-'}
+                <Typography variant="subtitle1" className={classes.header} gutterBottom>
+                  {t('Cleanup command')}
+                </Typography>
+              {injectResultDto.inject_commands_lines?.cleanup_command ? <pre>
+                <Typography variant="body1" gutterBottom>
+                   {injectResultDto.inject_commands_lines?.cleanup_command}
+                </Typography>
+              </pre> : '-'}
+                <Typography variant="subtitle1" className={classes.header} gutterBottom>
+                  {t('External ID')}
+                </Typography>
+              {injectResultDto.inject_commands_lines?.external_id ? <pre>
+                <Typography variant="body1" gutterBottom>
+                  {injectResultDto.inject_commands_lines?.external_id}
+                </Typography>
+              </pre> : '-'}
+            </Paper>
+          ) : (
             <Paper variant="outlined" classes={{ root: classes.paper }}>
               <Typography variant="body1">{t('No data available')}</Typography>
             </Paper>
