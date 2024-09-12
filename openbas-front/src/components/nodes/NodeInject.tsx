@@ -8,6 +8,7 @@ import { isNotEmptyField } from '../../utils/utils';
 import InjectIcon from '../../admin/components/common/injects/InjectIcon';
 import InjectPopover from '../../admin/components/common/injects/InjectPopover';
 import type { InjectOutputType, InjectStore } from '../../actions/injects/Inject';
+import { useFormatter } from '../i18n';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -19,7 +20,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
         ? '1px solid rgba(255, 255, 255, 0.12)'
         : '1px solid rgba(0, 0, 0, 0.12)',
     borderRadius: 4,
-    width: 240,
+    width: 250,
     minHeight: '100px',
     height: 'auto',
     padding: '8px 5px 5px 5px',
@@ -105,6 +106,7 @@ export type NodeInject = Node<{
 const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
   const classes = useStyles();
   const theme: Theme = useTheme();
+  const { ft, fld } = useFormatter();
 
   /**
    * Converts the duration in second to a string representing the relative time
@@ -121,10 +123,11 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
    * @param durationInSeconds the duration in seconds
    */
   const convertToAbsoluteTime = (startDate: string, durationInSeconds: number) => {
-    return moment.utc(startDate)
+    const date = moment.utc(startDate)
       .add(durationInSeconds, 's')
-      .add(-new Date().getTimezoneOffset() / 60, 'h')
-      .format('MMMM Do, YYYY - h:mmA');
+      .toDate();
+
+    return `${fld(date)} - ${ft(date)}`;
   };
 
   /**

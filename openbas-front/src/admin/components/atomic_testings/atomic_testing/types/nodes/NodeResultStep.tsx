@@ -83,8 +83,20 @@ const NodeResultStepComponent = ({ data }: NodeProps<NodeResultStep>) => {
       <Tooltip title={data.description}>
         <div className={classes.description}>{data.description}</div>
       </Tooltip>
-      {(data.end || data.middle) && (<Handle type="target" position={Position.Left} isConnectable={false} />)}
-      {(data.start || data.middle) && (<Handle type="source" position={Position.Right} isConnectable={false} />)}
+      {(data.end || data.middle) && (
+        <Handle
+          type="target"
+          position={Position.Left}
+          isConnectable={false}
+        />
+      )}
+      {(data.start || data.middle) && (
+        <Handle
+          type="source"
+          position={Position.Right}
+          isConnectable={false}
+        />
+      )}
     </div>
   );
 };

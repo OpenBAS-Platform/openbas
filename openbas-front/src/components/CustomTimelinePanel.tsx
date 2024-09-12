@@ -4,6 +4,7 @@ import { useStore, type ReactFlowState, type BackgroundProps, Panel, Viewport } 
 import { makeStyles, useTheme } from '@mui/styles';
 import moment from 'moment-timezone';
 import type { Theme } from './Theme';
+import { useFormatter } from './i18n';
 
 const selector = (s: ReactFlowState) => ({ transform: s.transform, patternId: `pattern-${s.rfId}` });
 
@@ -50,6 +51,7 @@ function BackgroundComponent({
 }: Props) {
   const theme: Theme = useTheme();
   const classes = useStyles();
+  const { ft, fld, vnsdt } = useFormatter();
 
   const { transform } = useStore(selector, shallow);
   const [parsedDates, setParsedDates] = useState<TimelineDates[]>([]);
@@ -72,13 +74,13 @@ function BackgroundComponent({
           dateIndex: Math.round(date.unix() / (minutesPerGap * 3 * 60)),
         });
       } else {
-        const beginningDate = moment.utc(startDate)
-          .add(-new Date().getTimezoneOffset() / 60, 'h');
+        const beginningDate = moment.utc(startDate);
         const date = moment.utc(beginningDate)
           .add((minutesPerGap * 3 * i) + offset, 'm');
+
         newParsedDates.push({
           parsedDate: viewportData === undefined || viewportData?.zoom > 0.5
-            ? date.format('MMMM Do, YYYY - h:mmA') : date.format('l-h:mmA'),
+            ? `${fld(date.toDate())} - ${ft(date.toDate())}` : `${vnsdt(date.toDate())}`,
           dateIndex: Math.round((date.unix() - beginningDate.unix()) / (minutesPerGap * 3 * 60)),
         });
       }

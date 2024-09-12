@@ -25,15 +25,11 @@ interface Props {
   injects: InjectOutputType[];
   setViewMode?: (mode: string) => void;
   availableButtons: string[];
-  showTimeline: boolean;
-  handleShowTimeline: () => void;
 }
 
 const InjectsListButtons: FunctionComponent<Props> = ({
   injects,
   setViewMode,
-  showTimeline,
-  handleShowTimeline,
   availableButtons,
 }) => {
   // Standard hooks
@@ -66,13 +62,8 @@ const InjectsListButtons: FunctionComponent<Props> = ({
   );
   const exportInjectsToXLS = useExportToXLS({ data: exportInjects, fileName: `${t('Injects')}` });
 
-  const onShowTimeline = () => {
-    handleShowTimeline();
-  };
-
   const entries = [
     { label: 'Export injects', action: exportInjectsToXLS },
-    { label: showTimeline ? t('Hide timeline') : t('Show timeline'), action: onShowTimeline },
   ];
 
   return (

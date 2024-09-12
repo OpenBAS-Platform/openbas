@@ -284,18 +284,6 @@ const Injects: FunctionComponent<Props> = ({
     setPresetCreationValues(data);
   };
 
-  // Timeline
-  const [showTimeline, setShowTimeline] = useState<boolean>(
-    () => {
-      const storedValue = localStorage.getItem(`${exerciseOrScenarioId}_show_injects_timeline`);
-      return storedValue === null ? true : storedValue === 'true';
-    },
-  );
-  const handleShowTimeline = () => {
-    setShowTimeline(!showTimeline);
-    localStorage.setItem(`${exerciseOrScenarioId}_show_injects_timeline`, String(!showTimeline));
-  };
-
   // Filters
   const availableFilterNames = [
     'inject_platforms',
@@ -490,8 +478,6 @@ const Injects: FunctionComponent<Props> = ({
             injects={injects}
             availableButtons={availableButtons}
             setViewMode={setViewMode}
-            showTimeline={showTimeline}
-            handleShowTimeline={handleShowTimeline}
           />
         }
       />

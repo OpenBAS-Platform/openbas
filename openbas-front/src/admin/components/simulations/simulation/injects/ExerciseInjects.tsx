@@ -46,16 +46,17 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
   const { t } = useFormatter();
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const availableButtons = ['chain', 'list', 'distribution'];
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
 
   const [viewMode, setViewMode] = useState(() => {
     const storedValue = localStorage.getItem('scenario_or_exercise_view_mode');
-    return storedValue === null ? 'list' : storedValue;
+    return storedValue === null || !availableButtons.includes(storedValue) ? 'list' : storedValue;
   });
 
   const handleViewMode = (mode: string) => {
-    setViewMode(mode);
     localStorage.setItem('scenario_or_exercise_view_mode', mode);
+    setViewMode(mode);
   };
 
   const { injects, exercise, teams, articles, variables } = useHelper(
@@ -99,7 +100,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
               // @ts-expect-error typing
               teamsUsers={exercise.exercise_teams_users}
               setViewMode={handleViewMode}
-              availableButtons={['chain', 'list', 'distribution']}
+              availableButtons={availableButtons}
             />
           </TeamContext.Provider>
         </ArticleContext.Provider>
@@ -115,7 +116,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
             <Tooltip title={t('List view')}>
               <ToggleButton
                 value="list"
-                onClick={() => setViewMode('list')}
+                onClick={() => handleViewMode('list')}
                 selected={false}
                 aria-label="List view mode"
               >
@@ -125,7 +126,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
             <Tooltip title={t('Interactive view')}>
               <ToggleButton
                 value="chain"
-                onClick={() => setViewMode('chain')}
+                onClick={() => handleViewMode('chain')}
                 selected={false}
                 aria-label="Interactive view mode"
               >
@@ -135,7 +136,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
             <Tooltip title={t('Distribution view')}>
               <ToggleButton
                 value="distribution"
-                onClick={() => setViewMode('distribution')}
+                onClick={() => handleViewMode('distribution')}
                 selected={true}
                 aria-label="Distribution view mode"
               >

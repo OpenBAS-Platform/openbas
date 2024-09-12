@@ -159,7 +159,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
       const nodeInjectData = nodeInject.data;
       do {
         const previousNodes = nodeInjects.slice(0, index)
-          .filter((previousNode) => nodeInject.position.x >= previousNode.position.x && nodeInject.position.x < previousNode.position.x + 240);
+          .filter((previousNode) => nodeInject.position.x >= previousNode.position.x && nodeInject.position.x < previousNode.position.x + 250);
 
         for (let i = 0; i < previousNodes.length; i += 1) {
           const previousNode = previousNodes[i];
@@ -314,12 +314,13 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
 
   const connect = (connection: Connection) => {
     const inject = injects.find((currentInject) => currentInject.inject_id === connection.target);
-    if (inject !== undefined) {
+    const injectParent = injects.find((currentInject) => currentInject.inject_id === connection.source);
+    if (inject !== undefined && injectParent !== undefined && inject.inject_depends_duration > injectParent.inject_depends_duration) {
       const injectToUpdate = {
         ...injectsMap[inject.inject_id],
         inject_injector_contract: inject.inject_injector_contract.injector_contract_id,
         inject_id: inject.inject_id,
-        inject_depends_on: connection.source,
+        inject_depends_on: injectParent?.inject_id,
       };
       onUpdateInject([injectToUpdate]);
     }
