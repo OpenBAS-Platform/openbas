@@ -10,7 +10,6 @@ import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchTeams } from '../../../../actions/teams/team-actions';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { MESSAGING$ } from '../../../../utils/Environment';
 
 interface Props {
   atomic: InjectResultDTO;
