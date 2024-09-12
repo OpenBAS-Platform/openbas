@@ -488,7 +488,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
   return (
     <>
       {injects.length > 0 ? (
-        <div className={classes.container} style={{ width: '100%', height: 490 }}>
+        <div className={classes.container} style={{ width: '100%', height: 510 }}>
           <ReactFlow
             colorMode={theme.palette.mode}
             nodes={nodes}

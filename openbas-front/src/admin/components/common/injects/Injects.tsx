@@ -496,7 +496,7 @@ const Injects: FunctionComponent<Props> = ({
         }
       />
       {viewModeContext === 'chain' && (
-        <div style={{ marginBottom: 50 }}>
+        <div style={{ marginBottom: 10 }}>
           <div>
             <ChainedTimeline
               injects={injects}

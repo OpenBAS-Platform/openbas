@@ -181,3 +181,7 @@ input[type="file"] {
   --xy-background-color-default:#f8f8f8;
   --xy-minimap-mask-background-color-default: rgba(255, 255, 255, 0.8);
 }
+
+.react-flow__minimap {
+  margin: 15px 40px 15px 15px;
+}
