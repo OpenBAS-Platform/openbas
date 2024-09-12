@@ -20,7 +20,7 @@ import {
 import { Tooltip } from '@mui/material';
 import moment from 'moment-timezone';
 import { UnfoldLess, UnfoldMore, CropFree } from '@mui/icons-material';
-import type { InjectOutputType } from '../actions/injects/Inject';
+import type { InjectOutputType, InjectStore } from '../actions/injects/Inject';
 import type { Theme } from './Theme';
 import nodeTypes from './nodes';
 import CustomTimelineBackground from './CustomTimelineBackground';
@@ -64,9 +64,20 @@ interface Props {
     inject_depends_duration_hours: number
   }): void,
   onUpdateInject: (data: Inject[]) => void
+  onCreate: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void,
+  onUpdate: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void,
+  onDelete: (result: string) => void,
 }
 
-const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScenarioId, onSelectedInject, openCreateInjectDrawer, onUpdateInject }) => {
+const ChainedTimelineFlow: FunctionComponent<Props> = ({
+  injects,
+  exerciseOrScenarioId,
+  onSelectedInject,
+  openCreateInjectDrawer,
+  onUpdateInject,
+  onCreate,
+  onUpdate,
+  onDelete }) => {
   // Standard hooks
   const classes = useStyles();
   const theme = useTheme<Theme>();
@@ -209,6 +220,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({ injects, exerciseOrScen
               .concat(inject.inject_asset_groups!.map((assetGroup) => assetGroups[assetGroup]?.asset_group_name))
               .concat(inject.inject_teams!.map((team) => teams[team]?.team_name)),
             exerciseOrScenarioId,
+            onCreate,
+            onUpdate,
+            onDelete,
           },
           position: {
             x: (inject.inject_depends_duration / 60) * (gapSize / minutesPerGapAllowed[minutesPerGapIndex]),

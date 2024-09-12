@@ -49,13 +49,13 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
 
   const [viewMode, setViewMode] = useState(() => {
-    const storedValue = localStorage.getItem('exercise_view_mode');
+    const storedValue = localStorage.getItem('scenario_or_exercise_view_mode');
     return storedValue === null ? 'list' : storedValue;
   });
 
   const handleViewMode = (mode: string) => {
     setViewMode(mode);
-    localStorage.setItem('exercise_view_mode', mode);
+    localStorage.setItem('scenario_or_exercise_view_mode', mode);
   };
 
   const { injects, exercise, teams, articles, variables } = useHelper(

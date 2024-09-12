@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import * as R from 'ramda';
 import { ArticleContext, TeamContext, ViewModeContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
@@ -12,10 +11,9 @@ import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
-import type { Inject, Scenario } from '../../../../../utils/api-types';
+import type { Scenario } from '../../../../../utils/api-types';
 import { articleContextForScenario } from '../articles/ScenarioArticles';
 import { teamContextForScenario } from '../teams/ScenarioTeams';
-import injectContextForScenario from '../ScenarioContext';
 import { fetchScenarioInjectsSimple } from '../../../../../actions/injects/inject-action';
 import Injects from '../../../common/injects/Injects';
 
@@ -28,7 +26,9 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
   const dispatch = useAppDispatch();
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
 
-  const { injects, scenario, teams, articles, variables } = useHelper(
+  const availableButtons = ['chain', 'list'];
+
+  const { scenario, teams, articles, variables } = useHelper(
     (helper: InjectHelper & ScenariosHelper & ArticlesHelper & ChallengeHelper & VariablesHelper) => {
       return {
         injects: helper.getScenarioInjects(scenarioId),
@@ -49,26 +49,13 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
   const teamContext = teamContextForScenario(scenarioId, []);
 
   const [viewMode, setViewMode] = useState(() => {
-    const storedValue = localStorage.getItem('scenario_view_mode');
-    return storedValue === null ? 'list' : storedValue;
+    const storedValue = localStorage.getItem('scenario_or_exercise_view_mode');
+    return storedValue === null || !availableButtons.includes(storedValue) ? 'list' : storedValue;
   });
 
   const handleViewMode = (mode: string) => {
     setViewMode(mode);
-    localStorage.setItem('scenario_view_mode', mode);
-  };
-
-  const injectContext = injectContextForScenario(scenario);
-
-  const handleConnectInjects = async (connection: Connection) => {
-    const updateFields = [
-      'inject_title',
-      'inject_depends_from_another',
-      'inject_depends_duration',
-    ];
-    const sourceInject = injects.find((inject: Inject) => inject.inject_id === connection.source);
-    sourceInject.inject_depends_from_another = connection.target;
-    await injectContext.onUpdateInject(sourceInject.inject_id, R.pick(updateFields, sourceInject));
+    localStorage.setItem('scenario_or_exercise_view_mode', mode);
   };
 
   return (
@@ -86,9 +73,8 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
               usersNumber={scenario.scenario_users_number}
               // @ts-expect-error typing
               teamsUsers={scenario.scenario_teams_users}
-              onConnectInjects={handleConnectInjects}
               setViewMode={handleViewMode}
-              availableButtons={['chain', 'list']}
+              availableButtons={availableButtons}
             />
           </TeamContext.Provider>
         </ArticleContext.Provider>

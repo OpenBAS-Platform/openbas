@@ -7,7 +7,7 @@ import type { Theme } from '../Theme';
 import { isNotEmptyField } from '../../utils/utils';
 import InjectIcon from '../../admin/components/common/injects/InjectIcon';
 import InjectPopover from '../../admin/components/common/injects/InjectPopover';
-import type { InjectOutputType } from '../../actions/injects/Inject';
+import type { InjectOutputType, InjectStore } from '../../actions/injects/Inject';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -90,6 +90,9 @@ export type NodeInject = Node<{
   targets: string[],
   exerciseOrScenarioId: string,
   onSelectedInject(inject?: InjectOutputType): void,
+  onCreate: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void,
+  onUpdate: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void,
+  onDelete: (result: string) => void,
 }
 
 >;
@@ -146,7 +149,7 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
     if (data.inject) data.onSelectedInject(data.inject);
   };
 
-  const isDisabled = !data.inject?.inject_injector_contract?.injector_contract_content_parsed?.config.expose;
+  const isDisabled = !data.inject?.inject_injector_contract?.convertedContent?.config.expose;
 
   const dimNode = !data.inject?.inject_enabled || !data.inject?.inject_injector_contract?.convertedContent?.config.expose;
 
@@ -203,6 +206,9 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
               canBeTested={data.inject?.inject_testable}
               isDisabled={isDisabled}
               exerciseOrScenarioId={data.exerciseOrScenarioId}
+              onDelete={data.onDelete}
+              onUpdate={data.onUpdate}
+              onCreate={data.onCreate}
             />
           </span>
         </div>

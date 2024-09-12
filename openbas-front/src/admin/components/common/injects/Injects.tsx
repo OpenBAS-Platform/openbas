@@ -1,7 +1,6 @@
 import React, { CSSProperties, FunctionComponent, useContext, useMemo, useState } from 'react';
 import { Checkbox, Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { Connection } from '@xyflow/react';
 import { Link } from 'react-router-dom';
 import * as R from 'ramda';
 import { splitDuration } from '../../../../utils/Time';
@@ -95,7 +94,6 @@ interface Props {
   exerciseOrScenarioId: string
 
   setViewMode?: (mode: string) => void
-  onConnectInjects: (connection: Connection) => void
 
   availableButtons: string[]
 
@@ -512,6 +510,9 @@ const Injects: FunctionComponent<Props> = ({
                   setSelectedInjectId(inject?.inject_id);
                 }
               }}
+              onCreate={onCreate}
+              onUpdate={onUpdate}
+              onDelete={onDelete}
             />
             <div className="clearfix" />
           </div>
