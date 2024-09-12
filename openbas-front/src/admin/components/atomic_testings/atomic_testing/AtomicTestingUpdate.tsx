@@ -53,7 +53,6 @@ const AtomicTestingUpdate: FunctionComponent<Props> = ({
       ]),
     )(data);
     updateAtomicTesting(atomic.inject_id, toUpdate).then((result: { data: InjectResultDTO }) => {
-      MESSAGING$.notifySuccess('The element has been updated');
       updateInjectResultDto(result.data);
     });
   };
