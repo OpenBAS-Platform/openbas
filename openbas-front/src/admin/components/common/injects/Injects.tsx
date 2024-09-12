@@ -2,6 +2,8 @@ import React, { CSSProperties, FunctionComponent, useContext, useMemo, useState 
 import { Checkbox, Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { Connection } from '@xyflow/react';
+import { Link } from 'react-router-dom';
+import * as R from 'ramda';
 import { splitDuration } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
 import InjectIcon from './InjectIcon';
@@ -11,7 +13,7 @@ import ItemBoolean from '../../../../components/ItemBoolean';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { isNotEmptyField } from '../../../../utils/utils';
 import { useFormatter } from '../../../../components/i18n';
-import type { FilterGroup, Inject, Variable } from '../../../../utils/api-types';
+import type { FilterGroup, Inject, InjectTestStatus, Variable } from '../../../../utils/api-types';
 import type { InjectorContractConvertedContent, InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
 import { InjectContext, PermissionsContext } from '../Context';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -27,6 +29,9 @@ import type { TeamStore } from '../../../../actions/teams/Team';
 import type { ArticleStore } from '../../../../actions/channels/Article';
 import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
+import ToolBar from '../ToolBar';
+import { MESSAGING$ } from '../../../../utils/Environment';
+import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
 
 const useStyles = makeStyles(() => ({
   disabled: {
@@ -87,13 +92,6 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  selectAll: boolean
-  handleToggleSelectAll: () => void
-  onToggleEntity: (entity: { inject_id: string }, _?: React.SyntheticEvent, forceRemove?: { inject_id: string }[]) => void,
-  onToggleShiftEntity: (currentIndex: number, currentEntity: { inject_id: string }, event: React.SyntheticEvent | null) => void,
-  selectedElements: Record<string, { inject_id: string }>,
-  deSelectedElements: Record<string, { inject_id: string }>,
-
   exerciseOrScenarioId: string
 
   setViewMode?: (mode: string) => void
@@ -109,12 +107,6 @@ interface Props {
 }
 
 const Injects: FunctionComponent<Props> = ({
-  selectAll,
-  handleToggleSelectAll,
-  onToggleEntity,
-  onToggleShiftEntity,
-  selectedElements,
-  deSelectedElements,
   exerciseOrScenarioId,
   setViewMode,
   onConnectInjects,
@@ -219,21 +211,35 @@ const Injects: FunctionComponent<Props> = ({
   const [injects, setInjects] = useState<InjectOutputType[]>([]);
   const [selectedInjectId, setSelectedInjectId] = useState<string | null>(null);
 
+  // Optimistic update
+  const onCreate = (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+    if (result.entities) {
+      const created = result.entities.injects[result.result];
+      setInjects([created as InjectOutputType, ...injects]);
+    }
+  };
+  const onUpdate = (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+    if (result.entities) {
+      const updated = result.entities.injects[result.result];
+      setInjects(injects.map((i) => (i.inject_id !== updated.inject_id ? i as InjectOutputType : (updated as InjectOutputType))));
+    }
+  };
+
+  const onDelete = (result: string) => {
+    if (result) {
+      setInjects(injects.filter((i) => (i.inject_id !== result)));
+    }
+  };
+
   const onCreateInject = async (data: Inject) => {
     await injectContext.onAddInject(data).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
-      if (result.entities) {
-        const created = result.entities.injects[result.result];
-        setInjects([created as InjectOutputType, ...injects]);
-      }
+      onCreate(result);
     });
   };
   const onUpdateInject = async (data: Inject) => {
     if (selectedInjectId) {
       await injectContext.onUpdateInject(selectedInjectId, data).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
-        if (result.entities) {
-          const updated = result.entities.injects[result.result];
-          setInjects(injects.map((i) => (i.inject_id !== updated.inject_id ? i as InjectOutputType : (updated as InjectOutputType))));
-        }
+        onUpdate(result);
       });
     }
   };
@@ -289,6 +295,161 @@ const Injects: FunctionComponent<Props> = ({
     filterGroup: quickFilter,
     size: 100,
   }));
+
+  // Toolbar
+  const {
+    selectedElements,
+    deSelectedElements,
+    selectAll,
+    handleClearSelectedElements,
+    handleToggleSelectAll,
+    onToggleEntity,
+    numberOfSelectedElements,
+  } = useEntityToggle<{ inject_id: string }>('inject', injects.length);
+  const onRowShiftClick = (currentIndex: number, currentEntity: { inject_id: string }, event: React.SyntheticEvent | null = null) => {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    if (selectedElements && !R.isEmpty(selectedElements)) {
+      // Find the indexes of the first and last selected entities
+      let firstIndex = R.findIndex(
+        (n: Inject) => n.inject_id === R.head(R.values(selectedElements)).inject_id,
+        injects,
+      );
+      if (currentIndex > firstIndex) {
+        let entities: InjectOutputType[] = [];
+        while (firstIndex <= currentIndex) {
+          entities = [...entities, injects[firstIndex]];
+          // eslint-disable-next-line no-plusplus
+          firstIndex++;
+        }
+        const forcedRemove = R.values(selectedElements).filter(
+          (n: Inject) => !entities.map((o) => o.inject_id).includes(n.inject_id),
+        );
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        return onToggleEntity(entities, event, forcedRemove);
+      }
+      let entities: InjectOutputType[] = [];
+      while (firstIndex >= currentIndex) {
+        entities = [...entities, injects[firstIndex]];
+        // eslint-disable-next-line no-plusplus
+        firstIndex--;
+      }
+      const forcedRemove = R.values(selectedElements).filter(
+        (n: Inject) => !entities.map((o) => o.inject_id).includes(n.inject_id),
+      );
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      return onToggleEntity(entities, event, forcedRemove);
+    }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    return onToggleEntity(currentEntity, event);
+  };
+
+  const injectsToProcess = selectAll
+    ? injects.filter((inject: InjectOutputType) => !R.keys(deSelectedElements).includes(inject.inject_id))
+    : injects.filter(
+      (inject: InjectOutputType) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id),
+    );
+
+  const massUpdateInjects = async (actions: {
+    field: string,
+    type: string,
+    values: { value: string }[]
+  }[]) => {
+    const updateFields = [
+      'inject_title',
+      'inject_description',
+      'inject_injector_contract',
+      'inject_content',
+      'inject_depends_from_another',
+      'inject_depends_duration',
+      'inject_teams',
+      'inject_assets',
+      'inject_asset_groups',
+      'inject_documents',
+      'inject_all_teams',
+      'inject_country',
+      'inject_city',
+      'inject_tags',
+    ];
+    const injectsToUpdate = injectsToProcess.filter((inject: InjectOutputType) => inject.inject_injector_contract?.convertedContent);
+    for (const action of actions) {
+      for (const element of injectsToUpdate) {
+        const injectToUpdate: Omit<InjectOutputType, 'inject_injector_contract'> & { inject_injector_contract: string } = {
+          ...element,
+          inject_injector_contract: element.inject_injector_contract.injector_contract_id,
+        };
+        switch (action.type) {
+          case 'ADD':
+            // @ts-expect-error define type
+            if (isNotEmptyField(injectToUpdate[`inject_${action.field}`])) {
+              // @ts-expect-error define type
+              injectToUpdate[`inject_${action.field}`] = R.uniq([...injectToUpdate[`inject_${action.field}`], ...action.values.map((n) => n.value)]);
+            } else {
+              // @ts-expect-error define type
+              injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map((n) => n.value));
+            }
+            // eslint-disable-next-line no-await-in-loop
+            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
+              .then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+                onUpdate(result);
+              });
+            break;
+          case 'REPLACE':
+            // @ts-expect-error define type
+            injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map((n) => n.value));
+            // eslint-disable-next-line no-await-in-loop
+            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
+              .then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+                onUpdate(result);
+              });
+            break;
+          case 'REMOVE':
+            // @ts-expect-error define type
+            if (isNotEmptyField(injectToUpdate[`inject_${action.field}`])) {
+              // @ts-expect-error define type
+              injectToUpdate[`inject_${action.field}`] = injectToUpdate[`inject_${action.field}`].filter((n: string) => !action.values.map((o) => o.value).includes(n));
+            } else {
+              // @ts-expect-error define type
+              injectToUpdate[`inject_${action.field}`] = [];
+            }
+            // eslint-disable-next-line no-await-in-loop
+            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
+              .then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+                onUpdate(result);
+              });
+            break;
+          default:
+            return;
+        }
+        /* eslint-enable */
+      }
+    }
+  };
+
+  const bulkDeleteInjects = () => {
+    const deleteIds = injectsToProcess.map((inject: InjectOutputType) => inject.inject_id);
+    injectContext.onBulkDeleteInjects(deleteIds);
+    deleteIds.forEach((id) => onDelete(id));
+  };
+
+  const massTestInjects = () => {
+    injectContext.bulkTestInjects(injectsToProcess.map((inject: InjectOutputType) => inject.inject_id)).then((result: { uri: string, data: InjectTestStatus[] }) => {
+      if (numberOfSelectedElements === 1) {
+        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
+          itsDedicatedPage: <Link to={`${result.uri}/${result.data[0].status_id}`}>{t('its dedicated page')}</Link>,
+        }));
+      } else {
+        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
+          itsDedicatedPage: <Link to={`${result.uri}`}>{t('its dedicated page')}</Link>,
+        }));
+      }
+    });
+  };
 
   return (
     <>
@@ -369,7 +530,7 @@ const Injects: FunctionComponent<Props> = ({
               <ListItemIcon
                 style={{ minWidth: 40 }}
                 onClick={(event) => (event.shiftKey
-                  ? onToggleShiftEntity(index, inject, event)
+                  ? onRowShiftClick(index, inject, event)
                   : onToggleEntity(inject, event))
                 }
               >
@@ -421,6 +582,9 @@ const Injects: FunctionComponent<Props> = ({
                   canBeTested
                   setSelectedInjectId={setSelectedInjectId}
                   isDisabled={!injectContract || !isContractExposed}
+                  onCreate={onCreate}
+                  onUpdate={onUpdate}
+                  onDelete={onDelete}
                 />
               </ListItemSecondaryAction>
             </ListItem>
@@ -449,6 +613,18 @@ const Injects: FunctionComponent<Props> = ({
             setOpenCreateDrawer(true);
             setPresetCreationValues(undefined);
           }}
+          />
+          <ToolBar
+            numberOfSelectedElements={numberOfSelectedElements}
+            selectedElements={selectedElements}
+            deSelectedElements={deSelectedElements}
+            selectAll={selectAll}
+            handleClearSelectedElements={handleClearSelectedElements}
+            context="exercise"
+            id={exerciseOrScenarioId}
+            handleUpdate={massUpdateInjects}
+            handleBulkDelete={bulkDeleteInjects}
+            handleBulkTest={massTestInjects}
           />
           <CreateInject
             title={t('Create a new inject')}
