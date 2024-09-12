@@ -33,10 +33,11 @@ const LessonsCategories = ({
   lessonsCategories,
   lessonsAnswers,
   lessonsQuestions,
-  setSelectedQuestion,
+  setSelectedQuestion = () => {},
   teamsMap,
   teams,
   isReport,
+  style = {},
 }) => {
   const classes = useStyles();
   const { t } = useFormatter();
@@ -77,7 +78,7 @@ const LessonsCategories = ({
     R.fromPairs,
   )(lessonsAnswers);
   return (
-    <div style={{ marginTop: 40 }}>
+    <div style={{ marginTop: '30px', ...style }}>
       {sortedCategories.map((category) => {
         const questions = sortQuestions(
           lessonsQuestions.filter(
@@ -85,7 +86,7 @@ const LessonsCategories = ({
           ),
         );
         return (
-          <div key={category.lessonscategory_id} style={{ marginTop: 70 }}>
+          <div key={category.lessonscategory_id}>
             <Typography variant="h2" style={{ float: 'left' }}>
               {category.lessons_category_name}
             </Typography>
@@ -152,7 +153,7 @@ const LessonsCategories = ({
                         <ListItem
                           key={question.lessonsquestion_id}
                           divider
-                          button
+                          button={!isReport}
                           onClick={() => setSelectedQuestion && setSelectedQuestion(question)
                                                     }
                         >

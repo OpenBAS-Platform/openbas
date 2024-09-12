@@ -213,7 +213,7 @@ const ExerciseHeader = () => {
         <Buttons exerciseId={exercise.exercise_id} exerciseStatus={exercise.exercise_status} exerciseName={exercise.exercise_name} />
         <ExercisePopover
           exercise={exercise}
-          actions={['Update', 'Duplicate', 'Export', 'Delete']}
+          actions={['Update', 'Duplicate', 'Export', 'Delete', 'Access reports']}
           onDelete={() => navigate('/admin/exercises')}
         />
       </div>
