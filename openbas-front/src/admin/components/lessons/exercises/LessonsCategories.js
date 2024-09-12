@@ -33,7 +33,7 @@ const LessonsCategories = ({
   lessonsCategories,
   lessonsAnswers,
   lessonsQuestions,
-  setSelectedQuestion = () => {},
+  setSelectedQuestion = {},
   teamsMap,
   teams,
   isReport,

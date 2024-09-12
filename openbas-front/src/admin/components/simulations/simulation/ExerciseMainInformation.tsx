@@ -52,7 +52,7 @@ const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
           >
             {t('Category')}
           </Typography>
-          <ItemCategory category={exercise.exercise_category} label={t(exercise.exercise_category ?? 'Unknown')} />
+          <ItemCategory category={exercise?.exercise_category ?? ''} label={t(exercise.exercise_category ?? 'Unknown')} />
         </Grid>
         <Grid item xs={4} style={{ paddingTop: 10 }}>
           <Typography
@@ -62,7 +62,7 @@ const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
           >
             {t('Main Focus')}
           </Typography>
-          <ItemMainFocus mainFocus={exercise.exercise_main_focus} label={t(exercise.exercise_main_focus ?? 'Unknown')} />
+          <ItemMainFocus mainFocus={exercise?.exercise_main_focus ?? ''} label={t(exercise.exercise_main_focus ?? 'Unknown')} />
         </Grid>
         <Grid item xs={4} style={{ paddingTop: 10 }}>
           <Typography
