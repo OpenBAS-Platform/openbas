@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { normalize } from 'normalizr';
+import { store } from './store';
+import * as Constants from './constants/ActionTypes.js';
 
 // eslint-disable-next-line import/prefer-default-export
 export const api = (schema) => {
@@ -16,6 +18,13 @@ export const api = (schema) => {
     },
     (err) => {
       const res = err.response;
+      if (res && res.status === 401) {
+        // Dispatch the 401 to store to force logout
+        store.dispatch({
+          type: Constants.DATA_FETCH_ERROR,
+          payload: res,
+        });
+      }
       if (
         res
         && res.status === 503

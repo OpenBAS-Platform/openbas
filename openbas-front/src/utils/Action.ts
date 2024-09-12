@@ -34,7 +34,9 @@ const buildError = (data: AxiosError) => {
 };
 
 const notifyError = (error: AxiosError) => {
-  if (error.status === 409) {
+  if (error.status === 401) {
+    // Do not notify the user, as a 401 error will already trigger a disconnection
+  } else if (error.status === 409) {
     MESSAGING$.notifyError('The element already exists');
   } else if (error.status === 500) {
     MESSAGING$.notifyError('Internal error');
