@@ -16,7 +16,7 @@ export const fetchInjectResultDto = (injectId: string) => {
 
 export const deleteAtomicTesting = (injectId: string) => {
   const uri = `${ATOMIC_TESTING_URI}/${injectId}`;
-  return simpleDelCall(uri, injectId);
+  return simpleDelCall(uri);
 };
 
 export const updateAtomicTesting = (injectId: string, data: AtomicTestingInput) => {

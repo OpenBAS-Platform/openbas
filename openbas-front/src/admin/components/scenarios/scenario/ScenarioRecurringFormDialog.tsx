@@ -29,13 +29,10 @@ interface Recurrence {
   weekOfMonth?: 1 | 2 | 3 | 4 | 5,
 }
 
-// eslint-disable-next-line no-underscore-dangle
-const _MS_DELAY_TOO_CLOSE = 1000 * 60 * 2;
-
 const defaultFormValues = () => ({
   startDate: new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString(),
   endDate: null,
-  time: minutesInFuture(5).toISOString(),
+  time: minutesInFuture(1).toISOString(),
   onlyWeekday: false,
   dayOfWeek: 1 as Recurrence['dayOfWeek'],
   weekOfMonth: 1 as Recurrence['weekOfMonth'],
@@ -92,7 +89,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
           if (['noRepeat'].includes(selectRecurring)) {
             if (data.time) {
               return new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() !== new Date(data.startDate).getTime()
-                || (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < new Date(data.time).getTime();
+                || new Date(new Date(minutesInFuture(1).toISOString()).setSeconds(0, 0)).getTime() < new Date(data.time).getTime();
             }
           }
           return true;
@@ -169,6 +166,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
             <Select
               value={selectRecurring}
               label={t('Recurrence')}
+              variant="standard"
               onChange={(event) => onSelectRecurring(event.target.value)}
             >
               <MenuItem value="noRepeat">{t('Does not repeat')}</MenuItem>
@@ -226,6 +224,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                     <Select
                       value={field.value}
                       label={t('Week of month')}
+                      variant="standard"
                       onChange={field.onChange}
                     >
                       <MenuItem value={1}>{t('First')}</MenuItem>
@@ -249,6 +248,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                     <Select
                       value={field.value}
                       label={t('Day of week')}
+                      variant="standard"
                       onChange={field.onChange}
                     >
                       <MenuItem value={1}>{t('Monday')}</MenuItem>

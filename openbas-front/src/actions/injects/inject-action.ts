@@ -2,6 +2,7 @@ import { Dispatch } from 'redux';
 import { getReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import type { Exercise, Scenario, SearchPaginationInput } from '../../utils/api-types';
 import * as schema from '../Schema';
+import { MESSAGING$ } from '../../utils/Environment';
 
 export const testInject = (injectId: string) => {
   const uri = `/api/injects/${injectId}/test`;
@@ -11,7 +12,10 @@ export const testInject = (injectId: string) => {
 export const bulkTestInjects = (injectIds: string[]) => {
   const data = injectIds;
   const uri = '/api/injects/bulk/test';
-  return simplePostCall(uri, data, "Can't be tested");
+  return simplePostCall(uri, data, false).catch((error) => {
+    MESSAGING$.notifyError('Can\'t be tested');
+    throw error;
+  });
 };
 
 // -- EXERCISES --
