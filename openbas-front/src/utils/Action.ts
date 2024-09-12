@@ -7,6 +7,8 @@ import { Dispatch } from 'redux';
 import * as Constants from '../constants/ActionTypes';
 import { api } from '../network';
 import { MESSAGING$ } from './Environment';
+import { store } from '../store';
+import { DATA_FETCH_ERROR } from '../constants/ActionTypes';
 
 const isEmptyPath = R.isNil(window.BASE_PATH) || R.isEmpty(window.BASE_PATH);
 const contextPath = isEmptyPath || window.BASE_PATH === '/' ? '' : window.BASE_PATH;
@@ -47,9 +49,19 @@ const notifyError = (error: AxiosError) => {
   }
 };
 
+const checkUnauthorized = (error: AxiosError) => {
+  if (error.status === 401) {
+    store.dispatch({
+      type: DATA_FETCH_ERROR,
+      payload: error,
+    });
+  }
+};
+
 const simpleApi = api();
 
 export const simpleCall = (uri: string, params?: unknown, defaultErrorBehavior: boolean = true) => simpleApi.get(buildUri(uri), { params }).catch((error) => {
+  checkUnauthorized(error);
   if (defaultErrorBehavior) {
     notifyError(error);
   }
@@ -57,6 +69,7 @@ export const simpleCall = (uri: string, params?: unknown, defaultErrorBehavior: 
 });
 export const simplePostCall = (uri: string, data?: unknown, defaultNotifyErrorBehavior: boolean = true) => simpleApi.post(buildUri(uri), data)
   .catch((error) => {
+    checkUnauthorized(error);
     if (defaultNotifyErrorBehavior) {
       notifyError(error);
     }
@@ -70,6 +83,7 @@ export const simplePutCall = (uri: string, data?: unknown, defaultNotifyErrorBeh
     return response;
   })
   .catch((error) => {
+    checkUnauthorized(error);
     if (defaultNotifyErrorBehavior) {
       notifyError(error);
     }
@@ -83,6 +97,7 @@ export const simpleDelCall = (uri: string, defaultNotifyErrorBehavior: boolean =
     return response;
   })
   .catch((error) => {
+    checkUnauthorized(error);
     if (defaultNotifyErrorBehavior) {
       notifyError(error);
     }
