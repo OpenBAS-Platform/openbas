@@ -44,13 +44,14 @@ public class InjectExpectationFixture {
   }
 
   public static InjectExpectation createManualInjectExpectationWithExercise(Team team, Inject inject,
-      Exercise exercise) {
+      Exercise exercise, String expectationName) {
     InjectExpectation injectExpectation = new InjectExpectation();
     injectExpectation.setInject(inject);
     injectExpectation.setType(InjectExpectation.EXPECTATION_TYPE.MANUAL);
     injectExpectation.setTeam(team);
     injectExpectation.setExpectedScore(100.0);
     injectExpectation.setExercise(exercise);
+    injectExpectation.setName(expectationName);
     return injectExpectation;
 
   }

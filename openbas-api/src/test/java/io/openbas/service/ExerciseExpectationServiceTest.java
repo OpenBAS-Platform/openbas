@@ -112,6 +112,6 @@ public class ExerciseExpectationServiceTest {
   private void getInjectExpectation(Inject injectCreated, Team teamCreated, Exercise exerciseCreated) {
     this.injectExpectationRepository.save(
         InjectExpectationFixture.createManualInjectExpectationWithExercise(teamCreated, injectCreated,
-            exerciseCreated));
+            exerciseCreated, EXPECTATION_NAME));
   }
 }
