@@ -34,7 +34,7 @@ const FilterChipPopover: FunctionComponent<Props> = ({
   const displayOperatorAndFilter = () => {
     // Specific field
     if (propertySchema.schema_property_name === 'scenario_recurrence') {
-      return (<ScenarioStatusFilter propertySchema={propertySchema} helpers={helpers}/>);
+      return (<ScenarioStatusFilter propertySchema={propertySchema} helpers={helpers} />);
     }
 
     const operators = availableOperators(propertySchema);
@@ -43,6 +43,7 @@ const FilterChipPopover: FunctionComponent<Props> = ({
         <Select
           value={filter.operator ?? operators[0]}
           label="Operator"
+          variant="standard"
           fullWidth
           onChange={handleChangeOperator}
           style={{ marginBottom: 15 }}

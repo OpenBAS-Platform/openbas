@@ -53,6 +53,9 @@ interface Props<T> {
   attackPatterns?: AttackPatternStore[],
 }
 
+/**
+ * @deprecated Need to migrate to the new pagination system: PaginationComponentV2
+ */
 const PaginationComponent = <T extends object>({
   fetch,
   searchPaginationInput,

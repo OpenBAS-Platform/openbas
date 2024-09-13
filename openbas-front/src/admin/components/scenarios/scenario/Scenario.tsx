@@ -28,7 +28,7 @@ import { isEmptyField } from '../../../../utils/utils';
 import type { EndpointStore } from '../../assets/endpoints/Endpoint';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import ExerciseList from '../../simulations/ExerciseList';
-import useQueryable from '../../../../components/common/queryable/useQueryable';
+import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import ExercisePopover from '../../simulations/simulation/ExercisePopover';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
@@ -56,7 +56,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecurringFormDialog: React.Dispatch<React.SetStateAction<boolean>> }) => {
+const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiateSimulationAndStart: React.Dispatch<React.SetStateAction<boolean>> }) => {
   // Standard hooks
   const classes = useStyles();
   const theme = useTheme<Theme>();
@@ -76,7 +76,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
 
   // Exercises
   const [exercises, setExercises] = useState<EndpointStore[]>([]);
-  const { queryableHelpers, searchPaginationInput } = useQueryable(`scenario-${scenarioId}-simulations`, buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`scenario-${scenarioId}-simulations`, buildSearchPagination({
     sorts: initSorting('exercise_start_date'),
   }));
   const secondaryAction = (exercise: ExerciseStore) => (
@@ -245,9 +245,9 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
             variant="contained"
             color="primary"
             size="large"
-            onClick={() => setOpenScenarioRecurringFormDialog(true)}
+            onClick={() => setOpenInstantiateSimulationAndStart(true)}
           >
-            {t('Simulate Now')}
+            {t('Launch simulation now')}
           </Button>
         </div>
       )}

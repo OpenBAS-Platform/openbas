@@ -1,13 +1,13 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import React, { useEffect } from 'react';
-import { Button, Tooltip, Typography } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { PlayArrowOutlined, Stop } from '@mui/icons-material';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchScenario, updateScenarioRecurrence } from '../../../../actions/scenarios/scenario-actions';
+import { createRunningExerciseFromScenario, fetchScenario, updateScenarioRecurrence } from '../../../../actions/scenarios/scenario-actions';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import ScenarioPopover from './ScenarioPopover';
 import { useFormatter } from '../../../../components/i18n';
@@ -15,6 +15,9 @@ import { parseCron, ParsedCron } from '../../../../utils/Cron';
 import ScenarioRecurringFormDialog from './ScenarioRecurringFormDialog';
 import { truncate } from '../../../../utils/String';
 import type { Theme } from '../../../../components/Theme';
+import Transition from '../../../../components/common/Transition';
+import { MESSAGING$ } from '../../../../utils/Environment';
+import type { Exercise } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -51,7 +54,9 @@ interface ScenarioHeaderProps {
   setSelectRecurring: React.Dispatch<React.SetStateAction<string>>;
   selectRecurring: string;
   setOpenScenarioRecurringFormDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenInstantiateSimulationAndStart: React.Dispatch<React.SetStateAction<boolean>>;
   openScenarioRecurringFormDialog: boolean,
+  openInstantiateSimulationAndStart: boolean,
   noRepeat: boolean;
 }
 
@@ -63,6 +68,8 @@ const ScenarioHeader = ({
   noRepeat,
   openScenarioRecurringFormDialog,
   setOpenScenarioRecurringFormDialog,
+  openInstantiateSimulationAndStart,
+  setOpenInstantiateSimulationAndStart,
 }: ScenarioHeaderProps) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -138,9 +145,9 @@ const ScenarioHeader = ({
             variant="contained"
             color="primary"
             size="small"
-            onClick={() => setOpenScenarioRecurringFormDialog(true)}
+            onClick={() => setOpenInstantiateSimulationAndStart(true)}
           >
-            {t('Launch')}
+            {t('Launch now')}
           </Button>
         )}
         <ScenarioPopover
@@ -157,6 +164,35 @@ const ScenarioHeader = ({
         onSubmit={onSubmit}
         initialValues={scenario}
       />
+      <Dialog
+        open={openInstantiateSimulationAndStart}
+        TransitionComponent={Transition}
+        onClose={() => setOpenInstantiateSimulationAndStart(false)}
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t('A simulation will be launched based on this scenario and will start immediately. Are you sure you want to proceed?')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenInstantiateSimulationAndStart(false)}>
+            {t('Cancel')}
+          </Button>
+          <Button
+            color="secondary"
+            onClick={async () => {
+              setOpenInstantiateSimulationAndStart(false);
+              const exercise: Exercise = (await createRunningExerciseFromScenario(scenarioId)).data;
+              MESSAGING$.notifySuccess(t('New simulation successfully created and started. Click {here} to view the simulation.', {
+                here: <Link to={`/admin/exercises/${exercise.exercise_id}`}>{t('here')}</Link>,
+              }));
+            }}
+          >
+            {t('Confirm')}
+          </Button>
+        </DialogActions>
+      </Dialog>
       <div className="clearfix" />
     </>
   );

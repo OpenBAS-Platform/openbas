@@ -3,6 +3,7 @@ import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material'
 import { makeStyles } from '@mui/styles';
 import { SortHelpers } from './SortHelpers';
 import { useFormatter } from '../../../i18n';
+import { Header } from '../../SortHeadersList';
 
 const useStyles = makeStyles(() => ({
   sortableHeaderItem: {
@@ -28,12 +29,6 @@ const useStyles = makeStyles(() => ({
     textOverflow: 'ellipsis',
   },
 }));
-
-export interface Header {
-  field: string;
-  label: string;
-  isSortable: boolean;
-}
 
 interface Props {
   headers: Header[];

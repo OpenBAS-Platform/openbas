@@ -8,6 +8,7 @@ import type {
   ImportTestSummary,
   Inject,
   InjectsImportInput,
+  InjectTestStatus,
   LessonsAnswer,
   LessonsAnswerCreateInput,
   LessonsCategory,
@@ -74,15 +75,17 @@ export type InjectContextType = {
   searchInjects: (input: SearchPaginationInput) => Promise<{ data: Page<InjectOutputType> }>,
   onAddInject: (inject: Inject) => Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }>,
   onUpdateInject: (injectId: Inject['inject_id'], inject: Inject) => Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }>,
-  onUpdateInjectTrigger?: (injectId: Inject['inject_id']) => void,
+  onUpdateInjectTrigger?: (injectId: Inject['inject_id']) => Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }>,
   onUpdateInjectActivation: (injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }) => Promise<{
     result: string,
     entities: { injects: Record<string, InjectStore> }
   }>,
-  onInjectDone?: (injectId: Inject['inject_id']) => void,
-  onDeleteInject: (injectId: Inject['inject_id']) => void,
+  onInjectDone?: (injectId: Inject['inject_id']) => Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }>,
+  onDeleteInject: (injectId: Inject['inject_id']) => Promise<void>,
   onImportInjectFromXls?: (importId: string, input: InjectsImportInput) => Promise<ImportTestSummary>
   onDryImportInjectFromXls?: (importId: string, input: InjectsImportInput) => Promise<ImportTestSummary>
+  onBulkDeleteInjects: (injectIds: string[]) => void
+  bulkTestInjects: (injectIds: string[]) => Promise<{ uri: string, data: InjectTestStatus[] }>
 };
 export type LessonContextType = {
   onApplyLessonsTemplate: (data: string) => Promise<LessonsCategory[]>,
@@ -169,7 +172,8 @@ export const InjectContext = createContext<InjectContextType>({
   onUpdateInject(_injectId: Inject['inject_id'], _inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
     return Promise.resolve({ result: '', entities: { injects: {} } });
   },
-  onUpdateInjectTrigger(_injectId: Inject['inject_id']): void {
+  onUpdateInjectTrigger(_injectId: Inject['inject_id']): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
+    return Promise.resolve({ result: '', entities: { injects: {} } });
   },
   onUpdateInjectActivation(_injectId: Inject['inject_id'], _injectEnabled: { inject_enabled: boolean }): Promise<{
     result: string,
@@ -177,9 +181,11 @@ export const InjectContext = createContext<InjectContextType>({
   }> {
     return Promise.resolve({ result: '', entities: { injects: {} } });
   },
-  onInjectDone(_injectId: Inject['inject_id']): void {
+  onInjectDone(_injectId: Inject['inject_id']): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
+    return Promise.resolve({ result: '', entities: { injects: {} } });
   },
-  onDeleteInject(_injectId: Inject['inject_id']): void {
+  onDeleteInject(_injectId: Inject['inject_id']): Promise<void> {
+    return Promise.resolve();
   },
   onImportInjectFromXls(_importId: string, _input: InjectsImportInput): Promise<ImportTestSummary> {
     return new Promise<ImportTestSummary>(() => {
@@ -187,6 +193,12 @@ export const InjectContext = createContext<InjectContextType>({
   },
   onDryImportInjectFromXls(_importId: string, _input: InjectsImportInput): Promise<ImportTestSummary> {
     return new Promise<ImportTestSummary>(() => {
+    });
+  },
+  onBulkDeleteInjects(_injectIds: string[]): void {
+  },
+  bulkTestInjects(_injectIds: string[]): Promise<{ uri: string, data: InjectTestStatus[] }> {
+    return new Promise<{ uri: string, data: InjectTestStatus[] }>(() => {
     });
   },
 });

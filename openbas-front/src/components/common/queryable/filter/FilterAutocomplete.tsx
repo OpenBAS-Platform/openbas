@@ -43,7 +43,7 @@ const FilterAutocomplete: FunctionComponent<Props> = ({
     helpers.handleAddFilterWithEmptyValue(buildEmptyFilter(value, operator));
   };
   const handleClearFilters = () => {
-    setPristine(false);
+    setPristine(true);
     helpers.handleClearAllFilters();
   };
 

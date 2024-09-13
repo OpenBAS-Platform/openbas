@@ -90,7 +90,7 @@ public class AssetGroup implements Base {
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("asset_group_tags")
-  @Queryable(sortable = true)
+  @Queryable(filterable = true, sortable = true, dynamicValues = true, path = "tags.id")
   private Set<Tag> tags = new HashSet<>();
 
   // -- AUDIT --

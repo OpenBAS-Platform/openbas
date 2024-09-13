@@ -1,57 +1,23 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
-import {
-  Box,
-  Button,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControlLabel,
-  Grid,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Switch,
-  Tooltip,
-} from '@mui/material';
+import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { DevicesOtherOutlined } from '@mui/icons-material';
-import * as R from 'ramda';
-import { makeStyles } from '@mui/styles';
 import Transition from '../../../../components/common/Transition';
-import SearchFilter from '../../../../components/SearchFilter';
-import TagsFilter from '../../common/filters/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
 import type { EndpointStore } from './Endpoint';
-import { truncate } from '../../../../utils/String';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchEndpoints } from '../../../../actions/assets/endpoint-actions';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import { fetchEndpoints, searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import PlatformIcon from '../../../../components/PlatformIcon';
-
-const useStyles = makeStyles(() => ({
-  box: {
-    width: '100%',
-    minHeight: '100%',
-    padding: 20,
-    border: '1px dashed rgba(255, 255, 255, 0.3)',
-  },
-  chip: {
-    margin: '0 10px 10px 0',
-  },
-  bodyItem: {
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
-  },
-}));
+import SelectList, { SelectListElements } from '../../../../components/common/SelectList';
+import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
+import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
+import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import type { FilterGroup } from '../../../../utils/api-types';
+import { buildFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 
 interface Props {
   initialState: string[];
@@ -59,7 +25,6 @@ interface Props {
   onClose: () => void;
   onSubmit: (endpointIds: string[]) => void;
   title: string;
-  filter?: (endpoint: EndpointStore) => boolean;
   platforms?: string[];
 }
 
@@ -69,16 +34,11 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
   onClose,
   onSubmit,
   title,
-  filter,
   platforms,
 }) => {
   // Standard hooks
-  const classes = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
-
-  // Filter and sort hook
-  const filtering = useSearchAnFilter('asset', 'name', ['name']);
 
   // Fetching data
   const { endpointsMap } = useHelper((helper: EndpointHelper) => ({
@@ -88,39 +48,86 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
     dispatch(fetchEndpoints());
   });
 
-  const [disableFilter, setDisableFilter] = useState(false);
-
-  const sortedEndpoints: EndpointStore[] = filtering.filterAndSort(R.values(endpointsMap)
-    .filter((!disableFilter && !!filter) ? filter : () => true))
-    .filter((endpoint: EndpointStore) => {
-      if (platforms && platforms.length > 0) {
-        return platforms.includes(endpoint.endpoint_platform);
-      }
-      return true;
-    });
-
-  const [endpointIds, setEndpointIds] = useState<string[]>(initialState);
+  const [endpointValues, setEndpointValues] = useState<EndpointStore[]>(initialState.map((id) => endpointsMap[id]));
   useEffect(() => {
-    setEndpointIds(initialState);
+    setEndpointValues(initialState.map((id) => endpointsMap[id]));
   }, [open, initialState]);
 
   const addEndpoint = (endpointId: string) => {
-    setEndpointIds([...endpointIds, endpointId]);
+    setEndpointValues([...endpointValues, endpointsMap[endpointId]]);
   };
   const removeEndpoint = (endpointId: string) => {
-    setEndpointIds(endpointIds.filter((id) => id !== endpointId));
+    setEndpointValues(endpointValues.filter((v) => v.asset_id !== endpointId));
   };
 
   // Dialog
   const handleClose = () => {
-    setEndpointIds([]);
+    setEndpointValues([]);
     onClose();
   };
 
   const handleSubmit = () => {
-    onSubmit(endpointIds);
+    onSubmit(endpointValues.map((v) => v.asset_id));
     handleClose();
   };
+
+  // Headers
+  const elements: SelectListElements<EndpointStore> = useMemo(() => ({
+    icon: {
+      value: () => <DevicesOtherOutlined color="primary" />,
+    },
+    headers: [
+      {
+        field: 'icon',
+        value: (endpoint: EndpointStore) => endpoint.asset_name,
+        width: 45,
+      },
+      {
+        field: 'asset_name',
+        value: (endpoint: EndpointStore) => endpoint.asset_name,
+        width: 45,
+      },
+      {
+        field: 'endpoint_platform',
+        value: (endpoint: EndpointStore) => <>
+          <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
+          {endpoint.endpoint_platform}
+        </>,
+        width: 20,
+      },
+      {
+        field: 'asset_tags',
+        value: (endpoint: EndpointStore) => <ItemTags variant="reduced-view" tags={endpoint.asset_tags} />,
+        width: 35,
+      },
+    ],
+  }), []);
+
+  // Pagination
+  const [endpoints, setEndpoints] = useState<ScenarioStore[]>([]);
+
+  const availableFilterNames = [
+    'asset_tags',
+    'endpoint_platform',
+  ];
+  const quickFilter: FilterGroup = {
+    mode: 'and',
+    filters: [
+      buildFilter('endpoint_platform', platforms ?? [], 'contains'),
+    ],
+  };
+  const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({
+    filterGroup: quickFilter,
+  }));
+
+  const paginationComponent = <PaginationComponentV2
+    fetch={searchEndpoints}
+    searchPaginationInput={searchPaginationInput}
+    setContent={setEndpoints}
+    entityPrefix="endpoint"
+    availableFilterNames={availableFilterNames}
+    queryableHelpers={queryableHelpers}
+                              />;
 
   return (
     <Dialog
@@ -139,85 +146,17 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
     >
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
-        <Grid container spacing={3} style={{ marginTop: -15 }}>
-          <Grid item xs={8}>
-            <Grid container spacing={3}>
-              <Grid item xs={4}>
-                <SearchFilter
-                  fullWidth
-                  onChange={filtering.handleSearch}
-                  keyword={filtering.keyword}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <TagsFilter
-                  fullWidth
-                  onAddTag={filtering.handleAddTag}
-                  onRemoveTag={filtering.handleRemoveTag}
-                  currentTags={filtering.tags}
-                />
-              </Grid>
-              {!!filter
-                && <Grid item xs={4}>
-                  <Tooltip title={t('By default, only assets compliant with the injector are displayed')}>
-                    <FormControlLabel
-                      control={<Switch checked={disableFilter} onChange={(_e, checked) => setDisableFilter(checked)} />}
-                      label={t('Show all assets')}
-                    />
-                  </Tooltip>
-                </Grid>
-              }
-            </Grid>
-            <List>
-              {sortedEndpoints.map((endpoint) => {
-                const disabled = endpointIds.includes(endpoint.asset_id);
-                return (
-                  <ListItemButton
-                    key={endpoint.asset_id}
-                    disabled={disabled}
-                    divider
-                    dense
-                    onClick={() => addEndpoint(endpoint.asset_id)}
-                  >
-                    <ListItemIcon>
-                      <DevicesOtherOutlined color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <div className={classes.bodyItem} style={{ width: '45%' }}>
-                            {endpoint.asset_name}
-                          </div>
-                          <div className={classes.bodyItem} style={{ width: '20%', display: 'flex', alignItems: 'center' }}>
-                            <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} /> {endpoint.endpoint_platform}
-                          </div>
-                          <div className={classes.bodyItem} style={{ width: '35%' }}>
-                            <ItemTags variant="reduced-view" tags={endpoint.asset_tags} />
-                          </div>
-                        </div>
-                      }
-                    />
-                  </ListItemButton>
-                );
-              })}
-            </List>
-          </Grid>
-          <Grid item xs={4}>
-            <Box className={classes.box}>
-              {endpointIds.map((endpointId) => {
-                const endpoint: EndpointStore = endpointsMap[endpointId];
-                return (
-                  <Chip
-                    key={endpointId}
-                    onDelete={() => removeEndpoint(endpointId)}
-                    label={truncate(endpoint?.asset_name, 22)}
-                    classes={{ root: classes.chip }}
-                  />
-                );
-              })}
-            </Box>
-          </Grid>
-        </Grid>
+        <Box sx={{ marginTop: 2 }}>
+          <SelectList
+            values={endpoints}
+            selectedValues={endpointValues}
+            elements={elements}
+            prefix="asset"
+            onSelect={addEndpoint}
+            onDelete={removeEndpoint}
+            paginationComponent={paginationComponent}
+          />
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>{t('Cancel')}</Button>

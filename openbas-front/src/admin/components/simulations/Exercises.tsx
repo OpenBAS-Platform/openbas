@@ -12,7 +12,7 @@ import ExerciseList from './ExerciseList';
 import { searchExercises } from '../../../actions/Exercise';
 import ImportUploaderExercise from './ImportUploaderExercise';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
-import useQueryable from '../../../components/common/queryable/useQueryable';
+import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import ExercisePopover from './simulation/ExercisePopover';
 import type { ExerciseStore } from '../../../actions/exercises/Exercise';
@@ -50,7 +50,7 @@ const Exercises = () => {
       buildEmptyFilter('exercise_tags', 'contains'),
     ],
   };
-  const { queryableHelpers, searchPaginationInput } = useQueryable('simulations', buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('simulations', buildSearchPagination({
     sorts: initSorting('exercise_updated_at', 'DESC'),
     filterGroup: quickFilter,
   }));

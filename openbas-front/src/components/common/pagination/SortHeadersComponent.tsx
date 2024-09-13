@@ -44,6 +44,9 @@ interface Props {
   defaultSortAsc?: boolean;
 }
 
+/**
+ * @deprecated Need to migrate to the new pagination system: SortHeadersComponentV2
+ */
 const SortHeadersComponent: FunctionComponent<Props> = ({
   headers,
   inlineStylesHeaders,

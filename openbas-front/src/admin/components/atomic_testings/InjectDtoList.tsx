@@ -4,17 +4,18 @@ import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui
 import { useFormatter } from '../../../components/i18n';
 import InjectIcon from '../common/injects/InjectIcon';
 import type { InjectResultDTO, SearchPaginationInput } from '../../../utils/api-types';
-import AtomicTestingResult from './atomic_testing/AtomicTestingResult';
-import ItemTargets from '../../../components/ItemTargets';
 import Empty from '../../../components/Empty';
 import { type Page } from '../../../components/common/queryable/Page';
 import InjectorContract from '../common/injects/InjectorContract';
-import ItemStatus from '../../../components/ItemStatus';
 import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
 import { isNotEmptyField } from '../../../utils/utils';
 import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
+import { Header } from '../../../components/common/SortHeadersList';
+import ItemStatus from '../../../components/ItemStatus';
+import AtomicTestingResult from './atomic_testing/AtomicTestingResult';
+import ItemTargets from '../../../components/ItemTargets';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -83,7 +84,7 @@ const InjectDtoList: FunctionComponent<Props> = ({
   const [injects, setInjects] = useState<InjectResultDTO[]>([]);
 
   // Headers
-  const headers = useMemo(() => [
+  const headers: Header[] = useMemo(() => [
     {
       field: 'inject_type',
       label: 'Type',
@@ -101,13 +102,17 @@ const InjectDtoList: FunctionComponent<Props> = ({
       field: 'inject_title',
       label: 'Title',
       isSortable: true,
-      value: (injectDto: InjectResultDTO) => injectDto.inject_title,
+      value: (injectDto: InjectResultDTO) => {
+        return <>{injectDto.inject_title}</>;
+      },
     },
     {
       field: 'inject_status.tracking_sent_date',
       label: 'Execution Date',
       isSortable: false,
-      value: (injectDto: InjectResultDTO) => fldt(injectDto.inject_status?.tracking_sent_date),
+      value: (injectDto: InjectResultDTO) => {
+        return <>{fldt(injectDto.inject_status?.tracking_sent_date)}</>;
+      },
     },
     {
       field: 'inject_status',
@@ -139,7 +144,9 @@ const InjectDtoList: FunctionComponent<Props> = ({
       field: 'inject_updated_at',
       label: 'Updated',
       isSortable: true,
-      value: (injectDto: InjectResultDTO) => nsdt(injectDto.inject_updated_at),
+      value: (injectDto: InjectResultDTO) => {
+        return <>{nsdt(injectDto.inject_updated_at)}</>;
+      },
     },
   ], []);
 
@@ -184,7 +191,7 @@ const InjectDtoList: FunctionComponent<Props> = ({
                   onDelete={(result) => setInjects(injects.filter((e) => (e.inject_id !== result)))}
                   inList
                 />
-                  }
+              }
               disablePadding
             >
               <ListItemButton
@@ -194,11 +201,11 @@ const InjectDtoList: FunctionComponent<Props> = ({
                   <InjectIcon
                     isPayload={isNotEmptyField(injectDto.inject_injector_contract?.injector_contract_payload)}
                     type={
-                                injectDto.inject_injector_contract?.injector_contract_payload
-                                  ? injectDto.inject_injector_contract.injector_contract_payload.payload_collector_type
-                                    || injectDto.inject_injector_contract.injector_contract_payload.payload_type
-                                  : injectDto.inject_type
-                              }
+                      injectDto.inject_injector_contract?.injector_contract_payload
+                        ? injectDto.inject_injector_contract.injector_contract_payload.payload_collector_type
+                        || injectDto.inject_injector_contract.injector_contract_payload.payload_type
+                        : injectDto.inject_type
+                    }
                     variant="list"
                   />
                 </ListItemIcon>
@@ -211,11 +218,11 @@ const InjectDtoList: FunctionComponent<Props> = ({
                           className={classes.bodyItem}
                           style={inlineStyles[header.field]}
                         >
-                          {header.value(injectDto)}
+                          {header.value?.(injectDto)}
                         </div>
                       ))}
                     </div>
-                          }
+                  }
                 />
               </ListItemButton>
             </ListItem>

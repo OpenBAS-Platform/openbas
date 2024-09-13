@@ -23,7 +23,7 @@ export const fetchMapper = (mapperId: string) => {
 
 export const deleteMapper = (mapperId: RawPaginationImportMapper['import_mapper_id']) => {
   const uri = `${XLS_MAPPER_URI}/${mapperId}`;
-  return simpleDelCall(uri, mapperId);
+  return simpleDelCall(uri);
 };
 
 export const createMapper = (data: ImportMapperAddInput) => {

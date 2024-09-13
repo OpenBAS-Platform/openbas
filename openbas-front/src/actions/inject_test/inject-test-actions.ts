@@ -19,5 +19,5 @@ export const fetchInjectTestStatus = (testId: string | undefined) => {
 
 export const deleteInjectTest = (testId: string | undefined) => {
   const uri = `/api/injects/test/${testId}`;
-  return simpleDelCall(uri, testId);
+  return simpleDelCall(uri);
 };

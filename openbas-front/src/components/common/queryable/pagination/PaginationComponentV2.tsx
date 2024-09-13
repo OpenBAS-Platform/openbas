@@ -70,7 +70,9 @@ const PaginationComponentV2 = <T extends object>({
 
   useEffect(() => {
     // Retrieve input from uri
-    queryableHelpers.uriHelpers.retrieveFromUri();
+    if (queryableHelpers.uriHelpers) {
+      queryableHelpers.uriHelpers.retrieveFromUri();
+    }
 
     if (entityPrefix) {
       useFilterableProperties(entityPrefix, availableFilterNames).then((propertySchemas: PropertySchemaDTO[]) => {
@@ -86,7 +88,9 @@ const PaginationComponentV2 = <T extends object>({
 
   useEffect(() => {
     // Modify URI
-    queryableHelpers.uriHelpers.updateUri();
+    if (queryableHelpers.uriHelpers) {
+      queryableHelpers.uriHelpers.updateUri();
+    }
 
     // Fetch datas
     fetch(searchPaginationInput).then((result: { data: Page<T> }) => {

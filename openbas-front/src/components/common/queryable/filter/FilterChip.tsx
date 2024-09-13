@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { Chip, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import classNames from 'classnames';
 import { FilterHelpers } from './FilterHelpers';
 import FilterChipPopover from './FilterChipPopover';
 import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
@@ -27,6 +26,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: '0 4px',
     // display: 'flex',
     // alignItems: 'center',
+  },
+  title: {
+    cursor: 'pointer',
+    '&:hover': { textDecorationLine: 'underline' },
   },
 }));
 
@@ -81,10 +84,14 @@ const FilterChip: FunctionComponent<Props> = ({
     });
   };
 
-  const title = (withStyle: boolean) => {
+  const title = (isTooltip: boolean) => {
+    if (isTooltip) {
+      return (<span><strong>{t(filter.key)}</strong>{' '}<span>{convertOperatorToIcon(t, filter.operator)} {toValues(options)}</span></span>);
+    }
     return (
-      <span className={classNames({ [classes.container]: withStyle })}>
-        <strong>{t(filter.key)}</strong> {convertOperatorToIcon(t, filter.operator)} {toValues(options)}
+      <span className={classes.container}>
+        <strong onClick={handleOpen} className={classes.title}>{t(filter.key)}</strong>{' '}
+        <span>{convertOperatorToIcon(t, filter.operator)} {toValues(options)}</span>
       </span>
     );
   };
@@ -92,11 +99,10 @@ const FilterChip: FunctionComponent<Props> = ({
   return (
     <>
       <Tooltip
-        title={title(false)}
+        title={title(true)}
       >
         <Chip
-          label={title(true)}
-          onClick={handleOpen}
+          label={title(false)}
           onDelete={handleRemoveFilter}
           component="div"
           ref={chipRef}
