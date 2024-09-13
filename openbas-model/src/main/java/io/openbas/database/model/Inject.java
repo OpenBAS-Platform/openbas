@@ -284,10 +284,10 @@ public class Inject implements Base, Injection {
 
   @JsonProperty("inject_date")
   public Optional<Instant> getDate() {
-    // If a trigger now was executed for this inject, we ignore pauses
+    // If a trigger now was executed for this inject, we ignore pauses and we set inject inside of a range of execution
     if (this.triggerNow) {
       this.triggerNow = false;
-      return Optional.of(now());
+      return Optional.of(now().minusSeconds(30));
     }
     return InjectModelHelper.getDate(getExercise(), getScenario(), getDependsOn(), getDependsDuration());
   }
