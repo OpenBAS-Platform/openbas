@@ -117,17 +117,21 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
               <Typography variant="subtitle1" className={classes.header} gutterBottom>
                 {t('Content')}
               </Typography>
-              {injectResultDto.inject_commands_lines?.content ? <pre>
+              {(injectResultDto.inject_commands_lines?.content?.length ?? 0) > 0 ? <pre>
                 <Typography variant="body1" gutterBottom>
-                   {injectResultDto.inject_commands_lines?.content}
+                   {injectResultDto.inject_commands_lines?.content?.map((content, index) => (
+                       <li key={index}>{content}</li>
+                     ))}
                 </Typography>
               </pre> : '-'}
                 <Typography variant="subtitle1" className={classes.header} gutterBottom>
                   {t('Cleanup command')}
                 </Typography>
-              {injectResultDto.inject_commands_lines?.cleanup_command ? <pre>
+              {(injectResultDto.inject_commands_lines?.cleanup_command?.length ?? 0) > 0 ? <pre>
                 <Typography variant="body1" gutterBottom>
-                   {injectResultDto.inject_commands_lines?.cleanup_command}
+                    {injectResultDto.inject_commands_lines?.cleanup_command?.map((content, index) => (
+                        <li key={index}>{content}</li>
+                    ))}
                 </Typography>
               </pre> : '-'}
                 <Typography variant="subtitle1" className={classes.header} gutterBottom>

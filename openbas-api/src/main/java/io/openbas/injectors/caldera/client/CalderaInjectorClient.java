@@ -53,6 +53,16 @@ public class CalderaInjectorClient {
         }
     }
 
+    public Ability findAbilityById(String abilityId) {
+        try {
+            String jsonResponse = this.get(this.config.getRestApiV2Url() + ABILITIES_URI + "/" + abilityId);
+            return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Ability createAbility(Map<String, Object> body) {
         try {
             String jsonResponse = this.post(

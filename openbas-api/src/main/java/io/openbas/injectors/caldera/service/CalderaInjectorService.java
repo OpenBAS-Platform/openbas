@@ -37,6 +37,10 @@ public class CalderaInjectorService {
         return this.client.abilities();
     }
 
+    public Ability findAbilityById(String abilityId) {
+        return this.client.findAbilityById(abilityId);
+    }
+
     public String exploit(
             @NotBlank final String obfuscator,
             @NotBlank final String paw,

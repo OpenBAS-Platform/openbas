@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -11,10 +12,10 @@ import java.util.Objects;
 public class InjectStatusCommandLine {
 
     @JsonProperty("content")
-    private String content;
+    private List<String> content;
 
     @JsonProperty("cleanup_command")
-    private String cleanupCommand;
+    private List<String> cleanupCommand;
 
     @JsonProperty("external_id")
     private String externalId;
@@ -23,7 +24,7 @@ public class InjectStatusCommandLine {
         // Default constructor
     }
 
-    public InjectStatusCommandLine(String content, String cleanupCommand, String externalId) {
+    public InjectStatusCommandLine(List<String> content, List<String> cleanupCommand, String externalId) {
         this.content = content;
         this.cleanupCommand = cleanupCommand;
         this.externalId = externalId;
@@ -34,8 +35,7 @@ public class InjectStatusCommandLine {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         InjectStatusCommandLine that = (InjectStatusCommandLine) o;
-        return Objects.equals(content, that.content)
-                && Objects.equals(cleanupCommand, that.cleanupCommand) && Objects.equals(externalId, that.externalId);
+        return Objects.equals(externalId, that.externalId);
     }
 
     @Override

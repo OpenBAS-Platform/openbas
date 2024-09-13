@@ -2453,6 +2453,7 @@ const i18n = {
       'Select the template': '选择模板',
       'Supporting payloads': '支持载荷',
       'Command Line': '命令行',
+      'Command Lines': '命令行',
       Executable: '可执行',
       'File Drop': '文件投放',
       'DNS Resolution': 'DNS解析',

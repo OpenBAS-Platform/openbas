@@ -173,6 +173,28 @@ public class CalderaExecutor extends Injector {
         return new ExecutionProcess(true, expectations);
     }
 
+    @Override
+    public InjectStatusCommandLine getCommandsLines(String externalId) {
+        InjectStatusCommandLine commandLine = new InjectStatusCommandLine();
+        Set<String> contents = new HashSet<>();
+        Set<String> cleanCommands = new HashSet<>();
+        Ability ability = calderaService.findAbilityById(externalId);
+        if(ability != null) {
+            ability.getExecutors().forEach(executor -> {
+                if(executor.getCommand() != null && !executor.getCommand().isBlank()) {
+                    contents.add(executor.getCommand());
+                }
+                if(executor.getCleanup() != null && !executor.getCleanup().isEmpty()) {
+                    cleanCommands.addAll(executor.getCleanup());
+                }
+            });
+        }
+        commandLine.setExternalId(externalId);
+        commandLine.setContent(contents.stream().toList());
+        commandLine.setCleanupCommand(cleanCommands.stream().toList());
+        return commandLine;
+    }
+
     // -- PRIVATE --
 
     private Map<Asset, Boolean> resolveAllAssets(@NotNull final ExecutableInject inject) {

@@ -7,6 +7,7 @@ import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionExecutorService;
 import io.openbas.helper.InjectHelper;
+import io.openbas.service.AtomicTestingService;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -45,6 +46,7 @@ public class InjectsExecutionJob implements Job {
     private final ExerciseRepository exerciseRepository;
     private final QueueService queueService;
     private final ExecutionExecutorService executionExecutorService;
+    private final AtomicTestingService atomicTestingService;
 
     private final List<ExecutionStatus> executionStatusesNotReady =
             List.of(ExecutionStatus.QUEUING, ExecutionStatus.DRAFT, ExecutionStatus.EXECUTING, ExecutionStatus.PENDING);
@@ -162,6 +164,7 @@ public class InjectsExecutionJob implements Job {
             status.getTraces().add(InjectStatusExecution.traceError(errorMsg));
             status.setName(ExecutionStatus.ERROR);
             status.setTrackingSentDate(Instant.now());
+            status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
             injectStatusRepository.save(status);
         } else {
             inject.getInjectorContract().ifPresent(injectorContract -> {
@@ -174,12 +177,14 @@ public class InjectsExecutionJob implements Job {
                         status.setName(ExecutionStatus.ERROR);
                         status.setTrackingSentDate(Instant.now());
                         status.setInject(inject);
+                        status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
                         injectStatusRepository.save(status);
                     } else {
                         InjectStatus status = inject.getStatus().get();
                         status.getTraces().add(InjectStatusExecution.traceError("The inject is not ready to be executed (missing mandatory fields)"));
                         status.setName(ExecutionStatus.ERROR);
                         status.setTrackingSentDate(Instant.now());
+                        status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
                         injectStatusRepository.save(status);
                     }
                     return;
@@ -197,11 +202,13 @@ public class InjectsExecutionJob implements Job {
                             status.setName(ExecutionStatus.EXECUTING);
                             status.setTrackingSentDate(Instant.now());
                             status.setInject(inject);
+                            status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
                             injectStatusRepository.save(status);
                         } else {
                             InjectStatus status = inject.getStatus().get();
                             status.setName(ExecutionStatus.EXECUTING);
                             status.setTrackingSentDate(Instant.now());
+                            status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
                             injectStatusRepository.save(status);
                         }
                         newExecutableInject = this.executionExecutorService.launchExecutorContext(executableInject, inject);

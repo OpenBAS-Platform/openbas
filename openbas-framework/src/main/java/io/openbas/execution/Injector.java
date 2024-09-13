@@ -53,6 +53,10 @@ public abstract class Injector {
 
     public abstract ExecutionProcess process(Execution execution, ExecutableInject injection) throws Exception;
 
+    public InjectStatusCommandLine getCommandsLines(String externalId) {
+        return null;
+    }
+
     private InjectExpectation expectationConverter(
             @NotNull final ExecutableInject executableInject,
             Expectation expectation) {

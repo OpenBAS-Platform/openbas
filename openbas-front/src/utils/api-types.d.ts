@@ -1335,8 +1335,8 @@ export interface InjectStatus {
 }
 
 export interface InjectStatusCommandLine {
-  cleanup_command?: string;
-  content?: string;
+  cleanup_command?: string[];
+  content?: string[];
   external_id?: string;
 }
 
