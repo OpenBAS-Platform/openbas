@@ -33,6 +33,8 @@ interface Props {
   setSelectedInjectId: (injectId: Inject['inject_id']) => void;
   isDisabled: boolean;
   canBeTested?: boolean;
+  canDone?: boolean;
+  canTriggerNow?: boolean;
   exerciseOrScenarioId?: string;
   onCreate?: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void;
   onUpdate?: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void;
@@ -44,6 +46,8 @@ const InjectPopover: FunctionComponent<Props> = ({
   setSelectedInjectId,
   isDisabled,
   canBeTested = false,
+  canDone = false,
+  canTriggerNow = false,
   exerciseOrScenarioId,
   onCreate,
   onUpdate,
@@ -221,20 +225,20 @@ const InjectPopover: FunctionComponent<Props> = ({
         >
           {t('Update')}
         </MenuItem>
-        {!inject.inject_status && onInjectDone && (
-          <MenuItem
-            onClick={handleOpenDone}
-            disabled={isDisabled}
-          >
-            {t('Mark as done')}
-          </MenuItem>
+        {!inject.inject_status && onInjectDone && canDone && (
+        <MenuItem
+          onClick={handleOpenDone}
+          disabled={isDisabled}
+        >
+          {t('Mark as done')}
+        </MenuItem>
         )}
         {inject.inject_testable && canBeTested && (
           <MenuItem onClick={handleOpenTest}>
             {t('Test')}
           </MenuItem>
         )}
-        {inject.inject_type !== 'openbas_manual' && onUpdateInjectTrigger && (
+        {inject.inject_type !== 'openbas_manual' && canTriggerNow && onUpdateInjectTrigger && (
           <MenuItem
             onClick={handleOpenTrigger}
             disabled={isDisabled || !permissions.isRunning}

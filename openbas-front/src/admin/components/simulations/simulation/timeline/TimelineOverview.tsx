@@ -206,6 +206,8 @@ const TimelineOverview = () => {
                             inject={inject}
                             setSelectedInjectId={setSelectedInjectId}
                             isDisabled={isDisabled}
+                            canDone
+                            canTriggerNow
                           />
                         </ListItemSecondaryAction>
                       </ListItem>
