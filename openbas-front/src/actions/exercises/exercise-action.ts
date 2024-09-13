@@ -121,7 +121,7 @@ export const emptyLessonsCategories = (exerciseId: string) => (dispatch: Dispatc
 
 export const sendLessons = (exerciseId: string, data: LessonsSendInput) => (dispatch: Dispatch) => {
   const uri = `/api/exercises/${exerciseId}/lessons_send`;
-  return postReferential(schema.arrayOfLessonsCategories, uri, data)(dispatch);
+  return postReferential(null, uri, data)(dispatch);
 };
 
 export const fetchLessonsAnswers = (exerciseId: string) => (dispatch: Dispatch) => {
