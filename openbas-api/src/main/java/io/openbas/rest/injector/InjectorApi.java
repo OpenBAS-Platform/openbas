@@ -28,7 +28,7 @@ import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -335,7 +335,7 @@ public class InjectorApi extends RestBehavior {
 
     @GetMapping(INJECT0R_URI + "/options")
     public List<FilterUtilsJpa.Option> optionsByName(@RequestParam(required = false) final String searchText) {
-        return fromIterable(this.injectorRepository.findAll(byName(searchText), PageRequest.of(0, 10)))
+        return fromIterable(this.injectorRepository.findAll(byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
             .stream()
             .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
             .toList();

@@ -13,8 +13,8 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -128,7 +128,7 @@ public class KillChainPhaseApi extends RestBehavior {
 
   @GetMapping(KILL_CHAIN_PHASE_URI + "/options")
   public List<FilterUtilsJpa.Option> optionsByName(@RequestParam(required = false) final String searchText) {
-    return fromIterable(this.killChainPhaseRepository.findAll(byName(searchText), PageRequest.of(0, 10)))
+    return fromIterable(this.killChainPhaseRepository.findAll(byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
         .stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
