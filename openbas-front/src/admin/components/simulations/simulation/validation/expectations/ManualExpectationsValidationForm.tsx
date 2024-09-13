@@ -1,9 +1,9 @@
 import React, { FunctionComponent, useEffect } from 'react';
-import { Button, Chip, TextField as MuiTextField, Typography } from '@mui/material';
+import { Button, Chip, TextField as MuiTextField, Typography, Slider, Grid, Select, MenuItem } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 import { useFormatter } from '../../../../../../components/i18n';
 import { updateInjectExpectation } from '../../../../../../actions/Exercise';
@@ -44,11 +44,13 @@ interface FormProps {
   expectation: InjectExpectationsStore;
   onUpdate?: () => void;
   withSummary?: boolean;
+  selectPaddingTop: number;
 }
 
-const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expectation, onUpdate, withSummary = true }) => {
+const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expectation, onUpdate, withSummary = true, selectPaddingTop }) => {
   const classes = useStyles();
   const { t } = useFormatter();
+  const theme = useTheme<Theme>();
   const { teamsMap, usersMap }: {
     teamsMap: Record<string, Team>,
     usersMap: Record<string, User>
@@ -78,6 +80,8 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<{ expectation_score: number }>({
     mode: 'onTouched',
@@ -114,15 +118,45 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
                          />)}
         {withSummary && (<Typography variant="h3">{expectation.inject_expectation_user ? t('Player') : t('Team')}</Typography>)}
         {withSummary && targetLabel(expectation)}
-        <MuiTextField
-          className={withSummary ? classes.marginTop_2 : classes.scoreAcc}
-          variant="standard"
-          fullWidth
-          label={t('Score')}
-          type="number"
-          error={!!errors.expectation_score}
-          helperText={errors.expectation_score && errors.expectation_score?.message ? errors.expectation_score?.message : `${t('Expected score:')} ${expectation.inject_expectation_expected_score}`}
-          inputProps={register('expectation_score')}
+        <Grid container={true} spacing={3}>
+          <Grid item={true} xs={6}>
+            <MuiTextField
+              className={withSummary ? classes.marginTop_2 : classes.scoreAcc}
+              variant="standard"
+              fullWidth
+              label={t('Score')}
+              type="number"
+              error={!!errors.expectation_score}
+              helperText={errors.expectation_score && errors.expectation_score?.message ? errors.expectation_score?.message : `${t('Expected score:')} ${expectation.inject_expectation_expected_score}`}
+              {...register('expectation_score')}
+              InputProps={{
+                inputProps: {
+                  min: 0,
+                  max: 100,
+                },
+              }}
+            />
+          </Grid>
+          <Grid item={true} xs={6}>
+            <Select
+              fullWidth
+              value={watch('expectation_score') < expectation.inject_expectation_expected_score ? 'Failed' : 'Success'}
+              onChange={(event) => setValue('expectation_score', event.target.value === 'Success' ? 100 : 0)}
+              renderValue={(value) => {
+                return value;
+              }}
+              sx={{ marginTop: selectPaddingTop }}
+            >
+              <MenuItem value={'Success'}>{t('Success')}</MenuItem>
+              <MenuItem value={'Failed'}>{t('Failed')}</MenuItem>
+            </Select>
+          </Grid>
+        </Grid>
+        <Slider
+          size="small"
+          value={watch('expectation_score')}
+          onChange={(event, value) => setValue('expectation_score', value as number)}
+          style={{ color: watch('expectation_score') < expectation.inject_expectation_expected_score ? theme.palette.error.main : theme.palette.success.main }}
         />
         <div className={classes.buttons}>
           <Button

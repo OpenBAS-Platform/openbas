@@ -746,6 +746,7 @@ const i18n = {
       'Token key': 'Token',
       Example: 'Exemple',
       Score: 'Score',
+      Scores: 'Scores',
       'Expected score': 'Score attendu',
       Message: 'Message',
       'New control': 'Nouveau contrôle',
