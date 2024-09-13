@@ -52,6 +52,7 @@ public class InjectExpectationFixture {
     injectExpectation.setExpectedScore(100.0);
     injectExpectation.setExercise(exercise);
     return injectExpectation;
+
   }
 
 }
