@@ -112,7 +112,7 @@
     "eslint-plugin-import-newlines": "1.4.0",
     "eslint-plugin-playwright": "1.6.2",
     "eslint-plugin-react": "7.34.1",
-    "express": "4.19.2",
+    "express": "4.20.0",
     "fs-extra": "11.2.0",
     "globals": "15.9.0",
     "jsdom": "24.1.1",
