@@ -39,6 +39,7 @@ const useSearchOptions = () => {
       case 'scenario_tags':
       case 'exercise_tags':
       case 'inject_tags':
+      case 'payload_tags':
         searchTagAsOption(search).then((response) => {
           setOptions(response.data);
         });

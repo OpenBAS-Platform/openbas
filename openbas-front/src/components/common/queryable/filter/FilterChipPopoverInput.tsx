@@ -96,6 +96,7 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
                 e.stopPropagation();
               }
             }}
+            key={option.id}
             onClick={() => onClick(option.id)}
             style={{
               whiteSpace: 'nowrap',

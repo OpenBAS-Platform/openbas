@@ -21,6 +21,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -244,7 +245,7 @@ public class ScenarioApi {
 
   @GetMapping(SCENARIO_URI + "/options")
   public List<FilterUtilsJpa.Option> optionsByName(@RequestParam(required = false) final String searchText) {
-    return fromIterable(this.scenarioRepository.findAll(byName(searchText), PageRequest.of(0, 10)))
+    return fromIterable(this.scenarioRepository.findAll(byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
         .stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
