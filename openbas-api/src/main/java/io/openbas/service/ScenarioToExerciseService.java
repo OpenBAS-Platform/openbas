@@ -186,6 +186,7 @@ public class ScenarioToExerciseService {
 
     // Injects
     List<Inject> scenarioInjects = scenario.getInjects();
+    Map<String, Inject> mapExerciseInjectsByScenarioInject = new HashMap<>();
     scenarioInjects.forEach(scenarioInject -> {
       Inject exerciseInject = new Inject();
       exerciseInject.setTitle(scenarioInject.getTitle());
@@ -228,6 +229,8 @@ public class ScenarioToExerciseService {
       exerciseInject.setAssetGroups(CopyObjectListUtils.copy(scenarioInject.getAssetGroups(), AssetGroup.class));
       Inject injectSaved = this.injectRepository.save(exerciseInject);
 
+      mapExerciseInjectsByScenarioInject.put(scenarioInject.getId(), injectSaved);
+
       // Documents
       List<InjectDocument> exerciseInjectDocuments = new ArrayList<>();
       scenarioInject.getDocuments().forEach(injectDocument -> {
@@ -238,6 +241,15 @@ public class ScenarioToExerciseService {
         exerciseInjectDocuments.add(exerciseInjectDocument);
       });
       this.injectDocumentRepository.saveAll(exerciseInjectDocuments);
+    });
+
+    // Second pass to add the correct links
+    scenarioInjects.forEach(scenarioInject -> {
+      if(scenarioInject.getDependsOn() != null) {
+        Inject injectToUpdate = mapExerciseInjectsByScenarioInject.get(scenarioInject.getId());
+        injectToUpdate.setDependsOn(mapExerciseInjectsByScenarioInject.get(scenarioInject.getDependsOn().getId()));
+        this.injectRepository.save(injectToUpdate);
+      }
     });
 
     // Variables

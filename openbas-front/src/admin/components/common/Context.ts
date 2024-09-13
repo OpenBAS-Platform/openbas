@@ -277,3 +277,4 @@ export const ViewLessonContext = createContext<ViewLessonContextType>({
     });
   },
 });
+export const ViewModeContext = createContext('list');

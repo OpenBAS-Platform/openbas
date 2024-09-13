@@ -1347,6 +1347,11 @@ const i18n = {
       'Launch simulation now': 'Lancer la simulation maintenant',
       'Launch now': 'Lancer maintenant',
       'All teams value': 'Valeur de toutes les équipes',
+      Parent: 'Parent',
+      Inject: 'Stimuli',
+      Condition: 'Condition',
+      Childrens: 'Enfants',
+      'Interactive view': 'Vue interactive',
     },
     zh: {
       'Email address': 'email地址',
@@ -2601,6 +2606,11 @@ const i18n = {
       'All teams value': '所有团队的值',
       'The score set for the team will also be applied to all players in the team': '为团队设置的分数也将应用于团队中的所有玩家',
       Player: '玩家',
+      Parent: '父母',
+      Inject: '父母',
+      Condition: '条件',
+      Childrens: '儿童',
+      'Interactive view': '交互式视图',
     },
     en: {
       openbas_email: 'Email',

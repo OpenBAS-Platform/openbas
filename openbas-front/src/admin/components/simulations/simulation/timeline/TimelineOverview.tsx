@@ -316,6 +316,7 @@ const TimelineOverview = () => {
           injectId={selectedInjectId}
           teamsFromExerciseOrScenario={teams}
           isAtomic={false}
+          injects={injects}
         />
       )}
     </div>

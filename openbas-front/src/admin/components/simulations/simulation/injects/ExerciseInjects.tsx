@@ -1,10 +1,10 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { BarChartOutlined, ReorderOutlined } from '@mui/icons-material';
+import { BarChartOutlined, ReorderOutlined, ViewTimelineOutlined } from '@mui/icons-material';
 import { Grid, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import type { Exercise } from '../../../../../utils/api-types';
-import { ArticleContext, TeamContext } from '../../../common/Context';
+import { ArticleContext, TeamContext, ViewModeContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
@@ -46,7 +46,18 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
   const { t } = useFormatter();
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const availableButtons = ['chain', 'list', 'distribution'];
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
+
+  const [viewMode, setViewMode] = useState(() => {
+    const storedValue = localStorage.getItem('scenario_or_exercise_view_mode');
+    return storedValue === null || !availableButtons.includes(storedValue) ? 'list' : storedValue;
+  });
+
+  const handleViewMode = (mode: string) => {
+    localStorage.setItem('scenario_or_exercise_view_mode', mode);
+    setViewMode(mode);
+  };
 
   const { injects, exercise, teams, articles, variables } = useHelper(
     (helper: InjectHelper & ExercisesHelper & ArticlesHelper & ChallengeHelper & VariablesHelper) => {
@@ -70,11 +81,10 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
   const articleContext = articleContextForExercise(exerciseId);
   const teamContext = teamContextForExercise(exerciseId, []);
 
-  const [viewMode, setViewMode] = useState('list');
-
   return (
     <>
-      {viewMode === 'list' && (
+      <ViewModeContext.Provider value={viewMode}>
+        {(viewMode === 'list' || viewMode === 'chain') && (
         <ArticleContext.Provider value={articleContext}>
           <TeamContext.Provider value={teamContext}>
             <Injects
@@ -89,12 +99,13 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
               usersNumber={exercise.exercise_users_number}
               // @ts-expect-error typing
               teamsUsers={exercise.exercise_teams_users}
-              setViewMode={setViewMode}
+              setViewMode={handleViewMode}
+              availableButtons={availableButtons}
             />
           </TeamContext.Provider>
         </ArticleContext.Provider>
-      )}
-      {viewMode === 'distribution' && (
+        )}
+        {viewMode === 'distribution' && (
         <div style={{ marginTop: -12 }}>
           <ToggleButtonGroup
             size="small"
@@ -105,17 +116,27 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
             <Tooltip title={t('List view')}>
               <ToggleButton
                 value="list"
-                onClick={() => setViewMode('list')}
+                onClick={() => handleViewMode('list')}
                 selected={false}
                 aria-label="List view mode"
               >
                 <ReorderOutlined fontSize="small" color="primary" />
               </ToggleButton>
             </Tooltip>
+            <Tooltip title={t('Interactive view')}>
+              <ToggleButton
+                value="chain"
+                onClick={() => handleViewMode('chain')}
+                selected={false}
+                aria-label="Interactive view mode"
+              >
+                <ViewTimelineOutlined fontSize="small" color="primary" />
+              </ToggleButton>
+            </Tooltip>
             <Tooltip title={t('Distribution view')}>
               <ToggleButton
                 value="distribution"
-                onClick={() => setViewMode('distribution')}
+                onClick={() => handleViewMode('distribution')}
                 selected={true}
                 aria-label="Distribution view mode"
               >
@@ -176,7 +197,8 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
             </Grid>
           </Grid>
         </div>
-      )}
+        )}
+      </ViewModeContext.Provider>
     </>
   );
 };

@@ -1,8 +1,6 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import * as R from 'ramda';
-import { Connection } from '@xyflow/react';
-import { ArticleContext, TeamContext } from '../../../common/Context';
+import { ArticleContext, TeamContext, ViewModeContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
@@ -13,10 +11,9 @@ import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
-import type { Inject, Scenario } from '../../../../../utils/api-types';
+import type { Scenario } from '../../../../../utils/api-types';
 import { articleContextForScenario } from '../articles/ScenarioArticles';
 import { teamContextForScenario } from '../teams/ScenarioTeams';
-import injectContextForScenario from '../ScenarioContext';
 import { fetchScenarioInjectsSimple } from '../../../../../actions/injects/inject-action';
 import Injects from '../../../common/injects/Injects';
 
@@ -29,7 +26,9 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
   const dispatch = useAppDispatch();
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
 
-  const { injects, scenario, teams, articles, variables } = useHelper(
+  const availableButtons = ['chain', 'list'];
+
+  const { scenario, teams, articles, variables } = useHelper(
     (helper: InjectHelper & ScenariosHelper & ArticlesHelper & ChallengeHelper & VariablesHelper) => {
       return {
         injects: helper.getScenarioInjects(scenarioId),
@@ -49,37 +48,37 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
   const articleContext = articleContextForScenario(scenarioId);
   const teamContext = teamContextForScenario(scenarioId, []);
 
-  const injectContext = injectContextForScenario(scenario);
+  const [viewMode, setViewMode] = useState(() => {
+    const storedValue = localStorage.getItem('scenario_or_exercise_view_mode');
+    return storedValue === null || !availableButtons.includes(storedValue) ? 'list' : storedValue;
+  });
 
-  const handleConnectInjects = async (connection: Connection) => {
-    const updateFields = [
-      'inject_title',
-      'inject_depends_from_another',
-      'inject_depends_duration',
-    ];
-    const sourceInject = injects.find((inject: Inject) => inject.inject_id === connection.source);
-    sourceInject.inject_depends_from_another = connection.target;
-    await injectContext.onUpdateInject(sourceInject.inject_id, R.pick(updateFields, sourceInject));
+  const handleViewMode = (mode: string) => {
+    setViewMode(mode);
+    localStorage.setItem('scenario_or_exercise_view_mode', mode);
   };
 
   return (
     <>
-      <ArticleContext.Provider value={articleContext}>
-        <TeamContext.Provider value={teamContext}>
-          <Injects
-            exerciseOrScenarioId={scenarioId}
-            teams={teams}
-            articles={articles}
-            variables={variables}
-            uriVariable={`/admin/scenarios/${scenarioId}/definition/variables`}
-            allUsersNumber={scenario.scenario_all_users_number}
-            usersNumber={scenario.scenario_users_number}
-            // @ts-expect-error typing
-            teamsUsers={scenario.scenario_teams_users}
-            onConnectInjects={handleConnectInjects}
-          />
-        </TeamContext.Provider>
-      </ArticleContext.Provider>
+      <ViewModeContext.Provider value={viewMode}>
+        <ArticleContext.Provider value={articleContext}>
+          <TeamContext.Provider value={teamContext}>
+            <Injects
+              exerciseOrScenarioId={scenarioId}
+              teams={teams}
+              articles={articles}
+              variables={variables}
+              uriVariable={`/admin/scenarios/${scenarioId}/definition/variables`}
+              allUsersNumber={scenario.scenario_all_users_number}
+              usersNumber={scenario.scenario_users_number}
+              // @ts-expect-error typing
+              teamsUsers={scenario.scenario_teams_users}
+              setViewMode={handleViewMode}
+              availableButtons={availableButtons}
+            />
+          </TeamContext.Provider>
+        </ArticleContext.Provider>
+      </ViewModeContext.Provider>
     </>
 
   );

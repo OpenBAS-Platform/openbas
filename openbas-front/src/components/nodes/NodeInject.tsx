@@ -7,7 +7,8 @@ import type { Theme } from '../Theme';
 import { isNotEmptyField } from '../../utils/utils';
 import InjectIcon from '../../admin/components/common/injects/InjectIcon';
 import InjectPopover from '../../admin/components/common/injects/InjectPopover';
-import type { InjectOutputType } from '../../actions/injects/Inject';
+import type { InjectOutputType, InjectStore } from '../../actions/injects/Inject';
+import { useFormatter } from '../i18n';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -19,7 +20,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
         ? '1px solid rgba(255, 255, 255, 0.12)'
         : '1px solid rgba(0, 0, 0, 0.12)',
     borderRadius: 4,
-    width: 240,
+    width: 250,
     minHeight: '100px',
     height: 'auto',
     padding: '8px 5px 5px 5px',
@@ -52,7 +53,9 @@ const useStyles = makeStyles<Theme>((theme) => ({
     WebkitLineClamp: 2,
     WebkitBoxOrient: 'vertical',
     height: '40px',
-
+    color: theme.palette.mode === 'dark'
+      ? 'white'
+      : 'black',
   },
   targets: {
     display: 'flex',
@@ -88,6 +91,9 @@ export type NodeInject = Node<{
   targets: string[],
   exerciseOrScenarioId: string,
   onSelectedInject(inject?: InjectOutputType): void,
+  onCreate: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void,
+  onUpdate: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void,
+  onDelete: (result: string) => void,
 }
 
 >;
@@ -100,6 +106,7 @@ export type NodeInject = Node<{
 const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
   const classes = useStyles();
   const theme: Theme = useTheme();
+  const { ft, fld } = useFormatter();
 
   /**
    * Converts the duration in second to a string representing the relative time
@@ -116,10 +123,11 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
    * @param durationInSeconds the duration in seconds
    */
   const convertToAbsoluteTime = (startDate: string, durationInSeconds: number) => {
-    return moment.utc(startDate)
+    const date = moment.utc(startDate)
       .add(durationInSeconds, 's')
-      .add(-new Date().getTimezoneOffset() / 60, 'h')
-      .format('MMMM Do, YYYY - h:mmA');
+      .toDate();
+
+    return `${fld(date)} - ${ft(date)}`;
   };
 
   /**
@@ -144,7 +152,9 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
     if (data.inject) data.onSelectedInject(data.inject);
   };
 
-  const isDisabled = !data.inject?.inject_injector_contract.injector_contract_content_parsed?.config.expose;
+  const isDisabled = !data.inject?.inject_injector_contract?.convertedContent?.config.expose;
+
+  const dimNode = !data.inject?.inject_enabled || !data.inject?.inject_injector_contract?.convertedContent?.config.expose;
 
   let borderLeftColor = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)';
   if (!data.inject?.inject_enabled) {
@@ -158,7 +168,7 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
       borderLeftColor,
     }} onClick={onClick}
     >
-      <div className={classes.icon} style={{ opacity: data.inject?.inject_enabled ? '1' : '0.3' }}>
+      <div className={classes.icon} style={{ opacity: dimNode ? '0.3' : '1' }}>
         <InjectIcon
           isPayload={isNotEmptyField(data.inject?.inject_injector_contract?.injector_contract_payload)}
           type={
@@ -172,22 +182,22 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
       { data.startDate !== undefined ? (
         <div
           className={classes.triggerTime}
-          style={{ opacity: data.inject?.inject_enabled ? '1' : '0.3' }}
+          style={{ opacity: dimNode ? '0.3' : '1' }}
         >{convertToAbsoluteTime(data.startDate, data.inject!.inject_depends_duration)}</div>
 
       ) : (
         <div
           className={classes.triggerTime}
-          style={{ opacity: data.inject?.inject_enabled ? '1' : '0.3' }}
+          style={{ opacity: dimNode ? '0.3' : '1' }}
         >{convertToRelativeTime(data.inject!.inject_depends_duration)}</div>
 
       )}
-      <Tooltip title={data.label} style={{ opacity: data.inject?.inject_enabled ? '1' : '0.3' }}>
+      <Tooltip title={data.label} style={{ opacity: dimNode ? '0.3' : '1' }}>
         <div className={classes.label}>{data.label}</div>
       </Tooltip>
       <div className={classes.footer}>
         <Tooltip title={`${data.targets.slice(0, 3).join(', ')}`}>
-          <div className={classes.targets} style={{ opacity: data.inject?.inject_enabled ? '1' : '0.3' }}>
+          <div className={classes.targets} style={{ opacity: dimNode ? '0.3' : '1' }}>
             <span>{`${data.targets.slice(0, 3).join(', ')}${data.targets.length > 3 ? ', ...' : ''}`}</span>
           </div>
         </Tooltip>
@@ -199,6 +209,9 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
               canBeTested={data.inject?.inject_testable}
               isDisabled={isDisabled}
               exerciseOrScenarioId={data.exerciseOrScenarioId}
+              onDelete={data.onDelete}
+              onUpdate={data.onUpdate}
+              onCreate={data.onCreate}
             />
           </span>
         </div>

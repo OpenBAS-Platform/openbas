@@ -1,11 +1,11 @@
 import React, { FunctionComponent, useContext } from 'react';
 import { ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
-import { BarChartOutlined, ReorderOutlined } from '@mui/icons-material';
+import { BarChartOutlined, ReorderOutlined, ViewTimelineOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import type { InjectOutputType } from '../../../../actions/injects/Inject';
 import { exportData } from '../../../../utils/Environment';
 import { useFormatter } from '../../../../components/i18n';
-import { InjectContext } from '../Context';
+import { InjectContext, ViewModeContext } from '../Context';
 import ImportUploaderInjectFromXls from './ImportUploaderInjectFromXls';
 import useExportToXLS from '../../../../utils/hooks/useExportToXLS';
 import { useHelper } from '../../../../store';
@@ -24,20 +24,20 @@ const useStyles = makeStyles(() => ({
 interface Props {
   injects: InjectOutputType[];
   setViewMode?: (mode: string) => void;
-  showTimeline: boolean;
-  handleShowTimeline: () => void;
+  availableButtons: string[];
 }
 
 const InjectsListButtons: FunctionComponent<Props> = ({
   injects,
   setViewMode,
-  showTimeline,
-  handleShowTimeline,
+  availableButtons,
 }) => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
   const injectContext = useContext(InjectContext);
+
+  const viewModeContext = useContext(ViewModeContext);
 
   // Fetching data
   const { tagsMap } = useHelper((helper: TagHelper) => ({
@@ -62,13 +62,8 @@ const InjectsListButtons: FunctionComponent<Props> = ({
   );
   const exportInjectsToXLS = useExportToXLS({ data: exportInjects, fileName: `${t('Injects')}` });
 
-  const onShowTimeline = () => {
-    handleShowTimeline();
-  };
-
   const entries = [
     { label: 'Export injects', action: exportInjectsToXLS },
-    { label: showTimeline ? t('Hide timeline') : t('Show timeline'), action: onShowTimeline },
   ];
 
   return (
@@ -86,18 +81,31 @@ const InjectsListButtons: FunctionComponent<Props> = ({
       >
         {injectContext.onImportInjectFromXls
           && <ImportUploaderInjectFromXls />}
-        {!!setViewMode
+        {(!!setViewMode && availableButtons.includes('list'))
           && <Tooltip title={t('List view')}>
             <ToggleButton
               value="list"
-              selected
+              onClick={() => setViewMode('list')}
+              selected={viewModeContext === 'list'}
               aria-label="List view mode"
             >
-              <ReorderOutlined fontSize="small" color="inherit" />
+              <ReorderOutlined fontSize="small" color={viewModeContext === 'list' ? 'inherit' : 'primary'} />
             </ToggleButton>
           </Tooltip>
         }
-        {!!setViewMode
+        {(!!setViewMode && availableButtons.includes('chain'))
+          && <Tooltip title={t('Interactive view')}>
+            <ToggleButton
+              value="chain"
+              onClick={() => setViewMode('chain')}
+              selected={viewModeContext === 'chain'}
+              aria-label="Interactive view mode"
+            >
+              <ViewTimelineOutlined fontSize="small" color={viewModeContext === 'chain' ? 'inherit' : 'primary'} />
+            </ToggleButton>
+          </Tooltip>
+        }
+        {(!!setViewMode && availableButtons.includes('distribution'))
           && <Tooltip title={t('Distribution view')}>
             <ToggleButton
               value="distribution"

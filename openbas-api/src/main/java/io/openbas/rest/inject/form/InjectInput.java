@@ -27,7 +27,7 @@ public class InjectInput {
     @JsonProperty("inject_content")
     private ObjectNode content;
 
-    @JsonProperty("inject_depends_from_another")
+    @JsonProperty("inject_depends_on")
     private String dependsOn;
 
     @JsonProperty("inject_depends_duration")

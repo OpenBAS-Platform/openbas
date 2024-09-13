@@ -215,6 +215,7 @@ const UpdateInjectDetails = ({
         inject_asset_groups: assetGroupIds,
         inject_documents: documents,
         inject_depends_duration,
+        inject_depends_on: data.inject_depends_on,
       };
       await onUpdateInject(values);
     }

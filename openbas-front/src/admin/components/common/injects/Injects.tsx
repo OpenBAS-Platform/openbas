@@ -1,7 +1,6 @@
 import React, { CSSProperties, FunctionComponent, useContext, useMemo, useState } from 'react';
 import { Checkbox, Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { Connection } from '@xyflow/react';
 import { Link } from 'react-router-dom';
 import * as R from 'ramda';
 import { splitDuration } from '../../../../utils/Time';
@@ -15,7 +14,7 @@ import { isNotEmptyField } from '../../../../utils/utils';
 import { useFormatter } from '../../../../components/i18n';
 import type { FilterGroup, Inject, InjectTestStatus, Variable } from '../../../../utils/api-types';
 import type { InjectorContractConvertedContent, InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
-import { InjectContext, PermissionsContext } from '../Context';
+import { InjectContext, PermissionsContext, ViewModeContext } from '../Context';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
@@ -95,7 +94,8 @@ interface Props {
   exerciseOrScenarioId: string
 
   setViewMode?: (mode: string) => void
-  onConnectInjects: (connection: Connection) => void
+
+  availableButtons: string[]
 
   teams: TeamStore[]
   articles: ArticleStore[]
@@ -109,7 +109,7 @@ interface Props {
 const Injects: FunctionComponent<Props> = ({
   exerciseOrScenarioId,
   setViewMode,
-  onConnectInjects,
+  availableButtons,
   teams,
   articles,
   variables,
@@ -122,6 +122,7 @@ const Injects: FunctionComponent<Props> = ({
   const classes = useStyles();
   const { t, tPick } = useFormatter();
   const injectContext = useContext(InjectContext);
+  const viewModeContext = useContext(ViewModeContext);
   const { permissions } = useContext(PermissionsContext);
 
   // Headers
@@ -244,6 +245,29 @@ const Injects: FunctionComponent<Props> = ({
     }
   };
 
+  const massUpdateInject = async (data: Inject[]) => {
+    const promises: Promise<InjectStore | undefined>[] = [];
+    data.forEach((inject) => {
+      promises.push(injectContext.onUpdateInject(inject.inject_id, inject).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+        if (result.entities) {
+          const updated = result.entities.injects[result.result];
+          return updated;
+        }
+        return undefined;
+      }));
+    });
+
+    Promise.all(promises).then((values) => {
+      if (values !== undefined) {
+        const updatedInjects = injects
+          .map((inject) => (values.find((value) => value !== undefined && value.inject_id === inject.inject_id)
+            ? (values.find((value) => value !== undefined && value?.inject_id === inject.inject_id) as InjectOutputType)
+            : inject as InjectOutputType));
+        setInjects(updatedInjects);
+      }
+    });
+  };
+
   const [openCreateDrawer, setOpenCreateDrawer] = useState(false);
   const [presetCreationValues, setPresetCreationValues] = useState<{
     inject_depends_duration_days?: number,
@@ -258,18 +282,6 @@ const Injects: FunctionComponent<Props> = ({
   }) => {
     setOpenCreateDrawer(true);
     setPresetCreationValues(data);
-  };
-
-  // Timeline
-  const [showTimeline, setShowTimeline] = useState<boolean>(
-    () => {
-      const storedValue = localStorage.getItem(`${exerciseOrScenarioId}_show_injects_timeline`);
-      return storedValue === null ? true : storedValue === 'true';
-    },
-  );
-  const handleShowTimeline = () => {
-    setShowTimeline(!showTimeline);
-    localStorage.setItem(`${exerciseOrScenarioId}_show_injects_timeline`, String(!showTimeline));
   };
 
   // Filters
@@ -462,16 +474,20 @@ const Injects: FunctionComponent<Props> = ({
         queryableHelpers={queryableHelpers}
         disablePagination
         topBarButtons={
-          <InjectsListButtons injects={injects} setViewMode={setViewMode} showTimeline={showTimeline} handleShowTimeline={handleShowTimeline} />
+          <InjectsListButtons
+            injects={injects}
+            availableButtons={availableButtons}
+            setViewMode={setViewMode}
+          />
         }
       />
-      {showTimeline && (
-        <div style={{ marginBottom: 50 }}>
+      {viewModeContext === 'chain' && (
+        <div style={{ marginBottom: 10 }}>
           <div>
             <ChainedTimeline
               injects={injects}
-              onConnectInjects={onConnectInjects}
               exerciseOrScenarioId={exerciseOrScenarioId}
+              onUpdateInject={massUpdateInject}
               openCreateInjectDrawer={openCreateInjectDrawer}
               onSelectedInject={(inject) => {
                 const injectContract = inject?.inject_injector_contract.convertedContent;
@@ -480,11 +496,15 @@ const Injects: FunctionComponent<Props> = ({
                   setSelectedInjectId(inject?.inject_id);
                 }
               }}
+              onCreate={onCreate}
+              onUpdate={onUpdate}
+              onDelete={onDelete}
             />
             <div className="clearfix" />
           </div>
         </div>
       )}
+      {viewModeContext === 'list' && (
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -546,11 +566,11 @@ const Injects: FunctionComponent<Props> = ({
               </ListItemIcon>
               <ListItemIcon style={{ paddingTop: 5 }}>
                 <InjectIcon
-                  isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
+                  isPayload={isNotEmptyField(inject.inject_injector_contract?.injector_contract_payload)}
                   type={
-                    inject.inject_injector_contract.injector_contract_payload
-                      ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
-                      || inject.inject_injector_contract.injector_contract_payload?.payload_type
+                    inject.inject_injector_contract?.injector_contract_payload
+                      ? inject.inject_injector_contract?.injector_contract_payload?.payload_collector_type
+                      || inject.inject_injector_contract?.injector_contract_payload?.payload_type
                       : inject.inject_type
                   }
                   disabled={!injectContract || !isContractExposed || !inject.inject_enabled}
@@ -591,6 +611,7 @@ const Injects: FunctionComponent<Props> = ({
           );
         })}
       </List>
+      )}
       {permissions.canWrite && (
         <>
           {selectedInjectId !== null
@@ -598,15 +619,18 @@ const Injects: FunctionComponent<Props> = ({
               open
               handleClose={() => setSelectedInjectId(null)}
               onUpdateInject={onUpdateInject}
+              massUpdateInject={massUpdateInject}
               injectId={selectedInjectId}
               teamsFromExerciseOrScenario={teams}
               // @ts-expect-error typing
               articlesFromExerciseOrScenario={articles}
               variablesFromExerciseOrScenario={variables}
+              exerciseOrScenarioId={exerciseOrScenarioId}
               uriVariable={uriVariable}
               allUsersNumber={allUsersNumber}
               usersNumber={usersNumber}
               teamsUsers={teamsUsers}
+              injects={injects}
                />
           }
           <ButtonCreate onClick={() => {

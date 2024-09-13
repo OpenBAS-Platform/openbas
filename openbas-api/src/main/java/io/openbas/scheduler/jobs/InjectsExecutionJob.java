@@ -10,6 +10,7 @@ import io.openbas.helper.InjectHelper;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -29,20 +30,24 @@ import static java.util.stream.Collectors.groupingBy;
 
 @Component
 @DisallowConcurrentExecution
+@RequiredArgsConstructor
 public class InjectsExecutionJob implements Job {
 
     private static final Logger LOGGER = Logger.getLogger(InjectsExecutionJob.class.getName());
 
-    private ApplicationContext context;
-    private InjectHelper injectHelper;
-    private DryInjectRepository dryInjectRepository;
-    private InjectRepository injectRepository;
-    private InjectorRepository injectorRepository;
-    private InjectStatusRepository injectStatusRepository;
-    private DryInjectStatusRepository dryInjectStatusRepository;
-    private ExerciseRepository exerciseRepository;
-    private QueueService queueService;
-    private ExecutionExecutorService executionExecutorService;
+    private final ApplicationContext context;
+    private final InjectHelper injectHelper;
+    private final DryInjectRepository dryInjectRepository;
+    private final InjectRepository injectRepository;
+    private final InjectorRepository injectorRepository;
+    private final InjectStatusRepository injectStatusRepository;
+    private final DryInjectStatusRepository dryInjectStatusRepository;
+    private final ExerciseRepository exerciseRepository;
+    private final QueueService queueService;
+    private final ExecutionExecutorService executionExecutorService;
+
+    private final List<ExecutionStatus> executionStatusesNotReady =
+            List.of(ExecutionStatus.QUEUING, ExecutionStatus.DRAFT, ExecutionStatus.EXECUTING, ExecutionStatus.PENDING);
 
     @Resource
     protected ObjectMapper mapper;
@@ -53,56 +58,6 @@ public class InjectsExecutionJob implements Job {
     @Autowired
     public void setEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
-    }
-
-    @Autowired
-    public void setQueueService(QueueService queueService) {
-        this.queueService = queueService;
-    }
-
-    @Autowired
-    public void setExecutionExecutorService(ExecutionExecutorService executionExecutorService) {
-        this.executionExecutorService = executionExecutorService;
-    }
-
-    @Autowired
-    public void setDryInjectStatusRepository(DryInjectStatusRepository dryInjectStatusRepository) {
-        this.dryInjectStatusRepository = dryInjectStatusRepository;
-    }
-
-    @Autowired
-    public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
-        this.injectStatusRepository = injectStatusRepository;
-    }
-
-    @Autowired
-    public void setInjectorRepository(InjectorRepository injectorRepository) {
-        this.injectorRepository = injectorRepository;
-    }
-
-    @Autowired
-    public void setInjectRepository(InjectRepository injectRepository) {
-        this.injectRepository = injectRepository;
-    }
-
-    @Autowired
-    public void setDryInjectRepository(DryInjectRepository dryInjectRepository) {
-        this.dryInjectRepository = dryInjectRepository;
-    }
-
-    @Autowired
-    public void setExerciseRepository(ExerciseRepository exerciseRepository) {
-        this.exerciseRepository = exerciseRepository;
-    }
-
-    @Autowired
-    public void setContext(ApplicationContext context) {
-        this.context = context;
-    }
-
-    @Autowired
-    public void setInjectHelper(InjectHelper injectHelper) {
-        this.injectHelper = injectHelper;
     }
 
     public void handleAutoStartExercises() {
@@ -190,57 +145,77 @@ public class InjectsExecutionJob implements Job {
         // Depending on injector type (internal or external) execution must be done differently
         Inject inject = executableInject.getInjection().getInject();
 
-        inject.getInjectorContract().ifPresent(injectorContract -> {
-
-            if (!inject.isReady()) {
-                // Status
-                if (inject.getStatus().isEmpty()) {
-                    InjectStatus status = new InjectStatus();
-                    status.getTraces().add(InjectStatusExecution.traceError("The inject is not ready to be executed (missing mandatory fields)"));
-                    status.setName(ExecutionStatus.ERROR);
-                    status.setTrackingSentDate(Instant.now());
-                    status.setInject(inject);
-                    injectStatusRepository.save(status);
-                } else {
-                    InjectStatus status = inject.getStatus().get();
-                    status.getTraces().add(InjectStatusExecution.traceError("The inject is not ready to be executed (missing mandatory fields)"));
-                    status.setName(ExecutionStatus.ERROR);
-                    status.setTrackingSentDate(Instant.now());
-                    injectStatusRepository.save(status);
-                }
-                return;
+        // We are now checking if we depend on another inject and if it did not failed
+        if (inject.getDependsOn() != null
+                && inject.getDependsOn().getStatus().isPresent()
+                && ( inject.getDependsOn().getStatus().get().getName().equals(ExecutionStatus.ERROR)
+                    || executionStatusesNotReady.contains(inject.getDependsOn().getStatus().get().getName()))) {
+            InjectStatus status = new InjectStatus();
+            if (inject.getStatus().isEmpty()) {
+                status.setInject(inject);
+            } else {
+                status = inject.getStatus().get();
             }
+            String errorMsg = inject.getDependsOn().getStatus().get().getName().equals(ExecutionStatus.ERROR) ?
+                    "The inject is depending on another inject that failed"
+                    : "The inject is depending on another inject that is not executed yet";
+            status.getTraces().add(InjectStatusExecution.traceError(errorMsg));
+            status.setName(ExecutionStatus.ERROR);
+            status.setTrackingSentDate(Instant.now());
+            injectStatusRepository.save(status);
+        } else {
+            inject.getInjectorContract().ifPresent(injectorContract -> {
 
-            Injector externalInjector = injectorRepository.findByType(injectorContract.getInjector().getType()).orElseThrow();
-            LOGGER.log(Level.INFO, "Executing inject " + inject.getInject().getTitle());
-            // Executor logics
-            ExecutableInject newExecutableInject = executableInject;
-            if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
-                try {
+                if (!inject.isReady()) {
                     // Status
                     if (inject.getStatus().isEmpty()) {
                         InjectStatus status = new InjectStatus();
-                        status.setName(ExecutionStatus.EXECUTING);
+                        status.getTraces().add(InjectStatusExecution.traceError("The inject is not ready to be executed (missing mandatory fields)"));
+                        status.setName(ExecutionStatus.ERROR);
                         status.setTrackingSentDate(Instant.now());
                         status.setInject(inject);
                         injectStatusRepository.save(status);
                     } else {
                         InjectStatus status = inject.getStatus().get();
-                        status.setName(ExecutionStatus.EXECUTING);
+                        status.getTraces().add(InjectStatusExecution.traceError("The inject is not ready to be executed (missing mandatory fields)"));
+                        status.setName(ExecutionStatus.ERROR);
                         status.setTrackingSentDate(Instant.now());
                         injectStatusRepository.save(status);
                     }
-                    newExecutableInject = this.executionExecutorService.launchExecutorContext(executableInject, inject);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    return;
                 }
-            }
-            if (externalInjector.isExternal()) {
-                executeExternal(newExecutableInject);
-            } else {
-                executeInternal(newExecutableInject);
-            }
-        });
+
+                Injector externalInjector = injectorRepository.findByType(injectorContract.getInjector().getType()).orElseThrow();
+                LOGGER.log(Level.INFO, "Executing inject " + inject.getInject().getTitle());
+                // Executor logics
+                ExecutableInject newExecutableInject = executableInject;
+                if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
+                    try {
+                        // Status
+                        if (inject.getStatus().isEmpty()) {
+                            InjectStatus status = new InjectStatus();
+                            status.setName(ExecutionStatus.EXECUTING);
+                            status.setTrackingSentDate(Instant.now());
+                            status.setInject(inject);
+                            injectStatusRepository.save(status);
+                        } else {
+                            InjectStatus status = inject.getStatus().get();
+                            status.setName(ExecutionStatus.EXECUTING);
+                            status.setTrackingSentDate(Instant.now());
+                            injectStatusRepository.save(status);
+                        }
+                        newExecutableInject = this.executionExecutorService.launchExecutorContext(executableInject, inject);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                if (externalInjector.isExternal()) {
+                    executeExternal(newExecutableInject);
+                } else {
+                    executeInternal(newExecutableInject);
+                }
+            });
+        }
     }
 
     public void updateExercise(String exerciseId) {

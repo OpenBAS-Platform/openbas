@@ -146,7 +146,6 @@ input[type="file"] {
 }
 
 .react-flow__controls-button {
-  background: #070d19 !important;
   border-bottom: none !important;
 }
 .react-flow__controls-button:hover {
@@ -157,6 +156,32 @@ input[type="file"] {
   border: 1px solid #b5b7ba;
 }
 
-.react-flow__pane.draggable:not(.react-flow__pane.draggable.dragging) {
+.react-flow__pane.draggable:not(.react-flow__pane.draggable.dragging, :has(.react-flow__connection)) {
   cursor: none !important;
+}
+
+.react-flow__handle {
+  width: 12px;
+  height: 12px;
+}
+
+.dark.react-flow {
+  --xy-minimap-background-color-props: #070d19;
+  --xy-background-color: #070d19;
+  --xy-background-color-props: #070d19;
+  --xy-background-color-default:#070d19;
+  --xy-minimap-mask-background-color-default: rgba(80, 80, 80, 0.8);
+  --xy-controls-button-background-color-default: #070d19;
+}
+
+.light.react-flow {
+  --xy-minimap-background-color-props: #f8f8f8;
+  --xy-background-color: #f8f8f8;
+  --xy-background-color-props: #f8f8f8;
+  --xy-background-color-default:#f8f8f8;
+  --xy-minimap-mask-background-color-default: rgba(255, 255, 255, 0.8);
+}
+
+.react-flow__minimap {
+  margin: 15px 40px 15px 15px;
 }

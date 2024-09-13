@@ -86,6 +86,18 @@ const inject18n = (WrappedComponent) => {
           year: 'numeric',
         });
       };
+      const veryShortNumericDateTime = (date) => {
+        if (isNone(date)) {
+          return translate('None');
+        }
+        return this.props.intl.formatDate(date, {
+          minute: 'numeric',
+          hour: 'numeric',
+          day: 'numeric',
+          month: 'numeric',
+          year: 'numeric',
+        });
+      };
       const fullNumericDateTime = (date) => {
         if (isNone(date)) {
           return translate('None');
@@ -145,6 +157,7 @@ const inject18n = (WrappedComponent) => {
           {...{ fsd: shortDate }}
           {...{ nsd: shortNumericDate }}
           {...{ nsdt: shortNumericDateTime }}
+          {...{ vnsdt: veryShortNumericDateTime }}
           {...{ fndt: fullNumericDateTime }}
           {...{ fd: standardDate }}
           {...{ md: monthDate }}
@@ -230,6 +243,18 @@ export const useFormatter = () => {
       year: 'numeric',
     });
   };
+  const veryShortNumericDateTime = (date) => {
+    if (isNone(date)) {
+      return translate('None');
+    }
+    return intl.formatDate(date, {
+      minute: 'numeric',
+      hour: 'numeric',
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+    });
+  };
   const fullNumericDateTime = (date) => {
     if (isNone(date)) {
       return translate('None');
@@ -292,6 +317,7 @@ export const useFormatter = () => {
     fsd: shortDate,
     nsd: shortNumericDate,
     nsdt: shortNumericDateTime,
+    vnsdt: veryShortNumericDateTime,
     fndt: fullNumericDateTime,
     ft: time,
     fd: standardDate,
