@@ -602,7 +602,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
               {selectedExpectationForCreation && (
                 <>
                   {selectedExpectationForCreation.injectExpectation.inject_expectation_type === 'MANUAL'
-                    && <ManualExpectationsValidationForm expectation={selectedExpectationForCreation.injectExpectation} onUpdate={onUpdateValidation} selectPaddingTop={4} />}
+                    && <ManualExpectationsValidationForm expectation={selectedExpectationForCreation.injectExpectation} onUpdate={onUpdateValidation} />}
                   {['DETECTION', 'PREVENTION'].includes(selectedExpectationForCreation.injectExpectation.inject_expectation_type)
                     && <DetectionPreventionExpectationsValidationForm
                       expectation={selectedExpectationForCreation.injectExpectation}
@@ -628,7 +628,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                     && <ManualExpectationsValidationForm
                       expectation={selectedResultEdition.injectExpectation}
                       onUpdate={onUpdateValidation}
-                      selectPaddingTop={4}
                        />
                   }
                   {['DETECTION', 'PREVENTION'].includes(selectedResultEdition.injectExpectation.inject_expectation_type)

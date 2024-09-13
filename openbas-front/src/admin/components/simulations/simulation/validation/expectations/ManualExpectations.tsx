@@ -211,7 +211,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
             {t('Team')}
           </Typography>
           <Paper>
-            <ManualExpectationsValidationForm key={parentExpectation.targetId} expectation={parentExpectation} selectPaddingTop={4} />
+            <ManualExpectationsValidationForm key={parentExpectation.targetId} expectation={parentExpectation} />
           </Paper>
           <Divider style={{ margin: '20px 0' }} />
           <Typography variant="h5" style={{ fontWeight: 500, margin: '10px' }}>
@@ -256,7 +256,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
                     </div>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <ManualExpectationsValidationForm expectation={e} withSummary={false} selectPaddingTop={2} />
+                    <ManualExpectationsValidationForm expectation={e} withSummary={false} />
                   </AccordionDetails>
                 </Accordion>
               );

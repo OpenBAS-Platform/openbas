@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react';
-import { Button, Chip, TextField as MuiTextField, Typography, Slider, Grid, Select, MenuItem } from '@mui/material';
+import { Button, Chip, Grid, MenuItem, Select, Slider, TextField as MuiTextField, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -14,7 +14,7 @@ import type { TeamsHelper } from '../../../../../../actions/teams/team-helper';
 import type { UserHelper } from '../../../../../../actions/helper';
 import { useHelper } from '../../../../../../store';
 import type { Team, User } from '../../../../../../utils/api-types';
-import { resolveUserName, truncate, computeLabel, computeColorStyle } from '../../../../../../utils/String';
+import { computeColorStyle, computeLabel, resolveUserName, truncate } from '../../../../../../utils/String';
 import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
 import { fetchUsers } from '../../../../../../actions/User';
 import { fetchTeams } from '../../../../../../actions/teams/team-actions';
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginTop: theme.spacing(2),
   },
   scoreAcc: {
-    margin: 0,
+    marginTop: theme.spacing(0),
   },
   buttons: {
     display: 'flex',
@@ -115,13 +115,12 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
           classes={{ root: classes.chipInList }}
           style={computeColorStyle(expectation.inject_expectation_status)}
           label={t(computeLabel(expectation.inject_expectation_status))}
-                         />)}
+        />)}
         {withSummary && (<Typography variant="h3">{expectation.inject_expectation_user ? t('Player') : t('Team')}</Typography>)}
         {withSummary && targetLabel(expectation)}
-        <Grid container={true} spacing={3}>
-          <Grid item={true} xs={6}>
+        <Grid container spacing={3} className={withSummary ? classes.marginTop_2 : classes.scoreAcc}>
+          <Grid item xs={6}>
             <MuiTextField
-              className={withSummary ? classes.marginTop_2 : classes.scoreAcc}
               variant="standard"
               fullWidth
               label={t('Score')}
@@ -137,7 +136,7 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
               }}
             />
           </Grid>
-          <Grid item={true} xs={6}>
+          <Grid item xs={6}>
             <Select
               fullWidth
               value={watch('expectation_score') < expectation.inject_expectation_expected_score ? 'Failed' : 'Success'}
@@ -145,7 +144,7 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
               renderValue={(value) => {
                 return value;
               }}
-              sx={{ marginTop: selectPaddingTop }}
+              sx={{ marginTop: 2 }}
             >
               <MenuItem value={'Success'}>{t('Success')}</MenuItem>
               <MenuItem value={'Failed'}>{t('Failed')}</MenuItem>
@@ -155,8 +154,9 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
         <Slider
           size="small"
           value={watch('expectation_score')}
-          onChange={(event, value) => setValue('expectation_score', value as number)}
+          onChange={(_, value) => setValue('expectation_score', value as number)}
           style={{ color: watch('expectation_score') < expectation.inject_expectation_expected_score ? theme.palette.error.main : theme.palette.success.main }}
+          sx={{ width: '99%' }}
         />
         <div className={classes.buttons}>
           <Button
