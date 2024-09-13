@@ -10,7 +10,7 @@ steps:
       MINIO_ENDPOINT: minio
       MINIO_PORT: 9000
     commands:
-      - mvn clean install -q -DskipTests
+      - mvn clean install -DskipTests
       - cd openbas-api
       - mvn test
       - cd ../openbas-framework
