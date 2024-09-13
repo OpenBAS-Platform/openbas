@@ -11,7 +11,6 @@ import {
   updateInjectForExercise,
   updateInjectTriggerForExercise,
 } from '../../../../actions/Inject';
-import { secondsFromToNow } from '../../../../utils/Exercise';
 import type { InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
 import { dryImportXlsForExercise, importXlsForExercise } from '../../../../actions/exercises/exercise-action';
 import { fetchExercise, fetchExerciseTeams } from '../../../../actions/Exercise';
