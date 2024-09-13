@@ -5169,7 +5169,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xyflow/react@npm:^12.2.1":
+"@xyflow/react@npm:12.2.1":
   version: 12.2.1
   resolution: "@xyflow/react@npm:12.2.1"
   dependencies:
@@ -12068,7 +12068,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:7.18.0"
     "@uiw/react-md-editor": "npm:4.0.4"
     "@vitejs/plugin-react": "npm:4.3.0"
-    "@xyflow/react": "npm:^12.2.1"
+    "@xyflow/react": "npm:12.2.1"
     apexcharts: "npm:3.51.0"
     axios: "npm:1.7.4"
     chokidar: "npm:3.6.0"
