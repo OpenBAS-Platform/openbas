@@ -12,9 +12,9 @@ steps:
     commands:
       - mvn clean install -q -DskipTests
       - cd openbas-api
-      - mvn test -q
+      - mvn test
       - cd ../openbas-framework
-      - mvn test -q
+      - mvn test
 
   - name: frontend-tests
     image: node:20-alpine

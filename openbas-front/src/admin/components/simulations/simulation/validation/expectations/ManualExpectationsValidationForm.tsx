@@ -110,8 +110,8 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
   return (
     <div style={{ marginTop: 10 }}>
       <form id="expectationForm" onSubmit={handleSubmit(onSubmit)}>
-        {withSummary
-          && (<Chip
+        {withSummary && (
+          <Chip
             classes={{ root: classes.chipInList }}
             style={computeColorStyle(expectation.inject_expectation_status)}
             label={t(computeLabel(expectation.inject_expectation_status))}
