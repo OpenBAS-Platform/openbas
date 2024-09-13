@@ -1,6 +1,6 @@
 import React, { FunctionComponent, SyntheticEvent, useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, Slider, TextField as MuiTextField, Typography } from '@mui/material';
+import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField as MuiTextField, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import type { ExpectationInput } from './Expectation';
 import { formProps, infoMessage } from './ExpectationFormUtils';
