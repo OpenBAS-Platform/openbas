@@ -110,11 +110,12 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
   return (
     <div style={{ marginTop: 10 }}>
       <form id="expectationForm" onSubmit={handleSubmit(onSubmit)}>
-        {withSummary && (<Chip
-          classes={{ root: classes.chipInList }}
-          style={computeColorStyle(expectation.inject_expectation_status)}
-          label={t(computeLabel(expectation.inject_expectation_status))}
-        />)}
+        {withSummary
+          && (<Chip
+            classes={{ root: classes.chipInList }}
+            style={computeColorStyle(expectation.inject_expectation_status)}
+            label={t(computeLabel(expectation.inject_expectation_status))}
+          />)}
         {withSummary && (<Typography variant="h3">{expectation.inject_expectation_user ? t('Player') : t('Team')}</Typography>)}
         {withSummary && targetLabel(expectation)}
         <Grid container spacing={3} className={withSummary ? classes.marginTop_2 : classes.scoreAcc}>
