@@ -41,29 +41,29 @@ export const isEmptyFilter = (filterGroup: FilterGroup, key: string) => {
 export const convertOperatorToIcon = (t: (text: string) => string, operator: Filter['operator']) => {
   switch (operator) {
     case 'eq':
-      return <>=</>;
+      return <>&nbsp;=</>;
     case 'not_eq':
-      return <>&#8800;</>;
+      return <>&nbsp;&#8800;</>;
     case 'not_contains':
-      return t('not contains');
+      return <>&nbsp;{t('not contains')}</>;
     case 'contains':
-      return t('contains');
+      return <>&nbsp;{t('contains')}</>;
     case 'starts_with':
-      return t('starts with');
+      return <>&nbsp;{t('starts with')}</>;
     case 'not_starts_with':
-      return t('not starts with');
+      return <>&nbsp;{t('not starts with')}</>;
     case 'gt':
-      return <>&#62;</>;
+      return <>&nbsp;&#62;</>;
     case 'gte':
-      return <>&#8805;</>;
+      return <>&nbsp;&#8805;</>;
     case 'lt':
-      return <>&#60;</>;
+      return <>&nbsp;&#60;</>;
     case 'lte':
-      return <>&#8804;</>;
+      return <>&nbsp;&#8804;</>;
     case 'empty':
-      return t('is empty');
+      return <>&nbsp;{t('is empty')}</>;
     case 'not_empty':
-      return t('is not empty');
+      return <>&nbsp;{t('is not empty')}</>;
     default:
       return null;
   }
