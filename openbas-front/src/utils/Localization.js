@@ -2079,6 +2079,7 @@ const i18n = {
       'Token key': '令牌密钥',
       Example: '示例',
       Score: '分数',
+      Scores: '分数',
       Message: '消息',
       'New control': '新控制',
       'Percent of reached score': '达到分数百分比',
