@@ -1,8 +1,8 @@
 import React, { FunctionComponent } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { useFormatter } from './i18n';
+import { useFormatter } from '../i18n';
 import { Scale } from './Tick';
-import type { Theme } from './Theme';
+import type { Theme } from '../Theme';
 
 const useStyles = makeStyles(() => ({
   scaleBar: {
@@ -42,7 +42,7 @@ const ScaleBar: FunctionComponent<Props> = ({
   const scale: Scale = {
     min: {
       value: 0,
-      backgroundColor: theme.palette.error.main,
+      backgroundColor: theme.palette.error.main!,
       label: t('Failure'),
     },
     max: {
@@ -53,7 +53,7 @@ const ScaleBar: FunctionComponent<Props> = ({
     ticks: [
       {
         value: expectationScore,
-        backgroundColor: theme.palette.success.main,
+        backgroundColor: theme.palette.success.main!,
         label: t('Success'),
       },
     ],

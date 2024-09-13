@@ -14,6 +14,7 @@ public class V3_34__Alter_inject_expectation_score extends BaseJavaMigration {
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
-    select.execute("ALTER TABLE injects_expectations ALTER COLUMN inject_expectation_expected_score set not null;");
+    select.execute(
+        "ALTER TABLE injects_expectations ALTER COLUMN inject_expectation_expected_score set not null default 100;");
   }
 }

@@ -8,7 +8,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import ExpectationGroupField from './field/ExpectationGroupField';
 import { isTechnicalExpectation } from './ExpectationUtils';
-import ScaleBar from '../../../../../components/ScaleBar';
+import ScaleBar from '../../../../../components/scalebar/ScaleBar';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {

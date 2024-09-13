@@ -1,6 +1,6 @@
 export interface Tick {
   value: number;
-  backgroundColor: string | undefined;
+  backgroundColor: string;
   label: string;
 }
 
