@@ -450,6 +450,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
       </div>
       <div className={classes.container} style={{ width: '100%', height: 150 }}>
         <ReactFlow
+          colorMode={theme.palette.mode}
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
