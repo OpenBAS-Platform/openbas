@@ -1,5 +1,6 @@
 package io.openbas.utils.fixtures;
 
+import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.Team;
@@ -41,4 +42,16 @@ public class InjectExpectationFixture {
     injectExpectation.setExpectedScore(100.0);
     return injectExpectation;
   }
+
+  public static InjectExpectation createManualInjectExpectationWithExercise(Team team, Inject inject,
+      Exercise exercise) {
+    InjectExpectation injectExpectation = new InjectExpectation();
+    injectExpectation.setInject(inject);
+    injectExpectation.setType(InjectExpectation.EXPECTATION_TYPE.MANUAL);
+    injectExpectation.setTeam(team);
+    injectExpectation.setExpectedScore(100.0);
+    injectExpectation.setExercise(exercise);
+    return injectExpectation;
+  }
+
 }
