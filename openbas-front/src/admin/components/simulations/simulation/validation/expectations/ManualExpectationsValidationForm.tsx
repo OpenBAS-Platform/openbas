@@ -44,10 +44,9 @@ interface FormProps {
   expectation: InjectExpectationsStore;
   onUpdate?: () => void;
   withSummary?: boolean;
-  selectPaddingTop: number;
 }
 
-const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expectation, onUpdate, withSummary = true, selectPaddingTop }) => {
+const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expectation, onUpdate, withSummary = true }) => {
   const classes = useStyles();
   const { t } = useFormatter();
   const theme = useTheme<Theme>();
