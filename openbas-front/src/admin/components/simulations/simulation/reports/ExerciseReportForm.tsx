@@ -5,7 +5,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { Button, Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { ReportInput, ReportInformationInput, Report } from '../../../../../utils/api-types';
+import type { ReportInput, ReportInformationInput, Report } from '../../../../../utils/api-types';
 import { zodImplement } from '../../../../../utils/Zod';
 import { useFormatter } from '../../../../../components/i18n';
 import ReportInformationType from './ReportInformationType';

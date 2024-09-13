@@ -1,7 +1,7 @@
 import React from 'react';
 import * as R from 'ramda';
 import { Chip, Grid, Paper, Typography } from '@mui/material';
-import { Exercise, type KillChainPhase } from '../../../../utils/api-types';
+import type { Exercise, KillChainPhase } from '../../../../utils/api-types';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import ItemSeverity from '../../../../components/ItemSeverity';
 import ItemCategory from '../../../../components/ItemCategory';

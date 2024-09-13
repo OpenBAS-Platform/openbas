@@ -6,7 +6,7 @@ import { Button, Paper, Typography } from '@mui/material';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../../store';
 import { fetchReport, updateReportForExercise } from '../../../../../actions/reports/report-actions';
-import { ReportsHelper } from '../../../../../actions/reports/report-helper';
+import type { ReportsHelper } from '../../../../../actions/reports/report-helper';
 import type { Exercise, ExpectationResultsByType, Report, ReportInformation, ReportInput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import Loader from '../../../../../components/Loader';
@@ -17,7 +17,7 @@ import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-
 import { fetchExerciseExpectationResult, fetchLessonsAnswers, fetchLessonsCategories, fetchLessonsQuestions } from '../../../../../actions/exercises/exercise-action';
 import ExerciseDistribution from '../overview/ExerciseDistribution';
 import LessonsCategories from '../../../lessons/exercises/LessonsCategories';
-import { TeamsHelper } from '../../../../../actions/teams/team-helper';
+import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
 import ExerciseMainInformation from '../ExerciseMainInformation';
 import { fetchExercise } from '../../../../../actions/Exercise';
 import ReportInformationType from './ReportInformationType';
@@ -151,7 +151,7 @@ const ExerciseReport: React.FC = () => {
               teamsMap={teamsMap}
               teams={teams}
               isReport
-            />
+               />
           }
           {displayModule(ReportInformationType.EXERCISE_DETAILS) && <ExerciseDistribution exerciseId={exerciseId}/>}
         </div>

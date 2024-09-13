@@ -771,7 +771,7 @@ const i18n = {
       'General information': 'Informations générales',
       'There is no report for this simulation yet': 'Il n\'y a pas encore de rapport pour cette simulation',
       'Do you want to delete this report ?': 'Voulez-vous supprimer ce rapport ?',
-      'Player surveys' : 'Enquête auprès des joueurs',
+      'Player surveys': 'Enquête auprès des joueurs',
       'Score details': 'Details des scores',
       'Exercise details': 'Détails de l\'exercise',
       'Simulation definition statistics': 'Statistiques de la définition de la simulation',

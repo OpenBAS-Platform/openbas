@@ -36,7 +36,7 @@ const Reports: React.FC<Props> = ({ reports, navigateToReportPage }) => {
               && <ReportPopover
                 report={report}
                 actions={['Delete', 'Update']}
-              />
+                 />
             }
           >
             <ListItemButton onClick={() => navigateToReportPage(report.report_id)}>

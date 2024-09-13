@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import ButtonPopover, { VariantButtonPopover } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
-import { default as EditDialog } from '../../../../components/common/Dialog';
+import Dialog from '../../../../components/common/Dialog';
 import type { Report, ReportInput } from '../../../../utils/api-types';
 import { useFormatter } from '../../../../components/i18n';
 import { ReportContext } from '../../common/Context';
@@ -52,13 +52,13 @@ const ReportPopover: React.FC<Props> = ({
         handleSubmit={submitDelete}
         text={t('Do you want to delete this report ?')}
       />
-      <EditDialog
+      <Dialog
         title={t('Update the report')}
         open={openEdit}
         handleClose={handleCloseEdit}
       >
         {renderReportForm(submitUpdate, handleCloseEdit, report)}
-      </EditDialog>
+      </Dialog>
     </>
   );
 };

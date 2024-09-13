@@ -6,12 +6,12 @@ import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../../store';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { addReportForExercise, deleteReportForExercise, fetchReportsForExercise, updateReportForExercise } from '../../../../../actions/reports/report-actions';
-import { ReportsHelper } from '../../../../../actions/reports/report-helper';
+import type { ReportsHelper } from '../../../../../actions/reports/report-helper';
 import Reports from '../../../components/reports/Reports';
 import { PermissionsContext, ReportContextType, ReportContext } from '../../../common/Context';
 import type { Report, ReportInput } from '../../../../../utils/api-types';
 import ExerciseReportForm from './ExerciseReportForm';
-import { default as CreateReportDialog } from '../../../../../components/common/Dialog';
+import Dialog from '../../../../../components/common/Dialog';
 import { useFormatter } from '../../../../../components/i18n';
 
 interface ReportListProps {
@@ -68,7 +68,7 @@ const ExerciseReports: React.FC<ReportListProps> = ({ exerciseId, exerciseName }
           >
             <Add />
           </Fab>
-          <CreateReportDialog
+          <Dialog
             title={t('Create a new report')}
             open={openCreate}
             handleClose={handleCloseCreate}
@@ -78,7 +78,7 @@ const ExerciseReports: React.FC<ReportListProps> = ({ exerciseId, exerciseName }
               handleCancel={handleCloseCreate}
               initialValues={{ report_name: exerciseName } as Report}
             />
-          </CreateReportDialog>
+          </Dialog>
         </>
       )}
     </ReportContext.Provider>
