@@ -40,7 +40,7 @@ const ImportUploaderMapper: FunctionComponent<Props> = ({
 
   return (
     <>
-      <Tooltip title={t('Replay all the tests')}>
+      <Tooltip title={t('Replay all tests')}>
         <span>
           <IconButton
             aria-label="test"
