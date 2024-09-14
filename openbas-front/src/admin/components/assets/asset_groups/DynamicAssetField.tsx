@@ -21,6 +21,14 @@ const DynamicAssetField: FunctionComponent<Props> = ({
 
   const [filterGroup, helpers] = useFiltersState(value ?? emptyFilterGroup, undefined, onChange);
 
+  const availableFilterNames = [
+    'endpoint_agent_version',
+    'endpoint_arch',
+    'endpoint_hostname',
+    'endpoint_ips',
+    'endpoint_platform',
+  ];
+
   return (
     <div style={{ marginTop: 20 }}>
       <div style={{ display: 'flex', alignItems: 'end', gap: 10 }}>
@@ -35,6 +43,7 @@ const DynamicAssetField: FunctionComponent<Props> = ({
       </div>
       <FilterField
         entityPrefix="endpoint"
+        availableFilterNames={availableFilterNames}
         filterGroup={filterGroup}
         helpers={helpers}
         style={{ marginTop: 20 }}
