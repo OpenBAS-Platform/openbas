@@ -1,4 +1,4 @@
-FROM node:20.16.0-alpine3.20 AS front-builder
+FROM node:20.17.0-alpine3.20 AS front-builder
 
 WORKDIR /opt/openbas-build/openbas-front
 COPY openbas-front/packages ./packages
