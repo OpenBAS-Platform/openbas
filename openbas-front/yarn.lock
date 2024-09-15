@@ -4030,13 +4030,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sindresorhus/is@npm:^4.6.0":
-  version: 4.6.0
-  resolution: "@sindresorhus/is@npm:4.6.0"
-  checksum: 10c0/33b6fb1d0834ec8dd7689ddc0e2781c2bfd8b9c4e4bacbcb14111e0ae00621f2c264b8a7d36541799d74888b5dccdf422a891a5cb5a709ace26325eedc81e22e
-  languageName: node
-  linkType: hard
-
 "@stylistic/eslint-plugin-js@npm:1.8.1, @stylistic/eslint-plugin-js@npm:^1.8.1":
   version: 1.8.1
   resolution: "@stylistic/eslint-plugin-js@npm:1.8.1"
@@ -6033,13 +6026,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"char-regex@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "char-regex@npm:1.0.2"
-  checksum: 10c0/57a09a86371331e0be35d9083ba429e86c4f4648ecbe27455dbfb343037c16ee6fdc7f6b61f433a57cc5ded5561d71c56a150e018f40c2ffb7bc93a26dae341e
-  languageName: node
-  linkType: hard
-
 "character-entities-html4@npm:^2.0.0":
   version: 2.1.0
   resolution: "character-entities-html4@npm:2.1.0"
@@ -6435,6 +6421,13 @@ __metadata:
   version: 1.0.11
   resolution: "confusing-browser-globals@npm:1.0.11"
   checksum: 10c0/475d0a284fa964a5182b519af5738b5b64bf7e413cfd703c1b3496bf6f4df9f827893a9b221c0ea5873c1476835beb1e0df569ba643eff0734010c1eb780589e
+  languageName: node
+  linkType: hard
+
+"consola@npm:^3.2.3":
+  version: 3.2.3
+  resolution: "consola@npm:3.2.3"
+  checksum: 10c0/c606220524ec88a05bb1baf557e9e0e04a0c08a9c35d7a08652d99de195c4ddcb6572040a7df57a18ff38bbc13ce9880ad032d56630cef27bef72768ef0ac078
   languageName: node
   linkType: hard
 
@@ -7268,13 +7261,6 @@ __metadata:
   version: 9.2.2
   resolution: "emoji-regex@npm:9.2.2"
   checksum: 10c0/af014e759a72064cf66e6e694a7fc6b0ed3d8db680427b021a89727689671cefe9d04151b2cad51dbaf85d5ba790d061cd167f1cf32eb7b281f6368b3c181639
-  languageName: node
-  linkType: hard
-
-"emojilib@npm:^2.4.0":
-  version: 2.4.0
-  resolution: "emojilib@npm:2.4.0"
-  checksum: 10c0/6e66ba8921175842193f974e18af448bb6adb0cf7aeea75e08b9d4ea8e9baba0e4a5347b46ed901491dcaba277485891c33a8d70b0560ca5cc9672a94c21ab8f
   languageName: node
   linkType: hard
 
@@ -11649,18 +11635,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-emoji@npm:^2.1.3":
-  version: 2.1.3
-  resolution: "node-emoji@npm:2.1.3"
-  dependencies:
-    "@sindresorhus/is": "npm:^4.6.0"
-    char-regex: "npm:^1.0.2"
-    emojilib: "npm:^2.4.0"
-    skin-tone: "npm:^2.0.0"
-  checksum: 10c0/e688333373563aa8308df16111eee2b5837b53a51fb63bf8b7fbea2896327c5d24c9984eb0c8ca6ac155d4d9c194dcf1840d271033c1b588c7c45a3b65339ef7
-  languageName: node
-  linkType: hard
-
 "node-fetch-h2@npm:^2.3.0":
   version: 2.3.0
   resolution: "node-fetch-h2@npm:2.3.0"
@@ -12138,7 +12112,7 @@ __metadata:
     remark-parse: "npm:11.0.0"
     rxjs: "npm:7.8.1"
     seamless-immutable: "npm:7.1.4"
-    swagger-typescript-api: "npm:13.0.6"
+    swagger-typescript-api: "npm:13.0.22"
     typescript: "npm:5.4.5"
     usehooks-ts: "npm:3.1.0"
     uuid: "npm:9.0.1"
@@ -12983,12 +12957,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:~3.3.2":
-  version: 3.3.2
-  resolution: "prettier@npm:3.3.2"
+"prettier@npm:~3.3.3":
+  version: 3.3.3
+  resolution: "prettier@npm:3.3.3"
   bin:
     prettier: bin/prettier.cjs
-  checksum: 10c0/39ed27d17f0238da6dd6571d63026566bd790d3d0edac57c285fbab525982060c8f1e01955fe38134ab10f0951a6076da37f015db8173c02f14bc7f0803a384c
+  checksum: 10c0/b85828b08e7505716324e4245549b9205c0cacb25342a030ba8885aba2039a115dbcf75a0b7ca3b37bc9d101ee61fab8113fc69ca3359f2a226f1ecc07ad2e26
   languageName: node
   linkType: hard
 
@@ -14465,15 +14439,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"skin-tone@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "skin-tone@npm:2.0.0"
-  dependencies:
-    unicode-emoji-modifier-base: "npm:^1.0.0"
-  checksum: 10c0/82d4c2527864f9cbd6cb7f3c4abb31e2224752234d5013b881d3e34e9ab543545b05206df5a17d14b515459fcb265ce409f9cfe443903176b0360cd20e4e4ba5
-  languageName: node
-  linkType: hard
-
 "slash@npm:^3.0.0":
   version: 3.0.0
   resolution: "slash@npm:3.0.0"
@@ -15013,26 +14978,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swagger-typescript-api@npm:13.0.6":
-  version: 13.0.6
-  resolution: "swagger-typescript-api@npm:13.0.6"
+"swagger-typescript-api@npm:13.0.22":
+  version: 13.0.22
+  resolution: "swagger-typescript-api@npm:13.0.22"
   dependencies:
     "@types/swagger-schema-official": "npm:^2.0.25"
+    consola: "npm:^3.2.3"
     cosmiconfig: "npm:^9.0.0"
     didyoumean: "npm:^1.2.2"
     eta: "npm:^2.2.0"
     js-yaml: "npm:^4.1.0"
     lodash: "npm:^4.17.21"
     nanoid: "npm:^3.3.7"
-    node-emoji: "npm:^2.1.3"
-    prettier: "npm:~3.3.2"
+    prettier: "npm:~3.3.3"
     swagger-schema-official: "npm:2.0.0-bab6bed"
     swagger2openapi: "npm:^7.0.8"
-    typescript: "npm:~5.4.5"
+    typescript: "npm:~5.5.4"
   bin:
-    sta: ./index.js
-    swagger-typescript-api: ./index.js
-  checksum: 10c0/46a54edf5a5a248eb12163a7dc9a5124019268458d6a06c2347a6f23ab35f196aa725e7ab071510be69d38a46be49347cb2ce6269f1ae5c0630144260c078b1b
+    sta: ./dist/cli.js
+    swagger-typescript-api: ./dist/cli.js
+  checksum: 10c0/ac3615201ed87686669888e52958045f9e2dba2452a6689fe6b2e6c14ef3006914a6c9b6e5a7931ebed66f7af94536eb9e42bf3b3f062ab76e7f5709a06a1e30
   languageName: node
   linkType: hard
 
@@ -15440,7 +15405,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:5.4.5, typescript@npm:~5.4.5":
+"typescript@npm:5.4.5":
   version: 5.4.5
   resolution: "typescript@npm:5.4.5"
   bin:
@@ -15460,7 +15425,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A~5.4.5#optional!builtin<compat/typescript>":
+"typescript@npm:~5.5.4":
+  version: 5.5.4
+  resolution: "typescript@npm:5.5.4"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10c0/422be60f89e661eab29ac488c974b6cc0a660fb2228003b297c3d10c32c90f3bcffc1009b43876a082515a3c376b1eefcce823d6e78982e6878408b9a923199c
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>":
   version: 5.4.5
   resolution: "typescript@patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=5adc0c"
   bin:
@@ -15477,6 +15452,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 10c0/e3333f887c6829dfe0ab6c1dbe0dd1e3e2aeb56c66460cb85c5440c566f900c833d370ca34eb47558c0c69e78ced4bfe09b8f4f98b6de7afed9b84b8d1dd06a1
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@npm%3A~5.5.4#optional!builtin<compat/typescript>":
+  version: 5.5.4
+  resolution: "typescript@patch:typescript@npm%3A5.5.4#optional!builtin<compat/typescript>::version=5.5.4&hash=379a07"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10c0/73409d7b9196a5a1217b3aaad929bf76294d3ce7d6e9766dd880ece296ee91cf7d7db6b16c6c6c630ee5096eccde726c0ef17c7dfa52b01a243e57ae1f09ef07
   languageName: node
   linkType: hard
 
@@ -15510,13 +15495,6 @@ __metadata:
   version: 2.0.0
   resolution: "unicode-canonical-property-names-ecmascript@npm:2.0.0"
   checksum: 10c0/0fe812641bcfa3ae433025178a64afb5d9afebc21a922dafa7cba971deebb5e4a37350423890750132a85c936c290fb988146d0b1bd86838ad4897f4fc5bd0de
-  languageName: node
-  linkType: hard
-
-"unicode-emoji-modifier-base@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "unicode-emoji-modifier-base@npm:1.0.0"
-  checksum: 10c0/b37623fcf0162186debd20f116483e035a2d5b905b932a2c472459d9143d446ebcbefb2a494e2fe4fa7434355396e2a95ec3fc1f0c29a3bc8f2c827220e79c66
   languageName: node
   linkType: hard
 
