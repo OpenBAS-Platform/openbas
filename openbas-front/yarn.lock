@@ -10997,13 +10997,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mdi-material-ui@npm:7.9.1":
-  version: 7.9.1
-  resolution: "mdi-material-ui@npm:7.9.1"
+"mdi-material-ui@npm:7.9.2":
+  version: 7.9.2
+  resolution: "mdi-material-ui@npm:7.9.2"
   peerDependencies:
-    "@mui/material": ^5.0.0 || ^5.0.0-rc.0
+    "@mui/material": ^5.0.0 || ^6.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 10c0/05fdd862d27898850773f6c0687745532a1744be3872aab23de8fd3ccabac1833a3a46178780cd6fc7f59eb892c8b5f3c6fbaf07f1d12934c0a2518462dc6b3e
+  checksum: 10c0/c772d74d7979936a686142c97daa20ba956465f394be4a988c2b1e2cbc3e211b5cdd62c013949257064e1ec180da91daffd6075354711af5d805777908e0755d
   languageName: node
   linkType: hard
 
@@ -12106,7 +12106,7 @@ __metadata:
     js-file-download: "npm:0.4.12"
     jsdom: "npm:24.1.1"
     leaflet: "npm:1.9.4"
-    mdi-material-ui: "npm:7.9.1"
+    mdi-material-ui: "npm:7.9.2"
     moment: "npm:2.30.1"
     moment-timezone: "npm:0.5.45"
     normalizr: "npm:3.6.2"
