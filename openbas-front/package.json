@@ -24,7 +24,7 @@
     "@uiw/react-md-editor": "4.0.4",
     "@xyflow/react": "12.2.1",
     "apexcharts": "3.51.0",
-    "axios": "1.7.4",
+    "axios": "1.7.7",
     "ckeditor5-custom-build": "link:packages/ckeditor5-custom-build",
     "classcat": "^5.0.5",
     "classnames": "2.5.1",
