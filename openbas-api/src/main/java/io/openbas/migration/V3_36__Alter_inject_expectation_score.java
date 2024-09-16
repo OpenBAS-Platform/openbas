@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V3_35__Alter_inject_expectation_score extends BaseJavaMigration {
+public class V3_36__Alter_inject_expectation_score extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
