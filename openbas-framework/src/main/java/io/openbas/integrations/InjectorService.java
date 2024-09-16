@@ -72,6 +72,11 @@ public class InjectorService {
     @Transactional
     public void register(String id, String name, Contractor contractor, Boolean isCustomizable, String category, Map<String, String> executorCommands, Map<String, String> executorClearCommands, Boolean isPayloads) throws Exception {
         if(!contractor.isExpose()) {
+            Injector injector = injectorRepository.findById(id).orElse(null);
+            if( injector != null ) {
+                injectorRepository.deleteById(id);
+                return;
+            }
             return;
         }
         if (contractor.getIcon() != null) {
