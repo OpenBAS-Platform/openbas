@@ -73,7 +73,7 @@
     "rxjs": "7.8.1",
     "seamless-immutable": "7.1.4",
     "usehooks-ts": "3.1.0",
-    "uuid": "9.0.1",
+    "uuid": "10.0.0",
     "xlsx": "0.18.5",
     "zod": "3.23.8",
     "zustand": "^4.5.4"
@@ -93,7 +93,7 @@
     "@types/react-dom": "18.3.0",
     "@types/react-syntax-highlighter": "15",
     "@types/seamless-immutable": "7.1.19",
-    "@types/uuid": "9.0.8",
+    "@types/uuid": "10.0.0",
     "@typescript-eslint/eslint-plugin": "7.18.0",
     "@typescript-eslint/parser": "7.18.0",
     "@vitejs/plugin-react": "4.3.0",
