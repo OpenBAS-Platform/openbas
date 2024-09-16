@@ -192,6 +192,7 @@ public class PlatformSettingsService {
           ofNullable(dbSettings.get(PLATFORM_NAME.key())).map(Setting::getValue).orElse(PLATFORM_NAME.defaultValue())
       );
       platformSettings.setPlatformBaseUrl(openBASConfig.getBaseUrl());
+      platformSettings.setPlatformAgentUrl(openBASConfig.getBaseUrlForAgent());
       platformSettings.setXtmOpenctiEnable(openCTIConfig.getEnable());
       platformSettings.setXtmOpenctiUrl(openCTIConfig.getUrl());
       platformSettings.setAiEnabled(aiConfig.isEnabled());

@@ -20,7 +20,7 @@ public class OpenBASInjector {
     private static final String OPENBAS_INJECTOR_ID = "49229430-b5b5-431f-ba5b-f36f599b0144";
 
     private String dlUri(OpenBASConfig openBASConfig, String platform, String arch) {
-        return openBASConfig.getBaseUrl() + "/api/implant/openbas/" + platform + "/" + arch;
+        return openBASConfig.getBaseUrlForAgent() + "/api/implant/openbas/" + platform + "/" + arch;
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -31,7 +31,7 @@ public class OpenBASInjector {
     @Autowired
     public OpenBASInjector(InjectorService injectorService, OpenBASImplantContract contract, OpenBASConfig openBASConfig) {
         String tokenVar = "token=\"" + openBASConfig.getAdminToken() + "\"";
-        String serverVar = "server=\"" + openBASConfig.getBaseUrl() + "\"";
+        String serverVar = "server=\"" + openBASConfig.getBaseUrlForAgent() + "\"";
         Map<String, String> executorCommands = new HashMap<>();
         executorCommands.put(Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.x86_64, "$x=\"#{location}\";$location=$x.Replace(\"\\obas-agent-caldera.exe\", \"\");[Environment]::CurrentDirectory = $location;$filename=\"obas-implant-#{inject}.exe\";$" + tokenVar + ";$" + serverVar + ";" + dlVar(openBASConfig, "windows", "x86_64") + ";$wc=New-Object System.Net.WebClient;$data=$wc.DownloadData($url);[io.file]::WriteAllBytes($filename,$data) | Out-Null;Remove-NetFirewallRule -DisplayName \"Allow OpenBAS Inbound\";New-NetFirewallRule -DisplayName \"Allow OpenBAS Inbound\" -Direction Inbound -Program \"$location\\$filename\" -Action Allow | Out-Null;Remove-NetFirewallRule -DisplayName \"Allow OpenBAS Outbound\";New-NetFirewallRule -DisplayName \"Allow OpenBAS Outbound\" -Direction Outbound -Program \"$location\\$filename\" -Action Allow | Out-Null;Start-Process -FilePath \"$location\\$filename\" -ArgumentList \"--uri $server --token $token --inject-id #{inject}\" -WindowStyle hidden;");
         executorCommands.put(Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.x86_64, "x=\"#{location}\";location=$(echo \"$x\" | sed \"s#/openbas-caldera-agent##\");filename=obas-implant-#{inject};" + serverVar + ";" + tokenVar + ";curl -s -X GET " + dlUri(openBASConfig, "linux", "x86_64") + " > $location/$filename;chmod +x $location/$filename;$location/$filename --uri $server --token $token --inject-id #{inject} &");

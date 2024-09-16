@@ -108,7 +108,7 @@ public class EndpointService {
       in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
     }
     return IOUtils.toString(in, StandardCharsets.UTF_8)
-            .replace("${OPENBAS_URL}", openBASConfig.getBaseUrl())
+            .replace("${OPENBAS_URL}", openBASConfig.getBaseUrlForAgent())
             .replace("${OPENBAS_TOKEN}", adminToken);
   }
 

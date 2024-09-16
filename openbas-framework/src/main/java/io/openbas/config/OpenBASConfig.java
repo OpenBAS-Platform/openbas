@@ -2,10 +2,13 @@ package io.openbas.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+
+import static org.springframework.util.StringUtils.hasText;
 
 @Component
 @ConfigurationProperties(prefix = "openbas")
@@ -64,8 +67,20 @@ public class OpenBASConfig {
   @JsonIgnore
   private boolean cookieSecure = false;
 
-
   public String getBaseUrl() {
-    return baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+    return url(baseUrl);
+  }
+
+  @JsonProperty("application_agent_url")
+  private String agentUrl;
+
+  public String getBaseUrlForAgent() {
+    return hasText(agentUrl) ? url(agentUrl) :url(baseUrl);
+  }
+
+  // -- PRIVATE --
+
+  private String url(@NotBlank final String url) {
+    return url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
   }
 }

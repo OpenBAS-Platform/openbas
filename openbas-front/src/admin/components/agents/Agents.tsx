@@ -226,8 +226,8 @@ MD5: d604c952bb3c6d96621594d39992c499
 SHA1: 5b6087f87f5f2ae129f888bba799611836eb39a2
 SHA256: 98d1e64445bbef46a36d4724699a386646de78881a1b6f2b346122c76d696c12
 SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518a2be40f1a42226c68cbf5e779382a37ee5baa7dd7c538ec73ce059e8`,
-          displayedCode: `curl -s ${settings.platform_base_url}/api/agent/installer/openbas/linux/${userToken?.token_value} | sudo sh`,
-          code: `curl -s ${settings.platform_base_url}/api/agent/installer/openbas/linux/${userToken?.token_value} | sudo sh`,
+          displayedCode: `curl -s ${settings.platform_agent_url}/api/agent/installer/openbas/linux/${userToken?.token_value} | sudo sh`,
+          code: `curl -s ${settings.platform_agent_url}/api/agent/installer/openbas/linux/${userToken?.token_value} | sudo sh`,
         };
       case 'macos':
         return {
