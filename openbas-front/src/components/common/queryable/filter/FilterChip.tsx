@@ -24,10 +24,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.action?.selected,
     padding: '0 4px',
   },
-  empty: {
-    backgroundColor: 'transparent',
-    borderColor: 'white',
-  },
 }));
 
 interface Props {
@@ -122,7 +118,7 @@ const FilterChip: FunctionComponent<Props> = ({
           onClose={handleClose}
           anchorEl={chipRef.current}
           propertySchema={propertySchema}
-        />
+           />
       }
     </>
   );
