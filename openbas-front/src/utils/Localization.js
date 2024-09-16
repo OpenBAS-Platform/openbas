@@ -1352,6 +1352,7 @@ const i18n = {
       Condition: 'Condition',
       Childrens: 'Enfants',
       'Interactive view': 'Vue interactive',
+      'Execution successful': 'Exécution réussie',
     },
     zh: {
       'Email address': 'email地址',
@@ -2611,6 +2612,7 @@ const i18n = {
       Condition: '条件',
       Childrens: '儿童',
       'Interactive view': '交互式视图',
+      'Execution successful': '执行成功',
     },
     en: {
       openbas_email: 'Email',
