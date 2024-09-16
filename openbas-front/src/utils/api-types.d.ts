@@ -2473,6 +2473,7 @@ export interface PlatformSettings {
   java_version?: string;
   map_tile_server_dark?: string;
   map_tile_server_light?: string;
+  platform_agent_url?: string;
   platform_ai_enabled?: boolean;
   platform_ai_has_token?: boolean;
   platform_ai_model?: string;

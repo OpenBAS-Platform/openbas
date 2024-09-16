@@ -3,14 +3,16 @@ package io.openbas.rest.settings.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.rest.settings.form.PolicyInput;
 import io.openbas.rest.settings.form.ThemeInput;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.NONE;
 
 @Setter
@@ -24,6 +26,9 @@ public class PlatformSettings {
 
   @JsonProperty("platform_base_url")
   private String platformBaseUrl;
+
+  @JsonProperty("platform_agent_url")
+  private String platformAgentUrl;
 
   @JsonProperty("platform_theme")
   private String platformTheme;
