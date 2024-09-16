@@ -13,23 +13,16 @@ import type { Theme } from '../../../Theme';
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
     display: 'flex',
-    gap: '4px',
     alignItems: 'center',
     lineHeight: '32px',
+    cursor: 'pointer',
+    '&:hover': { textDecorationLine: 'underline' },
   },
   mode: {
     display: 'inline-block',
     height: '100%',
-    // borderRadius: 4,
-    // fontFamily: 'Consolas, monaco, monospace',
     backgroundColor: theme.palette.action?.selected,
     padding: '0 4px',
-    // display: 'flex',
-    // alignItems: 'center',
-  },
-  title: {
-    cursor: 'pointer',
-    '&:hover': { textDecorationLine: 'underline' },
   },
 }));
 
@@ -89,12 +82,20 @@ const FilterChip: FunctionComponent<Props> = ({
       return (<span><strong>{t(filter.key)}</strong>{' '}<span>{convertOperatorToIcon(t, filter.operator)} {toValues(options)}</span></span>);
     }
     return (
-      <span className={classes.container}>
-        <strong onClick={handleOpen} className={classes.title}>{t(filter.key)}</strong>{' '}
-        <span>{convertOperatorToIcon(t, filter.operator)} {toValues(options)}</span>
-      </span>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <span onClick={handleOpen} className={classes.container}>
+          <strong>{t(filter.key)}</strong>
+          {convertOperatorToIcon(t, filter.operator)}
+        </span>
+        <>&nbsp;</>
+        {toValues(options)}
+      </div>
     );
   };
+
+  const chipVariant = (!filter.values || filter.values.length === 0) && !['nil', 'not_nil'].includes(filter.operator ?? 'eq')
+    ? 'outlined'
+    : 'filled';
 
   return (
     <>
@@ -102,6 +103,7 @@ const FilterChip: FunctionComponent<Props> = ({
         title={title(true)}
       >
         <Chip
+          variant={chipVariant}
           label={title(false)}
           onDelete={handleRemoveFilter}
           component="div"

@@ -3,6 +3,7 @@ import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useFormatter } from '../../../../components/i18n';
 import { FilterHelpers } from '../../../../components/common/queryable/filter/FilterHelpers';
 import type { FilterGroup } from '../../../../utils/api-types';
+import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 
 export const INJECTOR_CONTRACT_INJECTOR_FILTER_KEY = 'injector_contract_injector';
 
@@ -26,8 +27,12 @@ const InjectorContractSwitchFilter: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
 
+  const retrieveFilter = () => {
+    return filterGroup?.filters?.find((f) => f.key === INJECTOR_CONTRACT_INJECTOR_FILTER_KEY);
+  };
+
   const isChecked = () => {
-    const filter = filterGroup?.filters?.find((f) => f.key === INJECTOR_CONTRACT_INJECTOR_FILTER_KEY);
+    const filter = retrieveFilter();
     if (!filter) {
       return false;
     }
@@ -40,6 +45,10 @@ const InjectorContractSwitchFilter: FunctionComponent<Props> = ({
     const { checked } = event.target;
     setEnablePlayerFilter(checked);
     if (checked) {
+      const filter = retrieveFilter();
+      if (!filter) {
+        filterHelpers.handleAddFilterWithEmptyValue(buildEmptyFilter(INJECTOR_CONTRACT_INJECTOR_FILTER_KEY, 'contains'));
+      }
       filterHelpers.handleAddMultipleValueFilter(
         INJECTOR_CONTRACT_INJECTOR_FILTER_KEY,
         INJECTOR_CONTRACT_PLAYERS_ONLY,
