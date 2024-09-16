@@ -184,7 +184,7 @@ const InjectForm = ({
                     })}
                 </Select>
               </FormControl>
-              <FormControl style={{ width: '100%' }}>
+              <FormControl style={{ width: '100%', marginTop: '15px' }}>
                 <InputLabel id="condition">{t('Condition')}</InputLabel>
                 <Select
                   labelId="condition"
@@ -192,7 +192,7 @@ const InjectForm = ({
                   fullWidth={true}
                   disabled
                 >
-                  <MenuItem value="Success">{t('Success')}</MenuItem>
+                  <MenuItem value="Success">{t('Execution successful')}</MenuItem>
                 </Select>
               </FormControl>
             </AccordionDetails>
@@ -266,7 +266,7 @@ const InjectForm = ({
                   fullWidth={true}
                   disabled
                 >
-                  <MenuItem value="Success">{t('Success')}</MenuItem>
+                  <MenuItem value="Success">{t('Execution successful')}</MenuItem>
                 </Select>
               </FormControl>
             </AccordionDetails>
