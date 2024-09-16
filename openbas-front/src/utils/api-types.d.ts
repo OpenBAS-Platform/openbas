@@ -1145,7 +1145,7 @@ export interface InjectExpectation {
   inject_expectation_description?: string;
   inject_expectation_exercise?: Exercise;
   /** @format double */
-  inject_expectation_expected_score?: number;
+  inject_expectation_expected_score: number;
   inject_expectation_group?: boolean;
   inject_expectation_id: string;
   inject_expectation_inject?: Inject;

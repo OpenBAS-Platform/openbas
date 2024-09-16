@@ -136,44 +136,44 @@ const ManualExpectations: FunctionComponent<Props> = ({
     <>
       <List component="div" disablePadding>
         {expectations.length > 0 && (
-        <ListItemButton
-          key={expectations[0].inject_expectation_name}
-          divider
-          sx={{ pl: 8 }}
-          classes={{ root: classes.item }}
-          onClick={() => handleItemClick(expectations)}
-          selected={selectedItem === expectations[0].inject_expectation_name}
-        >
-          <ListItemIcon>
-            <AssignmentTurnedIn fontSize="small"/>
-          </ListItemIcon>
-          <ListItemText
-            primary={(
-              <div className={classes.container}>
-                <Tooltip title={expectations[0].inject_expectation_description}>
-                  <span>
-                    {expectations[0].inject_expectation_name ?? 'Manual Expectation'}
-                  </span>
-                </Tooltip>
-                <div className={classes.chip}>
-                  <Chip
-                    classes={{ root: classes.validationType }}
-                    label={expectations[0].inject_expectation_group ? 'At least one player' : 'All players'}
-                  />
-                  <Chip
-                    classes={{ root: classes.points }}
-                    label={expectations[0].inject_expectation_expected_score}
-                  />
-                  <Chip
-                    classes={{ root: classes.chipInList }}
-                    style={style}
-                    label={label}
-                  />
+          <ListItemButton
+            key={expectations[0].inject_expectation_name}
+            divider
+            sx={{ pl: 8 }}
+            classes={{ root: classes.item }}
+            onClick={() => handleItemClick(expectations)}
+            selected={selectedItem === expectations[0].inject_expectation_name}
+          >
+            <ListItemIcon>
+              <AssignmentTurnedIn fontSize="small" />
+            </ListItemIcon>
+            <ListItemText
+              primary={(
+                <div className={classes.container}>
+                  <Tooltip title={expectations[0].inject_expectation_description}>
+                    <span>
+                      {expectations[0].inject_expectation_name ?? 'Manual Expectation'}
+                    </span>
+                  </Tooltip>
+                  <div className={classes.chip}>
+                    <Chip
+                      classes={{ root: classes.validationType }}
+                      label={expectations[0].inject_expectation_group ? 'At least one player' : 'All players'}
+                    />
+                    <Chip
+                      classes={{ root: classes.points }}
+                      label={expectations[0].inject_expectation_expected_score}
+                    />
+                    <Chip
+                      classes={{ root: classes.chipInList }}
+                      style={style}
+                      label={label}
+                    />
+                  </div>
                 </div>
-              </div>
-                            )}
-          />
-        </ListItemButton>
+              )}
+            />
+          </ListItemButton>
         )}
       </List>
       <Drawer
@@ -190,10 +190,10 @@ const ManualExpectations: FunctionComponent<Props> = ({
             <AlertTitle>
               <ExpandableText
                 source={
-                    expectations[0].inject_expectation_group
-                      ? t('At least one player (per team) must validate the expectation')
-                      : t('All players (per team) must validate the expectation')
-                  }
+                  expectations[0].inject_expectation_group
+                    ? t('At least one player (per team) must validate the expectation')
+                    : t('All players (per team) must validate the expectation')
+                }
                 limit={120}
               />
             </AlertTitle>
@@ -211,9 +211,9 @@ const ManualExpectations: FunctionComponent<Props> = ({
             {t('Team')}
           </Typography>
           <Paper>
-            <ManualExpectationsValidationForm key={parentExpectation.targetId} expectation={parentExpectation}/>
+            <ManualExpectationsValidationForm key={parentExpectation.targetId} expectation={parentExpectation} />
           </Paper>
-          <Divider style={{ margin: '20px 0' }}/>
+          <Divider style={{ margin: '20px 0' }} />
           <Typography variant="h5" style={{ fontWeight: 500, margin: '10px' }}>
             {t('Players')}
           </Typography>
@@ -231,7 +231,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
                   }}
                 >
                   <AccordionSummary
-                    expandIcon={<ExpandMore/>}
+                    expandIcon={<ExpandMore />}
                     aria-controls={`${panelId}-content`}
                     id={`${panelId}-header`}
                     style={{
@@ -242,11 +242,11 @@ const ManualExpectations: FunctionComponent<Props> = ({
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <PersonOutlined color="primary"/>
+                        <PersonOutlined color="primary" />
                         <Typography style={{ marginLeft: 8 }}>{targetLabel(e)}</Typography>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <Chip label={e.inject_expectation_score ?? 0} style={{ marginRight: 8 }}/>
+                        <Chip label={e.inject_expectation_score ?? 0} style={{ marginRight: 8 }} />
                         <Chip
                           classes={{ root: classes.chipStatusAcc }}
                           style={computeColorStyle(e.inject_expectation_status)}
@@ -256,7 +256,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
                     </div>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <ManualExpectationsValidationForm expectation={e} withSummary={false}/>
+                    <ManualExpectationsValidationForm expectation={e} withSummary={false} />
                   </AccordionDetails>
                 </Accordion>
               );

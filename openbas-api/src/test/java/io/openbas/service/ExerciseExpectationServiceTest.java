@@ -6,6 +6,7 @@ import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.Team;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
+import io.openbas.utils.fixtures.InjectExpectationFixture;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,96 +27,91 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ExerciseExpectationServiceTest {
 
-    public static final String EXPECTATION_NAME = "The animation team can validate the audience reaction";
-    @Autowired
-    private ExerciseExpectationService exerciseExpectationService;
+  public static final String EXPECTATION_NAME = "The animation team can validate the audience reaction";
+  @Autowired
+  private ExerciseExpectationService exerciseExpectationService;
 
-    @Autowired
-    private ExerciseRepository exerciseRepository;
+  @Autowired
+  private ExerciseRepository exerciseRepository;
 
-    @Autowired
-    private InjectRepository injectRepository;
+  @Autowired
+  private InjectRepository injectRepository;
 
-    @Autowired
-    private TeamRepository teamRepository;
+  @Autowired
+  private TeamRepository teamRepository;
 
-    @Autowired
-    private InjectExpectationRepository injectExpectationRepository;
+  @Autowired
+  private InjectExpectationRepository injectExpectationRepository;
 
-    @Autowired
-    private InjectorContractRepository injectorContractRepository;
+  @Autowired
+  private InjectorContractRepository injectorContractRepository;
 
-    static String EXERCISE_ID;
+  static String EXERCISE_ID;
 
-    @BeforeAll
-    void beforeAll() {
-        Exercise exerciseCreated = getExercise();
-        EXERCISE_ID = exerciseCreated.getId();
-        Team teamCreated = getTeam();
-        Inject injectCreated = getInject(exerciseCreated);
-        getInjectExpectation(injectCreated, teamCreated, exerciseCreated);
-    }
+  @BeforeAll
+  void beforeAll() {
+    Exercise exerciseCreated = getExercise();
+    EXERCISE_ID = exerciseCreated.getId();
+    Team teamCreated = getTeam();
+    Inject injectCreated = getInject(exerciseCreated);
+    getInjectExpectation(injectCreated, teamCreated, exerciseCreated);
+  }
 
-    @DisplayName("Retrieve inject expectations")
-    @Test
-    void retrieveInjectExpectations() {
-        List<InjectExpectation> expectations = this.exerciseExpectationService.injectExpectations(EXERCISE_ID);
-        assertNotNull(expectations);
+  @DisplayName("Retrieve inject expectations")
+  @Test
+  void retrieveInjectExpectations() {
+    List<InjectExpectation> expectations = this.exerciseExpectationService.injectExpectations(EXERCISE_ID);
+    assertNotNull(expectations);
 
-        assertEquals(EXPECTATION_NAME, expectations.getFirst().getName());
-    }
+    assertEquals(EXPECTATION_NAME, expectations.getFirst().getName());
+  }
 
-    @DisplayName("Update inject expectation")
-    @Test
-    void updateInjectExpectation() {
-        // -- PREPARE --
-        List<InjectExpectation> expectations = this.exerciseExpectationService.injectExpectations(EXERCISE_ID);
-        assertNotNull(expectations);
-        String id = expectations.getFirst().getId();
+  @DisplayName("Update inject expectation")
+  @Test
+  void updateInjectExpectation() {
+    // -- PREPARE --
+    List<InjectExpectation> expectations = this.exerciseExpectationService.injectExpectations(EXERCISE_ID);
+    assertNotNull(expectations);
+    String id = expectations.getFirst().getId();
 
-        // -- EXECUTE --
-        ExpectationUpdateInput input = new ExpectationUpdateInput();
-        input.setScore(7.0);
-        InjectExpectation expectation = this.exerciseExpectationService.updateInjectExpectation(id, input);
+    // -- EXECUTE --
+    ExpectationUpdateInput input = new ExpectationUpdateInput();
+    input.setScore(7.0);
+    InjectExpectation expectation = this.exerciseExpectationService.updateInjectExpectation(id, input);
 
-        // -- ASSERT --
-        assertNotNull(expectation);
-        assertEquals(7, expectation.getScore());
-    }
+    // -- ASSERT --
+    assertNotNull(expectation);
+    assertEquals(7, expectation.getScore());
+  }
 
-    protected Exercise getExercise() {
-        Exercise exercise = new Exercise();
-        exercise.setName("Exercice name");
-        exercise.setStatus(SCHEDULED);
-        exercise.setFrom("test@test.com");
-        exercise.setReplyTos(List.of("test@test.com"));
-        exercise.setStart(Instant.now());
-        return this.exerciseRepository.save(exercise);
-    }
+  protected Exercise getExercise() {
+    Exercise exercise = new Exercise();
+    exercise.setName("Exercice name");
+    exercise.setStatus(SCHEDULED);
+    exercise.setFrom("test@test.com");
+    exercise.setReplyTos(List.of("test@test.com"));
+    exercise.setStart(Instant.now());
+    return this.exerciseRepository.save(exercise);
+  }
 
-    private Team getTeam() {
-        Team team = new Team();
-        team.setName("test");
-        return this.teamRepository.save(team);
-    }
+  private Team getTeam() {
+    Team team = new Team();
+    team.setName("test");
+    return this.teamRepository.save(team);
+  }
 
-    private Inject getInject(Exercise exerciseCreated) {
-        Inject inject = new Inject();
-        inject.setTitle("test");
-        inject.setInjectorContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
-        inject.setExercise(exerciseCreated);
-        inject.setDependsDuration(0L);
-        return this.injectRepository.save(inject);
-    }
+  private Inject getInject(Exercise exerciseCreated) {
+    Inject inject = new Inject();
+    inject.setTitle("test");
+    inject.setInjectorContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+    inject.setExercise(exerciseCreated);
+    inject.setDependsDuration(0L);
+    return this.injectRepository.save(inject);
+  }
 
-    private void getInjectExpectation(Inject injectCreated, Team teamCreated, Exercise exerciseCreated) {
-        InjectExpectation expectation = new InjectExpectation();
-        expectation.setInject(injectCreated);
-        expectation.setTeam(teamCreated);
-        expectation.setType(MANUAL);
-        expectation.setName(EXPECTATION_NAME);
-        expectation.setExpectedScore(10.0);
-        expectation.setExercise(exerciseCreated);
-        this.injectExpectationRepository.save(expectation);
-    }
+  private void getInjectExpectation(Inject injectCreated, Team teamCreated, Exercise exerciseCreated) {
+    this.injectExpectationRepository.save(
+        InjectExpectationFixture.createManualInjectExpectationWithExercise(teamCreated, injectCreated,
+            exerciseCreated, EXPECTATION_NAME));
+  }
 }

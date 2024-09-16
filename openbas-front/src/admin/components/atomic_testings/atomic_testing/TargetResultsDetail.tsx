@@ -299,7 +299,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         isPayload={isNotEmptyField(inject.inject_injector_contract?.injector_contract_payload)}
         type={inject.inject_injector_contract?.injector_contract_payload
           ? inject.inject_injector_contract.injector_contract_payload.payload_collector_type
-                || inject.inject_injector_contract.injector_contract_payload.payload_type
+          || inject.inject_injector_contract.injector_contract_payload.payload_type
           : inject.inject_type}
       />
     );
@@ -341,9 +341,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
       const newSteps = Array.from(groupedBy).flatMap(([targetType, results]) => results.sort((a: InjectExpectationsStore, b: InjectExpectationsStore) => {
         if (a.inject_expectation_name && b.inject_expectation_name) {
           return a.inject_expectation_name.localeCompare(b.inject_expectation_name);
-        } if (a.inject_expectation_name && !b.inject_expectation_name) {
+        }
+        if (a.inject_expectation_name && !b.inject_expectation_name) {
           return -1; // a comes before b
-        } if (!a.inject_expectation_name && b.inject_expectation_name) {
+        }
+        if (!a.inject_expectation_name && b.inject_expectation_name) {
           return 1; // b comes before a
         }
         return a.inject_expectation_id.localeCompare(b.inject_expectation_id);
@@ -352,7 +354,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         label: (
           <span>
             {getStatusLabel(targetType, [expectation.inject_expectation_status])}
-            <br/>{truncate(expectation.inject_expectation_name, 20)}
+            <br />{truncate(expectation.inject_expectation_name, 20)}
           </span>
         ),
         type: targetType,
@@ -490,9 +492,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
             .toSorted((a, b) => {
               if (a.inject_expectation_name && b.inject_expectation_name) {
                 return a.inject_expectation_name.localeCompare(b.inject_expectation_name);
-              } if (a.inject_expectation_name && !b.inject_expectation_name) {
+              }
+              if (a.inject_expectation_name && !b.inject_expectation_name) {
                 return -1; // a comes before b
-              } if (!a.inject_expectation_name && b.inject_expectation_name) {
+              }
+              if (!a.inject_expectation_name && b.inject_expectation_name) {
                 return 1; // b comes before a
               }
               return a.inject_expectation_id.localeCompare(b.inject_expectation_id);
@@ -525,7 +529,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                 <Grid container={true} spacing={2}>
                   {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => (
                     <Grid key={index} item xs={4}>
-                      <Card key={injectExpectation.inject_expectation_id} >
+                      <Card key={injectExpectation.inject_expectation_id}>
                         <CardHeader
                           avatar={getAvatar(injectExpectation, expectationResult)}
                           action={
@@ -555,32 +559,32 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                 </MenuItem>
                               </Menu>
                             </>
-                        }
+                          }
                           title={expectationResult.sourceName ? t(expectationResult.sourceName) : t('Unknown')}
                           subheader={nsdt(expectationResult.date)}
                         />
                         <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
                           <ItemResult label={expectationResult.result} status={expectationResult.result} />
-                          <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={expectationResult.score}/></Tooltip>
+                          <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={expectationResult.score} /></Tooltip>
                         </CardContent>
                       </Card>
                     </Grid>
                   ))}
                   {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type) || (injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.length === 0))
                     && (
-                    <Grid item xs={4}>
-                      <Card classes={{ root: classes.resultCardDummy }}>
-                        <CardActionArea classes={{ root: classes.area }}
-                          onClick={() => setSelectedExpectationForCreation({
-                            injectExpectation,
-                            sourceIds: computeExistingSourceIds(injectExpectation.inject_expectation_results ?? []),
-                          })
-                        }
-                        >
-                          <AddBoxOutlined />
-                        </CardActionArea>
-                      </Card>
-                    </Grid>
+                      <Grid item xs={4}>
+                        <Card classes={{ root: classes.resultCardDummy }}>
+                          <CardActionArea classes={{ root: classes.area }}
+                            onClick={() => setSelectedExpectationForCreation({
+                              injectExpectation,
+                              sourceIds: computeExistingSourceIds(injectExpectation.inject_expectation_results ?? []),
+                            })
+                                          }
+                          >
+                            <AddBoxOutlined />
+                          </CardActionArea>
+                        </Card>
+                      </Grid>
                     )}
                 </Grid>
                 <Divider style={{ marginTop: 20 }} />

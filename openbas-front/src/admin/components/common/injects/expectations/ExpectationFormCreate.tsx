@@ -1,6 +1,6 @@
 import React, { FunctionComponent, SyntheticEvent, useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField as MuiTextField } from '@mui/material';
+import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField as MuiTextField, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import type { ExpectationInput } from './Expectation';
 import { formProps, infoMessage } from './ExpectationFormUtils';
@@ -8,6 +8,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import ExpectationGroupField from './field/ExpectationGroupField';
 import { isTechnicalExpectation } from './ExpectationUtils';
+import ScaleBar from '../../../../../components/scalebar/ScaleBar';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
@@ -113,6 +114,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
           errors.expectation_name && errors.expectation_name?.message
         }
         inputProps={register('expectation_name')}
+        InputLabelProps={{ required: true }}
       />
       <MuiTextField
         variant="standard"
@@ -126,6 +128,11 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         }
         inputProps={register('expectation_description')}
       />
+      <div style={{ marginTop: 20 }}>
+        <Typography variant="h4">{t('Scores')}</Typography>
+        <ScaleBar expectationScore={watch('expectation_score')} />
+      </div>
+
       <MuiTextField
         variant="standard"
         fullWidth
@@ -136,7 +143,13 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         helperText={
           errors.expectation_score && errors.expectation_score?.message
         }
-        inputProps={register('expectation_score')}
+        {...register('expectation_score')}
+        InputProps={{
+          inputProps: {
+            min: 0,
+            max: 100,
+          },
+        }}
       />
       <ExpectationGroupField isTechnicalExpectation={isTechnicalExpectation(watchType)} control={control} />
       <div className={classes.buttons}>
