@@ -360,7 +360,7 @@ public class InjectApi extends RestBehavior {
       @PathVariable String exerciseId,
       @PathVariable String injectId) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
-    inject.setTriggerNow(true);
+    inject.setTriggerNowDate(now());
     inject.setUpdatedAt(now());
     return injectRepository.save(inject);
   }

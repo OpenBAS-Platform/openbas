@@ -12,6 +12,6 @@ public class V3_34__Add_column_trigger_now extends BaseJavaMigration {
     @Override
     public void migrate(Context context) throws Exception {
         Statement select = context.getConnection().createStatement();
-        select.execute("ALTER TABLE injects ADD inject_trigger_now bool default false;");
+        select.execute("ALTER TABLE injects ADD inject_trigger_now_date timestamp;");
     }
 }
