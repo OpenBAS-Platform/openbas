@@ -28,6 +28,7 @@
     "builder/dev/build",
     "builder/prod/build",
     "src/static/ext/*",
+    "vite.config.ts",
     "__generated__"
   ],
   "references": [

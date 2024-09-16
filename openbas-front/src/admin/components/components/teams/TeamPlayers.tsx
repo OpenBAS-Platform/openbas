@@ -156,9 +156,9 @@ interface Props {
   handleClose: () => void
 }
 
-interface UserStoreExtended extends UserStore {
+type UserStoreExtended = UserStore & {
   user_enabled: boolean;
-}
+};
 
 const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
   // Standard hooks

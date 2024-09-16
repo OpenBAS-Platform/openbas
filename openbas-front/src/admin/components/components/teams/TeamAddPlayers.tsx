@@ -42,10 +42,10 @@ interface Props {
   teamId: Team['team_id']
 }
 
-interface UserStoreExtended extends UserStore {
+type UserStoreExtended = UserStore & {
   organization_name: Organization['organization_name'];
   organization_description: Organization['organization_description']
-}
+};
 
 const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
   const dispatch = useAppDispatch();
