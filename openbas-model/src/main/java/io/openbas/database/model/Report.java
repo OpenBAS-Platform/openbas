@@ -22,6 +22,7 @@ import static java.time.Instant.now;
 @Table(name = "reports")
 @EntityListeners(ModelBaseListener.class)
 public class Report implements Base {
+
     @Id
     @Column(name = "report_id")
     @JsonProperty("report_id")
@@ -59,6 +60,7 @@ public class Report implements Base {
     @JoinTable(name = "reports_exercises",
             joinColumns = @JoinColumn(name = "report_id"),
             inverseJoinColumns = @JoinColumn(name = "exercise_id"))
+    @JsonProperty("report_exercise")
     @JsonSerialize(using = MonoIdDeserializer.class)
     private Exercise exercise;
 

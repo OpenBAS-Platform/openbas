@@ -334,7 +334,7 @@ export const storeHelper = (state) => ({
     (l) => l.lessons_answer_exercise === exerciseId
             && l.lessons_answer_user === userId,
   ),
-  getExerciseReports: (exerciseId) => entities('reports', state).filter((l) => l.exercise === exerciseId),
+  getExerciseReports: (exerciseId) => entities('reports', state).filter((l) => l.report_exercise === exerciseId),
   // report
   getReport: (id) => entity(id, 'reports', state),
   // dryrun

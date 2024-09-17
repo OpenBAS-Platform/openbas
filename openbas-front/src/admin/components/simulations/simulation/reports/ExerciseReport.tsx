@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
-import { Button, Paper, Typography } from '@mui/material';
+import { Button, Paper, ToggleButtonGroup, Typography } from '@mui/material';
 
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../../store';
@@ -104,8 +104,9 @@ const ExerciseReport: React.FC = () => {
 
   return (
     <ReportContext.Provider value={context}>
-      <div style={{ margin: 20, display: 'flex', flexFlow: 'wrap' }}>
+      <div style={{ marginTop: 20, display: 'flex', flexFlow: 'wrap' }}>
         <Button
+          style={{ marginLeft: 20 }}
           color="primary"
           variant="outlined"
           component={Link}
@@ -113,14 +114,17 @@ const ExerciseReport: React.FC = () => {
         >
           {t('Back to administration')}
         </Button>
-        <ExportButtons
-          style={{ marginLeft: 'auto' }}
-          domElementId={`reportId_${reportId}`}
-          name={report?.report_name}
-          pixelRatio={2}
-        />
-        {permissions.canWrite && <ReportPopover variant={'toggle'} report={report} actions={['Update']}/>}
-        <div id={`reportId_${reportId}`} style={{ width: '100%', display: 'flex', flexFlow: 'wrap' }}>
+
+        <ToggleButtonGroup style={{ marginLeft: 'auto', marginRight: 20 }}>
+          <ExportButtons
+            domElementId={`reportId_${reportId}`}
+            name={report?.report_name}
+            pixelRatio={2}
+          />
+          {permissions.canWrite && <ReportPopover variant={'toggle'} report={report} actions={['Update']}/>}
+        </ToggleButtonGroup>
+
+        <div id={`reportId_${reportId}`} style={{ padding: 20, width: '100%', display: 'flex', flexFlow: 'wrap' }}>
           <div style={{ width: '100%', textAlign: 'center', fontSize: 25, fontWeight: 500, margin: '10px' }}>
             {report?.report_name}
           </div>
@@ -153,7 +157,9 @@ const ExerciseReport: React.FC = () => {
               isReport
                />
           }
-          {displayModule(ReportInformationType.EXERCISE_DETAILS) && <ExerciseDistribution exerciseId={exerciseId}/>}
+          {displayModule(ReportInformationType.EXERCISE_DETAILS)
+            && <ExerciseDistribution exerciseId={exerciseId} isReport={true}/>
+          }
         </div>
       </div>
     </ReportContext.Provider>

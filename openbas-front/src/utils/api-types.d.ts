@@ -2687,9 +2687,9 @@ export interface RenewTokenInput {
 }
 
 export interface Report {
-  exercise?: Exercise;
   /** @format date-time */
   report_created_at: string;
+  report_exercise?: Exercise;
   report_global_observation?: string;
   report_id: string;
   report_informations?: ReportInformation[];

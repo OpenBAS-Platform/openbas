@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Statement;
 
 @Component
-public class V3_35__Remove_cascade_delete_dependency extends BaseJavaMigration {
+public class V3_34__Remove_cascade_delete_dependency extends BaseJavaMigration {
 
     @Override
     public void migrate(Context context) throws Exception {

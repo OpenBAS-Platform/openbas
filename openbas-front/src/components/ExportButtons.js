@@ -66,12 +66,7 @@ class ExportButtons extends Component {
     setTimeout(() => {
       const container = document.getElementById(domElementId);
       const { offsetWidth, offsetHeight } = container;
-      container.setAttribute('style', 'padding: 30px 30px 50px 30px');
       if (theme === currentTheme.palette.mode && this.adjust) {
-        container.setAttribute(
-          'style',
-          'width:3840px; height:2160px; padding: 30px 30px 50px 30px',
-        );
         this.adjust(true);
       }
       setTimeout(() => {
@@ -102,7 +97,6 @@ class ExportButtons extends Component {
               },
             });
           }
-          container.setAttribute('style', '');
           return this.setState({ exporting: false });
         });
       }, timeout / 2);

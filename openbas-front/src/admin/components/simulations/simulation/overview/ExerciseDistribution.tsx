@@ -35,10 +35,12 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
+  isReport: boolean,
 }
 
 const ExerciseDistribution: FunctionComponent<Props> = ({
   exerciseId,
+  isReport = false,
 }) => {
   // Standard hooks
   const theme = useTheme<Theme>();
@@ -70,7 +72,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
     return <Loader />;
   }
 
-  if (exercise.exercise_status === 'SCHEDULED' && injectExpectations?.length === 0) {
+  if (exercise.exercise_status === 'SCHEDULED' && injectExpectations?.length === 0 && !isReport) {
     return (
       <div style={{ marginTop: 100, textAlign: 'center' }}>
         <div style={{ fontSize: 20 }}>

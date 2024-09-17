@@ -98,7 +98,7 @@ const Drawer: FunctionComponent<DrawerProps> = ({
         </IconButton>
         <Typography variant="subtitle2">{title}</Typography>
       </div>
-      <div style={containerStyle ?? { padding: '10px 20px 20px 20px' }}>{component}</div>
+      <div style={{ padding: '10px 20px 20px 20px', ...containerStyle }}>{component}</div>
     </DrawerMUI>
   );
 };
