@@ -77,6 +77,8 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
             true,
             exercises.length === 0,
             1,
+            exercises.length === 0,
+            t('No data to display'),
           ) as ApexOptions}
           series={series}
           type="bar"

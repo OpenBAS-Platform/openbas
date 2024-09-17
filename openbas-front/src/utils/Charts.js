@@ -260,6 +260,8 @@ export const areaChartOptions = (
  * @param {boolean} isResult
  * @param {boolean} isFakeData
  * @param {number} max
+ * @param {boolean} isChartAPlaceholder
+ * @param {string} emptyChartText
  */
 export const verticalBarsChartOptions = (
   theme,
@@ -273,6 +275,8 @@ export const verticalBarsChartOptions = (
   isResult = false,
   isFakeData = false,
   max = undefined,
+  isChartAPlaceholder = false,
+  emptyChartText = '',
 ) => ({
   chart: {
     type: 'bar',
@@ -282,6 +286,9 @@ export const verticalBarsChartOptions = (
     stacked: isStacked,
     width: '100%',
     height: '100%',
+    zoom: {
+      enabled: !isChartAPlaceholder,
+    },
   },
   theme: {
     mode: theme.palette.mode,
@@ -294,8 +301,13 @@ export const verticalBarsChartOptions = (
   states: {
     hover: {
       filter: {
-        type: 'lighten',
+        type: isChartAPlaceholder ? 'none' : 'lighten',
         value: 0.05,
+      },
+    },
+    active: {
+      filter: {
+        type: isChartAPlaceholder ? 'none' : 'lighten',
       },
     },
   },
@@ -315,6 +327,7 @@ export const verticalBarsChartOptions = (
   },
   tooltip: {
     theme: theme.palette.mode,
+    enabled: !isChartAPlaceholder,
   },
   xaxis: {
     type: isTimeSeries ? 'datetime' : 'category',
@@ -326,6 +339,7 @@ export const verticalBarsChartOptions = (
         fontSize: '12px',
         fontFamily: '"IBM Plex Sans", sans-serif',
       },
+      show: !isChartAPlaceholder,
     },
     axisBorder: {
       show: false,
@@ -360,6 +374,13 @@ export const verticalBarsChartOptions = (
       distributed,
     },
   },
+  ...(isChartAPlaceholder && {
+    subtitle: {
+      text: emptyChartText,
+      align: 'center',
+      offsetY: 130,
+    },
+  }),
 });
 
 /**
