@@ -12123,7 +12123,7 @@ __metadata:
     typescript: "npm:5.4.5"
     usehooks-ts: "npm:3.1.0"
     uuid: "npm:10.0.0"
-    vite: "npm:5.3.5"
+    vite: "npm:5.3.6"
     vite-plugin-istanbul: "npm:6.0.2"
     vitest: "npm:1.6.0"
     xlsx: "npm:0.18.5"
@@ -15935,9 +15935,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:5.3.5":
-  version: 5.3.5
-  resolution: "vite@npm:5.3.5"
+"vite@npm:5.3.6":
+  version: 5.3.6
+  resolution: "vite@npm:5.3.6"
   dependencies:
     esbuild: "npm:^0.21.3"
     fsevents: "npm:~2.3.3"
@@ -15971,7 +15971,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: 10c0/795c7e0dbc94b96c4a0aff0d5d4b349dd28ad8b7b70979c1010f96b4d83f7d6c1700ebd6fed91de2e021b0a3689b9abc2d8017f6dfa8c9a6ca5c7af637d6afc6
+  checksum: 10c0/d2cf20e17c8e8dd975fbf6eeb628ea3c594a78d4586619e26b2f46836454f3d96699469b5f45e7389386435dc724192b2d3607de26100a5330e64e932f5ac529
   languageName: node
   linkType: hard
 
