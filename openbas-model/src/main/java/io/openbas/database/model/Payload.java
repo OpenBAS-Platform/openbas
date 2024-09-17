@@ -6,6 +6,7 @@ import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
@@ -72,7 +73,7 @@ public class Payload implements Base {
   @Type(StringArrayType.class)
   @Column(name = "payload_platforms", columnDefinition = "text[]")
   @JsonProperty("payload_platforms")
-  private Endpoint.PLATFORM_TYPE[] platforms = new Endpoint.PLATFORM_TYPE[0];
+  private PLATFORM_TYPE[] platforms = new PLATFORM_TYPE[0];
 
   @Setter
   @ManyToMany(fetch = FetchType.EAGER)
@@ -164,7 +165,7 @@ public class Payload implements Base {
 
   @JsonProperty("payload_collector_type")
   private String getCollectorType() {
-    return null != collector ? this.collector.getType() : null;
+    return this.collector != null ? this.collector.getType() : null;
   }
 
   @Override
