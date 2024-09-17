@@ -14,6 +14,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
@@ -94,6 +95,11 @@ public class Payload implements Base {
   @JsonProperty("payload_cleanup_command")
   private String cleanupCommand;
 
+  @Getter
+  @Column(name = "payload_elevation_required")
+  @JsonProperty("payload_elevation_required")
+  private boolean elevationRequired;
+
   @Setter
   @Type(JsonType.class)
   @Column(name = "payload_arguments")
@@ -159,7 +165,7 @@ public class Payload implements Base {
 
   @JsonProperty("payload_collector_type")
   private String getCollectorType() {
-    return this.getCollector() != null ? this.getCollector().getType() : null;
+    return this.collector != null ? this.collector.getType() : null;
   }
 
   @Override
