@@ -164,6 +164,10 @@ public class AtomicTestingService {
                             newExpectation.put("expectation_score", 100);
                             predefinedExpectations.add(newExpectation);
                         });
+                        // We need the remove in case there are empty expectations because put is deprecated and putifabsent doesn't replace empty expectations
+                        if(finalContent.has(EXPECTATIONS) && finalContent.get(EXPECTATIONS).isEmpty()) {
+                            finalContent.remove(EXPECTATIONS);
+                        }
                         finalContent.putIfAbsent(EXPECTATIONS, predefinedExpectations);
                     }
                 }
