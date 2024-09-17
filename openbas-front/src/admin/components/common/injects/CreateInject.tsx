@@ -196,7 +196,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
     });
   };
 
-  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('injector-contracts', initSearchPaginationInput());
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(isAtomic ? 'injector-contracts-atomic' : 'injector-contracts', initSearchPaginationInput());
 
   const [selectedContract, setSelectedContract] = useState<number | null>(null);
   const selectContract = (contract: number) => {
