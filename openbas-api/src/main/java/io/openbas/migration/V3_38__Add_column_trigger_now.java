@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Statement;
 
 @Component
-public class V3_37__Add_column_trigger_now extends BaseJavaMigration {
+public class V3_38__Add_column_trigger_now extends BaseJavaMigration {
 
     @Override
     public void migrate(Context context) throws Exception {
