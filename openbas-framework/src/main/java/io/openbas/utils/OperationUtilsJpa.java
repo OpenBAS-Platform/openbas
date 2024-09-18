@@ -190,6 +190,9 @@ public class OperationUtilsJpa {
     } else {
       finalPaths = paths;
     }
+    if (type.equals(Instant.class)) {
+      return cb.isNull(finalPaths);
+    }
     return cb.or(
         cb.isNull(finalPaths),
         cb.equal(finalPaths, ""),

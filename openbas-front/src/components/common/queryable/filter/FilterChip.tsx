@@ -1,6 +1,8 @@
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
-import { Chip, Tooltip } from '@mui/material';
+import { Box, Chip, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
+import classNames from 'classnames';
 import { FilterHelpers } from './FilterHelpers';
 import FilterChipPopover from './FilterChipPopover';
 import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
@@ -11,18 +13,31 @@ import { Option } from '../../../../utils/Option';
 import type { Theme } from '../../../Theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
-  container: {
-    display: 'flex',
-    alignItems: 'center',
-    lineHeight: '32px',
-    cursor: 'pointer',
-    '&:hover': { textDecorationLine: 'underline' },
-  },
   mode: {
     display: 'inline-block',
     height: '100%',
     backgroundColor: theme.palette.action?.selected,
+    margin: '0 4px',
     padding: '0 4px',
+  },
+  modeTooltip: {
+    margin: '0 4px',
+  },
+  container: {
+    gap: '4px',
+    display: 'flex',
+    overflow: 'hidden',
+    maxWidth: '400px',
+    alignItems: 'center',
+    lineHeight: '32px',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+  },
+  label: {
+    cursor: 'pointer',
+    '&:hover': {
+      textDecorationLine: 'underline',
+    },
   },
 }));
 
@@ -62,51 +77,77 @@ const FilterChip: FunctionComponent<Props> = ({
     }
   }, [filter]);
 
-  const toValues = (opts: Option[]) => {
+  const toValues = (opts: Option[], isTooltip: boolean) => {
     return opts.map((o, idx) => {
       let or = <></>;
       if (idx > 0) {
-        or = <div className={classes.mode}> {t('OR')} </div>;
+        or = <div className={classNames({
+          [classes.mode]: !isTooltip,
+          [classes.modeTooltip]: isTooltip,
+        })}
+             >
+          {t('OR')}
+        </div>;
       }
       if (propertySchema.schema_property_type.includes('instant')) {
         return (
-          <span key={o.id}>{or} {fldt(o.label)}</span>
+          <>{or}<span key={o.id}> {fldt(o.label)}</span></>
         );
       }
-      return (<span key={o.id}>{or} {o.label}</span>);
+      return (<>{or}<span key={o.id}> {o.label}</span></>);
     });
   };
 
-  const title = (isTooltip: boolean) => {
-    if (isTooltip) {
-      return (<span><strong>{t(filter.key)}</strong>{' '}<span>{convertOperatorToIcon(t, filter.operator)} {toValues(options)}</span></span>);
+  const filterValues = (isTooltip: boolean) => {
+    const operator = filter.operator ?? 'eq';
+    const isOperatorNil = ['empty', 'not_empty'].includes(operator);
+    if (isOperatorNil) {
+      return (
+        <>
+          <strong
+            className={classes.label}
+            onClick={handleOpen}
+          >
+            {t(filter.key)}
+          </strong>{' '}
+          <span>
+            {operator === 'empty' ? t('is empty') : t('is not empty')}
+          </span>
+        </>
+      );
     }
     return (
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <span onClick={handleOpen} className={classes.container}>
-          <strong>{t(filter.key)}</strong>
+      <span className={classes.container}>
+        <strong className={classes.label} onClick={handleOpen}>
+          {t(filter.key)}
           {convertOperatorToIcon(t, filter.operator)}
-        </span>
-        <>&nbsp;</>
-        {toValues(options)}
-      </div>
+        </strong>
+        {' '}
+        <Box sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
+          {toValues(options, isTooltip)}
+        </Box>
+      </span>
     );
   };
 
-  const chipVariant = (!filter.values || filter.values.length === 0) && !['nil', 'not_nil'].includes(filter.operator ?? 'eq')
+  const isEmpty = (values?: string[]) => {
+    return R.isEmpty(values) || values?.some((v) => R.isEmpty(v));
+  };
+
+  const chipVariant = isEmpty(filter.values) && !['empty', 'not_empty'].includes(filter.operator ?? 'eq')
     ? 'outlined'
     : 'filled';
 
   return (
     <>
       <Tooltip
-        title={title(true)}
+        title={filterValues(true)}
       >
         <Chip
           variant={chipVariant}
-          label={title(false)}
+          label={filterValues(false)}
           onDelete={handleRemoveFilter}
-          component="div"
+          sx={{ borderRadius: 1 }}
           ref={chipRef}
         />
       </Tooltip>
