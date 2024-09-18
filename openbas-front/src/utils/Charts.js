@@ -324,6 +324,12 @@ export const verticalBarsChartOptions = (
       horizontal: 5,
       vertical: 20,
     },
+    onItemClick: {
+      toggleDataSeries: !isChartAPlaceholder,
+    },
+    onItemHover: {
+      highlightDataSeries: !isChartAPlaceholder,
+    },
   },
   tooltip: {
     theme: theme.palette.mode,
