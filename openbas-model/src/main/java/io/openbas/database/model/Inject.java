@@ -80,6 +80,11 @@ public class Inject implements Base, Injection {
   private boolean enabled = true;
 
   @Getter
+  @Column(name = "inject_trigger_now_date")
+  @JsonProperty("inject_trigger_now_date")
+  private Instant triggerNowDate;
+
+  @Getter
   @Column(name = "inject_content")
   @Convert(converter = ContentConverter.class)
   @JsonProperty("inject_content")
@@ -279,6 +284,13 @@ public class Inject implements Base, Injection {
 
   @JsonProperty("inject_date")
   public Optional<Instant> getDate() {
+    // If a trigger now was executed for this inject linked to an exercise, we ignore pauses and we set inject inside of a range of execution
+    if(getExercise() != null && triggerNowDate != null ) {
+      Optional<Instant> exerciseStartOpt = getExercise().getStart();
+      if (exerciseStartOpt.isPresent() && (exerciseStartOpt.get().equals(triggerNowDate) || exerciseStartOpt.get().isBefore(triggerNowDate))) {
+        return Optional.of(now().minusSeconds(60));
+      }
+    }
     return InjectModelHelper.getDate(getExercise(), getScenario(), getDependsOn(), getDependsDuration());
   }
 

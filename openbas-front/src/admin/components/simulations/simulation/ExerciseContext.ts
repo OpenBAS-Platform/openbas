@@ -11,7 +11,6 @@ import {
   updateInjectForExercise,
   updateInjectTriggerForExercise,
 } from '../../../../actions/Inject';
-import { secondsFromToNow } from '../../../../utils/Exercise';
 import type { InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
 import { dryImportXlsForExercise, importXlsForExercise } from '../../../../actions/exercises/exercise-action';
 import { fetchExercise, fetchExerciseTeams } from '../../../../actions/Exercise';
@@ -32,10 +31,7 @@ const injectContextForExercise = (exercise: ExerciseStore) => {
       return dispatch(updateInjectForExercise(exercise.exercise_id, injectId, inject));
     },
     onUpdateInjectTrigger(injectId: Inject['inject_id']): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
-      const injectDependsDuration = secondsFromToNow(
-        exercise.exercise_start_date,
-      );
-      return dispatch(updateInjectTriggerForExercise(exercise.exercise_id, injectId, { inject_depends_duration: injectDependsDuration > 0 ? injectDependsDuration : 0 }));
+      return dispatch(updateInjectTriggerForExercise(exercise.exercise_id, injectId));
     },
     onUpdateInjectActivation(injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }): Promise<{
       result: string,

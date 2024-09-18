@@ -358,10 +358,9 @@ public class InjectApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject updateInjectTrigger(
       @PathVariable String exerciseId,
-      @PathVariable String injectId,
-      @Valid @RequestBody InjectUpdateTriggerInput input) {
+      @PathVariable String injectId) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
-    inject.setDependsDuration(input.getDependsDuration());
+    inject.setTriggerNowDate(now());
     inject.setUpdatedAt(now());
     return injectRepository.save(inject);
   }
