@@ -50,3 +50,10 @@ services:
       - type: bind
         source: caldera.yml
         target: /usr/src/app/conf/local.yml
+  openbas-telemetry-jaeger:
+    container_name: openbas-telemetry-jaeger
+    image: jaegertracing/all-in-one
+    restart: unless-stopped
+    ports:
+      - "16686:16686"
+      - "4317:4317"
