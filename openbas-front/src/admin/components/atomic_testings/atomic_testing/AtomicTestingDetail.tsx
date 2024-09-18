@@ -110,7 +110,46 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
           </Paper>
         )}
       </Grid>
-      <Grid item xs={12} style={{ marginBottom: 30 }}>
+      <Grid item xs={6} style={{ marginBottom: 30 }}>
+        <Typography variant="h4">{t('Command Lines')}</Typography>
+        {injectResultDto ? (
+          <Paper variant="outlined" classes={{ root: classes.paper }}>
+            <Typography variant="subtitle1" className={classes.header} gutterBottom>
+              {t('Content')}
+            </Typography>
+            {(injectResultDto.inject_commands_lines?.content?.length ?? 0) > 0 ? <pre>
+              <Typography variant="body1" gutterBottom>
+                {injectResultDto.inject_commands_lines?.content?.map((content, index) => (
+                  <li key={index}>{content}</li>
+                ))}
+              </Typography>
+            </pre> : '-'}
+            <Typography variant="subtitle1" className={classes.header} gutterBottom>
+              {t('Cleanup command')}
+            </Typography>
+            {(injectResultDto.inject_commands_lines?.cleanup_command?.length ?? 0) > 0 ? <pre>
+              <Typography variant="body1" gutterBottom>
+                {injectResultDto.inject_commands_lines?.cleanup_command?.map((content, index) => (
+                  <li key={index}>{content}</li>
+                ))}
+              </Typography>
+            </pre> : '-'}
+            <Typography variant="subtitle1" className={classes.header} gutterBottom>
+              {t('External ID')}
+            </Typography>
+            {injectResultDto.inject_commands_lines?.external_id ? <pre>
+              <Typography variant="body1" gutterBottom>
+                {injectResultDto.inject_commands_lines?.external_id}
+              </Typography>
+            </pre> : '-'}
+          </Paper>
+        ) : (
+          <Paper variant="outlined" classes={{ root: classes.paper }}>
+            <Typography variant="body1">{t('No data available')}</Typography>
+          </Paper>
+        )}
+      </Grid>
+      <Grid item xs={6} style={{ marginBottom: 30 }}>
         <Typography variant="h4">{t('Execution logs')}</Typography>
         {injectResultDto ? (
           <Paper variant="outlined" classes={{ root: classes.paper }}>

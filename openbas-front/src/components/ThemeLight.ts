@@ -170,10 +170,6 @@ const ThemeLight = (
             color: '#000000 !important',
             background: `${accent || '#c0dfff'} !important`,
           },
-          'pre.light': {
-            fontFamily: 'Consolas, monaco, monospace',
-            background: `${nav || THEME_LIGHT_DEFAULT_NAV} !important`,
-          },
           code: {
             fontFamily: 'Consolas, monaco, monospace',
             color: '#000000 !important',

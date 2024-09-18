@@ -1273,6 +1273,7 @@ export interface InjectReceptionInput {
 export interface InjectResultDTO {
   /** Attack Patterns */
   inject_attack_patterns: AttackPattern[];
+  inject_commands_lines?: InjectStatusCommandLine;
   inject_content?: object;
   /** Description */
   inject_description: string;
@@ -1302,6 +1303,7 @@ export interface InjectResultDTO {
 
 export interface InjectStatus {
   listened?: boolean;
+  status_commands_lines?: InjectStatusCommandLine;
   status_id?: string;
   status_name:
     | "DRAFT"
@@ -1330,6 +1332,12 @@ export interface InjectStatus {
   /** @format int32 */
   tracking_total_success?: number;
   updateAttributes?: object;
+}
+
+export interface InjectStatusCommandLine {
+  cleanup_command?: string[];
+  content?: string[];
+  external_id?: string;
 }
 
 export interface InjectStatusExecution {
