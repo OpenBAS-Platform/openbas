@@ -32,7 +32,7 @@ const DynamicAssetField: FunctionComponent<Props> = ({
   return (
     <div style={{ marginTop: 20 }}>
       <div style={{ display: 'flex', alignItems: 'end', gap: 10 }}>
-        <InputLabel id="dynamic-asset-filter">{t('Dynamic asset filter')}</InputLabel>
+        <InputLabel id="dynamic-asset-filter">{t('Rule')}</InputLabel>
         <Tooltip title={t('Filter allowing assets to be added dynamically to this group')}>
           <InfoOutlined
             fontSize="small"

@@ -789,6 +789,8 @@ const i18n = {
       // Assets
       Endpoints: 'Endpoints',
       asset: 'actif',
+      Rules: 'Règles',
+      Rule: 'Règle',
       'Teams of players': 'Equipes de joueurs',
       'Create a new endpoint': 'Créer un nouvel endpoint',
       'Update the endpoint': 'Modifier l\'endpoint',
@@ -815,7 +817,6 @@ const i18n = {
       'Asset groups': 'Groupe d\'assets',
       AssetGroup: 'Groupe-d-assets',
       AssetGroups: 'Groupes-d-assets',
-      'Dynamic asset filter': 'Filtre d\'actifs dynamique',
       'Filter allowing assets to be added dynamically to this group': 'Filtre permettant d\'ajouter dynamiquement des actifs à ce groupe',
       'Create a new asset group': 'Créer un nouvel asset group',
       'Update the asset group': 'Modifier l\'asset group',
@@ -2118,6 +2119,8 @@ const i18n = {
       'Should not be empty': '不能为空',
       // Assets
       Endpoints: '终端',
+      Rules: '规则',
+      Rule: '规则',
       'Teams of players': '选手团队',
       'Create a new endpoint': '创建新终端',
       'Update the endpoint': '更新终端',
@@ -2143,7 +2146,6 @@ const i18n = {
       'Asset groups': '资产组',
       AssetGroup: '资产组',
       AssetGroups: '资产组',
-      'Dynamic asset filter': '动态资产过滤器',
       'Filter allowing assets to be added dynamically to this group': '允许将资产动态添加到该组的过滤器',
       'Create a new asset group': '创建一个新资产组',
       'Update the asset group': '更新资产组',
