@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Statement;
 
 @Component
-public class V3_38__Add_column_status_commands_lines extends BaseJavaMigration {
+public class V3_39__Add_column_status_commands_lines extends BaseJavaMigration {
 
     @Override
     public void migrate(Context context) throws Exception {
