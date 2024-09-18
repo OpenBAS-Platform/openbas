@@ -350,12 +350,20 @@ public class InjectService {
             });
             inject.getTeams().forEach(team -> team.getUsers().forEach(user -> {
                 if(!scenario.getTeamUsers().contains(user)) {
-                    ScenarioTeamUser scenarioTeamUser = new ScenarioTeamUser();
-                    scenarioTeamUser.setScenario(scenario);
-                    scenarioTeamUser.setTeam(team);
-                    scenarioTeamUser.setUser(user);
-                    scenarioTeamUserRepository.save(scenarioTeamUser);
-                    scenario.getTeamUsers().add(scenarioTeamUser);
+                    ScenarioTeamUserId compositeId = new ScenarioTeamUserId();
+                    compositeId.setScenarioId(scenario.getId());
+                    compositeId.setTeamId(team.getId());
+                    compositeId.setUserId(user.getId());
+                    boolean exists = scenarioTeamUserRepository.findById(compositeId).isPresent();
+
+                    if(!exists) {
+                        ScenarioTeamUser scenarioTeamUser = new ScenarioTeamUser();
+                        scenarioTeamUser.setScenario(scenario);
+                        scenarioTeamUser.setTeam(team);
+                        scenarioTeamUser.setUser(user);
+                        scenarioTeamUserRepository.save(scenarioTeamUser);
+                        scenario.getTeamUsers().add(scenarioTeamUser);
+                    }
                 }
             }));
         });
