@@ -746,7 +746,7 @@ const select = (state, ownProps) => {
   const assetGroups = helper.getAssetGroups()
     .map((n) => ({ label: n.asset_group_name, value: n.asset_group_id }))
     .sort((a, b) => a.label.localeCompare(b.label));
-  const teams = (ownProps.context === 'scenario' ? helper.getScenarioTeams(ownProps.id) : helper.getExerciseTeams(ownProps.id))
+  const teams = ownProps.teamsFromExerciseOrScenario
     .map((n) => ({ label: n.team_name, value: n.team_id }))
     .sort((a, b) => a.label.localeCompare(b.label));
   return { endpoints, assetGroups, teams };
