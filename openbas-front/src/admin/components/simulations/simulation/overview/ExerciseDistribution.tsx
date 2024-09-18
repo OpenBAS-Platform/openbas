@@ -35,7 +35,7 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
-  isReport: boolean,
+  isReport?: boolean,
 }
 
 const ExerciseDistribution: FunctionComponent<Props> = ({

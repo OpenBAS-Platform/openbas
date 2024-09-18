@@ -158,7 +158,7 @@ const ExerciseReport: React.FC = () => {
                />
           }
           {displayModule(ReportInformationType.EXERCISE_DETAILS)
-            && <ExerciseDistribution exerciseId={exerciseId} isReport={true}/>
+            && <ExerciseDistribution exerciseId={exerciseId} isReport/>
           }
         </div>
       </div>
