@@ -32,6 +32,7 @@ import { useQueryableWithLocalStorage } from '../../../../components/common/quer
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import ExercisePopover from '../../simulations/simulation/ExercisePopover';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import Loader from '../../../../components/Loader';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -68,8 +69,10 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
     scenario: helper.getScenario(scenarioId),
     exercises: helper.getExercisesMap(),
   }));
+  const [loadingScenarioExercises, setLoadingScenarioExercises] = useState(true);
   useDataLoader(() => {
-    dispatch(fetchScenarioExercises(scenarioId));
+    setLoadingScenarioExercises(true);
+    dispatch(fetchScenarioExercises(scenarioId)).finally(() => setLoadingScenarioExercises(false));
   });
   const scenarioExercises = scenario.scenario_exercises?.map((exerciseId: string) => exercisesFromStore[exerciseId]).filter((ex: ExerciseStore) => !!ex);
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
@@ -207,7 +210,8 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
             {t('Simulations Results')}
           </Typography>
           <Paper classes={{ root: classes.paper }} variant="outlined">
-            <ScenarioDistributionByExercise exercises={scenarioExercises}/>
+            {loadingScenarioExercises && (<Loader variant="inElement" />)}
+            {!loadingScenarioExercises && (<ScenarioDistributionByExercise exercises={scenarioExercises}/>)}
           </Paper>
         </Grid>
         {(scenarioExercises ?? 0).length > 0 && (

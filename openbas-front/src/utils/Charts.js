@@ -289,6 +289,9 @@ export const verticalBarsChartOptions = (
     zoom: {
       enabled: !isChartAPlaceholder,
     },
+    animations: {
+      enabled: !isChartAPlaceholder,
+    },
   },
   theme: {
     mode: theme.palette.mode,
