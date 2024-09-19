@@ -41,8 +41,10 @@ const Index = () => {
   const { injectId } = useParams() as { injectId: InjectResultDTO['inject_id'] };
   const [injectResultDto, setInjectResultDto] = useState<InjectResultDTO>();
 
-  const updateInjectResultDto = (newData: InjectResultDTO) => {
-    setInjectResultDto(newData);
+  const updateInjectResultDto = () => {
+    fetchInjectResultDto(injectId).then((result: { data: InjectResultDTO }) => {
+      setInjectResultDto(result.data);
+    });
   };
 
   useEffect(() => {
