@@ -49,7 +49,7 @@ public class Team implements Base {
     @NotBlank
     private String name;
 
-    @Queryable(sortable = true)
+    @Queryable(searchable = true, sortable = true)
     @Column(name = "team_description")
     @JsonProperty("team_description")
     private String description;
@@ -65,6 +65,7 @@ public class Team implements Base {
     @NotNull
     private Instant updatedAt = now();
 
+    @Queryable(filterable = true, dynamicValues = true, path = "tags.id")
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "teams_tags",
             joinColumns = @JoinColumn(name = "team_id"),

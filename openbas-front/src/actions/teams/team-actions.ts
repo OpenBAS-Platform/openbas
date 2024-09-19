@@ -18,6 +18,12 @@ export const searchTeams = (searchPaginationInput: SearchPaginationInput) => {
   return simplePostCall(uri, data);
 };
 
+export const findTeams = (teamIds: string[]) => {
+  const data = teamIds;
+  const uri = '/api/teams/find';
+  return simplePostCall(uri, data);
+};
+
 export const fetchTeamPlayers = (teamId: Team['team_id']) => (dispatch: Dispatch) => {
   const uri = `/api/teams/${teamId}/players`;
   return getReferential(schema.arrayOfUsers, uri)(dispatch);

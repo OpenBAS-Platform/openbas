@@ -21,7 +21,6 @@ import { MESSAGING$ } from '../../../utils/Environment';
 import { fetchAssetGroups } from '../../../actions/asset_groups/assetgroup-action';
 import { fetchEndpoints } from '../../../actions/assets/endpoint-actions';
 import { storeHelper } from '../../../actions/Schema';
-import { fetchTeams } from '../../../actions/teams/team-actions';
 import DialogDelete from '../../../components/common/DialogDelete';
 import DialogTest from '../../../components/common/DialogTest';
 
@@ -166,7 +165,6 @@ class ToolBar extends Component {
   componentDidMount() {
     this.props.fetchEndpoints();
     this.props.fetchAssetGroups();
-    this.props.fetchTeams();
     this.subscription = MESSAGING$.toggleNav.subscribe({
       next: () => this.setState({ navOpen: localStorage.getItem('navOpen') === 'true' }),
     });
@@ -753,7 +751,7 @@ const select = (state, ownProps) => {
 };
 
 export default R.compose(
-  connect(select, { fetchEndpoints, fetchAssetGroups, fetchTeams }),
+  connect(select, { fetchEndpoints, fetchAssetGroups }),
   inject18n,
   withTheme,
   withStyles(styles),

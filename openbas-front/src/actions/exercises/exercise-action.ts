@@ -15,7 +15,7 @@ import type {
 import * as schema from '../Schema';
 import { MESSAGING$ } from '../../utils/Environment';
 
-const EXERCISE_URI = '/api/exercises/';
+export const EXERCISE_URI = '/api/exercises/';
 
 export const fetchExerciseExpectationResult = (exerciseId: Exercise['exercise_id']) => {
   const uri = `${EXERCISE_URI}${exerciseId}/results`;

@@ -26,6 +26,7 @@ import type {
   SearchPaginationInput,
   Team,
   TeamCreateInput,
+  TeamOutput,
   Variable,
   VariableInput,
 } from '../../../utils/api-types';
@@ -77,6 +78,7 @@ export type TeamContextType = {
   onToggleUser?: (teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean) => void,
   checkUserEnabled?: (teamId: Team['team_id'], userId: UserStore['user_id']) => boolean,
   computeTeamUsersEnabled?: (teamId: Team['team_id']) => number,
+  searchTeams: (input: SearchPaginationInput) => Promise<{ data: Page<TeamOutput> }>,
 };
 
 export type InjectContextType = {
@@ -174,6 +176,10 @@ export const TeamContext = createContext<TeamContextType>({
   },
   onRemoveUsersTeam(_teamId: Team['team_id'], _userIds: UserStore['user_id'][]): Promise<void> {
     return new Promise<void>(() => {
+    });
+  },
+  searchTeams(_: SearchPaginationInput): Promise<{ data: Page<TeamOutput> }> {
+    return new Promise<{ data: Page<TeamOutput> }>(() => {
     });
   },
 });

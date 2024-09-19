@@ -5,7 +5,6 @@ import io.openbas.database.model.Organization;
 import io.openbas.database.model.Team;
 import io.openbas.database.model.TeamSimple;
 import io.openbas.database.model.User;
-import io.openbas.database.raw.RawPaginationTeam;
 import io.openbas.database.raw.RawTeam;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.AlreadyExistingException;
@@ -15,12 +14,14 @@ import io.openbas.rest.helper.TeamHelper;
 import io.openbas.rest.team.form.TeamCreateInput;
 import io.openbas.rest.team.form.TeamUpdateInput;
 import io.openbas.rest.team.form.UpdateUsersTeamInput;
+import io.openbas.rest.team.output.TeamOutput;
+import io.openbas.service.TeamService;
+import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,16 +30,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.database.specification.TeamSpecification.contextual;
-import static io.openbas.database.specification.TeamSpecification.teamsAccessibleFromOrganizations;
+import static io.openbas.database.specification.TeamSpecification.*;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.time.Instant.now;
@@ -58,6 +56,8 @@ public class TeamApi extends RestBehavior {
     private OrganizationRepository organizationRepository;
     private TagRepository tagRepository;
     private ExerciseTeamUserRepository exerciseTeamUserRepository;
+
+    private TeamService teamService;
 
     @Autowired
     public void setExerciseRepository(ExerciseRepository exerciseRepository) {
@@ -109,6 +109,12 @@ public class TeamApi extends RestBehavior {
         this.tagRepository = tagRepository;
     }
 
+
+    @Autowired
+    public void setTeamService(TeamService teamService) {
+        this.teamService = teamService;
+    }
+
     @GetMapping("/api/teams")
     @PreAuthorize("isObserver()")
     public Iterable<TeamSimple> getTeams() {
@@ -118,7 +124,7 @@ public class TeamApi extends RestBehavior {
             //We get all the teams as raw
             teams = fromIterable(teamRepository.rawTeams());
         } else {
-            //We get the teams that are linked to the oragnizations we are part of
+            //We get the teams that are linked to the organizations we are part of
             User local = userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
             List<String> organizationIds = local.getGroups().stream()
                     .flatMap(group -> group.getOrganizations().stream())
@@ -134,26 +140,18 @@ public class TeamApi extends RestBehavior {
     @PostMapping("/api/teams/search")
     @PreAuthorize("isObserver()")
     @Transactional(readOnly = true)
-    public Page<RawPaginationTeam> teams(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-        BiFunction<Specification<Team>, Pageable, Page<Team>> teamsFunction;
-        OpenBASPrincipal currentUser = currentUser();
-        if (currentUser.isAdmin()) {
-            teamsFunction = (Specification<Team> specification, Pageable pageable) -> this.teamRepository
-                    .findAll(contextual(false).and(specification), pageable);
-        } else {
-            User local = this.userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
-            List<String> organizationIds = local.getGroups().stream()
-                    .flatMap(group -> group.getOrganizations().stream())
-                    .map(Organization::getId)
-                    .toList();
-            teamsFunction = (Specification<Team> specification, Pageable pageable) -> this.teamRepository
-                    .findAll(contextual(false).and(teamsAccessibleFromOrganizations(organizationIds).and(specification)), pageable);
-        }
-        return buildPaginationJPA(
-                teamsFunction,
-                searchPaginationInput,
-                Team.class
-        ).map(RawPaginationTeam::new);
+    @Tracing(name = "Paginate teams", layer = "api", operation = "POST")
+    public Page<TeamOutput> searchTeams(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+        final Specification<Team> teamSpecification = contextual(false);
+        return this.teamService.teamPagination(searchPaginationInput, teamSpecification);
+    }
+
+    @PostMapping("/api/teams/find")
+    @PreAuthorize("isObserver()")
+    @Transactional(readOnly = true)
+    @Tracing(name = "Find teams", layer = "api", operation = "POST")
+    public List<TeamOutput> findTeams(@RequestBody @Valid @NotNull final List<String> teamIds) {
+        return this.teamService.find(fromIds(teamIds));
     }
 
     @GetMapping("/api/teams/{teamId}")

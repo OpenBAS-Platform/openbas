@@ -6,6 +6,7 @@ import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.LessonsInput;
 import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
+import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.helper.TeamHelper;
 import io.openbas.rest.scenario.form.*;
 import io.openbas.service.ImportService;
@@ -43,7 +44,7 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 @RestController
 @Secured(ROLE_USER)
 @RequiredArgsConstructor
-public class ScenarioApi {
+public class ScenarioApi extends RestBehavior {
 
   public static final String SCENARIO_URI = "/api/scenarios";
 

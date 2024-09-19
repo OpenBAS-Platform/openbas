@@ -907,6 +907,8 @@ const i18n = {
       payload_status: 'Statut',
       payload_tags: 'Tags',
       payload_updated_at: 'Mis à jour à',
+      // Team
+      team_tags: 'Tags',
       Unverified: 'Non vérifié',
       Verified: 'Vérifié',
       Recurrence: 'Récurrence',
@@ -2744,6 +2746,8 @@ const i18n = {
       payload_status: 'Status',
       payload_tags: 'Tags',
       payload_updated_at: 'Updated',
+      // Team
+      team_tags: 'Tags',
       recurrence_The: 'The',
       recurrence_at: 'at',
       recurrence_from: 'from',

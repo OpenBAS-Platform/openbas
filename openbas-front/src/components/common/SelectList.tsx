@@ -8,7 +8,7 @@ export interface SelectListIcon {
 
 export interface SelectListHeader<T> {
   field: string;
-  value: (value: T) => React.ReactElement;
+  value: (value: T) => React.ReactElement | string;
   width: number;
 }
 
@@ -22,12 +22,12 @@ interface Props<T> {
   selectedValues: T[];
   elements: SelectListElements<T>;
   prefix: string;
-  onSelect: (id: string) => void;
+  onSelect: (id: string, value: T) => void;
   onDelete: (id: string) => void;
   paginationComponent: React.ReactElement;
 }
 
-const SelectList = <T extends Record<string, object | string | boolean | unknown>>({
+const SelectList = <T extends object>({
   values,
   selectedValues,
   elements,
@@ -36,8 +36,13 @@ const SelectList = <T extends Record<string, object | string | boolean | unknown
   onDelete,
   paginationComponent,
 }: Props<T>) => {
+  // @ts-expect-error: use a Record<string, unknown> is not working
+  const getId = (v: T) => v[`${prefix}_id`];
+  // @ts-expect-error: use a Record<string, unknown> is not working
+  const getName = (v: T) => v[`${prefix}_name`];
+
   const selectedIds = useMemo(
-    () => selectedValues.map((v) => v[`${prefix}_id`] as unknown as string),
+    () => selectedValues.map((v) => getId(v)),
     [selectedValues, prefix],
   );
 
@@ -48,7 +53,7 @@ const SelectList = <T extends Record<string, object | string | boolean | unknown
         <Grid item xs={8}>
           <List>
             {values.map((value) => {
-              const id = value[`${prefix}_id`] as unknown as string;
+              const id = getId(value);
               const disabled = selectedIds.includes(id);
               return (
                 <ListItemButton
@@ -56,7 +61,7 @@ const SelectList = <T extends Record<string, object | string | boolean | unknown
                   disabled={disabled}
                   divider
                   dense
-                  onClick={() => onSelect(id)}
+                  onClick={() => onSelect(id, value)}
                 >
                   <ListItemIcon>
                     {elements.icon.value()}
@@ -97,12 +102,13 @@ const SelectList = <T extends Record<string, object | string | boolean | unknown
             }}
           >
             {selectedValues.map((selectedValue) => {
-              const id = selectedValue[`${prefix}_id`] as unknown as string;
+              const id = getId(selectedValue);
+              const name = getName(selectedValue);
               return (
                 <Chip
                   key={id}
                   onDelete={() => onDelete(id)}
-                  label={truncate(selectedValue[`${prefix}_name`], 22)}
+                  label={truncate(name, 22)}
                   sx={{ margin: '0 10px 10px 0' }}
                 />
               );

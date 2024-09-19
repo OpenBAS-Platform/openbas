@@ -8,7 +8,7 @@ import { useAppDispatch } from '../../../../../utils/hooks';
 import { PermissionsContext, TeamContext } from '../../../common/Context';
 import type { UserStore } from '../../../teams/players/Player';
 import AddTeams from '../../../components/teams/AddTeams';
-import type { Team, TeamCreateInput } from '../../../../../utils/api-types';
+import type { SearchPaginationInput, Team, TeamCreateInput, TeamOutput } from '../../../../../utils/api-types';
 import type { TeamStore } from '../../../../../actions/teams/Team';
 import {
   addExerciseTeamPlayers,
@@ -24,6 +24,8 @@ import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import ContextualTeams from '../../../components/teams/ContextualTeams';
 import { useFormatter } from '../../../../../components/i18n';
+import type { Page } from '../../../../../components/common/queryable/Page';
+import { searchExerciseTeams } from '../../../../../actions/exercises/exercise-teams-action';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -74,6 +76,9 @@ export const teamContextForExercise = (exerciseId: ExerciseStore['exercise_id'],
       } else {
         dispatch(enableExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: [userId] }));
       }
+    },
+    searchTeams(input: SearchPaginationInput): Promise<{ data: Page<TeamOutput> }> {
+      return searchExerciseTeams(exerciseId, input);
     },
   };
 };

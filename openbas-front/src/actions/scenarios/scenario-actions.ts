@@ -21,7 +21,7 @@ import type {
 import * as schema from '../Schema';
 import { MESSAGING$ } from '../../utils/Environment';
 
-const SCENARIO_URI = '/api/scenarios';
+export const SCENARIO_URI = '/api/scenarios';
 
 export const addScenario = (data: ScenarioInput) => (dispatch: Dispatch) => {
   return postReferential(scenario, SCENARIO_URI, data)(dispatch);

@@ -1,11 +1,21 @@
 package io.openbas.database.specification;
 
+import io.openbas.database.model.Exercise;
+import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Team;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.validation.constraints.NotBlank;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
 public class TeamSpecification {
+
+  public static Specification<Team> fromIds(@NotNull final List<String> ids) {
+    return (root, query, builder) -> root.get("id").in(ids);
+  }
 
   public static Specification<Team> teamsAccessibleFromOrganizations(List<String> organizationIds) {
     return (root, query, builder) -> builder.or(
@@ -19,6 +29,20 @@ public class TeamSpecification {
       return (root, query, builder) -> builder.isTrue(root.get("contextual"));
     }
     return (root, query, builder) -> builder.isFalse(root.get("contextual"));
+  }
+
+  public static Specification<Team> fromExercise(@NotBlank final String exerciseId) {
+    return (root, query, cb) -> {
+      Join<Team, Exercise> exercisesJoin = root.join("exercises", JoinType.LEFT);
+      return cb.equal(exercisesJoin.get("id"), exerciseId);
+    };
+  }
+
+  public static Specification<Team> fromScenario(@NotBlank final String scenarioId) {
+    return (root, query, cb) -> {
+      Join<Team, Scenario> scenariosJoin = root.join("scenarios", JoinType.LEFT);
+      return cb.equal(scenariosJoin.get("id"), scenarioId);
+    };
   }
 
 }

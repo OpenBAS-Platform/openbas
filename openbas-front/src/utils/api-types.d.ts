@@ -1082,6 +1082,8 @@ export interface Inject {
   inject_teams?: Team[];
   inject_testable?: boolean;
   inject_title: string;
+  /** @format date-time */
+  inject_trigger_now_date?: string;
   inject_type?: string;
   /** @format date-time */
   inject_updated_at: string;
@@ -1206,7 +1208,7 @@ export interface InjectInput {
   inject_country?: string;
   /** @format int64 */
   inject_depends_duration?: number;
-  inject_depends_from_another?: string;
+  inject_depends_on?: string;
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
   inject_injector_contract?: string;
@@ -1393,11 +1395,6 @@ export interface InjectUpdateActivationInput {
 export interface InjectUpdateStatusInput {
   message?: string;
   status?: string;
-}
-
-export interface InjectUpdateTriggerInput {
-  /** @format int64 */
-  inject_depends_duration?: number;
 }
 
 export interface Injector {
@@ -2230,25 +2227,6 @@ export interface PageRawPaginationScenario {
   totalPages?: number;
 }
 
-export interface PageRawPaginationTeam {
-  content?: RawPaginationTeam[];
-  empty?: boolean;
-  first?: boolean;
-  last?: boolean;
-  /** @format int32 */
-  number?: number;
-  /** @format int32 */
-  numberOfElements?: number;
-  pageable?: PageableObject;
-  /** @format int32 */
-  size?: number;
-  sort?: SortObject[];
-  /** @format int64 */
-  totalElements?: number;
-  /** @format int32 */
-  totalPages?: number;
-}
-
 export interface PageSecurityPlatform {
   content?: SecurityPlatform[];
   empty?: boolean;
@@ -2270,6 +2248,25 @@ export interface PageSecurityPlatform {
 
 export interface PageTag {
   content?: Tag[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageTeamOutput {
+  content?: TeamOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -2339,6 +2336,7 @@ export interface Payload {
   /** @format date-time */
   payload_created_at: string;
   payload_description?: string;
+  payload_elevation_required?: boolean;
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -2416,6 +2414,7 @@ export interface PayloadUpsertInput {
   payload_cleanup_executor?: string;
   payload_collector?: string;
   payload_description?: string;
+  payload_elevation_required?: boolean;
   payload_external_id: string;
   payload_name: string;
   payload_platforms?: string[];
@@ -2609,19 +2608,6 @@ export interface RawPaginationScenario {
   scenario_tags?: string[];
   /** @format date-time */
   scenario_updated_at?: string;
-}
-
-export interface RawPaginationTeam {
-  team_contextual?: boolean;
-  team_description?: string;
-  team_id?: string;
-  team_name?: string;
-  team_organization?: string;
-  team_tags?: string[];
-  /** @format date-time */
-  team_updated_at?: string;
-  /** @format int64 */
-  team_users_number?: number;
 }
 
 export interface RawUser {
@@ -3004,6 +2990,21 @@ export interface TeamCreateInput {
   team_organization?: string;
   team_scenarios?: string[];
   team_tags?: string[];
+}
+
+export interface TeamOutput {
+  team_contextual?: boolean;
+  team_description?: string;
+  team_id: string;
+  team_name: string;
+  /** @uniqueItems true */
+  team_tags?: string[];
+  /** @format date-time */
+  team_updated_at: string;
+  /** @uniqueItems true */
+  team_users?: string[];
+  /** @format int64 */
+  team_users_number?: number;
 }
 
 export interface TeamUpdateInput {

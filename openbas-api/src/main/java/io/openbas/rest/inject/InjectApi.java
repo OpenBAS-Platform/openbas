@@ -21,7 +21,6 @@ import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.AtomicTestingService;
 import io.openbas.service.InjectService;
-import io.openbas.service.InjectTestStatusService;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.AtomicTestingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -152,7 +151,6 @@ public class InjectApi extends RestBehavior {
     }
     return injectRepository.save(inject);
   }
-
 
   @GetMapping("/api/injects/try/{injectId}")
   public Inject tryInject(@PathVariable String injectId) {

@@ -32,10 +32,11 @@ const useRetrieveOptions = () => {
         break;
       case 'asset_tags':
       case 'asset_group_tags':
-      case 'scenario_tags':
       case 'exercise_tags':
       case 'inject_tags':
       case 'payload_tags':
+      case 'scenario_tags':
+      case 'team_tags':
         searchTagByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });

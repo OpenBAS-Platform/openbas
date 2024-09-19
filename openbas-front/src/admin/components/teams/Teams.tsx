@@ -4,11 +4,12 @@ import { PermissionsContext, PermissionsContextType, TeamContext, type TeamConte
 import { useHelper } from '../../../store';
 import type { UserHelper } from '../../../actions/helper';
 import type { TeamStore } from '../../../actions/teams/Team';
-import type { Team, User } from '../../../utils/api-types';
+import type { SearchPaginationInput, Team, TeamOutput, User } from '../../../utils/api-types';
 import type { TeamsHelper } from '../../../actions/teams/team-helper';
 import type { UserStore } from './players/Player';
 import { updateTeamPlayers } from '../../../actions/teams/team-actions';
 import { useAppDispatch } from '../../../utils/hooks';
+import { Page } from '../../../components/common/queryable/Page';
 
 const Teams = () => {
   const dispatch = useAppDispatch();
@@ -35,6 +36,10 @@ const Teams = () => {
       return dispatch(updateTeamPlayers(teamId, {
         team_users: [...(teams.find((t) => t.team_id === teamId)?.team_users?.filter((u) => !userIds.includes(u)) || [])],
       }));
+    },
+    searchTeams(_: SearchPaginationInput): Promise<{ data: Page<TeamOutput> }> {
+      return new Promise<{ data: Page<TeamOutput> }>(() => {
+      });
     },
   };
 

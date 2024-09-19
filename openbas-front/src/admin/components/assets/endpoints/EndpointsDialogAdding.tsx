@@ -12,7 +12,6 @@ import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchEndpoints, searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import SelectList, { SelectListElements } from '../../../../components/common/SelectList';
-import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
@@ -78,33 +77,28 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
     },
     headers: [
       {
-        field: 'icon',
-        value: (endpoint: EndpointStore) => endpoint.asset_name,
-        width: 45,
-      },
-      {
         field: 'asset_name',
         value: (endpoint: EndpointStore) => endpoint.asset_name,
-        width: 45,
+        width: 50,
       },
       {
         field: 'endpoint_platform',
-        value: (endpoint: EndpointStore) => <>
+        value: (endpoint: EndpointStore) => <div style={{ display: 'flex', alignItems: 'center' }}>
           <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
           {endpoint.endpoint_platform}
-        </>,
+        </div>,
         width: 20,
       },
       {
         field: 'asset_tags',
         value: (endpoint: EndpointStore) => <ItemTags variant="reduced-view" tags={endpoint.asset_tags} />,
-        width: 35,
+        width: 30,
       },
     ],
   }), []);
 
   // Pagination
-  const [endpoints, setEndpoints] = useState<ScenarioStore[]>([]);
+  const [endpoints, setEndpoints] = useState<EndpointStore[]>([]);
 
   const availableFilterNames = [
     'asset_tags',
