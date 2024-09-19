@@ -260,7 +260,6 @@ export const areaChartOptions = (
  * @param {boolean} isResult
  * @param {boolean} isFakeData
  * @param {number} max
- * @param {boolean} isChartAPlaceholder
  * @param {string} emptyChartText
  */
 export const verticalBarsChartOptions = (
@@ -275,7 +274,6 @@ export const verticalBarsChartOptions = (
   isResult = false,
   isFakeData = false,
   max = undefined,
-  isChartAPlaceholder = false,
   emptyChartText = '',
 ) => ({
   chart: {
@@ -287,10 +285,10 @@ export const verticalBarsChartOptions = (
     width: '100%',
     height: '100%',
     zoom: {
-      enabled: !isChartAPlaceholder,
+      enabled: !isFakeData,
     },
     animations: {
-      enabled: !isChartAPlaceholder,
+      enabled: !isFakeData,
     },
   },
   theme: {
@@ -304,13 +302,13 @@ export const verticalBarsChartOptions = (
   states: {
     hover: {
       filter: {
-        type: isChartAPlaceholder ? 'none' : 'lighten',
+        type: isFakeData ? 'none' : 'lighten',
         value: 0.05,
       },
     },
     active: {
       filter: {
-        type: isChartAPlaceholder ? 'none' : 'lighten',
+        type: isFakeData ? 'none' : 'lighten',
       },
     },
   },
@@ -328,15 +326,15 @@ export const verticalBarsChartOptions = (
       vertical: 20,
     },
     onItemClick: {
-      toggleDataSeries: !isChartAPlaceholder,
+      toggleDataSeries: !isFakeData,
     },
     onItemHover: {
-      highlightDataSeries: !isChartAPlaceholder,
+      highlightDataSeries: !isFakeData,
     },
   },
   tooltip: {
     theme: theme.palette.mode,
-    enabled: !isChartAPlaceholder,
+    enabled: !isFakeData,
   },
   xaxis: {
     type: isTimeSeries ? 'datetime' : 'category',
@@ -348,7 +346,7 @@ export const verticalBarsChartOptions = (
         fontSize: '12px',
         fontFamily: '"IBM Plex Sans", sans-serif',
       },
-      show: !isChartAPlaceholder,
+      show: !isFakeData,
     },
     axisBorder: {
       show: false,
@@ -383,7 +381,7 @@ export const verticalBarsChartOptions = (
       distributed,
     },
   },
-  ...(isChartAPlaceholder && {
+  ...(isFakeData && {
     subtitle: {
       text: emptyChartText,
       align: 'center',
