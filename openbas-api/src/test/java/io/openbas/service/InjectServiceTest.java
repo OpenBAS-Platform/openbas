@@ -250,10 +250,14 @@ class InjectServiceTest {
             when(userRepository.findById(any())).thenReturn(Optional.of(mockedUser));
             Team team1 = new Team();
             team1.setName("team1");
+            team1.setUsers(List.of(new User()));
             Team team2 = new Team();
             team2.setName("team2");
+            team1.setUsers(List.of(new User()));
             when(teamRepository.findAll()).thenReturn(List.of(team1));
             when(teamRepository.save(any())).thenReturn(team2);
+
+            when(injectRepository.saveAll(any())).thenReturn(List.of(createNewInject(List.of(team1)), new Inject()));
 
             sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
             ImportTestSummary importTestSummary =
@@ -667,5 +671,12 @@ class InjectServiceTest {
 
         return objectMapper
                 .readValue(objectMapper.writeValueAsString(objectToCopy), classToCopy);
+    }
+
+    private Inject createNewInject(List<Team> teams) {
+        Inject inject = new Inject();
+        inject.setTeams(teams);
+        inject.setId(UUID.randomUUID().toString());
+        return inject;
     }
 }
