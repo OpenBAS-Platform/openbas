@@ -533,8 +533,7 @@ class InjectServiceTest {
 
             assertTrue(LocalDateTime.of(2024, Month.JUNE, 26, 0, 0)
                     .toInstant(ZoneOffset.of("Z"))
-                    .equals(mockedScenario.getRecurrenceStart()));
-            assertTrue("0 0 7 * * *".equals(mockedScenario.getRecurrence()));
+                    .equals(mockedExercise.getStart().get()));
         }
     }
 
