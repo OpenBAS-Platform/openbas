@@ -1364,6 +1364,9 @@ const i18n = {
       Childrens: 'Enfants',
       'Interactive view': 'Vue interactive',
       'Execution successful': 'Exécution réussie',
+      'Internal error': 'Erreur interne',
+      'The element has been successfully updated': 'L\'élément a été mis à jour avec succès',
+      'The element has been successfully deleted': 'L\'élément a été supprimé avec succès',
     },
     zh: {
       'Email address': 'email地址',
@@ -1558,7 +1561,6 @@ const i18n = {
       Dark: '深色',
       Light: '浅色',
       'This field is required.': '该字段必填.',
-      'The element has been updated': '元素已被更新.',
       'The element already exists': '元素已存在.',
       'Manage the users of this group': '管理组内用户',
       'Create a new document': '创建新文档',
@@ -2635,6 +2637,9 @@ const i18n = {
       Childrens: '儿童',
       'Interactive view': '交互式视图',
       'Execution successful': '执行成功',
+      'The element has been successfully updated': '元素已成功更新',
+      'The element has been successfully deleted': '元素已成功删除',
+      'Internal error': '内部错误 ',
     },
     en: {
       openbas_email: 'Email',
