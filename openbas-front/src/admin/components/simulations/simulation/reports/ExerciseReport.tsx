@@ -100,7 +100,7 @@ const ExerciseReport: React.FC = () => {
   };
 
   if (!isFeatureEnabled('report')) {
-    return <div>This page is coming soon</div>;
+    return <div>{t('This page is coming soon')}</div>;
   }
 
   if (loading) {
