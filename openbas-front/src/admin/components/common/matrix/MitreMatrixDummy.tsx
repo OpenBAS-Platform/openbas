@@ -19,8 +19,7 @@ const useStyles = makeStyles(() => ({
     display: 'flex',
     gap: 20,
     overflowX: 'auto',
-    '--start-if-can-scroll': 'var(--can-scroll) start',
-    justifyContent: 'var(--start-if-can-scroll, space-evenly)',
+    // test
     animation: 'detect-scroll linear',
     animationTimeline: 'scroll(self inline)',
   },
