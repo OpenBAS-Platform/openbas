@@ -25,6 +25,7 @@ import ReportPopover from '../../../components/reports/ReportPopover';
 import { ReportContextType, ReportContext } from '../../../common/Context';
 import ExerciseReportForm from './ExerciseReportForm';
 import { usePermissions } from '../../../../../utils/Exercise';
+import { isFeatureEnabled } from '../../../../../utils/utils';
 
 const ExerciseReport: React.FC = () => {
   // Standard hooks
@@ -97,6 +98,10 @@ const ExerciseReport: React.FC = () => {
   const displayModule = (moduleType: ReportInformationType) => {
     return report.report_informations?.find((info: ReportInformation) => info.report_informations_type === moduleType)?.report_informations_display;
   };
+
+  if (!isFeatureEnabled('report')) {
+    return <div>This page is coming soon</div>;
+  }
 
   if (loading) {
     return <Loader/>;
