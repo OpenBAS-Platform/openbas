@@ -158,12 +158,12 @@ const ExerciseList: FunctionComponent<Props> = ({
       {exercises.map((exercise: ExerciseStore) => (
         <ListItem
           key={exercise.exercise_id}
-          classes={{ root: classes.item }}
           secondaryAction={secondaryAction && secondaryAction(exercise)}
           disablePadding
           divider
         >
           <ListItemButton
+            classes={{ root: classes.item }}
             href={`/admin/exercises/${exercise.exercise_id}`}
           >
             <ListItemIcon>

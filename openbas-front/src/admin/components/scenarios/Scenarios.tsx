@@ -33,6 +33,9 @@ const useStyles = makeStyles(() => ({
   itemHead: {
     textTransform: 'uppercase',
   },
+  item: {
+    height: 50,
+  },
   bodyItems: {
     display: 'flex',
   },
@@ -242,6 +245,7 @@ const Scenarios = () => {
             >
               <ListItemButton
                 href={`/admin/scenarios/${scenario.scenario_id}`}
+                classes={{ root: classes.item }}
               >
                 <ListItemIcon>
                   <MovieFilterOutlined color="primary" />
