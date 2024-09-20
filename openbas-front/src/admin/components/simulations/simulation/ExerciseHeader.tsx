@@ -4,7 +4,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Toolti
 import { CancelOutlined, PauseOutlined, PlayArrowOutlined, RestartAltOutlined } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { updateExerciseStatus } from '../../../../actions/Exercise';
-import ExercisePopover from './ExercisePopover';
+import ExercisePopover, { ExerciseActionPopover } from './ExercisePopover';
 import { useHelper } from '../../../../store';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
@@ -16,6 +16,7 @@ import type { ExercisesHelper } from '../../../../actions/exercises/exercise-hel
 import type { Exercise as ExerciseType } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
 import type { Theme } from '../../../../components/Theme';
+import { isFeatureEnabled } from '../../../../utils/utils';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -200,6 +201,11 @@ const ExerciseHeader = () => {
     };
   });
 
+  const actions: ExerciseActionPopover[] = ['Update', 'Duplicate', 'Export', 'Delete'];
+  if (isFeatureEnabled('report')) {
+    actions.push('Access reports');
+  }
+
   return (
     <>
       <Tooltip title={exercise.exercise_name}>
@@ -213,7 +219,7 @@ const ExerciseHeader = () => {
         <Buttons exerciseId={exercise.exercise_id} exerciseStatus={exercise.exercise_status} exerciseName={exercise.exercise_name} />
         <ExercisePopover
           exercise={exercise}
-          actions={['Update', 'Duplicate', 'Export', 'Delete']}
+          actions={actions}
           onDelete={() => navigate('/admin/exercises')}
         />
       </div>

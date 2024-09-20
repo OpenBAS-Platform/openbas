@@ -66,12 +66,7 @@ class ExportButtons extends Component {
     setTimeout(() => {
       const container = document.getElementById(domElementId);
       const { offsetWidth, offsetHeight } = container;
-      container.setAttribute('style', 'padding: 30px 30px 50px 30px');
       if (theme === currentTheme.palette.mode && this.adjust) {
-        container.setAttribute(
-          'style',
-          'width:3840px; height:2160px; padding: 30px 30px 50px 30px',
-        );
         this.adjust(true);
       }
       setTimeout(() => {
@@ -102,7 +97,6 @@ class ExportButtons extends Component {
               },
             });
           }
-          container.setAttribute('style', '');
           return this.setState({ exporting: false });
         });
       }, timeout / 2);
@@ -119,8 +113,6 @@ class ExportButtons extends Component {
 
   exportPdf(domElementId, name, theme, background) {
     this.setState({ exporting: true });
-    const container = document.getElementById(domElementId);
-    container.setAttribute('style', 'padding:30px 30px 50px 30px');
     this.handleClosePdf();
     const { theme: currentTheme, pixelRatio = 1 } = this.props;
     let timeout = 4000;
@@ -164,7 +156,6 @@ class ExportButtons extends Component {
             },
           });
         }
-        container.setAttribute('style', '');
         return this.setState({ exporting: false });
       });
     }, timeout);
@@ -172,9 +163,9 @@ class ExportButtons extends Component {
 
   render() {
     const { anchorElImage, anchorElPdf, exporting } = this.state;
-    const { classes, t, domElementId, name, csvData, csvFileName } = this.props;
+    const { classes, t, domElementId, name, csvData, csvFileName, style = {} } = this.props;
     return (
-      <div className={classes.exportButtons}>
+      <div className={classes.exportButtons} style={style}>
         <ToggleButtonGroup size="small" color="secondary" exclusive={true}>
           <Tooltip title={t('Export to image')}>
             <ToggleButton onClick={this.handleOpenImage.bind(this)}>

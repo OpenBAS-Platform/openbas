@@ -2687,50 +2687,46 @@ export interface RenewTokenInput {
 }
 
 export interface Report {
-  listened?: boolean;
   /** @format date-time */
-  report_created_at?: string;
-  report_description?: string;
+  report_created_at: string;
   report_exercise?: Exercise;
-  report_general_information?: boolean;
-  report_id?: string;
-  report_lessons_details?: boolean;
-  report_lessons_objectives?: boolean;
-  report_lessons_stats?: boolean;
-  report_name?: string;
-  report_stats_data?: boolean;
-  report_stats_definition?: boolean;
-  report_stats_definition_score?: boolean;
-  report_stats_results?: boolean;
+  report_global_observation?: string;
+  report_id: string;
+  report_informations?: ReportInformation[];
+  report_name: string;
   /** @format date-time */
-  report_updated_at?: string;
+  report_updated_at: string;
   updateAttributes?: object;
 }
 
-export interface ReportCreateInput {
-  report_description?: string;
-  report_general_information?: boolean;
-  report_lessons_details?: boolean;
-  report_lessons_objectives?: boolean;
-  report_lessons_stats?: boolean;
-  report_name: string;
-  report_stats_data?: boolean;
-  report_stats_definition?: boolean;
-  report_stats_definition_score?: boolean;
-  report_stats_results?: boolean;
+export interface ReportInformation {
+  id: string;
+  report: Report;
+  report_informations_display?: boolean;
+  report_informations_type:
+    | "MAIN_INFORMATION"
+    | "SCORE_DETAILS"
+    | "INJECT_RESULT"
+    | "GLOBAL_OBSERVATION"
+    | "PLAYER_SURVEYS"
+    | "EXERCISE_DETAILS";
+  updateAttributes?: object;
 }
 
-export interface ReportUpdateInput {
-  report_description?: string;
-  report_general_information?: boolean;
-  report_lessons_details?: boolean;
-  report_lessons_objectives?: boolean;
-  report_lessons_stats?: boolean;
+export interface ReportInformationInput {
+  report_informations_display: boolean;
+  report_informations_type:
+    | "MAIN_INFORMATION"
+    | "SCORE_DETAILS"
+    | "INJECT_RESULT"
+    | "GLOBAL_OBSERVATION"
+    | "PLAYER_SURVEYS"
+    | "EXERCISE_DETAILS";
+}
+
+export interface ReportInput {
+  report_informations?: ReportInformationInput[];
   report_name: string;
-  report_stats_data?: boolean;
-  report_stats_definition?: boolean;
-  report_stats_definition_score?: boolean;
-  report_stats_results?: boolean;
 }
 
 export interface ResetUserInput {

@@ -370,6 +370,7 @@ const Lessons: React.FC<Props> = ({
         teamsMap={teamsMap}
         teams={teams}
         isReport={false}
+        style={{ marginTop: '60px' }}
       />
       <CreateLessonsCategory/>
       <Dialog

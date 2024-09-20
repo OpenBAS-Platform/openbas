@@ -1,5 +1,5 @@
 import { Drawer as DrawerMUI, IconButton, type PaperProps, Typography } from '@mui/material';
-import React, { FunctionComponent } from 'react';
+import React, { CSSProperties, FunctionComponent } from 'react';
 import { Close } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import type { Theme } from '../Theme';
@@ -39,9 +39,6 @@ const useStyles = makeStyles<Theme>((theme: Theme) => ({
     display: 'inline-flex',
     alignItems: 'center',
   },
-  container: {
-    padding: '10px 20px 20px 20px',
-  },
 }));
 
 interface DrawerProps {
@@ -55,6 +52,7 @@ interface DrawerProps {
   variant?: 'full' | 'half';
   PaperProps?: PaperProps
   disableEnforceFocus?: boolean
+  containerStyle?: CSSProperties
 }
 
 const Drawer: FunctionComponent<DrawerProps> = ({
@@ -65,6 +63,7 @@ const Drawer: FunctionComponent<DrawerProps> = ({
   variant = 'half',
   PaperProps = undefined,
   disableEnforceFocus = false,
+  containerStyle = {},
 }) => {
   const classes = useStyles({ variant });
   let component;
@@ -99,7 +98,7 @@ const Drawer: FunctionComponent<DrawerProps> = ({
         </IconButton>
         <Typography variant="subtitle2">{title}</Typography>
       </div>
-      <div className={classes.container}>{component}</div>
+      <div style={{ padding: '10px 20px 20px 20px', ...containerStyle }}>{component}</div>
     </DrawerMUI>
   );
 };

@@ -32,8 +32,9 @@ import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { useHelper } from '../../../../store';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
+import ExerciseReports from './reports/ExerciseReports';
 
-export type ExerciseActionPopover = 'Duplicate' | 'Update' | 'Delete' | 'Export';
+export type ExerciseActionPopover = 'Duplicate' | 'Update' | 'Delete' | 'Export' | 'Access reports';
 
 interface ExercisePopoverProps {
   exercise: ExerciseStore;
@@ -122,6 +123,11 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const handleOpenExport = () => setOpenExport(true);
   const handleCloseExport = () => setOpenExport(false);
 
+  // Reports
+  const [openReports, setOpenReports] = useState(false);
+  const handleOpenReports = () => setOpenReports(true);
+  const handleCloseReports = () => setOpenReports(false);
+
   // Tab
   const [currentTab, setCurrentTab] = useState(0);
 
@@ -167,6 +173,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   if (actions.includes('Update')) entries.push({ label: 'Update', action: () => handleOpenEdit(), disabled: !permissions.canWriteBypassStatus });
   if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete(), disabled: !userAdmin });
   if (actions.includes('Export')) entries.push({ label: 'Export', action: () => handleOpenExport() });
+  if (actions.includes('Access reports')) entries.push({ label: 'Access reports', action: () => handleOpenReports() });
 
   return (
     <>
@@ -198,6 +205,14 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
             />
           )}
         </>
+      </Drawer>
+      <Drawer
+        open={openReports}
+        containerStyle={{ padding: '0px' }}
+        handleClose={handleCloseReports}
+        title={t('Reports')}
+      >
+        <ExerciseReports exerciseId={exercise.exercise_id} exerciseName={exercise.exercise_name} />
       </Drawer>
       <DialogDelete
         open={openDelete}

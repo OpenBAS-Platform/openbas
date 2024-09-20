@@ -1,5 +1,5 @@
 import { Grid, Paper, Typography } from '@mui/material';
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { useFormatter } from '../../../../../components/i18n';
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
@@ -13,7 +13,7 @@ import ExerciseDistributionScoreByTeam from './ExerciseDistributionScoreByTeam';
 import ExerciseDistributionScoreByTeamInPercentage from './ExerciseDistributionScoreByTeamInPercentage';
 import ExerciseDistributionScoreOverTimeByTeamInPercentage from './ExerciseDistributionScoreOverTimeByTeamInPercentage';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
+import { fetchExercise, fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import { useHelper } from '../../../../../store';
@@ -22,6 +22,7 @@ import arrowDark from '../../../../../static/images/misc/arrow_dark.png';
 import arrowLight from '../../../../../static/images/misc/arrow_light.png';
 import type { Theme } from '../../../../../components/Theme';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
+import Loader from '../../../../../components/Loader';
 
 const useStyles = makeStyles(() => ({
   paperChart: {
@@ -34,28 +35,44 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
+  isReport?: boolean,
 }
 
 const ExerciseDistribution: FunctionComponent<Props> = ({
   exerciseId,
+  isReport = false,
 }) => {
   // Standard hooks
   const theme = useTheme<Theme>();
   const { t } = useFormatter();
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const [loading, setLoading] = useState(true);
 
   useDataLoader(() => {
-    dispatch(fetchExerciseInjectExpectations(exerciseId));
-    dispatch(fetchExerciseInjects(exerciseId));
-    dispatch(fetchExerciseTeams(exerciseId));
+    setLoading(true);
+    const fetchPromises = [
+      dispatch(fetchExercise(exerciseId)).finally(() => setLoading(false)),
+      dispatch(fetchExerciseInjectExpectations(exerciseId)),
+      dispatch(fetchExerciseInjects(exerciseId)),
+      dispatch(fetchExerciseTeams(exerciseId)),
+    ];
+    Promise.all(fetchPromises)
+      .finally(() => {
+        setLoading(false);
+      });
   });
 
   const { injectExpectations, exercise } = useHelper((helper: InjectHelper & ExercisesHelper) => ({
     exercise: helper.getExercise(exerciseId),
     injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
   }));
-  if (exercise.exercise_status === 'SCHEDULED' && injectExpectations?.length === 0) {
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (exercise.exercise_status === 'SCHEDULED' && injectExpectations?.length === 0 && !isReport) {
     return (
       <div style={{ marginTop: 100, textAlign: 'center' }}>
         <div style={{ fontSize: 20 }}>
