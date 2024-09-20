@@ -202,7 +202,7 @@ const ExerciseHeader = () => {
   });
 
   const actions: ExerciseActionPopover[] = ['Update', 'Duplicate', 'Export', 'Delete'];
-  if (isFeatureEnabled('dd')) {
+  if (isFeatureEnabled('report')) {
     actions.push('Access reports');
   }
 
