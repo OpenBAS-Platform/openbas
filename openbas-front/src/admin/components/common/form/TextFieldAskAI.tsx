@@ -18,9 +18,9 @@ import {
 } from '@mui/material';
 import EETooltip from '../entreprise_edition/EETooltip';
 import { useFormatter } from '../../../../components/i18n';
-// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import-x/no-cycle
 import ResponseDialog from '../../../../utils/ai/ResponseDialog';
-// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import-x/no-cycle
 import SimpleRichTextField from '../../../../components/fields/SimpleRichTextField';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
 import useAI from '../../../../utils/hooks/useAI';
