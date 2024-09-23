@@ -30,6 +30,10 @@ const momentMap = {
   zh: 'zh-cn',
 };
 
+// Export LANG to be used in non-React code
+// eslint-disable-next-line import/no-mutable-exports
+export let LANG = DEFAULT_LANG;
+
 const AppIntlProvider = (props) => {
   const { children } = props;
   const { platformName, lang } = useHelper((helper) => {
@@ -42,6 +46,7 @@ const AppIntlProvider = (props) => {
     const userLang = rawUserLang !== 'auto' ? rawUserLang : platformLang;
     return { platformName: name, lang: userLang };
   });
+  LANG = lang;
   const baseMessages = i18n.messages[lang] || i18n.messages[DEFAULT_LANG];
   const momentLocale = momentMap[lang];
   moment.locale(momentLocale);
