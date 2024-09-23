@@ -14,6 +14,9 @@ import PaginationComponentV2 from '../../../../components/common/queryable/pagin
 import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import { TeamContext } from '../../common/Context';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { fetchTags } from '../../../../actions/Tag';
+import { useAppDispatch } from '../../../../utils/hooks';
 
 const useStyles = makeStyles(() => ({
   createButton: {
@@ -34,7 +37,13 @@ const AddTeams: React.FC<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();
+  const dispatch = useAppDispatch();
   const { searchTeams } = useContext(TeamContext);
+
+  // Fetch datas
+  useDataLoader(() => {
+    dispatch(fetchTags());
+  });
 
   const [teams, setTeams] = useState<TeamOutput[]>([]);
   const [teamValues, setTeamValues] = useState<TeamOutput[]>([]);

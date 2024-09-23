@@ -6,10 +6,7 @@ import { Chip, Slide, Tooltip } from '@mui/material';
 import { hexToRGB } from '../utils/Colors';
 import { useFormatter } from './i18n';
 import { useHelper } from '../store';
-import { getLabelOfRemainingItems, getRemainingItemsCount, truncate, getVisibleItems } from '../utils/String';
-import useDataLoader from '../utils/hooks/useDataLoader';
-import { fetchTags } from '../actions/Tag';
-import { useAppDispatch } from '../utils/hooks';
+import { getLabelOfRemainingItems, getRemainingItemsCount, getVisibleItems, truncate } from '../utils/String';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -39,7 +36,6 @@ const useStyles = makeStyles(() => ({
 const ItemTags = (props) => {
   const { tags, variant, limit = 2 } = props;
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
   const theme = useTheme();
   const classes = useStyles();
   let style = classes.tag;
@@ -55,9 +51,6 @@ const ItemTags = (props) => {
   const resolvedTags = useHelper((helper) => {
     const allTags = helper.getTags() ?? [];
     return allTags.filter((tag) => (tags ?? []).includes(tag.tag_id));
-  });
-  useDataLoader(() => {
-    dispatch(fetchTags());
   });
   const orderedTags = R.sortWith([R.ascend(R.prop('tag_name'))], resolvedTags);
 
