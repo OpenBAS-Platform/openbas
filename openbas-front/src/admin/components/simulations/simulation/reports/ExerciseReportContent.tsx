@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Paper, Typography } from '@mui/material';
-import { Exercise, ExpectationResultsByType, InjectResultDTO, Report, ReportInformation } from '../../../../../utils/api-types';
+import type { Exercise, ExpectationResultsByType, InjectResultDTO, Report, ReportInformation } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useFormatter } from '../../../../../components/i18n';
 import ReportInformationType from './ReportInformationType';
