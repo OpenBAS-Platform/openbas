@@ -19,7 +19,7 @@ const IndexPrivate = lazy(() => import('./private/Index'));
 const IndexAdmin = lazy(() => import('./admin/Index'));
 const Comcheck = lazy(() => import('./public/components/comcheck/Comcheck'));
 const Channel = lazy(() => import('./public/components/channels/Channel'));
-const ExerciseReport = lazy(() => import('./admin/components/simulations/simulation/reports/ExerciseReport'));
+const ExerciseReport = lazy(() => import('./admin/components/simulations/simulation/reports/ExerciseReportPage'));
 const Challenges = lazy(() => import('./public/components/challenges/Challenges'));
 const ExerciseViewLessons = lazy(() => import('./public/components/lessons/ExerciseViewLessons'));
 const ScenarioViewLessons = lazy(() => import('./public/components/lessons/ScenarioViewLessons'));

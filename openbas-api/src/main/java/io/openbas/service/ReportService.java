@@ -1,10 +1,13 @@
 package io.openbas.service;
 
+import io.openbas.database.model.Inject;
 import io.openbas.database.model.Report;
 import io.openbas.database.model.ReportInformation;
+import io.openbas.database.model.ReportInjectComment;
 import io.openbas.database.repository.ReportRepository;
 import io.openbas.database.specification.ReportSpecification;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.report.form.ReportInjectCommentInput;
 import io.openbas.rest.report.form.ReportInput;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -48,6 +51,24 @@ public class ReportService {
             }
         });
         return this.reportRepository.save(report);
+    }
+
+    public List<ReportInjectComment> updateReportInjectComment(@NotNull final Report report, @NotNull final Inject inject, @NotNull final ReportInjectCommentInput input){
+        ReportInjectComment reportInjectComment = report.getReportInjectsComments().stream()
+                .filter(c -> c.getInject().getId().equals(input.getInjectId()))
+                .findFirst()
+                .orElse(null);
+        if (reportInjectComment != null) {
+            reportInjectComment.setComment(input.getComment());
+        } else {
+            reportInjectComment = new ReportInjectComment();
+            reportInjectComment.setInject(inject);
+            reportInjectComment.setReport(report);
+            reportInjectComment.setComment(input.getComment());
+            report.getReportInjectsComments().add(reportInjectComment);
+        }
+        this.reportRepository.save(report);
+        return report.getReportInjectsComments();
     }
 
     public void deleteReport(@NotBlank final UUID reportId) {

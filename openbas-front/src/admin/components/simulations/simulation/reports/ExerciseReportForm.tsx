@@ -21,6 +21,7 @@ interface ExerciseReportFormInput {
   report_name: string;
   report_main_information: boolean;
   report_score_details: boolean;
+  report_inject_result: boolean;
   report_player_surveys: boolean;
   report_exercise_details: boolean;
 }
@@ -42,6 +43,7 @@ const ExerciseReportForm: React.FC<Props> = ({
     report_name: initialValues?.report_name || '',
     report_main_information: findReportInfo(ReportInformationType.MAIN_INFORMATION),
     report_score_details: findReportInfo(ReportInformationType.SCORE_DETAILS),
+    report_inject_result: findReportInfo(ReportInformationType.INJECT_RESULT),
     report_player_surveys: findReportInfo(ReportInformationType.PLAYER_SURVEYS),
     report_exercise_details: findReportInfo(ReportInformationType.EXERCISE_DETAILS),
   };
@@ -57,6 +59,7 @@ const ExerciseReportForm: React.FC<Props> = ({
         report_name: z.string().min(1, { message: t('Should not be empty') }),
         report_main_information: z.boolean(),
         report_score_details: z.boolean(),
+        report_inject_result: z.boolean(),
         report_player_surveys: z.boolean(),
         report_exercise_details: z.boolean(),
       }),
@@ -73,6 +76,10 @@ const ExerciseReportForm: React.FC<Props> = ({
       {
         report_informations_type: ReportInformationType.SCORE_DETAILS,
         report_informations_display: data.report_score_details,
+      },
+      {
+        report_informations_type: ReportInformationType.INJECT_RESULT,
+        report_informations_display: data.report_inject_result,
       },
       {
         report_informations_type: ReportInformationType.PLAYER_SURVEYS,
@@ -125,6 +132,15 @@ const ExerciseReportForm: React.FC<Props> = ({
           />
         }
         label={t('Score details')}
+      />
+      <FormControlLabel
+        control={
+          <Checkbox
+            {...register('report_inject_result')}
+            defaultChecked={initialFormValues?.report_inject_result}
+          />
+        }
+        label={t('Injects results')}
       />
       <FormControlLabel
         control={

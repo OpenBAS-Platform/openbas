@@ -18,7 +18,7 @@ const ERROR_30S_DELAY = 30000;
 let sseClient;
 let lastPingDate = new Date().getTime();
 const listeners = new Map();
-const useDataLoader = (loader = () => {}) => {
+const useDataLoader = (loader = () => {}, refetchArg = []) => {
   const sseConnect = () => {
     sseClient = new EventSource(buildUri('/api/stream'), { withCredentials: true });
     const autoReConnect = setInterval(() => {
@@ -95,7 +95,7 @@ const useDataLoader = (loader = () => {}) => {
         sseClient = undefined;
       }
     };
-  }, []);
+  }, refetchArg);
 };
 
 export default useDataLoader;

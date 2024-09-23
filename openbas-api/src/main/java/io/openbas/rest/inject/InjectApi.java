@@ -210,6 +210,21 @@ public class InjectApi extends RestBehavior {
     ));
   }
 
+  @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/resultdto")
+  @PreAuthorize("isExerciseObserver(#exerciseId)")
+  @Transactional(readOnly = true)
+  public List<InjectResultDTO> exerciseInjectsWithExpectations(@PathVariable final String exerciseId) {
+    return this.injectRepository.findAll(InjectSpecification.fromExercise(exerciseId)).stream()
+            .map(inject -> AtomicTestingMapper.toDto(
+                    inject, getTargets(
+                            inject.getTeams(),
+                            inject.getAssets(),
+                            inject.getAssetGroups()
+                    )
+            ))
+            .collect(Collectors.toList());
+  }
+
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Inject exerciseInject(@PathVariable String exerciseId, @PathVariable String injectId) {

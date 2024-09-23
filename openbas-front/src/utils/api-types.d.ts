@@ -2651,6 +2651,7 @@ export interface Report {
   report_global_observation?: string;
   report_id: string;
   report_informations?: ReportInformation[];
+  report_injects_comments?: ReportInjectComment[];
   report_name: string;
   /** @format date-time */
   report_updated_at: string;
@@ -2679,6 +2680,17 @@ export interface ReportInformationInput {
     | "GLOBAL_OBSERVATION"
     | "PLAYER_SURVEYS"
     | "EXERCISE_DETAILS";
+}
+
+export interface ReportInjectComment {
+  inject_id?: string;
+  report_id?: string;
+  report_inject_comment?: string;
+}
+
+export interface ReportInjectCommentInput {
+  inject_id: string;
+  report_inject_comment: string;
 }
 
 export interface ReportInput {

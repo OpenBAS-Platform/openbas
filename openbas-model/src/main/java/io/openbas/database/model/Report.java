@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import io.openbas.helper.MultiModelDeserializer;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -64,10 +65,10 @@ public class Report implements Base {
     @JsonSerialize(using = MonoIdDeserializer.class)
     private Exercise exercise;
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonProperty("report_injects_comments")
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    private List<ReportInjectComment> reportInjectsComments = new ArrayList<>();
 
     @Override
     public String getId() {

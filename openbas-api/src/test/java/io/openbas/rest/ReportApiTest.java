@@ -6,7 +6,9 @@ import io.openbas.database.model.*;
 import io.openbas.rest.exercise.ExerciseService;
 import io.openbas.rest.mapper.MapperApi;
 import io.openbas.rest.report.ReportApi;
+import io.openbas.rest.report.form.ReportInjectCommentInput;
 import io.openbas.rest.report.form.ReportInput;
+import io.openbas.service.InjectService;
 import io.openbas.service.ReportService;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
@@ -21,6 +23,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,6 +47,8 @@ public class ReportApiTest {
     private ReportService reportService;
     @Mock
     private ExerciseService exerciseService;
+    @Mock
+    private InjectService injectService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -54,7 +59,7 @@ public class ReportApiTest {
 
     @BeforeEach
     void before() throws IllegalAccessException, NoSuchFieldException {
-        ReportApi reportApi = new ReportApi(exerciseService, reportService);
+        ReportApi reportApi = new ReportApi(exerciseService, reportService, injectService);
         Field sessionContextField = MapperApi.class.getSuperclass().getDeclaredField("mapper");
         sessionContextField.setAccessible(true);
         sessionContextField.set(reportApi, objectMapper);
@@ -147,6 +152,42 @@ public class ReportApiTest {
             verify(reportService).updateReport(report, reportInput);
             assertNotNull(response);
             assertEquals(JsonPath.read(response, "$.report_id"), report.getId());
+        }
+
+        @DisplayName("Update report inject comment")
+        @Test
+        void updateReportInjectCommentTest() throws Exception {
+            // -- PREPARE --
+            Inject inject = new Inject();
+            inject.setTitle("Test inject");
+            inject.setId(UUID.randomUUID().toString());
+            inject.setExercise(exercise);
+            report.setExercise(exercise);
+            ReportInjectCommentInput injectCommentInput = new ReportInjectCommentInput();
+            injectCommentInput.setInjectId(inject.getId());
+            injectCommentInput.setComment("Comment test");
+
+            when(reportService.report(any())).thenReturn(report);
+            when(injectService.inject(any())).thenReturn(inject);
+            when(reportService.updateReportInjectComment(any(Report.class), any(Inject.class), any(ReportInjectCommentInput.class)))
+                    .thenReturn(null);
+
+            // -- EXECUTE --
+            String response = mvc
+                    .perform(MockMvcRequestBuilders.put("/api/exercises/"+ exercise.getId() +"/reports/"+ report.getId()+"/inject-comments")
+                            .content(asJsonString(injectCommentInput))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().is2xxSuccessful())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            // -- ASSERT --
+            verify(reportService).report(UUID.fromString(report.getId()));
+            verify(injectService).inject(inject.getId());
+            verify(reportService).updateReportInjectComment(report, inject, injectCommentInput);
+            assertNotNull(response);
         }
 
         @DisplayName("Delete Report")
