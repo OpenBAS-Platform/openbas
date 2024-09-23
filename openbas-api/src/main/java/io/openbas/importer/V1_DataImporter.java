@@ -3,6 +3,7 @@ package io.openbas.importer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
+import io.openbas.database.model.Scenario.SEVERITY;
 import io.openbas.database.repository.*;
 import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.injectors.channel.model.ChannelContent;
@@ -284,26 +285,18 @@ public class V1_DataImporter implements Importer {
     scenario.setSubtitle(scenarioNode.get("scenario_subtitle").textValue());
     scenario.setCategory(scenarioNode.get("scenario_category").textValue());
     scenario.setMainFocus(scenarioNode.get("scenario_main_focus").textValue());
-    if (scenarioNode.get("scenario_severity") != null) {
-      String severity = scenarioNode.get("scenario_severity").textValue();
-      scenario.setSeverity(Scenario.SEVERITY.valueOf(severity));
-    }
-    if (scenarioNode.get("scenario_recurrence") != null) {
-      scenario.setRecurrence(scenarioNode.get("scenario_recurrence").textValue());
-    }
-    if (scenarioNode.get("scenario_recurrence_start") != null) {
-      scenario.setRecurrence(scenarioNode.get("scenario_recurrence").textValue());
-      String recurrenceStart = scenarioNode.get("scenario_recurrence_start").textValue();
-      if (hasText(recurrenceStart)) {
-        scenario.setRecurrenceStart(Instant.parse(recurrenceStart));
-      }
-    }
-    if (scenarioNode.get("scenario_recurrence_end") != null) {
-      String recurrenceEnd = scenarioNode.get("scenario_recurrence_end").textValue();
-      if (hasText(recurrenceEnd)) {
-        scenario.setRecurrenceEnd(Instant.parse(recurrenceEnd));
-      }
-    }
+    Optional.ofNullable(scenarioNode.get("scenario_severity"))
+        .map(JsonNode::textValue)
+        .ifPresent(severity -> scenario.setSeverity(SEVERITY.valueOf(severity)));
+    Optional.ofNullable(scenarioNode.get("scenario_recurrence"))
+        .map(JsonNode::textValue)
+        .ifPresent(scenario::setRecurrence);
+    Optional.ofNullable(scenarioNode.get("scenario_recurrence_start"))
+        .map(JsonNode::textValue)
+        .ifPresent(recurrenceStart -> scenario.setRecurrenceStart(Instant.parse(recurrenceStart)));
+    Optional.ofNullable(scenarioNode.get("scenario_recurrence_end"))
+        .map(JsonNode::textValue)
+        .ifPresent(recurrenceEnd -> scenario.setRecurrenceEnd(Instant.parse(recurrenceEnd)));
     scenario.setHeader(scenarioNode.get("scenario_message_header").textValue());
     scenario.setFooter(scenarioNode.get("scenario_message_footer").textValue());
     scenario.setFrom(scenarioNode.get("scenario_mail_from").textValue());
