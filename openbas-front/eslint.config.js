@@ -4,18 +4,17 @@ import stylistic from '@stylistic/eslint-plugin';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 import js from '@eslint/js';
-// import tsParser from '@typescript-eslint/parser';
+import eslintPluginImportX from 'eslint-plugin-import-x'
 import reactRecommended from 'eslint-plugin-react/configs/recommended.js';
-import customRules from 'eslint-plugin-custom-rules';
-import importNewlines from 'eslint-plugin-custom-rules';
+import customRules from './packages/eslint-plugin-custom-rules/lib/index.js';
+import importNewlines from 'eslint-plugin-import-newlines';
 
-// import eslint-plugin-react-hooks & @typescript-eslint/eslint-plugin to not let tools report them as unused
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import eslintPluginReactHooks from 'eslint-plugin-react-hooks';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import tsEslintEslintPlugin from '@typescript-eslint/eslint-plugin';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import is18nextEslintPlugin from 'eslint-plugin-i18next';
+// imports to not let tools report them as unused
+import 'eslint-plugin-react-hooks';
+import '@typescript-eslint/eslint-plugin';
+import 'eslint-plugin-i18next';
+import 'eslint-import-resolver-oxc';
+import '@typescript-eslint/parser';
 
 import { FlatCompat } from '@eslint/eslintrc';
 
@@ -43,24 +42,34 @@ export default [
     },
   },
 
+  // rules recommended by eslint-plugin-import-x
+  {
+    ...eslintPluginImportX.flatConfigs.recommended,
+    ...eslintPluginImportX.flatConfigs.typescript,
+    "settings": {
+      "import-x/resolver": "oxc"
+    }
+  },
+
   // rules recommended by @stylistic/eslint-plugin
   stylistic.configs.customize({
     semi: true,
   }),
 
-  // rules recommended by @typescript-eslint/eslint-plugin
+  // rules recommended by @typescript-eslint/eslint-plugin  ---  typescript-eslint to avoid compat mode
   ...compat.extends('plugin:@typescript-eslint/recommended'),
 
   // rules recommended by eslint-plugin-react-hooks
-  ...compat.extends('plugin:react-hooks/recommended'),
+  // ...compat.extends('plugin:react-hooks/recommended'), WAIT FOR https://github.com/facebook/react/issues/28313
 
   // rules recommended by eslint-plugin-i18next
   ...compat.extends('plugin:i18next/recommended'),
 
-  // eslint-plugin-custom-rules config
   {
     plugins: {
+      // eslint-plugin-custom-rules config
       'custom-rules': customRules,
+      // eslint-plugin-import-newlines config
       'import-newlines': importNewlines,
     },
     rules: {
@@ -116,14 +125,29 @@ export default [
       'import-newlines/enforce': ['error', {items: 20, 'max-len': 180}],
 
       // @stylistic rules
-      '@stylistic/arrow-parens': 'off',
-      '@stylistic/quote-props': ['error', 'as-needed'],
-      '@stylistic/brace-style': ['error', '1tbs'],
+      // '@stylistic/arrow-parens': 'off',
+      // '@stylistic/quote-props': ['error', 'as-needed'],
+      // '@stylistic/brace-style': ['error', '1tbs'],
+
+      'import-x/no-cycle': 'error',
     },
   },
 
   // ignores patterns
   {
-    ignores: ['src/static/ext', 'packages', 'builder/prod/build', 'builder/dev/build', 'playwright-report'],
+    ignores: [
+      'node_modules',
+      'coverage',
+      'packages',
+      'public',
+      'src/static/ext',
+      'builder/prod/build',
+      'builder/dev/build',
+      '__generated__',
+      'test-results',
+      'playwright-report',
+      'blob-report',
+      'playwright/.cache',
+    ],
   },
 ];
