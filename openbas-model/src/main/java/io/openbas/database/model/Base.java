@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Transient;
 import org.springframework.beans.BeanUtils;
 
@@ -16,11 +17,13 @@ public interface Base {
         return this.isUserHasAccess(user.isAdmin());
     }
 
+    @JsonIgnore
     @Transient
     default void setUpdateAttributes(Object input) {
         BeanUtils.copyProperties(input, this);
     }
 
+    @JsonIgnore
     default boolean isListened() {
         return true;
     }
