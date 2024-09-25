@@ -6,19 +6,23 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
-public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpecificationExecutor<Inject>,
+public interface InjectRepository extends
+    JpaRepository<Inject, String>, JpaSpecificationExecutor<Inject>,
     StatisticRepository {
 
   @NotNull
@@ -149,4 +153,26 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
           "GROUP BY org.organization_id",
       nativeQuery = true)
   List<RawInject> rawAll();
+
+  // -- TEAM --
+
+  @Modifying
+  @Query(
+      value = "DELETE FROM injects_teams it "
+          + "WHERE it.team_id IN :teamIds "
+          + "AND EXISTS (SELECT 1 FROM injects i WHERE it.inject_id = i.inject_id AND i.inject_exercise = :exerciseId)",
+      nativeQuery = true
+  )
+  @Transactional
+  void removeTeamsForExercise(@Param("exerciseId") final String exerciseId, @Param("teamIds") final List<String> teamIds);
+
+  @Modifying
+  @Query(
+      value = "DELETE FROM injects_teams it "
+          + "WHERE it.team_id IN :teamIds "
+          + "AND EXISTS (SELECT 1 FROM injects i WHERE it.inject_id = i.inject_id AND i.inject_scenario = :scenarioId)",
+      nativeQuery = true
+  )
+  @Transactional
+  void removeTeamsForScenario(@Param("scenarioId") final String scenarioId, @Param("teamIds") final List<String> teamIds);
 }

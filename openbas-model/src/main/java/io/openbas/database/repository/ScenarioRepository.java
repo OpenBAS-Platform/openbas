@@ -7,18 +7,17 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
 
 @Repository
-public interface ScenarioRepository extends CrudRepository<Scenario, String>,
+public interface ScenarioRepository extends
+    JpaRepository<Scenario, String>,
     StatisticRepository,
     JpaSpecificationExecutor<Scenario> {
 
@@ -103,5 +102,15 @@ public interface ScenarioRepository extends CrudRepository<Scenario, String>,
   @NotNull
   @EntityGraph(value = "Scenario.tags-injects", type = EntityGraph.EntityGraphType.LOAD)
   Page<Scenario> findAll(@NotNull Specification<Scenario> spec, @NotNull Pageable pageable);
+
+  // -- TEAM --
+
+  @Modifying
+  @Query(
+      value = "DELETE FROM scenarios_teams st WHERE st.scenario_id = :scenarioId AND st.team_id in :teamIds",
+      nativeQuery = true
+  )
+  @Transactional
+  void removeTeams(@Param("scenarioId") final String scenarioId, @Param("teamIds") final List<String> teamIds);
 
 }

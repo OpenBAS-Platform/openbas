@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,7 @@ public interface ExerciseTeamUserRepository extends CrudRepository<ExerciseTeamU
 
     @Modifying
     @Query(value = "delete from exercises_teams_users i where i.team_id = :teamId", nativeQuery = true)
+    @Transactional
     void deleteTeamFromAllReferences(@Param("teamId") String teamId);
 
     @Modifying
