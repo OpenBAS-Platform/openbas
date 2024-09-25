@@ -186,7 +186,7 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
                     <Chip
                       key={teamId}
                       onDelete={() => {
-                        setTeamIds(teamIds.filter((id) => id !== teamId));
+                        setTeamIds((prevIds) => prevIds.filter((id) => id !== teamId));
                       }}
                       label={truncate(team.team_name, 22)}
                       avatar={<Avatar src={teamGravatar} sx={{ height: '32px', width: '32px' }} />}
