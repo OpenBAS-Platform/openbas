@@ -1138,6 +1138,8 @@ export interface InjectExpectation {
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: User;
+  /** @format int64 */
+  inject_expiration_time: number;
   listened?: boolean;
   targetId?: string;
 }

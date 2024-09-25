@@ -4,7 +4,7 @@ import { MoreVert } from '@mui/icons-material';
 import Transition from '../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../components/i18n';
 import ExpectationFormUpdate from './ExpectationFormUpdate';
-import type { ExpectationInput } from './Expectation';
+import type { ExpectationInput, ExpectationInputForm } from './Expectation';
 import Dialog from '../../../../../components/common/Dialog';
 import { PermissionsContext } from '../../Context';
 
@@ -35,6 +35,7 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
     expectation_description: expectation.expectation_description ?? '',
     expectation_score: expectation.expectation_score ?? 100,
     expectation_expectation_group: expectation.expectation_expectation_group ?? false,
+    expectation_expiration_time: expectation.expectation_expiration_time ?? 21600,
   };
 
   // Popover
@@ -51,8 +52,18 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   };
   const handleCloseEdit = () => setOpenEdit(false);
 
-  const onSubmitEdit = (data: ExpectationInput) => {
-    handleUpdate(data, index);
+  const onSubmitEdit = (data: ExpectationInputForm) => {
+    const values: ExpectationInput = {
+      expectation_type: data.expectation_type,
+      expectation_name: data.expectation_name,
+      expectation_description: data.expectation_description,
+      expectation_score: data.expectation_score,
+      expectation_expectation_group: data.expectation_expectation_group,
+      expectation_expiration_time: data.expiration_time_days * 3600 * 24
+        + data.expiration_time_hours * 3600
+        + data.expiration_time_minutes * 60,
+    };
+    handleUpdate(values, index);
     handleCloseEdit();
   };
 

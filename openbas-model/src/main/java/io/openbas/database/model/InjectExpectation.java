@@ -118,6 +118,12 @@ public class InjectExpectation implements Base {
   private Double expectedScore;
 
   @Setter
+  @Column(name = "inject_expiration_time")
+  @JsonProperty("inject_expiration_time")
+  @NotNull
+  private Long expirationTime = 60L;
+
+  @Setter
   @Column(name = "inject_expectation_created_at")
   @JsonProperty("inject_expectation_created_at")
   private Instant createdAt = now();
