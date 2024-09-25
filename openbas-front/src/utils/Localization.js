@@ -462,6 +462,7 @@ const i18n = {
       Running: 'En cours',
       Failure: 'Echec',
       Expired: 'Expiré',
+      'Expired after': 'Expiré après',
       Anonymized: 'Anonymisé',
       'No media pressure entry in this channel yet.':
         'Encore aucune entrée de pression médiatique dans ce média.',
@@ -1826,6 +1827,7 @@ const i18n = {
       Running: '运行中',
       Failure: '失败',
       Expired: '过期',
+      'Expired after': '过期时间',
       Anonymized: '匿名',
       'No media pressure entry in this channel yet.':
         '这个频道中还没有媒体项.',

@@ -20,56 +20,61 @@ import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.DETEC
 @Setter
 public class DetectionExpectation implements Expectation {
 
-    private Double score;
-    private String name;
-    private String description;
-    private Asset asset;
-    private AssetGroup assetGroup;
-    private boolean expectationGroup;
-    private List<InjectExpectationSignature> injectExpectationSignatures;
+  private Double score;
+  private String name;
+  private String description;
+  private Asset asset;
+  private AssetGroup assetGroup;
+  private boolean expectationGroup;
+  private Long expirationTime;
+  private List<InjectExpectationSignature> injectExpectationSignatures;
 
-    private DetectionExpectation() {
-    }
+  private DetectionExpectation() {
+  }
 
-    @Override
-    public InjectExpectation.EXPECTATION_TYPE type() {
-        return DETECTION;
-    }
+  @Override
+  public InjectExpectation.EXPECTATION_TYPE type() {
+    return DETECTION;
+  }
 
-    public static DetectionExpectation detectionExpectationForAsset(
-            @Nullable final Double score,
-            @NotBlank final String name,
-            final String description,
-            @NotNull final Asset asset,
-            final boolean expectationGroup,
-            final List<InjectExpectationSignature> expectationSignatures
-    ) {
-        DetectionExpectation detectionExpectation = new DetectionExpectation();
-        detectionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
-        detectionExpectation.setName(name);
-        detectionExpectation.setDescription(description);
-        detectionExpectation.setAsset(asset);
-        detectionExpectation.setExpectationGroup(expectationGroup);
-        detectionExpectation.setInjectExpectationSignatures(expectationSignatures);
-        return detectionExpectation;
-    }
+  public static DetectionExpectation detectionExpectationForAsset(
+      @Nullable final Double score,
+      @NotBlank final String name,
+      final String description,
+      @NotNull final Asset asset,
+      final boolean expectationGroup,
+      final Long expirationTime,
+      final List<InjectExpectationSignature> expectationSignatures
+  ) {
+    DetectionExpectation detectionExpectation = new DetectionExpectation();
+    detectionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
+    detectionExpectation.setName(name);
+    detectionExpectation.setDescription(description);
+    detectionExpectation.setAsset(asset);
+    detectionExpectation.setExpectationGroup(expectationGroup);
+    detectionExpectation.setExpirationTime(expirationTime);
+    detectionExpectation.setInjectExpectationSignatures(expectationSignatures);
+    return detectionExpectation;
+  }
 
-    public static DetectionExpectation detectionExpectationForAssetGroup(
-            @Nullable final Double score,
-            @NotBlank final String name,
-            final String description,
-            @NotNull final AssetGroup assetGroup,
-            final boolean expectationGroup,
-            final List<InjectExpectationSignature> expectationSignatures
-    ) {
-        DetectionExpectation detectionExpectation = new DetectionExpectation();
-        detectionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
-        detectionExpectation.setName(name);
-        detectionExpectation.setDescription(description);
-        detectionExpectation.setAssetGroup(assetGroup);
-        detectionExpectation.setExpectationGroup(expectationGroup);
-        detectionExpectation.setInjectExpectationSignatures(expectationSignatures);
-        return detectionExpectation;
-    }
+  public static DetectionExpectation detectionExpectationForAssetGroup(
+      @Nullable final Double score,
+      @NotBlank final String name,
+      final String description,
+      @NotNull final AssetGroup assetGroup,
+      final boolean expectationGroup,
+      final Long expirationTime,
+      final List<InjectExpectationSignature> expectationSignatures
+  ) {
+    DetectionExpectation detectionExpectation = new DetectionExpectation();
+    detectionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
+    detectionExpectation.setName(name);
+    detectionExpectation.setDescription(description);
+    detectionExpectation.setAssetGroup(assetGroup);
+    detectionExpectation.setExpectationGroup(expectationGroup);
+    detectionExpectation.setExpirationTime(expirationTime);
+    detectionExpectation.setInjectExpectationSignatures(expectationSignatures);
+    return detectionExpectation;
+  }
 
 }

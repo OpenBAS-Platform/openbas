@@ -40,19 +40,16 @@ public class ExpectationsExpirationManagerService {
     List<InjectExpectation> expectationAssets = expectations.stream().toList();
     expectationAssets.forEach((expectation) -> {
       Long userExpirationTime = expectation.getExpirationTime();
-      if (userExpirationTime != null) {
-        // Maximum time for detection
-        if (isExpired(expectation, Math.toIntExact(userExpirationTime / 60))) {
-          String result = computeFailedMessage(expectation.getType());
-          this.injectExpectationService.computeExpectation(
-              expectation,
-              this.config.getId(),
-              "collector",
-              PRODUCT_NAME,
-              result,
-              false
-          );
-        }
+      if (isExpired(expectation, Math.toIntExact(userExpirationTime / 60))) {
+        String result = computeFailedMessage(expectation.getType());
+        this.injectExpectationService.computeExpectation(
+            expectation,
+            this.config.getId(),
+            "collector",
+            PRODUCT_NAME,
+            result,
+            false
+        );
       }
 
     });
@@ -62,19 +59,16 @@ public class ExpectationsExpirationManagerService {
     List<InjectExpectation> expectationAssets = expectations.stream().filter(e -> e.getAsset() != null).toList();
     expectationAssets.forEach((expectation) -> {
       Long userExpirationTime = expectation.getExpirationTime();
-      if (userExpirationTime != null) {
-        // Maximum time for detection
-        if (isExpired(expectation, Math.toIntExact(userExpirationTime / 60))) {
-          String result = computeFailedMessage(expectation.getType());
-          this.injectExpectationService.computeExpectation(
-              expectation,
-              this.config.getId(),
-              "collector",
-              PRODUCT_NAME,
-              result,
-              false
-          );
-        }
+      if (isExpired(expectation, Math.toIntExact(userExpirationTime / 60))) {
+        String result = computeFailedMessage(expectation.getType());
+        this.injectExpectationService.computeExpectation(
+            expectation,
+            this.config.getId(),
+            "collector",
+            PRODUCT_NAME,
+            result,
+            false
+        );
       }
 
     });

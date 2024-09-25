@@ -35,7 +35,7 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
     expectation_description: expectation.expectation_description ?? '',
     expectation_score: expectation.expectation_score ?? 100,
     expectation_expectation_group: expectation.expectation_expectation_group ?? false,
-    expectation_expiration_time: expectation.expectation_expiration_time ?? 21600,
+    expectation_expiration_time: expectation.expectation_expiration_time || ((expectation.expectation_type === 'DETECTION' || expectation.expectation_type === 'PREVENTION') ? 21600 : 3600),
   };
 
   // Popover

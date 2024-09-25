@@ -44,6 +44,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import type { InjectExpectationStore } from '../../../../actions/injects/Inject';
 import { NodeResultStep } from './types/nodes/NodeResultStep';
 import { isTechnicalExpectation } from '../../common/injects/expectations/ExpectationUtils';
+import { splitDuration } from '../../../../utils/Time';
 
 interface Steptarget {
   label: string;
@@ -85,6 +86,18 @@ const useStyles = makeStyles<Theme>((theme) => ({
     fontSize: '0.75rem',
     height: '20px',
     padding: '0 4px',
+  },
+  duration: {
+    fontSize: 12,
+    lineHeight: '12px',
+    height: 20,
+    float: 'left',
+    marginRight: 7,
+    borderRadius: 4,
+    width: 180,
+    backgroundColor: 'rgba(0, 177, 255, 0.08)',
+    color: '#00b1ff',
+    border: '1px solid #00b1ff',
   },
 }));
 
@@ -527,49 +540,68 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                   {t('Results')}
                 </Typography>
                 <Grid container={true} spacing={2}>
-                  {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => (
-                    <Grid key={index} item xs={4}>
-                      <Card key={injectExpectation.inject_expectation_id}>
-                        <CardHeader
-                          avatar={getAvatar(injectExpectation, expectationResult)}
-                          action={
-                            <>
-                              <IconButton
-                                color="primary"
-                                onClick={(ev) => {
-                                  ev.stopPropagation();
-                                  setAnchorEls({ ...anchorEls, [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: ev.currentTarget });
-                                }}
-                                aria-haspopup="true"
-                                size="large"
-                                disabled={['collector', 'media-pressure', 'challenge'].includes(expectationResult.sourceType ?? 'unknown')}
-                              >
-                                <MoreVertOutlined />
-                              </IconButton>
-                              <Menu
-                                anchorEl={anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]}
-                                open={Boolean(anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`])}
-                                onClose={() => setAnchorEls({ ...anchorEls, [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: null })}
-                              >
-                                <MenuItem onClick={() => handleOpenResultEdition(injectExpectation, expectationResult)}>
-                                  {t('Update')}
-                                </MenuItem>
-                                <MenuItem onClick={() => handleOpenResultDeletion(injectExpectation, expectationResult)}>
-                                  {t('Delete')}
-                                </MenuItem>
-                              </Menu>
-                            </>
-                          }
-                          title={expectationResult.sourceName ? t(expectationResult.sourceName) : t('Unknown')}
-                          subheader={nsdt(expectationResult.date)}
-                        />
-                        <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
-                          <ItemResult label={expectationResult.result} status={expectationResult.result} />
-                          <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={expectationResult.score} /></Tooltip>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  ))}
+                  {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
+                    const duration = splitDuration(injectExpectation.inject_expiration_time || 0);
+                    return (
+                      <Grid key={index} item xs={4}>
+                        <Card key={injectExpectation.inject_expectation_id}>
+                          <CardHeader
+                            avatar={getAvatar(injectExpectation, expectationResult)}
+                            action={
+                              <>
+                                <IconButton
+                                  color="primary"
+                                  onClick={(ev) => {
+                                    ev.stopPropagation();
+                                    setAnchorEls({ ...anchorEls, [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: ev.currentTarget });
+                                  }}
+                                  aria-haspopup="true"
+                                  size="large"
+                                  disabled={['collector', 'media-pressure', 'challenge'].includes(expectationResult.sourceType ?? 'unknown')}
+                                >
+                                  <MoreVertOutlined />
+                                </IconButton>
+                                <Menu
+                                  anchorEl={anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]}
+                                  open={Boolean(anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`])}
+                                  onClose={() => setAnchorEls({ ...anchorEls, [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: null })}
+                                >
+                                  <MenuItem onClick={() => handleOpenResultEdition(injectExpectation, expectationResult)}>
+                                    {t('Update')}
+                                  </MenuItem>
+                                  <MenuItem onClick={() => handleOpenResultDeletion(injectExpectation, expectationResult)}>
+                                    {t('Delete')}
+                                  </MenuItem>
+                                </Menu>
+                              </>
+                            }
+                            title={expectationResult.sourceName ? t(expectationResult.sourceName) : t('Unknown')}
+                            subheader={
+                              <>
+                                <div>{nsdt(expectationResult.date)}</div>
+                                <div style={{ marginTop: 10 }}>
+                                  <Typography variant="h4">{t('Expired after')}</Typography>
+                                  <Chip
+                                    classes={{ root: classes.duration }}
+                                    label={`${duration.days}
+                                      ${t('d')}, ${duration.hours}
+                                    ${t('h')}, ${duration.minutes}
+                                    ${t('m')}`}
+                                  />
+                                </div>
+
+                              </>
+
+                            }
+                          />
+                          <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
+                            <ItemResult label={expectationResult.result} status={expectationResult.result} />
+                            <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={expectationResult.score} /></Tooltip>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    );
+                  })}
                   {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type) || (injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.length === 0))
                     && (
                       <Grid item xs={4}>

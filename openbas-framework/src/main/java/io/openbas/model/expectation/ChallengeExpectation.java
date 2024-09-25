@@ -16,17 +16,14 @@ public class ChallengeExpectation implements Expectation {
   private Challenge challenge;
   private boolean expectationGroup;
   private String name;
+  private Long expirationTime;
 
-  public ChallengeExpectation(Double score, Challenge challenge) {
-    setScore(Objects.requireNonNullElse(score, 100.0));
-    setChallenge(challenge);
-  }
-
-  public ChallengeExpectation(Double score, Challenge challenge, boolean expectationGroup) {
-    setScore(Objects.requireNonNullElse(score, 100.0));
+  public ChallengeExpectation(io.openbas.model.inject.form.Expectation expectation, Challenge challenge) {
+    setScore(Objects.requireNonNullElse(expectation.getScore(), 100.0));
     setChallenge(challenge);
     setName(challenge.getName());
-    setExpectationGroup(expectationGroup);
+    setExpectationGroup(expectation.isExpectationGroup());
+    setExpirationTime(expectation.getExpirationTime());
   }
 
   @Override

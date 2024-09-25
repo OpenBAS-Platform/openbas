@@ -121,7 +121,7 @@ public class InjectExpectation implements Base {
   @Column(name = "inject_expiration_time")
   @JsonProperty("inject_expiration_time")
   @NotNull
-  private Long expirationTime = 60L;
+  private Long expirationTime;
 
   @Setter
   @Column(name = "inject_expectation_created_at")

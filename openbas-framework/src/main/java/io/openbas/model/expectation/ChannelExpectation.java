@@ -16,17 +16,20 @@ public class ChannelExpectation implements Expectation {
   private Article article;
   private boolean expectationGroup;
   private String name;
+  private Long expirationTime;
 
   public ChannelExpectation(Double score, Article article) {
     setScore(Objects.requireNonNullElse(score, 100.0));
     setArticle(article);
   }
 
-  public ChannelExpectation(Double score, Article article, boolean expectationGroup) {
+
+  public ChannelExpectation(io.openbas.model.inject.form.Expectation expectation, Article article) {
     setScore(Objects.requireNonNullElse(score, 100.0));
     setArticle(article);
     setName(article.getName());
-    setExpectationGroup(expectationGroup);
+    setExpectationGroup(expectation.isExpectationGroup());
+    setExpirationTime(expectation.getExpirationTime());
   }
 
   @Override
