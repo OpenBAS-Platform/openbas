@@ -541,10 +541,11 @@ const Injects: FunctionComponent<Props> = ({
             const injectContract = inject.inject_injector_contract?.convertedContent;
             const isContractExposed = injectContract?.config.expose;
             return (
-              <ListItemButton
+              <ListItem
                 key={inject.inject_id}
                 classes={{ root: classes.item }}
                 divider
+                button
                 onClick={() => {
                   if (injectContract && isContractExposed) {
                     setSelectedInjectId(inject.inject_id);
@@ -611,7 +612,7 @@ const Injects: FunctionComponent<Props> = ({
                     onDelete={onDelete}
                   />
                 </ListItemSecondaryAction>
-              </ListItemButton>
+              </ListItem>
             );
           })}
         </List>
