@@ -37,7 +37,7 @@ public class InjectImporter implements Base {
     @NotBlank
     private String importTypeValue;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "importer_injector_contract_id")
     @JsonProperty("inject_importer_injector_contract")
     @JsonSerialize(using = MonoIdDeserializer.class)
