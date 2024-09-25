@@ -231,14 +231,7 @@ public class ExerciseApi extends RestBehavior {
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Iterable<Team> removeExerciseTeams(@PathVariable String exerciseId,
                                               @Valid @RequestBody ExerciseUpdateTeamsInput input) {
-        Exercise exercise = this.exerciseService.exercise(exerciseId);
-        // Remove teams from exercise
-        List<Team> teams = exercise.getTeams().stream().filter(team -> !input.getTeamIds().contains(team.getId())).toList();
-        exercise.setTeams(new ArrayList<>(teams));
-        this.exerciseService.updateExercise(exercise);
-        // Remove all association between users / exercises / teams
-        input.getTeamIds().forEach(exerciseTeamUserRepository::deleteTeamFromAllReferences);
-        return teamRepository.findAllById(input.getTeamIds());
+        return this.exerciseService.removeTeams(exerciseId, input.getTeamIds());
     }
 
     @Transactional(rollbackOn = Exception.class)
