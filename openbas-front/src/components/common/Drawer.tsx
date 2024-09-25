@@ -3,6 +3,8 @@ import React, { CSSProperties, FunctionComponent } from 'react';
 import { Close } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import type { Theme } from '../Theme';
+import useAuth from '../../utils/hooks/useAuth';
+import { computeBannerSettings } from '../../public/components/systembanners/SystemBanners';
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
   drawerPaperHalf: {
@@ -65,6 +67,9 @@ const Drawer: FunctionComponent<DrawerProps> = ({
   disableEnforceFocus = false,
   containerStyle = {},
 }) => {
+  const { settings } = useAuth();
+  const { bannerHeightNumber } = computeBannerSettings(settings);
+
   const classes = useStyles({ variant });
   let component;
   if (children) {
@@ -87,7 +92,7 @@ const Drawer: FunctionComponent<DrawerProps> = ({
         disableEnforceFocus,
       }}
     >
-      <div className={variant === 'full' ? classes.headerFull : classes.header}>
+      <div className={variant === 'full' ? classes.headerFull : classes.header} style={{ marginTop: bannerHeightNumber }}>
         <IconButton
           aria-label="Close"
           onClick={handleClose}
