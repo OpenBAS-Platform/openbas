@@ -17,8 +17,6 @@ import ItemStatus from '../../../../../components/ItemStatus';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import type { Exercise, Inject } from '../../../../../utils/api-types';
-import type { TagHelper } from '../../../../../actions/helper';
-import type { InjectStore } from '../../../../../actions/injects/Inject';
 import { fetchExerciseInjects, updateInjectForExercise } from '../../../../../actions/Inject';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
@@ -28,6 +26,7 @@ import SearchFilter from '../../../../../components/SearchFilter';
 import TagsFilter from '../../../common/filters/TagsFilter';
 import useSearchAnFilter from '../../../../../utils/SortingFiltering';
 import { isNotEmptyField } from '../../../../../utils/utils';
+import { InjectStore } from '../../../../../actions/injects/Inject';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -79,7 +78,7 @@ const TimelineOverview = () => {
     exercise,
     injects,
     teams,
-  } = useHelper((helper: InjectHelper & ExercisesHelper & TagHelper) => {
+  } = useHelper((helper: InjectHelper & ExercisesHelper) => {
     return {
       exercise: helper.getExercise(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
@@ -98,7 +97,7 @@ const TimelineOverview = () => {
   const filtering = useSearchAnFilter(
     'inject',
     'depends_duration',
-    searchColumns,
+    searchColumns
   );
 
   const filteredInjects = filtering.filterAndSort(injects);
