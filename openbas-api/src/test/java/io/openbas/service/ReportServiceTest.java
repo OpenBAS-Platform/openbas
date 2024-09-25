@@ -5,6 +5,8 @@ import io.openbas.database.repository.ReportRepository;
 import io.openbas.rest.report.form.ReportInformationInput;
 import io.openbas.rest.report.form.ReportInjectCommentInput;
 import io.openbas.rest.report.form.ReportInput;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,9 +18,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,13 +31,17 @@ public class ReportServiceTest {
 
     @Mock
     private ReportRepository reportRepository;
+    @Mock
+    private EntityManager entityManager;
+    @Mock
+    private TypedQuery<ReportInjectComment> reportInjectCommentQuery;
 
     private ReportService reportService;
 
     @BeforeEach
     void before() {
         // Injecting mocks into the controller
-        reportService = new ReportService(reportRepository);
+        reportService = new ReportService(reportRepository, entityManager);
     }
 
     @DisplayName("Test create a report")
@@ -99,7 +106,7 @@ public class ReportServiceTest {
         when(reportRepository.save(any(Report.class))).thenReturn(report);
 
         // -- EXECUTE --
-       reportService.updateReport(report, reportInput);
+        reportService.updateReport(report, reportInput);
 
         // -- ASSERT --
         ArgumentCaptor<Report> reportCaptor = ArgumentCaptor.forClass(Report.class);
@@ -115,12 +122,14 @@ public class ReportServiceTest {
     class ReportInjectCommentTest {
         @DisplayName("Test update existing report inject comment")
         @Test
-        void updateExistingReportInjectComment() throws Exception {
+        void updateExistingReportInjectComment() {
             // -- PREPARE --
             Report report = new Report();
             report.setName("test");
+            report.setId(UUID.randomUUID().toString());
             Inject inject = new Inject();
             inject.setId("fakeID123");
+
             // add report inject comment
             ReportInjectComment existingReportInjectComment = new ReportInjectComment();
             existingReportInjectComment.setReport(report);
@@ -132,7 +141,11 @@ public class ReportServiceTest {
             commentInput.setInjectId(inject.getId());
             commentInput.setComment("New comment");
 
-            when(reportRepository.save(any(Report.class))).thenReturn(report);
+            // Mock
+            when(entityManager.createQuery(anyString(), eq(ReportInjectComment.class))).thenReturn(reportInjectCommentQuery);
+            when(reportInjectCommentQuery.setParameter(eq("reportId"), eq(UUID.fromString(report.getId())))).thenReturn(reportInjectCommentQuery);
+            when(reportInjectCommentQuery.setParameter(eq("injectId"), eq(inject.getId()))).thenReturn(reportInjectCommentQuery);
+            when(reportInjectCommentQuery.getResultStream()).thenReturn(java.util.stream.Stream.of(existingReportInjectComment));
 
             // -- EXECUTE --
             reportService.updateReportInjectComment(report, inject, commentInput);
@@ -151,6 +164,7 @@ public class ReportServiceTest {
             // -- PREPARE --
             Report report = new Report();
             report.setName("test");
+            report.setId(UUID.randomUUID().toString());
             Inject inject = new Inject();
             inject.setId("fakeID123");
 
@@ -158,7 +172,12 @@ public class ReportServiceTest {
             commentInput.setInjectId(inject.getId());
             commentInput.setComment("New test comment");
 
+            // Mock
             when(reportRepository.save(any(Report.class))).thenReturn(report);
+            when(entityManager.createQuery(anyString(), eq(ReportInjectComment.class))).thenReturn(reportInjectCommentQuery);
+            when(reportInjectCommentQuery.setParameter(eq("reportId"), eq(UUID.fromString(report.getId())))).thenReturn(reportInjectCommentQuery);
+            when(reportInjectCommentQuery.setParameter(eq("injectId"), eq(inject.getId()))).thenReturn(reportInjectCommentQuery);
+            when(reportInjectCommentQuery.getResultStream()).thenReturn(java.util.stream.Stream.of());
 
             // -- EXECUTE --
             reportService.updateReportInjectComment(report, inject, commentInput);

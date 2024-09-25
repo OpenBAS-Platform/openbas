@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Paper, Typography } from '@mui/material';
-import type { Exercise, ExpectationResultsByType, InjectResultDTO, Report, ReportInformation } from '../../../../../utils/api-types';
+import type { Exercise, ExpectationResultsByType, InjectResultDTO, Report, ReportInformation, ReportInjectComment } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useFormatter } from '../../../../../components/i18n';
 import ReportInformationType from './ReportInformationType';
@@ -129,7 +129,7 @@ const ExerciseReportContent: React.FC<Props> = ({ report, exerciseId, canWrite =
             initialInjectComments={report?.report_injects_comments}
             injects={injects}
             style={{ width: '100%', marginTop: 20 }}
-            onCommentSubmit={(value) => updateReportInjectCommentForExercise(exerciseId, report.report_id, value)}
+            onCommentSubmit={(value: ReportInjectComment) => updateReportInjectCommentForExercise(exerciseId, report.report_id, value)}
           />
         )
       }
