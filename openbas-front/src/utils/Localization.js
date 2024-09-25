@@ -502,6 +502,7 @@ const i18n = {
       'Create a new user': 'Créer un nouvel utilisateur',
       'Dryrun recipients': 'Destinataires de la simulation',
       'Create a new report': 'Créer un nouveau rapport',
+      'Update inject comment': 'Modifier le commentaire du stimuli',
       'Do you want to delete this report?':
         'Souhaitez-vous supprimer ce rapport ?',
       'Update the report': 'Modifier le rapport',
@@ -1862,6 +1863,7 @@ const i18n = {
       'Create a new user': '创建新用户',
       'Dryrun recipients': '运行接收者',
       'Create a new report': '创建新报告',
+      'Update inject comment': '编辑刺激评论',
       'Do you want to delete this report?':
         '你想要删除这份报告么?',
       'Update the report': '更新报告',
