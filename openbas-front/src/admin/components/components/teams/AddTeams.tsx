@@ -181,12 +181,15 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
               <Box className={classes.box}>
                 {teamIds.map((teamId) => {
                   const team = teamsMap[teamId];
+                  if (!team) {
+                    return null; // Skip rendering if team is undefined
+                  }
                   const teamGravatar = R.propOr('-', 'team_gravatar', team);
                   return (
                     <Chip
                       key={teamId}
                       onDelete={() => {
-                        setTeamIds(teamIds.filter((id) => id !== teamId));
+                        setTeamIds((prevIds) => prevIds.filter((id) => id !== teamId));
                       }}
                       label={truncate(team.team_name, 22)}
                       avatar={<Avatar src={teamGravatar} sx={{ height: '32px', width: '32px' }} />}
