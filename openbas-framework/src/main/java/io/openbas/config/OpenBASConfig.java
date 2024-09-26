@@ -74,6 +74,12 @@ public class OpenBASConfig {
   @JsonProperty("application_agent_url")
   private String agentUrl;
 
+  @JsonProperty("unsecured_certificate")
+  private boolean unsecuredCertificate;
+
+  @JsonProperty("with_proxy")
+  private boolean withProxy;
+
   public String getBaseUrlForAgent() {
     return hasText(agentUrl) ? url(agentUrl) :url(baseUrl);
   }
