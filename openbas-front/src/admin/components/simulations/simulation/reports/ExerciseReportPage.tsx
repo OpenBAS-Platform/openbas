@@ -85,7 +85,9 @@ const ExerciseReportPage: React.FC = () => {
           {permissions.canWrite && <ReportPopover variant={'toggle'} report={report} actions={['Update']}/>}
         </ToggleButtonGroup>
 
-        <ExerciseReportContent report={report} exerciseId={exerciseId} canWrite={permissions.canWrite}/>
+        <div style={{ width: '100%' }}>
+          <ExerciseReportContent report={report} exerciseId={exerciseId} canWrite={permissions.canWrite}/>
+        </div>
       </div>
     </ReportContext.Provider>
   );

@@ -100,7 +100,7 @@ const ExerciseReportContent: React.FC<Props> = ({ report, exerciseId, canWrite =
   }
 
   return (
-    <div id={`reportId_${report.report_id}`} style={{ padding: 20, width: '100%', display: 'flex', flexFlow: 'wrap' }}>
+    <div id={`reportId_${report.report_id}`} style={{ padding: 20, display: 'flex', flexFlow: 'wrap', maxWidth: '1200px', margin: 'auto' }}>
       <div style={{ width: '100%', textAlign: 'center', fontSize: 25, fontWeight: 500, margin: '10px' }}>
         {report?.report_name}
       </div>
