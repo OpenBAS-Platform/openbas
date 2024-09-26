@@ -1,6 +1,7 @@
 package io.openbas.rest.scenario.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.database.model.Scenario.SEVERITY;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -33,7 +34,7 @@ public class ScenarioInput {
 
   @Nullable
   @JsonProperty("scenario_severity")
-  private String severity;
+  private SEVERITY severity;
 
   @Nullable
   @JsonProperty("scenario_external_reference")
