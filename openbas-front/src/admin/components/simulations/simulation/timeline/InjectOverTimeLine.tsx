@@ -3,36 +3,24 @@ import React, { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 import * as R from 'ramda';
 import Empty from '../../../../../components/Empty';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import { useFormatter } from '../../../../../components/i18n';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { lineChartOptions } from '../../../../../utils/Charts';
 import type { Theme } from '../../../../../components/Theme';
-import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
-import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import type { InjectStore } from '../../../../../actions/injects/Inject';
+import { Inject } from '../../../../../utils/api-types';
 
 interface Props {
-  exerciseId: ExerciseStore['exercise_id'];
+  injects: Inject[];
 }
 
 const InjectOverTimeLine: FunctionComponent<Props> = ({
-  exerciseId,
+  injects,
 }) => {
   // Standard hooks
   const { t, nsdt } = useFormatter();
   const dispatch = useAppDispatch();
   const theme: Theme = useTheme();
-
-  // Fetching data
-  const { injects } = useHelper((helper: InjectHelper) => ({
-    injects: helper.getExerciseInjects(exerciseId),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchExerciseInjects(exerciseId));
-  });
 
   let cumulation = 0;
   const injectsOverTime = R.pipe(

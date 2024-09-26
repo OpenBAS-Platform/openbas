@@ -297,7 +297,7 @@ const TimelineOverview = () => {
             {t('Sent injects over time')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            <InjectOverTimeArea exerciseId={exerciseId} />
+            <InjectOverTimeArea injects={filteredInjects} />
           </Paper>
         </Grid>
         <Grid item xs={6}>
@@ -305,7 +305,7 @@ const TimelineOverview = () => {
             {t('Sent injects over time')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            <InjectOverTimeLine exerciseId={exerciseId} />
+            <InjectOverTimeLine injects={filteredInjects} />
           </Paper>
         </Grid>
       </Grid>
