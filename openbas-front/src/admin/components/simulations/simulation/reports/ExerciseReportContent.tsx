@@ -136,7 +136,7 @@ const ExerciseReportContent: React.FC<Props> = ({ report, exerciseId, canWrite =
       {displayModule(ReportInformationType.GLOBAL_OBSERVATION)
         && <div style={{ width: '100%', marginTop: 20 }}>
           <Typography variant="h4" gutterBottom>
-            {t('Notes')}
+            {t('Global observation')}
           </Typography>
             {canWrite
               ? <SimpleRichTextField
