@@ -29,13 +29,20 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
 
+  const getExpirationTime = (expirationTime: number): number => {
+    if (expirationTime !== null || expirationTime !== undefined) {
+      return expirationTime;
+    }
+    return (expectation.expectation_type === 'DETECTION' || expectation.expectation_type === 'PREVENTION') ? 21600 : 3600;
+  };
+
   const initialValues = {
     expectation_type: expectation.expectation_type ?? '',
     expectation_name: expectation.expectation_name ?? '',
     expectation_description: expectation.expectation_description ?? '',
     expectation_score: expectation.expectation_score ?? 100,
     expectation_expectation_group: expectation.expectation_expectation_group ?? false,
-    expectation_expiration_time: expectation.expectation_expiration_time || ((expectation.expectation_type === 'DETECTION' || expectation.expectation_type === 'PREVENTION') ? 21600 : 3600),
+    expectation_expiration_time: getExpirationTime(expectation.expectation_expiration_time),
   };
 
   // Popover

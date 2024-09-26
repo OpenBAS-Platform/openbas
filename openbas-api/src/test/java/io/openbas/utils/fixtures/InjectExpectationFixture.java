@@ -13,6 +13,7 @@ public class InjectExpectationFixture {
     injectExpectation.setType(InjectExpectation.EXPECTATION_TYPE.PREVENTION);
     injectExpectation.setTeam(team);
     injectExpectation.setExpectedScore(100.0);
+    injectExpectation.setExpirationTime(21600L);
     return injectExpectation;
   }
 
@@ -22,6 +23,7 @@ public class InjectExpectationFixture {
     injectExpectation.setType(InjectExpectation.EXPECTATION_TYPE.DETECTION);
     injectExpectation.setTeam(team);
     injectExpectation.setExpectedScore(100.0);
+    injectExpectation.setExpirationTime(21600L);
     return injectExpectation;
   }
 
@@ -31,6 +33,7 @@ public class InjectExpectationFixture {
     injectExpectation.setType(InjectExpectation.EXPECTATION_TYPE.MANUAL);
     injectExpectation.setTeam(team);
     injectExpectation.setExpectedScore(100.0);
+    injectExpectation.setExpirationTime(3600L);
     return injectExpectation;
   }
 
@@ -40,6 +43,7 @@ public class InjectExpectationFixture {
     injectExpectation.setType(InjectExpectation.EXPECTATION_TYPE.ARTICLE);
     injectExpectation.setTeam(team);
     injectExpectation.setExpectedScore(100.0);
+    injectExpectation.setExpirationTime(3600L);
     return injectExpectation;
   }
 
@@ -50,6 +54,7 @@ public class InjectExpectationFixture {
     injectExpectation.setType(InjectExpectation.EXPECTATION_TYPE.MANUAL);
     injectExpectation.setTeam(team);
     injectExpectation.setExpectedScore(100.0);
+    injectExpectation.setExpirationTime(3600L);
     injectExpectation.setExercise(exercise);
     injectExpectation.setName(expectationName);
     return injectExpectation;
