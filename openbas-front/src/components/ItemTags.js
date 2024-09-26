@@ -6,7 +6,7 @@ import { Chip, Slide, Tooltip } from '@mui/material';
 import { hexToRGB } from '../utils/Colors';
 import { useFormatter } from './i18n';
 import { useHelper } from '../store';
-import { getLabelOfRemainingItems, getRemainingItemsCount, truncate, getVisibleItems } from '../utils/String';
+import { getLabelOfRemainingItems, getRemainingItemsCount, getVisibleItems, truncate } from '../utils/String';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

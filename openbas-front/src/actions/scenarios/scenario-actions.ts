@@ -14,14 +14,13 @@ import type {
   ScenarioInput,
   ScenarioRecurrenceInput,
   ScenarioTeamPlayersEnableInput,
-  ScenarioUpdateTeamsInput,
   SearchPaginationInput,
   Team,
 } from '../../utils/api-types';
 import * as schema from '../Schema';
 import { MESSAGING$ } from '../../utils/Environment';
 
-const SCENARIO_URI = '/api/scenarios';
+export const SCENARIO_URI = '/api/scenarios';
 
 export const addScenario = (data: ScenarioInput) => (dispatch: Dispatch) => {
   return postReferential(scenario, SCENARIO_URI, data)(dispatch);
@@ -90,18 +89,6 @@ export const fetchScenarioTeams = (scenarioId: Scenario['scenario_id']) => (disp
   const uri = `/api/scenarios/${scenarioId}/teams`;
   return getReferential(schema.arrayOfTeams, uri)(dispatch);
 };
-
-export const addScenarioTeams = (scenarioId: Scenario['scenario_id'], data: ScenarioUpdateTeamsInput) => (dispatch: Dispatch) => putReferential(
-  schema.arrayOfTeams,
-  `/api/scenarios/${scenarioId}/teams/add`,
-  data,
-)(dispatch);
-
-export const removeScenarioTeams = (scenarioId: Scenario['scenario_id'], data: ScenarioUpdateTeamsInput) => (dispatch: Dispatch) => putReferential(
-  schema.arrayOfTeams,
-  `/api/scenarios/${scenarioId}/teams/remove`,
-  data,
-)(dispatch);
 
 export const enableScenarioTeamPlayers = (scenarioId: Scenario['scenario_id'], teamId: Team['team_id'], data: ScenarioTeamPlayersEnableInput) => (dispatch: Dispatch) => putReferential(
   scenario,

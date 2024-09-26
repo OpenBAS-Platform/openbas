@@ -31,24 +31,24 @@ const ScenarioDefinition = () => {
   return (
     <>
       <Grid
-        container={true}
+        container
         spacing={3}
         classes={{ container: classes.gridContainer }}
       >
-        <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
+        <Grid item xs={6} style={{ paddingTop: 10 }}>
           <ScenarioTeams scenarioTeamsUsers={scenario.scenario_teams_users} />
         </Grid>
-        <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
+        <Grid item xs={6} style={{ paddingTop: 10 }}>
           <ScenarioVariables />
         </Grid>
-        <Grid item={true} xs={12} style={{ marginTop: 25 }}>
-          <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
+        <Grid item xs={12} style={{ marginTop: 25 }}>
+          <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
             {t('Media pressure')}
           </Typography>
           <ScenarioArticles />
         </Grid>
-        <Grid item={true} xs={12} style={{ marginTop: 5 }}>
-          <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
+        <Grid item xs={12} style={{ marginTop: 5 }}>
+          <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
             {t('Used challenges (in injects)')}
           </Typography>
           <ScenarioChallenges />

@@ -6,6 +6,7 @@ import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.LessonsInput;
 import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
+import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.helper.TeamHelper;
 import io.openbas.rest.scenario.form.*;
 import io.openbas.service.ImportService;
@@ -43,7 +44,7 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 @RestController
 @Secured(ROLE_USER)
 @RequiredArgsConstructor
-public class ScenarioApi {
+public class ScenarioApi extends RestBehavior {
 
   public static final String SCENARIO_URI = "/api/scenarios";
 
@@ -155,15 +156,6 @@ public class ScenarioApi {
 
   // -- TEAMS --
 
-  @Transactional(rollbackOn = Exception.class)
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/add")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Iterable<Team> addScenarioTeams(
-      @PathVariable @NotBlank final String scenarioId,
-      @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
-    return this.scenarioService.addTeams(scenarioId, input.getTeamIds());
-  }
-
   @GetMapping(SCENARIO_URI + "/{scenarioId}/teams")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<TeamSimple> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {
@@ -173,12 +165,30 @@ public class ScenarioApi {
   }
 
   @Transactional(rollbackOn = Exception.class)
+  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/add")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public Iterable<Team> addScenarioTeams(
+      @PathVariable @NotBlank final String scenarioId,
+      @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
+    return this.scenarioService.addTeams(scenarioId, input.getTeamIds());
+  }
+
+  @Transactional(rollbackOn = Exception.class)
   @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/remove")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Iterable<Team> removeScenarioTeams(
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
     return this.scenarioService.removeTeams(scenarioId, input.getTeamIds());
+  }
+
+  @Transactional(rollbackOn = Exception.class)
+  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/replace")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public Iterable<Team> replaceScenarioTeams(
+      @PathVariable @NotBlank final String scenarioId,
+      @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
+    return this.scenarioService.replaceTeams(scenarioId, input.getTeamIds());
   }
 
   @Transactional(rollbackOn = Exception.class)

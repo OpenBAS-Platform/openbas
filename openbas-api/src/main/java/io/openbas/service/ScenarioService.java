@@ -450,6 +450,15 @@ public class ScenarioService {
     return teamRepository.findAllById(teamIds);
   }
 
+  public Iterable<Team> replaceTeams(@NotBlank final String scenarioId, @NotNull final List<String> teamIds) {
+    Scenario scenario = this.scenario(scenarioId);
+    // Replace teams from exercise
+    List<Team> teams = fromIterable(this.teamRepository.findAllById(teamIds));
+    scenario.setTeams(teams);
+    this.updateScenario(scenario);
+    return teams;
+  }
+
   public Scenario enablePlayers(@NotBlank final String scenarioId, @NotBlank final String teamId,
       @NotNull final List<String> playerIds) {
     Scenario scenario = this.scenario(scenarioId);

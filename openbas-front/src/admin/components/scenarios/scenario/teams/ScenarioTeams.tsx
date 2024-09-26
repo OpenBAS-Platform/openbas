@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../../store';
@@ -7,23 +7,23 @@ import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import {
   addScenarioTeamPlayers,
-  addScenarioTeams,
   disableScenarioTeamPlayers,
   enableScenarioTeamPlayers,
   fetchScenarioTeams,
   removeScenarioTeamPlayers,
-  removeScenarioTeams,
 } from '../../../../../actions/scenarios/scenario-actions';
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import type { TeamStore } from '../../../../../actions/teams/Team';
 import { PermissionsContext, TeamContext } from '../../../common/Context';
-import type { Team, TeamCreateInput } from '../../../../../utils/api-types';
+import type { SearchPaginationInput, Team, TeamCreateInput, TeamOutput } from '../../../../../utils/api-types';
 import { addTeam, fetchTeams } from '../../../../../actions/teams/team-actions';
 import type { UserStore } from '../../../teams/players/Player';
-import AddTeams from '../../../components/teams/AddTeams';
+import UpdateTeams from '../../../components/teams/UpdateTeams';
 import { useFormatter } from '../../../../../components/i18n';
 import ContextualTeams from '../../../components/teams/ContextualTeams';
+import { addScenarioTeams, removeScenarioTeams, replaceScenarioTeams, searchScenarioTeams } from '../../../../../actions/scenarios/scenario-teams-action';
+import type { Page } from '../../../../../components/common/queryable/Page';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -68,12 +68,18 @@ export const teamContextForScenario = (scenarioId: ScenarioStore['scenario_id'],
     onRemoveTeam(teamId: Team['team_id']): void {
       dispatch(removeScenarioTeams(scenarioId, { scenario_teams: [teamId] }));
     },
+    onReplaceTeam(teamIds: Team['team_id'][]): Promise<{ result: string[] }> {
+      return dispatch(replaceScenarioTeams(scenarioId, { scenario_teams: teamIds }));
+    },
     onToggleUser(teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean): void {
       if (userEnabled) {
         dispatch(disableScenarioTeamPlayers(scenarioId, teamId, { scenario_team_players: [userId] }));
       } else {
         dispatch(enableScenarioTeamPlayers(scenarioId, teamId, { scenario_team_players: [userId] }));
       }
+    },
+    searchTeams(input: SearchPaginationInput): Promise<{ data: Page<TeamOutput> }> {
+      return searchScenarioTeams(scenarioId, input);
     },
   };
 };
@@ -91,14 +97,17 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
   useDataLoader(() => {
     dispatch(fetchScenarioTeams(scenarioId));
   });
-  const teamIds = teams.map((team) => team.team_id);
-  const onAddTeams = (ids: Team['team_id'][]) => dispatch(addScenarioTeams(scenarioId, { scenario_teams: ids }));
+  const [teamIds, setTeamsId] = useState<string[]>([]);
+
+  useEffect(() => {
+    setTeamsId(teams.map((team) => team.team_id));
+  }, [teams]);
   return (
     <TeamContext.Provider value={teamContextForScenario(scenarioId, scenarioTeamsUsers)}>
-      <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
+      <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
         {t('Teams')}
       </Typography>
-      {permissions.canWrite && <AddTeams addedTeamIds={teamIds} onAddTeams={onAddTeams} />}
+      {permissions.canWrite && <UpdateTeams addedTeamIds={teamIds} setTeamIds={(ids: string[]) => setTeamsId(ids)}/>}
       <div className="clearfix" />
       <Paper classes={{ root: classes.paper }} variant="outlined">
         <ContextualTeams teamIds={teamIds} />
