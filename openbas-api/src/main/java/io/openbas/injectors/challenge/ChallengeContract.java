@@ -31,66 +31,69 @@ import static io.openbas.helper.SupportedLanguage.fr;
 @Component
 public class ChallengeContract extends Contractor {
 
-    public static final String CHALLENGE_PUBLISH = "f8e70b27-a69c-4b9f-a2df-e217c36b3981";
+  public static final String CHALLENGE_PUBLISH = "f8e70b27-a69c-4b9f-a2df-e217c36b3981";
 
-    public static final String TYPE = "openbas_challenge";
+  public static final String TYPE = "openbas_challenge";
 
-    @Override
-    public boolean isExpose() {
-        return true;
-    }
+  @Override
+  public boolean isExpose() {
+    return true;
+  }
 
-    @Override
-    public String getType() {
-        return TYPE;
-    }
+  @Override
+  public String getType() {
+    return TYPE;
+  }
 
-    @Override
-    public ContractConfig getConfig() {
-        return new ContractConfig(TYPE, Map.of(en, "Challenge", fr, "Challenge"), "#e91e63", "#e91e63", "/img/challenge.png", isExpose());
-    }
+  @Override
+  public ContractConfig getConfig() {
+    return new ContractConfig(TYPE, Map.of(en, "Challenge", fr, "Challenge"), "#e91e63", "#e91e63",
+        "/img/challenge.png", isExpose());
+  }
 
-    @Override
-    public List<Contract> contracts() {
-        ContractConfig contractConfig = getConfig();
-        // In this "internal" contract we can't express choices.
-        // Choices are contextual to a specific exercise.
-        String messageBody = """
-                    Dear player,<br /><br />
-                    News challenges have been published.<br /><br />
-                    <#list challenges as challenge>
-                        - <a href="${challenge.uri}">${challenge.name}</a><br />
-                    </#list>
-                    <br/><br/>
-                    Kind regards,<br />
-                    The animation team
-                """;
-        // We include the expectations for challenges
-        Expectation expectation = new Expectation();
-        expectation.setType(CHALLENGE);
-        expectation.setName("Expect targets to complete the challenge(s)");
-        expectation.setScore(0.0);
-        ContractExpectations expectationsField = expectationsField(
-                "expectations", "Expectations", List.of(expectation)
-        );
-        List<ContractElement> publishInstance = contractBuilder()
-                .mandatory(challengeField("challenges", "Challenges", Multiple))
-                // Contract specific
-                .optional(expectationsField)
-                .mandatory(textField("subject", "Subject", "New challenges published for ${user.email}"))
-                .mandatory(richTextareaField("body", "Body", messageBody))
-                .optional(checkboxField("encrypted", "Encrypted", false))
-                .mandatory(teamField("teams", "Teams", Multiple))
-                .optional(attachmentField("attachments", "Attachments", Multiple))
-                .build();
-        Contract publishChallenge = executableContract(contractConfig,
-                CHALLENGE_PUBLISH, Map.of(en, "Publish challenges", fr, "Publier des challenges"), publishInstance, List.of(Endpoint.PLATFORM_TYPE.Internal), false);
-        publishChallenge.setAtomicTesting(false);
-        return List.of(publishChallenge);
-    }
+  @Override
+  public List<Contract> contracts() {
+    ContractConfig contractConfig = getConfig();
+    // In this "internal" contract we can't express choices.
+    // Choices are contextual to a specific exercise.
+    String messageBody = """
+            Dear player,<br /><br />
+            News challenges have been published.<br /><br />
+            <#list challenges as challenge>
+                - <a href="${challenge.uri}">${challenge.name}</a><br />
+            </#list>
+            <br/><br/>
+            Kind regards,<br />
+            The animation team
+        """;
+    // We include the expectations for challenges
+    Expectation expectation = new Expectation();
+    expectation.setType(CHALLENGE);
+    expectation.setName("Expect targets to complete the challenge(s)");
+    expectation.setScore(0.0);
+    expectation.setExpirationTime(3600L);
+    ContractExpectations expectationsField = expectationsField(
+        "expectations", "Expectations", List.of(expectation)
+    );
+    List<ContractElement> publishInstance = contractBuilder()
+        .mandatory(challengeField("challenges", "Challenges", Multiple))
+        // Contract specific
+        .optional(expectationsField)
+        .mandatory(textField("subject", "Subject", "New challenges published for ${user.email}"))
+        .mandatory(richTextareaField("body", "Body", messageBody))
+        .optional(checkboxField("encrypted", "Encrypted", false))
+        .mandatory(teamField("teams", "Teams", Multiple))
+        .optional(attachmentField("attachments", "Attachments", Multiple))
+        .build();
+    Contract publishChallenge = executableContract(contractConfig,
+        CHALLENGE_PUBLISH, Map.of(en, "Publish challenges", fr, "Publier des challenges"), publishInstance,
+        List.of(Endpoint.PLATFORM_TYPE.Internal), false);
+    publishChallenge.setAtomicTesting(false);
+    return List.of(publishChallenge);
+  }
 
-    public ContractorIcon getIcon() {
-        InputStream iconStream = getClass().getResourceAsStream("/img/icon-challenge.png");
-        return new ContractorIcon(iconStream);
-    }
+  public ContractorIcon getIcon() {
+    InputStream iconStream = getClass().getResourceAsStream("/img/icon-challenge.png");
+    return new ContractorIcon(iconStream);
+  }
 }
