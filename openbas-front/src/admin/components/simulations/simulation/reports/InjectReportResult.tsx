@@ -9,7 +9,8 @@ import ItemTargets from '../../../../../components/ItemTargets';
 import AtomicTestingResult from '../../../atomic_testings/atomic_testing/AtomicTestingResult';
 import InjectorContract from '../../../common/injects/InjectorContract';
 import Dialog from '../../../../../components/common/Dialog';
-import SimpleRichTextField from '../../../../../components/fields/SimpleRichTextField';
+import MarkDownField from '../../../../../components/fields/MarkDownField';
+import ExpandableMarkdown from '../../../../../components/ExpandableMarkdown';
 
 interface Props {
   style?: CSSProperties;
@@ -95,9 +96,7 @@ const InjectReportResult: React.FC<Props> = ({
       label: 'Comments',
       render: (inject: InjectResultDTO) => {
         const currentInjectComment = findInjectCommentsByInjectId(inject.inject_id);
-        return <div
-          dangerouslySetInnerHTML={{ __html: currentInjectComment?.report_inject_comment ?? '' }}
-               />;
+        return <ExpandableMarkdown limit={300} source={currentInjectComment?.report_inject_comment || ''}/>;
       },
     },
   ];
@@ -146,36 +145,38 @@ const InjectReportResult: React.FC<Props> = ({
               ))}
             </TableBody>
           </Table>
-          <Dialog
-            title={t('Update inject comment')}
-            open={openEditInjectComment}
-            handleClose={() => setOpenEditInjectComment(false)}
-          >
-            <>
-              <SimpleRichTextField
-                value={injectCommentEdited?.report_inject_comment}
-                onChange={handleCommentChange}
-                style={{ height: 300 }}
-              />
-              <div style={{ gridColumn: 'span 2', marginTop: '20px', display: 'flex' }}>
-                <Button
-                  style={{ marginLeft: 'auto' }}
-                  onClick={() => setOpenEditInjectComment(false)}
-                >
-                  {t('Cancel')}
-                </Button>
-                <Button
-                  color="secondary"
-                  type="submit"
-                  onClick={() => saveComment()}
-                >
-                  {t('Update')}
-                </Button>
-              </div>
-            </>
-          </Dialog>
         </TableContainer>
       </Paper>
+
+      <Dialog
+        title={t('Update inject comment')}
+        open={openEditInjectComment}
+        handleClose={() => setOpenEditInjectComment(false)}
+      >
+        <>
+          <Paper variant="outlined">
+            <MarkDownField
+              onChange={handleCommentChange}
+              initialValue={injectCommentEdited?.report_inject_comment || ''}
+            />
+          </Paper>
+          <div style={{ gridColumn: 'span 2', marginTop: '20px', display: 'flex' }}>
+            <Button
+              style={{ marginLeft: 'auto' }}
+              onClick={() => setOpenEditInjectComment(false)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              color="secondary"
+              type="submit"
+              onClick={() => saveComment()}
+            >
+              {t('Update')}
+            </Button>
+          </div>
+        </>
+      </Dialog>
     </div>
   );
 };
