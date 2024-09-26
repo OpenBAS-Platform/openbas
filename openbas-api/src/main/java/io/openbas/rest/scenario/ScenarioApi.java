@@ -156,15 +156,6 @@ public class ScenarioApi extends RestBehavior {
 
   // -- TEAMS --
 
-  @Transactional(rollbackOn = Exception.class)
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/add")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Iterable<Team> addScenarioTeams(
-      @PathVariable @NotBlank final String scenarioId,
-      @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
-    return this.scenarioService.addTeams(scenarioId, input.getTeamIds());
-  }
-
   @GetMapping(SCENARIO_URI + "/{scenarioId}/teams")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<TeamSimple> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {
@@ -174,12 +165,30 @@ public class ScenarioApi extends RestBehavior {
   }
 
   @Transactional(rollbackOn = Exception.class)
+  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/add")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public Iterable<Team> addScenarioTeams(
+      @PathVariable @NotBlank final String scenarioId,
+      @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
+    return this.scenarioService.addTeams(scenarioId, input.getTeamIds());
+  }
+
+  @Transactional(rollbackOn = Exception.class)
   @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/remove")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Iterable<Team> removeScenarioTeams(
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
     return this.scenarioService.removeTeams(scenarioId, input.getTeamIds());
+  }
+
+  @Transactional(rollbackOn = Exception.class)
+  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/replace")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public Iterable<Team> replaceScenarioTeams(
+      @PathVariable @NotBlank final String scenarioId,
+      @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
+    return this.scenarioService.replaceTeams(scenarioId, input.getTeamIds());
   }
 
   @Transactional(rollbackOn = Exception.class)

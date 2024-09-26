@@ -39,18 +39,6 @@ export const fetchExerciseTeams = (exerciseId) => (dispatch) => {
   return getReferential(schema.arrayOfTeams, uri)(dispatch);
 };
 
-export const addExerciseTeams = (exerciseId, data) => (dispatch) => putReferential(
-  schema.arrayOfTeams,
-  `/api/exercises/${exerciseId}/teams/add`,
-  data,
-)(dispatch);
-
-export const removeExerciseTeams = (exerciseId, data) => (dispatch) => putReferential(
-  schema.arrayOfTeams,
-  `/api/exercises/${exerciseId}/teams/remove`,
-  data,
-)(dispatch);
-
 export const enableExerciseTeamPlayers = (exerciseId, teamId, data) => (dispatch) => putReferential(
   schema.exercise,
   `/api/exercises/${exerciseId}/teams/${teamId}/players/enable`,

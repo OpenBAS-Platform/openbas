@@ -25,6 +25,7 @@ interface Props<T> {
   onSelect: (id: string, value: T) => void;
   onDelete: (id: string) => void;
   paginationComponent: React.ReactElement;
+  buttonComponent?: React.ReactElement;
 }
 
 const SelectList = <T extends object>({
@@ -35,6 +36,7 @@ const SelectList = <T extends object>({
   onSelect,
   onDelete,
   paginationComponent,
+  buttonComponent,
 }: Props<T>) => {
   // @ts-expect-error: use a Record<string, unknown> is not working
   const getId = (v: T) => v[`${prefix}_id`];
@@ -60,7 +62,6 @@ const SelectList = <T extends object>({
                   key={id}
                   disabled={disabled}
                   divider
-                  dense
                   onClick={() => onSelect(id, value)}
                 >
                   <ListItemIcon>
@@ -91,6 +92,7 @@ const SelectList = <T extends object>({
                 </ListItemButton>
               );
             })}
+            {buttonComponent}
           </List>
         </Grid>
         <Grid item xs={4}>

@@ -17,6 +17,7 @@ import { TeamContext } from '../../common/Context';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../../actions/Tag';
 import { useAppDispatch } from '../../../../utils/hooks';
+import CreateTeam from './CreateTeam';
 
 const useStyles = makeStyles(() => ({
   createButton: {
@@ -27,18 +28,18 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   addedTeamIds: Team['team_id'][];
-  onAddTeams: (teamIds: Team['team_id'][]) => Promise<void>,
+  setTeamIds: (ids: string[]) => void;
 }
 
 const AddTeams: React.FC<Props> = ({
   addedTeamIds,
-  onAddTeams,
+  setTeamIds,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const { searchTeams } = useContext(TeamContext);
+  const { searchTeams, onReplaceTeam } = useContext(TeamContext);
 
   // Fetch datas
   useDataLoader(() => {
@@ -58,12 +59,12 @@ const AddTeams: React.FC<Props> = ({
 
   const handleSubmit = async () => {
     setOpen(false);
-    await onAddTeams(teamValues.map((v) => v.team_id));
+    onReplaceTeam?.(teamValues.map((v) => v.team_id)).then((result) => setTeamIds(result.result));
   };
 
   useEffect(() => {
     findTeams(addedTeamIds).then((result) => setTeamValues(result.data));
-  }, [open, addedTeamIds]);
+  }, [addedTeamIds]);
 
   // Pagination
   const addTeam = (_teamId: string, team: TeamOutput) => setTeamValues([...teamValues, team]);
@@ -100,7 +101,7 @@ const AddTeams: React.FC<Props> = ({
     entityPrefix="team"
     availableFilterNames={availableFilterNames}
     queryableHelpers={queryableHelpers}
-  />;
+                              />;
 
   return (
     <>
@@ -138,6 +139,10 @@ const AddTeams: React.FC<Props> = ({
               onSelect={addTeam}
               onDelete={removeTeam}
               paginationComponent={paginationComponent}
+              buttonComponent={<CreateTeam
+                inline
+                onCreate={(team) => setTeamValues([...teamValues, team])}
+                               />}
             />
           </Box>
         </DialogContent>

@@ -67,7 +67,7 @@ const CreateTeam: FunctionComponent<CreateTeamProps> = ({
   return (
     <div>
       {inline ? (
-        <ListItemButton divider={true} onClick={handleOpen} color="primary">
+        <ListItemButton divider onClick={handleOpen} color="primary">
           <ListItemIcon color="primary">
             <ControlPointOutlined color="primary" />
           </ListItemIcon>

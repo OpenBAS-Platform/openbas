@@ -214,13 +214,14 @@ public class ExerciseApi extends RestBehavior {
     public Iterable<Team> addExerciseTeams(
             @PathVariable String exerciseId,
             @Valid @RequestBody ExerciseUpdateTeamsInput input) {
-        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+        Exercise exercise = this.exerciseService.exercise(exerciseId);
+        // Add teams to exercise
         List<Team> teams = exercise.getTeams();
-        List<Team> teamsToAdd = fromIterable(teamRepository.findAllById(input.getTeamIds()));
+        List<Team> teamsToAdd = fromIterable(this.teamRepository.findAllById(input.getTeamIds()));
         List<String> existingTeamIds = teams.stream().map(Team::getId).toList();
         teams.addAll(teamsToAdd.stream().filter(t -> !existingTeamIds.contains(t.getId())).toList());
         exercise.setTeams(teams);
-        exercise.setUpdatedAt(now());
+        this.exerciseService.updateExercise(exercise);
         return teamsToAdd;
     }
 
@@ -229,14 +230,28 @@ public class ExerciseApi extends RestBehavior {
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Iterable<Team> removeExerciseTeams(@PathVariable String exerciseId,
                                               @Valid @RequestBody ExerciseUpdateTeamsInput input) {
-        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+        Exercise exercise = this.exerciseService.exercise(exerciseId);
         // Remove teams from exercise
         List<Team> teams = exercise.getTeams().stream().filter(team -> !input.getTeamIds().contains(team.getId())).toList();
-        exercise.setTeams(fromIterable(teams));
-        exerciseRepository.save(exercise);
+        exercise.setTeams(teams);
+        this.exerciseService.updateExercise(exercise);
         // Remove all association between users / exercises / teams
         input.getTeamIds().forEach(exerciseTeamUserRepository::deleteTeamFromAllReferences);
         return teamRepository.findAllById(input.getTeamIds());
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    @PutMapping(EXERCISE_URI + "/{exerciseId}/teams/replace")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Iterable<Team> replaceExerciseTeams(
+        @PathVariable String exerciseId,
+        @Valid @RequestBody ExerciseUpdateTeamsInput input) {
+        Exercise exercise = this.exerciseService.exercise(exerciseId);
+        // Replace teams from exercise
+        List<Team> teams = fromIterable(this.teamRepository.findAllById(input.getTeamIds()));
+        exercise.setTeams(teams);
+        this.exerciseService.updateExercise(exercise);
+        return teams;
     }
 
     @Transactional(rollbackOn = Exception.class)

@@ -75,6 +75,7 @@ export type TeamContextType = {
   onAddTeam?: (teamId: Team['team_id']) => Promise<void>,
   onCreateTeam?: (team: TeamCreateInput) => Promise<{ result: string }>,
   onRemoveTeam?: (teamId: Team['team_id']) => void,
+  onReplaceTeam?: (teamIds: Team['team_id'][]) => Promise<{ result: string[] }>,
   onToggleUser?: (teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean) => void,
   checkUserEnabled?: (teamId: Team['team_id'], userId: UserStore['user_id']) => boolean,
   computeTeamUsersEnabled?: (teamId: Team['team_id']) => number,
