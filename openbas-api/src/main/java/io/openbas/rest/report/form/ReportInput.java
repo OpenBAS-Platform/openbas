@@ -17,4 +17,7 @@ public class ReportInput {
 
     @JsonProperty("report_informations")
     private List<ReportInformationInput> reportInformations;
+
+    @JsonProperty("report_global_observation")
+    private String globalObservation;
 }

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Paper, Typography } from '@mui/material';
-import type { Exercise, ExpectationResultsByType, InjectResultDTO, Report, ReportInformation, ReportInjectComment } from '../../../../../utils/api-types';
+import type { Exercise, ExpectationResultsByType, InjectResultDTO, Report, ReportInformation, ReportInput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useFormatter } from '../../../../../components/i18n';
 import ReportInformationType from './ReportInformationType';
@@ -22,9 +22,10 @@ import Loader from '../../../../../components/Loader';
 import ExerciseMainInformation from '../ExerciseMainInformation';
 import ResponsePie from '../../../common/injects/ResponsePie';
 import InjectReportResult from './InjectReportResult';
-import { updateReportInjectCommentForExercise } from '../../../../../actions/reports/report-actions';
+import { updateReportGlobalObservation, updateReportInjectCommentForExercise } from '../../../../../actions/reports/report-actions';
 import LessonsCategories from '../../../lessons/exercises/LessonsCategories';
 import ExerciseDistribution from '../overview/ExerciseDistribution';
+import SimpleRichTextField from '../../../../../components/fields/SimpleRichTextField';
 
 interface Props {
   report: Report,
@@ -36,6 +37,7 @@ const ExerciseReportContent: React.FC<Props> = ({ report, exerciseId, canWrite =
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
   const [loading, setLoading] = useState(true);
+  const globalObservationRef = useRef<string>(report?.report_global_observation ?? '');
 
   const displayModule = (moduleType: ReportInformationType) => {
     return report?.report_informations?.find((info: ReportInformation) => info.report_informations_type === moduleType)?.report_informations_display;
@@ -66,9 +68,7 @@ const ExerciseReportContent: React.FC<Props> = ({ report, exerciseId, canWrite =
     const fetchPromises = [];
     setLoading(true);
     if (displayModule(ReportInformationType.MAIN_INFORMATION)) {
-      fetchPromises.push(
-        dispatch(fetchExercise(exerciseId)),
-      );
+      fetchPromises.push(dispatch(fetchExercise(exerciseId)));
     }
     if (displayModule(ReportInformationType.PLAYER_SURVEYS)) {
       fetchPromises.push(
@@ -78,7 +78,7 @@ const ExerciseReportContent: React.FC<Props> = ({ report, exerciseId, canWrite =
       );
     }
     Promise.all(fetchPromises).then(() => setLoading(false));
-  }, [report]);
+  }, [report.report_informations]);
 
   const [exerciseExpectationResults, setResults] = useState<ExpectationResultsByType[] | null>(null);
   const [injects, setInjects] = useState<InjectResultDTO[]>([]);
@@ -89,11 +89,11 @@ const ExerciseReportContent: React.FC<Props> = ({ report, exerciseId, canWrite =
       }) => setResults(result.data));
     }
     if (displayModule(ReportInformationType.INJECT_RESULT)) {
-      exerciseInjectsResultDTO(exerciseId).then((result: { data: InjectResultDTO[] }) => {
+      exerciseInjectsResultDTO(exerciseId).then((result) => {
         setInjects(result.data);
       });
     }
-  }, [report]);
+  }, [report.report_informations]);
 
   if (loading) {
     return <Loader/>;
@@ -129,9 +129,37 @@ const ExerciseReportContent: React.FC<Props> = ({ report, exerciseId, canWrite =
             initialInjectComments={report?.report_injects_comments}
             injects={injects}
             style={{ width: '100%', marginTop: 20 }}
-            onCommentSubmit={(value: ReportInjectComment) => updateReportInjectCommentForExercise(exerciseId, report.report_id, value)}
+            onCommentSubmit={(value) => updateReportInjectCommentForExercise(exerciseId, report.report_id, value)}
           />
         )
+      }
+      {displayModule(ReportInformationType.GLOBAL_OBSERVATION)
+        && <div style={{ width: '100%', marginTop: 20 }}>
+          <Typography variant="h4" gutterBottom>
+            {t('Notes')}
+          </Typography>
+            {canWrite
+              ? <SimpleRichTextField
+                  value={globalObservationRef.current}
+                  onChange={(value: string) => {
+                    globalObservationRef.current = value;
+                  }}
+                  style={{ height: 200, width: '100%' }}
+                  onBlur={() => updateReportGlobalObservation(exerciseId, report.report_id, {
+                    report_informations: report.report_informations,
+                    report_global_observation: globalObservationRef.current,
+                    report_name: report.report_name,
+                  } as ReportInput)
+                }
+                /> : <Paper variant="outlined" sx={{ padding: '10px 15px 10px 15px' }}>
+                  {globalObservationRef.current
+                    ? <div dangerouslySetInnerHTML={{ __html: globalObservationRef.current }}/>
+                    : <div style={{ textTransform: 'none' }}>
+                      {t('-')}
+                    </div>}
+                </Paper>
+            }
+          </div>
       }
       {displayModule(ReportInformationType.PLAYER_SURVEYS)
         && <LessonsCategories

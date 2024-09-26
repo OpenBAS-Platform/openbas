@@ -108,7 +108,7 @@ const InjectReportResult: React.FC<Props> = ({
       </Typography>
 
       <Paper variant="outlined">
-        <TableContainer>
+        <TableContainer style={{ maxHeight: 'none', overflow: 'visible' }}>
           <Table aria-label="injects results">
             <TableHead>
               <TableRow>
