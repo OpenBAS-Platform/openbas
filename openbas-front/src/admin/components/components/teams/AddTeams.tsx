@@ -181,6 +181,9 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
               <Box className={classes.box}>
                 {teamIds.map((teamId) => {
                   const team = teamsMap[teamId];
+                  if (!team) {
+                    return null; // Skip rendering if team is undefined
+                  }
                   const teamGravatar = R.propOr('-', 'team_gravatar', team);
                   return (
                     <Chip
