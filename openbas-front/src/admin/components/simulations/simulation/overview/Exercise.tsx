@@ -102,7 +102,7 @@ const Exercise = () => {
         {exercise.exercise_status !== 'SCHEDULED' && (
           <Grid item xs={12} style={{ marginTop: 25 }}>
             <Typography variant="h4" gutterBottom style={{ marginBottom: 15 }}>
-              {t('Injects Results')}
+              {t('Injects results')}
             </Typography>
             <Paper classes={{ root: classes.paper }} variant="outlined">
               <InjectDtoList

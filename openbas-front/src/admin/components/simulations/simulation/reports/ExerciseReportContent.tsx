@@ -39,6 +39,12 @@ const ExerciseReportContent: React.FC<Props> = ({ report, exerciseId, canWrite =
   const [loading, setLoading] = useState(true);
   const globalObservationRef = useRef<string>(report?.report_global_observation ?? '');
 
+  const saveGlobalObservation = () => updateReportGlobalObservation(exerciseId, report.report_id, {
+    report_informations: report.report_informations,
+    report_global_observation: globalObservationRef.current,
+    report_name: report.report_name,
+  } as ReportInput);
+
   const displayModule = (moduleType: ReportInformationType) => {
     return report?.report_informations?.find((info: ReportInformation) => info.report_informations_type === moduleType)?.report_informations_display;
   };
@@ -145,12 +151,7 @@ const ExerciseReportContent: React.FC<Props> = ({ report, exerciseId, canWrite =
                     globalObservationRef.current = value;
                   }}
                   style={{ height: 200, width: '100%' }}
-                  onBlur={() => updateReportGlobalObservation(exerciseId, report.report_id, {
-                    report_informations: report.report_informations,
-                    report_global_observation: globalObservationRef.current,
-                    report_name: report.report_name,
-                  } as ReportInput)
-                }
+                  onBlur={saveGlobalObservation}
                 /> : <Paper variant="outlined" sx={{ padding: '10px 15px 10px 15px' }}>
                   {globalObservationRef.current
                     ? <div dangerouslySetInnerHTML={{ __html: globalObservationRef.current }}/>
