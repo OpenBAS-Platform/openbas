@@ -30,6 +30,7 @@ import { attackPatternsFakeData, categoriesDataFakeData, categoriesLabelsFakeDat
 import ExerciseList from './simulations/ExerciseList';
 import type { EndpointStore } from './assets/endpoints/Endpoint';
 import { initSorting, type Page } from '../../components/common/queryable/Page';
+import Loader from '../../components/Loader';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -76,9 +77,11 @@ const Dashboard = () => {
   // Fetching data
   const exercisesFromStore = useHelper((helper: ExercisesHelper) => helper.getExercises());
   const statistics = useHelper((helper: StatisticsHelper) => helper.getStatistics());
+  const [loadingExercises, setLoadingExercises] = useState(true);
   useDataLoader(() => {
     dispatch(fetchKillChainPhases());
-    dispatch(fetchExercises());
+    setLoadingExercises(true);
+    dispatch(fetchExercises()).finally(() => setLoadingExercises(false));
     dispatch(fetchStatistics());
     dispatch(fetchAttackPatterns());
   });
@@ -151,7 +154,8 @@ const Dashboard = () => {
       <Grid item={true} xs={6}>
         <Typography variant="h4">{t('Simulations')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          <Chart
+          {loadingExercises && (<Loader variant="inElement" />)}
+          {!loadingExercises && (<Chart
             options={verticalBarsChartOptions(
               theme,
               fld,
@@ -163,12 +167,14 @@ const Dashboard = () => {
               'dataPoints',
               true,
               exercisesOverTime.length === 0,
+              undefined,
+              t('No data to display'),
             ) as ApexOptions}
             series={exercisesData}
             type="bar"
             width="100%"
             height="100%"
-          />
+                                 />)}
         </Paper>
       </Grid>
       <Grid item={true} xs={3}>

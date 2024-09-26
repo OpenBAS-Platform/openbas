@@ -260,6 +260,7 @@ export const areaChartOptions = (
  * @param {boolean} isResult
  * @param {boolean} isFakeData
  * @param {number} max
+ * @param {string} emptyChartText
  */
 export const verticalBarsChartOptions = (
   theme,
@@ -273,6 +274,7 @@ export const verticalBarsChartOptions = (
   isResult = false,
   isFakeData = false,
   max = undefined,
+  emptyChartText = '',
 ) => ({
   chart: {
     type: 'bar',
@@ -282,6 +284,12 @@ export const verticalBarsChartOptions = (
     stacked: isStacked,
     width: '100%',
     height: '100%',
+    zoom: {
+      enabled: !isFakeData,
+    },
+    animations: {
+      enabled: !isFakeData,
+    },
   },
   theme: {
     mode: theme.palette.mode,
@@ -294,8 +302,13 @@ export const verticalBarsChartOptions = (
   states: {
     hover: {
       filter: {
-        type: 'lighten',
+        type: isFakeData ? 'none' : 'lighten',
         value: 0.05,
+      },
+    },
+    active: {
+      filter: {
+        type: isFakeData ? 'none' : 'lighten',
       },
     },
   },
@@ -312,9 +325,16 @@ export const verticalBarsChartOptions = (
       horizontal: 5,
       vertical: 20,
     },
+    onItemClick: {
+      toggleDataSeries: !isFakeData,
+    },
+    onItemHover: {
+      highlightDataSeries: !isFakeData,
+    },
   },
   tooltip: {
     theme: theme.palette.mode,
+    enabled: !isFakeData,
   },
   xaxis: {
     type: isTimeSeries ? 'datetime' : 'category',
@@ -326,6 +346,7 @@ export const verticalBarsChartOptions = (
         fontSize: '12px',
         fontFamily: '"IBM Plex Sans", sans-serif',
       },
+      show: !isFakeData,
     },
     axisBorder: {
       show: false,
@@ -360,6 +381,13 @@ export const verticalBarsChartOptions = (
       distributed,
     },
   },
+  ...(isFakeData && {
+    subtitle: {
+      text: emptyChartText,
+      align: 'center',
+      offsetY: 130,
+    },
+  }),
 });
 
 /**

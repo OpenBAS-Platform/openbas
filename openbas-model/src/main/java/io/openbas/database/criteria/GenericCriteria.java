@@ -21,7 +21,7 @@ public class GenericCriteria {
       Specification<T> specification) {
     CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
     Root<T> countRoot = countQuery.from(entityClass);
-    countQuery.select(cb.count(countRoot));
+    countQuery.select(cb.countDistinct(countRoot));
     if (specification != null) {
       Predicate predicate = specification.toPredicate(countRoot, countQuery, cb);
       if (predicate != null) {

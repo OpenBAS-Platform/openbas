@@ -23,7 +23,6 @@ public interface Base {
         BeanUtils.copyProperties(input, this);
     }
 
-    @JsonIgnore
     default boolean isListened() {
         return true;
     }

@@ -297,6 +297,7 @@ public class ImapService {
     }
 
     private void syncFolders() throws Exception {
+        try {
         // Sync sent
         Folder sentBox = imapStore.getFolder(sentFolder);
         sentBox.open(Folder.READ_ONLY);
@@ -306,6 +307,23 @@ public class ImapService {
             Folder inbox = imapStore.getFolder(listeningFolder);
             inbox.open(Folder.READ_ONLY);
             synchronizeBox(inbox, false);
+        }
+        } catch (MessagingException e) {
+            log.warning("Connection failure: " + e.getMessage());
+            // Retry logic or rethrow the exception
+            retrySyncFolders();
+        }
+    }
+
+    private void retrySyncFolders() throws Exception {
+        for (int i = 0; i < 3; i++) {
+            try {
+                syncFolders();
+                break;
+            } catch (MessagingException e) {
+                log.warning("Retrying connection..." + e.getMessage());
+                Thread.sleep(2000);
+            }
         }
     }
 

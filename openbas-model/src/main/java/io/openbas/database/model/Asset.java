@@ -85,6 +85,7 @@ public class Asset implements Base {
   @JsonProperty("asset_tags")
   private Set<Tag> tags = new HashSet<>();
 
+  @Queryable(sortable = true)
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "asset_executor")
   @JsonSerialize(using = MonoIdDeserializer.class)

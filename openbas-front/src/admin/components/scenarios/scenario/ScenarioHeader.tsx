@@ -6,8 +6,7 @@ import { PlayArrowOutlined, Stop } from '@mui/icons-material';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { createRunningExerciseFromScenario, fetchScenario, updateScenarioRecurrence } from '../../../../actions/scenarios/scenario-actions';
+import { createRunningExerciseFromScenario, updateScenarioRecurrence } from '../../../../actions/scenarios/scenario-actions';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import ScenarioPopover from './ScenarioPopover';
 import { useFormatter } from '../../../../components/i18n';
@@ -83,9 +82,6 @@ const ScenarioHeader = ({
   const { scenario }: { scenario: ScenarioStore } = useHelper((helper: ScenariosHelper) => ({
     scenario: helper.getScenario(scenarioId),
   }));
-  useDataLoader(() => {
-    dispatch(fetchScenario(scenarioId));
-  });
 
   // Local
   const ended = scenario.scenario_recurrence_end && new Date(scenario.scenario_recurrence_end).getTime() < new Date().getTime();

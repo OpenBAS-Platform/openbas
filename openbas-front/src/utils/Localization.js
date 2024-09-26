@@ -1367,6 +1367,7 @@ const i18n = {
       'Internal error': 'Erreur interne',
       'The element has been successfully updated': 'L\'élément a été mis à jour avec succès',
       'The element has been successfully deleted': 'L\'élément a été supprimé avec succès',
+      'No data to display': 'Aucune donnée à afficher',
     },
     zh: {
       'Email address': 'email地址',
@@ -2640,6 +2641,7 @@ const i18n = {
       'The element has been successfully updated': '元素已成功更新',
       'The element has been successfully deleted': '元素已成功删除',
       'Internal error': '内部错误 ',
+      'No data to display': '没有可显示的数据',
     },
     en: {
       openbas_email: 'Email',
