@@ -109,7 +109,9 @@ public class EndpointService {
     }
     return IOUtils.toString(in, StandardCharsets.UTF_8)
             .replace("${OPENBAS_URL}", openBASConfig.getBaseUrlForAgent())
-            .replace("${OPENBAS_TOKEN}", adminToken);
+            .replace("${OPENBAS_TOKEN}", adminToken)
+            .replace("${OPENBAS_UNSECURED_CERTIFICATE}", String.valueOf(openBASConfig.isUnsecuredCertificate()))
+            .replace("${OPENBAS_WITH_PROXY}", String.valueOf(openBASConfig.isWithProxy()));
   }
 
   public String generateInstallCommand(String platform, String token) throws IOException {
