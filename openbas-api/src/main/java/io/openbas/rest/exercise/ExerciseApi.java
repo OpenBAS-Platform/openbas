@@ -233,7 +233,7 @@ public class ExerciseApi extends RestBehavior {
         Exercise exercise = this.exerciseService.exercise(exerciseId);
         // Remove teams from exercise
         List<Team> teams = exercise.getTeams().stream().filter(team -> !input.getTeamIds().contains(team.getId())).toList();
-        exercise.setTeams(teams);
+        exercise.setTeams(new ArrayList<>(teams));
         this.exerciseService.updateExercise(exercise);
         // Remove all association between users / exercises / teams
         input.getTeamIds().forEach(exerciseTeamUserRepository::deleteTeamFromAllReferences);

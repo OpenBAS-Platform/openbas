@@ -257,7 +257,7 @@ const i18n = {
         'Souhaitez-vous supprimer ce document ?',
       'Update the document': 'Modifier le document',
       'Inject data': 'Données du stimuli',
-      'Add teams': 'Ajouter une équipe',
+      'Update teams': 'Modifier les équipe',
       'Add target teams in this inject':
         'Ajouter des équipes cibles dans ce stimuli',
       'Targeted teams': 'Equipes ciblées',
@@ -1623,7 +1623,7 @@ const i18n = {
         '你想要删除这个文档么?',
       'Update the document': '更新文档',
       'Inject data': '注入数据',
-      'Add teams': '添加团队',
+      'Add teams': '编辑团队',
       'Add target teams in this inject':
         '在这个注入里添加目标团队',
       'Targeted teams': '目标团队',

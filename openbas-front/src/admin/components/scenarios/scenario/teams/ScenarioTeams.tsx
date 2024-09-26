@@ -19,7 +19,7 @@ import { PermissionsContext, TeamContext } from '../../../common/Context';
 import type { SearchPaginationInput, Team, TeamCreateInput, TeamOutput } from '../../../../../utils/api-types';
 import { addTeam, fetchTeams } from '../../../../../actions/teams/team-actions';
 import type { UserStore } from '../../../teams/players/Player';
-import AddTeams from '../../../components/teams/AddTeams';
+import UpdateTeams from '../../../components/teams/UpdateTeams';
 import { useFormatter } from '../../../../../components/i18n';
 import ContextualTeams from '../../../components/teams/ContextualTeams';
 import { addScenarioTeams, removeScenarioTeams, replaceScenarioTeams, searchScenarioTeams } from '../../../../../actions/scenarios/scenario-teams-action';
@@ -107,7 +107,7 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
       <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
         {t('Teams')}
       </Typography>
-      {permissions.canWrite && <AddTeams addedTeamIds={teamIds} setTeamIds={(ids: string[]) => setTeamsId(ids)}/>}
+      {permissions.canWrite && <UpdateTeams addedTeamIds={teamIds} setTeamIds={(ids: string[]) => setTeamsId(ids)}/>}
       <div className="clearfix" />
       <Paper classes={{ root: classes.paper }} variant="outlined">
         <ContextualTeams teamIds={teamIds} />

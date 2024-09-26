@@ -7,7 +7,7 @@ import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { PermissionsContext, TeamContext, TeamContextType } from '../../../common/Context';
 import type { UserStore } from '../../../teams/players/Player';
-import AddTeams from '../../../components/teams/AddTeams';
+import UpdateTeams from '../../../components/teams/UpdateTeams';
 import type { SearchPaginationInput, Team, TeamCreateInput, TeamOutput } from '../../../../../utils/api-types';
 import type { TeamStore } from '../../../../../actions/teams/Team';
 import { addExerciseTeamPlayers, disableExerciseTeamPlayers, enableExerciseTeamPlayers, fetchExerciseTeams, removeExerciseTeamPlayers } from '../../../../../actions/Exercise';
@@ -101,7 +101,7 @@ const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
       <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
         {t('Teams')}
       </Typography>
-      {permissions.canWrite && <AddTeams addedTeamIds={teamIds} setTeamIds={(ids: string[]) => setTeamsId(ids)}/>}
+      {permissions.canWrite && <UpdateTeams addedTeamIds={teamIds} setTeamIds={(ids: string[]) => setTeamsId(ids)}/>}
       <div className="clearfix" />
       <Paper classes={{ root: classes.paper }} variant="outlined">
         <ContextualTeams teamIds={teamIds} />

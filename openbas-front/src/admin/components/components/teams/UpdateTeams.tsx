@@ -31,7 +31,7 @@ interface Props {
   setTeamIds: (ids: string[]) => void;
 }
 
-const AddTeams: React.FC<Props> = ({
+const UpdateTeams: React.FC<Props> = ({
   addedTeamIds,
   setTeamIds,
 }) => {
@@ -128,7 +128,7 @@ const AddTeams: React.FC<Props> = ({
           },
         }}
       >
-        <DialogTitle>{t('Add teams')}</DialogTitle>
+        <DialogTitle>{t('Update teams')}</DialogTitle>
         <DialogContent>
           <Box sx={{ marginTop: 2 }}>
             <SelectList
@@ -149,7 +149,7 @@ const AddTeams: React.FC<Props> = ({
         <DialogActions>
           <Button onClick={handleClose}>{t('Cancel')}</Button>
           <Button color="secondary" onClick={handleSubmit}>
-            {t('Add')}
+            {t('Update')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -157,4 +157,4 @@ const AddTeams: React.FC<Props> = ({
   );
 };
 
-export default AddTeams;
+export default UpdateTeams;
