@@ -32,7 +32,7 @@ public class ExerciseTeamApi extends RestBehavior {
   private final TeamService teamService;
 
   @PostMapping(EXERCISE_URI + "/{exerciseId}/teams/search")
-  @PreAuthorize("isScenarioObserver(#exerciseId)")
+  @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
   @Tracing(name = "Paginate teams for exercise", layer = "api", operation = "POST")
   public Page<TeamOutput> searchTeams(
