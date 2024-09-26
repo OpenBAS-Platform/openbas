@@ -4,11 +4,10 @@ import Chart from 'react-apexcharts';
 import * as R from 'ramda';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
-import { useAppDispatch } from '../../../../../utils/hooks';
 import { lineChartOptions } from '../../../../../utils/Charts';
 import type { Theme } from '../../../../../components/Theme';
 import type { InjectStore } from '../../../../../actions/injects/Inject';
-import { Inject } from '../../../../../utils/api-types';
+import type { Inject } from '../../../../../utils/api-types';
 
 interface Props {
   injects: Inject[];
@@ -19,7 +18,6 @@ const InjectOverTimeLine: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t, nsdt } = useFormatter();
-  const dispatch = useAppDispatch();
   const theme: Theme = useTheme();
 
   let cumulation = 0;

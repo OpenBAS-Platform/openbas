@@ -26,7 +26,7 @@ import SearchFilter from '../../../../../components/SearchFilter';
 import TagsFilter from '../../../common/filters/TagsFilter';
 import useSearchAnFilter from '../../../../../utils/SortingFiltering';
 import { isNotEmptyField } from '../../../../../utils/utils';
-import { InjectStore } from '../../../../../actions/injects/Inject';
+import type { InjectStore } from '../../../../../actions/injects/Inject';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -97,7 +97,7 @@ const TimelineOverview = () => {
   const filtering = useSearchAnFilter(
     'inject',
     'depends_duration',
-    searchColumns
+    searchColumns,
   );
 
   const filteredInjects = filtering.filterAndSort(injects);
