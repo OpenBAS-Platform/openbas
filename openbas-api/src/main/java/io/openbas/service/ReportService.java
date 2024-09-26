@@ -1,9 +1,6 @@
 package io.openbas.service;
 
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.Report;
-import io.openbas.database.model.ReportInformation;
-import io.openbas.database.model.ReportInjectComment;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.ReportRepository;
 import io.openbas.database.specification.ReportSpecification;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -16,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.time.Instant.now;
@@ -56,30 +54,30 @@ public class ReportService {
     }
 
     public List<ReportInjectComment> updateReportInjectComment(@NotNull final Report report, @NotNull final Inject inject, @NotNull final ReportInjectCommentInput input){
-        ReportInjectComment reportInjectComment = findReportInjectComment(report.getId(), inject.getId());
-
-        if (reportInjectComment != null) {
-            reportInjectComment.setComment(input.getComment());
+        Optional<ReportInjectComment> reportInjectComment = findReportInjectComment(report.getId(), inject.getId());
+        ReportInjectComment injectComment;
+        if (reportInjectComment.isPresent()) {
+            injectComment = reportInjectComment.get();
+            injectComment.setComment(input.getComment());
         } else {
-            reportInjectComment = new ReportInjectComment();
-            reportInjectComment.setInject(inject);
-            reportInjectComment.setReport(report);
-            reportInjectComment.setComment(input.getComment());
-            report.getReportInjectsComments().add(reportInjectComment);
+            injectComment = new ReportInjectComment();
+            injectComment.setInject(inject);
+            injectComment.setReport(report);
+            injectComment.setComment(input.getComment());
+            report.getReportInjectsComments().add(injectComment);
         }
         this.reportRepository.save(report);
         return report.getReportInjectsComments();
     }
 
-    private ReportInjectComment findReportInjectComment(String reportId, String injectId) {
+    private Optional<ReportInjectComment> findReportInjectComment(String reportId, String injectId) {
         String jpql = "SELECT r FROM ReportInjectComment r WHERE r.report.id = :reportId AND r.inject.id = :injectId";
 
         return this.entityManager.createQuery(jpql, ReportInjectComment.class)
             .setParameter("reportId", UUID.fromString(reportId))
             .setParameter("injectId", injectId)
             .getResultStream()
-            .findFirst()
-            .orElse(null);
+            .findFirst();
     }
 
     public void deleteReport(@NotBlank final UUID reportId) {
