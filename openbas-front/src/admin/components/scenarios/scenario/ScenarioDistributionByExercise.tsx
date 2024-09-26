@@ -7,7 +7,6 @@ import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 import Empty from '../../../../components/Empty';
 import { verticalBarsChartOptions } from '../../../../utils/Charts';
-import { random } from '../../../../utils/Number';
 
 interface Props {
   exercises: ExerciseSimpleStore[];
@@ -28,9 +27,9 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
         exercise_name: 'fake',
         exercise_start_date: now.toISOString(),
         exercise_global_score: [
-          { type: 'PREVENTION', distribution: [{ value: random(0.1, 1), label: t('Unknown') }], avgResult: 'PARTIAL' },
-          { type: 'DETECTION', distribution: [{ value: random(0.1, 1), label: t('Unknown') }], avgResult: 'PARTIAL' },
-          { type: 'HUMAN_RESPONSE', distribution: [{ value: random(0.1, 1), label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'PREVENTION', distribution: [{ value: 0.69, label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'DETECTION', distribution: [{ value: 0.84, label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'HUMAN_RESPONSE', distribution: [{ value: 0.46, label: t('Unknown') }], avgResult: 'PARTIAL' },
         ],
         exercise_targets: [],
         exercise_tags: undefined,
@@ -77,6 +76,7 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
             true,
             exercises.length === 0,
             1,
+            t('No data to display'),
           ) as ApexOptions}
           series={series}
           type="bar"
