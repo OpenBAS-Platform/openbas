@@ -329,12 +329,20 @@ public class InjectService {
             });
             inject.getTeams().forEach(team -> team.getUsers().forEach(user -> {
                 if(!exercise.getTeamUsers().contains(user)) {
-                    ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
-                    exerciseTeamUser.setExercise(exercise);
-                    exerciseTeamUser.setTeam(team);
-                    exerciseTeamUser.setUser(user);
-                    exerciseTeamUserRepository.save(exerciseTeamUser);
-                    exercise.getTeamUsers().add(exerciseTeamUser);
+                    ExerciseTeamUserId compositeId = new ExerciseTeamUserId();
+                    compositeId.setExerciseId(exercise.getId());
+                    compositeId.setTeamId(team.getId());
+                    compositeId.setUserId(user.getId());
+                    boolean exists = exerciseTeamUserRepository.findById(compositeId).isPresent();
+
+                    if(!exists) {
+                        ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
+                        exerciseTeamUser.setExercise(exercise);
+                        exerciseTeamUser.setTeam(team);
+                        exerciseTeamUser.setUser(user);
+                        exerciseTeamUserRepository.save(exerciseTeamUser);
+                        exercise.getTeamUsers().add(exerciseTeamUser);
+                    }
                 }
             }));
         });
@@ -350,12 +358,20 @@ public class InjectService {
             });
             inject.getTeams().forEach(team -> team.getUsers().forEach(user -> {
                 if(!scenario.getTeamUsers().contains(user)) {
-                    ScenarioTeamUser scenarioTeamUser = new ScenarioTeamUser();
-                    scenarioTeamUser.setScenario(scenario);
-                    scenarioTeamUser.setTeam(team);
-                    scenarioTeamUser.setUser(user);
-                    scenarioTeamUserRepository.save(scenarioTeamUser);
-                    scenario.getTeamUsers().add(scenarioTeamUser);
+                    ScenarioTeamUserId compositeId = new ScenarioTeamUserId();
+                    compositeId.setScenarioId(scenario.getId());
+                    compositeId.setTeamId(team.getId());
+                    compositeId.setUserId(user.getId());
+                    boolean exists = scenarioTeamUserRepository.findById(compositeId).isPresent();
+
+                    if(!exists) {
+                        ScenarioTeamUser scenarioTeamUser = new ScenarioTeamUser();
+                        scenarioTeamUser.setScenario(scenario);
+                        scenarioTeamUser.setTeam(team);
+                        scenarioTeamUser.setUser(user);
+                        scenarioTeamUserRepository.save(scenarioTeamUser);
+                        scenario.getTeamUsers().add(scenarioTeamUser);
+                    }
                 }
             }));
         });
