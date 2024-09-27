@@ -11,7 +11,7 @@
             <appender-ref ref="STDOUT" />
         </root>
     </springProfile>
-    <springProfile name="nativeTest | native">
+    <springProfile name="!dev">
         <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
         <appender name="json" class="ch.qos.logback.core.ConsoleAppender">
             <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
