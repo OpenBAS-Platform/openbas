@@ -190,7 +190,7 @@ public class OperationUtilsJpa {
     } else {
       finalPaths = paths;
     }
-    if (type.equals(Instant.class)) {
+    if (type.equals(Instant.class) || type.isEnum()) {
       return cb.isNull(finalPaths);
     }
     return cb.or(
