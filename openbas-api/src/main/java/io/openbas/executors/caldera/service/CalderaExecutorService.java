@@ -28,7 +28,6 @@ import java.util.logging.Level;
 import static java.time.Instant.now;
 import static java.time.ZoneOffset.UTC;
 
-@ConditionalOnProperty(prefix = "executor.caldera", name = "enable")
 @Log
 @Service
 public class CalderaExecutorService implements Runnable {
@@ -85,8 +84,8 @@ public class CalderaExecutorService implements Runnable {
                 this.executor = executorService.register(config.getId(), CALDERA_EXECUTOR_TYPE, CALDERA_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-caldera.png"), new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
                 this.calderaExecutorContextService.registerAbilities();
             } else {
-                executorService.remove(config.getId());
                 this.platformSettingsService.cleanMessage(BannerMessage.BANNER_KEYS.CALDERA_UNAVAILABLE);
+                executorService.removeFromType(CALDERA_EXECUTOR_TYPE);
             }
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error creating caldera executor: " + e);
