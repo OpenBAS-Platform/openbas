@@ -13,18 +13,12 @@
     </springProfile>
     <springProfile name="!dev">
         <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
-        <appender name="json" class="ch.qos.logback.core.ConsoleAppender">
-            <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
-                <jsonFormatter
-                        class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
-                    <prettyPrint>true</prettyPrint>
-                </jsonFormatter>
-                <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
-            </layout>
+        <appender name="jsonEncoder" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="ch.qos.logback.classic.encoder.JsonEncoder"/>
         </appender>
 
         <root level="debug">
-            <appender-ref ref="json" />
+            <appender-ref ref="jsonEncoder" />
         </root>
     </springProfile>
 </configuration>
