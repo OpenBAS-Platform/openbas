@@ -123,11 +123,9 @@ public class Inject implements Base, Injection {
   private Scenario scenario;
 
   @Getter
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "inject_depends_from_another")
-  @JsonSerialize(using = MonoIdDeserializer.class)
+  @OneToMany(mappedBy = "compositeId.injectChildrenId", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonProperty("inject_depends_on")
-  private Inject dependsOn;
+  private List<InjectDependency> dependsOn;
 
   @Getter
   @Column(name = "inject_depends_duration")
@@ -279,7 +277,7 @@ public class Inject implements Base, Injection {
 
   @JsonIgnore
   public Instant computeInjectDate(Instant source, int speed) {
-    return InjectModelHelper.computeInjectDate(source, speed, getDependsOn(), getDependsDuration(), getExercise());
+    return InjectModelHelper.computeInjectDate(source, speed, getDependsDuration(), getExercise());
   }
 
   @JsonProperty("inject_date")
@@ -291,7 +289,7 @@ public class Inject implements Base, Injection {
         return Optional.of(now().minusSeconds(60));
       }
     }
-    return InjectModelHelper.getDate(getExercise(), getScenario(), getDependsOn(), getDependsDuration());
+    return InjectModelHelper.getDate(getExercise(), getScenario(), getDependsDuration());
   }
 
   @JsonIgnore

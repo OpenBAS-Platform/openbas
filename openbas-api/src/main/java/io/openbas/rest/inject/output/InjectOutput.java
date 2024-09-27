@@ -2,6 +2,7 @@ package io.openbas.rest.inject.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.database.model.InjectDependency;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.helper.InjectModelHelper;
 import io.openbas.injectors.email.EmailContract;
@@ -12,6 +13,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Data
 public class InjectOutput {
@@ -39,7 +42,7 @@ public class InjectOutput {
   private Long dependsDuration;
 
   @JsonProperty("inject_depends_on")
-  private String dependsOn;
+  private Map<String, String> dependsOn;
 
   @JsonProperty("inject_injector_contract")
   private InjectorContract injectorContract;
@@ -79,20 +82,19 @@ public class InjectOutput {
       String exerciseId,
       String scenarioId,
       Long dependsDuration,
-      String dependsOn,
       InjectorContract injectorContract,
       String[] tags,
       String[] teams,
       String[] assets,
       String[] assetGroups,
-      String injectType) {
+      String injectType,
+      InjectDependency injectDependency) {
     this.id = id;
     this.title = title;
     this.enabled = enabled;
     this.exercise = exerciseId;
     this.scenario = scenarioId;
     this.dependsDuration = dependsDuration;
-    this.dependsOn = dependsOn;
     this.injectorContract = injectorContract;
     this.tags = tags != null ? new HashSet<>(Arrays.asList(tags)) : new HashSet<>();
 
@@ -111,5 +113,11 @@ public class InjectOutput {
     this.injectType = injectType;
     this.teams = teams != null ? new ArrayList<>(Arrays.asList(teams)) : new ArrayList<>();
     this.content = content;
+
+    if (injectDependency != null) {
+      this.dependsOn = Stream.of(injectDependency)
+              .collect(Collectors.toMap(injectDep -> injectDep.getCompositeId().getInjectParentId().getId(), InjectDependency::getCondition));
+    }
+
   }
 }

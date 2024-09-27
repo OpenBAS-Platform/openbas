@@ -1,30 +1,47 @@
 package io.openbas.scheduler.jobs;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.asset.QueueService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionExecutorService;
 import io.openbas.helper.InjectHelper;
+import io.openbas.inject_expectation.InjectExpectationService;
+import io.openbas.injector_contract.ContractType;
+import io.openbas.model.Expectation;
 import io.openbas.service.AtomicTestingService;
+import io.openbas.service.ExerciseExpectationService;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static java.time.Instant.now;
 import static java.util.stream.Collectors.groupingBy;
@@ -47,9 +64,15 @@ public class InjectsExecutionJob implements Job {
     private final QueueService queueService;
     private final ExecutionExecutorService executionExecutorService;
     private final AtomicTestingService atomicTestingService;
+    private final InjectDependenciesRepository injectDependenciesRepository;
+    private final ExerciseExpectationService exerciseExpectationService;
+
+    private static final String EXPECTATIONS = "expectations";
 
     private final List<ExecutionStatus> executionStatusesNotReady =
             List.of(ExecutionStatus.QUEUING, ExecutionStatus.DRAFT, ExecutionStatus.EXECUTING, ExecutionStatus.PENDING);
+
+    private final List<InjectExpectation.EXPECTATION_STATUS> expectationStatusesSuccess = List.of(InjectExpectation.EXPECTATION_STATUS.SUCCESS);
 
     @Resource
     protected ObjectMapper mapper;
@@ -148,24 +171,23 @@ public class InjectsExecutionJob implements Job {
         Inject inject = executableInject.getInjection().getInject();
 
         // We are now checking if we depend on another inject and if it did not failed
-        if (inject.getDependsOn() != null
-                && inject.getDependsOn().getStatus().isPresent()
-                && ( inject.getDependsOn().getStatus().get().getName().equals(ExecutionStatus.ERROR)
-                    || executionStatusesNotReady.contains(inject.getDependsOn().getStatus().get().getName()))) {
+        Optional<List<String>> errorMessages = getErrorMessagesPreExecution(executableInject.getExercise().getId(), inject);
+        if (errorMessages.isPresent()) {
             InjectStatus status = new InjectStatus();
             if (inject.getStatus().isEmpty()) {
                 status.setInject(inject);
             } else {
                 status = inject.getStatus().get();
             }
-            String errorMsg = inject.getDependsOn().getStatus().get().getName().equals(ExecutionStatus.ERROR) ?
-                    "The inject is depending on another inject that failed"
-                    : "The inject is depending on another inject that is not executed yet";
-            status.getTraces().add(InjectStatusExecution.traceError(errorMsg));
-            status.setName(ExecutionStatus.ERROR);
-            status.setTrackingSentDate(Instant.now());
-            status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
-            injectStatusRepository.save(status);
+
+            InjectStatus finalStatus = status;
+            errorMessages.get().forEach(
+                    errorMsg -> finalStatus.getTraces().add(InjectStatusExecution.traceError(errorMsg))
+            );
+            finalStatus.setName(ExecutionStatus.ERROR);
+            finalStatus.setTrackingSentDate(Instant.now());
+            finalStatus.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
+            injectStatusRepository.save(finalStatus);
         } else {
             inject.getInjectorContract().ifPresent(injectorContract -> {
 
@@ -223,6 +245,67 @@ public class InjectsExecutionJob implements Job {
                 }
             });
         }
+    }
+
+    private Optional<List<String>> getErrorMessagesPreExecution(String exerciseId, Inject inject) {
+        List<InjectDependency> injectDependencies = injectDependenciesRepository.findParents(List.of(inject.getId()));
+        if (!injectDependencies.isEmpty()) {
+            List<Inject> parents = StreamSupport.stream(injectRepository.findAllById(injectDependencies.stream()
+                    .map(injectDependency -> injectDependency.getCompositeId().getInjectParentId().getId()).toList()).spliterator(), false)
+                    .collect(Collectors.toList());
+
+            Map<String, Boolean> mapCondition = getStringBooleanMap(parents, exerciseId, injectDependencies);
+
+            List<String> results = null;
+
+            for (InjectDependency injectDependency : injectDependencies) {
+                String expressionToEvaluate = injectDependency.getCondition()
+                        .replaceAll("(.*-Execution-Success)", "#this['$1']");
+
+                ExpressionParser parser = new SpelExpressionParser();
+                EvaluationContext context = new StandardEvaluationContext(mapCondition);
+                Expression exp = parser.parseExpression(String.format(expressionToEvaluate,
+                        injectDependency.getCompositeId().getInjectParentId() + "-Execution-Success"));
+                boolean canBeExecuted = Boolean.TRUE.equals(exp.getValue(mapCondition, Boolean.class));
+                if (!canBeExecuted) {
+                    if (results == null) {
+                        results = new ArrayList<>();
+                    }
+                    results.add("The conditions to launch this inject are not met");
+                }
+            }
+            return results == null ? Optional.empty() : Optional.of(results);
+        }
+        return Optional.empty();
+    }
+
+    private @NotNull Map<String, Boolean> getStringBooleanMap(List<Inject> parents, String exerciseId, List<InjectDependency> injectDependencies) {
+        Map<String, Boolean> mapCondition = new HashMap<>();
+
+        List<InjectExpectation> expectations = this.exerciseExpectationService.injectExpectations(exerciseId);
+
+        injectDependencies.forEach(injectDependency -> {
+            List<String> splittedConditions = List.of(injectDependency.getCondition().split("&&|\\|\\|"));
+            splittedConditions.forEach(condition -> {
+                mapCondition.put(injectDependency.getCondition().split("==")[0].trim(), false);
+            });
+        });
+
+        parents.forEach(parent -> {
+            mapCondition.put(parent.getId() + "-Execution-Success",
+                    parent.getStatus().isPresent()
+                            && !parent.getStatus().get().getName().equals(ExecutionStatus.ERROR)
+                            && !executionStatusesNotReady.contains(parent.getStatus().get().getName()));
+
+            parent.getExpectations().forEach(injectExpectation -> {
+                String name = String.format("%s-%s-Success", parent.getId(), StringUtils.capitalize(injectExpectation.getType().toString().toLowerCase()));
+                if(injectExpectation.getType().equals(InjectExpectation.EXPECTATION_TYPE.MANUAL)) {
+                    name = String.format("%s-%s-Success", parent.getId(), injectExpectation.getName());
+                }
+                mapCondition.put(name, expectationStatusesSuccess.contains(injectExpectation.getResponse()));
+            });
+        });
+        return mapCondition;
     }
 
     public void updateExercise(String exerciseId) {
