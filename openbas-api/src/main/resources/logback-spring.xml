@@ -7,7 +7,7 @@
             </encoder>
         </appender>
 
-        <root level="debug">
+        <root>
             <appender-ref ref="STDOUT" />
         </root>
     </springProfile>
@@ -17,7 +17,7 @@
             <encoder class="ch.qos.logback.classic.encoder.JsonEncoder"/>
         </appender>
 
-        <root level="debug">
+        <root>
             <appender-ref ref="jsonEncoder" />
         </root>
     </springProfile>
