@@ -6,7 +6,6 @@ import io.openbas.database.specification.ReportSpecification;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.report.form.ReportInjectCommentInput;
 import io.openbas.rest.report.form.ReportInput;
-import jakarta.persistence.EntityManager;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,6 @@ import static java.time.Instant.now;
 @Service
 public class ReportService {
     private final ReportRepository reportRepository;
-    private final EntityManager entityManager;
 
     public Report report(@NotNull final UUID reportId) {
         return this.reportRepository.findById(reportId).orElseThrow(ElementNotFoundException::new);
@@ -54,7 +52,7 @@ public class ReportService {
     }
 
     public List<ReportInjectComment> updateReportInjectComment(@NotNull final Report report, @NotNull final Inject inject, @NotNull final ReportInjectCommentInput input){
-        Optional<ReportInjectComment> reportInjectComment = findReportInjectComment(report.getId(), inject.getId());
+        Optional<ReportInjectComment> reportInjectComment = this.reportRepository.findReportInjectComment(UUID.fromString(report.getId()), inject.getId());
         ReportInjectComment injectComment;
         if (reportInjectComment.isPresent()) {
             injectComment = reportInjectComment.get();
@@ -68,16 +66,6 @@ public class ReportService {
         }
         this.reportRepository.save(report);
         return report.getReportInjectsComments();
-    }
-
-    private Optional<ReportInjectComment> findReportInjectComment(String reportId, String injectId) {
-        String jpql = "SELECT r FROM ReportInjectComment r WHERE r.report.id = :reportId AND r.inject.id = :injectId";
-
-        return this.entityManager.createQuery(jpql, ReportInjectComment.class)
-            .setParameter("reportId", UUID.fromString(reportId))
-            .setParameter("injectId", injectId)
-            .getResultStream()
-            .findFirst();
     }
 
     public void deleteReport(@NotBlank final UUID reportId) {

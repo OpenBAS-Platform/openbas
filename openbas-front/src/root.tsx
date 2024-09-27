@@ -67,7 +67,7 @@ const Root = () => {
                 <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()} />
                 <Route path="lessons/exercise/:exerciseId" element={errorWrapper(ExerciseViewLessons)()} />
                 <Route path="lessons/scenario/:scenarioId" element={errorWrapper(ScenarioViewLessons)()} />
-                <Route path="reports/:exerciseId/:reportId" element={errorWrapper(ExerciseReport)()} />
+                <Route path="reports/:reportId/exercise/:exerciseId" element={errorWrapper(ExerciseReport)()} />
                 {/* Not found */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

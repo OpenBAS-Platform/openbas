@@ -25,7 +25,7 @@ const ExerciseReports: React.FC<ReportListProps> = ({ exerciseId, exerciseName }
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const navigateToReportPage = (reportId:string) => navigate(`/reports/${exerciseId}/${reportId}`);
+  const navigateToReportPage = (reportId:string) => navigate(`/reports/${reportId}/exercise/${exerciseId}`);
 
   const [openCreate, setOpenCreate] = useState(false);
   const handleOpenCreate = () => setOpenCreate(true);

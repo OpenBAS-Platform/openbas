@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
-import { Button, ToggleButtonGroup } from '@mui/material';
+import { Alert, Button, ToggleButtonGroup } from '@mui/material';
 
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../../store';
@@ -62,7 +62,9 @@ const ExerciseReportPage: React.FC = () => {
   if (loading) {
     return <Loader/>;
   }
-
+  if (!report) {
+    return <Alert severity="warning">{t('This report is not available')}</Alert>;
+  }
   return (
     <ReportContext.Provider value={context}>
       <div style={{ marginTop: 20, display: 'flex', flexFlow: 'wrap' }}>
