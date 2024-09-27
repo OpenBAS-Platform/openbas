@@ -84,18 +84,20 @@ public class CalderaContract extends Contractor {
   }
 
   private ContractExpectations expectations() {
+    Long EXPIRATION_TIME = 21600L;
+    Double SCORE = 100.0;
     // Prevention
     Expectation preventionExpectation = new Expectation();
     preventionExpectation.setType(PREVENTION);
     preventionExpectation.setName("Expect inject to be prevented");
-    preventionExpectation.setScore(100.0);
-    preventionExpectation.setExpirationTime(21600L);
+    preventionExpectation.setScore(SCORE);
+    preventionExpectation.setExpirationTime(EXPIRATION_TIME);
     // Detection
     Expectation detectionExpectation = new Expectation();
     detectionExpectation.setType(DETECTION);
     detectionExpectation.setName("Expect inject to be detected");
-    detectionExpectation.setScore(100.0);
-    detectionExpectation.setExpirationTime(21600L);
+    detectionExpectation.setScore(SCORE);
+    detectionExpectation.setExpirationTime(EXPIRATION_TIME);
     return expectationsField("expectations", "Expectations", List.of(preventionExpectation, detectionExpectation));
   }
 

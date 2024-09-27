@@ -63,7 +63,7 @@ public class PreventionExpectation implements Expectation {
       final String description,
       @NotNull final AssetGroup assetGroup,
       final boolean expectationGroup,
-      final Long expirationTime,
+      @NotNull final Long expirationTime,
       final List<InjectExpectationSignature> expectationSignatures
   ) {
     PreventionExpectation preventionExpectation = new PreventionExpectation();

@@ -29,11 +29,14 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
 
+  const EXPIRATION_TIME_SIX_HOURS: number = 21600;
+  const EXPIRATION_TIME_ONE_HOUR: number = 3600;
+
   const getExpirationTime = (expirationTime: number): number => {
     if (expirationTime !== null || expirationTime !== undefined) {
       return expirationTime;
     }
-    return (expectation.expectation_type === 'DETECTION' || expectation.expectation_type === 'PREVENTION') ? 21600 : 3600;
+    return (expectation.expectation_type === 'DETECTION' || expectation.expectation_type === 'PREVENTION') ? EXPIRATION_TIME_SIX_HOURS : EXPIRATION_TIME_ONE_HOUR;
   };
 
   const initialValues = {
@@ -61,11 +64,7 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
 
   const onSubmitEdit = (data: ExpectationInputForm) => {
     const values: ExpectationInput = {
-      expectation_type: data.expectation_type,
-      expectation_name: data.expectation_name,
-      expectation_description: data.expectation_description,
-      expectation_score: data.expectation_score,
-      expectation_expectation_group: data.expectation_expectation_group,
+      ...data,
       expectation_expiration_time: data.expiration_time_days * 3600 * 24
         + data.expiration_time_hours * 3600
         + data.expiration_time_minutes * 60,

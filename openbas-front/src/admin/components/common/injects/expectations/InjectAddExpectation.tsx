@@ -43,11 +43,7 @@ const InjectAddExpectation: FunctionComponent<InjectAddExpectationProps> = ({
   // Form
   const onSubmit = (data: ExpectationInputForm) => {
     const values: ExpectationInput = {
-      expectation_type: data.expectation_type,
-      expectation_name: data.expectation_name,
-      expectation_description: data.expectation_description,
-      expectation_score: data.expectation_score,
-      expectation_expectation_group: data.expectation_expectation_group,
+      ...data,
       expectation_expiration_time: data.expiration_time_days * 3600 * 24
         + data.expiration_time_hours * 3600
         + data.expiration_time_minutes * 60,

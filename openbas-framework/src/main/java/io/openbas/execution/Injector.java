@@ -88,11 +88,13 @@ public abstract class Injector {
       @NotNull InjectExpectation expectationExecution,
       @NotNull final ExecutableInject executableInject,
       @NotNull final Expectation expectation) {
+    Long DEFAULT_EXPIRATION_TIME = 86400L;
     expectationExecution.setExercise(executableInject.getInjection().getExercise());
     expectationExecution.setInject(executableInject.getInjection().getInject());
     expectationExecution.setExpectedScore(expectation.getScore());
     expectationExecution.setExpectationGroup(expectation.isExpectationGroup());
-    expectationExecution.setExpirationTime(expectation.getExpirationTime());
+    expectationExecution.setExpirationTime(
+        Optional.ofNullable(expectation.getExpirationTime()).orElse(DEFAULT_EXPIRATION_TIME));
     switch (expectation.type()) {
       case ARTICLE -> {
         expectationExecution.setName(expectation.getName());

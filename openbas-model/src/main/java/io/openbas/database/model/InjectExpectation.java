@@ -117,6 +117,9 @@ public class InjectExpectation implements Base {
   @NotNull
   private Double expectedScore;
 
+  /**
+   * Expiration time stored in db in seconds
+   */
   @Setter
   @Column(name = "inject_expiration_time")
   @JsonProperty("inject_expiration_time")

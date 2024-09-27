@@ -59,6 +59,8 @@ public class ChannelContract extends Contractor {
 
   @Override
   public List<Contract> contracts() {
+    Long EXPIRATION_TIME = 3600L;
+    Double SCORE = 0.0;
     ContractConfig contractConfig = getConfig();
     // In this "internal" contract we can't express choices.
     // Choices are contextual to a specific exercise.
@@ -76,8 +78,8 @@ public class ChannelContract extends Contractor {
     Expectation expectation = new Expectation();
     expectation.setType(ARTICLE);
     expectation.setName("Expect targets to read the article(s)");
-    expectation.setScore(0.0);
-    expectation.setExpirationTime(3600L);
+    expectation.setScore(SCORE);
+    expectation.setExpirationTime(EXPIRATION_TIME);
     ContractExpectations expectationsField = expectationsField(
         "expectations", "Expectations", List.of(expectation)
     );

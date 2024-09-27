@@ -22,6 +22,11 @@ public class Expectation {
   @JsonProperty("expectation_expectation_group")
   private boolean expectationGroup;
 
+  /**
+   * Gets the expiration time
+   *
+   * @return the expiration in seconds
+   */
   @JsonProperty("expectation_expiration_time")
   private Long expirationTime;
 
