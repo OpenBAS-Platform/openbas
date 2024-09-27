@@ -7,12 +7,14 @@ import { useFormatter } from '../i18n';
 interface Props {
   disabled?: boolean;
   onChange: (value: string) => void;
+  onBlur?: () => void;
   initialValue: string;
 }
 
 const MarkDownField: React.FC<Props> = ({
   disabled = false,
   onChange,
+  onBlur = () => {},
   initialValue,
 }) => {
   const { t } = useFormatter();
@@ -73,6 +75,7 @@ const MarkDownField: React.FC<Props> = ({
       }}
       preview={isEdit ? 'edit' : 'preview'}
       onChange={(val) => onChange(val || '')}
+      onBlur={onBlur}
       commands={[
         writeCommand,
         previewCommand,

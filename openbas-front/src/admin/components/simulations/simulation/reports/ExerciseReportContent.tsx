@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Paper, Typography } from '@mui/material';
 import type { Exercise, ExpectationResultsByType, InjectResultDTO, Report, ReportInformation, ReportInput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
@@ -25,7 +25,7 @@ import InjectReportResult from './InjectReportResult';
 import { updateReportGlobalObservation, updateReportInjectCommentForExercise } from '../../../../../actions/reports/report-actions';
 import LessonsCategories from '../../../lessons/exercises/LessonsCategories';
 import ExerciseDistribution from '../overview/ExerciseDistribution';
-import SimpleRichTextField from '../../../../../components/fields/SimpleRichTextField';
+import ReportGlobalObservation from '../../../components/reports/ReportGlobalObservation';
 
 interface Props {
   report: Report,
@@ -37,11 +37,10 @@ const ExerciseReportContent: React.FC<Props> = ({ report, exerciseId, canWrite =
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
   const [loading, setLoading] = useState(true);
-  const globalObservationRef = useRef<string>(report?.report_global_observation ?? '');
 
-  const saveGlobalObservation = () => updateReportGlobalObservation(exerciseId, report.report_id, {
+  const saveGlobalObservation = (comment: string) => updateReportGlobalObservation(exerciseId, report.report_id, {
     report_informations: report.report_informations,
-    report_global_observation: globalObservationRef.current,
+    report_global_observation: comment,
     report_name: report.report_name,
   } as ReportInput);
 
@@ -108,7 +107,7 @@ const ExerciseReportContent: React.FC<Props> = ({ report, exerciseId, canWrite =
   return (
     <div id={`reportId_${report.report_id}`} style={{ padding: 20, display: 'flex', flexFlow: 'wrap', maxWidth: '1400px', margin: 'auto' }}>
       <div style={{ width: '100%', textAlign: 'center', fontSize: 25, fontWeight: 500, margin: '10px' }}>
-        {report?.report_name}
+        {report.report_name}
       </div>
       {displayModule(ReportInformationType.MAIN_INFORMATION)
         && <div style={{ width: '50%', paddingRight: '25px' }}>
@@ -140,27 +139,13 @@ const ExerciseReportContent: React.FC<Props> = ({ report, exerciseId, canWrite =
         )
       }
       {displayModule(ReportInformationType.GLOBAL_OBSERVATION)
-        && <div style={{ width: '100%', marginTop: 20 }}>
-          <Typography variant="h4" gutterBottom>
-            {t('Global observation')}
-          </Typography>
-            {canWrite
-              ? <SimpleRichTextField
-                  value={globalObservationRef.current}
-                  onChange={(value: string) => {
-                    globalObservationRef.current = value;
-                  }}
-                  style={{ height: 200, width: '100%' }}
-                  onBlur={saveGlobalObservation}
-                /> : <Paper variant="outlined" sx={{ padding: '10px 15px 10px 15px' }}>
-                  {globalObservationRef.current
-                    ? <div dangerouslySetInnerHTML={{ __html: globalObservationRef.current }}/>
-                    : <div style={{ textTransform: 'none' }}>
-                      {t('-')}
-                    </div>}
-                </Paper>
-            }
-          </div>
+        && <ReportGlobalObservation
+          label={t('Global observation')}
+          initialValue={report.report_global_observation || ''}
+          onBlur={saveGlobalObservation}
+          style={{ width: '100%', marginTop: 20 }}
+          canWrite={canWrite}
+           />
       }
       {displayModule(ReportInformationType.PLAYER_SURVEYS)
         && <LessonsCategories
