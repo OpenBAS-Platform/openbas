@@ -41,6 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -87,6 +88,7 @@ public class InjectApi extends RestBehavior {
   private final InjectService injectService;
   private final AtomicTestingService atomicTestingService;
   private final InjectDuplicateService injectDuplicateService;
+  private final InjectDependenciesRepository injectDependenciesRepository;
 
   // -- INJECTS --
 
@@ -297,7 +299,15 @@ public class InjectApi extends RestBehavior {
     inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
     inject.setExercise(exercise);
     // Set dependencies
-    inject.setDependsOn(resolveOptionalRelation(input.getDependsOn(), injectRepository));
+    if(input.getDependsOn() != null) {
+      inject.setDependsOn(input.getDependsOn().entrySet().stream().map(entry -> {
+        InjectDependency injectDependency = new InjectDependency();
+        injectDependency.getCompositeId().setInjectChildrenId(injectRepository.findById(entry.getKey()).orElse(null));
+        injectDependency.getCompositeId().setInjectParentId(inject);
+        injectDependency.setCondition(entry.getValue());
+        return injectDependency;
+      }).toList());
+    }
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
     inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
     inject.setAssetGroups(fromIterable(assetGroupService.assetGroups(input.getAssetGroups())));
@@ -467,7 +477,15 @@ public class InjectApi extends RestBehavior {
     inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
     inject.setScenario(scenario);
     // Set dependencies
-    inject.setDependsOn(resolveOptionalRelation(input.getDependsOn(), this.injectRepository));
+    if(input.getDependsOn() != null) {
+      inject.setDependsOn(input.getDependsOn().entrySet().stream().map(entry -> {
+        InjectDependency injectDependency = new InjectDependency();
+        injectDependency.getCompositeId().setInjectChildrenId(injectRepository.findById(entry.getKey()).orElse(null));
+        injectDependency.getCompositeId().setInjectParentId(inject);
+        injectDependency.setCondition(entry.getValue());
+        return injectDependency;
+      }).toList());
+    }
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
     inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
     inject.setAssetGroups(fromIterable(assetGroupService.assetGroups(input.getAssetGroups())));
@@ -575,7 +593,37 @@ public class InjectApi extends RestBehavior {
     inject.setUpdateAttributes(input);
 
     // Set dependencies
-    inject.setDependsOn(updateRelation(input.getDependsOn(), inject.getDependsOn(), this.injectRepository));
+    if(input.getDependsOn() != null) {
+      input.getDependsOn().entrySet().forEach(entry -> {
+        Optional<InjectDependency> existingDependency = inject.getDependsOn().stream()
+                .filter(injectDependency -> injectDependency.getCompositeId().getInjectParentId().getId().equals(entry.getKey()))
+                .findFirst();
+        if(existingDependency.isPresent()) {
+          existingDependency.get().setCondition(entry.getValue());
+        } else {
+          InjectDependency injectDependency = new InjectDependency();
+          injectDependency.getCompositeId().setInjectChildrenId(inject);
+          injectDependency.getCompositeId().setInjectParentId(injectRepository.findById(entry.getKey()).orElse(null));
+          injectDependency.setCondition(entry.getValue());
+          inject.getDependsOn().add(injectDependency);
+        }
+      });
+    }
+
+    List<InjectDependency> injectDepencyToRemove = new ArrayList<>();
+    if(input.getDependsOn() != null) {
+      inject.getDependsOn().forEach(
+        injectDependency -> {
+          if (!input.getDependsOn().keySet().contains(injectDependency.getCompositeId().getInjectParentId().getId())) {
+            injectDepencyToRemove.add(injectDependency);
+          }
+        }
+      );
+    } else {
+      injectDepencyToRemove.addAll(inject.getDependsOn());
+    }
+    inject.getDependsOn().removeAll(injectDepencyToRemove);
+
     inject.setTeams(fromIterable(this.teamRepository.findAllById(input.getTeams())));
     inject.setAssets(fromIterable(this.assetService.assets(input.getAssets())));
     inject.setAssetGroups(fromIterable(this.assetGroupService.assetGroups(input.getAssetGroups())));

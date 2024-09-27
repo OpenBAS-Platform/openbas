@@ -18,6 +18,7 @@ import { isEmptyField } from '../../../../utils/utils';
 import { tagOptions } from '../../../../utils/Option';
 import { splitDuration } from '../../../../utils/Time';
 import PlatformIcon from '../../../../components/PlatformIcon';
+import { fromInjectDependencyToInputDependency } from './chaining/ChainingUtils';
 
 const useStyles = makeStyles((theme) => ({
   details: {
@@ -197,6 +198,7 @@ const UpdateInjectDetails = ({
         + data.inject_depends_duration_hours * 3600
         + data.inject_depends_duration_minutes * 60;
       const inject_tags = !R.isEmpty(data.inject_tags) ? R.pluck('id', data.inject_tags) : [];
+      console.log(data.inject_depends_on);
       const values = {
         inject_title: data.inject_title,
         inject_injector_contract: contractContent.contract_id,
@@ -209,7 +211,7 @@ const UpdateInjectDetails = ({
         inject_asset_groups: assetGroupIds,
         inject_documents: documents,
         inject_depends_duration,
-        inject_depends_on: data.inject_depends_on,
+        inject_depends_on: fromInjectDependencyToInputDependency(data.inject_depends_on),
       };
       await onUpdateInject(values);
     }

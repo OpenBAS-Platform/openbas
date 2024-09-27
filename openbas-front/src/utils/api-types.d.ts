@@ -1073,7 +1073,7 @@ export interface Inject {
    * @min 0
    */
   inject_depends_duration: number;
-  inject_depends_on?: Inject;
+  inject_depends_on?: InjectDependency[];
   inject_description?: string;
   inject_documents?: InjectDocument[];
   inject_enabled?: boolean;
@@ -1102,6 +1102,20 @@ export interface Inject {
   /** @format int64 */
   inject_users_number?: number;
   listened?: boolean;
+}
+
+export interface InjectDependency {
+  dependency_condition?: string;
+  /** @format date-time */
+  dependency_created_at?: string;
+  dependency_relationship?: InjectDependencyId;
+  /** @format date-time */
+  dependency_updated_at?: string;
+}
+
+export interface InjectDependencyId {
+  inject_children_id?: Inject;
+  inject_parent_id?: Inject;
 }
 
 export interface InjectDocument {
@@ -1221,7 +1235,7 @@ export interface InjectInput {
   inject_country?: string;
   /** @format int64 */
   inject_depends_duration?: number;
-  inject_depends_on?: string;
+  inject_depends_on?: Record<string, string>;
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
   inject_injector_contract?: string;
@@ -1239,7 +1253,7 @@ export interface InjectOutput {
    * @min 0
    */
   inject_depends_duration: number;
-  inject_depends_on?: string;
+  inject_depends_on?: Record<string, string>;
   inject_enabled?: boolean;
   inject_exercise?: string;
   inject_id: string;

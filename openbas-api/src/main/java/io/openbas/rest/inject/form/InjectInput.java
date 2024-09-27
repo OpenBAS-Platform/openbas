@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Setter
 @Getter
@@ -28,7 +29,7 @@ public class InjectInput {
     private ObjectNode content;
 
     @JsonProperty("inject_depends_on")
-    private String dependsOn;
+    private Map<String, String> dependsOn;
 
     @JsonProperty("inject_depends_duration")
     private Long dependsDuration;

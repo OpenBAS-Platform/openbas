@@ -33,11 +33,24 @@ const UpdateInjectLogicalChains = ({
   const { t, tPick } = useFormatter();
   const classes = useStyles();
 
+  const injectDependsOn = {};
+  if (inject.inject_depends_on !== null) {
+    for (let i = 0; i < inject.inject_depends_on.length; i += 1) {
+      injectDependsOn[inject.inject_depends_on[i].dependency_relationship.inject_parent_id] = inject.inject_depends_on[i].dependency_condition;
+    }
+  }
+  console.log(injectDependsOn);
+
   const initialValues = {
     ...inject,
     inject_depends_to: injects
-      .filter((currentInject) => currentInject.inject_depends_on === inject.inject_id)
-      .map((currentInject) => currentInject.inject_id),
+      .filter((currentInject) => currentInject.inject_depends_on !== null && currentInject.inject_depends_on[inject.inject_id] !== undefined)
+      .map((currentInject) => {
+        const inject_depends = {};
+        inject_depends[currentInject.inject_id] = currentInject.inject_depends_on;
+        return inject_depends;
+      }),
+    inject_depends_on: inject.inject_depends_on !== null ? injectDependsOn : null,
   };
 
   const onSubmit = async (data) => {
@@ -50,10 +63,11 @@ const UpdateInjectLogicalChains = ({
 
     const injectsToUpdate = [];
 
-    const childrenIds = data.inject_depends_to;
-
+    console.log(data.inject_depends_to);
+    const childrenIds = data.inject_depends_to.flatMap((childrenInject) => Object.keys(childrenInject));
     const injectsWithoutDependencies = injects
-      .filter((currentInject) => currentInject.inject_depends_on === data.inject_id
+      .filter((currentInject) => currentInject.inject_depends_on !== null
+        && currentInject.inject_depends_on[data.inject_id] !== undefined
         && !childrenIds.includes(currentInject.inject_id))
       .map((currentInject) => {
         return {
@@ -69,11 +83,18 @@ const UpdateInjectLogicalChains = ({
     childrenIds.forEach((childrenId) => {
       const children = injects.find((currentInject) => currentInject.inject_id === childrenId);
       if (children !== undefined) {
+        const injectDependsOnUpdate = {};
+        for (let i = 0; i < data.inject_depends_to.length; i += 1) {
+          if (data.inject_depends_to[i][childrenId] !== undefined) {
+            injectDependsOnUpdate[inject.inject_id] = data.inject_depends_to[i][childrenId][inject.inject_id];
+          }
+        }
+
         const injectChildrenUpdate = {
           ...children,
           inject_id: children.inject_id,
           inject_injector_contract: children.inject_injector_contract.injector_contract_id,
-          inject_depends_on: inject.inject_id,
+          inject_depends_on: injectDependsOnUpdate,
         };
         injectsToUpdate.push(injectChildrenUpdate);
       }
