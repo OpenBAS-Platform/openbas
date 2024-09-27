@@ -100,7 +100,7 @@ export const availableOperators = (propertySchema: PropertySchemaDTO) => {
     return ['contains', 'not_contains', 'empty', 'not_empty'];
   }
   // Array
-  if (propertySchema.schema_property_values || propertySchema.schema_property_type_array) {
+  if (propertySchema.schema_property_type_array) {
     return ['contains', 'not_contains', 'empty', 'not_empty'];
   }
   return [
