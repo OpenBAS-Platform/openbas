@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V3_41__Add_column_expiration_time_expectations extends BaseJavaMigration {
+public class V3_42__Add_column_expiration_time_expectations extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
