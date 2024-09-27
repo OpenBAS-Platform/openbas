@@ -210,7 +210,7 @@ public class ScenarioService {
         .map(tuple -> new RawPaginationScenario(
             tuple.get("scenario_id", String.class),
             tuple.get("scenario_name", String.class),
-            tuple.get("scenario_severity", Scenario.SEVERITY.class),
+            Scenario.SEVERITY.valueOf(tuple.get("scenario_severity", String.class)), // Convert String to Enum
             tuple.get("scenario_category", String.class),
             tuple.get("scenario_recurrence", String.class),
             tuple.get("scenario_updated_at", Instant.class),
