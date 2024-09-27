@@ -6,7 +6,7 @@ import { useFormatter } from '../i18n';
 
 interface Props {
   disabled?: boolean;
-  onChange: (value: string) => {};
+  onChange: (value: string) => void;
   initialValue: string;
 }
 
