@@ -1,6 +1,7 @@
 package io.openbas.injectors.caldera;
 
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
+import io.openbas.expectation.ExpectationBuilderService;
 import io.openbas.helper.SupportedLanguage;
 import io.openbas.injector_contract.*;
 import io.openbas.injector_contract.fields.*;
@@ -8,7 +9,6 @@ import io.openbas.injectors.caldera.client.model.Ability;
 import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
 import io.openbas.injectors.caldera.model.Obfuscator;
 import io.openbas.injectors.caldera.service.CalderaInjectorService;
-import io.openbas.model.inject.form.Expectation;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -21,8 +21,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.DETECTION;
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVENTION;
 import static io.openbas.executors.caldera.service.CalderaExecutorService.toPlatform;
 import static io.openbas.helper.SupportedLanguage.en;
 import static io.openbas.helper.SupportedLanguage.fr;
@@ -42,6 +40,7 @@ public class CalderaContract extends Contractor {
 
   private final CalderaInjectorConfig config;
   private final CalderaInjectorService injectorCalderaService;
+  private final ExpectationBuilderService expectationBuilderService;
 
   @Override
   public boolean isExpose() {
@@ -84,21 +83,14 @@ public class CalderaContract extends Contractor {
   }
 
   private ContractExpectations expectations() {
-    Long EXPIRATION_TIME = 21600L;
-    Double SCORE = 100.0;
-    // Prevention
-    Expectation preventionExpectation = new Expectation();
-    preventionExpectation.setType(PREVENTION);
-    preventionExpectation.setName("Expect inject to be prevented");
-    preventionExpectation.setScore(SCORE);
-    preventionExpectation.setExpirationTime(EXPIRATION_TIME);
-    // Detection
-    Expectation detectionExpectation = new Expectation();
-    detectionExpectation.setType(DETECTION);
-    detectionExpectation.setName("Expect inject to be detected");
-    detectionExpectation.setScore(SCORE);
-    detectionExpectation.setExpirationTime(EXPIRATION_TIME);
-    return expectationsField("expectations", "Expectations", List.of(preventionExpectation, detectionExpectation));
+    return expectationsField(
+        "expectations",
+        "Expectations",
+        List.of(
+            this.expectationBuilderService.buildPreventionExpectation(),
+            this.expectationBuilderService.buildDetectionExpectation()
+        )
+    );
   }
 
   private List<Contract> abilityContracts(@NotNull final ContractConfig contractConfig) {

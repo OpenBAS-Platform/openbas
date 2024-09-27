@@ -39,8 +39,7 @@ public class ExpectationsExpirationManagerService {
   private void computeExpectations(@NotNull final List<InjectExpectation> expectations) {
     List<InjectExpectation> expectationAssets = expectations.stream().toList();
     expectationAssets.forEach((expectation) -> {
-      Long userExpirationTime = expectation.getExpirationTime();
-      if (isExpired(expectation, Math.toIntExact(userExpirationTime / 60))) {
+      if (isExpired(expectation)) {
         String result = computeFailedMessage(expectation.getType());
         this.injectExpectationService.computeExpectation(
             expectation,
@@ -58,8 +57,7 @@ public class ExpectationsExpirationManagerService {
   private void computeExpectationsForAssets(@NotNull final List<InjectExpectation> expectations) {
     List<InjectExpectation> expectationAssets = expectations.stream().filter(e -> e.getAsset() != null).toList();
     expectationAssets.forEach((expectation) -> {
-      Long userExpirationTime = expectation.getExpirationTime();
-      if (isExpired(expectation, Math.toIntExact(userExpirationTime / 60))) {
+      if (isExpired(expectation)) {
         String result = computeFailedMessage(expectation.getType());
         this.injectExpectationService.computeExpectation(
             expectation,

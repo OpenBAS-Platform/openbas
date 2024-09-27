@@ -1,5 +1,8 @@
 package io.openbas.injectors.channel;
 
+import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Variable.VariableType;
+import io.openbas.expectation.ExpectationBuilderService;
 import io.openbas.injector_contract.Contract;
 import io.openbas.injector_contract.ContractConfig;
 import io.openbas.injector_contract.Contractor;
@@ -7,15 +10,15 @@ import io.openbas.injector_contract.ContractorIcon;
 import io.openbas.injector_contract.fields.ContractCheckbox;
 import io.openbas.injector_contract.fields.ContractElement;
 import io.openbas.injector_contract.fields.ContractExpectations;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Variable.VariableType;
-import io.openbas.model.inject.form.Expectation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+import static io.openbas.helper.SupportedLanguage.en;
+import static io.openbas.helper.SupportedLanguage.fr;
 import static io.openbas.injector_contract.Contract.executableContract;
 import static io.openbas.injector_contract.ContractCardinality.Multiple;
 import static io.openbas.injector_contract.ContractCardinality.One;
@@ -23,19 +26,19 @@ import static io.openbas.injector_contract.ContractDef.contractBuilder;
 import static io.openbas.injector_contract.ContractVariable.variable;
 import static io.openbas.injector_contract.fields.ContractArticle.articleField;
 import static io.openbas.injector_contract.fields.ContractAttachment.attachmentField;
-import static io.openbas.injector_contract.fields.ContractTeam.teamField;
 import static io.openbas.injector_contract.fields.ContractCheckbox.checkboxField;
 import static io.openbas.injector_contract.fields.ContractExpectations.expectationsField;
+import static io.openbas.injector_contract.fields.ContractTeam.teamField;
 import static io.openbas.injector_contract.fields.ContractText.textField;
 import static io.openbas.injector_contract.fields.ContractTextArea.richTextareaField;
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.ARTICLE;
-import static io.openbas.helper.SupportedLanguage.en;
-import static io.openbas.helper.SupportedLanguage.fr;
 import static io.openbas.injectors.channel.ChannelExecutor.VARIABLE_ARTICLE;
 import static io.openbas.injectors.channel.ChannelExecutor.VARIABLE_ARTICLES;
 
 @Component
+@RequiredArgsConstructor
 public class ChannelContract extends Contractor {
+
+  private final ExpectationBuilderService expectationBuilderService;
 
   public static final String CHANNEL_PUBLISH = "fb5e49a2-6366-4492-b69a-f9b9f39a533e";
 
@@ -59,8 +62,6 @@ public class ChannelContract extends Contractor {
 
   @Override
   public List<Contract> contracts() {
-    Long EXPIRATION_TIME = 3600L;
-    Double SCORE = 0.0;
     ContractConfig contractConfig = getConfig();
     // In this "internal" contract we can't express choices.
     // Choices are contextual to a specific exercise.
@@ -75,13 +76,10 @@ public class ChannelContract extends Contractor {
             The animation team
         """;
     ContractCheckbox emailingField = checkboxField("emailing", "Send email", true);
-    Expectation expectation = new Expectation();
-    expectation.setType(ARTICLE);
-    expectation.setName("Expect targets to read the article(s)");
-    expectation.setScore(SCORE);
-    expectation.setExpirationTime(EXPIRATION_TIME);
     ContractExpectations expectationsField = expectationsField(
-        "expectations", "Expectations", List.of(expectation)
+        "expectations",
+        "Expectations",
+        List.of(this.expectationBuilderService.buildArticleExpectation())
     );
     List<ContractElement> publishInstance = contractBuilder()
         // built in

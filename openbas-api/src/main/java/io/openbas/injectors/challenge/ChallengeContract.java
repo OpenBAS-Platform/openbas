@@ -1,35 +1,38 @@
 package io.openbas.injectors.challenge;
 
+import io.openbas.database.model.Endpoint;
+import io.openbas.expectation.ExpectationBuilderService;
 import io.openbas.injector_contract.Contract;
 import io.openbas.injector_contract.ContractConfig;
 import io.openbas.injector_contract.Contractor;
 import io.openbas.injector_contract.ContractorIcon;
 import io.openbas.injector_contract.fields.ContractElement;
-import io.openbas.database.model.Endpoint;
 import io.openbas.injector_contract.fields.ContractExpectations;
-import io.openbas.model.inject.form.Expectation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.CHALLENGE;
+import static io.openbas.helper.SupportedLanguage.en;
+import static io.openbas.helper.SupportedLanguage.fr;
 import static io.openbas.injector_contract.Contract.executableContract;
 import static io.openbas.injector_contract.ContractCardinality.Multiple;
 import static io.openbas.injector_contract.ContractDef.contractBuilder;
-import static io.openbas.injector_contract.fields.ContractChallenge.challengeField;
 import static io.openbas.injector_contract.fields.ContractAttachment.attachmentField;
+import static io.openbas.injector_contract.fields.ContractChallenge.challengeField;
+import static io.openbas.injector_contract.fields.ContractCheckbox.checkboxField;
 import static io.openbas.injector_contract.fields.ContractExpectations.expectationsField;
 import static io.openbas.injector_contract.fields.ContractTeam.teamField;
-import static io.openbas.injector_contract.fields.ContractCheckbox.checkboxField;
 import static io.openbas.injector_contract.fields.ContractText.textField;
 import static io.openbas.injector_contract.fields.ContractTextArea.richTextareaField;
-import static io.openbas.helper.SupportedLanguage.en;
-import static io.openbas.helper.SupportedLanguage.fr;
 
 @Component
+@RequiredArgsConstructor
 public class ChallengeContract extends Contractor {
+
+  private final ExpectationBuilderService expectationBuilderService;
 
   public static final String CHALLENGE_PUBLISH = "f8e70b27-a69c-4b9f-a2df-e217c36b3981";
 
@@ -53,8 +56,6 @@ public class ChallengeContract extends Contractor {
 
   @Override
   public List<Contract> contracts() {
-    Long EXPIRATION_TIME = 3600L;
-    Double SCORE = 0.0;
     ContractConfig contractConfig = getConfig();
     // In this "internal" contract we can't express choices.
     // Choices are contextual to a specific exercise.
@@ -69,13 +70,10 @@ public class ChallengeContract extends Contractor {
             The animation team
         """;
     // We include the expectations for challenges
-    Expectation expectation = new Expectation();
-    expectation.setType(CHALLENGE);
-    expectation.setName("Expect targets to complete the challenge(s)");
-    expectation.setScore(SCORE);
-    expectation.setExpirationTime(EXPIRATION_TIME);
     ContractExpectations expectationsField = expectationsField(
-        "expectations", "Expectations", List.of(expectation)
+        "expectations",
+        "Expectations",
+        List.of(this.expectationBuilderService.buildChallengeExpectation())
     );
     List<ContractElement> publishInstance = contractBuilder()
         .mandatory(challengeField("challenges", "Challenges", Multiple))

@@ -14,5 +14,8 @@ public interface Expectation {
 
   String getName();
 
+  /**
+   * Expiration time in seconds
+   */
   Long getExpirationTime();
 }

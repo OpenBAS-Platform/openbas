@@ -3,6 +3,7 @@ package io.openbas.rest.settings.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.rest.settings.form.PolicyInput;
 import io.openbas.rest.settings.form.ThemeInput;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -132,5 +133,26 @@ public class PlatformSettings {
     }
     return null;
   }
+
+  // EXPECTATION
+  @NotNull
+  @JsonProperty("expectation_detection_expiration_time")
+  private long detectionExpirationTime;
+
+  @NotNull
+  @JsonProperty("expectation_prevention_expiration_time")
+  private long preventionExpirationTime;
+
+  @NotNull
+  @JsonProperty("expectation_challenge_expiration_time")
+  private long challengeExpirationTime;
+
+  @NotNull
+  @JsonProperty("expectation_article_expiration_time")
+  private long articleExpirationTime;
+
+  @NotNull
+  @JsonProperty("expectation_manual_expiration_time")
+  private long manualExpirationTime;
 
 }

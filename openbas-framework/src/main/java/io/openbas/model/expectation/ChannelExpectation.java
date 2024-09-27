@@ -18,11 +18,6 @@ public class ChannelExpectation implements Expectation {
   private String name;
   private Long expirationTime;
 
-  public ChannelExpectation(Double score, Article article) {
-    setScore(Objects.requireNonNullElse(score, 100.0));
-    setArticle(article);
-  }
-
 
   public ChannelExpectation(io.openbas.model.inject.form.Expectation expectation, Article article) {
     setScore(Objects.requireNonNullElse(score, 100.0));

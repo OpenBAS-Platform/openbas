@@ -1,12 +1,8 @@
 package io.openbas.injectors.caldera;
 
-import io.openbas.asset.EndpointService;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
-import io.openbas.inject_expectation.InjectExpectationService;
-import io.openbas.injectors.caldera.client.CalderaInjectorClient;
 import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
-import io.openbas.injectors.caldera.service.CalderaGarbageCollectorService;
 import io.openbas.injectors.caldera.service.CalderaInjectorService;
 import io.openbas.injectors.caldera.service.CalderaResultCollectorService;
 import jakarta.annotation.PostConstruct;

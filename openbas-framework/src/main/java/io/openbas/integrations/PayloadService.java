@@ -7,6 +7,7 @@ import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.InjectorRepository;
 import io.openbas.database.repository.PayloadRepository;
+import io.openbas.expectation.ExpectationBuilderService;
 import io.openbas.helper.SupportedLanguage;
 import io.openbas.injector_contract.Contract;
 import io.openbas.injector_contract.ContractConfig;
@@ -14,7 +15,6 @@ import io.openbas.injector_contract.ContractDef;
 import io.openbas.injector_contract.fields.ContractAsset;
 import io.openbas.injector_contract.fields.ContractAssetGroup;
 import io.openbas.injector_contract.fields.ContractExpectations;
-import io.openbas.model.inject.form.Expectation;
 import io.openbas.utils.StringUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
@@ -26,8 +26,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.DETECTION;
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVENTION;
 import static io.openbas.database.model.Payload.PAYLOAD_SOURCE.MANUAL;
 import static io.openbas.database.model.Payload.PAYLOAD_STATUS.VERIFIED;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -52,6 +50,7 @@ public class PayloadService {
   private final InjectorRepository injectorRepository;
   private final InjectorContractRepository injectorContractRepository;
   private final AttackPatternRepository attackPatternRepository;
+  private final ExpectationBuilderService expectationBuilderService;
 
   public void updateInjectorContractsForPayload(Payload payload) {
     List<Injector> injectors = this.injectorRepository.findAllByPayloads(true);
@@ -132,21 +131,14 @@ public class PayloadService {
   }
 
   private ContractExpectations expectations() {
-    Long EXPIRATION_TIME = 21600L;
-    Double SCORE = 100.0;
-    // Prevention
-    Expectation preventionExpectation = new Expectation();
-    preventionExpectation.setType(PREVENTION);
-    preventionExpectation.setName("Expect inject to be prevented");
-    preventionExpectation.setScore(SCORE);
-    preventionExpectation.setExpirationTime(EXPIRATION_TIME);
-    // Detection
-    Expectation detectionExpectation = new Expectation();
-    detectionExpectation.setType(DETECTION);
-    detectionExpectation.setName("Expect inject to be detected");
-    detectionExpectation.setScore(SCORE);
-    detectionExpectation.setExpirationTime(EXPIRATION_TIME);
-    return expectationsField("expectations", "Expectations", List.of(preventionExpectation, detectionExpectation));
+    return expectationsField(
+        "expectations",
+        "Expectations",
+        List.of(
+            this.expectationBuilderService.buildPreventionExpectation(),
+            this.expectationBuilderService.buildDetectionExpectation()
+        )
+    );
   }
 
   public Payload duplicate(@NotBlank final String payloadId) {

@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.openbas.database.model.InjectStatusExecution.traceError;
+import static java.util.Optional.ofNullable;
 
 
 public abstract class Injector {
@@ -88,13 +89,15 @@ public abstract class Injector {
       @NotNull InjectExpectation expectationExecution,
       @NotNull final ExecutableInject executableInject,
       @NotNull final Expectation expectation) {
-    Long DEFAULT_EXPIRATION_TIME = 86400L;
     expectationExecution.setExercise(executableInject.getInjection().getExercise());
     expectationExecution.setInject(executableInject.getInjection().getInject());
     expectationExecution.setExpectedScore(expectation.getScore());
     expectationExecution.setExpectationGroup(expectation.isExpectationGroup());
+    // One day by default to avoid side effects on existing inject content
+    // Can be removed after a few time (deprecation time -> 3 months)
     expectationExecution.setExpirationTime(
-        Optional.ofNullable(expectation.getExpirationTime()).orElse(DEFAULT_EXPIRATION_TIME));
+        ofNullable(expectation.getExpirationTime()).orElse(86400L)
+    );
     switch (expectation.type()) {
       case ARTICLE -> {
         expectationExecution.setName(expectation.getName());

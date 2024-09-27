@@ -7,6 +7,8 @@ import ExpectationFormUpdate from './ExpectationFormUpdate';
 import type { ExpectationInput, ExpectationInputForm } from './Expectation';
 import Dialog from '../../../../../components/common/Dialog';
 import { PermissionsContext } from '../../Context';
+import useExpectationExpirationTime from './useExpectationExpirationTime';
+import type { InjectExpectation } from '../../../../../utils/api-types';
 
 interface ExpectationPopoverProps {
   index: number;
@@ -29,14 +31,11 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
 
-  const EXPIRATION_TIME_SIX_HOURS: number = 21600;
-  const EXPIRATION_TIME_ONE_HOUR: number = 3600;
-
   const getExpirationTime = (expirationTime: number): number => {
     if (expirationTime !== null || expirationTime !== undefined) {
       return expirationTime;
     }
-    return (expectation.expectation_type === 'DETECTION' || expectation.expectation_type === 'PREVENTION') ? EXPIRATION_TIME_SIX_HOURS : EXPIRATION_TIME_ONE_HOUR;
+    return useExpectationExpirationTime(expectation.expectation_type as InjectExpectation['inject_expectation_type']); // FIXME: should change type of expectation_type property
   };
 
   const initialValues = {

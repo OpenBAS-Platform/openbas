@@ -13,6 +13,9 @@ import java.util.OptionalDouble;
 
 public class ExpectationUtils {
 
+    private ExpectationUtils() {
+
+    }
 
     public static List<InjectExpectation> processByValidationType(boolean isaNewExpectationResult, List<InjectExpectation> childrenExpectations, List<InjectExpectation> parentExpectations, Map<Team, List<InjectExpectation>> playerByTeam) {
         List<InjectExpectation> updatedExpectations = new ArrayList<>();

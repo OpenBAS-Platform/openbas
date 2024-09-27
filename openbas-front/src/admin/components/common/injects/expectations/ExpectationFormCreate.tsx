@@ -10,6 +10,7 @@ import ExpectationGroupField from './field/ExpectationGroupField';
 import { isTechnicalExpectation } from './ExpectationUtils';
 import ScaleBar from '../../../../../components/scalebar/ScaleBar';
 import { splitDuration } from '../../../../../utils/Time';
+import useExpectationExpirationTime from './useExpectationExpirationTime';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
@@ -52,37 +53,38 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const classes = useStyles();
 
-  const computeValuesFromType = (type: string) => {
+  const manualExpectationExpirationTime = useExpectationExpirationTime('MANUAL');
+
+  const computeValuesFromType = (type: string): ExpectationInputForm => {
     const predefinedExpectation = predefinedExpectations.filter((pe) => pe.expectation_type === type)[0];
     if (predefinedExpectation) {
+      const expirationTime = splitDuration(predefinedExpectation.expectation_expiration_time || 0);
       return {
         expectation_type: predefinedExpectation.expectation_type ?? '',
         expectation_name: predefinedExpectation.expectation_name ?? '',
         expectation_description: predefinedExpectation.expectation_description ?? '',
         expectation_score: predefinedExpectation.expectation_score > 0 ? predefinedExpectation.expectation_score : 100,
         expectation_expectation_group: predefinedExpectation.expectation_expectation_group ?? false,
-        expectation_expiration_time: predefinedExpectation.expectation_expiration_time,
+        expiration_time_days: parseInt(expirationTime.days, 10),
+        expiration_time_hours: parseInt(expirationTime.hours, 10),
+        expiration_time_minutes: parseInt(expirationTime.minutes, 10),
       };
     }
+    const expirationTime = splitDuration(manualExpectationExpirationTime || 0);
     return {
       expectation_type: 'MANUAL',
       expectation_name: '',
       expectation_description: '',
       expectation_score: 100,
       expectation_expectation_group: false,
-      expectation_expiration_time: 3600,
+      expiration_time_days: parseInt(expirationTime.days, 10),
+      expiration_time_hours: parseInt(expirationTime.hours, 10),
+      expiration_time_minutes: parseInt(expirationTime.minutes, 10),
     };
   };
 
   const predefinedTypes = predefinedExpectations.map((e) => e.expectation_type);
-  const valuesFromComputedTypes = computeValuesFromType(predefinedTypes[0]);
-  const expirationTime = splitDuration(valuesFromComputedTypes.expectation_expiration_time || 0);
-  const initialValues: ExpectationInputForm = {
-    ...valuesFromComputedTypes,
-    expiration_time_days: parseInt(expirationTime.days, 10),
-    expiration_time_hours: parseInt(expirationTime.hours, 10),
-    expiration_time_minutes: parseInt(expirationTime.minutes, 10),
-  };
+  const initialValues: ExpectationInputForm = computeValuesFromType(predefinedTypes[0]);
 
   const {
     register,

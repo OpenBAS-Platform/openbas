@@ -118,7 +118,7 @@ public class InjectExpectation implements Base {
   private Double expectedScore;
 
   /**
-   * Expiration time stored in db in seconds
+   * Expiration time in seconds
    */
   @Setter
   @Column(name = "inject_expiration_time")

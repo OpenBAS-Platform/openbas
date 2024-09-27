@@ -2,7 +2,6 @@ package io.openbas.model.expectation;
 
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
-import io.openbas.database.model.InjectExpectationSignature;
 import io.openbas.model.Expectation;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +9,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Objects;
 
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;

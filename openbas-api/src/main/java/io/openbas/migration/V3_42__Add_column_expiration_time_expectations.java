@@ -7,28 +7,28 @@ import org.springframework.stereotype.Component;
 import java.sql.Connection;
 import java.sql.Statement;
 
+import static io.openbas.expectation.ExpectationPropertiesConfig.DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME;
+import static io.openbas.expectation.ExpectationPropertiesConfig.DEFAULT_TECHNICAL_EXPECTATION_EXPIRATION_TIME;
+
 @Component
 public class V3_42__Add_column_expiration_time_expectations extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
-    Statement select = context.getConnection().createStatement();
     Connection connection = context.getConnection();
     Statement statement = connection.createStatement();
-    long technicalMinutesExpirationTime = 60L;
-    long manualMinutesExpirationTime = 360L;
 
-    select.execute("ALTER TABLE injects_expectations ADD inject_expiration_time bigint;");
-    select.execute(
-        "UPDATE injects_expectations SET inject_expiration_time = " + technicalMinutesExpirationTime + " "
+    statement.execute("ALTER TABLE injects_expectations ADD inject_expiration_time bigint;");
+    statement.execute(
+        "UPDATE injects_expectations SET inject_expiration_time = " + DEFAULT_TECHNICAL_EXPECTATION_EXPIRATION_TIME + " "
             + "WHERE inject_expectation_type = 'DETECTION' OR inject_expectation_type = 'PREVENTION';");
 
-    select.execute(
-        "UPDATE injects_expectations SET inject_expiration_time = " + manualMinutesExpirationTime + " "
+    statement.execute(
+        "UPDATE injects_expectations SET inject_expiration_time = " + DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME + " "
             + "WHERE inject_expectation_type = 'MANUAL' OR inject_expectation_type = 'CHALLENGE' "
             + "OR inject_expectation_type = 'ARTICLE' OR inject_expectation_type = 'DOCUMENT' OR inject_expectation_type = 'TEXT';");
 
-    select.execute(
+    statement.execute(
         "ALTER TABLE injects_expectations ALTER COLUMN inject_expiration_time SET NOT NULL;");
   }
 }
