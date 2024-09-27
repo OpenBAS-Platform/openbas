@@ -274,6 +274,55 @@ class InjectServiceTest {
         }
     }
 
+    @DisplayName("Import an XLS file with absolute date")
+    @Test
+    void testImportXlsAbsoluteDateWithExistingScenarioTeamUser() throws IOException {
+        try (MockedStatic<SessionHelper> sessionHelper = Mockito.mockStatic(SessionHelper.class)) {
+            User mockedUser = new User();
+            String fileID = UUID.randomUUID().toString();
+            File testFile = ResourceUtils.getFile("classpath:xls-test-files/test_file_2.xlsx");
+            createTempFile(testFile, fileID);
+
+            mockedScenario = new Scenario();
+            mockedScenario.setId(UUID.randomUUID().toString());
+
+            mockedImportMapper = createImportMapper(UUID.randomUUID().toString());
+            mockedImportMapper.getInjectImporters().forEach(injectImporter -> {
+                injectImporter.setRuleAttributes(injectImporter.getRuleAttributes().stream()
+                        .map(ruleAttribute -> {
+                            if("trigger_time".equals(ruleAttribute.getName())) {
+                                ruleAttribute.setAdditionalConfig(Map.of("timePattern", "dd/MM/yyyy HH'h'mm"));
+                            }
+                            return ruleAttribute;
+                        }).toList()
+                );
+            });
+            when(userRepository.findById(any())).thenReturn(Optional.of(mockedUser));
+            Team team1 = new Team();
+            team1.setName("team1");
+            team1.setUsers(List.of(new User()));
+            Team team2 = new Team();
+            team2.setName("team2");
+            team1.setUsers(List.of(new User()));
+            when(scenarioTeamUserRepository.findById(any()))
+                    .thenReturn(Optional.of(new ScenarioTeamUser()));
+            when(teamRepository.findAll()).thenReturn(List.of(team1));
+            when(teamRepository.save(any())).thenReturn(team2);
+
+            when(injectRepository.saveAll(any())).thenReturn(List.of(createNewInject(List.of(team1)), new Inject()));
+
+            sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
+            ImportTestSummary importTestSummary =
+                    injectService.importInjectIntoScenarioFromXLS(mockedScenario,
+                            mockedImportMapper, fileID, "CHECKLIST", 120, true);
+
+            assertTrue(LocalDateTime.of(2024, Month.JUNE, 26, 0, 0)
+                    .toInstant(ZoneOffset.of("Z"))
+                    .equals(mockedScenario.getRecurrenceStart()));
+            assertTrue("0 0 7 * * *".equals(mockedScenario.getRecurrence()));
+        }
+    }
+
     @DisplayName("Import an XLS file with relative and absolute dates")
     @Test
     void testImportXlsAbsoluteAndRelativeDates() throws IOException {
