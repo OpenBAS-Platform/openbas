@@ -86,6 +86,7 @@ public class CalderaExecutorService implements Runnable {
                 this.calderaExecutorContextService.registerAbilities();
             } else {
                 executorService.remove(config.getId());
+                this.platformSettingsService.cleanMessage(BannerMessage.BANNER_KEYS.CALDERA_UNAVAILABLE);
             }
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error creating caldera executor: " + e);
