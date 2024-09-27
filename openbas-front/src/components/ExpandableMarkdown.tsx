@@ -6,16 +6,18 @@ import MarkdownDisplay from './MarkdownDisplay';
 
 interface ExpandableMarkdownProps {
   source?: string | null;
-  limit: number;
+  limit?: number;
+  showAll?: boolean;
 }
 
 const ExpandableMarkdown: FunctionComponent<ExpandableMarkdownProps> = ({
   source,
-  limit,
+  limit = 500,
+  showAll = false,
 }) => {
-  const [expand, setExpand] = useState(false);
+  const [expand, setExpand] = useState(showAll);
   const onClick = () => setExpand(!expand);
-  const shouldBeTruncated = (source || '').length > limit;
+  const shouldBeTruncated = !showAll && (source || '').length > limit;
   return (
     <div style={{ position: 'relative' }}>
       {shouldBeTruncated && (

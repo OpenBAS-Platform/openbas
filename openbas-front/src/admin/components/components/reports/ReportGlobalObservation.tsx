@@ -32,7 +32,7 @@ const ReportGlobalObservation: React.FC<Props> = ({
               onChange={(value: string) => setGlobalObservationRef(value)}
               initialValue={globalObservation}
               onBlur={() => onBlur(globalObservation)}
-            /> : <ExpandableMarkdown limit={300} source={globalObservation}/>
+            /> : <ExpandableMarkdown showAll source={globalObservation}/>
         }
       </Paper>
     </div>
