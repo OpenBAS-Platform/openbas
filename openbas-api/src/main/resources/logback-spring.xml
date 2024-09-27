@@ -1,0 +1,24 @@
+<configuration>
+    <springProfile name="dev">
+        <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            </encoder>
+        </appender>
+
+        <root>
+            <appender-ref ref="STDOUT" />
+        </root>
+    </springProfile>
+    <springProfile name="!dev">
+        <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+        <appender name="jsonEncoder" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="ch.qos.logback.classic.encoder.JsonEncoder"/>
+        </appender>
+
+        <root>
+            <appender-ref ref="jsonEncoder" />
+        </root>
+    </springProfile>
+</configuration>
