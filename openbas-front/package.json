@@ -45,7 +45,7 @@
     "moment": "2.30.1",
     "moment-timezone": "0.5.45",
     "normalizr": "3.6.2",
-    "pdfmake": "0.2.10",
+    "pdfmake": "0.2.13",
     "prop-types": "15.8.1",
     "qs": "6.13.0",
     "ramda": "0.30.1",
