@@ -6,10 +6,10 @@ import type { Schema } from 'normalizr';
 import { Dispatch } from 'redux';
 import { createIntl, createIntlCache } from 'react-intl';
 import * as Constants from '../constants/ActionTypes';
+import { DATA_FETCH_ERROR } from '../constants/ActionTypes';
 import { api } from '../network';
 import { MESSAGING$ } from './Environment';
 import { store } from '../store';
-import { DATA_FETCH_ERROR } from '../constants/ActionTypes';
 import { LANG } from '../components/AppIntlProvider';
 import i18n from './Localization';
 
@@ -59,12 +59,17 @@ const notifyError = (error: AxiosError) => {
 };
 
 const notifySuccess = (message: string) => {
+  const messages = i18n.messages[LANG as keyof typeof i18n.messages] as Record<string, string>;
   const intl = createIntl({
     locale: LANG,
     messages: i18n.messages[LANG as keyof typeof i18n.messages],
   }, cache);
 
-  MESSAGING$.notifySuccess(intl.formatMessage({ id: message }));
+  if (!messages[message]) {
+    MESSAGING$.notifySuccess(message);
+  } else {
+    MESSAGING$.notifySuccess(intl.formatMessage({ id: message }));
+  }
 };
 
 const checkUnauthorized = (error: AxiosError) => {
