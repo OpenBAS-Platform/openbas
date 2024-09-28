@@ -30,7 +30,7 @@
     "classnames": "2.5.1",
     "cronstrue": "2.50.0",
     "d3-hierarchy": "3.1.2",
-    "date-fns": "3.6.0",
+    "date-fns": "4.1.0",
     "dompurify": "3.1.6",
     "elkjs": "0.9.3",
     "final-form": "4.20.10",
