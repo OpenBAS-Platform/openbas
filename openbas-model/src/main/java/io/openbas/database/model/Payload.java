@@ -118,14 +118,12 @@ public class Payload implements Base {
   private String externalId;
 
   @Queryable(filterable = true, sortable = true)
-  @Setter
   @Column(name = "payload_source")
   @Enumerated(EnumType.STRING)
   @JsonProperty("payload_source")
   private PAYLOAD_SOURCE source;
 
   @Queryable(filterable = true)
-  @Setter
   @Column(name = "payload_status")
   @Enumerated(EnumType.STRING)
   @JsonProperty("payload_status")
@@ -166,6 +164,14 @@ public class Payload implements Base {
   @JsonProperty("payload_collector_type")
   private String getCollectorType() {
     return this.collector != null ? this.collector.getType() : null;
+  }
+
+  public void setStatus(String status) {
+    this.status = PAYLOAD_STATUS.valueOf(status.toUpperCase());
+  }
+
+  public void setSource(String source) {
+    this.source = PAYLOAD_SOURCE.valueOf(source.toUpperCase());
   }
 
   @Override
