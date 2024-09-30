@@ -10,8 +10,8 @@ import static java.util.Optional.ofNullable;
 @Setter
 public class ExpectationPropertiesConfig {
 
-  public static long DEFAULT_TECHNICAL_EXPECTATION_EXPIRATION_TIME = 21600L;
-  public static long DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME = 3600L;
+  public static long DEFAULT_TECHNICAL_EXPECTATION_EXPIRATION_TIME = 21600L; // 6 hours
+  public static long DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME = 86400L; // 24 hours
 
   @Value("${openbas.expectation.technical.expiration-time:#{null}}")
   private Long technicalExpirationTime;
