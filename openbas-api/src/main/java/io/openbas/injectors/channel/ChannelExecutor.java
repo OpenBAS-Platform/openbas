@@ -118,10 +118,10 @@ public class ChannelExecutor extends Injector {
                   .stream()
                   .flatMap((entry) -> switch (entry.getType()) {
                     case MANUAL -> Stream.of(
-                        (Expectation) new ManualExpectation(entry.getScore(), entry.getName(), entry.getDescription(), entry.isExpectationGroup())
+                        (Expectation) new ManualExpectation(entry)
                     );
                     case ARTICLE -> articles.stream()
-                        .map(article -> (Expectation) new ChannelExpectation(entry.getScore(), article, entry.isExpectationGroup()));
+                        .map(article -> (Expectation) new ChannelExpectation(entry, article));
                     default -> Stream.of();
                   })
                   .toList()

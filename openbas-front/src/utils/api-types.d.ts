@@ -1138,6 +1138,8 @@ export interface InjectExpectation {
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: User;
+  /** @format int64 */
+  inject_expiration_time: number;
   listened?: boolean;
   targetId?: string;
 }
@@ -2434,6 +2436,16 @@ export interface PlatformSettings {
   executor_caldera_enable?: boolean;
   executor_caldera_public_url?: string;
   executor_tanium_enable?: boolean;
+  /** @format int64 */
+  expectation_article_expiration_time: number;
+  /** @format int64 */
+  expectation_challenge_expiration_time: number;
+  /** @format int64 */
+  expectation_detection_expiration_time: number;
+  /** @format int64 */
+  expectation_manual_expiration_time: number;
+  /** @format int64 */
+  expectation_prevention_expiration_time: number;
   java_version?: string;
   map_tile_server_dark?: string;
   map_tile_server_light?: string;
@@ -2773,7 +2785,7 @@ export interface ScenarioInput {
   scenario_external_url?: string;
   scenario_main_focus?: string;
   scenario_name: string;
-  scenario_severity?: string;
+  scenario_severity?: "low" | "medium" | "high" | "critical";
   scenario_subtitle?: string;
   scenario_tags?: string[];
 }

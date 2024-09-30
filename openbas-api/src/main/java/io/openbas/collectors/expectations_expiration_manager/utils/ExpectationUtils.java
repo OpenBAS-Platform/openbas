@@ -12,8 +12,13 @@ import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVE
 
 public class ExpectationUtils {
 
-  public static boolean isExpired(@NotNull final InjectExpectation expectation, final int expirationTime) {
-    return expectation.getCreatedAt().isBefore(Instant.now().minus(expirationTime, ChronoUnit.MINUTES));
+  private ExpectationUtils() {
+
+  }
+
+  public static boolean isExpired(@NotNull final InjectExpectation expectation) {
+    Instant expirationTime = Instant.now().minus(expectation.getExpirationTime() / 60, ChronoUnit.MINUTES);
+    return expectation.getCreatedAt().isBefore(expirationTime);
   }
 
   public static String computeFailedMessage(@NotNull final EXPECTATION_TYPE expectationType) {

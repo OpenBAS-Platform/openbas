@@ -14,6 +14,13 @@ export interface ExpectationInput {
   expectation_description?: string;
   expectation_score: number;
   expectation_expectation_group: boolean;
+  expectation_expiration_time: number;
+}
+
+export interface ExpectationInputForm extends Omit<ExpectationInput, 'expectation_expiration_time'> {
+  expiration_time_days: number;
+  expiration_time_hours: number;
+  expiration_time_minutes: number;
 }
 
 export enum ExpectationType {

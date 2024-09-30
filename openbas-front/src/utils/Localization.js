@@ -462,6 +462,7 @@ const i18n = {
       Running: 'En cours',
       Failure: 'Echec',
       Expired: 'Expiré',
+      'Expired after': 'Expiré après',
       Anonymized: 'Anonymisé',
       'No media pressure entry in this channel yet.':
         'Encore aucune entrée de pression médiatique dans ce média.',
@@ -584,6 +585,7 @@ const i18n = {
       'Send the questionnaire': 'Envoyer le questionnaire',
       'Reset answers': 'Réinitialiser les réponses',
       hours: 'heures',
+      'Expiration time': 'Temps d\'expiration',
       Apply: 'Appliquer',
       players: 'joueurs',
       Explanation: 'Explication',
@@ -1593,6 +1595,7 @@ const i18n = {
       Disabled: '禁用',
       Days: '天',
       Hours: '小时',
+      'Expiration time': '过期时间',
       Minutes: '分钟',
       Seconds: '秒',
       'Try the inject': '尝试注入',
@@ -1824,6 +1827,7 @@ const i18n = {
       Running: '运行中',
       Failure: '失败',
       Expired: '过期',
+      'Expired after': '过期时间',
       Anonymized: '匿名',
       'No media pressure entry in this channel yet.':
         '这个频道中还没有媒体项.',

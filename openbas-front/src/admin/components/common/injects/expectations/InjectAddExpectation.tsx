@@ -6,7 +6,7 @@ import type { Theme } from '../../../../../components/Theme';
 import { useFormatter } from '../../../../../components/i18n';
 import Dialog from '../../../../../components/common/Dialog';
 import ExpectationFormCreate from './ExpectationFormCreate';
-import type { ExpectationInput } from './Expectation';
+import type { ExpectationInput, ExpectationInputForm } from './Expectation';
 import { PermissionsContext } from '../../Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -41,8 +41,14 @@ const InjectAddExpectation: FunctionComponent<InjectAddExpectationProps> = ({
   const handleClose = () => setOpenDialog(false);
 
   // Form
-  const onSubmit = (data: ExpectationInput) => {
-    handleAddExpectation(data);
+  const onSubmit = (data: ExpectationInputForm) => {
+    const values: ExpectationInput = {
+      ...data,
+      expectation_expiration_time: data.expiration_time_days * 3600 * 24
+        + data.expiration_time_hours * 3600
+        + data.expiration_time_minutes * 60,
+    };
+    handleAddExpectation(values);
     handleClose();
   };
 

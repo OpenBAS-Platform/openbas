@@ -4,9 +4,11 @@ import { MoreVert } from '@mui/icons-material';
 import Transition from '../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../components/i18n';
 import ExpectationFormUpdate from './ExpectationFormUpdate';
-import type { ExpectationInput } from './Expectation';
+import type { ExpectationInput, ExpectationInputForm } from './Expectation';
 import Dialog from '../../../../../components/common/Dialog';
 import { PermissionsContext } from '../../Context';
+import useExpectationExpirationTime from './useExpectationExpirationTime';
+import type { InjectExpectation } from '../../../../../utils/api-types';
 
 interface ExpectationPopoverProps {
   index: number;
@@ -29,12 +31,20 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
 
+  const getExpirationTime = (expirationTime: number): number => {
+    if (expirationTime !== null || expirationTime !== undefined) {
+      return expirationTime;
+    }
+    return useExpectationExpirationTime(expectation.expectation_type as InjectExpectation['inject_expectation_type']); // FIXME: should change type of expectation_type property
+  };
+
   const initialValues = {
     expectation_type: expectation.expectation_type ?? '',
     expectation_name: expectation.expectation_name ?? '',
     expectation_description: expectation.expectation_description ?? '',
     expectation_score: expectation.expectation_score ?? 100,
     expectation_expectation_group: expectation.expectation_expectation_group ?? false,
+    expectation_expiration_time: getExpirationTime(expectation.expectation_expiration_time),
   };
 
   // Popover
@@ -51,8 +61,14 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   };
   const handleCloseEdit = () => setOpenEdit(false);
 
-  const onSubmitEdit = (data: ExpectationInput) => {
-    handleUpdate(data, index);
+  const onSubmitEdit = (data: ExpectationInputForm) => {
+    const values: ExpectationInput = {
+      ...data,
+      expectation_expiration_time: data.expiration_time_days * 3600 * 24
+        + data.expiration_time_hours * 3600
+        + data.expiration_time_minutes * 60,
+    };
+    handleUpdate(values, index);
     handleCloseEdit();
   };
 

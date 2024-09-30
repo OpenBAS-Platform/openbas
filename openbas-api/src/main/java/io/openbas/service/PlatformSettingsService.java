@@ -8,6 +8,7 @@ import io.openbas.database.model.Setting;
 import io.openbas.database.model.Theme;
 import io.openbas.database.repository.SettingRepository;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
+import io.openbas.expectation.ExpectationPropertiesConfig;
 import io.openbas.helper.RabbitMQHelper;
 import io.openbas.injectors.opencti.config.OpenCTIConfig;
 import io.openbas.rest.settings.form.*;
@@ -50,6 +51,8 @@ public class PlatformSettingsService {
 
   @Resource
   private OpenBASConfig openBASConfig;
+  @Resource
+  private ExpectationPropertiesConfig expectationPropertiesConfig;
   @Resource
   private RabbitmqConfig rabbitmqConfig;
 
@@ -239,13 +242,20 @@ public class PlatformSettingsService {
       String value = getValueFromMapOfSettings(dbSettings, PLATFORM_BANNER + "." + bannerKey.key());
       if(value != null) {
         if(platformBannerByLevel.get(bannerKey.level().name()) == null) {
-          platformBannerByLevel.put(bannerKey.level().name(), new ArrayList<String>(Arrays.asList(bannerKey.message())));
+          platformBannerByLevel.put(bannerKey.level().name(), new ArrayList<>(Arrays.asList(bannerKey.message())));
         } else {
           platformBannerByLevel.get(bannerKey.level().name()).add(bannerKey.message());
         }
       }
     }
     platformSettings.setPlatformBannerByLevel(platformBannerByLevel);
+
+    // EXPECTATION
+    platformSettings.setDetectionExpirationTime(expectationPropertiesConfig.getDetectionExpirationTime());
+    platformSettings.setPreventionExpirationTime(expectationPropertiesConfig.getPreventionExpirationTime());
+    platformSettings.setChallengeExpirationTime(expectationPropertiesConfig.getChallengeExpirationTime());
+    platformSettings.setArticleExpirationTime(expectationPropertiesConfig.getArticleExpirationTime());
+    platformSettings.setManualExpirationTime(expectationPropertiesConfig.getManualExpirationTime());
 
     return platformSettings;
   }

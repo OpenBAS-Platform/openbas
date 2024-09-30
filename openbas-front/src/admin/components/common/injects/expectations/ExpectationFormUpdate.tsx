@@ -1,13 +1,14 @@
 import React, { FunctionComponent, SyntheticEvent } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField as MuiTextField } from '@mui/material';
+import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField, TextField as MuiTextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { formProps, infoMessage } from './ExpectationFormUtils';
-import type { ExpectationInput } from './Expectation';
+import { ExpectationInput, ExpectationInputForm } from './Expectation';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import ExpectationGroupField from './field/ExpectationGroupField';
 import { isTechnicalExpectation } from './ExpectationUtils';
+import { splitDuration } from '../../../../../utils/Time';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
@@ -19,10 +20,25 @@ const useStyles = makeStyles((theme: Theme) => ({
     gap: theme.spacing(2),
     marginTop: theme.spacing(2),
   },
+  duration: {
+    marginTop: 20,
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'space-between',
+    border: `1px solid ${theme.palette.primary.main}`,
+    borderRadius: 4,
+    padding: 15,
+  },
+  trigger: {
+    fontFamily: 'Consolas, monaco, monospace',
+    fontSize: 12,
+    paddingTop: 15,
+    color: theme.palette.primary.main,
+  },
 }));
 
 interface Props {
-  onSubmit: SubmitHandler<ExpectationInput>;
+  onSubmit: SubmitHandler<ExpectationInputForm>;
   handleClose: () => void;
   initialValues: ExpectationInput;
 }
@@ -35,13 +51,21 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const classes = useStyles();
 
+  const expirationTime = splitDuration(initialValues.expectation_expiration_time || 0);
+  const formInitialValues: ExpectationInputForm = {
+    ...initialValues,
+    expiration_time_days: parseInt(expirationTime.days, 10),
+    expiration_time_hours: parseInt(expirationTime.hours, 10),
+    expiration_time_minutes: parseInt(expirationTime.minutes, 10),
+  };
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
     getValues,
-    control,
-  } = useForm<ExpectationInput>(formProps(initialValues, t));
+  } = useForm<ExpectationInputForm>(formProps(formInitialValues, t));
+  const { control } = useForm<ExpectationInput>();
 
   const handleSubmitWithoutPropagation = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -96,6 +120,32 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
         }
         inputProps={register('expectation_description')}
       />
+      <div className={classes.duration}>
+        <div className={classes.trigger}>
+          {t('Expiration time')}
+        </div>
+        <TextField
+          variant="standard"
+          type="number"
+          label={t('Days')}
+          style={{ width: '20%' }}
+          inputProps={register('expiration_time_days')}
+        />
+        <TextField
+          variant="standard"
+          type="number"
+          label={t('Hours')}
+          style={{ width: '20%' }}
+          inputProps={register('expiration_time_hours')}
+        />
+        <TextField
+          variant="standard"
+          type="number"
+          label={t('Minutes')}
+          style={{ width: '20%' }}
+          inputProps={register('expiration_time_minutes')}
+        />
+      </div>
       <MuiTextField
         variant="standard"
         fullWidth

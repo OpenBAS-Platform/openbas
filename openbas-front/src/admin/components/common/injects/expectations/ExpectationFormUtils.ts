@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { UseFormProps } from 'react-hook-form';
 import { zodImplement } from '../../../../../utils/Zod';
-import type { ExpectationInput } from './Expectation';
+import { ExpectationInputForm } from './Expectation';
 
 export const infoMessage = (type: string, t: (key: string) => string) => {
   if (type === 'ARTICLE') {
@@ -14,14 +14,17 @@ export const infoMessage = (type: string, t: (key: string) => string) => {
   return '';
 };
 
-export const formProps = (initialValues: ExpectationInput, t: (key: string) => string): UseFormProps<ExpectationInput> => ({
+export const formProps = (initialValues: ExpectationInputForm, t: (key: string) => string): UseFormProps<ExpectationInputForm> => ({
   mode: 'onTouched',
-  resolver: zodResolver(zodImplement<ExpectationInput>().with({
+  resolver: zodResolver(zodImplement<ExpectationInputForm>().with({
     expectation_type: z.string(),
     expectation_name: z.string().min(1, { message: t('Should not be empty') }),
     expectation_description: z.string().optional(),
     expectation_score: z.coerce.number().min(1, 'Score must be greater than 0'),
     expectation_expectation_group: z.coerce.boolean(),
+    expiration_time_days: z.coerce.number().min(0),
+    expiration_time_hours: z.coerce.number().min(0),
+    expiration_time_minutes: z.coerce.number().min(0),
   })),
   defaultValues: initialValues,
 });

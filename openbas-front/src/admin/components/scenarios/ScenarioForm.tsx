@@ -60,7 +60,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
         scenario_name: z.string().min(1, { message: t('Should not be empty') }),
         scenario_category: z.string().optional(),
         scenario_main_focus: z.string().optional(),
-        scenario_severity: z.string().optional(),
+        scenario_severity: z.enum(['low', 'medium', 'high', 'critical']).optional(),
         scenario_subtitle: z.string().optional(),
         scenario_description: z.string().optional(),
         scenario_tags: z.string().array().optional(),
