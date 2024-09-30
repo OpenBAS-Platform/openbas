@@ -8,7 +8,7 @@ RUN yarn install
 COPY openbas-front /opt/openbas-build/openbas-front
 RUN yarn build
 
-FROM maven:3.9.6-eclipse-temurin-21 AS api-builder
+FROM maven:3.9.9-eclipse-temurin-21 AS api-builder
 
 WORKDIR /opt/openbas-build/openbas
 COPY openbas-model ./openbas-model

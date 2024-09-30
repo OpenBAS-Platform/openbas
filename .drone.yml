@@ -4,7 +4,7 @@ name: openbas-tests
 
 steps:
   - name: api-tests
-    image: maven:3.9.8-eclipse-temurin-22
+    image: maven:3.9.9-eclipse-temurin-22
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql:5432/openbas
       MINIO_ENDPOINT: minio
@@ -31,7 +31,7 @@ steps:
       - NODE_OPTIONS=--max_old_space_size=8192 yarn test
 
   - name: app-e2e
-    image: maven:3.9.8-eclipse-temurin-22
+    image: maven:3.9.9-eclipse-temurin-22
     detach: true
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql-e2e:5432/openbas
