@@ -109,7 +109,7 @@ const UpdateTeams: React.FC<Props> = ({
     entityPrefix="team"
     availableFilterNames={availableFilterNames}
     queryableHelpers={queryableHelpers}
-  />;
+                              />;
 
   return (
     <>
@@ -150,7 +150,7 @@ const UpdateTeams: React.FC<Props> = ({
               buttonComponent={<CreateTeam
                 inline
                 onCreate={(team) => setSelectedTeamValues([...selectedTeamValues, team])}
-              />}
+                               />}
             />
           </Box>
         </DialogContent>

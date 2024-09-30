@@ -7,7 +7,6 @@ import ItemTags from '../../../../components/ItemTags';
 import TeamPopover from './TeamPopover';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import type { TeamStore } from '../../../../actions/teams/Team';
-import type { Team } from '../../../../utils/api-types';
 import TeamPlayers from './TeamPlayers';
 import { PermissionsContext, TeamContext } from '../../common/Context';
 

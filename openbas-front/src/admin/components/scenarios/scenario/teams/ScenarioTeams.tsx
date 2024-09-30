@@ -4,7 +4,13 @@ import { Paper, Typography } from '@mui/material';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import { addScenarioTeamPlayers, disableScenarioTeamPlayers, enableScenarioTeamPlayers, fetchScenarioTeams, removeScenarioTeamPlayers, } from '../../../../../actions/scenarios/scenario-actions';
+import {
+  addScenarioTeamPlayers,
+  disableScenarioTeamPlayers,
+  enableScenarioTeamPlayers,
+  fetchScenarioTeams,
+  removeScenarioTeamPlayers,
+} from '../../../../../actions/scenarios/scenario-actions';
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import type { TeamStore } from '../../../../../actions/teams/Team';
@@ -94,7 +100,7 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
         && <UpdateTeams
           addedTeamIds={teams.map((team: TeamStore) => team.team_id)}
           setTeams={(ts: TeamStore[]) => setTeams(ts)}
-        />
+           />
       }
       <div className="clearfix" />
       <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">

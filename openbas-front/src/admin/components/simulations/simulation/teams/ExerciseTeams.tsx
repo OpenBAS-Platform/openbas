@@ -1,7 +1,6 @@
 import { useParams } from 'react-router-dom';
 import React, { useContext, useEffect, useState } from 'react';
 import { Paper, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../../../utils/hooks';
@@ -95,7 +94,7 @@ const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
         && <UpdateTeams
           addedTeamIds={teams.map((team: TeamStore) => team.team_id)}
           setTeams={(ts: TeamStore[]) => setTeams(ts)}
-        />
+           />
       }
       <div className="clearfix" />
       <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">

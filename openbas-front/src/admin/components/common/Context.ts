@@ -33,7 +33,7 @@ import type {
 import type { UserStore } from '../teams/players/Player';
 import type { InjectOutputType, InjectStore } from '../../../actions/injects/Inject';
 import { Page } from '../../../components/common/queryable/Page';
-import { TeamStore } from '../../../actions/teams/Team';
+import type { TeamStore } from '../../../actions/teams/Team';
 
 export type PermissionsContextType = {
   permissions: { readOnly: boolean, canWrite: boolean, isRunning: boolean }
