@@ -436,8 +436,8 @@ public class AtomicTestingService {
                 // Inject has a command payload
                 Payload payload = injectorContract.getPayload();
                 Command payloadCommand = (Command) Hibernate.unproxy(payload);
-                return new InjectStatusCommandLine(!payloadCommand.getContent().isBlank() ? List.of(payloadCommand.getContent()) : null,
-                        !payloadCommand.getCleanupCommand().isBlank() ? List.of(payload.getCleanupCommand()) : null, payload.getExternalId());
+                return new InjectStatusCommandLine(payloadCommand.getContent() != null && !payloadCommand.getContent().isBlank() ? List.of(payloadCommand.getContent()) : null,
+                        payloadCommand.getCleanupCommand() != null && !payloadCommand.getCleanupCommand().isBlank() ? List.of(payload.getCleanupCommand()) : null, payload.getExternalId());
             } else {
                 // Inject comes from Caldera ability and tomorrow from other(s) Executor(s)
                 io.openbas.execution.Injector executor = context.getBean(injectorContract.getInjector().getType(), io.openbas.execution.Injector.class);
