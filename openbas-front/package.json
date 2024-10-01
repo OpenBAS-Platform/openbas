@@ -86,7 +86,7 @@
     "@stylistic/eslint-plugin": "1.8.1",
     "@testing-library/react": "14.3.1",
     "@types/d3-hierarchy": "3.1.7",
-    "@types/node": "20.16.6",
+    "@types/node": "20.16.10",
     "@types/qs": "6",
     "@types/react": "18.3.3",
     "@types/react-csv": "1.1.10",

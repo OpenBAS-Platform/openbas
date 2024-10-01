@@ -4418,12 +4418,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:20.16.6":
-  version: 20.16.6
-  resolution: "@types/node@npm:20.16.6"
+"@types/node@npm:20.16.10":
+  version: 20.16.10
+  resolution: "@types/node@npm:20.16.10"
   dependencies:
     undici-types: "npm:~6.19.2"
-  checksum: 10c0/a3bd104b4061451625ed3b320c88e01e1261d41dbcaa7248d376f60a1a831e1cbc4362eef5be3445ccc1ea2d0a9178fc1ddd5e55a4f5df571dce78e5d91375a8
+  checksum: 10c0/c0c0c7ecb083ec638c2118e54b5242bb4c39a75608cbac9475cf15aaceb64b8bc997a87a0798e700a81d61651c8a7750ae0455be0f0996ada6e8b2bb818d90c5
   languageName: node
   linkType: hard
 
@@ -12085,7 +12085,7 @@ __metadata:
     "@stylistic/eslint-plugin": "npm:1.8.1"
     "@testing-library/react": "npm:14.3.1"
     "@types/d3-hierarchy": "npm:3.1.7"
-    "@types/node": "npm:20.16.6"
+    "@types/node": "npm:20.16.10"
     "@types/qs": "npm:6"
     "@types/react": "npm:18.3.3"
     "@types/react-csv": "npm:1.1.10"
