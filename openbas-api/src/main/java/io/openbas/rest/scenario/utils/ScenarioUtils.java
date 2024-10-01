@@ -21,9 +21,11 @@ public class ScenarioUtils {
   }
 
   private static final String SCENARIO_RECURRENCE_FILTER = "scenario_recurrence";
+  private static final String SCENARIO_KILL_CHAIN_PHASES_FILTER = "scenario_kill_chain_phases";
+  private static final String SCENARIO_TAGS_FILTER = "scenario_tags";
 
   /**
-   * Manage filters that are not directly managed by the generic mechanics -> scenario_kill_chain_phases
+   * Manage filters that are not directly managed by the generic mechanics -> scenario_recurrence, scenario_tags, scenario_kill_chain_phases
    */
   public static Function<Specification<Scenario>, Specification<Scenario>> handleDeepFilter(
       @NotNull final SearchPaginationInput searchPaginationInput) {
