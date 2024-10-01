@@ -16,8 +16,6 @@ public class PayloadFixture {
     command.setContent("cd ..");
     command.setExecutor("PowerShell");
     command.setPlatforms(new Endpoint.PLATFORM_TYPE[]{Endpoint.PLATFORM_TYPE.Windows});
-    command.setSource("MANUAL");
-    command.setStatus("VERIFIED");
     command.setAttackPatterns(Collections.emptyList());
     return command;
   }
