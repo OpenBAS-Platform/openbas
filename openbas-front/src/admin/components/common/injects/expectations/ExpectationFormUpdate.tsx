@@ -1,6 +1,6 @@
 import React, { FunctionComponent, SyntheticEvent } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField, TextField as MuiTextField } from '@mui/material';
+import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField, TextField as MuiTextField, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { formProps, infoMessage } from './ExpectationFormUtils';
 import { ExpectationInput, ExpectationInputForm } from './Expectation';
@@ -9,6 +9,7 @@ import type { Theme } from '../../../../../components/Theme';
 import ExpectationGroupField from './field/ExpectationGroupField';
 import { isTechnicalExpectation } from './ExpectationUtils';
 import { splitDuration } from '../../../../../utils/Time';
+import ScaleBar from '../../../../../components/scalebar/ScaleBar';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
@@ -146,10 +147,14 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
           inputProps={register('expiration_time_minutes')}
         />
       </div>
+      <div style={{ marginTop: 20 }}>
+        <Typography variant="h4">{t('Scores')}</Typography>
+        <ScaleBar expectationScore={initialValues.expectation_score} />
+      </div>
       <MuiTextField
         variant="standard"
         fullWidth
-        label={t('Score')}
+        label={t('Success score')}
         type="number"
         className={classes.marginTop_2}
         error={!!errors.expectation_score}

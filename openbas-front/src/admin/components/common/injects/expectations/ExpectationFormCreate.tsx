@@ -185,7 +185,6 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         <Typography variant="h4">{t('Scores')}</Typography>
         <ScaleBar expectationScore={watch('expectation_score')} />
       </div>
-
       <MuiTextField
         variant="standard"
         fullWidth
