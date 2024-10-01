@@ -37,6 +37,23 @@ public class ScenarioUtils {
     // Existence of the filter
     Optional<Filters.Filter> scenarioRecurrenceFilterOpt = ofNullable(searchPaginationInput.getFilterGroup())
         .flatMap(f -> f.findByKey(SCENARIO_RECURRENCE_FILTER));
+    Optional<Filters.Filter> scenarioKillChainsFilterOpt = ofNullable(searchPaginationInput.getFilterGroup())
+        .flatMap(f -> f.findByKey(SCENARIO_KILL_CHAIN_PHASES_FILTER));
+    Optional<Filters.Filter> scenarioTagsFilterOpt = ofNullable(searchPaginationInput.getFilterGroup())
+        .flatMap(f -> f.findByKey(SCENARIO_TAGS_FILTER));
+
+    if (scenarioKillChainsFilterOpt.isPresent()) {
+    searchPaginationInput.getFilterGroup().removeByKey(SCENARIO_KILL_CHAIN_PHASES_FILTER);
+      if (!scenarioKillChainsFilterOpt.get().getValues().isEmpty()) {
+        return (Specification<Scenario> specification) -> specification;
+      }
+    }
+    if (scenarioTagsFilterOpt.isPresent()) {
+    searchPaginationInput.getFilterGroup().removeByKey(SCENARIO_TAGS_FILTER);
+      if (!scenarioTagsFilterOpt.get().getValues().isEmpty()) {
+        return (Specification<Scenario> specification) -> specification;
+      }
+    }
 
     if (scenarioRecurrenceFilterOpt.isPresent()) {
       // Purge filter
