@@ -4,11 +4,13 @@ import { MoreVert } from '@mui/icons-material';
 import Transition from '../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../components/i18n';
 import ExpectationFormUpdate from './ExpectationFormUpdate';
-import type { ExpectationInput, ExpectationInputForm } from './Expectation';
+import { ExpectationInput, ExpectationInputForm } from './Expectation';
 import Dialog from '../../../../../components/common/Dialog';
 import { PermissionsContext } from '../../Context';
 import useExpectationExpirationTime from './useExpectationExpirationTime';
-import type { InjectExpectation } from '../../../../../utils/api-types';
+import type { InjectExpectation, PlatformSettings } from '../../../../../utils/api-types';
+import { useHelper } from '../../../../../store';
+import type { LoggedHelper } from '../../../../../actions/helper';
 
 interface ExpectationPopoverProps {
   index: number;
@@ -24,6 +26,9 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   handleDelete,
 }) => {
   // Standard hooks
+  const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({
+    settings: helper.getPlatformSettings(),
+  }));
   const { t } = useFormatter();
   const { permissions } = useContext(PermissionsContext);
 
@@ -42,7 +47,7 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
     expectation_type: expectation.expectation_type ?? '',
     expectation_name: expectation.expectation_name ?? '',
     expectation_description: expectation.expectation_description ?? '',
-    expectation_score: expectation.expectation_score ?? 100,
+    expectation_score: expectation.expectation_score ?? settings.expectation_manual_default_score_value,
     expectation_expectation_group: expectation.expectation_expectation_group ?? false,
     expectation_expiration_time: getExpirationTime(expectation.expectation_expiration_time),
   };

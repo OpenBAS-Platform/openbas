@@ -11,6 +11,9 @@ import { isTechnicalExpectation } from './ExpectationUtils';
 import ScaleBar from '../../../../../components/scalebar/ScaleBar';
 import { splitDuration } from '../../../../../utils/Time';
 import useExpectationExpirationTime from './useExpectationExpirationTime';
+import type { PlatformSettings } from '../../../../../utils/api-types';
+import { useHelper } from '../../../../../store';
+import type { LoggedHelper } from '../../../../../actions/helper';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
@@ -53,6 +56,10 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const classes = useStyles();
 
+  const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({
+    settings: helper.getPlatformSettings(),
+  }));
+
   const manualExpectationExpirationTime = useExpectationExpirationTime('MANUAL');
 
   const computeValuesFromType = (type: string): ExpectationInputForm => {
@@ -63,7 +70,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         expectation_type: predefinedExpectation.expectation_type ?? '',
         expectation_name: predefinedExpectation.expectation_name ?? '',
         expectation_description: predefinedExpectation.expectation_description ?? '',
-        expectation_score: predefinedExpectation.expectation_score > 0 ? predefinedExpectation.expectation_score : 100,
+        expectation_score: predefinedExpectation.expectation_score > 0 ? predefinedExpectation.expectation_score : settings.expectation_manual_default_score_value,
         expectation_expectation_group: predefinedExpectation.expectation_expectation_group ?? false,
         expiration_time_days: parseInt(expirationTime.days, 10),
         expiration_time_hours: parseInt(expirationTime.hours, 10),
@@ -75,7 +82,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
       expectation_type: 'MANUAL',
       expectation_name: '',
       expectation_description: '',
-      expectation_score: 100,
+      expectation_score: settings.expectation_manual_default_score_value,
       expectation_expectation_group: false,
       expiration_time_days: parseInt(expirationTime.days, 10),
       expiration_time_hours: parseInt(expirationTime.hours, 10),

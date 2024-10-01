@@ -155,4 +155,8 @@ public class PlatformSettings {
   @JsonProperty("expectation_manual_expiration_time")
   private long manualExpirationTime;
 
+  @NotNull
+  @JsonProperty("expectation_manual_default_score_value")
+  private int expectationDefaultScoreValue;
+
 }
