@@ -323,7 +323,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
     const inject = injects.find((currentInject) => currentInject.inject_id === connection.target);
     const injectParent = injects.find((currentInject) => currentInject.inject_id === connection.source);
     if (inject !== undefined && injectParent !== undefined && inject.inject_depends_duration > injectParent.inject_depends_duration) {
-      const newDependsOn = {};
+      const newDependsOn: Record<string, string> = {};
       newDependsOn[injectParent?.inject_id] = `${injectParent?.inject_id}-Execution-Success == true`;
       const injectToUpdate = {
         ...injectsMap[inject.inject_id],
@@ -347,7 +347,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
     const dependsOn = nodes.find((currentNode) => (data.inject?.inject_depends_on !== null
       && data.inject?.inject_depends_on![currentNode.id]));
     const dependsTo = nodes
-      .filter((currentNode) => (currentNode.data.inject?.inject_depends_on !== undefined && currentNode.data.inject?.inject_depends_on !== null && currentNode.data.inject?.inject_depends_on[node.id] !== undefined))
+      .filter((currentNode) => (currentNode.data.inject?.inject_depends_on !== undefined
+          && currentNode.data.inject?.inject_depends_on !== null
+          && currentNode.data.inject?.inject_depends_on[node.id] !== undefined))
       .sort((a, b) => a.data.inject!.inject_depends_duration - b.data.inject!.inject_depends_duration)[0];
     const aSecond = gapSize / (minutesPerGapAllowed[minutesPerGapIndex] * 60);
     if (dependsOn?.position && position.x <= dependsOn?.position.x) {
@@ -473,7 +475,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
           inject_depends_on: undefined,
         };
         updates.push(injectToRemoveEdge);
-        const newDependsOn = {};
+        const newDependsOn: Record<string, string> = {};
         newDependsOn[edge.source] = `${edge.source}-Execution-Success == true`;
         const injectToUpdateEdge = {
           ...injectsMap[injectToUpdate.inject_id],
@@ -488,8 +490,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
       const inject = injects.find((currentInject) => currentInject.inject_id === edge.target);
       const parent = injects.find((currentInject) => currentInject.inject_id === connectionState.toNode?.id);
       if (inject !== undefined && parent !== undefined && parent.inject_depends_duration < inject.inject_depends_duration) {
-        const newDependsOn = {};
-        newDependsOn[connectionState.toNode?.id] = `${connectionState.toNode?.id}-Execution-Success == true`;
+        const newDependsOn: Record<string, string> = {};
+        newDependsOn[connectionState.toNode!.id] = `${connectionState.toNode?.id}-Execution-Success == true`;
         const injectToUpdate = {
           ...injectsMap[inject.inject_id],
           inject_injector_contract: inject.inject_injector_contract.injector_contract_id,
