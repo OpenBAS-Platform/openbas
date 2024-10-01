@@ -54,7 +54,7 @@ public class ScenarioUtils {
       return handleRecurrenceFilter(searchPaginationInput, scenarioRecurrenceFilterOpt);
     }
 
-    return specification -> (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
+    return createSpecification();
   }
 
   private static Optional<Filters.Filter> getFilter(SearchPaginationInput input, String key) {
