@@ -125,6 +125,8 @@ public class ImapService {
                     sentBox.create(Folder.READ_WRITE);
                     sentBox.setSubscribed(true);
                 }
+                defaultFolder.close();
+                sentBox.close();
             }  catch (Exception e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
@@ -294,6 +296,7 @@ public class ImapService {
         }
         currentState.setValue(String.valueOf(messageCount));
         settingRepository.save(currentState);
+        inbox.close();
     }
 
     private void syncFolders() throws Exception {
