@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -95,11 +96,7 @@ public class InjectExpectation implements Base {
       return EXPECTATION_STATUS.PENDING;
     }
     if (team != null) {
-      return switch (getResults().getFirst().getResult()) {
-        case "Failed" -> EXPECTATION_STATUS.FAILED;
-        case "Success" -> EXPECTATION_STATUS.SUCCESS;
-        default -> EXPECTATION_STATUS.PENDING;
-      };
+      return getExpectationStatus();
     }
 
     if (this.getScore() >= this.getExpectedScore()) {
@@ -109,6 +106,18 @@ public class InjectExpectation implements Base {
       return EXPECTATION_STATUS.FAILED;
     }
     return EXPECTATION_STATUS.PARTIAL;
+  }
+
+  @JsonIgnore
+  public EXPECTATION_STATUS getExpectationStatus() {
+    String result = getResults().getFirst().getResult().toUpperCase();
+    return switch (result) {
+      case "FAILED" -> EXPECTATION_STATUS.FAILED;
+      case "SUCCESS" -> EXPECTATION_STATUS.SUCCESS;
+      case "PARTIAL" -> EXPECTATION_STATUS.PARTIAL;
+      case "UNKNOWN" -> EXPECTATION_STATUS.UNKNOWN;
+      default -> EXPECTATION_STATUS.PENDING;
+    };
   }
 
   @Setter
