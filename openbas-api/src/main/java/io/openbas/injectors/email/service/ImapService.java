@@ -326,6 +326,9 @@ public class ImapService {
                 Thread.sleep(2000);
             }
         }
+        if(imapStore != null && imapStore.isConnected()) {
+            imapStore.close();
+        }
     }
 
     // Sync folders every 10 sec
