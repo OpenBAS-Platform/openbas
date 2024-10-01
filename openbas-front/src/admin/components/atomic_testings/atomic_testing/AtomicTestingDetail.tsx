@@ -110,9 +110,9 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
           </Paper>
         )}
       </Grid>
-      <Grid item xs={6} style={{ marginBottom: 30 }}>
-        <Typography variant="h4">{t('Command Lines')}</Typography>
-        {injectResultDto ? (
+      {injectResultDto?.inject_commands_lines && (
+        <Grid item xs={6} style={{ marginBottom: 30 }}>
+          <Typography variant="h4">{t('Command Lines')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Typography variant="subtitle1" className={classes.header} gutterBottom>
               {t('Content')}
@@ -143,13 +143,9 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
               </Typography>
             </pre> : '-'}
           </Paper>
-        ) : (
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <Typography variant="body1">{t('No data available')}</Typography>
-          </Paper>
-        )}
-      </Grid>
-      <Grid item xs={6} style={{ marginBottom: 30 }}>
+          </Grid>
+      )}
+      <Grid item xs={injectResultDto?.inject_commands_lines ? 6 : 12} style={{ marginBottom: 30 }}>
         <Typography variant="h4">{t('Execution logs')}</Typography>
         {injectResultDto ? (
           <Paper variant="outlined" classes={{ root: classes.paper }}>
