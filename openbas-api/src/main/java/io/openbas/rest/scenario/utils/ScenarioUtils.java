@@ -29,58 +29,62 @@ public class ScenarioUtils {
    * Manage filters that are not directly managed by the generic mechanics -> scenario_recurrence, scenario_tags, scenario_kill_chain_phases
    */
   public static Function<Specification<Scenario>, Specification<Scenario>> handleDeepFilter(
-      @NotNull final SearchPaginationInput searchPaginationInput) {
+      @NotNull SearchPaginationInput searchPaginationInput) {
     return handleCustomFilter(searchPaginationInput);
   }
 
   private static UnaryOperator<Specification<Scenario>> handleCustomFilter(
-      @NotNull final SearchPaginationInput searchPaginationInput) {
-    Specification<Scenario> customSpecification = null;
-    // Existence of the filter
-    Optional<Filters.Filter> scenarioRecurrenceFilterOpt = ofNullable(searchPaginationInput.getFilterGroup())
-        .flatMap(f -> f.findByKey(SCENARIO_RECURRENCE_FILTER));
-    Optional<Filters.Filter> scenarioKillChainsFilterOpt = ofNullable(searchPaginationInput.getFilterGroup())
-        .flatMap(f -> f.findByKey(SCENARIO_KILL_CHAIN_PHASES_FILTER));
-    Optional<Filters.Filter> scenarioTagsFilterOpt = ofNullable(searchPaginationInput.getFilterGroup())
-        .flatMap(f -> f.findByKey(SCENARIO_TAGS_FILTER));
+      @NotNull SearchPaginationInput searchPaginationInput) {
 
+    // Extract filters from the input
+    Optional<Filters.Filter> scenarioRecurrenceFilterOpt = getFilter(searchPaginationInput, SCENARIO_RECURRENCE_FILTER);
+    Optional<Filters.Filter> scenarioKillChainsFilterOpt = getFilter(searchPaginationInput, SCENARIO_KILL_CHAIN_PHASES_FILTER);
+    Optional<Filters.Filter> scenarioTagsFilterOpt = getFilter(searchPaginationInput, SCENARIO_TAGS_FILTER);
 
-    if (scenarioKillChainsFilterOpt.isPresent()) {
-      List<?> values = scenarioKillChainsFilterOpt.get().getValues();
-
-      if (values != null && !values.isEmpty()) {
-        return (Specification<Scenario> specification) -> specification;
-      }else{
-        return specification -> (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
-      }
+    if (scenarioKillChainsFilterOpt.isPresent() && hasValues(scenarioKillChainsFilterOpt)) {
+      return createSpecification();
     }
 
-    if (scenarioTagsFilterOpt.isPresent()) {
-      List<?> values = scenarioTagsFilterOpt.get().getValues();
-
-      if (values != null && !values.isEmpty()) {
-        return (Specification<Scenario> specification) -> specification;
-      }else{
-        return specification -> (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
-      }
+    if (scenarioTagsFilterOpt.isPresent() && hasValues(scenarioTagsFilterOpt)) {
+      return createSpecification();
     }
 
     if (scenarioRecurrenceFilterOpt.isPresent()) {
-      // Purge filter
       searchPaginationInput.getFilterGroup().removeByKey(SCENARIO_RECURRENCE_FILTER);
-      if (scenarioRecurrenceFilterOpt.get().getValues().contains("Scheduled")) {
-        customSpecification = ScenarioSpecification.isRecurring();
-      } else if (scenarioRecurrenceFilterOpt.get().getValues().contains("Not planned")) {
-        customSpecification = ScenarioSpecification.noRecurring();
-      }
-      if (customSpecification != null) {
-        return computeMode(searchPaginationInput, customSpecification);
-      }
-      return (Specification<Scenario> specification) -> specification;
-    } else {
-      return (Specification<Scenario> specification) -> specification;
+      return handleRecurrenceFilter(searchPaginationInput, scenarioRecurrenceFilterOpt);
     }
 
+    return specification -> (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
+  }
+
+  private static Optional<Filters.Filter> getFilter(SearchPaginationInput input, String key) {
+    return ofNullable(input.getFilterGroup()).flatMap(f -> f.findByKey(key));
+  }
+
+  private static boolean hasValues(Optional<Filters.Filter> filterOpt) {
+    List<?> values = filterOpt.get().getValues();
+    return values != null && !values.isEmpty();
+  }
+
+  private static UnaryOperator<Specification<Scenario>> createSpecification() {
+    return specification -> specification;
+  }
+
+  private static UnaryOperator<Specification<Scenario>> handleRecurrenceFilter(
+      SearchPaginationInput searchPaginationInput, Optional<Filters.Filter> filterOpt) {
+    Specification<Scenario> customSpecification = null;
+
+    if (filterOpt.get().getValues().contains("Scheduled")) {
+      customSpecification = ScenarioSpecification.isRecurring();
+    } else if (filterOpt.get().getValues().contains("Not planned")) {
+      customSpecification = ScenarioSpecification.noRecurring();
+    }
+
+    if (customSpecification != null) {
+      return computeMode(searchPaginationInput, customSpecification);
+    }
+
+    return createSpecification();
   }
 
 }
