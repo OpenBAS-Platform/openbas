@@ -13,7 +13,6 @@ import { useFormatter } from '../../../components/i18n';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { initSorting } from '../../../components/common/queryable/Page';
 import type { OrganizationHelper, UserHelper } from '../../../actions/helper';
-import type { UserStore } from './players/Player';
 import { useAppDispatch } from '../../../utils/hooks';
 import { fetchTags } from '../../../actions/Tag';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
@@ -23,6 +22,7 @@ import ExportButton from '../../../components/common/ExportButton';
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
 import { Header } from '../../../components/common/SortHeadersList';
+import type { PlayerOutput } from '../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -92,31 +92,31 @@ const Players = () => {
       field: 'user_email',
       label: 'Email address',
       isSortable: true,
-      value: (player: UserStore) => player.user_email,
+      value: (player: PlayerOutput) => player.user_email,
     },
     {
       field: 'user_firstname',
       label: 'Firstname',
       isSortable: true,
-      value: (player: UserStore) => player.user_firstname,
+      value: (player: PlayerOutput) => player.user_firstname || '-',
     },
     {
       field: 'user_lastname',
       label: 'Lastname',
       isSortable: true,
-      value: (player: UserStore) => player.user_lastname,
+      value: (player: PlayerOutput) => player.user_lastname || '-',
     },
     {
       field: 'user_organization',
       label: 'Organization',
       isSortable: false,
-      value: (player: UserStore) => organizationsMap[player.user_organization]?.organization_name || '-',
+      value: (player: PlayerOutput) => (player.user_organization ? organizationsMap[player.user_organization]?.organization_name : '-'),
     },
     {
       field: 'user_tags',
       label: 'Tags',
       isSortable: true,
-      value: (player: UserStore) => <ItemTags variant="list" tags={player.user_tags} />,
+      value: (player: PlayerOutput) => <ItemTags variant="list" tags={player.user_tags} />,
     },
   ], []);
 
@@ -128,7 +128,7 @@ const Players = () => {
     'user_tags',
   ];
 
-  const [players, setPlayers] = useState<UserStore[]>([]);
+  const [players, setPlayers] = useState<PlayerOutput[]>([]);
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('players', buildSearchPagination({
     sorts: initSorting('user_email'),
     textSearch: search,
@@ -180,7 +180,7 @@ const Players = () => {
             }
           />
         </ListItem>
-        {players.map((player: UserStore) => (
+        {players.map((player: PlayerOutput) => (
           <ListItem
             key={player.user_id}
             classes={{ root: classes.item }}

@@ -1,81 +1,52 @@
 package io.openbas.rest.user;
 
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.SessionManager;
 import io.openbas.database.model.*;
-import io.openbas.database.raw.RawPaginationPlayer;
 import io.openbas.database.raw.RawPlayer;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.user.form.player.PlayerInput;
+import io.openbas.rest.user.form.player.PlayerOutput;
 import io.openbas.service.UserService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.specification.UserSpecification.accessibleFromOrganizations;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
 @RestController
+@RequiredArgsConstructor
 public class PlayerApi extends RestBehavior {
+
+  public static final String PLAYER_URI = "/api/players";
 
   @Resource
   private SessionManager sessionManager;
 
-  private CommunicationRepository communicationRepository;
-  private OrganizationRepository organizationRepository;
-  private UserRepository userRepository;
-  private TagRepository tagRepository;
-  private UserService userService;
+  private final CommunicationRepository communicationRepository;
+  private final OrganizationRepository organizationRepository;
+  private final UserRepository userRepository;
+  private final TagRepository tagRepository;
+  private final UserService userService;
   private final TeamRepository teamRepository;
-
-  public PlayerApi(TeamRepository teamRepository) {
-    this.teamRepository = teamRepository;
-  }
-
-  @Autowired
-  public void setCommunicationRepository(CommunicationRepository communicationRepository) {
-    this.communicationRepository = communicationRepository;
-  }
-
-  @Autowired
-  public void setTagRepository(TagRepository tagRepository) {
-    this.tagRepository = tagRepository;
-  }
-
-  @Autowired
-  public void setOrganizationRepository(OrganizationRepository organizationRepository) {
-    this.organizationRepository = organizationRepository;
-  }
-
-  @Autowired
-  public void setUserService(UserService userService) {
-    this.userService = userService;
-  }
-
-  @Autowired
-  public void setUserRepository(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
+  private final PlayerService playerService;
 
 
   @GetMapping("/api/players")
@@ -97,27 +68,10 @@ public class PlayerApi extends RestBehavior {
     return players;
   }
 
-  @PostMapping("/api/players/search")
-  public Page<RawPaginationPlayer> players(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    BiFunction<Specification<User>, Pageable, Page<User>> playersFunction;
-    OpenBASPrincipal currentUser = currentUser();
-    if (currentUser.isAdmin()) {
-      playersFunction = (Specification<User> specification, Pageable pageable) -> this.userRepository
-          .findAll(specification, pageable);
-    } else {
-      User local = userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
-      List<String> organizationIds = local.getGroups().stream()
-          .flatMap(group -> group.getOrganizations().stream())
-          .map(Organization::getId)
-          .toList();
-      playersFunction = (Specification<User> specification, Pageable pageable) -> this.userRepository
-          .findAll(accessibleFromOrganizations(organizationIds).and(specification), pageable);
-    }
-    return buildPaginationJPA(
-        playersFunction,
-        searchPaginationInput,
-        User.class
-    ).map(RawPaginationPlayer::new);
+  @LogExecutionTime
+  @PostMapping(PLAYER_URI + "/search")
+  public Page<PlayerOutput> players(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+    return this.playerService.playerPagination(searchPaginationInput);
   }
 
   @GetMapping("/api/player/{userId}/communications")
