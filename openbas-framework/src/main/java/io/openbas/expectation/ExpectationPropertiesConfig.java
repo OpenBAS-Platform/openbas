@@ -12,7 +12,7 @@ public class ExpectationPropertiesConfig {
 
   public static long DEFAULT_TECHNICAL_EXPECTATION_EXPIRATION_TIME = 21600L; // 6 hours
   public static long DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME = 86400L; // 24 hours
-  public static int DEFAULT_MANUAL_EXPECTATION_SCORE = 50; // 24 hours
+  public static int DEFAULT_MANUAL_EXPECTATION_SCORE = 50;
 
   @Value("${openbas.expectation.technical.expiration-time:#{null}}")
   private Long technicalExpirationTime;
