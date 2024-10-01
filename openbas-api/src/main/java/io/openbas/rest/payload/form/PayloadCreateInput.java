@@ -1,6 +1,7 @@
 package io.openbas.rest.payload.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import io.openbas.database.model.PayloadArgument;
 import io.openbas.database.model.PayloadPrerequisite;
@@ -46,6 +47,9 @@ public class PayloadCreateInput {
 
   @JsonProperty("command_content")
   private String content;
+
+  @JsonProperty("executable_arch")
+  private Endpoint.PLATFORM_ARCH executableArch;
 
   @JsonProperty("executable_file")
   private String executableFile;
