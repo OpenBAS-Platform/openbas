@@ -31,6 +31,7 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
   inline = false,
   onCreate,
 }) => {
+  // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();

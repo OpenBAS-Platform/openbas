@@ -118,7 +118,7 @@ const Players = () => {
       isSortable: true,
       value: (player: PlayerOutput) => <ItemTags variant="list" tags={player.user_tags} />,
     },
-  ], []);
+  ], [organizationsMap]);
 
   const availableFilterNames = [
     'user_email',

@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
-import { Button, Dialog as MuiDialog, DialogActions, DialogContent, DialogContentText, Drawer as MuiDrawer, IconButton, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog as MuiDialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { deletePlayer, updatePlayer } from '../../../../actions/User';
 import PlayerForm from './PlayerForm';
