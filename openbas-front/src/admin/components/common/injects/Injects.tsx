@@ -253,6 +253,7 @@ const Injects: FunctionComponent<Props> = ({
     data.forEach((inject) => {
       promises.push(injectContext.onUpdateInject(inject.inject_id, inject).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
         if (result.entities) {
+          onUpdate(result);
           return result.entities.injects[result.result];
         }
         return undefined;
