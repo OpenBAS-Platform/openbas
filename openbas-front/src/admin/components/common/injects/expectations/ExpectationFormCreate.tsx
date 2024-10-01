@@ -189,7 +189,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
       <MuiTextField
         variant="standard"
         fullWidth
-        label={t('Score')}
+        label={t('Success score')}
         type="number"
         className={classes.marginTop_2}
         error={!!errors.expectation_score}
