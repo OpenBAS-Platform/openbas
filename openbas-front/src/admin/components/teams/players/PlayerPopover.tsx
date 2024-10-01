@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
-import { Dialog as MuiDialog, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog as MuiDialog, DialogActions, DialogContent, DialogContentText, Drawer as MuiDrawer, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import Dialog from '../../../../components/common/Dialog';
 import { deletePlayer, updatePlayer } from '../../../../actions/User';
 import PlayerForm from './PlayerForm';
 import { useFormatter } from '../../../../components/i18n';
@@ -13,6 +12,8 @@ import { useHelper } from '../../../../store';
 import type { OrganizationHelper, TagHelper, UserHelper } from '../../../../actions/helper';
 import type { PlayerInputForm, UserStore } from './Player';
 import { TeamContext } from '../../common/Context';
+import DialogDelete from '../../../../components/common/DialogDelete';
+import Drawer from '../../../../components/common/Drawer';
 
 interface PlayerPopoverProps {
   user: UserStore;
@@ -147,25 +148,13 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
           <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
         )}
       </Menu>
-      <MuiDialog
+      <DialogDelete
         open={openDelete}
-        TransitionComponent={Transition}
-        onClose={handleCloseDelete}
-        PaperProps={{ elevation: 1 }}
-      >
-        <DialogContent>
-          <DialogContentText>
-            {t('Do you want to delete this player?')}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDelete}>{t('Cancel')}</Button>
-          <Button color="secondary" onClick={submitDelete}>
-            {t('Delete')}
-          </Button>
-        </DialogActions>
-      </MuiDialog>
-      <Dialog
+        handleClose={handleCloseDelete}
+        handleSubmit={submitDelete}
+        text={t('Do you want to delete this player?')}
+      />
+      <Drawer
         open={openEdit}
         handleClose={handleCloseEdit}
         title={t('Update the player')}
@@ -174,10 +163,10 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
           initialValues={initialValues}
           handleClose={handleCloseEdit}
           onSubmit={onSubmitEdit}
-          editing={true}
+          editing
           canUpdateEmail={canUpdateEmail}
         />
-      </Dialog>
+      </Drawer>
       <MuiDialog
         open={openRemove}
         TransitionComponent={Transition}
