@@ -4,11 +4,6 @@ import * as Constants from '../constants/ActionTypes';
 
 // region players
 export const fetchPlayers = () => (dispatch) => getReferential(schema.arrayOfUsers, '/api/players')(dispatch);
-export const searchPlayers = (searchPaginationInput) => {
-  const data = searchPaginationInput;
-  const uri = '/api/players/search';
-  return simplePostCall(uri, data);
-};
 
 export const addPlayer = (data) => (dispatch) => postReferential(schema.user, '/api/players', data)(dispatch);
 

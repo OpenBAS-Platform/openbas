@@ -11,9 +11,11 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.organization.form.OrganizationCreateInput;
 import io.openbas.rest.organization.form.OrganizationUpdateInput;
+import io.openbas.utils.FilterUtilsJpa;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +24,15 @@ import java.util.List;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.database.specification.OrganizationSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static java.time.Instant.now;
 
 @RestController
 public class OrganizationApi extends RestBehavior {
+
+  public static final String ORGANIZATION_URI = "/api/organizations";
 
   private InjectRepository injectRepository;
   private OrganizationRepository organizationRepository;
@@ -95,5 +100,23 @@ public class OrganizationApi extends RestBehavior {
   public void deleteOrganization(@PathVariable String organizationId) {
     checkOrganizationAccess(userRepository, organizationId);
     organizationRepository.deleteById(organizationId);
+  }
+
+  // -- OPTION --
+
+  @GetMapping(ORGANIZATION_URI + "/options")
+  public List<FilterUtilsJpa.Option> optionsByName(@RequestParam(required = false) final String searchText) {
+    return fromIterable(this.organizationRepository.findAll(byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
+        .stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
+  }
+
+  @PostMapping(ORGANIZATION_URI + "/options")
+  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+    return fromIterable(this.organizationRepository.findAllById(ids))
+        .stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
   }
 }
