@@ -25,6 +25,8 @@ interface Props {
   onSubmit: (endpointIds: string[]) => void;
   title: string;
   platforms?: string[];
+  payloadType?: string;
+  payloadArch?: string;
 }
 
 const EndpointsDialogAdding: FunctionComponent<Props> = ({
@@ -34,6 +36,8 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
   onSubmit,
   title,
   platforms,
+  payloadType,
+  payloadArch,
 }) => {
   // Standard hooks
   const dispatch = useAppDispatch();
@@ -90,6 +94,11 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
         width: 20,
       },
       {
+        field: 'endpoint_arch',
+        value: (endpoint: EndpointStore) => endpoint.endpoint_arch,
+        width: 20,
+      },
+      {
         field: 'asset_tags',
         value: (endpoint: EndpointStore) => <ItemTags variant="reduced-view" tags={endpoint.asset_tags} />,
         width: 30,
@@ -103,6 +112,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
   const availableFilterNames = [
     'asset_tags',
     'endpoint_platform',
+    'endpoint_arch',
   ];
   const quickFilter: FilterGroup = {
     mode: 'and',
@@ -110,6 +120,9 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
       buildFilter('endpoint_platform', platforms ?? [], 'contains'),
     ],
   };
+  if (quickFilter.filters && payloadType === 'Executable' && payloadArch) {
+    quickFilter.filters?.push(buildFilter('endpoint_arch', [payloadArch], 'contains'));
+  }
   const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({
     filterGroup: quickFilter,
   }));

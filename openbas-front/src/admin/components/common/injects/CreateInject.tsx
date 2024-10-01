@@ -180,6 +180,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
     'injector_contract_labels',
     'injector_contract_platforms',
     'injector_contract_players',
+    'injector_contract_arch',
   ];
 
   // Contracts

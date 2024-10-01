@@ -2,6 +2,7 @@ package io.openbas.utils.schema;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
+import io.openbas.utils.SubclassScanner;
 import jakarta.persistence.Column;
 import jakarta.persistence.JoinTable;
 import jakarta.validation.constraints.Email;
@@ -13,10 +14,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -34,9 +32,28 @@ public class SchemaUtils {
       Email.class
   );
 
+  private static final String BASE_CLASS_PACKAGE = "io.openbas.database.model";
+
   private static final ConcurrentHashMap<Class<?>, List<PropertySchema>> cacheMap = new ConcurrentHashMap<>();
 
   // -- SCHEMA --
+  public static List<PropertySchema> schemaWithSubtypes(@NotNull Class<?> clazz) throws ClassNotFoundException {
+    List<List<PropertySchema>> propertySchemasAll = new ArrayList<>();
+    propertySchemasAll.add(schema(clazz));
+    propertySchemasAll
+      .addAll(SubclassScanner.getSubclasses(BASE_CLASS_PACKAGE, clazz)
+      .stream()
+      .map(SchemaUtils::schema)
+      .toList());
+
+    return propertySchemasAll.stream().flatMap(List::stream)
+      .collect(Collectors.toMap(
+        PropertySchema::getName,
+        propertySchema -> propertySchema,
+        (existing, replacement) -> existing
+      ))
+      .values().stream().toList();
+  }
 
   public static List<PropertySchema> schema(@NotNull Class<?> clazz) {
     return cacheMap.computeIfAbsent(clazz, SchemaUtils::computeSchema);

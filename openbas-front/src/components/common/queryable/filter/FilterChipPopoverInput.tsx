@@ -5,6 +5,7 @@ import { useFormatter } from '../../../i18n';
 import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
 import { FilterHelpers } from './FilterHelpers';
 import useSearchOptions from './useSearchOptions';
+import wordsToExcludeFromTranslation from './WordsToExcludeFromTranslation';
 
 interface Props {
   filter: Filter;
@@ -54,7 +55,10 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
   const { options, setOptions, searchOptions } = useSearchOptions();
   useEffect(() => {
     if (propertySchema.schema_property_values && propertySchema.schema_property_values?.length > 0) {
-      setOptions(propertySchema.schema_property_values.map((v) => ({ id: v, label: t(v.charAt(0).toUpperCase() + v.slice(1).toLowerCase()) })));
+      setOptions(propertySchema.schema_property_values.map((value) => {
+        const label = wordsToExcludeFromTranslation.includes(value) ? value : t(value.charAt(0).toUpperCase() + value.slice(1).toLowerCase());
+        return ({ id: value, label });
+      }));
     } else {
       searchOptions(filter.key);
     }

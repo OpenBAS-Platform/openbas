@@ -15,13 +15,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.openbas.database.model.Endpoint.PLATFORM_ARCH.arm64;
 import static io.openbas.database.model.Endpoint.PLATFORM_TYPE.Linux;
 import static io.openbas.database.model.Filters.FilterOperator.contains;
 import static io.openbas.database.model.Payload.PAYLOAD_SOURCE.MANUAL;
 import static io.openbas.rest.payload.PayloadApi.PAYLOAD_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
-import static io.openbas.utils.fixtures.PayloadFixture.createDefaultCommand;
-import static io.openbas.utils.fixtures.PayloadFixture.createDefaultDnsResolution;
+import static io.openbas.utils.fixtures.PayloadFixture.*;
 import static java.lang.String.valueOf;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -48,6 +48,10 @@ public class PayloadApiSearchTest extends IntegrationTest {
     Payload dnsResolution = createDefaultDnsResolution();
     Payload dnsResolutionSaved = this.payloadRepository.save(dnsResolution);
     PAYLOAD_COMMAND_IDS.add(dnsResolutionSaved.getId());
+
+    Payload executable = createDefaultExecutable();
+    Payload executableSaved = this.payloadRepository.save(executable);
+    PAYLOAD_COMMAND_IDS.add(executableSaved.getId());
   }
 
   @AfterAll
@@ -121,8 +125,9 @@ public class PayloadApiSearchTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
-            .andExpect(jsonPath("$.content.[0].payload_name").value("dns resolution payload"))
-            .andExpect(jsonPath("$.content.[1].payload_name").value("command payload"));
+            .andExpect(jsonPath("$.content.[0].payload_name").value("executable payload"))
+            .andExpect(jsonPath("$.content.[1].payload_name").value("dns resolution payload"))
+            .andExpect(jsonPath("$.content.[2].payload_name").value("command payload"));
       }
     }
 
@@ -169,7 +174,21 @@ public class PayloadApiSearchTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
-            .andExpect(jsonPath("$.numberOfElements").value(2));
+            .andExpect(jsonPath("$.numberOfElements").value(3));
+      }
+
+      @Test
+      @DisplayName("Filtering page of payloads by architecture")
+      void given_filter_input_by_arch_should_return_a_page_of_executable_payloads_filtered_by_architecture() throws Exception {
+        SearchPaginationInput searchPaginationInput = PaginationFixture.simpleFilter(
+                "executable_arch", valueOf(arm64), contains
+        );
+
+        mvc.perform(post(PAYLOAD_URI + "/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(searchPaginationInput)))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.numberOfElements").value(1));
       }
 
     }

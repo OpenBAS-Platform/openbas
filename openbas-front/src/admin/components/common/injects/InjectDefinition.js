@@ -1200,6 +1200,8 @@ class InjectDefinition extends Component {
                 onSubmit={this.handleAddAssets.bind(this)}
                 disabled={fieldAssets.readOnly}
                 platforms={injectorContract.platforms}
+                payloadType={injectorContract.payloadType}
+                payloadArch={injectorContract.payloadArch}
               />
             </>
           )}

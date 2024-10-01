@@ -1498,6 +1498,7 @@ export interface InjectorContractOutput {
     | "Internal"
     | "Unknown"
   )[];
+  injector_contract_arch?: "x86_64" | "arm64";
 }
 
 export interface InjectorContractUpdateInput {
@@ -2351,6 +2352,7 @@ export interface Payload {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
+  executable_arch?: "x86_64" | "arm64";
 }
 
 export interface PayloadArgument {
@@ -2365,6 +2367,7 @@ export interface PayloadCreateInput {
   command_executor?: string;
   dns_resolution_hostname?: string;
   executable_file?: string;
+  executable_arch?: "x86_64" | "arm64";
   file_drop_file?: string;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];

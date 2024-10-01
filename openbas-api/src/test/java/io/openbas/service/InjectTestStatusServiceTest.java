@@ -59,7 +59,7 @@ public class InjectTestStatusServiceTest {
   @BeforeAll
   void beforeAll() {
     Exercise exercise = new Exercise();
-    exercise.setName("Exercice name");
+    exercise.setName("Exercise name");
     exercise.setFrom("test@test.com");
     exercise.setReplyTos(List.of("test@test.com"));
     EXERCISE = this.exerciseRepository.save(exercise);

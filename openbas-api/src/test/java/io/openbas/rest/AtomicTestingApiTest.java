@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AtomicTestingApiTest extends IntegrationTest {
 
-    public static final String ATOMIC_TESTINGS_URI = "/api/atomic_testings";
+    public static final String ATOMIC_TESTINGS_URI = "/api/atomic-testings";
 
     static Inject INJECT_WITH_PAYLOAD;
     static Inject INJECT_WITHOUT_PAYLOAD;

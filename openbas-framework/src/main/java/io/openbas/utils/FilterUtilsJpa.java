@@ -89,7 +89,12 @@ public class FilterUtilsJpa {
     String filterKey = filter.getKey();
 
     return (root, query, cb) -> {
-      List<PropertySchema> propertySchemas = SchemaUtils.schema(root.getJavaType());
+      List<PropertySchema> propertySchemas;
+      try {
+          propertySchemas = SchemaUtils.schemaWithSubtypes(root.getJavaType());
+      } catch (ClassNotFoundException e) {
+          throw new RuntimeException(e);
+      }
       List<PropertySchema> filterableProperties = getFilterableProperties(propertySchemas);
       PropertySchema filterableProperty = retrieveProperty(filterableProperties, filterKey);
       Expression<U> paths = toPath(filterableProperty, root, joinMap);
