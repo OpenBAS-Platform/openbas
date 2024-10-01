@@ -256,6 +256,7 @@ public class PlatformSettingsService {
     platformSettings.setChallengeExpirationTime(expectationPropertiesConfig.getChallengeExpirationTime());
     platformSettings.setArticleExpirationTime(expectationPropertiesConfig.getArticleExpirationTime());
     platformSettings.setManualExpirationTime(expectationPropertiesConfig.getManualExpirationTime());
+    platformSettings.setExpectationDefaultScoreValue(expectationPropertiesConfig.getDefaultExpectationScoreValue());
 
     return platformSettings;
   }

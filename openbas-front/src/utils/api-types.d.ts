@@ -2442,6 +2442,8 @@ export interface PlatformSettings {
   expectation_challenge_expiration_time: number;
   /** @format int64 */
   expectation_detection_expiration_time: number;
+  /** @format int32 */
+  expectation_manual_default_score_value: number;
   /** @format int64 */
   expectation_manual_expiration_time: number;
   /** @format int64 */

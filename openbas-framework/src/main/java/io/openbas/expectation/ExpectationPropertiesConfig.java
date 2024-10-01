@@ -12,6 +12,7 @@ public class ExpectationPropertiesConfig {
 
   public static long DEFAULT_TECHNICAL_EXPECTATION_EXPIRATION_TIME = 21600L; // 6 hours
   public static long DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME = 86400L; // 24 hours
+  public static int DEFAULT_MANUAL_EXPECTATION_SCORE = 50;
 
   @Value("${openbas.expectation.technical.expiration-time:#{null}}")
   private Long technicalExpirationTime;
@@ -28,6 +29,8 @@ public class ExpectationPropertiesConfig {
   private Long articleExpirationTime;
   @Value("${openbas.expectation.manual.expiration-time:#{null}}")
   private Long manualExpirationTime;
+  @Value("${openbas.expectation.manual.default-score-value:#{null}}")
+  private Integer defaultManualExpectationScore;
 
   public long getDetectionExpirationTime() {
     return ofNullable(this.detectionExpirationTime)
@@ -67,6 +70,11 @@ public class ExpectationPropertiesConfig {
             ofNullable(this.humanExpirationTime)
                 .orElse(DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME)
         );
+  }
+
+  public int getDefaultExpectationScoreValue() {
+    return ofNullable(this.defaultManualExpectationScore)
+            .orElse(DEFAULT_MANUAL_EXPECTATION_SCORE);
   }
 
 }
