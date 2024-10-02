@@ -3,6 +3,7 @@ package io.openbas.utils;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
+import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
@@ -29,6 +30,10 @@ public class ResultUtils {
                 .filter(expectation -> expectation.getUser() == null) // Filter expectations linked to players
                 .toList();
         return AtomicTestingUtils.getExpectationResultByTypes(expectations);
+    }
+
+    public static List<ExpectationResultsByType> computeGlobalExpectationResults_raw(@NotNull final List<RawInjectExpectation> rawInjectExpectations) {
+        return AtomicTestingUtils.getRawExpectationResultByTypes(rawInjectExpectations);
     }
 
     public static List<InjectExpectationResultsByAttackPattern> computeInjectExpectationResults(

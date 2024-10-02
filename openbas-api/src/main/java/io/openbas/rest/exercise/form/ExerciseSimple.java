@@ -8,6 +8,7 @@ import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Tag;
 import io.openbas.database.raw.RawExercise;
+import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper;
@@ -27,8 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static io.openbas.utils.ResultUtils.computeGlobalExpectationResults;
-import static io.openbas.utils.ResultUtils.computeTargetResults;
+import static io.openbas.utils.ResultUtils.*;
 import static java.time.Instant.now;
 
 @Setter
@@ -73,12 +73,15 @@ public class ExerciseSimple {
   @NotNull
   private List<InjectTargetWithResult> targets;
 
-  public static ExerciseSimple fromExercise(Exercise exercise) {
+  public static ExerciseSimple fromExercise(Exercise exercise, InjectExpectationRepository injectExpectationRepository) {
     ExerciseSimple simple = new ExerciseSimple();
     BeanUtils.copyProperties(exercise, simple);
     simple.setStart(exercise.getStart().orElse(null));
     simple.setUpdatedAt(exercise.getUpdatedAt());
-    simple.setExpectationResultByTypes(computeGlobalExpectationResults(exercise.getInjects()));
+    simple.setExpectationResultByTypes(
+        computeGlobalExpectationResults_raw(
+            injectExpectationRepository.rawForComputeGlobalByIds(
+                exercise.getInjects().stream().map(Inject::getId).toList())));
     simple.setTargets(computeTargetResults(exercise.getInjects()));
     return simple;
   }
