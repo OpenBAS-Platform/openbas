@@ -15,53 +15,61 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.openbas.utils.AtomicTestingUtils.getTargetsWithResults;
+import static io.openbas.utils.AtomicTestingUtils.getTargetsWithResultsWithRawQueries;
 
 public class ResultUtils {
 
-    private ResultUtils() {
-    }
+  private ResultUtils() {
+  }
 
-    // -- GLOBAL SCORE --
+  // -- GLOBAL SCORE --
 
-    public static List<ExpectationResultsByType> computeGlobalExpectationResults(@NotNull final List<Inject> injects) {
-        List<InjectExpectation> expectations = injects
-                .stream()
-                .flatMap(inject -> inject.getExpectations().stream())
-                .filter(expectation -> expectation.getUser() == null) // Filter expectations linked to players
-                .toList();
-        return AtomicTestingUtils.getExpectationResultByTypes(expectations);
-    }
+  public static List<ExpectationResultsByType> computeGlobalExpectationResults(@NotNull final List<Inject> injects) {
+    List<InjectExpectation> expectations = injects
+        .stream()
+        .flatMap(inject -> inject.getExpectations().stream())
+        .filter(expectation -> expectation.getUser() == null) // Filter expectations linked to players
+        .toList();
+    return AtomicTestingUtils.getExpectationResultByTypes(expectations);
+  }
 
-    public static List<ExpectationResultsByType> computeGlobalExpectationResults_raw(@NotNull final List<RawInjectExpectation> rawInjectExpectations) {
-        return AtomicTestingUtils.getRawExpectationResultByTypes(rawInjectExpectations);
-    }
+  public static List<ExpectationResultsByType> computeGlobalExpectationResults_raw(
+      @NotNull final List<RawInjectExpectation> rawInjectExpectations) {
+    return AtomicTestingUtils.getRawExpectationResultByTypes(rawInjectExpectations);
+  }
 
-    public static List<InjectExpectationResultsByAttackPattern> computeInjectExpectationResults(
-            @NotNull final List<Inject> injects) {
+  public static List<InjectExpectationResultsByAttackPattern> computeInjectExpectationResults(
+      @NotNull final List<Inject> injects) {
 
-        Map<AttackPattern, List<Inject>> groupedByAttackPattern = injects.stream()
-                .flatMap(inject -> inject.getInjectorContract()
-                        .map(contract -> contract.getAttackPatterns().stream()
-                                .map(attackPattern -> Map.entry(attackPattern, inject)))
-                        .orElseGet(Stream::empty))
-                .collect(Collectors.groupingBy(
-                        Map.Entry::getKey,
-                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())
-                ));
+    Map<AttackPattern, List<Inject>> groupedByAttackPattern = injects.stream()
+        .flatMap(inject -> inject.getInjectorContract()
+            .map(contract -> contract.getAttackPatterns().stream()
+                .map(attackPattern -> Map.entry(attackPattern, inject)))
+            .orElseGet(Stream::empty))
+        .collect(Collectors.groupingBy(
+            Map.Entry::getKey,
+            Collectors.mapping(Map.Entry::getValue, Collectors.toList())
+        ));
 
-        return groupedByAttackPattern.entrySet()
-                .stream()
-                .map(entry -> new InjectExpectationResultsByAttackPattern(entry.getKey(), entry.getValue()))
-                .toList();
-    }
+    return groupedByAttackPattern.entrySet()
+        .stream()
+        .map(entry -> new InjectExpectationResultsByAttackPattern(entry.getKey(), entry.getValue()))
+        .toList();
+  }
 
-    // -- TARGET --
+  // -- TARGET --
 
-    public static List<InjectTargetWithResult> computeTargetResults(@NotNull final List<Inject> injects) {
-        return injects.stream()
-                .flatMap(inject -> getTargetsWithResults(inject).stream())
-                .distinct()
-                .toList();
-    }
+  public static List<InjectTargetWithResult> computeTargetResults(@NotNull final List<Inject> injects) {
+    return injects.stream()
+        .flatMap(inject -> getTargetsWithResults(inject).stream())
+        .distinct()
+        .toList();
+  }
 
+  public static List<InjectTargetWithResult> computeTargetResultsWithRawExercise(@NotNull final List<Inject> injects) {
+    return injects.stream()
+        .flatMap(inject -> getTargetsWithResultsWithRawQueries(inject).stream())
+        .distinct()
+        .toList();
+  }
 }
