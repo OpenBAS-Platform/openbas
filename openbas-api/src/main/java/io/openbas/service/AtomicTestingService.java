@@ -228,7 +228,7 @@ public class AtomicTestingService {
         injectDuplicate.setTeams(injectOrigin.getTeams().stream().toList());
         injectDuplicate.setEnabled(injectOrigin.isEnabled());
         injectDuplicate.setDependsDuration(injectOrigin.getDependsDuration());
-        injectDuplicate.setDependsOn(injectOrigin.getDependsOn());
+        injectDuplicate.setDependsOn(injectOrigin.getDependsOn().stream().toList());
         injectDuplicate.setCountry(injectOrigin.getCountry());
         injectDuplicate.setCity(injectOrigin.getCity());
         injectDuplicate.setInjectorContract(injectOrigin.getInjectorContract().orElse(null));
