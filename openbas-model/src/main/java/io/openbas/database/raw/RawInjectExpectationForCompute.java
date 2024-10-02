@@ -1,6 +1,6 @@
 package io.openbas.database.raw;
 
-public interface RawInjectExpectation {
+public interface RawInjectExpectationForCompute {
 
   String getInject_expectation_type();
 
@@ -8,15 +8,15 @@ public interface RawInjectExpectation {
 
   Double getInject_expectation_expected_score();
 
-  String getTeam_id();
+  RawTeam getTeam();
 
-  String getAsset_id();
+  RawAsset getAsset();
 
-  String getAsset_group_id();
+  RawAssetGroupForCompute getAsset_group();
+
+  RawUser getUser();
 
   String getInject_expectation_id();
-
-  String getExercise_id();
 
   Boolean getInject_expectation_group();
 }

@@ -4,6 +4,8 @@ import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.raw.RawInjectExpectation;
+import io.openbas.database.raw.RawInjectExpectationForCompute;
+import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
@@ -34,8 +36,8 @@ public class ResultUtils {
   }
 
   public static List<ExpectationResultsByType> computeGlobalExpectationResults_raw(
-      @NotNull final List<RawInjectExpectation> rawInjectExpectations) {
-    return AtomicTestingUtils.getRawExpectationResultByTypes(rawInjectExpectations);
+      @NotNull final List<RawInjectExpectationForCompute> rawInjectExpectations) {
+    return AtomicTestingUtils.getRawExpectationResultByTypesForCompute(rawInjectExpectations);
   }
 
   public static List<InjectExpectationResultsByAttackPattern> computeInjectExpectationResults(
@@ -66,9 +68,9 @@ public class ResultUtils {
         .toList();
   }
 
-  public static List<InjectTargetWithResult> computeTargetResultsWithRawExercise(@NotNull final List<Inject> injects) {
+  public static List<InjectTargetWithResult> computeTargetResultsWithRawExercise(@NotNull final List<Inject> injects, InjectExpectationRepository injectExpectationRepository) {
     return injects.stream()
-        .flatMap(inject -> getTargetsWithResultsWithRawQueries(inject).stream())
+        .flatMap(inject -> getTargetsWithResultsWithRawQueries(inject, injectExpectationRepository).stream())
         .distinct()
         .toList();
   }
