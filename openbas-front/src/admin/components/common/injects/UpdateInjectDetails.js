@@ -198,7 +198,6 @@ const UpdateInjectDetails = ({
         + data.inject_depends_duration_hours * 3600
         + data.inject_depends_duration_minutes * 60;
       const inject_tags = !R.isEmpty(data.inject_tags) ? R.pluck('id', data.inject_tags) : [];
-      console.log(data.inject_depends_on);
       const values = {
         inject_title: data.inject_title,
         inject_injector_contract: contractContent.contract_id,

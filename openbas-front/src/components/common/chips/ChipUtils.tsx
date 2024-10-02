@@ -2,7 +2,7 @@ import React from 'react';
 
 // -- OPERATOR --
 
-export const convertOperatorToIcon = (t: (text: string) => string, operator?: string) => {
+const convertOperatorToIcon = (t: (text: string) => string, operator?: string) => {
   switch (operator) {
     case 'is':
       return <>&nbsp;{t('is')}</>;
@@ -10,3 +10,5 @@ export const convertOperatorToIcon = (t: (text: string) => string, operator?: st
       return null;
   }
 };
+
+export default convertOperatorToIcon;
