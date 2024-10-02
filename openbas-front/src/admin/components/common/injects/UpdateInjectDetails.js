@@ -18,7 +18,7 @@ import { isEmptyField } from '../../../../utils/utils';
 import { tagOptions } from '../../../../utils/Option';
 import { splitDuration } from '../../../../utils/Time';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import { fromInjectDependencyToInputDependency } from './chaining/ChainingUtils';
+import fromInjectDependencyToInputDependency from './chaining/ChainingUtils';
 
 const useStyles = makeStyles((theme) => ({
   details: {
