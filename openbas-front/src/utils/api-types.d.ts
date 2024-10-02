@@ -2365,6 +2365,7 @@ export interface PayloadCreateInput {
   command_executor?: string;
   dns_resolution_hostname?: string;
   executable_file?: string;
+  executable_arch?: "x86_64" | "arm64";
   file_drop_file?: string;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
