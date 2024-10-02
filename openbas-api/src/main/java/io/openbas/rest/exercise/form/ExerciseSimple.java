@@ -82,7 +82,7 @@ public class ExerciseSimple {
         computeGlobalExpectationResults_raw(
             injectExpectationRepository.rawForComputeGlobalByIds(
                 exercise.getInjects().stream().map(Inject::getId).toList())));
-    simple.setTargets(computeTargetResults(exercise.getInjects()));
+    simple.setTargets(computeTargetResultsWithRawExercise(exercise.getInjects(), injectExpectationRepository));
     return simple;
   }
 

@@ -2,11 +2,11 @@ package io.openbas.database.raw;
 
 import java.util.List;
 
-public interface RawAssetGroup {
+public interface RawAssetGroupForCompute {
 
     public String getAsset_group_id();
     public String getAsset_group_name();
-    public List<String> getAsset_ids();
-    public List<String> getDynamicAsset_ids();
+    public List<RawAsset> getAsset_ids();
+    public List<RawAsset> getDynamicAsset_ids();
 
 }
