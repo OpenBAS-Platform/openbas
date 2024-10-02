@@ -15,6 +15,8 @@ public class LoggingAspect {
 
   public static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
+  private static final long EXECUTION_TIME_THRESHOLD = 500;
+
   /**
    * This method uses Around advice which ensures that an advice can run before and after the method execution, to and
    * log the execution time of the method This advice will be applied to all the method which are annotate with the
@@ -33,10 +35,19 @@ public class LoggingAspect {
     stopWatch.start(methodName);
     Object result = proceedingJoinPoint.proceed();
     stopWatch.stop();
+
+    long executionTime = stopWatch.getTotalTimeMillis();
+
     // Log method execution time
     if (logger.isInfoEnabled()) {
       logger.info(stopWatch.prettyPrint());
     }
+
+    if (executionTime > EXECUTION_TIME_THRESHOLD) {
+      logger.warn("Execution of {}.{} took {} ms, which exceeds the threshold of {} ms",
+          className, methodName, executionTime, EXECUTION_TIME_THRESHOLD);
+    }
+
     return result;
   }
 }
