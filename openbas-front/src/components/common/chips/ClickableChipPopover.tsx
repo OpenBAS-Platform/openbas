@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from 'react';
 import { MenuItem, Popover, Select, SelectChangeEvent } from '@mui/material';
-import { useFormatter } from '../../i18n';
 
 interface Props {
   handleChangeValue: (event: SelectChangeEvent) => void;
@@ -20,9 +19,6 @@ const ClickableChipPopover: FunctionComponent<Props> = ({
   element,
 }) => {
   // Standard hooks
-  const { t } = useFormatter();
-
-  console.log(availableValues);
 
   const displayOperatorAndFilter = () => {
     // Specific field

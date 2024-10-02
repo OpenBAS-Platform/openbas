@@ -4,7 +4,7 @@ import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
 import type { Theme } from '../../Theme';
 import { useFormatter } from '../../i18n';
-import { convertOperatorToIcon } from './ChipUtils';
+import convertOperatorToIcon from './ChipUtils';
 import ClickableChipPopover from './ClickableChipPopover';
 
 const useStyles = makeStyles((theme: Theme) => ({

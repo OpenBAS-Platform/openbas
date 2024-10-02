@@ -39,7 +39,6 @@ const UpdateInjectLogicalChains = ({
       injectDependsOn[inject.inject_depends_on[i].dependency_relationship.inject_parent_id] = inject.inject_depends_on[i].dependency_condition;
     }
   }
-  console.log(injectDependsOn);
 
   const initialValues = {
     ...inject,
@@ -63,7 +62,6 @@ const UpdateInjectLogicalChains = ({
 
     const injectsToUpdate = [];
 
-    console.log(data.inject_depends_to);
     const childrenIds = data.inject_depends_to.flatMap((childrenInject) => Object.keys(childrenInject));
     const injectsWithoutDependencies = injects
       .filter((currentInject) => currentInject.inject_depends_on !== null
