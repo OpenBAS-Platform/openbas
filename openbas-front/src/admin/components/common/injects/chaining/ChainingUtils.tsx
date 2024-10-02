@@ -7,7 +7,7 @@ const fromInjectDependencyToInputDependency = (dependencies: InjectDependency[])
         && dependencies[i].dependency_condition !== undefined) {
       const key = dependencies[i].dependency_relationship!.inject_parent_id;
       if (key !== undefined) {
-        result[key] = dependencies[i].dependency_condition!;
+        result[key as unknown as string] = dependencies[i].dependency_condition!;
       }
     }
   }
