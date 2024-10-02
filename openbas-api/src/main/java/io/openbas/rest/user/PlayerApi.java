@@ -49,7 +49,7 @@ public class PlayerApi extends RestBehavior {
   private final PlayerService playerService;
 
 
-  @GetMapping("/api/players")
+  @GetMapping(PLAYER_URI)
   @Transactional(rollbackOn = Exception.class)
   @PreAuthorize("isObserver()")
   public Iterable<RawPlayer> players() {
@@ -81,7 +81,7 @@ public class PlayerApi extends RestBehavior {
     return communicationRepository.findByUser(userId);
   }
 
-  @PostMapping("/api/players")
+  @PostMapping(PLAYER_URI)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public User createPlayer(@Valid @RequestBody PlayerInput input) {
@@ -95,7 +95,7 @@ public class PlayerApi extends RestBehavior {
     return savedUser;
   }
 
-  @PostMapping("/api/players/upsert")
+  @PostMapping(PLAYER_URI + "/upsert")
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public User upsertPlayer(@Valid @RequestBody PlayerInput input) {
@@ -129,7 +129,7 @@ public class PlayerApi extends RestBehavior {
     }
   }
 
-  @PutMapping("/api/players/{userId}")
+  @PutMapping(PLAYER_URI + "/{userId}")
   @PreAuthorize("isPlanner()")
   public User updatePlayer(@PathVariable String userId, @Valid @RequestBody PlayerInput input) {
     checkUserAccess(userRepository, userId);
@@ -143,7 +143,7 @@ public class PlayerApi extends RestBehavior {
     return userRepository.save(user);
   }
 
-  @DeleteMapping("/api/players/{userId}")
+  @DeleteMapping(PLAYER_URI + "/{userId}")
   @PreAuthorize("isPlanner()")
   public void deletePlayer(@PathVariable String userId) {
     checkUserAccess(userRepository, userId);
