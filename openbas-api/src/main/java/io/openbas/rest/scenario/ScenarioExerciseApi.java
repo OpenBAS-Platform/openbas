@@ -2,6 +2,7 @@ package io.openbas.rest.scenario;
 
 import io.openbas.database.model.Exercise;
 import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.rest.exercise.ExerciseService;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.ExerciseSpecification.fromScenario;
+import static io.openbas.rest.exercise.form.ExerciseSimple.fromExercise;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
@@ -26,12 +28,13 @@ public class ScenarioExerciseApi {
 
   private final ExerciseService exerciseService;
   private final ExerciseRepository exerciseRepository;
+  private final InjectExpectationRepository injectExpectationRepository;
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/exercises")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<ExerciseSimple> scenarioExercises(@PathVariable @NotBlank final String scenarioId) {
     return this.exerciseRepository.findAll(fromScenario(scenarioId))
-        .stream().map(ExerciseSimple::fromExercise).toList();
+        .stream().map(exercise->fromExercise(exercise, injectExpectationRepository)).toList();
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/exercises/search")
