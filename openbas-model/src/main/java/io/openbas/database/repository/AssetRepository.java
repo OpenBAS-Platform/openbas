@@ -25,13 +25,13 @@ public interface AssetRepository extends CrudRepository<Asset, String>, JpaSpeci
    */
   @Query(value = "SELECT asset_id, asset_name, asset_type, endpoint_platform " +
       "FROM assets " +
-      "WHERE asset_id IN :ids ", nativeQuery = true)
+      "WHERE asset_id IN :ids ;", nativeQuery = true)
   List<RawAsset> rawByIds(@Param("ids") List<String> ids);
 
   @Query(value = "SELECT ia.inject_id, a.asset_id, a.asset_name, a.asset_type, a.endpoint_platform " +
       "FROM assets a " +
       "LEFT JOIN injects_assets ia ON a.asset_id = ia.asset_id " +
-      "WHERE ia.inject_id IN :injectIds;", nativeQuery = true)
+      "WHERE ia.inject_id IN :injectIds ;", nativeQuery = true)
   List<RawAsset> rawByInjectIds(@Param("injectIds") List<String> injectIds);
 }
 
