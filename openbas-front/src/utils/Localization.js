@@ -889,6 +889,7 @@ const i18n = {
       injector_contract_injector: 'Injector',
       injector_contract_labels: 'Label',
       injector_contract_platforms: 'Platforms',
+      injector_contract_arch: 'Architecture',
       // Scenario
       scenario_category: 'Catégorie',
       scenario_kill_chain_phases: 'Phase de kill chain',
@@ -2791,6 +2792,7 @@ const i18n = {
       injector_contract_injector: 'Injector',
       injector_contract_labels: 'Label',
       injector_contract_platforms: 'Platforms',
+      injector_contract_arch: 'Architecture',
       // Scenario
       scenario_category: 'Category',
       scenario_kill_chain_phases: 'Kill chain phase',
