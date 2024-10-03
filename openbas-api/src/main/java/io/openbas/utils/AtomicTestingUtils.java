@@ -362,10 +362,10 @@ public class AtomicTestingUtils {
         long failureCount = normalizedScores.stream().filter(s -> s != null && s.equals(0.0)).count();
 
         return List.of(
-                new ResultDistribution(type.successLabel, (int) successCount),
-                new ResultDistribution(type.pendingLabel, (int) pendingCount),
-                new ResultDistribution(type.partialLabel, (int) partialCount),
-                new ResultDistribution(type.failureLabel, (int) failureCount)
+                new ResultDistribution(ExpectationType.SUCCESS_ID, type.successLabel, (int) successCount),
+                new ResultDistribution(ExpectationType.PENDING_ID, type.pendingLabel, (int) pendingCount),
+                new ResultDistribution(ExpectationType.PARTIAL_ID, type.partialLabel, (int) partialCount),
+                new ResultDistribution(ExpectationType.FAILED_ID, type.failureLabel, (int) failureCount)
         );
     }
 
