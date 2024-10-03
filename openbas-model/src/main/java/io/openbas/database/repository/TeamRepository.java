@@ -52,6 +52,12 @@ public interface TeamRepository extends CrudRepository<Team, String>,
           "WHERE team_id IN :ids ;", nativeQuery = true)
   List<RawTeam> rawTeamByIds(@Param("ids") List<String> ids);
 
+  @Query(value="SELECT DISTINCT( team_id, team_name) "
+          + "FROM teams t "
+          + "LEFT JOIN injects_teams it ON t.team_id = it.team_id "
+          + "WHERE it.inject_id IN :ids ;", nativeQuery = true)
+  List<RawTeam> rawTeamByInjectIds(@Param("ids") List<String> ids);
+
   @Query(value="SELECT teams.team_id, teams.team_name, teams.team_description, teams.team_created_at, teams.team_updated_at, teams.team_organization, " +
           "       team_contextual, " +
           "       coalesce(array_agg(DISTINCT teams_tags.tag_id) FILTER ( WHERE teams_tags.tag_id IS NOT NULL ), '{}') as team_tags, " +

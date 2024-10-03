@@ -504,9 +504,7 @@ public class AtomicTestingUtils {
           .toList());
     }
 
-    List<String> injectAssetIds = inject.getInject_assets().stream()
-        .map(RawAsset::getAsset_id)
-        .collect(Collectors.toList());
+    List<String> injectAssetIds = inject.getInject_assets();
 
     assetsToRefine.removeAll(
         assetsToRemove

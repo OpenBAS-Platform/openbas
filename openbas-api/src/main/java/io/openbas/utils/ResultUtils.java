@@ -4,8 +4,10 @@ import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.raw.RawInjectExpectationForCompute;
+import io.openbas.database.raw.RawTeam;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.repository.InjectRepository;
+import io.openbas.database.repository.TeamRepository;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
@@ -68,9 +70,12 @@ public class ResultUtils {
         .toList();
   }
 
-  public static List<InjectTargetWithResult> computeTargetResultsWithRawExercise(@NotNull List<Inject> injects, InjectRepository injectRepository, InjectExpectationRepository injectExpectationRepository) {
+  public static List<InjectTargetWithResult> computeTargetResultsWithRawExercise(@NotNull List<Inject> injects, InjectRepository injectRepository, InjectExpectationRepository injectExpectationRepository, TeamRepository teamRepository) {
+    List<String> injectIds = injects.stream().map(Inject::getId).toList();
+    Map<String, RawTeam> teamMap = teamRepository.rawTeamByInjectIds(injectIds).stream().collect(Collectors.toMap(RawTeam::getTeam_id, team -> team));
+
     return injects.stream()
-        .flatMap(inject -> getTargetsWithResultsWithRawQueries(inject.getId(), injectRepository, injectExpectationRepository).stream())
+        .flatMap(inject -> getTargetsWithResultsWithRawQueries(inject.getId(), injectRepository, injectExpectationRepository, teamMap, mapAssets, mapAssetsGroups).stream())
         .distinct()
         .toList();
   }
