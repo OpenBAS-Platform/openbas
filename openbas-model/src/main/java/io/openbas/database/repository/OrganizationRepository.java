@@ -35,7 +35,6 @@ public interface OrganizationRepository extends CrudRepository<Organization, Str
                     "GROUP BY org.organization_id", nativeQuery = true)
     List<RawOrganization> rawAll();
 
-
     @Query(value =
             "SELECT org.*," +
                     "array_agg(DISTINCT org_tags.tag_id) FILTER (WHERE org_tags.tag_id IS NOT NULL) AS organization_tags, " +

@@ -5,7 +5,6 @@ import io.openbas.database.model.Organization;
 import io.openbas.database.model.Tag;
 import io.openbas.database.model.Team;
 import io.openbas.database.model.User;
-import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.team.output.TeamOutput;
@@ -17,7 +16,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
@@ -25,7 +23,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -60,7 +57,7 @@ public class TeamService {
 
   @Tracing(name = "Paginate teams", layer = "service")
   public Page<TeamOutput> teamPagination(
-      @RequestBody @Valid SearchPaginationInput searchPaginationInput,
+      @NotNull SearchPaginationInput searchPaginationInput,
       @NotNull final Specification<Team> teamSpecification) {
     BiFunction<Specification<Team>, Pageable, Page<TeamOutput>> teamsFunction;
     OpenBASPrincipal currentUser = currentUser();

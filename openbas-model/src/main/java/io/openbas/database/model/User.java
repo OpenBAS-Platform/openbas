@@ -60,13 +60,13 @@ public class User implements Base {
   @Setter
   @Column(name = "user_firstname")
   @JsonProperty("user_firstname")
-  @Queryable(searchable = true, sortable = true)
+  @Queryable(filterable = true, searchable = true, sortable = true)
   private String firstname;
 
   @Setter
   @Column(name = "user_lastname")
   @JsonProperty("user_lastname")
-  @Queryable(searchable = true, sortable = true)
+  @Queryable(filterable = true, searchable = true, sortable = true)
   private String lastname;
 
   @Getter(NONE)
@@ -84,7 +84,7 @@ public class User implements Base {
   @Getter(NONE)
   @Column(name = "user_email")
   @JsonProperty("user_email")
-  @Queryable(searchable = true, sortable = true)
+  @Queryable(filterable = true, searchable = true, sortable = true)
   @NotBlank
   private String email;
 
@@ -131,6 +131,7 @@ public class User implements Base {
   @JoinColumn(name = "user_organization")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("user_organization")
+  @Queryable(dynamicValues = true, filterable = true, sortable = true, path = "organization.id")
   private Organization organization;
 
   @Setter
@@ -175,7 +176,7 @@ public class User implements Base {
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("user_tags")
-  @Queryable(sortable = true)
+  @Queryable(dynamicValues = true, filterable = true, sortable = true, path = "tags.id")
   private Set<Tag> tags = new HashSet<>();
 
   @Setter

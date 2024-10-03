@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
-import { Fab, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { Add, ControlPointOutlined } from '@mui/icons-material';
+import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { addPlayer } from '../../../../actions/User';
 import PlayerForm from './PlayerForm';
@@ -11,13 +11,10 @@ import type { Theme } from '../../../../components/Theme';
 import type { PlayerInput } from '../../../../utils/api-types';
 import { Option } from '../../../../utils/Option';
 import type { PlayerInputForm, UserStore } from './Player';
+import ButtonCreate from '../../../../components/common/ButtonCreate';
+import Drawer from '../../../../components/common/Drawer';
 
 const useStyles = makeStyles((theme: Theme) => ({
-  createButton: {
-    position: 'fixed',
-    bottom: 30,
-    right: 30,
-  },
   text: {
     fontSize: theme.typography.h2.fontSize,
     color: theme.palette.primary.main,
@@ -34,6 +31,7 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
   inline = false,
   onCreate,
 }) => {
+  // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -67,36 +65,44 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
   return (
     <div>
       {inline ? (
-        <ListItemButton divider={true} onClick={handleOpen} color="primary">
-          <ListItemIcon color="primary">
-            <ControlPointOutlined color="primary" />
-          </ListItemIcon>
-          <ListItemText
-            primary={t('Create a new player')}
-            classes={{ primary: classes.text }}
-          />
-        </ListItemButton>
+        <>
+          <ListItemButton divider onClick={handleOpen} color="primary">
+            <ListItemIcon color="primary">
+              <ControlPointOutlined color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={t('Create a new player')}
+              classes={{ primary: classes.text }}
+            />
+          </ListItemButton>
+          <Dialog
+            open={openDialog}
+            handleClose={handleClose}
+            title={t('Create a new player')}
+          >
+            <PlayerForm
+              initialValues={{ user_tags: [] }}
+              handleClose={handleClose}
+              onSubmit={onSubmit}
+            />
+          </Dialog>
+        </>
       ) : (
-        <Fab
-          onClick={handleOpen}
-          color="primary"
-          aria-label="Add"
-          className={classes.createButton}
-        >
-          <Add />
-        </Fab>
+        <>
+          <ButtonCreate onClick={handleOpen} />
+          <Drawer
+            open={openDialog}
+            handleClose={handleClose}
+            title={t('Create a new player')}
+          >
+            <PlayerForm
+              initialValues={{ user_tags: [] }}
+              handleClose={handleClose}
+              onSubmit={onSubmit}
+            />
+          </Drawer>
+        </>
       )}
-      <Dialog
-        open={openDialog}
-        handleClose={handleClose}
-        title={t('Create a new player')}
-      >
-        <PlayerForm
-          initialValues={{ user_tags: [] }}
-          handleClose={handleClose}
-          onSubmit={onSubmit}
-        />
-      </Dialog>
     </div>
   );
 };

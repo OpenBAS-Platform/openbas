@@ -5,6 +5,7 @@ import { searchKillChainPhasesByIdAsOption } from '../../../../actions/kill_chai
 import { searchTagByIdAsOption } from '../../../../actions/tags/tag-action';
 import { searchScenarioByIdAsOption } from '../../../../actions/scenarios/scenario-actions';
 import { searchAttackPatternsByIdAsOption } from '../../../../actions/AttackPattern';
+import { searchOrganizationByIdAsOptions } from '../../../../actions/organizations/organization-actions';
 
 const useRetrieveOptions = () => {
   const [options, setOptions] = useState<Option[]>([]);
@@ -37,12 +38,18 @@ const useRetrieveOptions = () => {
       case 'payload_tags':
       case 'scenario_tags':
       case 'team_tags':
+      case 'user_tags':
         searchTagByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;
       case 'exercise_scenario':
         searchScenarioByIdAsOption(ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'user_organization':
+        searchOrganizationByIdAsOptions(ids).then((response) => {
           setOptions(response.data);
         });
         break;

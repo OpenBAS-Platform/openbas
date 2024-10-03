@@ -2134,6 +2134,25 @@ export interface PagePayload {
   totalPages?: number;
 }
 
+export interface PagePlayerOutput {
+  content?: PlayerOutput[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageRawPaginationAssetGroup {
   content?: RawPaginationAssetGroup[];
   empty?: boolean;
@@ -2174,25 +2193,6 @@ export interface PageRawPaginationDocument {
 
 export interface PageRawPaginationImportMapper {
   content?: RawPaginationImportMapper[];
-  empty?: boolean;
-  first?: boolean;
-  last?: boolean;
-  /** @format int32 */
-  number?: number;
-  /** @format int32 */
-  numberOfElements?: number;
-  pageable?: PageableObject;
-  /** @format int32 */
-  size?: number;
-  sort?: SortObject[];
-  /** @format int64 */
-  totalElements?: number;
-  /** @format int32 */
-  totalPages?: number;
-}
-
-export interface PageRawPaginationPlayer {
-  content?: RawPaginationPlayer[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -2502,6 +2502,20 @@ export interface PlayerInput {
   user_teams?: string[];
 }
 
+export interface PlayerOutput {
+  user_phone2?: string;
+  user_country?: string;
+  user_email: string;
+  user_firstname?: string;
+  user_id: string;
+  user_lastname?: string;
+  user_organization?: string;
+  user_pgp_key?: string;
+  user_phone?: string;
+  /** @uniqueItems true */
+  user_tags?: string[];
+}
+
 export interface PolicyInput {
   platform_consent_confirm_text?: string;
   platform_consent_message?: string;
@@ -2595,19 +2609,6 @@ export interface RawPaginationImportMapper {
   import_mapper_name?: string;
   /** @format date-time */
   import_mapper_updated_at?: string;
-}
-
-export interface RawPaginationPlayer {
-  user_phone2?: string;
-  user_country?: string;
-  user_email?: string;
-  user_firstname?: string;
-  user_id?: string;
-  user_lastname?: string;
-  user_organization?: string;
-  user_pgp_key?: string;
-  user_phone?: string;
-  user_tags?: string[];
 }
 
 export interface RawPaginationScenario {

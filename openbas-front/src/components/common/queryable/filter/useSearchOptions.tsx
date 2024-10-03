@@ -6,6 +6,7 @@ import { searchTagAsOption } from '../../../../actions/tags/tag-action';
 import { searchScenarioAsOption, searchScenarioCategoryAsOption } from '../../../../actions/scenarios/scenario-actions';
 import { searchAttackPatternsByNameAsOption } from '../../../../actions/AttackPattern';
 import { useFormatter } from '../../../i18n';
+import { searchOrganizationsByNameAsOption } from '../../../../actions/organizations/organization-actions';
 
 const useSearchOptions = () => {
   // Standard hooks
@@ -41,6 +42,7 @@ const useSearchOptions = () => {
       case 'payload_tags':
       case 'scenario_tags':
       case 'team_tags':
+      case 'user_tags':
         searchTagAsOption(search).then((response) => {
           setOptions(response.data);
         });
@@ -52,6 +54,11 @@ const useSearchOptions = () => {
         break;
       case 'scenario_category':
         searchScenarioCategoryAsOption(search).then((response: { data: Option[] }) => {
+          setOptions(response.data.map((d) => ({ id: d.id, label: t(d.label) })));
+        });
+        break;
+      case 'user_organization':
+        searchOrganizationsByNameAsOption(search).then((response: { data: Option[] }) => {
           setOptions(response.data.map((d) => ({ id: d.id, label: t(d.label) })));
         });
         break;
