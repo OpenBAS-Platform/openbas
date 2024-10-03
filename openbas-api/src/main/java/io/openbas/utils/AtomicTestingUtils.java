@@ -292,7 +292,9 @@ public class AtomicTestingUtils {
 
   public static List<InjectTargetWithResult> getTargetsWithResultsWithRawQueries(final String injectId,
       InjectRepository injectRepository,
-      InjectExpectationRepository injectExpectationRepository, List<RawTeam> rawTeamList, List<RawAsset> rawAssetList,
+      InjectExpectationRepository injectExpectationRepository,
+      List<RawTeam> rawTeamList,
+      List<RawAsset> rawAssetList,
       List<RawAssetGroup> rawAssetGroupList) {
 
     RawInject inject = injectRepository.findRawInjectForCompute(injectId);
@@ -332,58 +334,66 @@ public class AtomicTestingUtils {
 
     /* Match Target with expectations
      * */
-    rawTeamList.forEach(team -> {
-      // Check if there are no expectations matching the current team (t)
-      boolean noMatchingExpectations = teamExpectations.stream()
-          .noneMatch(exp -> exp.getTeam().getTeam_id().equals(team.getTeam_id()));
-      if (noMatchingExpectations) {
-        InjectTargetWithResult target = new InjectTargetWithResult(
-            TargetType.TEAMS,
-            team.getTeam_id(),
-            team.getTeam_name(),
-            defaultExpectationResultsByTypes,
-            null
-        );
-        targets.add(target);
-      }
-    });
-    rawAssetList.forEach(asset -> {
-      // Check if there are no expectations matching the current asset (t)
-      boolean noMatchingExpectations = assetExpectations.stream()
-          .noneMatch(exp -> exp.getAsset().getAsset_id().equals(asset.getAsset_id()));
-      if (noMatchingExpectations) {
-        InjectTargetWithResult target = new InjectTargetWithResult(
-            TargetType.ASSETS,
-            asset.getAsset_id(),
-            asset.getAsset_name(),
-            defaultExpectationResultsByTypes,
-            Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform()
-                : null
-        );
-
-        targets.add(target);
-      }
-    });
-    rawAssetGroupList.forEach(assetGroup -> {
-      // Check if there are no expectations matching the current assetgroup (t)
-      boolean noMatchingExpectations = assetGroupExpectations.stream()
-          .noneMatch(exp -> exp.getAsset_group().getAsset_group_id().equals(assetGroup.getAsset_group_id()));
-
-      List<InjectTargetWithResult> children = new ArrayList<>();
-
-      assetGroup.getAsset_ids().forEach(asset -> {
-        RawAsset finalAsset = rawAssetList.stream().filter(a -> a.getAsset_id().equals(asset)).findFirst()
-            .orElseThrow();
-        children.add(new InjectTargetWithResult(
-            TargetType.ASSETS,
-            asset,
-            finalAsset.getAsset_name(),
-            defaultExpectationResultsByTypes,
-            Objects.equals(finalAsset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform()
-                : null
-        ));
+    if (rawTeamList != null) {
+      rawTeamList.forEach(team -> {
+        // Check if there are no expectations matching the current team (t)
+        boolean noMatchingExpectations = teamExpectations.stream()
+            .noneMatch(exp -> exp.getTeam().getTeam_id().equals(team.getTeam_id()));
+        if (noMatchingExpectations) {
+          InjectTargetWithResult target = new InjectTargetWithResult(
+              TargetType.TEAMS,
+              team.getTeam_id(),
+              team.getTeam_name(),
+              defaultExpectationResultsByTypes,
+              null
+          );
+          targets.add(target);
+        }
       });
-      // Add dynamic assets as children
+    }
+
+    if (rawAssetList != null) {
+      rawAssetList.forEach(asset -> {
+        // Check if there are no expectations matching the current asset (t)
+        boolean noMatchingExpectations = assetExpectations.stream()
+            .noneMatch(exp -> exp.getAsset().getAsset_id().equals(asset.getAsset_id()));
+        if (noMatchingExpectations) {
+          InjectTargetWithResult target = new InjectTargetWithResult(
+              TargetType.ASSETS,
+              asset.getAsset_id(),
+              asset.getAsset_name(),
+              defaultExpectationResultsByTypes,
+              Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform()
+                  : null
+          );
+
+          targets.add(target);
+        }
+      });
+    }
+
+    if (rawAssetGroupList != null) {
+      rawAssetGroupList.forEach(assetGroup -> {
+        // Check if there are no expectations matching the current assetgroup (t)
+        boolean noMatchingExpectations = assetGroupExpectations.stream()
+            .noneMatch(exp -> exp.getAsset_group().getAsset_group_id().equals(assetGroup.getAsset_group_id()));
+
+        List<InjectTargetWithResult> children = new ArrayList<>();
+
+        assetGroup.getAsset_ids().forEach(asset -> {
+          RawAsset finalAsset = rawAssetList.stream().filter(a -> a.getAsset_id().equals(asset)).findFirst()
+              .orElseThrow();
+          children.add(new InjectTargetWithResult(
+              TargetType.ASSETS,
+              asset,
+              finalAsset.getAsset_name(),
+              defaultExpectationResultsByTypes,
+              Objects.equals(finalAsset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(
+                  asset)).getPlatform()
+                  : null
+          ));
+        });
+        // Add dynamic assets as children
       /*assetGroup.getDynamicAssets().forEach(asset -> {
         children.add(new InjectTargetWithResult(
             TargetType.ASSETS,
@@ -395,20 +405,20 @@ public class AtomicTestingUtils {
         ));
       });*/
 
-      if (noMatchingExpectations) {
-        InjectTargetWithResult target = new InjectTargetWithResult(
-            TargetType.ASSETS_GROUPS,
-            assetGroup.getAsset_group_id(),
-            assetGroup.getAsset_group_name(),
-            defaultExpectationResultsByTypes,
-            children,
-            null
-        );
+        if (noMatchingExpectations) {
+          InjectTargetWithResult target = new InjectTargetWithResult(
+              TargetType.ASSETS_GROUPS,
+              assetGroup.getAsset_group_id(),
+              assetGroup.getAsset_group_name(),
+              defaultExpectationResultsByTypes,
+              children,
+              null
+          );
 
-        targets.add(target);
-      }
-    });
-
+          targets.add(target);
+        }
+      });
+    }
     /* Build results for expectations with scores
      */
     if (!teamExpectations.isEmpty()) {
