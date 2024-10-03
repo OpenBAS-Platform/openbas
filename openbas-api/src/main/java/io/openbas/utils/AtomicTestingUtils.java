@@ -295,7 +295,8 @@ public class AtomicTestingUtils {
       InjectExpectationRepository injectExpectationRepository,
       List<RawTeam> rawTeamList,
       List<RawAsset> rawAssetList,
-      List<RawAssetGroup> rawAssetGroupList) {
+      List<RawAssetGroup> rawAssetGroupList,
+      Map<String, RawAsset> assetForAssetGroupMap) {
 
     RawInject inject = injectRepository.findRawInjectForCompute(injectId);
     List<ExpectationResultsByType> defaultExpectationResultsByTypes = getDefaultExpectationResultsByTypes();
@@ -381,7 +382,7 @@ public class AtomicTestingUtils {
         List<InjectTargetWithResult> children = new ArrayList<>();
 
         assetGroup.getAsset_ids().forEach(asset -> {
-          RawAsset finalAsset = rawAssetList.stream().filter(a -> a.getAsset_id().equals(asset)).findFirst().orElseThrow();
+          RawAsset finalAsset = assetForAssetGroupMap.get(asset);
           children.add(new InjectTargetWithResult(
               TargetType.ASSETS,
               asset,
