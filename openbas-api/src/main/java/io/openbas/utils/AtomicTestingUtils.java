@@ -434,7 +434,7 @@ public class AtomicTestingUtils {
               )
               .entrySet().stream()
               .map(entry -> new InjectTargetWithResult(TargetType.TEAMS, entry.getKey(),
-                  entry.getKey().getTeam_name(), entry.getValue(), playerExpectations.isEmpty() ? List.of()
+                  expectations.stream().filter(re->re.getTeam_id().equals(entry.getKey())).map(re->re.getTeam_name()).findAny().orElseThrow(), entry.getValue(), playerExpectations.isEmpty() ? List.of()
                   : calculateResultsforPlayersWithRawValues(groupedByTeamAndUser.get(entry.getKey())), null))
               .toList()
       );
@@ -451,8 +451,8 @@ public class AtomicTestingUtils {
               )
               .entrySet().stream()
               .map(entry -> new InjectTargetWithResult(TargetType.ASSETS, entry.getKey(),
-                  entry.getKey().getAsset_name(), entry.getValue(),
-                  Objects.equals(entry.getKey().getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(entry.getKey().getEndpoint_platform()) : null))
+                  expectations.stream().filter(re->re.getAsset_id().equals(entry.getKey())).map(re->re.getAsset_name()).findAny().orElseThrow(), entry.getValue(),
+                  Objects.equals(expectations.stream().filter(re->re.getAsset_id().equals(entry.getKey())).map(re->re.getAsset_type()).findAny().orElseThrow(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(expectations.stream().filter(re->re.getAsset_id().equals(entry.getKey())).map(re->re.getEndpoint_platform()).findAny().orElseThrow()) : null))
               .toList()
       );
     }
@@ -548,11 +548,11 @@ public class AtomicTestingUtils {
   }
 
   private static List<InjectTargetWithResult> calculateResultsforPlayersWithRawValues(
-      Map<RawUser, List<RawInjectExpectationForCompute>> expectationsByUser) {
+      Map<String, List<RawInjectExpectationForCompute>> expectationsByUser) {
     return expectationsByUser.entrySet().stream()
         .map(userEntry -> new InjectTargetWithResult(
             TargetType.PLAYER,
-            userEntry.getKey().getUser_id(),
+            userEntry.getKey(),
             userEntry.getKey().getName(),
             getRawExpectationResultByTypesForCompute(userEntry.getValue()),
             null

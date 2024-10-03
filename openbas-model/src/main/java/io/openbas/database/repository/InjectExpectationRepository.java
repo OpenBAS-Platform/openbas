@@ -131,6 +131,8 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
   + "t.team_name AS team_name, "
   + "a.asset_id AS asset_id, "
   + "a.asset_name AS asset_name, "
+  + "a.asset_type AS asset_type, "
+  + "a.endpoint_platform AS endpoint_platform, "
   + "at.asset_group_id AS asset_group_id, "
   + "at.asset_group_name AS asset_group_name, "
   + "COALESCE(ARRAY_AGG(aga.asset_id) FILTER (WHERE aga.asset_id IS NOT NULL),'{}') AS asset_ids, "
