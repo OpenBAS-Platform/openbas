@@ -2,6 +2,7 @@ package io.openbas.opencti;
 
 import io.openbas.database.model.Exercise;
 import io.openbas.database.repository.InjectExpectationRepository;
+import io.openbas.database.repository.InjectRepository;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.service.ScenarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +28,7 @@ public class OpenCTIApi {
 
   private final ScenarioService scenarioService;
   private final InjectExpectationRepository injectExpectationRepository;
+  private final InjectRepository injectRepository;
 
   @Operation(summary = "Retrieve the latest exercise by external reference ID (example: a report ID")
   @ApiResponses(value = {
@@ -39,7 +41,7 @@ public class OpenCTIApi {
   @GetMapping(OPENCTI_URI + "/exercises/latest/{externalReferenceId}")
   public ExerciseSimple latestExerciseByExternalReference(@PathVariable @NotBlank final String externalReferenceId) {
     Exercise exercise = this.scenarioService.latestExerciseByExternalReference(externalReferenceId);
-    return ExerciseSimple.fromExercise(exercise, injectExpectationRepository);
+    return ExerciseSimple.fromExercise(exercise, injectRepository, injectExpectationRepository);
   }
 
 }
