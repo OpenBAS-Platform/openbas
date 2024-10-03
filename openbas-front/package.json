@@ -81,7 +81,7 @@
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "7.24.6",
     "@eslint/eslintrc": "3.1.0",
-    "@eslint/js": "8.57.0",
+    "@eslint/js": "8.57.1",
     "@playwright/test": "1.47.2",
     "@stylistic/eslint-plugin": "1.8.1",
     "@testing-library/react": "14.3.1",
@@ -101,7 +101,7 @@
     "compression": "1.7.4",
     "cross-env": "7.0.3",
     "esbuild": "0.24.0",
-    "eslint": "8.57.0",
+    "eslint": "8.57.1",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-airbnb-typescript": "18.0.0",
