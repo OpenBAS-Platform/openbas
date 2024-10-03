@@ -15,6 +15,7 @@ public interface RawInjectExpectationForCompute {
   String getAsset_id();
   String getAsset_name();
   String getAsset_type();
+  String getEndpoint_platform();
 
   String getAsset_group_id();
   String getAsset_group_name();
