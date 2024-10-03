@@ -62,7 +62,7 @@ public class AtomicTestingMapper {
 
     }
 
-    public record ResultDistribution(@NotNull String label, @NotNull Integer value) {
+    public record ResultDistribution(@NotNull String id, @NotNull String label, @NotNull Integer value) {
 
     }
 
