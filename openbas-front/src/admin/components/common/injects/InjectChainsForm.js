@@ -247,7 +247,7 @@ const InjectForm = ({
         let writtenCondition = '';
         for (const conditionElementIndex in conditions[dependency].conditionElement) {
           if (Object.hasOwn(conditions[dependency].conditionElement, conditionElementIndex)) {
-            writtenCondition += `${conditionElementIndex > 0 ? '&& ' : ''}${conditions[dependency].conditionElement[conditionElementIndex].name} == ${conditions[dependency].conditionElement[conditionElementIndex].value}`;
+            writtenCondition += `${conditionElementIndex > 0 ? ' && ' : ''}${conditions[dependency].conditionElement[conditionElementIndex].name} == ${conditions[dependency].conditionElement[conditionElementIndex].value}`;
           }
         }
         newConditions[conditions[dependency].parentId] = writtenCondition;

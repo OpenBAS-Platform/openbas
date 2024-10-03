@@ -611,7 +611,7 @@ public class InjectApi extends RestBehavior {
     }
 
     List<InjectDependency> injectDepencyToRemove = new ArrayList<>();
-    if(input.getDependsOn() != null) {
+    if(input.getDependsOn() != null && !input.getDependsOn().isEmpty()) {
       inject.getDependsOn().forEach(
         injectDependency -> {
           if (!input.getDependsOn().keySet().contains(injectDependency.getCompositeId().getInjectParentId().getId())) {

@@ -219,7 +219,10 @@ const Injects: FunctionComponent<Props> = ({
   const onUpdate = (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
     if (result.entities) {
       const updated = result.entities.injects[result.result];
-      setInjects(injects.map((i) => (i.inject_id !== updated.inject_id ? i as InjectOutputType : (updated as InjectOutputType))));
+      setInjects(injects.map((i) => {
+        console.log((i.inject_id !== updated.inject_id ? i as InjectOutputType : (updated as InjectOutputType)));
+        return (i.inject_id !== updated.inject_id ? i as InjectOutputType : (updated as InjectOutputType));
+      }));
     }
   };
 
