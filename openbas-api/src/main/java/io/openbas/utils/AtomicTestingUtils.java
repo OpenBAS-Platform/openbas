@@ -307,17 +307,17 @@ public class AtomicTestingUtils {
     List<RawInjectExpectationForCompute> assetGroupExpectations = new ArrayList<>();
 
     expectations.forEach(expectation -> {
-      if (expectation.getTeam().getTeam_id() != null) {
+      if (expectation.getTeam() != null && expectation.getTeam().getTeam_id() != null) {
         if (expectation.getUser().getUser_id() != null) {
           playerExpectations.add(expectation);
         } else {
           teamExpectations.add(expectation);
         }
       }
-      if (expectation.getAsset().getAsset_id() != null) {
+      if (expectation.getAsset() != null && expectation.getAsset().getAsset_id() != null) {
         assetExpectations.add(expectation);
       }
-      if (expectation.getAsset_group().getAsset_group_id() != null) {
+      if (expectation.getAsset_group() != null && expectation.getAsset_group().getAsset_group_id() != null) {
         assetGroupExpectations.add(expectation);
       }
     });
