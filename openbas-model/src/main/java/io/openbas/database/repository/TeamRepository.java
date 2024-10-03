@@ -55,8 +55,7 @@ public interface TeamRepository extends CrudRepository<Team, String>,
   @Query(value = "SELECT it.inject_id, t.team_id, t.team_name "
       + "FROM teams t "
       + "LEFT JOIN injects_teams it ON t.team_id = it.team_id "
-      + "WHERE it.inject_id IN :injectIds "
-      + "AND it.inject_id IS NOT NULL ;", nativeQuery = true)
+      + "WHERE it.inject_id IN :injectIds ;", nativeQuery = true)
   List<RawTeam> rawTeamByInjectIds(@Param("injectIds") List<String> ids);
 
   @Query(value =
