@@ -1,14 +1,62 @@
 import React from 'react';
-import { z } from 'zod';
+import { z, ZodBoolean } from 'zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { Button, Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import type { ReportInput, ReportInformationInput, Report } from '../../../../../utils/api-types';
-import { zodImplement } from '../../../../../utils/Zod';
 import { useFormatter } from '../../../../../components/i18n';
 import ReportInformationType from './ReportInformationType';
+
+interface ExerciseReportFormInput {
+  report_name: string;
+  report_main_information: boolean;
+  report_score_details: boolean;
+  report_inject_result: boolean;
+  report_global_observation: boolean;
+  report_player_surveys: boolean;
+  report_exercise_details: boolean;
+}
+
+interface ExerciseReportModulesConfig {
+  type: ReportInformationType;
+  name: 'report_main_information' | 'report_score_details' | 'report_inject_result' | 'report_player_surveys' | 'report_exercise_details' | 'report_name' | 'report_global_observation';
+  label: string;
+}
+
+const exerciseReportModulesConfig: ExerciseReportModulesConfig[] = [
+  {
+    type: ReportInformationType.MAIN_INFORMATION,
+    name: 'report_main_information',
+    label: 'General information',
+  },
+  {
+    type: ReportInformationType.SCORE_DETAILS,
+    name: 'report_score_details',
+    label: 'Score details',
+  },
+  {
+    type: ReportInformationType.INJECT_RESULT,
+    name: 'report_inject_result',
+    label: 'Injects results',
+  },
+  {
+    type: ReportInformationType.PLAYER_SURVEYS,
+    name: 'report_player_surveys',
+    label: 'Player surveys',
+  },
+  {
+    type: ReportInformationType.GLOBAL_OBSERVATION,
+    name: 'report_global_observation',
+    label: 'Global observation',
+  },
+  {
+    type: ReportInformationType.EXERCISE_DETAILS,
+    name: 'report_exercise_details',
+    label: 'Exercise details',
+  },
+];
 
 interface Props {
   onSubmit: SubmitHandler<ReportInput>;
@@ -16,16 +64,6 @@ interface Props {
   editing?: boolean;
   initialValues?: Report,
 }
-
-interface ExerciseReportFormInput {
-  report_name: string;
-  report_main_information: boolean;
-  report_score_details: boolean;
-  report_inject_result: boolean;
-  report_player_surveys: boolean;
-  report_exercise_details: boolean;
-}
-
 const ExerciseReportForm: React.FC<Props> = ({
   onSubmit,
   handleCancel,
@@ -39,14 +77,12 @@ const ExerciseReportForm: React.FC<Props> = ({
     return initialValues?.report_informations?.find((info) => info.report_informations_type === type)?.report_informations_display ?? true;
   };
 
-  const initialFormValues: ExerciseReportFormInput = {
-    report_name: initialValues?.report_name || '',
-    report_main_information: findReportInfo(ReportInformationType.MAIN_INFORMATION),
-    report_score_details: findReportInfo(ReportInformationType.SCORE_DETAILS),
-    report_inject_result: findReportInfo(ReportInformationType.INJECT_RESULT),
-    report_player_surveys: findReportInfo(ReportInformationType.PLAYER_SURVEYS),
-    report_exercise_details: findReportInfo(ReportInformationType.EXERCISE_DETAILS),
-  };
+  const initialModulesValues: Record<string, boolean> = {};
+  const modulesFormInput: Record<string, ZodBoolean > = {};
+  exerciseReportModulesConfig.forEach((moduleConfig) => {
+    initialModulesValues[moduleConfig.name] = findReportInfo(moduleConfig.type);
+    modulesFormInput[moduleConfig.name] = z.boolean();
+  });
 
   const {
     register,
@@ -54,42 +90,23 @@ const ExerciseReportForm: React.FC<Props> = ({
     formState: { errors, isSubmitting },
   } = useForm<ExerciseReportFormInput>({
     mode: 'onTouched',
-    resolver: zodResolver(
-      zodImplement<ExerciseReportFormInput>().with({
-        report_name: z.string().min(1, { message: t('Should not be empty') }),
-        report_main_information: z.boolean(),
-        report_score_details: z.boolean(),
-        report_inject_result: z.boolean(),
-        report_player_surveys: z.boolean(),
-        report_exercise_details: z.boolean(),
-      }),
-    ),
-    defaultValues: initialFormValues,
+    resolver: zodResolver(z.object({
+      report_name: z.string().min(1, { message: t('Should not be empty') }),
+      ...modulesFormInput,
+    })),
+    defaultValues: {
+      report_name: initialValues?.report_name || '',
+      ...initialModulesValues,
+    },
   });
 
   const onSubmitHandler = (data: ExerciseReportFormInput) => {
-    const reportInformationList: ReportInformationInput[] = [
-      {
-        report_informations_type: ReportInformationType.MAIN_INFORMATION,
-        report_informations_display: data.report_main_information,
-      },
-      {
-        report_informations_type: ReportInformationType.SCORE_DETAILS,
-        report_informations_display: data.report_score_details,
-      },
-      {
-        report_informations_type: ReportInformationType.INJECT_RESULT,
-        report_informations_display: data.report_inject_result,
-      },
-      {
-        report_informations_type: ReportInformationType.PLAYER_SURVEYS,
-        report_informations_display: data.report_player_surveys,
-      },
-      {
-        report_informations_type: ReportInformationType.EXERCISE_DETAILS,
-        report_informations_display: data.report_exercise_details,
-      },
-    ];
+    const reportInformationList: ReportInformationInput[] = exerciseReportModulesConfig.map((moduleConfig) => {
+      return {
+        report_informations_type: moduleConfig.type,
+        report_informations_display: !!data[moduleConfig.name],
+      };
+    });
     onSubmit({ report_name: data.report_name, report_informations: reportInformationList });
   };
 
@@ -115,51 +132,20 @@ const ExerciseReportForm: React.FC<Props> = ({
       >
         {t('Modules')}
       </Typography>
-      <FormControlLabel
-        control={
-          <Checkbox
-            {...register('report_main_information')}
-            defaultChecked={initialFormValues?.report_main_information}
+      { exerciseReportModulesConfig.map((moduleConfig) => {
+        return (
+          <FormControlLabel
+            key={moduleConfig.name}
+            control={
+              <Checkbox
+                {...register(moduleConfig.name)}
+                defaultChecked={initialModulesValues[moduleConfig.name]}
+              />
+          }
+            label={t(moduleConfig.label)}
           />
-        }
-        label={t('General information')}
-      />
-      <FormControlLabel
-        control={
-          <Checkbox
-            {...register('report_score_details')}
-            defaultChecked={initialFormValues?.report_score_details}
-          />
-        }
-        label={t('Score details')}
-      />
-      <FormControlLabel
-        control={
-          <Checkbox
-            {...register('report_inject_result')}
-            defaultChecked={initialFormValues?.report_inject_result}
-          />
-        }
-        label={t('Injects results')}
-      />
-      <FormControlLabel
-        control={
-          <Checkbox
-            {...register('report_player_surveys')}
-            defaultChecked={initialFormValues?.report_player_surveys}
-          />
-        }
-        label={t('Player surveys')}
-      />
-      <FormControlLabel
-        control={
-          <Checkbox
-            {...register('report_exercise_details')}
-            defaultChecked={initialFormValues?.report_exercise_details}
-          />
-        }
-        label={t('Exercise details')}
-      />
+        );
+      })}
       <div style={{ gridColumn: 'span 2', marginTop: '20px', display: 'flex' }}>
         <Button
           style={{ marginLeft: 'auto' }}

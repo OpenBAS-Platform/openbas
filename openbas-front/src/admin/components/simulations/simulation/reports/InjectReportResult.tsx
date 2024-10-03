@@ -96,7 +96,7 @@ const InjectReportResult: React.FC<Props> = ({
       label: 'Comments',
       render: (inject: InjectResultDTO) => {
         const currentInjectComment = findInjectCommentsByInjectId(inject.inject_id);
-        return <ExpandableMarkdown limit={300} source={currentInjectComment?.report_inject_comment || ''}/>;
+        return <ExpandableMarkdown showAll source={currentInjectComment?.report_inject_comment || ''}/>;
       },
     },
   ];
@@ -108,7 +108,7 @@ const InjectReportResult: React.FC<Props> = ({
       </Typography>
 
       <Paper variant="outlined">
-        <TableContainer>
+        <TableContainer style={{ maxHeight: 'none', overflow: 'visible' }}>
           <Table aria-label="injects results">
             <TableHead>
               <TableRow>

@@ -84,4 +84,7 @@ public class Report implements Base {
     public String toString() {
         return name;
     }
+
+    @Transient
+    private boolean isListened = false;
 }

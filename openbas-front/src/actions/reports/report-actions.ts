@@ -27,6 +27,15 @@ export const updateReportForExercise = (
   return putReferential(schema.report, uri, data)(dispatch);
 };
 
+export const updateReportGlobalObservation = (
+  exerciseId: Exercise['exercise_id'],
+  reportId: Report['report_id'],
+  data: ReportInput,
+) => {
+  const uri = `/api/exercises/${exerciseId}/reports/${reportId}`;
+  return simplePutCall(uri, data);
+};
+
 export const updateReportInjectCommentForExercise = (
   exerciseId: Exercise['exercise_id'],
   reportId: Report['report_id'],

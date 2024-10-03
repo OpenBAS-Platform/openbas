@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import { Alert, Button, ToggleButtonGroup } from '@mui/material';
@@ -28,6 +28,7 @@ const ExerciseReportPage: React.FC = () => {
 
   const { exerciseId, reportId } = useParams() as { exerciseId: Exercise['exercise_id'], reportId: Report['report_id'] };
   const permissions = usePermissions(exerciseId);
+  const [canEditReport, setCanEditReport] = useState(permissions.canWrite);
 
   const { report } = useHelper((helper: ReportsHelper) => {
     return {
@@ -39,6 +40,10 @@ const ExerciseReportPage: React.FC = () => {
     setLoading(true);
     dispatch(fetchReport(reportId)).finally(() => setLoading(false));
   });
+
+  useEffect(() => {
+    setCanEditReport(permissions.canWrite);
+  }, [permissions.canWrite]);
 
   // Context
   const context: ReportContextType = {
@@ -83,12 +88,14 @@ const ExerciseReportPage: React.FC = () => {
             domElementId={`reportId_${reportId}`}
             name={report?.report_name}
             pixelRatio={2}
+            onExportClick={() => setCanEditReport(false)}
+            onExportEnd={() => setCanEditReport(permissions.canWrite)}
           />
           {permissions.canWrite && <ReportPopover variant={'toggle'} report={report} actions={['Update']}/>}
         </ToggleButtonGroup>
 
         <div style={{ width: '100%' }}>
-          <ExerciseReportContent report={report} exerciseId={exerciseId} canWrite={permissions.canWrite}/>
+          <ExerciseReportContent report={report} exerciseId={exerciseId} canWrite={canEditReport}/>
         </div>
       </div>
     </ReportContext.Provider>

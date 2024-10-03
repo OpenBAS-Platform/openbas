@@ -12,12 +12,13 @@ const SimpleRichTextField = (props) => {
   const {
     label,
     value,
-    onChange,
+    onChange = () => {},
     style,
     disabled,
     askAi,
     inInject,
     context,
+    onBlur = () => {},
   } = props;
   const lang = useHelper((helper) => {
     const me = helper.getMe();
@@ -46,6 +47,7 @@ const SimpleRichTextField = (props) => {
         onChange={(_, editor) => {
           onChange(editor.getData());
         }}
+        onBlur={onBlur}
         disabled={disabled}
       />
       {askAi && (

@@ -2696,6 +2696,7 @@ export interface ReportInjectCommentInput {
 export interface ReportInput {
   report_informations?: ReportInformationInput[];
   report_name: string;
+  report_global_observation?: string;
 }
 
 export interface ResetUserInput {
