@@ -70,7 +70,7 @@ public class ImapService {
     private FileService fileService;
     private final PlatformSettingsService platformSettingsService;
 
-    public ImapService(Environment env, @Autowired PlatformSettingsService platformSettingsService) throws Exception {
+    public ImapService(Environment env, @Autowired PlatformSettingsService platformSettingsService) {
         this.platformSettingsService = platformSettingsService;
         try {
             initStore(env);
@@ -294,20 +294,22 @@ public class ImapService {
         }
         currentState.setValue(String.valueOf(messageCount));
         settingRepository.save(currentState);
-        inbox.close();
+    }
+
+    private void tryToSynchronizeFolderFromBox(String folderName, Boolean isSent) throws Exception {
+        try(Folder folderBox = imapStore.getFolder(folderName)) {
+            folderBox.open(Folder.READ_ONLY);
+            synchronizeBox(folderBox, isSent);
+        }
     }
 
     private void syncFolders() throws Exception {
         try {
         // Sync sent
-        Folder sentBox = imapStore.getFolder(sentFolder);
-        sentBox.open(Folder.READ_ONLY);
-        synchronizeBox(sentBox, true);
+        tryToSynchronizeFolderFromBox(sentFolder, true);
         // Sync received
         for (String listeningFolder : inboxFolders) {
-            Folder inbox = imapStore.getFolder(listeningFolder);
-            inbox.open(Folder.READ_ONLY);
-            synchronizeBox(inbox, false);
+            tryToSynchronizeFolderFromBox(listeningFolder, false);
         }
         } catch (MessagingException e) {
             log.warning("Connection failure: " + e.getMessage());
@@ -324,10 +326,10 @@ public class ImapService {
             } catch (MessagingException e) {
                 log.warning("Retrying connection..." + e.getMessage());
                 Thread.sleep(2000);
+                if(i == 2 && imapStore != null && imapStore.isConnected()) {
+                    imapStore.close();
+                }
             }
-        }
-        if(imapStore != null && imapStore.isConnected()) {
-            imapStore.close();
         }
     }
 
@@ -350,11 +352,11 @@ public class ImapService {
 
     public void storeSentMessage(MimeMessage message) throws Exception {
         if (enabled) {
-            Folder folder = imapStore.getFolder(sentFolder);
-            folder.open(Folder.READ_WRITE);
-            message.setFlag(Flags.Flag.SEEN, true);
-            folder.appendMessages(new Message[]{message});
-            folder.close();
+            try (Folder folder = imapStore.getFolder(sentFolder)) {
+                folder.open(Folder.READ_WRITE);
+                message.setFlag(Flags.Flag.SEEN, true);
+                folder.appendMessages(new Message[]{message});
+            }
         }
     }
 }
