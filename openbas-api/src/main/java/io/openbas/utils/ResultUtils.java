@@ -78,8 +78,18 @@ public class ResultUtils {
         .collect(Collectors.groupingBy(RawTeam::getInject_id));
     Map<String, List<RawAsset>> assetMap = assetRepository.rawByInjectIds(injectIds).stream()
         .collect(Collectors.groupingBy(RawAsset::getInject_id));
-    Map<String, List<RawAssetGroup>> assetGroupMap = assetGroupRepository.rawByInjectIds(injectIds).stream()
+
+    List<RawAssetGroup> rawAssetGroups = assetGroupRepository.rawByInjectIds(injectIds);
+
+    Map<String, List<RawAssetGroup>> assetGroupMap = rawAssetGroups.stream()
         .collect(Collectors.groupingBy(RawAssetGroup::getInject_id));
+
+    List<RawAsset> assetForAssetGroupMap = assetRepository.rawByIds(
+        rawAssetGroups.stream()
+            .flatMap(rawAssetGroup -> rawAssetGroup.getAsset_ids().stream())
+            .distinct()
+    ).toList();
+
 
     return injects.stream()
         .flatMap(

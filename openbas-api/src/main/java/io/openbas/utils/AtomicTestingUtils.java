@@ -381,8 +381,7 @@ public class AtomicTestingUtils {
         List<InjectTargetWithResult> children = new ArrayList<>();
 
         assetGroup.getAsset_ids().forEach(asset -> {
-          RawAsset finalAsset = rawAssetList.stream().filter(a -> a.getAsset_id().equals(asset)).findFirst()
-              .orElseThrow();
+          RawAsset finalAsset = rawAssetList.stream().filter(a -> a.getAsset_id().equals(asset)).findFirst().orElseThrow();
           children.add(new InjectTargetWithResult(
               TargetType.ASSETS,
               asset,
