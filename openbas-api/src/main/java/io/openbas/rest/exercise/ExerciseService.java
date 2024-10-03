@@ -4,10 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
-import io.openbas.database.repository.ArticleRepository;
-import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.database.repository.TeamRepository;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.GrantService;
@@ -20,7 +18,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +27,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Instant;
@@ -65,6 +63,8 @@ public class ExerciseService {
     private final ArticleRepository articleRepository;
     private final ExerciseRepository exerciseRepository;
     private final TeamRepository teamRepository;
+    private final ExerciseTeamUserRepository exerciseTeamUserRepository;
+    private final InjectRepository injectRepository;
 
     // region properties
     @Value("${openbas.mail.imap.enabled}")
@@ -195,7 +195,7 @@ public class ExerciseService {
 
     // -- CREATION --
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Exercise createExercise(@NotNull final Exercise exercise){
             if (imapEnabled) {
                 exercise.setFrom(imapUsername);
@@ -405,6 +405,19 @@ public class ExerciseService {
             duplicatedObjectives.add(duplicatedObjective);
         }
         duplicatedExercise.setObjectives(duplicatedObjectives);
+    }
+
+    // -- TEAMS --
+
+    @Transactional(rollbackFor = Exception.class)
+    public Iterable<Team> removeTeams(@NotBlank final String exerciseId, @NotNull final List<String> teamIds) {
+        // Remove teams from exercise
+        this.exerciseRepository.removeTeams(exerciseId, teamIds);
+        // Remove all association between users / exercises / teams
+        teamIds.forEach(exerciseTeamUserRepository::deleteTeamFromAllReferences);
+        // Remove all association between injects and teams
+        this.injectRepository.removeTeamsForExercise(exerciseId, teamIds);
+        return teamRepository.findAllById(teamIds);
     }
 
 }
