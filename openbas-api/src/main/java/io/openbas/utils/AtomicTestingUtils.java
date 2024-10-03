@@ -290,8 +290,10 @@ public class AtomicTestingUtils {
     return sortResults(targets);
   }
 
-  public static List<InjectTargetWithResult> getTargetsWithResultsWithRawQueries(final String injectId, InjectRepository injectRepository,
-      InjectExpectationRepository injectExpectationRepository) {
+  public static List<InjectTargetWithResult> getTargetsWithResultsWithRawQueries(final String injectId,
+      InjectRepository injectRepository,
+      InjectExpectationRepository injectExpectationRepository, List<RawTeam> rawTeamList, List<RawAsset> rawAssetList,
+      List<RawAssetGroup> rawAssetGroupList) {
 
     RawInject inject = injectRepository.findRawInjectForCompute(injectId);
     List<ExpectationResultsByType> defaultExpectationResultsByTypes = getDefaultExpectationResultsByTypes();
@@ -330,7 +332,7 @@ public class AtomicTestingUtils {
 
     /* Match Target with expectations
      * */
-    inject.getInject_teams().forEach(team -> {
+    rawTeamList.forEach(team -> {
       // Check if there are no expectations matching the current team (t)
       boolean noMatchingExpectations = teamExpectations.stream()
           .noneMatch(exp -> exp.getTeam().getTeam_id().equals(team.getTeam_id()));
@@ -345,7 +347,7 @@ public class AtomicTestingUtils {
         targets.add(target);
       }
     });
-    inject.getInject_assets().forEach(asset -> {
+    rawAssetList.forEach(asset -> {
       // Check if there are no expectations matching the current asset (t)
       boolean noMatchingExpectations = assetExpectations.stream()
           .noneMatch(exp -> exp.getAsset().getAsset_id().equals(asset.getAsset_id()));
@@ -355,38 +357,43 @@ public class AtomicTestingUtils {
             asset.getAsset_id(),
             asset.getAsset_name(),
             defaultExpectationResultsByTypes,
-            Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null
+            Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform()
+                : null
         );
 
         targets.add(target);
       }
     });
-    inject.getInject_asset_groups().forEach(assetGroup -> {
+    rawAssetGroupList.forEach(assetGroup -> {
       // Check if there are no expectations matching the current assetgroup (t)
       boolean noMatchingExpectations = assetGroupExpectations.stream()
           .noneMatch(exp -> exp.getAsset_group().getAsset_group_id().equals(assetGroup.getAsset_group_id()));
 
       List<InjectTargetWithResult> children = new ArrayList<>();
 
-      assetGroup.getAssets().forEach(asset -> {
+      assetGroup.getAsset_ids().forEach(asset -> {
+        RawAsset finalAsset = rawAssetList.stream().filter(a -> a.getAsset_id().equals(asset)).findFirst()
+            .orElseThrow();
         children.add(new InjectTargetWithResult(
             TargetType.ASSETS,
-            asset.getAsset_id(),
-            asset.getAsset_name(),
+            asset,
+            finalAsset.getAsset_name(),
             defaultExpectationResultsByTypes,
-            Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null
+            Objects.equals(finalAsset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform()
+                : null
         ));
       });
       // Add dynamic assets as children
-      assetGroup.getDynamicAssets().forEach(asset -> {
+      /*assetGroup.getDynamicAssets().forEach(asset -> {
         children.add(new InjectTargetWithResult(
             TargetType.ASSETS,
             asset.getAsset_id(),
             asset.getAsset_name(),
             defaultExpectationResultsByTypes,
-            Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null
+            Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform()
+                : null
         ));
-      });
+      });*/
 
       if (noMatchingExpectations) {
         InjectTargetWithResult target = new InjectTargetWithResult(
@@ -476,7 +483,8 @@ public class AtomicTestingUtils {
                     asset.getAsset_id(),
                     asset.getAsset_name(),
                     defaultExpectationResultsByTypes,
-                    Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform()
+                    Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(
+                        asset)).getPlatform()
                         : null
                 ));
               }
@@ -492,7 +500,8 @@ public class AtomicTestingUtils {
                     asset.getAsset_id(),
                     asset.getAsset_name(),
                     defaultExpectationResultsByTypes,
-                    Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform()
+                    Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(
+                        asset)).getPlatform()
                         : null
                 ));
               }
@@ -590,6 +599,7 @@ public class AtomicTestingUtils {
 
     return resultAvgOfExpectations;
   }
+
   @NotNull
   public static List<ExpectationResultsByType> getRawExpectationResultByTypesForCompute(
       final List<RawInjectExpectationForCompute> expectations) {

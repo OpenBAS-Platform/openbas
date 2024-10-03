@@ -8,8 +8,7 @@ import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Tag;
 import io.openbas.database.raw.RawExercise;
-import io.openbas.database.repository.InjectExpectationRepository;
-import io.openbas.database.repository.InjectRepository;
+import io.openbas.database.repository.*;
 import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper;
@@ -74,7 +73,9 @@ public class ExerciseSimple {
   @NotNull
   private List<InjectTargetWithResult> targets;
 
-  public static ExerciseSimple fromExercise(Exercise exercise, InjectRepository injectRepository, InjectExpectationRepository injectExpectationRepository) {
+  public static ExerciseSimple fromExercise(Exercise exercise, InjectRepository injectRepository,
+      InjectExpectationRepository injectExpectationRepository, TeamRepository teamRepository,
+      AssetRepository assetRepository, AssetGroupRepository assetGroupRepository) {
     ExerciseSimple simple = new ExerciseSimple();
     BeanUtils.copyProperties(exercise, simple);
     simple.setStart(exercise.getStart().orElse(null));
@@ -83,26 +84,29 @@ public class ExerciseSimple {
         computeGlobalExpectationResults_raw(
             injectExpectationRepository.rawForComputeGlobalByIds(
                 exercise.getInjects().stream().map(Inject::getId).toList())));
-    simple.setTargets(computeTargetResultsWithRawExercise(exercise.getInjects(), injectRepository, injectExpectationRepository));
+    simple.setTargets(
+        computeTargetResultsWithRawExercise(exercise.getInjects(), injectRepository, injectExpectationRepository,
+            teamRepository, assetRepository, assetGroupRepository));
     return simple;
   }
 
   /**
    * Create a classic Exercise object from a Raw one
+   *
    * @param exercise the raw exercise
-   * @param injects the list of Injects linked to that exercise
+   * @param injects  the list of Injects linked to that exercise
    * @return an Exercise Simple object
    */
   public static ExerciseSimple fromRawExercise(RawExercise exercise, List<Inject> injects) {
     ExerciseSimple simple = new ExerciseSimple();
     simple.setId(exercise.getExercise_id());
     simple.setName(exercise.getExercise_name());
-    if(exercise.getExercise_tags() != null) {
+    if (exercise.getExercise_tags() != null) {
       simple.setTags(exercise.getExercise_tags().stream().map((tagId) -> {
-          Tag tag = new Tag();
-          tag.setId(tagId);
-          return tag;
-        }
+            Tag tag = new Tag();
+            tag.setId(tagId);
+            return tag;
+          }
       ).collect(Collectors.toSet()));
     } else {
       simple.setTags(new HashSet<>());
@@ -115,8 +119,8 @@ public class ExerciseSimple {
 
     // We set the ExpectationResults
     simple.setExpectationResultByTypes(AtomicTestingUtils
-            .getExpectationResultByTypes(injects.stream().flatMap(inject -> inject.getExpectations().stream()).toList()));
-    if(injects != null) {
+        .getExpectationResultByTypes(injects.stream().flatMap(inject -> inject.getExpectations().stream()).toList()));
+    if (injects != null) {
       simple.setTargets(computeTargetResults(injects));
     } else {
       simple.setTargets(new ArrayList<>());
