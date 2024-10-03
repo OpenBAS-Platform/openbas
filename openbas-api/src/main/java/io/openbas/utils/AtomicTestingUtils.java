@@ -5,6 +5,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.InjectExpectationRepository;
+import io.openbas.database.repository.InjectRepository;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
@@ -289,10 +290,12 @@ public class AtomicTestingUtils {
     return sortResults(targets);
   }
 
-  public static List<InjectTargetWithResult> getTargetsWithResultsWithRawQueries(final Inject inject,
+  public static List<InjectTargetWithResult> getTargetsWithResultsWithRawQueries(final String injectId, InjectRepository injectRepository,
       InjectExpectationRepository injectExpectationRepository) {
+
+    RawInject inject = injectRepository.findRawInjectForCompute(injectId);
     List<ExpectationResultsByType> defaultExpectationResultsByTypes = getDefaultExpectationResultsByTypes();
-    List<RawInjectExpectationForCompute> expectations = injectExpectationRepository.rawByInjectId(inject.getId());
+    List<RawInjectExpectationForCompute> expectations = injectExpectationRepository.rawByInjectId(injectId);
 
     List<RawInjectExpectationForCompute> teamExpectations = new ArrayList<>();
     List<RawInjectExpectationForCompute> playerExpectations = new ArrayList<>();
@@ -327,69 +330,69 @@ public class AtomicTestingUtils {
 
     /* Match Target with expectations
      * */
-    inject.getTeams().forEach(team -> {
+    inject.getInject_teams().forEach(team -> {
       // Check if there are no expectations matching the current team (t)
       boolean noMatchingExpectations = teamExpectations.stream()
-          .noneMatch(exp -> exp.getTeam().getTeam_id().equals(team.getId()));
+          .noneMatch(exp -> exp.getTeam().getTeam_id().equals(team.getTeam_id()));
       if (noMatchingExpectations) {
         InjectTargetWithResult target = new InjectTargetWithResult(
             TargetType.TEAMS,
-            team.getId(),
-            team.getName(),
+            team.getTeam_id(),
+            team.getTeam_name(),
             defaultExpectationResultsByTypes,
             null
         );
         targets.add(target);
       }
     });
-    inject.getAssets().forEach(asset -> {
+    inject.getInject_assets().forEach(asset -> {
       // Check if there are no expectations matching the current asset (t)
       boolean noMatchingExpectations = assetExpectations.stream()
-          .noneMatch(exp -> exp.getAsset().getAsset_id().equals(asset.getId()));
+          .noneMatch(exp -> exp.getAsset().getAsset_id().equals(asset.getAsset_id()));
       if (noMatchingExpectations) {
         InjectTargetWithResult target = new InjectTargetWithResult(
             TargetType.ASSETS,
-            asset.getId(),
-            asset.getName(),
+            asset.getAsset_id(),
+            asset.getAsset_name(),
             defaultExpectationResultsByTypes,
-            Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null
+            Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null
         );
 
         targets.add(target);
       }
     });
-    inject.getAssetGroups().forEach(assetGroup -> {
+    inject.getInject_asset_groups().forEach(assetGroup -> {
       // Check if there are no expectations matching the current assetgroup (t)
       boolean noMatchingExpectations = assetGroupExpectations.stream()
-          .noneMatch(exp -> exp.getAsset_group().getAsset_group_id().equals(assetGroup.getId()));
+          .noneMatch(exp -> exp.getAsset_group().getAsset_group_id().equals(assetGroup.getAsset_group_id()));
 
       List<InjectTargetWithResult> children = new ArrayList<>();
 
       assetGroup.getAssets().forEach(asset -> {
         children.add(new InjectTargetWithResult(
             TargetType.ASSETS,
-            asset.getId(),
-            asset.getName(),
+            asset.getAsset_id(),
+            asset.getAsset_name(),
             defaultExpectationResultsByTypes,
-            Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null
+            Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null
         ));
       });
       // Add dynamic assets as children
       assetGroup.getDynamicAssets().forEach(asset -> {
         children.add(new InjectTargetWithResult(
             TargetType.ASSETS,
-            asset.getId(),
-            asset.getName(),
+            asset.getAsset_id(),
+            asset.getAsset_name(),
             defaultExpectationResultsByTypes,
-            Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null
+            Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null
         ));
       });
 
       if (noMatchingExpectations) {
         InjectTargetWithResult target = new InjectTargetWithResult(
             TargetType.ASSETS_GROUPS,
-            assetGroup.getId(),
-            assetGroup.getName(),
+            assetGroup.getAsset_group_id(),
+            assetGroup.getAsset_group_name(),
             defaultExpectationResultsByTypes,
             children,
             null
@@ -453,9 +456,9 @@ public class AtomicTestingUtils {
 
             for (InjectTargetWithResult asset : assetsToRefine) {
               // Verify if any expectation is related to a dynamic assets
-              boolean foundExpectationForAsset = entry.getKey().getAsset_ids().stream()
+              boolean foundExpectationForAsset = entry.getKey().getAssets().stream()
                   .anyMatch(assetChild -> assetChild.equals(asset.getId()));
-              boolean foundExpectationForDynamicAssets = entry.getKey().getDynamicAsset_ids().stream()
+              boolean foundExpectationForDynamicAssets = entry.getKey().getDynamicAssets().stream()
                   .anyMatch(assetChild -> assetChild.equals(asset.getId()));
               if (foundExpectationForAsset || foundExpectationForDynamicAssets) {
                 children.add(asset);
@@ -464,7 +467,7 @@ public class AtomicTestingUtils {
             }
 
             // Other children without expectations are added with a default result
-            entry.getKey().getAsset_ids().forEach(asset -> {
+            entry.getKey().getAssets().forEach(asset -> {
               boolean foundAssetsWithoutResults = children.stream()
                   .noneMatch(child -> child.getId().equals(asset.getAsset_id()));
               if (foundAssetsWithoutResults) {
@@ -480,7 +483,7 @@ public class AtomicTestingUtils {
             });
 
             // For dynamicAssets
-            entry.getKey().getDynamicAsset_ids().forEach(asset -> {
+            entry.getKey().getDynamicAssets().forEach(asset -> {
               boolean foundDynamicAssetsWithoutResults = children.stream()
                   .noneMatch(child -> child.getId().equals(asset.getAsset_id()));
               if (foundDynamicAssetsWithoutResults) {
@@ -501,8 +504,8 @@ public class AtomicTestingUtils {
           .toList());
     }
 
-    List<String> injectAssetIds = inject.getAssets().stream()
-        .map(Asset::getId)
+    List<String> injectAssetIds = inject.getInject_assets().stream()
+        .map(RawAsset::getAsset_id)
         .collect(Collectors.toList());
 
     assetsToRefine.removeAll(

@@ -3,6 +3,7 @@ package io.openbas.rest.scenario;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
+import io.openbas.database.repository.InjectRepository;
 import io.openbas.rest.exercise.ExerciseService;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -28,13 +29,14 @@ public class ScenarioExerciseApi {
 
   private final ExerciseService exerciseService;
   private final ExerciseRepository exerciseRepository;
+  private final InjectRepository injectRepository;
   private final InjectExpectationRepository injectExpectationRepository;
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/exercises")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<ExerciseSimple> scenarioExercises(@PathVariable @NotBlank final String scenarioId) {
     return this.exerciseRepository.findAll(fromScenario(scenarioId))
-        .stream().map(exercise->fromExercise(exercise, injectExpectationRepository)).toList();
+        .stream().map(exercise->fromExercise(exercise, injectRepository, injectExpectationRepository)).toList();
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/exercises/search")
