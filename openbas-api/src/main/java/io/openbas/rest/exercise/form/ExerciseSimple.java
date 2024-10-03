@@ -3,6 +3,7 @@ package io.openbas.rest.exercise.form;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Inject;
@@ -75,7 +76,7 @@ public class ExerciseSimple {
 
   public static ExerciseSimple fromExercise(Exercise exercise, InjectRepository injectRepository,
       InjectExpectationRepository injectExpectationRepository, TeamRepository teamRepository,
-      AssetRepository assetRepository, AssetGroupRepository assetGroupRepository) {
+      AssetRepository assetRepository, AssetGroupRepository assetGroupRepository, AssetGroupService assetGroupService) {
     ExerciseSimple simple = new ExerciseSimple();
     BeanUtils.copyProperties(exercise, simple);
     simple.setStart(exercise.getStart().orElse(null));
@@ -86,7 +87,7 @@ public class ExerciseSimple {
                 exercise.getInjects().stream().map(Inject::getId).toList())));
     simple.setTargets(
         computeTargetResultsWithRawExercise(exercise.getInjects(), injectRepository, injectExpectationRepository,
-            teamRepository, assetRepository, assetGroupRepository));
+            teamRepository, assetRepository, assetGroupRepository, assetGroupService));
     return simple;
   }
 

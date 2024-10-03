@@ -296,7 +296,9 @@ public class AtomicTestingUtils {
       List<RawTeam> rawTeamList,
       List<RawAsset> rawAssetList,
       List<RawAssetGroup> rawAssetGroupList,
-      Map<String, RawAsset> assetForAssetGroupMap) {
+      Map<String, RawAsset> assetForAssetGroupMap,
+      Map<String, List<RawAsset>> dynamicAssetGroupMap
+      ) {
 
     RawInject inject = injectRepository.findRawInjectForCompute(injectId);
     List<ExpectationResultsByType> defaultExpectationResultsByTypes = getDefaultExpectationResultsByTypes();
@@ -393,16 +395,16 @@ public class AtomicTestingUtils {
           ));
         });
         // Add dynamic assets as children
-      /*assetGroup.getDynamicAssets().forEach(asset -> {
+      dynamicAssetGroupMap.get(assetGroup.getAsset_group_id()).forEach(dynamicAsset -> {
         children.add(new InjectTargetWithResult(
             TargetType.ASSETS,
-            asset.getAsset_id(),
-            asset.getAsset_name(),
+            dynamicAsset.getAsset_id(),
+            dynamicAsset.getAsset_name(),
             defaultExpectationResultsByTypes,
-            Objects.equals(asset.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(finalAsset.getEndpoint_platform())
+            Objects.equals(dynamicAsset.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(dynamicAsset.getEndpoint_platform())
                 : null
         ));
-      });*/
+      });
 
         if (noMatchingExpectations) {
           InjectTargetWithResult target = new InjectTargetWithResult(
@@ -471,9 +473,9 @@ public class AtomicTestingUtils {
 
             for (InjectTargetWithResult asset : assetsToRefine) {
               // Verify if any expectation is related to a dynamic assets
-              boolean foundExpectationForAsset = entry.getKey().getAssets().stream()
+              boolean foundExpectationForAsset = entry.getKey().getAsset_ids().stream()
                   .anyMatch(assetChild -> assetChild.equals(asset.getId()));
-              boolean foundExpectationForDynamicAssets = entry.getKey().getDynamicAssets().stream()
+              boolean foundExpectationForDynamicAssets = dynamicAssetGroupMap.get(entry.getKey()).stream()
                   .anyMatch(assetChild -> assetChild.equals(asset.getId()));
               if (foundExpectationForAsset || foundExpectationForDynamicAssets) {
                 children.add(asset);
@@ -482,32 +484,32 @@ public class AtomicTestingUtils {
             }
 
             // Other children without expectations are added with a default result
-            entry.getKey().getAssets().forEach(asset -> {
+            entry.getKey().getAsset_ids().forEach(asset -> {
               boolean foundAssetsWithoutResults = children.stream()
-                  .noneMatch(child -> child.getId().equals(asset.getAsset_id()));
+                  .noneMatch(child -> child.getId().equals(asset));
               if (foundAssetsWithoutResults) {
                 children.add(new InjectTargetWithResult(
                     TargetType.ASSETS,
-                    asset.getAsset_id(),
-                    asset.getAsset_name(),
+                    asset,
+                    assetForAssetGroupMap.get(asset).getAsset_name(),
                     defaultExpectationResultsByTypes,
-                    Objects.equals(asset.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(asset.getEndpoint_platform())
+                    Objects.equals(assetForAssetGroupMap.get(asset).getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(assetForAssetGroupMap.get(asset).getEndpoint_platform())
                         : null
                 ));
               }
             });
 
             // For dynamicAssets
-            entry.getKey().getDynamicAssets().forEach(asset -> {
+            dynamicAssetGroupMap.get(entry.getKey()).forEach(dynamicAsset -> {
               boolean foundDynamicAssetsWithoutResults = children.stream()
-                  .noneMatch(child -> child.getId().equals(asset.getAsset_id()));
+                  .noneMatch(child -> child.getId().equals(dynamicAsset.getAsset_id()));
               if (foundDynamicAssetsWithoutResults) {
                 children.add(new InjectTargetWithResult(
                     TargetType.ASSETS,
-                    asset.getAsset_id(),
-                    asset.getAsset_name(),
+                    dynamicAsset.getAsset_id(),
+                    dynamicAsset.getAsset_name(),
                     defaultExpectationResultsByTypes,
-                    Objects.equals(asset.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(asset.getEndpoint_platform())
+                    Objects.equals(dynamicAsset.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(dynamicAsset.getEndpoint_platform())
                         : null
                 ));
               }
