@@ -61,14 +61,14 @@ public class ResultUtils {
 
   // -- TARGET --
 
-  public static List<InjectTargetWithResult> computeTargetResults(@NotNull final List<Inject> injects) {
+  public static List<InjectTargetWithResult> computeTargetResults(@NotNull List<Inject> injects) {
     return injects.stream()
         .flatMap(inject -> getTargetsWithResults(inject).stream())
         .distinct()
         .toList();
   }
 
-  public static List<InjectTargetWithResult> computeTargetResultsWithRawExercise(@NotNull final List<Inject> injects, InjectRepository injectRepository, InjectExpectationRepository injectExpectationRepository) {
+  public static List<InjectTargetWithResult> computeTargetResultsWithRawExercise(@NotNull List<Inject> injects, InjectRepository injectRepository, InjectExpectationRepository injectExpectationRepository) {
     return injects.stream()
         .flatMap(inject -> getTargetsWithResultsWithRawQueries(inject.getId(), injectRepository, injectExpectationRepository).stream())
         .distinct()
