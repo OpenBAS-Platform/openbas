@@ -363,7 +363,7 @@ public class AtomicTestingUtils {
               asset.getAsset_id(),
               asset.getAsset_name(),
               defaultExpectationResultsByTypes,
-              Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform()
+              Objects.equals(asset.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(asset.getEndpoint_platform())
                   : null
           );
 
@@ -388,8 +388,7 @@ public class AtomicTestingUtils {
               asset,
               finalAsset.getAsset_name(),
               defaultExpectationResultsByTypes,
-              Objects.equals(finalAsset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(
-                  asset)).getPlatform()
+              Objects.equals(finalAsset.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(finalAsset.getEndpoint_platform())
                   : null
           ));
         });
@@ -400,7 +399,7 @@ public class AtomicTestingUtils {
             asset.getAsset_id(),
             asset.getAsset_name(),
             defaultExpectationResultsByTypes,
-            Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform()
+            Objects.equals(asset.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(finalAsset.getEndpoint_platform())
                 : null
         ));
       });*/
@@ -451,8 +450,7 @@ public class AtomicTestingUtils {
               .entrySet().stream()
               .map(entry -> new InjectTargetWithResult(TargetType.ASSETS, entry.getKey().getAsset_id(),
                   entry.getKey().getAsset_name(), entry.getValue(),
-                  Objects.equals(entry.getKey().getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(
-                      entry.getKey())).getPlatform() : null))
+                  Objects.equals(entry.getKey().getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(entry.getKey().getEndpoint_platform()) : null))
               .toList()
       );
     }
@@ -493,8 +491,7 @@ public class AtomicTestingUtils {
                     asset.getAsset_id(),
                     asset.getAsset_name(),
                     defaultExpectationResultsByTypes,
-                    Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(
-                        asset)).getPlatform()
+                    Objects.equals(asset.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(asset.getEndpoint_platform())
                         : null
                 ));
               }
@@ -510,8 +507,7 @@ public class AtomicTestingUtils {
                     asset.getAsset_id(),
                     asset.getAsset_name(),
                     defaultExpectationResultsByTypes,
-                    Objects.equals(asset.getAsset_type(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(
-                        asset)).getPlatform()
+                    Objects.equals(asset.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(asset.getEndpoint_platform())
                         : null
                 ));
               }
