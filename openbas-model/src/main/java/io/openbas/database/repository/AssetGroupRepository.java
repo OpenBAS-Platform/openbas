@@ -1,6 +1,7 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.AssetGroup;
+import io.openbas.database.raw.RawAsset;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,16 +37,27 @@ public interface AssetGroupRepository extends CrudRepository<AssetGroup, String>
 
   /**
    * Returns the raw asset group having the ids passed in parameter
+   *
    * @param ids a list of ids
    * @return the list of raw asset group
    */
   @Query(value = "SELECT ag.asset_group_id, ag.asset_group_name,  " +
-          "coalesce(array_agg(aga.asset_id) FILTER ( WHERE aga.asset_id IS NOT NULL ), '{}') asset_ids " +
-          "FROM asset_groups ag " +
-          "LEFT JOIN asset_groups_assets aga ON ag.asset_group_id = aga.asset_group_id " +
-          "WHERE ag.asset_group_id IN :ids " +
-          "GROUP BY ag.asset_group_id;", nativeQuery = true)
+      "coalesce(array_agg(aga.asset_id) FILTER ( WHERE aga.asset_id IS NOT NULL ), '{}') asset_ids " +
+      "FROM asset_groups ag " +
+      "LEFT JOIN asset_groups_assets aga ON ag.asset_group_id = aga.asset_group_id " +
+      "WHERE ag.asset_group_id IN :ids " +
+      "GROUP BY ag.asset_group_id;", nativeQuery = true)
   List<RawAssetGroup> rawAssetGroupByIds(@Param("ids") List<String> ids);
+
+  @Query(value =
+      "SELECT iat.inject_id, ag.asset_group_id, ag.asset_group_name, coalesce(array_agg(aga.asset_id) " +
+          "FILTER ( WHERE aga.asset_id IS NOT NULL ), '{}') asset_ids " +
+          "FROM asset_groups ag " +
+          "LEFT JOIN injects_asset_groups iat ON ag.asset_group_id = iat.asset_group_id " +
+          "LEFT JOIN asset_groups_assets aga ON aga.asset_group_id = ag.asset_group_id " +
+          "WHERE iat.inject_id IN :injectIds " +
+          "GROUP BY iat.inject_id, ag.asset_group_id, ag.asset_group_name;", nativeQuery = true)
+  List<RawAssetGroup> rawByInjectIds(@Param("injectIds") List<String> injectIds);
 
   // -- PAGINATION --
 

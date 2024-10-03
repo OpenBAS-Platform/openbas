@@ -3,11 +3,11 @@ package io.openbas.utils;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
+import io.openbas.database.raw.RawAsset;
+import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.raw.RawInjectExpectationForCompute;
 import io.openbas.database.raw.RawTeam;
-import io.openbas.database.repository.InjectExpectationRepository;
-import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.TeamRepository;
+import io.openbas.database.repository.*;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
@@ -70,12 +70,21 @@ public class ResultUtils {
         .toList();
   }
 
-  public static List<InjectTargetWithResult> computeTargetResultsWithRawExercise(@NotNull List<Inject> injects, InjectRepository injectRepository, InjectExpectationRepository injectExpectationRepository, TeamRepository teamRepository) {
+  public static List<InjectTargetWithResult> computeTargetResultsWithRawExercise(@NotNull List<Inject> injects,
+      InjectRepository injectRepository, InjectExpectationRepository injectExpectationRepository,
+      TeamRepository teamRepository, AssetRepository assetRepository, AssetGroupRepository assetGroupRepository) {
     List<String> injectIds = injects.stream().map(Inject::getId).toList();
-    Map<String, RawTeam> teamMap = teamRepository.rawTeamByInjectIds(injectIds).stream().collect(Collectors.toMap(RawTeam::getTeam_id, team -> team));
+    Map<String, List<RawTeam>> teamMap = teamRepository.rawTeamByInjectIds(injectIds).stream()
+        .collect(Collectors.groupingBy(RawTeam::getInject_id));
+    Map<String, List<RawAsset>> assetMap = assetRepository.rawByInjectIds(injectIds).stream()
+        .collect(Collectors.groupingBy(RawAsset::getInject_id));
+    Map<String, List<RawAssetGroup>> assetGroupMap = assetGroupRepository.rawByInjectIds(injectIds).stream()
+        .collect(Collectors.groupingBy(RawAssetGroup::getInject_id));
 
     return injects.stream()
-        .flatMap(inject -> getTargetsWithResultsWithRawQueries(inject.getId(), injectRepository, injectExpectationRepository, teamMap, mapAssets, mapAssetsGroups).stream())
+        .flatMap(
+            inject -> getTargetsWithResultsWithRawQueries(inject.getId(), injectRepository, injectExpectationRepository,
+                teamMap.get(inject.getId()), assetMap.get(inject.getId()), assetGroupMap.get(inject.getId())).stream())
         .distinct()
         .toList();
   }
