@@ -288,7 +288,7 @@ public class InjectsExecutionJob implements Job {
         injectDependencies.forEach(injectDependency -> {
             List<String> splittedConditions = List.of(injectDependency.getCondition().split("&&|\\|\\|"));
             splittedConditions.forEach(condition -> {
-                mapCondition.put(injectDependency.getCondition().split("==")[0].trim(), false);
+                mapCondition.put(condition.split("==")[0].trim(), false);
             });
         });
 
@@ -304,7 +304,8 @@ public class InjectsExecutionJob implements Job {
                 if(injectExpectation.getType().equals(InjectExpectation.EXPECTATION_TYPE.MANUAL)) {
                     name = String.format("%s-%s-Success", parent.getId(), injectExpectation.getName());
                 }
-                if(InjectExpectation.EXPECTATION_TYPE.CHALLENGE.equals(injectExpectation.getType())) {
+                if(InjectExpectation.EXPECTATION_TYPE.CHALLENGE.equals(injectExpectation.getType())
+                || InjectExpectation.EXPECTATION_TYPE.ARTICLE.equals(injectExpectation.getType())) {
                     if(injectExpectation.getUser() == null) {
                         mapCondition.put(name, injectExpectation.getScore() >= injectExpectation.getExpectedScore());
                     }
