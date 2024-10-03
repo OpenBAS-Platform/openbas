@@ -12,7 +12,7 @@ public interface RawInjectExpectationForCompute {
 
   RawAsset getAsset();
 
-  RawAssetGroupForCompute getAsset_group();
+  RawAssetGroup getAsset_group();
 
   RawUser getUser();
 

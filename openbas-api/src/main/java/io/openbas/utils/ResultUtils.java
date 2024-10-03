@@ -1,5 +1,6 @@
 package io.openbas.utils;
 
+import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
@@ -72,27 +73,34 @@ public class ResultUtils {
 
   public static List<InjectTargetWithResult> computeTargetResultsWithRawExercise(@NotNull List<Inject> injects,
       InjectRepository injectRepository, InjectExpectationRepository injectExpectationRepository,
-      TeamRepository teamRepository, AssetRepository assetRepository, AssetGroupRepository assetGroupRepository) {
+      TeamRepository teamRepository, AssetRepository assetRepository, AssetGroupRepository assetGroupRepository,
+      AssetGroupService assetGroupService) {
+
     List<String> injectIds = injects.stream().map(Inject::getId).toList();
+
     Map<String, List<RawTeam>> teamMap = teamRepository.rawTeamByInjectIds(injectIds).stream()
         .collect(Collectors.groupingBy(RawTeam::getInject_id));
     Map<String, List<RawAsset>> assetMap = assetRepository.rawByInjectIds(injectIds).stream()
         .collect(Collectors.groupingBy(RawAsset::getInject_id));
 
+    // -- ASSETS GROUPS --
     List<RawAssetGroup> rawAssetGroups = assetGroupRepository.rawByInjectIds(injectIds);
 
     Map<String, List<RawAssetGroup>> assetGroupMap = rawAssetGroups.stream()
         .collect(Collectors.groupingBy(RawAssetGroup::getInject_id));
+
+  Map<String, List<RawAsset>> dynamicAssetGroupMap = assetGroupService.computeRawDynamicAsset(rawAssetGroups);
 
     Map<String, RawAsset> assetForAssetGroupMap = assetRepository.rawByIds(
         rawAssetGroups.stream()
             .flatMap(rawAssetGroup -> rawAssetGroup.getAsset_ids().stream())
             .distinct().toList()).stream().collect(Collectors.toMap(RawAsset::getAsset_id, asset -> asset));
 
+
     return injects.stream()
         .flatMap(
             inject -> getTargetsWithResultsWithRawQueries(inject.getId(), injectRepository, injectExpectationRepository,
-                teamMap.get(inject.getId()), assetMap.get(inject.getId()), assetGroupMap.get(inject.getId()), assetForAssetGroupMap).stream())
+                teamMap.get(inject.getId()), assetMap.get(inject.getId()), assetGroupMap.get(inject.getId()), assetForAssetGroupMap, dynamicAssetGroupMap).stream())
         .distinct()
         .toList();
   }

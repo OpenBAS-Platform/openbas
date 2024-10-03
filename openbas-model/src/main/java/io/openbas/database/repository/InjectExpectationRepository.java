@@ -128,7 +128,8 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
   @Query(value = "SELECT "
       + "t.team_id AS team_id, t.team_name AS team_name, "
       + "a.asset_id AS asset_id, a.asset_name AS asset_name, "
-      + "at.asset_group_id AS asset_group_id, at.asset_group_name AS asset_group_name, "
+      + "at.asset_group_id AS asset_group_id, at.asset_group_name AS asset_group_name, at.asset_group_dynamic_filter AS asset_group_dynamic_filter, "
+      + "coalesce(array_agg(aga.asset_id) FILTER ( WHERE aga.asset_id IS NOT NULL ), '{}') asset_ids, "
       + "i.inject_expectation_type AS inject_expectation_type, "
       + "u.user_id AS user_id, "
       + "i.inject_expectation_score AS inject_expectation_score, "
@@ -139,9 +140,10 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
       + "LEFT JOIN teams t ON t.team_id = i.team_id "
       + "LEFT JOIN assets a ON a.asset_id = i.asset_id "
       + "LEFT JOIN asset_groups at ON at.asset_group_id = i.asset_group_id "
+      + "LEFT JOIN asset_groups_assets aga ON aga.asset_group_id = at.asset_group_id "
       + "LEFT JOIN users u ON u.user_id = i.user_id "
-      + "WHERE i.inject_id = :id",
-      nativeQuery = true)
+      + "WHERE i.inject_id = :id "
+      + "GROUP BY i.inject_expectation_id;", nativeQuery = true)
   List<RawInjectExpectationForCompute> rawByInjectId(@Param("id") final String id);
 
 

@@ -1,5 +1,6 @@
 package io.openbas.rest.scenario;
 
+import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exercise.ExerciseService;
@@ -32,13 +33,14 @@ public class ScenarioExerciseApi {
   private final TeamRepository teamRepository;
   private final AssetRepository assetRepository;
   private final AssetGroupRepository assetGroupRepository;
+  private final AssetGroupService assetGroupService;
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/exercises")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<ExerciseSimple> scenarioExercises(@PathVariable @NotBlank final String scenarioId) {
     return this.exerciseRepository.findAll(fromScenario(scenarioId))
         .stream().map(exercise -> fromExercise(exercise, injectRepository, injectExpectationRepository, teamRepository,
-            assetRepository, assetGroupRepository)).toList();
+            assetRepository, assetGroupRepository, assetGroupService)).toList();
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/exercises/search")

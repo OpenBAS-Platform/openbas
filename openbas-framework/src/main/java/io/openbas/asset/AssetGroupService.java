@@ -3,6 +3,8 @@ package io.openbas.asset;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.raw.RawAsset;
+import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.repository.AssetGroupRepository;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,6 +24,7 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
 import static io.openbas.utils.FilterUtilsRuntime.computeFilterGroupRuntime;
 import static java.time.Instant.now;
+import static java.util.Collections.emptyList;
 
 @RequiredArgsConstructor
 @Service
@@ -119,6 +123,18 @@ public class AssetGroupService {
                 .toList();
         assetGroup.setDynamicAssets(assets);
         return assetGroup;
+    }
+
+    public Map<String, List<RawAsset>> computeRawDynamicAsset(@NotNull List<RawAssetGroup> assetGroups) {
+        if (assetGroups.isEmpty() || isEmptyFilterGroup(assetGroups.get(0).getAsset_group_dynamic_filter())) {
+            return Map.of();
+        }
+
+        Specification<Endpoint> specification = computeFilterGroupJpa(assetGroups.get(0).getAsset_group_dynamic_filter());
+        List<RawAsset> dynamicAssets = emptyList();
+
+        return dynamicAssets.stream()
+            .collect(Collectors.groupingBy(RawAsset::getAsset_id));
     }
 
 }

@@ -1,5 +1,6 @@
 package io.openbas.opencti;
 
+import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exercise.form.ExerciseSimple;
@@ -31,6 +32,7 @@ public class OpenCTIApi {
   private final TeamRepository teamRepository;
   private final AssetRepository assetRepository;
   private final AssetGroupRepository assetGroupRepository;
+  private final AssetGroupService assetGroupService;
 
   @Operation(summary = "Retrieve the latest exercise by external reference ID (example: a report ID")
   @ApiResponses(value = {
@@ -44,7 +46,7 @@ public class OpenCTIApi {
   public ExerciseSimple latestExerciseByExternalReference(@PathVariable @NotBlank final String externalReferenceId) {
     Exercise exercise = this.scenarioService.latestExerciseByExternalReference(externalReferenceId);
     return ExerciseSimple.fromExercise(exercise, injectRepository, injectExpectationRepository, teamRepository,
-        assetRepository, assetGroupRepository);
+        assetRepository, assetGroupRepository, assetGroupService);
   }
 
 }
