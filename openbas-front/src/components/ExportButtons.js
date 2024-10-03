@@ -46,6 +46,9 @@ class ExportButtons extends Component {
 
   exportImage(domElementId, name, theme, background) {
     this.setState({ exporting: true });
+    if (typeof this.props.onExportClick === 'function') {
+      this.props.onExportClick();
+    }
     this.handleCloseImage();
     const { theme: currentTheme, pixelRatio = 1 } = this.props;
     let timeout = 4000;
@@ -97,6 +100,9 @@ class ExportButtons extends Component {
               },
             });
           }
+          if (typeof this.props.onExportEnd === 'function') {
+            this.props.onExportEnd();
+          }
           return this.setState({ exporting: false });
         });
       }, timeout / 2);
@@ -113,6 +119,9 @@ class ExportButtons extends Component {
 
   exportPdf(domElementId, name, theme, background) {
     this.setState({ exporting: true });
+    if (typeof this.props.onExportClick === 'function') {
+      this.props.onExportClick();
+    }
     this.handleClosePdf();
     const { theme: currentTheme, pixelRatio = 1 } = this.props;
     let timeout = 4000;
@@ -155,6 +164,9 @@ class ExportButtons extends Component {
               },
             },
           });
+        }
+        if (typeof this.props.onExportEnd === 'function') {
+          this.props.onExportEnd();
         }
         return this.setState({ exporting: false });
       });
@@ -290,6 +302,8 @@ ExportButtons.propTypes = {
   localUpdateUser: PropTypes.func,
   domElementId: PropTypes.string,
   name: PropTypes.string,
+  onExportClick: PropTypes.func,
+  onExportEnd: PropTypes.func,
 };
 
 const select = (state) => {

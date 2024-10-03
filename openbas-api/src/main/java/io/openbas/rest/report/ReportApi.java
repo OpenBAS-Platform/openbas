@@ -3,7 +3,9 @@ package io.openbas.rest.report;
 import io.openbas.database.model.*;
 import io.openbas.rest.exercise.ExerciseService;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.rest.report.form.ReportInjectCommentInput;
 import io.openbas.rest.report.form.ReportInput;
+import io.openbas.service.InjectService;
 import io.openbas.service.ReportService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -23,6 +25,7 @@ public class ReportApi extends RestBehavior {
 
     private final ExerciseService exerciseService;
     private final ReportService reportService;
+    private final InjectService injectService;
 
     @GetMapping("/api/reports/{reportId}")
     @PreAuthorize("isObserver()")
@@ -44,6 +47,17 @@ public class ReportApi extends RestBehavior {
         Report report = new Report();
         report.setExercise(exercise);
         return this.reportService.updateReport(report, input);
+    }
+
+    @PutMapping("/api/exercises/{exerciseId}/reports/{reportId}/inject-comments")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    @Transactional(rollbackOn = Exception.class)
+    public Iterable<ReportInjectComment> updateReportInjectComment(@PathVariable String exerciseId, @PathVariable String reportId, @Valid @RequestBody ReportInjectCommentInput input) {
+        Report report = this.reportService.report(UUID.fromString(reportId));
+        assert exerciseId.equals(report.getExercise().getId());
+        Inject inject = this.injectService.inject(input.getInjectId());
+        assert exerciseId.equals(inject.getExercise().getId());
+        return this.reportService.updateReportInjectComment(report, inject, input);
     }
 
     @PutMapping("/api/exercises/{exerciseId}/reports/{reportId}")

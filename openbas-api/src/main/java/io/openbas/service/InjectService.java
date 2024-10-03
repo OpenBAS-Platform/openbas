@@ -23,6 +23,7 @@ import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FilenameUtils;
@@ -143,6 +144,11 @@ public class InjectService {
     if (!CollectionUtils.isEmpty(injectIds)) {
       injectRepository.deleteAllById(injectIds);
     }
+  }
+
+  public Inject inject(@NotBlank final String injectId) {
+    return this.injectRepository.findById(injectId)
+                .orElseThrow(() -> new ElementNotFoundException("Inject not found"));
   }
 
   @Tracing(name = "Fetch injects with criteria builder", layer = "service", operation = "GET")

@@ -33,6 +33,11 @@ export const searchExerciseInjects = (exerciseId: Exercise['exercise_id'], searc
   return simplePostCall(uri, data);
 };
 
+export const exerciseInjectsResultDTO = (exerciseId: Exercise['exercise_id']) => {
+  const uri = `${EXERCISE_URI}${exerciseId}/injects/resultdto`;
+  return simpleCall(uri);
+};
+
 // -- IMPORT --
 
 export const importXlsForExercise = (exerciseId: Exercise['exercise_id'], importId: string, input: InjectsImportInput) => {

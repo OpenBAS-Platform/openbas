@@ -1,13 +1,15 @@
 package io.openbas.service;
 
-import io.openbas.database.model.Report;
-import io.openbas.database.model.ReportInformation;
-import io.openbas.database.model.ReportInformationsType;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.ReportRepository;
 import io.openbas.rest.report.form.ReportInformationInput;
+import io.openbas.rest.report.form.ReportInjectCommentInput;
 import io.openbas.rest.report.form.ReportInput;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -16,9 +18,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -99,7 +103,7 @@ public class ReportServiceTest {
         when(reportRepository.save(any(Report.class))).thenReturn(report);
 
         // -- EXECUTE --
-       reportService.updateReport(report, reportInput);
+        reportService.updateReport(report, reportInput);
 
         // -- ASSERT --
         ArgumentCaptor<Report> reportCaptor = ArgumentCaptor.forClass(Report.class);
@@ -108,6 +112,73 @@ public class ReportServiceTest {
         assertEquals(reportInput.getName(), capturedReport.getName());
         assertEquals(1, capturedReport.getReportInformations().size());
         assertEquals(true, capturedReport.getReportInformations().getFirst().getReportInformationsDisplay());
+    }
+
+    @Nested
+    @DisplayName("Reports inject comment")
+    class ReportInjectCommentTest {
+        @DisplayName("Test update existing report inject comment")
+        @Test
+        void updateExistingReportInjectComment() {
+            // -- PREPARE --
+            Report report = new Report();
+            report.setName("test");
+            report.setId(UUID.randomUUID().toString());
+            Inject inject = new Inject();
+            inject.setId("fakeID123");
+
+            // add report inject comment
+            ReportInjectComment existingReportInjectComment = new ReportInjectComment();
+            existingReportInjectComment.setReport(report);
+            existingReportInjectComment.setComment("comment");
+            existingReportInjectComment.setInject(inject);
+            report.setReportInjectsComments(List.of(existingReportInjectComment));
+
+            ReportInjectCommentInput commentInput = new ReportInjectCommentInput();
+            commentInput.setInjectId(inject.getId());
+            commentInput.setComment("New comment");
+
+            // Mock
+            when(reportRepository.findReportInjectComment(eq(UUID.fromString(report.getId())), eq(inject.getId()))).thenReturn(Optional.of(existingReportInjectComment));
+
+            // -- EXECUTE --
+            reportService.updateReportInjectComment(report, inject, commentInput);
+
+            // -- ASSERT --
+            ArgumentCaptor<Report> reportCaptor = ArgumentCaptor.forClass(Report.class);
+            verify(reportRepository).save(reportCaptor.capture());
+            Report capturedReport= reportCaptor.getValue();
+            assertEquals(1, capturedReport.getReportInjectsComments().size());
+            assertEquals(commentInput.getComment(), capturedReport.getReportInjectsComments().getFirst().getComment());
+        }
+
+        @DisplayName("Test add new report inject comment")
+        @Test
+        void addReportInjectComment() throws Exception {
+            // -- PREPARE --
+            Report report = new Report();
+            report.setName("test");
+            report.setId(UUID.randomUUID().toString());
+            Inject inject = new Inject();
+            inject.setId("fakeID123");
+
+            ReportInjectCommentInput commentInput = new ReportInjectCommentInput();
+            commentInput.setInjectId(inject.getId());
+            commentInput.setComment("New test comment");
+
+            // Mock
+            when(reportRepository.findReportInjectComment(eq(UUID.fromString(report.getId())), eq(inject.getId()))).thenReturn(Optional.empty());
+
+            // -- EXECUTE --
+            reportService.updateReportInjectComment(report, inject, commentInput);
+
+            // -- ASSERT --
+            ArgumentCaptor<Report> reportCaptor = ArgumentCaptor.forClass(Report.class);
+            verify(reportRepository).save(reportCaptor.capture());
+            Report capturedReport= reportCaptor.getValue();
+            assertEquals(1, capturedReport.getReportInjectsComments().size());
+            assertEquals(commentInput.getComment(), capturedReport.getReportInjectsComments().getFirst().getComment());
+        }
     }
 }
 

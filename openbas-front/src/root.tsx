@@ -19,7 +19,7 @@ const IndexPrivate = lazy(() => import('./private/Index'));
 const IndexAdmin = lazy(() => import('./admin/Index'));
 const Comcheck = lazy(() => import('./public/components/comcheck/Comcheck'));
 const Channel = lazy(() => import('./public/components/channels/Channel'));
-const ExerciseReport = lazy(() => import('./admin/components/simulations/simulation/reports/ExerciseReport'));
+const ExerciseReport = lazy(() => import('./admin/components/simulations/simulation/reports/ExerciseReportPage'));
 const Challenges = lazy(() => import('./public/components/challenges/Challenges'));
 const ExerciseViewLessons = lazy(() => import('./public/components/lessons/ExerciseViewLessons'));
 const ScenarioViewLessons = lazy(() => import('./public/components/lessons/ScenarioViewLessons'));
@@ -67,7 +67,7 @@ const Root = () => {
                 <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()} />
                 <Route path="lessons/exercise/:exerciseId" element={errorWrapper(ExerciseViewLessons)()} />
                 <Route path="lessons/scenario/:scenarioId" element={errorWrapper(ScenarioViewLessons)()} />
-                <Route path="reports/:exerciseId/:reportId" element={errorWrapper(ExerciseReport)()} />
+                <Route path="reports/:reportId/exercise/:exerciseId" element={errorWrapper(ExerciseReport)()} />
                 {/* Not found */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
