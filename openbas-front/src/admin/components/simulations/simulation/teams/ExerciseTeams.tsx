@@ -1,7 +1,6 @@
 import { useParams } from 'react-router-dom';
 import React, { useContext, useEffect, useState } from 'react';
 import { Paper, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../../../utils/hooks';
@@ -18,18 +17,6 @@ import ContextualTeams from '../../../components/teams/ContextualTeams';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Page } from '../../../../../components/common/queryable/Page';
 import { searchExerciseTeams, addExerciseTeams, removeExerciseTeams, replaceExerciseTeams } from '../../../../../actions/exercises/exercise-teams-action';
-
-// Deprecated - https://mui.com/system/styles/basics/
-// Do not use it for new code.
-const useStyles = makeStyles(() => ({
-  paper: {
-    height: '100%',
-    minHeight: '100%',
-    margin: '-4px 0 0 0',
-    padding: 15,
-    borderRadius: 4,
-  },
-}));
 
 interface Props {
   exerciseTeamsUsers: ExerciseStore['exercise_teams_users'],
@@ -62,7 +49,7 @@ export const teamContextForExercise = (exerciseId: ExerciseStore['exercise_id'],
     onRemoveTeam(teamId: Team['team_id']): void {
       dispatch(removeExerciseTeams(exerciseId, { exercise_teams: [teamId] }));
     },
-    onReplaceTeam(teamIds: Team['team_id'][]): Promise<{ result: string[] }> {
+    onReplaceTeam(teamIds: Team['team_id'][]): Promise<{ result: string[], entities: { teams: Record<string, TeamStore> } }> {
       return dispatch(replaceExerciseTeams(exerciseId, { exercise_teams: teamIds }));
     },
     onToggleUser(teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean): void {
@@ -81,30 +68,37 @@ export const teamContextForExercise = (exerciseId: ExerciseStore['exercise_id'],
 const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
   const dispatch = useAppDispatch();
-  const { exerciseId } = useParams() as { exerciseId: ExerciseStore['exercise_id'] };
-  const { teams }: { exercise: ExerciseStore, teams: TeamStore[] } = useHelper((helper: ExercisesHelper) => ({
-    teams: helper.getExerciseTeams(exerciseId),
-  }));
   const { permissions } = useContext(PermissionsContext);
+
+  // Fetching data
+  const { exerciseId } = useParams() as { exerciseId: ExerciseStore['exercise_id'] };
+  const { teamsStore }: { teamsStore: TeamStore[] } = useHelper((helper: ExercisesHelper) => ({
+    teamsStore: helper.getExerciseTeams(exerciseId),
+  }));
   useDataLoader(() => {
     dispatch(fetchExerciseTeams(exerciseId));
   });
-  const [teamIds, setTeamsId] = useState<string[]>([]);
 
+  const [teams, setTeams] = useState<TeamStore[]>([]);
   useEffect(() => {
-    setTeamsId(teams.map((team) => team.team_id));
-  }, [teams]);
+    setTeams(teamsStore);
+  }, [teamsStore]);
+
   return (
     <TeamContext.Provider value={teamContextForExercise(exerciseId, exerciseTeamsUsers)}>
       <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
         {t('Teams')}
       </Typography>
-      {permissions.canWrite && <UpdateTeams addedTeamIds={teamIds} setTeamIds={(ids: string[]) => setTeamsId(ids)}/>}
+      {permissions.canWrite
+        && <UpdateTeams
+          addedTeamIds={teams.map((team: TeamStore) => team.team_id)}
+          setTeams={(ts: TeamStore[]) => setTeams(ts)}
+           />
+      }
       <div className="clearfix" />
-      <Paper classes={{ root: classes.paper }} variant="outlined">
-        <ContextualTeams teamIds={teamIds} />
+      <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
+        <ContextualTeams teams={teams} />
       </Paper>
     </TeamContext.Provider>
   );

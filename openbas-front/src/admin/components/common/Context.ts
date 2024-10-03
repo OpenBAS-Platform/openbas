@@ -33,6 +33,7 @@ import type {
 import type { UserStore } from '../teams/players/Player';
 import type { InjectOutputType, InjectStore } from '../../../actions/injects/Inject';
 import { Page } from '../../../components/common/queryable/Page';
+import type { TeamStore } from '../../../actions/teams/Team';
 
 export type PermissionsContextType = {
   permissions: { readOnly: boolean, canWrite: boolean, isRunning: boolean }
@@ -75,7 +76,7 @@ export type TeamContextType = {
   onAddTeam?: (teamId: Team['team_id']) => Promise<void>,
   onCreateTeam?: (team: TeamCreateInput) => Promise<{ result: string }>,
   onRemoveTeam?: (teamId: Team['team_id']) => void,
-  onReplaceTeam?: (teamIds: Team['team_id'][]) => Promise<{ result: string[] }>,
+  onReplaceTeam?: (teamIds: Team['team_id'][]) => Promise<{ result: string[], entities: { teams: Record<string, TeamStore> } }>,
   onToggleUser?: (teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean) => void,
   checkUserEnabled?: (teamId: Team['team_id'], userId: UserStore['user_id']) => boolean,
   computeTeamUsersEnabled?: (teamId: Team['team_id']) => number,

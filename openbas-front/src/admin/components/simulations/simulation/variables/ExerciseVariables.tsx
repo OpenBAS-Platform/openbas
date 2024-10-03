@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { Paper, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../../store';
 import type { Exercise, Variable, VariableInput } from '../../../../../utils/api-types';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
@@ -13,22 +12,9 @@ import { PermissionsContext, VariableContext, VariableContextType } from '../../
 import CreateVariable from '../../../components/variables/CreateVariable';
 import { useFormatter } from '../../../../../components/i18n';
 
-// Deprecated - https://mui.com/system/styles/basics/
-// Do not use it for new code.
-const useStyles = makeStyles(() => ({
-  paper: {
-    height: '100%',
-    minHeight: '100%',
-    margin: '-4px 0 0 0',
-    padding: 15,
-    borderRadius: 4,
-  },
-}));
-
 const ExerciseVariables = () => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
   const dispatch = useAppDispatch();
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
@@ -51,7 +37,7 @@ const ExerciseVariables = () => {
       </Typography>
       {permissions.canWrite && (<CreateVariable />)}
       <div className="clearfix" />
-      <Paper classes={{ root: classes.paper }} variant="outlined">
+      <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
         <Variables variables={variables} />
       </Paper>
     </VariableContext.Provider>

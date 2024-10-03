@@ -1,7 +1,6 @@
 import { useParams } from 'react-router-dom';
 import React, { useContext, useEffect, useState } from 'react';
 import { Paper, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../../../utils/hooks';
@@ -24,18 +23,6 @@ import { useFormatter } from '../../../../../components/i18n';
 import ContextualTeams from '../../../components/teams/ContextualTeams';
 import { addScenarioTeams, removeScenarioTeams, replaceScenarioTeams, searchScenarioTeams } from '../../../../../actions/scenarios/scenario-teams-action';
 import type { Page } from '../../../../../components/common/queryable/Page';
-
-// Deprecated - https://mui.com/system/styles/basics/
-// Do not use it for new code.
-const useStyles = makeStyles(() => ({
-  paper: {
-    height: '100%',
-    minHeight: '100%',
-    margin: '-4px 0 0 0',
-    padding: 15,
-    borderRadius: 4,
-  },
-}));
 
 interface Props {
   scenarioTeamsUsers: ScenarioStore['scenario_teams_users'],
@@ -68,7 +55,7 @@ export const teamContextForScenario = (scenarioId: ScenarioStore['scenario_id'],
     onRemoveTeam(teamId: Team['team_id']): void {
       dispatch(removeScenarioTeams(scenarioId, { scenario_teams: [teamId] }));
     },
-    onReplaceTeam(teamIds: Team['team_id'][]): Promise<{ result: string[] }> {
+    onReplaceTeam(teamIds: Team['team_id'][]): Promise<{ result: string[], entities: { teams: Record<string, TeamStore> } }> {
       return dispatch(replaceScenarioTeams(scenarioId, { scenario_teams: teamIds }));
     },
     onToggleUser(teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean): void {
@@ -87,30 +74,37 @@ export const teamContextForScenario = (scenarioId: ScenarioStore['scenario_id'],
 const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
   const dispatch = useAppDispatch();
-  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
-  const { teams }: { scenario: ScenarioStore, teams: TeamStore[] } = useHelper((helper: ScenariosHelper) => ({
-    teams: helper.getScenarioTeams(scenarioId),
-  }));
   const { permissions } = useContext(PermissionsContext);
+
+  // Fetching data
+  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
+  const { teamsStore }: { teamsStore: TeamStore[] } = useHelper((helper: ScenariosHelper) => ({
+    teamsStore: helper.getScenarioTeams(scenarioId),
+  }));
   useDataLoader(() => {
     dispatch(fetchScenarioTeams(scenarioId));
   });
-  const [teamIds, setTeamsId] = useState<string[]>([]);
 
+  const [teams, setTeams] = useState<TeamStore[]>([]);
   useEffect(() => {
-    setTeamsId(teams.map((team) => team.team_id));
-  }, [teams]);
+    setTeams(teamsStore);
+  }, [teamsStore]);
+
   return (
     <TeamContext.Provider value={teamContextForScenario(scenarioId, scenarioTeamsUsers)}>
       <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
         {t('Teams')}
       </Typography>
-      {permissions.canWrite && <UpdateTeams addedTeamIds={teamIds} setTeamIds={(ids: string[]) => setTeamsId(ids)}/>}
+      {permissions.canWrite
+        && <UpdateTeams
+          addedTeamIds={teams.map((team: TeamStore) => team.team_id)}
+          setTeams={(ts: TeamStore[]) => setTeams(ts)}
+           />
+      }
       <div className="clearfix" />
-      <Paper classes={{ root: classes.paper }} variant="outlined">
-        <ContextualTeams teamIds={teamIds} />
+      <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
+        <ContextualTeams teams={teams} />
       </Paper>
     </TeamContext.Provider>
   );

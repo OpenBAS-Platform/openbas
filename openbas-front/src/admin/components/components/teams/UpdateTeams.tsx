@@ -28,12 +28,12 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   addedTeamIds: Team['team_id'][];
-  setTeamIds: (ids: string[]) => void;
+  setTeams: (teams: TeamStore[]) => void;
 }
 
 const UpdateTeams: React.FC<Props> = ({
   addedTeamIds,
-  setTeamIds,
+  setTeams,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -46,29 +46,37 @@ const UpdateTeams: React.FC<Props> = ({
     dispatch(fetchTags());
   });
 
-  const [teams, setTeams] = useState<TeamOutput[]>([]);
   const [teamValues, setTeamValues] = useState<TeamOutput[]>([]);
+  const [selectedTeamValues, setSelectedTeamValues] = useState<TeamOutput[]>([]);
 
   // Dialog
   const [open, setOpen] = useState(false);
 
   const handleClose = () => {
     setOpen(false);
-    setTeamValues([]);
+    setSelectedTeamValues([]);
   };
 
   const handleSubmit = async () => {
     setOpen(false);
-    onReplaceTeam?.(teamValues.map((v) => v.team_id)).then((result) => setTeamIds(result.result));
+    onReplaceTeam?.(selectedTeamValues.map((v) => v.team_id)).then((result) => {
+      if (result.result.length === 0) {
+        setTeams([]);
+      } else {
+        setTeams(Object.values(result.entities.teams));
+      }
+    });
   };
 
   useEffect(() => {
-    findTeams(addedTeamIds).then((result) => setTeamValues(result.data));
-  }, [addedTeamIds]);
+    if (open) {
+      findTeams(addedTeamIds).then((result) => setSelectedTeamValues(result.data));
+    }
+  }, [open, addedTeamIds]);
 
   // Pagination
-  const addTeam = (_teamId: string, team: TeamOutput) => setTeamValues([...teamValues, team]);
-  const removeTeam = (teamId: string) => setTeamValues(teamValues.filter((v) => v.team_id !== teamId));
+  const addTeam = (_teamId: string, team: TeamOutput) => setSelectedTeamValues([...selectedTeamValues, team]);
+  const removeTeam = (teamId: string) => setSelectedTeamValues(selectedTeamValues.filter((v) => v.team_id !== teamId));
 
   // Headers
   const elements: SelectListElements<EndpointStore> = useMemo(() => ({
@@ -97,7 +105,7 @@ const UpdateTeams: React.FC<Props> = ({
   const paginationComponent = <PaginationComponentV2
     fetch={(input) => searchTeams(input)}
     searchPaginationInput={searchPaginationInput}
-    setContent={setTeams}
+    setContent={setTeamValues}
     entityPrefix="team"
     availableFilterNames={availableFilterNames}
     queryableHelpers={queryableHelpers}
@@ -132,8 +140,8 @@ const UpdateTeams: React.FC<Props> = ({
         <DialogContent>
           <Box sx={{ marginTop: 2 }}>
             <SelectList
-              values={teams}
-              selectedValues={teamValues}
+              values={teamValues}
+              selectedValues={selectedTeamValues}
               elements={elements}
               prefix="team"
               onSelect={addTeam}
@@ -141,7 +149,7 @@ const UpdateTeams: React.FC<Props> = ({
               paginationComponent={paginationComponent}
               buttonComponent={<CreateTeam
                 inline
-                onCreate={(team) => setTeamValues([...teamValues, team])}
+                onCreate={(team) => setSelectedTeamValues([...selectedTeamValues, team])}
                                />}
             />
           </Box>
