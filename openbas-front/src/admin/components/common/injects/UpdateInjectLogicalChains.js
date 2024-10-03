@@ -97,7 +97,6 @@ const UpdateInjectLogicalChains = ({
         injectsToUpdate.push(injectChildrenUpdate);
       }
     });
-
     await onUpdateInject([injectUpdate, ...injectsToUpdate]);
 
     handleClose();

@@ -123,7 +123,7 @@ public class Inject implements Base, Injection {
   private Scenario scenario;
 
   @Getter
-  @OneToMany(mappedBy = "compositeId.injectChildrenId", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "compositeId.injectChildrenId", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
   @JsonProperty("inject_depends_on")
   private List<InjectDependency> dependsOn;
 

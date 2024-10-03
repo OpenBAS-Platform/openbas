@@ -66,6 +66,7 @@ public class InjectsExecutionJob implements Job {
     private final AtomicTestingService atomicTestingService;
     private final InjectDependenciesRepository injectDependenciesRepository;
     private final ExerciseExpectationService exerciseExpectationService;
+    private final InjectExpectationRepository injectExpectationRepository;
 
     private static final String EXPECTATIONS = "expectations";
 
@@ -259,13 +260,15 @@ public class InjectsExecutionJob implements Job {
             List<String> results = null;
 
             for (InjectDependency injectDependency : injectDependencies) {
-                String expressionToEvaluate = injectDependency.getCondition()
-                        .replaceAll("(.*-Execution-Success)", "#this['$1']");
+                String expressionToEvaluate = injectDependency.getCondition();
+                List<String> conditions = Arrays.stream(injectDependency.getCondition()
+                                .split("(&&|\\|\\|)")).toList();
+                for(String condition : conditions) {
+                    expressionToEvaluate = expressionToEvaluate.replaceAll(condition.trim(), condition.trim().replaceAll("(.*-Success)", "#this['$1']"));
+                }
 
                 ExpressionParser parser = new SpelExpressionParser();
-                EvaluationContext context = new StandardEvaluationContext(mapCondition);
-                Expression exp = parser.parseExpression(String.format(expressionToEvaluate,
-                        injectDependency.getCompositeId().getInjectParentId() + "-Execution-Success"));
+                Expression exp = parser.parseExpression(expressionToEvaluate);
                 boolean canBeExecuted = Boolean.TRUE.equals(exp.getValue(mapCondition, Boolean.class));
                 if (!canBeExecuted) {
                     if (results == null) {
@@ -282,8 +285,6 @@ public class InjectsExecutionJob implements Job {
     private @NotNull Map<String, Boolean> getStringBooleanMap(List<Inject> parents, String exerciseId, List<InjectDependency> injectDependencies) {
         Map<String, Boolean> mapCondition = new HashMap<>();
 
-        List<InjectExpectation> expectations = this.exerciseExpectationService.injectExpectations(exerciseId);
-
         injectDependencies.forEach(injectDependency -> {
             List<String> splittedConditions = List.of(injectDependency.getCondition().split("&&|\\|\\|"));
             splittedConditions.forEach(condition -> {
@@ -297,12 +298,19 @@ public class InjectsExecutionJob implements Job {
                             && !parent.getStatus().get().getName().equals(ExecutionStatus.ERROR)
                             && !executionStatusesNotReady.contains(parent.getStatus().get().getName()));
 
-            parent.getExpectations().forEach(injectExpectation -> {
+            List<InjectExpectation> expectations = injectExpectationRepository.findAllForExerciseAndInject(exerciseId, parent.getId());
+            expectations.forEach(injectExpectation -> {
                 String name = String.format("%s-%s-Success", parent.getId(), StringUtils.capitalize(injectExpectation.getType().toString().toLowerCase()));
                 if(injectExpectation.getType().equals(InjectExpectation.EXPECTATION_TYPE.MANUAL)) {
                     name = String.format("%s-%s-Success", parent.getId(), injectExpectation.getName());
                 }
-                mapCondition.put(name, expectationStatusesSuccess.contains(injectExpectation.getResponse()));
+                if(InjectExpectation.EXPECTATION_TYPE.CHALLENGE.equals(injectExpectation.getType())) {
+                    if(injectExpectation.getUser() == null) {
+                        mapCondition.put(name, injectExpectation.getScore() >= injectExpectation.getExpectedScore());
+                    }
+                } else {
+                    mapCondition.put(name, expectationStatusesSuccess.contains(injectExpectation.getResponse()));
+                }
             });
         });
         return mapCondition;
