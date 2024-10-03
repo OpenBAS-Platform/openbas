@@ -7,19 +7,18 @@ import jakarta.persistence.JoinTable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static org.reflections.scanners.Scanners.SubTypes;
 import static org.springframework.util.StringUtils.hasText;
 
 public class SchemaUtils {
@@ -37,6 +36,24 @@ public class SchemaUtils {
   private static final ConcurrentHashMap<Class<?>, List<PropertySchema>> cacheMap = new ConcurrentHashMap<>();
 
   // -- SCHEMA --
+  public static List<PropertySchema> schemaWithSubtypes(@NotNull Class<?> clazz) throws ClassNotFoundException {
+    Reflections reflections = new Reflections("io.openbas.database.model");
+    Set<Class<?>> subTypes = reflections.get(SubTypes.of(clazz).asClass());
+
+    List<List<PropertySchema>> propertySchemasAll = new ArrayList<>();
+    propertySchemasAll.add(schema(clazz));
+    for (Class<?> subType : subTypes) {
+      propertySchemasAll.add(schema(subType));
+    }
+
+    return propertySchemasAll.stream().flatMap(List::stream)
+      .collect(Collectors.toMap(
+        PropertySchema::getName,
+        propertySchema -> propertySchema,
+        (existing, replacement) -> existing
+      ))
+      .values().stream().toList();
+  }
 
   public static List<PropertySchema> schema(@NotNull Class<?> clazz) {
     return cacheMap.computeIfAbsent(clazz, SchemaUtils::computeSchema);
