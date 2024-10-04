@@ -120,10 +120,10 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
   @Query(value = "SELECT "
       + "inject_expectation_type, inject_expectation_score, inject_expectation_expected_score, user_id, team_id "
       + "FROM injects_expectations i "
-      + "WHERE i.inject_expectation_id IN :ids "
+      + "WHERE i.inject_id IN :injectIds "
       + "AND i.user_id is null",
       nativeQuery = true)
-  List<RawInjectExpectationForCompute> rawForComputeGlobalByIds(@Param("ids") final List<String> ids);
+  List<RawInjectExpectationForCompute> rawForComputeGlobalByIds(@Param("injectIds") final List<String> ids);
 
   @Query(value = "SELECT "
       + "i.inject_expectation_id AS inject_expectation_id, "

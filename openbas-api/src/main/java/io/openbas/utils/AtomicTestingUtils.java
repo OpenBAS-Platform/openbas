@@ -299,7 +299,7 @@ public class AtomicTestingUtils {
 
       Map<String, RawAsset> assetForAssetGroupMap,
       Map<String, List<RawAsset>> dynamicAssetGroupMap
-      ) {
+  ) {
 
     RawInject inject = injectRepository.findRawInjectForCompute(injectId);
     List<ExpectationResultsByType> defaultExpectationResultsByTypes = getDefaultExpectationResultsByTypes();
@@ -331,31 +331,31 @@ public class AtomicTestingUtils {
     teamExpectations.stream()
         .filter(expectation -> !teamExpectationMap.containsKey(expectation.getTeam_id()))
         .forEach(expectation -> {
-              teamExpectationMap.put(
-                  expectation.getTeam_id(),
-                  expectation
-              );
-            });
+          teamExpectationMap.put(
+              expectation.getTeam_id(),
+              expectation
+          );
+        });
 
     Map<String, RawInjectExpectationForCompute> assetExpectationMap = new LinkedHashMap<>();
     assetExpectations.stream()
         .filter(expectation -> !assetExpectationMap.containsKey(expectation.getAsset_id()))
         .forEach(expectation -> {
-              assetExpectationMap.put(
-                  expectation.getAsset_id(),
-                  expectation
-              );
-            });
+          assetExpectationMap.put(
+              expectation.getAsset_id(),
+              expectation
+          );
+        });
 
     Map<String, RawInjectExpectationForCompute> assetGroupExpectationMap = new LinkedHashMap<>();
     assetGroupExpectations.stream()
         .filter(expectation -> !assetGroupExpectationMap.containsKey(expectation.getAsset_group_id()))
         .forEach(expectation -> {
           assetGroupExpectationMap.put(
-                  expectation.getAsset_group_id(),
-                  expectation
-              );
-            });
+              expectation.getAsset_group_id(),
+              expectation
+          );
+        });
 
     //Results
     List<InjectTargetWithResult> targets = new ArrayList<>();
@@ -474,8 +474,9 @@ public class AtomicTestingUtils {
               )
               .entrySet().stream()
               .map(entry -> new InjectTargetWithResult(TargetType.TEAMS, entry.getKey(),
-                  teamExpectationMap.get(entry.getKey()).getTeam_name(), entry.getValue(), playerExpectations.isEmpty() ? List.of()
-                  : calculateResultsforPlayersWithRawValues(groupedByTeamAndUser.get(entry.getKey())), null))
+                  teamExpectationMap.get(entry.getKey()).getTeam_name(), entry.getValue(),
+                  playerExpectations.isEmpty() ? List.of()
+                      : calculateResultsforPlayersWithRawValues(groupedByTeamAndUser.get(entry.getKey())), null))
               .toList()
       );
     }
@@ -492,7 +493,8 @@ public class AtomicTestingUtils {
               .entrySet().stream()
               .map(entry -> new InjectTargetWithResult(TargetType.ASSETS, entry.getKey(),
                   assetExpectationMap.get(entry.getKey()).getAsset_name(), entry.getValue(),
-                  Objects.equals(rawAssetMap.get(entry.getKey()).getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(rawAssetMap.get(entry.getKey()).getEndpoint_platform()) : null))
+                  Objects.equals(rawAssetMap.get(entry.getKey()).getAsset_type(), "Endpoint")
+                      ? Endpoint.PLATFORM_TYPE.valueOf(rawAssetMap.get(entry.getKey()).getEndpoint_platform()) : null))
               .toList()
       );
     }
@@ -534,7 +536,8 @@ public class AtomicTestingUtils {
                     asset,
                     assetForAssetGroupMap.get(asset).getAsset_name(),
                     defaultExpectationResultsByTypes,
-                    Objects.equals(assetForAssetGroupMap.get(asset).getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(assetForAssetGroupMap.get(asset).getEndpoint_platform())
+                    Objects.equals(assetForAssetGroupMap.get(asset).getAsset_type(), "Endpoint")
+                        ? Endpoint.PLATFORM_TYPE.valueOf(assetForAssetGroupMap.get(asset).getEndpoint_platform())
                         : null
                 ));
               }
@@ -557,7 +560,8 @@ public class AtomicTestingUtils {
             });*/
 
             return new InjectTargetWithResult(TargetType.ASSETS_GROUPS, entry.getKey(),
-                assetGroupExpectationMap.get(entry.getKey()).getAsset_group_name(), entry.getValue(), sortResults(children), null);
+                assetGroupExpectationMap.get(entry.getKey()).getAsset_group_name(), entry.getValue(),
+                sortResults(children), null);
           })
           .toList());
     }
@@ -659,9 +663,9 @@ public class AtomicTestingUtils {
 
     List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
 
-    getExpectationByType(ExpectationType.PREVENTION, preventionScores).ifPresent(resultAvgOfExpectations::add);
-    getExpectationByType(ExpectationType.DETECTION, detectionScores).ifPresent(resultAvgOfExpectations::add);
-    getExpectationByType(ExpectationType.HUMAN_RESPONSE, humanScores).ifPresent(resultAvgOfExpectations::add);
+    getExpectationByType(ExpectationType.PREVENTION, preventionScores).map(resultAvgOfExpectations::add);
+    getExpectationByType(ExpectationType.DETECTION, detectionScores).map(resultAvgOfExpectations::add);
+    getExpectationByType(ExpectationType.HUMAN_RESPONSE, humanScores).map(resultAvgOfExpectations::add);
 
     return resultAvgOfExpectations;
   }
@@ -780,19 +784,11 @@ public class AtomicTestingUtils {
             return null;
           }
           if (rawInjectExpectation.getTeam_id() != null) {
-            if (rawInjectExpectation.getInject_expectation_group()) {
-              if (rawInjectExpectation.getInject_expectation_score() > 0) {
-                return 1.0;
-              } else {
-                return 0.0;
-              }
+            if (rawInjectExpectation.getInject_expectation_score()
+                >= rawInjectExpectation.getInject_expectation_expected_score()) {
+              return 1.0;
             } else {
-              if (rawInjectExpectation.getInject_expectation_score()
-                  >= rawInjectExpectation.getInject_expectation_expected_score()) {
-                return 1.0;
-              } else {
-                return 0.0;
-              }
+              return 0.0;
             }
           } else {
             if (rawInjectExpectation.getInject_expectation_score()
