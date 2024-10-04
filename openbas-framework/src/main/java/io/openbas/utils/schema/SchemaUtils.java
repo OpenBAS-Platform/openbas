@@ -2,12 +2,12 @@ package io.openbas.utils.schema;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
+import io.openbas.utils.SubclassScanner;
 import jakarta.persistence.Column;
 import jakarta.persistence.JoinTable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -18,7 +18,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static org.reflections.scanners.Scanners.SubTypes;
 import static org.springframework.util.StringUtils.hasText;
 
 public class SchemaUtils {
@@ -33,18 +32,19 @@ public class SchemaUtils {
       Email.class
   );
 
+  private static final String BASE_CLASS_PACKAGE = "io.openbas.database.model";
+
   private static final ConcurrentHashMap<Class<?>, List<PropertySchema>> cacheMap = new ConcurrentHashMap<>();
 
   // -- SCHEMA --
   public static List<PropertySchema> schemaWithSubtypes(@NotNull Class<?> clazz) throws ClassNotFoundException {
-    Reflections reflections = new Reflections("io.openbas.database.model");
-    Set<Class<?>> subTypes = reflections.get(SubTypes.of(clazz).asClass());
-
     List<List<PropertySchema>> propertySchemasAll = new ArrayList<>();
     propertySchemasAll.add(schema(clazz));
-    for (Class<?> subType : subTypes) {
-      propertySchemasAll.add(schema(subType));
-    }
+    propertySchemasAll
+      .addAll(SubclassScanner.getSubclasses(BASE_CLASS_PACKAGE, clazz)
+      .stream()
+      .map(SchemaUtils::schema)
+      .toList());
 
     return propertySchemasAll.stream().flatMap(List::stream)
       .collect(Collectors.toMap(
