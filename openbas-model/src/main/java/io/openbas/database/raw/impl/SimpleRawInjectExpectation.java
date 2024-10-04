@@ -13,8 +13,10 @@ public class SimpleRawInjectExpectation implements RawInjectExpectation {
     private Double inject_expectation_score;
     private Double inject_expectation_expected_score;
     private String team_id;
+    private String user_id;
     private String asset_id;
     private String asset_group_id;
     private String exercise_id;
     private Boolean inject_expectation_group;
+
 }

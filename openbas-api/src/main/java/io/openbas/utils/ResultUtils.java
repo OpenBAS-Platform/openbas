@@ -6,7 +6,7 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.raw.RawAsset;
 import io.openbas.database.raw.RawAssetGroup;
-import io.openbas.database.raw.RawInjectExpectationForCompute;
+import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.raw.RawTeam;
 import io.openbas.database.repository.*;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
@@ -39,7 +39,7 @@ public class ResultUtils {
   }
 
   public static List<ExpectationResultsByType> computeGlobalExpectationResults_raw(
-      @NotNull final List<RawInjectExpectationForCompute> rawInjectExpectations) {
+      @NotNull final List<RawInjectExpectation> rawInjectExpectations) {
     return AtomicTestingUtils.getRawExpectationResultByTypesForCompute(rawInjectExpectations);
   }
 

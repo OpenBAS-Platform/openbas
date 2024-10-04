@@ -303,12 +303,12 @@ public class AtomicTestingUtils {
 
     RawInject inject = injectRepository.findRawInjectForCompute(injectId);
     List<ExpectationResultsByType> defaultExpectationResultsByTypes = getDefaultExpectationResultsByTypes();
-    List<RawInjectExpectationForCompute> expectations = injectExpectationRepository.rawByInjectId(injectId);
+    List<RawInjectExpectation> expectations = injectExpectationRepository.rawByInjectId(injectId);
 
-    List<RawInjectExpectationForCompute> teamExpectations = new ArrayList<>();
-    List<RawInjectExpectationForCompute> playerExpectations = new ArrayList<>();
-    List<RawInjectExpectationForCompute> assetExpectations = new ArrayList<>();
-    List<RawInjectExpectationForCompute> assetGroupExpectations = new ArrayList<>();
+    List<RawInjectExpectation> teamExpectations = new ArrayList<>();
+    List<RawInjectExpectation> playerExpectations = new ArrayList<>();
+    List<RawInjectExpectation> assetExpectations = new ArrayList<>();
+    List<RawInjectExpectation> assetGroupExpectations = new ArrayList<>();
 
     expectations.forEach(expectation -> {
       if (expectation.getTeam_id() != null && expectation.getTeam_id() != null) {
@@ -330,10 +330,10 @@ public class AtomicTestingUtils {
     List<InjectTargetWithResult> assetsToRefine = new ArrayList<>();
 
     // Players
-    Map<String, Map<String, List<RawInjectExpectationForCompute>>> groupedByTeamAndUser = playerExpectations.stream()
+    Map<String, Map<String, List<RawInjectExpectation>>> groupedByTeamAndUser = playerExpectations.stream()
         .collect(Collectors.groupingBy(
-            RawInjectExpectationForCompute::getTeam_id,
-            Collectors.groupingBy(RawInjectExpectationForCompute::getUser_id)
+            RawInjectExpectation::getTeam_id,
+            Collectors.groupingBy(RawInjectExpectation::getUser_id)
         ));
 
     /* Match Target with expectations
@@ -435,7 +435,7 @@ public class AtomicTestingUtils {
           teamExpectations
               .stream()
               .collect(
-                  Collectors.groupingBy(RawInjectExpectationForCompute::getTeam_id,
+                  Collectors.groupingBy(RawInjectExpectation::getTeam_id,
                       Collectors.collectingAndThen(
                           Collectors.toList(), AtomicTestingUtils::getRawExpectationResultByTypesForCompute)
                   )
@@ -452,7 +452,7 @@ public class AtomicTestingUtils {
           assetExpectations
               .stream()
               .collect(
-                  Collectors.groupingBy(RawInjectExpectationForCompute::getAsset_id,
+                  Collectors.groupingBy(RawInjectExpectation::getAsset_id,
                       Collectors.collectingAndThen(
                           Collectors.toList(), AtomicTestingUtils::getRawExpectationResultByTypesForCompute)
                   )
@@ -470,7 +470,7 @@ public class AtomicTestingUtils {
       targets.addAll(assetGroupExpectations
           .stream()
           .collect(
-              Collectors.groupingBy(RawInjectExpectationForCompute::getAsset_group_id,
+              Collectors.groupingBy(RawInjectExpectation::getAsset_group_id,
                   Collectors.collectingAndThen(
                       Collectors.toList(), AtomicTestingUtils::getRawExpectationResultByTypesForCompute)
               )
@@ -557,7 +557,7 @@ public class AtomicTestingUtils {
   }
 
   private static List<InjectTargetWithResult> calculateResultsforPlayersWithRawValues(
-      Map<String, List<RawInjectExpectationForCompute>> expectationsByUser) {
+      Map<String, List<RawInjectExpectation>> expectationsByUser) {
     return expectationsByUser.entrySet().stream()
         .map(userEntry -> new InjectTargetWithResult(
             TargetType.PLAYER,
@@ -619,7 +619,7 @@ public class AtomicTestingUtils {
 
   @NotNull
   public static List<ExpectationResultsByType> getRawExpectationResultByTypesForCompute(
-      final List<RawInjectExpectationForCompute> expectations) {
+      final List<RawInjectExpectation> expectations) {
     List<Double> preventionScores = getRawScoresForCompute(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
     List<Double> detectionScores = getRawScoresForCompute(List.of(EXPECTATION_TYPE.DETECTION), expectations);
     List<Double> humanScores = getRawScoresForCompute(
@@ -739,7 +739,7 @@ public class AtomicTestingUtils {
   }
 
   public static List<Double> getRawScoresForCompute(final List<EXPECTATION_TYPE> types,
-      List<RawInjectExpectationForCompute> expectations) {
+      List<RawInjectExpectation> expectations) {
     return expectations
         .stream()
         .filter(e -> types.contains(EXPECTATION_TYPE.valueOf(e.getInject_expectation_type())))
