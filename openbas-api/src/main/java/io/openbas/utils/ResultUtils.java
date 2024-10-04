@@ -78,18 +78,31 @@ public class ResultUtils {
 
     List<String> injectIds = injects.stream().map(Inject::getId).toList();
 
-    Map<String, List<RawTeam>> teamMap = teamRepository.rawTeamByInjectIds(injectIds).stream()
-        .collect(Collectors.groupingBy(RawTeam::getInject_id));
-    Map<String, List<RawAsset>> assetMap = assetRepository.rawByInjectIds(injectIds).stream()
-        .collect(Collectors.groupingBy(RawAsset::getInject_id));
+    Map<String, Map<String, RawTeam>> teamMap = teamRepository.rawTeamByInjectIds(injectIds).stream()
+        .collect(Collectors.groupingBy(RawTeam::getInject_id,
+            Collectors.toMap(
+            RawTeam::getTeam_id,
+            rawTeam -> rawTeam
+        )));
+
+    Map<String, Map<String, RawAsset>> assetMap = assetRepository.rawByInjectIds(injectIds).stream()
+        .collect(Collectors.groupingBy(RawAsset::getInject_id,
+            Collectors.toMap(
+            RawAsset::getAsset_id,
+            rawAsset -> rawAsset
+        )));
 
     // -- ASSETS GROUPS --
     List<RawAssetGroup> rawAssetGroups = assetGroupRepository.rawByInjectIds(injectIds);
 
-    Map<String, List<RawAssetGroup>> assetGroupMap = rawAssetGroups.stream()
-        .collect(Collectors.groupingBy(RawAssetGroup::getInject_id));
+    Map<String, Map<String, RawAssetGroup>> assetGroupMap = rawAssetGroups.stream()
+        .collect(Collectors.groupingBy(RawAssetGroup::getInject_id,
+            Collectors.toMap(
+            RawAssetGroup::getAsset_group_id,
+            rawAssetGroup -> rawAssetGroup
+        )));
 
-  Map<String, List<RawAsset>> dynamicAssetGroupMap = assetGroupService.computeRawDynamicAsset(rawAssetGroups);
+  Map<String, List<RawAsset>> dynamicForAssetGroupMap = assetGroupService.computeRawDynamicAsset(rawAssetGroups);
 
     Map<String, RawAsset> assetForAssetGroupMap = assetRepository.rawByIds(
         rawAssetGroups.stream()
@@ -100,7 +113,7 @@ public class ResultUtils {
     return injects.stream()
         .flatMap(
             inject -> getTargetsWithResultsWithRawQueries(inject.getId(), injectRepository, injectExpectationRepository,
-                teamMap.get(inject.getId()), assetMap.get(inject.getId()), assetGroupMap.get(inject.getId()), assetForAssetGroupMap, dynamicAssetGroupMap).stream())
+                teamMap.get(inject.getId()), assetMap.get(inject.getId()), assetGroupMap.get(inject.getId()), assetForAssetGroupMap, dynamicForAssetGroupMap).stream())
         .distinct()
         .toList();
   }
