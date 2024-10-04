@@ -18,5 +18,4 @@ public class SimpleRawInjectExpectation implements RawInjectExpectation {
     private String asset_group_id;
     private String exercise_id;
     private Boolean inject_expectation_group;
-
 }

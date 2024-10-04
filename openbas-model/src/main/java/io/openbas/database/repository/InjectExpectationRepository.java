@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.raw.RawInjectExpectation;
+import io.openbas.database.raw.RawInjectExpectationForCompute;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -122,19 +123,49 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
       + "WHERE i.inject_expectation_id IN :ids "
       + "AND i.user_id is null",
       nativeQuery = true)
-  List<RawInjectExpectation> rawForComputeGlobalByIds(@Param("ids") final List<String> ids);
+  List<RawInjectExpectationForCompute> rawForComputeGlobalByIds(@Param("ids") final List<String> ids);
 
   @Query(value = "SELECT "
-  + "i.inject_expectation_id AS inject_expectation_id, "
-  + "i.team_id AS team_id, "
-  + "i.asset_id AS asset_id, "
-  + "i.asset_group_id AS asset_group_id, "
-  + "i.user_id AS user_id, "
-  + "i.inject_expectation_type AS inject_expectation_type, "
-  + "i.inject_expectation_score AS inject_expectation_score, "
-  + "i.inject_expectation_expected_score AS inject_expectation_expected_score, "
-  + "i.inject_expectation_group AS inject_expectation_group "
-  + "FROM injects_expectations i "
-  + "WHERE i.inject_id = :injectId ; ", nativeQuery = true)
-  List<RawInjectExpectation> rawByInjectId(@Param("injectId") final String injectId);
+      + "i.inject_expectation_id AS inject_expectation_id, "
+      + "t.team_id AS team_id, "
+      + "t.team_name AS team_name, "
+      + "a.asset_id AS asset_id, "
+      + "a.asset_name AS asset_name, "
+      + "a.asset_type AS asset_type, "
+      + "a.endpoint_platform AS endpoint_platform, "
+      + "at.asset_group_id AS asset_group_id, "
+      + "at.asset_group_name AS asset_group_name, "
+      + "COALESCE(ARRAY_AGG(aga.asset_id) FILTER (WHERE aga.asset_id IS NOT NULL),'{}') AS asset_ids, "
+      + "i.inject_expectation_type AS inject_expectation_type, "
+      + "u.user_id AS user_id, "
+      + "u.user_firstname AS user_firstname, "
+      + "u.user_lastname AS user_lastname, "
+      + "i.inject_expectation_score AS inject_expectation_score, "
+      + "i.inject_expectation_expected_score AS inject_expectation_expected_score, "
+      + "i.inject_expectation_group AS inject_expectation_group "
+      + "FROM injects_expectations i "
+      + "LEFT JOIN teams t ON t.team_id = i.team_id "
+      + "LEFT JOIN assets a ON a.asset_id = i.asset_id "
+      + "LEFT JOIN asset_groups at ON at.asset_group_id = i.asset_group_id "
+      + "LEFT JOIN asset_groups_assets aga ON aga.asset_group_id = at.asset_group_id "
+      + "LEFT JOIN users u ON u.user_id = i.user_id "
+      + "WHERE i.inject_id = :injectId "
+      + "GROUP BY "
+      + "i.inject_expectation_id, "
+      + "t.team_id, "
+      + "t.team_name, "
+      + "a.asset_id, "
+      + "a.asset_name, "
+      + "a.asset_type, "
+      + "a.endpoint_platform, "
+      + "at.asset_group_id, "
+      + "at.asset_group_name, "
+      + "u.user_id, "
+      + "u.user_firstname, "
+      + "u.user_lastname, "
+      + "i.inject_expectation_type, "
+      + "i.inject_expectation_score, "
+      + "i.inject_expectation_expected_score, "
+      + "i.inject_expectation_group ; ", nativeQuery = true)
+  List<RawInjectExpectationForCompute> rawByInjectId(@Param("injectId") final String injectId);
 }

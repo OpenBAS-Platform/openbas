@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface RawAssetGroup {
 
-  public String getAsset_group_id();
+  String getAsset_group_id();
 
-  public String getAsset_group_name();
+  String getAsset_group_name();
 
-  public List<String> getAsset_ids();
+  List<String> getAsset_ids();
 
   String getInject_id();
 
