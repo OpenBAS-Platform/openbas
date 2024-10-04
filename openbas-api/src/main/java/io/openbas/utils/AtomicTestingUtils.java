@@ -327,10 +327,35 @@ public class AtomicTestingUtils {
     });
 
     //Map by targetIt
-    Map<String, RawInjectExpectationForCompute> teamExpectationMap = teamExpectations.stream().collect(Collectors.toMap(RawInjectExpectationForCompute::getTeam_id, expectation->expectation));
-    Map<String, RawInjectExpectationForCompute> assetExpectationMap = assetExpectations.stream().collect(Collectors.toMap(RawInjectExpectationForCompute::getAsset_id, expectation->expectation));
-    Map<String, RawInjectExpectationForCompute> assetGroupExpectationMap = assetGroupExpectations.stream().collect(Collectors.toMap(RawInjectExpectationForCompute::getAsset_group_id, expectation->expectation));
+    Map<String, RawInjectExpectationForCompute> teamExpectationMap = new LinkedHashMap<>();
+    teamExpectations.stream()
+        .filter(expectation -> !teamExpectationMap.containsKey(expectation.getTeam_id()))
+        .forEach(expectation -> {
+              teamExpectationMap.put(
+                  expectation.getTeam_id(),
+                  expectation
+              );
+            });
 
+    Map<String, RawInjectExpectationForCompute> assetExpectationMap = new LinkedHashMap<>();
+    assetExpectations.stream()
+        .filter(expectation -> !assetExpectationMap.containsKey(expectation.getAsset_id()))
+        .forEach(expectation -> {
+              assetExpectationMap.put(
+                  expectation.getAsset_id(),
+                  expectation
+              );
+            });
+
+    Map<String, RawInjectExpectationForCompute> assetGroupExpectationMap = new LinkedHashMap<>();
+    assetGroupExpectations.stream()
+        .filter(expectation -> !assetGroupExpectationMap.containsKey(expectation.getAsset_group_id()))
+        .forEach(expectation -> {
+          assetGroupExpectationMap.put(
+                  expectation.getAsset_group_id(),
+                  expectation
+              );
+            });
 
     //Results
     List<InjectTargetWithResult> targets = new ArrayList<>();
