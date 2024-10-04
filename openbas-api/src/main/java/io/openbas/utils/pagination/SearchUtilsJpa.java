@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.List;
 
 import static io.openbas.utils.JpaUtils.toPath;
@@ -35,7 +36,7 @@ public class SearchUtilsJpa {
       List<PropertySchema> searchableProperties = getSearchableProperties(propertySchemas);
       List<Predicate> predicates = searchableProperties.stream()
           .map(propertySchema -> {
-            Expression<String> paths = toPath(propertySchema, root);
+            Expression<String> paths = toPath(propertySchema, root, new HashMap<>());
             return toPredicate(paths, search, cb, propertySchema.getType());
           })
           .toList();
