@@ -306,7 +306,7 @@ public class InjectsExecutionJob implements Job {
                 }
                 if(InjectExpectation.EXPECTATION_TYPE.CHALLENGE.equals(injectExpectation.getType())
                 || InjectExpectation.EXPECTATION_TYPE.ARTICLE.equals(injectExpectation.getType())) {
-                    if(injectExpectation.getUser() == null) {
+                    if(injectExpectation.getUser() == null && injectExpectation.getScore() != null) {
                         mapCondition.put(name, injectExpectation.getScore() >= injectExpectation.getExpectedScore());
                     }
                 } else {
