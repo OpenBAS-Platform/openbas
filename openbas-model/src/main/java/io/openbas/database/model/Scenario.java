@@ -31,15 +31,6 @@ import static lombok.AccessLevel.NONE;
 @Entity
 @Table(name = "scenarios")
 @EntityListeners(ModelBaseListener.class)
-@NamedEntityGraphs({
-    @NamedEntityGraph(
-        name = "Scenario.tags-injects",
-        attributeNodes = {
-            @NamedAttributeNode("tags"),
-            @NamedAttributeNode("injects")
-        }
-    )
-})
 public class Scenario implements Base {
 
   public enum SEVERITY {
