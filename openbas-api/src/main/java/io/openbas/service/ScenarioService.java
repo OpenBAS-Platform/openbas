@@ -46,7 +46,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.BiFunction;
+import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -56,7 +57,7 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.database.specification.ScenarioSpecification.findGrantedFor;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.rest.scenario.utils.ScenarioUtils.handleDeepFilter;
+import static io.openbas.rest.scenario.utils.ScenarioUtils.handleCustomFilter;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_SCENARIO;
 import static io.openbas.utils.Constants.ARTICLES;
@@ -122,31 +123,45 @@ public class ScenarioService {
   }
 
   public Page<RawPaginationScenario> scenarios(@NotNull final SearchPaginationInput searchPaginationInput) {
-    Function<Specification<Scenario>, Specification<Scenario>> finalSpecification = handleDeepFilter(searchPaginationInput);
+    Map<String, Join<Base, Base>> joinMap = new HashMap<>();
+
+    // Compute custom filter
+    UnaryOperator<Specification<Scenario>> deepFilterSpecification = handleCustomFilter(
+        searchPaginationInput
+    );
+
+    // Compute find all method
+    BiFunction<Specification<Scenario>, Pageable, Page<RawPaginationScenario>> findAll = getFindAllFunction(
+        deepFilterSpecification, joinMap
+    );
+
+    // Compute pagination from find all
+    return buildPaginationCriteriaBuilder(findAll, searchPaginationInput, Scenario.class, joinMap);
+  }
+
+  private BiFunction<Specification<Scenario>, Pageable, Page<RawPaginationScenario>> getFindAllFunction(
+      UnaryOperator<Specification<Scenario>> deepFilterSpecification,
+      Map<String, Join<Base, Base>> joinMap) {
+
     if (currentUser().isAdmin()) {
-      return buildPaginationCriteriaBuilder(
-          (Specification<Scenario> specification, Pageable pageable) -> this.findAllWithCriteriaBuilder(
-              finalSpecification.apply(specification),
-              pageable
-          ),
-          searchPaginationInput,
-          Scenario.class
+      return (specification, pageable) -> this.findAllWithCriteriaBuilder(
+          deepFilterSpecification.apply(specification),
+          pageable,
+          joinMap
       );
     } else {
-      return buildPaginationCriteriaBuilder(
-          (Specification<Scenario> specification, Pageable pageable) -> this.findAllWithCriteriaBuilder(
-              findGrantedFor(currentUser().getId()).and(finalSpecification.apply(specification)),
-              pageable
-          ),
-          searchPaginationInput,
-          Scenario.class
+      return (specification, pageable) -> this.findAllWithCriteriaBuilder(
+          findGrantedFor(currentUser().getId()).and(deepFilterSpecification.apply(specification)),
+          pageable,
+          joinMap
       );
     }
   }
 
   private Page<RawPaginationScenario> findAllWithCriteriaBuilder(
       Specification<Scenario> specification,
-      Pageable pageable) {
+      Pageable pageable,
+      Map<String, Join<Base, Base>> joinMap) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
     // -- Create Query --
@@ -154,7 +169,8 @@ public class ScenarioService {
     // FROM
     Root<Scenario> scenarioRoot = cq.from(Scenario.class);
     // Join on TAG
-    Join<Scenario, Tag> scenarioTagsJoin = scenarioRoot.join("tags", JoinType.LEFT);
+    Join<Base, Base> scenarioTagsJoin = scenarioRoot.join("tags", JoinType.LEFT);
+    joinMap.put("tags", scenarioTagsJoin);
     Expression<String[]> tagIdsExpression =
         cb.function(
             "array_remove",
@@ -163,8 +179,10 @@ public class ScenarioService {
             cb.nullLiteral(String.class)
         );
     // Join on INJECT and INJECTOR CONTRACT
-    Join<Scenario, Inject> injectsJoin = scenarioRoot.join("injects", JoinType.LEFT);
-    Join<Inject, InjectorContract> injectorsContractsJoin = injectsJoin.join("injectorContract", JoinType.LEFT);
+    Join<Base, Base> injectsJoin = scenarioRoot.join("injects", JoinType.LEFT);
+    joinMap.put("injects", injectsJoin);
+    Join<Base, Base> injectorsContractsJoin = injectsJoin.join("injectorContract", JoinType.LEFT);
+    joinMap.put("injects.injectorContract", injectorsContractsJoin);
     Expression<String[]> platformExpression =
         cb.function(
             "array_union_agg",
@@ -226,9 +244,7 @@ public class ScenarioService {
   }
 
   /**
-     * Scenario is recurring
-     * AND start date is before now
-     * AND end date is after now
+   * Scenario is recurring AND start date is before now AND end date is after now
    */
   public List<Scenario> recurringScenarios(@NotNull final Instant instant) {
     return this.scenarioRepository.findAll(
@@ -239,10 +255,7 @@ public class ScenarioService {
   }
 
   /**
-     * Scenario is recurring
-     * AND
-     * start date is before now
-     * OR stop date is before now
+   * Scenario is recurring AND start date is before now OR stop date is before now
    */
   public List<Scenario> potentialOutdatedRecurringScenario(@NotNull final Instant instant) {
     return this.scenarioRepository.findAll(
@@ -611,7 +624,7 @@ public class ScenarioService {
     variableService.createVariables(variableList);
   }
 
-  private void getLessonsCategories(Scenario duplicatedScenario, Scenario originalScenario){
+  private void getLessonsCategories(Scenario duplicatedScenario, Scenario originalScenario) {
     List<LessonsCategory> duplicatedCategories = new ArrayList<>();
     for (LessonsCategory originalCategory : originalScenario.getLessonsCategories()) {
       LessonsCategory duplicatedCategory = new LessonsCategory();
@@ -649,7 +662,7 @@ public class ScenarioService {
     duplicatedScenario.setLessonsCategories(duplicatedCategories);
   }
 
-  private void getObjectives(Scenario scenario, Scenario scenarioOrigin){
+  private void getObjectives(Scenario scenario, Scenario scenarioOrigin) {
     List<Objective> duplicatedObjectives = new ArrayList<>();
     for (Objective originalObjective : scenarioOrigin.getObjectives()) {
       Objective duplicatedObjective = new Objective();

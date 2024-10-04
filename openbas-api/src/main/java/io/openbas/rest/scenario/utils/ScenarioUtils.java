@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import static io.openbas.utils.CustomFilterUtils.computeMode;
@@ -23,14 +22,9 @@ public class ScenarioUtils {
   private static final String SCENARIO_RECURRENCE_FILTER = "scenario_recurrence";
 
   /**
-   * Manage filters that are not directly managed by the generic mechanics -> scenario_kill_chain_phases
+   * Manage filters that are not directly managed by the generic mechanics
    */
-  public static Function<Specification<Scenario>, Specification<Scenario>> handleDeepFilter(
-      @NotNull final SearchPaginationInput searchPaginationInput) {
-    return handleCustomFilter(searchPaginationInput);
-  }
-
-  private static UnaryOperator<Specification<Scenario>> handleCustomFilter(
+  public static UnaryOperator<Specification<Scenario>> handleCustomFilter(
       @NotNull final SearchPaginationInput searchPaginationInput) {
     // Existence of the filter
     Optional<Filters.Filter> scenarioRecurrenceFilterOpt = ofNullable(searchPaginationInput.getFilterGroup())

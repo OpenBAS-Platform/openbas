@@ -1,5 +1,6 @@
 package io.openbas.utils;
 
+import io.openbas.database.model.Base;
 import io.openbas.database.model.Filters.Filter;
 import io.openbas.database.model.Filters.FilterGroup;
 import io.openbas.database.model.Filters.FilterMode;
@@ -8,15 +9,14 @@ import io.openbas.utils.schema.PropertySchema;
 import io.openbas.utils.schema.SchemaUtils;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.validation.constraints.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -39,8 +39,17 @@ public class FilterUtilsJpa {
 
   private static final Specification<?> EMPTY_SPECIFICATION = (root, query, cb) -> cb.conjunction();
 
+
   @SuppressWarnings("unchecked")
-  public static <T> Specification<T> computeFilterGroupJpa(@Nullable final FilterGroup filterGroup) {
+  public static <T> Specification<T> computeFilterGroupJpa(
+      @Nullable final FilterGroup filterGroup) {
+    return computeFilterGroupJpa(filterGroup, new HashMap<>());
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> Specification<T> computeFilterGroupJpa(
+      @Nullable final FilterGroup filterGroup,
+      Map<String, Join<Base, Base>> joinMap) {
     if (filterGroup == null) {
       return (Specification<T>) EMPTY_SPECIFICATION;
     }
@@ -50,7 +59,7 @@ public class FilterUtilsJpa {
     if (!filters.isEmpty()) {
       List<Specification<T>> list = filters
           .stream()
-          .map((Function<? super Filter, Specification<T>>) FilterUtilsJpa::computeFilter)
+          .map((Function<? super Filter, Specification<T>>) f -> FilterUtilsJpa.computeFilter(f, joinMap))
           .toList();
       Specification<T> result = null;
       for (Specification<T> el : list) {
@@ -71,7 +80,9 @@ public class FilterUtilsJpa {
   }
 
   @SuppressWarnings("unchecked")
-  private static <T, U> Specification<T> computeFilter(@Nullable final Filter filter) {
+  private static <T, U> Specification<T> computeFilter(
+      @Nullable final Filter filter,
+      Map<String, Join<Base, Base>> joinMap) {
     if (filter == null) {
       return (Specification<T>) EMPTY_SPECIFICATION;
     }
@@ -81,7 +92,7 @@ public class FilterUtilsJpa {
       List<PropertySchema> propertySchemas = SchemaUtils.schema(root.getJavaType());
       List<PropertySchema> filterableProperties = getFilterableProperties(propertySchemas);
       PropertySchema filterableProperty = retrieveProperty(filterableProperties, filterKey);
-      Expression<U> paths = toPath(filterableProperty, root);
+      Expression<U> paths = toPath(filterableProperty, root, joinMap);
       // In case of join table, we will use ID so type is String
       return toPredicate(
           paths, filter, cb, filterableProperty.getJoinTable() != null ? String.class : filterableProperty.getType()
