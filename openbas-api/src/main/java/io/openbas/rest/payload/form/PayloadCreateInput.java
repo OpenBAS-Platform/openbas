@@ -8,6 +8,7 @@ import io.openbas.database.model.PayloadArgument;
 import io.openbas.database.model.PayloadPrerequisite;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,11 +29,11 @@ public class PayloadCreateInput {
   @JsonProperty("payload_name")
   private String name;
 
-  @NotBlank(message = MANDATORY_MESSAGE)
+  @NotNull(message = MANDATORY_MESSAGE)
   @JsonProperty("payload_source")
   private PAYLOAD_SOURCE source;
 
-  @NotBlank(message = MANDATORY_MESSAGE)
+  @NotNull(message = MANDATORY_MESSAGE)
   @JsonProperty("payload_status")
   private PAYLOAD_STATUS status;
 

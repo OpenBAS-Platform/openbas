@@ -122,6 +122,7 @@ public class Payload implements Base {
   @Column(name = "payload_source")
   @Enumerated(EnumType.STRING)
   @JsonProperty("payload_source")
+  @NotNull
   private PAYLOAD_SOURCE source;
 
   @Setter
@@ -129,6 +130,7 @@ public class Payload implements Base {
   @Column(name = "payload_status")
   @Enumerated(EnumType.STRING)
   @JsonProperty("payload_status")
+  @NotNull
   private PAYLOAD_STATUS status;
 
   // -- COLLECTOR --
