@@ -338,6 +338,18 @@ const Payloads = () => {
             ) : selectedPayload?.payload_platforms?.map(
               (platform) => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
             )}
+            {(selectedPayload?.executable_arch) && (
+            <>
+              <Typography
+                variant="h3"
+                gutterBottom
+                style={{ marginTop: 20 }}
+              >
+                {t('Architecture')}
+              </Typography>
+              {selectedPayload?.executable_arch}
+            </>
+            )}
             <Typography
               variant="h3"
               gutterBottom

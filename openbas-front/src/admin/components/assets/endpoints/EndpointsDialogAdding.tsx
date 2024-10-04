@@ -94,6 +94,11 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
         width: 20,
       },
       {
+        field: 'endpoint_arch',
+        value: (endpoint: EndpointStore) => endpoint.endpoint_arch,
+        width: 20,
+      },
+      {
         field: 'asset_tags',
         value: (endpoint: EndpointStore) => <ItemTags variant="reduced-view" tags={endpoint.asset_tags} />,
         width: 30,

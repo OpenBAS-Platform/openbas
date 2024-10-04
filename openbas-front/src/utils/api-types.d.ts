@@ -2352,6 +2352,7 @@ export interface Payload {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
+  executable_arch?: "x86_64" | "arm64";
 }
 
 export interface PayloadArgument {
