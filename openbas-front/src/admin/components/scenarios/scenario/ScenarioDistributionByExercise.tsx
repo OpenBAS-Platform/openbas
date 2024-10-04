@@ -27,9 +27,9 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
         exercise_name: 'fake',
         exercise_start_date: now.toISOString(),
         exercise_global_score: [
-          { type: 'PREVENTION', distribution: [{ value: 0.69, label: t('Unknown') }], avgResult: 'PARTIAL' },
-          { type: 'DETECTION', distribution: [{ value: 0.84, label: t('Unknown') }], avgResult: 'PARTIAL' },
-          { type: 'HUMAN_RESPONSE', distribution: [{ value: 0.46, label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'PREVENTION', distribution: [{ id: 'PARTIAL_ID', value: 0.69, label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'DETECTION', distribution: [{ id: 'PARTIAL_ID', value: 0.84, label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'HUMAN_RESPONSE', distribution: [{ id: 'PARTIAL_ID', value: 0.46, label: t('Unknown') }], avgResult: 'PARTIAL' },
         ],
         exercise_targets: [],
         exercise_tags: undefined,
