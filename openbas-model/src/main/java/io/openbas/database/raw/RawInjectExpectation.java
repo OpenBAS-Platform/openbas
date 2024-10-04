@@ -10,6 +10,8 @@ public interface RawInjectExpectation {
 
   String getTeam_id();
 
+  String getUser_id();
+
   String getAsset_id();
 
   String getAsset_group_id();
@@ -19,4 +21,5 @@ public interface RawInjectExpectation {
   String getExercise_id();
 
   Boolean getInject_expectation_group();
+
 }

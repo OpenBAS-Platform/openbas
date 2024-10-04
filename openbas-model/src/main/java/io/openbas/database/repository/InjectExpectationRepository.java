@@ -2,7 +2,6 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.raw.RawInjectExpectation;
-import io.openbas.database.raw.RawInjectExpectationForCompute;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -123,7 +122,7 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
       + "WHERE i.inject_expectation_id IN :ids "
       + "AND i.user_id is null",
       nativeQuery = true)
-  List<RawInjectExpectationForCompute> rawForComputeGlobalByIds(@Param("ids") final List<String> ids);
+  List<RawInjectExpectation> rawForComputeGlobalByIds(@Param("ids") final List<String> ids);
 
   @Query(value = "SELECT "
   + "i.inject_expectation_id AS inject_expectation_id, "
@@ -137,5 +136,5 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
   + "i.inject_expectation_group AS inject_expectation_group "
   + "FROM injects_expectations i "
   + "WHERE i.inject_id = :injectId ; ", nativeQuery = true)
-  List<RawInjectExpectationForCompute> rawByInjectId(@Param("injectId") final String injectId);
+  List<RawInjectExpectation> rawByInjectId(@Param("injectId") final String injectId);
 }
