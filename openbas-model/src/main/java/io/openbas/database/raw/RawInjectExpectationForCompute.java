@@ -10,7 +10,6 @@ public interface RawInjectExpectationForCompute {
   Double getInject_expectation_expected_score();
 
   String getTeam_id();
-  String getTeam_name();
 
   String getAsset_id();
 
