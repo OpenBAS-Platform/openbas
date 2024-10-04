@@ -1498,6 +1498,7 @@ export interface InjectorContractOutput {
     | "Internal"
     | "Unknown"
   )[];
+  injector_contract_arch?: "x86_64" | "arm64";
 }
 
 export interface InjectorContractUpdateInput {
