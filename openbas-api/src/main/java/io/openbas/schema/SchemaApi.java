@@ -7,14 +7,12 @@ import io.openbas.utils.schema.SchemaUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@PreAuthorize("isAdmin()")
 @RequestMapping
 public class SchemaApi extends RestBehavior {
 
