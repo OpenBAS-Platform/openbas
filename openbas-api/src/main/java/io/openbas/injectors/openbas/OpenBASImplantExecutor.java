@@ -3,7 +3,6 @@ package io.openbas.injectors.openbas;
 import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.Injector;
 import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
@@ -40,7 +39,6 @@ public class OpenBASImplantExecutor extends Injector {
 
   private final AssetGroupService assetGroupService;
   private final InjectRepository injectRepository;
-  private final InjectStatusRepository injectStatusRepository;
 
   private Map<Asset, Boolean> resolveAllAssets(@NotNull final ExecutableInject inject) {
     Map<Asset, Boolean> assets = new HashMap<>();

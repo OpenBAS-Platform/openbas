@@ -13,6 +13,9 @@ import java.util.List;
 
 public class TeamSpecification {
 
+  private TeamSpecification() {
+  }
+
   public static Specification<Team> fromIds(@NotNull final List<String> ids) {
     return (root, query, builder) -> root.get("id").in(ids);
   }

@@ -4,7 +4,7 @@ import { MoreVert } from '@mui/icons-material';
 
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
-import type { AssetGroupInput } from '../../../../utils/api-types';
+import type { AssetGroupInput, AssetGroupOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import Drawer from '../../../../components/common/Drawer';
 import DialogDelete from '../../../../components/common/DialogDelete';
@@ -26,7 +26,7 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   inline?: boolean;
-  assetGroup: AssetGroupStore;
+  assetGroup: AssetGroupStore | AssetGroupOutput;
   onRemoveAssetGroupFromInject?: (assetGroupId: string) => void;
   onRemoveEndpointFromAssetGroup?: (assetId: string) => void;
   openEditOnInit?: boolean;

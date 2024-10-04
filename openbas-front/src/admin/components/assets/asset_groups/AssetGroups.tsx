@@ -1,6 +1,6 @@
 import { makeStyles } from '@mui/styles';
-import React, { CSSProperties, useState } from 'react';
-import { Chip, Drawer as MuiDrawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import React, { CSSProperties, useMemo, useState } from 'react';
+import { Box, Chip, Drawer as MuiDrawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { SelectGroup } from 'mdi-material-ui';
 import { useSearchParams } from 'react-router-dom';
 import { useFormatter } from '../../../../components/i18n';
@@ -13,30 +13,30 @@ import AssetGroupCreation from './AssetGroupCreation';
 import { searchAssetGroups } from '../../../../actions/asset_groups/assetgroup-action';
 import AssetGroupManagement from './AssetGroupManagement';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
-import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
-import type { SearchPaginationInput } from '../../../../utils/api-types';
+import type { AssetGroupOutput } from '../../../../utils/api-types';
 import { initSorting } from '../../../../components/common/queryable/Page';
-import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
-import { convertOperatorToIcon } from '../../../../components/common/queryable/filter/FilterUtils';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { fetchTags } from '../../../../actions/Tag';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
+import ExportButton from '../../../../components/common/ExportButton';
+import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
+import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
+import { Header } from '../../../../components/common/SortHeadersList';
+import FilterModeChip from '../../../../components/common/queryable/filter/FilterModeChip';
+import FilterChipValues from '../../../../components/common/queryable/filter/FilterChipValues';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
-    paddingLeft: 10,
     textTransform: 'uppercase',
-    cursor: 'pointer',
   },
   item: {
-    paddingLeft: 10,
     height: 50,
   },
   bodyItems: {
     display: 'flex',
-    alignItems: 'center',
   },
   bodyItem: {
     height: 24,
@@ -44,7 +44,8 @@ const useStyles = makeStyles(() => ({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    alignContent: 'center',
+    paddingRight: 10,
+    boxSizing: 'content-box',
   },
   drawerPaper: {
     minHeight: '100vh',
@@ -67,6 +68,61 @@ const inlineStyles: Record<string, CSSProperties> = {
   asset_group_tags: {
     width: '25%',
   },
+};
+
+const computeRuleValues = (assetGroup: AssetGroupOutput, t: (value: string) => string) => {
+  const computeDynamic = () => {
+    if (assetGroup.asset_group_dynamic_filter?.filters && assetGroup.asset_group_dynamic_filter?.filters.length > 0) {
+      return (
+        <>
+          {assetGroup.asset_group_dynamic_filter.filters.map((filter, idx) => (
+            <React.Fragment key={filter.key}>
+              {idx !== 0 && <FilterModeChip mode={assetGroup.asset_group_dynamic_filter?.mode} />}
+              <Chip
+                key={filter.key}
+                variant={'filled'}
+                size="small"
+                sx={{ borderRadius: 1 }}
+                label={<FilterChipValues filter={filter} />}
+              />
+            </React.Fragment>))}
+        </>
+      );
+    }
+    return (<></>);
+  };
+
+  const computeStatic = () => {
+    if (assetGroup.asset_group_assets && assetGroup.asset_group_assets?.length > 0) {
+      return (
+        <div style={{ alignContent: 'center' }}>{assetGroup.asset_group_assets?.length} {t('managed assets')}</div>
+      );
+    }
+    return (<></>);
+  };
+
+  const andWord = () => {
+    if (assetGroup.asset_group_dynamic_filter?.filters && assetGroup.asset_group_dynamic_filter?.filters.length > 0
+      && assetGroup.asset_group_assets && assetGroup.asset_group_assets?.length > 0) {
+      return (<div style={{ alignContent: 'center' }}>{t('and')}</div>);
+    }
+    return (<></>);
+  };
+
+  return (
+    <Box
+      sx={{
+        padding: '0px 4px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 1,
+      }}
+    >
+      {computeDynamic()}
+      {andWord()}
+      {computeStatic()}
+    </Box>
+  );
 };
 
 const AssetGroups = () => {
@@ -92,15 +148,43 @@ const AssetGroups = () => {
   });
 
   // Headers
-  const headers = [
-    { field: 'asset_group_name', label: 'Name', isSortable: true },
-    { field: 'asset_group_description', label: 'Description', isSortable: true },
-    { field: 'asset_group_assets', label: 'Rules', isSortable: false },
-    { field: 'asset_group_tags', label: 'Tags', isSortable: true },
+  const headers: Header[] = useMemo(() => [
+    {
+      field: 'asset_group_name',
+      label: 'Name',
+      isSortable: true,
+      value: (assetGroup: AssetGroupOutput) => assetGroup.asset_group_name,
+    },
+    {
+      field: 'asset_group_description',
+      label: 'Description',
+      isSortable: true,
+      value: (assetGroup: AssetGroupOutput) => assetGroup.asset_group_description || '-',
+    },
+    {
+      field: 'asset_group_assets',
+      label: 'Rules',
+      isSortable: true,
+      value: (assetGroup: AssetGroupOutput) => {
+        return computeRuleValues(assetGroup, t);
+      },
+    },
+    {
+      field: 'asset_group_tags',
+      label: 'Tags',
+      isSortable: true,
+      value: (assetGroup: AssetGroupOutput) => <ItemTags variant="list" tags={assetGroup.asset_group_tags} />,
+    },
+  ], []);
+
+  const availableFilterNames = [
+    'asset_group_name',
+    'asset_group_description',
+    'asset_group_tags',
   ];
 
   const [assetGroups, setAssetGroups] = useState<AssetGroupStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('asset-groups', buildSearchPagination({
     sorts: initSorting('asset_group_name'),
     textSearch: search,
   }));
@@ -120,43 +204,36 @@ const AssetGroups = () => {
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Assets') }, { label: t('Asset groups'), current: true }]} />
-      <PaginationComponent
+      <PaginationComponentV2
         fetch={searchAssetGroups}
         searchPaginationInput={searchPaginationInput}
         setContent={setAssetGroups}
-        exportProps={exportProps}
+        entityPrefix="asset_group"
+        availableFilterNames={availableFilterNames}
+        queryableHelpers={queryableHelpers}
+        topBarButtons={
+          <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
+        }
       />
-      <div className="clearfix" />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
+          secondaryAction={<>&nbsp;</>}
         >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
-              &nbsp;
-            </span>
-          </ListItemIcon>
+          <ListItemIcon />
           <ListItemText
             primary={
-              <SortHeadersComponent
+              <SortHeadersComponentV2
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
-                searchPaginationInput={searchPaginationInput}
-                setSearchPaginationInput={setSearchPaginationInput}
+                sortHelpers={queryableHelpers.sortHelpers}
               />
             }
           />
-          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {assetGroups.map((assetGroup: AssetGroupStore) => (
+        {assetGroups.map((assetGroup: AssetGroupOutput) => (
           <ListItem
             key={assetGroup.asset_group_id}
             classes={{ root: classes.item }}
@@ -170,34 +247,15 @@ const AssetGroups = () => {
             <ListItemText
               primary={
                 <div className={classes.bodyItems}>
-                  <div className={classes.bodyItem} style={inlineStyles.asset_group_name}>
-                    {assetGroup.asset_group_name}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.asset_group_description}>
-                    {assetGroup.asset_group_description}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.asset_group_assets}>
-                    {assetGroup.asset_group_dynamic_filter?.filters?.length
-                      ? assetGroup.asset_group_dynamic_filter?.filters.map((filter, index) => (
-                        <>
-                          {
-                            index !== 0 && <span style={{ marginRight: 10 }}>
-                                {t(assetGroup.asset_group_dynamic_filter?.mode?.toUpperCase())}
-                              </span>
-                          }
-                          <Chip
-                            size="small"
-                            style={index !== assetGroup.asset_group_dynamic_filter?.filters?.length ? { marginRight: 10 } : {}}
-                            key={filter.key}
-                            label={<><strong>{t(filter.key)}</strong> {convertOperatorToIcon(t, filter.operator)}{' '}{filter.values?.join(', ')}</>}
-                          />
-                        </>))
-                      : ''}
-                    {assetGroup.asset_group_assets?.length ? `${assetGroup.asset_group_dynamic_filter?.filters?.length ? t('and') : ''} ${assetGroup.asset_group_assets?.length} ${t('managed assets')}` : ''}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.asset_group_tags}>
-                    <ItemTags variant="list" tags={assetGroup.asset_group_tags} />
-                  </div>
+                  {headers.map((header) => (
+                    <div
+                      key={header.field}
+                      className={classes.bodyItem}
+                      style={inlineStyles[header.field]}
+                    >
+                      {header.value?.(assetGroup)}
+                    </div>
+                  ))}
                 </div>
               }
             />
