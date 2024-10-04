@@ -16,7 +16,7 @@ public class V3_43__Payloads_default_values extends BaseJavaMigration {
         Statement select = connection.createStatement();
 
         select.executeUpdate("UPDATE payloads SET payload_source = 'MANUAL' WHERE payload_source IS NULL;");
-        select.executeUpdate("UPDATE payloads SET payload_status = 'UNVERIFIED' WHERE payload_source IS NULL;");
+        select.executeUpdate("UPDATE payloads SET payload_status = 'UNVERIFIED' WHERE payload_status IS NULL;");
 
         select.execute("ALTER TABLE payloads ALTER COLUMN payload_source SET DEFAULT 'MANUAL';");
         select.execute("ALTER TABLE payloads ALTER COLUMN payload_status SET DEFAULT 'UNVERIFIED';");
