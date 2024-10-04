@@ -1,11 +1,15 @@
 package io.openbas.utils.pagination;
 
+import io.openbas.database.model.Base;
+import jakarta.persistence.criteria.Join;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiFunction;
 
 import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
@@ -39,15 +43,28 @@ public class PaginationUtils {
   public static <T, U> Page<U> buildPaginationCriteriaBuilder(
       @NotNull final BiFunction<Specification<T>, Pageable, Page<U>> findAll,
       @NotNull final SearchPaginationInput input,
-      @NotNull final Class<T> clazz) {
+      @NotNull final Class<T> clazz,
+      Map<String, Join<Base, Base>> joinMap) {
     // Specification
-    Specification<T> filterSpecifications = computeFilterGroupJpa(input.getFilterGroup());
+    Specification<T> filterSpecifications = computeFilterGroupJpa(input.getFilterGroup(), joinMap);
     Specification<T> searchSpecifications = computeSearchJpa(input.getTextSearch());
 
     // Pageable
     Pageable pageable = PageRequest.of(input.getPage(), input.getSize(), toSortJpa(input.getSorts(), clazz));
 
     return findAll.apply(filterSpecifications.and(searchSpecifications), pageable);
+  }
+
+  public static <T, U> Page<U> buildPaginationCriteriaBuilder(
+      @NotNull final BiFunction<Specification<T>, Pageable, Page<U>> findAll,
+      @NotNull final SearchPaginationInput input,
+      @NotNull final Class<T> clazz) {
+    return buildPaginationCriteriaBuilder(
+        findAll,
+        input,
+        clazz,
+        new HashMap<>()
+    );
   }
 
   /**
