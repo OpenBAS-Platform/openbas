@@ -137,6 +137,7 @@ public class AssetGroupService {
           .stream()
           .map(endpoint -> (Asset) endpoint)
           .filter(asset -> asset.getParent() == null && asset.getInject() == null)
+          .map(asset-> (RawAsset) asset)
           .distinct()
           .toList();
     }));
