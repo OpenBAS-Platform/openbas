@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawExercise;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.raw.RawScenario;
 import io.openbas.database.repository.*;
@@ -15,10 +16,12 @@ import io.openbas.rest.exercise.exports.ExerciseExportMixins;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
+import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.scenario.export.ScenarioExportMixins;
 import io.openbas.rest.scenario.export.ScenarioFileExport;
 import io.openbas.rest.scenario.form.ScenarioSimple;
+import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -91,12 +94,15 @@ public class ScenarioService {
   private final ScenarioTeamUserRepository scenarioTeamUserRepository;
   private final ArticleRepository articleRepository;
 
+  private final ExerciseMapper exerciseMapper;
+
   private final GrantService grantService;
   private final VariableService variableService;
   private final ChallengeService challengeService;
   private final TeamService teamService;
   private final FileService fileService;
   private final InjectDuplicateService injectDuplicateService;
+
 
   @Transactional
   public Scenario createScenario(@NotNull final Scenario scenario) {
@@ -122,7 +128,8 @@ public class ScenarioService {
   }
 
   public Page<RawPaginationScenario> scenarios(@NotNull final SearchPaginationInput searchPaginationInput) {
-    Function<Specification<Scenario>, Specification<Scenario>> finalSpecification = handleDeepFilter(searchPaginationInput);
+    Function<Specification<Scenario>, Specification<Scenario>> finalSpecification = handleDeepFilter(
+        searchPaginationInput);
     if (currentUser().isAdmin()) {
       return buildPaginationCriteriaBuilder(
           (Specification<Scenario> specification, Pageable pageable) -> this.findAllWithCriteriaBuilder(
@@ -226,9 +233,7 @@ public class ScenarioService {
   }
 
   /**
-     * Scenario is recurring
-     * AND start date is before now
-     * AND end date is after now
+   * Scenario is recurring AND start date is before now AND end date is after now
    */
   public List<Scenario> recurringScenarios(@NotNull final Instant instant) {
     return this.scenarioRepository.findAll(
@@ -239,10 +244,7 @@ public class ScenarioService {
   }
 
   /**
-     * Scenario is recurring
-     * AND
-     * start date is before now
-     * OR stop date is before now
+   * Scenario is recurring AND start date is before now OR stop date is before now
    */
   public List<Scenario> potentialOutdatedRecurringScenario(@NotNull final Instant instant) {
     return this.scenarioRepository.findAll(
@@ -260,17 +262,15 @@ public class ScenarioService {
   }
 
   @Transactional(readOnly = true)
-  public Exercise latestExerciseByExternalReference(@NotBlank final String scenarioExternalReference) {
-    List<Scenario> scenarios = this.scenarioRepository.findByExternalReference(scenarioExternalReference);
-    Optional<Exercise> latestEndedExercise = scenarios.stream()
-        .flatMap(scenario -> scenario.getExercises().stream())
-        .filter(exercise -> exercise.getEnd().isPresent())
-        .max(Comparator.comparing(exercise -> exercise.getEnd().get()));
-    if (latestEndedExercise.isPresent()) {
-      return latestEndedExercise.get();
-    } else {
-      throw new ElementNotFoundException("Latest exercise not found");
-    }
+  public ExerciseSimple latestExerciseByExternalReference(@NotBlank final String scenarioExternalReference) {
+    Optional<RawExercise> latestEndedExercise = scenarioRepository.rawAllByExternalReference(scenarioExternalReference)
+        .stream()
+        .filter(rawExercise -> rawExercise.getExercise_end_date() != null)
+        .max(Comparator.comparing(RawExercise::getExercise_end_date));
+
+    return latestEndedExercise
+        .map(exerciseMapper::fromRawExercise)
+        .orElseThrow(() -> new ElementNotFoundException("Latest exercise not found"));
   }
 
   public Scenario updateScenario(@NotNull final Scenario scenario) {
@@ -611,7 +611,7 @@ public class ScenarioService {
     variableService.createVariables(variableList);
   }
 
-  private void getLessonsCategories(Scenario duplicatedScenario, Scenario originalScenario){
+  private void getLessonsCategories(Scenario duplicatedScenario, Scenario originalScenario) {
     List<LessonsCategory> duplicatedCategories = new ArrayList<>();
     for (LessonsCategory originalCategory : originalScenario.getLessonsCategories()) {
       LessonsCategory duplicatedCategory = new LessonsCategory();
@@ -649,7 +649,7 @@ public class ScenarioService {
     duplicatedScenario.setLessonsCategories(duplicatedCategories);
   }
 
-  private void getObjectives(Scenario scenario, Scenario scenarioOrigin){
+  private void getObjectives(Scenario scenario, Scenario scenarioOrigin) {
     List<Objective> duplicatedObjectives = new ArrayList<>();
     for (Objective originalObjective : scenarioOrigin.getObjectives()) {
       Objective duplicatedObjective = new Objective();

@@ -24,7 +24,6 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
 import static io.openbas.utils.FilterUtilsRuntime.computeFilterGroupRuntime;
 import static java.time.Instant.now;
-import static java.util.Collections.emptyList;
 
 @RequiredArgsConstructor
 @Service
@@ -126,7 +125,10 @@ public class AssetGroupService {
     return assetGroup;
   }
 
-  public Map<String, List<RawAsset>> computeRawDynamicAsset(@NotNull List<RawAssetGroup> assetGroups) {
+  /**
+   *
+   * */
+  public Map<String, List<RawAsset>> computeDynamicAssetFromRaw(@NotNull List<RawAssetGroup> assetGroups) {
     if (assetGroups.isEmpty() || isEmptyFilterGroup(assetGroups.get(0).getAsset_group_dynamic_filter())) {
       return Map.of();
     }
