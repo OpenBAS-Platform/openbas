@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.Constants.ARTICLES;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.StringUtils.duplicateString;
