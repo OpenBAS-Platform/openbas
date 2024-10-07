@@ -4,6 +4,7 @@ import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Inject;
 import io.openbas.database.raw.*;
+import io.openbas.database.raw.impl.RawEndpoint;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.AssetRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
@@ -102,7 +103,7 @@ public class ResultUtils {
                 rawAssetGroup -> rawAssetGroup
             )));
 
-    Map<String, List<RawAsset>> dynamicForAssetGroupMap = assetGroupService.computeDynamicAssetFromRaw(rawAssetGroups);
+    Map<String, List<RawEndpoint>> dynamicForAssetGroupMap = assetGroupService.computeDynamicAssetFromRaw(rawAssetGroups);
 
     Map<String, RawAsset> assetForAssetGroupMap = assetRepository.rawByIds(
         rawAssetGroups.stream()

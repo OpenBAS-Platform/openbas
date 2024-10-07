@@ -50,13 +50,13 @@ public interface AssetGroupRepository extends CrudRepository<AssetGroup, String>
   List<RawAssetGroup> rawAssetGroupByIds(@Param("ids") List<String> ids);
 
   @Query(value =
-      "SELECT iat.inject_id, ag.asset_group_id, ag.asset_group_name, coalesce(array_agg(aga.asset_id) " +
-          "FILTER ( WHERE aga.asset_id IS NOT NULL ), '{}') asset_ids " +
+      "SELECT iat.inject_id, ag.asset_group_id, ag.asset_group_name, CAST(ag.asset_group_dynamic_filter as text), " +
+          "coalesce(array_agg(aga.asset_id) FILTER ( WHERE aga.asset_id IS NOT NULL ), '{}') asset_ids " +
           "FROM asset_groups ag " +
           "LEFT JOIN injects_asset_groups iat ON ag.asset_group_id = iat.asset_group_id " +
           "LEFT JOIN asset_groups_assets aga ON aga.asset_group_id = ag.asset_group_id " +
           "WHERE iat.inject_id IN (:injectIds) " +
-          "GROUP BY iat.inject_id, ag.asset_group_id, ag.asset_group_name ;", nativeQuery = true)
+          "GROUP BY iat.inject_id, ag.asset_group_id, ag.asset_group_name, CAST(ag.asset_group_dynamic_filter as text) ;", nativeQuery = true)
   List<RawAssetGroup> rawByInjectIds(@Param("injectIds") List<String> injectIds);
 
   // -- PAGINATION --
