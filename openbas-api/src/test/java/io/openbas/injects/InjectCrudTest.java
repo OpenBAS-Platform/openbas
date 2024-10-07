@@ -32,7 +32,7 @@ class InjectCrudTest {
   void createInjectSuccess() {
     // -- PREPARE --
     Exercise exercise = new Exercise();
-    exercise.setName("Exercice name");
+    exercise.setName("Exercise name");
     exercise.setFrom("test@test.com");
     exercise.setReplyTos(List.of("test@test.com"));
     Exercise exerciseCreated = this.exerciseRepository.save(exercise);
