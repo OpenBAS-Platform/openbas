@@ -32,4 +32,14 @@ public class PayloadFixture {
     return dnsResolution;
   }
 
+  public static Payload createDefaultExecutable() {
+    Executable executable = new Executable("executable-id", Executable.EXECUTABLE_TYPE, "executable payload");
+    executable.setPlatforms(new Endpoint.PLATFORM_TYPE[]{Endpoint.PLATFORM_TYPE.MacOS});
+    executable.setExecutableArch(Endpoint.PLATFORM_ARCH.arm64);
+    executable.setSource(MANUAL);
+    executable.setStatus(VERIFIED);
+    executable.setAttackPatterns(Collections.emptyList());
+    return executable;
+  }
+
 }
