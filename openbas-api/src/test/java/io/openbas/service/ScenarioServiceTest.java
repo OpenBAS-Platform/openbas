@@ -3,6 +3,7 @@ package io.openbas.service;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.inject.service.InjectDuplicateService;
+import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.fixtures.ScenarioFixture;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,6 +52,8 @@ public class ScenarioServiceTest {
     FileService fileService;
     @Autowired
     private InjectDuplicateService injectDuplicateService;
+    @Autowired
+    private ExerciseMapper exerciseMapper;
 
 
     @InjectMocks
@@ -59,7 +62,7 @@ public class ScenarioServiceTest {
     @BeforeEach
     void setUp() {
         scenarioService = new ScenarioService(scenarioRepository, teamRepository, userRepository, documentRepository,
-                scenarioTeamUserRepository, articleRepository, grantService, variableService, challengeService,
+                scenarioTeamUserRepository, articleRepository, exerciseMapper, grantService, variableService, challengeService,
                 teamService, fileService, injectDuplicateService
         );
     }
