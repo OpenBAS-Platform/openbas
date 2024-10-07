@@ -49,7 +49,7 @@ public class InjectHelperTest {
     void injectsToRunTest() {
         // -- PREPARE --
         Exercise exercise = new Exercise();
-        exercise.setName("Exercice name");
+        exercise.setName("Exercise name");
         exercise.setStart(Instant.now());
         exercise.setFrom("test@test.com");
         exercise.setReplyTos(List.of("test@test.com"));

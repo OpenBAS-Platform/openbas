@@ -23,14 +23,14 @@ public class SchemaApi extends RestBehavior {
       @RequestBody @Valid @NotNull List<String> filterNames) throws ClassNotFoundException {
     String completeClassName = "io.openbas.database.model." + className;
     if (filterableOnly) {
-      return SchemaUtils.schema(Class.forName(completeClassName))
+      return SchemaUtils.schemaWithSubtypes(Class.forName(completeClassName))
           .stream()
           .filter(PropertySchema::isFilterable)
           .filter(p -> filterNames.isEmpty() || filterNames.contains(p.getJsonName()))
           .map(PropertySchemaDTO::new)
           .toList();
     }
-    return SchemaUtils.schema(Class.forName(completeClassName))
+    return SchemaUtils.schemaWithSubtypes(Class.forName(completeClassName))
         .stream()
         .filter(p -> filterNames.isEmpty() || filterNames.contains(p.getJsonName()))
         .map(PropertySchemaDTO::new)

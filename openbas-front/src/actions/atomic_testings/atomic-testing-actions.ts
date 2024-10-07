@@ -1,7 +1,7 @@
 import { simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
 import type { AtomicTestingInput, SearchPaginationInput } from '../../utils/api-types';
 
-const ATOMIC_TESTING_URI = '/api/atomic_testings';
+const ATOMIC_TESTING_URI = '/api/atomic-testings';
 
 export const searchAtomicTestings = (searchPaginationInput: SearchPaginationInput) => {
   const data = searchPaginationInput;

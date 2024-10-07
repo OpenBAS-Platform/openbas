@@ -190,6 +190,7 @@ const Payloads = () => {
     'payload_status',
     'payload_tags',
     'payload_updated_at',
+    'executable_arch',
   ];
   const [payloads, setPayloads] = useState<PayloadStore[]>([]);
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('payloads', buildSearchPagination({
@@ -336,6 +337,18 @@ const Payloads = () => {
               <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
             ) : selectedPayload?.payload_platforms?.map(
               (platform) => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
+            )}
+            {(selectedPayload?.executable_arch) && (
+            <>
+              <Typography
+                variant="h3"
+                gutterBottom
+                style={{ marginTop: 20 }}
+              >
+                {t('Architecture')}
+              </Typography>
+              {selectedPayload?.executable_arch}
+            </>
             )}
             <Typography
               variant="h3"

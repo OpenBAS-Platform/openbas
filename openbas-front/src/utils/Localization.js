@@ -889,6 +889,7 @@ const i18n = {
       injector_contract_injector: 'Injector',
       injector_contract_labels: 'Label',
       injector_contract_platforms: 'Platforms',
+      injector_contract_arch: 'Architecture',
       // Scenario
       scenario_category: 'Catégorie',
       scenario_kill_chain_phases: 'Phase de kill chain',
@@ -915,6 +916,7 @@ const i18n = {
       payload_status: 'Statut',
       payload_tags: 'Tags',
       payload_updated_at: 'Mis à jour à',
+      executable_arch: 'Architecture',
       // Team
       team_tags: 'Tags',
       // User
@@ -2790,6 +2792,7 @@ const i18n = {
       injector_contract_injector: 'Injector',
       injector_contract_labels: 'Label',
       injector_contract_platforms: 'Platforms',
+      injector_contract_arch: 'Architecture',
       // Scenario
       scenario_category: 'Category',
       scenario_kill_chain_phases: 'Kill chain phase',
@@ -2816,6 +2819,7 @@ const i18n = {
       payload_status: 'Status',
       payload_tags: 'Tags',
       payload_updated_at: 'Updated',
+      executable_arch: 'Architecture',
       // Team
       team_tags: 'Tags',
       // User
