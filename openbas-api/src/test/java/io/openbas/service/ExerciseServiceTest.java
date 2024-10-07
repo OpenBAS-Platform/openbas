@@ -33,7 +33,7 @@ public class ExerciseServiceTest {
     InjectDuplicateService injectDuplicateService;
     @Mock
     VariableService variableService;
-    @Mock
+    @Autowired
     private TeamService teamService;
 
     @Autowired
