@@ -96,13 +96,13 @@ public class StatisticApi extends RestBehavior {
 
   private List<ExpectationResultsByType> computeGlobalExpectationResults(@NotNull final Instant from) {
     List<RawInjectExpectation> rawInjectExpectations = fromIterable(this.exerciseRepository.allInjectExpectationsFromDate(from));
-    return AtomicTestingUtils.getRawExpectationResultByTypes(rawInjectExpectations);
+    return AtomicTestingUtils.getExpectationResultByTypesFromRaw(rawInjectExpectations);
   }
 
   private List<ExpectationResultsByType> computeUserExpectationResults(@NotNull final Instant from) {
     OpenBASPrincipal user = currentUser();
     List<RawInjectExpectation> rawInjectExpectations = fromIterable(this.exerciseRepository.allGrantedInjectExpectationsFromDate(from, user.getId()));
-    return AtomicTestingUtils.getRawExpectationResultByTypes(rawInjectExpectations);
+    return AtomicTestingUtils.getExpectationResultByTypesFromRaw(rawInjectExpectations);
   }
 
   private List<InjectExpectationResultsByAttackPattern> computeGlobalInjectExpectationResults(
@@ -139,11 +139,11 @@ public class StatisticApi extends RestBehavior {
                                   rawInjectExpectation.setInject_expectation_expected_score(expectation.getInject_expectation_expected_score());
                                   rawInjectExpectation.setInject_expectation_type(expectation.getInject_expectation_type());
                                   resultInjectExpectationResultsByAttackPattern
-                                          .setResults(AtomicTestingUtils.getRawExpectationResultByTypes(Stream.of(rawInjectExpectation)
+                                          .setResults(AtomicTestingUtils.getExpectationResultByTypesFromRaw(Stream.of(rawInjectExpectation)
                                                   .collect(Collectors.toList())));
                                 } else {
                                   resultInjectExpectationResultsByAttackPattern
-                                          .setResults(AtomicTestingUtils.getRawExpectationResultByTypes(new ArrayList<>()));
+                                          .setResults(AtomicTestingUtils.getExpectationResultByTypesFromRaw(new ArrayList<>()));
                                 }
                                 return resultInjectExpectationResultsByAttackPattern;
                               })

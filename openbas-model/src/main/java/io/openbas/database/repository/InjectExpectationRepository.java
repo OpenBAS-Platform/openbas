@@ -2,7 +2,6 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.raw.RawInjectExpectation;
-import io.openbas.database.raw.RawInjectExpectationForCompute;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -113,17 +112,17 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
       + "team_id, asset_id, asset_group_id, inject_expectation_type, "
       + "inject_expectation_score, inject_expectation_group, inject_expectation_expected_score, inject_expectation_id, exercise_id "
       + "FROM injects_expectations i "
-      + "where i.inject_expectation_id IN :ids",
+      + "where i.inject_expectation_id IN :ids ;",
       nativeQuery = true)
   List<RawInjectExpectation> rawByIds(@Param("ids") final List<String> ids);
 
   @Query(value = "SELECT "
       + "inject_expectation_type, inject_expectation_score, inject_expectation_expected_score, user_id, team_id "
-      + "FROM injects_expectations i "
-      + "WHERE i.inject_id IN :injectIds "
-      + "AND i.user_id is null",
+      + "FROM injects_expectations ie "
+      + "WHERE ie.inject_id IN (:injectIds) "
+      + "AND ie.user_id is null ;",
       nativeQuery = true)
-  List<RawInjectExpectationForCompute> rawForComputeGlobalByIds(@Param("injectIds") final List<String> ids);
+  List<RawInjectExpectation> rawForComputeGlobalByIds(@Param("injectIds") List<String> injectIds);
 
   @Query(value = "SELECT "
       + "i.inject_expectation_id AS inject_expectation_id, "
@@ -167,5 +166,5 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
       + "i.inject_expectation_score, "
       + "i.inject_expectation_expected_score, "
       + "i.inject_expectation_group ; ", nativeQuery = true)
-  List<RawInjectExpectationForCompute> rawByInjectId(@Param("injectId") final String injectId);
+  List<RawInjectExpectation> rawByInjectId(@Param("injectId") final String injectId);
 }
