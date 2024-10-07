@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/atomic_testings")
+@RequestMapping("/api/atomic-testings")
 @PreAuthorize("isAdmin()")
 @RequiredArgsConstructor
 public class AtomicTestingApi extends RestBehavior {
