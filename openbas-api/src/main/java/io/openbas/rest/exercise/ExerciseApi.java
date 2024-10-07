@@ -516,11 +516,8 @@ public class ExerciseApi extends RestBehavior {
 
     @GetMapping(EXERCISE_URI + "/{exerciseId}/results")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public List<ExpectationResultsByType> globalResults(@NotBlank final @PathVariable String exerciseId) {
-        return exerciseRepository.findById(exerciseId)
-                .map(Exercise::getInjects)
-                .map((ResultUtils::computeGlobalExpectationResults))
-                .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + exerciseId));
+    public List<ExpectationResultsByType> globalResults(@NotBlank @PathVariable String exerciseId) {
+        return exerciseService.getGlobalResults(exerciseId);
     }
 
     @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/results")
@@ -627,32 +624,7 @@ public class ExerciseApi extends RestBehavior {
 
     @GetMapping(EXERCISE_URI)
     public List<ExerciseSimple> exercises() {
-        // We get the exercises depending on whether or not we are granted
-        Iterable<RawExercise> exercises = currentUser().isAdmin() ? exerciseRepository.rawAll()
-                : exerciseRepository.rawAllGranted(currentUser().getId());
-
-        // From the list of exercises, we get the list of the injects ids
-        List<String> listOfInjectIds = fromIterable(exercises).stream()
-                .filter(exercise -> exercise.getInject_ids() != null)
-                .flatMap(exercise -> exercise.getInject_ids().stream())
-                .distinct()
-                .toList();
-
-        Map<String, Inject> mapOfInjects = this.injectService.mapOfInjects(listOfInjectIds);
-
-        // Finally, for all exercices we got, we convert them to classic exercises with the injects we created
-        return fromIterable(exercises).stream().map(currentExercice -> {
-            // We make a list out of all the injects that are linked to the exercise
-            List<Inject> listOfInjectsOfExercise = new ArrayList<>();
-            if (currentExercice.getInject_ids() != null) {
-                listOfInjectsOfExercise = currentExercice.getInject_ids().stream().map(mapOfInjects::get)
-                        .collect(Collectors.toList());
-            }
-
-            // We create a new exercise out of the Raw object
-            return ExerciseSimple.fromRawExercise(currentExercice,
-                    listOfInjectsOfExercise);
-        }).toList();
+      return exerciseService.exercises();
     }
 
     @PostMapping(EXERCISE_URI + "/search")

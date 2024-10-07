@@ -58,12 +58,12 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
    * @return the list of expectations
    */
   @Query(value =
-      "SELECT ie.inject_expectation_type, ie.inject_expectation_group, ie.inject_expectation_score, ie.inject_expectation_expected_score "
-          +
-          "FROM injects_expectations ie " +
-          "INNER JOIN injects ON ie.inject_id = injects.inject_id " +
-          "INNER JOIN exercises ON injects.inject_exercise = exercises.exercise_id " +
-          "WHERE exercises.exercise_created_at < :from ;", nativeQuery = true)
+      "SELECT "
+          + "ie.inject_expectation_type, ie.inject_expectation_group, ie.inject_expectation_score, ie.inject_expectation_expected_score "
+          + "FROM injects_expectations ie "
+          + "INNER JOIN injects ON ie.inject_id = injects.inject_id "
+          + "INNER JOIN exercises ON injects.inject_exercise = exercises.exercise_id "
+          + "WHERE exercises.exercise_created_at < :from ;", nativeQuery = true)
   List<RawInjectExpectation> allInjectExpectationsFromDate(@Param("from") Instant from);
 
   /**
@@ -135,14 +135,20 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
    * @return the list of exercises
    */
   @Query(value =
-      " SELECT ex.exercise_category, ex.exercise_id, ex.exercise_status, ex.exercise_start_date, ex.exercise_name, " +
-          " ex.exercise_subtitle, array_agg(et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags, " +
-          " array_agg(injects.inject_id) FILTER ( WHERE injects.inject_id IS NOT NULL ) as inject_ids " +
-          "FROM exercises ex " +
-          "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id " +
-          "LEFT JOIN injects ON ie.inject_id = injects.inject_id " +
-          "LEFT JOIN exercises_tags et ON et.exercise_id = ex.exercise_id " +
-          "GROUP BY ex.exercise_id ;", nativeQuery = true)
+      " SELECT ex.exercise_id, "
+          + "ex.exercise_status, "
+          + "ex.exercise_start_date, "
+          + "ex.exercise_updated_at, "
+          + "ex.exercise_end_date, "
+          + "ex.exercise_name, "
+          + "ex.exercise_category, "
+          + "ex.exercise_subtitle, "
+          + " array_agg(distinct ie.inject_id) FILTER ( WHERE ie.inject_id IS NOT NULL ) as inject_ids, "
+          + " array_agg(distinct et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags "
+          + "FROM exercises ex "
+          + "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id "
+          + "LEFT JOIN exercises_tags et ON et.exercise_id = ex.exercise_id "
+          + "GROUP BY ex.exercise_id ;", nativeQuery = true)
   List<RawExercise> rawAll();
 
   /**
@@ -216,4 +222,42 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
           "WHERE ex.exercise_id = :exerciseId " +
           "GROUP BY ex.exercise_id, inj.inject_scenario, se.scenario_id ;", nativeQuery = true)
   RawExercise rawDetailsById(@Param("exerciseId") String exerciseId);
+
+  @Query(value =
+      " SELECT ex.exercise_id, "
+          + "ex.exercise_status, "
+          + "ex.exercise_start_date, "
+          + "ex.exercise_updated_at, "
+          + "ex.exercise_end_date, "
+          + "ex.exercise_name, "
+          + "ex.exercise_category, "
+          + "ex.exercise_subtitle, "
+          + " array_agg(distinct ie.inject_id) FILTER ( WHERE ie.inject_id IS NOT NULL ) as inject_ids, "
+          + " array_agg(distinct et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags "
+          + "FROM exercises ex "
+          + "LEFT JOIN exercises_tags et ON et.exercise_id = ex.exercise_id "
+          + "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id "
+          + "WHERE ex.exercise_id = :id "
+          + "GROUP BY ex.exercise_id ;", nativeQuery = true)
+  RawExercise rawById(@Param("id") String id);
+
+  @Query(value =
+      " SELECT ex.exercise_id, "
+          + "ex.exercise_status, "
+          + "ex.exercise_start_date, "
+          + "ex.exercise_updated_at, "
+          + "ex.exercise_end_date, "
+          + "ex.exercise_name, "
+          + "ex.exercise_category, "
+          + "ex.exercise_subtitle, "
+          + " array_agg(distinct ie.inject_id) FILTER ( WHERE ie.inject_id IS NOT NULL ) as inject_ids, "
+          + " array_agg(distinct et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags "
+          + "FROM exercises ex "
+          + "LEFT JOIN scenarios_exercises s ON s.exercise_id = ex.exercise_id "
+          + "LEFT JOIN exercises_tags et ON et.exercise_id = ex.exercise_id "
+          + "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id "
+          + "WHERE s.scenario_id IN (:scenarioIds) "
+          + "GROUP BY ex.exercise_id ;", nativeQuery = true)
+  List<RawExercise> rawAllByScenarioId(@Param("scenarioIds") List<String> scenarioIds);
+
 }

@@ -55,7 +55,7 @@ public interface AssetGroupRepository extends CrudRepository<AssetGroup, String>
           "FROM asset_groups ag " +
           "LEFT JOIN injects_asset_groups iat ON ag.asset_group_id = iat.asset_group_id " +
           "LEFT JOIN asset_groups_assets aga ON aga.asset_group_id = ag.asset_group_id " +
-          "WHERE iat.inject_id IN :injectIds " +
+          "WHERE iat.inject_id IN (:injectIds) " +
           "GROUP BY iat.inject_id, ag.asset_group_id, ag.asset_group_name ;", nativeQuery = true)
   List<RawAssetGroup> rawByInjectIds(@Param("injectIds") List<String> injectIds);
 

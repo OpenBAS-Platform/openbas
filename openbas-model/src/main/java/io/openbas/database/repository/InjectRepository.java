@@ -149,17 +149,4 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
           "GROUP BY org.organization_id",
       nativeQuery = true)
   List<RawInject> rawAll();
-
-  @Query(value = "SELECT i.inject_id, "
-      + "coalesce(array_agg(it.team_id) FILTER ( WHERE it.team_id IS NOT NULL ), '{}') as inject_teams, "
-      + "coalesce(array_agg(ia.asset_id) FILTER ( WHERE ia.asset_id IS NOT NULL ), '{}') as inject_assets, "
-      + "coalesce(array_agg(iag.asset_group_id) FILTER ( WHERE iag.asset_group_id IS NOT NULL ), '{}') as inject_assets_groups "
-      + "FROM injects i "
-      + "LEFT JOIN injects_teams it ON i.inject_id = it.inject_id "
-      + "LEFT JOIN injects_assets ia ON i.inject_id = ia.inject_id "
-      + "LEFT JOIN injects_asset_groups iag ON i.inject_id = iag.inject_id "
-      + "WHERE i.inject_id = :id "
-      + "GROUP BY i.inject_id",
-      nativeQuery = true)
-  RawInject findRawInjectForCompute(@Param("id") final String id);
 }
