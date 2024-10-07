@@ -7,6 +7,7 @@ import io.openbas.database.raw.RawAsset;
 import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.raw.RawTeam;
+import io.openbas.database.raw.impl.RawEndpoint;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
@@ -300,7 +301,7 @@ public class AtomicTestingUtils {
       Map<String, RawAsset> rawAssetMap,
       Map<String, RawAssetGroup> rawAssetGroupMap,
       Map<String, RawAsset> assetForAssetGroupMap,
-      Map<String, List<RawAsset>> dynamicAssetGroupMap
+      Map<String, List<RawEndpoint>> dynamicAssetGroupMap
   ) {
 
     // Get expectations with default values

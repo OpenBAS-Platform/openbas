@@ -2,8 +2,10 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Scenario;
+import io.openbas.database.raw.RawAsset;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

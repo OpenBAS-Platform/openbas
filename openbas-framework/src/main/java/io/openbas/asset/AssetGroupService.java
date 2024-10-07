@@ -5,6 +5,7 @@ import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.raw.RawAsset;
 import io.openbas.database.raw.RawAssetGroup;
+import io.openbas.database.raw.impl.RawEndpoint;
 import io.openbas.database.repository.AssetGroupRepository;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -128,18 +129,17 @@ public class AssetGroupService {
   /**
    *
    * */
-  public Map<String, List<RawAsset>> computeDynamicAssetFromRaw(@NotNull List<RawAssetGroup> assetGroups) {
-    if (assetGroups.isEmpty() || isEmptyFilterGroup(assetGroups.get(0).getAsset_group_dynamic_filter())) {
+  public Map<String, List<RawEndpoint>> computeDynamicAssetFromRaw(@NotNull List<RawAssetGroup> assetGroups) {
+    if (assetGroups.isEmpty()) {
       return Map.of();
     }
 
     return assetGroups.stream().collect(Collectors.toMap(RawAssetGroup::getAsset_group_id, assetGroup -> {
-      Specification<Endpoint> specification = computeFilterGroupJpa(assetGroup.getAsset_group_dynamic_filter());
+      Specification<Endpoint> specification = computeFilterGroupJpa(assetGroup.getAssetGroupDynamicFilter());
       return this.endpointService.endpoints(specification)
           .stream()
-          .map(endpoint -> (Asset) endpoint)
-          .filter(asset -> asset.getParent() == null && asset.getInject() == null)
-          .map(asset-> (RawAsset) asset)
+          .filter(endpoint -> endpoint.getParent() == null && endpoint.getInject() == null)
+          .map(RawEndpoint::new)
           .distinct()
           .toList();
     }));
