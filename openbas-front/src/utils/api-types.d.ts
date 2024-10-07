@@ -2344,8 +2344,8 @@ export interface Payload {
   payload_name: string;
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
-  payload_source?: "COMMUNITY" | "FILIGRAN" | "MANUAL";
-  payload_status?: "UNVERIFIED" | "VERIFIED";
+  payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
+  payload_status: "UNVERIFIED" | "VERIFIED";
   /** @uniqueItems true */
   payload_tags?: Tag[];
   payload_type?: string;
@@ -2374,8 +2374,8 @@ export interface PayloadCreateInput {
   payload_name: string;
   payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
-  payload_source: string;
-  payload_status: string;
+  payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
+  payload_status: "UNVERIFIED" | "VERIFIED";
   payload_tags?: string[];
   payload_type: string;
 }
@@ -2691,13 +2691,13 @@ export interface ReportInjectComment {
 
 export interface ReportInjectCommentInput {
   inject_id: string;
-  report_inject_comment: string;
+  report_inject_comment?: string;
 }
 
 export interface ReportInput {
+  report_global_observation?: string;
   report_informations?: ReportInformationInput[];
   report_name: string;
-  report_global_observation?: string;
 }
 
 export interface ResetUserInput {
@@ -2706,6 +2706,7 @@ export interface ResetUserInput {
 }
 
 export interface ResultDistribution {
+  id: string;
   label: string;
   /** @format int32 */
   value: number;

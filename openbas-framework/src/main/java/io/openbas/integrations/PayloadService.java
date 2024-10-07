@@ -183,16 +183,13 @@ public class PayloadService {
     return duplicate;
   }
 
-  private <T extends Payload> void duplicateCommonProperties(@org.jetbrains.annotations.NotNull final T origin,
-      @org.jetbrains.annotations.NotNull T duplicate) {
-    BeanUtils.copyProperties(origin, duplicate);
-    duplicate.setId(null);
-    duplicate.setName(StringUtils.duplicateString(origin.getName()));
-    duplicate.setAttackPatterns(new ArrayList<>(origin.getAttackPatterns()));
-    duplicate.setTags(new HashSet<>(origin.getTags()));
-    duplicate.setExternalId(null);
-    duplicate.setSource(MANUAL);
-    duplicate.setStatus(VERIFIED);
-    duplicate.setCollector(null);
-  }
+    private <T extends Payload> void duplicateCommonProperties(@org.jetbrains.annotations.NotNull final T origin, @org.jetbrains.annotations.NotNull T duplicate) {
+        BeanUtils.copyProperties(origin, duplicate);
+        duplicate.setId(null);
+        duplicate.setName(StringUtils.duplicateString(origin.getName()));
+        duplicate.setAttackPatterns(new ArrayList<>(origin.getAttackPatterns()));
+        duplicate.setTags(new HashSet<>(origin.getTags()));
+        duplicate.setExternalId(null);
+        duplicate.setCollector(null);
+    }
 }
