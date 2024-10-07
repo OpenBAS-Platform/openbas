@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawExercise;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.raw.RawScenario;
 import io.openbas.database.repository.*;
@@ -15,10 +16,12 @@ import io.openbas.rest.exercise.exports.ExerciseExportMixins;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
+import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.scenario.export.ScenarioExportMixins;
 import io.openbas.rest.scenario.export.ScenarioFileExport;
 import io.openbas.rest.scenario.form.ScenarioSimple;
+import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -92,12 +95,15 @@ public class ScenarioService {
   private final ScenarioTeamUserRepository scenarioTeamUserRepository;
   private final ArticleRepository articleRepository;
 
+  private final ExerciseMapper exerciseMapper;
+
   private final GrantService grantService;
   private final VariableService variableService;
   private final ChallengeService challengeService;
   private final TeamService teamService;
   private final FileService fileService;
   private final InjectDuplicateService injectDuplicateService;
+
 
   @Transactional
   public Scenario createScenario(@NotNull final Scenario scenario) {
@@ -136,13 +142,13 @@ public class ScenarioService {
     );
 
     // Compute pagination from find all
-    return buildPaginationCriteriaBuilder(findAll, searchPaginationInput, Scenario.class, joinMap);
+    return buildPaginationCriteriaBuilder(findAll,
+        searchPaginationInput, Scenario.class, joinMap);
   }
 
   private TriFunction<Specification<Scenario>, Specification<Scenario>, Pageable, Page<RawPaginationScenario>> getFindAllFunction(
       UnaryOperator<Specification<Scenario>> deepFilterSpecification,
       Map<String, Join<Base, Base>> joinMap) {
-
     if (currentUser().isAdmin()) {
       return (specification, specificationCount, pageable) -> this.findAllWithCriteriaBuilder(
           deepFilterSpecification.apply(specification),
@@ -276,17 +282,15 @@ public class ScenarioService {
   }
 
   @Transactional(readOnly = true)
-  public Exercise latestExerciseByExternalReference(@NotBlank final String scenarioExternalReference) {
-    List<Scenario> scenarios = this.scenarioRepository.findByExternalReference(scenarioExternalReference);
-    Optional<Exercise> latestEndedExercise = scenarios.stream()
-        .flatMap(scenario -> scenario.getExercises().stream())
-        .filter(exercise -> exercise.getEnd().isPresent())
-        .max(Comparator.comparing(exercise -> exercise.getEnd().get()));
-    if (latestEndedExercise.isPresent()) {
-      return latestEndedExercise.get();
-    } else {
-      throw new ElementNotFoundException("Latest exercise not found");
-    }
+  public ExerciseSimple latestExerciseByExternalReference(@NotBlank final String scenarioExternalReference) {
+    Optional<RawExercise> latestEndedExercise = scenarioRepository.rawAllByExternalReference(scenarioExternalReference)
+        .stream()
+        .filter(rawExercise -> rawExercise.getExercise_end_date() != null)
+        .max(Comparator.comparing(RawExercise::getExercise_end_date));
+
+    return latestEndedExercise
+        .map(exerciseMapper::fromRawExercise)
+        .orElseThrow(() -> new ElementNotFoundException("Latest exercise not found"));
   }
 
   public Scenario updateScenario(@NotNull final Scenario scenario) {
