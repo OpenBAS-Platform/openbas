@@ -2,6 +2,7 @@ import type { ImportTestSummary, Inject, InjectsImportInput, InjectTestStatus, S
 import {
   addInjectForScenario,
   bulkDeleteInjectsForScenario,
+  bulkUpdateInjectForScenario,
   deleteInjectScenario,
   fetchScenarioInjects,
   updateInjectActivationForScenario,
@@ -23,6 +24,9 @@ const injectContextForScenario = (scenario: ScenarioStore) => {
     },
     onAddInject(inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
       return dispatch(addInjectForScenario(scenario.scenario_id, inject));
+    },
+    onBulkUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
+      return dispatch(bulkUpdateInjectForScenario(scenario.scenario_id, injectId, inject));
     },
     onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
       return dispatch(updateInjectForScenario(scenario.scenario_id, injectId, inject));
