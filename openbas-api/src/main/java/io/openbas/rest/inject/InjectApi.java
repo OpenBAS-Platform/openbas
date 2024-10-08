@@ -539,7 +539,7 @@ public class InjectApi extends RestBehavior {
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody @NotNull InjectInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
-    Inject inject = bulkUpdateInject(injectId, input);
+    Inject inject = updateInject(injectId, input);
 
     // If Documents not yet linked directly to the exercise, attached it
     inject.getDocuments().forEach(document -> {
