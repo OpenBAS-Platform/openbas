@@ -92,11 +92,8 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 interface Props {
   exerciseOrScenarioId: string
-
   setViewMode?: (mode: string) => void
-
   availableButtons: string[]
-
   teams: TeamStore[]
   articles: ArticleStore[]
   variables: Variable[]
@@ -411,7 +408,7 @@ const Injects: FunctionComponent<Props> = ({
               injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map((n) => n.value));
             }
             // eslint-disable-next-line no-await-in-loop
-            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
+            await injectContext.onBulkUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
               .then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
                 onUpdate(result);
               });
@@ -420,7 +417,7 @@ const Injects: FunctionComponent<Props> = ({
             // @ts-expect-error define type
             injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map((n) => n.value));
             // eslint-disable-next-line no-await-in-loop
-            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
+            await injectContext.onBulkUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
               .then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
                 onUpdate(result);
               });
@@ -435,7 +432,7 @@ const Injects: FunctionComponent<Props> = ({
               injectToUpdate[`inject_${action.field}`] = [];
             }
             // eslint-disable-next-line no-await-in-loop
-            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
+            await injectContext.onBulkUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
               .then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
                 onUpdate(result);
               });

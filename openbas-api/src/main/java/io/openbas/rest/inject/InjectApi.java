@@ -177,6 +177,19 @@ public class InjectApi extends RestBehavior {
     return injectRepository.save(inject);
   }
 
+  @Transactional(rollbackFor = Exception.class)
+  @PutMapping(INJECT_URI + "/{exerciseId}/{injectId}/bulk")
+  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  public Inject bulkUpdateInject(
+      @PathVariable String exerciseId,
+      @PathVariable String injectId,
+      @Valid @RequestBody InjectInput input) {
+    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+    Inject inject = bulkUpdateInject(injectId, input);
+    this.exerciseRepository.save(exercise);
+    return injectRepository.save(inject);
+  }
+
   // -- EXERCISES --
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects")
@@ -592,6 +605,17 @@ public class InjectApi extends RestBehavior {
       injectDoc.setAttached(attached);
     });
     inject.setDocuments(injectDocuments);
+
+    return inject;
+  }
+
+  private Inject bulkUpdateInject(@NotBlank final String injectId, @NotNull InjectInput input) {
+    Inject inject = this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+
+    // Set dependencies
+    inject.setTeams(fromIterable(this.teamRepository.findAllById(input.getTeams())));
+    inject.setAssets(fromIterable(this.assetService.assets(input.getAssets())));
+    inject.setAssetGroups(fromIterable(this.assetGroupService.assetGroups(input.getAssetGroups())));
 
     return inject;
   }
