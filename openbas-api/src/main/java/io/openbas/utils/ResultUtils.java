@@ -82,11 +82,12 @@ public class ResultUtils {
       @NotNull List<String> injectIds) {
 
     // -- EXPECTATIONS --
-    Map<String, List<RawInjectExpectation>> expectationMap = injectExpectationRepository.rawByInjectId(injectIds)
+    List<RawInjectExpectation> rawInjectExpectations = injectExpectationRepository.rawByInjectId(injectIds);
+    Map<String, List<RawInjectExpectation>> expectationMap = rawInjectExpectations
         .stream().collect(Collectors.groupingBy(RawInjectExpectation::getInject_id));
 
     // -- TEAMS INJECT --
-    Map<String, Map<String, RawTeam>> teamMap = teamRepository.rawByInjectIds(injectIds).stream()
+    Map<String, Map<String, RawTeam>> teamMap = teamRepository.rawByIdsOrInjectIds(rawInjectExpectations.stream().map(RawInjectExpectation::getTeam_id).toList(), injectIds).stream()
         .collect(Collectors.groupingBy(RawTeam::getInject_id,
             Collectors.toMap(
                 RawTeam::getTeam_id,
@@ -94,7 +95,7 @@ public class ResultUtils {
             )));
 
     // -- ASSETS INJECT --
-    Map<String, Map<String, RawAsset>> assetMap = assetRepository.rawByInjectIds(injectIds).stream()
+    Map<String, Map<String, RawAsset>> assetMap = assetRepository.rawByIdsOrInjectIds(rawInjectExpectations.stream().map(RawInjectExpectation::getAsset_id).toList(), injectIds).stream()
         .collect(Collectors.groupingBy(RawAsset::getInject_id,
             Collectors.toMap(
                 RawAsset::getAsset_id,
@@ -102,8 +103,7 @@ public class ResultUtils {
             )));
 
     // -- ASSETS GROUPS INJECT --
-    List<RawAssetGroup> rawAssetGroups = assetGroupRepository.rawByInjectIds(injectIds);
-
+    List<RawAssetGroup> rawAssetGroups = assetGroupRepository.rawByIdsOrInjectIds(rawInjectExpectations.stream().map(RawInjectExpectation::getAsset_group_id).toList(), injectIds);
     Map<String, Map<String, RawAssetGroup>> assetGroupMap = rawAssetGroups.stream()
         .collect(Collectors.groupingBy(RawAssetGroup::getInject_id,
             Collectors.toMap(
