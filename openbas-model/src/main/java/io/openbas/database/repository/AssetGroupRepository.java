@@ -1,7 +1,6 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.AssetGroup;
-import io.openbas.database.raw.RawAsset;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,9 +54,9 @@ public interface AssetGroupRepository extends CrudRepository<AssetGroup, String>
           "FROM asset_groups ag " +
           "LEFT JOIN injects_asset_groups iat ON ag.asset_group_id = iat.asset_group_id " +
           "LEFT JOIN asset_groups_assets aga ON aga.asset_group_id = ag.asset_group_id " +
-          "WHERE iat.inject_id IN (:injectIds) OR ag.asset_group_id IN (:agroupIds) " +
+          "WHERE iat.asset_group_id IN (:assetGroupIds) OR iat.inject_id IN (:injectIds) " +
           "GROUP BY iat.inject_id, ag.asset_group_id, ag.asset_group_name, CAST(ag.asset_group_dynamic_filter as text) ;", nativeQuery = true)
-  List<RawAssetGroup> rawByIdsOrInjectIds(@Param("agroupIds") List<String> agroupIds, @Param("injectIds") List<String> injectIds);
+  List<RawAssetGroup> rawByIdsOrInjectIds(@Param("assetGroupIds") List<String> assetGroupIds, @Param("injectIds") List<String> injectIds);
 
   // -- PAGINATION --
 
