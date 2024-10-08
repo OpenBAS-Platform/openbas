@@ -122,12 +122,13 @@ public class ResultUtils {
         .flatMap(
             injectId -> {
               return AtomicTestingUtils.getTargetsWithResultsFromRaw(
-                  expectationMap.containsKey(injectId)? expectationMap.get(injectId): emptyList(),
-                  teamMap.containsKey(injectId)? teamMap.get(injectId) : emptyMap(),
-                  assetMap.containsKey(injectId)? assetMap.get(injectId) : emptyMap(),
-                  assetGroupMap.containsKey(injectId)? assetGroupMap.get(injectId) : emptyMap(),
-                  assetForAssetGroupMap.containsKey(injectId)? assetForAssetGroupMap : emptyMap(),
-                  dynamicForAssetGroupMap.containsKey(injectId)? dynamicForAssetGroupMap : emptyMap()).stream();
+                  expectationMap.getOrDefault(injectId, emptyList()),
+                  teamMap.getOrDefault(injectId, emptyMap()),
+                  assetMap.getOrDefault(injectId, emptyMap()),
+                  assetGroupMap.getOrDefault(injectId, emptyMap()),
+                  assetForAssetGroupMap,
+                  dynamicForAssetGroupMap
+              ).stream();
             })
         .distinct()
         .toList();
