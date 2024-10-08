@@ -52,11 +52,11 @@ public interface TeamRepository extends CrudRepository<Team, String>,
       "WHERE team_id IN :ids ;", nativeQuery = true)
   List<RawTeam> rawTeamByIds(@Param("ids") List<String> ids);
 
-  @Query(value = "SELECT it.inject_id, t.team_id, t.team_name "
+  @Query(value = "SELECT DISTINCT (it.inject_id, t.team_id, t.team_name) "
       + "FROM teams t "
       + "LEFT JOIN injects_teams it ON t.team_id = it.team_id "
-      + "WHERE it.inject_id IN (:injectIds) OR t.team_id IN (:teamIds) ;", nativeQuery = true)
-  List<RawTeam> rawByIdsOrInjectIds(@Param("teamIds") List<String> teamIds, @Param("injectIds") List<String> injectIds);
+      + "WHERE it.team_id IN (:ids) OR it.inject_id IN (:injectIds) ;", nativeQuery = true)
+  List<RawTeam> rawByIdsOrInjectIds(@Param("ids") List<String> ids, @Param("injectIds") List<String> injectIds);
 
   @Query(value =
       "SELECT teams.team_id, teams.team_name, teams.team_description, teams.team_created_at, teams.team_updated_at, teams.team_organization, "
