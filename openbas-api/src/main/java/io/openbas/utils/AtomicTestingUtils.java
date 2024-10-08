@@ -442,17 +442,19 @@ public class AtomicTestingUtils {
         });
 
         // Add dynamic assets as children
-        dynamicAssetGroupMap.get(assetGroup.getAsset_group_id()).forEach(dynamicAsset -> {
-          children.add(new InjectTargetWithResult(
-              TargetType.ASSETS,
-              dynamicAsset.getAsset_id(),
-              dynamicAsset.getAsset_name(),
-              defaultExpectationResultsByTypes,
-              Objects.equals(dynamicAsset.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(
-                  dynamicAsset.getEndpoint_platform())
-                  : null
-          ));
-        });
+        if(dynamicAssetGroupMap.containsKey(assetGroup.getAsset_group_id())) {
+          dynamicAssetGroupMap.get(assetGroup.getAsset_group_id()).forEach(dynamicAsset -> {
+            children.add(new InjectTargetWithResult(
+                TargetType.ASSETS,
+                dynamicAsset.getAsset_id(),
+                dynamicAsset.getAsset_name(),
+                defaultExpectationResultsByTypes,
+                Objects.equals(dynamicAsset.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(
+                    dynamicAsset.getEndpoint_platform())
+                    : null
+            ));
+          });
+        }
 
         if (noMatchingExpectations) {
           InjectTargetWithResult target = new InjectTargetWithResult(
@@ -563,21 +565,23 @@ public class AtomicTestingUtils {
             });
 
             // For dynamicAssets
-            dynamicAssetGroupMap.get(entry.getKey()).forEach(dynamicAsset -> {
-              boolean foundDynamicAssetsWithoutResults = children.stream()
-                  .noneMatch(child -> child.getId().equals(dynamicAsset.getAsset_id()));
-              if (foundDynamicAssetsWithoutResults) {
-                children.add(new InjectTargetWithResult(
-                    TargetType.ASSETS,
-                    dynamicAsset.getAsset_id(),
-                    dynamicAsset.getAsset_name(),
-                    defaultExpectationResultsByTypes,
-                    Objects.equals(dynamicAsset.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(
-                        dynamicAsset.getEndpoint_platform())
-                        : null
-                ));
-              }
-            });
+            if(dynamicAssetGroupMap.containsKey(entry.getKey())) {
+              dynamicAssetGroupMap.get(entry.getKey()).forEach(dynamicAsset -> {
+                boolean foundDynamicAssetsWithoutResults = children.stream()
+                    .noneMatch(child -> child.getId().equals(dynamicAsset.getAsset_id()));
+                if (foundDynamicAssetsWithoutResults) {
+                  children.add(new InjectTargetWithResult(
+                      TargetType.ASSETS,
+                      dynamicAsset.getAsset_id(),
+                      dynamicAsset.getAsset_name(),
+                      defaultExpectationResultsByTypes,
+                      Objects.equals(dynamicAsset.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(
+                          dynamicAsset.getEndpoint_platform())
+                          : null
+                  ));
+                }
+              });
+            }
 
             return new InjectTargetWithResult(TargetType.ASSETS_GROUPS, entry.getKey(),
                 assetGroupExpectationMap.get(entry.getKey()).getAsset_group_name(), entry.getValue(),

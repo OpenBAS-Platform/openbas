@@ -16,11 +16,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 
 @RequiredArgsConstructor
 @Component
@@ -37,7 +39,7 @@ public class ResultUtils {
     if (injectIds != null) {
       return computeGlobalExpectationResults(injectIds);
     }else{
-      return Collections.emptyList();
+      return emptyList();
     }
   }
 
@@ -45,7 +47,7 @@ public class ResultUtils {
     if (injectIds != null) {
       return computeTargetResults(injectIds);
     }else{
-      return Collections.emptyList();
+      return emptyList();
     }
   }
 
@@ -79,13 +81,19 @@ public class ResultUtils {
   public List<InjectTargetWithResult> computeTargetResults(
       @NotNull List<String> injectIds) {
 
-    Map<String, Map<String, RawTeam>> teamMap = teamRepository.rawTeamByInjectIds(injectIds).stream()
+    // -- EXPECTATIONS --
+    Map<String, List<RawInjectExpectation>> expectationMap = injectExpectationRepository.rawByInjectId(injectIds)
+        .stream().collect(Collectors.groupingBy(RawInjectExpectation::getInject_id));
+
+    // -- TEAMS INJECT --
+    Map<String, Map<String, RawTeam>> teamMap = teamRepository.rawByInjectIds(injectIds).stream()
         .collect(Collectors.groupingBy(RawTeam::getInject_id,
             Collectors.toMap(
                 RawTeam::getTeam_id,
                 rawTeam -> rawTeam
             )));
 
+    // -- ASSETS INJECT --
     Map<String, Map<String, RawAsset>> assetMap = assetRepository.rawByInjectIds(injectIds).stream()
         .collect(Collectors.groupingBy(RawAsset::getInject_id,
             Collectors.toMap(
@@ -93,7 +101,7 @@ public class ResultUtils {
                 rawAsset -> rawAsset
             )));
 
-    // -- ASSETS GROUPS --
+    // -- ASSETS GROUPS INJECT --
     List<RawAssetGroup> rawAssetGroups = assetGroupRepository.rawByInjectIds(injectIds);
 
     Map<String, Map<String, RawAssetGroup>> assetGroupMap = rawAssetGroups.stream()
@@ -113,13 +121,13 @@ public class ResultUtils {
     return injectIds.stream()
         .flatMap(
             injectId -> {
-              List<RawInjectExpectation> expectations = injectExpectationRepository.rawByInjectId(injectId);
-              return AtomicTestingUtils.getTargetsWithResultsFromRaw(expectations,
-                  teamMap.get(injectId),
-                  assetMap.get(injectId),
-                  assetGroupMap.get(injectId),
-                  assetForAssetGroupMap,
-                  dynamicForAssetGroupMap).stream();
+              return AtomicTestingUtils.getTargetsWithResultsFromRaw(
+                  expectationMap.containsKey(injectId)? expectationMap.get(injectId): emptyList(),
+                  teamMap.containsKey(injectId)? teamMap.get(injectId) : emptyMap(),
+                  assetMap.containsKey(injectId)? assetMap.get(injectId) : emptyMap(),
+                  assetGroupMap.containsKey(injectId)? assetGroupMap.get(injectId) : emptyMap(),
+                  assetForAssetGroupMap.containsKey(injectId)? assetForAssetGroupMap : emptyMap(),
+                  dynamicForAssetGroupMap.containsKey(injectId)? dynamicForAssetGroupMap : emptyMap()).stream();
             })
         .distinct()
         .toList();
