@@ -126,6 +126,7 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
 
   @Query(value = "SELECT "
       + "i.inject_expectation_id AS inject_expectation_id, "
+      + "i.inject_id AS inject_id, "
       + "t.team_id AS team_id, "
       + "t.team_name AS team_name, "
       + "a.asset_id AS asset_id, "
@@ -148,9 +149,10 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
       + "LEFT JOIN asset_groups at ON at.asset_group_id = i.asset_group_id "
       + "LEFT JOIN asset_groups_assets aga ON aga.asset_group_id = at.asset_group_id "
       + "LEFT JOIN users u ON u.user_id = i.user_id "
-      + "WHERE i.inject_id = :injectId "
+      + "WHERE i.inject_id IN (:injectIds) "
       + "GROUP BY "
       + "i.inject_expectation_id, "
+      + "i.inject_id, "
       + "t.team_id, "
       + "t.team_name, "
       + "a.asset_id, "
@@ -166,5 +168,5 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
       + "i.inject_expectation_score, "
       + "i.inject_expectation_expected_score, "
       + "i.inject_expectation_group ; ", nativeQuery = true)
-  List<RawInjectExpectation> rawByInjectId(@Param("injectId") final String injectId);
+  List<RawInjectExpectation> rawByInjectId(@Param("injectIds") final List<String> injectIds);
 }
