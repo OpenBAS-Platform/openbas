@@ -2691,13 +2691,13 @@ export interface ReportInjectComment {
 
 export interface ReportInjectCommentInput {
   inject_id: string;
-  report_inject_comment: string;
+  report_inject_comment?: string;
 }
 
 export interface ReportInput {
+  report_global_observation?: string;
   report_informations?: ReportInformationInput[];
   report_name: string;
-  report_global_observation?: string;
 }
 
 export interface ResetUserInput {
@@ -2706,6 +2706,7 @@ export interface ResetUserInput {
 }
 
 export interface ResultDistribution {
+  id: string;
   label: string;
   /** @format int32 */
   value: number;

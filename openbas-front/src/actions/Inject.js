@@ -25,6 +25,11 @@ export const updateInjectForExercise = (exerciseId, injectId, data) => (dispatch
   return putReferential(schema.inject, uri, data)(dispatch);
 };
 
+export const bulkUpdateInjectForExercise = (exerciseId, injectId, data) => (dispatch) => {
+  const uri = `/api/injects/${exerciseId}/${injectId}/bulk`;
+  return putReferential(schema.inject, uri, data)(dispatch);
+};
+
 export const updateInjectTriggerForExercise = (exerciseId, injectId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects/${injectId}/trigger`;
   return putReferential(schema.inject, uri)(dispatch);
