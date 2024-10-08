@@ -519,6 +519,19 @@ public class InjectApi extends RestBehavior {
   }
 
   @Transactional(rollbackFor = Exception.class)
+  @PutMapping(INJECT_URI + "/{scenarioId}/injects/{injectId}/bulk")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public Inject bulkUpdateInjectForScenario(
+      @PathVariable String scenarioId,
+      @PathVariable String injectId,
+      @Valid @RequestBody InjectInput input) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    Inject inject = bulkUpdateInject(injectId, input);
+    this.scenarioService.updateScenario(scenario);
+    return injectRepository.save(inject);
+  }
+
+  @Transactional(rollbackFor = Exception.class)
   @PutMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Inject updateInjectForScenario(
@@ -526,7 +539,7 @@ public class InjectApi extends RestBehavior {
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody @NotNull InjectInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
-    Inject inject = updateInject(injectId, input);
+    Inject inject = bulkUpdateInject(injectId, input);
 
     // If Documents not yet linked directly to the exercise, attached it
     inject.getDocuments().forEach(document -> {

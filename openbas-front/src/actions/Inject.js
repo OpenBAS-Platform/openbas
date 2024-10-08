@@ -92,6 +92,11 @@ export const fetchScenarioInjects = (scenarioId) => (dispatch) => {
   return getReferential(schema.arrayOfInjects, uri)(dispatch);
 };
 
+export const bulkUpdateInjectForScenario = (scenarioId, injectId, data) => (dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/injects/${injectId}/bulk`;
+  return putReferential(schema.inject, uri, data)(dispatch);
+};
+
 export const updateInjectForScenario = (scenarioId, injectId, data) => (dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/injects/${injectId}`;
   return putReferential(schema.inject, uri, data)(dispatch);
