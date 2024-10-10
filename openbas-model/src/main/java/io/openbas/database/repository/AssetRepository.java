@@ -30,7 +30,7 @@ public interface AssetRepository extends CrudRepository<Asset, String>, JpaSpeci
   @Query(value = "SELECT DISTINCT a.asset_id, a.asset_name, a.asset_type, a.endpoint_platform " +
       "FROM assets a " +
       "LEFT JOIN injects_assets ia ON a.asset_id = ia.asset_id " +
-      "WHERE ia.asset_id IN (:assetIds) OR ia.inject_id IN (:injectIds) ;", nativeQuery = true)
+      "WHERE a.asset_id IN (:assetIds) OR ia.inject_id IN (:injectIds) ;", nativeQuery = true)
   List<RawAsset> rawByIdsOrInjectIds(@Param("assetIds") List<String> assetIds, @Param("injectIds") List<String> injectIds);
 }
 
