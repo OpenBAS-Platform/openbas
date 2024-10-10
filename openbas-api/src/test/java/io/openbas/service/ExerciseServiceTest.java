@@ -6,6 +6,8 @@ import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.rest.exercise.ExerciseService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
+import io.openbas.utils.ExerciseMapper;
+import io.openbas.utils.ResultUtils;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,14 +30,16 @@ public class ExerciseServiceTest {
     @Mock
     GrantService grantService;
     @Mock
-    InjectService injectService;
-    @Mock
     InjectDuplicateService injectDuplicateService;
-    @Autowired
-    private TeamService teamService;
     @Mock
     VariableService variableService;
+    @Autowired
+    private TeamService teamService;
 
+    @Autowired
+    ExerciseMapper exerciseMapper;
+    @Autowired
+    ResultUtils resultUtils;
     @Autowired
     private ArticleRepository articleRepository;
     @Autowired
@@ -47,8 +51,9 @@ public class ExerciseServiceTest {
     private ExerciseService exerciseService;
     @BeforeEach
     void setUp() {
-        exerciseService = new ExerciseService(grantService, injectService, injectDuplicateService,
-                teamService,variableService, articleRepository,exerciseRepository,teamRepository);
+        exerciseService = new ExerciseService(grantService, injectDuplicateService,
+                teamService,variableService, exerciseMapper, resultUtils, articleRepository,
+                exerciseRepository, teamRepository);
     }
 
     @DisplayName("Should create new contextual teams while exercise duplication")

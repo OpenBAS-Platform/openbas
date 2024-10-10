@@ -1,7 +1,6 @@
 package io.openbas.rest.scenario;
 
 import io.openbas.database.model.Exercise;
-import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.rest.exercise.ExerciseService;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -25,13 +24,11 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteri
 public class ScenarioExerciseApi {
 
   private final ExerciseService exerciseService;
-  private final ExerciseRepository exerciseRepository;
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/exercises")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<ExerciseSimple> scenarioExercises(@PathVariable @NotBlank final String scenarioId) {
-    return this.exerciseRepository.findAll(fromScenario(scenarioId))
-        .stream().map(ExerciseSimple::fromExercise).toList();
+    return exerciseService.scenarioExercises(scenarioId);
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/exercises/search")

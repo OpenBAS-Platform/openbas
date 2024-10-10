@@ -9,6 +9,7 @@ public interface RawUser {
   default String getUser_gravatar() {
     return UserHelper.getGravatar(getUser_email());
   }
+  default String getName() { return getUser_firstname() + " " + getUser_lastname(); }
 
   String getUser_id();
   String getUser_firstname();
