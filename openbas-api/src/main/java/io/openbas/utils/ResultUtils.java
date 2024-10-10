@@ -117,7 +117,7 @@ public class ResultUtils {
         .map(RawInjectExpectation::getAsset_id)
         .filter(Objects::nonNull)
         .distinct()
-        .toList();
+        .collect(Collectors.toList());
 
     assetIds.addAll(rawAssetGroups
         .stream()
