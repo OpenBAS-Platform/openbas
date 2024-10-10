@@ -27,7 +27,7 @@ public interface AssetRepository extends CrudRepository<Asset, String>, JpaSpeci
       "WHERE asset_id IN :ids ;", nativeQuery = true)
   List<RawAsset> rawByIds(@Param("ids") List<String> ids);
 
-  @Query(value = "SELECT DISTINCT (a.asset_id, a.asset_name, a.asset_type, a.endpoint_platform) " +
+  @Query(value = "SELECT DISTINCT a.asset_id, a.asset_name, a.asset_type, a.endpoint_platform " +
       "FROM assets a " +
       "LEFT JOIN injects_assets ia ON a.asset_id = ia.asset_id " +
       "WHERE ia.asset_id IN (:assetIds) OR ia.inject_id IN (:injectIds) ;", nativeQuery = true)

@@ -300,7 +300,6 @@ public class AtomicTestingUtils {
       Map<String, RawTeam> rawTeamMap,
       Map<String, RawAsset> rawAssetMap,
       Map<String, RawAssetGroup> rawAssetGroupMap,
-      Map<String, RawAsset> assetForAssetGroupMap,
       Map<String, List<RawEndpoint>> dynamicAssetGroupMap
   ) {
 
@@ -427,7 +426,7 @@ public class AtomicTestingUtils {
 
         // Process each asset in the asset group
         assetGroup.getAsset_ids().forEach(assetId -> {
-          RawAsset finalAsset = assetForAssetGroupMap.get(assetId);
+          RawAsset finalAsset = rawAssetMap.get(assetId);
           if (finalAsset != null) {
             children.add(new InjectTargetWithResult(
                 TargetType.ASSETS,
@@ -555,10 +554,10 @@ public class AtomicTestingUtils {
                 children.add(new InjectTargetWithResult(
                     TargetType.ASSETS,
                     asset,
-                    assetForAssetGroupMap.get(asset).getAsset_name(),
+                    rawAssetMap.get(asset).getAsset_name(),
                     defaultExpectationResultsByTypes,
-                    Objects.equals(assetForAssetGroupMap.get(asset).getAsset_type(), "Endpoint")
-                        ? Endpoint.PLATFORM_TYPE.valueOf(assetForAssetGroupMap.get(asset).getEndpoint_platform())
+                    Objects.equals(rawAssetMap.get(asset).getAsset_type(), "Endpoint")
+                        ? Endpoint.PLATFORM_TYPE.valueOf(rawAssetMap.get(asset).getEndpoint_platform())
                         : null
                 ));
               }
