@@ -37,11 +37,7 @@ public class ResultUtils {
 
   // -- UTILS --
   public List<AtomicTestingMapper.ExpectationResultsByType> getResultsByTypes(List<String> injectIds) {
-    if (injectIds != null) {
-      return computeGlobalExpectationResults(injectIds);
-    } else {
-      return emptyList();
-    }
+    return computeGlobalExpectationResults(injectIds);
   }
 
   public List<InjectTargetWithResult> getInjectTargetWithResults(List<String> injectIds) {

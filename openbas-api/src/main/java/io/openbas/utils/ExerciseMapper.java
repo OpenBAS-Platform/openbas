@@ -36,10 +36,8 @@ public class ExerciseMapper {
     simple.setStatus(ExerciseStatus.valueOf(rawExercise.getExercise_status()));
     simple.setStart(rawExercise.getExercise_start_date());
     simple.setUpdatedAt(rawExercise.getExercise_updated_at());
-
-    simple.setExpectationResultByTypes(resultUtils.getResultsByTypes(rawExercise.getInject_ids()));
-
     simple.setTargets(resultUtils.getInjectTargetWithResults(rawExercise.getInject_ids()));
+    simple.setExpectationResultByTypes(resultUtils.getResultsByTypes(rawExercise.getInject_ids()));
 
     return simple;
   }
