@@ -186,7 +186,6 @@ public class InjectApi extends RestBehavior {
       @Valid @RequestBody InjectInput input) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     Inject inject = bulkUpdateInject(injectId, input);
-    this.exerciseRepository.save(exercise);
     return injectRepository.save(inject);
   }
 
@@ -519,7 +518,7 @@ public class InjectApi extends RestBehavior {
   }
 
   @Transactional(rollbackFor = Exception.class)
-  @PutMapping(INJECT_URI + "/{scenarioId}/injects/{injectId}/bulk")
+  @PutMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}/bulk")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Inject bulkUpdateInjectForScenario(
       @PathVariable String scenarioId,
@@ -527,7 +526,6 @@ public class InjectApi extends RestBehavior {
       @Valid @RequestBody InjectInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     Inject inject = bulkUpdateInject(injectId, input);
-    this.scenarioService.updateScenario(scenario);
     return injectRepository.save(inject);
   }
 
