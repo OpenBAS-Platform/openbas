@@ -11,6 +11,7 @@ steps:
       MINIO_PORT: 9000
     commands:
       - mvn clean install -q -DskipTests
+      - mvn spotless:check
       - cd openbas-api
       - mvn test -q
       - cd ../openbas-framework
