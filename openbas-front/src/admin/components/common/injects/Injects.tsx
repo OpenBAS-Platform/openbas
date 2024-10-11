@@ -49,7 +49,6 @@ const useStyles = makeStyles(() => ({
     color: '#00b1ff',
     border: '1px solid #00b1ff',
   },
-
   itemHead: {
     textTransform: 'uppercase',
   },
