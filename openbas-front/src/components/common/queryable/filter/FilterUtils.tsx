@@ -91,16 +91,16 @@ export const availableOperators = (propertySchema: PropertySchemaDTO) => {
   if (propertySchema.schema_property_type.includes('instant')) {
     return ['gt', 'gte', 'lt', 'lte', 'empty', 'not_empty'];
   }
-  // Array
-  if (propertySchema.schema_property_type_array || propertySchema.schema_property_values) {
-    return ['contains', 'not_contains', 'empty', 'not_empty'];
-  }
   // Enum & not array
   if (propertySchema.schema_property_values && !propertySchema.schema_property_type_array) {
-    return ['eq'];
+    return ['eq', 'not_eq', 'empty', 'not_empty'];
   }
   // Dynamic value & not array
   if (propertySchema.schema_property_has_dynamic_value && !propertySchema.schema_property_type_array) {
+    return ['contains', 'not_contains', 'empty', 'not_empty'];
+  }
+  // Array
+  if (propertySchema.schema_property_type_array) {
     return ['contains', 'not_contains', 'empty', 'not_empty'];
   }
   return [

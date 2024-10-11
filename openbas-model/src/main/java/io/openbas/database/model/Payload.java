@@ -117,18 +117,20 @@ public class Payload implements Base {
   @JsonProperty("payload_external_id")
   private String externalId;
 
-  @Queryable(filterable = true, sortable = true)
   @Setter
+  @Queryable(filterable = true, sortable = true)
   @Column(name = "payload_source")
   @Enumerated(EnumType.STRING)
   @JsonProperty("payload_source")
+  @NotNull
   private PAYLOAD_SOURCE source;
 
-  @Queryable(filterable = true)
   @Setter
+  @Queryable(filterable = true)
   @Column(name = "payload_status")
   @Enumerated(EnumType.STRING)
   @JsonProperty("payload_status")
+  @NotNull
   private PAYLOAD_STATUS status;
 
   // -- COLLECTOR --
