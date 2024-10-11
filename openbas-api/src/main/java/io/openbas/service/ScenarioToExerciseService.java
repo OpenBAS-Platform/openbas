@@ -247,7 +247,8 @@ public class ScenarioToExerciseService {
     scenarioInjects.forEach(scenarioInject -> {
       if(scenarioInject.getDependsOn() != null) {
         Inject injectToUpdate = mapExerciseInjectsByScenarioInject.get(scenarioInject.getId());
-        injectToUpdate.setDependsOn(scenarioInject.getDependsOn());
+        injectToUpdate.getDependsOn().clear();
+        injectToUpdate.getDependsOn().addAll(scenarioInject.getDependsOn());
         this.injectRepository.save(injectToUpdate);
       }
     });
