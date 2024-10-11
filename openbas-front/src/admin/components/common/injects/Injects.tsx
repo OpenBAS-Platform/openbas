@@ -220,7 +220,6 @@ const Injects: FunctionComponent<Props> = ({
     if (result.entities) {
       const updated = result.entities.injects[result.result];
       setInjects(injects.map((i) => {
-        console.log((i.inject_id !== updated.inject_id ? i as InjectOutputType : (updated as InjectOutputType)));
         return (i.inject_id !== updated.inject_id ? i as InjectOutputType : (updated as InjectOutputType));
       }));
     }
