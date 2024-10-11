@@ -184,7 +184,6 @@ public class InjectApi extends RestBehavior {
       @PathVariable String exerciseId,
       @PathVariable String injectId,
       @Valid @RequestBody InjectInput input) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     Inject inject = bulkUpdateInject(injectId, input);
     return injectRepository.save(inject);
   }
@@ -524,7 +523,6 @@ public class InjectApi extends RestBehavior {
       @PathVariable String scenarioId,
       @PathVariable String injectId,
       @Valid @RequestBody InjectInput input) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
     Inject inject = bulkUpdateInject(injectId, input);
     return injectRepository.save(inject);
   }
