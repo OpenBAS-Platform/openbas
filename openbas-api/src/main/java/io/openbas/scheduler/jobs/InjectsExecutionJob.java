@@ -55,10 +55,7 @@ public class InjectsExecutionJob implements Job {
     private final ExecutionExecutorService executionExecutorService;
     private final AtomicTestingService atomicTestingService;
     private final InjectDependenciesRepository injectDependenciesRepository;
-    private final ExerciseExpectationService exerciseExpectationService;
     private final InjectExpectationRepository injectExpectationRepository;
-
-    private static final String EXPECTATIONS = "expectations";
 
     private final List<ExecutionStatus> executionStatusesNotReady =
             List.of(ExecutionStatus.QUEUING, ExecutionStatus.DRAFT, ExecutionStatus.EXECUTING, ExecutionStatus.PENDING);
@@ -238,6 +235,12 @@ public class InjectsExecutionJob implements Job {
         }
     }
 
+    /**
+     * Get error messages if pre execution conditions are not met
+     * @param exerciseId the id of the exercise
+     * @param inject the inject to check
+     * @return an optional of list of error message
+     */
     private Optional<List<String>> getErrorMessagesPreExecution(String exerciseId, Inject inject) {
         List<InjectDependency> injectDependencies = injectDependenciesRepository.findParents(List.of(inject.getId()));
         if (!injectDependencies.isEmpty()) {
@@ -272,6 +275,13 @@ public class InjectsExecutionJob implements Job {
         return Optional.empty();
     }
 
+    /**
+     * Get a map containing the expectations and if they are met or not
+     * @param parents the parents injects
+     * @param exerciseId the id of the exercise
+     * @param injectDependencies the list of dependencies
+     * @return a map of expectations and their value
+     */
     private @NotNull Map<String, Boolean> getStringBooleanMap(List<Inject> parents, String exerciseId, List<InjectDependency> injectDependencies) {
         Map<String, Boolean> mapCondition = new HashMap<>();
 
