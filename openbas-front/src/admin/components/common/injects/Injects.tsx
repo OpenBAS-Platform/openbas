@@ -215,6 +215,7 @@ const Injects: FunctionComponent<Props> = ({
       setInjects([created as InjectOutputType, ...injects]);
     }
   };
+
   const onUpdate = (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
     if (result.entities) {
       const updated = result.entities.injects[result.result];
