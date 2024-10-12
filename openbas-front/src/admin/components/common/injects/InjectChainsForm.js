@@ -28,6 +28,15 @@ const InjectForm = ({
 }) => {
   const classes = useStyles();
   const { t } = useFormatter();
+
+  const breakpointAndOr = /&&|\|\|/gm;
+  const breakpointValue = /==/gm;
+  const typeFromName = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-(.*)-Success/mg;
+
+  const capitalize = (text) => {
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  };
+
   const [parents, setParents] = useState(
     injects.filter((currentInject) => values.inject_depends_on !== null
         && values.inject_depends_on[currentInject.inject_id] !== undefined)
@@ -44,9 +53,6 @@ const InjectForm = ({
   );
 
   const getConditionContentParent = (injectDependsOn) => {
-    const breakpointAndOr = /&&|\|\|/gm;
-    const breakpointValue = /==/gm;
-    const typeFromName = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-(.*)-Success/mg;
     const conditions = [];
     for (const dependency in injectDependsOn) {
       if (Object.hasOwn(injectDependsOn, dependency)) {
@@ -71,9 +77,6 @@ const InjectForm = ({
   };
 
   const getConditionContentChildren = (injectDependsTo) => {
-    const breakpointAndOr = /&&|\|\|/gm;
-    const breakpointValue = /==/gm;
-    const typeFromName = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-(.*)-Success/mg;
     const conditions = [];
     for (const children in injectDependsTo) {
       if (Object.hasOwn(injectDependsTo, children)) {
@@ -390,10 +393,6 @@ const InjectForm = ({
       'inject_depends_to',
       conditionsToStringChildren(newConditionElements),
     );
-  };
-
-  const capitalize = (text) => {
-    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   };
 
   const getAvailableExpectations = (inject) => {
