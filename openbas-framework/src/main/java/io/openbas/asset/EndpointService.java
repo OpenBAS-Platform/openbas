@@ -2,7 +2,6 @@ package io.openbas.asset;
 
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Endpoint;
-import io.openbas.database.raw.RawAsset;
 import io.openbas.database.repository.EndpointRepository;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
