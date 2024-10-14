@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { Handle, NodeProps, Position, Node, OnConnect } from '@xyflow/react';
+import { Handle, NodeProps, Position, Node, OnConnect, XYPosition } from '@xyflow/react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { Tooltip } from '@mui/material';
 import moment from 'moment';
@@ -89,6 +89,10 @@ export type NodeInject = Node<{
   fixedY?: number,
   startDate?: string,
   targets: string[],
+  boundingBox?: {
+    topLeft: XYPosition,
+    bottomRight: XYPosition
+  },
   exerciseOrScenarioId: string,
   onSelectedInject(inject?: InjectOutputType): void,
   onCreate: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void,

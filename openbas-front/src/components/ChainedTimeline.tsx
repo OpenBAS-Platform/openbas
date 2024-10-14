@@ -37,7 +37,7 @@ import { useFormatter } from './i18n';
 import type { AssetGroupsHelper } from '../actions/asset_groups/assetgroup-helper';
 import type { EndpointHelper } from '../actions/assets/asset-helper';
 import type { Inject } from '../utils/api-types';
-import chainingUtils from '../admin/components/common/injects/chaining/ChainingUtils';
+import chainingUtils from './common/chaining/ChainingUtils';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -287,8 +287,6 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
         inject_injector_contract: injectFromMap.inject_injector_contract.injector_contract_id,
         inject_id: node.id,
         inject_depends_duration: convertCoordinatesToTime(node.position),
-        inject_depends_on: injectFromMap.inject_depends_on !== null
-          ? chainingUtils.fromInjectDependencyToInputDependency(injectFromMap.inject_depends_on) : null,
       };
       onUpdateInject([inject]);
       setCurrentUpdatedNode(node);
