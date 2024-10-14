@@ -40,8 +40,9 @@ public class ScenarioExerciseApi {
       @PathVariable @NotBlank final String scenarioId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationCriteriaBuilder(
-        (Specification<Exercise> specification, Pageable pageable) -> this.exerciseService.exercises(
+        (Specification<Exercise> specification, Specification<Exercise> specificationCount, Pageable pageable) -> this.exerciseService.exercises(
             fromScenario(scenarioId).and(specification),
+            fromScenario(scenarioId).and(specificationCount),
             pageable
         ),
         searchPaginationInput,

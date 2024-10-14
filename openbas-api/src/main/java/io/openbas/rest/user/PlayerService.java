@@ -13,6 +13,7 @@ import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,7 +22,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.function.BiFunction;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
@@ -42,7 +42,7 @@ public class PlayerService {
 
   public Page<PlayerOutput> playerPagination(
       @NotNull SearchPaginationInput searchPaginationInput) {
-    BiFunction<Specification<User>, Pageable, Page<PlayerOutput>> playersFunction;
+    TriFunction<Specification<User>, Specification<User>, Pageable, Page<PlayerOutput>> playersFunction;
     OpenBASPrincipal currentUser = currentUser();
     if (currentUser.isAdmin()) {
       playersFunction = this::paginate;
@@ -52,8 +52,10 @@ public class PlayerService {
           .flatMap(group -> group.getOrganizations().stream())
           .map(Organization::getId)
           .toList();
-      playersFunction = (Specification<User> specification, Pageable pageable) -> this.paginate(
-          accessibleFromOrganizations(organizationIds).and(specification), pageable
+      playersFunction = (specification, specificationCount, pageable) -> this.paginate(
+          accessibleFromOrganizations(organizationIds).and(specification),
+          accessibleFromOrganizations(organizationIds).and(specificationCount),
+          pageable
       );
     }
     return buildPaginationCriteriaBuilder(
@@ -65,7 +67,10 @@ public class PlayerService {
 
   // -- PRIVATE --
 
-  private Page<PlayerOutput> paginate(Specification<User> specification, Pageable pageable) {
+  private Page<PlayerOutput> paginate(
+      Specification<User> specification,
+      Specification<User> specificationCount,
+      Pageable pageable) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
@@ -95,7 +100,7 @@ public class PlayerService {
     List<PlayerOutput> players = execution(query);
 
     // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, User.class, specification);
+    Long total = countQuery(cb, this.entityManager, User.class, specificationCount);
 
     return new PageImpl<>(players, pageable, total);
   }

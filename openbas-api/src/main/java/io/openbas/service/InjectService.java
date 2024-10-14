@@ -177,7 +177,10 @@ public class InjectService {
     return execInject(query);
   }
 
-    public Page<InjectOutput> injects(Specification<Inject> specification, Pageable pageable) {
+    public Page<InjectOutput> injects(
+        Specification<Inject> specification,
+        Specification<Inject> specificationCount,
+        Pageable pageable) {
         CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
         CriteriaQuery<Tuple> cq = cb.createTupleQuery();
@@ -207,7 +210,7 @@ public class InjectService {
         List<InjectOutput> injects = execInject(query);
 
         // -- Count Query --
-        Long total = countQuery(cb, this.entityManager, Inject.class, specification);
+        Long total = countQuery(cb, this.entityManager, Inject.class, specificationCount);
 
         return new PageImpl<>(injects, pageable, total);
     }

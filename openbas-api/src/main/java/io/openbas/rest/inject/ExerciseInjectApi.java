@@ -59,8 +59,10 @@ public class ExerciseInjectApi extends RestBehavior {
       @PathVariable @NotBlank final String exerciseId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationCriteriaBuilder(
-        (Specification<Inject> specification, Pageable pageable) -> this.injectService.injects(
-            fromExercise(exerciseId).and(specification), pageable
+        (Specification<Inject> specification, Specification<Inject> specificationCount, Pageable pageable) -> this.injectService.injects(
+            fromExercise(exerciseId).and(specification),
+            fromExercise(exerciseId).and(specificationCount),
+            pageable
         ),
         searchPaginationInput,
         Inject.class

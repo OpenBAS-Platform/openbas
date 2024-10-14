@@ -31,6 +31,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -46,7 +47,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -131,7 +131,7 @@ public class ScenarioService {
     );
 
     // Compute find all method
-    BiFunction<Specification<Scenario>, Pageable, Page<RawPaginationScenario>> findAll = getFindAllFunction(
+    TriFunction<Specification<Scenario>, Specification<Scenario>, Pageable, Page<RawPaginationScenario>> findAll = getFindAllFunction(
         deepFilterSpecification, joinMap
     );
 
@@ -139,19 +139,21 @@ public class ScenarioService {
     return buildPaginationCriteriaBuilder(findAll, searchPaginationInput, Scenario.class, joinMap);
   }
 
-  private BiFunction<Specification<Scenario>, Pageable, Page<RawPaginationScenario>> getFindAllFunction(
+  private TriFunction<Specification<Scenario>, Specification<Scenario>, Pageable, Page<RawPaginationScenario>> getFindAllFunction(
       UnaryOperator<Specification<Scenario>> deepFilterSpecification,
       Map<String, Join<Base, Base>> joinMap) {
 
     if (currentUser().isAdmin()) {
-      return (specification, pageable) -> this.findAllWithCriteriaBuilder(
+      return (specification, specificationCount, pageable) -> this.findAllWithCriteriaBuilder(
           deepFilterSpecification.apply(specification),
+          deepFilterSpecification.apply(specificationCount),
           pageable,
           joinMap
       );
     } else {
-      return (specification, pageable) -> this.findAllWithCriteriaBuilder(
+      return (specification, specificationCount, pageable) -> this.findAllWithCriteriaBuilder(
           findGrantedFor(currentUser().getId()).and(deepFilterSpecification.apply(specification)),
+          findGrantedFor(currentUser().getId()).and(deepFilterSpecification.apply(specificationCount)),
           pageable,
           joinMap
       );
@@ -160,6 +162,7 @@ public class ScenarioService {
 
   private Page<RawPaginationScenario> findAllWithCriteriaBuilder(
       Specification<Scenario> specification,
+      Specification<Scenario> specificationCount,
       Pageable pageable,
       Map<String, Join<Base, Base>> joinMap) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -238,7 +241,7 @@ public class ScenarioService {
         .toList();
 
     // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, Scenario.class, specification);
+    Long total = countQuery(cb, this.entityManager, Scenario.class, specificationCount);
 
     return new PageImpl<>(scenarios, pageable, total);
   }

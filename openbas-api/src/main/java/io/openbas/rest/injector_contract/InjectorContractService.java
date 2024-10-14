@@ -3,7 +3,6 @@ package io.openbas.rest.injector_contract;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.injectors.email.EmailContract;
-import io.openbas.injectors.email.EmailInjector;
 import io.openbas.injectors.ovh.OvhSmsContract;
 import io.openbas.rest.injector_contract.output.InjectorContractOutput;
 import jakarta.persistence.EntityManager;
@@ -64,6 +63,7 @@ public class InjectorContractService {
 
   public Page<InjectorContractOutput> injectorContracts(
       @Nullable final Specification<InjectorContract> specification,
+      @Nullable final Specification<InjectorContract> specificationCount,
       @NotNull final Pageable pageable) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
@@ -94,7 +94,7 @@ public class InjectorContractService {
     List<InjectorContractOutput> injectorContractOutputs = execInjectorContract(query);
 
     // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, InjectorContract.class, specification);
+    Long total = countQuery(cb, this.entityManager, InjectorContract.class, specificationCount);
 
     return new PageImpl<>(injectorContractOutputs, pageable, total);
   }
