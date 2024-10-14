@@ -1,5 +1,5 @@
 import { toPng } from 'html-to-image';
-import {Content, ContentTable, TDocumentDefinitions} from 'pdfmake/interfaces';
+import { Content, ContentTable, TDocumentDefinitions } from 'pdfmake/interfaces';
 import type { InjectResultDTO, Report } from '../../../../../utils/api-types';
 import convertMarkdownToPdfMake from './convertMarkdownToPdfMake';
 import { ExerciseReportData } from './useExerciseReportData';
