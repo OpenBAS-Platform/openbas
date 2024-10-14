@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Dialog, ToggleButton, Tooltip } from '@mui/material';
 import { FilePdfBox } from 'mdi-material-ui';
-import pdfMake from 'pdfmake';
+import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 
 import { useDispatch } from 'react-redux';
+import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { useFormatter } from './i18n';
 import Loader from './Loader';
 import { useHelper } from '../store';
@@ -13,7 +14,7 @@ import type { UserHelper } from '../actions/helper';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 interface Props {
-  getPdfDocDefinition: ()=> Promise<object>,
+  getPdfDocDefinition: ()=> Promise<TDocumentDefinitions>,
   pdfName: string;
 }
 
@@ -49,7 +50,7 @@ const ExportPdfButton: React.FC<Props> = ({ getPdfDocDefinition, pdfName }) => {
         }, 1200);
       });
     }
-    const pdfDocDefinition = await getPdfDocDefinition();
+    const pdfDocDefinition: TDocumentDefinitions = await getPdfDocDefinition();
     pdfMake.createPdf(pdfDocDefinition).download(`${pdfName}.pdf`);
     if (user.user_theme !== 'light') {
       changeUserTheme(user.user_theme);

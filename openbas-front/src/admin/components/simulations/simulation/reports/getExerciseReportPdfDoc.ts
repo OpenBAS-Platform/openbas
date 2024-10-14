@@ -1,5 +1,5 @@
 import { toPng } from 'html-to-image';
-import { ContentTable } from 'pdfmake/interfaces';
+import {Content, ContentTable, TDocumentDefinitions} from 'pdfmake/interfaces';
 import type { InjectResultDTO, Report } from '../../../../../utils/api-types';
 import convertMarkdownToPdfMake from './convertMarkdownToPdfMake';
 import { ExerciseReportData } from './useExerciseReportData';
@@ -60,7 +60,7 @@ const getExerciseReportPdfDocDefinition = async ({
   tPick,
   fldt,
   t,
-}: Props) => {
+}: Props): Promise<TDocumentDefinitions> => {
   // Fetch reports images
   const modulesImages = [
     'main_information',
@@ -293,7 +293,7 @@ const getExerciseReportPdfDocDefinition = async ({
 
       // Exercise details page
       displayExerciseDetails ? exerciseDetailsPage(imagesMap) : [],
-    ],
+    ] as Content,
     styles: {
       reportTitle: {
         fontSize: 40,
