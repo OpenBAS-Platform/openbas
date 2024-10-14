@@ -25,6 +25,11 @@ export const updateInjectForExercise = (exerciseId, injectId, data) => (dispatch
   return putReferential(schema.inject, uri, data)(dispatch);
 };
 
+export const bulkUpdateInjectForExercise = (exerciseId, injectId, data) => (dispatch) => {
+  const uri = `/api/injects/${exerciseId}/${injectId}/bulk`;
+  return putReferential(schema.inject, uri, data)(dispatch);
+};
+
 export const updateInjectTriggerForExercise = (exerciseId, injectId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects/${injectId}/trigger`;
   return putReferential(schema.inject, uri)(dispatch);
@@ -85,6 +90,11 @@ export const duplicateInjectForScenario = (scenarioId, injectId) => (dispatch) =
 export const fetchScenarioInjects = (scenarioId) => (dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/injects`;
   return getReferential(schema.arrayOfInjects, uri)(dispatch);
+};
+
+export const bulkUpdateInjectForScenario = (scenarioId, injectId, data) => (dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/injects/${injectId}/bulk`;
+  return putReferential(schema.inject, uri, data)(dispatch);
 };
 
 export const updateInjectForScenario = (scenarioId, injectId, data) => (dispatch) => {
