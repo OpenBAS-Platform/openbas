@@ -15,6 +15,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.time.Instant;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.List;
 import static io.openbas.database.model.ExerciseStatus.RUNNING;
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
+import static io.openbas.rest.inject.InjectApi.INJECT_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,6 +41,7 @@ class InjectApiTest extends IntegrationTest {
   static Document DOCUMENT2;
   static Team TEAM;
   static String SCENARIO_INJECT_ID;
+  static String EXERCISE_INJECT_ID;
 
   @Autowired
   private MockMvc mvc;
@@ -264,6 +267,71 @@ class InjectApiTest extends IntegrationTest {
   }
 
   // -- EXERCISES --
+
+
+  @DisplayName("Add an inject for simulation")
+  @Test
+  @Order(9)
+  @WithMockPlannerUser
+  void addInjectForSimulationTest() throws Exception {
+    // -- PREPARE --
+    InjectInput input = new InjectInput();
+    input.setTitle("Test inject");
+    input.setInjectorContract(EMAIL_DEFAULT);
+    input.setDependsDuration(0L);
+
+    // -- EXECUTE --
+    String response = mvc
+        .perform(post(EXERCISE_URI + "/" + EXERCISE.getId() + "/injects")
+            .content(asJsonString(input))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is2xxSuccessful())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // -- ASSERT --
+    assertNotNull(response);
+    EXERCISE_INJECT_ID = JsonPath.read(response, "$.inject_id");
+    response = mvc
+        .perform(get(EXERCISE_URI + "/" + EXERCISE.getId())
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is2xxSuccessful())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+    assertEquals(EXERCISE_INJECT_ID, JsonPath.read(response, "$.exercise_injects[0]"));
+  }
+
+  @DisplayName("Update inject for simulation")
+  @Test
+  @Order(10)
+  @WithMockPlannerUser
+  void updateInjectForSimulationTest() throws Exception {
+    // -- PREPARE --
+    Inject inject = injectRepository.findById(EXERCISE_INJECT_ID).orElseThrow();
+    InjectInput input = new InjectInput();
+    String injectTitle = "A new title";
+    input.setTitle(injectTitle);
+    input.setInjectorContract(inject.getInjectorContract().map(InjectorContract::getId).orElse(null));
+    input.setDependsDuration(inject.getDependsDuration());
+
+    // -- EXECUTE --
+    String response = mvc
+        .perform(put(INJECT_URI + "/" + EXERCISE.getId() + "/" + EXERCISE_INJECT_ID)
+            .content(asJsonString(input))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is2xxSuccessful())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // -- ASSERT --
+    assertNotNull(response);
+    assertEquals(injectTitle, JsonPath.read(response, "$.inject_title"));
+  }
 
   // -- BULK DELETE --
 
