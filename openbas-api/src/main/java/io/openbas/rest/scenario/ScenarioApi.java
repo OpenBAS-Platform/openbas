@@ -299,19 +299,3 @@ public class ScenarioApi extends RestBehavior {
   }
 
 }
-
-// -- After --
-
-// Without filters
-// Time: back-end 0.06   front-end 0.08
-
-// With filters
-// Time: back-end 0.47   front-end 0.5
-
-// -- Before --
-
-// Without filters
-// Time: back-end 0.02   front-end 0.04
-
-// With filters
-// Time: back-end 0.02   front-end 0.03
