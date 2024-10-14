@@ -4438,6 +4438,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/pdfkit@npm:*":
+  version: 0.13.5
+  resolution: "@types/pdfkit@npm:0.13.5"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/de23f205951e5b7c12882453c08a3cbf602fd664cf0b110a310711eafdc8ace153dd13b350247d1713fe9847f1776bc443b9a701f6d799a57207d8ddab4ea499
+  languageName: node
+  linkType: hard
+
+"@types/pdfmake@npm:^0.2.9":
+  version: 0.2.9
+  resolution: "@types/pdfmake@npm:0.2.9"
+  dependencies:
+    "@types/node": "npm:*"
+    "@types/pdfkit": "npm:*"
+  checksum: 10c0/6b76e101f078882190064edeaa9f0c99de2212f94484fba17b92dad9e93007f939e1ff201f9934ae1f878efbeedead66ba41e497fd292914511236a1823af495
+  languageName: node
+  linkType: hard
+
 "@types/prismjs@npm:^1.0.0":
   version: 1.26.3
   resolution: "@types/prismjs@npm:1.26.3"
@@ -11973,6 +11992,7 @@ __metadata:
     "@testing-library/react": "npm:14.3.1"
     "@types/d3-hierarchy": "npm:3.1.7"
     "@types/node": "npm:20.16.10"
+    "@types/pdfmake": "npm:^0.2.9"
     "@types/qs": "npm:6"
     "@types/react": "npm:18.3.11"
     "@types/react-csv": "npm:1.1.10"

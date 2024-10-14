@@ -1,9 +1,7 @@
-import pdfMake from 'pdfmake';
+import { Content } from 'pdfmake/interfaces';
 
-type PdfMakeText = pdfMake.Content;
-
-const parseMarkdownLine = (line: string): PdfMakeText[] => {
-  const tokens: PdfMakeText[] = [];
+const parseMarkdownLine = (line: string): Content[] => {
+  const tokens: Content[] = [];
 
   // Corrected regex to match bold, strikethrough, italic,link and codeSnippet
   const regex = /\*\*([^*]+)\*\*|~~([^~]+)~~|\*([^*]+)\*|\[([^\]]+)\]\(([^)]+)\)|`([^`]+)`/g;
@@ -15,11 +13,11 @@ const parseMarkdownLine = (line: string): PdfMakeText[] => {
     }
 
     if (boldText) {
-      tokens.push({ text: boldText, bold: true });
+      tokens.push({ text: boldText, style: 'boldText' });
     } else if (strikethroughText) {
       tokens.push({ text: strikethroughText, decoration: 'lineThrough' });
     } else if (italicText) {
-      tokens.push({ text: italicText, italics: true });
+      tokens.push({ text: italicText, style: 'italicText' });
     } else if (linkText && linkUrl) {
       tokens.push({ text: linkText, link: linkUrl, color: 'blue' });
     } else if (codeText) {
@@ -37,15 +35,15 @@ const parseMarkdownLine = (line: string): PdfMakeText[] => {
   return tokens;
 };
 
-const convertMarkdownToPdfMake = (markdown: string): (PdfMakeText)[] => {
-  const content: (PdfMakeText)[] = [];
+const convertMarkdownToPdfMake = (markdown: string): Content[] => {
+  const content: Content[] = [];
 
   const lines = markdown.split('\n');
   lines.forEach((line) => {
     if (line.startsWith('-')) {
-      content.push({ ul: [{ text: convertMarkdownToPdfMake(line.replace('-', '')) as PdfMakeText[] }] });
+      content.push({ ul: [{ text: convertMarkdownToPdfMake(line.replace('-', '')) as Content[] }] });
     } else if (line.startsWith('> ')) {
-      content.push({ text: line.replace('> ', ''), margin: [5, 2, 0, 2], background: '#f1f2f3', italics: true });
+      content.push({ text: line.replace('> ', ''), margin: [5, 2, 0, 2], background: '#f1f2f3', style: 'italicText' });
     } else if (line.startsWith('# ')) {
       content.push({ text: line.replace('# ', ''), style: 'markdownHeaderH1' });
     } else if (line.startsWith('## ')) {
@@ -54,7 +52,7 @@ const convertMarkdownToPdfMake = (markdown: string): (PdfMakeText)[] => {
       content.push({ text: line.replace('### ', '') });
     } else if (line.trim().length > 0) {
       const parsedLine = parseMarkdownLine(line);
-      content.push(...parsedLine);
+      content.push({ text: parsedLine });
     }
   });
 

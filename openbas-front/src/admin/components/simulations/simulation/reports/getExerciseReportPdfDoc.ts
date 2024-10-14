@@ -1,5 +1,5 @@
 import { toPng } from 'html-to-image';
-import pdfMake from 'pdfmake';
+import { ContentTable } from 'pdfmake/interfaces';
 import type { InjectResultDTO, Report } from '../../../../../utils/api-types';
 import convertMarkdownToPdfMake from './convertMarkdownToPdfMake';
 import { ExerciseReportData } from './useExerciseReportData';
@@ -30,7 +30,7 @@ const getBase64ImageFromURL = (url: string) => {
 
 const tableCustomLayout = (displayColumnLine:boolean, paddingTop:number) => ({
   hLineWidth: () => 0.5,
-  vLineWidth: (i:number, node: pdfMake.Content) => {
+  vLineWidth: (i:number, node: ContentTable) => {
     if (displayColumnLine || (i === 0 || i === node.table.body.length + 1)) {
       return 0.5;
     }
@@ -105,7 +105,6 @@ const getExerciseReportPdfDocDefinition = async ({
         body: [
           [t('Type'), t('Title'), t('Execution date'), t('Scores'), t('Targets'), t('Comments')].map((title) => ({
             text: title,
-            bold: true,
             style: 'tableTitle',
           })),
           ...reportData.injects.map((inject) => {
@@ -196,7 +195,7 @@ const getExerciseReportPdfDocDefinition = async ({
         .sort((a, b) => (a.lessons_question_order || 0) - (b.lessons_question_order || 0));
 
       return ([
-        { text: [t('Category'), ` : ${category.lessons_category_name}`], bold: true, style: 'markdownHeaderH1' },
+        { text: [t('Category'), ` : ${category.lessons_category_name}`], style: 'markdownHeaderH1' },
         { text: [t('Targeted teams'), ` : ${(category.lessons_category_teams || []).map((teamId) => reportData.teams.find((team) => team.team_id === teamId)?.team_name).join(', ') || '-'}`] },
         ...lessonQuestions.flatMap((question) => {
           const lessonsAnswers = (question.lessons_question_answers || [])
@@ -213,7 +212,7 @@ const getExerciseReportPdfDocDefinition = async ({
                   body: [
                     [t('Score'), t('What worked well'), t('What didn\'t work well')].map((title) => ({
                       text: title,
-                      bold: true,
+                      style: 'tableTitle',
                     })),
                     ...lessonsAnswers.map((answer) => ([answer?.lessons_answer_score, answer?.lessons_answer_positive, answer?.lessons_answer_negative])),
                   ],
@@ -327,6 +326,13 @@ const getExerciseReportPdfDocDefinition = async ({
       },
       tableTitle: {
         fontSize: 10,
+        bold: true,
+      },
+      boldText: {
+        bold: true,
+      },
+      italicText: {
+        italics: true,
       },
     },
     defaultStyle: {
