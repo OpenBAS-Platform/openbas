@@ -107,7 +107,7 @@ const ExerciseReportForm: React.FC<Props> = ({
         report_informations_display: !!data[moduleConfig.name],
       };
     });
-    onSubmit({ report_name: data.report_name, report_informations: reportInformationList });
+    onSubmit({ ...initialValues, report_name: data.report_name, report_informations: reportInformationList });
   };
 
   return (

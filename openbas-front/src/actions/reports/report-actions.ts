@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux';
 import type { Exercise, Report, ReportInjectComment, ReportInput } from '../../utils/api-types';
-import { delReferential, getReferential, postReferential, putReferential, simplePutCall } from '../../utils/Action';
+import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
 import * as schema from '../Schema';
 
 export const fetchReportsForExercise = (exerciseId: Exercise['exercise_id']) => (dispatch: Dispatch) => {
@@ -27,22 +27,13 @@ export const updateReportForExercise = (
   return putReferential(schema.report, uri, data)(dispatch);
 };
 
-export const updateReportGlobalObservation = (
-  exerciseId: Exercise['exercise_id'],
-  reportId: Report['report_id'],
-  data: ReportInput,
-) => {
-  const uri = `/api/exercises/${exerciseId}/reports/${reportId}`;
-  return simplePutCall(uri, data);
-};
-
 export const updateReportInjectCommentForExercise = (
   exerciseId: Exercise['exercise_id'],
   reportId: Report['report_id'],
   data: ReportInjectComment,
-) => {
+) => (dispatch: Dispatch) => {
   const uri = `/api/exercises/${exerciseId}/reports/${reportId}/inject-comments`;
-  return simplePutCall(uri, data);
+  return putReferential(schema.report, uri, data)(dispatch);
 };
 
 export const deleteReportForExercise = (exerciseId: Exercise['exercise_id'], reportId: Report['report_id']) => (dispatch: Dispatch) => {

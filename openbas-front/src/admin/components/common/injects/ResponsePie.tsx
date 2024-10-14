@@ -1,5 +1,5 @@
 import Chart from 'react-apexcharts';
-import React, { FunctionComponent } from 'react';
+import React, { memo } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { Button, Grid } from '@mui/material';
 import { InfoOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
@@ -46,11 +46,7 @@ interface Props {
   immutable?: boolean;
 }
 
-const ResponsePie: FunctionComponent<Props> = ({
-  expectationResultsByTypes,
-  humanValidationLink,
-  immutable,
-}) => {
+const ResponsePie = (({ expectationResultsByTypes, humanValidationLink, immutable }: Props) => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
@@ -147,6 +143,6 @@ const ResponsePie: FunctionComponent<Props> = ({
       </Grid>
     </Grid>
   );
-};
+});
 
-export default ResponsePie;
+export default memo(ResponsePie);

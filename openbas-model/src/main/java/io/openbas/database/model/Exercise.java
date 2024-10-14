@@ -8,6 +8,8 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import io.openbas.database.model.Scenario.SEVERITY;
 import io.openbas.helper.*;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -184,6 +186,7 @@ public class Exercise implements Base {
       inverseJoinColumns = @JoinColumn(name = "team_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("exercise_teams")
+  @ArraySchema(schema = @Schema(type = "string"))
   private List<Team> teams = new ArrayList<>();
 
   @Getter

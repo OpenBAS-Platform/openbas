@@ -1,7 +1,7 @@
 import React from 'react';
 import { SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import type { ExpectationResultsByType } from '../../../../utils/api-types';
+import type { ExpectationResultsByType, InjectResultDTO } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   inline: {
@@ -13,9 +13,10 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   expectations: ExpectationResultsByType[] | undefined;
+  injectId?: InjectResultDTO['inject_id']
 }
 
-const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
+const AtomicTestingResult: React.FC<Props> = ({ expectations, injectId }) => {
   const classes = useStyles();
   const getColor = (result: string | undefined): string => {
     const colorMap: Record<string, string> = {
@@ -36,7 +37,7 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
     );
   }
   return (
-    <div className={classes.inline}>
+    <div className={classes.inline} id={`inject_expectations_${injectId}`}>
       {expectations.map((expectation, index) => {
         const color = getColor(expectation.avgResult);
         let IconComponent;

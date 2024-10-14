@@ -27,8 +27,6 @@ export const updateUserPassword = (userId, data) => (dispatch) => putReferential
 
 export const updateUser = (userId, data) => (dispatch) => putReferential(schema.user, `/api/users/${userId}`, data)(dispatch);
 
-export const localUpdateUser = (data) => (dispatch) => dispatch({ type: Constants.DATA_UPDATE_SUCCESS, payload: data });
-
 export const deleteUser = (userId) => (dispatch) => delReferential(`/api/users/${userId}`, 'users', userId)(dispatch);
 // endregion
 

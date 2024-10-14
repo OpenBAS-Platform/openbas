@@ -19,7 +19,7 @@ const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
 
   return (
-    <Paper sx={{ padding: '15px' }} variant="outlined">
+    <Paper id='main_information' sx={{ padding: '15px' }} variant="outlined">
       <Grid container spacing={3}>
         <Grid item xs={12} style={{ paddingTop: 10 }}>
           <Typography

@@ -8,12 +8,14 @@ interface ExpandableMarkdownProps {
   source?: string | null;
   limit?: number;
   showAll?: boolean;
+  markdownDOMId?: string,
 }
 
 const ExpandableMarkdown: FunctionComponent<ExpandableMarkdownProps> = ({
   source,
   limit = 500,
   showAll = false,
+  markdownDOMId = '',
 }) => {
   const [expand, setExpand] = useState(showAll);
   const onClick = () => setExpand(!expand);
@@ -27,7 +29,7 @@ const ExpandableMarkdown: FunctionComponent<ExpandableMarkdownProps> = ({
         </IconButton>
       </div>
       )}
-      <div style={{ overflowX: 'auto' }}>
+      <div id={markdownDOMId} style={{ overflowX: 'auto' }}>
         <MarkdownDisplay
           content={expand ? emptyFilled(source) : truncate(source, limit)}
           remarkGfmPlugin={true}
