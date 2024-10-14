@@ -61,11 +61,13 @@ public class OpenBASConfig {
   @JsonIgnore
   private String cookieName = "openbas_token";
 
-  @JsonIgnore
-  private String cookieDuration = "P1D";
+  @JsonProperty("cookie_duration")
+  @Value("${openbas.cookie-duration:P1D}")
+  private String cookieDuration;
 
-  @JsonIgnore
-  private boolean cookieSecure = false;
+  @JsonProperty("cookie_secure")
+  @Value("${openbas.cookie-secure:false}")
+  private boolean cookieSecure;
 
   public String getBaseUrl() {
     return url(baseUrl);
