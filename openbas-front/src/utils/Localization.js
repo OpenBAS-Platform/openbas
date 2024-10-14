@@ -2146,7 +2146,6 @@ const i18n = {
       'Score details': '分数详情',
       'Injects results': '注入结果',
       'Global observation': '全球观察',
-      'Global observation': '全球观察',
       'This report is not available': '该报告不可用',
       'Simulation definition statistics': '模拟定义统计',
       'Simulation definition scores': '模拟定义分数',

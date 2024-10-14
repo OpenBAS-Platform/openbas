@@ -1,5 +1,4 @@
 import { toPng } from 'html-to-image';
-// @ts-ignore
 import pdfMake from 'pdfmake';
 import type { InjectResultDTO, Report } from '../../../../../utils/api-types';
 import convertMarkdownToPdfMake from './convertMarkdownToPdfMake';

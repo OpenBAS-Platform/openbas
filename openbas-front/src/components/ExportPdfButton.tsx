@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { Dialog, ToggleButton, Tooltip } from '@mui/material';
 import { FilePdfBox } from 'mdi-material-ui';
-// @ts-ignore
 import pdfMake from 'pdfmake';
-// @ts-ignore
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 
 import { useDispatch } from 'react-redux';

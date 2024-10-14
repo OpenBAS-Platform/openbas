@@ -1,4 +1,3 @@
-// @ts-ignore
 import pdfMake from 'pdfmake';
 
 type PdfMakeText = pdfMake.Content;
