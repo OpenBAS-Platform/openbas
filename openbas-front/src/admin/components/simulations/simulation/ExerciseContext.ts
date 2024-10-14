@@ -8,6 +8,7 @@ import {
   fetchExerciseInjects,
   injectDone,
   updateInjectActivationForExercise,
+  bulkUpdateInjectForExercise,
   updateInjectForExercise,
   updateInjectTriggerForExercise,
 } from '../../../../actions/Inject';
@@ -26,6 +27,9 @@ const injectContextForExercise = (exercise: ExerciseStore) => {
     },
     onAddInject(inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
       return dispatch(addInjectForExercise(exercise.exercise_id, inject));
+    },
+    onBulkUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
+      return dispatch(bulkUpdateInjectForExercise(exercise.exercise_id, injectId, inject));
     },
     onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
       return dispatch(updateInjectForExercise(exercise.exercise_id, injectId, inject));
