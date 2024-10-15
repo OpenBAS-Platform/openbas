@@ -2717,6 +2717,7 @@ const i18n = {
       'The element has been successfully deleted': '元素已成功删除',
       'Internal error': '内部错误 ',
       'No data to display': '没有可显示的数据',
+      'No simulation in this platform yet': '此平台尚未提供模拟功能',
     },
     en: {
       openbas_email: 'Email',
@@ -2870,7 +2871,6 @@ const i18n = {
       'Executor Caldera is not responding, your exercises may be impacted.': 'Executor Caldera is not responding, your exercises may be impacted.',
       'Value that signifies that all teams are targeted. A regex can be used.': 'Value that signifies that all teams are targeted. A regex can be used.',
       'New simulation successfully created and started. Click {here} to view the simulation.': 'New simulation successfully created and started. Click {here} to view the simulation.',
-      'No simulation in this platform yet': '此平台尚未提供模拟功能',
     },
   },
 };
