@@ -3,6 +3,7 @@ package io.openbas.rest.payload;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.integrations.PayloadService;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.payload.form.PayloadCreateInput;
@@ -102,10 +103,11 @@ public class PayloadApi extends RestBehavior {
                 return commandPayload;
             case "Executable":
                 Executable executablePayload = new Executable();
-                executablePayload.setUpdateAttributes(input);
-                executablePayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
-                executablePayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-                executablePayload.setExecutableFile(documentRepository.findById(input.getExecutableFile()).orElseThrow());
+                PayloadCreateInput validatedInput = validateExecutableInput(input);
+                executablePayload.setUpdateAttributes(validatedInput);
+                executablePayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(validatedInput.getAttackPatternsIds())));
+                executablePayload.setTags(iterableToSet(tagRepository.findAllById(validatedInput.getTagIds())));
+                executablePayload.setExecutableFile(documentRepository.findById(validatedInput.getExecutableFile()).orElseThrow());
                 executablePayload = payloadRepository.save(executablePayload);
                 this.payloadService.updateInjectorContractsForPayload(executablePayload);
                 return executablePayload;
@@ -136,6 +138,15 @@ public class PayloadApi extends RestBehavior {
                 return networkTrafficPayload;
             default:
                 throw new UnsupportedOperationException("Payload type " + input.getType() + " is not supported");
+        }
+    }
+
+    private static PayloadCreateInput validateExecutableInput(PayloadCreateInput input) {
+        Optional<Endpoint.PLATFORM_ARCH> maybeArch = Optional.ofNullable(input.getExecutableArch());
+        if (maybeArch.isPresent()) {
+            return input;
+        } else {
+            throw new BadRequestException("Executable arch is missing");
         }
     }
 

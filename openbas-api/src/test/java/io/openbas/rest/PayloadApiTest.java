@@ -44,6 +44,7 @@ public class PayloadApiTest extends IntegrationTest {
     void afterAll() {
         this.documentRepository.deleteAll(List.of(EXECUTABLE_FILE));
     }
+
     @Test
     @DisplayName("Create Executable Payload")
     @WithMockAdminUser
@@ -64,5 +65,25 @@ public class PayloadApiTest extends IntegrationTest {
             .content(asJsonString(input)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.executable_arch").value("x86_64"));
+    }
+
+    @Test
+    @DisplayName("Creating an Executable Payload without Arch should fail")
+    @WithMockAdminUser
+    void createExecutablePayloadWithoutArch() throws Exception {
+        PayloadCreateInput input = new PayloadCreateInput();
+        input.setType("Executable");
+        input.setName("My Executable Payload");
+        input.setSource(Payload.PAYLOAD_SOURCE.MANUAL);
+        input.setStatus(Payload.PAYLOAD_STATUS.VERIFIED);
+        input.setPlatforms(new Endpoint.PLATFORM_TYPE[]{Endpoint.PLATFORM_TYPE.Linux});
+        input.setAttackPatternsIds(Collections.emptyList());
+        input.setTagIds(Collections.emptyList());
+        input.setExecutableFile(EXECUTABLE_FILE.getId());
+
+        mvc.perform(post(PAYLOAD_URI)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(input)))
+            .andExpect(status().isBadRequest());
     }
 }
