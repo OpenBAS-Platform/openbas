@@ -121,6 +121,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
   ];
   const gapSize = 125;
   const newNodeSize = 50;
+  const nodeHeightClearance = 200;
+  const nodeWidthClearance = 350;
 
   let startDate: string | undefined;
 
@@ -171,8 +173,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
       const dependencies = nodesAvailable.filter((dependencyNode) => nodesId.includes(dependencyNode.id));
       const minX = Math.min(currentNode.position.x, ...dependencies.map((value) => value.data.boundingBox!.topLeft.x));
       const minY = Math.min(currentNode.position.y, ...dependencies.map((value) => value.data.boundingBox!.topLeft.y));
-      const maxX = Math.max(currentNode.position.x + 250, ...dependencies.map((value) => value.data.boundingBox!.bottomRight.x));
-      const maxY = Math.max(currentNode.position.y + 200, ...dependencies.map((value) => value.data.boundingBox!.bottomRight.y));
+      const maxX = Math.max(currentNode.position.x + nodeWidthClearance, ...dependencies.map((value) => value.data.boundingBox!.bottomRight.x));
+      const maxY = Math.max(currentNode.position.y + nodeHeightClearance, ...dependencies.map((value) => value.data.boundingBox!.bottomRight.y));
       return {
         topLeft: { x: minX, y: minY },
         bottomRight: { x: maxX, y: maxY },
@@ -180,7 +182,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
     }
     return {
       topLeft: currentNode.position,
-      bottomRight: { x: currentNode.position.x + 250, y: currentNode.position.y + 200 },
+      bottomRight: { x: currentNode.position.x + nodeWidthClearance, y: currentNode.position.y + nodeHeightClearance },
     };
   };
 
@@ -274,6 +276,10 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
             fixedY: 0,
             startDate,
             onSelectedInject,
+            boundingBox: {
+              topLeft: { x: (inject.inject_depends_duration / 60) * (gapSize / minutesPerGapAllowed[minutesPerGapIndex]), y: 0 },
+              bottomRight: { x: (inject.inject_depends_duration / 60) * (gapSize / minutesPerGapAllowed[minutesPerGapIndex]) + nodeWidthClearance, y: nodeHeightClearance },
+            },
             targets: inject.inject_assets!.map((asset) => assets[asset]?.asset_name)
               .concat(inject.inject_asset_groups!.map((assetGroup) => assetGroups[assetGroup]?.asset_group_name))
               .concat(inject.inject_teams!.map((team) => teams[team]?.team_name)),
