@@ -76,7 +76,7 @@ const AssetGroupDialogAdding: FunctionComponent<Props> = ({
     entityPrefix="asset_group"
     availableFilterNames={availableFilterNames}
     queryableHelpers={queryableHelpers}
-  />;
+                              />;
 
   return (
     <Dialog

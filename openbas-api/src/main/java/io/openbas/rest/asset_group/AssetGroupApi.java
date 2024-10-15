@@ -59,7 +59,7 @@ public class AssetGroupApi {
     return this.assetGroupCriteriaBuilderService.assetGroupPagination(searchPaginationInput);
   }
 
-  @PostMapping("/api/teams/find")
+  @PostMapping(ASSET_GROUP_URI + "/find")
   @PreAuthorize("isObserver()")
   @Transactional(readOnly = true)
   @Tracing(name = "Find teams", layer = "api", operation = "POST")
@@ -103,11 +103,3 @@ public class AssetGroupApi {
   }
 
 }
-
-// Before
-// Time without filters -> 0.02
-// Time with filters -> 0.013
-
-// After
-// Time without filters -> 0.02
-// Time with filters -> 0.009
