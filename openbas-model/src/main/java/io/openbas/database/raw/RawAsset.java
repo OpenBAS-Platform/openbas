@@ -9,7 +9,4 @@ public interface RawAsset {
   String getAsset_name();
 
   String getEndpoint_platform();
-
-  String getInject_id();
-
 }
