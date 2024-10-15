@@ -77,7 +77,10 @@ public class ExerciseService {
     private OpenBASConfig openBASConfig;
     // endregion
 
-    public Page<ExerciseSimple> exercises(Specification<Exercise> specification, Pageable pageable) {
+    public Page<ExerciseSimple> exercises(
+        Specification<Exercise> specification,
+        Specification<Exercise> specificationCount,
+        Pageable pageable) {
         CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
         CriteriaQuery<Tuple> cq = cb.createTupleQuery();
@@ -133,7 +136,7 @@ public class ExerciseService {
         }
 
         // -- Count Query --
-        Long total = countQuery(cb, this.entityManager, Exercise.class, specification);
+        Long total = countQuery(cb, this.entityManager, Exercise.class, specificationCount);
 
         return new PageImpl<>(exercises, pageable, total);
     }

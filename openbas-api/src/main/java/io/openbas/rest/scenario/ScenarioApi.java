@@ -1,5 +1,6 @@
 package io.openbas.rest.scenario;
 
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.repository.*;
@@ -82,6 +83,7 @@ public class ScenarioApi extends RestBehavior {
     return this.scenarioService.scenarios();
   }
 
+  @LogExecutionTime
   @PostMapping(SCENARIO_URI + "/search")
   public Page<RawPaginationScenario> scenarios(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return this.scenarioService.scenarios(searchPaginationInput);

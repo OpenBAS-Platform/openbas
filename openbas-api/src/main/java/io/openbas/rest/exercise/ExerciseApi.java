@@ -665,9 +665,10 @@ public class ExerciseApi extends RestBehavior {
             );
         } else {
             return buildPaginationCriteriaBuilder(
-                    (Specification<Exercise> specification, Pageable pageable) -> this.exerciseService.exercises(
+                    (Specification<Exercise> specification, Specification<Exercise> specificationCount, Pageable pageable) -> this.exerciseService.exercises(
                         findGrantedFor(currentUser().getId()).and(specification),
-                            pageable
+                        findGrantedFor(currentUser().getId()).and(specificationCount),
+                        pageable
                     ),
                     searchPaginationInput,
                     Exercise.class

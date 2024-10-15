@@ -17,6 +17,7 @@ import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,7 +26,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.function.BiFunction;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
@@ -59,11 +59,13 @@ public class TeamService {
   public Page<TeamOutput> teamPagination(
       @NotNull SearchPaginationInput searchPaginationInput,
       @NotNull final Specification<Team> teamSpecification) {
-    BiFunction<Specification<Team>, Pageable, Page<TeamOutput>> teamsFunction;
+    TriFunction<Specification<Team>, Specification<Team>, Pageable, Page<TeamOutput>> teamsFunction;
     OpenBASPrincipal currentUser = currentUser();
     if (currentUser.isAdmin()) {
-      teamsFunction = (Specification<Team> specification, Pageable pageable) -> this.paginate(
-          teamSpecification.and(specification), pageable
+      teamsFunction = (Specification<Team> specification, Specification<Team> specificationCount, Pageable pageable) -> this.paginate(
+          teamSpecification.and(specification),
+          teamSpecification.and(specificationCount),
+          pageable
       );
     } else {
       User user = this.userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
@@ -72,8 +74,10 @@ public class TeamService {
           .flatMap(group -> group.getOrganizations().stream())
           .map(Organization::getId)
           .toList();
-      teamsFunction = (Specification<Team> specification, Pageable pageable) -> this.paginate(
-          teamSpecification.and(teamsAccessibleFromOrganizations(organizationIds)).and(specification), pageable
+      teamsFunction = (Specification<Team> specification, Specification<Team> specificationCount, Pageable pageable) -> this.paginate(
+          teamSpecification.and(teamsAccessibleFromOrganizations(organizationIds)).and(specification),
+          teamSpecification.and(teamsAccessibleFromOrganizations(organizationIds)).and(specificationCount),
+          pageable
       );
     }
     return buildPaginationCriteriaBuilder(
@@ -83,7 +87,10 @@ public class TeamService {
     );
   }
 
-  private Page<TeamOutput> paginate(Specification<Team> specification, Pageable pageable) {
+  private Page<TeamOutput> paginate(
+      Specification<Team> specification,
+      Specification<Team> specificationCount,
+      Pageable pageable) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
@@ -113,7 +120,7 @@ public class TeamService {
     List<TeamOutput> teams = execution(query);
 
     // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, Team.class, specification);
+    Long total = countQuery(cb, this.entityManager, Team.class, specificationCount);
 
     return new PageImpl<>(teams, pageable, total);
   }

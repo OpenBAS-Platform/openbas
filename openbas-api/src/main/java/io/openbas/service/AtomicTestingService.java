@@ -290,15 +290,21 @@ public class AtomicTestingService {
             return predicate;
         });
         return buildPaginationCriteriaBuilder(
-                (Specification<Inject> specification, Pageable pageable) -> this.atomicTestings(
-                    customSpec.and(specification), pageable),
+                (Specification<Inject> specification, Specification<Inject> specificationCount, Pageable pageable) -> this.atomicTestings(
+                    customSpec.and(specification),
+                    customSpec.and(specificationCount),
+                    pageable
+                ),
                 searchPaginationInput,
                 Inject.class
         );
     }
 
 
-    public Page<AtomicTestingOutput> atomicTestings(Specification<Inject> specification, Pageable pageable) {
+    public Page<AtomicTestingOutput> atomicTestings(
+        Specification<Inject> specification,
+        Specification<Inject> specificationCount,
+        Pageable pageable) {
         CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
         CriteriaQuery<Tuple> cq = cb.createTupleQuery();
@@ -368,8 +374,8 @@ public class AtomicTestingService {
             );
         }
 
-    // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, Inject.class, specification);
+        // -- Count Query --
+        Long total = countQuery(cb, this.entityManager, Inject.class, specificationCount);
 
         return new PageImpl<>(injects, pageable, total);
     }

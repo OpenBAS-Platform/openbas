@@ -47,8 +47,10 @@ public class ScenarioInjectApi extends RestBehavior {
       @PathVariable @NotBlank final String scenarioId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationCriteriaBuilder(
-        (Specification<Inject> specification, Pageable pageable) -> this.injectService.injects(
-            fromScenario(scenarioId).and(specification), pageable
+        (Specification<Inject> specification, Specification<Inject> specificationCount, Pageable pageable) -> this.injectService.injects(
+            fromScenario(scenarioId).and(specification),
+            fromScenario(scenarioId).and(specificationCount),
+            pageable
         ),
         searchPaginationInput,
         Inject.class
