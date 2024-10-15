@@ -30,13 +30,15 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
   const drawerRef = useRef(null);
   const [availableTabs] = useState<string[]>(['Inject details', 'Logical chains']);
   const [activeTab, setActiveTab] = useState<null | string>(availableTabs[0]);
+  const [isInjectLoading, setIsInjectLoading] = useState(true);
   // Fetching data
   const { inject } = useHelper((helper: InjectHelper) => ({
     inject: helper.getInject(injectId),
   }));
 
   useDataLoader(() => {
-    dispatch(fetchInject(injectId));
+    setIsInjectLoading(true);
+    dispatch(fetchInject(injectId)).finally(() => setIsInjectLoading(false));
   });
 
   // Selection
@@ -70,7 +72,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
           })}
         </Tabs>
         )}
-        {(isAtomic || activeTab === 'Inject details') && (
+        {!isInjectLoading && (isAtomic || activeTab === 'Inject details') && (
           <UpdateInjectDetails
             drawerRef={drawerRef}
             contractContent={injectorContract}
@@ -83,7 +85,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
             {...props}
           />
         )}
-        {(!isAtomic && activeTab === 'Logical chains') && (
+        {(!isInjectLoading && !isAtomic && activeTab === 'Logical chains') && (
           <UpdateInjectLogicalChains
             inject={inject}
             handleClose={handleClose}
