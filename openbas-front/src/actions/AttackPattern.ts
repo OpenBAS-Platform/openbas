@@ -9,6 +9,10 @@ export const fetchAttackPatterns = () => (dispatch: Dispatch) => {
   return getReferential(schema.arrayOfAttackPatterns, ATTACK_PATTERN_URI)(dispatch);
 };
 
+export const searchAttackPatternsById = (ids: string[]) => {
+  return simplePostCall(`${ATTACK_PATTERN_URI}/query`, ids);
+};
+
 export const searchAttackPatterns = (paginationInput: SearchPaginationInput) => {
   const data = paginationInput;
   const uri = `${ATTACK_PATTERN_URI}/search`;

@@ -156,6 +156,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
 
 const Index = () => {
   // Standard hooks
+  const [pristine, setPristine] = useState(true);
   const [loading, setLoading] = useState(true);
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -164,12 +165,15 @@ const Index = () => {
   const exercise = useHelper((helper: ExercisesHelper) => helper.getExercise(exerciseId));
   useDataLoader(() => {
     setLoading(true);
-    dispatch(fetchExercise(exerciseId)).finally(() => setLoading(false));
+    dispatch(fetchExercise(exerciseId)).finally(() => {
+      setPristine(false);
+      setLoading(false);
+    });
   });
 
   const exerciseInjectContext = injectContextForExercise(exercise);
 
-  if (loading) {
+  if (pristine && loading) {
     return <Loader />;
   }
   if (!loading && !exercise) {

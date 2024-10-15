@@ -2,6 +2,7 @@ import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui
 import { HubOutlined } from '@mui/icons-material';
 import React, { CSSProperties, FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
+import { Link } from 'react-router-dom';
 import ExerciseStatus from './simulation/ExerciseStatus';
 import ItemTags from '../../../components/ItemTags';
 import { useFormatter } from '../../../components/i18n';
@@ -82,7 +83,7 @@ const ExerciseList: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const inlineStyles = getInlineStyles(variant);
-  const { nsdt } = useFormatter();
+  const { nsdt, vnsdt } = useFormatter();
 
   // Fetching data
   useDataLoader(() => {
@@ -101,7 +102,12 @@ const ExerciseList: FunctionComponent<Props> = ({
       field: 'exercise_start_date',
       label: 'Start date',
       isSortable: true,
-      value: (exercise: ExerciseSimple) => <>{(exercise.exercise_start_date ? (nsdt(exercise.exercise_start_date)) : ('-'))}</>,
+      value: (exercise: ExerciseSimple) => {
+        if (!exercise.exercise_start_date) {
+          return '-';
+        }
+        return <>{(variant === 'reduced-view' ? vnsdt(exercise.exercise_start_date) : nsdt(exercise.exercise_start_date))}</>;
+      },
     },
     {
       field: 'exercise_status',
@@ -131,7 +137,12 @@ const ExerciseList: FunctionComponent<Props> = ({
       field: 'exercise_updated_at',
       label: 'Updated',
       isSortable: true,
-      value: (exercise: ExerciseSimple) => <>{nsdt(exercise.exercise_updated_at)}</>,
+      value: (exercise: ExerciseSimple) => {
+        if (!exercise.exercise_updated_at) {
+          return '-';
+        }
+        return <>{(variant === 'reduced-view' ? vnsdt(exercise.exercise_updated_at) : nsdt(exercise.exercise_updated_at))}</>;
+      },
     },
   ];
 
@@ -164,7 +175,8 @@ const ExerciseList: FunctionComponent<Props> = ({
         >
           <ListItemButton
             classes={{ root: classes.item }}
-            href={`/admin/exercises/${exercise.exercise_id}`}
+            component={Link}
+            to={`/admin/exercises/${exercise.exercise_id}`}
           >
             <ListItemIcon>
               <HubOutlined color="primary" />

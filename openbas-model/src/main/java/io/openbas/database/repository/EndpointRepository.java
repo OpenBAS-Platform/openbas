@@ -36,11 +36,11 @@ public interface EndpointRepository extends CrudRepository<Endpoint, String>,
       "join i.exercise as e " +
       "join e.grants as grant " +
       "join grant.group.users as user " +
-      "where user.id = :userId and i.createdAt < :creationDate")
+      "where user.id = :userId and i.createdAt > :creationDate")
   long userCount(@Param("userId") String userId, @Param("creationDate") Instant creationDate);
 
   @Override
-  @Query("select count(distinct e) from Endpoint e where e.createdAt < :creationDate")
+  @Query("select count(distinct e) from Endpoint e where e.createdAt > :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
 
 }

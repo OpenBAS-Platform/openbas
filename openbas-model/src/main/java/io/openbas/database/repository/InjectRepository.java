@@ -2,8 +2,10 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawInject;
+
 import java.util.Collection;
 import java.util.Set;
+
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -95,36 +97,62 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
       "join i.exercise as e " +
       "join e.grants as grant " +
       "join grant.group.users as user " +
-      "where user.id = :userId and i.createdAt < :creationDate")
+      "where user.id = :userId and i.createdAt > :creationDate")
   long userCount(@Param("userId") String userId, @Param("creationDate") Instant creationDate);
 
   @Override
-  @Query("select count(distinct i) from Inject i where i.createdAt < :creationDate")
+  @Query("select count(distinct i) from Inject i where i.createdAt > :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
 
+  @Query(value = "select icap.attack_pattern_id, count(distinct i) as countInjects from injects i "
+      + "left join injectors_contracts_attack_patterns icap ON icap.injector_contract_id = i.inject_injector_contract "
+      + "left join exercises e ON e.exercise_id = i.inject_exercise "
+      + "left join injects_statuses injectStatus ON injectStatus.status_inject = i.inject_id "
+      + "where i.inject_created_at > :creationDate and i.inject_exercise is not null and e.exercise_start_date is not null and icap.injector_contract_id is not null and injectStatus.status_name = 'SUCCESS'"
+      + "group by icap.attack_pattern_id order by countInjects DESC limit 10", nativeQuery = true)
+  List<Object[]> globalCountGroupByAttackPatternInExercise(@Param("creationDate") Instant creationDate);
+
+  @Query(value = "select icap.attack_pattern_id, count(distinct i) as countInjects from injects i "
+      + "left join injectors_contracts_attack_patterns icap ON icap.injector_contract_id = i.inject_injector_contract "
+      + "inner join exercises e on e.exercise_id = i.inject_exercise "
+      + "inner join grants ON grants.grant_exercise = e.exercise_id "
+      + "inner join groups ON grants.grant_group = groups.group_id "
+      + "inner join users_groups ON groups.group_id = users_groups.group_id "
+      + "left join injects_statuses injectStatus ON injectStatus.status_inject = i.inject_id "
+      + "where users_groups.user_id = :userId and i.inject_created_at > :creationDate and i.inject_exercise is not null and e.exercise_start_date is not null and icap.injector_contract_id is not null and injectStatus.status_name = 'SUCCESS'"
+      + "group by icap.attack_pattern_id order by countInjects DESC limit 10", nativeQuery = true)
+  List<Object[]> userCountGroupByAttackPatternInExercise(@Param("userId") String userId,
+      @Param("creationDate") Instant creationDate);
+
   @Query(value = " SELECT injects.inject_id, ins.status_name, injects.inject_scenario, " +
-          "coalesce(array_agg(it.team_id) FILTER ( WHERE it.team_id IS NOT NULL ), '{}') as inject_teams, " +
-          "coalesce(array_agg(assets.asset_id) FILTER ( WHERE assets.asset_id IS NOT NULL ), '{}') as inject_assets, " +
-          "coalesce(array_agg(iag.asset_group_id) FILTER ( WHERE iag.asset_group_id IS NOT NULL ), '{}') as inject_asset_groups, " +
-          "coalesce(array_agg(ie.inject_expectation_id) FILTER ( WHERE ie.inject_expectation_id IS NOT NULL ), '{}') as inject_expectations, " +
-          "coalesce(array_agg(com.communication_id) FILTER ( WHERE com.communication_id IS NOT NULL ), '{}') as inject_communications, " +
-          "coalesce(array_agg(apkcp.phase_id) FILTER ( WHERE apkcp.phase_id IS NOT NULL ), '{}') as inject_kill_chain_phases, " +
-          "coalesce(array_union_agg(injcon.injector_contract_platforms) FILTER ( WHERE injcon.injector_contract_platforms IS NOT NULL ), '{}') as inject_platforms " +
-          "FROM injects " +
-          "LEFT JOIN injects_teams it ON injects.inject_id = it.inject_id " +
-          "LEFT JOIN injects_assets ia ON injects.inject_id = ia.inject_id " +
-          "LEFT JOIN injects_asset_groups iag ON injects.inject_id = iag.inject_id " +
-          "LEFT JOIN asset_groups_assets aga ON aga.asset_group_id = iag.asset_group_id " +
-          "LEFT JOIN assets ON assets.asset_id = ia.asset_id OR aga.asset_id = assets.asset_id " +
-          "LEFT JOIN communications com ON com.communication_inject = injects.inject_id " +
-          "LEFT JOIN injects_expectations ie ON injects.inject_id = ie.inject_id " +
-          "LEFT JOIN injectors_contracts_attack_patterns icap ON icap.injector_contract_id = injects.inject_injector_contract " +
-          "LEFT JOIN injectors_contracts injcon ON injcon.injector_contract_id = injects.inject_injector_contract " +
-          "LEFT JOIN attack_patterns_kill_chain_phases apkcp ON apkcp.attack_pattern_id = icap.attack_pattern_id " +
-          "LEFT JOIN injects_statuses ins ON ins.status_inject = injects.inject_id " +
-          "WHERE injects.inject_id IN :ids " +
-          "GROUP BY injects.inject_id, ins.status_name;", nativeQuery = true)
-  List<RawInject> findRawByIds(@Param("ids")List<String> ids);
+      "coalesce(array_agg(it.team_id) FILTER ( WHERE it.team_id IS NOT NULL ), '{}') as inject_teams, " +
+      "coalesce(array_agg(assets.asset_id) FILTER ( WHERE assets.asset_id IS NOT NULL ), '{}') as inject_assets, " +
+      "coalesce(array_agg(iag.asset_group_id) FILTER ( WHERE iag.asset_group_id IS NOT NULL ), '{}') as inject_asset_groups, "
+      +
+      "coalesce(array_agg(ie.inject_expectation_id) FILTER ( WHERE ie.inject_expectation_id IS NOT NULL ), '{}') as inject_expectations, "
+      +
+      "coalesce(array_agg(com.communication_id) FILTER ( WHERE com.communication_id IS NOT NULL ), '{}') as inject_communications, "
+      +
+      "coalesce(array_agg(apkcp.phase_id) FILTER ( WHERE apkcp.phase_id IS NOT NULL ), '{}') as inject_kill_chain_phases, "
+      +
+      "coalesce(array_union_agg(injcon.injector_contract_platforms) FILTER ( WHERE injcon.injector_contract_platforms IS NOT NULL ), '{}') as inject_platforms "
+      +
+      "FROM injects " +
+      "LEFT JOIN injects_teams it ON injects.inject_id = it.inject_id " +
+      "LEFT JOIN injects_assets ia ON injects.inject_id = ia.inject_id " +
+      "LEFT JOIN injects_asset_groups iag ON injects.inject_id = iag.inject_id " +
+      "LEFT JOIN asset_groups_assets aga ON aga.asset_group_id = iag.asset_group_id " +
+      "LEFT JOIN assets ON assets.asset_id = ia.asset_id OR aga.asset_id = assets.asset_id " +
+      "LEFT JOIN communications com ON com.communication_inject = injects.inject_id " +
+      "LEFT JOIN injects_expectations ie ON injects.inject_id = ie.inject_id " +
+      "LEFT JOIN injectors_contracts_attack_patterns icap ON icap.injector_contract_id = injects.inject_injector_contract "
+      +
+      "LEFT JOIN injectors_contracts injcon ON injcon.injector_contract_id = injects.inject_injector_contract " +
+      "LEFT JOIN attack_patterns_kill_chain_phases apkcp ON apkcp.attack_pattern_id = icap.attack_pattern_id " +
+      "LEFT JOIN injects_statuses ins ON ins.status_inject = injects.inject_id " +
+      "WHERE injects.inject_id IN :ids " +
+      "GROUP BY injects.inject_id, ins.status_name;", nativeQuery = true)
+  List<RawInject> findRawByIds(@Param("ids") List<String> ids);
 
   @Query(value = " SELECT injects.inject_id, " +
       "coalesce(array_agg(it.team_id) FILTER ( WHERE it.team_id IS NOT NULL ), '{}') as inject_teams " +
@@ -132,13 +160,15 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
       "LEFT JOIN injects_teams it ON injects.inject_id = it.inject_id " +
       "WHERE injects.inject_id IN :ids AND it.team_id = :teamId " +
       "GROUP BY injects.inject_id", nativeQuery = true)
-  Set<RawInject> findRawInjectTeams(@Param("ids") Collection<String> ids, @Param("teamId")  String teamId);
+  Set<RawInject> findRawInjectTeams(@Param("ids") Collection<String> ids, @Param("teamId") String teamId);
 
   @Query(value =
       "SELECT org.*, " +
           "array_agg(DISTINCT org_tags.tag_id) FILTER (WHERE org_tags.tag_id IS NOT NULL) AS organization_tags, " +
-          "array_agg(DISTINCT injects.inject_id) FILTER (WHERE injects.inject_id IS NOT NULL) AS organization_injects, " +
-          "coalesce(array_length(array_agg(DISTINCT injects.inject_id) FILTER (WHERE injects.inject_id IS NOT NULL), 1), 0) AS organization_injects_number " +
+          "array_agg(DISTINCT injects.inject_id) FILTER (WHERE injects.inject_id IS NOT NULL) AS organization_injects, "
+          +
+          "coalesce(array_length(array_agg(DISTINCT injects.inject_id) FILTER (WHERE injects.inject_id IS NOT NULL), 1), 0) AS organization_injects_number "
+          +
           "FROM organizations org " +
           "LEFT JOIN organizations_tags org_tags ON org.organization_id = org_tags.organization_id " +
           "LEFT JOIN users ON users.user_organization = org.organization_id " +

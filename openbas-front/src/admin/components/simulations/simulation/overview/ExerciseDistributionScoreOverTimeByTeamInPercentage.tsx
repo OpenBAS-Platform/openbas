@@ -85,11 +85,9 @@ const ExerciseDistributionScoreOverTimeByTeamInPercentage: FunctionComponent<Pro
     <>
       {teamsTotalScores.length > 0 ? (
         <Chart
-          // @ts-expect-error: Need to migrate Chart.js file
           options={lineChartOptions(
             theme,
             true,
-            // @ts-expect-error: Need to migrate i18n.js file
             nsdt,
             null,
             undefined,

@@ -76,13 +76,13 @@ const AtomicTestings = () => {
       />
       {userAdmin && (<>
         <ButtonCreate onClick={() => setOpenCreateDrawer(true)} />
-        <CreateInject
+        {openCreateDrawer && <CreateInject
           title={t('Create a new atomic test')}
           onCreateInject={onCreateAtomicTesting}
           isAtomic
           open={openCreateDrawer}
           handleClose={() => setOpenCreateDrawer(false)}
-        />
+                             />}
       </>)
       }
     </>

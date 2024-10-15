@@ -20,6 +20,31 @@ import type { FilterGroup } from '../../../utils/api-types';
 import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
 import ExportButton from '../../../components/common/ExportButton';
 
+// Filters
+const availableFilterNames = [
+  'exercise_kill_chain_phases',
+  'exercise_name',
+  'exercise_scenario',
+  'exercise_start_date',
+  'exercise_status',
+  'exercise_tags',
+  'exercise_updated_at',
+];
+
+const quickFilter: FilterGroup = {
+  mode: 'and',
+  filters: [
+    buildEmptyFilter('exercise_kill_chain_phases', 'contains'),
+    buildEmptyFilter('exercise_scenario', 'contains'),
+    buildEmptyFilter('exercise_tags', 'contains'),
+  ],
+};
+
+const searchPaginationInit = buildSearchPagination({
+  sorts: initSorting('exercise_updated_at', 'DESC'),
+  filterGroup: quickFilter,
+});
+
 const Exercises = () => {
   // Standard hooks
   const { t } = useFormatter();
@@ -31,29 +56,7 @@ const Exercises = () => {
 
   const [exercises, setExercises] = useState<EndpointStore[]>([]);
 
-  // Filters
-  const availableFilterNames = [
-    'exercise_kill_chain_phases',
-    'exercise_name',
-    'exercise_scenario',
-    'exercise_start_date',
-    'exercise_status',
-    'exercise_tags',
-    'exercise_updated_at',
-  ];
-
-  const quickFilter: FilterGroup = {
-    mode: 'and',
-    filters: [
-      buildEmptyFilter('exercise_kill_chain_phases', 'contains'),
-      buildEmptyFilter('exercise_scenario', 'contains'),
-      buildEmptyFilter('exercise_tags', 'contains'),
-    ],
-  };
-  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('simulations', buildSearchPagination({
-    sorts: initSorting('exercise_updated_at', 'DESC'),
-    filterGroup: quickFilter,
-  }));
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('simulations', searchPaginationInit);
 
   // Export
   const exportProps = {

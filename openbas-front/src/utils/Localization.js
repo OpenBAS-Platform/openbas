@@ -1090,6 +1090,7 @@ const i18n = {
       'validations needed': 'validations nécessaires',
       'Add tags': 'Ajouter des étiquettes',
       '24 hours': '24 heures',
+      '1 month': '1 mois',
       'Asset Groups': "Groupes d'actifs",
       Values: 'Valeurs',
       'No available options': 'Aucune option disponible',
@@ -1384,6 +1385,7 @@ const i18n = {
       'The element has been successfully updated': 'L\'élément a été mis à jour avec succès',
       'The element has been successfully deleted': 'L\'élément a été supprimé avec succès',
       'No data to display': 'Aucune donnée à afficher',
+      'No simulation in this platform yet': 'Pas encore de simulation sur cette plateforme',
     },
     zh: {
       'Email address': 'email地址',
@@ -2440,6 +2442,7 @@ const i18n = {
       'validations needed': '需要验证',
       'Add tags': '添加标签',
       '24 hours': '24小时',
+      '1 month': '一个月',
       'Asset Groups': '资产组',
       Values: '值',
       'No available options': '无可用选项',
@@ -2867,6 +2870,7 @@ const i18n = {
       'Executor Caldera is not responding, your exercises may be impacted.': 'Executor Caldera is not responding, your exercises may be impacted.',
       'Value that signifies that all teams are targeted. A regex can be used.': 'Value that signifies that all teams are targeted. A regex can be used.',
       'New simulation successfully created and started. Click {here} to view the simulation.': 'New simulation successfully created and started. Click {here} to view the simulation.',
+      'No simulation in this platform yet': '此平台尚未提供模拟功能',
     },
   },
 };

@@ -26,6 +26,7 @@ import PaginationComponentV2 from '../../../../components/common/queryable/pagin
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
 import { Header } from '../../../../components/common/SortHeadersList';
+import Loader from '../../../../components/Loader';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -266,7 +267,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
                   }
                 />
               </ListItem>
-              {contracts.map((contract, index) => {
+              {(attackPatterns.length && Object.keys(attackPatternsMap).length && Object.keys(killChainPhasesMap).length) ? contracts.map((contract, index) => {
                 const contractAttackPatterns = computeAttackPatterns(contract, attackPatternsMap);
                 // eslint-disable-next-line max-len
                 const contractKillChainPhase = contractAttackPatterns.map((contractAttackPattern: AttackPatternStore) => contractAttackPattern.attack_pattern_kill_chain_phases ?? []).flat().at(0);
@@ -305,7 +306,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
                     </ListItemIcon>
                   </ListItemButton>
                 );
-              })}
+              }) : <Loader variant="inElement" />}
             </List>
           </Grid>
           <Grid item xs={5} style={{ paddingTop: 10 }}>

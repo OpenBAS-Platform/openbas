@@ -36,19 +36,20 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
       "join team.exercises as e " +
       "join e.grants as grant " +
       "join grant.group.users as user " +
-      "where user.id = :userId and u.createdAt < :creationDate")
+      "where user.id = :userId and u.createdAt > :creationDate")
   long userCount(String userId, Instant creationDate);
 
   @Override
-  @Query("select count(distinct u) from User u where u.createdAt < :creationDate")
+  @Query("select count(distinct u) from User u where u.createdAt > :creationDate")
   long globalCount(Instant creationDate);
 
   // -- ADMIN --
 
   // Custom query to bypass ID generator on User property
   @Modifying
-  @Query(value = "insert into users(user_id, user_firstname, user_lastname, user_email, user_password, user_admin, user_status) "
-      + "values (:id, :firstname, :lastName, :email, :password, true, 1)", nativeQuery = true)
+  @Query(value =
+      "insert into users(user_id, user_firstname, user_lastname, user_email, user_password, user_admin, user_status) "
+          + "values (:id, :firstname, :lastName, :email, :password, true, 1)", nativeQuery = true)
   void createAdmin(
       @Param("id") String userId,
       @Param("firstname") String userFirstName,
@@ -71,13 +72,13 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
   List<RawUser> rawAll();
 
   @Query(value = "select us.user_id, us.user_email, " +
-          "us.user_firstname, us.user_lastname, " +
-          "us.user_country, us.user_organization," +
-          "array_remove(array_agg(tg.tag_id), null) as user_tags " +
-          "from users us " +
-          "left join users_tags usr_tg on us.user_id = usr_tg.user_id " +
-          "left join tags tg on usr_tg.tag_id = tg.tag_id " +
-          "group by us.user_id;", nativeQuery = true)
+      "us.user_firstname, us.user_lastname, " +
+      "us.user_country, us.user_organization," +
+      "array_remove(array_agg(tg.tag_id), null) as user_tags " +
+      "from users us " +
+      "left join users_tags usr_tg on us.user_id = usr_tg.user_id " +
+      "left join tags tg on usr_tg.tag_id = tg.tag_id " +
+      "group by us.user_id;", nativeQuery = true)
   List<RawPlayer> rawAllPlayers();
 
   @Query(value = "select us from users us where us.user_organization is null or us.user_organization in :organizationIds", nativeQuery = true)

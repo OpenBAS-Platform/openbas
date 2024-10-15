@@ -57,7 +57,6 @@ const InjectDistributionByTeam: FunctionComponent<Props> = ({
     <>
       {sortedTeamsByExpectedScore.length > 0 ? (
         <Chart
-          // @ts-expect-error: Need to migrate Chart.js file
           options={horizontalBarsChartOptions(theme)}
           series={expectedScoreByTeamData}
           type="bar"

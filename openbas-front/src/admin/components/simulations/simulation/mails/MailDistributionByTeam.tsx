@@ -60,7 +60,6 @@ const MailDistributionByTeam: FunctionComponent<Props> = ({
     <>
       {sortedTeamsByCommunicationNumber.length > 0 ? (
         <Chart
-          // @ts-expect-error: Need to migrate Chart.js file
           options={horizontalBarsChartOptions(theme)}
           series={totalMailsByTeamData}
           type="bar"

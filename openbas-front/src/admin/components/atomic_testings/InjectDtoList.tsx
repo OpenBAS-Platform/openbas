@@ -1,6 +1,7 @@
 import React, { CSSProperties, FunctionComponent, useMemo, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Link } from 'react-router-dom';
 import { useFormatter } from '../../../components/i18n';
 import InjectIcon from '../common/injects/InjectIcon';
 import type { InjectResultDTO, SearchPaginationInput } from '../../../utils/api-types';
@@ -195,7 +196,8 @@ const InjectDtoList: FunctionComponent<Props> = ({
               disablePadding
             >
               <ListItemButton
-                href={goTo(injectDto.inject_id)}
+                component={Link}
+                to={goTo(injectDto.inject_id)}
               >
                 <ListItemIcon>
                   <InjectIcon
