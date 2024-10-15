@@ -4,8 +4,6 @@ import java.util.List;
 
 public interface RawInjectExpectation {
 
-  default String getName() { return getUser_firstname() + " " + getUser_lastname(); }
-
   String getInject_expectation_type();
 
   Double getInject_expectation_score();

@@ -11,9 +11,14 @@ public interface RawPlayer {
     }
 
     String getUser_id();
+
     String getUser_firstname();
+
     String getUser_lastname();
+
     String getUser_email();
+
     String getUser_organization();
+
     List<String> getUser_tags();
 }
