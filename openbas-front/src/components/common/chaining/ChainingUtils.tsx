@@ -1,4 +1,5 @@
 import type { InjectDependency } from '../../../utils/api-types';
+import type { InjectStore } from '../../../actions/injects/Inject';
 
 const breakpointAndOr = /(&&|\|\|)/gm;
 const breakpointValue = /==/gm;
@@ -36,4 +37,19 @@ const fromInjectDependencyToLabel = (dependency: string) => {
   return label;
 };
 
-export default { fromInjectDependencyToInputDependency, fromInjectDependencyToLabel };
+const convertInjectStore = (injectStore: InjectStore) => {
+  const dependingOn : Record<string, string> = {};
+  injectStore.inject_depends_on?.forEach((value) => {
+    if (value.dependency_condition != null && value.dependency_relationship?.inject_parent_id !== undefined) {
+      dependingOn[value.dependency_relationship?.inject_parent_id as unknown as string] = value.dependency_condition;
+    }
+  });
+  const newResult = {
+    ...injectStore,
+    inject_depends_on: Object.keys(dependingOn).length === 0 ? null : dependingOn,
+  };
+
+  return newResult;
+};
+
+export default { fromInjectDependencyToInputDependency, fromInjectDependencyToLabel, convertInjectStore };
