@@ -144,33 +144,33 @@ public class PayloadService {
   public Payload duplicate(@NotBlank final String payloadId) {
     Payload origin = this.payloadRepository.findById(payloadId).orElseThrow();
     Payload duplicate;
-    switch (origin.getType()) {
-      case "Command":
+    switch (PayloadType.fromString(origin.getType())) {
+      case PayloadType.COMMAND:
         Command originCommand = (Command) Hibernate.unproxy(origin);
         Command duplicateCommand = new Command();
         duplicateCommonProperties(originCommand, duplicateCommand);
         duplicate = payloadRepository.save(duplicateCommand);
         break;
-      case "Executable":
+      case PayloadType.EXECUTABLE:
         Executable originExecutable = (Executable) Hibernate.unproxy(origin);
         Executable duplicateExecutable = new Executable();
         duplicateCommonProperties(originExecutable, duplicateExecutable);
         duplicateExecutable.setExecutableFile(originExecutable.getExecutableFile());
         duplicate = payloadRepository.save(duplicateExecutable);
         break;
-      case "FileDrop":
+      case PayloadType.FILE_DROP:
         FileDrop originFileDrop = (FileDrop) Hibernate.unproxy(origin);
         FileDrop duplicateFileDrop = new FileDrop();
         duplicateCommonProperties(originFileDrop, duplicateFileDrop);
         duplicate = payloadRepository.save(duplicateFileDrop);
         break;
-      case "DnsResolution":
+      case PayloadType.DNS_RESOLUTION:
         DnsResolution originDnsResolution = (DnsResolution) Hibernate.unproxy(origin);
         DnsResolution duplicateDnsResolution = new DnsResolution();
         duplicateCommonProperties(originDnsResolution, duplicateDnsResolution);
         duplicate = payloadRepository.save(duplicateDnsResolution);
         break;
-      case "NetworkTraffic":
+      case PayloadType.NETWORK_TRAFFIC:
         NetworkTraffic originNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(origin);
         NetworkTraffic duplicateNetworkTraffic = new NetworkTraffic();
         duplicateCommonProperties(originNetworkTraffic, duplicateNetworkTraffic);
