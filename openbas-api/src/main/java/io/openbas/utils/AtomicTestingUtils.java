@@ -7,7 +7,6 @@ import io.openbas.database.raw.RawAsset;
 import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.raw.RawTeam;
-import io.openbas.database.raw.impl.RawEndpoint;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
@@ -300,7 +299,7 @@ public class AtomicTestingUtils {
       Map<String, RawTeam> rawTeamMap,
       Map<String, RawAsset> rawAssetMap,
       Map<String, RawAssetGroup> rawAssetGroupMap,
-      Map<String, List<RawEndpoint>> dynamicAssetGroupMap
+      Map<String, List<Endpoint>> dynamicAssetGroupMap
   ) {
 
     // Get expectations with default values
@@ -445,11 +444,11 @@ public class AtomicTestingUtils {
           dynamicAssetGroupMap.get(assetGroup.getAsset_group_id()).forEach(dynamicAsset -> {
             children.add(new InjectTargetWithResult(
                 TargetType.ASSETS,
-                dynamicAsset.getAsset_id(),
-                dynamicAsset.getAsset_name(),
+                dynamicAsset.getId(),
+                dynamicAsset.getName(),
                 defaultExpectationResultsByTypes,
-                Objects.equals(dynamicAsset.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(
-                    dynamicAsset.getEndpoint_platform())
+                Objects.equals(dynamicAsset.getType(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(
+                    String.valueOf(dynamicAsset.getPlatform()))
                     : null
             ));
           });
@@ -567,15 +566,15 @@ public class AtomicTestingUtils {
             if(dynamicAssetGroupMap.containsKey(entry.getKey())) {
               dynamicAssetGroupMap.get(entry.getKey()).forEach(dynamicAsset -> {
                 boolean foundDynamicAssetsWithoutResults = children.stream()
-                    .noneMatch(child -> child.getId().equals(dynamicAsset.getAsset_id()));
+                    .noneMatch(child -> child.getId().equals(dynamicAsset.getId()));
                 if (foundDynamicAssetsWithoutResults) {
                   children.add(new InjectTargetWithResult(
                       TargetType.ASSETS,
-                      dynamicAsset.getAsset_id(),
-                      dynamicAsset.getAsset_name(),
+                      dynamicAsset.getId(),
+                      dynamicAsset.getName(),
                       defaultExpectationResultsByTypes,
-                      Objects.equals(dynamicAsset.getAsset_type(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(
-                          dynamicAsset.getEndpoint_platform())
+                      Objects.equals(dynamicAsset.getType(), "Endpoint") ? Endpoint.PLATFORM_TYPE.valueOf(
+                          String.valueOf(dynamicAsset.getPlatform()))
                           : null
                   ));
                 }

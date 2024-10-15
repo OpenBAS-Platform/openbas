@@ -48,6 +48,7 @@ public interface AssetGroupRepository extends CrudRepository<AssetGroup, String>
       "GROUP BY ag.asset_group_id;", nativeQuery = true)
   List<RawAssetGroup> rawAssetGroupByIds(@Param("ids") List<String> ids);
 
+
   @Query(value =
       "SELECT ag.asset_group_id, ag.asset_group_name, CAST(ag.asset_group_dynamic_filter as text), " +
           "coalesce(array_agg(aga.asset_id) FILTER ( WHERE aga.asset_id IS NOT NULL ), '{}') asset_ids " +

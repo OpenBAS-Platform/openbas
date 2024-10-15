@@ -2,12 +2,12 @@ package io.openbas.utils;
 
 import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.AttackPattern;
+import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawAsset;
 import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.raw.RawTeam;
-import io.openbas.database.raw.impl.RawEndpoint;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.AssetRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
@@ -123,7 +123,7 @@ public class ResultUtils {
     List<RawAsset> rawAssets = assetRepository.rawByIdsOrInjectIds(assetIds, injectIds);
     Map<String, RawAsset> assetMap = rawAssets.stream().collect(Collectors.toMap(RawAsset::getAsset_id, rawAsset ->rawAsset));
 
-    Map<String, List<RawEndpoint>> dynamicForAssetGroupMap = assetGroupService.computeDynamicAssetFromRaw(
+    Map<String, List<Endpoint>> dynamicForAssetGroupMap = assetGroupService.computeDynamicAssetFromRaw(
         rawAssetGroups);
 
     return injectIds.stream()

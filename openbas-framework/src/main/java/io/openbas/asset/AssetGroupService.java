@@ -3,9 +3,7 @@ package io.openbas.asset;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Endpoint;
-import io.openbas.database.raw.RawAsset;
 import io.openbas.database.raw.RawAssetGroup;
-import io.openbas.database.raw.impl.RawEndpoint;
 import io.openbas.database.repository.AssetGroupRepository;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -129,7 +127,7 @@ public class AssetGroupService {
   /**
    *
    * */
-  public Map<String, List<RawEndpoint>> computeDynamicAssetFromRaw(@NotNull List<RawAssetGroup> assetGroups) {
+  public Map<String, List<Endpoint>> computeDynamicAssetFromRaw(@NotNull List<RawAssetGroup> assetGroups) {
     if (assetGroups.isEmpty()) {
       return Map.of();
     }
@@ -139,7 +137,6 @@ public class AssetGroupService {
       return this.endpointService.endpoints(specification)
           .stream()
           .filter(endpoint -> endpoint.getParent() == null && endpoint.getInject() == null)
-          .map(RawEndpoint::new)
           .distinct()
           .toList();
     }));
