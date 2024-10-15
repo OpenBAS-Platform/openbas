@@ -32,6 +32,4 @@ public interface RawTeam {
   Set<String> getTeam_exercise_injects();
 
   Set<String> getTeam_communications();
-
-  String getInject_id();
 }
