@@ -103,7 +103,7 @@ public class PayloadApi extends RestBehavior {
                 return commandPayload;
             case PayloadType.EXECUTABLE:
                 Executable executablePayload = new Executable();
-                PayloadCreateInput validatedInput = validateExecutableInput(input);
+                PayloadCreateInput validatedInput = validateExecutableCreateInput(input);
                 executablePayload.setUpdateAttributes(validatedInput);
                 executablePayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(validatedInput.getAttackPatternsIds())));
                 executablePayload.setTags(iterableToSet(tagRepository.findAllById(validatedInput.getTagIds())));
@@ -141,7 +141,16 @@ public class PayloadApi extends RestBehavior {
         }
     }
 
-    private static PayloadCreateInput validateExecutableInput(PayloadCreateInput input) {
+    private static PayloadCreateInput validateExecutableCreateInput(PayloadCreateInput input) {
+        Optional<Endpoint.PLATFORM_ARCH> maybeArch = Optional.ofNullable(input.getExecutableArch());
+        if (maybeArch.isPresent()) {
+            return input;
+        } else {
+            throw new BadRequestException("Executable arch is missing");
+        }
+    }
+
+    private static PayloadUpdateInput validateExecutableUpdateInput(PayloadUpdateInput input) {
         Optional<Endpoint.PLATFORM_ARCH> maybeArch = Optional.ofNullable(input.getExecutableArch());
         if (maybeArch.isPresent()) {
             return input;
@@ -168,9 +177,10 @@ public class PayloadApi extends RestBehavior {
                 this.payloadService.updateInjectorContractsForPayload(payloadCommand);
                 return payloadCommand;
             case PayloadType.EXECUTABLE:
+                PayloadUpdateInput validatedInput = validateExecutableUpdateInput(input);
                 Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
-                payloadExecutable.setUpdateAttributes(input);
-                payloadExecutable.setExecutableFile(documentRepository.findById(input.getExecutableFile()).orElseThrow());
+                payloadExecutable.setUpdateAttributes(validatedInput);
+                payloadExecutable.setExecutableFile(documentRepository.findById(validatedInput.getExecutableFile()).orElseThrow());
                 payloadExecutable = payloadRepository.save(payloadExecutable);
                 this.payloadService.updateInjectorContractsForPayload(payloadExecutable);
                 return payloadExecutable;
