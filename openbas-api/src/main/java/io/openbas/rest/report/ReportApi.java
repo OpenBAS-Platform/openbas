@@ -1,7 +1,7 @@
 package io.openbas.rest.report;
 
 import io.openbas.database.model.*;
-import io.openbas.rest.exercise.ExerciseService;
+import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.report.form.ReportInjectCommentInput;
 import io.openbas.rest.report.form.ReportInput;

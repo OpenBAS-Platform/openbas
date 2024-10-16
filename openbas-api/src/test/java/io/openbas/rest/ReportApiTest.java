@@ -3,7 +3,7 @@ package io.openbas.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.database.model.*;
-import io.openbas.rest.exercise.ExerciseService;
+import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.mapper.MapperApi;
 import io.openbas.rest.report.ReportApi;
 import io.openbas.rest.report.form.ReportInjectCommentInput;
@@ -23,7 +23,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 

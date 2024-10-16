@@ -2,7 +2,7 @@ package io.openbas.service;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
-import io.openbas.rest.exercise.ExerciseService;
+import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.ResultUtils;

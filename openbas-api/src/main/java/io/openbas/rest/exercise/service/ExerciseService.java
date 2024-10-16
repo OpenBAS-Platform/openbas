@@ -1,4 +1,4 @@
-package io.openbas.rest.exercise;
+package io.openbas.rest.exercise.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;

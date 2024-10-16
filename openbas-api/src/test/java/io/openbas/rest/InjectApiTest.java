@@ -5,7 +5,7 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
-import io.openbas.rest.exercise.ExerciseService;
+import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.fixtures.InjectExpectationFixture;
