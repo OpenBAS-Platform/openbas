@@ -34,7 +34,7 @@ const ExerciseReportPage: React.FC = () => {
   const { loading, report, displayModule, setReloadReportDataCount, reportData } = useExerciseReportData(reportId, exerciseId);
   const [selectedQuestion, setSelectedQuestion] = useState<LessonsQuestion | null>(null);
   const selectedQuestionAnswers = selectedQuestion && selectedQuestion.lessonsquestion_id
-    ? reportData.lessonsAnswers.filter((answer) => answer.lessons_answer_question == selectedQuestion.lessonsquestion_id)
+    ? reportData.lessonsAnswers.filter((answer) => answer.lessons_answer_question === selectedQuestion.lessonsquestion_id)
     : [];
 
   const permissions = usePermissions(exerciseId);
