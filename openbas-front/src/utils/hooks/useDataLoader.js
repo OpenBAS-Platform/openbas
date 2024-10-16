@@ -15,6 +15,8 @@ const ERROR_2S_DELAY = 2000;
 const ERROR_8S_DELAY = 8000;
 const ERROR_30S_DELAY = 30000;
 
+// pristine is used to avoid duplicate requests at the launch of the app
+let pristine = true;
 let sseClient;
 let lastPingDate = new Date().getTime();
 const listeners = new Map();
@@ -31,7 +33,10 @@ const useDataLoader = (loader = () => {}, refetchArg = []) => {
         sseConnect();
       }
     }, EVENT_TRY_DELAY);
-    sseClient.addEventListener('open', () => [...listeners.keys()].forEach((load) => load()));
+    sseClient.addEventListener('open', () => {
+      pristine = false;
+      [...listeners.keys()].forEach((load) => load());
+    });
     sseClient.addEventListener('message', (event) => {
       const data = JSON.parse(event.data);
       if (data.listened) {
@@ -80,7 +85,7 @@ const useDataLoader = (loader = () => {}, refetchArg = []) => {
     listeners.set(loader, '');
     if (EventSource !== undefined && sseClient === undefined) {
       sseClient = sseConnect();
-    } else {
+    } else if (!pristine) {
       const load = async () => {
         await loader();
       };

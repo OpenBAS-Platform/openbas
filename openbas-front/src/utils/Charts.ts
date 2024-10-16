@@ -1,45 +1,52 @@
 import * as C from '@mui/material/colors';
+import { ApexOptions } from 'apexcharts';
+import type { Theme } from '../components/Theme';
 
-export const colors = (temp) => [
-  C.red[temp],
-  C.pink[temp],
-  C.purple[temp],
-  C.deepPurple[temp],
-  C.indigo[temp],
-  C.blue[temp],
-  C.lightBlue[temp],
-  C.cyan[temp],
-  C.teal[temp],
-  C.green[temp],
-  C.lightGreen[temp],
-  C.lime[temp],
-  C.yellow[temp],
-  C.amber[temp],
-  C.orange[temp],
-  C.deepOrange[temp],
-  C.brown[temp],
-  C.grey[temp],
-  C.blueGrey[temp],
-  C.red[temp + 100],
-  C.pink[temp + 100],
-  C.purple[temp + 100],
-  C.deepPurple[temp + 100],
-  C.indigo[temp + 100],
-  C.blue[temp + 100],
-  C.lightBlue[temp + 100],
-  C.cyan[temp + 100],
-  C.teal[temp + 100],
-  C.green[temp + 100],
-  C.lightGreen[temp + 100],
-  C.lime[temp + 100],
-  C.yellow[temp + 100],
-  C.amber[temp + 100],
-  C.orange[temp + 100],
-  C.deepOrange[temp + 100],
-  C.brown[temp + 100],
-  C.grey[temp + 100],
-  C.blueGrey[temp + 100],
-];
+type Temp = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800;
+
+export const colors = (temp: Temp): string[] => {
+  const tempPlus100 = (temp + 100) as Temp;
+  return [
+    C.red[temp],
+    C.pink[temp],
+    C.purple[temp],
+    C.deepPurple[temp],
+    C.indigo[temp],
+    C.blue[temp],
+    C.lightBlue[temp],
+    C.cyan[temp],
+    C.teal[temp],
+    C.green[temp],
+    C.lightGreen[temp],
+    C.lime[temp],
+    C.yellow[temp],
+    C.amber[temp],
+    C.orange[temp],
+    C.deepOrange[temp],
+    C.brown[temp],
+    C.grey[temp],
+    C.blueGrey[temp],
+    C.red[tempPlus100],
+    C.pink[tempPlus100],
+    C.purple[tempPlus100],
+    C.deepPurple[tempPlus100],
+    C.indigo[tempPlus100],
+    C.blue[tempPlus100],
+    C.lightBlue[tempPlus100],
+    C.cyan[tempPlus100],
+    C.teal[tempPlus100],
+    C.green[tempPlus100],
+    C.lightGreen[tempPlus100],
+    C.lime[tempPlus100],
+    C.yellow[tempPlus100],
+    C.amber[tempPlus100],
+    C.orange[tempPlus100],
+    C.deepOrange[tempPlus100],
+    C.brown[tempPlus100],
+    C.grey[tempPlus100],
+    C.blueGrey[tempPlus100],
+  ];
+};
 
 /**
  * A custom tooltip for ApexChart.
@@ -50,13 +57,13 @@ export const colors = (temp) => [
  *
  * @param {Theme} theme
  */
-const simpleLabelTooltip = (theme) => ({ seriesIndex, w }) => (`
-  <div style="background: ${theme.palette.background.nav}; color: ${theme.palette.text.primary}; padding: 2px 6px; font-size: 12px">
+const simpleLabelTooltip = (theme: Theme): ApexTooltip['custom'] => ({ seriesIndex, w }) => (`
+  <div style="background: ${theme.palette.background.nav}; color: ${theme.palette.text?.primary}; padding: 2px 6px; font-size: 12px">
     ${w.config.labels[seriesIndex]}
   </div>
 `);
 
-export const resultColors = (temp) => [
+export const resultColors = (temp: Temp) => [
   C.deepPurple[temp],
   C.indigo[temp],
   C.lightBlue[temp],
@@ -69,7 +76,7 @@ const toolbarOptions = {
       columnDelimiter: ',',
       headerCategory: 'category',
       headerValue: 'value',
-      dateFormatter(timestamp) {
+      dateFormatter(timestamp: number) {
         return new Date(timestamp).toDateString();
       },
     },
@@ -77,21 +84,21 @@ const toolbarOptions = {
 };
 
 export const lineChartOptions = (
-  theme,
+  theme: Theme,
   isTimeSeries = false,
-  xFormatter = null,
-  yFormatter = null,
+  xFormatter: NonNullable<ApexXAxis['labels']>['formatter'] | null = null,
+  yFormatter: NonNullable<ApexYAxis['labels']>['formatter'] | null = null,
   tickAmount = undefined,
   distributed = false,
   dataLabels = false,
-) => ({
+): ApexOptions => ({
   chart: {
     type: 'line',
     background: 'transparent',
     toolbar: {
       show: false,
     },
-    foreColor: theme.palette.text.secondary,
+    foreColor: theme.palette.text?.secondary,
   },
   theme: {
     mode: theme.palette.mode,
@@ -135,7 +142,7 @@ export const lineChartOptions = (
     tickAmount,
     tickPlacement: 'on',
     labels: {
-      formatter: (value) => (xFormatter ? xFormatter(value) : value),
+      formatter: (value: string) => (xFormatter ? xFormatter(value) : value),
       style: {
         fontSize: '12px',
         fontFamily: '"IBM Plex Sans", sans-serif',
@@ -147,7 +154,7 @@ export const lineChartOptions = (
   },
   yaxis: {
     labels: {
-      formatter: (value) => (yFormatter ? yFormatter(value) : value),
+      formatter: (value: number) => (yFormatter ? yFormatter(value) : value.toString()),
       style: {
         fontSize: '14px',
         fontFamily: '"IBM Plex Sans", sans-serif',
@@ -160,19 +167,19 @@ export const lineChartOptions = (
 });
 
 export const areaChartOptions = (
-  theme,
+  theme: Theme,
   isTimeSeries = false,
-  xFormatter = null,
-  yFormatter = null,
+  xFormatter: NonNullable<ApexXAxis['labels']>['formatter'] | null = null,
+  yFormatter: NonNullable<ApexYAxis['labels']>['formatter'] | null = null,
   tickAmount = undefined,
-) => ({
+): ApexOptions => ({
   chart: {
     type: 'area',
     background: 'transparent',
     toolbar: {
       show: false,
     },
-    foreColor: theme.palette.text.secondary,
+    foreColor: theme.palette.text?.secondary,
   },
   theme: {
     mode: theme.palette.mode,
@@ -214,8 +221,8 @@ export const areaChartOptions = (
       opacityFrom: 0.7,
       opacityTo: 0.1,
       gradientToColors: [
-        theme.palette.primary.main,
-        theme.palette.primary.main,
+        theme.palette.primary.main!,
+        theme.palette.primary.main!,
       ],
     },
   },
@@ -224,7 +231,7 @@ export const areaChartOptions = (
     tickAmount,
     tickPlacement: 'on',
     labels: {
-      formatter: (value) => (xFormatter ? xFormatter(value) : value),
+      formatter: (value: string) => (xFormatter ? xFormatter(value) : value),
       style: {
         fontSize: '12px',
         fontFamily: '"IBM Plex Sans", sans-serif',
@@ -236,7 +243,7 @@ export const areaChartOptions = (
   },
   yaxis: {
     labels: {
-      formatter: (value) => (yFormatter ? yFormatter(value) : value),
+      formatter: (value: number) => (yFormatter ? yFormatter(value) : value.toString()),
       style: {
         fontSize: '14px',
         fontFamily: '"IBM Plex Sans", sans-serif',
@@ -263,24 +270,24 @@ export const areaChartOptions = (
  * @param {string} emptyChartText
  */
 export const verticalBarsChartOptions = (
-  theme,
-  xFormatter = null,
-  yFormatter = null,
+  theme: Theme,
+  xFormatter: NonNullable<ApexXAxis['labels']>['formatter'] | null = null,
+  yFormatter: NonNullable<ApexYAxis['labels']>['formatter'] | null = null,
   distributed = false,
   isTimeSeries = false,
   isStacked = false,
   legend = false,
-  tickAmount = undefined,
+  tickAmount: ApexXAxis['tickAmount'] = undefined,
   isResult = false,
   isFakeData = false,
-  max = undefined,
+  max: ApexYAxis['max'] = undefined,
   emptyChartText = '',
-) => ({
+): ApexOptions => ({
   chart: {
     type: 'bar',
     background: 'transparent',
     toolbar: toolbarOptions,
-    foreColor: theme.palette.text.secondary,
+    foreColor: theme.palette.text?.secondary,
     stacked: isStacked,
     width: '100%',
     height: '100%',
@@ -341,7 +348,7 @@ export const verticalBarsChartOptions = (
     tickAmount,
     tickPlacement: 'on',
     labels: {
-      formatter: (value) => (xFormatter ? xFormatter(value) : value),
+      formatter: (value: string) => (xFormatter ? xFormatter(value) : value),
       style: {
         fontSize: '12px',
         fontFamily: '"IBM Plex Sans", sans-serif',
@@ -361,7 +368,7 @@ export const verticalBarsChartOptions = (
   },
   yaxis: {
     labels: {
-      formatter: (value) => (yFormatter ? yFormatter(value) : value),
+      formatter: (value: number) => (yFormatter ? yFormatter(value) : value.toString()),
       style: {
         fontFamily: '"IBM Plex Sans", sans-serif',
       },
@@ -403,27 +410,35 @@ export const verticalBarsChartOptions = (
  * @param {string[]} categories
  * @param {boolean} legend
  * @param {boolean} isFakeData
+ * @param {string} emptyChartText
  */
 export const horizontalBarsChartOptions = (
-  theme,
+  theme: Theme,
   adjustTicks = false,
-  xFormatter = null,
-  yFormatter = null,
+  xFormatter: NonNullable<ApexXAxis['labels']>['formatter'] | null = null,
+  yFormatter: NonNullable<ApexYAxis['labels']>['formatter'] | null = null,
   distributed = false,
   stacked = false,
   total = false,
   categories = null,
   legend = false,
   isFakeData = false,
-) => ({
+  emptyChartText = '',
+): ApexOptions => ({
   chart: {
     type: 'bar',
     background: 'transparent',
     toolbar: toolbarOptions,
-    foreColor: theme.palette.text.secondary,
+    foreColor: theme.palette.text?.secondary,
     stacked,
     width: '100%',
     height: '100%',
+    zoom: {
+      enabled: !isFakeData,
+    },
+    animations: {
+      enabled: !isFakeData,
+    },
   },
   theme: {
     mode: theme.palette.mode,
@@ -438,7 +453,7 @@ export const horizontalBarsChartOptions = (
   states: {
     hover: {
       filter: {
-        type: 'lighten',
+        type: isFakeData ? 'none' : 'lighten',
         value: 0.05,
       },
     },
@@ -460,12 +475,13 @@ export const horizontalBarsChartOptions = (
     },
   },
   tooltip: {
+    enabled: !isFakeData,
     theme: theme.palette.mode,
   },
   xaxis: {
     categories: categories ?? [],
     labels: {
-      formatter: (value) => (xFormatter ? xFormatter(value) : value),
+      formatter: (value: string) => (xFormatter ? xFormatter(value) : value),
       style: {
         fontFamily: '"IBM Plex Sans", sans-serif',
       },
@@ -477,7 +493,7 @@ export const horizontalBarsChartOptions = (
   },
   yaxis: {
     labels: {
-      formatter: (value) => (yFormatter ? yFormatter(value) : value),
+      formatter: (value: number) => (yFormatter ? yFormatter(value) : value.toString()),
       style: {
         fontFamily: '"IBM Plex Sans", sans-serif',
       },
@@ -507,9 +523,16 @@ export const horizontalBarsChartOptions = (
       },
     },
   },
+  ...(isFakeData && {
+    subtitle: {
+      text: emptyChartText,
+      align: 'center',
+      offsetY: 130,
+    },
+  }),
 });
 
-export const radarChartOptions = (theme, labels, chartColors = []) => ({
+export const radarChartOptions = (theme: Theme, labels: string[], chartColors = []): ApexOptions => ({
   chart: {
     type: 'radar',
     background: 'transparent',
@@ -548,8 +571,8 @@ export const radarChartOptions = (theme, labels, chartColors = []) => ({
   },
   markers: {
     shape: 'circle',
-    strokeColors: [theme.palette.primary.main],
-    colors: [theme.palette.primary.main],
+    strokeColors: [theme.palette.primary.main!],
+    colors: [theme.palette.primary.main!],
   },
   xaxis: {
     labels: {
@@ -576,7 +599,7 @@ export const radarChartOptions = (theme, labels, chartColors = []) => ({
           theme.palette.mode === 'dark'
             ? 'rgba(255, 255, 255, .1)'
             : 'rgba(0, 0, 0, .1)',
-        fill: { colors: [theme.palette.background.paper] },
+        fill: { colors: [theme.palette.background.paper!] },
       },
     },
   },
@@ -592,14 +615,14 @@ export const radarChartOptions = (theme, labels, chartColors = []) => ({
  * @param {boolean} isFakeData
  */
 export const polarAreaChartOptions = (
-  theme,
-  labels,
-  formatter = null,
-  legendPosition = 'bottom',
-  chartColors = [],
+  theme: Theme,
+  labels: string[],
+  formatter: NonNullable<ApexYAxis['labels']>['formatter'] | null = null,
+  legendPosition: ApexLegend['position'] = 'bottom',
+  chartColors: string[] = [],
   legend = true,
   isFakeData = false,
-) => {
+): ApexOptions => {
   const temp = theme.palette.mode === 'dark' ? 400 : 600;
   let chartFinalColors = chartColors;
   if (chartFinalColors.length === 0) {
@@ -615,9 +638,15 @@ export const polarAreaChartOptions = (
       type: 'polarArea',
       background: 'transparent',
       toolbar: toolbarOptions,
-      foreColor: theme.palette.text.secondary,
+      foreColor: theme.palette.text?.secondary,
       width: '100%',
       height: '100%',
+      zoom: {
+        enabled: !isFakeData,
+      },
+      animations: {
+        enabled: !isFakeData,
+      },
     },
     theme: {
       mode: theme.palette.mode,
@@ -635,10 +664,10 @@ export const polarAreaChartOptions = (
     legend: {
       show: legend,
       position: legendPosition,
-      floating: legendPosition === 'bottom',
       fontFamily: '"IBM Plex Sans", sans-serif',
     },
     tooltip: {
+      enabled: !isFakeData,
       theme: theme.palette.mode,
       custom: simpleLabelTooltip(theme),
     },
@@ -650,7 +679,7 @@ export const polarAreaChartOptions = (
     },
     yaxis: {
       labels: {
-        formatter: (value) => (formatter ? formatter(value) : value),
+        formatter: (value: number) => (formatter ? formatter(value) : value.toString()),
         style: {
           fontFamily: '"IBM Plex Sans", sans-serif',
         },
@@ -691,8 +720,23 @@ export const polarAreaChartOptions = (
  * @param {boolean} displayValue
  * @param {boolean} displayTooltip
  * @param {number} size
+ * @param {boolean} isFakeData
  */
-export const donutChartOptions = (
+interface DonutChartOptions {
+  theme: Theme
+  labels: string[]
+  legendPosition?: ApexLegend['position']
+  reversed?: boolean
+  chartColors?: string[]
+  displayLegend?: boolean
+  displayLabels?: boolean
+  displayValue?: boolean
+  displayTooltip?: boolean
+  size?: number
+  isFakeData?: boolean
+}
+
+export const donutChartOptions = ({
   theme,
   labels,
   legendPosition = 'bottom',
@@ -703,11 +747,12 @@ export const donutChartOptions = (
   displayValue = true,
   displayTooltip = true,
   size = 70,
-) => {
+  isFakeData = false,
+}: DonutChartOptions): ApexOptions => {
   const temp = theme.palette.mode === 'dark' ? 400 : 600;
-  let dataLabelsColors = labels.map(() => theme.palette.text.primary);
+  let dataLabelsColors = labels.map(() => theme.palette.text?.primary);
   if (chartColors.length > 0) {
-    dataLabelsColors = chartColors.map((n) => (n === '#ffffff' ? '#000000' : theme.palette.text.primary));
+    dataLabelsColors = chartColors.map((n) => (n === '#ffffff' ? '#000000' : theme.palette.text?.primary));
   }
   let chartFinalColors = chartColors;
   if (chartFinalColors.length === 0) {
@@ -731,9 +776,15 @@ export const donutChartOptions = (
       type: 'donut',
       background: 'transparent',
       toolbar: toolbarOptions,
-      foreColor: theme.palette.text.secondary,
+      foreColor: theme.palette.text?.secondary,
       width: '100%',
       height: '100%',
+      zoom: {
+        enabled: !isFakeData,
+      },
+      animations: {
+        enabled: !isFakeData,
+      },
     },
     theme: {
       mode: theme.palette.mode,
@@ -741,12 +792,12 @@ export const donutChartOptions = (
     colors: chartFinalColors,
     labels,
     fill: {
-      opacity: 1,
+      opacity: isFakeData ? 0.1 : 1,
     },
     states: {
       hover: {
         filter: {
-          type: 'lighten',
+          type: isFakeData ? 'none' : 'lighten',
           value: 0.05,
         },
       },
@@ -757,7 +808,7 @@ export const donutChartOptions = (
       colors: [theme.palette.background.paper],
     },
     tooltip: {
-      enabled: displayTooltip,
+      enabled: !isFakeData && displayTooltip,
       theme: theme.palette.mode,
       custom: simpleLabelTooltip(theme),
     },
@@ -765,9 +816,15 @@ export const donutChartOptions = (
       show: displayLegend,
       position: legendPosition,
       fontFamily: '"IBM Plex Sans", sans-serif',
+      onItemClick: {
+        toggleDataSeries: !isFakeData,
+      },
+      onItemHover: {
+        highlightDataSeries: !isFakeData,
+      },
     },
     dataLabels: {
-      enabled: displayLabels,
+      enabled: !isFakeData && displayLabels,
       style: {
         fontSize: '10px',
         fontFamily: '"IBM Plex Sans", sans-serif',
@@ -784,8 +841,10 @@ export const donutChartOptions = (
     plotOptions: {
       pie: {
         donut: {
-          value: {
-            show: displayValue,
+          labels: {
+            value: {
+              show: displayValue,
+            },
           },
           background: 'transparent',
           size: `${size}%`,

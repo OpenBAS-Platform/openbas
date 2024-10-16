@@ -58,7 +58,6 @@ const ExerciseDistributionScoreByInject: FunctionComponent<Props> = ({
     <>
       {injectsTotalScores.length > 0 ? (
         <Chart
-          // @ts-expect-error: Need to migrate Chart.js file
           options={horizontalBarsChartOptions(
             theme,
             false,

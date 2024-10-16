@@ -2,7 +2,6 @@ import { useTheme } from '@mui/styles';
 import React, { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 import * as R from 'ramda';
-import { Theme } from '@mui/material';
 import Empty from '../../../../../components/Empty';
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import { useFormatter } from '../../../../../components/i18n';
@@ -15,6 +14,7 @@ import { getTeamsColors } from '../../../common/injects/InjectsDistribution';
 import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import type { TeamStore } from '../../../../../actions/teams/Team';
+import type { Theme } from '../../../../../components/Theme';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
@@ -67,11 +67,9 @@ const MailDistributionOverTime: FunctionComponent<Props> = ({
     <>
       {teamsCommunications.length > 0 ? (
         <Chart
-          // @ts-expect-error: Need to migrate Chart.js file
           options={lineChartOptions(
             theme,
             true,
-            // @ts-expect-error: Need to migrate i18n.js file
             nsdt,
             null,
             undefined,

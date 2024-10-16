@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { emptyFilterGroup } from './FilterUtils';
 import { FilterHelpers } from './FilterHelpers';
 import {
@@ -24,6 +24,7 @@ const useFiltersState = (
   const [filtersState, setFiltersState] = useState<Props>({
     filters: initFilters,
   });
+  const hasBeenInitialized = useRef<boolean>(false);
   const helpers: FilterHelpers = {
     // Switch filter group operator
     handleSwitchMode: () => {
@@ -74,7 +75,10 @@ const useFiltersState = (
   };
 
   useEffect(() => {
-    onChange?.(filtersState.filters);
+    if (hasBeenInitialized.current) {
+      onChange?.(filtersState.filters);
+    }
+    hasBeenInitialized.current = true;
   }, [filtersState]);
 
   return [filtersState.filters, helpers];

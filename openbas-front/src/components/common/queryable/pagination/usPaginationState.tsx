@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PaginationHelpers } from './PaginationHelpers';
 
 export const ROWS_PER_PAGE_OPTIONS = [20, 50, 100];
@@ -6,6 +6,7 @@ export const ROWS_PER_PAGE_OPTIONS = [20, 50, 100];
 const usPaginationState = (initSize?: number, onChange?: (page: number, size: number) => void): PaginationHelpers => {
   const [page, setPage] = React.useState(0);
   const [size, setSize] = React.useState(initSize ?? ROWS_PER_PAGE_OPTIONS[0]);
+  const hasBeenInitialized = useRef<boolean>(false);
   const [totalElements, setTotalElements] = useState(0);
 
   const helpers: PaginationHelpers = {
@@ -19,7 +20,10 @@ const usPaginationState = (initSize?: number, onChange?: (page: number, size: nu
   };
 
   useEffect(() => {
-    onChange?.(page, size);
+    if (hasBeenInitialized.current) {
+      onChange?.(page, size);
+    }
+    hasBeenInitialized.current = true;
   }, [page, size]);
 
   return helpers;

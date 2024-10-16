@@ -12,6 +12,8 @@ import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types'
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import type { InjectExpectationResultsByAttackPatternStore } from '../../../../actions/exercises/Exercise';
 import KillChainPhaseColumn from './KillChainPhaseColumn';
+import Empty from '../../../../components/Empty';
+import { useFormatter } from '../../../../components/i18n';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -26,17 +28,18 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   goToLink?: string;
-  injectResults: InjectExpectationResultsByAttackPatternStore[];
-  ttpAlreadyLoaded?: boolean;
+  injectResults?: InjectExpectationResultsByAttackPatternStore[];
+  attackPatterns?: Record<string, AttackPattern>;
 }
 
 const MitreMatrix: FunctionComponent<Props> = ({
   goToLink,
   injectResults,
-  ttpAlreadyLoaded,
+  attackPatterns,
 }) => {
   // Standard hooks
   const classes = useStyles();
+  const { t } = useFormatter();
   const dispatch = useAppDispatch();
   // Fetching data
   const { attackPatternMap, killChainPhaseMap }: {
@@ -46,19 +49,30 @@ const MitreMatrix: FunctionComponent<Props> = ({
     attackPatternMap: helper.getAttackPatternsMap(),
     killChainPhaseMap: helper.getKillChainPhasesMap(),
   }));
-  if (!ttpAlreadyLoaded) {
-    useDataLoader(() => {
-      dispatch(fetchKillChainPhases());
+
+  useDataLoader(() => {
+    dispatch(fetchKillChainPhases());
+    if (!attackPatterns) {
       dispatch(fetchAttackPatterns());
-    });
+    }
+  });
+
+  if (!(injectResults && injectResults.length)) {
+    return <Empty message={t('No data to display')} />;
   }
+
   // Attack Pattern
   const resultAttackPatternIds = R.uniq(
     injectResults
       .filter((injectResult) => !!injectResult.inject_attack_pattern)
       .flatMap((injectResult) => injectResult.inject_attack_pattern) as unknown as string[],
   );
-  const resultAttackPatterns: AttackPatternStore[] = resultAttackPatternIds.map((attackPatternId: string) => attackPatternMap[attackPatternId])
+  const resultAttackPatterns: AttackPatternStore[] = resultAttackPatternIds.map((attackPatternId: string) => {
+    if (attackPatterns) {
+      return attackPatterns[attackPatternId];
+    }
+    return attackPatternMap[attackPatternId];
+  })
     .filter((attackPattern: AttackPattern) => !!attackPattern);
   const getAttackPatterns = (killChainPhase: KillChainPhase) => {
     return resultAttackPatterns.filter((attackPattern: AttackPatternStore) => attackPattern.attack_pattern_kill_chain_phases?.includes(killChainPhase.phase_id));
