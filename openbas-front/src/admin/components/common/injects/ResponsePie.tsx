@@ -44,9 +44,10 @@ interface Props {
   expectationResultsByTypes?: ExpectationResultsByType[] | null;
   humanValidationLink?: string;
   immutable?: boolean;
+  disableChartAnimation?:boolean;
 }
 
-const ResponsePie = (({ expectationResultsByTypes, humanValidationLink, immutable }: Props) => {
+const ResponsePie = (({ expectationResultsByTypes, humanValidationLink, immutable, disableChartAnimation }: Props) => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
@@ -101,14 +102,14 @@ const ResponsePie = (({ expectationResultsByTypes, humanValidationLink, immutabl
         <div className={classes.chartContainer}>
           {renderIcon(type, hasDistribution)}
           <Chart options={
-            donutChartOptions(
+            donutChartOptions({
               theme,
               labels,
-              'bottom',
-              false,
-              colors,
-              false,
-            ) as ApexOptions}
+              legendPosition: 'bottom',
+              chartColors: colors,
+              displayLegend: false,
+              disableAnimation: disableChartAnimation,
+            }) as ApexOptions}
             series={data}
             type="donut"
             width="100%"

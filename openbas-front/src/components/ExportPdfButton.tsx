@@ -44,11 +44,6 @@ const ExportPdfButton: React.FC<Props> = ({ getPdfDocDefinition, pdfName }) => {
     setExporting(true);
     if (user.user_theme !== 'light') {
       changeUserTheme('light');
-      await new Promise<void>((resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, 1200);
-      });
     }
     const pdfDocDefinition: TDocumentDefinitions = await getPdfDocDefinition();
     pdfMake.createPdf(pdfDocDefinition).download(`${pdfName}.pdf`);

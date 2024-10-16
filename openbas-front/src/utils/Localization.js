@@ -1888,7 +1888,7 @@ const i18n = {
       'Do you want to delete this report?':
         '你想要删除这份报告么?',
       'Update the report': '更新报告',
-      'Table of contents': 'TODO',
+      'Table of contents': '目录',
 
       token: '令牌',
       status: '状态',

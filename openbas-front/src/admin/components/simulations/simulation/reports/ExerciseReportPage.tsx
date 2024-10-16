@@ -13,7 +13,6 @@ import ReportPopover from '../../../components/reports/ReportPopover';
 import { ReportContextType, ReportContext } from '../../../common/Context';
 import ExerciseReportForm from './ExerciseReportForm';
 import { usePermissions } from '../../../../../utils/Exercise';
-import { isFeatureEnabled } from '../../../../../utils/utils';
 import ExportPdfButton from '../../../../../components/ExportPdfButton';
 import useExerciseReportData from './useExerciseReportData';
 import getExerciseReportPdfDocDefinition from './getExerciseReportPdfDoc';
@@ -64,10 +63,6 @@ const ExerciseReportPage: React.FC = () => {
     } as ReportInput,
   ));
 
-  if (!isFeatureEnabled('report')) {
-    return <div>{t('This page is coming soon')}</div>;
-  }
-
   if (loading) {
     return <Loader/>;
   }
@@ -113,7 +108,7 @@ const ExerciseReportPage: React.FC = () => {
               {t('Results')}
             </Typography>
             <Paper id='score_details' variant="outlined" style={{ display: 'flex', alignItems: 'center' }}>
-              <ResponsePie expectationResultsByTypes={reportData.exerciseExpectationResults}/>
+              <ResponsePie expectationResultsByTypes={reportData.exerciseExpectationResults} disableChartAnimation/>
             </Paper>
             </div>
          }

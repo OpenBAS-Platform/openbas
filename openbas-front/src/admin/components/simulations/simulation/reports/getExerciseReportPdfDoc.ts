@@ -31,7 +31,7 @@ const getBase64ImageFromURL = (url: string) => {
 const tableCustomLayout = (displayColumnLine:boolean, paddingTop:number) => ({
   hLineWidth: () => 0.5,
   vLineWidth: (i:number, node: ContentTable) => {
-    if (displayColumnLine || (i === 0 || i === node.table.body.length + 1)) {
+    if (displayColumnLine || (i === 0 || i === node.table.body[0].length)) {
       return 0.5;
     }
     return 0;
@@ -102,6 +102,7 @@ const getExerciseReportPdfDocDefinition = async ({
     {
       style: 'tableStyle',
       table: {
+        widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*'],
         body: [
           [t('Type'), t('Title'), t('Execution date'), t('Scores'), t('Targets'), t('Comments')].map((title) => ({
             text: title,
@@ -283,13 +284,13 @@ const getExerciseReportPdfDocDefinition = async ({
       // Global Information Page
       ...(displayGlobalObservation
         ? [
-          { text: 'Global observation', tocItem: ['mainToc'], pageBreak: 'before', style: 'header' },
+          { text: t('Global observation'), tocItem: ['mainToc'], pageBreak: 'before', style: 'header' },
           { stack: convertMarkdownToPdfMake(report.report_global_observation || ' -') },
         ]
         : []),
 
       // Player surveys page
-      displayPlayerSurveys ? playersSurveysPage() : [],
+      displayPlayerSurveys && reportData.lessonsCategories.length > 0 ? playersSurveysPage() : [],
 
       // Exercise details page
       displayExerciseDetails ? exerciseDetailsPage(imagesMap) : [],
