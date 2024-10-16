@@ -235,7 +235,7 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
       " SELECT DISTINCT (ie.inject_id) "
           + "FROM exercises ex "
           + "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id "
-          + "WHERE ex.exercise_id = :exerciseId ;", nativeQuery = true)
+          + "WHERE ex.exercise_id = :exerciseId AND ie.inject_id IS NOT NULL;", nativeQuery = true)
   List<String> findInjectsByExercise(@Param("exerciseId") String exerciseId);
 
   @Query(value =
