@@ -47,13 +47,13 @@ public class AssetGroup implements Base {
 
   @Column(name = "asset_group_name")
   @JsonProperty("asset_group_name")
-  @Queryable(searchable = true, sortable = true)
+  @Queryable(filterable = true, searchable = true, sortable = true)
   @NotBlank
   private String name;
 
   @Column(name = "asset_group_description")
   @JsonProperty("asset_group_description")
-  @Queryable(sortable = true)
+  @Queryable(filterable = true, sortable = true)
   private String description;
 
   // -- ASSET --

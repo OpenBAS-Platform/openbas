@@ -152,6 +152,17 @@ export interface AssetGroupInput {
   asset_group_tags?: string[];
 }
 
+export interface AssetGroupOutput {
+  /** @uniqueItems true */
+  asset_group_assets?: string[];
+  asset_group_description?: string;
+  asset_group_dynamic_filter?: FilterGroup;
+  asset_group_id: string;
+  asset_group_name: string;
+  /** @uniqueItems true */
+  asset_group_tags?: string[];
+}
+
 export interface AtomicTestingInput {
   inject_all_teams?: boolean;
   inject_asset_groups?: string[];
@@ -1888,6 +1899,25 @@ export interface OrganizationUpdateInput {
   organization_tags?: string[];
 }
 
+export interface PageAssetGroupOutput {
+  content?: AssetGroupOutput[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageAtomicTestingOutput {
   content?: AtomicTestingOutput[];
   empty?: boolean;
@@ -2137,25 +2167,6 @@ export interface PagePayload {
 
 export interface PagePlayerOutput {
   content?: PlayerOutput[];
-  empty?: boolean;
-  first?: boolean;
-  last?: boolean;
-  /** @format int32 */
-  number?: number;
-  /** @format int32 */
-  numberOfElements?: number;
-  pageable?: PageableObject;
-  /** @format int32 */
-  size?: number;
-  sort?: SortObject[];
-  /** @format int64 */
-  totalElements?: number;
-  /** @format int32 */
-  totalPages?: number;
-}
-
-export interface PageRawPaginationAssetGroup {
-  content?: RawPaginationAssetGroup[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -2584,15 +2595,6 @@ export interface RawDocument {
   document_tags?: string[];
   document_target?: string;
   document_type?: string;
-}
-
-export interface RawPaginationAssetGroup {
-  asset_group_assets?: string[];
-  asset_group_description?: string;
-  asset_group_dynamic_filter?: FilterGroup;
-  asset_group_id?: string;
-  asset_group_name?: string;
-  asset_group_tags?: string[];
 }
 
 export interface RawPaginationDocument {

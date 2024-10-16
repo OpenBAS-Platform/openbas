@@ -869,6 +869,9 @@ const i18n = {
       OR: 'OU',
       // Asset
       asset_tags: 'Tags',
+      // Asset Group
+      asset_group_name: 'Nom',
+      asset_group_description: 'Description',
       asset_group_tags: 'Tags',
       // Endpoint
       endpoint_hostname: 'Nom d\'hôte',
@@ -2225,6 +2228,10 @@ const i18n = {
       'Clear filters': '清除过滤器',
       AND: '和',
       OR: '或',
+      // Asset Group
+      asset_group_name: '名称',
+      asset_group_description: '描述',
+      asset_group_tags: '标签',
       // Endpoint
       endpoint_hostname: '终端主机名',
       endpoint_ips: 'IP地址',
@@ -2772,6 +2779,9 @@ const i18n = {
       // -- FILTERS --
       // Asset
       asset_tags: 'Tags',
+      // Asset Group
+      asset_group_name: 'Name',
+      asset_group_description: 'Description',
       asset_group_tags: 'Tags',
       // Endpoint
       endpoint_hostname: 'Hostname',

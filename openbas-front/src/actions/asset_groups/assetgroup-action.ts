@@ -39,6 +39,12 @@ export const searchAssetGroups = (searchPaginationInput: SearchPaginationInput) 
   return simplePostCall(uri, data);
 };
 
+export const findAssetGroups = (assetGroupIds: string[]) => {
+  const data = assetGroupIds;
+  const uri = `${ASSET_GROUP_URI}/find`;
+  return simplePostCall(uri, data);
+};
+
 export const fetchAssetGroup = (assetGroupId: AssetGroup['asset_group_id']) => (dispatch: Dispatch) => {
   const uri = `${ASSET_GROUP_URI}/${assetGroupId}`;
   return getReferential(assetGroup, uri)(dispatch);

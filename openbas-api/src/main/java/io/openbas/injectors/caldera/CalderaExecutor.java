@@ -12,7 +12,6 @@ import io.openbas.execution.Injector;
 import io.openbas.injectors.caldera.client.model.Ability;
 import io.openbas.injectors.caldera.client.model.Agent;
 import io.openbas.injectors.caldera.client.model.ExploitResult;
-import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
 import io.openbas.injectors.caldera.model.CalderaInjectContent;
 import io.openbas.injectors.caldera.service.CalderaInjectorService;
 import io.openbas.model.ExecutionProcess;
@@ -37,10 +36,10 @@ import static io.openbas.database.model.InjectExpectationSignature.*;
 import static io.openbas.database.model.InjectStatusExecution.*;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAsset;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAssetGroup;
-import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAsset;
-import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAssetGroup;
 import static io.openbas.model.expectation.ManualExpectation.manualExpectationForAsset;
 import static io.openbas.model.expectation.ManualExpectation.manualExpectationForAssetGroup;
+import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAsset;
+import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAssetGroup;
 import static java.time.Instant.now;
 
 @Component(CalderaContract.TYPE)
@@ -50,7 +49,6 @@ public class CalderaExecutor extends Injector {
 
   private final int RETRY_NUMBER = 20;
 
-  private final CalderaInjectorConfig config;
   private final CalderaInjectorService calderaService;
   private final EndpointService endpointService;
   private final AssetGroupService assetGroupService;
