@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Exercise;
 import io.openbas.database.raw.RawExercise;
+import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.raw.RawGlobalInjectExpectation;
 import io.openbas.database.raw.RawInjectExpectation;
 import jakarta.validation.constraints.NotNull;
@@ -258,6 +259,6 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
           + "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id "
           + "WHERE s.scenario_id IN (:scenarioIds) "
           + "GROUP BY ex.exercise_id ;", nativeQuery = true)
-  List<RawExercise> rawAllByScenarioId(@Param("scenarioIds") List<String> scenarioIds);
+  List<RawExerciseSimple> rawAllByScenarioId(@Param("scenarioIds") List<String> scenarioIds);
 
 }

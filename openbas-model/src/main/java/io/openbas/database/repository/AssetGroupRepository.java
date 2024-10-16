@@ -40,7 +40,7 @@ public interface AssetGroupRepository extends CrudRepository<AssetGroup, String>
    * @param ids a list of ids
    * @return the list of raw asset group
    */
-  @Query(value = "SELECT ag.asset_group_id, ag.asset_group_name,  " +
+  @Query(value = "SELECT ag.asset_group_id, ag.asset_group_name, CAST(ag.asset_group_dynamic_filter as text),  " +
       "coalesce(array_agg(aga.asset_id) FILTER ( WHERE aga.asset_id IS NOT NULL ), '{}') asset_ids " +
       "FROM asset_groups ag " +
       "LEFT JOIN asset_groups_assets aga ON ag.asset_group_id = aga.asset_group_id " +
