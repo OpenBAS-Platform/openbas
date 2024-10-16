@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Button, FormControl, IconButton, InputLabel, MenuItem, Select, Tooltip, Typography } from '@mui/material';
 import { Add, DeleteOutlined, ExpandMore } from '@mui/icons-material';
@@ -49,6 +49,12 @@ const InjectForm = ({
       }),
   );
 
+  const [addChildrenButtonDisabled, setAddChildrenButtonDisabled] = useState(false);
+  useEffect(() => {
+    const availableChildrensNumber = injects.filter((currentInject) => currentInject.inject_depends_duration > values.inject_depends_duration).length;
+    setAddChildrenButtonDisabled(childrens.length >= availableChildrensNumber);
+  }, [childrens]);
+
   const getConditionContentParent = (injectDependsOn) => {
     const conditions = [];
     for (const dependency in injectDependsOn) {
@@ -80,20 +86,22 @@ const InjectForm = ({
         for (const dependency in injectDependsTo[children]) {
           if (Object.hasOwn(injectDependsTo[children], dependency)) {
             const condition = injectDependsTo[children][dependency][values.inject_id];
-            const splittedConditions = condition.split(breakpointAndOr);
-            conditions.push({
-              childrenId: dependency,
-              mode: condition.includes('||') ? 'or' : 'and',
-              conditionElement: splittedConditions.map((splitedCondition, index) => {
-                const key = Array.from(splitedCondition.split(breakpointValue)[0].trim().matchAll(typeFromName), (m) => m[1]);
-                return {
-                  name: splitedCondition.split(breakpointValue)[0].trim(),
-                  value: splitedCondition.split(breakpointValue)[1].trim(),
-                  key: key[0],
-                  index,
-                };
-              }),
-            });
+            if (condition !== undefined) {
+              const splittedConditions = condition.split(breakpointAndOr);
+              conditions.push({
+                childrenId: dependency,
+                mode: condition.includes('||') ? 'or' : 'and',
+                conditionElement: splittedConditions.map((splitedCondition, index) => {
+                  const key = Array.from(splitedCondition.split(breakpointValue)[0].trim().matchAll(typeFromName), (m) => m[1]);
+                  return {
+                    name: splitedCondition.split(breakpointValue)[0].trim(),
+                    value: splitedCondition.split(breakpointValue)[1].trim(),
+                    key: key[0],
+                    index,
+                  };
+                }),
+              });
+            }
           }
         }
       }
@@ -505,7 +513,8 @@ const InjectForm = ({
           color="secondary"
           aria-label="Add"
           size="large"
-          disabled={parents.length > 0}
+          disabled={parents.length > 0
+              || injects.filter((currentInject) => currentInject.inject_depends_duration < values.inject_depends_duration).length === 0}
           onClick={addParent}
         >
           <Add fontSize="small"/>
@@ -597,6 +606,7 @@ const InjectForm = ({
           color="secondary"
           aria-label="Add"
           size="large"
+          disabled={addChildrenButtonDisabled}
           onClick={addChildren}
         >
           <Add fontSize="small"/>

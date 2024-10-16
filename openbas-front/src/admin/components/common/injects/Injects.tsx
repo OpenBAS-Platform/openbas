@@ -31,6 +31,7 @@ import { useQueryableWithLocalStorage } from '../../../../components/common/quer
 import ToolBar from '../ToolBar';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
+import chainingUtils from './chaining/ChainingUtils';
 
 const useStyles = makeStyles(() => ({
   disabled: {
@@ -245,7 +246,7 @@ const Injects: FunctionComponent<Props> = ({
   const onUpdateInject = async (data: Inject) => {
     if (selectedInjectId) {
       await injectContext.onUpdateInject(selectedInjectId, data).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
-        onUpdate(result);
+        onUpdate(chainingUtils.convertInjectStore(result.entities.injects[result.result]) as never);
       });
     }
   };
@@ -256,17 +257,7 @@ const Injects: FunctionComponent<Props> = ({
       promises.push(injectContext.onUpdateInject(inject.inject_id, inject).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
         if (result.entities) {
           onUpdate(result);
-          const dependingOn : Record<string, string> = {};
-          result.entities.injects[result.result].inject_depends_on?.forEach((value) => {
-            if (value.dependency_condition != null && value.dependency_relationship?.inject_parent_id !== undefined) {
-              dependingOn[value.dependency_relationship?.inject_parent_id as unknown as string] = value.dependency_condition;
-            }
-          });
-          const newResult = {
-            ...result.entities.injects[result.result],
-            inject_depends_on: dependingOn,
-          };
-          return newResult as never;
+          return chainingUtils.convertInjectStore(result.entities.injects[result.result]) as never;
         }
         return undefined;
       }));

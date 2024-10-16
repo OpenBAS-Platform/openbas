@@ -116,7 +116,7 @@ public class InjectOutput {
 
     if (injectDependency != null) {
       this.dependsOn = Stream.of(injectDependency)
-              .collect(Collectors.toMap(injectDep -> injectDep.getCompositeId().getInjectParentId().getId(), InjectDependency::getCondition));
+              .collect(Collectors.toMap(injectDep -> injectDep.getCompositeId().getInjectParent().getId(), InjectDependency::getCondition));
     }
 
   }
