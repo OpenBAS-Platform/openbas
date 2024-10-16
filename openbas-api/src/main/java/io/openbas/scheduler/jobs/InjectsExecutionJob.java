@@ -244,9 +244,8 @@ public class InjectsExecutionJob implements Job {
     private Optional<List<String>> getErrorMessagesPreExecution(String exerciseId, Inject inject) {
         List<InjectDependency> injectDependencies = injectDependenciesRepository.findParents(List.of(inject.getId()));
         if (!injectDependencies.isEmpty()) {
-            List<Inject> parents = StreamSupport.stream(injectRepository.findAllById(injectDependencies.stream()
-                    .map(injectDependency -> injectDependency.getCompositeId().getInjectParent().getId()).toList()).spliterator(), false)
-                    .collect(Collectors.toList());
+            List<Inject> parents = injectDependencies.stream()
+                    .map(injectDependency -> injectDependency.getCompositeId().getInjectParent()).toList();
 
             Map<String, Boolean> mapCondition = getStringBooleanMap(parents, exerciseId, injectDependencies);
 
