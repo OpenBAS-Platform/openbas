@@ -115,7 +115,7 @@ AvailableVariablesDialogProps
             sx={{ textTransform: 'none' }}
             label={t('Custom variables')}
             value="2"
-          />}
+                          />}
         </TabList>
         <DialogContent>
           <TabPanel
@@ -164,7 +164,7 @@ AvailableVariablesDialogProps
           {uriVariable && <TabPanel
             value="2"
             style={{ maxHeight: '100%', overflow: 'auto', padding: 0 }}
-          >
+                          >
             <Alert severity="info">
               {t('Please follow this link to')}
               {/* TODO: validate when migrate to new react router version */}
