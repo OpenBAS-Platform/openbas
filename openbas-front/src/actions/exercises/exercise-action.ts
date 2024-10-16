@@ -22,6 +22,11 @@ export const fetchExerciseExpectationResult = (exerciseId: Exercise['exercise_id
   return simpleCall(uri);
 };
 
+export const fetchPlayersByExercise = (exerciseId: Exercise['exercise_id']) => (dispatch: Dispatch) => {
+  const uri = `${EXERCISE_URI}/${exerciseId}/players`;
+  return getReferential(schema.arrayOfUsers, uri)(dispatch);
+};
+
 export const fetchExerciseInjectExpectationResults = (exerciseId: Exercise['exercise_id']) => {
   const uri = `${EXERCISE_URI}/${exerciseId}/injects/results`;
   return simpleCall(uri);

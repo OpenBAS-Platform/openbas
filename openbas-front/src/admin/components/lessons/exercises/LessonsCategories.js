@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { makeStyles } from '@mui/styles';
-import { Box, Chip, Grid, LinearProgress, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
+import { Box, Chip, Grid, LinearProgress, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
 import { CastForEducationOutlined, HelpOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
 import LessonsCategoryPopover from '../categories/LessonsCategoryPopover';
@@ -150,10 +150,9 @@ const LessonsCategories = ({
                         question.lessonsquestion_id
                       ] || { score: 0, number: 0, comments: 0 };
                       return (
-                        <ListItem
+                        <ListItemButton
                           key={question.lessonsquestion_id}
                           divider
-                          button={!isReport}
                           onClick={() => setSelectedQuestion && setSelectedQuestion(question)
                                                     }
                         >
@@ -189,7 +188,7 @@ const LessonsCategories = ({
                               </Typography>
                             </Box>
                           </Box>
-                        </ListItem>
+                        </ListItemButton>
                       );
                     })}
                   </List>

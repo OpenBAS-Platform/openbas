@@ -9,6 +9,7 @@ import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
 import ReportInformationType from './ReportInformationType';
 import { fetchExercise, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import {
+  fetchPlayersByExercise,
   exerciseInjectsResultDTO,
   fetchExerciseExpectationResult,
   fetchLessonsAnswers,
@@ -26,7 +27,9 @@ import type {
   Report,
   ReportInformation,
   Team,
+  User,
 } from '../../../../../utils/api-types';
+import type { UserHelper } from '../../../../../actions/helper';
 
 export interface ExerciseReportData {
   injects: InjectResultDTO[],
@@ -37,6 +40,7 @@ export interface ExerciseReportData {
   lessonsAnswers: LessonsAnswer[],
   teams: Team[],
   teamsMap: Record<string, Team>,
+  usersMap: Record<string, User>,
 }
 
 interface ReturnType {
@@ -62,7 +66,8 @@ const useExerciseReportData = (reportId: Report['report_id'], exerciseId: Exerci
     lessonsAnswers,
     teams,
     teamsMap,
-  } = useHelper((helper: InjectHelper & ReportsHelper & ExercisesHelper & TeamsHelper) => {
+    usersMap,
+  } = useHelper((helper: InjectHelper & ReportsHelper & ExercisesHelper & TeamsHelper & UserHelper) => {
     return {
       report: helper.getReport(reportId),
       exercise: helper.getExercise(exerciseId),
@@ -71,6 +76,7 @@ const useExerciseReportData = (reportId: Report['report_id'], exerciseId: Exerci
       lessonsAnswers: helper.getExerciseLessonsAnswers(exerciseId),
       teamsMap: helper.getTeamsMap(),
       teams: helper.getExerciseTeams(exerciseId),
+      usersMap: helper.getUsersMap(),
     };
   });
 
@@ -95,6 +101,7 @@ const useExerciseReportData = (reportId: Report['report_id'], exerciseId: Exerci
           dispatch(fetchLessonsQuestions(exerciseId)),
           dispatch(fetchLessonsAnswers(exerciseId)),
           dispatch(fetchLessonsCategories(exerciseId)),
+          dispatch(fetchPlayersByExercise(exerciseId)),
         );
       }
       if (displayModule(ReportInformationType.SCORE_DETAILS)) {
@@ -124,6 +131,7 @@ const useExerciseReportData = (reportId: Report['report_id'], exerciseId: Exerci
       lessonsAnswers,
       teams,
       teamsMap,
+      usersMap,
     },
   };
 };

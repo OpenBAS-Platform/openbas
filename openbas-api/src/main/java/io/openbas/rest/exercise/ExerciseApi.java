@@ -255,6 +255,12 @@ public class ExerciseApi extends RestBehavior {
         return teams;
     }
 
+    @GetMapping(EXERCISE_URI + "/{exerciseId}/players")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
+    public Iterable<RawPlayer> getPlayersByExercise(@PathVariable String exerciseId) {
+        return userRepository.rawPlayersByExerciseId(exerciseId);  // Return the list of players wrapped in a ResponseEntity
+    }
+
     @Transactional(rollbackOn = Exception.class)
     @PutMapping(EXERCISE_URI + "/{exerciseId}/teams/{teamId}/players/enable")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
