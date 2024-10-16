@@ -31,7 +31,7 @@ import { useQueryableWithLocalStorage } from '../../../../components/common/quer
 import ToolBar from '../ToolBar';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
-import chainingUtils from './chaining/ChainingUtils';
+import chainingUtils from '../../../../components/common/chaining/ChainingUtils';
 
 const useStyles = makeStyles(() => ({
   disabled: {
