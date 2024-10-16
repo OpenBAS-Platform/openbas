@@ -68,7 +68,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
               teams={teams}
               articles={articles}
               variables={variables}
-              uriVariable={`/admin/scenarios/${scenarioId}/definition/variables`}
+              uriVariable={`/admin/scenarios/${scenarioId}/definition`}
               allUsersNumber={scenario.scenario_all_users_number}
               usersNumber={scenario.scenario_users_number}
               // @ts-expect-error typing
