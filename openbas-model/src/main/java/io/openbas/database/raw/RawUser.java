@@ -23,4 +23,7 @@ public interface RawUser {
 
   List<String> getUser_tags();
 
+  List<String> getUser_groups();
+
+  List<String> getUser_teams();
 }

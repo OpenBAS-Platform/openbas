@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
-import io.openbas.database.raw.RawExercise;
 import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.repository.ArticleRepository;
 import io.openbas.database.repository.ExerciseRepository;
@@ -409,10 +408,6 @@ public class ExerciseService {
   }
 
   public List<AtomicTestingMapper.ExpectationResultsByType> getGlobalResults(@NotBlank String exerciseId) {
-    RawExercise rawExercise = exerciseRepository.rawById(exerciseId);
-    if (rawExercise == null) {
-      throw new ElementNotFoundException("Exercise not found with ID: " + exerciseId);
-    }
-    return resultUtils.getResultsByTypes(rawExercise.getInject_ids());
+    return resultUtils.getResultsByTypes(exerciseRepository.findInjectsByExercise(exerciseId));
   }
 }

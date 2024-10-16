@@ -232,22 +232,11 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
   RawExercise rawDetailsById(@Param("exerciseId") String exerciseId);
 
   @Query(value =
-      " SELECT ex.exercise_id, "
-          + "ex.exercise_status, "
-          + "ex.exercise_start_date, "
-          + "ex.exercise_updated_at, "
-          + "ex.exercise_end_date, "
-          + "ex.exercise_name, "
-          + "ex.exercise_category, "
-          + "ex.exercise_subtitle, "
-          + " array_agg(distinct ie.inject_id) FILTER ( WHERE ie.inject_id IS NOT NULL ) as inject_ids, "
-          + " array_agg(distinct et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags "
+      " SELECT DISTINCT (ie.inject_id) "
           + "FROM exercises ex "
-          + "LEFT JOIN exercises_tags et ON et.exercise_id = ex.exercise_id "
           + "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id "
-          + "WHERE ex.exercise_id = :id "
-          + "GROUP BY ex.exercise_id ;", nativeQuery = true)
-  RawExercise rawById(@Param("id") String id);
+          + "WHERE ex.exercise_id = :exerciseId ;", nativeQuery = true)
+  List<String> findInjectsByExercise(@Param("exerciseId") String exerciseId);
 
   @Query(value =
       " SELECT ex.exercise_id, "
