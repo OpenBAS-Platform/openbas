@@ -216,10 +216,31 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
             && nodeInjectData.boundingBox?.topLeft.x >= previousNode.data.boundingBox.topLeft.x
             && nodeInjectData.boundingBox?.topLeft.x < previousNode.data.boundingBox.bottomRight.x);
 
-      const maxY = Math.max(0, ...previousNodes
-        .map((previousNode) => (previousNode.data.boundingBox?.bottomRight.y ? previousNode.data.boundingBox?.bottomRight.y : 0)));
+      const arrayOfY = previousNodes
+        .map((previousNode) => (previousNode.data.boundingBox?.bottomRight.y ? previousNode.data.boundingBox?.bottomRight.y : 0));
+      const maxY = Math.max(0, ...arrayOfY);
 
-      nodeInjectPosition.y = previousNodes.length === 0 ? 0 : maxY;
+      nodeInjectPosition.y = 0;
+      let rowFound = false;
+      for (let row = 1; row <= (maxY / nodeHeightClearance) + 1; row += 1) {
+        if (!arrayOfY.includes(row * nodeHeightClearance)) {
+          nodeInjectPosition.y = (row - 1) * nodeHeightClearance;
+          rowFound = true;
+          break;
+        }
+      }
+
+      if (!rowFound) {
+        nodeInjectPosition.y = previousNodes.length === 0 ? 0 : maxY;
+      }
+      if (nodeInject.data.inject?.inject_depends_on) {
+        const nodesId = Object.keys(nodeInject.data.inject?.inject_depends_on);
+        const dependencies = reorganizedInjects.filter((dependencyNode) => nodesId.includes(dependencyNode.id));
+        const minY = Math.min(...dependencies.map((value) => value.data.boundingBox!.topLeft.y));
+
+        nodeInjectPosition.y = nodeInjectPosition.y < minY ? minY : nodeInjectPosition.y;
+      }
+
       nodeInjectData.fixedY = nodeInjectPosition.y;
       nodeInjectData.boundingBox = calculateBoundingBox(nodeInject, reorganizedInjects);
       reorganizedInjects[index] = nodeInject;
