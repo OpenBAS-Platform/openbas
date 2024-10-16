@@ -88,7 +88,6 @@ public class InjectApi extends RestBehavior {
   private final InjectService injectService;
   private final AtomicTestingService atomicTestingService;
   private final InjectDuplicateService injectDuplicateService;
-  private final InjectDependenciesRepository injectDependenciesRepository;
 
   // -- INJECTS --
 
