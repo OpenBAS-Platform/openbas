@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
-import static io.openbas.utils.fixtures.UserFixture.EMAIL;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -51,13 +50,14 @@ public class ExerciseApiTest {
     private ExerciseTeamUserRepository exerciseTeamUserRepository;
 
     private static final List<String> EXERCISE_IDS = new ArrayList<>();
+    private static final List<String> USER_IDS = new ArrayList<>();
+    private static final List<String> TEAM_IDS = new ArrayList<>();
 
     @AfterAll
     void afterAll() {
         this.exerciseRepository.deleteAllById(EXERCISE_IDS);
-        this.userRepository.deleteAll();
-        this.teamRepository.deleteAll();
-        this.exerciseTeamUserRepository.deleteAll();
+        this.userRepository.deleteAllById(USER_IDS);
+        this.teamRepository.deleteAllById(TEAM_IDS);
     }
 
     @Nested
@@ -70,8 +70,10 @@ public class ExerciseApiTest {
             // -- PREPARE --
             User userTom = userRepository.save(UserFixture.getUser("Tom", "TEST", "tom-test@fake.email"));
             User userBen = userRepository.save(UserFixture.getUser("Ben", "TEST", "ben-test@fake.email"));
+            USER_IDS.addAll(Arrays.asList(userTom.getId(), userBen.getId()));
             Team teamA = teamRepository.save(TeamFixture.getTeam(userTom, "TeamA", false));
             Team teamB = teamRepository.save(TeamFixture.getTeam(userBen, "TeamB", false));
+            TEAM_IDS.addAll(Arrays.asList(teamA.getId(), teamB.getId()));
 
             Exercise exercise = ExerciseFixture.createDefaultCrisisExercise();
             exercise.setTeams(Arrays.asList(teamA, teamB));
@@ -91,9 +93,8 @@ public class ExerciseApiTest {
             mvc.perform(get(EXERCISE_URI + "/"+ exerciseSaved.getId() +"/players")
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().is2xxSuccessful())
-                    .andExpect(jsonPath("$.length()").value(2))  // Check if the array has 2 elements
-                    .andExpect(jsonPath("$[0].user_id").value(userTom.getId()))  // Verify userTom's ID
-                    .andExpect(jsonPath("$[1].user_id").value(userBen.getId()));
+                    .andExpect(jsonPath("$.length()").value(2))
+                    .andExpect(jsonPath("$[*].user_id").value(org.hamcrest.Matchers.containsInAnyOrder(userTom.getId(), userBen.getId())));
         }
     }
 }
