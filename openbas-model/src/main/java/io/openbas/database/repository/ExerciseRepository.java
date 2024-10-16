@@ -150,7 +150,7 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
           + "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id "
           + "LEFT JOIN exercises_tags et ON et.exercise_id = ex.exercise_id "
           + "GROUP BY ex.exercise_id ;", nativeQuery = true)
-  List<RawExercise> rawAll();
+  List<RawExerciseSimple> rawAll();
 
   /**
    * Get the raw version of the exercises a user can see
@@ -159,9 +159,16 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
    * @return the list of exercises
    */
   @Query(value =
-      " SELECT ex.exercise_category, ex.exercise_id, ex.exercise_status, ex.exercise_start_date, ex.exercise_name, " +
-          " ex.exercise_subtitle, array_agg(et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags, " +
-          " array_agg(injects.inject_id) FILTER ( WHERE injects.inject_id IS NOT NULL ) as inject_ids " +
+      " SELECT ex.exercise_id, "
+          + "ex.exercise_status, "
+          + "ex.exercise_start_date, "
+          + "ex.exercise_updated_at, "
+          + "ex.exercise_end_date, "
+          + "ex.exercise_name, "
+          + "ex.exercise_category, "
+          + "ex.exercise_subtitle, "
+          + " array_agg(et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags, "
+          + " array_agg(injects.inject_id) FILTER ( WHERE injects.inject_id IS NOT NULL ) as inject_ids " +
           "FROM exercises ex " +
           "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id " +
           "LEFT JOIN injects ON ie.inject_id = injects.inject_id " +
@@ -171,7 +178,7 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
           "INNER JOIN users_groups ON groups.group_id = users_groups.group_id " +
           "WHERE users_groups.user_id = :userId " +
           "GROUP BY ex.exercise_id ;", nativeQuery = true)
-  List<RawExercise> rawAllGranted(@Param("userId") String userId);
+  List<RawExerciseSimple> rawAllGranted(@Param("userId") String userId);
 
   /**
    * Get the raw version of the exercises a user can see

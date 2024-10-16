@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawExercise;
+import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.repository.ArticleRepository;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.TeamRepository;
@@ -81,10 +82,10 @@ public class ExerciseService {
 
   public List<ExerciseSimple> exercises(){
     // We get the exercises depending on whether or not we are granted
-    List<RawExercise> exercises = currentUser().isAdmin() ? exerciseRepository.rawAll()
+    List<RawExerciseSimple> exercises = currentUser().isAdmin() ? exerciseRepository.rawAll()
         : exerciseRepository.rawAllGranted(currentUser().getId());
 
-    return exercises.stream().map(exercise->exerciseMapper.fromRawExercise(exercise)).collect(Collectors.toList());
+    return exercises.stream().map(exercise->exerciseMapper.fromRawExerciseSimple(exercise)).collect(Collectors.toList());
   }
 
   public Page<ExerciseSimple> exercises(
@@ -404,7 +405,7 @@ public class ExerciseService {
   // -- ScenarioExercise--
   public Iterable<ExerciseSimple> scenarioExercises(@NotBlank String scenarioId) {
     return exerciseRepository.rawAllByScenarioId(List.of(scenarioId))
-        .stream().map(rawExercise -> exerciseMapper.fromRawExercise(rawExercise)).toList();
+        .stream().map(rawExerciseSimple -> exerciseMapper.fromRawExerciseSimple(rawExerciseSimple)).toList();
   }
 
   public List<AtomicTestingMapper.ExpectationResultsByType> getGlobalResults(@NotBlank String exerciseId) {

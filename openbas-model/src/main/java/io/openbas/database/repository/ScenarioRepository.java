@@ -1,7 +1,7 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Scenario;
-import io.openbas.database.raw.RawExercise;
+import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.raw.RawScenario;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
@@ -40,7 +40,7 @@ public interface ScenarioRepository extends CrudRepository<Scenario, String>,
           + "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id "
           + "WHERE s.scenario_external_reference = :externalReference "
           + "GROUP BY ex.exercise_id ;", nativeQuery = true)
-  List<RawExercise> rawAllByExternalReference(@Param("externalReference") String externalReference);
+  List<RawExerciseSimple> rawAllByExternalReference(@Param("externalReference") String externalReference);
 
   @Query("select distinct s from Scenario s " +
       "join s.grants as grant " +

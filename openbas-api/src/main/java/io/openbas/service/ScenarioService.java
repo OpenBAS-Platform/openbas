@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
-import io.openbas.database.raw.RawExercise;
+import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.raw.RawScenario;
 import io.openbas.database.repository.*;
@@ -283,13 +283,13 @@ public class ScenarioService {
 
   @Transactional(readOnly = true)
   public ExerciseSimple latestExerciseByExternalReference(@NotBlank final String scenarioExternalReference) {
-    Optional<RawExercise> latestEndedExercise = scenarioRepository.rawAllByExternalReference(scenarioExternalReference)
+    Optional<RawExerciseSimple> latestEndedExercise = scenarioRepository.rawAllByExternalReference(scenarioExternalReference)
         .stream()
         .filter(rawExercise -> rawExercise.getExercise_end_date() != null)
-        .max(Comparator.comparing(RawExercise::getExercise_end_date));
+        .max(Comparator.comparing(RawExerciseSimple::getExercise_end_date));
 
     return latestEndedExercise
-        .map(exerciseMapper::fromRawExercise)
+        .map(exerciseMapper::fromRawExerciseSimple)
         .orElseThrow(() -> new ElementNotFoundException("Latest exercise not found"));
   }
 

@@ -2,7 +2,7 @@ package io.openbas.utils;
 
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Tag;
-import io.openbas.database.raw.RawExercise;
+import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ public class ExerciseMapper {
   private final ResultUtils resultUtils;
 
 
-  public ExerciseSimple fromRawExercise(RawExercise rawExercise) {
+  public ExerciseSimple fromRawExerciseSimple(RawExerciseSimple rawExercise) {
     ExerciseSimple simple = new ExerciseSimple();
     simple.setId(rawExercise.getExercise_id());
     simple.setName(rawExercise.getExercise_name());
