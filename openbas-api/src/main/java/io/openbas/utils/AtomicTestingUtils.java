@@ -3,10 +3,7 @@ package io.openbas.utils;
 import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
-import io.openbas.database.raw.RawAsset;
-import io.openbas.database.raw.RawAssetGroup;
-import io.openbas.database.raw.RawInjectExpectation;
-import io.openbas.database.raw.RawTeam;
+import io.openbas.database.raw.*;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
@@ -297,6 +294,7 @@ public class AtomicTestingUtils {
   public static List<InjectTargetWithResult> getTargetsWithResultsFromRaw(
       List<RawInjectExpectation> expectations,
       Map<String, RawTeam> rawTeamMap,
+      Map<String, RawUser> rawUserMap,
       Map<String, RawAsset> rawAssetMap,
       Map<String, RawAssetGroup> rawAssetGroupMap,
       Map<String, List<Endpoint>> dynamicAssetGroupMap
@@ -483,9 +481,9 @@ public class AtomicTestingUtils {
               )
               .entrySet().stream()
               .map(entry -> new InjectTargetWithResult(TargetType.TEAMS, entry.getKey(),
-                  rawTeamMap.get(teamExpectationMap.get(entry.getKey())).getTeam_name(), entry.getValue(),
+                  rawTeamMap.get(teamExpectationMap.get(entry.getKey()).getTeam_id()).getTeam_name(), entry.getValue(),
                   playerExpectations.isEmpty() ? List.of()
-                      : calculateResultsforPlayersFromRaw(groupedByTeamAndUser.get(entry.getKey())), null))
+                      : calculateResultsforPlayersFromRaw(groupedByTeamAndUser.get(entry.getKey()), rawUserMap), null))
               .toList()
       );
     }
@@ -504,7 +502,7 @@ public class AtomicTestingUtils {
               )
               .entrySet().stream()
               .map(entry -> new InjectTargetWithResult(TargetType.ASSETS, entry.getKey(),
-                  rawAssetMap.get(assetExpectationMap.get(entry.getKey())).getAsset_name(), entry.getValue(),
+                  rawAssetMap.get(assetExpectationMap.get(entry.getKey()).getAsset_id()).getAsset_name(), entry.getValue(),
                   Objects.equals(rawAssetMap.get(entry.getKey()).getAsset_type(), "Endpoint")
                       ? Endpoint.PLATFORM_TYPE.valueOf(rawAssetMap.get(entry.getKey()).getEndpoint_platform()) : null))
               .toList()
@@ -546,7 +544,7 @@ public class AtomicTestingUtils {
             }
 
             // Other children without expectations are added with a default result
-            rawAssetGroupMap.get(assetGroupExpectationMap.get(entry.getKey())).getAsset_ids().forEach(asset -> {
+            rawAssetGroupMap.get(assetGroupExpectationMap.get(entry.getKey()).getAsset_group_id()).getAsset_ids().forEach(asset -> {
               boolean foundAssetsWithoutResults = children.stream()
                   .noneMatch(child -> child.getId().equals(asset));
               if (foundAssetsWithoutResults) {
@@ -582,7 +580,7 @@ public class AtomicTestingUtils {
             }
 
             return new InjectTargetWithResult(TargetType.ASSETS_GROUPS, entry.getKey(),
-                rawAssetGroupMap.get(assetGroupExpectationMap.get(entry.getKey())).getAsset_group_name(), entry.getValue(),
+                rawAssetGroupMap.get(assetGroupExpectationMap.get(entry.getKey()).getAsset_group_id()).getAsset_group_name(), entry.getValue(),
                 sortResults(children), null);
           })
           .toList());
@@ -615,12 +613,14 @@ public class AtomicTestingUtils {
   }
 
   private static List<InjectTargetWithResult> calculateResultsforPlayersFromRaw(
-      Map<String, List<RawInjectExpectation>> expectationsByUser) {
+      Map<String, List<RawInjectExpectation>> expectationsByUser,
+      Map<String, RawUser> rawUserMap
+      ) {
     return expectationsByUser.entrySet().stream()
         .map(userEntry -> new InjectTargetWithResult(
             TargetType.PLAYER,
             userEntry.getKey(),
-            "toto",
+            StringUtils.getName(rawUserMap.get(userEntry.getValue().get(0)).getUser_firstname(), rawUserMap.get(userEntry.getValue().get(0)).getUser_lastname()),
             getExpectationResultByTypesFromRaw(userEntry.getValue()),
             null
         ))
