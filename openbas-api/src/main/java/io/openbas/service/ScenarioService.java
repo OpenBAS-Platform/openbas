@@ -466,7 +466,7 @@ public class ScenarioService {
     // Remove teams from exercise
     this.scenarioRepository.removeTeams(scenarioId, teamIds);
     // Remove all association between users / exercises / teams
-    teamIds.forEach(this.scenarioTeamUserRepository::deleteTeamFromAllReferences);
+    this.scenarioTeamUserRepository.deleteTeamFromAllReferences(teamIds);
     // Remove all association between injects and teams
     this.injectRepository.removeTeamsForScenario(scenarioId, teamIds);
     return teamRepository.findAllById(teamIds);

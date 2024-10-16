@@ -138,7 +138,7 @@ class ScenarioServiceTest {
         User user = getUser();
         User userSaved = this.userRepository.saveAndFlush(user);
         USER_ID = userSaved.getId();
-        Team team = getTeam(user);
+        Team team = getTeam(userSaved);
         Team teamSaved = this.teamRepository.saveAndFlush(team);
         TEAM_ID = teamSaved.getId();
         Scenario scenario = ScenarioFixture.getScenario();
