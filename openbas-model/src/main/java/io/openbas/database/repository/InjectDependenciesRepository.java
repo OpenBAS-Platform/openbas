@@ -24,14 +24,4 @@ public interface InjectDependenciesRepository extends CrudRepository<InjectDepen
             "FROM injects_dependencies " +
             "WHERE inject_children_id IN :childrens", nativeQuery = true)
     List<InjectDependency> findParents(@NotNull List<String> childrens);
-
-    @Query(value = "SELECT " +
-            "inject_parent_id, " +
-            "inject_children_id, " +
-            "dependency_condition, " +
-            "dependency_created_at, " +
-            "dependency_updated_at " +
-            "FROM injects_dependencies " +
-            "WHERE inject_parent_id IN :parents", nativeQuery = true)
-    List<InjectDependency> findChildrens(@NotNull List<String> parents);
 }
