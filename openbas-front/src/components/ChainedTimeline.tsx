@@ -121,7 +121,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
   ];
   const gapSize = 125;
   const newNodeSize = 50;
-  const nodeHeightClearance = 200;
+  const nodeHeightClearance = 220;
   const nodeWidthClearance = 350;
 
   let startDate: string | undefined;
