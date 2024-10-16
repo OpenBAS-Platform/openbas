@@ -27,24 +27,24 @@ public class InjectDependencyId implements Serializable {
     @JsonProperty("inject_parent_id")
     @JoinColumn(referencedColumnName="inject_id", name="inject_parent_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
-    private Inject injectParentId;
+    private Inject injectParent;
 
     @ManyToOne
     @JsonProperty("inject_children_id")
     @JoinColumn(referencedColumnName="inject_id", name="inject_children_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
-    private Inject injectChildrenId;
+    private Inject injectChildren;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         InjectDependencyId that = (InjectDependencyId) o;
-        return injectParentId.equals(that.injectParentId) && injectChildrenId.equals(that.injectChildrenId);
+        return injectParent.equals(that.injectParent) && injectChildren.equals(that.injectChildren);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(injectParentId, injectChildrenId);
+        return Objects.hash(injectParent, injectChildren);
     }
 }

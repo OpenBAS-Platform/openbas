@@ -301,8 +301,8 @@ public class InjectApi extends RestBehavior {
     if(input.getDependsOn() != null) {
       inject.setDependsOn(input.getDependsOn().entrySet().stream().map(entry -> {
         InjectDependency injectDependency = new InjectDependency();
-        injectDependency.getCompositeId().setInjectChildrenId(injectRepository.findById(entry.getKey()).orElse(null));
-        injectDependency.getCompositeId().setInjectParentId(inject);
+        injectDependency.getCompositeId().setInjectChildren(injectRepository.findById(entry.getKey()).orElse(null));
+        injectDependency.getCompositeId().setInjectParent(inject);
         injectDependency.setCondition(entry.getValue());
         return injectDependency;
       }).toList());
@@ -479,8 +479,8 @@ public class InjectApi extends RestBehavior {
     if(input.getDependsOn() != null) {
       inject.setDependsOn(input.getDependsOn().entrySet().stream().map(entry -> {
         InjectDependency injectDependency = new InjectDependency();
-        injectDependency.getCompositeId().setInjectChildrenId(injectRepository.findById(entry.getKey()).orElse(null));
-        injectDependency.getCompositeId().setInjectParentId(inject);
+        injectDependency.getCompositeId().setInjectChildren(injectRepository.findById(entry.getKey()).orElse(null));
+        injectDependency.getCompositeId().setInjectParent(inject);
         injectDependency.setCondition(entry.getValue());
         return injectDependency;
       }).toList());
@@ -595,14 +595,14 @@ public class InjectApi extends RestBehavior {
     if(input.getDependsOn() != null) {
       input.getDependsOn().entrySet().forEach(entry -> {
         Optional<InjectDependency> existingDependency = inject.getDependsOn().stream()
-                .filter(injectDependency -> injectDependency.getCompositeId().getInjectParentId().getId().equals(entry.getKey()))
+                .filter(injectDependency -> injectDependency.getCompositeId().getInjectParent().getId().equals(entry.getKey()))
                 .findFirst();
         if(existingDependency.isPresent()) {
           existingDependency.get().setCondition(entry.getValue());
         } else {
           InjectDependency injectDependency = new InjectDependency();
-          injectDependency.getCompositeId().setInjectChildrenId(inject);
-          injectDependency.getCompositeId().setInjectParentId(injectRepository.findById(entry.getKey()).orElse(null));
+          injectDependency.getCompositeId().setInjectChildren(inject);
+          injectDependency.getCompositeId().setInjectParent(injectRepository.findById(entry.getKey()).orElse(null));
           injectDependency.setCondition(entry.getValue());
           inject.getDependsOn().add(injectDependency);
         }
@@ -613,7 +613,7 @@ public class InjectApi extends RestBehavior {
     if(input.getDependsOn() != null && !input.getDependsOn().isEmpty()) {
       inject.getDependsOn().forEach(
         injectDependency -> {
-          if (!input.getDependsOn().keySet().contains(injectDependency.getCompositeId().getInjectParentId().getId())) {
+          if (!input.getDependsOn().keySet().contains(injectDependency.getCompositeId().getInjectParent().getId())) {
             injectDepencyToRemove.add(injectDependency);
           }
         }

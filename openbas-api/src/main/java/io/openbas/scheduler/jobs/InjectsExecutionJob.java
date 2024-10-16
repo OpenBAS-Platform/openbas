@@ -245,7 +245,7 @@ public class InjectsExecutionJob implements Job {
         List<InjectDependency> injectDependencies = injectDependenciesRepository.findParents(List.of(inject.getId()));
         if (!injectDependencies.isEmpty()) {
             List<Inject> parents = StreamSupport.stream(injectRepository.findAllById(injectDependencies.stream()
-                    .map(injectDependency -> injectDependency.getCompositeId().getInjectParentId().getId()).toList()).spliterator(), false)
+                    .map(injectDependency -> injectDependency.getCompositeId().getInjectParent().getId()).toList()).spliterator(), false)
                     .collect(Collectors.toList());
 
             Map<String, Boolean> mapCondition = getStringBooleanMap(parents, exerciseId, injectDependencies);
@@ -266,8 +266,9 @@ public class InjectsExecutionJob implements Job {
                 if (!canBeExecuted) {
                     if (results == null) {
                         results = new ArrayList<>();
+                        results.add("This inject depends on other injects expectations that are not met. The following conditions were not as expected : ");
                     }
-                    results.add("The conditions to launch this inject are not met");
+                    results.addAll(labelFromCondition(injectDependency.getCompositeId().getInjectParent(), injectDependency.getCondition()));
                 }
             }
             return results == null ? Optional.empty() : Optional.of(results);
@@ -315,6 +316,16 @@ public class InjectsExecutionJob implements Job {
             });
         });
         return mapCondition;
+    }
+
+    private List<String> labelFromCondition(Inject injectParent, String condition) {
+        List<String> result = new ArrayList<>();
+        List<String> conditionElements = List.of(condition.split("(&&|\\|\\|)"));
+        for (String conditionElement : conditionElements) {
+            String type = conditionElement.split("==")[0].trim().replaceAll(injectParent.getId() + "-", "").replaceAll("-Success", "");
+            result.add(String.format("Inject '%s' - %s is %s", injectParent.getTitle(), type, conditionElement.endsWith("true") ? "true" : "false"));
+        }
+        return result;
     }
 
     public void updateExercise(String exerciseId) {
