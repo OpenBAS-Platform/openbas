@@ -5,6 +5,7 @@ import { Add, DeleteOutlined, ExpandMore } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import ClickableModeChip from '../../../../components/common/chips/ClickableModeChip';
 import ClickableChip from '../../../../components/common/chips/ClickableChip';
+import { capitalize } from '../../../../utils/String';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -32,10 +33,6 @@ const InjectForm = ({
   const breakpointAndOr = /&&|\|\|/gm;
   const breakpointValue = /==/gm;
   const typeFromName = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-(.*)-Success/mg;
-
-  const capitalize = (text) => {
-    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
-  };
 
   const [parents, setParents] = useState(
     injects.filter((currentInject) => values.inject_depends_on !== null
@@ -570,20 +567,22 @@ const InjectForm = ({
                 >
                   {getClickableParentChip(parent)}
                 </Box>
-                <Button
-                  color="secondary"
-                  aria-label="Add"
-                  size="large"
-                  onClick={() => {
-                    addConditionParent(parent);
-                  }}
-                  style={{ justifyContent: 'start' }}
-                >
-                  <Add fontSize="small"/>
-                  <Typography>
-                    {t('Add condition')}
-                  </Typography>
-                </Button>
+                <div style={{ justifyContent: 'left' }}>
+                  <Button
+                    color="secondary"
+                    aria-label="Add"
+                    size="large"
+                    onClick={() => {
+                      addConditionParent(parent);
+                    }}
+                    style={{ justifyContent: 'start' }}
+                  >
+                    <Add fontSize="small"/>
+                    <Typography>
+                      {t('Add condition')}
+                    </Typography>
+                  </Button>
+                </div>
               </FormControl>
             </AccordionDetails>
           </Accordion>
@@ -661,20 +660,22 @@ const InjectForm = ({
                 >
                   {getClickableChildrenChip(children)}
                 </Box>
-                <Button
-                  color="secondary"
-                  aria-label="Add"
-                  size="large"
-                  onClick={() => {
-                    addConditionChildren(children);
-                  }}
-                  style={{ justifyContent: 'start' }}
-                >
-                  <Add fontSize="small"/>
-                  <Typography>
-                    {t('Add condition')}
-                  </Typography>
-                </Button>
+                <div style={{ justifyContent: 'left' }}>
+                  <Button
+                    color="secondary"
+                    aria-label="Add"
+                    size="large"
+                    onClick={() => {
+                      addConditionChildren(children);
+                    }}
+                    style={{ justifyContent: 'start' }}
+                  >
+                    <Add fontSize="small"/>
+                    <Typography>
+                      {t('Add condition')}
+                    </Typography>
+                  </Button>
+                </div>
               </FormControl>
             </AccordionDetails>
           </Accordion>

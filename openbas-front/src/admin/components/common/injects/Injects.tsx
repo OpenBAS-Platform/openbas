@@ -392,7 +392,7 @@ const Injects: FunctionComponent<Props> = ({
       'inject_description',
       'inject_injector_contract',
       'inject_content',
-      'inject_depends_from_another',
+      'inject_depends_on',
       'inject_depends_duration',
       'inject_teams',
       'inject_assets',
