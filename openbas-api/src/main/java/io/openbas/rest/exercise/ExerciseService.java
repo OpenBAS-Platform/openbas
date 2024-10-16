@@ -4,12 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
-import io.openbas.database.repository.*;
-import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.database.raw.RawExerciseSimple;
-import io.openbas.database.repository.ArticleRepository;
-import io.openbas.database.repository.ExerciseRepository;
-import io.openbas.database.repository.TeamRepository;
+import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
@@ -422,7 +418,7 @@ public class ExerciseService {
     // Remove teams from exercise
     this.exerciseRepository.removeTeams(exerciseId, teamIds);
     // Remove all association between users / exercises / teams
-    teamIds.forEach(exerciseTeamUserRepository::deleteTeamFromAllReferences);
+    this.exerciseTeamUserRepository.deleteTeamsFromAllReferences(teamIds);
     // Remove all association between injects and teams
     this.injectRepository.removeTeamsForExercise(exerciseId, teamIds);
     return teamRepository.findAllById(teamIds);
