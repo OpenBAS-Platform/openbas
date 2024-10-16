@@ -1,5 +1,6 @@
 package io.openbas.rest.scenario;
 
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Exercise;
 import io.openbas.rest.exercise.ExerciseService;
 import io.openbas.rest.exercise.form.ExerciseSimple;
@@ -25,12 +26,14 @@ public class ScenarioExerciseApi {
 
   private final ExerciseService exerciseService;
 
+  @LogExecutionTime
   @GetMapping(SCENARIO_URI + "/{scenarioId}/exercises")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<ExerciseSimple> scenarioExercises(@PathVariable @NotBlank final String scenarioId) {
     return exerciseService.scenarioExercises(scenarioId);
   }
 
+  @LogExecutionTime
   @PostMapping(SCENARIO_URI + "/{scenarioId}/exercises/search")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<ExerciseSimple> scenarioExercises(

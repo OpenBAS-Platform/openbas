@@ -1,6 +1,7 @@
 package io.openbas.rest.exercise;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
@@ -622,11 +623,13 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
+    @LogExecutionTime
     @GetMapping(EXERCISE_URI)
     public List<ExerciseSimple> exercises() {
       return exerciseService.exercises();
     }
 
+    @LogExecutionTime
     @PostMapping(EXERCISE_URI + "/search")
     public Page<ExerciseSimple> exercises(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
         if (currentUser().isAdmin()) {

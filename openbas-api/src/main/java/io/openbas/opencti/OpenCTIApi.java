@@ -1,5 +1,6 @@
 package io.openbas.opencti;
 
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.service.ScenarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +34,7 @@ public class OpenCTIApi {
           }),
       @ApiResponse(responseCode = "404", description = "Exercise not found", content = @Content)
   })
+  @LogExecutionTime
   @GetMapping(OPENCTI_URI + "/exercises/latest/{externalReferenceId}")
   public ExerciseSimple latestExerciseByExternalReference(@PathVariable @NotBlank final String externalReferenceId) {
     return scenarioService.latestExerciseByExternalReference(externalReferenceId);
