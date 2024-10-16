@@ -24,6 +24,8 @@ interface Props {
   endpointIds: string[];
   onSubmit: (endpointIds: string[]) => void;
   platforms?: string[];
+  payloadType?: string;
+  payloadArch?: string;
 }
 
 const InjectAddEndpoints: FunctionComponent<Props> = ({
@@ -31,6 +33,8 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
   endpointIds,
   onSubmit,
   platforms,
+  payloadType,
+  payloadArch,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -59,7 +63,7 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
           classes={{ primary: classes.text }}
         />
       </ListItemButton>
-      <EndpointsDialogAdding initialState={endpointIds} open={openDialog} platforms={platforms}
+      <EndpointsDialogAdding initialState={endpointIds} open={openDialog} platforms={platforms} payloadType={payloadType} payloadArch={payloadArch}
         onClose={handleClose} onSubmit={onSubmit}
         title={t('Add assets in this inject')}
       />

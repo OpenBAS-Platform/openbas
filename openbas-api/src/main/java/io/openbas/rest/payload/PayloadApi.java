@@ -3,6 +3,7 @@ package io.openbas.rest.payload;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.integrations.PayloadService;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.payload.form.PayloadCreateInput;
@@ -91,8 +92,8 @@ public class PayloadApi extends RestBehavior {
     @PreAuthorize("isPlanner()")
     @Transactional(rollbackOn = Exception.class)
     public Payload createPayload(@Valid @RequestBody PayloadCreateInput input) {
-        switch (input.getType()) {
-            case "Command":
+        switch (PayloadType.fromString(input.getType())) {
+            case PayloadType.COMMAND:
                 Command commandPayload = new Command();
                 commandPayload.setUpdateAttributes(input);
                 commandPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
@@ -100,16 +101,17 @@ public class PayloadApi extends RestBehavior {
                 commandPayload = payloadRepository.save(commandPayload);
                 this.payloadService.updateInjectorContractsForPayload(commandPayload);
                 return commandPayload;
-            case "Executable":
+            case PayloadType.EXECUTABLE:
                 Executable executablePayload = new Executable();
-                executablePayload.setUpdateAttributes(input);
-                executablePayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
-                executablePayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-                executablePayload.setExecutableFile(documentRepository.findById(input.getExecutableFile()).orElseThrow());
+                PayloadCreateInput validatedInput = validateExecutableCreateInput(input);
+                executablePayload.setUpdateAttributes(validatedInput);
+                executablePayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(validatedInput.getAttackPatternsIds())));
+                executablePayload.setTags(iterableToSet(tagRepository.findAllById(validatedInput.getTagIds())));
+                executablePayload.setExecutableFile(documentRepository.findById(validatedInput.getExecutableFile()).orElseThrow());
                 executablePayload = payloadRepository.save(executablePayload);
                 this.payloadService.updateInjectorContractsForPayload(executablePayload);
                 return executablePayload;
-            case "FileDrop":
+            case PayloadType.FILE_DROP:
                 FileDrop fileDropPayload = new FileDrop();
                 fileDropPayload.setUpdateAttributes(input);
                 fileDropPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
@@ -118,7 +120,7 @@ public class PayloadApi extends RestBehavior {
                 fileDropPayload = payloadRepository.save(fileDropPayload);
                 this.payloadService.updateInjectorContractsForPayload(fileDropPayload);
                 return fileDropPayload;
-            case "DnsResolution":
+            case PayloadType.DNS_RESOLUTION:
                 DnsResolution dnsResolutionPayload = new DnsResolution();
                 dnsResolutionPayload.setUpdateAttributes(input);
                 dnsResolutionPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
@@ -126,7 +128,7 @@ public class PayloadApi extends RestBehavior {
                 dnsResolutionPayload = payloadRepository.save(dnsResolutionPayload);
                 this.payloadService.updateInjectorContractsForPayload(dnsResolutionPayload);
                 return dnsResolutionPayload;
-            case "NetworkTraffic":
+            case PayloadType.NETWORK_TRAFFIC:
                 NetworkTraffic networkTrafficPayload = new NetworkTraffic();
                 networkTrafficPayload.setUpdateAttributes(input);
                 networkTrafficPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
@@ -136,6 +138,24 @@ public class PayloadApi extends RestBehavior {
                 return networkTrafficPayload;
             default:
                 throw new UnsupportedOperationException("Payload type " + input.getType() + " is not supported");
+        }
+    }
+
+    private static PayloadCreateInput validateExecutableCreateInput(PayloadCreateInput input) {
+        Optional<Endpoint.PLATFORM_ARCH> maybeArch = Optional.ofNullable(input.getExecutableArch());
+        if (maybeArch.isPresent()) {
+            return input;
+        } else {
+            throw new BadRequestException("Executable arch is missing");
+        }
+    }
+
+    private static PayloadUpdateInput validateExecutableUpdateInput(PayloadUpdateInput input) {
+        Optional<Endpoint.PLATFORM_ARCH> maybeArch = Optional.ofNullable(input.getExecutableArch());
+        if (maybeArch.isPresent()) {
+            return input;
+        } else {
+            throw new BadRequestException("Executable arch is missing");
         }
     }
 
@@ -149,34 +169,35 @@ public class PayloadApi extends RestBehavior {
         payload.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         payload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         payload.setUpdatedAt(Instant.now());
-        switch (payload.getType()) {
-            case "Command":
+        switch (PayloadType.fromString(payload.getType())) {
+            case PayloadType.COMMAND:
                 Command payloadCommand = (Command) Hibernate.unproxy(payload);
                 payloadCommand.setUpdateAttributes(input);
                 payloadCommand = payloadRepository.save(payloadCommand);
                 this.payloadService.updateInjectorContractsForPayload(payloadCommand);
                 return payloadCommand;
-            case "Executable":
+            case PayloadType.EXECUTABLE:
+                PayloadUpdateInput validatedInput = validateExecutableUpdateInput(input);
                 Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
-                payloadExecutable.setUpdateAttributes(input);
-                payloadExecutable.setExecutableFile(documentRepository.findById(input.getExecutableFile()).orElseThrow());
+                payloadExecutable.setUpdateAttributes(validatedInput);
+                payloadExecutable.setExecutableFile(documentRepository.findById(validatedInput.getExecutableFile()).orElseThrow());
                 payloadExecutable = payloadRepository.save(payloadExecutable);
                 this.payloadService.updateInjectorContractsForPayload(payloadExecutable);
                 return payloadExecutable;
-            case "FileDrop":
+            case PayloadType.FILE_DROP:
                 FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
                 payloadFileDrop.setUpdateAttributes(input);
                 payloadFileDrop.setFileDropFile(documentRepository.findById(input.getFileDropFile()).orElseThrow());
                 payloadFileDrop = payloadRepository.save(payloadFileDrop);
                 this.payloadService.updateInjectorContractsForPayload(payloadFileDrop);
                 return payloadFileDrop;
-            case "DnsResolution":
+            case PayloadType.DNS_RESOLUTION:
                 DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
                 payloadDnsResolution.setUpdateAttributes(input);
                 payloadDnsResolution = payloadRepository.save(payloadDnsResolution);
                 this.payloadService.updateInjectorContractsForPayload(payloadDnsResolution);
                 return payloadDnsResolution;
-            case "NetworkTraffic":
+            case PayloadType.NETWORK_TRAFFIC:
                 NetworkTraffic payloadNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(payload);
                 payloadNetworkTraffic.setUpdateAttributes(input);
                 payloadNetworkTraffic = payloadRepository.save(payloadNetworkTraffic);
@@ -207,34 +228,34 @@ public class PayloadApi extends RestBehavior {
             existingPayload.setAttackPatterns(fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(input.getAttackPatternsExternalIds())));
             existingPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
             existingPayload.setUpdatedAt(Instant.now());
-            switch (existingPayload.getType()) {
-                case "Command":
+            switch (PayloadType.fromString(existingPayload.getType())) {
+                case PayloadType.COMMAND:
                     Command payloadCommand = (Command) Hibernate.unproxy(existingPayload);
                     payloadCommand.setUpdateAttributes(input);
                     payloadCommand = payloadRepository.save(payloadCommand);
                     this.payloadService.updateInjectorContractsForPayload(payloadCommand);
                     return payloadCommand;
-                case "Executable":
+                case PayloadType.EXECUTABLE:
                     Executable payloadExecutable = (Executable) Hibernate.unproxy(existingPayload);
                     payloadExecutable.setUpdateAttributes(input);
                     payloadExecutable.setExecutableFile(documentRepository.findById(input.getExecutableFile()).orElseThrow());
                     payloadExecutable = payloadRepository.save(payloadExecutable);
                     this.payloadService.updateInjectorContractsForPayload(payloadExecutable);
                     return payloadExecutable;
-                case "FileDrop":
+                case PayloadType.FILE_DROP:
                     FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(existingPayload);
                     payloadFileDrop.setUpdateAttributes(input);
                     payloadFileDrop.setFileDropFile(documentRepository.findById(input.getFileDropFile()).orElseThrow());
                     payloadFileDrop = payloadRepository.save(payloadFileDrop);
                     this.payloadService.updateInjectorContractsForPayload(payloadFileDrop);
                     return payloadFileDrop;
-                case "DnsResolution":
+                case PayloadType.DNS_RESOLUTION:
                     DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(existingPayload);
                     payloadDnsResolution.setUpdateAttributes(input);
                     payloadDnsResolution = payloadRepository.save(payloadDnsResolution);
                     this.payloadService.updateInjectorContractsForPayload(payloadDnsResolution);
                     return payloadDnsResolution;
-                case "NetworkTraffic":
+                case PayloadType.NETWORK_TRAFFIC:
                     NetworkTraffic payloadNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(existingPayload);
                     payloadNetworkTraffic.setUpdateAttributes(input);
                     payloadNetworkTraffic = payloadRepository.save(payloadNetworkTraffic);
@@ -244,8 +265,8 @@ public class PayloadApi extends RestBehavior {
                     throw new UnsupportedOperationException("Payload type " + existingPayload.getType() + " is not supported");
             }
         } else {
-            switch (input.getType()) {
-                case "Command":
+            switch (PayloadType.fromString(input.getType())) {
+                case PayloadType.COMMAND:
                     Command commandPayload = new Command();
                     commandPayload.setUpdateAttributes(input);
                     if( input.getCollector() != null ) {
@@ -256,7 +277,7 @@ public class PayloadApi extends RestBehavior {
                     commandPayload = payloadRepository.save(commandPayload);
                     this.payloadService.updateInjectorContractsForPayload(commandPayload);
                     return commandPayload;
-                case "Executable":
+                case PayloadType.EXECUTABLE:
                     Executable executablePayload = new Executable();
                     executablePayload.setUpdateAttributes(input);
                     if( input.getCollector() != null ) {
@@ -268,7 +289,7 @@ public class PayloadApi extends RestBehavior {
                     executablePayload = payloadRepository.save(executablePayload);
                     this.payloadService.updateInjectorContractsForPayload(executablePayload);
                     return executablePayload;
-                case "FileDrop":
+                case PayloadType.FILE_DROP:
                     FileDrop fileDropPayload = new FileDrop();
                     fileDropPayload.setUpdateAttributes(input);
                     if( input.getCollector() != null ) {
@@ -280,7 +301,7 @@ public class PayloadApi extends RestBehavior {
                     fileDropPayload = payloadRepository.save(fileDropPayload);
                     this.payloadService.updateInjectorContractsForPayload(fileDropPayload);
                     return fileDropPayload;
-                case "DnsResolution":
+                case PayloadType.DNS_RESOLUTION:
                     DnsResolution dnsResolutionPayload = new DnsResolution();
                     dnsResolutionPayload.setUpdateAttributes(input);
                     if( input.getCollector() != null ) {
@@ -291,7 +312,7 @@ public class PayloadApi extends RestBehavior {
                     dnsResolutionPayload = payloadRepository.save(dnsResolutionPayload);
                     this.payloadService.updateInjectorContractsForPayload(dnsResolutionPayload);
                     return dnsResolutionPayload;
-                case "NetworkTraffic":
+                case PayloadType.NETWORK_TRAFFIC:
                     NetworkTraffic networkTrafficPayload = new NetworkTraffic();
                     networkTrafficPayload.setUpdateAttributes(input);
                     if( input.getCollector() != null ) {

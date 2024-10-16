@@ -7,10 +7,7 @@ import io.openbas.database.model.Team;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
 import io.openbas.utils.fixtures.InjectExpectationFixture;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -57,6 +54,11 @@ public class ExerciseExpectationServiceTest {
     getInjectExpectation(injectCreated, teamCreated, exerciseCreated);
   }
 
+  @AfterAll
+  void afterAll() {
+    this.exerciseRepository.deleteById(EXERCISE_ID);
+  }
+
   @DisplayName("Retrieve inject expectations")
   @Test
   void retrieveInjectExpectations() {
@@ -86,7 +88,7 @@ public class ExerciseExpectationServiceTest {
 
   protected Exercise getExercise() {
     Exercise exercise = new Exercise();
-    exercise.setName("Exercice name");
+    exercise.setName("Exercise name");
     exercise.setStatus(SCHEDULED);
     exercise.setFrom("test@test.com");
     exercise.setReplyTos(List.of("test@test.com"));
