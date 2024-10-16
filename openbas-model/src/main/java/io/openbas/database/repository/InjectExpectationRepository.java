@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface InjectExpectationRepository extends CrudRepository<InjectExpectation, String>,
@@ -131,7 +132,7 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
       + "FROM injects_expectations i "
       + "WHERE i.inject_id IN (:injectIds) "
       + "AND i.user_id is null ;", nativeQuery = true) //We don't include expectations for players, only for the team, if applicable
-  List<RawInjectExpectation> rawForComputeGlobalByIds(@Param("injectIds") List<String> injectIds);
+  List<RawInjectExpectation> rawForComputeGlobalByIds(@Param("injectIds") Set<String> injectIds);
 
   @Query(value = "SELECT "
       + "i.inject_expectation_id AS inject_expectation_id, "
@@ -147,5 +148,5 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
       + "i.inject_expectation_group AS inject_expectation_group "
       + "FROM injects_expectations i "
       + "WHERE i.inject_id IN (:injectIds) ; ", nativeQuery = true)
-  List<RawInjectExpectation> rawByInjectId(@Param("injectIds") final List<String> injectIds);
+  Set<RawInjectExpectation> rawByInjectId(@Param("injectIds") final Set<String> injectIds);
 }

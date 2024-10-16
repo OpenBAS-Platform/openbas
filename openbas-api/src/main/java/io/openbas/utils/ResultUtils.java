@@ -31,11 +31,11 @@ public class ResultUtils {
   private final AssetGroupService assetGroupService;
 
   // -- UTILS --
-  public List<AtomicTestingMapper.ExpectationResultsByType> getResultsByTypes(List<String> injectIds) {
+  public List<AtomicTestingMapper.ExpectationResultsByType> getResultsByTypes(Set<String> injectIds) {
     return computeGlobalExpectationResults(injectIds);
   }
 
-  public List<InjectTargetWithResult> getInjectTargetWithResults(List<String> injectIds) {
+  public List<InjectTargetWithResult> getInjectTargetWithResults(Set<String> injectIds) {
     if (injectIds != null) {
       return computeTargetResults(injectIds);
     } else {
@@ -65,62 +65,58 @@ public class ResultUtils {
 
   // -- GLOBAL SCORE --
   public List<ExpectationResultsByType> computeGlobalExpectationResults(
-      @NotNull List<String> injectIds) {
+      @NotNull Set<String> injectIds) {
     return AtomicTestingUtils.getExpectationResultByTypesFromRaw(
         injectExpectationRepository.rawForComputeGlobalByIds(injectIds));
   }
 
   // -- TARGETS WITH RESULTS --
   public List<InjectTargetWithResult> computeTargetResults(
-      @NotNull List<String> injectIds) {
+      @NotNull Set<String> injectIds) {
 
     // -- EXPECTATIONS --
-    List<RawInjectExpectation> rawInjectExpectations = injectExpectationRepository.rawByInjectId(injectIds);
+    Set<RawInjectExpectation> rawInjectExpectations = injectExpectationRepository.rawByInjectId(injectIds);
     Map<String, List<RawInjectExpectation>> expectationMap = rawInjectExpectations
         .stream().collect(Collectors.groupingBy(RawInjectExpectation::getInject_id));
 
     // -- TEAMS INJECT --
 
-    List<String> teamIds = rawInjectExpectations
+    Set<String> teamIds = rawInjectExpectations
         .stream()
         .map(RawInjectExpectation::getTeam_id)
         .filter(Objects::nonNull)
-        .distinct()
-        .toList();
+        .collect(Collectors.toSet());
 
-    List<RawTeam> rawTeams = teamRepository.rawByIdsOrInjectIds(teamIds, injectIds);
+    Set<RawTeam> rawTeams = teamRepository.rawByIdsOrInjectIds(teamIds, injectIds);
     Map<String, RawTeam> teamMap = rawTeams.stream().collect(Collectors.toMap(RawTeam::getTeam_id, rawTeam ->rawTeam));
 
     // -- USER MAP FROM TEAMS --
 
-    List<String> userIds = rawInjectExpectations
+    Set<String> userIds = rawInjectExpectations
         .stream()
         .map(RawInjectExpectation::getUser_id)
         .filter(Objects::nonNull)
-        .distinct()
-        .toList();
+        .collect(Collectors.toSet());
 
-    List<RawUser> rawUsers = userRepository.rawUserByIds(userIds);
+    Set<RawUser> rawUsers = userRepository.rawUserByIds(userIds);
     Map<String, RawUser> userMap = rawUsers.stream().collect(Collectors.toMap(RawUser::getUser_id, rawUser ->rawUser));
 
     // -- ASSETS GROUPS INJECT --
-    List<String> assetGroupIds = rawInjectExpectations
+    Set<String> assetGroupIds = rawInjectExpectations
         .stream()
         .map(RawInjectExpectation::getAsset_group_id)
         .filter(Objects::nonNull)
-        .distinct()
-        .toList();
+        .collect(Collectors.toSet());
 
-    List<RawAssetGroup> rawAssetGroups = assetGroupRepository.rawByIdsOrInjectIds(assetGroupIds, injectIds);
+    Set<RawAssetGroup> rawAssetGroups = assetGroupRepository.rawByIdsOrInjectIds(assetGroupIds, injectIds);
     Map<String, RawAssetGroup> assetGroupMap = rawAssetGroups.stream().collect(Collectors.toMap(RawAssetGroup::getAsset_group_id, rawAssetGroup ->rawAssetGroup));
 
     // -- ASSETS INJECT --
-    List<String> assetIds = rawInjectExpectations
+    Set<String> assetIds = rawInjectExpectations
         .stream()
         .map(RawInjectExpectation::getAsset_id)
         .filter(Objects::nonNull)
-        .distinct()
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
 
     assetIds.addAll(rawAssetGroups
         .stream()

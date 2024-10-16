@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -127,7 +128,7 @@ public class AssetGroupService {
   /**
    *
    * */
-  public Map<String, List<Endpoint>> computeDynamicAssetFromRaw(@NotNull List<RawAssetGroup> assetGroups) {
+  public Map<String, List<Endpoint>> computeDynamicAssetFromRaw(@NotNull Set<RawAssetGroup> assetGroups) {
     if (assetGroups.isEmpty()) {
       return Map.of();
     }

@@ -121,8 +121,8 @@ public class ExerciseService {
 
     for (ExerciseSimple exercise : exercises) {
      if (exercise.getInjectIds() != null) {
-        exercise.setExpectationResultByTypes(resultUtils.getResultsByTypes(List.of(exercise.getInjectIds())));
-        exercise.setTargets(resultUtils.getInjectTargetWithResults(List.of(exercise.getInjectIds())));
+        exercise.setExpectationResultByTypes(resultUtils.getResultsByTypes(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
+        exercise.setTargets(resultUtils.getInjectTargetWithResults(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
       }
     }
 
