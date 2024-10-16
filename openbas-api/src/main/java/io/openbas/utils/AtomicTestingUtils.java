@@ -483,7 +483,7 @@ public class AtomicTestingUtils {
               )
               .entrySet().stream()
               .map(entry -> new InjectTargetWithResult(TargetType.TEAMS, entry.getKey(),
-                  teamExpectationMap.get(entry.getKey()).getTeam_name(), entry.getValue(),
+                  rawTeamMap.get(teamExpectationMap.get(entry.getKey())).getTeam_name(), entry.getValue(),
                   playerExpectations.isEmpty() ? List.of()
                       : calculateResultsforPlayersFromRaw(groupedByTeamAndUser.get(entry.getKey())), null))
               .toList()
@@ -504,7 +504,7 @@ public class AtomicTestingUtils {
               )
               .entrySet().stream()
               .map(entry -> new InjectTargetWithResult(TargetType.ASSETS, entry.getKey(),
-                  assetExpectationMap.get(entry.getKey()).getAsset_name(), entry.getValue(),
+                  rawAssetMap.get(assetExpectationMap.get(entry.getKey())).getAsset_name(), entry.getValue(),
                   Objects.equals(rawAssetMap.get(entry.getKey()).getAsset_type(), "Endpoint")
                       ? Endpoint.PLATFORM_TYPE.valueOf(rawAssetMap.get(entry.getKey()).getEndpoint_platform()) : null))
               .toList()
@@ -531,7 +531,7 @@ public class AtomicTestingUtils {
 
             // Loop into assetsToRefine to keep just assets linked to asset group
             for (InjectTargetWithResult asset : assetsToRefine) {
-              boolean foundExpectationForAsset = assetGroupExpectationMap.get(entry.getKey()).getAsset_ids().stream()
+              boolean foundExpectationForAsset = rawAssetGroupMap.get(assetGroupExpectationMap.get(entry.getKey())).getAsset_ids().stream()
                   .anyMatch(assetChild -> assetChild.equals(asset.getId()));
 
               // Verify if any expectation is related to a dynamic assets
@@ -546,7 +546,7 @@ public class AtomicTestingUtils {
             }
 
             // Other children without expectations are added with a default result
-            assetGroupExpectationMap.get(entry.getKey()).getAsset_ids().forEach(asset -> {
+            rawAssetGroupMap.get(assetGroupExpectationMap.get(entry.getKey())).getAsset_ids().forEach(asset -> {
               boolean foundAssetsWithoutResults = children.stream()
                   .noneMatch(child -> child.getId().equals(asset));
               if (foundAssetsWithoutResults) {
@@ -582,7 +582,7 @@ public class AtomicTestingUtils {
             }
 
             return new InjectTargetWithResult(TargetType.ASSETS_GROUPS, entry.getKey(),
-                assetGroupExpectationMap.get(entry.getKey()).getAsset_group_name(), entry.getValue(),
+                rawAssetGroupMap.get(assetGroupExpectationMap.get(entry.getKey())).getAsset_group_name(), entry.getValue(),
                 sortResults(children), null);
           })
           .toList());
