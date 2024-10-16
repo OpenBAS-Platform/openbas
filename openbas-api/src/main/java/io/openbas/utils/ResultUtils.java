@@ -4,14 +4,8 @@ import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Inject;
-import io.openbas.database.raw.RawAsset;
-import io.openbas.database.raw.RawAssetGroup;
-import io.openbas.database.raw.RawInjectExpectation;
-import io.openbas.database.raw.RawTeam;
-import io.openbas.database.repository.AssetGroupRepository;
-import io.openbas.database.repository.AssetRepository;
-import io.openbas.database.repository.InjectExpectationRepository;
-import io.openbas.database.repository.TeamRepository;
+import io.openbas.database.raw.*;
+import io.openbas.database.repository.*;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
@@ -31,6 +25,7 @@ public class ResultUtils {
 
   private final InjectExpectationRepository injectExpectationRepository;
   private final TeamRepository teamRepository;
+  private final UserRepository userRepository;
   private final AssetRepository assetRepository;
   private final AssetGroupRepository assetGroupRepository;
   private final AssetGroupService assetGroupService;
@@ -96,6 +91,18 @@ public class ResultUtils {
     List<RawTeam> rawTeams = teamRepository.rawByIdsOrInjectIds(teamIds, injectIds);
     Map<String, RawTeam> teamMap = rawTeams.stream().collect(Collectors.toMap(RawTeam::getTeam_id, rawTeam ->rawTeam));
 
+    // -- USER MAP FROM TEAMS --
+
+    List<String> userIds = rawInjectExpectations
+        .stream()
+        .map(RawInjectExpectation::getUser_id)
+        .filter(Objects::nonNull)
+        .distinct()
+        .toList();
+
+    List<RawUser> rawUsers = userRepository.rawUserByIds(userIds);
+    Map<String, RawUser> userMap = rawUsers.stream().collect(Collectors.toMap(RawUser::getUser_id, rawUser ->rawUser));
+
     // -- ASSETS GROUPS INJECT --
     List<String> assetGroupIds = rawInjectExpectations
         .stream()
@@ -132,6 +139,7 @@ public class ResultUtils {
               return AtomicTestingUtils.getTargetsWithResultsFromRaw(
                   expectationMap.getOrDefault(injectId, emptyList()),
                   teamMap,
+                  userMap,
                   assetMap,
                   assetGroupMap,
                   dynamicForAssetGroupMap

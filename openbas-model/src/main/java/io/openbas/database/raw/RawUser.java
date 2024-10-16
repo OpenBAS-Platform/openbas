@@ -1,7 +1,6 @@
 package io.openbas.database.raw;
 
 import io.openbas.helper.UserHelper;
-import java.time.Instant;
 import java.util.List;
 
 public interface RawUser {
