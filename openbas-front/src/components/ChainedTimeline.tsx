@@ -362,6 +362,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
         inject_injector_contract: injectFromMap.inject_injector_contract.injector_contract_id,
         inject_id: node.id,
         inject_depends_duration: convertCoordinatesToTime(node.position),
+        inject_depends_on: chainingUtils.fromInjectDependencyToInputDependency(injectFromMap.inject_depends_on),
       };
       onUpdateInject([inject]);
       setCurrentUpdatedNode(node);

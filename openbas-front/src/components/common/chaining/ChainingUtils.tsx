@@ -7,6 +7,9 @@ const typeFromName = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{1
 
 const fromInjectDependencyToInputDependency = (dependencies: InjectDependency[]) => {
   const result : Record<string, string> = {};
+  if (dependencies === null) {
+    return null;
+  }
   for (let i = 0; i < dependencies.length; i += 1) {
     if (dependencies[i].dependency_relationship?.inject_parent_id !== undefined
         && dependencies[i].dependency_condition !== undefined) {
