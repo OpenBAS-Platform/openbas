@@ -4,6 +4,7 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawInject;
 import java.util.Collection;
 import java.util.Set;
+
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;

@@ -83,6 +83,16 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
   @Query(value = "select us from users us where us.user_organization is null or us.user_organization in :organizationIds", nativeQuery = true)
   List<RawPlayer> rawPlayersAccessibleFromOrganizations(@Param("organizationIds") List<String> organizationIds);
 
+  @Query(value = "SELECT us.user_id, "
+      + "us.user_firstname, "
+      + "us.user_lastname, "
+      + "us.user_email, "
+      + "us.user_phone, "
+      + "us.user_organization "
+      + "FROM users us "
+      + "WHERE us.user_id IN :ids ;", nativeQuery = true)
+  List<RawUser> rawUserByIds(@Param("ids") List<String> ids);
+
   // -- PAGINATION --
 
   @NotNull

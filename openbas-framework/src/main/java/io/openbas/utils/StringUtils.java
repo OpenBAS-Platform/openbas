@@ -18,4 +18,6 @@ public class StringUtils {
     return newName;
   }
 
+  public static String getName(String firstName, String lastName) { return firstName + " " + lastName; }
+
 }

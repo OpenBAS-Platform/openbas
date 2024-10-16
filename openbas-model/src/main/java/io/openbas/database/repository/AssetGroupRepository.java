@@ -36,16 +36,28 @@ public interface AssetGroupRepository extends CrudRepository<AssetGroup, String>
 
   /**
    * Returns the raw asset group having the ids passed in parameter
+   *
    * @param ids a list of ids
    * @return the list of raw asset group
    */
-  @Query(value = "SELECT ag.asset_group_id, ag.asset_group_name,  " +
+  @Query(value = "SELECT ag.asset_group_id, ag.asset_group_name, CAST(ag.asset_group_dynamic_filter as text),  " +
+      "coalesce(array_agg(aga.asset_id) FILTER ( WHERE aga.asset_id IS NOT NULL ), '{}') asset_ids " +
+      "FROM asset_groups ag " +
+      "LEFT JOIN asset_groups_assets aga ON ag.asset_group_id = aga.asset_group_id " +
+      "WHERE ag.asset_group_id IN :ids " +
+      "GROUP BY ag.asset_group_id;", nativeQuery = true)
+  List<RawAssetGroup> rawAssetGroupByIds(@Param("ids") List<String> ids);
+
+
+  @Query(value =
+      "SELECT ag.asset_group_id, ag.asset_group_name, CAST(ag.asset_group_dynamic_filter as text), " +
           "coalesce(array_agg(aga.asset_id) FILTER ( WHERE aga.asset_id IS NOT NULL ), '{}') asset_ids " +
           "FROM asset_groups ag " +
-          "LEFT JOIN asset_groups_assets aga ON ag.asset_group_id = aga.asset_group_id " +
-          "WHERE ag.asset_group_id IN :ids " +
-          "GROUP BY ag.asset_group_id;", nativeQuery = true)
-  List<RawAssetGroup> rawAssetGroupByIds(@Param("ids") List<String> ids);
+          "LEFT JOIN injects_asset_groups iat ON ag.asset_group_id = iat.asset_group_id " +
+          "LEFT JOIN asset_groups_assets aga ON aga.asset_group_id = ag.asset_group_id " +
+          "WHERE iat.asset_group_id IN (:assetGroupIds) OR iat.inject_id IN (:injectIds) " +
+          "GROUP BY ag.asset_group_id, ag.asset_group_name, CAST(ag.asset_group_dynamic_filter as text) ;", nativeQuery = true)
+  List<RawAssetGroup> rawByIdsOrInjectIds(@Param("assetGroupIds") List<String> assetGroupIds, @Param("injectIds") List<String> injectIds);
 
   // -- PAGINATION --
 

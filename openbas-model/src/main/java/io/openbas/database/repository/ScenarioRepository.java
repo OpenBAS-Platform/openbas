@@ -1,6 +1,7 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Scenario;
+import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.raw.RawScenario;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
@@ -21,8 +22,25 @@ public interface ScenarioRepository extends CrudRepository<Scenario, String>,
     StatisticRepository,
     JpaSpecificationExecutor<Scenario> {
 
-  @NotNull
-  List<Scenario> findByExternalReference(@Param("externalReference") final String externalReference);
+  @Query(value =
+      "SELECT ex.exercise_id, "
+          + "ex.exercise_status, "
+          + "ex.exercise_start_date, "
+          + "ex.exercise_updated_at, "
+          + "ex.exercise_end_date, "
+          + "ex.exercise_name, "
+          + "ex.exercise_category, "
+          + "ex.exercise_subtitle, "
+          + " array_agg(distinct ie.inject_id) FILTER ( WHERE ie.inject_id IS NOT NULL ) as inject_ids, "
+          + " array_agg(distinct et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags "
+          + "FROM exercises ex "
+          + "LEFT JOIN scenarios_exercises se ON se.exercise_id = ex.exercise_id "
+          + "LEFT JOIN scenarios s ON se.scenario_id = s.scenario_id "
+          + "LEFT JOIN exercises_tags et ON et.exercise_id = ex.exercise_id "
+          + "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id "
+          + "WHERE s.scenario_external_reference = :externalReference "
+          + "GROUP BY ex.exercise_id ;", nativeQuery = true)
+  List<RawExerciseSimple> rawAllByExternalReference(@Param("externalReference") String externalReference);
 
   @Query("select distinct s from Scenario s " +
       "join s.grants as grant " +

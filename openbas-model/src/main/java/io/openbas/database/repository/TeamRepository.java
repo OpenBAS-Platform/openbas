@@ -47,20 +47,35 @@ public interface TeamRepository extends CrudRepository<Team, String>,
   @Query("select count(distinct t) from Team t where t.createdAt < :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
 
-  @Query(value="SELECT team_id, team_name " +
-          "FROM teams " +
-          "WHERE team_id IN :ids ;", nativeQuery = true)
+  @Query(value = "SELECT team_id, team_name " +
+      "FROM teams " +
+      "WHERE team_id IN :ids ;", nativeQuery = true)
   List<RawTeam> rawTeamByIds(@Param("ids") List<String> ids);
 
-  @Query(value="SELECT teams.team_id, teams.team_name, teams.team_description, teams.team_created_at, teams.team_updated_at, teams.team_organization, " +
+  @Query(value = "SELECT DISTINCT t.team_id AS team_id, t.team_name AS team_name "
+      + "FROM teams t "
+      + "LEFT JOIN injects_teams it ON t.team_id = it.team_id "
+      + "WHERE t.team_id IN (:ids) OR it.inject_id IN (:injectIds) ;", nativeQuery = true)
+  List<RawTeam> rawByIdsOrInjectIds(@Param("ids") List<String> ids, @Param("injectIds") List<String> injectIds);
+
+  @Query(value =
+      "SELECT teams.team_id, teams.team_name, teams.team_description, teams.team_created_at, teams.team_updated_at, teams.team_organization, "
+          +
           "       team_contextual, " +
-          "       coalesce(array_agg(DISTINCT teams_tags.tag_id) FILTER ( WHERE teams_tags.tag_id IS NOT NULL ), '{}') as team_tags, " +
-          "       coalesce(array_agg(DISTINCT users_teams.user_id) FILTER ( WHERE users_teams.user_id IS NOT NULL ), '{}') as team_users, " +
-          "       coalesce(array_agg(DISTINCT exercises_teams.exercise_id) FILTER ( WHERE exercises_teams.exercise_id IS NOT NULL ), '{}') as team_exercises, " +
-          "       coalesce(array_agg(DISTINCT scenarios_teams.scenario_id) FILTER ( WHERE scenarios_teams.scenario_id IS NOT NULL ), '{}') as team_scenarios, " +
-          "       coalesce(array_agg(DISTINCT injects_expectations.inject_expectation_id) FILTER ( WHERE injects_expectations.inject_expectation_id IS NOT NULL), '{}') as team_expectations, " +
-          "       coalesce(array_agg(DISTINCT injects.inject_id) FILTER ( WHERE injects.inject_id IS NOT NULL), '{}') as team_exercise_injects, " +
-          "       coalesce(array_agg(DISTINCT communications.communication_id) FILTER ( WHERE communications.communication_id IS NOT NULL), '{}') as team_communications " +
+          "       coalesce(array_agg(DISTINCT teams_tags.tag_id) FILTER ( WHERE teams_tags.tag_id IS NOT NULL ), '{}') as team_tags, "
+          +
+          "       coalesce(array_agg(DISTINCT users_teams.user_id) FILTER ( WHERE users_teams.user_id IS NOT NULL ), '{}') as team_users, "
+          +
+          "       coalesce(array_agg(DISTINCT exercises_teams.exercise_id) FILTER ( WHERE exercises_teams.exercise_id IS NOT NULL ), '{}') as team_exercises, "
+          +
+          "       coalesce(array_agg(DISTINCT scenarios_teams.scenario_id) FILTER ( WHERE scenarios_teams.scenario_id IS NOT NULL ), '{}') as team_scenarios, "
+          +
+          "       coalesce(array_agg(DISTINCT injects_expectations.inject_expectation_id) FILTER ( WHERE injects_expectations.inject_expectation_id IS NOT NULL), '{}') as team_expectations, "
+          +
+          "       coalesce(array_agg(DISTINCT injects.inject_id) FILTER ( WHERE injects.inject_id IS NOT NULL), '{}') as team_exercise_injects, "
+          +
+          "       coalesce(array_agg(DISTINCT communications.communication_id) FILTER ( WHERE communications.communication_id IS NOT NULL), '{}') as team_communications "
+          +
           "FROM teams " +
           "LEFT JOIN teams_tags ON teams_tags.team_id = teams.team_id " +
           "LEFT JOIN users_teams ON users_teams.team_id = teams.team_id " +
@@ -74,15 +89,24 @@ public interface TeamRepository extends CrudRepository<Team, String>,
           "GROUP BY teams.team_id ;", nativeQuery = true)
   List<RawTeam> rawTeams();
 
-  @Query(value="SELECT teams.team_id, teams.team_name, teams.team_description, teams.team_created_at, teams.team_updated_at, teams.team_organization, " +
+  @Query(value =
+      "SELECT teams.team_id, teams.team_name, teams.team_description, teams.team_created_at, teams.team_updated_at, teams.team_organization, "
+          +
           "       team_contextual, " +
-          "       coalesce(array_agg(DISTINCT teams_tags.tag_id) FILTER ( WHERE teams_tags.tag_id IS NOT NULL ), '{}') as team_tags, " +
-          "       coalesce(array_agg(DISTINCT users_teams.user_id) FILTER ( WHERE users_teams.user_id IS NOT NULL ), '{}') as team_users, " +
-          "       coalesce(array_agg(DISTINCT exercises_teams.exercise_id) FILTER ( WHERE exercises_teams.exercise_id IS NOT NULL ), '{}') as team_exercises, " +
-          "       coalesce(array_agg(DISTINCT scenarios_teams.scenario_id) FILTER ( WHERE scenarios_teams.scenario_id IS NOT NULL ), '{}') as team_scenarios, " +
-          "       coalesce(array_agg(DISTINCT injects_expectations.inject_expectation_id) FILTER ( WHERE injects_expectations.inject_expectation_id IS NOT NULL), '{}') as team_expectations, " +
-          "       coalesce(array_agg(DISTINCT injects.inject_id) FILTER ( WHERE injects.inject_id IS NOT NULL), '{}') as team_exercise_injects, " +
-          "       coalesce(array_agg(DISTINCT communications.communication_id) FILTER ( WHERE communications.communication_id IS NOT NULL), '{}') as team_communications " +
+          "       coalesce(array_agg(DISTINCT teams_tags.tag_id) FILTER ( WHERE teams_tags.tag_id IS NOT NULL ), '{}') as team_tags, "
+          +
+          "       coalesce(array_agg(DISTINCT users_teams.user_id) FILTER ( WHERE users_teams.user_id IS NOT NULL ), '{}') as team_users, "
+          +
+          "       coalesce(array_agg(DISTINCT exercises_teams.exercise_id) FILTER ( WHERE exercises_teams.exercise_id IS NOT NULL ), '{}') as team_exercises, "
+          +
+          "       coalesce(array_agg(DISTINCT scenarios_teams.scenario_id) FILTER ( WHERE scenarios_teams.scenario_id IS NOT NULL ), '{}') as team_scenarios, "
+          +
+          "       coalesce(array_agg(DISTINCT injects_expectations.inject_expectation_id) FILTER ( WHERE injects_expectations.inject_expectation_id IS NOT NULL), '{}') as team_expectations, "
+          +
+          "       coalesce(array_agg(DISTINCT injects.inject_id) FILTER ( WHERE injects.inject_id IS NOT NULL), '{}') as team_exercise_injects, "
+          +
+          "       coalesce(array_agg(DISTINCT communications.communication_id) FILTER ( WHERE communications.communication_id IS NOT NULL), '{}') as team_communications "
+          +
           "FROM teams " +
           "LEFT JOIN teams_tags ON teams_tags.team_id = teams.team_id " +
           "LEFT JOIN users_teams ON users_teams.team_id = teams.team_id " +
@@ -101,15 +125,24 @@ public interface TeamRepository extends CrudRepository<Team, String>,
   @EntityGraph(value = "Team.tags", type = EntityGraph.EntityGraphType.LOAD)
   Page<Team> findAll(@NotNull Specification<Team> spec, @NotNull Pageable pageable);
 
-  @Query(value="SELECT teams.team_id, teams.team_name, teams.team_description, teams.team_created_at, teams.team_updated_at, teams.team_organization, " +
+  @Query(value =
+      "SELECT teams.team_id, teams.team_name, teams.team_description, teams.team_created_at, teams.team_updated_at, teams.team_organization, "
+          +
           "       team_contextual, " +
-          "       coalesce(array_agg(DISTINCT teams_tags.tag_id) FILTER ( WHERE teams_tags.tag_id IS NOT NULL ), '{}') as team_tags, " +
-          "       coalesce(array_agg(DISTINCT users_teams.user_id) FILTER ( WHERE users_teams.user_id IS NOT NULL ), '{}') as team_users, " +
-          "       coalesce(array_agg(DISTINCT exercises_teams.exercise_id) FILTER ( WHERE exercises_teams.exercise_id IS NOT NULL ), '{}') as team_exercises, " +
-          "       coalesce(array_agg(DISTINCT scenarios_teams.scenario_id) FILTER ( WHERE scenarios_teams.scenario_id IS NOT NULL ), '{}') as team_scenarios, " +
-          "       coalesce(array_agg(DISTINCT injects_expectations.inject_expectation_id) FILTER ( WHERE injects_expectations.inject_expectation_id IS NOT NULL), '{}') as team_expectations, " +
-          "       coalesce(array_agg(DISTINCT injects.inject_id) FILTER ( WHERE injects.inject_id IS NOT NULL), '{}') as team_exercise_injects, " +
-          "       coalesce(array_agg(DISTINCT communications.communication_id) FILTER ( WHERE communications.communication_id IS NOT NULL), '{}') as team_communications " +
+          "       coalesce(array_agg(DISTINCT teams_tags.tag_id) FILTER ( WHERE teams_tags.tag_id IS NOT NULL ), '{}') as team_tags, "
+          +
+          "       coalesce(array_agg(DISTINCT users_teams.user_id) FILTER ( WHERE users_teams.user_id IS NOT NULL ), '{}') as team_users, "
+          +
+          "       coalesce(array_agg(DISTINCT exercises_teams.exercise_id) FILTER ( WHERE exercises_teams.exercise_id IS NOT NULL ), '{}') as team_exercises, "
+          +
+          "       coalesce(array_agg(DISTINCT scenarios_teams.scenario_id) FILTER ( WHERE scenarios_teams.scenario_id IS NOT NULL ), '{}') as team_scenarios, "
+          +
+          "       coalesce(array_agg(DISTINCT injects_expectations.inject_expectation_id) FILTER ( WHERE injects_expectations.inject_expectation_id IS NOT NULL), '{}') as team_expectations, "
+          +
+          "       coalesce(array_agg(DISTINCT injects.inject_id) FILTER ( WHERE injects.inject_id IS NOT NULL), '{}') as team_exercise_injects, "
+          +
+          "       coalesce(array_agg(DISTINCT communications.communication_id) FILTER ( WHERE communications.communication_id IS NOT NULL), '{}') as team_communications "
+          +
           "FROM teams " +
           "LEFT JOIN teams_tags ON teams_tags.team_id = teams.team_id " +
           "LEFT JOIN users_teams ON users_teams.team_id = teams.team_id " +
@@ -123,15 +156,24 @@ public interface TeamRepository extends CrudRepository<Team, String>,
           "WHERE exercises.exercise_id = :exerciseId GROUP BY teams.team_id ;", nativeQuery = true)
   List<RawTeam> rawTeamByExerciseId(@Param("exerciseId") String exerciseId);
 
-  @Query(value="SELECT teams.team_id, teams.team_name, teams.team_description, teams.team_created_at, teams.team_updated_at, teams.team_organization, " +
+  @Query(value =
+      "SELECT teams.team_id, teams.team_name, teams.team_description, teams.team_created_at, teams.team_updated_at, teams.team_organization, "
+          +
           "       team_contextual, " +
-          "       coalesce(array_agg(DISTINCT teams_tags.tag_id) FILTER ( WHERE teams_tags.tag_id IS NOT NULL ), '{}') as team_tags, " +
-          "       coalesce(array_agg(DISTINCT users_teams.user_id) FILTER ( WHERE users_teams.user_id IS NOT NULL ), '{}') as team_users, " +
-          "       coalesce(array_agg(DISTINCT exercises_teams.exercise_id) FILTER ( WHERE exercises_teams.exercise_id IS NOT NULL ), '{}') as team_exercises, " +
-          "       coalesce(array_agg(DISTINCT scenarios_teams.scenario_id) FILTER ( WHERE scenarios_teams.scenario_id IS NOT NULL ), '{}') as team_scenarios, " +
-          "       coalesce(array_agg(DISTINCT injects_expectations.inject_expectation_id) FILTER ( WHERE injects_expectations.inject_expectation_id IS NOT NULL), '{}') as team_expectations, " +
-          "       coalesce(array_agg(DISTINCT injects.inject_id) FILTER ( WHERE injects.inject_id IS NOT NULL), '{}') as team_exercise_injects, " +
-          "       coalesce(array_agg(DISTINCT communications.communication_id) FILTER ( WHERE communications.communication_id IS NOT NULL), '{}') as team_communications " +
+          "       coalesce(array_agg(DISTINCT teams_tags.tag_id) FILTER ( WHERE teams_tags.tag_id IS NOT NULL ), '{}') as team_tags, "
+          +
+          "       coalesce(array_agg(DISTINCT users_teams.user_id) FILTER ( WHERE users_teams.user_id IS NOT NULL ), '{}') as team_users, "
+          +
+          "       coalesce(array_agg(DISTINCT exercises_teams.exercise_id) FILTER ( WHERE exercises_teams.exercise_id IS NOT NULL ), '{}') as team_exercises, "
+          +
+          "       coalesce(array_agg(DISTINCT scenarios_teams.scenario_id) FILTER ( WHERE scenarios_teams.scenario_id IS NOT NULL ), '{}') as team_scenarios, "
+          +
+          "       coalesce(array_agg(DISTINCT injects_expectations.inject_expectation_id) FILTER ( WHERE injects_expectations.inject_expectation_id IS NOT NULL), '{}') as team_expectations, "
+          +
+          "       coalesce(array_agg(DISTINCT injects.inject_id) FILTER ( WHERE injects.inject_id IS NOT NULL), '{}') as team_exercise_injects, "
+          +
+          "       coalesce(array_agg(DISTINCT communications.communication_id) FILTER ( WHERE communications.communication_id IS NOT NULL), '{}') as team_communications "
+          +
           "FROM teams " +
           "LEFT JOIN teams_tags ON teams_tags.team_id = teams.team_id " +
           "LEFT JOIN users_teams ON users_teams.team_id = teams.team_id " +

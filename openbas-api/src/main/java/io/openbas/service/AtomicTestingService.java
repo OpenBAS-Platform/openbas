@@ -367,7 +367,7 @@ public class AtomicTestingService {
                     assetGroups.stream().filter(ag -> currentAssetGroupIds.contains(ag.getAsset_group_id())).toList()
             ));
             inject.setExpectationResultByTypes(
-                    getRawExpectationResultByTypes(
+                    getExpectationResultByTypesFromRaw(
                             expectations.stream().filter(e -> currentInjectExpectationIds.contains(e.getInject_expectation_id()))
                                     .toList()
                     )
