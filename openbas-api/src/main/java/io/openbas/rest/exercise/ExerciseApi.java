@@ -515,6 +515,7 @@ public class ExerciseApi extends RestBehavior {
         return detail;
     }
 
+    @LogExecutionTime
     @GetMapping(EXERCISE_URI + "/{exerciseId}/results")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     public List<ExpectationResultsByType> globalResults(@NotBlank @PathVariable String exerciseId) {
