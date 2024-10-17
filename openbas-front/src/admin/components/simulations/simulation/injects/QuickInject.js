@@ -1417,7 +1417,7 @@ class QuickInject extends Component {
           </Form>
         </div>
         <AvailableVariablesDialog
-          uriVariable={`/admin/exercises/${exerciseId}/definition/variables`}
+          uriVariable={`/admin/exercises/${exerciseId}/definition`}
           variables={this.props.exerciseVariables}
           open={openVariables}
           handleClose={this.handleCloseVariables.bind(this)}

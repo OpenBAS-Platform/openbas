@@ -94,7 +94,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
               teams={teams}
               articles={articles}
               variables={variables}
-              uriVariable={`/admin/exercises/${exerciseId}/definition/variables`}
+              uriVariable={`/admin/exercises/${exerciseId}/definition`}
               allUsersNumber={exercise.exercise_all_users_number}
               usersNumber={exercise.exercise_users_number}
               // @ts-expect-error typing
