@@ -18,12 +18,14 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
 import java.util.List;
 
-import static io.openbas.database.model.ExerciseStatus.SCHEDULED;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
+import static io.openbas.utils.fixtures.ExerciseFixture.getExercise;
+import static io.openbas.utils.fixtures.ExerciseLessonsCategoryFixture.getLessonsCategory;
+import static io.openbas.utils.fixtures.TeamFixture.getTeam;
+import static io.openbas.utils.fixtures.UserFixture.getUser;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.mockito.Mockito.*;
@@ -31,7 +33,6 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ExerciseLessonsApiTest extends IntegrationTest {
 
@@ -57,7 +58,6 @@ public class ExerciseLessonsApiTest extends IntegrationTest {
 
   @BeforeAll
   void beforeAll() {
-    EXERCISE = getExercise();
     LESSONCATEGORY = getLessonCategory();
   }
 
@@ -71,41 +71,14 @@ public class ExerciseLessonsApiTest extends IntegrationTest {
 
 
   private LessonsCategory getLessonCategory() {
-    LessonsCategory lessonsCategory = new LessonsCategory();
-    lessonsCategory.setExercise(EXERCISE);
-    lessonsCategory.setName("Category");
-    lessonsCategory.setDescription("Description");
-    lessonsCategory.setOrder(0);
-    lessonsCategory.setTeams(List.of(getTeam()));
-    return this.lessonsCategoryRepository.save(lessonsCategory);
-  }
-
-  private Team getTeam() {
-    Team team = new Team();
-    team.setName("My team");
-
-    User user = new User();
-    user.setEmail("testSurvey@gmail.com");
-    USER = this.userRepository.save(user);
-
-    team.setUsers(List.of(USER));
-    TEAM = this.teamRepository.save(team);
-    return TEAM;
-  }
-
-  private Exercise getExercise() {
-    Exercise exercise = new Exercise();
-    exercise.setName("Exercice name");
-    exercise.setStatus(SCHEDULED);
-    exercise.setFrom("test@test.com");
-    exercise.setReplyTos(List.of("test@test.com"));
-    exercise.setStart(Instant.now());
-    return this.exerciseService.createExercise(exercise);
+    USER = this.userRepository.save(getUser());
+    TEAM = teamRepository.save(getTeam(USER, "My team", false));
+    EXERCISE = this.exerciseService.createExercise(getExercise(List.of(TEAM)));
+    return this.lessonsCategoryRepository.save(getLessonsCategory(EXERCISE, List.of(TEAM)));
   }
 
   @DisplayName("Send surveys for exercise lessons")
   @Test
-  @Order(1)
   @WithMockPlannerUser
   void sendExerciseLessonsTest() throws Exception {
 
