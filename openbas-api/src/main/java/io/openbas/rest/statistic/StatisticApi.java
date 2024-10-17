@@ -26,11 +26,13 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.utils.AtomicTestingUtils.getExpectationResultByTypesFromRaw;
+import static java.util.stream.Collectors.groupingBy;
 
 @RestController
 @RequiredArgsConstructor
@@ -96,13 +98,13 @@ public class StatisticApi extends RestBehavior {
 
   private List<ExpectationResultsByType> computeGlobalExpectationResults(@NotNull final Instant from) {
     List<RawInjectExpectation> rawInjectExpectations = fromIterable(this.exerciseRepository.allInjectExpectationsFromDate(from));
-    return AtomicTestingUtils.getExpectationResultByTypesFromRaw(rawInjectExpectations);
+    return getExpectationResultByTypesFromRaw(rawInjectExpectations);
   }
 
   private List<ExpectationResultsByType> computeUserExpectationResults(@NotNull final Instant from) {
     OpenBASPrincipal user = currentUser();
     List<RawInjectExpectation> rawInjectExpectations = fromIterable(this.exerciseRepository.allGrantedInjectExpectationsFromDate(from, user.getId()));
-    return AtomicTestingUtils.getExpectationResultByTypesFromRaw(rawInjectExpectations);
+    return getExpectationResultByTypesFromRaw(rawInjectExpectations);
   }
 
   private List<InjectExpectationResultsByAttackPattern> computeGlobalInjectExpectationResults(
@@ -118,43 +120,58 @@ public class StatisticApi extends RestBehavior {
     return injectExpectationResultsByAttackPatternFromRawGlobalInjectExpectation(rawGlobalInjectExpectations);
   }
 
-  private List<InjectExpectationResultsByAttackPattern> injectExpectationResultsByAttackPatternFromRawGlobalInjectExpectation(List<RawGlobalInjectExpectation> rawGlobalInjectExpectations ) {
+  private List<InjectExpectationResultsByAttackPattern> injectExpectationResultsByAttackPatternFromRawGlobalInjectExpectation(
+      List<RawGlobalInjectExpectation> rawGlobalInjectExpectations) {
     return rawGlobalInjectExpectations.stream()
-            .map(RawGlobalInjectExpectation::getAttack_pattern_id)
-            .distinct()
-            .map(
-                    attackPatternId ->
-                    {
-                      InjectExpectationResultsByAttackPattern resultExpectation = new InjectExpectationResultsByAttackPattern();
-                      resultExpectation.setAttackPattern(new AttackPattern());
-                      resultExpectation.getAttackPattern().setId(attackPatternId);
-                      resultExpectation.setResults(rawGlobalInjectExpectations.stream()
-                              .filter((expectation) -> expectation.getAttack_pattern_id().equals(attackPatternId))
-                              .map((expectation) -> {
-                                InjectExpectationResultsByAttackPattern.InjectExpectationResultsByType resultInjectExpectationResultsByAttackPattern = new InjectExpectationResultsByAttackPattern.InjectExpectationResultsByType();
-                                resultInjectExpectationResultsByAttackPattern.setInjectTitle(expectation.getInject_title());
-                                if(expectation.getInject_expectation_type() != null) {
-                                  SimpleRawInjectExpectation rawInjectExpectation = new SimpleRawInjectExpectation();
-                                  rawInjectExpectation.setInject_expectation_score(expectation.getInject_expectation_score());
-                                  rawInjectExpectation.setInject_expectation_expected_score(expectation.getInject_expectation_expected_score());
-                                  rawInjectExpectation.setInject_expectation_type(expectation.getInject_expectation_type());
-                                  resultInjectExpectationResultsByAttackPattern
-                                          .setResults(AtomicTestingUtils.getExpectationResultByTypesFromRaw(Stream.of(rawInjectExpectation)
-                                                  .collect(Collectors.toList())));
-                                } else {
-                                  resultInjectExpectationResultsByAttackPattern
-                                          .setResults(AtomicTestingUtils.getExpectationResultByTypesFromRaw(new ArrayList<>()));
-                                }
-                                return resultInjectExpectationResultsByAttackPattern;
-                              })
-                              .collect(Collectors.toList())
-                      );
+        .map(RawGlobalInjectExpectation::getAttack_pattern_id)
+        .distinct()
+        .map(
+            attackPatternId ->
+            {
+              InjectExpectationResultsByAttackPattern resultExpectation = new InjectExpectationResultsByAttackPattern();
+              resultExpectation.setAttackPattern(new AttackPattern());
+              resultExpectation.getAttackPattern().setId(attackPatternId);
 
-                      return resultExpectation;
-                    }
-            )
-            .collect(Collectors.toList())
-            ;
+              Map<String, Map<String, List<RawGlobalInjectExpectation>>> rawGlobalInjectExpectationsGroupByAttackAndInjectId = rawGlobalInjectExpectations.stream()
+                  .collect(groupingBy(RawGlobalInjectExpectation::getAttack_pattern_id,
+                      groupingBy(RawGlobalInjectExpectation::getInject_id)));
+
+              List<InjectExpectationResultsByAttackPattern.InjectExpectationResultsByType> results = new ArrayList<>();
+
+              rawGlobalInjectExpectationsGroupByAttackAndInjectId.forEach((attackId, injects) -> {
+                if (attackId.equals(attackPatternId)) {
+                  injects.forEach((injectId, expectations) -> {
+                    RawGlobalInjectExpectation expectation = expectations.getFirst();
+                    InjectExpectationResultsByAttackPattern.InjectExpectationResultsByType resultInjectExpectationResultsByAttackPattern = new InjectExpectationResultsByAttackPattern.InjectExpectationResultsByType();
+                    resultInjectExpectationResultsByAttackPattern.setInjectTitle(expectation.getInject_title());
+
+                    ArrayList<RawInjectExpectation> expectationsRefined = new ArrayList<>();
+
+                    expectations.stream().forEach(e -> {
+                      if (e.getInject_expectation_type() != null) {
+                        SimpleRawInjectExpectation rawInjectExpectation = new SimpleRawInjectExpectation();
+                        rawInjectExpectation.setInject_expectation_score(e.getInject_expectation_score());
+                        rawInjectExpectation.setInject_expectation_expected_score(
+                            e.getInject_expectation_expected_score());
+                        rawInjectExpectation.setInject_expectation_type(e.getInject_expectation_type());
+                        expectationsRefined.add(rawInjectExpectation);
+                      }
+                    });
+
+                    resultInjectExpectationResultsByAttackPattern
+                        .setResults(AtomicTestingUtils.getExpectationResultByTypesFromRaw(expectationsRefined));
+
+                    results.add(resultInjectExpectationResultsByAttackPattern);
+                  });
+                }
+              });
+
+              resultExpectation.setResults(results);
+
+              return resultExpectation;
+            }
+        )
+        .collect(Collectors.toList());
   }
 
 }
