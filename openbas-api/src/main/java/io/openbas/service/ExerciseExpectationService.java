@@ -67,7 +67,7 @@ public class ExerciseExpectationService {
             exists.get().setDate(now().toString());
         } else {
             injectExpectation.getResults().add(
-                    buildInjectExpectationResult(input.getSourceType(),result,  input.getScore())
+                    buildInjectExpectationResult(input.getSourceId(), input.getSourceType(), input.getSourceName(), result,  input.getScore())
             );
         }
         if (injectExpectation.getScore() == null) {
@@ -166,7 +166,7 @@ public class ExerciseExpectationService {
             parentExpectation.setUpdatedAt(Instant.now());
             parentExpectation.getResults().clear();
             parentExpectation.getResults().add(
-                    buildInjectExpectationResult("player-manual-validation", result, parentExpectation.getScore())
+                    buildInjectExpectationResult("player-manual-validation", "player-manual-validation", "Player Manual Validation", result, parentExpectation.getScore())
             );
             injectExpectationRepository.save(parentExpectation);
 
@@ -179,37 +179,21 @@ public class ExerciseExpectationService {
                 expectation.getResults().clear();
                 if(result != null) {
                     expectation.getResults().add(
-                            buildInjectExpectationResult("team-manual-validation", result, updated.getScore()));
+                            buildInjectExpectationResult("team-manual-validation", "team-manual-validation", "Team Manual Validation", result, updated.getScore()));
                 }
                 injectExpectationRepository.save(expectation);
             }
         }
     }
 
-    private InjectExpectationResult buildInjectExpectationResult(String type, String resultStatus, Double score ){
+    private InjectExpectationResult buildInjectExpectationResult(String id, String type, String name, String resultStatus, Double score ){
         return InjectExpectationResult.builder()
-                .sourceId(type)
+                .sourceId(id)
                 .sourceType(type)
-                .sourceName(transformExpectationResultTypeToName(type))
+                .sourceName(name)
                 .result(resultStatus)
                 .date(now().toString())
                 .score(score)
                 .build();
-    }
-
-    private String transformExpectationResultTypeToName(String type){
-        if (type==null) {
-            return "";
-        }
-        String[] words = type.split("-");
-
-        // Capitalize each word and join them with a space
-        StringBuilder result = new StringBuilder();
-        for (String word : words) {
-            result.append(Character.toUpperCase(word.charAt(0)))
-                    .append(word.substring(1))
-                    .append(" ");
-        }
-        return result.toString().trim();
     }
 }
