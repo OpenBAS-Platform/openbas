@@ -34,6 +34,7 @@ import io.openbas.service.*;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.persistence.criteria.Join;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;

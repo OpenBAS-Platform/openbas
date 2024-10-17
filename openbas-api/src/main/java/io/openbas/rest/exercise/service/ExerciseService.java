@@ -45,6 +45,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.criteria.GenericCriteria.countQuery;
+import static io.openbas.utils.Constants.ARTICLES;
+import static io.openbas.utils.JpaUtils.arrayAggOnId;
+import static io.openbas.utils.StringUtils.duplicateString;
+import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
+import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
+
 @RequiredArgsConstructor
 @Validated
 @Service
@@ -93,12 +106,13 @@ public class ExerciseService {
   public Page<ExerciseSimple> exercises(
       Specification<Exercise> specification,
       Specification<Exercise> specificationCount,
-      Pageable pageable) {
+      Pageable pageable,
+        Map<String, Join<Base, Base>> joinMap) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
     Root<Exercise> exerciseRoot = cq.from(Exercise.class);
-    select(cb, cq, exerciseRoot);
+    select(cb, cq, exerciseRoot, joinMap);
 
     // -- Text Search and Filters --
     if (specification != null) {
@@ -140,11 +154,16 @@ public class ExerciseService {
 
   // -- SELECT --
 
-  private void select(CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Exercise> exerciseRoot) {
+  private void select(CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Exercise> exerciseRoot,
+      Map<String, Join<Base, Base>> joinMap) {
     // Array aggregations
-    Expression<String[]> tagIdsExpression = createJoinArrayAggOnId(cb, exerciseRoot, "tags");
-    Expression<String[]> injectIdsExpression = createJoinArrayAggOnId(cb, exerciseRoot, "injects");
+    Join<Base, Base> exerciseTagsJoin = exerciseRoot.join("tags", JoinType.LEFT);
+    joinMap.put("tags", exerciseTagsJoin);
+    Expression<String[]> tagIdsExpression = arrayAggOnId(cb, exerciseTagsJoin);
 
+    Join<Base, Base> injectsJoin = exerciseRoot.join("injects", JoinType.LEFT);
+    joinMap.put("injects", injectsJoin);
+    Expression<String[]> injectIdsExpression = arrayAggOnId(cb, injectsJoin);
     // SELECT
     cq.multiselect(
             exerciseRoot.get("id").alias("exercise_id"),
