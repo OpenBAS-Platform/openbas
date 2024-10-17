@@ -741,20 +741,26 @@ public class ExerciseApi extends RestBehavior {
   @PostMapping(EXERCISE_URI + "/search")
   public Page<ExerciseSimple> exercises(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    Map<String, Join<Base, Base>> joinMap = new HashMap<>();
     if (currentUser().isAdmin()) {
       return buildPaginationCriteriaBuilder(
-          this.exerciseService::exercises, searchPaginationInput, Exercise.class);
-    } else {
-      return buildPaginationCriteriaBuilder(
-          (Specification<Exercise> specification,
-              Specification<Exercise> specificationCount,
-              Pageable pageable) ->
-              this.exerciseService.exercises(
-                  findGrantedFor(currentUser().getId()).and(specification),
-                  findGrantedFor(currentUser().getId()).and(specificationCount),
-                  pageable),
-          searchPaginationInput,
-          Exercise.class);
+          (Specification<Exercise> specification, Specification<Exercise> specificationCount, Pageable pageable) -> this.exerciseService.exercises(
+                    findGrantedFor(currentUser().getId()).and(specification),
+                    findGrantedFor(currentUser().getId()).and(specificationCount),
+                    pageable,
+                    joinMap
+                ), searchPaginationInput, Exercise.class);
+
+        } else {
+            return buildPaginationCriteriaBuilder(
+                    (Specification<Exercise> specification, Specification<Exercise> specificationCount, Pageable pageable) -> this.exerciseService.exercises(
+                        findGrantedFor(currentUser().getId()).and(specification),
+                        findGrantedFor(currentUser().getId()).and(specificationCount),
+                        pageable,
+                        joinMap
+                    ),
+                    searchPaginationInput,
+                    Exercise.class);
     }
   }
 
