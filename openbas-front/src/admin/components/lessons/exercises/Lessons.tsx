@@ -528,7 +528,7 @@ const Lessons: React.FC<Props> = ({
         </DialogContent>
       </Dialog>
       <AnswersByQuestionDialog
-        open={selectedQuestion !== null}
+        open={!!selectedQuestion}
         onClose={() => setSelectedQuestion(null)}
         question={selectedQuestion?.lessons_question_content || ''}
         answers={selectedQuestionAnswers}

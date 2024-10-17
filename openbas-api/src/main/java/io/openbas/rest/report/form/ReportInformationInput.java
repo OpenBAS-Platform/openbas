@@ -1,7 +1,7 @@
 package io.openbas.rest.report.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.model.ReportInformationsType;
+import io.openbas.rest.report.model.ReportInformationsType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

@@ -153,7 +153,7 @@ const ExerciseReportPage: React.FC = () => {
           && <ExerciseDistribution exerciseId={exerciseId} isReport/>
         }
         <AnswersByQuestionDialog
-          open={selectedQuestion !== null}
+          open={!!selectedQuestion}
           onClose={() => setSelectedQuestion(null)}
           question={selectedQuestion?.lessons_question_content || ''}
           answers={selectedQuestionAnswers}

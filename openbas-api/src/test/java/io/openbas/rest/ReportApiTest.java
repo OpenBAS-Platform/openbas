@@ -8,8 +8,9 @@ import io.openbas.rest.mapper.MapperApi;
 import io.openbas.rest.report.ReportApi;
 import io.openbas.rest.report.form.ReportInjectCommentInput;
 import io.openbas.rest.report.form.ReportInput;
+import io.openbas.rest.report.model.Report;
 import io.openbas.service.InjectService;
-import io.openbas.service.ReportService;
+import io.openbas.rest.report.service.ReportService;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import org.junit.jupiter.api.*;
@@ -23,7 +24,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 

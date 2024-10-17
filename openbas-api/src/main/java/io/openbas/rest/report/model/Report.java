@@ -1,8 +1,10 @@
-package io.openbas.database.model;
+package io.openbas.rest.report.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.database.model.Base;
+import io.openbas.database.model.Exercise;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
 import jakarta.validation.constraints.NotBlank;

@@ -1,8 +1,11 @@
-package io.openbas.service;
+package io.openbas.rest.report.service;
 
 import io.openbas.database.model.*;
-import io.openbas.database.repository.ReportRepository;
-import io.openbas.database.specification.ReportSpecification;
+import io.openbas.rest.report.model.Report;
+import io.openbas.rest.report.model.ReportInformation;
+import io.openbas.rest.report.model.ReportInjectComment;
+import io.openbas.rest.report.repository.ReportRepository;
+import io.openbas.rest.report.specification.ReportSpecification;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.report.form.ReportInjectCommentInput;
 import io.openbas.rest.report.form.ReportInput;
