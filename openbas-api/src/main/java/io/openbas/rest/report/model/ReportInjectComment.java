@@ -1,8 +1,9 @@
-package io.openbas.database.model;
+package io.openbas.rest.report.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openbas.database.model.Inject;
 import io.openbas.helper.MonoIdDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

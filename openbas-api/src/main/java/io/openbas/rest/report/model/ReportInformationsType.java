@@ -1,4 +1,4 @@
-package io.openbas.database.model;
+package io.openbas.rest.report.model;
 
 public enum ReportInformationsType  {
     MAIN_INFORMATION,

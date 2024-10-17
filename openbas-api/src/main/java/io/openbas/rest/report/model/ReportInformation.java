@@ -1,7 +1,8 @@
-package io.openbas.database.model;
+package io.openbas.rest.report.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openbas.database.model.Base;
 import io.openbas.helper.MonoIdDeserializer;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;

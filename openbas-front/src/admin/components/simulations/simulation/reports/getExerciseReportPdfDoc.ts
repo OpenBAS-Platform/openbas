@@ -1,9 +1,10 @@
 import { toPng } from 'html-to-image';
 import { Content, ContentTable, TDocumentDefinitions } from 'pdfmake/interfaces';
-import type { InjectResultDTO, Report } from '../../../../../utils/api-types';
+import type { InjectResultDTO, LessonsAnswer, Report } from '../../../../../utils/api-types';
 import convertMarkdownToPdfMake from './convertMarkdownToPdfMake';
 import { ExerciseReportData } from './useExerciseReportData';
 import ReportInformationType from './ReportInformationType';
+import { resolveUserName } from '../../../../../utils/String';
 
 const getBase64ImageFromURL = (url: string) => {
   return new Promise((resolve, reject) => {
@@ -202,20 +203,30 @@ const getExerciseReportPdfDocDefinition = async ({
           const lessonsAnswers = (question.lessons_question_answers || [])
             .map((answerId) => reportData.lessonsAnswers.find((answer) => answer.lessonsanswer_id === answerId));
           const totalScore = (lessonsAnswers || []).reduce((sum, answer) => sum + (answer?.lessons_answer_score || 0), 0);
+          const getUserName = (answer: LessonsAnswer): string => {
+            if (reportData.exercise.exercise_lessons_anonymized) return t('Anonymized');
+            if (answer.lessons_answer_user) return resolveUserName(reportData.usersMap[answer.lessons_answer_user as string]);
+            return '-';
+          };
           return [
             { text: [t('Question'), ` : ${question.lessons_question_content}`], margin: [0, 6, 0, 0] },
             { text: [t('Total score'), ` : ${totalScore}`] },
             (lessonsAnswers.length > 0
               ? {
                 table: {
-                  widths: ['auto', '*', '*'],
+                  widths: ['auto', 'auto', '*', '*'],
                   margin: [0, 2, 0, 0],
                   body: [
-                    [t('Score'), t('What worked well'), t('What didn\'t work well')].map((title) => ({
+                    [t('User'), t('Score'), t('What worked well'), t('What didn\'t work well')].map((title) => ({
                       text: title,
                       style: 'tableTitle',
                     })),
-                    ...lessonsAnswers.map((answer) => ([answer?.lessons_answer_score, answer?.lessons_answer_positive, answer?.lessons_answer_negative])),
+                    ...(lessonsAnswers || []).map((answer) => ([
+                      answer && getUserName(answer),
+                      answer?.lessons_answer_score,
+                      answer?.lessons_answer_positive,
+                      answer?.lessons_answer_negative,
+                    ])),
                   ],
                 },
                 layout: tableCustomLayout(true, 6),

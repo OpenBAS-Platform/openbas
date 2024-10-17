@@ -1616,12 +1616,12 @@ export interface LessonsAnswer {
   lessons_answer_exercise?: string;
   lessons_answer_negative?: string;
   lessons_answer_positive?: string;
-  lessons_answer_question: LessonsQuestion;
+  lessons_answer_question: string;
   /** @format int32 */
   lessons_answer_score: number;
   /** @format date-time */
   lessons_answer_updated_at: string;
-  lessons_answer_user?: User;
+  lessons_answer_user?: string;
   lessonsanswer_id: string;
   listened?: boolean;
 }

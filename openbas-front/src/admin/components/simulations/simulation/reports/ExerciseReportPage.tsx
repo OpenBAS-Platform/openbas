@@ -4,7 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Alert, Button, Paper, ToggleButtonGroup, Typography } from '@mui/material';
 
 import { updateReportForExercise, updateReportInjectCommentForExercise } from '../../../../../actions/reports/report-actions';
-import type { Exercise, Report, ReportInput } from '../../../../../utils/api-types';
+import type { Exercise, LessonsQuestion, Report, ReportInput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import Loader from '../../../../../components/Loader';
 import { useFormatter } from '../../../../../components/i18n';
@@ -23,6 +23,7 @@ import InjectReportResult from './InjectReportResult';
 import ReportGlobalObservation from '../../../components/reports/ReportGlobalObservation';
 import LessonsCategories from '../../../lessons/exercises/LessonsCategories';
 import ExerciseDistribution from '../overview/ExerciseDistribution';
+import AnswersByQuestionDialog from '../../../lessons/exercises/AnswersByQuestionDialog';
 
 const ExerciseReportPage: React.FC = () => {
   // Standard hooks
@@ -31,6 +32,10 @@ const ExerciseReportPage: React.FC = () => {
 
   const { exerciseId, reportId } = useParams() as { exerciseId: Exercise['exercise_id'], reportId: Report['report_id'] };
   const { loading, report, displayModule, setReloadReportDataCount, reportData } = useExerciseReportData(reportId, exerciseId);
+  const [selectedQuestion, setSelectedQuestion] = useState<LessonsQuestion | null>(null);
+  const selectedQuestionAnswers = selectedQuestion && selectedQuestion.lessonsquestion_id
+    ? reportData.lessonsAnswers.filter((answer) => answer.lessons_answer_question === selectedQuestion.lessonsquestion_id)
+    : [];
 
   const permissions = usePermissions(exerciseId);
   const [canEditReport, setCanEditReport] = useState(permissions.canWrite);
@@ -140,12 +145,21 @@ const ExerciseReportPage: React.FC = () => {
             lessonsQuestions={reportData.lessonsQuestions}
             teamsMap={reportData.teamsMap}
             teams={reportData.teams}
+            setSelectedQuestion={setSelectedQuestion}
             isReport
              />
         }
         {displayModule(ReportInformationType.EXERCISE_DETAILS)
           && <ExerciseDistribution exerciseId={exerciseId} isReport/>
         }
+        <AnswersByQuestionDialog
+          open={!!selectedQuestion}
+          onClose={() => setSelectedQuestion(null)}
+          question={selectedQuestion?.lessons_question_content || ''}
+          answers={selectedQuestionAnswers}
+          anonymized={!!reportData.exercise.exercise_lessons_anonymized}
+          usersMap={reportData.usersMap}
+        />
       </div>
     </ReportContext.Provider>
   );

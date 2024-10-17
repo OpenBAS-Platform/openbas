@@ -81,6 +81,17 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
           "group by us.user_id;", nativeQuery = true)
   List<RawPlayer> rawAllPlayers();
 
+  @Query(value = "SELECT us.user_id, us.user_email, " +
+          "us.user_firstname, us.user_lastname, " +
+          "coalesce(array_agg(DISTINCT exercises_teams.exercise_id) FILTER (WHERE exercises_teams.exercise_id IS NOT NULL), '{}') AS teams_exercises " +
+          "FROM users us " +
+          "JOIN users_teams ON us.user_id = users_teams.user_id " +
+          "JOIN teams ON users_teams.team_id = teams.team_id " +
+          "JOIN exercises_teams ON teams.team_id = exercises_teams.team_id " +
+          "WHERE exercises_teams.exercise_id = :exerciseId " +
+          "GROUP BY us.user_id;", nativeQuery = true)
+  List<RawPlayer> rawPlayersByExerciseId(@Param("exerciseId") String exerciseId);
+
   @Query(value = "select us from users us where us.user_organization is null or us.user_organization in :organizationIds", nativeQuery = true)
   List<RawPlayer> rawPlayersAccessibleFromOrganizations(@Param("organizationIds") List<String> organizationIds);
 

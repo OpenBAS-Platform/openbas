@@ -1,12 +1,15 @@
 package io.openbas.service;
 
 import io.openbas.database.model.*;
-import io.openbas.database.repository.ReportRepository;
+import io.openbas.rest.report.model.Report;
+import io.openbas.rest.report.model.ReportInformation;
+import io.openbas.rest.report.model.ReportInformationsType;
+import io.openbas.rest.report.model.ReportInjectComment;
+import io.openbas.rest.report.repository.ReportRepository;
 import io.openbas.rest.report.form.ReportInformationInput;
 import io.openbas.rest.report.form.ReportInjectCommentInput;
 import io.openbas.rest.report.form.ReportInput;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
+import io.openbas.rest.report.service.ReportService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

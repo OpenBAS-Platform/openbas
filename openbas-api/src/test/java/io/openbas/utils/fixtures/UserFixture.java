@@ -26,12 +26,15 @@ public class UserFixture {
     public static LoginUserInput getLoginUserInput() {
         return LoginUserInput.builder().login(EMAIL).password(RAW_PASSWORD).build();
     }
-
     public static User getUser() {
+        return getUser("Firstname", "Lastname", EMAIL);
+    }
+
+    public static User getUser(String firstName, String lastName, String email) {
         User user = new User();
-        user.setFirstname("Firstname");
-        user.setLastname("Lastname");
-        user.setEmail(EMAIL);
+        user.setFirstname(firstName);
+        user.setLastname(lastName);
+        user.setEmail(email);
         user.setPassword(ENCODED_PASSWORD);
         return user;
     }

@@ -1,6 +1,6 @@
-package io.openbas.database.specification;
+package io.openbas.rest.report.specification;
 
-import io.openbas.database.model.Report;
+import io.openbas.rest.report.model.Report;
 import org.springframework.data.jpa.domain.Specification;
 
 
