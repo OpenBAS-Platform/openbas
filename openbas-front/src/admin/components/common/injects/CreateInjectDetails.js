@@ -163,58 +163,58 @@ const CreateInjectDetails = ({
       if (hasExpectations && injectDetailsState.expectations) {
         finalData.expectations = injectDetailsState.expectations;
       }
-      if (openDetails) {
-        contractContent.fields
-          .filter(
-            (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
-              f.key,
-            ),
-          )
-          .forEach((field) => {
-            if (field.type === 'number') {
-              finalData[field.key] = parseInt(data[field.key], 10);
-            } else if (
-              field.type === 'textarea'
+
+      contractContent.fields
+        .filter(
+          (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+            f.key,
+          ),
+        )
+        .forEach((field) => {
+          if (field.type === 'number') {
+            finalData[field.key] = parseInt(data[field.key], 10);
+          } else if (
+            field.type === 'textarea'
                   && field.richText
                   && data[field.key]
                   && data[field.key].length > 0
-            ) {
-              finalData[field.key] = data[field.key]
-                .replaceAll(
-                  '&lt;#list challenges as challenge&gt;',
-                  '<#list challenges as challenge>',
-                )
-                .replaceAll(
-                  '&lt;#list articles as article&gt;',
-                  '<#list articles as article>',
-                )
-                .replaceAll('&lt;/#list&gt;', '</#list>');
-            } else if (data[field.key] && field.type === 'tuple') {
-              if (field.cardinality && field.cardinality === '1') {
-                if (finalData[field.key].type === 'attachment') {
-                  finalData[field.key] = {
-                    key: data[field.key].key,
-                    value: `${field.tupleFilePrefix}${data[field.key].value}`,
-                  };
-                } else {
-                  finalData[field.key] = R.dissoc('type', data[field.key]);
-                }
+          ) {
+            finalData[field.key] = data[field.key]
+              .replaceAll(
+                '&lt;#list challenges as challenge&gt;',
+                '<#list challenges as challenge>',
+              )
+              .replaceAll(
+                '&lt;#list articles as article&gt;',
+                '<#list articles as article>',
+              )
+              .replaceAll('&lt;/#list&gt;', '</#list>');
+          } else if (data[field.key] && field.type === 'tuple') {
+            if (field.cardinality && field.cardinality === '1') {
+              if (finalData[field.key].type === 'attachment') {
+                finalData[field.key] = {
+                  key: data[field.key].key,
+                  value: `${field.tupleFilePrefix}${data[field.key].value}`,
+                };
               } else {
-                finalData[field.key] = data[field.key].map((pair) => {
-                  if (pair.type === 'attachment') {
-                    return {
-                      key: pair.key,
-                      value: `${field.tupleFilePrefix}${pair.value}`,
-                    };
-                  }
-                  return R.dissoc('type', pair);
-                });
+                finalData[field.key] = R.dissoc('type', data[field.key]);
               }
             } else {
-              finalData[field.key] = data[field.key];
+              finalData[field.key] = data[field.key].map((pair) => {
+                if (pair.type === 'attachment') {
+                  return {
+                    key: pair.key,
+                    value: `${field.tupleFilePrefix}${pair.value}`,
+                  };
+                }
+                return R.dissoc('type', pair);
+              });
             }
-          });
-      }
+          } else {
+            finalData[field.key] = data[field.key];
+          }
+        });
+
       const { allTeams, teamsIds, assetIds, assetGroupIds, documents } = injectDetailsState;
       const inject_depends_duration = data.inject_depends_duration_days * 3600 * 24
           + data.inject_depends_duration_hours * 3600
