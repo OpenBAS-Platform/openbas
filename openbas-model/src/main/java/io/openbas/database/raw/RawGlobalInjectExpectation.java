@@ -8,6 +8,8 @@ public interface RawGlobalInjectExpectation {
 
     Double getInject_expectation_expected_score();
 
+    String getInject_id();
+
     String getInject_title();
 
     String getAttack_pattern_id();
