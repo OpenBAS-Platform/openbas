@@ -86,7 +86,7 @@ const InjectReportResult: React.FC<Props> = ({
     },
     {
       label: 'Scores',
-      render: (inject: InjectResultDTO) => <AtomicTestingResult expectations={inject.inject_expectation_results} />,
+      render: (inject: InjectResultDTO) => <AtomicTestingResult expectations={inject.inject_expectation_results} injectId={inject.inject_id} />,
     },
     {
       label: 'Targets',
@@ -96,7 +96,7 @@ const InjectReportResult: React.FC<Props> = ({
       label: 'Comments',
       render: (inject: InjectResultDTO) => {
         const currentInjectComment = findInjectCommentsByInjectId(inject.inject_id);
-        return <ExpandableMarkdown showAll source={currentInjectComment?.report_inject_comment || ''}/>;
+        return <ExpandableMarkdown showAll source={currentInjectComment?.report_inject_comment || ''} markdownDOMId={`markdown_${inject.inject_id}`}/>;
       },
     },
   ];

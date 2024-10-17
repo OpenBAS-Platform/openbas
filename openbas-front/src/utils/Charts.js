@@ -691,8 +691,9 @@ export const polarAreaChartOptions = (
  * @param {boolean} displayValue
  * @param {boolean} displayTooltip
  * @param {number} size
+ * @param {boolean} disableAnimation
  */
-export const donutChartOptions = (
+export const donutChartOptions = ({
   theme,
   labels,
   legendPosition = 'bottom',
@@ -703,7 +704,8 @@ export const donutChartOptions = (
   displayValue = true,
   displayTooltip = true,
   size = 70,
-) => {
+  disableAnimation = false,
+}) => {
   const temp = theme.palette.mode === 'dark' ? 400 : 600;
   let dataLabelsColors = labels.map(() => theme.palette.text.primary);
   if (chartColors.length > 0) {
@@ -734,6 +736,9 @@ export const donutChartOptions = (
       foreColor: theme.palette.text.secondary,
       width: '100%',
       height: '100%',
+      animations: {
+        enabled: !disableAnimation,
+      },
     },
     theme: {
       mode: theme.palette.mode,

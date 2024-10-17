@@ -34,7 +34,7 @@ export const searchExerciseInjects = (exerciseId: Exercise['exercise_id'], searc
 };
 
 export const exerciseInjectsResultDTO = (exerciseId: Exercise['exercise_id']) => {
-  const uri = `${EXERCISE_URI}${exerciseId}/injects/resultdto`;
+  const uri = `${EXERCISE_URI}/${exerciseId}/injects/resultdto`;
   return simpleCall(uri);
 };
 

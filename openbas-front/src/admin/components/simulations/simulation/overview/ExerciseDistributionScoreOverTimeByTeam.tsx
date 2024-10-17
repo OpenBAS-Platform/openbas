@@ -66,6 +66,7 @@ const ExerciseDistributionScoreOverTimeByTeam: FunctionComponent<Props> = ({
     <>
       {teamsScores.length > 0 ? (
         <Chart
+          id='exercise_distribution_score_over_time_by_team'
           // @ts-expect-error: Need to migrate Chart.js file
           options={lineChartOptions(
             theme,

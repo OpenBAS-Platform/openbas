@@ -16,7 +16,6 @@ import type { ExercisesHelper } from '../../../../actions/exercises/exercise-hel
 import type { Exercise as ExerciseType } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
 import type { Theme } from '../../../../components/Theme';
-import { isFeatureEnabled } from '../../../../utils/utils';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -201,10 +200,7 @@ const ExerciseHeader = () => {
     };
   });
 
-  const actions: ExerciseActionPopover[] = ['Update', 'Duplicate', 'Export', 'Delete'];
-  if (isFeatureEnabled('report')) {
-    actions.push('Access reports');
-  }
+  const actions: ExerciseActionPopover[] = ['Update', 'Duplicate', 'Export', 'Delete', 'Access reports'];
 
   return (
     <>

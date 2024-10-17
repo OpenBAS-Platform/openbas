@@ -78,7 +78,7 @@ const LessonsCategories = ({
     R.fromPairs,
   )(lessonsAnswers);
   return (
-    <div style={{ marginTop: '30px', ...style }}>
+    <div id='lessons_categories' style={{ marginTop: '30px', ...style }}>
       {sortedCategories.map((category) => {
         const questions = sortQuestions(
           lessonsQuestions.filter(

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -75,11 +77,13 @@ public class LessonsCategory implements Base {
             inverseJoinColumns = @JoinColumn(name = "team_id"))
     @JsonSerialize(using = MultiIdListDeserializer.class)
     @JsonProperty("lessons_category_teams")
+    @ArraySchema(schema = @Schema(type = "string"))
     private List<Team> teams = new ArrayList<>();
 
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonProperty("lessons_category_questions")
     @JsonSerialize(using = MultiIdListDeserializer.class)
+    @ArraySchema(schema = @Schema(type = "string"))
     private List<LessonsQuestion> questions = new ArrayList<>();
 
     // region transient

@@ -1,5 +1,5 @@
 import Chart from 'react-apexcharts';
-import React, { FunctionComponent } from 'react';
+import React, { memo } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { Button, Grid } from '@mui/material';
 import { InfoOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
@@ -44,13 +44,10 @@ interface Props {
   expectationResultsByTypes?: ExpectationResultsByType[] | null;
   humanValidationLink?: string;
   immutable?: boolean;
+  disableChartAnimation?:boolean;
 }
 
-const ResponsePie: FunctionComponent<Props> = ({
-  expectationResultsByTypes,
-  humanValidationLink,
-  immutable,
-}) => {
+const ResponsePie = (({ expectationResultsByTypes, humanValidationLink, immutable, disableChartAnimation }: Props) => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
@@ -105,14 +102,14 @@ const ResponsePie: FunctionComponent<Props> = ({
         <div className={classes.chartContainer}>
           {renderIcon(type, hasDistribution)}
           <Chart options={
-            donutChartOptions(
+            donutChartOptions({
               theme,
               labels,
-              'bottom',
-              false,
-              colors,
-              false,
-            ) as ApexOptions}
+              legendPosition: 'bottom',
+              chartColors: colors,
+              displayLegend: false,
+              disableAnimation: disableChartAnimation,
+            }) as ApexOptions}
             series={data}
             type="donut"
             width="100%"
@@ -147,6 +144,6 @@ const ResponsePie: FunctionComponent<Props> = ({
       </Grid>
     </Grid>
   );
-};
+});
 
-export default ResponsePie;
+export default memo(ResponsePie);
