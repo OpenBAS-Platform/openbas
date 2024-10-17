@@ -87,7 +87,7 @@
     "@testing-library/react": "14.3.1",
     "@types/d3-hierarchy": "3.1.7",
     "@types/node": "20.16.10",
-    "@types/pdfmake": "^0.2.9",
+    "@types/pdfmake": "0.2.9",
     "@types/qs": "6",
     "@types/react": "18.3.11",
     "@types/react-csv": "1.1.10",
