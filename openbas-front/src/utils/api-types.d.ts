@@ -740,7 +740,7 @@ export interface Exercise {
   exercise_subtitle?: string;
   /** @uniqueItems true */
   exercise_tags?: Tag[];
-  exercise_teams?: Team[];
+  exercise_teams?: string[];
   exercise_teams_users?: ExerciseTeamUser[];
   /** @format date-time */
   exercise_updated_at: string;
@@ -1641,9 +1641,9 @@ export interface LessonsCategory {
   lessons_category_name: string;
   /** @format int32 */
   lessons_category_order?: number;
-  lessons_category_questions?: LessonsQuestion[];
+  lessons_category_questions?: string[];
   lessons_category_scenario?: Scenario;
-  lessons_category_teams?: Team[];
+  lessons_category_teams?: string[];
   /** @format date-time */
   lessons_category_updated_at: string;
   lessons_category_users?: string[];
@@ -1674,7 +1674,7 @@ export interface LessonsInput {
 }
 
 export interface LessonsQuestion {
-  lessons_question_answers?: LessonsAnswer[];
+  lessons_question_answers?: string[];
   lessons_question_category: LessonsCategory;
   lessons_question_content: string;
   /** @format date-time */

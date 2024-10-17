@@ -51,7 +51,7 @@ public class ReportService {
         return this.reportRepository.save(report);
     }
 
-    public List<ReportInjectComment> updateReportInjectComment(@NotNull final Report report, @NotNull final Inject inject, @NotNull final ReportInjectCommentInput input){
+    public Report updateReportInjectComment(@NotNull final Report report, @NotNull final Inject inject, @NotNull final ReportInjectCommentInput input){
         Optional<ReportInjectComment> reportInjectComment = this.reportRepository.findReportInjectComment(UUID.fromString(report.getId()), inject.getId());
         ReportInjectComment injectComment;
         if (reportInjectComment.isPresent()) {
@@ -64,8 +64,7 @@ public class ReportService {
             injectComment.setComment(input.getComment());
             report.getReportInjectsComments().add(injectComment);
         }
-        this.reportRepository.save(report);
-        return report.getReportInjectsComments();
+        return this.reportRepository.save(report);
     }
 
     public void deleteReport(@NotBlank final UUID reportId) {

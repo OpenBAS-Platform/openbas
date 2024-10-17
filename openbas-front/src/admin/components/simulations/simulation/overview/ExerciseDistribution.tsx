@@ -86,7 +86,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
     return <div />;
   }
   return (
-    <Grid container={true} spacing={3}>
+    <Grid id='exercise_distribution' container={true} spacing={3}>
       <Grid item xs={6} style={{ marginTop: 25 }}>
         <Typography variant="h4">
           {t('Distribution of score by team (in % of expectations)')}

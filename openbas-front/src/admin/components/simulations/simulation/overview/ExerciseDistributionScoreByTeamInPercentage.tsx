@@ -75,6 +75,7 @@ const ExerciseDistributionScoreByTeamInPercentage: FunctionComponent<Props> = ({
     <>
       {teamsTotalScores.length > 0 ? (
         <Chart
+          id='exercise_distribution_score_by_team'
           // @ts-expect-error: Need to migrate Chart.js file
           options={horizontalBarsChartOptions(theme)}
           series={percentScoreByTeamData}

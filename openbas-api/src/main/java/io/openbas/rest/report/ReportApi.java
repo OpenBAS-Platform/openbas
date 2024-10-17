@@ -52,7 +52,7 @@ public class ReportApi extends RestBehavior {
     @PutMapping("/api/exercises/{exerciseId}/reports/{reportId}/inject-comments")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackOn = Exception.class)
-    public Iterable<ReportInjectComment> updateReportInjectComment(@PathVariable String exerciseId, @PathVariable String reportId, @Valid @RequestBody ReportInjectCommentInput input) {
+    public Report updateReportInjectComment(@PathVariable String exerciseId, @PathVariable String reportId, @Valid @RequestBody ReportInjectCommentInput input) {
         Report report = this.reportService.report(UUID.fromString(reportId));
         assert exerciseId.equals(report.getExercise().getId());
         Inject inject = this.injectService.inject(input.getInjectId());

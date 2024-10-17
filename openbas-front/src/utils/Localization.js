@@ -66,7 +66,7 @@ const i18n = {
       'This file type is not accepted here.':
         "Ce type de fichier n'est pas accepté ici",
       'Distribution of score by team (in % of expectations)':
-        'Distribution du score par team (en % des attendus)',
+        'Distribution du score par équipe (en % des attendus)',
       'Select all': 'Sélectionner tout',
       'Do you want to anonymize lessons learned questionnaire?':
         "Souhaitez-vous anonymiser le questionnaire de retour d'expérience ?",
@@ -120,7 +120,7 @@ const i18n = {
         'Souhaitez-vous supprimer cette organisation ?',
       'Mail sent to': 'Mail envoyé à',
       'Teams scores over time (in % of expectations)':
-        'Score des team dans le temps (en % des attendus)',
+        'Score des équipes dans le temps (en % des attendus)',
       'Distribution of total score by inject type':
         'Distribution du score total par type de stimuli',
       on: 'le',
@@ -446,6 +446,7 @@ const i18n = {
       'Comment (optional)': 'Commentaire (optionnel)',
       "What didn't work well": "Ce qui n'a pas bien fonctionné",
       'What worked well': 'Ce qui a bien fonctionné',
+      'Answers : N/A': 'Réponses : N/A',
       'Global evaluation': 'Evaluation globale',
       'Your overall evaluation about this question.':
         'Votre évaluation générale à propos de cette question.',
@@ -508,6 +509,7 @@ const i18n = {
       'Do you want to delete this report?':
         'Souhaitez-vous supprimer ce rapport ?',
       'Update the report': 'Modifier le rapport',
+      'Table of contents': 'Sommaire',
       token: 'Token du compte',
       status: 'Statut',
       'Inject documents': 'Documents du stimuli',
@@ -1828,6 +1830,7 @@ const i18n = {
       'Comment (optional)': '评论 (可选)',
       "What didn't work well": '效果不佳的地方',
       'What worked well': '效果较好地方',
+      'Answers : N/A': '没有答案',
       'Global evaluation': '总体评价',
       'Your overall evaluation about this question.':
         '您对本问题的总体评价.',
@@ -1890,6 +1893,8 @@ const i18n = {
       'Do you want to delete this report?':
         '你想要删除这份报告么?',
       'Update the report': '更新报告',
+      'Table of contents': '目录',
+
       token: '令牌',
       status: '状态',
       'Inject documents': '注入文档',
