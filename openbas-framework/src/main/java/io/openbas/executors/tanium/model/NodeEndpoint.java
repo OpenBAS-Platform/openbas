@@ -7,6 +7,5 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NodeEndpoint {
 
-    private TaniumEndpoint node;
-
+  private TaniumEndpoint node;
 }

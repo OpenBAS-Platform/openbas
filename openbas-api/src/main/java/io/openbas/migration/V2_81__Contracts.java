@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V2_81__Contracts extends BaseJavaMigration {
@@ -17,7 +16,8 @@ public class V2_81__Contracts extends BaseJavaMigration {
     // Cleanup injectors
     select.execute("ALTER TABLE injectors DROP column injector_contracts;");
     // Create injectors_contracts table
-    select.execute("""
+    select.execute(
+        """
           CREATE TABLE injectors_contracts (
             injector_contract_id varchar(255) not null constraint injector_contract_pkey primary key,
             injector_contract_created_at timestamp not null default now(),
@@ -33,7 +33,8 @@ public class V2_81__Contracts extends BaseJavaMigration {
           CREATE INDEX idx_injectors_contracts on injectors_contracts (injector_contract_id);
      """);
     // Create relations between contracts and attack_patterns
-    select.execute("""
+    select.execute(
+        """
         CREATE TABLE injectors_contracts_attack_patterns (
             attack_pattern_id varchar(255) not null
                 constraint attack_pattern_id_fk

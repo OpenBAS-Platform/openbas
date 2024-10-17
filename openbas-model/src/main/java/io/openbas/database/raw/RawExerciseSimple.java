@@ -5,23 +5,23 @@ import java.util.List;
 
 public interface RawExerciseSimple {
 
-    String getExercise_id();
+  String getExercise_id();
 
-    String getExercise_status();
+  String getExercise_status();
 
-    Instant getExercise_start_date();
+  Instant getExercise_start_date();
 
-    Instant getExercise_updated_at();
+  Instant getExercise_updated_at();
 
-    Instant getExercise_end_date();
+  Instant getExercise_end_date();
 
-    String getExercise_name();
+  String getExercise_name();
 
-    String getExercise_category();
+  String getExercise_category();
 
-    String getExercise_subtitle();
+  String getExercise_subtitle();
 
-    List<String> getExercise_tags();
+  List<String> getExercise_tags();
 
-    List<String> getInject_ids();
+  List<String> getInject_ids();
 }

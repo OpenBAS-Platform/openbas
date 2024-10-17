@@ -15,5 +15,4 @@ public class ArticleFixture {
     article.setChannel(channel);
     return article;
   }
-
 }

@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V2_68__Assets_Asset_Groups extends BaseJavaMigration {
@@ -15,11 +14,13 @@ public class V2_68__Assets_Asset_Groups extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     // Add extension
-    select.execute("""
+    select.execute(
+        """
         CREATE EXTENSION IF NOT EXISTS hstore;
         """);
     // Create table asset
-    select.execute("""
+    select.execute(
+        """
         CREATE TABLE IF NOT EXISTS assets (
             asset_id varchar(255) not null constraint assets_pkey primary key,
             asset_type varchar(255) not null,
@@ -34,14 +35,16 @@ public class V2_68__Assets_Asset_Groups extends BaseJavaMigration {
         CREATE INDEX IF NOT EXISTS idx_assets on assets (asset_id);
         """);
     // Add column for endpoint type
-    select.execute("""
+    select.execute(
+        """
         ALTER TABLE assets ADD COLUMN endpoint_ips text[];
         ALTER TABLE assets ADD COLUMN endpoint_hostname varchar(255);
         ALTER TABLE assets ADD COLUMN endpoint_platform varchar(255) not null;
         ALTER TABLE assets ADD COLUMN endpoint_mac_addresses text[];
         """);
     // Add association table between asset and tag
-    select.execute("""
+    select.execute(
+        """
         CREATE TABLE assets_tags (
           asset_id varchar(255) not null constraint asset_id_fk references assets,
           tag_id varchar(255) not null constraint tag_id_fk references tags,
@@ -51,7 +54,8 @@ public class V2_68__Assets_Asset_Groups extends BaseJavaMigration {
         CREATE INDEX idx_assets_tags_tag on assets_tags (tag_id);
         """);
     // Create table asset groups
-    select.execute("""
+    select.execute(
+        """
         CREATE TABLE IF NOT EXISTS asset_groups (
             asset_group_id varchar(255) not null constraint asset_groups_pkey primary key,
             asset_group_name varchar(255) not null,
@@ -62,7 +66,8 @@ public class V2_68__Assets_Asset_Groups extends BaseJavaMigration {
         CREATE INDEX IF NOT EXISTS idx_asset_groups on asset_groups (asset_group_id);
         """);
     // Add association table between asset group and tag
-    select.execute("""
+    select.execute(
+        """
         CREATE TABLE asset_groups_tags (
           asset_group_id varchar(255) not null constraint asset_group_id_fk references asset_groups on delete cascade,
           tag_id varchar(255) not null constraint tag_id_fk references tags on delete cascade,
@@ -72,7 +77,8 @@ public class V2_68__Assets_Asset_Groups extends BaseJavaMigration {
         CREATE INDEX idx_asset_groups_tags_tag on asset_groups_tags (tag_id);
         """);
     // Add association table between asset and asset groups
-    select.execute("""
+    select.execute(
+        """
         CREATE TABLE IF NOT EXISTS asset_groups_assets (
             asset_group_id varchar(255) not null constraint asset_group_id_fk references asset_groups on delete cascade,
             asset_id varchar(255) not null constraint asset_id_fk references assets on delete cascade,

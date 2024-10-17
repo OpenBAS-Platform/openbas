@@ -18,9 +18,9 @@ public class LoggingAspect {
   private static final long EXECUTION_TIME_THRESHOLD = 500;
 
   /**
-   * This method uses Around advice which ensures that an advice can run before and after the method execution, to and
-   * log the execution time of the method This advice will be applied to all the method which are annotate with the
-   * annotation @LogExecutionTime
+   * This method uses Around advice which ensures that an advice can run before and after the method
+   * execution, to and log the execution time of the method This advice will be applied to all the
+   * method which are annotate with the annotation @LogExecutionTime
    */
   @Around("@annotation(io.openbas.aop.LogExecutionTime)")
   public Object methodTimeLogger(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
@@ -44,8 +44,12 @@ public class LoggingAspect {
     }
 
     if (executionTime > EXECUTION_TIME_THRESHOLD) {
-      logger.warn("Execution of {}.{} took {} ms, which exceeds the threshold of {} ms",
-          className, methodName, executionTime, EXECUTION_TIME_THRESHOLD);
+      logger.warn(
+          "Execution of {}.{} took {} ms, which exceeds the threshold of {} ms",
+          className,
+          methodName,
+          executionTime,
+          EXECUTION_TIME_THRESHOLD);
     }
 
     return result;

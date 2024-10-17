@@ -6,7 +6,8 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V2_87__Delete_constraint_not_null_inject_expectations_exercise extends BaseJavaMigration {
+public class V2_87__Delete_constraint_not_null_inject_expectations_exercise
+    extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {

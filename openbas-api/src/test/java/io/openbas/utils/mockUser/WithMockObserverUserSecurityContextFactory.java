@@ -1,5 +1,8 @@
 package io.openbas.utils.mockUser;
 
+import static io.openbas.database.model.Grant.GRANT_TYPE.OBSERVER;
+import static io.openbas.service.UserService.buildAuthenticationToken;
+
 import io.openbas.database.model.Grant;
 import io.openbas.database.model.Group;
 import io.openbas.database.model.User;
@@ -9,6 +12,8 @@ import io.openbas.database.repository.UserRepository;
 import io.openbas.database.specification.GroupSpecification;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -16,22 +21,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Optional;
-
-import static io.openbas.database.model.Grant.GRANT_TYPE.OBSERVER;
-import static io.openbas.service.UserService.buildAuthenticationToken;
-
 @Component
-public class WithMockObserverUserSecurityContextFactory implements WithSecurityContextFactory<WithMockObserverUser> {
+public class WithMockObserverUserSecurityContextFactory
+    implements WithSecurityContextFactory<WithMockObserverUser> {
 
   public static final String MOCK_USER_OBSERVER_EMAIL = "observer@openbas.io";
-  @Autowired
-  private GrantRepository grantRepository;
-  @Autowired
-  private GroupRepository groupRepository;
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private GrantRepository grantRepository;
+  @Autowired private GroupRepository groupRepository;
+  @Autowired private UserRepository userRepository;
 
   @Override
   public SecurityContext createSecurityContext(WithMockObserverUser customUser) {
@@ -49,7 +46,8 @@ public class WithMockObserverUserSecurityContextFactory implements WithSecurityC
 
   @PreDestroy
   public void preDestroy() {
-    this.userRepository.deleteById(this.userRepository.findByEmailIgnoreCase(MOCK_USER_OBSERVER_EMAIL).orElseThrow().getId());
+    this.userRepository.deleteById(
+        this.userRepository.findByEmailIgnoreCase(MOCK_USER_OBSERVER_EMAIL).orElseThrow().getId());
   }
 
   private void createObserverMockUser() {

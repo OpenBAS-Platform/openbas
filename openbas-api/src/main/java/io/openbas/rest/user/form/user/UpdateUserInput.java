@@ -1,17 +1,15 @@
 package io.openbas.rest.user.form.user;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.Pattern;
-import lombok.Getter;
-import lombok.Setter;
-
-import jakarta.validation.constraints.Email;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static io.openbas.config.AppConfig.EMAIL_FORMAT;
 import static io.openbas.config.AppConfig.PHONE_FORMAT;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -46,5 +44,4 @@ public class UpdateUserInput {
 
   @JsonProperty("user_tags")
   private List<String> tagIds = new ArrayList<>();
-
 }

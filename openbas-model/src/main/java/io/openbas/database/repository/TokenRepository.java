@@ -2,6 +2,8 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Token;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -9,11 +11,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
-import java.util.Optional;
-
 @Repository
-public interface TokenRepository extends CrudRepository<Token, String>, JpaSpecificationExecutor<Token> {
+public interface TokenRepository
+    extends CrudRepository<Token, String>, JpaSpecificationExecutor<Token> {
 
   @NotNull
   Optional<Token> findById(@NotNull String id);
@@ -24,12 +24,14 @@ public interface TokenRepository extends CrudRepository<Token, String>, JpaSpeci
 
   // Custom query to bypass ID generator on Token property
   @Modifying
-  @Query(value = "insert into tokens(token_id, token_user, token_value, token_created_at) "
-      + "values (:id, :user, :value, :createdAt)", nativeQuery = true)
+  @Query(
+      value =
+          "insert into tokens(token_id, token_user, token_value, token_created_at) "
+              + "values (:id, :user, :value, :createdAt)",
+      nativeQuery = true)
   void createToken(
       @Param("id") String tokenId,
       @Param("user") String adminUser,
       @Param("value") String tokenValue,
-      @Param("createdAt") Instant createdAt
-  );
+      @Param("createdAt") Instant createdAt);
 }
