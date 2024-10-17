@@ -16,7 +16,12 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.repository.*;
+import io.openbas.execution.ExecutableInject;
+import io.openbas.execution.ExecutionContext;
+import io.openbas.execution.ExecutionContextService;
+import io.openbas.execution.Executor;
 import io.openbas.rest.exercise.service.ExerciseService;
+import io.openbas.rest.inject.form.DirectInjectInput;
 import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.fixtures.InjectExpectationFixture;
@@ -28,6 +33,13 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Collections;
+
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
+import static io.openbas.utils.fixtures.UserFixture.getSavedUser;
+import static org.mockito.Mockito.verify;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
@@ -44,13 +56,19 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private ScenarioService scenarioService;
   @Autowired private ExerciseService exerciseService;
   @Autowired private ExerciseRepository exerciseRepository;
-  @Autowired private ScenarioRepository scenarioRepository;
+  @Autowired private ExecutionContextService executionContextService;
+  @Autowired
+  private Executor executor;
+  @Autowired
+  private ScenarioRepository scenarioRepository;
   @Autowired private InjectRepository injectRepository;
   @Autowired private DocumentRepository documentRepository;
   @Autowired private CommunicationRepository communicationRepository;
   @Autowired private InjectExpectationRepository injectExpectationRepository;
   @Autowired private TeamRepository teamRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
+  @Autowired
+  private UserRepository userRepository;
 
   @BeforeAll
   void beforeAll() {
@@ -337,6 +355,44 @@ class InjectApiTest extends IntegrationTest {
     // -- ASSERT --
     assertNotNull(response);
     assertEquals(injectTitle, JsonPath.read(response, "$.inject_title"));
+  }
+
+  @DisplayName("Execute an email inject for exercise")
+  @Test
+  @Order(11)
+  @WithMockPlannerUser
+  void executeEmailInjectForExerciseTest() throws Exception {
+    // -- PREPARE --
+    InjectorContract injectorContract = this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
+    Inject inject = getInjectForEmailContract(injectorContract);
+    inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
+    inject.setExercise(EXERCISE);
+    Inject savedInject = this.injectRepository.save(inject);
+    List<ExecutionContext> userInjectContexts = Collections.singletonList(
+        executionContextService.executionContext(getSavedUser(), savedInject, "Direct execution"));
+    ExecutableInject injection = new ExecutableInject(
+        true, true, savedInject, List.of(), savedInject.getAssets(),
+        savedInject.getAssetGroups(), userInjectContexts
+    );
+
+    DirectInjectInput input = new DirectInjectInput();
+    input.setTitle(savedInject.getTitle());
+    input.setDescription(savedInject.getDescription());
+    input.setInjectorContract(savedInject.getInjectorContract().orElseThrow().getId());
+    input.setUserIds(List.of(savedInject.getId()));
+
+    // -- EXECUTE --
+    mvc.perform(multipart(EXERCISE_URI + "/" + EXERCISE.getId() + "/inject")
+            .content(asJsonString(input))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is2xxSuccessful());
+
+    // -- ASSERT --
+    verify(executor).execute(injection);
+
+    //-- THEN ---
+    injectRepository.delete(savedInject);
   }
 
   // -- BULK DELETE --
