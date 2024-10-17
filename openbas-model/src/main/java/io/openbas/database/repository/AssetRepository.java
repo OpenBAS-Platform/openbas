@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface AssetRepository extends CrudRepository<Asset, String>, JpaSpecificationExecutor<Asset> {
@@ -31,6 +32,6 @@ public interface AssetRepository extends CrudRepository<Asset, String>, JpaSpeci
       "FROM assets a " +
       "LEFT JOIN injects_assets ia ON a.asset_id = ia.asset_id " +
       "WHERE a.asset_id IN (:assetIds) OR ia.inject_id IN (:injectIds) ;", nativeQuery = true)
-  List<RawAsset> rawByIdsOrInjectIds(@Param("assetIds") List<String> assetIds, @Param("injectIds") List<String> injectIds);
+  List<RawAsset> rawByIdsOrInjectIds(@Param("assetIds") Set<String> assetIds, @Param("injectIds") Set<String> injectIds);
 }
 

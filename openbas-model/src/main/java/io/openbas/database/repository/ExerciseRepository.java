@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface ExerciseRepository extends CrudRepository<Exercise, String>,
@@ -236,7 +237,7 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
           + "FROM exercises ex "
           + "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id "
           + "WHERE ex.exercise_id = :exerciseId AND ie.inject_id IS NOT NULL;", nativeQuery = true)
-  List<String> findInjectsByExercise(@Param("exerciseId") String exerciseId);
+  Set<String> findInjectsByExercise(@Param("exerciseId") String exerciseId);
 
   @Query(value =
       " SELECT ex.exercise_id, "
@@ -255,6 +256,6 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
           + "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id "
           + "WHERE s.scenario_id IN (:scenarioIds) "
           + "GROUP BY ex.exercise_id ;", nativeQuery = true)
-  List<RawExerciseSimple> rawAllByScenarioId(@Param("scenarioIds") List<String> scenarioIds);
+  Set<RawExerciseSimple> rawAllByScenarioId(@Param("scenarioIds") List<String> scenarioIds);
 
 }
