@@ -18,6 +18,7 @@ public class RawPaginationDocument {
   List<String> document_scenarios;
   String document_type;
   List<String> document_tags;
+  boolean document_can_be_deleted = true;
 
   public RawPaginationDocument(final Document document) {
     this.document_id = document.getId();

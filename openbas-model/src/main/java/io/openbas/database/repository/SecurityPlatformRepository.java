@@ -1,5 +1,6 @@
 package io.openbas.database.repository;
 
+import io.openbas.database.model.Document;
 import io.openbas.database.model.SecurityPlatform;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -8,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -29,4 +31,9 @@ public interface SecurityPlatformRepository extends CrudRepository<SecurityPlatf
   @Override
   @Query("select count(distinct s) from SecurityPlatform s where s.createdAt < :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
+
+  @Query("select distinct s.logoDark from SecurityPlatform s " +
+          "union " +
+          "select distinct s.logoLight from SecurityPlatform s ")
+  List<Document> securityPlatformLogo();
 }
