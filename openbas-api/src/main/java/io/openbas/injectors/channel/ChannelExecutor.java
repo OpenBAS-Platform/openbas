@@ -95,7 +95,7 @@ public class ChannelExecutor extends Injector {
           boolean encrypted = content.isEncrypted();
           users.forEach(userInjectContext -> {
             try {
-              // Put the challenges variables in the injection context
+              // Put the articles variables in the injection context
               List<ArticleVariable> articleVariables = articles.stream()
                   .map(article -> new ArticleVariable(article.getId(), article.getName(),
                       buildArticleUri(userInjectContext, article)))
