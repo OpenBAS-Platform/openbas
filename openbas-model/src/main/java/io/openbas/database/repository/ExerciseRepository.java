@@ -6,18 +6,20 @@ import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.raw.RawGlobalInjectExpectation;
 import io.openbas.database.raw.RawInjectExpectation;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ExerciseRepository extends CrudRepository<Exercise, String>,
+public interface ExerciseRepository extends JpaRepository<Exercise, String>,
     StatisticRepository,
     JpaSpecificationExecutor<Exercise> {
 
@@ -256,5 +258,16 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
           + "WHERE s.scenario_id IN (:scenarioIds) "
           + "GROUP BY ex.exercise_id ;", nativeQuery = true)
   List<RawExerciseSimple> rawAllByScenarioId(@Param("scenarioIds") List<String> scenarioIds);
+
+
+  // -- TEAM --
+
+  @Modifying
+  @Query(
+      value = "DELETE FROM exercises_teams et WHERE et.exercise_id = :exerciseId AND et.team_id in :teamIds",
+      nativeQuery = true
+  )
+  @Transactional
+  void removeTeams(@Param("exerciseId") final String exerciseId, @Param("teamIds") final List<String> teamIds);
 
 }
