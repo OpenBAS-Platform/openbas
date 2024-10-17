@@ -27,7 +27,7 @@ public class GrantService {
     List<Group> groups = fromIterable(this.groupRepository.findAll());
     List<Grant> grants = groups.stream()
         .filter(group -> !group.getExercisesDefaultGrants().isEmpty())
-        .flatMap(group -> group.getExercisesDefaultGrants().stream().map(s -> Tuples.of(group, s))).map(tuple -> {
+        .flatMap(group -> group.getExercisesDefaultGrants().stream().distinct().map(s -> Tuples.of(group, s))).map(tuple -> {
           Grant grant = new Grant();
           grant.setGroup(tuple.getT1());
           grant.setName(tuple.getT2());
@@ -45,7 +45,7 @@ public class GrantService {
     List<Group> groups = fromIterable(this.groupRepository.findAll());
     List<Grant> grants = groups.stream()
         .filter(group -> !group.getScenariosDefaultGrants().isEmpty())
-        .flatMap(group -> group.getScenariosDefaultGrants().stream().map(s -> Tuples.of(group, s))).map(tuple -> {
+        .flatMap(group -> group.getScenariosDefaultGrants().stream().distinct().map(s -> Tuples.of(group, s))).map(tuple -> {
           Grant grant = new Grant();
           grant.setGroup(tuple.getT1());
           grant.setName(tuple.getT2());
