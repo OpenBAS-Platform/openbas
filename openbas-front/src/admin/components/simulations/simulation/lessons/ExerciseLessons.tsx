@@ -22,7 +22,6 @@ import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-
 import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
 import type { UserHelper } from '../../../../../actions/helper';
 import { fetchLessonsTemplates } from '../../../../../actions/Lessons';
-import { fetchPlayers } from '../../../../../actions/User';
 import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import { fetchExerciseTeams, updateExerciseLessons } from '../../../../../actions/Exercise';
 import Lessons from '../../../lessons/exercises/Lessons';
@@ -36,6 +35,7 @@ import {
   fetchLessonsAnswers,
   fetchLessonsCategories,
   fetchLessonsQuestions,
+  fetchPlayersByExercise,
   resetLessonsAnswers,
   sendLessons,
   updateLessonsCategory,
@@ -46,7 +46,6 @@ import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import { usePermissions } from '../../../../../utils/Exercise';
 import { addExerciseObjective, deleteExerciseObjective, fetchExerciseObjectives, updateExerciseObjective } from '../../../../../actions/Objective';
 import { addExerciseEvaluation, fetchExerciseEvaluations, updateExerciseEvaluation } from '../../../../../actions/Evaluation';
-import { fetchTeams } from '../../../../../actions/teams/team-actions';
 
 const ExerciseLessons = () => {
   const dispatch = useAppDispatch();
@@ -99,8 +98,7 @@ const ExerciseLessons = () => {
   });
   useDataLoader(() => {
     dispatch(fetchLessonsTemplates());
-    dispatch(fetchPlayers());
-    dispatch(fetchTeams());
+    dispatch(fetchPlayersByExercise(exerciseId));
     dispatch(fetchLessonsCategories(exerciseId));
     dispatch(fetchLessonsQuestions(exerciseId));
     dispatch(fetchLessonsAnswers(exerciseId));

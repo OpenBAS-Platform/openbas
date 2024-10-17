@@ -1,4 +1,4 @@
-package io.openbas.rest;
+package io.openbas.rest.exercise;
 
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Exercise;

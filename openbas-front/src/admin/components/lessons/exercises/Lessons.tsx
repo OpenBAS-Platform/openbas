@@ -20,7 +20,6 @@ import {
   FormControl,
   FormControlLabel,
   Grid,
-  LinearProgress,
   Link,
   Paper,
   Radio,
@@ -40,8 +39,8 @@ import { useFormatter } from '../../../../components/i18n';
 import type { Inject, LessonsAnswer, LessonsCategory, LessonsQuestion, LessonsSendInput, LessonsTemplate, Objective, Team, User } from '../../../../utils/api-types';
 import Transition from '../../../../components/common/Transition';
 import CreateLessonsTemplate from '../../components/lessons/CreateLessonsTemplate';
-import { resolveUserName } from '../../../../utils/String';
 import { LessonContext } from '../../common/Context';
+import AnswersByQuestionDialog from './AnswersByQuestionDialog';
 
 const useStyles = makeStyles((theme: Theme) => ({
   metric: {
@@ -528,76 +527,14 @@ const Lessons: React.FC<Props> = ({
           />
         </DialogContent>
       </Dialog>
-      <Dialog
-        open={selectedQuestion !== null}
-        TransitionComponent={Transition}
+      <AnswersByQuestionDialog
+        open={!!selectedQuestion}
         onClose={() => setSelectedQuestion(null)}
-        PaperProps={{ elevation: 1 }}
-        maxWidth="lg"
-        fullWidth
-      >
-        <DialogTitle>{selectedQuestion?.lessons_question_content}</DialogTitle>
-        <DialogContent style={{ paddingTop: 20 }}>
-          {selectedQuestionAnswers.map((answer: LessonsAnswer) => {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            const getUserName = answer.lessons_answer_user ? resolveUserName(usersMap[answer.lessons_answer_user]) : '-';
-            return (
-              <div
-                key={answer.lessonsanswer_id}
-                style={{
-                  marginBottom: 70,
-                  borderBottom: `1px solid ${theme.palette.background.paper}`,
-                  paddingBottom: 10,
-                }}
-              >
-                <Grid container spacing={3}>
-                  <Grid item xs={3} style={{ marginTop: -10 }}>
-                    <Typography variant="h4">{t('User')}</Typography>
-                    {source.lessons_anonymized
-                      ? t('Anonymized')
-                      : getUserName
-                                        }
-                  </Grid>
-                  <Grid item xs={3} style={{ marginTop: -10 }}>
-                    <Typography variant="h4" style={{ marginBottom: 20 }}>
-                      {t('Score')}
-                    </Typography>
-                    <div style={{ width: '80%', display: 'flex', alignItems: 'center' }}>
-                      <LinearProgress
-                        variant="determinate"
-                        value={answer.lessons_answer_score}
-                        style={{
-                          flex: 1,
-                          marginRight: 8,
-                        }}
-                      />
-                      <Typography variant="body2" color="text.secondary">
-                        {answer.lessons_answer_score}%
-                      </Typography>
-                    </div>
-                  </Grid>
-                  <Grid item xs={3} style={{ marginTop: -10 }}>
-                    <Typography variant="h4">{t('What worked well')}</Typography>
-                    {answer.lessons_answer_positive}
-                  </Grid>
-                  <Grid item xs={3} style={{ marginTop: -10 }}>
-                    <Typography variant="h4">
-                      {t('What didn\'t work well')}
-                    </Typography>
-                    {answer.lessons_answer_negative}
-                  </Grid>
-                </Grid>
-              </div>
-            );
-          })}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setSelectedQuestion(null)}>
-            {t('Close')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        question={selectedQuestion?.lessons_question_content || ''}
+        answers={selectedQuestionAnswers}
+        anonymized={source.lessons_anonymized}
+        usersMap={usersMap}
+      />
       <Dialog
         open={openAnonymize}
         TransitionComponent={Transition}

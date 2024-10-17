@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,6 +36,7 @@ public class LessonsAnswer implements Base {
     @JoinColumn(name = "lessons_answer_question")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("lessons_answer_question")
+    @Schema(type = "string")
     @NotNull
     private LessonsQuestion question;
 
@@ -42,6 +44,7 @@ public class LessonsAnswer implements Base {
     @JoinColumn(name = "lessons_answer_user")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("lessons_answer_user")
+    @Schema(type = "string")
     private User user;
 
     @Column(name = "lessons_answer_created_at")

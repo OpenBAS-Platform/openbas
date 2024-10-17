@@ -1,4 +1,4 @@
-package io.openbas.database.model;
+package io.openbas.rest.report.model;
 
 import java.io.Serial;
 import java.io.Serializable;

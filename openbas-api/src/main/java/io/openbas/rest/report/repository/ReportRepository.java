@@ -1,7 +1,7 @@
-package io.openbas.database.repository;
+package io.openbas.rest.report.repository;
 
-import io.openbas.database.model.Report;
-import io.openbas.database.model.ReportInjectComment;
+import io.openbas.rest.report.model.Report;
+import io.openbas.rest.report.model.ReportInjectComment;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
