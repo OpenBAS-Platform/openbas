@@ -156,7 +156,7 @@ input[type="file"] {
   border: 1px solid #b5b7ba;
 }
 
-.react-flow__pane.draggable:not(.react-flow__pane.draggable.dragging, :has(.react-flow__connection)) {
+.chainedTimeline .react-flow__pane.draggable:not(.react-flow__pane.draggable.dragging, :has(.react-flow__connection)) {
   cursor: none !important;
 }
 
