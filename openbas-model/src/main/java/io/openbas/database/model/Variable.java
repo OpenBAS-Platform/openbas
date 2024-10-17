@@ -1,19 +1,18 @@
 package io.openbas.database.model;
 
+import static java.time.Instant.now;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
-import lombok.Data;
-import org.hibernate.annotations.UuidGenerator;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.time.Instant;
-
-import static java.time.Instant.now;
+import lombok.Data;
+import org.hibernate.annotations.UuidGenerator;
 
 @Data
 @Entity
@@ -40,7 +39,7 @@ public class Variable implements Base {
   @Column(name = "variable_key")
   @JsonProperty("variable_key")
   @NotBlank
-  @Pattern(regexp="^[a-z_]+$")
+  @Pattern(regexp = "^[a-z_]+$")
   private String key;
 
   @Column(name = "variable_value")
@@ -80,5 +79,4 @@ public class Variable implements Base {
   @JsonProperty("variable_updated_at")
   @NotNull
   private Instant updatedAt = now();
-
 }

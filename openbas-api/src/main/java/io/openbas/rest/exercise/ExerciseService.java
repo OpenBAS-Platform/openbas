@@ -1,5 +1,14 @@
 package io.openbas.rest.exercise;
 
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.criteria.GenericCriteria.countQuery;
+import static io.openbas.utils.Constants.ARTICLES;
+import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
+import static io.openbas.utils.StringUtils.duplicateString;
+import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
+import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
@@ -25,6 +34,9 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,26 +47,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.utils.Constants.ARTICLES;
-import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
-import static io.openbas.utils.StringUtils.duplicateString;
-import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
-import static java.time.Instant.now;
-import static java.util.Optional.ofNullable;
-
 @RequiredArgsConstructor
 @Validated
 @Service
 public class ExerciseService {
 
-  @PersistenceContext
-  private EntityManager entityManager;
+  @PersistenceContext private EntityManager entityManager;
 
   private final GrantService grantService;
   private final InjectDuplicateService injectDuplicateService;
@@ -75,22 +73,26 @@ public class ExerciseService {
   @Value("${openbas.mail.imap.username}")
   private String imapUsername;
 
-  @Resource
-  private OpenBASConfig openBASConfig;
+  @Resource private OpenBASConfig openBASConfig;
+
   // endregion
 
-  public List<ExerciseSimple> exercises(){
+  public List<ExerciseSimple> exercises() {
     // We get the exercises depending on whether or not we are granted
-    List<RawExerciseSimple> exercises = currentUser().isAdmin() ? exerciseRepository.rawAll()
-        : exerciseRepository.rawAllGranted(currentUser().getId());
+    List<RawExerciseSimple> exercises =
+        currentUser().isAdmin()
+            ? exerciseRepository.rawAll()
+            : exerciseRepository.rawAllGranted(currentUser().getId());
 
-    return exercises.stream().map(exercise->exerciseMapper.fromRawExerciseSimple(exercise)).collect(Collectors.toList());
+    return exercises.stream()
+        .map(exercise -> exerciseMapper.fromRawExerciseSimple(exercise))
+        .collect(Collectors.toList());
   }
 
   public Page<ExerciseSimple> exercises(
-        Specification<Exercise> specification,
-        Specification<Exercise> specificationCount,
-        Pageable pageable) {
+      Specification<Exercise> specification,
+      Specification<Exercise> specificationCount,
+      Pageable pageable) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
@@ -120,9 +122,11 @@ public class ExerciseService {
     List<ExerciseSimple> exercises = execution(query);
 
     for (ExerciseSimple exercise : exercises) {
-     if (exercise.getInjectIds() != null) {
-        exercise.setExpectationResultByTypes(resultUtils.getResultsByTypes(List.of(exercise.getInjectIds())));
-        exercise.setTargets(resultUtils.getInjectTargetWithResults(List.of(exercise.getInjectIds())));
+      if (exercise.getInjectIds() != null) {
+        exercise.setExpectationResultByTypes(
+            resultUtils.getResultsByTypes(List.of(exercise.getInjectIds())));
+        exercise.setTargets(
+            resultUtils.getInjectTargetWithResults(List.of(exercise.getInjectIds())));
       }
     }
 
@@ -141,49 +145,47 @@ public class ExerciseService {
 
     // SELECT
     cq.multiselect(
-        exerciseRoot.get("id").alias("exercise_id"),
-        exerciseRoot.get("name").alias("exercise_name"),
-        exerciseRoot.get("status").alias("exercise_status"),
-        exerciseRoot.get("subtitle").alias("exercise_subtitle"),
-        exerciseRoot.get("category").alias("exercise_category"),
-        exerciseRoot.get("start").alias("exercise_start_date"),
-        exerciseRoot.get("updatedAt").alias("exercise_updated_at"),
-        tagIdsExpression.alias("exercise_tags"),
-        injectIdsExpression.alias("exercise_injects")
-    ).distinct(true);
+            exerciseRoot.get("id").alias("exercise_id"),
+            exerciseRoot.get("name").alias("exercise_name"),
+            exerciseRoot.get("status").alias("exercise_status"),
+            exerciseRoot.get("subtitle").alias("exercise_subtitle"),
+            exerciseRoot.get("category").alias("exercise_category"),
+            exerciseRoot.get("start").alias("exercise_start_date"),
+            exerciseRoot.get("updatedAt").alias("exercise_updated_at"),
+            tagIdsExpression.alias("exercise_tags"),
+            injectIdsExpression.alias("exercise_injects"))
+        .distinct(true);
 
     // GROUP BY
-    cq.groupBy(Collections.singletonList(
-        exerciseRoot.get("id")
-    ));
+    cq.groupBy(Collections.singletonList(exerciseRoot.get("id")));
   }
 
   // -- EXECUTION --
 
   private List<ExerciseSimple> execution(TypedQuery<Tuple> query) {
-    return query.getResultList()
-        .stream()
-        .map(tuple -> {
-          ExerciseSimple exerciseSimple = new ExerciseSimple();
-          exerciseSimple.setId(tuple.get("exercise_id", String.class));
-          exerciseSimple.setName(tuple.get("exercise_name", String.class));
-          exerciseSimple.setStatus(tuple.get("exercise_status", ExerciseStatus.class));
-          exerciseSimple.setSubtitle(tuple.get("exercise_subtitle", String.class));
-          exerciseSimple.setCategory(tuple.get("exercise_category", String.class));
-          exerciseSimple.setStart(tuple.get("exercise_start_date", Instant.class));
-          exerciseSimple.setUpdatedAt(tuple.get("exercise_updated_at", Instant.class));
-          exerciseSimple.setTags(
-              Arrays.stream(tuple.get("exercise_tags", String[].class))
-                  .map(t -> {
-                    Tag tag = new Tag();
-                    tag.setId(t);
-                    return tag;
-                  })
-                  .collect(Collectors.toSet())
-          );
-          exerciseSimple.setInjectIds(tuple.get("exercise_injects", String[].class));
-          return exerciseSimple;
-        })
+    return query.getResultList().stream()
+        .map(
+            tuple -> {
+              ExerciseSimple exerciseSimple = new ExerciseSimple();
+              exerciseSimple.setId(tuple.get("exercise_id", String.class));
+              exerciseSimple.setName(tuple.get("exercise_name", String.class));
+              exerciseSimple.setStatus(tuple.get("exercise_status", ExerciseStatus.class));
+              exerciseSimple.setSubtitle(tuple.get("exercise_subtitle", String.class));
+              exerciseSimple.setCategory(tuple.get("exercise_category", String.class));
+              exerciseSimple.setStart(tuple.get("exercise_start_date", Instant.class));
+              exerciseSimple.setUpdatedAt(tuple.get("exercise_updated_at", Instant.class));
+              exerciseSimple.setTags(
+                  Arrays.stream(tuple.get("exercise_tags", String[].class))
+                      .map(
+                          t -> {
+                            Tag tag = new Tag();
+                            tag.setId(t);
+                            return tag;
+                          })
+                      .collect(Collectors.toSet()));
+              exerciseSimple.setInjectIds(tuple.get("exercise_injects", String[].class));
+              return exerciseSimple;
+            })
         .toList();
   }
 
@@ -205,7 +207,8 @@ public class ExerciseService {
   // -- READ --
 
   public Exercise exercise(@NotBlank final String exerciseId) {
-    return this.exerciseRepository.findById(exerciseId)
+    return this.exerciseRepository
+        .findById(exerciseId)
         .orElseThrow(() -> new ElementNotFoundException("Exercise not found"));
   }
 
@@ -255,59 +258,76 @@ public class ExerciseService {
     return exerciseDuplicate;
   }
 
-  private void getListOfExerciseTeams(@NotNull Exercise exercise, @NotNull Exercise exerciseOrigin) {
+  private void getListOfExerciseTeams(
+      @NotNull Exercise exercise, @NotNull Exercise exerciseOrigin) {
     Map<String, Team> contextualTeams = new HashMap<>();
     List<Team> exerciseTeams = new ArrayList<>();
-    exerciseOrigin.getTeams().forEach(scenarioTeam -> {
-      if (scenarioTeam.getContextual()) {
-        Team team = teamService.copyContextualTeam(scenarioTeam);
-        Team teamSaved = this.teamRepository.save(team);
-        exerciseTeams.add(teamSaved);
-        contextualTeams.put(scenarioTeam.getId(), teamSaved);
-      } else {
-        exerciseTeams.add(scenarioTeam);
-      }
-    });
+    exerciseOrigin
+        .getTeams()
+        .forEach(
+            scenarioTeam -> {
+              if (scenarioTeam.getContextual()) {
+                Team team = teamService.copyContextualTeam(scenarioTeam);
+                Team teamSaved = this.teamRepository.save(team);
+                exerciseTeams.add(teamSaved);
+                contextualTeams.put(scenarioTeam.getId(), teamSaved);
+              } else {
+                exerciseTeams.add(scenarioTeam);
+              }
+            });
     exercise.setTeams(new ArrayList<>(exerciseTeams));
 
-    exercise.getInjects().forEach(inject -> {
-      List<Team> teams = new ArrayList<>();
-      inject.getTeams().forEach(team -> {
-        if (team.getContextual()) {
-          teams.add(contextualTeams.get(team.getId()));
-        } else {
-          teams.add(team);
-        }
-      });
-      inject.setTeams(teams);
-    });
+    exercise
+        .getInjects()
+        .forEach(
+            inject -> {
+              List<Team> teams = new ArrayList<>();
+              inject
+                  .getTeams()
+                  .forEach(
+                      team -> {
+                        if (team.getContextual()) {
+                          teams.add(contextualTeams.get(team.getId()));
+                        } else {
+                          teams.add(team);
+                        }
+                      });
+              inject.setTeams(teams);
+            });
   }
 
   private void getListOfDuplicatedInjects(Exercise exercise, Exercise exerciseOrigin) {
-    List<Inject> injectListForExercise = exerciseOrigin.getInjects()
-        .stream().map(inject -> injectDuplicateService.createInjectForExercise(exercise.getId(), inject.getId(), false))
-        .toList();
+    List<Inject> injectListForExercise =
+        exerciseOrigin.getInjects().stream()
+            .map(
+                inject ->
+                    injectDuplicateService.createInjectForExercise(
+                        exercise.getId(), inject.getId(), false))
+            .toList();
     exercise.setInjects(new ArrayList<>(injectListForExercise));
   }
 
   private void getListOfArticles(Exercise exercise, Exercise exerciseOrigin) {
     List<Article> articleList = new ArrayList<>();
     Map<String, String> mapIdArticleOriginNew = new HashMap<>();
-    exerciseOrigin.getArticles().forEach(article -> {
-      Article exerciceArticle = new Article();
-      exerciceArticle.setName(article.getName());
-      exerciceArticle.setContent(article.getContent());
-      exerciceArticle.setAuthor(article.getAuthor());
-      exerciceArticle.setShares(article.getShares());
-      exerciceArticle.setLikes(article.getLikes());
-      exerciceArticle.setComments(article.getComments());
-      exerciceArticle.setChannel(article.getChannel());
-      exerciceArticle.setDocuments(new ArrayList<>(article.getDocuments()));
-      exerciceArticle.setExercise(exercise);
-      Article save = articleRepository.save(exerciceArticle);
-      articleList.add(save);
-      mapIdArticleOriginNew.put(article.getId(), save.getId());
-    });
+    exerciseOrigin
+        .getArticles()
+        .forEach(
+            article -> {
+              Article exerciceArticle = new Article();
+              exerciceArticle.setName(article.getName());
+              exerciceArticle.setContent(article.getContent());
+              exerciceArticle.setAuthor(article.getAuthor());
+              exerciceArticle.setShares(article.getShares());
+              exerciceArticle.setLikes(article.getLikes());
+              exerciceArticle.setComments(article.getComments());
+              exerciceArticle.setChannel(article.getChannel());
+              exerciceArticle.setDocuments(new ArrayList<>(article.getDocuments()));
+              exerciceArticle.setExercise(exercise);
+              Article save = articleRepository.save(exerciceArticle);
+              articleList.add(save);
+              mapIdArticleOriginNew.put(article.getId(), save.getId());
+            });
     exercise.setArticles(articleList);
     for (Inject inject : exercise.getInjects()) {
       if (ofNullable(inject.getContent()).map(c -> c.has(ARTICLES)).orElse(Boolean.FALSE)) {
@@ -329,15 +349,19 @@ public class ExerciseService {
 
   private void getListOfVariables(Exercise exercise, Exercise exerciseOrigin) {
     List<Variable> variables = variableService.variablesFromExercise(exerciseOrigin.getId());
-    List<Variable> variableList = variables.stream().map(variable -> {
-      Variable variable1 = new Variable();
-      variable1.setKey(variable.getKey());
-      variable1.setDescription(variable.getDescription());
-      variable1.setValue(variable.getValue());
-      variable1.setType(variable.getType());
-      variable1.setExercise(exercise);
-      return variable1;
-    }).toList();
+    List<Variable> variableList =
+        variables.stream()
+            .map(
+                variable -> {
+                  Variable variable1 = new Variable();
+                  variable1.setKey(variable.getKey());
+                  variable1.setDescription(variable.getDescription());
+                  variable1.setValue(variable.getValue());
+                  variable1.setType(variable.getType());
+                  variable1.setExercise(exercise);
+                  return variable1;
+                })
+            .toList();
     variableService.createVariables(variableList);
   }
 
@@ -403,11 +427,13 @@ public class ExerciseService {
 
   // -- ScenarioExercise--
   public Iterable<ExerciseSimple> scenarioExercises(@NotBlank String scenarioId) {
-    return exerciseRepository.rawAllByScenarioId(List.of(scenarioId))
-        .stream().map(rawExerciseSimple -> exerciseMapper.fromRawExerciseSimple(rawExerciseSimple)).toList();
+    return exerciseRepository.rawAllByScenarioId(List.of(scenarioId)).stream()
+        .map(rawExerciseSimple -> exerciseMapper.fromRawExerciseSimple(rawExerciseSimple))
+        .toList();
   }
 
-  public List<AtomicTestingMapper.ExpectationResultsByType> getGlobalResults(@NotBlank String exerciseId) {
+  public List<AtomicTestingMapper.ExpectationResultsByType> getGlobalResults(
+      @NotBlank String exerciseId) {
     return resultUtils.getResultsByTypes(exerciseRepository.findInjectsByExercise(exerciseId));
   }
 }

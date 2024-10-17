@@ -1,22 +1,23 @@
 package io.openbas.migration;
 
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
-import java.sql.Statement;
-
 @Component
 public class V2_18__Exercise_workflow extends BaseJavaMigration {
 
-    @Override
-    public void migrate(Context context) throws Exception {
-        Statement select = context.getConnection().createStatement();
-        // Exercise
-        select.execute("ALTER TABLE exercises ADD exercise_status varchar(255) not null default 'SCHEDULED';");
-        select.execute("ALTER TABLE exercises ADD exercise_pause_date timestamp;");
-        // Add pauses
-        select.execute("""
+  @Override
+  public void migrate(Context context) throws Exception {
+    Statement select = context.getConnection().createStatement();
+    // Exercise
+    select.execute(
+        "ALTER TABLE exercises ADD exercise_status varchar(255) not null default 'SCHEDULED';");
+    select.execute("ALTER TABLE exercises ADD exercise_pause_date timestamp;");
+    // Add pauses
+    select.execute(
+        """
                             create table pauses
                             (
                                 pause_id varchar(255) not null constraint pauses_pkey primary key,
@@ -27,5 +28,5 @@ public class V2_18__Exercise_workflow extends BaseJavaMigration {
                             );
                             create index idx_pauses on pauses (pause_id);
                 """);
-    }
+  }
 }

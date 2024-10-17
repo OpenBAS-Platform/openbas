@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V2_82__Collectors extends BaseJavaMigration {
@@ -15,7 +14,8 @@ public class V2_82__Collectors extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     // Create table
-    select.execute("""
+    select.execute(
+        """
           CREATE TABLE collectors (
             collector_id varchar(255) not null constraint collector_pkey primary key,
             collector_created_at timestamp not null default now(),

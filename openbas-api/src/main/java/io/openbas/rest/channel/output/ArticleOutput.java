@@ -1,5 +1,7 @@
 package io.openbas.rest.channel.output;
 
+import static java.util.Optional.ofNullable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Article;
 import io.openbas.database.model.Document;
@@ -7,13 +9,10 @@ import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Scenario;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.util.Optional.ofNullable;
+import lombok.Data;
 
 @Data
 public class ArticleOutput {
@@ -53,8 +52,7 @@ public class ArticleOutput {
   @JsonProperty("article_documents")
   private List<String> documents = new ArrayList<>();
 
-  @Transient
-  private Instant virtualPublication;
+  @Transient private Instant virtualPublication;
 
   @JsonProperty("article_virtual_publication")
   public Instant getVirtualPublication() {
@@ -82,5 +80,4 @@ public class ArticleOutput {
     articleOutput.setVirtualPublication(article.getVirtualPublication());
     return articleOutput;
   }
-
 }

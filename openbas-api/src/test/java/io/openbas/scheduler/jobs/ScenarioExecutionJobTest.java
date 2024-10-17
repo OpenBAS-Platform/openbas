@@ -1,38 +1,33 @@
 package io.openbas.scheduler.jobs;
 
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.fixtures.ScenarioFixture;
-import org.junit.jupiter.api.*;
-import org.quartz.JobExecutionException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.utils.fixtures.ScenarioFixture.getScenario;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.*;
+import org.quartz.JobExecutionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ScenarioExecutionJobTest {
 
-  @Autowired
-  private ScenarioExecutionJob job;
+  @Autowired private ScenarioExecutionJob job;
 
-  @Autowired
-  private ScenarioService scenarioService;
-  @Autowired
-  private ExerciseRepository exerciseRepository;
+  @Autowired private ScenarioService scenarioService;
+  @Autowired private ExerciseRepository exerciseRepository;
 
   static String SCENARIO_ID_1;
   static String SCENARIO_ID_2;
@@ -56,7 +51,8 @@ class ScenarioExecutionJobTest {
     int hourToStart = (zonedDateTime.getHour() + 1) % 24;
 
     Scenario scenario = ScenarioFixture.getScenario();
-    scenario.setRecurrence("0 " + zonedDateTime.getMinute() + " " + hourToStart + " * * *"); // Every day now + 1 hour
+    scenario.setRecurrence(
+        "0 " + zonedDateTime.getMinute() + " " + hourToStart + " * * *"); // Every day now + 1 hour
     Scenario scenarioSaved = this.scenarioService.createScenario(scenario);
     SCENARIO_ID_1 = scenarioSaved.getId();
 
@@ -64,12 +60,11 @@ class ScenarioExecutionJobTest {
     this.job.execute(null);
 
     // -- ASSERT --
-    List<Exercise> createdExercises = fromIterable(
-        this.exerciseRepository.findAll())
-        .stream()
-        .filter(exercise -> exercise.getScenario() != null)
-        .filter(exercise -> SCENARIO_ID_1.equals(exercise.getScenario().getId()))
-        .toList();
+    List<Exercise> createdExercises =
+        fromIterable(this.exerciseRepository.findAll()).stream()
+            .filter(exercise -> exercise.getScenario() != null)
+            .filter(exercise -> SCENARIO_ID_1.equals(exercise.getScenario().getId()))
+            .toList();
     assertEquals(0, createdExercises.size());
   }
 
@@ -82,7 +77,12 @@ class ScenarioExecutionJobTest {
 
     Scenario scenario = ScenarioFixture.getScenario();
     int minuteToStart = (zonedDateTime.getMinute() + 1) % 60;
-    scenario.setRecurrence("0 " + minuteToStart + " " + zonedDateTime.getHour() + " * * *"); // Every day now + 1 minute
+    scenario.setRecurrence(
+        "0 "
+            + minuteToStart
+            + " "
+            + zonedDateTime.getHour()
+            + " * * *"); // Every day now + 1 minute
     Scenario scenarioSaved = this.scenarioService.createScenario(scenario);
     SCENARIO_ID_2 = scenarioSaved.getId();
 
@@ -90,11 +90,11 @@ class ScenarioExecutionJobTest {
     this.job.execute(null);
 
     // -- ASSERT --
-    List<Exercise> createdExercises = fromIterable(this.exerciseRepository.findAll())
-        .stream()
-        .filter(exercise -> exercise.getScenario() != null)
-        .filter(exercise -> SCENARIO_ID_2.equals(exercise.getScenario().getId()))
-        .toList();
+    List<Exercise> createdExercises =
+        fromIterable(this.exerciseRepository.findAll()).stream()
+            .filter(exercise -> exercise.getScenario() != null)
+            .filter(exercise -> SCENARIO_ID_2.equals(exercise.getScenario().getId()))
+            .toList();
     assertEquals(1, createdExercises.size());
     Exercise createdExercise = createdExercises.getFirst();
     assertNotNull(createdExercise.getStart());
@@ -110,25 +110,30 @@ class ScenarioExecutionJobTest {
     this.job.execute(null);
 
     // -- ASSERT --
-    List<Exercise> createdExercises = fromIterable(
-        this.exerciseRepository.findAll())
-        .stream()
-        .filter(exercise -> exercise.getScenario() != null)
-        .filter(exercise -> SCENARIO_ID_2.equals(exercise.getScenario().getId()))
-        .toList();
+    List<Exercise> createdExercises =
+        fromIterable(this.exerciseRepository.findAll()).stream()
+            .filter(exercise -> exercise.getScenario() != null)
+            .filter(exercise -> SCENARIO_ID_2.equals(exercise.getScenario().getId()))
+            .toList();
     assertEquals(1, createdExercises.size());
   }
 
   @DisplayName("Not create simulation based on end date before now")
   @Test
   @Order(4)
-  void given_end_date_before_now_should_not_create_second_simulation() throws JobExecutionException {
+  void given_end_date_before_now_should_not_create_second_simulation()
+      throws JobExecutionException {
     // -- PREPARE --
     ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"));
 
     Scenario scenario = ScenarioFixture.getScenario();
     int minuteToStart = (zonedDateTime.getMinute() + 1) % 60;
-    scenario.setRecurrence("0 " + minuteToStart + " " + zonedDateTime.getHour() + " * * *"); // Every day now + 1 minute
+    scenario.setRecurrence(
+        "0 "
+            + minuteToStart
+            + " "
+            + zonedDateTime.getHour()
+            + " * * *"); // Every day now + 1 minute
     scenario.setRecurrenceEnd(Instant.now().minus(0, ChronoUnit.DAYS));
     Scenario scenarioSaved = this.scenarioService.createScenario(scenario);
     SCENARIO_ID_3 = scenarioSaved.getId();
@@ -137,12 +142,11 @@ class ScenarioExecutionJobTest {
     this.job.execute(null);
 
     // -- ASSERT --
-    List<Exercise> createdExercises = fromIterable(
-        this.exerciseRepository.findAll())
-        .stream()
-        .filter(exercise -> exercise.getScenario() != null)
-        .filter(exercise -> SCENARIO_ID_3.equals(exercise.getScenario().getId()))
-        .toList();
+    List<Exercise> createdExercises =
+        fromIterable(this.exerciseRepository.findAll()).stream()
+            .filter(exercise -> exercise.getScenario() != null)
+            .filter(exercise -> SCENARIO_ID_3.equals(exercise.getScenario().getId()))
+            .toList();
     assertEquals(0, createdExercises.size());
   }
 }

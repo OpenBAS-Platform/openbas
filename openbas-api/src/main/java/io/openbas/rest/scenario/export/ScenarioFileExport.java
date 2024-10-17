@@ -1,15 +1,14 @@
 package io.openbas.rest.scenario.export;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.*;
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import lombok.Data;
 
 @Data
 @JsonInclude(NON_NULL)
@@ -57,9 +56,8 @@ public class ScenarioFileExport {
   @JsonProperty("scenario_lessons_questions")
   private List<LessonsQuestion> lessonsQuestions = new ArrayList<>();
 
-  @JsonIgnore
-  public static final String SCENARIO_VARIABLES = "scenario_variables";
+  @JsonIgnore public static final String SCENARIO_VARIABLES = "scenario_variables";
+
   @JsonProperty(SCENARIO_VARIABLES)
   private List<Variable> variables;
-
 }

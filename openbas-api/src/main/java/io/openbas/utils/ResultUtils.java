@@ -1,5 +1,7 @@
 package io.openbas.utils;
 
+import static java.util.Collections.emptyList;
+
 import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Endpoint;
@@ -10,14 +12,11 @@ import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.Collections.emptyList;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
@@ -31,7 +30,8 @@ public class ResultUtils {
   private final AssetGroupService assetGroupService;
 
   // -- UTILS --
-  public List<AtomicTestingMapper.ExpectationResultsByType> getResultsByTypes(List<String> injectIds) {
+  public List<AtomicTestingMapper.ExpectationResultsByType> getResultsByTypes(
+      List<String> injectIds) {
     return computeGlobalExpectationResults(injectIds);
   }
 
@@ -46,22 +46,26 @@ public class ResultUtils {
   public static List<InjectExpectationResultsByAttackPattern> computeInjectExpectationResults(
       @NotNull final List<Inject> injects) {
 
-    Map<AttackPattern, List<Inject>> groupedByAttackPattern = injects.stream()
-        .flatMap(inject -> inject.getInjectorContract()
-            .map(contract -> contract.getAttackPatterns().stream()
-                .map(attackPattern -> Map.entry(attackPattern, inject)))
-            .orElseGet(Stream::empty))
-        .collect(Collectors.groupingBy(
-            Map.Entry::getKey,
-            Collectors.mapping(Map.Entry::getValue, Collectors.toList())
-        ));
+    Map<AttackPattern, List<Inject>> groupedByAttackPattern =
+        injects.stream()
+            .flatMap(
+                inject ->
+                    inject
+                        .getInjectorContract()
+                        .map(
+                            contract ->
+                                contract.getAttackPatterns().stream()
+                                    .map(attackPattern -> Map.entry(attackPattern, inject)))
+                        .orElseGet(Stream::empty))
+            .collect(
+                Collectors.groupingBy(
+                    Map.Entry::getKey,
+                    Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
 
-    return groupedByAttackPattern.entrySet()
-        .stream()
+    return groupedByAttackPattern.entrySet().stream()
         .map(entry -> new InjectExpectationResultsByAttackPattern(entry.getKey(), entry.getValue()))
         .toList();
   }
-
 
   // -- GLOBAL SCORE --
   public List<ExpectationResultsByType> computeGlobalExpectationResults(
@@ -71,67 +75,76 @@ public class ResultUtils {
   }
 
   // -- TARGETS WITH RESULTS --
-  public List<InjectTargetWithResult> computeTargetResults(
-      @NotNull List<String> injectIds) {
+  public List<InjectTargetWithResult> computeTargetResults(@NotNull List<String> injectIds) {
 
     // -- EXPECTATIONS --
-    List<RawInjectExpectation> rawInjectExpectations = injectExpectationRepository.rawByInjectId(injectIds);
-    Map<String, List<RawInjectExpectation>> expectationMap = rawInjectExpectations
-        .stream().collect(Collectors.groupingBy(RawInjectExpectation::getInject_id));
+    List<RawInjectExpectation> rawInjectExpectations =
+        injectExpectationRepository.rawByInjectId(injectIds);
+    Map<String, List<RawInjectExpectation>> expectationMap =
+        rawInjectExpectations.stream()
+            .collect(Collectors.groupingBy(RawInjectExpectation::getInject_id));
 
     // -- TEAMS INJECT --
 
-    List<String> teamIds = rawInjectExpectations
-        .stream()
-        .map(RawInjectExpectation::getTeam_id)
-        .filter(Objects::nonNull)
-        .distinct()
-        .toList();
+    List<String> teamIds =
+        rawInjectExpectations.stream()
+            .map(RawInjectExpectation::getTeam_id)
+            .filter(Objects::nonNull)
+            .distinct()
+            .toList();
 
     List<RawTeam> rawTeams = teamRepository.rawByIdsOrInjectIds(teamIds, injectIds);
-    Map<String, RawTeam> teamMap = rawTeams.stream().collect(Collectors.toMap(RawTeam::getTeam_id, rawTeam ->rawTeam));
+    Map<String, RawTeam> teamMap =
+        rawTeams.stream().collect(Collectors.toMap(RawTeam::getTeam_id, rawTeam -> rawTeam));
 
     // -- USER MAP FROM TEAMS --
 
-    List<String> userIds = rawInjectExpectations
-        .stream()
-        .map(RawInjectExpectation::getUser_id)
-        .filter(Objects::nonNull)
-        .distinct()
-        .toList();
+    List<String> userIds =
+        rawInjectExpectations.stream()
+            .map(RawInjectExpectation::getUser_id)
+            .filter(Objects::nonNull)
+            .distinct()
+            .toList();
 
     List<RawUser> rawUsers = userRepository.rawUserByIds(userIds);
-    Map<String, RawUser> userMap = rawUsers.stream().collect(Collectors.toMap(RawUser::getUser_id, rawUser ->rawUser));
+    Map<String, RawUser> userMap =
+        rawUsers.stream().collect(Collectors.toMap(RawUser::getUser_id, rawUser -> rawUser));
 
     // -- ASSETS GROUPS INJECT --
-    List<String> assetGroupIds = rawInjectExpectations
-        .stream()
-        .map(RawInjectExpectation::getAsset_group_id)
-        .filter(Objects::nonNull)
-        .distinct()
-        .toList();
+    List<String> assetGroupIds =
+        rawInjectExpectations.stream()
+            .map(RawInjectExpectation::getAsset_group_id)
+            .filter(Objects::nonNull)
+            .distinct()
+            .toList();
 
-    List<RawAssetGroup> rawAssetGroups = assetGroupRepository.rawByIdsOrInjectIds(assetGroupIds, injectIds);
-    Map<String, RawAssetGroup> assetGroupMap = rawAssetGroups.stream().collect(Collectors.toMap(RawAssetGroup::getAsset_group_id, rawAssetGroup ->rawAssetGroup));
+    List<RawAssetGroup> rawAssetGroups =
+        assetGroupRepository.rawByIdsOrInjectIds(assetGroupIds, injectIds);
+    Map<String, RawAssetGroup> assetGroupMap =
+        rawAssetGroups.stream()
+            .collect(
+                Collectors.toMap(RawAssetGroup::getAsset_group_id, rawAssetGroup -> rawAssetGroup));
 
     // -- ASSETS INJECT --
-    List<String> assetIds = rawInjectExpectations
-        .stream()
-        .map(RawInjectExpectation::getAsset_id)
-        .filter(Objects::nonNull)
-        .distinct()
-        .collect(Collectors.toList());
+    List<String> assetIds =
+        rawInjectExpectations.stream()
+            .map(RawInjectExpectation::getAsset_id)
+            .filter(Objects::nonNull)
+            .distinct()
+            .collect(Collectors.toList());
 
-    assetIds.addAll(rawAssetGroups
-        .stream()
-        .flatMap(rawAssetGroup -> rawAssetGroup.getAsset_ids().stream())
-        .distinct().toList());
+    assetIds.addAll(
+        rawAssetGroups.stream()
+            .flatMap(rawAssetGroup -> rawAssetGroup.getAsset_ids().stream())
+            .distinct()
+            .toList());
 
     List<RawAsset> rawAssets = assetRepository.rawByIdsOrInjectIds(assetIds, injectIds);
-    Map<String, RawAsset> assetMap = rawAssets.stream().collect(Collectors.toMap(RawAsset::getAsset_id, rawAsset ->rawAsset));
+    Map<String, RawAsset> assetMap =
+        rawAssets.stream().collect(Collectors.toMap(RawAsset::getAsset_id, rawAsset -> rawAsset));
 
-    Map<String, List<Endpoint>> dynamicForAssetGroupMap = assetGroupService.computeDynamicAssetFromRaw(
-        rawAssetGroups);
+    Map<String, List<Endpoint>> dynamicForAssetGroupMap =
+        assetGroupService.computeDynamicAssetFromRaw(rawAssetGroups);
 
     return injectIds.stream()
         .flatMap(
@@ -142,11 +155,10 @@ public class ResultUtils {
                   userMap,
                   assetMap,
                   assetGroupMap,
-                  dynamicForAssetGroupMap
-              ).stream();
+                  dynamicForAssetGroupMap)
+                  .stream();
             })
         .distinct()
         .toList();
   }
-
 }

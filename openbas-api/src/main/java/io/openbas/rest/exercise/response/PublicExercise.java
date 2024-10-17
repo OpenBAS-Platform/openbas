@@ -9,19 +9,18 @@ import lombok.Setter;
 @Setter
 public class PublicExercise {
 
-    @JsonProperty("exercise_id")
-    private String id;
+  @JsonProperty("exercise_id")
+  private String id;
 
-    @JsonProperty("exercise_name")
-    private String name;
+  @JsonProperty("exercise_name")
+  private String name;
 
-    @JsonProperty("exercise_description")
-    private String description;
+  @JsonProperty("exercise_description")
+  private String description;
 
-    public PublicExercise(Exercise exercise) {
-        this.id = exercise.getId();
-        this.name = exercise.getName();
-        this.description = exercise.getDescription();
-    }
-
+  public PublicExercise(Exercise exercise) {
+    this.id = exercise.getId();
+    this.name = exercise.getName();
+    this.description = exercise.getDescription();
+  }
 }

@@ -1,18 +1,14 @@
 package io.openbas.asset;
 
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static java.time.Instant.now;
+
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.EndpointRepository;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,9 +16,12 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
-
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static java.time.Instant.now;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -30,13 +29,13 @@ public class EndpointService {
 
   public static String JFROG_BASE = "https://filigran.jfrog.io/artifactory";
 
-  @Resource
-  private OpenBASConfig openBASConfig;
+  @Resource private OpenBASConfig openBASConfig;
 
   @Value("${openbas.admin.token:#{null}}")
   private String adminToken;
 
-  @Value("${info.app.version:unknown}") String version;
+  @Value("${info.app.version:unknown}")
+  String version;
 
   private final EndpointRepository endpointRepository;
 
@@ -94,13 +93,15 @@ public class EndpointService {
     this.endpointRepository.deleteById(endpointId);
   }
 
-  public String getFileOrDownloadFromJfrog(String platform, String file, String adminToken) throws IOException {
-    String extension = switch (platform.toLowerCase()) {
-      case "windows" -> "ps1";
-      case "linux", "macos" -> "sh";
-        default -> throw new UnsupportedOperationException("");
-    };
-    String filename = file +  "-" + version + "." + extension;
+  public String getFileOrDownloadFromJfrog(String platform, String file, String adminToken)
+      throws IOException {
+    String extension =
+        switch (platform.toLowerCase()) {
+          case "windows" -> "ps1";
+          case "linux", "macos" -> "sh";
+          default -> throw new UnsupportedOperationException("");
+        };
+    String filename = file + "-" + version + "." + extension;
     String resourcePath = "/openbas-agent/" + platform.toLowerCase() + "/";
     InputStream in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
     if (in == null) { // Dev mode, get from artifactory
@@ -108,10 +109,12 @@ public class EndpointService {
       in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
     }
     return IOUtils.toString(in, StandardCharsets.UTF_8)
-            .replace("${OPENBAS_URL}", openBASConfig.getBaseUrlForAgent())
-            .replace("${OPENBAS_TOKEN}", adminToken)
-            .replace("${OPENBAS_UNSECURED_CERTIFICATE}", String.valueOf(openBASConfig.isUnsecuredCertificate()))
-            .replace("${OPENBAS_WITH_PROXY}", String.valueOf(openBASConfig.isWithProxy()));
+        .replace("${OPENBAS_URL}", openBASConfig.getBaseUrlForAgent())
+        .replace("${OPENBAS_TOKEN}", adminToken)
+        .replace(
+            "${OPENBAS_UNSECURED_CERTIFICATE}",
+            String.valueOf(openBASConfig.isUnsecuredCertificate()))
+        .replace("${OPENBAS_WITH_PROXY}", String.valueOf(openBASConfig.isWithProxy()));
   }
 
   public String generateInstallCommand(String platform, String token) throws IOException {

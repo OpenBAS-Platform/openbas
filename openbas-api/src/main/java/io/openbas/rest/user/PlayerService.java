@@ -1,5 +1,13 @@
 package io.openbas.rest.user;
 
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.criteria.GenericCriteria.countQuery;
+import static io.openbas.database.specification.UserSpecification.accessibleFromOrganizations;
+import static io.openbas.rest.user.PlayerQueryHelper.execution;
+import static io.openbas.rest.user.PlayerQueryHelper.select;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
+import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
+
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Organization;
 import io.openbas.database.model.User;
@@ -12,6 +20,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.NotNull;
@@ -21,48 +30,36 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.database.specification.UserSpecification.accessibleFromOrganizations;
-import static io.openbas.rest.user.PlayerQueryHelper.execution;
-import static io.openbas.rest.user.PlayerQueryHelper.select;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
-import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
-
 @Service
 @RequiredArgsConstructor
 public class PlayerService {
 
-  @PersistenceContext
-  private EntityManager entityManager;
+  @PersistenceContext private EntityManager entityManager;
 
   private final UserRepository userRepository;
 
-  public Page<PlayerOutput> playerPagination(
-      @NotNull SearchPaginationInput searchPaginationInput) {
-    TriFunction<Specification<User>, Specification<User>, Pageable, Page<PlayerOutput>> playersFunction;
+  public Page<PlayerOutput> playerPagination(@NotNull SearchPaginationInput searchPaginationInput) {
+    TriFunction<Specification<User>, Specification<User>, Pageable, Page<PlayerOutput>>
+        playersFunction;
     OpenBASPrincipal currentUser = currentUser();
     if (currentUser.isAdmin()) {
       playersFunction = this::paginate;
     } else {
-      User local = userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
-      List<String> organizationIds = local.getGroups().stream()
-          .flatMap(group -> group.getOrganizations().stream())
-          .map(Organization::getId)
-          .toList();
-      playersFunction = (specification, specificationCount, pageable) -> this.paginate(
-          accessibleFromOrganizations(organizationIds).and(specification),
-          accessibleFromOrganizations(organizationIds).and(specificationCount),
-          pageable
-      );
+      User local =
+          userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
+      List<String> organizationIds =
+          local.getGroups().stream()
+              .flatMap(group -> group.getOrganizations().stream())
+              .map(Organization::getId)
+              .toList();
+      playersFunction =
+          (specification, specificationCount, pageable) ->
+              this.paginate(
+                  accessibleFromOrganizations(organizationIds).and(specification),
+                  accessibleFromOrganizations(organizationIds).and(specificationCount),
+                  pageable);
     }
-    return buildPaginationCriteriaBuilder(
-        playersFunction,
-        searchPaginationInput,
-        User.class
-    );
+    return buildPaginationCriteriaBuilder(playersFunction, searchPaginationInput, User.class);
   }
 
   // -- PRIVATE --
@@ -104,5 +101,4 @@ public class PlayerService {
 
     return new PageImpl<>(players, pageable, total);
   }
-
 }

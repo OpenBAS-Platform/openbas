@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V2_83__Scenario_recurrence extends BaseJavaMigration {
@@ -15,12 +14,14 @@ public class V2_83__Scenario_recurrence extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     // Add recurrence to scenario
-    select.executeUpdate("""
+    select.executeUpdate(
+        """
         ALTER TABLE scenarios ADD COLUMN scenario_recurrence varchar(256);
         ALTER TABLE scenarios ADD COLUMN scenario_recurrence_start timestamp;
         """);
     // Add association table between scenario and exercise
-    select.execute("""
+    select.execute(
+        """
         CREATE TABLE scenario_exercise (
           scenario_id varchar(255) not null constraint scenario_id_fk references scenarios on delete cascade,
           exercise_id varchar(255) not null constraint exercise_id_fk references exercises on delete cascade,

@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V3_22__Endpoints extends BaseJavaMigration {
@@ -14,6 +13,7 @@ public class V3_22__Endpoints extends BaseJavaMigration {
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
-    select.execute("ALTER TABLE assets ADD COLUMN endpoint_arch varchar(255) not null default 'x86_64';");
+    select.execute(
+        "ALTER TABLE assets ADD COLUMN endpoint_arch varchar(255) not null default 'x86_64';");
   }
 }

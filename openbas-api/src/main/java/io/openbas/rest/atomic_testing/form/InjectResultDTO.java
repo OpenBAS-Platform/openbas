@@ -1,21 +1,20 @@
 package io.openbas.rest.atomic_testing.form;
 
+import static java.time.Instant.now;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-
-import static java.time.Instant.now;
 
 @Setter
 @Getter
@@ -69,8 +68,7 @@ public class InjectResultDTO {
 
   @Schema(
       description = "Specifies the categories of targetResults for atomic testing.",
-      example = "assets, asset groups, teams, players"
-  )
+      example = "assets, asset groups, teams, players")
   @JsonProperty("inject_targets")
   @NotNull
   private List<InjectTargetWithResult> targets;

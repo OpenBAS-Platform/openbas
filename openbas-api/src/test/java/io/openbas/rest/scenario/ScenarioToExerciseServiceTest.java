@@ -1,22 +1,5 @@
 package io.openbas.rest.scenario;
 
-import io.openbas.database.model.*;
-import io.openbas.database.repository.*;
-import io.openbas.service.LoadService;
-import io.openbas.service.ScenarioService;
-import io.openbas.service.ScenarioToExerciseService;
-import io.openbas.utils.fixtures.ScenarioFixture;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.utils.fixtures.ArticleFixture.ARTICLE_NAME;
 import static io.openbas.utils.fixtures.ArticleFixture.getArticle;
@@ -29,39 +12,41 @@ import static io.openbas.utils.fixtures.TeamFixture.getTeam;
 import static io.openbas.utils.fixtures.UserFixture.getUser;
 import static org.junit.jupiter.api.Assertions.*;
 
+import io.openbas.database.model.*;
+import io.openbas.database.repository.*;
+import io.openbas.service.LoadService;
+import io.openbas.service.ScenarioService;
+import io.openbas.service.ScenarioToExerciseService;
+import io.openbas.utils.fixtures.ScenarioFixture;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ScenarioToExerciseServiceTest {
 
-  @Autowired
-  private ScenarioToExerciseService scenarioToExerciseService;
-  @Autowired
-  private LoadService loadService;
+  @Autowired private ScenarioToExerciseService scenarioToExerciseService;
+  @Autowired private LoadService loadService;
 
-  @Autowired
-  private ScenarioService scenarioService;
-  @Autowired
-  private ExerciseRepository exerciseRepository;
-  @Autowired
-  private UserRepository userRepository;
-  @Autowired
-  private TagRepository tagRepository;
-  @Autowired
-  private TeamRepository teamRepository;
-  @Autowired
-  private DocumentRepository documentRepository;
-  @Autowired
-  private ChannelRepository channelRepository;
-  @Autowired
-  private LessonsCategoryRepository lessonsCategoryRepository;
-  @Autowired
-  private LessonsQuestionRepository lessonsQuestionRepository;
-  @Autowired
-  private InjectRepository injectRepository;
-  @Autowired
-  private VariableRepository variableRepository;
-  @Autowired
-  private InjectorContractRepository injectorContractRepository;
+  @Autowired private ScenarioService scenarioService;
+  @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private UserRepository userRepository;
+  @Autowired private TagRepository tagRepository;
+  @Autowired private TeamRepository teamRepository;
+  @Autowired private DocumentRepository documentRepository;
+  @Autowired private ChannelRepository channelRepository;
+  @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
+  @Autowired private LessonsQuestionRepository lessonsQuestionRepository;
+  @Autowired private InjectRepository injectRepository;
+  @Autowired private VariableRepository variableRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
 
   private static String SCENARIO_ID;
   private static String EXERCISE_ID;
@@ -113,18 +98,24 @@ class ScenarioToExerciseServiceTest {
     contextualTeam.setContextual(true);
     Team contextualTeamSaved = this.teamRepository.save(contextualTeam);
     TEAM_CONTEXTUAL_ID = contextualTeamSaved.getId();
-    scenario.setTeams(new ArrayList<>() {{
-      add(teamSaved);
-      add(contextualTeamSaved);
-    }});
+    scenario.setTeams(
+        new ArrayList<>() {
+          {
+            add(teamSaved);
+            add(contextualTeamSaved);
+          }
+        });
 
     // Tag
     Tag tag = getTag();
     Tag tagSaved = this.tagRepository.save(tag);
     TAG_ID = tagSaved.getId();
-    scenario.setTags(new HashSet<>() {{
-      add(tagSaved);
-    }});
+    scenario.setTags(
+        new HashSet<>() {
+          {
+            add(tagSaved);
+          }
+        });
 
     Scenario scenarioSaved = this.scenarioService.createScenario(scenario);
     SCENARIO_ID = scenarioSaved.getId();
@@ -143,17 +134,23 @@ class ScenarioToExerciseServiceTest {
     // Objective
     Objective objective = getObjective();
     objective.setScenario(scenarioSaved);
-    scenario.setObjectives(new ArrayList<>() {{
-      add(objective);
-    }});
+    scenario.setObjectives(
+        new ArrayList<>() {
+          {
+            add(objective);
+          }
+        });
 
     // Document
     Document document = getDocumentJpeg();
     Document documentSaved = this.documentRepository.save(document);
     DOCUMENT_ID = documentSaved.getId();
-    scenario.setDocuments(new ArrayList<>() {{
-      add(documentSaved);
-    }});
+    scenario.setDocuments(
+        new ArrayList<>() {
+          {
+            add(documentSaved);
+          }
+        });
 
     // Article
     Document documentArticle = new Document();
@@ -167,21 +164,30 @@ class ScenarioToExerciseServiceTest {
     Channel channelSaved = this.channelRepository.save(channel);
     CHANNEL_ID = channelSaved.getId();
     Article article = getArticle(channelSaved);
-    article.setDocuments(new ArrayList<>() {{
-      add(documentArticleSaved);
-    }});
-    scenarioSaved.setArticles(new ArrayList<>() {{
-      add(article);
-    }});
+    article.setDocuments(
+        new ArrayList<>() {
+          {
+            add(documentArticleSaved);
+          }
+        });
+    scenarioSaved.setArticles(
+        new ArrayList<>() {
+          {
+            add(article);
+          }
+        });
 
     // Lessons questions
     LessonsCategory lessonsCategory = new LessonsCategory();
     lessonsCategory.setName("Category");
     lessonsCategory.setScenario(scenarioSaved);
-    lessonsCategory.setTeams(new ArrayList<>() {{
-      add(teamSaved);
-      add(contextualTeamSaved);
-    }});
+    lessonsCategory.setTeams(
+        new ArrayList<>() {
+          {
+            add(teamSaved);
+            add(contextualTeamSaved);
+          }
+        });
     LessonsCategory lessonsCategorySaved = this.lessonsCategoryRepository.save(lessonsCategory);
     LESSON_CATEGORY_ID = lessonsCategorySaved.getId();
     LessonsQuestion lessonsQuestion = new LessonsQuestion();
@@ -190,25 +196,39 @@ class ScenarioToExerciseServiceTest {
     LessonsQuestion lessonsQuestionSaved = this.lessonsQuestionRepository.save(lessonsQuestion);
     LESSON_QUESTION_ID = lessonsQuestionSaved.getId();
 
-    lessonsCategory.setQuestions(new ArrayList<>() {{
-      add(lessonsQuestionSaved);
-    }});
-    scenario.setLessonsCategories(new ArrayList<>() {{
-      add(lessonsCategorySaved);
-    }});
+    lessonsCategory.setQuestions(
+        new ArrayList<>() {
+          {
+            add(lessonsQuestionSaved);
+          }
+        });
+    scenario.setLessonsCategories(
+        new ArrayList<>() {
+          {
+            add(lessonsCategorySaved);
+          }
+        });
 
     // Inject
-    Inject inject = getInjectForEmailContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
-    inject.setTeams(new ArrayList<>() {{
-      add(teamSaved);
-      add(contextualTeamSaved);
-    }});
+    Inject inject =
+        getInjectForEmailContract(
+            this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+    inject.setTeams(
+        new ArrayList<>() {
+          {
+            add(teamSaved);
+            add(contextualTeamSaved);
+          }
+        });
     inject.setScenario(scenarioSaved);
     Inject injectSaved = this.injectRepository.save(inject);
     INJECT_ID = injectSaved.getId();
-    scenario.setInjects(new HashSet<>() {{
-      add(inject);
-    }});
+    scenario.setInjects(
+        new HashSet<>() {
+          {
+            add(inject);
+          }
+        });
 
     // Variables
     Variable variable = new Variable();
@@ -230,8 +250,10 @@ class ScenarioToExerciseServiceTest {
     assertEquals(2, (long) exerciseSaved.getGrants().size());
     // User & Teams
     assertEquals(2, (long) exerciseSaved.getTeams().size());
-    assertTrue(exerciseSaved.getTeams().stream().anyMatch(t -> teamSaved.getId().equals(t.getId())));
-    assertTrue(exerciseSaved.getTeams().stream().anyMatch(t -> Boolean.TRUE.equals(t.getContextual())));
+    assertTrue(
+        exerciseSaved.getTeams().stream().anyMatch(t -> teamSaved.getId().equals(t.getId())));
+    assertTrue(
+        exerciseSaved.getTeams().stream().anyMatch(t -> Boolean.TRUE.equals(t.getContextual())));
     // Team Users
     assertEquals(2, exerciseSaved.getTeamUsers().size());
     // Tags
@@ -244,15 +266,20 @@ class ScenarioToExerciseServiceTest {
     // Articles
     assertEquals(1, exerciseSaved.getArticles().size());
     assertEquals(ARTICLE_NAME, exerciseSaved.getArticles().getFirst().getName());
-    assertEquals(documentArticleName, exerciseSaved.getArticles().getFirst().getDocuments().getFirst().getName());
+    assertEquals(
+        documentArticleName,
+        exerciseSaved.getArticles().getFirst().getDocuments().getFirst().getName());
     // Lessons questions
     assertEquals(1, exerciseSaved.getLessonsCategories().size());
     LessonsCategory exerciseLessonsCategory = exerciseSaved.getLessonsCategories().getFirst();
     assertEquals(1, exerciseLessonsCategory.getQuestions().size());
-    assertTrue(exerciseLessonsCategory.getTeams().stream().anyMatch(t -> teamSaved.getId().equals(t.getId())));
-    assertTrue(exerciseLessonsCategory.getTeams().stream().anyMatch(t -> Boolean.TRUE.equals(t.getContextual())));
+    assertTrue(
+        exerciseLessonsCategory.getTeams().stream()
+            .anyMatch(t -> teamSaved.getId().equals(t.getId())));
+    assertTrue(
+        exerciseLessonsCategory.getTeams().stream()
+            .anyMatch(t -> Boolean.TRUE.equals(t.getContextual())));
     // Injects
     assertEquals(1, exerciseSaved.getInjects().size());
   }
-
 }
