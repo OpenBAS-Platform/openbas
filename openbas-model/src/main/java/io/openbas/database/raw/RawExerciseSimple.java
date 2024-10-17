@@ -1,7 +1,7 @@
 package io.openbas.database.raw;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.Set;
 
 public interface RawExerciseSimple {
 
@@ -21,7 +21,7 @@ public interface RawExerciseSimple {
 
     String getExercise_subtitle();
 
-    List<String> getExercise_tags();
+    Set<String> getExercise_tags();
 
-    List<String> getInject_ids();
+    Set<String> getInject_ids();
 }

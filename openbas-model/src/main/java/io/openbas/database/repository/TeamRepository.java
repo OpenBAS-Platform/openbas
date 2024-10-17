@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface TeamRepository extends CrudRepository<Team, String>,
@@ -56,7 +57,7 @@ public interface TeamRepository extends CrudRepository<Team, String>,
       + "FROM teams t "
       + "LEFT JOIN injects_teams it ON t.team_id = it.team_id "
       + "WHERE t.team_id IN (:ids) OR it.inject_id IN (:injectIds) ;", nativeQuery = true)
-  List<RawTeam> rawByIdsOrInjectIds(@Param("ids") List<String> ids, @Param("injectIds") List<String> injectIds);
+  Set<RawTeam> rawByIdsOrInjectIds(@Param("ids") Set<String> ids, @Param("injectIds") Set<String> injectIds);
 
   @Query(value =
       "SELECT teams.team_id, teams.team_name, teams.team_description, teams.team_created_at, teams.team_updated_at, teams.team_organization, "

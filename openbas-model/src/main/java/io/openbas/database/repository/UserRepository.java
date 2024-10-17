@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface UserRepository extends CrudRepository<User, String>, JpaSpecificationExecutor<User>,
@@ -91,7 +92,7 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
       + "us.user_organization "
       + "FROM users us "
       + "WHERE us.user_id IN :ids ;", nativeQuery = true)
-  List<RawUser> rawUserByIds(@Param("ids") List<String> ids);
+  Set<RawUser> rawUserByIds(@Param("ids") Set<String> ids);
 
   // -- PAGINATION --
 

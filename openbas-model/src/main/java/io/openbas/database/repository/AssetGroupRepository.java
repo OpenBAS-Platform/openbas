@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface AssetGroupRepository extends CrudRepository<AssetGroup, String>,
@@ -57,7 +58,7 @@ public interface AssetGroupRepository extends CrudRepository<AssetGroup, String>
           "LEFT JOIN asset_groups_assets aga ON aga.asset_group_id = ag.asset_group_id " +
           "WHERE iat.asset_group_id IN (:assetGroupIds) OR iat.inject_id IN (:injectIds) " +
           "GROUP BY ag.asset_group_id, ag.asset_group_name, CAST(ag.asset_group_dynamic_filter as text) ;", nativeQuery = true)
-  List<RawAssetGroup> rawByIdsOrInjectIds(@Param("assetGroupIds") List<String> assetGroupIds, @Param("injectIds") List<String> injectIds);
+  Set<RawAssetGroup> rawByIdsOrInjectIds(@Param("assetGroupIds") Set<String> assetGroupIds, @Param("injectIds") Set<String> injectIds);
 
   // -- PAGINATION --
 
