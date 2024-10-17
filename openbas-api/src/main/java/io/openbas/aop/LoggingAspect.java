@@ -44,8 +44,11 @@ public class LoggingAspect {
     }
 
     if (executionTime > EXECUTION_TIME_THRESHOLD) {
-      logger.warn("Execution of {}.{} took {} ms, which exceeds the threshold of {} ms",
-          className, methodName, executionTime, EXECUTION_TIME_THRESHOLD);
+      logger.warn(
+          "Execution of " + className + "." + methodName + " took "
+              + executionTime + " ms, which exceeds the threshold of " + EXECUTION_TIME_THRESHOLD
+              + " ms"
+      );
     }
 
     return result;
