@@ -68,6 +68,10 @@ export const computeLabel = (status) => {
   return 'Failed';
 };
 
+export const capitalize = (text) => {
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+};
+
 // compute color for status
 export const computeColorStyle = (status) => {
   if (status === 'PENDING') {
