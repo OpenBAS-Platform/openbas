@@ -2598,6 +2598,7 @@ export interface RawDocument {
 }
 
 export interface RawPaginationDocument {
+  document_can_be_deleted?: boolean;
   document_description?: string;
   document_exercises?: string[];
   document_id?: string;

@@ -269,13 +269,18 @@ public class DocumentApi extends RestBehavior {
     @PostMapping("/api/documents/search")
     public Page<RawPaginationDocument> searchDocuments(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
         OpenBASPrincipal user = currentUser();
+        List<Document> securityPlatformLogos = securityPlatformRepository.securityPlatformLogo();
         if (user.isAdmin()) {
             return buildPaginationJPA(
                     (Specification<Document> specification, Pageable pageable) -> this.documentRepository.findAll(
                             specification, pageable),
                     searchPaginationInput,
                     Document.class
-            ).map(RawPaginationDocument::new);
+            ).map((document) -> {
+                var rawPaginationDocument = new RawPaginationDocument(document);
+                rawPaginationDocument.setDocument_can_be_deleted(!securityPlatformLogos.contains(document));
+                return rawPaginationDocument;
+            });
         } else {
             return buildPaginationJPA(
                     (Specification<Document> specification, Pageable pageable) -> this.documentRepository.findAll(
@@ -284,7 +289,11 @@ public class DocumentApi extends RestBehavior {
                     ),
                     searchPaginationInput,
                     Document.class
-            ).map(RawPaginationDocument::new);
+            ).map((document) -> {
+                var rawPaginationDocument = new RawPaginationDocument(document);
+                rawPaginationDocument.setDocument_can_be_deleted(!securityPlatformLogos.contains(document));
+                return rawPaginationDocument;
+            });
         }
     }
 
