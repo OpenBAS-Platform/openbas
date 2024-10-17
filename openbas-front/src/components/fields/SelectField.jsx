@@ -38,7 +38,7 @@ const SelectField = (props) => {
         defaultValue={defaultValue}
         control={control}
         render={({ field }) => (
-          <MUISelect {...field}>
+          <MUISelect {...field} {...others}>
             {children}
           </MUISelect>
         )}
