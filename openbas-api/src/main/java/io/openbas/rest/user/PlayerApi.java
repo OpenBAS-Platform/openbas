@@ -1,11 +1,10 @@
 package io.openbas.rest.user;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.SessionManager;
-import io.openbas.database.model.Communication;
-import io.openbas.database.model.Tag;
-import io.openbas.database.model.Team;
-import io.openbas.database.model.User;
+import io.openbas.database.model.*;
+import io.openbas.database.raw.RawPlayer;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
@@ -22,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -47,6 +47,25 @@ public class PlayerApi extends RestBehavior {
   private final UserService userService;
   private final TeamRepository teamRepository;
   private final PlayerService playerService;
+
+  @GetMapping(PLAYER_URI)
+  @Transactional(rollbackOn = Exception.class)
+  @PreAuthorize("isObserver()")
+  public Iterable<RawPlayer> players() {
+    List<RawPlayer> players;
+    OpenBASPrincipal currentUser = currentUser();
+    if (currentUser.isAdmin()) {
+      players = fromIterable(userRepository.rawAllPlayers());
+    } else {
+      User local = userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
+      List<String> organizationIds = local.getGroups().stream()
+          .flatMap(group -> group.getOrganizations().stream())
+          .map(Organization::getId)
+          .toList();
+      players = userRepository.rawPlayersAccessibleFromOrganizations(organizationIds);
+    }
+    return players;
+  }
 
   @LogExecutionTime
   @PostMapping(PLAYER_URI + "/search")
