@@ -6,7 +6,6 @@ import fsExtra from "fs-extra/esm";
 import path from "node:path";
 import esbuild from "esbuild";
 import chokidar from "chokidar";
-import compression from "compression";
 
 // mimic CommonJS variables -- not needed if using CommonJS
 const __filename = fileURLToPath(import.meta.url);
@@ -24,9 +23,10 @@ const debounce = (func, timeout = 500) => {
     }, timeout);
   };
 };
+
 const middleware = (target, ws = true) =>
-  createProxyMiddleware(basePath + target, {
-    target: "http://localhost:8080",
+  createProxyMiddleware({
+    target: "http://localhost:8080" + basePath + target,
     changeOrigin: true,
     ws,
   });
@@ -39,7 +39,7 @@ esbuild
     publicPath: "/",
     bundle: true,
     banner: {
-      js: ' (() => new EventSource("http://localhost:3000/dev").onmessage = () => location.reload())();',
+      js: ' (() => new EventSource("http://localhost:3001/dev").onmessage = () => location.reload())();',
     },
     loader: {
       ".js": "jsx",
@@ -67,9 +67,9 @@ esbuild
     });
     // Listen change for hot recompile
     chokidar
-      .watch("src/**/*.{js,jsx,ts,tsx}", {
-        awaitWriteFinish: true,
-        ignoreInitial: true,
+      .watch('./src', {
+        ignored: (path, stats) => stats?.isFile()
+          && !(path.endsWith('.js') || path.endsWith('.jsx') || path.endsWith('.ts') || path.endsWith('.tsx')),
       })
       .on(
         "all",
@@ -104,12 +104,11 @@ esbuild
       );
     });
     app.set("trust proxy", 1);
-    app.use(compression({}));
-    app.use(middleware("/api"));
-    app.use(middleware("/login"));
-    app.use(middleware("/logout"));
-    app.use(middleware("/oauth2"));
-    app.use(middleware("/saml2"));
+    app.use("/api", middleware("/api"));
+    app.use("/login", middleware("/login"));
+    app.use("/logout", middleware("/logout"));
+    app.use("/oauth2", middleware("/oauth2"));
+    app.use("/saml2", middleware("/saml2"));
     app.use(
       basePath + `/static`,
       express.static(path.join(__dirname, "./build/static")),
@@ -132,5 +131,5 @@ esbuild
       res.header("Pragma", "no-cache");
       return res.send(withOptionValued);
     });
-    app.listen(3000);
+    app.listen(3001);
   });
