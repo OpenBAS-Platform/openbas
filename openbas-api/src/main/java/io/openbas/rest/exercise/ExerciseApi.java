@@ -21,6 +21,7 @@ import io.openbas.service.*;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.persistence.criteria.Join;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -633,11 +634,14 @@ public class ExerciseApi extends RestBehavior {
     @LogExecutionTime
     @PostMapping(EXERCISE_URI + "/search")
     public Page<ExerciseSimple> exercises(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+        Map<String, Join<Base, Base>> joinMap = new HashMap<>();
+
         if (currentUser().isAdmin()) {
             return buildPaginationCriteriaBuilder(
                 this.exerciseService::exercises,
                     searchPaginationInput,
-                    Exercise.class
+                    Exercise.class,
+                    joinMap
             );
         } else {
             return buildPaginationCriteriaBuilder(
@@ -647,7 +651,8 @@ public class ExerciseApi extends RestBehavior {
                         pageable
                     ),
                     searchPaginationInput,
-                    Exercise.class
+                    Exercise.class,
+                    joinMap
             );
         }
     }
