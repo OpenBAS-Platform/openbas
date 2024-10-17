@@ -638,7 +638,12 @@ public class ExerciseApi extends RestBehavior {
 
         if (currentUser().isAdmin()) {
             return buildPaginationCriteriaBuilder(
-                this.exerciseService::exercises,
+                (Specification<Exercise> specification, Specification<Exercise> specificationCount, Pageable pageable) -> this.exerciseService.exercises(
+                    findGrantedFor(currentUser().getId()).and(specification),
+                    findGrantedFor(currentUser().getId()).and(specificationCount),
+                    pageable,
+                    joinMap
+                ),
                     searchPaginationInput,
                     Exercise.class,
                     joinMap
@@ -648,7 +653,8 @@ public class ExerciseApi extends RestBehavior {
                     (Specification<Exercise> specification, Specification<Exercise> specificationCount, Pageable pageable) -> this.exerciseService.exercises(
                         findGrantedFor(currentUser().getId()).and(specification),
                         findGrantedFor(currentUser().getId()).and(specificationCount),
-                        pageable
+                        pageable,
+                        joinMap
                     ),
                     searchPaginationInput,
                     Exercise.class,
