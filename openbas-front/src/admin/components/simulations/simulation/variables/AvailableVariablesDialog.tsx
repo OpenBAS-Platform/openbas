@@ -111,11 +111,11 @@ AvailableVariablesDialogProps
             label={t('Builtin variables')}
             value="1"
           />
-          <Tab
+          {uriVariable && <Tab
             sx={{ textTransform: 'none' }}
             label={t('Custom variables')}
             value="2"
-          />
+                          />}
         </TabList>
         <DialogContent>
           <TabPanel
@@ -161,10 +161,10 @@ AvailableVariablesDialogProps
               })}
             </List>
           </TabPanel>
-          <TabPanel
+          {uriVariable && <TabPanel
             value="2"
             style={{ maxHeight: '100%', overflow: 'auto', padding: 0 }}
-          >
+                          >
             <Alert severity="info">
               {t('Please follow this link to')}
               {/* TODO: validate when migrate to new react router version */}
@@ -193,7 +193,7 @@ AvailableVariablesDialogProps
                 </div>
               ))}
             </List>
-          </TabPanel>
+          </TabPanel>}
         </DialogContent>
       </TabContext>
 

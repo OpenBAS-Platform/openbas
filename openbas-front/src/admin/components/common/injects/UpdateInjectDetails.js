@@ -162,15 +162,9 @@ const UpdateInjectDetails = ({
               && data[field.key]
               && data[field.key].length > 0
             ) {
+              const regex = /&lt;#list\s+(\w+)\s+as\s+(\w+)&gt;/g;
               finalData[field.key] = data[field.key]
-                .replaceAll(
-                  '&lt;#list challenges as challenge&gt;',
-                  '<#list challenges as challenge>',
-                )
-                .replaceAll(
-                  '&lt;#list articles as article&gt;',
-                  '<#list articles as article>',
-                )
+                .replace(regex, (_, listName, identifier) => `<#list ${listName} as ${identifier}>`)
                 .replaceAll('&lt;/#list&gt;', '</#list>');
             } else if (data[field.key] && field.type === 'tuple') {
               if (field.cardinality && field.cardinality === '1') {
