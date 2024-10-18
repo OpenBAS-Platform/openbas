@@ -62,8 +62,8 @@ public class AssetGroupApi {
   @PostMapping(ASSET_GROUP_URI + "/find")
   @PreAuthorize("isObserver()")
   @Transactional(readOnly = true)
-  @Tracing(name = "Find teams", layer = "api", operation = "POST")
-  public List<AssetGroupOutput> findTeams(
+  @Tracing(name = "Find asset groups", layer = "api", operation = "POST")
+  public List<AssetGroupOutput> findAssetGroups(
       @RequestBody @Valid @NotNull final List<String> assetGroupIds) {
     return this.assetGroupCriteriaBuilderService.find(fromIds(assetGroupIds));
   }

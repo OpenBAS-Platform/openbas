@@ -3,11 +3,13 @@ package io.openbas.database.repository;
 import io.openbas.database.model.Executor;
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ExecutorRepository extends CrudRepository<Executor, String> {
+public interface ExecutorRepository
+    extends CrudRepository<Executor, String>, JpaSpecificationExecutor<Executor> {
 
   @NotNull
   Optional<Executor> findById(@NotNull String id);

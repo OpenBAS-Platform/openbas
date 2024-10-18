@@ -9,11 +9,13 @@ import io.openbas.database.model.Executor;
 import io.openbas.database.model.Token;
 import io.openbas.database.repository.ExecutorRepository;
 import io.openbas.database.repository.TokenRepository;
+import io.openbas.integrations.ExecutorService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.executor.form.ExecutorCreateInput;
 import io.openbas.rest.executor.form.ExecutorUpdateInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.FileService;
+import io.openbas.utils.FilterUtilsJpa;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +33,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 public class ExecutorApi extends RestBehavior {
+
+  public static final String EXECUTOR_URI = "/api/executors";
 
   @Value("${info.app.version:unknown}")
   String version;
@@ -43,6 +49,7 @@ public class ExecutorApi extends RestBehavior {
   private EndpointService endpointService;
   private FileService fileService;
   private TokenRepository tokenRepository;
+  private ExecutorService executorService;
 
   @Resource protected ObjectMapper mapper;
 
@@ -66,7 +73,12 @@ public class ExecutorApi extends RestBehavior {
     this.executorRepository = executorRepository;
   }
 
-  @GetMapping("/api/executors")
+  @Autowired
+  public void setExecutorService(ExecutorService executorService) {
+    this.executorService = executorService;
+  }
+
+  @GetMapping(EXECUTOR_URI)
   public Iterable<Executor> executors() {
     return executorRepository.findAll();
   }
@@ -80,7 +92,7 @@ public class ExecutorApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
-  @PutMapping("/api/executors/{executorId}")
+  @PutMapping(EXECUTOR_URI + "/{executorId}")
   public Executor updateExecutor(
       @PathVariable String executorId, @Valid @RequestBody ExecutorUpdateInput input) {
     Executor executor =
@@ -91,7 +103,7 @@ public class ExecutorApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping(
-      value = "/api/executors",
+      value = EXECUTOR_URI,
       produces = {MediaType.APPLICATION_JSON_VALUE},
       consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
   @Transactional(rollbackOn = Exception.class)
@@ -210,5 +222,18 @@ public class ExecutorApi extends RestBehavior {
     }
     String installCommand = this.endpointService.generateInstallCommand(platform, token);
     return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(installCommand);
+  }
+
+  @GetMapping(EXECUTOR_URI + "/options")
+  @PreAuthorize("isPlanner()")
+  public List<FilterUtilsJpa.Option> optionsByName(
+      @RequestParam(required = false) final String searchText) {
+    return this.executorService.optionsByName(searchText);
+  }
+
+  @PostMapping(EXECUTOR_URI + "/options")
+  @PreAuthorize("isPlanner()")
+  public List<FilterUtilsJpa.Option> optionsByIds(@RequestBody final List<String> ids) {
+    return this.executorService.optionsByIds(ids);
   }
 }

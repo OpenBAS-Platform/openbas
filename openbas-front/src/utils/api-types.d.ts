@@ -618,6 +618,18 @@ export interface Endpoint {
   listened?: boolean;
 }
 
+
+export interface EndpointOutput {
+  asset_id: string;
+  asset_name: string;
+  asset_executor?: string;
+  asset_active?: boolean;
+  /** @uniqueItems true */
+  asset_tags?: Tag[];
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
+  endpoint_arch: "x86_64" | "arm64" | "Unknown";
+}
+
 export interface EndpointInput {
   asset_description?: string;
   /** @format date-time */
@@ -634,6 +646,25 @@ export interface EndpointInput {
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
   endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
+}
+
+export interface PageEndpointOutput {
+  content?: EndpointOutput[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
 }
 
 export interface EndpointRegisterInput {

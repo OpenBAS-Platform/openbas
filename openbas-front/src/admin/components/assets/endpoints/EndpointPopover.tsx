@@ -9,7 +9,7 @@ import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { EndpointInput } from '../../../../utils/api-types';
+import type { EndpointInput, EndpointOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { EndpointStore } from './Endpoint';
 import EndpointForm from './EndpointForm';
@@ -17,7 +17,7 @@ import { EndpointStoreWithType } from './EndpointsList';
 
 interface Props {
   inline?: boolean;
-  endpoint: EndpointStoreWithType;
+  endpoint: EndpointStoreWithType | EndpointOutput;
   assetGroupId?: string;
   assetGroupEndpointIds?: string[];
   onRemoveEndpointFromInject?: (assetId: string) => void;

@@ -1,23 +1,26 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { CSSProperties, useState } from 'react';
+import { CSSProperties, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { fetchExecutors } from '../../../../actions/Executor';
-import type { ExecutorHelper } from '../../../../actions/executors/executor-helper';
-import type { TagHelper, UserHelper } from '../../../../actions/helper';
+import type { UserHelper } from '../../../../actions/helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
-import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
-import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
+import ExportButton from '../../../../components/common/ExportButton';
 import { initSorting } from '../../../../components/common/queryable/Page';
+import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
+import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
+import { Header } from '../../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../../components/i18n';
+import ItemExecutor from '../../../../components/ItemExecutor';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import type { SearchPaginationInput } from '../../../../utils/api-types';
+import type { EndpointOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import AssetStatus from '../AssetStatus';
@@ -27,24 +30,20 @@ import EndpointPopover from './EndpointPopover';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
-    paddingLeft: 10,
     textTransform: 'uppercase',
-    cursor: 'pointer',
   },
   item: {
-    paddingLeft: 10,
     height: 50,
   },
   bodyItems: {
     display: 'flex',
-    alignItems: 'center',
   },
   bodyItem: {
     fontSize: 13,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    paddingRight: 10,
+    boxSizing: 'content-box',
   },
 }));
 
@@ -70,7 +69,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   asset_tags: {
     width: '20%',
   },
-  asset_status: {
+  asset_active: {
     width: '15%',
     cursor: 'default',
   },
@@ -88,27 +87,70 @@ const Endpoints = () => {
   const [searchId] = searchParams.getAll('id');
 
   // Fetching data
-  const { userAdmin, executorsMap } = useHelper((helper: ExecutorHelper & UserHelper & TagHelper) => ({
+  const { userAdmin } = useHelper((helper: UserHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
-    executorsMap: helper.getExecutorsMap(),
-    tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchExecutors());
   });
 
   // Headers
-  const headers = [
-    { field: 'asset_name', label: 'Name', isSortable: true },
-    { field: 'endpoint_platform', label: 'Platform', isSortable: true },
-    { field: 'endpoint_arch', label: 'Architecture', isSortable: true },
-    { field: 'asset_executor', label: 'Executor', isSortable: true },
-    { field: 'asset_tags', label: 'Tags', isSortable: true },
-    { field: 'asset_status', label: 'Status', isSortable: false },
+  const headers: Header[] = useMemo(() => [
+    {
+      field: 'asset_name',
+      label: t('Name'),
+      isSortable: true,
+      value: (endpoint: EndpointOutput) => endpoint.asset_name,
+    },
+    {
+      field: 'endpoint_platform',
+      label: 'Platform',
+      isSortable: true,
+      value: (endpoint: EndpointOutput) => (
+        <>
+          <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
+          {' '}
+          {endpoint.endpoint_platform}
+        </>
+      ),
+    },
+    {
+      field: 'endpoint_arch',
+      label: t('Architecture'),
+      isSortable: true,
+      value: (endpoint: EndpointOutput) => endpoint.endpoint_arch,
+    },
+    {
+      field: 'asset_executor',
+      label: t('Executor'),
+      isSortable: true,
+      value: (endpoint: EndpointOutput) => <ItemExecutor executorId={endpoint.asset_executor ?? null} />,
+    },
+    {
+      field: 'asset_tags',
+      label: t('Tags'),
+      isSortable: false,
+      value: (endpoint: EndpointOutput) => <ItemTags variant="list" tags={endpoint.asset_tags} />,
+    },
+    {
+      field: 'asset_active',
+      label: t('Status'),
+      isSortable: false,
+      value: (endpoint: EndpointOutput) => <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'} />,
+    },
+  ], []);
+
+  const availableFilterNames = [
+    'asset_name',
+    'endpoint_platform',
+    'endpoint_arch',
+    'asset_executor',
+    'asset_tags',
+    'asset_last_seen',
   ];
 
   const [endpoints, setEndpoints] = useState<EndpointStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('endpoints', buildSearchPagination({
     sorts: initSorting('asset_name'),
     textSearch: search,
   }));
@@ -133,33 +175,37 @@ const Endpoints = () => {
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Assets') }, { label: t('Endpoints'), current: true }]} />
-      <PaginationComponent
+      <PaginationComponentV2
         fetch={searchEndpoints}
         searchPaginationInput={searchPaginationInput}
         setContent={setEndpoints}
-        exportProps={exportProps}
+        entityPrefix="endpoint"
+        availableFilterNames={availableFilterNames}
+        queryableHelpers={queryableHelpers}
+        topBarButtons={
+          <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
+        }
       />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
+          secondaryAction={<>&nbsp;</>}
         >
           <ListItemIcon />
           <ListItemText
             primary={(
-              <SortHeadersComponent
+              <SortHeadersComponentV2
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
-                searchPaginationInput={searchPaginationInput}
-                setSearchPaginationInput={setSearchPaginationInput}
+                sortHelpers={queryableHelpers.sortHelpers}
               />
             )}
           />
           <ListItemSecondaryAction />
         </ListItem>
-        {endpoints.map((endpoint: EndpointStore) => {
-          const executor = executorsMap[endpoint.asset_executor ?? 'Unknown'];
+        {endpoints.map((endpoint: EndpointOutput) => {
           return (
             <ListItem
               key={endpoint.asset_id}
@@ -172,33 +218,15 @@ const Endpoints = () => {
               <ListItemText
                 primary={(
                   <div className={classes.bodyItems}>
-                    <div className={classes.bodyItem} style={inlineStyles.asset_name}>
-                      {endpoint.asset_name}
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
-                      <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
-                      {' '}
-                      {endpoint.endpoint_platform}
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.endpoint_arch}>
-                      {endpoint.endpoint_arch}
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.asset_executor}>
-                      {executor && (
-                        <img
-                          src={`/api/images/executors/${executor.executor_type}`}
-                          alt={executor.executor_type}
-                          style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
-                        />
-                      )}
-                      {executor?.executor_name ?? t('Unknown')}
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.asset_tags}>
-                      <ItemTags variant="list" tags={endpoint.asset_tags} />
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.asset_status}>
-                      <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'} />
-                    </div>
+                    {headers.map(header => (
+                      <div
+                        key={header.field}
+                        className={classes.bodyItem}
+                        style={inlineStyles[header.field]}
+                      >
+                        {header.value?.(endpoint)}
+                      </div>
+                    ))}
                   </div>
                 )}
               />

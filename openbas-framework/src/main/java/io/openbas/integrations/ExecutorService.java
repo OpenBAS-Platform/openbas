@@ -1,15 +1,20 @@
 package io.openbas.integrations;
 
+import static io.openbas.database.specification.ExecutorSpecification.byName;
+import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.service.FileService.EXECUTORS_IMAGES_BASE_PATH;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Executor;
 import io.openbas.database.repository.ExecutorRepository;
 import io.openbas.service.FileService;
+import io.openbas.utils.FilterUtilsJpa;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.io.InputStream;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -75,5 +80,22 @@ public class ExecutorService {
     executorRepository
         .findByType(type)
         .ifPresent(executor -> executorRepository.deleteById(executor.getId()));
+  }
+
+  @Transactional
+  public List<FilterUtilsJpa.Option> optionsByName(final String searchText) {
+    return fromIterable(
+            this.executorRepository.findAll(
+                byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
+        .stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
+  }
+
+  @Transactional
+  public List<FilterUtilsJpa.Option> optionsByIds(final List<String> ids) {
+    return fromIterable(this.executorRepository.findAllById(ids)).stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
   }
 }

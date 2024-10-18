@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { searchAttackPatternsByIdAsOption } from '../../../../actions/AttackPattern';
+import { searchExecutorByIdAsOption } from '../../../../actions/executors/executor-actions';
 import { searchInjectorByIdAsOptions } from '../../../../actions/injectors/injector-action';
 import { searchKillChainPhasesByIdAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
 import { searchOrganizationByIdAsOptions } from '../../../../actions/organizations/organization-actions';
@@ -51,6 +52,11 @@ const useRetrieveOptions = () => {
         break;
       case 'user_organization':
         searchOrganizationByIdAsOptions(ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'asset_executor':
+        searchExecutorByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;

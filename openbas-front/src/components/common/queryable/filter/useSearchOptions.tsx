@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { searchAttackPatternsByNameAsOption } from '../../../../actions/AttackPattern';
+import { searchExecutorAsOption } from '../../../../actions/executors/executor-actions';
 import { searchInjectorsByNameAsOption } from '../../../../actions/injectors/injector-action';
 import { searchKillChainPhasesByNameAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
 import { searchOrganizationsByNameAsOption } from '../../../../actions/organizations/organization-actions';
@@ -61,6 +62,11 @@ const useSearchOptions = () => {
       case 'user_organization':
         searchOrganizationsByNameAsOption(search).then((response: { data: Option[] }) => {
           setOptions(response.data.map(d => ({ id: d.id, label: t(d.label) })));
+        });
+        break;
+      case 'asset_executor':
+        searchExecutorAsOption(search).then((response) => {
+          setOptions(response.data);
         });
         break;
       default:
