@@ -1,7 +1,7 @@
 import React, { CSSProperties, useState } from 'react';
 import { Button, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 
-import EditIcon from '@mui/icons-material/Edit';
+import { Edit } from '@mui/icons-material';
 import { SubmitHandler } from 'react-hook-form';
 import { useFormatter } from '../../../../../components/i18n';
 import type { InjectResultDTO, ReportInjectComment } from '../../../../../utils/api-types';
@@ -137,7 +137,7 @@ const InjectReportResult: React.FC<Props> = ({
                         sx={{ padding: '0px', width: '45px', verticalAlign: 'top' }} align="right"
                       >
                       <IconButton color="primary" onClick={() => openEditCommentDialog(inject.inject_id)}>
-                        <EditIcon />
+                        <Edit />
                       </IconButton>
                     </TableCell> : <TableCell sx={{ padding: '0px', width: '45px' }}></TableCell>
                   }
