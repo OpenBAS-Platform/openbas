@@ -1,6 +1,7 @@
 package io.openbas.rest.payload.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.database.model.Payload;
 import io.openbas.database.model.PayloadArgument;
 import io.openbas.database.model.PayloadPrerequisite;
 import jakarta.validation.constraints.NotBlank;
@@ -25,11 +26,11 @@ public class PayloadUpsertInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("payload_source")
-    private String source;
+    private Payload.PAYLOAD_SOURCE source;
 
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("payload_status")
-    private String status;
+    private Payload.PAYLOAD_STATUS status;
 
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("payload_external_id")
