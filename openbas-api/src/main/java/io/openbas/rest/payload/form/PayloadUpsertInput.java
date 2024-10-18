@@ -1,6 +1,7 @@
 package io.openbas.rest.payload.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Payload;
 import io.openbas.database.model.PayloadArgument;
 import io.openbas.database.model.PayloadPrerequisite;
@@ -40,7 +41,7 @@ public class PayloadUpsertInput {
     private String collector;
 
     @JsonProperty("payload_platforms")
-    private String[] platforms;
+    private Endpoint.PLATFORM_TYPE[] platforms;
 
     @JsonProperty("payload_description")
     private String description;
