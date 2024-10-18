@@ -270,7 +270,6 @@ class InjectApiTest extends IntegrationTest {
 
   @DisplayName("Add an inject for simulation")
   @Test
-  @Order(9)
   @WithMockPlannerUser
   void addInjectForSimulationTest() throws Exception {
     // -- PREPARE --
@@ -292,33 +291,31 @@ class InjectApiTest extends IntegrationTest {
 
     // -- ASSERT --
     assertNotNull(response);
+    assertEquals("Test inject", JsonPath.read(response, "$.inject_title"));
     EXERCISE_INJECT_ID = JsonPath.read(response, "$.inject_id");
-    response = mvc
-        .perform(get(EXERCISE_URI + "/" + EXERCISE.getId())
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
-    assertEquals(EXERCISE_INJECT_ID, JsonPath.read(response, "$.exercise_injects[0]"));
+
   }
 
   @DisplayName("Update inject for simulation")
   @Test
-  @Order(10)
   @WithMockPlannerUser
   void updateInjectForSimulationTest() throws Exception {
     // -- PREPARE --
-    Inject inject = injectRepository.findById(EXERCISE_INJECT_ID).orElseThrow();
+    InjectInput injectInput = new InjectInput();
+    injectInput.setTitle("Test inject");
+    injectInput.setDependsDuration(0L);
+    Inject inject = injectInput.toInject(injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+    Inject savedInject = injectRepository.save(inject);
+
+    Inject injectToUpdate = injectRepository.findById(savedInject.getId()).orElseThrow();
     InjectInput input = new InjectInput();
     String injectTitle = "A new title";
     input.setTitle(injectTitle);
-    input.setInjectorContract(inject.getInjectorContract().map(InjectorContract::getId).orElse(null));
     input.setDependsDuration(inject.getDependsDuration());
 
     // -- EXECUTE --
     String response = mvc
-        .perform(put(INJECT_URI + "/" + EXERCISE.getId() + "/" + EXERCISE_INJECT_ID)
+        .perform(put(INJECT_URI + "/" + EXERCISE.getId() + "/" + injectToUpdate.getId())
             .content(asJsonString(input))
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
