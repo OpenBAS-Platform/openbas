@@ -623,7 +623,6 @@ const Injects: FunctionComponent<Props> = ({
               onUpdateInject={onUpdateInject}
               massUpdateInject={massUpdateInject}
               injectId={selectedInjectId}
-              teamsFromExerciseOrScenario={teams}
               // @ts-expect-error typing
               articlesFromExerciseOrScenario={articles}
               variablesFromExerciseOrScenario={variables}
