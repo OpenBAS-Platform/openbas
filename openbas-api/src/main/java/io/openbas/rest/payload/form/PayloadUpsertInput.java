@@ -1,11 +1,11 @@
 package io.openbas.rest.payload.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Payload;
 import io.openbas.database.model.PayloadArgument;
 import io.openbas.database.model.PayloadPrerequisite;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,11 +25,11 @@ public class PayloadUpsertInput {
     @JsonProperty("payload_name")
     private String name;
 
-    @NotBlank(message = MANDATORY_MESSAGE)
+    @NotNull(message = MANDATORY_MESSAGE)
     @JsonProperty("payload_source")
     private Payload.PAYLOAD_SOURCE source;
 
-    @NotBlank(message = MANDATORY_MESSAGE)
+    @NotNull(message = MANDATORY_MESSAGE)
     @JsonProperty("payload_status")
     private Payload.PAYLOAD_STATUS status;
 
@@ -41,7 +41,7 @@ public class PayloadUpsertInput {
     private String collector;
 
     @JsonProperty("payload_platforms")
-    private Endpoint.PLATFORM_TYPE[] platforms;
+    private String[] platforms;
 
     @JsonProperty("payload_description")
     private String description;
