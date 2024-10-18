@@ -84,6 +84,7 @@ export const useQueryableWithLocalStorage = (localStorageKey: string, initSearch
   const [searchPaginationInput, setSearchPaginationInput] = useState(searchPaginationInputFromUri ?? searchPaginationInputFromLocalStorage);
 
   useEffect(() => {
+    // check deep changes between state from local storage and transitional state
     if (!R.equals(searchPaginationInputFromLocalStorage, searchPaginationInput)) {
       setSearchPaginationInput(searchPaginationInputFromLocalStorage);
     }
