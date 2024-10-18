@@ -1,5 +1,8 @@
 package io.openbas.rest;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.InjectorContract;
@@ -16,11 +19,20 @@ import io.openbas.service.ScenarioService;
 import io.openbas.utils.fixtures.InjectExpectationFixture;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
+import jakarta.annotation.Resource;
+import jakarta.annotation.Resources;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -61,7 +73,7 @@ class InjectApiTest extends IntegrationTest {
   private ExerciseRepository exerciseRepository;
   @Autowired
   private ExecutionContextService executionContextService;
-  @Autowired
+  @SpyBean
   private Executor executor;
   @Autowired
   private ScenarioRepository scenarioRepository;
@@ -79,6 +91,8 @@ class InjectApiTest extends IntegrationTest {
   private InjectorContractRepository injectorContractRepository;
   @Autowired
   private UserRepository userRepository;
+  @Resource
+  private ObjectMapper objectMapper;
 
   @BeforeAll
   void beforeAll() {
@@ -345,7 +359,6 @@ class InjectApiTest extends IntegrationTest {
 
   @DisplayName("Execute an email inject for exercise")
   @Test
-  @Order(11)
   @WithMockPlannerUser
   void executeEmailInjectForExerciseTest() throws Exception {
     // -- PREPARE --
@@ -353,6 +366,11 @@ class InjectApiTest extends IntegrationTest {
     Inject inject = getInjectForEmailContract(injectorContract);
     inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setExercise(EXERCISE);
+    ObjectNode content = objectMapper.createObjectNode();
+    content.set("subject", objectMapper.convertValue("Subject", JsonNode.class));
+    content.set("body", objectMapper.convertValue("Test body", JsonNode.class));
+    content.set("expectationType", objectMapper.convertValue("none", JsonNode.class));
+    inject.setContent(content);
     Inject savedInject = this.injectRepository.save(inject);
     List<ExecutionContext> userInjectContexts = Collections.singletonList(
         executionContextService.executionContext(getSavedUser(), savedInject, "Direct execution"));
@@ -366,14 +384,26 @@ class InjectApiTest extends IntegrationTest {
     input.setDescription(savedInject.getDescription());
     input.setInjectorContract(savedInject.getInjectorContract().orElseThrow().getId());
     input.setUserIds(List.of(savedInject.getId()));
+    input.setContent(savedInject.getContent());
+    MockMultipartFile inputJson = new MockMultipartFile("input", null, "application/json",
+        objectMapper.writeValueAsString(input).getBytes());
+
+    // Getting a test file
+    File testFile = ResourceUtils.getFile("classpath:xls-test-files/test_file_1.xlsx");
+    InputStream in = new FileInputStream(testFile);
+    MockMultipartFile fileJson = new MockMultipartFile("file",
+        "my-awesome-file.xls",
+        "application/xlsx",
+        in.readAllBytes());
 
     // -- EXECUTE --
     mvc.perform(multipart(EXERCISE_URI + "/" + EXERCISE.getId() + "/inject")
-            .content(asJsonString(input))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful());
-
+            .file(inputJson)
+            .file(fileJson))
+        .andExpect(status().is2xxSuccessful())
+        /*.andReturn()
+        .getResponse()
+        .getContentAsString()*/;
     // -- ASSERT --
     verify(executor).execute(injection);
 
