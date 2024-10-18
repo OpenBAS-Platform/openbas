@@ -71,8 +71,8 @@ export type ReportContextType = {
 };
 
 export type TeamContextType = {
-  onAddUsersTeam: (teamId: Team['team_id'], userIds: UserStore['user_id'][]) => Promise<void>,
-  onRemoveUsersTeam: (teamId: Team['team_id'], userIds: UserStore['user_id'][]) => Promise<void>,
+  onAddUsersTeam?: (teamId: Team['team_id'], userIds: UserStore['user_id'][]) => Promise<void>,
+  onRemoveUsersTeam?: (teamId: Team['team_id'], userIds: UserStore['user_id'][]) => Promise<void>,
   onAddTeam?: (teamId: Team['team_id']) => Promise<void>,
   onCreateTeam?: (team: TeamCreateInput) => Promise<{ result: string }>,
   onRemoveTeam?: (teamId: Team['team_id']) => void,
@@ -80,7 +80,7 @@ export type TeamContextType = {
   onToggleUser?: (teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean) => void,
   checkUserEnabled?: (teamId: Team['team_id'], userId: UserStore['user_id']) => boolean,
   computeTeamUsersEnabled?: (teamId: Team['team_id']) => number,
-  searchTeams: (input: SearchPaginationInput) => Promise<{ data: Page<TeamOutput> }>,
+  searchTeams: (input: SearchPaginationInput, contextualOnly?: boolean) => Promise<{ data: Page<TeamOutput> }>,
 };
 
 export type InjectContextType = {
@@ -181,7 +181,7 @@ export const TeamContext = createContext<TeamContextType>({
     return new Promise<void>(() => {
     });
   },
-  searchTeams(_: SearchPaginationInput): Promise<{ data: Page<TeamOutput> }> {
+  searchTeams(_: SearchPaginationInput, _contextualOnly?: boolean): Promise<{ data: Page<TeamOutput> }> {
     return new Promise<{ data: Page<TeamOutput> }>(() => {
     });
   },

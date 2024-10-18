@@ -45,3 +45,10 @@ export const duplicateAtomicTesting = (injectId: string) => {
   const uri = `${ATOMIC_TESTING_URI}/${injectId}`;
   return simplePostCall(uri, null);
 };
+
+// -- TEAMS --
+
+export const searchAtomicTestingTeams = (paginationInput: SearchPaginationInput, contextualOnly: boolean = false) => {
+  const uri = `${ATOMIC_TESTING_URI}/teams/search?contextualOnly=${contextualOnly}`;
+  return simplePostCall(uri, paginationInput);
+};
