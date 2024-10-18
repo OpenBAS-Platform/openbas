@@ -70,7 +70,6 @@ public class Payload implements Base {
   private String description;
 
   @Queryable(filterable = true, searchable = true)
-  @Type(StringArrayType.class)
   @Column(name = "payload_platforms", columnDefinition = "text[]")
   @JsonProperty("payload_platforms")
   private PLATFORM_TYPE[] platforms = new PLATFORM_TYPE[0];
