@@ -24,9 +24,9 @@ public class VariableHelper {
       VariableType.String, One, List.of(
           variable(USER + ".id", "Id of the user in the platform", VariableType.String, One),
           variable(USER + ".email", "Email of the user", VariableType.String, One),
-          variable(USER + ".firstname", "Firstname of the user", VariableType.String, One),
-          variable(USER + ".lastname", "Lastname of the user", VariableType.String, One),
-          variable(USER + ".lang", "Lang of the user", VariableType.String, One)
+          variable(USER + ".firstname", "First name of the user", VariableType.String, One),
+          variable(USER + ".lastname", "Last name of the user", VariableType.String, One),
+          variable(USER + ".lang", "Language of the user", VariableType.String, One)
       ));
 
   public static final ContractVariable exerciceVariable = variable(EXERCISE, "Exercise of the current injection",
