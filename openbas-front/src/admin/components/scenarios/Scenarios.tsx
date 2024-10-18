@@ -2,6 +2,7 @@ import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
 import { MovieFilterOutlined } from '@mui/icons-material';
 import React, { CSSProperties, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import type { TagHelper, UserHelper } from '../../../actions/helper';
@@ -244,7 +245,8 @@ const Scenarios = () => {
               disablePadding
             >
               <ListItemButton
-                href={`/admin/scenarios/${scenario.scenario_id}`}
+                component={Link}
+                to={`/admin/scenarios/${scenario.scenario_id}`}
                 classes={{ root: classes.item }}
               >
                 <ListItemIcon>
