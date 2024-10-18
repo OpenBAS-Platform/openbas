@@ -69,11 +69,6 @@ const PaginationComponentV2 = <T extends object>({
   const [options, setOptions] = useState<OptionPropertySchema[]>([]);
 
   useEffect(() => {
-    // Retrieve input from uri
-    if (queryableHelpers.uriHelpers) {
-      queryableHelpers.uriHelpers.retrieveFromUri();
-    }
-
     if (entityPrefix) {
       useFilterableProperties(entityPrefix, availableFilterNames).then((propertySchemas: PropertySchemaDTO[]) => {
         const newOptions = propertySchemas.filter((property) => property.schema_property_name !== MITRE_FILTER_KEY)
