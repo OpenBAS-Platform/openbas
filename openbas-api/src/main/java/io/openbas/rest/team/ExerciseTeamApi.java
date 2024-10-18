@@ -1,5 +1,10 @@
 package io.openbas.rest.team;
 
+import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.database.specification.TeamSpecification.contextual;
+import static io.openbas.database.specification.TeamSpecification.fromExercise;
+import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
+
 import io.openbas.database.model.Team;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.team.output.TeamOutput;
@@ -19,11 +24,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.database.specification.TeamSpecification.contextual;
-import static io.openbas.database.specification.TeamSpecification.fromExercise;
-import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
-
 @RequiredArgsConstructor
 @RestController
 @Secured(ROLE_USER)
@@ -38,8 +38,8 @@ public class ExerciseTeamApi extends RestBehavior {
   public Page<TeamOutput> searchTeams(
       @PathVariable @NotBlank final String exerciseId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    final Specification<Team> teamSpecification = contextual(false).or(fromExercise(exerciseId).and(contextual(true)));
+    final Specification<Team> teamSpecification =
+        contextual(false).or(fromExercise(exerciseId).and(contextual(true)));
     return this.teamService.teamPagination(searchPaginationInput, teamSpecification);
   }
-
 }

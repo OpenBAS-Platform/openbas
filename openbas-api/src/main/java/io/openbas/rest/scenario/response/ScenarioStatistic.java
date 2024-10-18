@@ -1,9 +1,8 @@
 package io.openbas.rest.scenario.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-
 import java.util.Map;
+import lombok.Data;
 
 @Data
 public class ScenarioStatistic {
@@ -13,5 +12,4 @@ public class ScenarioStatistic {
 
   @JsonProperty("scenarios_attack_scenario_count")
   private Map<String, Long> scenariosCategoriesCount;
-
 }

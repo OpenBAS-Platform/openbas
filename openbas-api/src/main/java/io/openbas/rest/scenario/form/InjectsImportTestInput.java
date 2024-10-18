@@ -1,12 +1,12 @@
 package io.openbas.rest.scenario.form;
 
+import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.rest.mapper.form.ImportMapperAddInput;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 @Data
 public class InjectsImportTestInput {

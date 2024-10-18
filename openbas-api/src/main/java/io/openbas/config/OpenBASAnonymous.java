@@ -1,13 +1,11 @@
 package io.openbas.config;
 
-import org.springframework.security.core.GrantedAuthority;
-
 import java.util.Collection;
-
+import org.springframework.security.core.GrantedAuthority;
 
 public class OpenBASAnonymous implements OpenBASPrincipal {
 
-  public final static String ANONYMOUS = "anonymous";
+  public static final String ANONYMOUS = "anonymous";
   public static final String LANG_AUTO = "auto";
 
   @Override

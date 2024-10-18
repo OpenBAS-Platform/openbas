@@ -1,5 +1,9 @@
 package io.openbas.rest.variable;
 
+import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
+import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Variable;
@@ -15,10 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
 @RequiredArgsConstructor
 @RestController
@@ -40,7 +40,8 @@ public class VariableApi extends RestBehavior {
       @Valid @RequestBody final VariableInput input) {
     Variable variable = new Variable();
     variable.setUpdateAttributes(input);
-    Exercise exercise = this.exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+    Exercise exercise =
+        this.exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     variable.setExercise(exercise);
     return this.variableService.createVariable(variable);
   }
@@ -114,5 +115,4 @@ public class VariableApi extends RestBehavior {
     assert scenarioId.equals(variable.getScenario().getId());
     this.variableService.deleteVariable(variableId);
   }
-
 }

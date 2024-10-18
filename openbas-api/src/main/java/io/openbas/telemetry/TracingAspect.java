@@ -1,8 +1,11 @@
 package io.openbas.telemetry;
 
+import static io.openbas.config.SessionHelper.currentUser;
+
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Scope;
+import java.lang.reflect.Method;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -10,10 +13,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
-
-import java.lang.reflect.Method;
-
-import static io.openbas.config.SessionHelper.currentUser;
 
 @Aspect
 @Component
@@ -29,12 +28,14 @@ public class TracingAspect {
     Method method = signature.getMethod();
     Tracing tracing = method.getAnnotation(Tracing.class);
 
-    Span span = tracer.spanBuilder(tracing.name())
-        .setAttribute("USER", getCurrentUser())
-        .setAttribute("LAYER", tracing.layer())
-        .setAttribute("OPERATION", tracing.operation())
-        .setAttribute("METHOD", method.getName())
-        .startSpan();
+    Span span =
+        tracer
+            .spanBuilder(tracing.name())
+            .setAttribute("USER", getCurrentUser())
+            .setAttribute("LAYER", tracing.layer())
+            .setAttribute("OPERATION", tracing.operation())
+            .setAttribute("METHOD", method.getName())
+            .startSpan();
     try (Scope ignored = span.makeCurrent()) {
       return proceedingJoinPoint.proceed();
     } finally {

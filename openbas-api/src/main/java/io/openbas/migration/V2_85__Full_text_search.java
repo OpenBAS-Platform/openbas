@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V2_85__Full_text_search extends BaseJavaMigration {
@@ -15,9 +14,10 @@ public class V2_85__Full_text_search extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     // Add full text search index on assets, assets groups, players, teams, organizations
-    select.execute("""
+    select.execute(
+        """
         CREATE EXTENSION IF NOT EXISTS pg_trgm;
-        
+
         CREATE INDEX idx_pg_trgm_assets_asset_name ON assets USING gin(to_tsvector('simple', asset_name));
         CREATE INDEX idx_pg_trgm_asset_groups_asset_group_name ON asset_groups USING gin(to_tsvector('simple', asset_group_name));
         CREATE INDEX idx_pg_trgm_users_user_email ON users USING gin(to_tsvector('simple', user_email));

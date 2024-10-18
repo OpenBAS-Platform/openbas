@@ -1,5 +1,10 @@
 package io.openbas.service;
 
+import static io.openbas.utils.fixtures.ExerciseFixture.getExercise;
+import static io.openbas.utils.fixtures.TeamFixture.getTeam;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ArticleRepository;
 import io.openbas.database.repository.ExerciseRepository;
@@ -9,6 +14,8 @@ import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.ResultUtils;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,70 +24,65 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static io.openbas.utils.fixtures.TeamFixture.getTeam;
-import static io.openbas.utils.fixtures.ExerciseFixture.getExercise;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-
 @SpringBootTest
 public class ExerciseServiceTest {
-    @Mock
-    GrantService grantService;
-    @Mock
-    InjectDuplicateService injectDuplicateService;
-    @Mock
-    VariableService variableService;
-    @Autowired
-    private TeamService teamService;
+  @Mock GrantService grantService;
+  @Mock InjectDuplicateService injectDuplicateService;
+  @Mock VariableService variableService;
+  @Autowired private TeamService teamService;
 
-    @Autowired
-    ExerciseMapper exerciseMapper;
-    @Autowired
-    ResultUtils resultUtils;
-    @Autowired
-    private ArticleRepository articleRepository;
-    @Autowired
-    private ExerciseRepository exerciseRepository;
-    @Autowired
-    private TeamRepository teamRepository;
+  @Autowired ExerciseMapper exerciseMapper;
+  @Autowired ResultUtils resultUtils;
+  @Autowired private ArticleRepository articleRepository;
+  @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private TeamRepository teamRepository;
 
-    @InjectMocks
-    private ExerciseService exerciseService;
-    @BeforeEach
-    void setUp() {
-        exerciseService = new ExerciseService(grantService, injectDuplicateService,
-                teamService,variableService, exerciseMapper, resultUtils, articleRepository,
-                exerciseRepository, teamRepository);
-    }
+  @InjectMocks private ExerciseService exerciseService;
 
-    @DisplayName("Should create new contextual teams while exercise duplication")
-    @Test
-    @Transactional(rollbackOn = Exception.class)
-    void createNewContextualTeamsWhileExerciseDuplication(){
-        // -- PREPARE --
-        List<Team> exerciseTeams = new ArrayList<>();;
-        Team contextualTeam = this.teamRepository.save(getTeam(null, "fakeTeamName1", true));
-        exerciseTeams.add(contextualTeam);
-        Team noContextualTeam = this.teamRepository.save(getTeam(null, "fakeTeamName2",false));
-        exerciseTeams.add(noContextualTeam);
-        Exercise exercise = this.exerciseRepository.save(getExercise(exerciseTeams));
+  @BeforeEach
+  void setUp() {
+    exerciseService =
+        new ExerciseService(
+            grantService,
+            injectDuplicateService,
+            teamService,
+            variableService,
+            exerciseMapper,
+            resultUtils,
+            articleRepository,
+            exerciseRepository,
+            teamRepository);
+  }
 
-        // -- EXECUTE --
-        Exercise exerciseDuplicated = exerciseService.getDuplicateExercise(exercise.getId());
+  @DisplayName("Should create new contextual teams while exercise duplication")
+  @Test
+  @Transactional(rollbackOn = Exception.class)
+  void createNewContextualTeamsWhileExerciseDuplication() {
+    // -- PREPARE --
+    List<Team> exerciseTeams = new ArrayList<>();
+    ;
+    Team contextualTeam = this.teamRepository.save(getTeam(null, "fakeTeamName1", true));
+    exerciseTeams.add(contextualTeam);
+    Team noContextualTeam = this.teamRepository.save(getTeam(null, "fakeTeamName2", false));
+    exerciseTeams.add(noContextualTeam);
+    Exercise exercise = this.exerciseRepository.save(getExercise(exerciseTeams));
 
-        // -- ASSERT --
-        assertNotEquals(exercise.getId(), exerciseDuplicated.getId());
-        assertEquals(2, exerciseDuplicated.getTeams().size());
-        exerciseDuplicated.getTeams().forEach(team -> {
-            if (team.getContextual()){
+    // -- EXECUTE --
+    Exercise exerciseDuplicated = exerciseService.getDuplicateExercise(exercise.getId());
+
+    // -- ASSERT --
+    assertNotEquals(exercise.getId(), exerciseDuplicated.getId());
+    assertEquals(2, exerciseDuplicated.getTeams().size());
+    exerciseDuplicated
+        .getTeams()
+        .forEach(
+            team -> {
+              if (team.getContextual()) {
                 assertNotEquals(contextualTeam.getId(), team.getId());
                 assertEquals(contextualTeam.getName(), team.getName());
-            } else {
+              } else {
                 assertEquals(noContextualTeam.getId(), team.getId());
-            }
-        });
-    }
+              }
+            });
+  }
 }

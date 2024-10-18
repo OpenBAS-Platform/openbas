@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V2_70__Enhance_attack_patterns extends BaseJavaMigration {
@@ -15,7 +14,8 @@ public class V2_70__Enhance_attack_patterns extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     // Cleanup a bit indexes
-    select.execute("""
+    select.execute(
+        """
         ALTER TABLE users_teams RENAME CONSTRAINT fk_cfb417fca76ed395 TO fk_user_id;
         ALTER TABLE users_teams RENAME CONSTRAINT fk_cfb417fccb0ca5a3 TO fk_team_id;
         ALTER TABLE injects_tags RENAME CONSTRAINT tag_id_fk TO fk_tag_id;
@@ -41,7 +41,8 @@ public class V2_70__Enhance_attack_patterns extends BaseJavaMigration {
         ALTER INDEX attack_patterns_kill_chain_phases_pkey RENAME TO pkey_attack_patterns_kill_chain_phases;
     """);
     // Add column for endpoint type
-    select.execute("""
+    select.execute(
+        """
         ALTER TABLE kill_chain_phases ADD COLUMN phase_description text;
         ALTER TABLE kill_chain_phases ADD COLUMN phase_shortname varchar(255) not null;
         ALTER TABLE kill_chain_phases ADD COLUMN phase_external_id varchar(255) not null;

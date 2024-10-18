@@ -16,5 +16,4 @@ public class Agent {
   private String architecture;
   private String[] host_ip_addrs;
   private String exe_name;
-
 }

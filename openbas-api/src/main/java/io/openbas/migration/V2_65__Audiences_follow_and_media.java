@@ -1,15 +1,13 @@
 package io.openbas.migration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.flywaydb.core.api.migration.BaseJavaMigration;
-import org.flywaydb.core.api.migration.Context;
-import org.springframework.stereotype.Component;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Objects;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
+import org.springframework.stereotype.Component;
 
 @Component
 public class V2_65__Audiences_follow_and_media extends BaseJavaMigration {
@@ -19,7 +17,8 @@ public class V2_65__Audiences_follow_and_media extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     // Medias
-    select.execute("""
+    select.execute(
+        """
         ALTER TABLE teams RENAME CONSTRAINT team_pkey TO teams_pkey;
         ALTER TABLE medias RENAME CONSTRAINT medias_pkey TO channels_pkey;
         ALTER TABLE medias RENAME COLUMN media_id TO channel_id;
@@ -37,18 +36,24 @@ public class V2_65__Audiences_follow_and_media extends BaseJavaMigration {
         ALTER TABLE medias RENAME COLUMN media_updated_at TO channel_updated_at;
         ALTER TABLE medias RENAME TO channels;
      """);
-    select.execute("""
+    select.execute(
+        """
       ALTER TABLE articles RENAME CONSTRAINT fk_article_media TO fk_article_channel;
       ALTER TABLE articles RENAME COLUMN article_media TO article_channel;
     """);
     // Add Variable table
-    select.execute("""
+    select.execute(
+        """
         ALTER TABLE teams ADD team_contextual bool default false;
     """);
     // Migration the data
     ObjectMapper mapper = new ObjectMapper();
-    ResultSet results = select.executeQuery("SELECT * FROM injects_teams it LEFT JOIN injects as inject ON it.inject_id = inject.inject_id");
-    PreparedStatement statement = connection.prepareStatement("INSERT INTO exercises_teams (exercise_id, team_id) SELECT ?, ? WHERE NOT EXISTS (SELECT exercise_id FROM exercises_teams WHERE exercise_id = ? and team_id = ?)");
+    ResultSet results =
+        select.executeQuery(
+            "SELECT * FROM injects_teams it LEFT JOIN injects as inject ON it.inject_id = inject.inject_id");
+    PreparedStatement statement =
+        connection.prepareStatement(
+            "INSERT INTO exercises_teams (exercise_id, team_id) SELECT ?, ? WHERE NOT EXISTS (SELECT exercise_id FROM exercises_teams WHERE exercise_id = ? and team_id = ?)");
     while (results.next()) {
       String exerciseId = results.getString("inject_exercise");
       String teamId = results.getString("team_id");

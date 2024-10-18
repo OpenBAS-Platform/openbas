@@ -6,14 +6,13 @@ import io.openbas.database.model.ChallengeFlag;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Tag;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import org.springframework.util.CollectionUtils;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.Data;
+import org.springframework.util.CollectionUtils;
 
 @Data
 public class ChallengeOutput {
@@ -63,9 +62,9 @@ public class ChallengeOutput {
     if (!CollectionUtils.isEmpty(challenge.getFlags())) {
       challengeOutput.setFlags(challenge.getFlags());
     }
-    challengeOutput.setTags(challenge.getTags().stream().map(Tag::getId).collect(Collectors.toSet()));
+    challengeOutput.setTags(
+        challenge.getTags().stream().map(Tag::getId).collect(Collectors.toSet()));
     challengeOutput.setDocuments(challenge.getDocuments().stream().map(Document::getId).toList());
     return challengeOutput;
   }
-
 }

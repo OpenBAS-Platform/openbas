@@ -1,12 +1,12 @@
 package io.openbas.rest.exception;
 
-public class ElementNotFoundException extends RuntimeException{
+public class ElementNotFoundException extends RuntimeException {
 
-    public ElementNotFoundException() {
-        super();
-    }
+  public ElementNotFoundException() {
+    super();
+  }
 
-    public ElementNotFoundException(String errorMessage) {
-        super(errorMessage);
-    }
+  public ElementNotFoundException(String errorMessage) {
+    super(errorMessage);
+  }
 }

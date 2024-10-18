@@ -23,5 +23,4 @@ public interface RawInjectExpectation {
   String getInject_id();
 
   Boolean getInject_expectation_group();
-
 }

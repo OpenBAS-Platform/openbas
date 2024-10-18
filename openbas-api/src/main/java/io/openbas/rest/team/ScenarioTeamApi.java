@@ -1,5 +1,10 @@
 package io.openbas.rest.team;
 
+import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.database.specification.TeamSpecification.contextual;
+import static io.openbas.database.specification.TeamSpecification.fromScenario;
+import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+
 import io.openbas.database.model.Team;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.team.output.TeamOutput;
@@ -19,11 +24,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.database.specification.TeamSpecification.contextual;
-import static io.openbas.database.specification.TeamSpecification.fromScenario;
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
-
 @RequiredArgsConstructor
 @RestController
 @Secured(ROLE_USER)
@@ -38,8 +38,8 @@ public class ScenarioTeamApi extends RestBehavior {
   public Page<TeamOutput> teams(
       @PathVariable @NotBlank final String scenarioId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    final Specification<Team> teamSpecification = contextual(false).or(fromScenario(scenarioId).and(contextual(true)));
+    final Specification<Team> teamSpecification =
+        contextual(false).or(fromScenario(scenarioId).and(contextual(true)));
     return this.teamService.teamPagination(searchPaginationInput, teamSpecification);
   }
-
 }

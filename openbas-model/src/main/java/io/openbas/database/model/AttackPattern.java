@@ -1,5 +1,7 @@
 package io.openbas.database.model;
 
+import static java.time.Instant.now;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
@@ -9,16 +11,13 @@ import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.UuidGenerator;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static java.time.Instant.now;
+import lombok.Data;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UuidGenerator;
 
 @Data
 @Entity
@@ -83,7 +82,8 @@ public class AttackPattern implements Base {
   private AttackPattern parent;
 
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "attack_patterns_kill_chain_phases",
+  @JoinTable(
+      name = "attack_patterns_kill_chain_phases",
       joinColumns = @JoinColumn(name = "attack_pattern_id"),
       inverseJoinColumns = @JoinColumn(name = "phase_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)

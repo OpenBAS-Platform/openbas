@@ -1,13 +1,12 @@
 package io.openbas.rest.scenario.form;
 
+import static io.openbas.config.AppConfig.EMAIL_FORMAT;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-
 import java.util.List;
-
-import static io.openbas.config.AppConfig.EMAIL_FORMAT;
+import lombok.Data;
 
 @Data
 public class ScenarioInformationInput {
@@ -25,5 +24,4 @@ public class ScenarioInformationInput {
 
   @JsonProperty("scenario_message_footer")
   private String footer;
-
 }

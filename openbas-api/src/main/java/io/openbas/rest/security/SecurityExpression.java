@@ -1,5 +1,7 @@
 package io.openbas.rest.security;
 
+import static io.openbas.database.model.User.ROLE_ADMIN;
+
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Scenario;
@@ -8,17 +10,15 @@ import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.service.ScenarioService;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
-import java.util.List;
-import java.util.Optional;
-
-import static io.openbas.database.model.User.ROLE_ADMIN;
-
-public class SecurityExpression extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
+public class SecurityExpression extends SecurityExpressionRoot
+    implements MethodSecurityExpressionOperations {
 
   private final UserRepository userRepository;
   private final ExerciseRepository exerciseRepository;
@@ -42,15 +42,18 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
   private OpenBASPrincipal getUser() {
     return (OpenBASPrincipal) this.getPrincipal();
   }
+
   public boolean isAdmin() {
     return isUserHasBypass();
   }
 
   private boolean isUserHasBypass() {
     OpenBASPrincipal principal = getUser();
-    return principal.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+    return principal.getAuthorities().stream()
+        .map(GrantedAuthority::getAuthority)
         .anyMatch(s -> s.equals(ROLE_ADMIN));
   }
+
   // endregion
 
   // region exercise annotations
@@ -61,8 +64,8 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
     }
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
     List<User> planners = exercise.getPlanners();
-    Optional<User> planner = planners.stream()
-        .filter(user -> user.getId().equals(getUser().getId())).findAny();
+    Optional<User> planner =
+        planners.stream().filter(user -> user.getId().equals(getUser().getId())).findAny();
     return planner.isPresent();
   }
 
@@ -73,8 +76,8 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
     }
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
     List<User> observers = exercise.getObservers();
-    Optional<User> observer = observers.stream()
-        .filter(user -> user.getId().equals(getUser().getId())).findAny();
+    Optional<User> observer =
+        observers.stream().filter(user -> user.getId().equals(getUser().getId())).findAny();
     return observer.isPresent();
   }
 
@@ -84,8 +87,8 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
     }
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
     List<User> players = exercise.getUsers();
-    Optional<User> player = players.stream()
-        .filter(user -> user.getId().equals(getUser().getId())).findAny();
+    Optional<User> player =
+        players.stream().filter(user -> user.getId().equals(getUser().getId())).findAny();
     return player.isPresent();
   }
 
@@ -93,6 +96,7 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
   public boolean isExerciseObserverOrPlayer(String exerciseId) {
     return isExerciseObserver(exerciseId) || isExercisePlayer(exerciseId);
   }
+
   // endregion
 
   // region scenario annotations
@@ -103,8 +107,8 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
     }
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     List<User> planners = scenario.getPlanners();
-    Optional<User> planner = planners.stream()
-        .filter(user -> user.getId().equals(getUser().getId())).findAny();
+    Optional<User> planner =
+        planners.stream().filter(user -> user.getId().equals(getUser().getId())).findAny();
     return planner.isPresent();
   }
 
@@ -115,10 +119,11 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
     }
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     List<User> observers = scenario.getObservers();
-    Optional<User> observer = observers.stream()
-        .filter(user -> user.getId().equals(getUser().getId())).findAny();
+    Optional<User> observer =
+        observers.stream().filter(user -> user.getId().equals(getUser().getId())).findAny();
     return observer.isPresent();
   }
+
   // endregion
 
   // region user annotations
@@ -144,6 +149,7 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
     User user = userRepository.findById(getUser().getId()).orElseThrow();
     return user.isPlayer();
   }
+
   // endregion
 
   // region setters

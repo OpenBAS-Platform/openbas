@@ -1,11 +1,10 @@
 package io.openbas.utils.fixtures;
 
+import static java.lang.String.valueOf;
+
 import io.openbas.database.model.KillChainPhase;
 import jakarta.validation.constraints.NotBlank;
-
 import java.util.Random;
-
-import static java.lang.String.valueOf;
 
 public class KillChainPhaseFixture {
 
@@ -19,5 +18,4 @@ public class KillChainPhaseFixture {
     killChainPhase.setExternalId(valueOf(RANDOM.nextInt()));
     return killChainPhase;
   }
-
 }

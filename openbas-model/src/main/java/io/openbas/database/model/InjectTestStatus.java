@@ -2,14 +2,13 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.Instant;
-import java.time.Duration;
-import java.util.Optional;
 
 @Setter
 @Getter
@@ -34,7 +33,8 @@ public class InjectTestStatus extends BaseInjectStatus implements Base {
 
   @JsonProperty("inject_type")
   private String getType() {
-    return inject.getInjectorContract()
+    return inject
+        .getInjectorContract()
         .map(InjectorContract::getInjector)
         .map(Injector::getType)
         .orElse(null);
@@ -55,22 +55,30 @@ public class InjectTestStatus extends BaseInjectStatus implements Base {
     injectTestStatus.setTrackingSentDate(Instant.now());
     injectTestStatus.getTraces().addAll(execution.getTraces());
     int numberOfElements = execution.getTraces().size();
-    int numberOfError = (int) execution.getTraces().stream().filter(ex -> ex.getStatus().equals(ExecutionStatus.ERROR))
-        .count();
-    int numberOfSuccess = (int) execution.getTraces().stream()
-        .filter(ex -> ex.getStatus().equals(ExecutionStatus.SUCCESS)).count();
+    int numberOfError =
+        (int)
+            execution.getTraces().stream()
+                .filter(ex -> ex.getStatus().equals(ExecutionStatus.ERROR))
+                .count();
+    int numberOfSuccess =
+        (int)
+            execution.getTraces().stream()
+                .filter(ex -> ex.getStatus().equals(ExecutionStatus.SUCCESS))
+                .count();
     injectTestStatus.setTrackingTotalError(numberOfError);
     injectTestStatus.setTrackingTotalSuccess(numberOfSuccess);
     injectTestStatus.setTrackingTotalCount(
         execution.getExpectedCount() != null ? execution.getExpectedCount() : numberOfElements);
-    ExecutionStatus globalStatus = numberOfSuccess > 0 ? ExecutionStatus.SUCCESS : ExecutionStatus.ERROR;
-    ExecutionStatus finalStatus = numberOfError > 0 && numberOfSuccess > 0 ? ExecutionStatus.PARTIAL : globalStatus;
+    ExecutionStatus globalStatus =
+        numberOfSuccess > 0 ? ExecutionStatus.SUCCESS : ExecutionStatus.ERROR;
+    ExecutionStatus finalStatus =
+        numberOfError > 0 && numberOfSuccess > 0 ? ExecutionStatus.PARTIAL : globalStatus;
     injectTestStatus.setName(execution.isAsync() ? ExecutionStatus.PENDING : finalStatus);
     injectTestStatus.setTrackingEndDate(Instant.now());
     injectTestStatus.setTrackingTotalExecutionTime(
-        Duration.between(injectTestStatus.getTrackingSentDate(), injectTestStatus.getTrackingEndDate()).getSeconds());
+        Duration.between(
+                injectTestStatus.getTrackingSentDate(), injectTestStatus.getTrackingEndDate())
+            .getSeconds());
     return injectTestStatus;
   }
-
-
 }

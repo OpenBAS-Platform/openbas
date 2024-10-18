@@ -3,11 +3,10 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.converter.InjectStatusCommandLineConverter;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.Duration;
 import java.time.Instant;
+import lombok.Getter;
+import lombok.Setter;
 
 @Setter
 @Getter
@@ -27,20 +26,29 @@ public class InjectStatus extends BaseInjectStatus {
     injectStatus.setInject(executedInject);
     injectStatus.getTraces().addAll(execution.getTraces());
     int numberOfElements = execution.getTraces().size();
-    int numberOfError = (int) execution.getTraces().stream().filter(ex -> ex.getStatus().equals(ExecutionStatus.ERROR))
-        .count();
-    int numberOfSuccess = (int) execution.getTraces().stream()
-        .filter(ex -> ex.getStatus().equals(ExecutionStatus.SUCCESS)).count();
+    int numberOfError =
+        (int)
+            execution.getTraces().stream()
+                .filter(ex -> ex.getStatus().equals(ExecutionStatus.ERROR))
+                .count();
+    int numberOfSuccess =
+        (int)
+            execution.getTraces().stream()
+                .filter(ex -> ex.getStatus().equals(ExecutionStatus.SUCCESS))
+                .count();
     injectStatus.setTrackingTotalError(numberOfError);
     injectStatus.setTrackingTotalSuccess(numberOfSuccess);
     injectStatus.setTrackingTotalCount(
         execution.getExpectedCount() != null ? execution.getExpectedCount() : numberOfElements);
-    ExecutionStatus globalStatus = numberOfSuccess > 0 ? ExecutionStatus.SUCCESS : ExecutionStatus.ERROR;
-    ExecutionStatus finalStatus = numberOfError > 0 && numberOfSuccess > 0 ? ExecutionStatus.PARTIAL : globalStatus;
+    ExecutionStatus globalStatus =
+        numberOfSuccess > 0 ? ExecutionStatus.SUCCESS : ExecutionStatus.ERROR;
+    ExecutionStatus finalStatus =
+        numberOfError > 0 && numberOfSuccess > 0 ? ExecutionStatus.PARTIAL : globalStatus;
     injectStatus.setName(execution.isAsync() ? ExecutionStatus.PENDING : finalStatus);
     injectStatus.setTrackingEndDate(Instant.now());
     injectStatus.setTrackingTotalExecutionTime(
-        Duration.between(injectStatus.getTrackingSentDate(), injectStatus.getTrackingEndDate()).getSeconds());
+        Duration.between(injectStatus.getTrackingSentDate(), injectStatus.getTrackingEndDate())
+            .getSeconds());
     return injectStatus;
   }
 

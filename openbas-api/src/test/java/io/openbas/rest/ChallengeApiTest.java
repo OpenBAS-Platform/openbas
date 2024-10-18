@@ -1,5 +1,13 @@
 package io.openbas.rest;
 
+import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
+import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.database.model.Challenge;
@@ -13,6 +21,7 @@ import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import jakarta.annotation.Resource;
+import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,37 +29,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
-
-import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
 class ChallengeApiTest {
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
-  @Autowired
-  private ScenarioRepository scenarioRepository;
-  @Autowired
-  private ScenarioService scenarioService;
-  @Autowired
-  private InjectRepository injectRepository;
-  @Autowired
-  private ChallengeRepository challengeRepository;
-  @Autowired
-  private InjectorContractRepository injectorContractRepository;
-  @Resource
-  private ObjectMapper objectMapper;
+  @Autowired private ScenarioRepository scenarioRepository;
+  @Autowired private ScenarioService scenarioService;
+  @Autowired private InjectRepository injectRepository;
+  @Autowired private ChallengeRepository challengeRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
+  @Resource private ObjectMapper objectMapper;
 
   static String SCENARIO_ID;
   static String CHALLENGE_ID;
@@ -85,7 +77,8 @@ class ChallengeApiTest {
     content.setChallenges(List.of(challenge.getId()));
     Inject inject = new Inject();
     inject.setTitle("Test inject");
-    inject.setInjectorContract(this.injectorContractRepository.findById(CHALLENGE_PUBLISH).orElseThrow());
+    inject.setInjectorContract(
+        this.injectorContractRepository.findById(CHALLENGE_PUBLISH).orElseThrow());
     inject.setContent(this.objectMapper.valueToTree(content));
     inject.setDependsDuration(0L);
     inject.setScenario(scenario);
@@ -93,17 +86,18 @@ class ChallengeApiTest {
     INJECT_ID = inject.getId();
 
     // -- EXECUTE --
-    String response = this.mvc
-        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID + "/challenges")
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        this.mvc
+            .perform(
+                get(SCENARIO_URI + "/" + SCENARIO_ID + "/challenges")
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
     assertEquals(challengeName, JsonPath.read(response, "$[0].challenge_name"));
   }
-
 }

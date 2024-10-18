@@ -1,5 +1,7 @@
 package io.openbas.rest.payload.form;
 
+import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
@@ -10,13 +12,10 @@ import io.openbas.database.model.PayloadPrerequisite;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -81,5 +80,3 @@ public class PayloadCreateInput {
   @JsonProperty("payload_attack_patterns")
   private List<String> attackPatternsIds = new ArrayList<>();
 }
-
-

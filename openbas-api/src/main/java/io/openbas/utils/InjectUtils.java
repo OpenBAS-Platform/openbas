@@ -7,9 +7,7 @@ import org.apache.poi.ss.usermodel.Row;
 
 public class InjectUtils {
 
-  private InjectUtils() {
-
-  }
+  private InjectUtils() {}
 
   public static boolean checkIfRowIsEmpty(Row row) {
     if (row == null) {
@@ -20,7 +18,9 @@ public class InjectUtils {
     }
     for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
       Cell cell = row.getCell(cellNum);
-      if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
+      if (cell != null
+          && cell.getCellType() != CellType.BLANK
+          && StringUtils.isNotBlank(cell.toString())) {
         return false;
       }
     }

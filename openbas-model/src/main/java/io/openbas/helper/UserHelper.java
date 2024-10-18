@@ -1,11 +1,10 @@
 package io.openbas.helper;
 
+import static java.util.Arrays.asList;
+
 import io.openbas.database.model.Grant;
 import io.openbas.database.model.User;
-
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 public class UserHelper {
 
@@ -22,5 +21,4 @@ public class UserHelper {
     String emailMd5 = CryptoHelper.md5Hex(email.trim().toLowerCase());
     return "https://www.gravatar.com/avatar/" + emailMd5 + "?d=mm";
   }
-
 }
