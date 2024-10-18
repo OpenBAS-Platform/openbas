@@ -1,12 +1,14 @@
 import { useLocalStorage } from 'usehooks-ts';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import * as R from 'ramda';
 import useFiltersState from './filter/useFiltersState';
 import type { FilterGroup, SearchPaginationInput, SortField } from '../../../utils/api-types';
 import useTextSearchState from './textSearch/useTextSearchState';
 import usPaginationState from './pagination/usPaginationState';
 import { QueryableHelpers } from './QueryableHelpers';
 import useSortState from './sort/useSortState';
-import useUriState from './uri/useUriState';
+import useUriState, { retrieveFromUri } from './uri/useUriState';
 import { buildSearchPagination } from './QueryableUtils';
 
 const buildUseQueryable = (
@@ -70,9 +72,23 @@ export const useQueryable = (initSearchPaginationInput: Partial<SearchPagination
 };
 
 export const useQueryableWithLocalStorage = (localStorageKey: string, initSearchPaginationInput: Partial<SearchPaginationInput>) => {
+  const [searchParams] = useSearchParams();
   const finalSearchPaginationInput: SearchPaginationInput = buildSearchPagination(initSearchPaginationInput);
+  const searchPaginationInputFromUri = retrieveFromUri(localStorageKey, searchParams);
 
-  const [searchPaginationInput, setSearchPaginationInput] = useLocalStorage<SearchPaginationInput>(localStorageKey, finalSearchPaginationInput);
+  const [searchPaginationInputFromLocalStorage, setSearchPaginationInputFromLocalStorage] = useLocalStorage<SearchPaginationInput>(
+    localStorageKey,
+    searchPaginationInputFromUri ?? finalSearchPaginationInput,
+  );
+  // add a transitional state to avoid re render because of useLocalStorage hook
+  const [searchPaginationInput, setSearchPaginationInput] = useState(searchPaginationInputFromUri ?? searchPaginationInputFromLocalStorage);
 
-  return buildUseQueryable(localStorageKey, initSearchPaginationInput, searchPaginationInput, setSearchPaginationInput);
+  useEffect(() => {
+    // check deep changes between state from local storage and transitional state
+    if (!R.equals(searchPaginationInputFromLocalStorage, searchPaginationInput)) {
+      setSearchPaginationInput(searchPaginationInputFromLocalStorage);
+    }
+  }, [searchPaginationInputFromLocalStorage]);
+
+  return buildUseQueryable(localStorageKey, initSearchPaginationInput, searchPaginationInput, setSearchPaginationInputFromLocalStorage);
 };
