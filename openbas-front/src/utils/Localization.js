@@ -871,6 +871,8 @@ const i18n = {
       OR: 'OU',
       // Asset
       asset_tags: 'Tags',
+      asset_name: 'Nom',
+      asset_executor: 'Exécuteur',
       // Asset Group
       asset_group_name: 'Nom',
       asset_group_description: 'Description',
@@ -1118,6 +1120,7 @@ const i18n = {
       'Last simulations': 'Dernières simulations',
       Collectors: 'Collecteurs',
       'Updated at': 'Mis à jour à',
+      Executor: 'Exécuteur',
       Executors: 'Exécuteurs',
       Injectors: 'Injecteurs',
       InjectorContracts: "Contrats d'injecteur",
@@ -2474,6 +2477,7 @@ const i18n = {
       'Last simulations': '最后模拟',
       Collectors: '收集器',
       'Updated at': '更新于',
+      Executor: '执行者',
       Executors: '执行者',
       Injectors: '注入者',
       InjectorContracts: '注入者合约',
@@ -2784,6 +2788,8 @@ const i18n = {
       // -- FILTERS --
       // Asset
       asset_tags: 'Tags',
+      asset_name: 'Name',
+      asset_executor: 'Executor',
       // Asset Group
       asset_group_name: 'Name',
       asset_group_description: 'Description',
