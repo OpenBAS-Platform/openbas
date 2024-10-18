@@ -380,7 +380,7 @@ class InjectApiTest extends IntegrationTest {
     inject.setExercise(EXERCISE);
     ObjectNode content = objectMapper.createObjectNode();
     content.set("subject", objectMapper.convertValue("Subject", JsonNode.class));
-    content.set("body", objectMapper.convertValue("Test body", JsonNode.class));
+    content.set("body", objectMapper.convertValue("Test body g", JsonNode.class));
     content.set("expectationType", objectMapper.convertValue("none", JsonNode.class));
     inject.setContent(content);
     Inject savedInject = this.injectRepository.save(inject);
