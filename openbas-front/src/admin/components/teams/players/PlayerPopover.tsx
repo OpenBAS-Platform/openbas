@@ -113,7 +113,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   const handleCloseRemove = () => setOpenRemove(false);
 
   const submitRemove = async () => {
-    await onRemoveUsersTeam(teamId!, [user.user_id]);
+    await onRemoveUsersTeam?.(teamId!, [user.user_id]);
     handleCloseRemove();
   };
 
