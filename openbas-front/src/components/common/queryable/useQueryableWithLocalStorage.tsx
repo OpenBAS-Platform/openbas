@@ -80,6 +80,7 @@ export const useQueryableWithLocalStorage = (localStorageKey: string, initSearch
     localStorageKey,
     searchPaginationInputFromUri ?? finalSearchPaginationInput,
   );
+  // add a transitional state to avoid re render because of useLocalStorage hook
   const [searchPaginationInput, setSearchPaginationInput] = useState(searchPaginationInputFromUri ?? searchPaginationInputFromLocalStorage);
 
   useEffect(() => {
