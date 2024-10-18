@@ -1,31 +1,53 @@
 package io.openbas.rest;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
+import io.openbas.execution.ExecutableInject;
+import io.openbas.execution.ExecutionContext;
+import io.openbas.execution.ExecutionContextService;
+import io.openbas.execution.Executor;
 import io.openbas.rest.exercise.ExerciseService;
+import io.openbas.rest.inject.form.DirectInjectInput;
 import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.fixtures.InjectExpectationFixture;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
+import jakarta.annotation.Resource;
+import jakarta.annotation.Resources;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 
+import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.ExerciseStatus.RUNNING;
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
+import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
+import static io.openbas.utils.fixtures.UserFixture.getSavedUser;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -49,6 +71,10 @@ class InjectApiTest extends IntegrationTest {
   @Autowired
   private ExerciseRepository exerciseRepository;
   @Autowired
+  private ExecutionContextService executionContextService;
+  @SpyBean
+  private Executor executor;
+  @Autowired
   private ScenarioRepository scenarioRepository;
   @Autowired
   private InjectRepository injectRepository;
@@ -62,6 +88,10 @@ class InjectApiTest extends IntegrationTest {
   private TeamRepository teamRepository;
   @Autowired
   private InjectorContractRepository injectorContractRepository;
+  @Autowired
+  private UserRepository userRepository;
+  @Resource
+  private ObjectMapper objectMapper;
 
   @BeforeAll
   void beforeAll() {
@@ -264,6 +294,60 @@ class InjectApiTest extends IntegrationTest {
   }
 
   // -- EXERCISES --
+
+  @DisplayName("Execute an email inject for exercise")
+  @Test
+  @WithMockPlannerUser
+  void executeEmailInjectForExerciseTest() throws Exception {
+    // -- PREPARE --
+    InjectorContract injectorContract = this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
+    Inject inject = getInjectForEmailContract(injectorContract);
+    inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
+    inject.setExercise(EXERCISE);
+    ObjectNode content = objectMapper.createObjectNode();
+    content.set("subject", objectMapper.convertValue("Subject", JsonNode.class));
+    content.set("body", objectMapper.convertValue("Test body g", JsonNode.class));
+    content.set("expectationType", objectMapper.convertValue("none", JsonNode.class));
+    inject.setContent(content);
+    Inject savedInject = this.injectRepository.save(inject);
+    List<ExecutionContext> userInjectContexts = Collections.singletonList(
+        executionContextService.executionContext(getSavedUser(), savedInject, "Direct execution"));
+    ExecutableInject injection = new ExecutableInject(
+        true, true, savedInject, List.of(), savedInject.getAssets(),
+        savedInject.getAssetGroups(), userInjectContexts
+    );
+
+    DirectInjectInput input = new DirectInjectInput();
+    input.setTitle(savedInject.getTitle());
+    input.setDescription(savedInject.getDescription());
+    input.setInjectorContract(savedInject.getInjectorContract().orElseThrow().getId());
+    input.setUserIds(List.of(savedInject.getId()));
+    input.setContent(savedInject.getContent());
+    MockMultipartFile inputJson = new MockMultipartFile("input", null, "application/json",
+        objectMapper.writeValueAsString(input).getBytes());
+
+    // Getting a test file
+    File testFile = ResourceUtils.getFile("classpath:xls-test-files/test_file_1.xlsx");
+    InputStream in = new FileInputStream(testFile);
+    MockMultipartFile fileJson = new MockMultipartFile("file",
+        "my-awesome-file.xls",
+        "application/xlsx",
+        in.readAllBytes());
+
+    // -- EXECUTE --
+    mvc.perform(multipart(EXERCISE_URI + "/" + EXERCISE.getId() + "/inject")
+            .file(inputJson)
+            .file(fileJson))
+        .andExpect(status().is2xxSuccessful())
+        /*.andReturn()
+        .getResponse()
+        .getContentAsString()*/;
+    // -- ASSERT --
+    verify(executor).execute(injection);
+
+    //-- THEN ---
+    injectRepository.delete(savedInject);
+  }
 
   // -- BULK DELETE --
 
