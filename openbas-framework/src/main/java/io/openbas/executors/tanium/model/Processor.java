@@ -7,6 +7,5 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Processor {
 
-    private String architecture;
-
+  private String architecture;
 }

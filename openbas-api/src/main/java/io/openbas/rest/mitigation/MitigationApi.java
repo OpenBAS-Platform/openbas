@@ -1,5 +1,10 @@
 package io.openbas.rest.mitigation;
 
+import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Mitigation;
 import io.openbas.database.repository.AttackPatternRepository;
@@ -14,22 +19,16 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RestController
 @Secured(ROLE_USER)
@@ -55,13 +54,13 @@ public class MitigationApi extends RestBehavior {
   }
 
   @PostMapping("/api/mitigations/search")
-  public Page<Mitigation> mitigations(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+  public Page<Mitigation> mitigations(
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
-        (Specification<Mitigation> specification, Pageable pageable) -> this.mitigationRepository.findAll(
-            specification, pageable),
+        (Specification<Mitigation> specification, Pageable pageable) ->
+            this.mitigationRepository.findAll(specification, pageable),
         searchPaginationInput,
-        Mitigation.class
-    );
+        Mitigation.class);
   }
 
   @GetMapping("/api/mitigations/{mitigationId}")
@@ -75,14 +74,16 @@ public class MitigationApi extends RestBehavior {
   public Mitigation createMitigation(@Valid @RequestBody MitigationCreateInput input) {
     Mitigation mitigation = new Mitigation();
     mitigation.setUpdateAttributes(input);
-    mitigation.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
+    mitigation.setAttackPatterns(
+        fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
     return mitigationRepository.save(mitigation);
   }
 
   @GetMapping("/api/mitigations/{mitigationId}/attack_patterns")
   public Iterable<AttackPattern> injectorContracts(@PathVariable String mitigationId) {
     mitigationRepository.findById(mitigationId).orElseThrow(ElementNotFoundException::new);
-    return attackPatternRepository.findAll(AttackPatternSpecification.fromAttackPattern(mitigationId));
+    return attackPatternRepository.findAll(
+        AttackPatternSpecification.fromAttackPattern(mitigationId));
   }
 
   @Secured(ROLE_ADMIN)
@@ -90,22 +91,27 @@ public class MitigationApi extends RestBehavior {
   public Mitigation updateMitigation(
       @NotBlank @PathVariable final String mitigationId,
       @Valid @RequestBody MitigationUpdateInput input) {
-    Mitigation mitigation = this.mitigationRepository.findById(mitigationId).orElseThrow(ElementNotFoundException::new);
+    Mitigation mitigation =
+        this.mitigationRepository.findById(mitigationId).orElseThrow(ElementNotFoundException::new);
     mitigation.setUpdateAttributes(input);
-    mitigation.setAttackPatterns(fromIterable(this.attackPatternRepository.findAllById(input.getAttackPatternsIds())));
+    mitigation.setAttackPatterns(
+        fromIterable(this.attackPatternRepository.findAllById(input.getAttackPatternsIds())));
     mitigation.setUpdatedAt(Instant.now());
     return mitigationRepository.save(mitigation);
   }
 
   private List<Mitigation> upsertMitigations(List<MitigationCreateInput> mitigations) {
     List<Mitigation> upserted = new ArrayList<>();
-    mitigations.forEach(mitigationInput -> {
+    mitigations.forEach(
+        mitigationInput -> {
           String mitigationExternalId = mitigationInput.getExternalId();
-          Optional<Mitigation> optionalMitigation = mitigationRepository.findByExternalId(
-              mitigationExternalId);
-          List<AttackPattern> attackPatterns = !mitigationInput.getAttackPatternsIds().isEmpty() ?
-              fromIterable(attackPatternRepository.findAllById(mitigationInput.getAttackPatternsIds()))
-              : List.of();
+          Optional<Mitigation> optionalMitigation =
+              mitigationRepository.findByExternalId(mitigationExternalId);
+          List<AttackPattern> attackPatterns =
+              !mitigationInput.getAttackPatternsIds().isEmpty()
+                  ? fromIterable(
+                      attackPatternRepository.findAllById(mitigationInput.getAttackPatternsIds()))
+                  : List.of();
           if (optionalMitigation.isEmpty()) {
             Mitigation newMitigation = new Mitigation();
             newMitigation.setStixId(mitigationInput.getStixId());
@@ -133,9 +139,10 @@ public class MitigationApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/mitigations/upsert")
   @Transactional(rollbackOn = Exception.class)
-  public Iterable<Mitigation> upsertKillChainPhases(@Valid @RequestBody MitigationUpsertInput input) {
-      List<MitigationCreateInput> mitigations = input.getMitigations();
-      return new ArrayList<>(upsertMitigations(mitigations));
+  public Iterable<Mitigation> upsertKillChainPhases(
+      @Valid @RequestBody MitigationUpsertInput input) {
+    List<MitigationCreateInput> mitigations = input.getMitigations();
+    return new ArrayList<>(upsertMitigations(mitigations));
   }
 
   @Secured(ROLE_ADMIN)

@@ -1,9 +1,8 @@
 package io.openbas.database.model;
 
-import lombok.Data;
-
 import jakarta.persistence.*;
 import java.io.Serializable;
+import lombok.Data;
 
 @Data
 @Entity
@@ -24,7 +23,5 @@ public class AssetGroupAsset {
 
     private String assetGroupId;
     private String assetId;
-
   }
-
 }

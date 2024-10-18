@@ -12,9 +12,7 @@ import lombok.Data;
 @Table(name = "scenarios_teams_users")
 public class ScenarioTeamUser {
 
-  @EmbeddedId
-  @JsonIgnore
-  private ScenarioTeamUserId compositeId = new ScenarioTeamUserId();
+  @EmbeddedId @JsonIgnore private ScenarioTeamUserId compositeId = new ScenarioTeamUserId();
 
   @ManyToOne(fetch = FetchType.LAZY)
   @MapsId("scenarioId")
@@ -36,5 +34,4 @@ public class ScenarioTeamUser {
   @JsonProperty("user_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
   private User user;
-
 }

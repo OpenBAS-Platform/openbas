@@ -1,17 +1,16 @@
 package io.openbas.config;
 
+import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.database.model.User.ROLE_USER;
+
 import io.openbas.database.model.User;
+import java.util.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-
-import java.util.*;
-
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.model.User.ROLE_USER;
 
 public class OpenBASOidcUser implements OpenBASPrincipal, OidcUser {
 
@@ -74,5 +73,4 @@ public class OpenBASOidcUser implements OpenBASPrincipal, OidcUser {
   public String getName() {
     return user.getFirstname() + " " + user.getLastname();
   }
-
 }

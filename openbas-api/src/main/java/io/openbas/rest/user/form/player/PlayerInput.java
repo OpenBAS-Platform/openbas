@@ -1,18 +1,16 @@
 package io.openbas.rest.user.form.player;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.Pattern;
-import lombok.Getter;
-import lombok.Setter;
-
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static io.openbas.config.AppConfig.EMAIL_FORMAT;
 import static io.openbas.config.AppConfig.PHONE_FORMAT;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter

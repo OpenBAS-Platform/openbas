@@ -7,13 +7,12 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TaniumEndpoint {
 
-    private String id;
-    private String computerID;
-    private String name;
-    private String[] ipAddresses;
-    private String[] macAddresses;
-    private Os os;
-    private Processor processor;
-    private String eidLastSeen;
-
+  private String id;
+  private String computerID;
+  private String name;
+  private String[] ipAddresses;
+  private String[] macAddresses;
+  private Os os;
+  private Processor processor;
+  private String eidLastSeen;
 }

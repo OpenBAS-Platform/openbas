@@ -7,7 +7,6 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Result {
 
-    private Link link;
-    private String output;
-
+  private Link link;
+  private String output;
 }

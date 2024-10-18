@@ -1,29 +1,29 @@
 package io.openbas.migration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.injectors.email.model.EmailContent;
-import io.openbas.injectors.channel.model.ChannelContent;
-import io.openbas.model.inject.form.Expectation;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.flywaydb.core.api.migration.BaseJavaMigration;
-import org.flywaydb.core.api.migration.Context;
-import org.springframework.stereotype.Component;
+import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.ARTICLE;
+import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.MANUAL;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.injectors.channel.model.ChannelContent;
+import io.openbas.injectors.email.model.EmailContent;
+import io.openbas.model.inject.form.Expectation;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Objects;
-
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.ARTICLE;
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.MANUAL;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
+import org.springframework.stereotype.Component;
 
 @Component
 public class V2_63__InjectExpectation_upgrade extends BaseJavaMigration {
 
-  public static final String EXPECTATION_MANUAL_NAME = "The animation team can validate the audience reaction";
+  public static final String EXPECTATION_MANUAL_NAME =
+      "The animation team can validate the audience reaction";
   public static final String EXPECTATION_ARTICLE_NAME = "Expect audiences to read the article(s)";
 
   @Override
@@ -31,19 +31,21 @@ public class V2_63__InjectExpectation_upgrade extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     // Upgrade Inject Expectation table
-    select.execute("""
+    select.execute(
+        """
         ALTER TABLE injects_expectations ADD inject_expectation_name varchar(255);
         ALTER TABLE injects_expectations ADD inject_expectation_description text;
         """);
     // Migration datas
     ObjectMapper mapper = new ObjectMapper();
-    ResultSet results = select.executeQuery("""
+    ResultSet results =
+        select.executeQuery(
+            """
         SELECT * FROM injects
         WHERE inject_type = 'openex_email' OR inject_type = 'openex_ovh_sms' OR inject_type = 'openex_media'
         """);
-    PreparedStatement statement = connection.prepareStatement(
-        "UPDATE injects SET inject_content = ? WHERE inject_id = ?"
-    );
+    PreparedStatement statement =
+        connection.prepareStatement("UPDATE injects SET inject_content = ? WHERE inject_id = ?");
     while (results.next()) {
       String content = results.getString("inject_content");
       if (!content.equals("null")) {
@@ -85,6 +87,7 @@ public class V2_63__InjectExpectation_upgrade extends BaseJavaMigration {
       return content;
     }
   }
+
   @Data
   public static class OvhSmsContentNew {
     private String message;

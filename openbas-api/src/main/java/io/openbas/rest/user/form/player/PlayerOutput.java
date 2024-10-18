@@ -2,10 +2,9 @@ package io.openbas.rest.user.form.player;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
+import java.util.Set;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.Set;
 
 @Builder
 @Data
@@ -42,5 +41,4 @@ public class PlayerOutput {
 
   @JsonProperty("user_tags")
   private Set<String> tags;
-
 }
