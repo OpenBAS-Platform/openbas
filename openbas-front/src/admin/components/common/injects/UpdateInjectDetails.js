@@ -58,7 +58,6 @@ const UpdateInjectDetails = ({
   onUpdateInject,
   isAtomic = false,
   drawerRef,
-  teamsFromExerciseOrScenario,
   ...props
 }) => {
   const { t, tPick } = useFormatter();
@@ -355,7 +354,6 @@ const UpdateInjectDetails = ({
                       handleClose={handleClose}
                       tagsMap={tagsMap}
                       permissions={permissions}
-                      teamsFromExerciseOrScenario={teamsFromExerciseOrScenario}
                       articlesFromExerciseOrScenario={[]}
                       variablesFromExerciseOrScenario={[]}
                       onUpdateInject={onUpdateInject}

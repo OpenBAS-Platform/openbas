@@ -6,7 +6,6 @@ import type { Inject } from '../../../../utils/api-types';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../../utils/hooks';
 import UpdateInjectDetails from './UpdateInjectDetails';
-import type { TeamStore } from '../../../../actions/teams/Team';
 import { fetchInject } from '../../../../actions/Inject';
 import { useHelper } from '../../../../store';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
@@ -20,11 +19,10 @@ interface Props {
   massUpdateInject?: (data: Inject[]) => Promise<void>;
   injectId: string;
   isAtomic?: boolean;
-  teamsFromExerciseOrScenario: TeamStore[];
   injects?: InjectOutputType[];
 }
 
-const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, massUpdateInject, injectId, isAtomic = false, teamsFromExerciseOrScenario, injects, ...props }) => {
+const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, massUpdateInject, injectId, isAtomic = false, injects, ...props }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const drawerRef = useRef(null);
@@ -81,7 +79,6 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
             handleClose={handleClose}
             onUpdateInject={onUpdateInject}
             isAtomic={isAtomic}
-            teamsFromExerciseOrScenario={teamsFromExerciseOrScenario}
             {...props}
           />
         )}

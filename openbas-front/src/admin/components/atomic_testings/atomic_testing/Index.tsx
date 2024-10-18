@@ -13,6 +13,8 @@ import { fetchInjectResultDto } from '../../../../actions/atomic_testings/atomic
 import type { InjectResultDTO } from '../../../../utils/api-types';
 import { InjectResultDtoContext } from '../InjectResultDtoContext';
 import { FIVE_SECONDS } from '../../../../utils/Time';
+import { TeamContext } from '../../common/Context';
+import teamContextForAtomicTesting from './context/TeamContextForAtomicTesting';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -71,46 +73,48 @@ const Index = () => {
       tabValue = `/admin/atomic_testings/${injectResultDto.inject_id}/detail`;
     }
     return (
-      <InjectResultDtoContext.Provider value={{ injectResultDto, updateInjectResultDto }}>
-        <Breadcrumbs variant="object" elements={[
-          { label: t('Atomic testings'), link: '/admin/atomic_testings' },
-          { label: injectResultDto.inject_title, current: true },
-        ]}
-        />
-        <AtomicTestingHeader />
-        <Box
-          sx={{
-            borderBottom: 1,
-            borderColor: 'divider',
-            marginBottom: 4,
-          }}
-        >
-          <Tabs value={tabValue}>
-            <Tab
-              component={Link}
-              to={`/admin/atomic_testings/${injectResultDto.inject_id}`}
-              value={`/admin/atomic_testings/${injectResultDto.inject_id}`}
-              label={t('Overview')}
-              className={classes.item}
-            />
-            <Tab
-              component={Link}
-              to={`/admin/atomic_testings/${injectResultDto.inject_id}/detail`}
-              value={`/admin/atomic_testings/${injectResultDto.inject_id}/detail`}
-              label={t('Execution details')}
-              className={classes.item}
-            />
-          </Tabs>
-        </Box>
-        <Suspense fallback={<Loader />}>
-          <Routes>
-            <Route path="" element={errorWrapper(AtomicTesting)()} />
-            <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
-            {/* Not found */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </InjectResultDtoContext.Provider>
+      <TeamContext.Provider value={teamContextForAtomicTesting()}>
+        <InjectResultDtoContext.Provider value={{ injectResultDto, updateInjectResultDto }}>
+          <Breadcrumbs variant="object" elements={[
+            { label: t('Atomic testings'), link: '/admin/atomic_testings' },
+            { label: injectResultDto.inject_title, current: true },
+          ]}
+          />
+          <AtomicTestingHeader />
+          <Box
+            sx={{
+              borderBottom: 1,
+              borderColor: 'divider',
+              marginBottom: 4,
+            }}
+          >
+            <Tabs value={tabValue}>
+              <Tab
+                component={Link}
+                to={`/admin/atomic_testings/${injectResultDto.inject_id}`}
+                value={`/admin/atomic_testings/${injectResultDto.inject_id}`}
+                label={t('Overview')}
+                className={classes.item}
+              />
+              <Tab
+                component={Link}
+                to={`/admin/atomic_testings/${injectResultDto.inject_id}/detail`}
+                value={`/admin/atomic_testings/${injectResultDto.inject_id}/detail`}
+                label={t('Execution details')}
+                className={classes.item}
+              />
+            </Tabs>
+          </Box>
+          <Suspense fallback={<Loader />}>
+            <Routes>
+              <Route path="" element={errorWrapper(AtomicTesting)()} />
+              <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
+              {/* Not found */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </InjectResultDtoContext.Provider>
+      </TeamContext.Provider>
     );
   }
   return <Loader />;
