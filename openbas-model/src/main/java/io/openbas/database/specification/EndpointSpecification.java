@@ -1,7 +1,10 @@
 package io.openbas.database.specification;
 
 import io.openbas.database.model.Endpoint;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
+
+import java.util.List;
 
 public class EndpointSpecification {
     public static Specification<Endpoint> findEndpointsForInjection() {
@@ -10,5 +13,9 @@ public class EndpointSpecification {
 
     public static Specification<Endpoint> findEndpointsForExecution() {
         return (root, query, criteriaBuilder) -> criteriaBuilder.or(criteriaBuilder.isNotNull(root.get("parent")), criteriaBuilder.isNotNull(root.get("inject")));
+    }
+
+    public static Specification<Endpoint> fromIds(@NotNull final List<String> ids) {
+        return (root, query, builder) -> root.get("id").in(ids);
     }
 }

@@ -67,14 +67,14 @@ public class Endpoint extends Asset {
   @JsonProperty("endpoint_agent_version")
   private String agentVersion;
 
-  @Queryable(filterable = true, sortable = true)
+  @Queryable(filterable = true, sortable = true, searchable = true)
   @Column(name = "endpoint_platform")
   @JsonProperty("endpoint_platform")
   @Enumerated(EnumType.STRING)
   @NotNull
   private PLATFORM_TYPE platform;
 
-  @Queryable(filterable = true, sortable = true)
+  @Queryable(filterable = true, sortable = true, searchable = true)
   @Column(name = "endpoint_arch")
   @JsonProperty("endpoint_arch")
   @Enumerated(EnumType.STRING)
