@@ -4,6 +4,7 @@ import io.openbas.database.model.Exercise;
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.scenario.form.InjectsImportInput;
 import io.openbas.rest.scenario.response.ImportTestSummary;

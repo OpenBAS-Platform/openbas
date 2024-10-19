@@ -2,7 +2,7 @@ package io.openbas.rest.scenario;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Exercise;
-import io.openbas.rest.exercise.ExerciseService;
+import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;

@@ -9,7 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,17 +21,8 @@ public interface ScenarioTeamUserRepository extends CrudRepository<ScenarioTeamU
     Optional<ScenarioTeamUser> findById(@NotNull final ScenarioTeamUserId id);
 
     @Modifying
-    @Query(value = "delete from scenarios_teams_users i where i.user_id = :userId", nativeQuery = true)
-    void deleteUserFromAllReferences(@Param("userId") final String userId);
+    @Query(value = "delete from scenarios_teams_users i where i.team_id in :teamIds", nativeQuery = true)
+    @Transactional
+    void deleteTeamFromAllReferences(@Param("teamIds") List<String> teamIds);
 
-    @Modifying
-    @Query(value = "delete from scenarios_teams_users i where i.team_id = :teamId", nativeQuery = true)
-    void deleteTeamFromAllReferences(@Param("teamId") final String teamId);
-
-    @Modifying
-    @Query(value = "insert into scenarios_teams_users (exercise_id, team_id, user_id) " +
-        "values (:exerciseId, :teamId, :userId)", nativeQuery = true)
-    void addExerciseTeamUser(@Param("exerciseId") final String exerciseId,
-                      @Param("teamId") final String teamId,
-                      @Param("userId") final String userId);
 }

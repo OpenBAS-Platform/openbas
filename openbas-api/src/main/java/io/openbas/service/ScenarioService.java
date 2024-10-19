@@ -103,7 +103,8 @@ public class ScenarioService {
   private final TeamService teamService;
   private final FileService fileService;
   private final InjectDuplicateService injectDuplicateService;
-
+  private final InjectRepository injectRepository;
+  private final LessonsCategoryRepository lessonsCategoryRepository;
 
   @Transactional
   public Scenario createScenario(@NotNull final Scenario scenario) {
@@ -460,13 +461,16 @@ public class ScenarioService {
     return teamsToAdd;
   }
 
+  @Transactional(rollbackFor = Exception.class)
   public Iterable<Team> removeTeams(@NotBlank final String scenarioId, @NotNull final List<String> teamIds) {
-    Scenario scenario = this.scenario(scenarioId);
-    List<Team> teams = scenario.getTeams().stream().filter(team -> !teamIds.contains(team.getId())).toList();
-    scenario.setTeams(new ArrayList<>(teams));
-    this.updateScenario(scenario);
+    // Remove teams from exercise
+    this.scenarioRepository.removeTeams(scenarioId, teamIds);
     // Remove all association between users / exercises / teams
-    teamIds.forEach(this.scenarioTeamUserRepository::deleteTeamFromAllReferences);
+    this.scenarioTeamUserRepository.deleteTeamFromAllReferences(teamIds);
+    // Remove all association between injects and teams
+    this.injectRepository.removeTeamsForScenario(scenarioId, teamIds);
+    // Remove all association between lessons learned and teams
+    this.lessonsCategoryRepository.removeTeamsForScenario(scenarioId, teamIds);
     return teamRepository.findAllById(teamIds);
   }
 

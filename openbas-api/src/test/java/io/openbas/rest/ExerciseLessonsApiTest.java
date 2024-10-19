@@ -1,12 +1,15 @@
 package io.openbas.rest;
 
 import io.openbas.IntegrationTest;
-import io.openbas.database.model.*;
+import io.openbas.database.model.Exercise;
+import io.openbas.database.model.LessonsCategory;
+import io.openbas.database.model.Team;
+import io.openbas.database.model.User;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.LessonsCategoryRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
-import io.openbas.rest.exercise.ExerciseService;
+import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.lessons.form.LessonsSendInput;
 import io.openbas.service.MailingService;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
@@ -26,9 +29,9 @@ import static io.openbas.utils.fixtures.ExerciseFixture.getExercise;
 import static io.openbas.utils.fixtures.ExerciseLessonsCategoryFixture.getLessonsCategory;
 import static io.openbas.utils.fixtures.TeamFixture.getTeam;
 import static io.openbas.utils.fixtures.UserFixture.getUser;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.mockito.Mockito.*;
 
 
 @SpringBootTest

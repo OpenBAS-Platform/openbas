@@ -1,13 +1,11 @@
-package io.openbas.rest.exercise;
+package io.openbas.rest.exercise.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawExerciseSimple;
-import io.openbas.database.repository.ArticleRepository;
-import io.openbas.database.repository.ExerciseRepository;
-import io.openbas.database.repository.TeamRepository;
+import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
@@ -23,7 +21,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +30,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Instant;
@@ -67,6 +65,9 @@ public class ExerciseService {
   private final ArticleRepository articleRepository;
   private final ExerciseRepository exerciseRepository;
   private final TeamRepository teamRepository;
+  private final ExerciseTeamUserRepository exerciseTeamUserRepository;
+  private final InjectRepository injectRepository;
+  private final LessonsCategoryRepository lessonsCategoryRepository;
 
   // region properties
   @Value("${openbas.mail.imap.enabled}")
@@ -79,18 +80,19 @@ public class ExerciseService {
   private OpenBASConfig openBASConfig;
   // endregion
 
-  public List<ExerciseSimple> exercises(){
+  public List<ExerciseSimple> exercises() {
     // We get the exercises depending on whether or not we are granted
     List<RawExerciseSimple> exercises = currentUser().isAdmin() ? exerciseRepository.rawAll()
         : exerciseRepository.rawAllGranted(currentUser().getId());
 
-    return exercises.stream().map(exercise->exerciseMapper.fromRawExerciseSimple(exercise)).collect(Collectors.toList());
+    return exercises.stream().map(exercise -> exerciseMapper.fromRawExerciseSimple(exercise))
+        .collect(Collectors.toList());
   }
 
   public Page<ExerciseSimple> exercises(
-        Specification<Exercise> specification,
-        Specification<Exercise> specificationCount,
-        Pageable pageable) {
+      Specification<Exercise> specification,
+      Specification<Exercise> specificationCount,
+      Pageable pageable) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
@@ -120,9 +122,11 @@ public class ExerciseService {
     List<ExerciseSimple> exercises = execution(query);
 
     for (ExerciseSimple exercise : exercises) {
-     if (exercise.getInjectIds() != null) {
-        exercise.setExpectationResultByTypes(resultUtils.getResultsByTypes(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
-        exercise.setTargets(resultUtils.getInjectTargetWithResults(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
+      if (exercise.getInjectIds() != null) {
+        exercise.setExpectationResultByTypes(
+            resultUtils.getResultsByTypes(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
+        exercise.setTargets(
+            resultUtils.getInjectTargetWithResults(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
       }
     }
 
@@ -189,7 +193,7 @@ public class ExerciseService {
 
   // -- CREATION --
 
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public Exercise createExercise(@NotNull final Exercise exercise) {
     if (imapEnabled) {
       exercise.setFrom(imapUsername);
@@ -410,4 +414,20 @@ public class ExerciseService {
   public List<AtomicTestingMapper.ExpectationResultsByType> getGlobalResults(@NotBlank String exerciseId) {
     return resultUtils.getResultsByTypes(exerciseRepository.findInjectsByExercise(exerciseId));
   }
+
+  // -- TEAMS --
+
+  @Transactional(rollbackFor = Exception.class)
+  public Iterable<Team> removeTeams(@NotBlank final String exerciseId, @NotNull final List<String> teamIds) {
+    // Remove teams from exercise
+    this.exerciseRepository.removeTeams(exerciseId, teamIds);
+    // Remove all association between users / exercises / teams
+    this.exerciseTeamUserRepository.deleteTeamsFromAllReferences(teamIds);
+    // Remove all association between injects and teams
+    this.injectRepository.removeTeamsForExercise(exerciseId, teamIds);
+    // Remove all association between lessons learned and teams
+    this.lessonsCategoryRepository.removeTeamsForExercise(exerciseId, teamIds);
+    return teamRepository.findAllById(teamIds);
+  }
+
 }
