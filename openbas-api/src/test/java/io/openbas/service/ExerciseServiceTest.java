@@ -58,6 +58,8 @@ class ExerciseServiceTest {
   private ExerciseTeamUserRepository exerciseTeamUserRepository;
   @Autowired
   private InjectorContractRepository injectorContractRepository;
+  @Autowired
+  private LessonsCategoryRepository lessonsCategoryRepository;
 
   private static String USER_ID;
   private static String TEAM_ID;
@@ -68,9 +70,11 @@ class ExerciseServiceTest {
 
   @BeforeEach
   void setUp() {
-    exerciseService = new ExerciseService(grantService,  injectDuplicateService,
+    exerciseService = new ExerciseService(
+        grantService,  injectDuplicateService,
         teamService, variableService, exerciseMapper, resultUtils,articleRepository, exerciseRepository, teamRepository,
-        exerciseTeamUserRepository, injectRepository);
+        exerciseTeamUserRepository, injectRepository, lessonsCategoryRepository
+    );
   }
 
   @AfterAll

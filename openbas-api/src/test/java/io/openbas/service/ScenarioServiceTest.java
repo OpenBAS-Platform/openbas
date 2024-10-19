@@ -61,6 +61,8 @@ class ScenarioServiceTest {
     private ExerciseMapper exerciseMapper;
     @Autowired
     private InjectorContractRepository injectorContractRepository;
+    @Autowired
+    private LessonsCategoryRepository lessonsCategoryRepository;
 
     @InjectMocks
     private ScenarioService scenarioService;
@@ -73,7 +75,7 @@ class ScenarioServiceTest {
     void setUp() {
         scenarioService = new ScenarioService(scenarioRepository, teamRepository, userRepository, documentRepository,
                 scenarioTeamUserRepository, articleRepository, exerciseMapper, grantService, variableService, challengeService,
-                teamService, fileService, injectDuplicateService, injectRepository
+                teamService, fileService, injectDuplicateService, injectRepository, lessonsCategoryRepository
         );
     }
 
