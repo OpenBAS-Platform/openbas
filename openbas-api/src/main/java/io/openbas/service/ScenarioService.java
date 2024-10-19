@@ -104,7 +104,7 @@ public class ScenarioService {
   private final FileService fileService;
   private final InjectDuplicateService injectDuplicateService;
   private final InjectRepository injectRepository;
-
+  private final LessonsCategoryRepository lessonsCategoryRepository;
 
   @Transactional
   public Scenario createScenario(@NotNull final Scenario scenario) {
@@ -469,6 +469,8 @@ public class ScenarioService {
     this.scenarioTeamUserRepository.deleteTeamFromAllReferences(teamIds);
     // Remove all association between injects and teams
     this.injectRepository.removeTeamsForScenario(scenarioId, teamIds);
+    // Remove all association between lessons learned and teams
+    this.lessonsCategoryRepository.removeTeamsForScenario(scenarioId, teamIds);
     return teamRepository.findAllById(teamIds);
   }
 

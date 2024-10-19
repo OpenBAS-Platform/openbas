@@ -65,8 +65,9 @@ public class ExerciseService {
   private final ArticleRepository articleRepository;
   private final ExerciseRepository exerciseRepository;
   private final TeamRepository teamRepository;
-    private final ExerciseTeamUserRepository exerciseTeamUserRepository;
-    private final InjectRepository injectRepository;
+  private final ExerciseTeamUserRepository exerciseTeamUserRepository;
+  private final InjectRepository injectRepository;
+  private final LessonsCategoryRepository lessonsCategoryRepository;
 
   // region properties
   @Value("${openbas.mail.imap.enabled}")
@@ -79,18 +80,19 @@ public class ExerciseService {
   private OpenBASConfig openBASConfig;
   // endregion
 
-  public List<ExerciseSimple> exercises(){
+  public List<ExerciseSimple> exercises() {
     // We get the exercises depending on whether or not we are granted
     List<RawExerciseSimple> exercises = currentUser().isAdmin() ? exerciseRepository.rawAll()
         : exerciseRepository.rawAllGranted(currentUser().getId());
 
-    return exercises.stream().map(exercise->exerciseMapper.fromRawExerciseSimple(exercise)).collect(Collectors.toList());
+    return exercises.stream().map(exercise -> exerciseMapper.fromRawExerciseSimple(exercise))
+        .collect(Collectors.toList());
   }
 
   public Page<ExerciseSimple> exercises(
-        Specification<Exercise> specification,
-        Specification<Exercise> specificationCount,
-        Pageable pageable) {
+      Specification<Exercise> specification,
+      Specification<Exercise> specificationCount,
+      Pageable pageable) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
@@ -120,9 +122,11 @@ public class ExerciseService {
     List<ExerciseSimple> exercises = execution(query);
 
     for (ExerciseSimple exercise : exercises) {
-     if (exercise.getInjectIds() != null) {
-        exercise.setExpectationResultByTypes(resultUtils.getResultsByTypes(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
-        exercise.setTargets(resultUtils.getInjectTargetWithResults(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
+      if (exercise.getInjectIds() != null) {
+        exercise.setExpectationResultByTypes(
+            resultUtils.getResultsByTypes(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
+        exercise.setTargets(
+            resultUtils.getInjectTargetWithResults(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
       }
     }
 
@@ -189,7 +193,7 @@ public class ExerciseService {
 
   // -- CREATION --
 
-    @Transactional(rollbackFor = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public Exercise createExercise(@NotNull final Exercise exercise) {
     if (imapEnabled) {
       exercise.setFrom(imapUsername);
@@ -421,6 +425,8 @@ public class ExerciseService {
     this.exerciseTeamUserRepository.deleteTeamsFromAllReferences(teamIds);
     // Remove all association between injects and teams
     this.injectRepository.removeTeamsForExercise(exerciseId, teamIds);
+    // Remove all association between lessons learned and teams
+    this.lessonsCategoryRepository.removeTeamsForExercise(exerciseId, teamIds);
     return teamRepository.findAllById(teamIds);
   }
 
