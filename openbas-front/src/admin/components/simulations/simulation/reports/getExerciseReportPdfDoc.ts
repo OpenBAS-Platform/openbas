@@ -5,11 +5,11 @@ import convertMarkdownToPdfMake from './convertMarkdownToPdfMake';
 import { ExerciseReportData } from './useExerciseReportData';
 import ReportInformationType from './ReportInformationType';
 import { resolveUserName } from '../../../../../utils/String';
+import LogoText from '../../../../../static/images/logo_text_light.png';
 
 const getBase64ImageFromURL = (url: string) => {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.src = url;
     const canvas = document.createElement('canvas');
 
     img.onload = () => {
@@ -18,14 +18,18 @@ const getBase64ImageFromURL = (url: string) => {
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL('image/png');
+        resolve(dataURL);
+      } else {
+        reject(new Error('Failed to get canvas context'));
       }
-      const dataURL = canvas.toDataURL('image/png');
-      resolve(dataURL);
     };
 
     img.onerror = (error) => {
       reject(error);
     };
+
+    img.src = url;
   });
 };
 
@@ -77,7 +81,7 @@ const getExerciseReportPdfDocDefinition = async ({
     'exercise_distribution_total_score_by_player',
     'exercise_distribution_total_score_by_inject',
   ];
-  const fetchPromises = [getBase64ImageFromURL('http://localhost:3001/src/static/images/logo_text_light.png').then((img) => ({
+  const fetchPromises = [getBase64ImageFromURL(LogoText).then((img) => ({
     key: 'openBAS_logo',
     img,
   }))];
