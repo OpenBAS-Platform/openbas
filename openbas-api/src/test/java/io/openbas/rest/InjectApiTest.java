@@ -40,7 +40,6 @@ class InjectApiTest extends IntegrationTest {
   static Document DOCUMENT2;
   static Team TEAM;
   static String SCENARIO_INJECT_ID;
-  static String EXERCISE_INJECT_ID;
 
   @Autowired
   private MockMvc mvc;
@@ -292,7 +291,6 @@ class InjectApiTest extends IntegrationTest {
     // -- ASSERT --
     assertNotNull(response);
     assertEquals("Test inject", JsonPath.read(response, "$.inject_title"));
-    EXERCISE_INJECT_ID = JsonPath.read(response, "$.inject_id");
 
   }
 
