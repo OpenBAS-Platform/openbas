@@ -48,11 +48,11 @@ const useStyles = makeStyles<Theme>((theme) => ({
 }));
 
 interface Props {
-  expectationScore: number;
+  expectationExpectedScore: number;
 }
 
 const ScaleBar: FunctionComponent<Props> = ({
-  expectationScore,
+  expectationExpectedScore,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -71,13 +71,13 @@ const ScaleBar: FunctionComponent<Props> = ({
     },
     ticks: [
       {
-        value: expectationScore,
+        value: expectationExpectedScore,
         backgroundColor: theme.palette.success.main!,
         label: t('Success'),
       },
     ],
   };
-  const isScoreReadable = expectationScore >= 0 && expectationScore < 95;
+  const isScoreReadable = expectationExpectedScore >= 0 && expectationExpectedScore < 95;
 
   return (
     <div className={classes.scaleBar}>
@@ -88,11 +88,11 @@ const ScaleBar: FunctionComponent<Props> = ({
       <div className={classes.track}>
         {isScoreReadable && (
           <>
-            <div className={classes.redTrack} style={{ width: `${expectationScore}%` }}>
+            <div className={classes.redTrack} style={{ width: `${expectationExpectedScore}%` }}>
               <div className={classes.failureLabel}><span>{scale.min.label}</span></div>
             </div>
-            <div style={{ width: `${100 - expectationScore}%` }}>
-              <div className={classes.expectationScoreValue}><span>{expectationScore}</span></div>
+            <div style={{ width: `${100 - expectationExpectedScore}%` }}>
+              <div className={classes.expectationScoreValue}><span>{expectationExpectedScore}</span></div>
               <div className={classes.successLabel}><span>{scale.ticks[0].label}</span></div>
             </div>
           </>
@@ -100,9 +100,9 @@ const ScaleBar: FunctionComponent<Props> = ({
         {!isScoreReadable && (
           <>
             <div className={classes.redTrack} style={{ width: '95%' }}>
-              {expectationScore < 100 && (
+              {expectationExpectedScore < 100 && (
                 <div className={classes.expectationScoreValue} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <span>{expectationScore}</span>
+                  <span>{expectationExpectedScore}</span>
                 </div>)}
               <div className={classes.failureLabel}><span>{scale.min.label}</span></div>
             </div>

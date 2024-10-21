@@ -190,7 +190,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
       </div>
       <div style={{ marginTop: 20 }}>
         <Typography variant="h4">{t('Scores')}</Typography>
-        <ScaleBar expectationScore={watch('expectation_score')} />
+        <ScaleBar expectationExpectedScore={watch('expectation_score')} />
       </div>
       <MuiTextField
         variant="standard"
