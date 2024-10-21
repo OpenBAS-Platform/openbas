@@ -362,7 +362,7 @@ const UpdateInjectDetails = ({
                   variant="contained"
                   color="secondary"
                   type="submit"
-                  disabled={submitting || !contractContent}
+                  disabled={submitting || Object.keys(errors).length > 0 || !contractContent}
                 >
                   {t('Update')}
                 </Button>
