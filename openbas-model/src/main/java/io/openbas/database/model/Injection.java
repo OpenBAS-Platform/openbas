@@ -1,15 +1,14 @@
 package io.openbas.database.model;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 
 public interface Injection {
-    String getId();
+  String getId();
 
-    Exercise getExercise();
+  Exercise getExercise();
 
-    Optional<Instant> getDate();
+  Optional<Instant> getDate();
 
-    Inject getInject();
+  Inject getInject();
 }

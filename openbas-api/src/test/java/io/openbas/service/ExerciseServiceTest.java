@@ -1,22 +1,5 @@
 package io.openbas.service;
 
-import io.openbas.database.model.*;
-import io.openbas.database.repository.*;
-import io.openbas.rest.exercise.service.ExerciseService;
-import io.openbas.rest.inject.service.InjectDuplicateService;
-import io.openbas.utils.ExerciseMapper;
-import io.openbas.utils.ResultUtils;
-import io.openbas.utils.fixtures.ExerciseFixture;
-import org.junit.jupiter.api.*;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static io.openbas.database.specification.TeamSpecification.fromExercise;
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.utils.fixtures.ExerciseFixture.getExercise;
@@ -26,55 +9,65 @@ import static io.openbas.utils.fixtures.UserFixture.getUser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import io.openbas.database.model.*;
+import io.openbas.database.repository.*;
+import io.openbas.rest.exercise.service.ExerciseService;
+import io.openbas.rest.inject.service.InjectDuplicateService;
+import io.openbas.utils.ExerciseMapper;
+import io.openbas.utils.ResultUtils;
+import io.openbas.utils.fixtures.ExerciseFixture;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ExerciseServiceTest {
 
-  @Mock
-  GrantService grantService;
-  @Mock
-  InjectDuplicateService injectDuplicateService;
-    @Mock
-    VariableService variableService;
-  @Autowired
-  private TeamService teamService;
+  @Mock GrantService grantService;
+  @Mock InjectDuplicateService injectDuplicateService;
+  @Mock VariableService variableService;
+  @Autowired private TeamService teamService;
 
-    @Autowired
-    ExerciseMapper exerciseMapper;
-    @Autowired
-    ResultUtils resultUtils;
-  @Autowired
-  private ArticleRepository articleRepository;
-  @Autowired
-  private ExerciseRepository exerciseRepository;
-  @Autowired
-  private TeamRepository teamRepository;
+  @Autowired ExerciseMapper exerciseMapper;
+  @Autowired ResultUtils resultUtils;
+  @Autowired private ArticleRepository articleRepository;
+  @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private TeamRepository teamRepository;
 
-  @Autowired
-  private UserRepository userRepository;
-  @Autowired
-  private InjectRepository injectRepository;
-  @Autowired
-  private ExerciseTeamUserRepository exerciseTeamUserRepository;
-  @Autowired
-  private InjectorContractRepository injectorContractRepository;
-  @Autowired
-  private LessonsCategoryRepository lessonsCategoryRepository;
+  @Autowired private UserRepository userRepository;
+  @Autowired private InjectRepository injectRepository;
+  @Autowired private ExerciseTeamUserRepository exerciseTeamUserRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
+  @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
 
   private static String USER_ID;
   private static String TEAM_ID;
   private static String INJECT_ID;
 
-  @InjectMocks
-  private ExerciseService exerciseService;
+  @InjectMocks private ExerciseService exerciseService;
 
   @BeforeEach
   void setUp() {
-    exerciseService = new ExerciseService(
-        grantService,  injectDuplicateService,
-        teamService, variableService, exerciseMapper, resultUtils,articleRepository, exerciseRepository, teamRepository,
-        exerciseTeamUserRepository, injectRepository, lessonsCategoryRepository
-    );
+    exerciseService =
+        new ExerciseService(
+            grantService,
+            injectDuplicateService,
+            teamService,
+            variableService,
+            exerciseMapper,
+            resultUtils,
+            articleRepository,
+            exerciseRepository,
+            teamRepository,
+            exerciseTeamUserRepository,
+            injectRepository,
+            lessonsCategoryRepository);
   }
 
   @AfterAll
@@ -102,14 +95,17 @@ class ExerciseServiceTest {
     // -- ASSERT --
     assertNotEquals(exercise.getId(), exerciseDuplicated.getId());
     assertEquals(2, exerciseDuplicated.getTeams().size());
-    exerciseDuplicated.getTeams().forEach(team -> {
-      if (team.getContextual()) {
-        assertNotEquals(contextualTeam.getId(), team.getId());
-        assertEquals(contextualTeam.getName(), team.getName());
-      } else {
-        assertEquals(noContextualTeam.getId(), team.getId());
-      }
-    });
+    exerciseDuplicated
+        .getTeams()
+        .forEach(
+            team -> {
+              if (team.getContextual()) {
+                assertNotEquals(contextualTeam.getId(), team.getId());
+                assertEquals(contextualTeam.getName(), team.getName());
+              } else {
+                assertEquals(noContextualTeam.getId(), team.getId());
+              }
+            });
   }
 
   @DisplayName("Should remove team from exercise")
@@ -127,7 +123,8 @@ class ExerciseServiceTest {
     exercise.setFrom(user.getEmail());
     Exercise exerciseSaved = this.exerciseRepository.saveAndFlush(exercise);
 
-    InjectorContract injectorContract = this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
+    InjectorContract injectorContract =
+        this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
     Inject injectDefaultEmail = getInjectForEmailContract(injectorContract);
     injectDefaultEmail.setExercise(exerciseSaved);
     injectDefaultEmail.setTeams(List.of(teamSaved));

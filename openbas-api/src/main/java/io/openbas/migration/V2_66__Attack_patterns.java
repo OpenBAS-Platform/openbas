@@ -1,14 +1,10 @@
 package io.openbas.migration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
 
 @Component
 public class V2_66__Attack_patterns extends BaseJavaMigration {
@@ -18,7 +14,8 @@ public class V2_66__Attack_patterns extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     // Kill chain phases
-    select.execute("""
+    select.execute(
+        """
           CREATE TABLE kill_chain_phases (
             phase_id varchar(255) not null constraint kill_chain_phases_pkey primary key,
             phase_created_at timestamp not null default now(),
@@ -31,7 +28,8 @@ public class V2_66__Attack_patterns extends BaseJavaMigration {
           CREATE UNIQUE INDEX kill_chain_phases_unique on kill_chain_phases (phase_name, phase_kill_chain_name);
      """);
     // Attack patterns
-    select.execute("""
+    select.execute(
+        """
           CREATE TABLE attack_patterns (
             attack_pattern_id varchar(255) not null constraint attack_patterns_pkey primary key,
             attack_pattern_created_at timestamp not null default now(),
@@ -49,7 +47,8 @@ public class V2_66__Attack_patterns extends BaseJavaMigration {
           CREATE INDEX idx_attack_patterns on attack_patterns (attack_pattern_id);
           CREATE UNIQUE INDEX attack_patterns_unique on attack_patterns (attack_pattern_external_id);
      """);
-    select.execute("""
+    select.execute(
+        """
         CREATE TABLE attack_patterns_kill_chain_phases (
             attack_pattern_id varchar(255) not null
                 constraint attack_pattern_id_fk
@@ -65,7 +64,8 @@ public class V2_66__Attack_patterns extends BaseJavaMigration {
         CREATE INDEX idx_attack_patterns_kill_chain_phases_kill_chain_phase on attack_patterns_kill_chain_phases (phase_id);
     """);
     // Cleanup a bit indexes
-    select.execute("""
+    select.execute(
+        """
         CREATE INDEX idx_teams on teams (team_id);
         ALTER INDEX idx_medias RENAME TO idx_channels;
         ALTER INDEX idx_4e039727729413d0 RENAME TO idx_comchecks;

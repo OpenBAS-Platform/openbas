@@ -10,8 +10,8 @@ public class InjectTestSpecification {
   public static Specification<InjectTestStatus> findInjectTestInExercise(String exerciseId) {
 
     return (root, query, criteriaBuilder) -> {
-      Path<Object> path = root.join("inject", JoinType.INNER)
-          .join("exercise", JoinType.INNER).get("id");
+      Path<Object> path =
+          root.join("inject", JoinType.INNER).join("exercise", JoinType.INNER).get("id");
       return criteriaBuilder.equal(path, exerciseId);
     };
   }
@@ -19,10 +19,9 @@ public class InjectTestSpecification {
   public static Specification<InjectTestStatus> findInjectTestInScenario(String scenarioId) {
 
     return (root, query, criteriaBuilder) -> {
-      Path<Object> path = root.join("inject", JoinType.INNER)
-          .join("scenario", JoinType.INNER).get("id");
+      Path<Object> path =
+          root.join("inject", JoinType.INNER).join("scenario", JoinType.INNER).get("id");
       return criteriaBuilder.equal(path, scenarioId);
     };
   }
-
 }

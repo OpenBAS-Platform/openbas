@@ -1,5 +1,16 @@
 package io.openbas.integrations;
 
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.SupportedLanguage.en;
+import static io.openbas.helper.SupportedLanguage.fr;
+import static io.openbas.injector_contract.Contract.executableContract;
+import static io.openbas.injector_contract.ContractCardinality.Multiple;
+import static io.openbas.injector_contract.ContractDef.contractBuilder;
+import static io.openbas.injector_contract.fields.ContractAsset.assetField;
+import static io.openbas.injector_contract.fields.ContractAssetGroup.assetGroupField;
+import static io.openbas.injector_contract.fields.ContractExpectations.expectationsField;
+import static io.openbas.injector_contract.fields.ContractText.textField;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
@@ -19,32 +30,17 @@ import io.openbas.utils.StringUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-
-import static io.openbas.database.model.Payload.PAYLOAD_SOURCE.MANUAL;
-import static io.openbas.database.model.Payload.PAYLOAD_STATUS.VERIFIED;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.helper.SupportedLanguage.en;
-import static io.openbas.helper.SupportedLanguage.fr;
-import static io.openbas.injector_contract.Contract.executableContract;
-import static io.openbas.injector_contract.ContractCardinality.Multiple;
-import static io.openbas.injector_contract.ContractDef.contractBuilder;
-import static io.openbas.injector_contract.fields.ContractAsset.assetField;
-import static io.openbas.injector_contract.fields.ContractAssetGroup.assetGroupField;
-import static io.openbas.injector_contract.fields.ContractExpectations.expectationsField;
-import static io.openbas.injector_contract.fields.ContractText.textField;
-
 @RequiredArgsConstructor
 @Service
 public class PayloadService {
 
-  @Resource
-  protected ObjectMapper mapper;
+  @Resource protected ObjectMapper mapper;
 
   private final PayloadRepository payloadRepository;
   private final InjectorRepository injectorRepository;
@@ -58,8 +54,8 @@ public class PayloadService {
   }
 
   private void updateInjectorContract(Injector injector, Payload payload) {
-    Optional<InjectorContract> injectorContract = injectorContractRepository.findInjectorContractByInjectorAndPayload(
-        injector, payload);
+    Optional<InjectorContract> injectorContract =
+        injectorContractRepository.findInjectorContractByInjectorAndPayload(injector, payload);
     if (injectorContract.isPresent()) {
       InjectorContract existingInjectorContract = injectorContract.get();
       Contract contract = buildContract(existingInjectorContract.getId(), injector, payload);
@@ -70,8 +66,10 @@ public class PayloadService {
       existingInjectorContract.setInjector(injector);
       existingInjectorContract.setPayload(payload);
       existingInjectorContract.setPlatforms(payload.getPlatforms());
-      existingInjectorContract.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(
-          payload.getAttackPatterns().stream().map(AttackPattern::getId).toList())));
+      existingInjectorContract.setAttackPatterns(
+          fromIterable(
+              attackPatternRepository.findAllById(
+                  payload.getAttackPatterns().stream().map(AttackPattern::getId).toList())));
       existingInjectorContract.setAtomicTesting(true);
       try {
         existingInjectorContract.setContent(mapper.writeValueAsString(contract));
@@ -91,8 +89,10 @@ public class PayloadService {
       newInjectorContract.setInjector(injector);
       newInjectorContract.setPayload(payload);
       newInjectorContract.setPlatforms(payload.getPlatforms());
-      newInjectorContract.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(
-          payload.getAttackPatterns().stream().map(AttackPattern::getId).toList())));
+      newInjectorContract.setAttackPatterns(
+          fromIterable(
+              attackPatternRepository.findAllById(
+                  payload.getAttackPatterns().stream().map(AttackPattern::getId).toList())));
       newInjectorContract.setAtomicTesting(true);
       try {
         newInjectorContract.setContent(mapper.writeValueAsString(contract));
@@ -103,11 +103,19 @@ public class PayloadService {
     }
   }
 
-  private Contract buildContract(@NotNull final String contractId, @NotNull final Injector injector,
+  private Contract buildContract(
+      @NotNull final String contractId,
+      @NotNull final Injector injector,
       @NotNull final Payload payload) {
     Map<SupportedLanguage, String> labels = Map.of(en, injector.getName(), fr, injector.getName());
-    ContractConfig contractConfig = new ContractConfig(injector.getType(), labels, "#000000", "#000000",
-        "/img/icon-" + injector.getType() + ".png", true);
+    ContractConfig contractConfig =
+        new ContractConfig(
+            injector.getType(),
+            labels,
+            "#000000",
+            "#000000",
+            "/img/icon-" + injector.getType() + ".png",
+            true);
     ContractAsset assetField = assetField("assets", "Assets", Multiple);
     ContractAssetGroup assetGroupField = assetGroupField("assetgroups", "Asset groups", Multiple);
     ContractExpectations expectationsField = expectations();
@@ -115,10 +123,16 @@ public class PayloadService {
     builder.mandatoryGroup(assetField, assetGroupField);
     builder.optional(expectationsField);
     if (payload.getArguments() != null) {
-      payload.getArguments().forEach(payloadArgument -> {
-        builder.mandatory(
-            textField(payloadArgument.getKey(), payloadArgument.getKey(), payloadArgument.getDefaultValue()));
-      });
+      payload
+          .getArguments()
+          .forEach(
+              payloadArgument -> {
+                builder.mandatory(
+                    textField(
+                        payloadArgument.getKey(),
+                        payloadArgument.getKey(),
+                        payloadArgument.getDefaultValue()));
+              });
     }
     return executableContract(
         contractConfig,
@@ -126,8 +140,7 @@ public class PayloadService {
         Map.of(en, payload.getName(), fr, payload.getName()),
         builder.build(),
         Arrays.asList(payload.getPlatforms()),
-        true
-    );
+        true);
   }
 
   private ContractExpectations expectations() {
@@ -136,9 +149,7 @@ public class PayloadService {
         "Expectations",
         List.of(
             this.expectationBuilderService.buildPreventionExpectation(),
-            this.expectationBuilderService.buildDetectionExpectation()
-        )
-    );
+            this.expectationBuilderService.buildDetectionExpectation()));
   }
 
   public Payload duplicate(@NotBlank final String payloadId) {
@@ -177,19 +188,22 @@ public class PayloadService {
         duplicate = payloadRepository.save(duplicateNetworkTraffic);
         break;
       default:
-        throw new UnsupportedOperationException("Payload type " + origin.getType() + " is not supported");
+        throw new UnsupportedOperationException(
+            "Payload type " + origin.getType() + " is not supported");
     }
     this.updateInjectorContractsForPayload(duplicate);
     return duplicate;
   }
 
-    private <T extends Payload> void duplicateCommonProperties(@org.jetbrains.annotations.NotNull final T origin, @org.jetbrains.annotations.NotNull T duplicate) {
-        BeanUtils.copyProperties(origin, duplicate);
-        duplicate.setId(null);
-        duplicate.setName(StringUtils.duplicateString(origin.getName()));
-        duplicate.setAttackPatterns(new ArrayList<>(origin.getAttackPatterns()));
-        duplicate.setTags(new HashSet<>(origin.getTags()));
-        duplicate.setExternalId(null);
-        duplicate.setCollector(null);
-    }
+  private <T extends Payload> void duplicateCommonProperties(
+      @org.jetbrains.annotations.NotNull final T origin,
+      @org.jetbrains.annotations.NotNull T duplicate) {
+    BeanUtils.copyProperties(origin, duplicate);
+    duplicate.setId(null);
+    duplicate.setName(StringUtils.duplicateString(origin.getName()));
+    duplicate.setAttackPatterns(new ArrayList<>(origin.getAttackPatterns()));
+    duplicate.setTags(new HashSet<>(origin.getTags()));
+    duplicate.setExternalId(null);
+    duplicate.setCollector(null);
+  }
 }

@@ -1,20 +1,20 @@
 package io.openbas.migration;
 
+import java.sql.*;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
-import java.sql.*;
-
 @Component
 public class V2_37__Media_introduction extends BaseJavaMigration {
 
-    @Override
-    public void migrate(Context context) throws Exception {
-        Connection connection = context.getConnection();
-        Statement select = connection.createStatement();
-        // Medias
-        select.execute("""
+  @Override
+  public void migrate(Context context) throws Exception {
+    Connection connection = context.getConnection();
+    Statement select = connection.createStatement();
+    // Medias
+    select.execute(
+        """
                 CREATE TABLE medias
                 (
                     media_id varchar(255) not null constraint medias_pkey primary key,
@@ -26,8 +26,9 @@ public class V2_37__Media_introduction extends BaseJavaMigration {
                 );
                 CREATE INDEX idx_medias on medias (media_id);
                 """);
-        // Create articles
-        select.execute("""
+    // Create articles
+    select.execute(
+        """
                 CREATE TABLE articles (
                     article_id varchar(255) not null constraint articles_pkey primary key,
                     article_created_at timestamp not null default now(),
@@ -45,8 +46,9 @@ public class V2_37__Media_introduction extends BaseJavaMigration {
                 CREATE INDEX idx_articles on articles (article_id);
                 CREATE INDEX idx_article_media_exercise on articles (article_media, article_exercise);
                 """);
-        // Challenges
-        select.execute("""
+    // Challenges
+    select.execute(
+        """
                 CREATE TABLE challenges (
                     challenge_id varchar(255) not null constraint challenges_pkey primary key,
                     challenge_created_at timestamp not null default now(),
@@ -57,8 +59,9 @@ public class V2_37__Media_introduction extends BaseJavaMigration {
                 );
                 CREATE INDEX idx_challenges on challenges (challenge_id);
                 """);
-        // Expectations
-        select.execute("""
+    // Expectations
+    select.execute(
+        """
                 CREATE TABLE injects_expectations (
                     inject_expectation_id varchar(255) not null constraint injects_expectations_pkey primary key,
                     inject_expectation_type varchar(255) not null,
@@ -71,8 +74,9 @@ public class V2_37__Media_introduction extends BaseJavaMigration {
                 );
                 CREATE INDEX idx_injects_expectations on injects_expectations (inject_expectation_id);
                 """);
-        // Inject user expectation
-        select.execute("""
+    // Inject user expectation
+    select.execute(
+        """
                 CREATE TABLE injects_expectations_executions (
                     expectation_execution_id varchar(255) not null constraint expectations_pkey primary key,
                     expectation_execution_created_at timestamp not null default now(),
@@ -85,5 +89,5 @@ public class V2_37__Media_introduction extends BaseJavaMigration {
                 );
                 CREATE INDEX idx_injects_expectations_executions on injects_expectations_executions (expectation_execution_id);
                 """);
-    }
+  }
 }

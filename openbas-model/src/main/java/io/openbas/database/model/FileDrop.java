@@ -26,9 +26,7 @@ public class FileDrop extends Payload {
   @JsonProperty("file_drop_file")
   private Document fileDropFile;
 
-  public FileDrop() {
-
-  }
+  public FileDrop() {}
 
   public FileDrop(String id, String type, String name) {
     super(id, type, name);

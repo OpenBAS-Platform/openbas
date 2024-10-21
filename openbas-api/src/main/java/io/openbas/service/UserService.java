@@ -1,5 +1,11 @@
 package io.openbas.service;
 
+import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.helper.DatabaseHelper.updateRelation;
+import static io.openbas.helper.StreamHelper.iterableToSet;
+import static java.time.Instant.now;
+
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Group;
 import io.openbas.database.model.Token;
@@ -9,6 +15,10 @@ import io.openbas.database.specification.GroupSpecification;
 import io.openbas.rest.user.form.user.CreateUserInput;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,21 +30,11 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.helper.DatabaseHelper.updateRelation;
-import static io.openbas.helper.StreamHelper.iterableToSet;
-import static java.time.Instant.now;
-
 @Service
 public class UserService {
 
-  private final Argon2PasswordEncoder passwordEncoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
+  private final Argon2PasswordEncoder passwordEncoder =
+      Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
   private UserRepository userRepository;
   private TokenRepository tokenRepository;
   private TagRepository tagRepository;
@@ -102,9 +102,11 @@ public class UserService {
       user.setPassword(encodeUserPassword(input.getPassword()));
     }
     user.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-    user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
+    user.setOrganization(
+        updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
     // Find automatic groups to assign
-    List<Group> assignableGroups = groupRepository.findAll(GroupSpecification.defaultUserAssignable());
+    List<Group> assignableGroups =
+        groupRepository.findAll(GroupSpecification.defaultUserAssignable());
     user.setGroups(assignableGroups);
     // Save the user
     User savedUser = userRepository.save(user);
@@ -118,32 +120,36 @@ public class UserService {
 
   // endregion
 
-  public static PreAuthenticatedAuthenticationToken buildAuthenticationToken(@NotNull final User user) {
+  public static PreAuthenticatedAuthenticationToken buildAuthenticationToken(
+      @NotNull final User user) {
     List<SimpleGrantedAuthority> roles = new ArrayList<>();
     roles.add(new SimpleGrantedAuthority(ROLE_USER));
     if (user.isAdmin()) {
       roles.add(new SimpleGrantedAuthority(ROLE_ADMIN));
     }
-    return new PreAuthenticatedAuthenticationToken(new OpenBASPrincipal() {
-      @Override
-      public String getId() {
-        return user.getId();
-      }
+    return new PreAuthenticatedAuthenticationToken(
+        new OpenBASPrincipal() {
+          @Override
+          public String getId() {
+            return user.getId();
+          }
 
-      @Override
-      public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
-      }
+          @Override
+          public Collection<? extends GrantedAuthority> getAuthorities() {
+            return roles;
+          }
 
-      @Override
-      public boolean isAdmin() {
-        return user.isAdmin();
-      }
+          @Override
+          public boolean isAdmin() {
+            return user.isAdmin();
+          }
 
-      @Override
-      public String getLang() {
-        return user.getLang();
-      }
-    }, "", roles);
+          @Override
+          public String getLang() {
+            return user.getLang();
+          }
+        },
+        "",
+        roles);
   }
 }

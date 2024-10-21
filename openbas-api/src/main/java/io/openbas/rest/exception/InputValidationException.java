@@ -2,14 +2,14 @@ package io.openbas.rest.exception;
 
 public class InputValidationException extends Exception {
 
-    private final String field;
+  private final String field;
 
-    public InputValidationException(String field, String message) {
-        super(message);
-        this.field = field;
-    }
+  public InputValidationException(String field, String message) {
+    super(message);
+    this.field = field;
+  }
 
-    public String getField() {
-        return field;
-    }
+  public String getField() {
+    return field;
+  }
 }

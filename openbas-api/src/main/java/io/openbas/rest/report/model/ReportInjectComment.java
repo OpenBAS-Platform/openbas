@@ -13,37 +13,35 @@ import lombok.Data;
 @Entity
 @Table(name = "report_inject_comment")
 public class ReportInjectComment {
-    @EmbeddedId
-    @JsonIgnore
-    private ReportInjectCommentId compositeId = new ReportInjectCommentId();
+  @EmbeddedId @JsonIgnore private ReportInjectCommentId compositeId = new ReportInjectCommentId();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("injectId")
-    @JoinColumn(name = "inject_id")
-    @JsonIgnore // Ignore Inject object in JSON
-    @JsonSerialize(using = MonoIdDeserializer.class)
-    @NotNull
-    private Inject inject;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @MapsId("injectId")
+  @JoinColumn(name = "inject_id")
+  @JsonIgnore // Ignore Inject object in JSON
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @NotNull
+  private Inject inject;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("reportId")
-    @JoinColumn(name = "report_id")
-    @JsonIgnore // Ignore Inject object in JSON
-    @JsonSerialize(using = MonoIdDeserializer.class)
-    @NotNull
-    private Report report;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @MapsId("reportId")
+  @JoinColumn(name = "report_id")
+  @JsonIgnore // Ignore Inject object in JSON
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @NotNull
+  private Report report;
 
-    @Column(name = "comment")
-    @JsonProperty("report_inject_comment")
-    private String comment;
+  @Column(name = "comment")
+  @JsonProperty("report_inject_comment")
+  private String comment;
 
-    @JsonProperty("inject_id")
-    public String getInjectId() {
-        return inject != null ? inject.getId() : null; // Customize serialization to return ID
-    }
+  @JsonProperty("inject_id")
+  public String getInjectId() {
+    return inject != null ? inject.getId() : null; // Customize serialization to return ID
+  }
 
-    @JsonProperty("report_id")
-    public String getReportId() {
-        return report != null ? report.getId() : null; // Customize serialization to return ID
-    }
+  @JsonProperty("report_id")
+  public String getReportId() {
+    return report != null ? report.getId() : null; // Customize serialization to return ID
+  }
 }

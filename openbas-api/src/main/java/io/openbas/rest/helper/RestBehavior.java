@@ -1,5 +1,8 @@
 package io.openbas.rest.helper;
 
+import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
+import static io.openbas.config.SessionHelper.currentUser;
+
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,6 +13,8 @@ import io.openbas.database.model.User;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.rest.exception.*;
 import jakarta.annotation.Resource;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.extern.java.Log;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springdoc.api.ErrorMessage;
@@ -24,18 +29,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
-import static io.openbas.config.SessionHelper.currentUser;
-
 @RestControllerAdvice
 @Log
 public class RestBehavior {
 
-  @Resource
-  protected ObjectMapper mapper;
+  @Resource protected ObjectMapper mapper;
 
   // Build the mapping between json specific name and the actual database field name
   private Map<String, String> buildJsonMappingFields(MethodArgumentNotValidException ex) {
@@ -43,7 +41,9 @@ public class RestBehavior {
     JavaType javaType = mapper.getTypeFactory().constructType(inputClass);
     BeanDescription beanDescription = mapper.getSerializationConfig().introspect(javaType);
     return beanDescription.findProperties().stream()
-        .collect(Collectors.toMap(BeanPropertyDefinition::getInternalName, BeanPropertyDefinition::getName));
+        .collect(
+            Collectors.toMap(
+                BeanPropertyDefinition::getInternalName, BeanPropertyDefinition::getName));
   }
 
   @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -53,11 +53,14 @@ public class RestBehavior {
     ValidationErrorBag bag = new ValidationErrorBag();
     ValidationError errors = new ValidationError();
     Map<String, ValidationContent> errorsBag = new HashMap<>();
-    ex.getBindingResult().getAllErrors().forEach((error) -> {
-      String fieldName = ((FieldError) error).getField();
-      String errorMessage = error.getDefaultMessage();
-      errorsBag.put(jsonFieldsMapping.get(fieldName), new ValidationContent(errorMessage));
-    });
+    ex.getBindingResult()
+        .getAllErrors()
+        .forEach(
+            (error) -> {
+              String fieldName = ((FieldError) error).getField();
+              String errorMessage = error.getDefaultMessage();
+              errorsBag.put(jsonFieldsMapping.get(fieldName), new ValidationContent(errorMessage));
+            });
     errors.setChildren(errorsBag);
     bag.setErrors(errors);
     return bag;
@@ -78,7 +81,8 @@ public class RestBehavior {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(ImportException.class)
   public ValidationErrorBag handleBadRequestExceptions(ImportException ex) {
-    ValidationErrorBag bag = new ValidationErrorBag(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+    ValidationErrorBag bag =
+        new ValidationErrorBag(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     ValidationError errors = new ValidationError();
     Map<String, ValidationContent> errorsBag = new HashMap<>();
     errorsBag.put(ex.getField(), new ValidationContent(ex.getMessage()));
@@ -90,7 +94,8 @@ public class RestBehavior {
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   @ExceptionHandler(AccessDeniedException.class)
   public ValidationErrorBag handleValidationExceptions() {
-    ValidationErrorBag bag = new ValidationErrorBag(HttpStatus.UNAUTHORIZED.value(), "ACCESS_DENIED");
+    ValidationErrorBag bag =
+        new ValidationErrorBag(HttpStatus.UNAUTHORIZED.value(), "ACCESS_DENIED");
     ValidationError errors = new ValidationError();
     Map<String, ValidationContent> errorsBag = new HashMap<>();
     errorsBag.put("username", new ValidationContent("Invalid user or password"));
@@ -123,7 +128,8 @@ public class RestBehavior {
   }
 
   @ExceptionHandler(UnsupportedMediaTypeException.class)
-  public ResponseEntity<ErrorMessage> handleUnsupportedMediaTypeException(UnsupportedMediaTypeException ex) {
+  public ResponseEntity<ErrorMessage> handleUnsupportedMediaTypeException(
+      UnsupportedMediaTypeException ex) {
     ErrorMessage message = new ErrorMessage(ex.getMessage());
     log.warning("UnsupportedMediaTypeException: " + ex.getMessage());
     return new ResponseEntity<>(message, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
@@ -160,10 +166,11 @@ public class RestBehavior {
       OpenBASPrincipal currentUser = currentUser();
       if (!currentUser.isAdmin()) {
         User local = userRepository.findById(currentUser.getId()).orElseThrow();
-        List<String> localOrganizationIds = local.getGroups().stream()
-            .flatMap(group -> group.getOrganizations().stream())
-            .map(Organization::getId)
-            .toList();
+        List<String> localOrganizationIds =
+            local.getGroups().stream()
+                .flatMap(group -> group.getOrganizations().stream())
+                .map(Organization::getId)
+                .toList();
         if (!localOrganizationIds.contains(askedUser.getOrganization().getId())) {
           throw new UnsupportedOperationException("User is restricted");
         }
@@ -176,10 +183,11 @@ public class RestBehavior {
       OpenBASPrincipal currentUser = currentUser();
       if (!currentUser.isAdmin()) {
         User local = userRepository.findById(currentUser.getId()).orElseThrow();
-        List<String> localOrganizationIds = local.getGroups().stream()
-            .flatMap(group -> group.getOrganizations().stream())
-            .map(Organization::getId)
-            .toList();
+        List<String> localOrganizationIds =
+            local.getGroups().stream()
+                .flatMap(group -> group.getOrganizations().stream())
+                .map(Organization::getId)
+                .toList();
         if (!localOrganizationIds.contains(organizationId)) {
           throw new UnsupportedOperationException("User is restricted");
         }

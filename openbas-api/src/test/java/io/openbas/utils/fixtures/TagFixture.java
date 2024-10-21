@@ -12,5 +12,4 @@ public class TagFixture {
     tag.setColor("#FFFFFF");
     return tag;
   }
-
 }

@@ -1,5 +1,10 @@
 package io.openbas.rest.injector_contract;
 
+import static io.openbas.database.criteria.GenericCriteria.countQuery;
+import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
+import static io.openbas.utils.JpaUtils.createLeftJoin;
+import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
+
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.injectors.email.EmailContract;
@@ -10,6 +15,10 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,22 +31,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
-import static io.openbas.utils.JpaUtils.createLeftJoin;
-import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
-
 @RequiredArgsConstructor
 @Service
 public class InjectorContractService {
 
-  @PersistenceContext
-  private EntityManager entityManager;
+  @PersistenceContext private EntityManager entityManager;
 
   private final InjectorContractRepository injectorContractRepository;
 
@@ -50,14 +48,18 @@ public class InjectorContractService {
   @EventListener(ApplicationReadyEvent.class)
   public void initImportAvailableOnStartup() {
     List<String> listOfInjectorImportAvailable = new ArrayList<>();
-    if (mailImportEnabled) listOfInjectorImportAvailable.addAll(Arrays.asList(EmailContract.EMAIL_GLOBAL, EmailContract.EMAIL_DEFAULT));
+    if (mailImportEnabled)
+      listOfInjectorImportAvailable.addAll(
+          Arrays.asList(EmailContract.EMAIL_GLOBAL, EmailContract.EMAIL_DEFAULT));
     if (smsImportEnabled) listOfInjectorImportAvailable.add(OvhSmsContract.OVH_DEFAULT);
 
     List<InjectorContract> listInjectorContract = new ArrayList<>();
     injectorContractRepository.findAll().spliterator().forEachRemaining(listInjectorContract::add);
-    listInjectorContract.forEach(injectorContract -> {
-        injectorContract.setImportAvailable(listOfInjectorImportAvailable.contains(injectorContract.getId()));
-    });
+    listInjectorContract.forEach(
+        injectorContract -> {
+          injectorContract.setImportAvailable(
+              listOfInjectorImportAvailable.contains(injectorContract.getId()));
+        });
     injectorContractRepository.saveAll(listInjectorContract);
   }
 
@@ -99,7 +101,6 @@ public class InjectorContractService {
     return new PageImpl<>(injectorContractOutputs, pageable, total);
   }
 
-
   // -- CRITERIA BUILDER --
 
   private void selectForInjectorContract(
@@ -107,50 +108,52 @@ public class InjectorContractService {
       @NotNull final CriteriaQuery<Tuple> cq,
       @NotNull final Root<InjectorContract> injectorContractRoot) {
     // Joins
-    Join<InjectorContract, Payload> injectorContractPayloadJoin = createLeftJoin(injectorContractRoot, "payload");
-    Join<Payload, Collector> payloadCollectorJoin = injectorContractPayloadJoin.join("collector", JoinType.LEFT);
-    Join<InjectorContract, Injector> injectorContractInjectorJoin = createLeftJoin(injectorContractRoot, "injector");
+    Join<InjectorContract, Payload> injectorContractPayloadJoin =
+        createLeftJoin(injectorContractRoot, "payload");
+    Join<Payload, Collector> payloadCollectorJoin =
+        injectorContractPayloadJoin.join("collector", JoinType.LEFT);
+    Join<InjectorContract, Injector> injectorContractInjectorJoin =
+        createLeftJoin(injectorContractRoot, "injector");
     // Array aggregations
-    Expression<String[]> attackPatternIdsExpression = createJoinArrayAggOnId(cb, injectorContractRoot, "attackPatterns");
+    Expression<String[]> attackPatternIdsExpression =
+        createJoinArrayAggOnId(cb, injectorContractRoot, "attackPatterns");
 
     // SELECT
     cq.multiselect(
-        injectorContractRoot.get("id").alias("injector_contract_id"),
-        injectorContractRoot.get("labels").alias("injector_contract_labels"),
-        injectorContractRoot.get("content").alias("injector_contract_content"),
-        injectorContractRoot.get("platforms").alias("injector_contract_platforms"),
-        injectorContractPayloadJoin.get("type").alias("payload_type"),
-        payloadCollectorJoin.get("type").alias("collector_type"),
-        injectorContractInjectorJoin.get("type").alias("injector_contract_injector_type"),
-        attackPatternIdsExpression.alias("injector_contract_attack_patterns"),
-        injectorContractPayloadJoin.get("executableArch").alias("payload_executable_arch")
-    ).distinct(true);
+            injectorContractRoot.get("id").alias("injector_contract_id"),
+            injectorContractRoot.get("labels").alias("injector_contract_labels"),
+            injectorContractRoot.get("content").alias("injector_contract_content"),
+            injectorContractRoot.get("platforms").alias("injector_contract_platforms"),
+            injectorContractPayloadJoin.get("type").alias("payload_type"),
+            payloadCollectorJoin.get("type").alias("collector_type"),
+            injectorContractInjectorJoin.get("type").alias("injector_contract_injector_type"),
+            attackPatternIdsExpression.alias("injector_contract_attack_patterns"),
+            injectorContractPayloadJoin.get("executableArch").alias("payload_executable_arch"))
+        .distinct(true);
 
     // GROUP BY
-    cq.groupBy(Arrays.asList(
-        injectorContractRoot.get("id"),
-        injectorContractPayloadJoin.get("id"),
-        payloadCollectorJoin.get("id"),
-        injectorContractInjectorJoin.get("id")
-    ));
+    cq.groupBy(
+        Arrays.asList(
+            injectorContractRoot.get("id"),
+            injectorContractPayloadJoin.get("id"),
+            payloadCollectorJoin.get("id"),
+            injectorContractInjectorJoin.get("id")));
   }
-
 
   private List<InjectorContractOutput> execInjectorContract(TypedQuery<Tuple> query) {
-    return query.getResultList()
-        .stream()
-        .map(tuple -> new InjectorContractOutput(
-            tuple.get("injector_contract_id", String.class),
-            tuple.get("injector_contract_labels", Map.class),
-            tuple.get("injector_contract_content", String.class),
-            tuple.get("injector_contract_platforms", Endpoint.PLATFORM_TYPE[].class),
-            tuple.get("payload_type", String.class),
-            tuple.get("collector_type", String.class),
-            tuple.get("injector_contract_injector_type", String.class),
-            tuple.get("injector_contract_attack_patterns", String[].class),
-            tuple.get("payload_executable_arch", Endpoint.PLATFORM_ARCH.class)
-        ))
+    return query.getResultList().stream()
+        .map(
+            tuple ->
+                new InjectorContractOutput(
+                    tuple.get("injector_contract_id", String.class),
+                    tuple.get("injector_contract_labels", Map.class),
+                    tuple.get("injector_contract_content", String.class),
+                    tuple.get("injector_contract_platforms", Endpoint.PLATFORM_TYPE[].class),
+                    tuple.get("payload_type", String.class),
+                    tuple.get("collector_type", String.class),
+                    tuple.get("injector_contract_injector_type", String.class),
+                    tuple.get("injector_contract_attack_patterns", String[].class),
+                    tuple.get("payload_executable_arch", Endpoint.PLATFORM_ARCH.class)))
         .toList();
   }
-
 }

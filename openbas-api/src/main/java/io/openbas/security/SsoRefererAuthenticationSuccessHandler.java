@@ -1,18 +1,17 @@
 package io.openbas.security;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
-import org.springframework.security.web.savedrequest.RequestCache;
-import org.springframework.security.web.savedrequest.SavedRequest;
+import static org.springframework.http.HttpHeaders.REFERER;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-
-import static org.springframework.http.HttpHeaders.REFERER;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.RequestCache;
+import org.springframework.security.web.savedrequest.SavedRequest;
 
 public class SsoRefererAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
@@ -24,9 +23,8 @@ public class SsoRefererAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 
   @Override
   public void onAuthenticationSuccess(
-      HttpServletRequest request,
-      HttpServletResponse response,
-      Authentication authentication) throws ServletException, IOException {
+      HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+      throws ServletException, IOException {
     SavedRequest savedRequest = this.requestCache.getRequest(request, response);
     if (savedRequest != null) {
       List<String> refererValues = savedRequest.getHeaderValues(REFERER);

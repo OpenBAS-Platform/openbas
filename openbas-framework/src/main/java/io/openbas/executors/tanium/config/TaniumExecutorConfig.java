@@ -11,40 +11,25 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "executor.tanium")
 public class TaniumExecutorConfig {
 
-    private final static String GATEWAY_URI = "/plugin/products/gateway/graphql";
+  private static final String GATEWAY_URI = "/plugin/products/gateway/graphql";
 
-    @Getter
-    private boolean enable;
+  @Getter private boolean enable;
 
-    @Getter
-    @NotBlank
-    private String id;
+  @Getter @NotBlank private String id;
 
-    @Getter
-    @NotBlank
-    private String url;
+  @Getter @NotBlank private String url;
 
-    @Getter
-    @NotBlank
-    private String apiKey;
+  @Getter @NotBlank private String apiKey;
 
-    @Getter
-    @NotBlank
-    private Integer computerGroupId = 1;
+  @Getter @NotBlank private Integer computerGroupId = 1;
 
-    @Getter
-    @NotBlank
-    private Integer actionGroupId = 4;
+  @Getter @NotBlank private Integer actionGroupId = 4;
 
-    @Getter
-    @NotBlank
-    private Integer windowsPackageId;
+  @Getter @NotBlank private Integer windowsPackageId;
 
-    @Getter
-    @NotBlank
-    private Integer unixPackageId;
+  @Getter @NotBlank private Integer unixPackageId;
 
-    public String getGatewayUrl() {
-        return url + GATEWAY_URI;
-    }
+  public String getGatewayUrl() {
+    return url + GATEWAY_URI;
+  }
 }

@@ -7,12 +7,11 @@ import io.openbas.database.model.Tag;
 import io.openbas.database.raw.RawScenario;
 import io.openbas.helper.MultiIdSetDeserializer;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import org.springframework.beans.BeanUtils;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 @Data
 public class ScenarioSimple {
@@ -42,16 +41,18 @@ public class ScenarioSimple {
     simple.setName(scenario.getScenario_name());
     simple.setSubtitle(scenario.getScenario_subtitle());
     if (scenario.getScenario_tags() != null) {
-      simple.setTags(scenario.getScenario_tags().stream().map((tagId) -> {
-                Tag tag = new Tag();
-                tag.setId(tagId);
-                return tag;
-              }
-      ).collect(Collectors.toSet()));
+      simple.setTags(
+          scenario.getScenario_tags().stream()
+              .map(
+                  (tagId) -> {
+                    Tag tag = new Tag();
+                    tag.setId(tagId);
+                    return tag;
+                  })
+              .collect(Collectors.toSet()));
     } else {
       simple.setTags(new HashSet<>());
     }
     return simple;
   }
-
 }

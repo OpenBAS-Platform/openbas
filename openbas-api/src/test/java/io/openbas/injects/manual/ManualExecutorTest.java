@@ -9,9 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class ManualExecutorTest {
 
-  @Autowired
-  private ManualExecutor manualExecutor;
-
+  @Autowired private ManualExecutor manualExecutor;
 
   @Test
   void process() {
@@ -24,5 +22,4 @@ public class ManualExecutorTest {
     Assertions.assertNotNull(error);
     Assertions.assertEquals("Manual inject cannot be executed", error.getMessage());
   }
-
 }

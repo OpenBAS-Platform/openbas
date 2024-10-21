@@ -1,9 +1,8 @@
 package io.openbas.execution;
 
 import io.openbas.database.model.User;
-import lombok.Data;
-
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 @Data
 public class ProtectUser {
@@ -25,5 +24,4 @@ public class ProtectUser {
     this.pgpKey = user.getPgpKey();
     this.phone = user.getPhone();
   }
-
 }

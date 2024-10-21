@@ -1,20 +1,19 @@
 package io.openbas.model;
 
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter
 public class ExecutionProcess {
 
-    private boolean async;
+  private boolean async;
 
-    private List<Expectation> expectations;
+  private List<Expectation> expectations;
 
-    public ExecutionProcess(boolean async, List<Expectation> expectations) {
-        this.async = async;
-        this.expectations = expectations;
-    }
+  public ExecutionProcess(boolean async, List<Expectation> expectations) {
+    this.async = async;
+    this.expectations = expectations;
+  }
 }

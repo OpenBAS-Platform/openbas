@@ -3,7 +3,6 @@ package io.openbas.database.raw;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Filters;
-
 import java.util.List;
 
 public interface RawAssetGroup {
@@ -22,7 +21,6 @@ public interface RawAssetGroup {
   String getAsset_group_name();
 
   List<String> getAsset_ids();
-  
-  String getAsset_group_dynamic_filter();
 
+  String getAsset_group_dynamic_filter();
 }

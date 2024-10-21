@@ -7,13 +7,10 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class UtilsSpecification {
 
-  private UtilsSpecification() {
-
-  }
+  private UtilsSpecification() {}
 
   public static <T extends Base> Specification<T> byName(
-      @Nullable final String searchText,
-      @NotBlank final String property) {
+      @Nullable final String searchText, @NotBlank final String property) {
     return (root, query, cb) -> {
       if (searchText == null || searchText.isEmpty()) {
         return cb.conjunction();
@@ -22,5 +19,4 @@ public class UtilsSpecification {
       return cb.like(cb.lower(root.get(property)), likePattern);
     };
   }
-
 }

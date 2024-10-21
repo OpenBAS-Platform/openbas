@@ -25,12 +25,14 @@ public class LoadService {
     Hibernate.initialize(exercise.getArticles());
     exercise.getArticles().forEach(article -> Hibernate.initialize(article.getDocuments()));
     Hibernate.initialize(exercise.getLessonsCategories());
-    exercise.getLessonsCategories().forEach(lessonsCategory -> {
-      Hibernate.initialize(lessonsCategory.getQuestions());
-      Hibernate.initialize(lessonsCategory.getTeams());
-    });
+    exercise
+        .getLessonsCategories()
+        .forEach(
+            lessonsCategory -> {
+              Hibernate.initialize(lessonsCategory.getQuestions());
+              Hibernate.initialize(lessonsCategory.getTeams());
+            });
     Hibernate.initialize(exercise.getInjects());
     return exercise;
   }
-
 }

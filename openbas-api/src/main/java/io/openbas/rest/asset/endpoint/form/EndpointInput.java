@@ -1,5 +1,7 @@
 package io.openbas.rest.asset.endpoint.form;
 
+import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Endpoint;
 import io.openbas.rest.asset.form.AssetInput;
@@ -8,8 +10,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -36,5 +36,4 @@ public class EndpointInput extends AssetInput {
 
   @JsonProperty("endpoint_mac_addresses")
   private String[] macAddresses;
-
 }
