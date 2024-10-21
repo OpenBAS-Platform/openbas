@@ -2,7 +2,6 @@ import { useTheme } from '@mui/styles';
 import React, { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 import * as R from 'ramda';
-import { Theme } from '@mui/material';
 import Empty from '../../../../../components/Empty';
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import { useFormatter } from '../../../../../components/i18n';
@@ -13,6 +12,7 @@ import { fetchExerciseCommunications } from '../../../../../actions/Communicatio
 import type { CommunicationHelper } from '../../../../../actions/communications/communication-helper';
 import type { Communication } from '../../../../../utils/api-types';
 import { areaChartOptions } from '../../../../../utils/Charts';
+import type { Theme } from '../../../../../components/Theme';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
@@ -56,7 +56,6 @@ const MailDistributionOverTimeChart: FunctionComponent<Props> = ({
     <>
       {communicationsOverTime.length > 0 ? (
         <Chart
-          // @ts-expect-error: Need to migrate Chart.js file
           options={areaChartOptions(theme, true, nsdt, null, undefined)}
           series={communicationsData}
           type="area"

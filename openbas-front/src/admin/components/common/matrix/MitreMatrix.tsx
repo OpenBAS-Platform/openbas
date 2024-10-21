@@ -12,6 +12,7 @@ import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types'
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import type { InjectExpectationResultsByAttackPatternStore } from '../../../../actions/exercises/Exercise';
 import KillChainPhaseColumn from './KillChainPhaseColumn';
+import MitreMatrixDummy from './MitreMatrixDummy';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -52,6 +53,11 @@ const MitreMatrix: FunctionComponent<Props> = ({
       dispatch(fetchAttackPatterns());
     });
   }
+
+  if (!injectResults) {
+    return <MitreMatrixDummy ttpAlreadyLoaded />;
+  }
+
   // Attack Pattern
   const resultAttackPatternIds = R.uniq(
     injectResults

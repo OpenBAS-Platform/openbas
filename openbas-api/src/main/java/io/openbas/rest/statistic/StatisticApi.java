@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,6 +34,11 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.AtomicTestingUtils.getExpectationResultByTypesFromRaw;
 import static java.util.stream.Collectors.groupingBy;
+
+enum Type {
+  GLOBAL,
+  USER,
+}
 
 @RestController
 @RequiredArgsConstructor
@@ -65,6 +71,9 @@ public class StatisticApi extends RestBehavior {
       statistic.setInjectsCount(computeGlobalStat(now, injectRepository));
       statistic.setResults(computeGlobalExpectationResults(now));
       statistic.setInjectResults(computeGlobalInjectExpectationResults(now));
+      statistic.setExerciseCountByCategory(computeExerciseCountGroupByCategory(Type.GLOBAL, now));
+      statistic.setExercisesCountByWeek(computeExerciseCountGroupByWeek(Type.GLOBAL, now));
+      statistic.setInjectsCountByAttackPattern(computeInjectCountGroupByAttackPattern(Type.GLOBAL, now));
     } else {
       statistic.setScenariosCount(computeUserStat(now, scenarioRepository));
       statistic.setExercisesCount(computeUserStat(now, exerciseRepository));
@@ -75,6 +84,9 @@ public class StatisticApi extends RestBehavior {
       statistic.setInjectsCount(computeUserStat(now, injectRepository));
       statistic.setResults(computeUserExpectationResults(now));
       statistic.setInjectResults(computeUserInjectExpectationResults(now));
+      statistic.setExerciseCountByCategory(computeExerciseCountGroupByCategory(Type.USER, now));
+      statistic.setExercisesCountByWeek(computeExerciseCountGroupByWeek(Type.USER, now));
+      statistic.setInjectsCountByAttackPattern(computeInjectCountGroupByAttackPattern(Type.USER, now));
     }
     return statistic;
   }
@@ -82,7 +94,8 @@ public class StatisticApi extends RestBehavior {
   // -- GLOBAL STATISTIC --
 
   private StatisticElement computeGlobalStat(Instant from, StatisticRepository repository) {
-    long global = repository.globalCount(from);
+    Instant minus3Months = from.minus(180, ChronoUnit.DAYS);
+    long global = repository.globalCount(minus3Months);
     Instant minusMonth = from.minus(30, ChronoUnit.DAYS);
     long progression = global - repository.globalCount(minusMonth);
     return new StatisticElement(global, progression);
@@ -90,33 +103,42 @@ public class StatisticApi extends RestBehavior {
 
   private StatisticElement computeUserStat(Instant from, StatisticRepository repository) {
     OpenBASPrincipal user = currentUser();
-    long global = repository.userCount(user.getId(), from);
+    Instant minus3Months = from.minus(180, ChronoUnit.DAYS);
+    long global = repository.userCount(user.getId(), minus3Months);
     Instant minusMonth = from.minus(30, ChronoUnit.DAYS);
     long progression = global - repository.userCount(user.getId(), minusMonth);
     return new StatisticElement(global, progression);
   }
 
   private List<ExpectationResultsByType> computeGlobalExpectationResults(@NotNull final Instant from) {
-    List<RawInjectExpectation> rawInjectExpectations = fromIterable(this.exerciseRepository.allInjectExpectationsFromDate(from));
+    Instant minus3Months = from.minus(180, ChronoUnit.DAYS);
+    List<RawInjectExpectation> rawInjectExpectations = fromIterable(
+        this.exerciseRepository.allInjectExpectationsFromDate(minus3Months));
     return getExpectationResultByTypesFromRaw(rawInjectExpectations);
   }
 
   private List<ExpectationResultsByType> computeUserExpectationResults(@NotNull final Instant from) {
     OpenBASPrincipal user = currentUser();
-    List<RawInjectExpectation> rawInjectExpectations = fromIterable(this.exerciseRepository.allGrantedInjectExpectationsFromDate(from, user.getId()));
+    Instant minus3Months = from.minus(180, ChronoUnit.DAYS);
+    List<RawInjectExpectation> rawInjectExpectations = fromIterable(
+        this.exerciseRepository.allGrantedInjectExpectationsFromDate(minus3Months, user.getId()));
     return getExpectationResultByTypesFromRaw(rawInjectExpectations);
   }
 
   private List<InjectExpectationResultsByAttackPattern> computeGlobalInjectExpectationResults(
       @NotNull final Instant from) {
-    List<RawGlobalInjectExpectation> rawGlobalInjectExpectations = fromIterable(this.exerciseRepository.rawGlobalInjectExpectationResultsFromDate(from));
+    Instant minus3Months = from.minus(180, ChronoUnit.DAYS);
+    List<RawGlobalInjectExpectation> rawGlobalInjectExpectations = fromIterable(
+        this.exerciseRepository.rawGlobalInjectExpectationResultsFromDate(minus3Months));
     return injectExpectationResultsByAttackPatternFromRawGlobalInjectExpectation(rawGlobalInjectExpectations);
   }
 
   private List<InjectExpectationResultsByAttackPattern> computeUserInjectExpectationResults(
       @NotNull final Instant from) {
     OpenBASPrincipal user = currentUser();
-    List<RawGlobalInjectExpectation> rawGlobalInjectExpectations = fromIterable(this.exerciseRepository.rawGrantedInjectExpectationResultsFromDate(from, user.getId()));
+    Instant minus3Months = from.minus(180, ChronoUnit.DAYS);
+    List<RawGlobalInjectExpectation> rawGlobalInjectExpectations = fromIterable(
+        this.exerciseRepository.rawGrantedInjectExpectationResultsFromDate(minus3Months, user.getId()));
     return injectExpectationResultsByAttackPatternFromRawGlobalInjectExpectation(rawGlobalInjectExpectations);
   }
 
@@ -172,6 +194,60 @@ public class StatisticApi extends RestBehavior {
             }
         )
         .collect(Collectors.toList());
+  }
+
+  private Map<String, Long> computeExerciseCountGroupByCategory(final Type type, @NotNull final Instant from) {
+    Instant minus3Months = from.minus(180, ChronoUnit.DAYS);
+    List<Object[]> result = new ArrayList<>();
+    if (type == Type.GLOBAL) {
+      result = exerciseRepository.globalCountGroupByCategory(minus3Months);
+    } else if (type == Type.USER) {
+      OpenBASPrincipal user = currentUser();
+      result = exerciseRepository.userCountGroupByCategory(user.getId(), minus3Months);
+    }
+    Map<String, Long> categoryCountMap = new HashMap<>();
+    for (Object[] row : result) {
+      String category = (String) row[0];
+      Long count = (Long) row[1];
+      categoryCountMap.put(category, count);
+    }
+    return categoryCountMap;
+  }
+
+  private Map<Instant, Long> computeExerciseCountGroupByWeek(final Type type, @NotNull final Instant from) {
+    Instant minus3Months = from.minus(180, ChronoUnit.DAYS);
+    List<Object[]> result = new ArrayList<>();
+    if (type == Type.GLOBAL) {
+      result = exerciseRepository.globalCountGroupByWeek(minus3Months);
+    } else if (type == Type.USER) {
+      OpenBASPrincipal user = currentUser();
+      result = exerciseRepository.userCountGroupByWeek(user.getId(), minus3Months);
+    }
+    Map<Instant, Long> weekCountMap = new HashMap<>();
+    for (Object[] row : result) {
+      Instant week = (Instant) row[0];
+      Long count = (Long) row[1];
+      weekCountMap.put(week, count);
+    }
+    return weekCountMap;
+  }
+
+  private Map<String, Long> computeInjectCountGroupByAttackPattern(final Type type, @NotNull final Instant from) {
+    Instant minus3Months = from.minus(180, ChronoUnit.DAYS);
+    List<Object[]> result = new ArrayList<>();
+    if (type == Type.GLOBAL) {
+      result = injectRepository.globalCountGroupByAttackPatternInExercise(minus3Months);
+    } else if (type == Type.USER) {
+      OpenBASPrincipal user = currentUser();
+      result = injectRepository.userCountGroupByAttackPatternInExercise(user.getId(), minus3Months);
+    }
+    Map<String, Long> attackPatternMap = new HashMap<>();
+    for (Object[] row : result) {
+      String attackPattern = (String) row[0];
+      Long count = (Long) row[1];
+      attackPatternMap.put(attackPattern, count);
+    }
+    return attackPatternMap;
   }
 
 }
