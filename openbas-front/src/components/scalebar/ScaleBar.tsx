@@ -77,7 +77,7 @@ const ScaleBar: FunctionComponent<Props> = ({
       },
     ],
   };
-  const isScoreReadable = expectationScore > 0 && expectationScore < 95;
+  const isScoreReadable = expectationScore >= 0 && expectationScore < 95;
 
   return (
     <div className={classes.scaleBar}>
