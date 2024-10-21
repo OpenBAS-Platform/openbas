@@ -37,7 +37,6 @@ import { useFormatter } from './i18n';
 import type { AssetGroupsHelper } from '../actions/asset_groups/assetgroup-helper';
 import type { EndpointHelper } from '../actions/assets/asset-helper';
 import type { Inject } from '../utils/api-types';
-import chainingUtils from '../admin/components/common/injects/chaining/ChainingUtils';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -288,7 +287,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
         inject_id: node.id,
         inject_depends_duration: convertCoordinatesToTime(node.position),
         inject_depends_on: injectFromMap.inject_depends_on !== null
-          ? chainingUtils.fromInjectDependencyToInputDependency(injectFromMap.inject_depends_on) : null,
+          ? injectFromMap.inject_depends_on : null,
       };
       onUpdateInject([inject]);
       setCurrentUpdatedNode(node);
@@ -348,11 +347,11 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
     const { position } = node;
     const { data } = node;
     const dependsOn = nodes.find((currentNode) => (data.inject?.inject_depends_on !== null
-      && data.inject?.inject_depends_on![currentNode.id]));
+      && data.inject?.inject_depends_on!.find((value) => value.dependency_relationship?.inject_children_id === currentNode.id)));
     const dependsTo = nodes
       .filter((currentNode) => (currentNode.data.inject?.inject_depends_on !== undefined
           && currentNode.data.inject?.inject_depends_on !== null
-          && currentNode.data.inject?.inject_depends_on[node.id] !== undefined))
+          && currentNode.data.inject?.inject_depends_on.find((value) => value.dependency_relationship?.inject_parent_id === node.id) !== undefined))
       .sort((a, b) => a.data.inject!.inject_depends_duration - b.data.inject!.inject_depends_duration)[0];
     const aSecond = gapSize / (minutesPerGapAllowed[minutesPerGapIndex] * 60);
     if (dependsOn?.position && position.x <= dependsOn?.position.x) {
