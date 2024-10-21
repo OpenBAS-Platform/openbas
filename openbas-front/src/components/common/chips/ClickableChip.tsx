@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-interface Element {
+export interface Element {
   key: string;
   operator?: string;
   value?: string;

@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   onClick?: () => void;
-  mode?: 'and' | 'or';
+  mode?: string;
 }
 
 const ClickableModeChip: FunctionComponent<Props> = ({
@@ -34,6 +34,15 @@ const ClickableModeChip: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
+
+  const modeToString = () => {
+    if (mode === '&&') {
+      return 'AND';
+    } if (mode === '||') {
+      return 'OR';
+    }
+    return mode?.toUpperCase();
+  };
 
   if (!mode) {
     return <></>;
@@ -47,7 +56,7 @@ const ClickableModeChip: FunctionComponent<Props> = ({
         [classes.hasClickEvent]: !!onClick,
       })}
     >
-      {t(mode.toUpperCase())}
+      {t(modeToString())}
     </div>
   );
 };

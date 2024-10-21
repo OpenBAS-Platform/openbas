@@ -1,6 +1,7 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
 import jakarta.persistence.Embeddable;
@@ -27,12 +28,14 @@ public class InjectDependencyId implements Serializable {
     @JsonProperty("inject_parent_id")
     @JoinColumn(referencedColumnName="inject_id", name="inject_parent_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
+    @Schema(type = "string")
     private Inject injectParent;
 
     @ManyToOne
     @JsonProperty("inject_children_id")
     @JoinColumn(referencedColumnName="inject_id", name="inject_children_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
+    @Schema(type = "string")
     private Inject injectChildren;
 
     @Override

@@ -3,11 +3,13 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.helper.MonoIdDeserializer;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
@@ -25,7 +27,8 @@ public class InjectDependency {
 
     @Column(name = "dependency_condition")
     @JsonProperty("dependency_condition")
-    private String condition;
+    @Type(JsonType.class)
+    private InjectDependencyConditions.InjectDependencyCondition injectDependencyCondition;
 
     @CreationTimestamp
     @Column(name = "dependency_created_at")
