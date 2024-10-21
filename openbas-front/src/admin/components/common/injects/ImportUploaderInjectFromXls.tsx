@@ -10,7 +10,11 @@ import { InjectContext } from '../Context';
 import { storeXlsFile } from '../../../../actions/mapper/mapper-actions';
 import { MESSAGING$ } from '../../../../utils/Environment';
 
-const ImportUploaderInjectFromXls = () => {
+interface Props {
+  onImportedInjects?: () => void
+}
+
+const ImportUploaderInjectFromXls = ({ onImportedInjects = () => {} }: Props) => {
   // Standard hooks
   const { t } = useFormatter();
   const injectContext = useContext(InjectContext);
@@ -42,6 +46,7 @@ const ImportUploaderInjectFromXls = () => {
         if (criticalMessages && criticalMessages?.length > 0) {
           MESSAGING$.notifyError(t(criticalMessages[0].message_code), true);
         }
+        onImportedInjects();
         handleClose();
       });
     }

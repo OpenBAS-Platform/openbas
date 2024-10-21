@@ -25,12 +25,14 @@ interface Props {
   injects: InjectOutputType[];
   setViewMode?: (mode: string) => void;
   availableButtons: string[];
+  onImportedInjects?: () => void;
 }
 
 const InjectsListButtons: FunctionComponent<Props> = ({
   injects,
   setViewMode,
   availableButtons,
+  onImportedInjects,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -80,7 +82,7 @@ const InjectsListButtons: FunctionComponent<Props> = ({
         aria-label="Change view mode"
       >
         {injectContext.onImportInjectFromXls
-          && <ImportUploaderInjectFromXls />}
+          && <ImportUploaderInjectFromXls onImportedInjects={onImportedInjects}/>}
         {(!!setViewMode && availableButtons.includes('list'))
           && <Tooltip title={t('List view')}>
             <ToggleButton
