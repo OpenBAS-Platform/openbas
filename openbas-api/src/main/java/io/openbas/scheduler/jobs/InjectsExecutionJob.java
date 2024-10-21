@@ -167,62 +167,75 @@ public class InjectsExecutionJob implements Job {
             status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
             injectStatusRepository.save(status);
         } else {
-            inject.getInjectorContract().ifPresent(injectorContract -> {
+            setInjectStatusAndExecuteInject(executableInject, inject);
+        }
+    }
 
-                if (!inject.isReady()) {
+    private void setInjectStatusAndExecuteInject(ExecutableInject executableInject, Inject inject) {
+        inject.getInjectorContract().ifPresentOrElse(injectorContract -> {
+            if (!inject.isReady()) {
+                // Status
+                if (inject.getStatus().isEmpty()) {
+                    InjectStatus status = new InjectStatus();
+                    status.getTraces().add(InjectStatusExecution.traceError("The inject is not ready to be executed (missing mandatory fields)"));
+                    status.setName(ExecutionStatus.ERROR);
+                    status.setTrackingSentDate(Instant.now());
+                    status.setInject(inject);
+                    status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
+                    injectStatusRepository.save(status);
+                } else {
+                    InjectStatus status = inject.getStatus().get();
+                    status.getTraces().add(InjectStatusExecution.traceError("The inject is not ready to be executed (missing mandatory fields)"));
+                    status.setName(ExecutionStatus.ERROR);
+                    status.setTrackingSentDate(Instant.now());
+                    status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
+                    injectStatusRepository.save(status);
+                }
+                return;
+            }
+
+            Injector externalInjector = injectorRepository.findByType(injectorContract.getInjector().getType()).orElseThrow();
+            LOGGER.log(Level.INFO, "Executing inject " + inject.getInject().getTitle());
+            // Executor logics
+            ExecutableInject newExecutableInject = executableInject;
+            if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
+                try {
                     // Status
                     if (inject.getStatus().isEmpty()) {
                         InjectStatus status = new InjectStatus();
-                        status.getTraces().add(InjectStatusExecution.traceError("The inject is not ready to be executed (missing mandatory fields)"));
-                        status.setName(ExecutionStatus.ERROR);
+                        status.setName(ExecutionStatus.EXECUTING);
                         status.setTrackingSentDate(Instant.now());
                         status.setInject(inject);
                         status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
                         injectStatusRepository.save(status);
                     } else {
                         InjectStatus status = inject.getStatus().get();
-                        status.getTraces().add(InjectStatusExecution.traceError("The inject is not ready to be executed (missing mandatory fields)"));
-                        status.setName(ExecutionStatus.ERROR);
+                        status.setName(ExecutionStatus.EXECUTING);
                         status.setTrackingSentDate(Instant.now());
                         status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
                         injectStatusRepository.save(status);
                     }
-                    return;
+                    newExecutableInject = this.executionExecutorService.launchExecutorContext(executableInject, inject);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
+            }
+            if (externalInjector.isExternal()) {
+                executeExternal(newExecutableInject);
+            } else {
+                executeInternal(newExecutableInject);
+            }
+        }, () -> setInjectStatusWhenNoInjectorContractExists(inject));
+    }
 
-                Injector externalInjector = injectorRepository.findByType(injectorContract.getInjector().getType()).orElseThrow();
-                LOGGER.log(Level.INFO, "Executing inject " + inject.getInject().getTitle());
-                // Executor logics
-                ExecutableInject newExecutableInject = executableInject;
-                if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
-                    try {
-                        // Status
-                        if (inject.getStatus().isEmpty()) {
-                            InjectStatus status = new InjectStatus();
-                            status.setName(ExecutionStatus.EXECUTING);
-                            status.setTrackingSentDate(Instant.now());
-                            status.setInject(inject);
-                            status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
-                            injectStatusRepository.save(status);
-                        } else {
-                            InjectStatus status = inject.getStatus().get();
-                            status.setName(ExecutionStatus.EXECUTING);
-                            status.setTrackingSentDate(Instant.now());
-                            status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
-                            injectStatusRepository.save(status);
-                        }
-                        newExecutableInject = this.executionExecutorService.launchExecutorContext(executableInject, inject);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                if (externalInjector.isExternal()) {
-                    executeExternal(newExecutableInject);
-                } else {
-                    executeInternal(newExecutableInject);
-                }
-            });
-        }
+    private void setInjectStatusWhenNoInjectorContractExists(Inject inject) {
+        InjectStatus status = new InjectStatus();
+        status.getTraces().add(InjectStatusExecution.traceError("The inject has no injector contract"));
+        status.setName(ExecutionStatus.ERROR);
+        status.setTrackingSentDate(Instant.now());
+        status.setInject(inject);
+        status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
+        injectStatusRepository.save(status);
     }
 
     public void updateExercise(String exerciseId) {
