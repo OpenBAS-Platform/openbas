@@ -86,7 +86,6 @@ const Groups = () => {
     dispatch(fetchExercises());
     dispatch(fetchScenarios());
     dispatch(fetchTags());
-    dispatch(fetchOrganizations());
   });
 
   // Headers
@@ -152,7 +151,7 @@ const Groups = () => {
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-              }
+            }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
@@ -240,7 +239,7 @@ const Groups = () => {
                     {group.group_users_number}
                   </div>
                 </div>
-                }
+              }
             />
             <ListItemSecondaryAction>
               <GroupPopover
