@@ -13,6 +13,7 @@ import { useAppDispatch } from './utils/hooks';
 import type { LoggedHelper } from './actions/helper';
 import Loader from './components/Loader';
 import { UserContext } from './utils/hooks/useAuth';
+import Message from './components/Message';
 
 const RootPublic = lazy(() => import('./public/Root'));
 const IndexPrivate = lazy(() => import('./private/Index'));
@@ -54,6 +55,7 @@ const Root = () => {
         <ConnectedIntlProvider>
           <ConnectedThemeProvider>
             <CssBaseline />
+            <Message />
             <Suspense fallback={<Loader />}>
               <Routes>
                 <Route path="" element={logged.isOnlyPlayer ? <Navigate to="private" replace={true} />

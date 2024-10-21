@@ -10,6 +10,7 @@ import { useFormatter } from './i18n';
 import Loader from './Loader';
 import { useHelper } from '../store';
 import type { UserHelper } from '../actions/helper';
+import { MESSAGING$ } from '../utils/Environment';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -45,12 +46,19 @@ const ExportPdfButton: React.FC<Props> = ({ getPdfDocDefinition, pdfName }) => {
     if (user.user_theme !== 'light') {
       changeUserTheme('light');
     }
-    const pdfDocDefinition: TDocumentDefinitions = await getPdfDocDefinition();
-    pdfMake.createPdf(pdfDocDefinition).download(`${pdfName}.pdf`);
-    if (user.user_theme !== 'light') {
-      changeUserTheme(user.user_theme);
-    }
-    setExporting(false);
+    getPdfDocDefinition()
+      .then((pdfDocDefinition: TDocumentDefinitions) => {
+        pdfMake.createPdf(pdfDocDefinition).download(`${pdfName}.pdf`);
+      })
+      .catch(() => {
+        MESSAGING$.notifyError(t('An error occurred during PDF generation.'));
+      })
+      .finally(() => {
+        if (user.user_theme !== 'light') {
+          changeUserTheme(user.user_theme);
+        }
+        setExporting(false);
+      });
   };
 
   return (
