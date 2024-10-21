@@ -182,20 +182,23 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
         const results = [];
         if (inject.inject_depends_on !== undefined) {
           for (let i = 0; i < inject.inject_depends_on.length; i += 1) {
-            results.push({
-              id: `${inject.inject_depends_on[i].dependency_relationship?.inject_parent_id}->${inject.inject_id}`,
-              target: `${inject.inject_id}`,
-              targetHandle: `target-${inject.inject_id}`,
-              source: `${inject.inject_depends_on[i].dependency_relationship?.inject_parent_id}`,
-              sourceHandle: `source-${inject.inject_depends_on[i].dependency_relationship?.inject_parent_id}`,
-              label: '',
-              labelShowBg: false,
-              labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
-            });
+            if (inject.inject_depends_on[i].dependency_relationship?.inject_children_id === inject.inject_id) {
+              results.push({
+                id: `${inject.inject_depends_on[i].dependency_relationship?.inject_parent_id}->${inject.inject_depends_on[i].dependency_relationship?.inject_children_id}`,
+                target: `${inject.inject_depends_on[i].dependency_relationship?.inject_children_id}`,
+                targetHandle: `target-${inject.inject_depends_on[i].dependency_relationship?.inject_children_id}`,
+                source: `${inject.inject_depends_on[i].dependency_relationship?.inject_parent_id}`,
+                sourceHandle: `source-${inject.inject_depends_on[i].dependency_relationship?.inject_parent_id}`,
+                label: '',
+                labelShowBg: false,
+                labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
+              });
+            }
           }
         }
         return results;
       });
+
     setEdges(newEdges);
   };
 

@@ -179,6 +179,13 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     const newParents = parents
       .map((element) => {
         if (element.index === parseInt(arr[1], 10)) {
+          const previousInject = injects.find((value) => value.inject_id === element.inject?.inject_id);
+          if (previousInject?.inject_depends_on !== undefined) {
+            previousInject!.inject_depends_on = previousInject!.inject_depends_on?.filter(
+              (dependsOn) => dependsOn.dependency_relationship?.inject_children_id !== values.inject_id,
+            );
+          }
+
           const baseInjectDependency: InjectDependency = {
             dependency_relationship: {
               inject_parent_id: newInject?.inject_id,
@@ -295,7 +302,7 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
   };
 
   const deleteChildren = (children: Dependency) => {
-    const childrenIndexInArray = childrens.findIndex((currentChildren) => currentChildren.index === children.index);
+    const childrenIndexInArray = childrens.findIndex((currentChildren) => currentChildren.inject?.inject_id === children.inject?.inject_id);
 
     if (childrenIndexInArray > -1) {
       const newChildrens = [
@@ -304,7 +311,7 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
       ];
       setChildrens(newChildrens);
 
-      form.mutators.setValue('inject_depends_to', newChildrens);
+      form.mutators.setValue('inject_depends_to', injectDependencyFromDependency(newChildrens));
     }
   };
 
