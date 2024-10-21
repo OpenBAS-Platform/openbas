@@ -52,7 +52,6 @@ import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
 import static io.openbas.utils.fixtures.TeamFixture.getTeam;
 import static io.openbas.utils.fixtures.UserFixture.getSavedUser;
 import static io.openbas.utils.fixtures.UserFixture.getUser;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
