@@ -250,9 +250,9 @@ public class InjectsExecutionJob implements Job {
 
             for (InjectDependency injectDependency : injectDependencies) {
                 String expressionToEvaluate = injectDependency.getInjectDependencyCondition().toString();
-                List<String> conditions = injectDependency.getInjectDependencyCondition().getConditions().stream().map(condition -> condition.toString()).toList();
+                List<String> conditions = injectDependency.getInjectDependencyCondition().getConditions().stream().map(InjectDependencyConditions.Condition::toString).toList();
                 for(String condition : conditions) {
-                    expressionToEvaluate = expressionToEvaluate.replaceAll(condition.trim(), condition.trim().replaceAll("(.*-Success)", "#this['$1']"));
+                    expressionToEvaluate = expressionToEvaluate.replaceAll(condition.split("==")[0].trim(), String.format("#this['%s']", condition.split("==")[0].trim()));
                 }
 
                 ExpressionParser parser = new SpelExpressionParser();
@@ -288,16 +288,16 @@ public class InjectsExecutionJob implements Job {
         });
 
         parents.forEach(parent -> {
-            mapCondition.put(parent.getId() + "-Execution-Success",
+            mapCondition.put("Execution",
                     parent.getStatus().isPresent()
                             && !parent.getStatus().get().getName().equals(ExecutionStatus.ERROR)
                             && !executionStatusesNotReady.contains(parent.getStatus().get().getName()));
 
             List<InjectExpectation> expectations = injectExpectationRepository.findAllForExerciseAndInject(exerciseId, parent.getId());
             expectations.forEach(injectExpectation -> {
-                String name = String.format("%s-%s-Success", parent.getId(), StringUtils.capitalize(injectExpectation.getType().toString().toLowerCase()));
+                String name = StringUtils.capitalize(injectExpectation.getType().toString().toLowerCase());
                 if(injectExpectation.getType().equals(InjectExpectation.EXPECTATION_TYPE.MANUAL)) {
-                    name = String.format("%s-%s-Success", parent.getId(), injectExpectation.getName());
+                    name = injectExpectation.getName();
                 }
                 if(InjectExpectation.EXPECTATION_TYPE.CHALLENGE.equals(injectExpectation.getType())
                 || InjectExpectation.EXPECTATION_TYPE.ARTICLE.equals(injectExpectation.getType())) {

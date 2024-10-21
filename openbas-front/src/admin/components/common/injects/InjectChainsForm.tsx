@@ -129,7 +129,6 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
    */
   const getConditionContentChildren = (injectDependsTo: (InjectDependency | undefined)[]) => {
     const conditions: ConditionType[] = [];
-    console.log(injectDependsTo);
     injectDependsTo.forEach((children) => {
       if (children !== undefined) {
         conditions.push({

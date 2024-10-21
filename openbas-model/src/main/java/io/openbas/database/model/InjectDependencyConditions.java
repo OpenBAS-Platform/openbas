@@ -3,6 +3,7 @@ package io.openbas.database.model;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 
 import javax.annotation.Nullable;
@@ -48,10 +49,12 @@ public class InjectDependencyConditions {
             for (var i = 0 ; i < conditions.size() ; i++) {
                 if(i > 0) {
                     result.append(mode.toString());
+                    result.append(StringUtils.SPACE);
                 }
                 result.append(conditions.get(i).toString());
+                result.append(StringUtils.SPACE);
             }
-            return result.toString();
+            return result.toString().trim();
         }
     }
 
