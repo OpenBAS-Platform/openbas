@@ -29,7 +29,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
-import io.openbas.utils.EmailSenderUtil.mockJavaMailSender;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -72,8 +72,8 @@ class InjectApiTest extends IntegrationTest {
 
   @Autowired
   private MockMvc mvc;
-  @Autowired
-  private JavaMailSender mockJavaMailSender;
+  @SpyBean
+  private JavaMailSender javaMailSender;
   @Autowired
   private ScenarioService scenarioService;
   @Autowired
@@ -107,7 +107,7 @@ class InjectApiTest extends IntegrationTest {
 
   @BeforeAll
   void beforeAll() {
-    reset(emailSender);
+    reset(mockJavaMailSender);
 
     Scenario scenario = new Scenario();
     scenario.setName("Scenario name");
