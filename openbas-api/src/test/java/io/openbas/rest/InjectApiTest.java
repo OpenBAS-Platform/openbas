@@ -49,7 +49,10 @@ import java.util.Collections;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
+import static io.openbas.utils.fixtures.TeamFixture.getTeam;
 import static io.openbas.utils.fixtures.UserFixture.getSavedUser;
+import static io.openbas.utils.fixtures.UserFixture.getUser;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -64,7 +67,8 @@ class InjectApiTest extends IntegrationTest {
   static String SCENARIO_INJECT_ID;
 
   @Autowired private MockMvc mvc;
-  @Autowired private ScenarioService scenarioService;
+  @Autowired
+  private ScenarioService scenarioService;
   @Autowired private ExerciseService exerciseService;
   @Autowired private ExerciseRepository exerciseRepository;
   @Autowired private ExecutionContextService executionContextService;
@@ -80,11 +84,14 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired
   private UserRepository userRepository;
+  @Autowired
+  private ExerciseTeamUserRepository exerciseTeamUserRepository;
   @Resource
   private ObjectMapper objectMapper;
 
   @BeforeAll
   void beforeAll() {
+
     Scenario scenario = new Scenario();
     scenario.setName("Scenario name");
     scenario.setFrom("test@test.com");
@@ -384,6 +391,14 @@ class InjectApiTest extends IntegrationTest {
     content.set("body", objectMapper.convertValue("Test body", JsonNode.class));
     content.set("expectationType", objectMapper.convertValue("none", JsonNode.class));
     inject.setContent(content);
+    User user = userRepository.save(getUser());
+    Team team = teamRepository.save(getTeam(user));
+    inject.setTeams(List.of(team));
+    ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
+    exerciseTeamUser.setExercise(EXERCISE);
+    exerciseTeamUser.setTeam(team);
+    exerciseTeamUser.setUser(user);
+    exerciseTeamUserRepository.save(exerciseTeamUser);
     Inject savedInject = this.injectRepository.save(inject);
     List<ExecutionContext> userInjectContexts = Collections.singletonList(
         executionContextService.executionContext(getSavedUser(), savedInject, "Direct execution"));
@@ -396,7 +411,7 @@ class InjectApiTest extends IntegrationTest {
     input.setTitle(savedInject.getTitle());
     input.setDescription(savedInject.getDescription());
     input.setInjectorContract(savedInject.getInjectorContract().orElseThrow().getId());
-    input.setUserIds(List.of(savedInject.getId()));
+    input.setUserIds(List.of(savedInject.getUser().getId()));
     input.setContent(savedInject.getContent());
     MockMultipartFile inputJson = new MockMultipartFile("input", null, "application/json",
         objectMapper.writeValueAsString(input).getBytes());
@@ -419,7 +434,7 @@ class InjectApiTest extends IntegrationTest {
         .getContentAsString();
     // -- ASSERT --
     assertNotNull(response);
-    assertEquals("ERROR", JsonPath.read(response, "$.status_name"));
+    assertEquals("SUCCESS", JsonPath.read(response, "$.status_name"));
     ArgumentCaptor<ExecutableInject> executableInjectCaptor = ArgumentCaptor.forClass(ExecutableInject.class);
     verify(executor).execute(executableInjectCaptor.capture());
 
@@ -428,6 +443,9 @@ class InjectApiTest extends IntegrationTest {
 
     //-- THEN ---
     injectRepository.delete(savedInject);
+    teamRepository.delete(team);
+    userRepository.delete(user);
+    exerciseTeamUserRepository.delete(exerciseTeamUser);
   }
 
   // -- BULK DELETE --
