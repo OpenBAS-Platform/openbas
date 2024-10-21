@@ -36,11 +36,6 @@ const ClickableModeChip: FunctionComponent<Props> = ({
   const { t } = useFormatter();
 
   const modeToString = () => {
-    if (mode === '&&') {
-      return 'AND';
-    } if (mode === '||') {
-      return 'OR';
-    }
     return mode?.toUpperCase();
   };
 

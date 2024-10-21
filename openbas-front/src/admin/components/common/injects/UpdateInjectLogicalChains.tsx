@@ -8,8 +8,10 @@ import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import InjectChainsForm from './InjectChainsForm';
 import type { Theme } from '../../../../components/Theme';
-import type { Inject } from '../../../../utils/api-types';
+import type { Inject, InjectDependency } from '../../../../utils/api-types';
 import type { InjectOutputType } from '../../../../actions/injects/Inject';
+import { useHelper } from '../../../../store';
+import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   injectorContract: {
@@ -34,14 +36,13 @@ interface Props {
   injects?: InjectOutputType[],
 }
 
-interface Dependency {
-  inject?: InjectOutputType,
-  index: number,
-}
-
 const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpdateInject, injects }) => {
   const { t, tPick } = useFormatter();
   const classes = useStyles();
+
+  const { injectsMap } = useHelper((helper: InjectHelper) => ({
+    injectsMap: helper.getInjectsMap(),
+  }));
 
   const initialValues = {
     ...inject,
@@ -57,7 +58,7 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
     inject_depends_on: inject.inject_depends_on,
   };
 
-  const onSubmit = async (data: Inject & { inject_depends_to: Dependency[] }) => {
+  const onSubmit = async (data: Inject & { inject_depends_to: InjectDependency[] }) => {
     const injectUpdate = {
       ...data,
       inject_id: data.inject_id,
@@ -65,11 +66,9 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
       inject_depends_on: data.inject_depends_on,
     };
 
-    console.log(data.inject_depends_on);
-
     const injectsToUpdate: Inject[] = [];
 
-    const childrenIds = data.inject_depends_to.map((childrenInject: Dependency) => childrenInject.inject?.inject_id);
+    const childrenIds = data.inject_depends_to.map((childrenInject: InjectDependency) => childrenInject.dependency_relationship?.inject_children_id);
 
     const injectsWithoutDependencies = injects ? injects
       .filter((currentInject) => currentInject.inject_depends_on !== null
@@ -77,7 +76,7 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
         && !childrenIds.includes(currentInject.inject_id))
       .map((currentInject) => {
         return {
-          ...currentInject,
+          ...injectsMap[currentInject.inject_id],
           inject_id: currentInject.inject_id,
           inject_injector_contract: currentInject.inject_injector_contract.injector_contract_id,
           inject_depends_on: undefined,
@@ -91,16 +90,13 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
       const children = injects.find((currentInject) => currentInject.inject_id === childrenId);
       if (children !== undefined) {
         const injectDependsOnUpdate = data.inject_depends_to
-          .find((dependsTo) => dependsTo.inject?.inject_id === childrenId)?.inject?.inject_depends_on;
-        console.log(injectDependsOnUpdate);
+          .find((dependsTo) => dependsTo.dependency_relationship?.inject_children_id === childrenId);
 
         const injectChildrenUpdate: Inject = {
-          ...children,
+          ...injectsMap[children.inject_id],
           inject_id: children.inject_id,
-          inject_injector_contract: children.inject_injector_contract,
-          inject_depends_on: injectDependsOnUpdate,
-          inject_created_at: '',
-          inject_updated_at: '',
+          inject_injector_contract: children.inject_injector_contract.injector_contract_id,
+          inject_depends_on: injectDependsOnUpdate ? [injectDependsOnUpdate] : [],
         };
         injectsToUpdate.push(injectChildrenUpdate);
       }

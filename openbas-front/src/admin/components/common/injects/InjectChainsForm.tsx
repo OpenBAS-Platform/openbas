@@ -22,7 +22,7 @@ import { useFormatter } from '../../../../components/i18n';
 import ClickableModeChip from '../../../../components/common/chips/ClickableModeChip';
 import ClickableChip from '../../../../components/common/chips/ClickableChip';
 import { capitalize } from '../../../../utils/String';
-import type { InjectDependency } from '../../../../utils/api-types';
+import type { Inject, InjectDependency } from '../../../../utils/api-types';
 import type { InjectOutputType } from '../../../../actions/injects/Inject';
 import type { Element } from '../../../../components/common/chips/ClickableChip';
 
@@ -42,8 +42,8 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  values: InjectOutputType & { inject_depends_to: InjectDependency[] },
-  form: FormApi<InjectOutputType & { inject_depends_to: InjectDependency[] }>,
+  values: Inject & { inject_depends_to: InjectDependency[]; },
+  form: FormApi<Inject & { inject_depends_to: InjectDependency[]; }, Partial<Inject & { inject_depends_to: InjectDependency[]; }>>,
   injects?: InjectOutputType[],
 }
 
@@ -161,6 +161,10 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
   const [parentConditions, setParentConditions] = useState(getConditionContentParent(values.inject_depends_on ? values.inject_depends_on : []));
   const [childrenConditions, setChildrenConditions] = useState(getConditionContentChildren(values.inject_depends_to));
 
+  const injectDependencyFromDependency = (deps: Dependency[]) => {
+    return deps.flatMap((dependency) => dependency.inject?.inject_depends_on);
+  };
+
   /**
    * Handle the change of the parent
    * @param _event the event
@@ -193,11 +197,11 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
               conditions: [
                 {
                   key: 'Execution',
-                  operator: '==',
+                  operator: 'eq',
                   value: true,
                 },
               ],
-              mode: '&&',
+              mode: 'and',
             },
           };
           newInject!.inject_depends_on = [baseInjectDependency];
@@ -213,7 +217,7 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
 
     form.mutators.setValue(
       'inject_depends_on',
-      newParents,
+      injectDependencyFromDependency(newParents),
     );
 
     if (newInject!.inject_depends_on !== null) {
@@ -252,11 +256,11 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
               conditions: [
                 {
                   key: 'Execution',
-                  operator: '==',
+                  operator: 'eq',
                   value: true,
                 },
               ],
-              mode: '&&',
+              mode: 'and',
             },
           };
           newInject!.inject_depends_on = [baseInjectDependency];
@@ -270,7 +274,7 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
 
     setChildrens(newChildrens);
 
-    form.mutators.setValue('inject_depends_to', newChildrens);
+    form.mutators.setValue('inject_depends_to', injectDependencyFromDependency(newChildrens));
 
     if (newInject!.inject_depends_on !== null) {
       setChildrenConditions(getConditionContentChildren(newInject!.inject_depends_on!));
@@ -293,7 +297,7 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
 
       form.mutators.setValue(
         'inject_depends_on',
-        newParents,
+        injectDependencyFromDependency(newParents),
       );
     }
   };
@@ -324,7 +328,7 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
 
     form.mutators.setValue(
       'inject_depends_on',
-      parents,
+      injectDependencyFromDependency(parents),
     );
 
     setParentConditions(parentConditions);
@@ -343,7 +347,7 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     setChildrenConditions(childrenConditions);
     form.mutators.setValue(
       'inject_depends_to',
-      childrens,
+      injectDependencyFromDependency(childrens),
     );
   };
 
@@ -371,7 +375,7 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     setParentConditions(newParentConditions);
     form.mutators.setValue(
       'inject_depends_on',
-      parents,
+      injectDependencyFromDependency(parents),
     );
   };
 
@@ -399,7 +403,7 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     setChildrenConditions(newChildrenConditions);
     form.mutators.setValue(
       'inject_depends_to',
-      childrens,
+      injectDependencyFromDependency(childrens),
     );
   };
 
@@ -408,7 +412,7 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
       if (currentCondition.parentId === condition.parentId) {
         return {
           ...currentCondition,
-          mode: currentCondition.mode === '&&' ? '||' : '&&',
+          mode: currentCondition.mode === 'and' ? 'or' : 'and',
         };
       }
       return currentCondition;
@@ -423,7 +427,7 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
       if (currentCondition.childrenId === condition.childrenId) {
         return {
           ...currentCondition,
-          mode: currentCondition.mode === '&&' ? '||' : '&&',
+          mode: currentCondition.mode === 'and' ? 'or' : 'and',
         };
       }
       return currentCondition;
@@ -446,7 +450,7 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     setParentConditions(newConditionElements);
     form.mutators.setValue(
       'inject_depends_on',
-      parents,
+      injectDependencyFromDependency(parents),
     );
   };
 
@@ -463,7 +467,7 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     setChildrenConditions(newConditionElements);
     form.mutators.setValue(
       'inject_depends_to',
-      childrens,
+      injectDependencyFromDependency(childrens),
     );
   };
 
