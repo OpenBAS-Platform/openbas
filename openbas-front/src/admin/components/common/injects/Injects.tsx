@@ -49,7 +49,6 @@ const useStyles = makeStyles(() => ({
     color: '#00b1ff',
     border: '1px solid #00b1ff',
   },
-
   itemHead: {
     textTransform: 'uppercase',
   },
@@ -216,10 +215,13 @@ const Injects: FunctionComponent<Props> = ({
       setInjects([created as InjectOutputType, ...injects]);
     }
   };
+
   const onUpdate = (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
     if (result.entities) {
       const updated = result.entities.injects[result.result];
-      setInjects(injects.map((i) => (i.inject_id !== updated.inject_id ? i as InjectOutputType : (updated as InjectOutputType))));
+      setInjects(injects.map((i) => {
+        return (i.inject_id !== updated.inject_id ? i as InjectOutputType : (updated as InjectOutputType));
+      }));
     }
   };
 
@@ -253,7 +255,7 @@ const Injects: FunctionComponent<Props> = ({
     data.forEach((inject) => {
       promises.push(injectContext.onUpdateInject(inject.inject_id, inject).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
         if (result.entities) {
-          return result.entities.injects[result.result];
+          onUpdate(result);
         }
         return undefined;
       }));
@@ -379,7 +381,7 @@ const Injects: FunctionComponent<Props> = ({
       'inject_description',
       'inject_injector_contract',
       'inject_content',
-      'inject_depends_from_another',
+      'inject_depends_on',
       'inject_depends_duration',
       'inject_teams',
       'inject_assets',

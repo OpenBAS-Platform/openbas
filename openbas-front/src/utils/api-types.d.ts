@@ -463,6 +463,12 @@ export interface Communication {
   listened?: boolean;
 }
 
+export interface Condition {
+  key: string;
+  operator: "eq";
+  value?: boolean;
+}
+
 export interface CreateUserInput {
   user_admin?: boolean;
   user_email: string;
@@ -1073,7 +1079,7 @@ export interface Inject {
    * @min 0
    */
   inject_depends_duration: number;
-  inject_depends_on?: Inject;
+  inject_depends_on?: InjectDependency[];
   inject_description?: string;
   inject_documents?: InjectDocument[];
   inject_enabled?: boolean;
@@ -1102,6 +1108,31 @@ export interface Inject {
   /** @format int64 */
   inject_users_number?: number;
   listened?: boolean;
+}
+
+export interface InjectDependency {
+  dependency_condition?: InjectDependencyCondition;
+  /** @format date-time */
+  dependency_created_at?: string;
+  dependency_relationship?: InjectDependencyId;
+  /** @format date-time */
+  dependency_updated_at?: string;
+}
+
+export interface InjectDependencyCondition {
+  conditions?: Condition[];
+  mode: "and" | "or";
+}
+
+export interface InjectDependencyId {
+  inject_children_id?: string;
+  inject_parent_id?: string;
+}
+
+export interface InjectDependencyInput {
+  dependency_conditions?: Condition[];
+  dependency_mode?: "&&" | "||";
+  dependency_parent?: string;
 }
 
 export interface InjectDocument {
@@ -1221,7 +1252,7 @@ export interface InjectInput {
   inject_country?: string;
   /** @format int64 */
   inject_depends_duration?: number;
-  inject_depends_on?: string;
+  inject_depends_on?: InjectDependencyInput[];
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
   inject_injector_contract?: string;
@@ -1239,7 +1270,7 @@ export interface InjectOutput {
    * @min 0
    */
   inject_depends_duration: number;
-  inject_depends_on?: string;
+  inject_depends_on?: InjectDependency[];
   inject_enabled?: boolean;
   inject_exercise?: string;
   inject_id: string;
