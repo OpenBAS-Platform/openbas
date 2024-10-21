@@ -17,10 +17,7 @@ import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static io.openbas.database.model.InjectExpectationSignature.*;
@@ -160,11 +157,8 @@ public class OpenBASImplantExecutor extends Injector {
             case "Command":
               Command payloadCommand = (Command) Hibernate.unproxy(injectorContract.getPayload());
               injectExpectationSignatures.add(
-                  InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
-                      .value("obas-implant-" + inject.getId()).build());
-              injectExpectationSignatures.add(
                   InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE)
-                      .value(payloadCommand.getContent()).build());
+                      .value(Base64.getEncoder().encodeToString(payloadCommand.getContent().getBytes())).build()); // Add parsing: base64 for example
               totalActionsCount = totalActionsCount + 1;
               if (payloadCommand.getPrerequisites() != null) {
                 totalActionsCount = totalActionsCount + payloadCommand.getPrerequisites().size();
