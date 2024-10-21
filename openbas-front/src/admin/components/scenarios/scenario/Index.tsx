@@ -196,6 +196,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
 const Index = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
+  const [pristine, setPristine] = useState(true);
   const [loading, setLoading] = useState(true);
   const { t } = useFormatter();
   // Fetching data
@@ -203,12 +204,16 @@ const Index = () => {
   const scenario = useHelper((helper: ScenariosHelper) => helper.getScenario(scenarioId));
   useDataLoader(() => {
     setLoading(true);
-    dispatch(fetchScenario(scenarioId)).finally(() => setLoading(false));
+    dispatch(fetchScenario(scenarioId)).finally(() => {
+      setPristine(false);
+      setLoading(false);
+    });
   });
 
   const scenarioInjectContext = injectContextForScenario(scenario);
 
-  if (loading) {
+  // avoid to show loader if something trigger useDataLoader
+  if (pristine && loading) {
     return <Loader />;
   }
   if (!loading && !scenario) {
