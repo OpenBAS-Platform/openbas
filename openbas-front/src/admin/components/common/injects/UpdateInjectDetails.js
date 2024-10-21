@@ -86,32 +86,7 @@ const UpdateInjectDetails = ({
   };
   const validate = (values) => {
     const errors = {};
-    if (openDetails && contractContent && Array.isArray(contractContent.fields)) {
-      contractContent.fields
-        .filter(
-          (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
-            f.key,
-          ),
-        )
-        .forEach((field) => {
-          const value = values[field.key];
-          if (field.mandatory && (value === undefined || R.isEmpty(value))) {
-            errors[field.key] = t('This field is required.');
-          }
-          if (field.mandatoryGroups) {
-            const { mandatoryGroups } = field;
-            const conditionOk = mandatoryGroups?.some((mandatoryKey) => {
-              const v = values[mandatoryKey];
-              return v !== undefined && !R.isEmpty(v);
-            });
-            // If condition are not filled
-            if (!conditionOk) {
-              const labels = mandatoryGroups.map((key) => contractContent.fields.find((f) => f.key === key).label).join(', ');
-              errors[field.key] = t(`One of this field is required : ${labels}.`);
-            }
-          }
-        });
-    }
+
     const requiredFields = [
       'inject_title',
       'inject_depends_duration_days',
@@ -387,7 +362,7 @@ const UpdateInjectDetails = ({
                   variant="contained"
                   color="secondary"
                   type="submit"
-                  disabled={submitting || Object.keys(errors).length > 0 || !contractContent}
+                  disabled={submitting || !contractContent}
                 >
                   {t('Update')}
                 </Button>
