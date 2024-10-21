@@ -478,20 +478,22 @@ public class Inject implements Base, Injection {
             assetGroup.setAssets(new ArrayList<>());
 
             // We add the assets to the asset group
-            for (String assetId : rawAssetGroup.getAsset_ids()) {
-              RawAsset rawAsset = mapOfAsset.get(assetId);
-              if (rawAsset != null) {
-                if (rawAsset.getAsset_type().equals(ENDPOINT_TYPE)) {
-                  Endpoint endpoint = new Endpoint(rawAsset.getAsset_id(),
-                      rawAsset.getAsset_type(),
-                      rawAsset.getAsset_name(),
-                      Endpoint.PLATFORM_TYPE.valueOf(rawAsset.getEndpoint_platform()));
-                  assetGroup.getAssets().add(endpoint);
-                } else {
-                  Asset asset = new Asset(rawAsset.getAsset_id(),
-                      rawAsset.getAsset_type(),
-                      rawAsset.getAsset_name());
-                  assetGroup.getAssets().add(asset);
+            if (rawAssetGroup.getAsset_ids() != null) {
+              for (String assetId : rawAssetGroup.getAsset_ids()) {
+                RawAsset rawAsset = mapOfAsset.get(assetId);
+                if (rawAsset != null) {
+                  if (rawAsset.getAsset_type().equals(ENDPOINT_TYPE)) {
+                    Endpoint endpoint = new Endpoint(rawAsset.getAsset_id(),
+                        rawAsset.getAsset_type(),
+                        rawAsset.getAsset_name(),
+                        Endpoint.PLATFORM_TYPE.valueOf(rawAsset.getEndpoint_platform()));
+                    assetGroup.getAssets().add(endpoint);
+                  } else {
+                    Asset asset = new Asset(rawAsset.getAsset_id(),
+                        rawAsset.getAsset_type(),
+                        rawAsset.getAsset_name());
+                    assetGroup.getAssets().add(asset);
+                  }
                 }
               }
             }

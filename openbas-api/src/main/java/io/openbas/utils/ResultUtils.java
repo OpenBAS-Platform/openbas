@@ -120,6 +120,7 @@ public class ResultUtils {
 
     assetIds.addAll(rawAssetGroups
         .stream()
+            .filter(rawAssetGroup -> rawAssetGroup.getAsset_ids() != null)
         .flatMap(rawAssetGroup -> rawAssetGroup.getAsset_ids().stream())
         .distinct().toList());
 
