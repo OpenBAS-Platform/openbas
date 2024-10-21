@@ -4,10 +4,9 @@ import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import org.springframework.data.jpa.domain.Specification;
-
 import java.time.Instant;
 import java.util.List;
+import org.springframework.data.jpa.domain.Specification;
 
 public class InjectExpectationSpecification {
 
@@ -20,12 +19,10 @@ public class InjectExpectationSpecification {
   }
 
   public static Specification<InjectExpectation> fromAssets(
-      @NotBlank final String injectId,
-      @NotEmpty final List<String> assetIds) {
-    return (root, query, cb) -> cb.and(
-        cb.equal(root.get("inject").get("id"), injectId),
-        root.get("asset").get("id").in(assetIds)
-    );
+      @NotBlank final String injectId, @NotEmpty final List<String> assetIds) {
+    return (root, query, cb) ->
+        cb.and(
+            cb.equal(root.get("inject").get("id"), injectId),
+            root.get("asset").get("id").in(assetIds));
   }
-
 }

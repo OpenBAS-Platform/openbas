@@ -2,6 +2,8 @@ package io.openbas.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
+import java.util.List;
+import java.util.concurrent.Executors;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,17 +19,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.EncodedResourceResolver;
 import org.springframework.web.servlet.resource.PathResourceResolver;
 
-import java.util.List;
-import java.util.concurrent.Executors;
-
 @Configuration
 @EnableWebMvc
 public class MvcConfig implements WebMvcConfigurer {
 
-  private final static int CACHE_PERIOD = 3600;
+  private static final int CACHE_PERIOD = 3600;
 
-  @Resource
-  private ObjectMapper objectMapper;
+  @Resource private ObjectMapper objectMapper;
 
   @Bean
   public MappingJackson2HttpMessageConverter customJackson2HttpMessageConverter() {
@@ -38,7 +36,7 @@ public class MvcConfig implements WebMvcConfigurer {
 
   @Override
   public void configureMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
-    //https://springdoc.org/#why-am-i-getting-an-error-swagger-ui-unable-to-render-definition-when-overriding-the-default-spring-registered-httpmessageconverter
+    // https://springdoc.org/#why-am-i-getting-an-error-swagger-ui-unable-to-render-definition-when-overriding-the-default-spring-registered-httpmessageconverter
     messageConverters.add(new ByteArrayHttpMessageConverter());
     messageConverters.add(new StringHttpMessageConverter());
     messageConverters.add(customJackson2HttpMessageConverter());
@@ -54,7 +52,8 @@ public class MvcConfig implements WebMvcConfigurer {
     return new ConcurrentTaskExecutor(Executors.newFixedThreadPool(20));
   }
 
-  private void addPathStaticResolver(ResourceHandlerRegistry registry, String pattern, String location) {
+  private void addPathStaticResolver(
+      ResourceHandlerRegistry registry, String pattern, String location) {
     registry
         .addResourceHandler(pattern)
         .addResourceLocations(location)

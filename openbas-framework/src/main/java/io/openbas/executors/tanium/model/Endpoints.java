@@ -7,6 +7,5 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Endpoints {
 
-    private EdgesEndpoints endpoints;
-
+  private EdgesEndpoints endpoints;
 }

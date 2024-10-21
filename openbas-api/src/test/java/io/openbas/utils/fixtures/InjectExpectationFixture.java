@@ -52,8 +52,8 @@ public class InjectExpectationFixture {
     return injectExpectation;
   }
 
-  public static InjectExpectation createManualInjectExpectationWithExercise(Team team, Inject inject,
-      Exercise exercise, String expectationName) {
+  public static InjectExpectation createManualInjectExpectationWithExercise(
+      Team team, Inject inject, Exercise exercise, String expectationName) {
     InjectExpectation injectExpectation = new InjectExpectation();
     injectExpectation.setInject(inject);
     injectExpectation.setType(InjectExpectation.EXPECTATION_TYPE.MANUAL);
@@ -63,7 +63,5 @@ public class InjectExpectationFixture {
     injectExpectation.setExercise(exercise);
     injectExpectation.setName(expectationName);
     return injectExpectation;
-
   }
-
 }

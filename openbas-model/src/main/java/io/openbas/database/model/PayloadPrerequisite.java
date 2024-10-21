@@ -2,7 +2,6 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,5 +24,4 @@ public class PayloadPrerequisite {
 
   @JsonProperty("description")
   private String description;
-
 }

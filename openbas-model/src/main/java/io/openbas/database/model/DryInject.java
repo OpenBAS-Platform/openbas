@@ -1,22 +1,21 @@
 package io.openbas.database.model;
 
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
-
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
-
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 @Setter
 @Entity
@@ -24,7 +23,8 @@ import static java.util.Optional.ofNullable;
 @EntityListeners(ModelBaseListener.class)
 public class DryInject implements Base, Injection {
 
-  public static final Comparator<DryInject> executionComparator = Comparator.comparing(o -> o.getDate().orElseThrow());
+  public static final Comparator<DryInject> executionComparator =
+      Comparator.comparing(o -> o.getDate().orElseThrow());
 
   @Getter
   @Id
@@ -79,12 +79,12 @@ public class DryInject implements Base, Injection {
 
   @Override
   public boolean equals(Object o) {
-      if (this == o) {
-          return true;
-      }
-      if (o == null || !Base.class.isAssignableFrom(o.getClass())) {
-          return false;
-      }
+    if (this == o) {
+      return true;
+    }
+    if (o == null || !Base.class.isAssignableFrom(o.getClass())) {
+      return false;
+    }
     Base base = (Base) o;
     return id.equals(base.getId());
   }

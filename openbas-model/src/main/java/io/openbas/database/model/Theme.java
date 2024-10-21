@@ -1,16 +1,9 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
-
-import java.util.Objects;
-
 
 @Data
 public class Theme implements Base {
@@ -54,11 +47,9 @@ public class Theme implements Base {
   @JsonProperty("theme_id")
   private String id;
 
-
   @Column(name = "personalized_theme_key")
   @JsonProperty("theme_key")
   private String key;
-
 
   @Column(name = "personalized_theme_value")
   @JsonProperty("theme_value")
@@ -68,5 +59,4 @@ public class Theme implements Base {
   public boolean isUserHasAccess(User user) {
     return user.isAdmin();
   }
-
 }

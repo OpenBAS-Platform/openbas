@@ -1,13 +1,12 @@
 package io.openbas.utils.fixtures;
 
+import static io.openbas.database.model.Scenario.SEVERITY.critical;
+
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Team;
-
 import java.util.List;
 import java.util.Set;
-
-import static io.openbas.database.model.Scenario.SEVERITY.critical;
 
 public class ScenarioFixture {
 
@@ -21,10 +20,10 @@ public class ScenarioFixture {
     scenario.setDescription("A crisis simulation for my enterprise");
     scenario.setSubtitle("A crisis simulation");
     scenario.setFrom("simulation@mail.fr");
-    if(scenarioTeams != null){
+    if (scenarioTeams != null) {
       scenario.setTeams(scenarioTeams);
     }
-    if(scenarioInjects != null){
+    if (scenarioInjects != null) {
       scenario.setInjects(scenarioInjects);
     }
     return scenario;
@@ -50,5 +49,4 @@ public class ScenarioFixture {
     scenario.setSeverity(critical);
     return scenario;
   }
-
 }

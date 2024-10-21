@@ -12,12 +12,9 @@ import org.springframework.stereotype.Component;
 @Setter
 public class OpenCTIConfig {
 
-  @NotBlank
-  private Boolean enable;
+  @NotBlank private Boolean enable;
 
-  @NotBlank
-  private String url;
+  @NotBlank private String url;
 
-  @NotBlank
-  private String token;
+  @NotBlank private String token;
 }

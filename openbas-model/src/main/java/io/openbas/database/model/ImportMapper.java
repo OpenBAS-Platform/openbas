@@ -6,16 +6,15 @@ import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.UuidGenerator;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
 
 @Data
 @Entity
@@ -59,12 +58,12 @@ public class ImportMapper implements Base {
 
   @Override
   public boolean equals(Object o) {
-      if (this == o) {
-          return true;
-      }
-      if (o == null || !Base.class.isAssignableFrom(o.getClass())) {
-          return false;
-      }
+    if (this == o) {
+      return true;
+    }
+    if (o == null || !Base.class.isAssignableFrom(o.getClass())) {
+      return false;
+    }
     Base base = (Base) o;
     return id.equals(base.getId());
   }

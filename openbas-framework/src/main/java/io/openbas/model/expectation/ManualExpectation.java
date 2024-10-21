@@ -1,17 +1,16 @@
 package io.openbas.model.expectation;
 
+import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
+
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.model.Expectation;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.Objects;
+import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.annotation.Nullable;
-import java.util.Objects;
-
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 
 @Getter
 @Setter
@@ -25,8 +24,7 @@ public class ManualExpectation implements Expectation {
   private boolean expectationGroup;
   private Long expirationTime;
 
-  public ManualExpectation() {
-  }
+  public ManualExpectation() {}
 
   public ManualExpectation(final Double score) {
     this.score = Objects.requireNonNullElse(score, 100.0);
@@ -46,8 +44,7 @@ public class ManualExpectation implements Expectation {
       final String description,
       @NotNull final Asset asset,
       final Long expirationTime,
-      final boolean expectationGroup
-  ) {
+      final boolean expectationGroup) {
     ManualExpectation manualExpectation = new ManualExpectation();
     manualExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
     manualExpectation.setName(name);
@@ -64,8 +61,7 @@ public class ManualExpectation implements Expectation {
       final String description,
       @NotNull final AssetGroup assetGroup,
       final Long expirationTime,
-      final boolean expectationGroup
-  ) {
+      final boolean expectationGroup) {
     ManualExpectation manualExpectation = new ManualExpectation();
     manualExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
     manualExpectation.setName(name);
@@ -80,5 +76,4 @@ public class ManualExpectation implements Expectation {
   public EXPECTATION_TYPE type() {
     return EXPECTATION_TYPE.MANUAL;
   }
-
 }

@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V3_31__Add_Injects_tests_statuses extends BaseJavaMigration {
@@ -15,7 +14,8 @@ public class V3_31__Add_Injects_tests_statuses extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     // Create table
-    select.execute("""
+    select.execute(
+        """
              CREATE TABLE injects_tests_statuses (
                status_id varchar(255) NOT NULL CONSTRAINT inject_test_status_pkey PRIMARY KEY,
                status_name VARCHAR(255) NOT NULL,
@@ -34,5 +34,4 @@ public class V3_31__Add_Injects_tests_statuses extends BaseJavaMigration {
              CREATE INDEX idx_inject_test_inject ON injects_tests_statuses(status_inject);
         """);
   }
-
 }
