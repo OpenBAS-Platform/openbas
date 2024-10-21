@@ -8,7 +8,6 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionExecutorService;
 import io.openbas.helper.InjectHelper;
 import io.openbas.service.AtomicTestingService;
-import io.openbas.service.ExerciseExpectationService;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -30,8 +29,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static java.time.Instant.now;
 import static java.util.stream.Collectors.groupingBy;
@@ -252,9 +249,8 @@ public class InjectsExecutionJob implements Job {
             List<String> results = null;
 
             for (InjectDependency injectDependency : injectDependencies) {
-                String expressionToEvaluate = injectDependency.getCondition();
-                List<String> conditions = Arrays.stream(injectDependency.getCondition()
-                                .split("(&&|\\|\\|)")).toList();
+                String expressionToEvaluate = injectDependency.getInjectDependencyCondition().toString();
+                List<String> conditions = injectDependency.getInjectDependencyCondition().getConditions().stream().map(condition -> condition.toString()).toList();
                 for(String condition : conditions) {
                     expressionToEvaluate = expressionToEvaluate.replaceAll(condition.trim(), condition.trim().replaceAll("(.*-Success)", "#this['$1']"));
                 }
@@ -267,7 +263,7 @@ public class InjectsExecutionJob implements Job {
                         results = new ArrayList<>();
                         results.add("This inject depends on other injects expectations that are not met. The following conditions were not as expected : ");
                     }
-                    results.addAll(labelFromCondition(injectDependency.getCompositeId().getInjectParent(), injectDependency.getCondition()));
+                    results.addAll(labelFromCondition(injectDependency.getCompositeId().getInjectParent(), injectDependency.getInjectDependencyCondition()));
                 }
             }
             return results == null ? Optional.empty() : Optional.of(results);
@@ -286,9 +282,8 @@ public class InjectsExecutionJob implements Job {
         Map<String, Boolean> mapCondition = new HashMap<>();
 
         injectDependencies.forEach(injectDependency -> {
-            List<String> splittedConditions = List.of(injectDependency.getCondition().split("&&|\\|\\|"));
-            splittedConditions.forEach(condition -> {
-                mapCondition.put(condition.split("==")[0].trim(), false);
+            injectDependency.getInjectDependencyCondition().getConditions().stream().forEach(condition ->  {
+                mapCondition.put(condition.getKey(), false);
             });
         });
 
@@ -317,12 +312,10 @@ public class InjectsExecutionJob implements Job {
         return mapCondition;
     }
 
-    private List<String> labelFromCondition(Inject injectParent, String condition) {
+    private List<String> labelFromCondition(Inject injectParent, InjectDependencyConditions.InjectDependencyCondition condition) {
         List<String> result = new ArrayList<>();
-        List<String> conditionElements = List.of(condition.split("(&&|\\|\\|)"));
-        for (String conditionElement : conditionElements) {
-            String type = conditionElement.split("==")[0].trim().replaceAll(injectParent.getId() + "-", "").replaceAll("-Success", "");
-            result.add(String.format("Inject '%s' - %s is %s", injectParent.getTitle(), type, conditionElement.endsWith("true") ? "true" : "false"));
+        for (InjectDependencyConditions.Condition conditionElement : condition.getConditions()) {
+            result.add(String.format("Inject '%s' - %s is %s", injectParent.getTitle(), conditionElement.getKey(), conditionElement.isValue()));
         }
         return result;
     }

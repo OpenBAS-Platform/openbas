@@ -42,7 +42,7 @@ public class InjectOutput {
   private Long dependsDuration;
 
   @JsonProperty("inject_depends_on")
-  private Map<String, String> dependsOn;
+  private List<InjectDependency> dependsOn;
 
   @JsonProperty("inject_injector_contract")
   private InjectorContract injectorContract;
@@ -115,8 +115,7 @@ public class InjectOutput {
     this.content = content;
 
     if (injectDependency != null) {
-      this.dependsOn = Stream.of(injectDependency)
-              .collect(Collectors.toMap(injectDep -> injectDep.getCompositeId().getInjectParent().getId(), InjectDependency::getCondition));
+      this.dependsOn = List.of(injectDependency);
     }
 
   }

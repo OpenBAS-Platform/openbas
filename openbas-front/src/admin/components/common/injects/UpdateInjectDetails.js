@@ -18,7 +18,6 @@ import { isEmptyField } from '../../../../utils/utils';
 import { tagOptions } from '../../../../utils/Option';
 import { splitDuration } from '../../../../utils/Time';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import chainingUtils from './chaining/ChainingUtils';
 
 const useStyles = makeStyles((theme) => ({
   details: {
@@ -210,7 +209,7 @@ const UpdateInjectDetails = ({
         inject_asset_groups: assetGroupIds,
         inject_documents: documents,
         inject_depends_duration,
-        inject_depends_on: chainingUtils.fromInjectDependencyToInputDependency(data.inject_depends_on),
+        inject_depends_on: data.inject_depends_on ? data.inject_depends_on : [],
       };
       await onUpdateInject(values);
     }
@@ -325,7 +324,7 @@ const UpdateInjectDetails = ({
           </div>}
         />
         <CardContent classes={{ root: classes.injectorContractContent }}>
-          {tPick(contractContent.label)}
+          {contractContent !== null ? tPick(contractContent.label) : ''}
         </CardContent>
       </Card>
       <Form

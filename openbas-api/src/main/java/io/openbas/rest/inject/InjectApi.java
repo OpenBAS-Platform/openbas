@@ -299,13 +299,21 @@ public class InjectApi extends RestBehavior {
     inject.setExercise(exercise);
     // Set dependencies
     if(input.getDependsOn() != null) {
-      inject.setDependsOn(input.getDependsOn().entrySet().stream().map(entry -> {
-        InjectDependency injectDependency = new InjectDependency();
-        injectDependency.getCompositeId().setInjectChildren(injectRepository.findById(entry.getKey()).orElse(null));
-        injectDependency.getCompositeId().setInjectParent(inject);
-        injectDependency.setCondition(entry.getValue());
-        return injectDependency;
-      }).toList());
+      inject.getDependsOn().addAll(
+        input.getDependsOn()
+          .stream()
+          .map(injectDependencyInput -> {
+            InjectDependency dependency = new InjectDependency();
+            InjectDependencyConditions.InjectDependencyCondition injectDependencyCondition  = new InjectDependencyConditions.InjectDependencyCondition();
+            injectDependencyCondition.setConditions(injectDependencyInput.getConditions());
+            injectDependencyCondition.setMode(injectDependencyInput.getMode());
+            dependency.setInjectDependencyCondition(injectDependencyCondition);
+            dependency.setCompositeId(new InjectDependencyId());
+            dependency.getCompositeId().setInjectChildren(inject);
+            dependency.getCompositeId().setInjectParent(injectRepository.findById(injectDependencyInput.getInjectParent()).orElse(null));
+            return dependency;
+          }).toList()
+      );
     }
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
     inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
@@ -477,13 +485,21 @@ public class InjectApi extends RestBehavior {
     inject.setScenario(scenario);
     // Set dependencies
     if(input.getDependsOn() != null) {
-      inject.setDependsOn(input.getDependsOn().entrySet().stream().map(entry -> {
-        InjectDependency injectDependency = new InjectDependency();
-        injectDependency.getCompositeId().setInjectChildren(injectRepository.findById(entry.getKey()).orElse(null));
-        injectDependency.getCompositeId().setInjectParent(inject);
-        injectDependency.setCondition(entry.getValue());
-        return injectDependency;
-      }).toList());
+      inject.getDependsOn().addAll(
+        input.getDependsOn()
+          .stream()
+          .map(injectDependencyInput -> {
+            InjectDependency dependency = new InjectDependency();
+            InjectDependencyConditions.InjectDependencyCondition injectDependencyCondition  = new InjectDependencyConditions.InjectDependencyCondition();
+            injectDependencyCondition.setConditions(injectDependencyInput.getConditions());
+            injectDependencyCondition.setMode(injectDependencyInput.getMode());
+            dependency.setInjectDependencyCondition(injectDependencyCondition);
+            dependency.setCompositeId(new InjectDependencyId());
+            dependency.getCompositeId().setInjectChildren(inject);
+            dependency.getCompositeId().setInjectParent(injectRepository.findById(injectDependencyInput.getInjectParent()).orElse(null));
+            return dependency;
+          }).toList()
+      );
     }
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
     inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
@@ -593,35 +609,39 @@ public class InjectApi extends RestBehavior {
 
     // Set dependencies
     if(input.getDependsOn() != null) {
-      input.getDependsOn().entrySet().forEach(entry -> {
+      input.getDependsOn().forEach(entry -> {
         Optional<InjectDependency> existingDependency = inject.getDependsOn().stream()
-                .filter(injectDependency -> injectDependency.getCompositeId().getInjectParent().getId().equals(entry.getKey()))
+                .filter(injectDependency -> injectDependency.getCompositeId().getInjectParent().getId().equals(entry.getInjectParent()))
                 .findFirst();
         if(existingDependency.isPresent()) {
-          existingDependency.get().setCondition(entry.getValue());
+          existingDependency.get().getInjectDependencyCondition().setConditions(entry.getConditions());
         } else {
           InjectDependency injectDependency = new InjectDependency();
           injectDependency.getCompositeId().setInjectChildren(inject);
-          injectDependency.getCompositeId().setInjectParent(injectRepository.findById(entry.getKey()).orElse(null));
-          injectDependency.setCondition(entry.getValue());
+          injectDependency.getCompositeId().setInjectParent(injectRepository.findById(entry.getInjectParent()).orElse(null));
+          injectDependency.setInjectDependencyCondition(new InjectDependencyConditions.InjectDependencyCondition());
+          injectDependency.getInjectDependencyCondition().setConditions(entry.getConditions());
+          injectDependency.getInjectDependencyCondition().setMode(entry.getMode());
           inject.getDependsOn().add(injectDependency);
         }
       });
     }
 
     List<InjectDependency> injectDepencyToRemove = new ArrayList<>();
-    if(input.getDependsOn() != null && !input.getDependsOn().isEmpty()) {
-      inject.getDependsOn().forEach(
-        injectDependency -> {
-          if (!input.getDependsOn().keySet().contains(injectDependency.getCompositeId().getInjectParent().getId())) {
-            injectDepencyToRemove.add(injectDependency);
+    if(inject.getDependsOn() != null && !inject.getDependsOn().isEmpty()) {
+      if (input.getDependsOn() != null && !input.getDependsOn().isEmpty()) {
+        inject.getDependsOn().forEach(
+          injectDependency -> {
+            if (!input.getDependsOn().stream().map(InjectDependencyInput::getInjectParent).toList().contains(injectDependency.getCompositeId().getInjectParent().getId())) {
+              injectDepencyToRemove.add(injectDependency);
+            }
           }
-        }
-      );
-    } else {
-      injectDepencyToRemove.addAll(inject.getDependsOn());
+        );
+      } else {
+        injectDepencyToRemove.addAll(inject.getDependsOn());
+      }
+      inject.getDependsOn().removeAll(injectDepencyToRemove);
     }
-    inject.getDependsOn().removeAll(injectDepencyToRemove);
 
     inject.setTeams(fromIterable(this.teamRepository.findAllById(input.getTeams())));
     inject.setAssets(fromIterable(this.assetService.assets(input.getAssets())));
