@@ -529,7 +529,7 @@ public class AtomicTestingUtils {
 
             // Loop into assetsToRefine to keep just assets linked to asset group
             for (InjectTargetWithResult asset : assetsToRefine) {
-              boolean foundExpectationForAsset = rawAssetGroupMap.get(assetGroupExpectationMap.get(entry.getKey())).getAsset_ids().stream()
+              boolean foundExpectationForAsset = rawAssetGroupMap.get(assetGroupExpectationMap.get(entry.getKey()).getAsset_group_id()).getAsset_ids().stream()
                   .anyMatch(assetChild -> assetChild.equals(asset.getId()));
 
               // Verify if any expectation is related to a dynamic assets
