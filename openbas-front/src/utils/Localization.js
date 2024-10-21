@@ -509,6 +509,7 @@ const i18n = {
       'Do you want to delete this report?':
         'Souhaitez-vous supprimer ce rapport ?',
       'Update the report': 'Modifier le rapport',
+      'An error occurred during PDF generation.': 'Une erreur s\'est produite lors de la génération du PDF.',
       'Table of contents': 'Sommaire',
       token: 'Token du compte',
       status: 'Statut',
@@ -1893,6 +1894,7 @@ const i18n = {
       'Do you want to delete this report?':
         '你想要删除这份报告么?',
       'Update the report': '更新报告',
+      'An error occurred during PDF generation.': 'PDF 生成过程中发生错误。',
       'Table of contents': '目录',
 
       token: '令牌',

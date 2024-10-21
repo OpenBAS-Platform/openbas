@@ -4,7 +4,6 @@ import { makeStyles, useTheme } from '@mui/styles';
 import { Box } from '@mui/material';
 import TopBar from './components/nav/TopBar';
 import LeftBar from './components/nav/LeftBar';
-import Message from '../components/Message';
 import { errorWrapper } from '../components/Error';
 import useDataLoader from '../utils/hooks/useDataLoader';
 import { useHelper } from '../store';
@@ -72,7 +71,6 @@ const Index = () => {
       >
         <TopBar />
         <LeftBar />
-        <Message />
         <Box component="main" sx={boxSx}>
           <div className={classes.toolbar} />
           <Suspense fallback={<Loader />}>
