@@ -40,12 +40,36 @@ public interface ExerciseRepository extends JpaRepository<Exercise, String>,
   @Query("select count(distinct e) from Exercise e " +
       "join e.grants as grant " +
       "join grant.group.users as user " +
-      "where user.id = :userId and e.createdAt < :creationDate")
+      "where user.id = :userId and e.createdAt > :creationDate")
   long userCount(@Param("userId") String userId, @Param("creationDate") Instant creationDate);
 
   @Override
-  @Query("select count(distinct e) from Exercise e where e.createdAt < :creationDate")
+  @Query("select count(distinct e) from Exercise e where e.createdAt > :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
+
+  @Query("select COALESCE(e.category, 'Unknown'), count(distinct e) "
+      + "from Exercise e where e.createdAt > :creationDate  "
+      + "group by e.category ")
+  List<Object[]> globalCountGroupByCategory(@Param("creationDate") Instant creationDate);
+
+  @Query("select COALESCE(e.category, 'Unknown'), count(distinct e) from Exercise e "
+      + "join e.grants as grant "
+      + "join grant.group.users as user "
+      + "where user.id = :userId and e.createdAt > :creationDate "
+      + "group by e.category ")
+  List<Object[]> userCountGroupByCategory(@Param("userId") String userId, @Param("creationDate") Instant creationDate);
+
+  @Query("select DATE_TRUNC('week', e.start), count(distinct e) from Exercise e "
+      + "where e.createdAt > :creationDate and e.start is not null "
+      + "group by DATE_TRUNC('week', e.start) order by DATE_TRUNC('week', e.start)")
+  List<Object[]> globalCountGroupByWeek(@Param("creationDate") Instant creationDate);
+
+  @Query("select DATE_TRUNC('week', e.start), count(distinct e) from Exercise e "
+      + "join e.grants as grant "
+      + "join grant.group.users as user "
+      + "where user.id = :userId and e.createdAt > :creationDate and e.start is not null "
+      + "group by DATE_TRUNC('week', e.start) order by DATE_TRUNC('week', e.start)")
+  List<Object[]> userCountGroupByWeek(@Param("userId") String userId, @Param("creationDate") Instant creationDate);
 
   @Query(value = "select e.*, se.scenario_id from exercises e " +
       "left join injects as inject on e.exercise_id = inject.inject_exercise " +
@@ -56,9 +80,9 @@ public interface ExerciseRepository extends JpaRepository<Exercise, String>,
   List<Exercise> thatMustBeFinished();
 
   /**
-   * Get all the expectations created before a date
+   * Get all the expectations created from a date
    *
-   * @param from the max date of creation
+   * @param from the  date of creation
    * @return the list of expectations
    */
   @Query(value =
@@ -67,34 +91,34 @@ public interface ExerciseRepository extends JpaRepository<Exercise, String>,
           + "FROM injects_expectations ie "
           + "INNER JOIN injects ON ie.inject_id = injects.inject_id "
           + "INNER JOIN exercises ON injects.inject_exercise = exercises.exercise_id "
-          + "WHERE exercises.exercise_created_at < :from ;", nativeQuery = true)
+          + "WHERE exercises.exercise_created_at > :from ;", nativeQuery = true)
   List<RawInjectExpectation> allInjectExpectationsFromDate(@Param("from") Instant from);
 
   /**
-   * Get all the expectations a user can see that were created before a date
+   * Get all the expectations a user can see that were created from a date
    *
-   * @param from   the max date of creation
+   * @param from   the  date of creation
    * @param userId the id of the user
    * @return the list of expectations
    */
   @Query(value =
       "SELECT ie.inject_expectation_type, ie.inject_expectation_group, ie.inject_expectation_score, ie.inject_expectation_expected_score "
-          +
-          "FROM injects_expectations ie " +
+
+          + "FROM injects_expectations ie " +
           "INNER JOIN injects ON ie.inject_id = injects.inject_id " +
           "INNER JOIN exercises e ON injects.inject_exercise = e.exercise_id " +
           "INNER join grants ON grants.grant_exercise = e.exercise_id " +
           "INNER join groups ON grants.grant_group = groups.group_id " +
           "INNER JOIN users_groups ON groups.group_id = users_groups.group_id " +
-          "WHERE e.exercise_created_at < :from " +
+          "WHERE e.exercise_created_at > :from " +
           "AND users_groups.user_id = :userId ;", nativeQuery = true)
   List<RawInjectExpectation> allGrantedInjectExpectationsFromDate(@Param("from") Instant from,
       @Param("userId") String userId);
 
   /**
-   * Returns the global expectations that were created before a date
+   * Returns the global expectations that were created from a date
    *
-   * @param from the date max of creation
+   * @param from the date of creation
    * @return a list of expectations
    */
   @Query(value =
@@ -103,17 +127,17 @@ public interface ExerciseRepository extends JpaRepository<Exercise, String>,
           +
           "FROM exercises " +
           "INNER JOIN injects ON exercises.exercise_id = injects.inject_exercise " +
-          "JOIN injects_expectations ie ON injects.inject_id = ie.inject_id " +
+          "LEFT JOIN injects_expectations ie ON injects.inject_id = ie.inject_id " +
           "INNER JOIN injectors_contracts ic ON injects.inject_injector_contract = ic.injector_contract_id " +
           "INNER JOIN injectors_contracts_attack_patterns icap ON ic.injector_contract_id = icap.injector_contract_id "
           +
-          "WHERE exercises.exercise_created_at < :from ;", nativeQuery = true)
+          "WHERE exercises.exercise_created_at > :from ;", nativeQuery = true)
   Iterable<RawGlobalInjectExpectation> rawGlobalInjectExpectationResultsFromDate(@Param("from") Instant from);
 
   /**
-   * Returns the global expectations that were created before a date and that a user can see
+   * Returns the global expectations that were created from a date and that a user can see
    *
-   * @param from   the date max of creation
+   * @param from   the date  of creation
    * @param userId the id of the user
    * @return the list of global expectations
    */
@@ -130,7 +154,7 @@ public interface ExerciseRepository extends JpaRepository<Exercise, String>,
           "INNER join grants ON grants.grant_exercise = exercises.exercise_id " +
           "INNER join groups ON grants.grant_group = groups.group_id " +
           "INNER JOIN users_groups ON groups.group_id = users_groups.group_id " +
-          "WHERE exercises.exercise_created_at < :from " +
+          "WHERE exercises.exercise_created_at > :from " +
           "AND users_groups.user_id = :userId ;", nativeQuery = true)
   Iterable<RawGlobalInjectExpectation> rawGrantedInjectExpectationResultsFromDate(@Param("from") Instant from,
       @Param("userId") String userId);

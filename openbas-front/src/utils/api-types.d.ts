@@ -1470,6 +1470,7 @@ export interface InjectorConnection {
 
 export interface InjectorContract {
   convertedContent?: object;
+  injector_contract_arch?: "x86_64" | "arm64" | "Unknown";
   injector_contract_atomic_testing?: boolean;
   injector_contract_attack_patterns?: AttackPattern[];
   injector_contract_content: string;
@@ -1524,6 +1525,7 @@ export interface InjectorContractInput {
 }
 
 export interface InjectorContractOutput {
+  injector_contract_arch?: "x86_64" | "arm64" | "Unknown";
   injector_contract_attack_patterns?: string[];
   injector_contract_content: string;
   injector_contract_id: string;
@@ -1540,7 +1542,6 @@ export interface InjectorContractOutput {
     | "Internal"
     | "Unknown"
   )[];
-  injector_contract_arch?: "x86_64" | "arm64";
 }
 
 export interface InjectorContractUpdateInput {
@@ -2394,7 +2395,6 @@ export interface Payload {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
-  executable_arch?: "x86_64" | "arm64";
 }
 
 export interface PayloadArgument {
@@ -2408,8 +2408,8 @@ export interface PayloadCreateInput {
   command_content?: string;
   command_executor?: string;
   dns_resolution_hostname?: string;
+  executable_arch?: "x86_64" | "arm64" | "Unknown";
   executable_file?: string;
-  executable_arch?: "x86_64" | "arm64";
   file_drop_file?: string;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
@@ -2436,6 +2436,7 @@ export interface PayloadUpdateInput {
   command_content?: string;
   command_executor?: string;
   dns_resolution_hostname?: string;
+  executable_arch?: "x86_64" | "arm64" | "Unknown";
   executable_file?: string;
   file_drop_file?: string;
   payload_arguments?: PayloadArgument[];
@@ -2466,8 +2467,8 @@ export interface PayloadUpsertInput {
   payload_name: string;
   payload_platforms?: string[];
   payload_prerequisites?: PayloadPrerequisite[];
-  payload_source: string;
-  payload_status: string;
+  payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
+  payload_status: "UNVERIFIED" | "VERIFIED";
   payload_tags?: string[];
   payload_type: string;
 }
@@ -2523,9 +2524,12 @@ export interface PlatformStatistic {
   asset_groups_count?: StatisticElement;
   assets_count?: StatisticElement;
   exercises_count?: StatisticElement;
+  exercises_count_by_category?: Record<string, number>;
+  exercises_count_by_week?: Record<string, number>;
   expectation_results?: ExpectationResultsByType[];
   inject_expectation_results?: InjectExpectationResultsByAttackPattern[];
   injects_count?: StatisticElement;
+  injects_count_by_attack_pattern?: Record<string, number>;
   platform_id?: string;
   scenarios_count?: StatisticElement;
   teams_count?: StatisticElement;
@@ -2662,8 +2666,6 @@ export interface RawPaginationScenario {
 }
 
 export interface RawUser {
-  /** @format date-time */
-  user_created_at?: string;
   user_email?: string;
   user_firstname?: string;
   user_gravatar?: string;

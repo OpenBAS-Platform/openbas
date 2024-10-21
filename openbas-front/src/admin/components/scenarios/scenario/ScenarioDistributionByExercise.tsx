@@ -1,7 +1,6 @@
 import Chart from 'react-apexcharts';
 import React, { FunctionComponent } from 'react';
 import { useTheme } from '@mui/styles';
-import type { ApexOptions } from 'apexcharts';
 import type { ExerciseSimpleStore } from '../../../../actions/exercises/Exercise';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
@@ -77,7 +76,7 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
             exercises.length === 0,
             1,
             t('No data to display'),
-          ) as ApexOptions}
+          )}
           series={series}
           type="bar"
           width="100%"

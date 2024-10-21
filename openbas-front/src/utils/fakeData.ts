@@ -1,47 +1,43 @@
 export const attackPatternsFakeData = [
   {
-    data: [
-      {
-        x: '[T1499.001] OS Exhaustion Flood',
-        y: 49,
-      },
-      {
-        x: '[T1614.001] System Language Discovery',
-        y: 45,
-      },
-      {
-        x: '[T1556.003] Pluggable Authentication Modules',
-        y: 40,
-      },
-      {
-        x: '[T1200] Hardware Additions',
-        y: 39,
-      },
-      {
-        x: '[T1218.013] Mavinject',
-        y: 33,
-      },
-      {
-        x: '[T1197] BITS Jobs',
-        y: 31,
-      },
-      {
-        x: '[T1021.005] VNC',
-        y: 21,
-      },
-      {
-        x: '[T1499.003] Application Exhaustion Flood',
-        y: 16,
-      },
-      {
-        x: '[T1499.004] Application or System Exploitation',
-        y: 13,
-      },
-      {
-        x: '[T1542.001] System Firmware',
-        y: 12,
-      },
-    ],
+    x: '[T1499.001] OS Exhaustion Flood',
+    y: 49,
+  },
+  {
+    x: '[T1614.001] System Language Discovery',
+    y: 45,
+  },
+  {
+    x: '[T1556.003] Pluggable Authentication Modules',
+    y: 40,
+  },
+  {
+    x: '[T1200] Hardware Additions',
+    y: 39,
+  },
+  {
+    x: '[T1218.013] Mavinject',
+    y: 33,
+  },
+  {
+    x: '[T1197] BITS Jobs',
+    y: 31,
+  },
+  {
+    x: '[T1021.005] VNC',
+    y: 21,
+  },
+  {
+    x: '[T1499.003] Application Exhaustion Flood',
+    y: 16,
+  },
+  {
+    x: '[T1499.004] Application or System Exploitation',
+    y: 13,
+  },
+  {
+    x: '[T1542.001] System Firmware',
+    y: 12,
   },
 ];
 
