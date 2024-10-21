@@ -6,6 +6,7 @@ import { searchTagByIdAsOption } from '../../../../actions/tags/tag-action';
 import { searchScenarioByIdAsOption } from '../../../../actions/scenarios/scenario-actions';
 import { searchAttackPatternsByIdAsOption } from '../../../../actions/AttackPattern';
 import { searchOrganizationByIdAsOptions } from '../../../../actions/organizations/organization-actions';
+import { searchExecutorByIdAsOption } from '../../../../actions/executors/executor-actions';
 
 const useRetrieveOptions = () => {
   const [options, setOptions] = useState<Option[]>([]);
@@ -50,6 +51,11 @@ const useRetrieveOptions = () => {
         break;
       case 'user_organization':
         searchOrganizationByIdAsOptions(ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'asset_executor':
+        searchExecutorByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;

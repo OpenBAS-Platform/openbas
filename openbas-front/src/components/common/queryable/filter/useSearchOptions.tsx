@@ -7,6 +7,7 @@ import { searchScenarioAsOption, searchScenarioCategoryAsOption } from '../../..
 import { searchAttackPatternsByNameAsOption } from '../../../../actions/AttackPattern';
 import { useFormatter } from '../../../i18n';
 import { searchOrganizationsByNameAsOption } from '../../../../actions/organizations/organization-actions';
+import { searchExecutorAsOption } from '../../../../actions/executors/executor-actions';
 
 const useSearchOptions = () => {
   // Standard hooks
@@ -60,6 +61,11 @@ const useSearchOptions = () => {
       case 'user_organization':
         searchOrganizationsByNameAsOption(search).then((response: { data: Option[] }) => {
           setOptions(response.data.map((d) => ({ id: d.id, label: t(d.label) })));
+        });
+        break;
+      case 'asset_executor':
+        searchExecutorAsOption(search).then((response) => {
+          setOptions(response.data);
         });
         break;
       default:

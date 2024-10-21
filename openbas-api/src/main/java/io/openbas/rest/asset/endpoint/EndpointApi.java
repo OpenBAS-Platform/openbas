@@ -1,5 +1,6 @@
 package io.openbas.rest.asset.endpoint;
 
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.asset.EndpointService;
 import io.openbas.database.model.AssetAgentJob;
 import io.openbas.database.model.Endpoint;
@@ -10,18 +11,18 @@ import io.openbas.database.repository.TagRepository;
 import io.openbas.database.specification.AssetAgentJobSpecification;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
+import io.openbas.rest.asset.endpoint.form.EndpointOutput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -31,9 +32,9 @@ import java.util.Optional;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.database.specification.EndpointSpecification.fromIds;
 import static io.openbas.executors.openbas.OpenBASExecutor.OPENBAS_EXECUTOR_ID;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RequiredArgsConstructor
 @RestController
@@ -44,6 +45,7 @@ public class EndpointApi {
 
   @Value("${info.app.version:unknown}") String version;
   private final EndpointService endpointService;
+  private final EndpointCriteriaBuilderService endpointCriteriaBuilderService;
   private final EndpointRepository endpointRepository;
   private final ExecutorRepository executorRepository;
   private final TagRepository tagRepository;
@@ -51,7 +53,7 @@ public class EndpointApi {
 
   @PostMapping(ENDPOINT_URI)
   @PreAuthorize("isPlanner()")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(input);
@@ -63,7 +65,7 @@ public class EndpointApi {
 
   @Secured(ROLE_ADMIN)
   @PostMapping(ENDPOINT_URI + "/register")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public Endpoint upsertEndpoint(@Valid @RequestBody final EndpointRegisterInput input) throws IOException {
     Optional<Endpoint> optionalEndpoint = this.endpointService.findByExternalReference(input.getExternalReference());
     Endpoint endpoint;
@@ -99,14 +101,14 @@ public class EndpointApi {
 
   @GetMapping(ENDPOINT_URI + "/jobs/{endpointExternalReference}")
   @PreAuthorize("isPlanner()")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public List<AssetAgentJob> getEndpointJobs(@PathVariable @NotBlank final String endpointExternalReference) {
     return this.assetAgentJobRepository.findAll(AssetAgentJobSpecification.forEndpoint(endpointExternalReference));
   }
 
   @PostMapping(ENDPOINT_URI + "/jobs/{assetAgentJobId}")
   @PreAuthorize("isPlanner()")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public void cleanupAssetAgentJob(@PathVariable @NotBlank final String assetAgentJobId) {
     this.assetAgentJobRepository.deleteById(assetAgentJobId);
   }
@@ -123,21 +125,22 @@ public class EndpointApi {
     return this.endpointService.endpoint(endpointId);
   }
 
+  @LogExecutionTime
   @PostMapping(ENDPOINT_URI + "/search")
-  public Page<Endpoint> endpoints(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    return buildPaginationJPA(
-            (Specification<Endpoint> specification, Pageable pageable) -> this.endpointRepository.findAll(
-                    EndpointSpecification.findEndpointsForInjection().and(specification),
-                    pageable
-            ),
-            searchPaginationInput,
-            Endpoint.class
-    );
+  public Page<EndpointOutput> endpoints(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+    return this.endpointCriteriaBuilderService.endpointPagination(searchPaginationInput);
+  }
+
+  @PostMapping(ENDPOINT_URI + "/find")
+  @PreAuthorize("isPlanner()")
+  @Transactional(readOnly = true)
+  public List<EndpointOutput> findEndpoints(@RequestBody @Valid @NotNull final List<String> endpointIds) {
+    return this.endpointCriteriaBuilderService.find(fromIds(endpointIds));
   }
 
   @PutMapping(ENDPOINT_URI + "/{endpointId}")
   @PreAuthorize("isPlanner()")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public Endpoint updateEndpoint(
       @PathVariable @NotBlank final String endpointId,
       @Valid @RequestBody final EndpointInput input) {
@@ -151,7 +154,7 @@ public class EndpointApi {
 
   @DeleteMapping(ENDPOINT_URI + "/{endpointId}")
   @PreAuthorize("isPlanner()")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public void deleteEndpoint(@PathVariable @NotBlank final String endpointId) {
     this.endpointService.deleteEndpoint(endpointId);
   }

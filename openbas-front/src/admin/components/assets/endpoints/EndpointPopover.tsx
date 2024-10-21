@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
-import type { EndpointInput } from '../../../../utils/api-types';
+import type { EndpointInput, EndpointOutput } from '../../../../utils/api-types';
 import EndpointForm from './EndpointForm';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { deleteEndpoint, updateEndpoint } from '../../../../actions/assets/endpoint-actions';
@@ -15,7 +15,7 @@ import type { EndpointStore } from './Endpoint';
 
 interface Props {
   inline?: boolean;
-  endpoint: EndpointStoreWithType;
+  endpoint: EndpointStoreWithType | EndpointOutput;
   assetGroupId?: string;
   assetGroupEndpointIds?: string[];
   onRemoveEndpointFromInject?: (assetId: string) => void;
