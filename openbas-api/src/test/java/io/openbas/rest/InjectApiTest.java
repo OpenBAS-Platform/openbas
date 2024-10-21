@@ -34,6 +34,7 @@ import jakarta.annotation.Resource;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.*;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
@@ -380,7 +381,7 @@ class InjectApiTest extends IntegrationTest {
     inject.setExercise(EXERCISE);
     ObjectNode content = objectMapper.createObjectNode();
     content.set("subject", objectMapper.convertValue("Subject", JsonNode.class));
-    content.set("body", objectMapper.convertValue("Test body g", JsonNode.class));
+    content.set("body", objectMapper.convertValue("Test body", JsonNode.class));
     content.set("expectationType", objectMapper.convertValue("none", JsonNode.class));
     inject.setContent(content);
     Inject savedInject = this.injectRepository.save(inject);
@@ -409,15 +410,21 @@ class InjectApiTest extends IntegrationTest {
         in.readAllBytes());
 
     // -- EXECUTE --
-    mvc.perform(multipart(EXERCISE_URI + "/" + EXERCISE.getId() + "/inject")
+    String response = mvc.perform(multipart(EXERCISE_URI + "/" + EXERCISE.getId() + "/inject")
             .file(inputJson)
             .file(fileJson))
         .andExpect(status().is2xxSuccessful())
-        /*.andReturn()
+        .andReturn()
         .getResponse()
-        .getContentAsString()*/;
+        .getContentAsString();
     // -- ASSERT --
-    verify(executor).execute(injection);
+    assertNotNull(response);
+    assertEquals("ERROR", JsonPath.read(response, "$.status_name"));
+    ArgumentCaptor<ExecutableInject> executableInjectCaptor = ArgumentCaptor.forClass(ExecutableInject.class);
+    verify(executor).execute(executableInjectCaptor.capture());
+
+    ExecutableInject capturedInjection = executableInjectCaptor.getValue();
+    assertEquals(injection.getExercise(), capturedInjection.getExercise());
 
     //-- THEN ---
     injectRepository.delete(savedInject);
