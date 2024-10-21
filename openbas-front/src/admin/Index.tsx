@@ -14,6 +14,8 @@ import Loader from '../components/Loader';
 import NotFound from '../components/NotFound';
 import InjectIndex from './components/simulations/simulation/injects/InjectIndex';
 import SystemBanners, { computeBannerSettings } from '../public/components/systembanners/SystemBanners';
+import { fetchTags } from '../actions/Tag';
+import { useAppDispatch } from '../utils/hooks';
 
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));
@@ -57,7 +59,10 @@ const Index = () => {
     overflowX: 'hidden',
     overflowY: 'hidden',
   };
-  useDataLoader();
+  const dispatch = useAppDispatch();
+  useDataLoader(() => {
+    dispatch(fetchTags());
+  });
   const { bannerHeight } = computeBannerSettings(settings);
   return (
     <>
