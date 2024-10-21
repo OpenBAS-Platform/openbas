@@ -4,41 +4,60 @@ import { useFormatter } from '../i18n';
 import { Scale } from './Tick';
 import type { Theme } from '../Theme';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles<Theme>((theme) => ({
   scaleBar: {
+    position: 'relative',
+  },
+  track: {
     display: 'flex',
     width: '100%',
-    padding: '20px 0 20px 0',
-  },
-  tickContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    flex: 1,
-  },
-  railSpan: {
     height: '5px',
-    width: '100%',
-    display: 'block',
+    position: 'relative',
+    backgroundColor: theme.palette.success.main!,
   },
-  tickLabel: {
-    textAlign: 'center',
+  redTrack: {
+    backgroundColor: theme.palette.error.main,
+    height: '100%',
+  },
+  labels: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginTop: '5px',
+  },
+  expectationScoreValue: {
     fontSize: 12,
-    padding: '10px 4px',
+    position: 'relative',
+    marginLeft: '5px',
+    top: '-18px',
+  },
+  failureLabel: {
+    textAlign: 'center',
+    marginTop: '5px',
+    fontSize: 12,
+  },
+  successLabel: {
+    fontSize: 12,
+    textAlign: 'center',
+    position: 'relative',
+    top: '-14px',
+  },
+  label: {
+    fontSize: 12,
+    padding: '0 4px',
   },
 }));
 
 interface Props {
-  expectationScore: number;
+  expectationExpectedScore: number;
 }
 
 const ScaleBar: FunctionComponent<Props> = ({
-  expectationScore,
+  expectationExpectedScore,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();
   const theme = useTheme<Theme>();
-
   const scale: Scale = {
     min: {
       value: 0,
@@ -52,37 +71,46 @@ const ScaleBar: FunctionComponent<Props> = ({
     },
     ticks: [
       {
-        value: expectationScore,
+        value: expectationExpectedScore,
         backgroundColor: theme.palette.success.main!,
         label: t('Success'),
       },
     ],
-
   };
+  const isScoreReadable = expectationExpectedScore >= 0 && expectationExpectedScore < 95;
+
   return (
     <div className={classes.scaleBar}>
-      {[scale.min, ...scale.ticks].map((tick, index) => (
-        <div key={index} className={classes.tickContainer}>
-          <div>
-            <span>
-              {tick.value}
-            </span>
-            {index === scale.ticks.length && (
-              <span style={{ float: 'right' }}>{scale.max.value}</span>
-            )}
-          </div>
-          <div>
-            <span
-              className={classes.railSpan}
-              style={{ backgroundColor: tick.backgroundColor }}
-            >
-            </span>
-          </div>
-          <div className={classes.tickLabel}>
-            <span>{tick.label}</span>
-          </div>
-        </div>
-      ))}
+      <div className={classes.labels}>
+        <span className={classes.label}>{scale.min.value}</span>
+        <span className={classes.label}>{scale.max.value}</span>
+      </div>
+      <div className={classes.track}>
+        {isScoreReadable && (
+          <>
+            <div className={classes.redTrack} style={{ width: `${expectationExpectedScore}%` }}>
+              <div className={classes.failureLabel}><span>{scale.min.label}</span></div>
+            </div>
+            <div style={{ width: `${100 - expectationExpectedScore}%` }}>
+              <div className={classes.expectationScoreValue}><span>{expectationExpectedScore}</span></div>
+              <div className={classes.successLabel}><span>{scale.ticks[0].label}</span></div>
+            </div>
+          </>
+        )}
+        {!isScoreReadable && (
+          <>
+            <div className={classes.redTrack} style={{ width: '95%' }}>
+              {expectationExpectedScore < 100 && (
+                <div className={classes.expectationScoreValue} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <span>{expectationExpectedScore}</span>
+                </div>)}
+              <div className={classes.failureLabel}><span>{scale.min.label}</span></div>
+            </div>
+            <div style={{ width: '5%' }}>
+              <div className={classes.successLabel} style={{ top: 0, marginTop: '3px' }}><span>{scale.ticks[0].label}</span></div>
+            </div>
+          </>)}
+      </div>
     </div>
   );
 };

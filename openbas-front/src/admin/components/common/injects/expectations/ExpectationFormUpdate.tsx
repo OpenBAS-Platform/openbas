@@ -149,7 +149,7 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
       </div>
       <div style={{ marginTop: 20 }}>
         <Typography variant="h4">{t('Scores')}</Typography>
-        <ScaleBar expectationScore={initialValues.expectation_score} />
+        <ScaleBar expectationExpectedScore={initialValues.expectation_score} />
       </div>
       <MuiTextField
         variant="standard"
