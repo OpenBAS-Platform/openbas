@@ -84,6 +84,9 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
     if (aggregation.includes('FAILED')) {
       return 'FAILED';
     }
+    if (aggregation.includes('PARTIAL')) {
+      return 'PARTIAL';
+    }
     if (aggregation.includes('PENDING')) {
       return 'PENDING';
     }
@@ -95,7 +98,7 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
   const aggregatedPrevention = (results ?? []).map((result) => result.results?.filter((r) => r.type === 'PREVENTION').map((r) => r.avgResult)).flat();
   const aggregatedDetection = (results ?? []).map((result) => result.results?.filter((r) => r.type === 'DETECTION').map((r) => r.avgResult)).flat();
   const aggregatedHumanResponse = (results ?? []).map((result) => result.results?.filter((r) => r.type === 'HUMAN_RESPONSE').map((r) => r.avgResult)).flat();
-  const aggregatedResults : ExpectationResultsByType[] = [
+  const aggregatedResults: ExpectationResultsByType[] = [
     {
       type: 'PREVENTION',
       avgResult: lowestSelector(aggregatedPrevention),

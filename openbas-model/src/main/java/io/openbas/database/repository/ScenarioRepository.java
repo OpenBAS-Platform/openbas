@@ -53,11 +53,11 @@ public interface ScenarioRepository extends
       "join team.scenarios as s " +
       "join s.grants as grant " +
       "join grant.group.users as user " +
-      "where user.id = :userId and u.createdAt < :creationDate")
+      "where user.id = :userId and u.createdAt > :creationDate")
   long userCount(String userId, Instant creationDate);
 
   @Override
-  @Query("select count(distinct s) from Scenario s where s.createdAt < :creationDate")
+  @Query("select count(distinct s) from Scenario s where s.createdAt > :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
 
   @Query(value = "SELECT scenario_category, COUNT(*) AS category_count " +
@@ -67,7 +67,9 @@ public interface ScenarioRepository extends
       "LIMIT :limit", nativeQuery = true)
   List<Object[]> findTopCategories(@Param("limit") @NotNull final int limit);
 
-  @Query(value = "SELECT sce.scenario_id, sce.scenario_name, sce.scenario_subtitle, array_agg(sct.tag_id) FILTER (WHERE sct.tag_id IS NOT NULL) as scenario_tags " +
+  @Query(value =
+      "SELECT sce.scenario_id, sce.scenario_name, sce.scenario_subtitle, array_agg(sct.tag_id) FILTER (WHERE sct.tag_id IS NOT NULL) as scenario_tags "
+          +
           "FROM scenarios sce " +
           "LEFT JOIN scenarios_tags sct ON sct.scenario_id = sce.scenario_id " +
           "INNER join grants ON grants.grant_scenario = sce.scenario_id " +
@@ -78,18 +80,20 @@ public interface ScenarioRepository extends
   List<RawScenario> rawAllGranted(@Param("userId") String userId);
 
 
-  @Query(value = "SELECT sce.scenario_id, sce.scenario_name, sce.scenario_subtitle, array_agg(sct.tag_id) FILTER (WHERE sct.tag_id IS NOT NULL) as scenario_tags " +
+  @Query(value =
+      "SELECT sce.scenario_id, sce.scenario_name, sce.scenario_subtitle, array_agg(sct.tag_id) FILTER (WHERE sct.tag_id IS NOT NULL) as scenario_tags "
+          +
           "FROM scenarios sce " +
           "LEFT JOIN scenarios_tags sct ON sct.scenario_id = sce.scenario_id " +
           "GROUP BY sce.scenario_id", nativeQuery = true)
   List<RawScenario> rawAll();
 
   @Query(value = "SELECT sce.scenario_id, " +
-          "coalesce(array_agg(inj.inject_id) FILTER (WHERE inj.inject_id IS NOT NULL), '{}') as scenario_injects " +
-          "FROM scenarios sce " +
-          "LEFT JOIN injects inj ON inj.inject_scenario = sce.scenario_id " +
-          "WHERE sce.scenario_id IN :ids " +
-          "GROUP BY sce.scenario_id", nativeQuery = true)
+      "coalesce(array_agg(inj.inject_id) FILTER (WHERE inj.inject_id IS NOT NULL), '{}') as scenario_injects " +
+      "FROM scenarios sce " +
+      "LEFT JOIN injects inj ON inj.inject_scenario = sce.scenario_id " +
+      "WHERE sce.scenario_id IN :ids " +
+      "GROUP BY sce.scenario_id", nativeQuery = true)
   List<RawScenario> rawInjectsFromScenarios(@Param("ids") List<String> ids);
 
   // -- CATEGORY --
