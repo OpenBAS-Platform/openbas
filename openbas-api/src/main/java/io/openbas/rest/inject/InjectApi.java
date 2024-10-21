@@ -304,13 +304,10 @@ public class InjectApi extends RestBehavior {
           .stream()
           .map(injectDependencyInput -> {
             InjectDependency dependency = new InjectDependency();
-            InjectDependencyConditions.InjectDependencyCondition injectDependencyCondition  = new InjectDependencyConditions.InjectDependencyCondition();
-            injectDependencyCondition.setConditions(injectDependencyInput.getConditions());
-            injectDependencyCondition.setMode(injectDependencyInput.getMode());
-            dependency.setInjectDependencyCondition(injectDependencyCondition);
+            dependency.setInjectDependencyCondition(injectDependencyInput.getConditions());
             dependency.setCompositeId(new InjectDependencyId());
             dependency.getCompositeId().setInjectChildren(inject);
-            dependency.getCompositeId().setInjectParent(injectRepository.findById(injectDependencyInput.getInjectParent()).orElse(null));
+            dependency.getCompositeId().setInjectParent(injectRepository.findById(injectDependencyInput.getRelationship().getInjectParentId()).orElse(null));
             return dependency;
           }).toList()
       );
@@ -490,13 +487,10 @@ public class InjectApi extends RestBehavior {
           .stream()
           .map(injectDependencyInput -> {
             InjectDependency dependency = new InjectDependency();
-            InjectDependencyConditions.InjectDependencyCondition injectDependencyCondition  = new InjectDependencyConditions.InjectDependencyCondition();
-            injectDependencyCondition.setConditions(injectDependencyInput.getConditions());
-            injectDependencyCondition.setMode(injectDependencyInput.getMode());
-            dependency.setInjectDependencyCondition(injectDependencyCondition);
+            dependency.setInjectDependencyCondition(injectDependencyInput.getConditions());
             dependency.setCompositeId(new InjectDependencyId());
             dependency.getCompositeId().setInjectChildren(inject);
-            dependency.getCompositeId().setInjectParent(injectRepository.findById(injectDependencyInput.getInjectParent()).orElse(null));
+            dependency.getCompositeId().setInjectParent(injectRepository.findById(injectDependencyInput.getRelationship().getInjectParentId()).orElse(null));
             return dependency;
           }).toList()
       );
@@ -611,17 +605,17 @@ public class InjectApi extends RestBehavior {
     if(input.getDependsOn() != null) {
       input.getDependsOn().forEach(entry -> {
         Optional<InjectDependency> existingDependency = inject.getDependsOn().stream()
-                .filter(injectDependency -> injectDependency.getCompositeId().getInjectParent().getId().equals(entry.getInjectParent()))
+                .filter(injectDependency -> injectDependency.getCompositeId().getInjectParent().getId().equals(entry.getRelationship().getInjectParentId()))
                 .findFirst();
         if(existingDependency.isPresent()) {
-          existingDependency.get().getInjectDependencyCondition().setConditions(entry.getConditions());
+          existingDependency.get().getInjectDependencyCondition().setConditions(entry.getConditions().getConditions());
         } else {
           InjectDependency injectDependency = new InjectDependency();
           injectDependency.getCompositeId().setInjectChildren(inject);
-          injectDependency.getCompositeId().setInjectParent(injectRepository.findById(entry.getInjectParent()).orElse(null));
+          injectDependency.getCompositeId().setInjectParent(injectRepository.findById(entry.getRelationship().getInjectParentId()).orElse(null));
           injectDependency.setInjectDependencyCondition(new InjectDependencyConditions.InjectDependencyCondition());
-          injectDependency.getInjectDependencyCondition().setConditions(entry.getConditions());
-          injectDependency.getInjectDependencyCondition().setMode(entry.getMode());
+          injectDependency.getInjectDependencyCondition().setConditions(entry.getConditions().getConditions());
+          injectDependency.getInjectDependencyCondition().setMode(entry.getConditions().getMode());
           inject.getDependsOn().add(injectDependency);
         }
       });
@@ -632,7 +626,7 @@ public class InjectApi extends RestBehavior {
       if (input.getDependsOn() != null && !input.getDependsOn().isEmpty()) {
         inject.getDependsOn().forEach(
           injectDependency -> {
-            if (!input.getDependsOn().stream().map(InjectDependencyInput::getInjectParent).toList().contains(injectDependency.getCompositeId().getInjectParent().getId())) {
+            if (!input.getDependsOn().stream().map((injectDependencyInput -> injectDependencyInput.getRelationship().getInjectParentId())).toList().contains(injectDependency.getCompositeId().getInjectParent().getId())) {
               injectDepencyToRemove.add(injectDependency);
             }
           }

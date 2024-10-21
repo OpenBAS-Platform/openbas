@@ -13,20 +13,10 @@ import java.util.List;
 @Getter
 public class InjectDependencyInput {
 
-    @JsonProperty("dependency_parent")
-    private String injectParent;
+    @JsonProperty("dependency_relationship")
+    private InjectDependencyIdInput relationship;
 
-    @JsonProperty("dependency_mode")
-    private InjectDependencyConditions.DependencyMode mode;
-
-    @JsonProperty("dependency_conditions")
-    private List<InjectDependencyConditions.Condition> conditions;
-
-    public InjectDependencyConditions.InjectDependencyCondition toInjectDependency() {
-        InjectDependencyConditions.InjectDependencyCondition injectDependency = new InjectDependencyConditions.InjectDependencyCondition();
-        injectDependency.setMode(getMode());
-        injectDependency.setConditions(getConditions());
-        return injectDependency;
-    }
+    @JsonProperty("dependency_condition")
+    private InjectDependencyConditions.InjectDependencyCondition conditions;
 
 }

@@ -465,7 +465,7 @@ export interface Communication {
 
 export interface Condition {
   key: string;
-  operator?: "==";
+  operator: "eq";
   value?: boolean;
 }
 
@@ -1121,7 +1121,7 @@ export interface InjectDependency {
 
 export interface InjectDependencyCondition {
   conditions?: Condition[];
-  mode: "&&" | "||";
+  mode: "and" | "or";
 }
 
 export interface InjectDependencyId {

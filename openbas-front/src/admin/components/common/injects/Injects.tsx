@@ -31,7 +31,6 @@ import { useQueryableWithLocalStorage } from '../../../../components/common/quer
 import ToolBar from '../ToolBar';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
-import chainingUtils from './chaining/ChainingUtils';
 
 const useStyles = makeStyles(() => ({
   disabled: {
@@ -246,7 +245,7 @@ const Injects: FunctionComponent<Props> = ({
   const onUpdateInject = async (data: Inject) => {
     if (selectedInjectId) {
       await injectContext.onUpdateInject(selectedInjectId, data).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
-        onUpdate(chainingUtils.convertInjectStore(result.entities.injects[result.result]) as never);
+        onUpdate(result);
       });
     }
   };
@@ -257,7 +256,6 @@ const Injects: FunctionComponent<Props> = ({
       promises.push(injectContext.onUpdateInject(inject.inject_id, inject).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
         if (result.entities) {
           onUpdate(result);
-          return chainingUtils.convertInjectStore(result.entities.injects[result.result]) as never;
         }
         return undefined;
       }));
