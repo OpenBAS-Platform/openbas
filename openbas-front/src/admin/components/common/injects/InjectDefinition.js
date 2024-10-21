@@ -971,7 +971,6 @@ class InjectDefinition extends Component {
       articlesMap,
       channelsMap,
       challengesMap,
-      teamsFromExerciseOrScenario,
       articlesFromExerciseOrScenario,
       isAtomic,
     } = this.props;
@@ -1173,7 +1172,6 @@ class InjectDefinition extends Component {
                       handleRemoveTeam={this.handleRemoveTeam.bind(this)}
                     />
                     <InjectAddTeams
-                      teams={teamsFromExerciseOrScenario}
                       injectTeamsIds={teamsIds}
                       handleAddTeams={this.handleAddTeams.bind(this)}
                     />
@@ -1559,7 +1557,6 @@ InjectDefinition.propTypes = {
   injectorContract: PropTypes.object,
   fetchDocuments: PropTypes.func,
   tagsMap: PropTypes.object,
-  teamsFromExerciseOrScenario: PropTypes.array,
   articlesFromExerciseOrScenario: PropTypes.array,
   variablesFromExerciseOrScenario: PropTypes.array,
   permissions: PropTypes.object,

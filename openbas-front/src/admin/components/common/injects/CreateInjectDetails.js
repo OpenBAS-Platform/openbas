@@ -9,7 +9,6 @@ import InjectDefinition from './InjectDefinition';
 import { PermissionsContext } from '../Context';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { fetchTeams } from '../../../../actions/teams/team-actions';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../../actions/Tag';
 import InjectForm from './InjectForm';
@@ -84,12 +83,10 @@ const CreateInjectDetails = ({
   const [openDetails, setOpenDetails] = useState(false);
   const [injectDetailsState, setInjectDetailsState] = useState({});
   const dispatch = useAppDispatch();
-  const { tagsMap, teams } = useHelper((helper) => ({
+  const { tagsMap } = useHelper((helper) => ({
     tagsMap: helper.getTagsMap(),
-    teams: helper.getTeams(),
   }));
   useDataLoader(() => {
-    dispatch(fetchTeams());
     dispatch(fetchTags());
   });
   const toggleInjectContent = () => {
@@ -391,7 +388,6 @@ const CreateInjectDetails = ({
                     handleClose={handleClose}
                     tagsMap={tagsMap}
                     permissions={permissions}
-                    teamsFromExerciseOrScenario={teams?.filter((team) => !team.team_contextual) ?? []}
                     articlesFromExerciseOrScenario={[]}
                     variablesFromExerciseOrScenario={[]}
                     onCreateInject={onCreateInject}

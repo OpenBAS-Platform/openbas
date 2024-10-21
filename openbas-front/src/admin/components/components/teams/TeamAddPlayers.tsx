@@ -98,7 +98,7 @@ const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
   )(R.values(usersMap));
 
   const submitAddUsers = async () => {
-    await onAddUsersTeam(teamId, usersIds);
+    await onAddUsersTeam?.(teamId, usersIds);
     setOpen(false);
     setKeyword('');
     setUsersIds([]);
