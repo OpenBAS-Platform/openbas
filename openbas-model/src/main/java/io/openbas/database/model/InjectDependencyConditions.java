@@ -12,12 +12,27 @@ import java.util.Optional;
 public class InjectDependencyConditions {
 
     public enum DependencyMode {
-        and,
-        or;
+        and{
+            @Override
+            public String toString() {
+                return "&&";
+            }
+        },
+        or{
+            @Override
+            public String toString() {
+                return "||";
+            }
+        };
     }
 
     public enum DependencyOperator {
-        eq;
+        eq {
+            @Override
+            public String toString() {
+                return "==";
+            }
+        };
     }
 
     @Data

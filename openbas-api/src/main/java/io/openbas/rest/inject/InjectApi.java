@@ -609,6 +609,7 @@ public class InjectApi extends RestBehavior {
                 .findFirst();
         if(existingDependency.isPresent()) {
           existingDependency.get().getInjectDependencyCondition().setConditions(entry.getConditions().getConditions());
+          existingDependency.get().getInjectDependencyCondition().setMode(entry.getConditions().getMode());
         } else {
           InjectDependency injectDependency = new InjectDependency();
           injectDependency.getCompositeId().setInjectChildren(inject);

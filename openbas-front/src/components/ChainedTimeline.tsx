@@ -36,7 +36,7 @@ import NodePhantom from './nodes/NodePhantom';
 import { useFormatter } from './i18n';
 import type { AssetGroupsHelper } from '../actions/asset_groups/assetgroup-helper';
 import type { EndpointHelper } from '../actions/assets/asset-helper';
-import type { Inject } from '../utils/api-types';
+import type { Inject, InjectDependency } from '../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -177,17 +177,17 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
   };
 
   const updateEdges = () => {
-    const newEdges = injects.filter((inject) => inject.inject_depends_on != null && inject.inject_depends_on !== undefined)
+    const newEdges = injects.filter((inject) => inject.inject_depends_on !== null && inject.inject_depends_on !== undefined)
       .flatMap((inject) => {
         const results = [];
         if (inject.inject_depends_on !== undefined) {
-          for (const key of Object.keys(inject.inject_depends_on)) {
+          for (let i = 0; i < inject.inject_depends_on.length; i += 1) {
             results.push({
-              id: `${inject.inject_id}->${key}`,
+              id: `${inject.inject_depends_on[i].dependency_relationship?.inject_parent_id}->${inject.inject_id}`,
               target: `${inject.inject_id}`,
               targetHandle: `target-${inject.inject_id}`,
-              source: `${key}`,
-              sourceHandle: `source-${key}`,
+              source: `${inject.inject_depends_on[i].dependency_relationship?.inject_parent_id}`,
+              sourceHandle: `source-${inject.inject_depends_on[i].dependency_relationship?.inject_parent_id}`,
               label: '',
               labelShowBg: false,
               labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
@@ -325,13 +325,27 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
     const inject = injects.find((currentInject) => currentInject.inject_id === connection.target);
     const injectParent = injects.find((currentInject) => currentInject.inject_id === connection.source);
     if (inject !== undefined && injectParent !== undefined && inject.inject_depends_duration > injectParent.inject_depends_duration) {
-      const newDependsOn: Record<string, string> = {};
-      newDependsOn[injectParent?.inject_id] = `${injectParent?.inject_id}-Execution-Success == true`;
+      const newDependsOn: InjectDependency = {
+        dependency_relationship: {
+          inject_children_id: inject.inject_id,
+          inject_parent_id: injectParent.inject_id,
+        },
+        dependency_condition:
+          {
+            mode: 'and',
+            conditions: [
+              {
+                key: 'Execution', operator: 'eq', value: true,
+              },
+            ],
+          },
+      };
+
       const injectToUpdate = {
         ...injectsMap[inject.inject_id],
         inject_injector_contract: inject.inject_injector_contract.injector_contract_id,
         inject_id: inject.inject_id,
-        inject_depends_on: newDependsOn,
+        inject_depends_on: [newDependsOn],
       };
       onUpdateInject([injectToUpdate]);
     }
@@ -347,7 +361,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
     const { position } = node;
     const { data } = node;
     const dependsOn = nodes.find((currentNode) => (data.inject?.inject_depends_on !== null
-      && data.inject?.inject_depends_on!.find((value) => value.dependency_relationship?.inject_children_id === currentNode.id)));
+      && data.inject?.inject_depends_on!.find((value) => value.dependency_relationship?.inject_parent_id === currentNode.id)));
     const dependsTo = nodes
       .filter((currentNode) => (currentNode.data.inject?.inject_depends_on !== undefined
           && currentNode.data.inject?.inject_depends_on !== null
@@ -477,13 +491,26 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
           inject_depends_on: undefined,
         };
         updates.push(injectToRemoveEdge);
-        const newDependsOn: Record<string, string> = {};
-        newDependsOn[edge.source] = `${edge.source}-Execution-Success == true`;
+        const newDependsOn: InjectDependency = {
+          dependency_relationship: {
+            inject_children_id: injectToUpdate.inject_id,
+            inject_parent_id: edge.source,
+          },
+          dependency_condition:
+              {
+                mode: 'and',
+                conditions: [
+                  {
+                    key: 'Execution', operator: 'eq', value: true,
+                  },
+                ],
+              },
+        };
         const injectToUpdateEdge = {
           ...injectsMap[injectToUpdate.inject_id],
           inject_injector_contract: injectToUpdate.inject_injector_contract.injector_contract_id,
           inject_id: injectToUpdate.inject_id,
-          inject_depends_on: newDependsOn,
+          inject_depends_on: [newDependsOn],
         };
         updates.push(injectToUpdateEdge);
         onUpdateInject(updates);
@@ -492,13 +519,26 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
       const inject = injects.find((currentInject) => currentInject.inject_id === edge.target);
       const parent = injects.find((currentInject) => currentInject.inject_id === connectionState.toNode?.id);
       if (inject !== undefined && parent !== undefined && parent.inject_depends_duration < inject.inject_depends_duration) {
-        const newDependsOn: Record<string, string> = {};
-        newDependsOn[connectionState.toNode!.id] = `${connectionState.toNode?.id}-Execution-Success == true`;
+        const newDependsOn: InjectDependency = {
+          dependency_relationship: {
+            inject_children_id: inject.inject_id,
+            inject_parent_id: connectionState.toNode?.id,
+          },
+          dependency_condition:
+              {
+                mode: 'and',
+                conditions: [
+                  {
+                    key: 'Execution', operator: 'eq', value: true,
+                  },
+                ],
+              },
+        };
         const injectToUpdate = {
           ...injectsMap[inject.inject_id],
           inject_injector_contract: inject.inject_injector_contract.injector_contract_id,
           inject_id: inject.inject_id,
-          inject_depends_on: connectionState.toNode?.id,
+          inject_depends_on: [newDependsOn],
         };
         onUpdateInject([injectToUpdate]);
       }

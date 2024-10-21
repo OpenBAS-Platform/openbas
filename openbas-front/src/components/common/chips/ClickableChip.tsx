@@ -119,7 +119,7 @@ const ClickableChip: FunctionComponent<Props> = ({
             {t('OR')}
           </div>;
         }
-        return (<>{or}<span key={o}> {o}</span></>);
+        return (<div key={o}>{or}<span> {o}</span></div>);
       });
     }
     return (<span key={'undefined'}> {t('undefined')}</span>);

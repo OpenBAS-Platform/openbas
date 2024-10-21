@@ -52,7 +52,7 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
           && currentInject.inject_depends_on
             .find((searchInject) => searchInject.dependency_relationship?.inject_parent_id === inject.inject_id)
           !== undefined)
-      .map((currentInject) => {
+      .flatMap((currentInject) => {
         return currentInject.inject_depends_on;
       }) : undefined,
     inject_depends_on: inject.inject_depends_on,

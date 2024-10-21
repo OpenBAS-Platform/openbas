@@ -22,8 +22,8 @@ import { useFormatter } from '../../../../components/i18n';
 import ClickableModeChip from '../../../../components/common/chips/ClickableModeChip';
 import ClickableChip from '../../../../components/common/chips/ClickableChip';
 import { capitalize } from '../../../../utils/String';
-import type { Inject, InjectDependency } from '../../../../utils/api-types';
-import type { InjectOutputType } from '../../../../actions/injects/Inject';
+import type { Inject, InjectDependency, InjectOutput } from '../../../../utils/api-types';
+import type { ConditionElement, ConditionType, Content, ConvertedContentType, Dependency, InjectOutputType } from '../../../../actions/injects/Inject';
 import type { Element } from '../../../../components/common/chips/ClickableChip';
 
 const useStyles = makeStyles(() => ({
@@ -45,25 +45,6 @@ interface Props {
   values: Inject & { inject_depends_to: InjectDependency[]; },
   form: FormApi<Inject & { inject_depends_to: InjectDependency[]; }, Partial<Inject & { inject_depends_to: InjectDependency[]; }>>,
   injects?: InjectOutputType[],
-}
-
-interface ConditionElement {
-  name: string,
-  value: boolean,
-  key: string,
-  index: number,
-}
-
-interface ConditionType {
-  parentId?: string,
-  childrenId?: string,
-  mode?: string,
-  conditionElement?: ConditionElement[],
-}
-
-interface Dependency {
-  inject?: InjectOutputType,
-  index: number,
 }
 
 const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
@@ -90,11 +71,15 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
   // List of childrens
   const [childrens, setChildrens] = useState<Dependency[]>(
     () => {
-      if (values.inject_depends_on) {
-        return values.inject_depends_on?.filter((searchInject) => searchInject.dependency_relationship?.inject_parent_id === values.inject_id)
+      if (injects !== undefined) {
+        return injects?.filter(
+          (searchInject) => searchInject.inject_depends_on?.find(
+            (dependsOnSearch) => dependsOnSearch.dependency_relationship?.inject_parent_id === values.inject_id,
+          ) !== undefined,
+        )
           .map((inject, index) => {
             return {
-              inject: injects?.find((currentInject) => currentInject.inject_id === inject.dependency_relationship?.inject_children_id),
+              inject,
               index,
             };
           });
@@ -118,18 +103,21 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     const conditions: ConditionType[] = [];
     if (injectDependsOn) {
       injectDependsOn.forEach((parent) => {
-        conditions.push({
-          parentId: parent.dependency_relationship?.inject_parent_id,
-          mode: parent.dependency_condition?.mode,
-          conditionElement: parent.dependency_condition?.conditions?.map((dependencyCondition, indexCondition) => {
-            return {
-              name: dependencyCondition.key,
-              value: dependencyCondition.value!,
-              key: dependencyCondition.key,
-              index: indexCondition,
-            };
-          }),
-        });
+        if (parent !== null) {
+          conditions.push({
+            parentId: parent.dependency_relationship?.inject_parent_id,
+            childrenId: parent.dependency_relationship?.inject_children_id,
+            mode: parent.dependency_condition?.mode,
+            conditionElement: parent.dependency_condition?.conditions?.map((dependencyCondition, indexCondition) => {
+              return {
+                name: dependencyCondition.key,
+                value: dependencyCondition.value!,
+                key: dependencyCondition.key,
+                index: indexCondition,
+              };
+            }),
+          });
+        }
       });
     }
     return conditions;
@@ -139,21 +127,25 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
    * Transform an inject dependency into ConditionElement
    * @param injectDependsTo an array of injectDependency
    */
-  const getConditionContentChildren = (injectDependsTo: InjectDependency[]) => {
+  const getConditionContentChildren = (injectDependsTo: (InjectDependency | undefined)[]) => {
     const conditions: ConditionType[] = [];
+    console.log(injectDependsTo);
     injectDependsTo.forEach((children) => {
-      conditions.push({
-        childrenId: children.dependency_relationship?.inject_children_id,
-        mode: children.dependency_condition?.mode,
-        conditionElement: children.dependency_condition?.conditions?.map((dependencyCondition, indexCondition) => {
-          return {
-            name: dependencyCondition.key,
-            value: dependencyCondition.value!,
-            key: dependencyCondition.key,
-            index: indexCondition,
-          };
-        }),
-      });
+      if (children !== undefined) {
+        conditions.push({
+          parentId: values.inject_id,
+          childrenId: children.dependency_relationship?.inject_children_id,
+          mode: children.dependency_condition?.mode,
+          conditionElement: children.dependency_condition?.conditions?.map((dependencyCondition, indexCondition) => {
+            return {
+              name: dependencyCondition.key,
+              value: dependencyCondition.value!,
+              key: dependencyCondition.key,
+              index: indexCondition,
+            };
+          }),
+        });
+      }
     });
     return conditions;
   };
@@ -162,7 +154,7 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
   const [childrenConditions, setChildrenConditions] = useState(getConditionContentChildren(values.inject_depends_to));
 
   const injectDependencyFromDependency = (deps: Dependency[]) => {
-    return deps.flatMap((dependency) => dependency.inject?.inject_depends_on);
+    return deps.flatMap((dependency) => (dependency.inject?.inject_depends_on !== null ? dependency.inject?.inject_depends_on : []));
   };
 
   /**
@@ -274,10 +266,11 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
 
     setChildrens(newChildrens);
 
-    form.mutators.setValue('inject_depends_to', injectDependencyFromDependency(newChildrens));
+    const dependsTo = injectDependencyFromDependency(newChildrens);
+    form.mutators.setValue('inject_depends_to', dependsTo);
 
     if (newInject!.inject_depends_on !== null) {
-      setChildrenConditions(getConditionContentChildren(newInject!.inject_depends_on!));
+      setChildrenConditions(getConditionContentChildren(dependsTo.filter((dep) => dep !== undefined)));
     }
   };
 
@@ -316,39 +309,98 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     }
   };
 
+  const updateDependsOn = (conditions: ConditionType) => {
+    const result: InjectDependency = {
+      dependency_relationship: {
+        inject_parent_id: conditions.parentId,
+        inject_children_id: conditions.childrenId,
+      },
+      dependency_condition: {
+        mode: conditions.mode === 'and' ? 'and' : 'or',
+        conditions: conditions.conditionElement?.map((value) => {
+          return {
+            value: value.value,
+            key: value.key,
+            operator: 'eq',
+          };
+        }),
+      },
+    };
+    return result;
+  };
+
+  const getAvailableExpectations = (inject: InjectOutputType | undefined) => {
+    if (inject?.inject_content !== null && inject?.inject_content !== undefined) {
+      const expectations = (inject.inject_content as Content).expectations.map((expectation) => (expectation.expectation_type === 'MANUAL' ? expectation.expectation_name : capitalize(expectation.expectation_type)));
+      return ['Execution', ...expectations];
+    }
+    if (inject?.inject_injector_contract !== undefined
+        && (inject?.inject_injector_contract.convertedContent as unknown as ConvertedContentType).fields.find((field) => field.key === 'expectations')) {
+      const predefinedExpectations = (inject.inject_injector_contract.convertedContent as unknown as ConvertedContentType).fields?.find((field) => field.key === 'expectations')
+        ?.predefinedExpectations.map((expectation) => (expectation.expectation_type === 'MANUAL' ? expectation.expectation_name : capitalize(expectation.expectation_type)));
+      if (predefinedExpectations !== undefined) {
+        return ['Execution', ...predefinedExpectations];
+      }
+    }
+    return ['Execution'];
+  };
+
   const addConditionParent = (parent: Dependency) => {
-    const { conditionElement } = parentConditions.find((currentCondition) => parent.inject!.inject_id === currentCondition.parentId)!;
+    const currentConditions = parentConditions.find((currentCondition) => parent.inject!.inject_id === currentCondition.parentId);
 
-    conditionElement?.push({
-      key: 'Execution',
-      name: 'Execution',
-      value: true,
-      index: conditionElement?.length,
-    });
+    if (parent.inject !== undefined && currentConditions !== undefined) {
+      const updatedParent = parents.find((currentParent) => currentParent.inject?.inject_id === parent.inject?.inject_id);
+      let expectationString = 'Execution';
+      if (currentConditions?.conditionElement !== undefined) {
+        expectationString = getAvailableExpectations(parent.inject)
+          .find((expectation) => !currentConditions?.conditionElement?.find((conditionElement) => conditionElement.key === expectation));
+      }
+      currentConditions.conditionElement?.push({
+        key: expectationString,
+        name: expectationString,
+        value: true,
+        index: currentConditions.conditionElement?.length,
+      });
 
-    form.mutators.setValue(
-      'inject_depends_on',
-      injectDependencyFromDependency(parents),
-    );
+      if (updatedParent?.inject?.inject_depends_on !== undefined) {
+        updatedParent.inject.inject_depends_on = [updateDependsOn(currentConditions)];
+      }
 
-    setParentConditions(parentConditions);
+      setParentConditions(parentConditions);
+      form.mutators.setValue(
+        'inject_depends_on',
+        injectDependencyFromDependency(parents),
+      );
+    }
   };
 
   const addConditionChildren = (children: Dependency) => {
-    const { conditionElement } = childrenConditions.find((currentCondition) => children.inject!.inject_id === currentCondition.childrenId)!;
+    const currentConditions = childrenConditions.find((currentCondition) => children.inject!.inject_id === currentCondition.childrenId);
 
-    conditionElement?.push({
-      key: 'Execution',
-      name: 'Execution',
-      value: true,
-      index: conditionElement?.length,
-    });
+    if (children.inject !== undefined && currentConditions !== undefined) {
+      const updatedChildren = childrens.find((currentChildren) => currentChildren.inject?.inject_id === children.inject?.inject_id);
+      let expectationString = 'Execution';
+      if (currentConditions?.conditionElement !== undefined) {
+        expectationString = getAvailableExpectations(values as InjectOutput as InjectOutputType)
+          .find((expectation) => !currentConditions?.conditionElement?.find((conditionElement) => conditionElement.key === expectation));
+      }
+      currentConditions.conditionElement?.push({
+        key: expectationString,
+        name: expectationString,
+        value: true,
+        index: currentConditions.conditionElement?.length,
+      });
 
-    setChildrenConditions(childrenConditions);
-    form.mutators.setValue(
-      'inject_depends_to',
-      injectDependencyFromDependency(childrens),
-    );
+      if (updatedChildren?.inject?.inject_depends_on !== undefined) {
+        updatedChildren.inject.inject_depends_on = [updateDependsOn(currentConditions)];
+      }
+
+      setChildrenConditions(childrenConditions);
+      form.mutators.setValue(
+        'inject_depends_to',
+        injectDependencyFromDependency(childrens),
+      );
+    }
   };
 
   const changeParentElement = (newElement: Element, conditions: ConditionType, condition: ConditionElement, parent: Dependency) => {
@@ -373,13 +425,19 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
       return parentCondition;
     });
     setParentConditions(newParentConditions);
+
+    const updatedParent = parents.find((currentParent) => currentParent.inject?.inject_id === parent.inject?.inject_id);
+    const newCondition = newParentConditions.find((parentCondition) => parentCondition.parentId === parent.inject?.inject_id);
+    if (updatedParent?.inject?.inject_depends_on !== undefined && newCondition !== undefined) {
+      updatedParent.inject.inject_depends_on = [updateDependsOn(newCondition)];
+    }
     form.mutators.setValue(
       'inject_depends_on',
       injectDependencyFromDependency(parents),
     );
   };
 
-  const changeChildrenElement = (newElement: Element, conditions: ConditionType, condition: ConditionElement, parent: Dependency) => {
+  const changeChildrenElement = (newElement: Element, conditions: ConditionType, condition: ConditionElement, children: Dependency) => {
     const newConditionElements = conditions.conditionElement?.map((newConditionElement) => {
       if (newConditionElement.index === condition.index) {
         return {
@@ -392,7 +450,7 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
       return newConditionElement;
     });
     const newChildrenConditions = childrenConditions.map((childrenCondition) => {
-      if (childrenCondition.childrenId === parent.inject?.inject_id) {
+      if (childrenCondition.childrenId === children.inject?.inject_id) {
         return {
           ...childrenCondition,
           conditionElement: newConditionElements,
@@ -401,6 +459,12 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
       return childrenCondition;
     });
     setChildrenConditions(newChildrenConditions);
+
+    const updatedChildren = childrens.find((currentChildren) => currentChildren.inject?.inject_id === children.inject?.inject_id);
+    const newCondition = newChildrenConditions.find((childrenCondition) => childrenCondition.childrenId === children.inject?.inject_id);
+    if (updatedChildren?.inject?.inject_depends_on !== undefined && newCondition !== undefined) {
+      updatedChildren.inject.inject_depends_on = [updateDependsOn(newCondition)];
+    }
     form.mutators.setValue(
       'inject_depends_to',
       injectDependencyFromDependency(childrens),
@@ -420,6 +484,16 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     if (newConditionElements !== undefined) {
       setParentConditions(newConditionElements);
     }
+
+    const newCurrentCondition = newConditionElements?.find((currentCondition) => currentCondition.parentId === condition.parentId);
+    const updatedParent = parents.find((currentParent) => currentParent.inject?.inject_id === newCurrentCondition?.parentId);
+    if (updatedParent?.inject?.inject_depends_on !== undefined && newCurrentCondition !== undefined) {
+      updatedParent.inject.inject_depends_on = [updateDependsOn(newCurrentCondition)];
+    }
+    form.mutators.setValue(
+      'inject_depends_on',
+      injectDependencyFromDependency(parents),
+    );
   };
 
   const changeModeChildren = (conditions: ConditionType[] | undefined, condition: ConditionType) => {
@@ -435,6 +509,16 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     if (newConditionElements !== undefined) {
       setChildrenConditions(newConditionElements);
     }
+
+    const newCurrentCondition = newConditionElements?.find((currentCondition) => currentCondition.childrenId === condition.childrenId);
+    const updatedChildren = childrens.find((currentChildren) => currentChildren.inject?.inject_id === newCurrentCondition?.childrenId);
+    if (updatedChildren?.inject?.inject_depends_on !== undefined && newCurrentCondition !== undefined) {
+      updatedChildren.inject.inject_depends_on = [updateDependsOn(newCurrentCondition)];
+    }
+    form.mutators.setValue(
+      'inject_depends_to',
+      injectDependencyFromDependency(childrens),
+    );
   };
 
   const deleteConditionParent = (conditions: ConditionType, condition: ConditionElement) => {
@@ -448,6 +532,11 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
       return currentCondition;
     });
     setParentConditions(newConditionElements);
+
+    const updatedParent = parents.find((currentParent) => currentParent.inject?.inject_id === conditions?.parentId);
+    if (updatedParent?.inject?.inject_depends_on !== undefined && conditions !== undefined) {
+      updatedParent.inject.inject_depends_on = [updateDependsOn(conditions)];
+    }
     form.mutators.setValue(
       'inject_depends_on',
       injectDependencyFromDependency(parents),
@@ -465,60 +554,22 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
       return currentCondition;
     });
     setChildrenConditions(newConditionElements);
+
+    const updatedChildren = childrens.find((currentChildren) => currentChildren.inject?.inject_id === conditions.childrenId);
+    if (updatedChildren?.inject?.inject_depends_on !== undefined && conditions !== undefined) {
+      updatedChildren.inject.inject_depends_on = [updateDependsOn(conditions)];
+    }
     form.mutators.setValue(
       'inject_depends_to',
       injectDependencyFromDependency(childrens),
     );
   };
 
-  interface content {
-    expectations: {
-      expectation_type: string,
-      expectation_name: string,
-    }[]
-  }
+  const canAddConditions = (inject: InjectOutputType, conditions?: ConditionType) => {
+    const expectationsNumber = getAvailableExpectations(inject).length;
+    if (conditions === undefined || conditions.conditionElement === undefined) return true;
 
-  interface ConvertedContentType {
-    fields: {
-      key: string
-      value: string,
-      predefinedExpectations: {
-        expectation_type: string,
-        expectation_name: string,
-      }[]
-    }[],
-  }
-
-  const getAvailableExpectations = (inject: InjectOutputType | undefined) => {
-    if (inject?.inject_content !== null && inject?.inject_content !== undefined) {
-      const expectations = (inject.inject_content as content).expectations.map((expectation) => (expectation.expectation_type === 'MANUAL' ? expectation.expectation_name : capitalize(expectation.expectation_type)));
-      return ['Execution', ...expectations];
-    }
-    if (inject?.inject_injector_contract !== undefined
-        && (inject?.inject_injector_contract.convertedContent as unknown as ConvertedContentType).fields.find((field) => field.key === 'expectations')) {
-      const predefinedExpectations = (inject.inject_injector_contract.convertedContent as unknown as ConvertedContentType).fields?.find((field) => field.key === 'expectations')
-        ?.predefinedExpectations.map((expectation) => (expectation.expectation_type === 'MANUAL' ? expectation.expectation_name : capitalize(expectation.expectation_type)));
-      if (predefinedExpectations !== undefined) {
-        return ['Execution', ...predefinedExpectations];
-      }
-    }
-    return ['Execution'];
-  };
-
-  const canParentAddConditions = (element: Dependency) => {
-    const expectationsNumber = getAvailableExpectations(element.inject).length;
-    const parentElement = parentConditions.find((parentCondition) => element.inject !== undefined && parentCondition.parentId === element.inject.inject_id);
-    if (parentElement === undefined || parentElement.conditionElement === undefined) return true;
-
-    return parentElement?.conditionElement.length < expectationsNumber;
-  };
-
-  const canChildrenAddConditions = (element: Dependency) => {
-    const expectationsNumber = getAvailableExpectations(element.inject).length;
-    const childrenElement = childrenConditions.find((childrenCondition) => element.inject !== undefined && childrenCondition.childrenId === element.inject.inject_id);
-    if (childrenElement === undefined || childrenElement.conditionElement === undefined) return true;
-
-    return childrenElement?.conditionElement.length < expectationsNumber;
+    return conditions?.conditionElement.length < expectationsNumber;
   };
 
   const getClickableParentChip = (parent: Dependency) => {
@@ -528,26 +579,26 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
       const conditions = parentConditions
         .find((parentCondition) => parent.inject !== undefined && parentCondition.parentId === parent.inject.inject_id);
       if (conditions?.conditionElement !== undefined) {
-        return (<><ClickableChip
-          key={`${condition.name}-${condition.index}`}
-          selectedElement={{ key: condition.key, operator: 'is', value: condition.value ? 'Success' : 'Fail' }}
-          pristine={true}
-          availableKeys={getAvailableExpectations(parent.inject)}
-          availableOperators={['is']}
-          availableValues={['Success', 'Fail']}
-          onDelete={
+        return (<div key={`${condition.name}-${condition.index}`} style={{ display: 'contents' }}>
+          <ClickableChip
+            selectedElement={{ key: condition.key, operator: 'is', value: condition.value ? 'Success' : 'Fail' }}
+            pristine={true}
+            availableKeys={getAvailableExpectations(parent.inject)}
+            availableOperators={['is']}
+            availableValues={['Success', 'Fail']}
+            onDelete={
               conditions.conditionElement.length > 1 ? () => { deleteConditionParent(conditions, condition); } : undefined
             }
-          onChange={(newElement) => {
-            changeParentElement(newElement, conditions, condition, parent);
-          }}
-                  />
+            onChange={(newElement) => {
+              changeParentElement(newElement, conditions, condition, parent);
+            }}
+          />
           {conditionIndex < conditions.conditionElement.length - 1
              && <ClickableModeChip
                mode={conditions.mode}
                onClick={() => { changeModeParent(parentConditions, conditions); }}
                 />
-          }</>);
+          }</div>);
       }
       return (<></>);
     });
@@ -561,26 +612,26 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
         const conditions = childrenConditions
           .find((childrenCondition) => childrenCondition.childrenId === children.inject?.inject_id);
         if (conditions?.conditionElement !== undefined) {
-          return (<><ClickableChip
-            key={`${condition.name}-${condition.index}`}
-            selectedElement={{ key: condition.key, operator: 'is', value: condition.value ? 'Success' : 'Fail' }}
-            pristine={true}
-            availableKeys={getAvailableExpectations(injects?.find((currentInject) => currentInject.inject_id === values.inject_id))}
-            availableOperators={['is']}
-            availableValues={['Success', 'Fail']}
-            onDelete={
+          return (<div key={`${condition.name}-${condition.index}`} style={{ display: 'contents' }}>
+            <ClickableChip
+              selectedElement={{ key: condition.key, operator: 'is', value: condition.value ? 'Success' : 'Fail' }}
+              pristine={true}
+              availableKeys={getAvailableExpectations(injects?.find((currentInject) => currentInject.inject_id === values.inject_id))}
+              availableOperators={['is']}
+              availableValues={['Success', 'Fail']}
+              onDelete={
                   conditions.conditionElement.length > 1 ? () => { deleteConditionChildren(conditions, condition); } : undefined
                 }
-            onChange={(newElement) => {
-              changeChildrenElement(newElement, conditions, condition, children);
-            }}
-                    />
+              onChange={(newElement) => {
+                changeChildrenElement(newElement, conditions, condition, children);
+              }}
+            />
             {conditionIndex < conditions.conditionElement.length - 1
                 && <ClickableModeChip
                   mode={conditions?.mode}
                   onClick={() => { changeModeChildren(childrenConditions, conditions); }}
                    />
-            }</>);
+            }</div>);
         }
         return (<></>);
       });
@@ -667,7 +718,7 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
                       addConditionParent(parent);
                     }}
                     style={{ justifyContent: 'start' }}
-                    disabled={!canParentAddConditions(parent)}
+                    disabled={!canAddConditions(parent.inject!, parentConditions.find((parentCondition) => parentCondition.parentId === parent.inject?.inject_id))}
                   >
                     <Add fontSize="small"/>
                     <Typography>
@@ -760,7 +811,10 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
                     onClick={() => {
                       addConditionChildren(children);
                     }}
-                    disabled={!canChildrenAddConditions(children)}
+                    disabled={!canAddConditions(
+                      values as InjectOutput as InjectOutputType,
+                      childrenConditions.find((childrenCondition) => childrenCondition.childrenId === children.inject?.inject_id),
+                    )}
                     style={{ justifyContent: 'start' }}
                   >
                     <Add fontSize="small"/>
