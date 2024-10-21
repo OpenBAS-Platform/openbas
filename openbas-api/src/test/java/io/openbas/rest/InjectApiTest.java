@@ -22,6 +22,7 @@ import java.util.List;
 import static io.openbas.database.model.ExerciseStatus.RUNNING;
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
+import static io.openbas.rest.inject.InjectApi.INJECT_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.*;
@@ -264,6 +265,67 @@ class InjectApiTest extends IntegrationTest {
   }
 
   // -- EXERCISES --
+
+
+  @DisplayName("Add an inject for simulation")
+  @Test
+  @WithMockPlannerUser
+  void addInjectForSimulationTest() throws Exception {
+    // -- PREPARE --
+    InjectInput input = new InjectInput();
+    input.setTitle("Test inject");
+    input.setInjectorContract(EMAIL_DEFAULT);
+    input.setDependsDuration(0L);
+
+    // -- EXECUTE --
+    String response = mvc
+        .perform(post(EXERCISE_URI + "/" + EXERCISE.getId() + "/injects")
+            .content(asJsonString(input))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is2xxSuccessful())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // -- ASSERT --
+    assertNotNull(response);
+    assertEquals("Test inject", JsonPath.read(response, "$.inject_title"));
+
+  }
+
+  @DisplayName("Update inject for simulation")
+  @Test
+  @WithMockPlannerUser
+  void updateInjectForSimulationTest() throws Exception {
+    // -- PREPARE --
+    InjectInput injectInput = new InjectInput();
+    injectInput.setTitle("Test inject");
+    injectInput.setDependsDuration(0L);
+    Inject inject = injectInput.toInject(injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+    Inject savedInject = injectRepository.save(inject);
+
+    Inject injectToUpdate = injectRepository.findById(savedInject.getId()).orElseThrow();
+    InjectInput input = new InjectInput();
+    String injectTitle = "A new title";
+    input.setTitle(injectTitle);
+    input.setDependsDuration(inject.getDependsDuration());
+
+    // -- EXECUTE --
+    String response = mvc
+        .perform(put(INJECT_URI + "/" + EXERCISE.getId() + "/" + injectToUpdate.getId())
+            .content(asJsonString(input))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is2xxSuccessful())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // -- ASSERT --
+    assertNotNull(response);
+    assertEquals(injectTitle, JsonPath.read(response, "$.inject_title"));
+  }
 
   // -- BULK DELETE --
 
