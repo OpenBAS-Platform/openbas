@@ -194,22 +194,21 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
   const calculateInjectPosition = (nodeInjects: NodeInject[]) => {
     let reorganizedInjects = nodeInjects;
 
-    for (let i = 0; i < nodeInjects.length; i += 1) {
-      let childrens = reorganizedInjects.slice(i).filter((nextNode) => nextNode.id !== nodeInjects[i].id
+    nodeInjects.forEach((node, i) => {
+      let childrens = reorganizedInjects.slice(i).filter((nextNode) => nextNode.id !== node.id
           && nextNode.data.inject?.inject_depends_on !== undefined
           && nextNode.data.inject?.inject_depends_on !== null
           && nextNode.data.inject!.inject_depends_on
-            .find((dependsOn) => dependsOn.dependency_relationship?.inject_parent_id === nodeInjects[i].id) !== undefined);
+            .find((dependsOn) => dependsOn.dependency_relationship?.inject_parent_id === node.id) !== undefined);
 
       childrens = childrens.sort((a, b) => a.data.inject!.inject_depends_duration - b.data.inject!.inject_depends_duration);
 
-      for (let j = 0; j < childrens.length; j += 1) {
-        reorganizedInjects = moveItem(reorganizedInjects, i + j + 1, reorganizedInjects.indexOf(childrens[j], i));
-      }
-    }
+      childrens.forEach((children, j) => {
+        reorganizedInjects = moveItem(reorganizedInjects, i + j + 1, reorganizedInjects.indexOf(children, i));
+      });
+    });
 
-    for (let index = 0; index < reorganizedInjects.length; index += 1) {
-      const nodeInject = reorganizedInjects[index];
+    reorganizedInjects.forEach((nodeInject, index) => {
       const nodeInjectPosition = nodeInject.position;
       const nodeInjectData = nodeInject.data;
 
@@ -247,7 +246,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
       nodeInjectData.fixedY = nodeInjectPosition.y;
       nodeInjectData.boundingBox = calculateBoundingBox(nodeInject, reorganizedInjects);
       reorganizedInjects[index] = nodeInject;
-    }
+    });
   };
 
   const updateEdges = () => {
