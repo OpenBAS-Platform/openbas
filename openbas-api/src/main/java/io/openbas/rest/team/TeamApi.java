@@ -133,9 +133,7 @@ public class TeamApi extends RestBehavior {
       teams = teamRepository.rawTeamsAccessibleFromOrganization(organizationIds);
     }
 
-    return TeamHelper.rawAllTeamToSimplerAllTeam(teams, injectExpectationRepository, injectRepository,
-        communicationRepository,
-        exerciseTeamUserRepository, scenarioRepository);
+    return TeamHelper.rawAllTeamToSimplerAllTeam(teams);
   }
 
   @PostMapping("/api/teams/search")
