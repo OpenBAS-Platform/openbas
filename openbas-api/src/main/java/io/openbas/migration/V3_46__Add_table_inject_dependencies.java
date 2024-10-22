@@ -2,8 +2,6 @@ package io.openbas.migration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.InjectDependencyConditions;
-import io.openbas.database.model.Variable;
-import jakarta.annotation.Resource;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
@@ -14,7 +12,7 @@ import java.sql.Statement;
 import java.util.List;
 
 @Component
-public class V3_202409191705__Add_table_inject_dependencies extends BaseJavaMigration {
+public class V3_46__Add_table_inject_dependencies extends BaseJavaMigration {
 
     @Override
     public void migrate(Context context) throws Exception {
