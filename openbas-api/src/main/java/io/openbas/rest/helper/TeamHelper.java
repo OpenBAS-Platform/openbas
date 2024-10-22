@@ -135,12 +135,7 @@ public class TeamHelper {
     }).collect(Collectors.toList());
   }
 
-  public static List<TeamSimple> rawAllTeamToSimplerAllTeam(List<RawTeam> teams,
-      InjectExpectationRepository injectExpectationRepository,
-      InjectRepository injectRepository,
-      CommunicationRepository communicationRepository,
-      ExerciseTeamUserRepository exerciseTeamUserRepository,
-      ScenarioRepository scenarioRepository) {
+  public static List<TeamSimple> rawAllTeamToSimplerAllTeam(List<RawTeam> teams) {
 
     // Then, for all the raw teams, we will create a simpler team object and then send it back to the front
     return teams.stream().map(rawTeam -> {
