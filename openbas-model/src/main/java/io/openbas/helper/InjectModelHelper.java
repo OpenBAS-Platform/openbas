@@ -51,9 +51,9 @@ public class InjectModelHelper {
           if (assets.isEmpty() && assetGroups.isEmpty()) {
             ready.set(false);
           }
-        } else if (jsonField.get("type").asText().equals("text") && content.get(key) == null) {
+        } else if ((jsonField.get("type").asText().equals("text") || jsonField.get("type").asText().equals("textarea")) && content.get(key) == null) {
           ready.set(false);
-        } else if (jsonField.get("type").asText().equals("text") && content.get(key).asText().isEmpty()) {
+        } else if ((jsonField.get("type").asText().equals("text") || jsonField.get("type").asText().equals("textarea")) && content.get(key).asText().isEmpty()) {
           ready.set(false);
         }
       });
