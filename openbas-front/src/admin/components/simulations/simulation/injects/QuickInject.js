@@ -50,7 +50,6 @@ import DocumentPopover from '../../../components/documents/DocumentPopover';
 import OldSelectField from '../../../../../components/fields/OldSelectField';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
 import InjectExpectations from '../../../common/injects/expectations/InjectExpectations';
-import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { fetchVariablesForExercise } from '../../../../../actions/variables/variable-actions';
 
 export const EMAIL_CONTRACT = '138ad8f8-32f8-4a22-8114-aaa12322bd09';
@@ -247,7 +246,6 @@ class QuickInject extends Component {
   componentDidMount() {
     const { exerciseId } = this.props;
     this.props.fetchDocuments();
-    this.props.fetchExerciseTeams(exerciseId);
     this.props.fetchVariablesForExercise(exerciseId);
   }
 
@@ -1136,7 +1134,6 @@ class QuickInject extends Component {
                             </ListItem>
                           ))}
                           <InjectAddTeams
-                            teams={this.props.exerciseTeams}
                             injectTeamsIds={teamsIds}
                             handleAddTeams={this.handleAddTeams.bind(
                               this,
@@ -1447,12 +1444,10 @@ const select = (state, ownProps) => {
   const documentsMap = helper.getDocumentsMap();
   const teamsMap = helper.getTeamsMap();
   const { exerciseId } = ownProps;
-  const exerciseTeams = helper.getExerciseTeams(exerciseId);
   const exerciseVariables = helper.getExerciseVariables(exerciseId);
   return {
     documentsMap,
     teamsMap,
-    exerciseTeams,
     exerciseVariables,
   };
 };
@@ -1460,7 +1455,6 @@ const select = (state, ownProps) => {
 export default R.compose(
   connect(select, {
     fetchDocuments,
-    fetchExerciseTeams,
     fetchVariablesForExercise,
     addInject: addInjectForExercise,
   }),

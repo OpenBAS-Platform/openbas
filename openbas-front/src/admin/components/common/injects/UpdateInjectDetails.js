@@ -70,7 +70,6 @@ const UpdateInjectDetails = ({
     tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
-    dispatch(fetchTeams());
     dispatch(fetchTags());
   });
 

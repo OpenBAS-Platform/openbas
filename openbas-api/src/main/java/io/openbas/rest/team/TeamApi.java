@@ -17,7 +17,6 @@ import io.openbas.rest.team.form.TeamUpdateInput;
 import io.openbas.rest.team.form.UpdateUsersTeamInput;
 import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.TeamService;
-import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -34,7 +33,8 @@ import java.util.Optional;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.database.specification.TeamSpecification.*;
+import static io.openbas.database.specification.TeamSpecification.contextual;
+import static io.openbas.database.specification.TeamSpecification.fromIds;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
@@ -83,7 +83,7 @@ public class TeamApi extends RestBehavior {
   @PostMapping("/api/teams/search")
   @PreAuthorize("isObserver()")
   @Transactional(readOnly = true)
-  @Tracing(name = "Paginate teams", layer = "api", operation = "POST")
+    @LogExecutionTime
   public Page<TeamOutput> searchTeams(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     final Specification<Team> teamSpecification = contextual(false);
     return this.teamService.teamPagination(searchPaginationInput, teamSpecification);
@@ -92,7 +92,7 @@ public class TeamApi extends RestBehavior {
   @PostMapping("/api/teams/find")
   @PreAuthorize("isObserver()")
   @Transactional(readOnly = true)
-  @Tracing(name = "Find teams", layer = "api", operation = "POST")
+    @LogExecutionTime
   public List<TeamOutput> findTeams(@RequestBody @Valid @NotNull final List<String> teamIds) {
     return this.teamService.find(fromIds(teamIds));
   }

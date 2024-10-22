@@ -7,7 +7,7 @@ import TeamForm from './TeamForm';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import Transition from '../../../../components/common/Transition';
-import type { TeamUpdateInput } from '../../../../utils/api-types';
+import type { TeamOutput, TeamUpdateInput } from '../../../../utils/api-types';
 import { Option, organizationOption, tagOptions } from '../../../../utils/Option';
 import { useHelper } from '../../../../store';
 import type { OrganizationHelper, TagHelper } from '../../../../actions/helper';
@@ -17,7 +17,7 @@ import { TeamContext } from '../../common/Context';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 
 interface TeamPopoverProps {
-  team: TeamStore;
+  team: TeamStore | TeamOutput;
   managePlayers?: () => void,
   disabled?: boolean,
   openEditOnInit?: boolean,

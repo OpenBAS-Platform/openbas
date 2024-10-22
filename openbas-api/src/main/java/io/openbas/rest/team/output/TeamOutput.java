@@ -33,6 +33,9 @@ public class TeamOutput {
   @JsonProperty("team_users")
   private Set<String> users;
 
+  @JsonProperty("team_organization")
+  private String organization;
+
   @JsonProperty("team_updated_at")
   @NotNull
   private Instant updatedAt;
