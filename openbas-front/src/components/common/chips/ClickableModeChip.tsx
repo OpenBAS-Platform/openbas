@@ -35,10 +35,6 @@ const ClickableModeChip: FunctionComponent<Props> = ({
   const classes = useStyles();
   const { t } = useFormatter();
 
-  const modeToString = () => {
-    return mode?.toUpperCase();
-  };
-
   if (!mode) {
     return <></>;
   }
@@ -51,7 +47,7 @@ const ClickableModeChip: FunctionComponent<Props> = ({
         [classes.hasClickEvent]: !!onClick,
       })}
     >
-      {t(modeToString())}
+      {t(mode.toUpperCase())}
     </div>
   );
 };

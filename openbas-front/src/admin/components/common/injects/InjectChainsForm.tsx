@@ -152,6 +152,10 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
   const [parentConditions, setParentConditions] = useState(getConditionContentParent(values.inject_depends_on ? values.inject_depends_on : []));
   const [childrenConditions, setChildrenConditions] = useState(getConditionContentChildren(values.inject_depends_to));
 
+  /**
+   * Get the inject dependency object from dependency ones
+   * @param deps the inject depencies
+   */
   const injectDependencyFromDependency = (deps: Dependency[]) => {
     return deps.flatMap((dependency) => (dependency.inject?.inject_depends_on !== null ? dependency.inject?.inject_depends_on : []));
   };
@@ -223,10 +227,18 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     }
   };
 
+  /**
+   * Add a new parent inject
+   */
   const addParent = () => {
     setParents([...parents, { inject: undefined, index: parents.length }]);
   };
 
+  /**
+   * Handle the change of a children
+   * @param _event
+   * @param child
+   */
   const handleChangeChildren = (_event: SelectChangeEvent<string>, child: ReactNode) => {
     const rx = /\.\$select-children-(.*)-inject-(.*)/g;
     if (!child) return;
@@ -280,10 +292,17 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     }
   };
 
+  /**
+   * Add a new children inject
+   */
   const addChildren = () => {
     setChildrens([...childrens, { inject: undefined, index: childrens.length }]);
   };
 
+  /**
+   * Delete a parent inject
+   * @param parent
+   */
   const deleteParent = (parent: Dependency) => {
     const parentIndexInArray = parents.findIndex((currentParent) => currentParent.index === parent.index);
 
@@ -301,6 +320,10 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     }
   };
 
+  /**
+   * Delete a children inject
+   * @param children
+   */
   const deleteChildren = (children: Dependency) => {
     const childrenIndexInArray = childrens.findIndex((currentChildren) => currentChildren.inject?.inject_id === children.inject?.inject_id);
 
@@ -315,6 +338,10 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     }
   };
 
+  /**
+   * Returns an updated depends on from a ConditionType
+   * @param conditions
+   */
   const updateDependsOn = (conditions: ConditionType) => {
     const result: InjectDependency = {
       dependency_relationship: {
@@ -335,6 +362,10 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     return result;
   };
 
+  /**
+   * Get the list of available expectations
+   * @param inject
+   */
   const getAvailableExpectations = (inject: InjectOutputType | undefined) => {
     if (inject?.inject_content !== null && inject?.inject_content !== undefined) {
       const expectations = (inject.inject_content as Content).expectations.map((expectation) => (expectation.expectation_type === 'MANUAL' ? expectation.expectation_name : capitalize(expectation.expectation_type)));
@@ -351,6 +382,10 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     return ['Execution'];
   };
 
+  /**
+   * Add a new condition to a parent inject
+   * @param parent
+   */
   const addConditionParent = (parent: Dependency) => {
     const currentConditions = parentConditions.find((currentCondition) => parent.inject!.inject_id === currentCondition.parentId);
 
@@ -380,6 +415,10 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     }
   };
 
+  /**
+   * Add a new condition to a children inject
+   * @param children
+   */
   const addConditionChildren = (children: Dependency) => {
     const currentConditions = childrenConditions.find((currentCondition) => children.inject!.inject_id === currentCondition.childrenId);
 
@@ -409,6 +448,13 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     }
   };
 
+  /**
+   * Handle a change in a condition of a parent element
+   * @param newElement
+   * @param conditions
+   * @param condition
+   * @param parent
+   */
   const changeParentElement = (newElement: Element, conditions: ConditionType, condition: ConditionElement, parent: Dependency) => {
     const newConditionElements = conditions.conditionElement?.map((newConditionElement) => {
       if (newConditionElement.index === condition.index) {
@@ -443,6 +489,13 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     );
   };
 
+  /**
+   * Handle a change in a condition of a children element
+   * @param newElement
+   * @param conditions
+   * @param condition
+   * @param children
+   */
   const changeChildrenElement = (newElement: Element, conditions: ConditionType, condition: ConditionElement, children: Dependency) => {
     const newConditionElements = conditions.conditionElement?.map((newConditionElement) => {
       if (newConditionElement.index === condition.index) {
@@ -477,6 +530,11 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     );
   };
 
+  /**
+   * Changes the mode (AND/OR) in a parent inject
+   * @param conditions
+   * @param condition
+   */
   const changeModeParent = (conditions: ConditionType[] | undefined, condition: ConditionType) => {
     const newConditionElements = conditions?.map((currentCondition) => {
       if (currentCondition.parentId === condition.parentId) {
@@ -502,6 +560,11 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     );
   };
 
+  /**
+   * Changes the mode (AND/OR) in a children inject
+   * @param conditions
+   * @param condition
+   */
   const changeModeChildren = (conditions: ConditionType[] | undefined, condition: ConditionType) => {
     const newConditionElements = conditions?.map((currentCondition) => {
       if (currentCondition.childrenId === condition.childrenId) {
@@ -527,6 +590,11 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     );
   };
 
+  /**
+   * Delete a condition from a parent inject
+   * @param conditions
+   * @param condition
+   */
   const deleteConditionParent = (conditions: ConditionType, condition: ConditionElement) => {
     const newConditionElements = parentConditions.map((currentCondition) => {
       if (currentCondition.parentId === conditions.parentId) {
@@ -549,6 +617,11 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     );
   };
 
+  /**
+   * Delete a condition from a children inject
+   * @param conditions
+   * @param condition
+   */
   const deleteConditionChildren = (conditions: ConditionType, condition: ConditionElement) => {
     const newConditionElements = childrenConditions.map((currentCondition) => {
       if (currentCondition.childrenId === conditions.childrenId) {
@@ -571,6 +644,11 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     );
   };
 
+  /**
+   * Whether or not we can add a new condition
+   * @param inject
+   * @param conditions
+   */
   const canAddConditions = (inject: InjectOutputType, conditions?: ConditionType) => {
     const expectationsNumber = getAvailableExpectations(inject).length;
     if (conditions === undefined || conditions.conditionElement === undefined) return true;
@@ -578,6 +656,10 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     return conditions?.conditionElement.length < expectationsNumber;
   };
 
+  /**
+   * Return a clickable parent chip
+   * @param parent
+   */
   const getClickableParentChip = (parent: Dependency) => {
     const parentChip = parentConditions.find((parentCondition) => parent.inject !== undefined && parentCondition.parentId === parent.inject.inject_id);
     if (parentChip === undefined || parentChip.conditionElement === undefined) return (<></>);
@@ -610,6 +692,10 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     });
   };
 
+  /**
+   * Return a clickable children chip
+   * @param parent
+   */
   const getClickableChildrenChip = (children: Dependency) => {
     const childrenChip = childrenConditions.find((childrenCondition) => children.inject !== undefined && childrenCondition.childrenId === children.inject.inject_id);
     if (childrenChip?.conditionElement === undefined) return (<></>);
