@@ -1,5 +1,6 @@
 package io.openbas.rest.team;
 
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Organization;
 import io.openbas.database.model.Team;
@@ -115,6 +116,7 @@ public class TeamApi extends RestBehavior {
     this.teamService = teamService;
   }
 
+  @LogExecutionTime
   @GetMapping("/api/teams")
   @PreAuthorize("isObserver()")
   public Iterable<TeamSimple> getTeams() {
@@ -136,6 +138,7 @@ public class TeamApi extends RestBehavior {
     return TeamHelper.rawAllTeamToSimplerAllTeam(teams);
   }
 
+  @LogExecutionTime
   @PostMapping("/api/teams/search")
   @PreAuthorize("isObserver()")
   @Transactional(readOnly = true)
