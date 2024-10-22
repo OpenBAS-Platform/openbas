@@ -37,6 +37,7 @@ import { useFormatter } from './i18n';
 import type { AssetGroupsHelper } from '../actions/asset_groups/assetgroup-helper';
 import type { EndpointHelper } from '../actions/assets/asset-helper';
 import type { Inject, InjectDependency } from '../utils/api-types';
+import ChainingUtils from './common/chaining/ChainingUtils';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -236,7 +237,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
       if (nodeInject.data.inject?.inject_depends_on) {
         const nodesId = Object.keys(nodeInject.data.inject?.inject_depends_on);
         const dependencies = reorganizedInjects.filter((dependencyNode) => nodesId.includes(dependencyNode.id));
-        const minY = Math.min(...dependencies.map((value) => value.data.boundingBox!.topLeft.y));
+        const minY = dependencies.length > 0 ? Math.min(...dependencies.map((value) => value.data.boundingBox!.topLeft.y)) : 0;
 
         nodeInjectPosition.y = nodeInjectPosition.y < minY ? minY : nodeInjectPosition.y;
       }
@@ -260,9 +261,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
                 targetHandle: `target-${inject.inject_depends_on[i].dependency_relationship?.inject_children_id}`,
                 source: `${inject.inject_depends_on[i].dependency_relationship?.inject_parent_id}`,
                 sourceHandle: `source-${inject.inject_depends_on[i].dependency_relationship?.inject_parent_id}`,
-                label: '',
+                label: ChainingUtils.fromInjectDependencyToLabel(inject.inject_depends_on[i]),
                 labelShowBg: false,
-                labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
+                labelStyle: { fill: theme.palette.text?.primary, fontSize: 14 },
               });
             }
           }
