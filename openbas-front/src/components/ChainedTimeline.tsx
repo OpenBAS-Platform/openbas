@@ -170,7 +170,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
    */
   const calculateBoundingBox = (currentNode: NodeInject, nodesAvailable: NodeInject[]) => {
     if (currentNode.data.inject?.inject_depends_on) {
-      const nodesId = Object.keys(currentNode.data.inject?.inject_depends_on);
+      const nodesId = currentNode.data.inject?.inject_depends_on.map((value) => value.dependency_relationship?.inject_parent_id);
       const dependencies = nodesAvailable.filter((dependencyNode) => nodesId.includes(dependencyNode.id));
       const minX = Math.min(currentNode.position.x, ...dependencies.map((value) => value.data.boundingBox!.topLeft.x));
       const minY = Math.min(currentNode.position.y, ...dependencies.map((value) => value.data.boundingBox!.topLeft.y));
@@ -193,11 +193,13 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
    */
   const calculateInjectPosition = (nodeInjects: NodeInject[]) => {
     let reorganizedInjects = nodeInjects;
+
     for (let i = 0; i < nodeInjects.length; i += 1) {
       let childrens = reorganizedInjects.slice(i).filter((nextNode) => nextNode.id !== nodeInjects[i].id
           && nextNode.data.inject?.inject_depends_on !== undefined
           && nextNode.data.inject?.inject_depends_on !== null
-          && nodeInjects[i].id in nextNode.data.inject!.inject_depends_on);
+          && nextNode.data.inject!.inject_depends_on
+            .find((dependsOn) => dependsOn.dependency_relationship?.inject_parent_id === nodeInjects[i].id) !== undefined);
 
       childrens = childrens.sort((a, b) => a.data.inject!.inject_depends_duration - b.data.inject!.inject_depends_duration);
 
@@ -235,7 +237,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
         nodeInjectPosition.y = previousNodes.length === 0 ? 0 : maxY;
       }
       if (nodeInject.data.inject?.inject_depends_on) {
-        const nodesId = Object.keys(nodeInject.data.inject?.inject_depends_on);
+        const nodesId = nodeInject.data.inject?.inject_depends_on.map((value) => value.dependency_relationship?.inject_parent_id);
         const dependencies = reorganizedInjects.filter((dependencyNode) => nodesId.includes(dependencyNode.id));
         const minY = dependencies.length > 0 ? Math.min(...dependencies.map((value) => value.data.boundingBox!.topLeft.y)) : 0;
 
