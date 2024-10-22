@@ -21,7 +21,7 @@ import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
@@ -45,76 +45,17 @@ import static org.springframework.util.StringUtils.hasText;
 
 @RestController
 @Secured(ROLE_USER)
+@RequiredArgsConstructor
 public class TeamApi extends RestBehavior {
 
-  private ExerciseRepository exerciseRepository;
-  private ScenarioRepository scenarioRepository;
-  private TeamRepository teamRepository;
-  private CommunicationRepository communicationRepository;
-  private InjectExpectationRepository injectExpectationRepository;
-  private InjectRepository injectRepository;
-  private UserRepository userRepository;
-  private OrganizationRepository organizationRepository;
-  private TagRepository tagRepository;
-  private ExerciseTeamUserRepository exerciseTeamUserRepository;
+  private final ExerciseRepository exerciseRepository;
+  private final ScenarioRepository scenarioRepository;
+  private final TeamRepository teamRepository;
+  private final UserRepository userRepository;
+  private final OrganizationRepository organizationRepository;
+  private final TagRepository tagRepository;
+  private final TeamService teamService;
 
-  private TeamService teamService;
-
-  @Autowired
-  public void setExerciseRepository(ExerciseRepository exerciseRepository) {
-    this.exerciseRepository = exerciseRepository;
-  }
-
-  @Autowired
-  public void setScenarioRepository(ScenarioRepository scenarioRepository) {
-    this.scenarioRepository = scenarioRepository;
-  }
-
-  @Autowired
-  public void setTeamRepository(TeamRepository teamRepository) {
-    this.teamRepository = teamRepository;
-  }
-
-  @Autowired
-  public void setUserRepository(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
-
-  @Autowired
-  public void setOrganizationRepository(OrganizationRepository organizationRepository) {
-    this.organizationRepository = organizationRepository;
-  }
-
-  @Autowired
-  public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
-    this.injectExpectationRepository = injectExpectationRepository;
-  }
-
-  @Autowired
-  public void setInjectRepository(InjectRepository injectRepository) {
-    this.injectRepository = injectRepository;
-  }
-
-  @Autowired
-  public void setCommunicationRepository(CommunicationRepository communicationRepository) {
-    this.communicationRepository = communicationRepository;
-  }
-
-  @Autowired
-  public void setExerciseTeamUserRepository(ExerciseTeamUserRepository exerciseTeamUserRepository) {
-    this.exerciseTeamUserRepository = exerciseTeamUserRepository;
-  }
-
-  @Autowired
-  public void setTagRepository(TagRepository tagRepository) {
-    this.tagRepository = tagRepository;
-  }
-
-
-  @Autowired
-  public void setTeamService(TeamService teamService) {
-    this.teamService = teamService;
-  }
 
   @LogExecutionTime
   @GetMapping("/api/teams")
