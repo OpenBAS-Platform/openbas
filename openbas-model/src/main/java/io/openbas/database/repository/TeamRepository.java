@@ -66,28 +66,11 @@ public interface TeamRepository extends
           "       team_contextual, " +
           "       coalesce(array_agg(DISTINCT teams_tags.tag_id) FILTER ( WHERE teams_tags.tag_id IS NOT NULL ), '{}') as team_tags, "
           +
-          "       coalesce(array_agg(DISTINCT users_teams.user_id) FILTER ( WHERE users_teams.user_id IS NOT NULL ), '{}') as team_users, "
-          +
-          "       coalesce(array_agg(DISTINCT exercises_teams.exercise_id) FILTER ( WHERE exercises_teams.exercise_id IS NOT NULL ), '{}') as team_exercises, "
-          +
-          "       coalesce(array_agg(DISTINCT scenarios_teams.scenario_id) FILTER ( WHERE scenarios_teams.scenario_id IS NOT NULL ), '{}') as team_scenarios, "
-          +
-          "       coalesce(array_agg(DISTINCT injects_expectations.inject_expectation_id) FILTER ( WHERE injects_expectations.inject_expectation_id IS NOT NULL), '{}') as team_expectations, "
-          +
-          "       coalesce(array_agg(DISTINCT injects.inject_id) FILTER ( WHERE injects.inject_id IS NOT NULL), '{}') as team_exercise_injects, "
-          +
-          "       coalesce(array_agg(DISTINCT communications.communication_id) FILTER ( WHERE communications.communication_id IS NOT NULL), '{}') as team_communications "
+          "       coalesce(array_agg(DISTINCT users_teams.user_id) FILTER ( WHERE users_teams.user_id IS NOT NULL ), '{}') as team_users "
           +
           "FROM teams " +
           "LEFT JOIN teams_tags ON teams_tags.team_id = teams.team_id " +
           "LEFT JOIN users_teams ON users_teams.team_id = teams.team_id " +
-          "LEFT JOIN exercises_teams ON exercises_teams.team_id = teams.team_id " +
-          "LEFT JOIN scenarios_teams ON scenarios_teams.team_id = teams.team_id " +
-          "LEFT JOIN injects_expectations ON injects_expectations.team_id = teams.team_id " +
-          "LEFT JOIN exercises ON exercises_teams.exercise_id = exercises.exercise_id " +
-          "LEFT JOIN exercises_teams_users ON exercises_teams_users.team_id = teams.team_id " +
-          "LEFT JOIN injects ON injects.inject_exercise = exercises.exercise_id " +
-          "LEFT JOIN communications ON communications.communication_inject = injects.inject_id " +
           "GROUP BY teams.team_id ;", nativeQuery = true)
   List<RawTeam> rawTeams();
 
