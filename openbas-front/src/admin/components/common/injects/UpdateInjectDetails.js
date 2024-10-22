@@ -9,7 +9,6 @@ import InjectDefinition from './InjectDefinition';
 import { PermissionsContext } from '../Context';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { fetchTeams } from '../../../../actions/teams/team-actions';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../../actions/Tag';
 import InjectForm from './InjectForm';
