@@ -109,22 +109,22 @@ public interface InjectRepository extends
   long globalCount(@Param("creationDate") Instant creationDate);
 
   @Query(value = "select icap.attack_pattern_id, count(distinct i) as countInjects from injects i "
-      + "left join injectors_contracts_attack_patterns icap ON icap.injector_contract_id = i.inject_injector_contract "
-      + "left join exercises e ON e.exercise_id = i.inject_exercise "
-      + "left join injects_statuses injectStatus ON injectStatus.status_inject = i.inject_id "
+      + "join injectors_contracts_attack_patterns icap ON icap.injector_contract_id = i.inject_injector_contract "
+      + "join exercises e ON e.exercise_id = i.inject_exercise "
+      + "join injects_statuses injectStatus ON injectStatus.status_inject = i.inject_id "
       + "where i.inject_created_at > :creationDate and i.inject_exercise is not null and e.exercise_start_date is not null and icap.injector_contract_id is not null and injectStatus.status_name = 'SUCCESS'"
-      + "group by icap.attack_pattern_id order by countInjects DESC limit 10", nativeQuery = true)
+      + "group by icap.attack_pattern_id order by countInjects DESC LIMIT 5", nativeQuery = true)
   List<Object[]> globalCountGroupByAttackPatternInExercise(@Param("creationDate") Instant creationDate);
 
   @Query(value = "select icap.attack_pattern_id, count(distinct i) as countInjects from injects i "
-      + "left join injectors_contracts_attack_patterns icap ON icap.injector_contract_id = i.inject_injector_contract "
-      + "inner join exercises e on e.exercise_id = i.inject_exercise "
+      + "join injectors_contracts_attack_patterns icap ON icap.injector_contract_id = i.inject_injector_contract "
+      + "join exercises e on e.exercise_id = i.inject_exercise "
       + "inner join grants ON grants.grant_exercise = e.exercise_id "
       + "inner join groups ON grants.grant_group = groups.group_id "
       + "inner join users_groups ON groups.group_id = users_groups.group_id "
-      + "left join injects_statuses injectStatus ON injectStatus.status_inject = i.inject_id "
+      + "join injects_statuses injectStatus ON injectStatus.status_inject = i.inject_id "
       + "where users_groups.user_id = :userId and i.inject_created_at > :creationDate and i.inject_exercise is not null and e.exercise_start_date is not null and icap.injector_contract_id is not null and injectStatus.status_name = 'SUCCESS'"
-      + "group by icap.attack_pattern_id order by countInjects DESC limit 10", nativeQuery = true)
+      + "group by icap.attack_pattern_id order by countInjects DESC LIMIT 5", nativeQuery = true)
   List<Object[]> userCountGroupByAttackPatternInExercise(@Param("userId") String userId,
       @Param("creationDate") Instant creationDate);
 
@@ -193,7 +193,8 @@ public interface InjectRepository extends
       nativeQuery = true
   )
   @Transactional
-  void removeTeamsForExercise(@Param("exerciseId") final String exerciseId, @Param("teamIds") final List<String> teamIds);
+  void removeTeamsForExercise(@Param("exerciseId") final String exerciseId,
+      @Param("teamIds") final List<String> teamIds);
 
   @Modifying
   @Query(
@@ -203,5 +204,6 @@ public interface InjectRepository extends
       nativeQuery = true
   )
   @Transactional
-  void removeTeamsForScenario(@Param("scenarioId") final String scenarioId, @Param("teamIds") final List<String> teamIds);
+  void removeTeamsForScenario(@Param("scenarioId") final String scenarioId,
+      @Param("teamIds") final List<String> teamIds);
 }

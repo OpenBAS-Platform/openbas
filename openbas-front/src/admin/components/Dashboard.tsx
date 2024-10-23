@@ -72,7 +72,7 @@ const Dashboard = () => {
   // Exercises
   const [exercises, setExercises] = useState<EndpointStore[]>([]);
   const searchPaginationInput = {
-    sorts: initSorting('exercise_start_date'),
+    sorts: initSorting('exercise_updated_at', 'DESC'),
     page: 0,
     size: 6,
   };
@@ -142,7 +142,7 @@ const Dashboard = () => {
   const injectsCountByAttackPattern = useMemo(
     () => [{
       data: injectsCountByAttackPatternHasValues && Object.keys(attackPatternsMap).length
-        ? Object.entries<number>(statistics.injects_count_by_attack_pattern!).reverse().map(([attackPatternId, value]) => {
+        ? Object.entries<number>(statistics.injects_count_by_attack_pattern!).map(([attackPatternId, value]) => {
           return ({
             x: [`[${attackPatternsMap[attackPatternId].attack_pattern_external_id}]`, attackPatternsMap[attackPatternId].attack_pattern_name],
             y: value,

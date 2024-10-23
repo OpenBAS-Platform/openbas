@@ -1,5 +1,6 @@
 package io.openbas.rest.statistic;
 
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.raw.RawGlobalInjectExpectation;
@@ -52,6 +53,7 @@ public class StatisticApi extends RestBehavior {
   private final AssetGroupRepository assetGroupRepository;
   private final InjectRepository injectRepository;
 
+  @LogExecutionTime
   @GetMapping("/api/statistics")
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Retrieve platform statistics")
@@ -97,7 +99,7 @@ public class StatisticApi extends RestBehavior {
     Instant minus3Months = from.minus(180, ChronoUnit.DAYS);
     long global = repository.globalCount(minus3Months);
     Instant minusMonth = from.minus(30, ChronoUnit.DAYS);
-    long progression = global - repository.globalCount(minusMonth);
+    long progression = repository.globalCount(minusMonth);
     return new StatisticElement(global, progression);
   }
 
@@ -106,7 +108,7 @@ public class StatisticApi extends RestBehavior {
     Instant minus3Months = from.minus(180, ChronoUnit.DAYS);
     long global = repository.userCount(user.getId(), minus3Months);
     Instant minusMonth = from.minus(30, ChronoUnit.DAYS);
-    long progression = global - repository.userCount(user.getId(), minusMonth);
+    long progression = repository.userCount(user.getId(), minusMonth);
     return new StatisticElement(global, progression);
   }
 
