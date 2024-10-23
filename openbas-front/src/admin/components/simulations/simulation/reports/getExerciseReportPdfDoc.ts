@@ -114,7 +114,7 @@ const getExerciseReportPdfDocDefinition = async ({
     {
       style: 'tableStyle',
       table: {
-        widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*'],
+        widths: ['auto', 'auto', 'auto', 'auto', 'auto', 190],
         body: [
           [t('Type'), t('Title'), t('Execution date'), t('Scores'), t('Targets'), t('Comments')].map((title) => ({
             text: title,
