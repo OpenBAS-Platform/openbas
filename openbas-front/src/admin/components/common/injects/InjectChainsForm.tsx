@@ -189,24 +189,6 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
               (dependsOn) => dependsOn.dependency_relationship?.inject_children_id !== values.inject_id,
             );
           }
-
-          const baseInjectDependency: InjectDependency = {
-            dependency_relationship: {
-              inject_parent_id: newInject?.inject_id,
-              inject_children_id: values.inject_id,
-            },
-            dependency_condition: {
-              conditions: [
-                {
-                  key: 'Execution',
-                  operator: 'eq',
-                  value: true,
-                },
-              ],
-              mode: 'and',
-            },
-          };
-          newInject!.inject_depends_on = [baseInjectDependency];
           return {
             inject: newInject!,
             index: element.index,
@@ -217,13 +199,30 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
 
     setParents(newParents);
 
+    const baseInjectDependency: InjectDependency = {
+      dependency_relationship: {
+        inject_parent_id: newInject?.inject_id,
+        inject_children_id: values.inject_id,
+      },
+      dependency_condition: {
+        conditions: [
+          {
+            key: 'Execution',
+            operator: 'eq',
+            value: true,
+          },
+        ],
+        mode: 'and',
+      },
+    };
+
     form.mutators.setValue(
       'inject_depends_on',
-      injectDependencyFromDependency(newParents),
+      [baseInjectDependency],
     );
 
     if (newInject!.inject_depends_on !== null) {
-      setParentConditions(getConditionContentParent(newInject!.inject_depends_on!));
+      setParentConditions(getConditionContentParent(injectDependencyFromDependency(newParents)));
     }
   };
 
@@ -504,14 +503,27 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
     });
     setParentConditions(newParentConditions);
 
-    const updatedParent = parents.find((currentParent) => currentParent.inject?.inject_id === parent.inject?.inject_id);
-    const newCondition = newParentConditions.find((parentCondition) => parentCondition.parentId === parent.inject?.inject_id);
-    if (updatedParent?.inject?.inject_depends_on !== undefined && newCondition !== undefined) {
-      updatedParent.inject.inject_depends_on = [updateDependsOn(newCondition)];
-    }
+    const element = newParentConditions?.find((conditionElement) => conditionElement.parentId === conditions.parentId);
+    const dep: InjectDependency = {
+      dependency_relationship: {
+        inject_parent_id: element?.parentId,
+        inject_children_id: element?.childrenId,
+      },
+      dependency_condition: {
+        mode: element?.mode === '&&' ? 'and' : 'or',
+        conditions: element?.conditionElement ? element?.conditionElement.map((value) => {
+          return {
+            key: value.key,
+            value: value.value,
+            operator: 'eq',
+          };
+        }) : [],
+      },
+    };
+
     form.mutators.setValue(
       'inject_depends_on',
-      injectDependencyFromDependency(parents),
+      [dep],
     );
   };
 
@@ -575,14 +587,27 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
       setParentConditions(newConditionElements);
     }
 
-    const newCurrentCondition = newConditionElements?.find((currentCondition) => currentCondition.parentId === condition.parentId);
-    const updatedParent = parents.find((currentParent) => currentParent.inject?.inject_id === newCurrentCondition?.parentId);
-    if (updatedParent?.inject?.inject_depends_on !== undefined && newCurrentCondition !== undefined) {
-      updatedParent.inject.inject_depends_on = [updateDependsOn(newCurrentCondition)];
-    }
+    const element = newConditionElements?.find((conditionElement) => conditionElement.parentId === condition.parentId);
+    const dep: InjectDependency = {
+      dependency_relationship: {
+        inject_parent_id: element?.parentId,
+        inject_children_id: element?.childrenId,
+      },
+      dependency_condition: {
+        mode: element?.mode === '&&' ? 'and' : 'or',
+        conditions: element?.conditionElement ? element?.conditionElement.map((value) => {
+          return {
+            key: value.key,
+            value: value.value,
+            operator: 'eq',
+          };
+        }) : [],
+      },
+    };
+
     form.mutators.setValue(
       'inject_depends_on',
-      injectDependencyFromDependency(parents),
+      [dep],
     );
   };
 
