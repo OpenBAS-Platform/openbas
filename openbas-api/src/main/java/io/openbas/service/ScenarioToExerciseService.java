@@ -247,7 +247,15 @@ public class ScenarioToExerciseService {
     scenarioInjects.forEach(scenarioInject -> {
       if(scenarioInject.getDependsOn() != null) {
         Inject injectToUpdate = mapExerciseInjectsByScenarioInject.get(scenarioInject.getId());
-        injectToUpdate.setDependsOn(mapExerciseInjectsByScenarioInject.get(scenarioInject.getDependsOn().getId()));
+        injectToUpdate.getDependsOn().clear();
+        injectToUpdate.getDependsOn().addAll(scenarioInject.getDependsOn().stream().map((injectDependency -> {
+            InjectDependency dep = new InjectDependency();
+            dep.setCompositeId(injectDependency.getCompositeId());
+            dep.setInjectDependencyCondition(injectDependency.getInjectDependencyCondition());
+            dep.getCompositeId().setInjectParent(mapExerciseInjectsByScenarioInject.get(dep.getCompositeId().getInjectParent().getId()));
+            dep.getCompositeId().setInjectChildren(injectToUpdate);
+            return dep;
+        })).toList());
         this.injectRepository.save(injectToUpdate);
       }
     });

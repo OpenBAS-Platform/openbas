@@ -36,7 +36,8 @@ import NodePhantom from './nodes/NodePhantom';
 import { useFormatter } from './i18n';
 import type { AssetGroupsHelper } from '../actions/asset_groups/assetgroup-helper';
 import type { EndpointHelper } from '../actions/assets/asset-helper';
-import type { Inject } from '../utils/api-types';
+import type { Inject, InjectDependency } from '../utils/api-types';
+import ChainingUtils from './common/chaining/ChainingUtils';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -121,6 +122,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
   ];
   const gapSize = 125;
   const newNodeSize = 50;
+  const nodeHeightClearance = 220;
+  const nodeWidthClearance = 350;
 
   let startDate: string | undefined;
 
@@ -148,47 +151,127 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
   };
 
   /**
+   * Move item from an index to another one
+   * @param array the array to update
+   * @param to the target index
+   * @param from the origin index
+   */
+  const moveItem = (array: NodeInject[], to: number, from: number) => {
+    const item = array[from];
+    array.splice(from, 1);
+    array.splice(to, 0, item);
+    return array;
+  };
+
+  /**
+   * Calculate a bounding box for an index
+   * @param currentNode the node to calculate the bounding box for
+   * @param nodesAvailable the nodes
+   */
+  const calculateBoundingBox = (currentNode: NodeInject, nodesAvailable: NodeInject[]) => {
+    if (currentNode.data.inject?.inject_depends_on) {
+      const nodesId = currentNode.data.inject?.inject_depends_on.map((value) => value.dependency_relationship?.inject_parent_id);
+      const dependencies = nodesAvailable.filter((dependencyNode) => nodesId.includes(dependencyNode.id));
+      const minX = Math.min(currentNode.position.x, ...dependencies.map((value) => value.data.boundingBox!.topLeft.x));
+      const minY = Math.min(currentNode.position.y, ...dependencies.map((value) => value.data.boundingBox!.topLeft.y));
+      const maxX = Math.max(currentNode.position.x + nodeWidthClearance, ...dependencies.map((value) => value.data.boundingBox!.bottomRight.x));
+      const maxY = Math.max(currentNode.position.y + nodeHeightClearance, ...dependencies.map((value) => value.data.boundingBox!.bottomRight.y));
+      return {
+        topLeft: { x: minX, y: minY },
+        bottomRight: { x: maxX, y: maxY },
+      };
+    }
+    return {
+      topLeft: currentNode.position,
+      bottomRight: { x: currentNode.position.x + nodeWidthClearance, y: currentNode.position.y + nodeHeightClearance },
+    };
+  };
+
+  /**
    * Calculate injects position when dragging stopped
    * @param nodeInjects the list of injects
    */
   const calculateInjectPosition = (nodeInjects: NodeInject[]) => {
-    nodeInjects.forEach((nodeInject, index) => {
-      let row = 0;
-      let rowFound = true;
+    let reorganizedInjects = nodeInjects;
+
+    nodeInjects.forEach((node, i) => {
+      let childrens = reorganizedInjects.slice(i).filter((nextNode) => nextNode.id !== node.id
+          && nextNode.data.inject?.inject_depends_on !== undefined
+          && nextNode.data.inject?.inject_depends_on !== null
+          && nextNode.data.inject!.inject_depends_on
+            .find((dependsOn) => dependsOn.dependency_relationship?.inject_parent_id === node.id) !== undefined);
+
+      childrens = childrens.sort((a, b) => a.data.inject!.inject_depends_duration - b.data.inject!.inject_depends_duration);
+
+      childrens.forEach((children, j) => {
+        reorganizedInjects = moveItem(reorganizedInjects, i + j + 1, reorganizedInjects.indexOf(children, i));
+      });
+    });
+
+    reorganizedInjects.forEach((nodeInject, index) => {
       const nodeInjectPosition = nodeInject.position;
       const nodeInjectData = nodeInject.data;
-      do {
-        const previousNodes = nodeInjects.slice(0, index)
-          .filter((previousNode) => nodeInject.position.x >= previousNode.position.x && nodeInject.position.x < previousNode.position.x + 250);
 
-        for (let i = 0; i < previousNodes.length; i += 1) {
-          const previousNode = previousNodes[i];
-          if (previousNode.position.y + 150 > row * 150 && previousNode.position.y <= row * 150) {
-            row += 1;
-            rowFound = false;
-          } else {
-            nodeInjectPosition.y = 150 * row;
-            nodeInjectData.fixedY = nodeInject.position.y;
-            rowFound = true;
-          }
+      const previousNodes = reorganizedInjects.slice(0, index)
+        .filter((previousNode) => previousNode.data.boundingBox !== undefined
+            && nodeInjectData.boundingBox !== undefined
+            && nodeInjectData.boundingBox?.topLeft.x >= previousNode.data.boundingBox.topLeft.x
+            && nodeInjectData.boundingBox?.topLeft.x < previousNode.data.boundingBox.bottomRight.x);
+
+      const arrayOfY = previousNodes
+        .map((previousNode) => (previousNode.data.boundingBox?.bottomRight.y ? previousNode.data.boundingBox?.bottomRight.y : 0));
+      const maxY = Math.max(0, ...arrayOfY);
+
+      nodeInjectPosition.y = 0;
+      let rowFound = false;
+      for (let row = 1; row <= (maxY / nodeHeightClearance) + 1; row += 1) {
+        if (!arrayOfY.includes(row * nodeHeightClearance)) {
+          nodeInjectPosition.y = (row - 1) * nodeHeightClearance;
+          rowFound = true;
+          break;
         }
-      } while (!rowFound);
+      }
+
+      if (!rowFound) {
+        nodeInjectPosition.y = previousNodes.length === 0 ? 0 : maxY;
+      }
+      if (nodeInject.data.inject?.inject_depends_on) {
+        const nodesId = nodeInject.data.inject?.inject_depends_on.map((value) => value.dependency_relationship?.inject_parent_id);
+        const dependencies = reorganizedInjects.filter((dependencyNode) => nodesId.includes(dependencyNode.id));
+        const minY = dependencies.length > 0 ? Math.min(...dependencies.map((value) => value.data.boundingBox!.topLeft.y)) : 0;
+
+        nodeInjectPosition.y = nodeInjectPosition.y < minY ? minY : nodeInjectPosition.y;
+      }
+
+      nodeInjectData.fixedY = nodeInjectPosition.y;
+      nodeInjectData.boundingBox = calculateBoundingBox(nodeInject, reorganizedInjects);
+      reorganizedInjects[index] = nodeInject;
     });
   };
 
   const updateEdges = () => {
-    const newEdges = injects.filter((inject) => inject.inject_depends_on != null).map((inject) => {
-      return ({
-        id: `${inject.inject_id}->${inject.inject_depends_on}`,
-        target: `${inject.inject_id}`,
-        targetHandle: `target-${inject.inject_id}`,
-        source: `${inject.inject_depends_on}`,
-        sourceHandle: `source-${inject.inject_depends_on}`,
-        label: '',
-        labelShowBg: false,
-        labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
+    const newEdges = injects.filter((inject) => inject.inject_depends_on !== null && inject.inject_depends_on !== undefined)
+      .flatMap((inject) => {
+        const results = [];
+        if (inject.inject_depends_on !== undefined) {
+          for (let i = 0; i < inject.inject_depends_on.length; i += 1) {
+            if (inject.inject_depends_on[i].dependency_relationship?.inject_children_id === inject.inject_id) {
+              results.push({
+                id: `${inject.inject_depends_on[i].dependency_relationship?.inject_parent_id}->${inject.inject_depends_on[i].dependency_relationship?.inject_children_id}`,
+                target: `${inject.inject_depends_on[i].dependency_relationship?.inject_children_id}`,
+                targetHandle: `target-${inject.inject_depends_on[i].dependency_relationship?.inject_children_id}`,
+                source: `${inject.inject_depends_on[i].dependency_relationship?.inject_parent_id}`,
+                sourceHandle: `source-${inject.inject_depends_on[i].dependency_relationship?.inject_parent_id}`,
+                label: ChainingUtils.fromInjectDependencyToLabel(inject.inject_depends_on[i]),
+                labelShowBg: false,
+                labelStyle: { fill: theme.palette.text?.primary, fontSize: 14 },
+              });
+            }
+          }
+        }
+        return results;
       });
-    });
+
     setEdges(newEdges);
   };
 
@@ -216,6 +299,10 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
             fixedY: 0,
             startDate,
             onSelectedInject,
+            boundingBox: {
+              topLeft: { x: (inject.inject_depends_duration / 60) * (gapSize / minutesPerGapAllowed[minutesPerGapIndex]), y: 0 },
+              bottomRight: { x: (inject.inject_depends_duration / 60) * (gapSize / minutesPerGapAllowed[minutesPerGapIndex]) + nodeWidthClearance, y: nodeHeightClearance },
+            },
             targets: inject.inject_assets!.map((asset) => assets[asset]?.asset_name)
               .concat(inject.inject_asset_groups!.map((assetGroup) => assetGroups[assetGroup]?.asset_group_name))
               .concat(inject.inject_teams!.map((team) => teams[team]?.team_name)),
@@ -279,6 +366,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
         inject_injector_contract: injectFromMap.inject_injector_contract.injector_contract_id,
         inject_id: node.id,
         inject_depends_duration: convertCoordinatesToTime(node.position),
+        inject_depends_on: injectFromMap.inject_depends_on !== null
+          ? injectFromMap.inject_depends_on : null,
       };
       onUpdateInject([inject]);
       setCurrentUpdatedNode(node);
@@ -316,11 +405,27 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
     const inject = injects.find((currentInject) => currentInject.inject_id === connection.target);
     const injectParent = injects.find((currentInject) => currentInject.inject_id === connection.source);
     if (inject !== undefined && injectParent !== undefined && inject.inject_depends_duration > injectParent.inject_depends_duration) {
+      const newDependsOn: InjectDependency = {
+        dependency_relationship: {
+          inject_children_id: inject.inject_id,
+          inject_parent_id: injectParent.inject_id,
+        },
+        dependency_condition:
+          {
+            mode: 'and',
+            conditions: [
+              {
+                key: 'Execution', operator: 'eq', value: true,
+              },
+            ],
+          },
+      };
+
       const injectToUpdate = {
         ...injectsMap[inject.inject_id],
         inject_injector_contract: inject.inject_injector_contract.injector_contract_id,
         inject_id: inject.inject_id,
-        inject_depends_on: injectParent?.inject_id,
+        inject_depends_on: [newDependsOn],
       };
       onUpdateInject([injectToUpdate]);
     }
@@ -335,8 +440,12 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
     setDraggingOnGoing(true);
     const { position } = node;
     const { data } = node;
-    const dependsOn = nodes.find((currentNode) => (currentNode.id === data.inject?.inject_depends_on));
-    const dependsTo = nodes.filter((currentNode) => (currentNode.data.inject?.inject_depends_on === node.id))
+    const dependsOn = nodes.find((currentNode) => (data.inject?.inject_depends_on !== null
+      && data.inject?.inject_depends_on!.find((value) => value.dependency_relationship?.inject_parent_id === currentNode.id)));
+    const dependsTo = nodes
+      .filter((currentNode) => (currentNode.data.inject?.inject_depends_on !== undefined
+          && currentNode.data.inject?.inject_depends_on !== null
+          && currentNode.data.inject?.inject_depends_on.find((value) => value.dependency_relationship?.inject_parent_id === node.id) !== undefined))
       .sort((a, b) => a.data.inject!.inject_depends_duration - b.data.inject!.inject_depends_duration)[0];
     const aSecond = gapSize / (minutesPerGapAllowed[minutesPerGapIndex] * 60);
     if (dependsOn?.position && position.x <= dependsOn?.position.x) {
@@ -462,11 +571,26 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
           inject_depends_on: undefined,
         };
         updates.push(injectToRemoveEdge);
+        const newDependsOn: InjectDependency = {
+          dependency_relationship: {
+            inject_children_id: injectToUpdate.inject_id,
+            inject_parent_id: edge.source,
+          },
+          dependency_condition:
+              {
+                mode: 'and',
+                conditions: [
+                  {
+                    key: 'Execution', operator: 'eq', value: true,
+                  },
+                ],
+              },
+        };
         const injectToUpdateEdge = {
           ...injectsMap[injectToUpdate.inject_id],
           inject_injector_contract: injectToUpdate.inject_injector_contract.injector_contract_id,
           inject_id: injectToUpdate.inject_id,
-          inject_depends_on: edge.source,
+          inject_depends_on: [newDependsOn],
         };
         updates.push(injectToUpdateEdge);
         onUpdateInject(updates);
@@ -475,11 +599,26 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
       const inject = injects.find((currentInject) => currentInject.inject_id === edge.target);
       const parent = injects.find((currentInject) => currentInject.inject_id === connectionState.toNode?.id);
       if (inject !== undefined && parent !== undefined && parent.inject_depends_duration < inject.inject_depends_duration) {
+        const newDependsOn: InjectDependency = {
+          dependency_relationship: {
+            inject_children_id: inject.inject_id,
+            inject_parent_id: connectionState.toNode?.id,
+          },
+          dependency_condition:
+              {
+                mode: 'and',
+                conditions: [
+                  {
+                    key: 'Execution', operator: 'eq', value: true,
+                  },
+                ],
+              },
+        };
         const injectToUpdate = {
           ...injectsMap[inject.inject_id],
           inject_injector_contract: inject.inject_injector_contract.injector_contract_id,
           inject_id: inject.inject_id,
-          inject_depends_on: connectionState.toNode?.id,
+          inject_depends_on: [newDependsOn],
         };
         onUpdateInject([injectToUpdate]);
       }

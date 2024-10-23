@@ -14,7 +14,7 @@ import TextSearchComponent from '../textSearch/TextSearchComponent';
 import FilterAutocomplete, { OptionPropertySchema } from '../filter/FilterAutocomplete';
 import useFilterableProperties from '../filter/useFilterableProperties';
 import FilterChips from '../filter/FilterChips';
-import FilterModeChip from '../filter/FilterModeChip';
+import ClickableModeChip from '../../chips/ClickableModeChip';
 import InjectorContractSwitchFilter from '../../../../admin/components/common/filters/InjectorContractSwitchFilter';
 import TablePaginationComponentV2 from './TablePaginationComponentV2';
 
@@ -186,7 +186,7 @@ const PaginationComponentV2 = <T extends object>({
                 onDelete={() => queryableHelpers.filterHelpers.handleRemoveFilterByKey(MITRE_FILTER_KEY)}
               />
               {(searchPaginationInput.filterGroup?.filters?.filter((f) => availableFilterNames?.filter((n) => n !== MITRE_FILTER_KEY).includes(f.key)).length ?? 0) > 0 && (
-                <FilterModeChip
+                <ClickableModeChip
                   onClick={queryableHelpers.filterHelpers.handleSwitchMode}
                   mode={searchPaginationInput.filterGroup.mode}
                 />
