@@ -167,7 +167,7 @@ MarkdownWithRedirectionWarningProps
   }
   return (
     <FieldOrEmpty source={content}>
-      <div onClick={(event) => browseLinkWarning(event)}>
+      <div onClick={(event) => browseLinkWarning(event)} style={{ wordBreak: 'break-word' }}>
         {remarkGfmPlugin ? remarkGfmMarkdownElement() : markdownElement()}
       </div>
       <ExternalLinkPopover
