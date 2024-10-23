@@ -20,10 +20,10 @@ import ReportInformationType from './ReportInformationType';
 import ExerciseMainInformation from '../ExerciseMainInformation';
 import ResponsePie from '../../../common/injects/ResponsePie';
 import InjectReportResult from './InjectReportResult';
-import ReportGlobalObservation from '../../../components/reports/ReportGlobalObservation';
 import LessonsCategories from '../../../lessons/exercises/LessonsCategories';
 import ExerciseDistribution from '../overview/ExerciseDistribution';
 import AnswersByQuestionDialog from '../../../lessons/exercises/AnswersByQuestionDialog';
+import ReportComment from '../../../components/reports/ReportComment';
 
 const ExerciseReportPage: React.FC = () => {
   // Standard hooks
@@ -112,7 +112,7 @@ const ExerciseReportPage: React.FC = () => {
             <Typography variant="h4" gutterBottom>
               {t('Results')}
             </Typography>
-            <Paper id='score_details' variant="outlined" style={{ display: 'flex', alignItems: 'center' }}>
+            <Paper variant="outlined" style={{ display: 'flex', alignItems: 'center' }}>
               <ResponsePie expectationResultsByTypes={reportData.exerciseExpectationResults} disableChartAnimation/>
             </Paper>
             </div>
@@ -121,7 +121,7 @@ const ExerciseReportPage: React.FC = () => {
           && (
             <InjectReportResult
               canEditComment={canEditReport}
-              initialInjectComments={report?.report_injects_comments}
+              injectsComments={report?.report_injects_comments}
               injects={reportData.injects}
               style={{ width: '100%', marginTop: 20 }}
               onCommentSubmit={(value) => dispatch(updateReportInjectCommentForExercise(exerciseId, report.report_id, value))}
@@ -129,13 +129,16 @@ const ExerciseReportPage: React.FC = () => {
           )
         }
         {displayModule(ReportInformationType.GLOBAL_OBSERVATION)
-          && <ReportGlobalObservation
-            label={t('Global observation')}
-            initialValue={report.report_global_observation || ''}
-            onBlur={saveGlobalObservation}
-            style={{ width: '100%', marginTop: 20 }}
-            canWrite={canEditReport}
-             />
+          && (<div style={{ width: '100%', marginTop: 20 }}>
+            <Typography variant="h4" gutterBottom>
+              {t('Global observation')}
+            </Typography>
+
+            <Paper variant="outlined" sx={{ padding: '10px 15px 10px 15px' }}>
+              <ReportComment canEditComment={canEditReport} initialComment={report.report_global_observation || ''} saveComment={saveGlobalObservation} />
+            </Paper>
+          </div>)
+
         }
         {displayModule(ReportInformationType.PLAYER_SURVEYS)
           && <LessonsCategories

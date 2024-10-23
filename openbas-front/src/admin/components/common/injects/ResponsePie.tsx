@@ -132,7 +132,7 @@ const ResponsePie = (({ expectationResultsByTypes, humanValidationLink, immutabl
   };
 
   return (
-    <Grid container={true} spacing={3}>
+    <Grid id='score_details' container={true} spacing={3}>
       <Grid item={true} xs={4}>
         {expectationResultsByTypes && expectationResultsByTypes.length > 0 ? <Pie type='prevention' title={t('TYPE_PREVENTION')} expectationResultsByType={prevention} /> : <Loader variant="inElement" />}
       </Grid>

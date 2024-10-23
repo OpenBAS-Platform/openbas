@@ -49,6 +49,13 @@ const tableCustomLayout = (displayColumnLine:boolean, paddingTop:number) => ({
   paddingBottom: () => paddingTop,
 });
 
+const imageBorder = {
+  hLineWidth: () => 0.5,
+  vLineWidth: () => 0.5,
+  hLineColor: () => '#aaa',
+  vLineColor: () => '#aaa',
+};
+
 interface Props {
   report: Report,
   reportData: ExerciseReportData,
@@ -107,7 +114,7 @@ const getExerciseReportPdfDocDefinition = async ({
     {
       style: 'tableStyle',
       table: {
-        widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*'],
+        widths: ['auto', 'auto', 'auto', 'auto', 'auto', 190],
         body: [
           [t('Type'), t('Title'), t('Execution date'), t('Scores'), t('Targets'), t('Comments')].map((title) => ({
             text: title,
@@ -270,20 +277,41 @@ const getExerciseReportPdfDocDefinition = async ({
       // First Page
       { image: imagesMap.get('openBAS_logo'), width: 150, margin: [0, 0, 0, 40] },
       { text: report.report_name, style: 'reportTitle' },
-      { text: fldt(reportData.exercise.exercise_start_date), margin: [0, 10, 0, 0] },
-      {
-        text: [{ text: t('Teams') }, { text: ` : ${reportData.exercise.exercise_teams?.map((teamId_1) => reportData.teams.find((team_1) => team_1.team_id === teamId_1)?.team_name).join(', ')}` }],
-        margin: [0, 0, 0, 150],
-      },
+      reportData.exercise.exercise_start_date ? { text: fldt(reportData.exercise.exercise_start_date), margin: [0, 10, 0, 0] } : {},
+      reportData.exercise.exercise_teams?.length && reportData.exercise.exercise_teams?.length > 0
+        ? {
+          text: [{ text: t('Teams') }, { text: ` : ${reportData.exercise.exercise_teams?.map((teamId_1) => reportData.teams.find((team_1) => team_1.team_id === teamId_1)?.team_name).join(', ')}` }],
+          margin: [0, 0, 0, 150],
+        } : {},
       '\n',
-      imagesMap.has('score_details') ? { image: imagesMap.get('score_details'), width: 530 } : {},
+      imagesMap.has('score_details')
+        ? {
+          table: {
+            body: [
+              [
+                {
+                  image: imagesMap.get('score_details'),
+                  width: 530,
+                },
+              ],
+            ],
+          },
+          layout: imageBorder,
+        } : {},
       '\n',
       imagesMap.has('main_information') ? {
-        image: imagesMap.get('main_information'),
-        width: 530,
-        alignment: 'center',
+        table: {
+          body: [
+            [
+              {
+                image: imagesMap.get('main_information'),
+                width: 530,
+              },
+            ],
+          ],
+        },
+        layout: imageBorder,
       } : {},
-
       // Table of Contents Page
       ...((displayInjectResultPage || displayGlobalObservation || displayPlayerSurveys || displayExerciseDetails) ? [{
         toc: {
