@@ -14,7 +14,6 @@ import Breadcrumbs from '../../../components/Breadcrumbs';
 import { initSorting } from '../../../components/common/queryable/Page';
 import type { OrganizationHelper, UserHelper } from '../../../actions/helper';
 import { useAppDispatch } from '../../../utils/hooks';
-import { fetchTags } from '../../../actions/Tag';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import { searchPlayers } from '../../../actions/players/player-actions';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -77,7 +76,6 @@ const Players = () => {
   }));
 
   useDataLoader(() => {
-    dispatch(fetchTags());
     dispatch(fetchOrganizations());
   });
 

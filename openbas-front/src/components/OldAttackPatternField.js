@@ -5,7 +5,7 @@ import { Box, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { connect } from 'react-redux';
 import AttackPatternForm from '../admin/components/settings/attack_patterns/AttackPatternForm';
-import { fetchAttackPatterns, addAttackPattern } from '../actions/AttackPattern';
+import { addAttackPattern } from '../actions/AttackPattern';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
 import { storeHelper } from '../actions/Schema';
@@ -29,10 +29,6 @@ class OldAttackPatternField extends Component {
   constructor(props) {
     super(props);
     this.state = { attackPatternCreation: false, attackPatternInput: '' };
-  }
-
-  componentDidMount() {
-    this.props.fetchAttackPatterns();
   }
 
   handleOpenAttackPatternCreation() {
@@ -142,7 +138,7 @@ const select = (state) => {
 };
 
 export default R.compose(
-  connect(select, { fetchAttackPatterns, addAttackPattern }),
+  connect(select, { addAttackPattern }),
   inject18n,
   withStyles(styles),
 )(OldAttackPatternField);

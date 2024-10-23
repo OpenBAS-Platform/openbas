@@ -5,12 +5,11 @@ import { Autocomplete as MuiAutocomplete, Box, Dialog, DialogContent, DialogTitl
 import { makeStyles } from '@mui/styles';
 import { FieldErrors } from 'react-hook-form';
 import { useAppDispatch } from '../../utils/hooks';
-import useDataLoader from '../../utils/hooks/useDataLoader';
 import type { Tag } from '../../utils/api-types';
 import { useHelper } from '../../store';
 import type { TagHelper, UserHelper } from '../../actions/helper';
 import { useFormatter } from '../i18n';
-import { addTag, fetchTags } from '../../actions/Tag';
+import { addTag } from '../../actions/Tag';
 import TagForm from '../../admin/components/settings/tags/TagForm';
 
 const useStyles = makeStyles(() => ({
@@ -55,9 +54,6 @@ const TagField: FunctionComponent<Props> = ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
   const dispatch = useAppDispatch();
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
 
   // Handle tag creation
   const [tagCreation, setTagCreation] = useState(false);

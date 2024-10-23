@@ -1,13 +1,9 @@
-import React, { FunctionComponent } from 'react';
+import React from 'react';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
-import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
-import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
-import { useAppDispatch } from '../../../../utils/hooks';
 import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import KillChainPhaseColumn from './KillChainPhaseColumn';
@@ -25,14 +21,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-interface Props {
-  ttpAlreadyLoaded?: boolean;
-}
-
-const MitreMatrixDummy: FunctionComponent<Props> = ({ ttpAlreadyLoaded }) => {
+const MitreMatrixDummy: React.FC = () => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useAppDispatch();
   // Fetching data
   const { attackPatterns, killChainPhaseMap }: {
     attackPatterns: AttackPattern[],
@@ -41,14 +32,6 @@ const MitreMatrixDummy: FunctionComponent<Props> = ({ ttpAlreadyLoaded }) => {
     attackPatterns: helper.getAttackPatterns(),
     killChainPhaseMap: helper.getKillChainPhasesMap(),
   }));
-
-  if (!ttpAlreadyLoaded) {
-    useDataLoader(() => {
-      dispatch(fetchKillChainPhases());
-      dispatch(fetchAttackPatterns());
-    });
-  }
-  // Attack Pattern
 
   // Kill Chain Phase
   const sortKillChainPhase = (k1: KillChainPhase, k2: KillChainPhase) => {

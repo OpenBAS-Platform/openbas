@@ -1,10 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
 import { Box, Autocomplete, TextField, Chip } from '@mui/material';
 import { LabelOutlined } from '@mui/icons-material';
-import { useDispatch } from 'react-redux';
-import { fetchTags } from '../../../../actions/Tag';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 
@@ -30,12 +28,6 @@ const useStyles = makeStyles(() => ({
 const TagsFilter = (props) => {
   const classes = useStyles();
   const { t } = useFormatter();
-  const dispatch = useDispatch();
-  useEffect(() => {
-    if (!props.tagsFetched) {
-      dispatch(fetchTags());
-    }
-  }, []);
   const tags = useHelper((helper) => helper.getTags());
   const { onAddTag, onClearTag, onRemoveTag, currentTags, fullWidth } = props;
   const tagTransform = (n) => ({

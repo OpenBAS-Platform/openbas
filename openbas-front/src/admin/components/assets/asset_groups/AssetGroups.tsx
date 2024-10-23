@@ -17,8 +17,6 @@ import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { AssetGroupOutput } from '../../../../utils/api-types';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { fetchTags } from '../../../../actions/Tag';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import ExportButton from '../../../../components/common/ExportButton';
@@ -142,10 +140,6 @@ const AssetGroups = () => {
   const { userAdmin } = useHelper((helper: EndpointHelper & UserHelper & TagHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
-
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
 
   // Headers
   const headers: Header[] = useMemo(() => [

@@ -8,11 +8,8 @@ import computeAttackPatterns from '../../../../utils/injector_contract/InjectorC
 import type { FilterGroup, Inject, InjectorContractOutput, KillChainPhase } from '../../../../utils/api-types';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
-import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
 import Drawer from '../../../../components/common/Drawer';
 import CreateInjectDetails from './CreateInjectDetails';
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
@@ -20,7 +17,6 @@ import InjectIcon from './InjectIcon';
 import type { InjectorHelper } from '../../../../actions/injectors/injector-helper';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
-import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import { isNotEmptyField } from '../../../../utils/utils';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
@@ -88,7 +84,6 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
   // Standard hooks
   const classes = useStyles();
   const drawerRef = useRef(null);
-  const dispatch = useAppDispatch();
   const { t, tPick } = useFormatter();
 
   // Fetching data
@@ -97,10 +92,6 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
     attackPatternsMap: helper.getAttackPatternsMap(),
     killChainPhasesMap: helper.getKillChainPhasesMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchKillChainPhases());
-    dispatch(fetchAttackPatterns());
-  });
 
   // Headers
   const headers: Header[] = useMemo(() => [

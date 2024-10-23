@@ -5,7 +5,7 @@ import React, { CSSProperties, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
-import type { TagHelper, UserHelper } from '../../../actions/helper';
+import type { UserHelper } from '../../../actions/helper';
 import { searchScenarios } from '../../../actions/scenarios/scenario-actions';
 import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import ScenarioCreation from './ScenarioCreation';
@@ -17,9 +17,6 @@ import PlatformIcon from '../../../components/PlatformIcon';
 import ItemCategory from '../../../components/ItemCategory';
 import ImportUploaderScenario from './ImportUploaderScenario';
 import ScenarioStatus from './scenario/ScenarioStatus';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
-import { fetchTags } from '../../../actions/Tag';
-import { useAppDispatch } from '../../../utils/hooks';
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import ScenarioPopover from './scenario/ScenarioPopover';
@@ -76,17 +73,13 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 const Scenarios = () => {
   // Standard hooks
-  const dispatch = useAppDispatch();
   const classes = useStyles();
   const { t, nsdt } = useFormatter();
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({
+  const { userAdmin } = useHelper((helper: UserHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
 
   // Headers
   const headers = useMemo(() => [

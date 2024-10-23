@@ -10,7 +10,6 @@ import ItemTags from '../../../components/ItemTags';
 import { truncate } from '../../../utils/String';
 import CreateOrganization from './organizations/CreateOrganization';
 import OrganizationPopover from './organizations/OrganizationPopover';
-import { fetchTags } from '../../../actions/Tag';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../common/filters/TagsFilter';
 import { exportData } from '../../../utils/Environment';
@@ -106,7 +105,6 @@ const Organizations = () => {
   }));
 
   useDataLoader(() => {
-    dispatch(fetchTags());
     dispatch(fetchOrganizations());
   });
 
@@ -142,7 +140,6 @@ const Organizations = () => {
             onAddTag={filtering.handleAddTag}
             onRemoveTag={filtering.handleRemoveTag}
             currentTags={filtering.tags}
-            tagsFetched
           />
         </div>
         <div className={classes.downloadButton}>

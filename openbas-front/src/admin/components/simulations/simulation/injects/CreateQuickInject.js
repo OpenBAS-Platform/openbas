@@ -9,7 +9,6 @@ import inject18n from '../../../../../components/i18n';
 import QuickInject, { EMAIL_CONTRACT } from './QuickInject';
 import { storeHelper } from '../../../../../actions/Schema';
 import { fetchExercises } from '../../../../../actions/Exercise';
-import { fetchTags } from '../../../../../actions/Tag';
 import { fetchInjectorContract } from '../../../../../actions/InjectorContracts';
 
 const styles = (theme) => ({
@@ -103,7 +102,6 @@ const select = (state) => {
 export default R.compose(
   connect(select, {
     fetchExercises,
-    fetchTags,
     fetchInjectorContract,
   }),
   inject18n,

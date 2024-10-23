@@ -8,9 +8,6 @@ import { ArrowDropDownOutlined, ArrowDropUpOutlined, HelpOutlined } from '@mui/i
 import InjectDefinition from './InjectDefinition';
 import { PermissionsContext } from '../Context';
 import { useHelper } from '../../../../store';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchTags } from '../../../../actions/Tag';
 import InjectForm from './InjectForm';
 import { useFormatter } from '../../../../components/i18n';
 import { isEmptyField } from '../../../../utils/utils';
@@ -64,13 +61,9 @@ const UpdateInjectDetails = ({
   const { permissions } = useContext(PermissionsContext);
   const [openDetails, setOpenDetails] = useState(true);
   const [injectDetailsState, setInjectDetailsState] = useState({});
-  const dispatch = useAppDispatch();
   const { tagsMap } = useHelper((helper) => ({
     tagsMap: helper.getTagsMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
 
   const toggleInjectContent = () => {
     if (openDetails) {

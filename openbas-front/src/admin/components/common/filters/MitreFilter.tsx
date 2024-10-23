@@ -3,11 +3,9 @@ import { makeStyles } from '@mui/styles';
 import { Button, Typography } from '@mui/material';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
-import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
@@ -147,8 +145,6 @@ const MitreFilter: FunctionComponent<MitreFilterProps> = ({
     injectorsContracts: helper.getInjectorContracts(),
   }));
   useDataLoader(() => {
-    dispatch(fetchKillChainPhases());
-    dispatch(fetchAttackPatterns());
     dispatch(fetchInjectorsContracts());
   });
 

@@ -9,7 +9,6 @@ import { fetchOrganizations } from '../../../../actions/Organization';
 import CreateGroup from './CreateGroup';
 import { searchGroups } from '../../../../actions/Group';
 import { fetchExercises } from '../../../../actions/Exercise';
-import { fetchTags } from '../../../../actions/Tag';
 import GroupPopover from './GroupPopover';
 import SecurityMenu from '../SecurityMenu';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
@@ -85,7 +84,6 @@ const Groups = () => {
     dispatch(fetchUsers());
     dispatch(fetchExercises());
     dispatch(fetchScenarios());
-    dispatch(fetchTags());
   });
 
   // Headers
