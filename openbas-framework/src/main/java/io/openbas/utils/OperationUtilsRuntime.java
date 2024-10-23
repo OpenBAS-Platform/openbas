@@ -24,6 +24,9 @@ public class OperationUtilsRuntime {
   }
 
   public static boolean containsText(@NotNull final Object value, @NotBlank final String text) {
+    if(value instanceof Enum<?>) {
+      return ((Enum<?>) value).name().toLowerCase().contains(text.toLowerCase());
+    }
     return ((String) value).toLowerCase().contains(text.toLowerCase());
   }
 
