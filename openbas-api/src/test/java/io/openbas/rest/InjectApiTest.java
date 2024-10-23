@@ -29,14 +29,21 @@ import io.openbas.utils.fixtures.InjectExpectationFixture;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Resource;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.ServletException;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.ResourceUtils;
@@ -48,9 +55,12 @@ import java.io.InputStream;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
+@ExtendWith(MockitoExtension.class)
 class InjectApiTest extends IntegrationTest {
 
   static Exercise EXERCISE;
@@ -81,6 +91,8 @@ class InjectApiTest extends IntegrationTest {
   private UserRepository userRepository;
   @Resource
   private ObjectMapper objectMapper;
+  @MockBean
+  private JavaMailSender javaMailSender;
 
   @BeforeAll
   void beforeAll() {
@@ -399,6 +411,11 @@ class InjectApiTest extends IntegrationTest {
         "application/xlsx",
         in.readAllBytes());
 
+    // Mock the behavior of JavaMailSender
+    doNothing().when(javaMailSender).send(ArgumentMatchers.any(SimpleMailMessage.class));
+    MimeMessage mimeMessage = mock(MimeMessage.class);
+    when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
+
     // -- EXECUTE --
     String response = mvc.perform(multipart(EXERCISE_URI + "/" + EXERCISE.getId() + "/inject")
             .file(inputJson)
@@ -415,6 +432,44 @@ class InjectApiTest extends IntegrationTest {
     verify(executor).execute(executableInjectCaptor.capture());
     verify(executor).execute(executableInjectCaptor.capture());
 
+
+    //-- THEN ---
+    userRepository.delete(user);
+  }
+
+  @DisplayName("Execute an email inject for exercise with no team")
+  @Test
+  @WithMockPlannerUser
+  void executeEmailInjectForExerciseWithNoTeam() throws Exception {
+    // -- PREPARE --
+    InjectorContract injectorContract = this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
+    Inject inject = getInjectForEmailContract(injectorContract);
+    User user = userRepository.findById(currentUser().getId()).orElseThrow();
+    DirectInjectInput input = new DirectInjectInput();
+    input.setTitle(inject.getTitle());
+    input.setDescription(inject.getDescription());
+    input.setInjectorContract(inject.getInjectorContract().orElseThrow().getId());
+    ObjectNode content = objectMapper.createObjectNode();
+    content.set("subject", objectMapper.convertValue("Subject", JsonNode.class));
+    content.set("body", objectMapper.convertValue("Test body", JsonNode.class));
+    content.set("expectationType", objectMapper.convertValue("none", JsonNode.class));
+    input.setContent(content);
+
+    MockMultipartFile inputJson = new MockMultipartFile("input", null, "application/json",
+        objectMapper.writeValueAsString(input).getBytes());
+
+    // -- EXECUTE --
+    String response = mvc.perform(multipart(EXERCISE_URI + "/" + EXERCISE.getId() + "/inject")
+            .file(inputJson))
+        .andExpect(status().is2xxSuccessful())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // -- ASSERT --
+    assertNotNull(response);
+    assertEquals("ERROR", JsonPath.read(response, "$.status_name"));
+    assertEquals("Email needs at least one user", JsonPath.read(response, "$.status_traces[0].execution_message"));
 
     //-- THEN ---
     userRepository.delete(user);
