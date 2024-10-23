@@ -23,8 +23,7 @@ steps:
         path: /drone/src/openbas-front/node_modules
     commands:
       - cd openbas-front
-      - apt update
-      - apt install -y git
+      - apk --no-cache add git
       - yarn install
       - yarn build
       - yarn check-ts
