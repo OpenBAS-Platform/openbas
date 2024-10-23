@@ -308,7 +308,7 @@ const Injects: FunctionComponent<Props> = ({
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`${exerciseOrScenarioId}-injects`, buildSearchPagination({
     sorts: initSorting('inject_depends_duration', 'ASC'),
     filterGroup: quickFilter,
-    size: 100,
+    size: 20,
   }));
 
   // Toolbar
