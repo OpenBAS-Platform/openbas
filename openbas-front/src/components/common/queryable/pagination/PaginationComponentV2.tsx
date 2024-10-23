@@ -47,6 +47,7 @@ interface Props<T> {
   queryableHelpers: QueryableHelpers;
   topBarButtons?: React.ReactElement | null;
   attackPatterns?: AttackPatternStore[],
+  reloadContentCount?: number
 }
 
 const PaginationComponentV2 = <T extends object>({
@@ -60,6 +61,7 @@ const PaginationComponentV2 = <T extends object>({
   queryableHelpers,
   attackPatterns,
   topBarButtons,
+  reloadContentCount = 0,
 }: Props<T>) => {
   // Standard hooks
   const classes = useStyles();
@@ -93,7 +95,7 @@ const PaginationComponentV2 = <T extends object>({
       setContent(data.content);
       queryableHelpers.paginationHelpers.handleChangeTotalElements(data.totalElements);
     });
-  }, [searchPaginationInput]);
+  }, [searchPaginationInput, reloadContentCount]);
 
   // Filters
   const [pristine, setPristine] = useState(true);

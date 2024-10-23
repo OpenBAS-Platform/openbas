@@ -208,6 +208,7 @@ const Injects: FunctionComponent<Props> = ({
   // Injects
   const [injects, setInjects] = useState<InjectOutputType[]>([]);
   const [selectedInjectId, setSelectedInjectId] = useState<string | null>(null);
+  const [reloadInjectCount, setReloadInjectCount] = useState(0);
 
   // Optimistic update
   const onCreate = (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
@@ -307,7 +308,7 @@ const Injects: FunctionComponent<Props> = ({
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`${exerciseOrScenarioId}-injects`, buildSearchPagination({
     sorts: initSorting('inject_depends_duration', 'ASC'),
     filterGroup: quickFilter,
-    size: 100,
+    size: 20,
   }));
 
   // Toolbar
@@ -474,12 +475,13 @@ const Injects: FunctionComponent<Props> = ({
         entityPrefix="inject"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
-        disablePagination
+        reloadContentCount={reloadInjectCount}
         topBarButtons={
           <InjectsListButtons
             injects={injects}
             availableButtons={availableButtons}
             setViewMode={setViewMode}
+            onImportedInjects={() => setReloadInjectCount((prev) => prev + 1)}
           />
         }
       />
