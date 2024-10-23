@@ -16,10 +16,17 @@ import io.openbas.utils.fixtures.InjectExpectationFixture;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Resource;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.ResourceUtils;
@@ -40,11 +47,13 @@ import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
+@ExtendWith(MockitoExtension.class)
 class InjectApiTest extends IntegrationTest {
 
   static Exercise EXERCISE;
@@ -80,6 +89,8 @@ class InjectApiTest extends IntegrationTest {
   private UserRepository userRepository;
   @Resource
   private ObjectMapper objectMapper;
+  @MockBean
+  private JavaMailSender javaMailSender;
 
   @BeforeAll
   void beforeAll() {
@@ -373,6 +384,11 @@ class InjectApiTest extends IntegrationTest {
         "my-awesome-file.xls",
         "application/xlsx",
         in.readAllBytes());
+
+    // Mock the behavior of JavaMailSender
+    doNothing().when(javaMailSender).send(ArgumentMatchers.any(SimpleMailMessage.class));
+    MimeMessage mimeMessage = mock(MimeMessage.class);
+    when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
 
     // -- EXECUTE --
     String response = mvc.perform(multipart(EXERCISE_URI + "/" + EXERCISE.getId() + "/inject")
