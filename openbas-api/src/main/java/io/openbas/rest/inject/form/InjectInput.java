@@ -3,6 +3,7 @@ package io.openbas.rest.inject.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.InjectDependency;
 import io.openbas.database.model.InjectorContract;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Setter
 @Getter
@@ -28,7 +30,7 @@ public class InjectInput {
     private ObjectNode content;
 
     @JsonProperty("inject_depends_on")
-    private String dependsOn;
+    private List<InjectDependencyInput> dependsOn = new ArrayList<>();
 
     @JsonProperty("inject_depends_duration")
     private Long dependsDuration;

@@ -64,15 +64,11 @@ public class InjectModelHelper {
   public static Instant computeInjectDate(
       Instant source,
       int speed,
-      Inject dependsOn,
       Long dependsDuration,
       Exercise exercise) {
     // Compute origin execution date
-    Optional<Inject> dependsOnInject = ofNullable(dependsOn);
     long duration = ofNullable(dependsDuration).orElse(0L) / speed;
-    Instant dependingStart = dependsOnInject
-        .map(inject -> inject.computeInjectDate(source, speed))
-        .orElse(source);
+    Instant dependingStart = source;
     Instant standardExecutionDate = dependingStart.plusSeconds(duration);
     // Compute execution dates with previous terminated pauses
     long previousPauseDelay = 0L;
@@ -99,7 +95,6 @@ public class InjectModelHelper {
   public static Optional<Instant> getDate(
       Exercise exercise,
       Scenario scenario,
-      Inject dependsOn,
       Long dependsDuration
   ) {
     if (exercise == null && scenario == null) {
@@ -116,7 +111,7 @@ public class InjectModelHelper {
       }
       return exercise
           .getStart()
-          .map(source -> computeInjectDate(source, SPEED_STANDARD, dependsOn, dependsDuration, exercise));
+          .map(source -> computeInjectDate(source, SPEED_STANDARD, dependsDuration, exercise));
     }
     return Optional.ofNullable(LocalDateTime.now().toInstant(ZoneOffset.UTC));
   }

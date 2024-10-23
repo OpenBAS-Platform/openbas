@@ -3,7 +3,7 @@ import { Box } from '@mui/material';
 import { FilterHelpers } from './FilterHelpers';
 import type { Filter, FilterGroup, PropertySchemaDTO } from '../../../../utils/api-types';
 import FilterChip from './FilterChip';
-import FilterModeChip from './FilterModeChip';
+import ClickableModeChip from '../../chips/ClickableModeChip';
 
 interface Props {
   propertySchemas: PropertySchemaDTO[];
@@ -48,7 +48,7 @@ const FilterChips: FunctionComponent<Props> = ({
         }
         return (
           <React.Fragment key={filter.key}>
-            {idx !== 0 && <FilterModeChip onClick={handleSwitchMode} mode={filterGroup?.mode} />}
+            {idx !== 0 && <ClickableModeChip onClick={handleSwitchMode} mode={filterGroup?.mode} />}
             <FilterChip
               filter={filter}
               helpers={helpers}

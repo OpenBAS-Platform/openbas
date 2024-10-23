@@ -1,8 +1,8 @@
 import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
-import { useFormatter } from '../../../i18n';
-import type { Theme } from '../../../Theme';
+import { useFormatter } from '../../i18n';
+import type { Theme } from '../../Theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   mode: {
@@ -24,10 +24,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   onClick?: () => void;
-  mode?: 'and' | 'or';
+  mode?: string;
 }
 
-const FilterModeChip: FunctionComponent<Props> = ({
+const ClickableModeChip: FunctionComponent<Props> = ({
   onClick,
   mode,
 }) => {
@@ -52,4 +52,4 @@ const FilterModeChip: FunctionComponent<Props> = ({
   );
 };
 
-export default FilterModeChip;
+export default ClickableModeChip;

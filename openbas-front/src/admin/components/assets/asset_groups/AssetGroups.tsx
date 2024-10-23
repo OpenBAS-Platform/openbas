@@ -25,7 +25,7 @@ import ExportButton from '../../../../components/common/ExportButton';
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
 import { Header } from '../../../../components/common/SortHeadersList';
-import FilterModeChip from '../../../../components/common/queryable/filter/FilterModeChip';
+import ClickableModeChip from '../../../../components/common/chips/ClickableModeChip';
 import FilterChipValues from '../../../../components/common/queryable/filter/FilterChipValues';
 
 const useStyles = makeStyles(() => ({
@@ -77,7 +77,7 @@ const computeRuleValues = (assetGroup: AssetGroupOutput, t: (value: string) => s
         <>
           {assetGroup.asset_group_dynamic_filter.filters.map((filter, idx) => (
             <React.Fragment key={filter.key}>
-              {idx !== 0 && <FilterModeChip mode={assetGroup.asset_group_dynamic_filter?.mode} />}
+              {idx !== 0 && <ClickableModeChip mode={assetGroup.asset_group_dynamic_filter?.mode} />}
               <Chip
                 key={filter.key}
                 variant={'filled'}
