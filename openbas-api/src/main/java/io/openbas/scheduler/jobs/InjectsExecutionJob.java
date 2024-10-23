@@ -229,13 +229,22 @@ public class InjectsExecutionJob implements Job {
     }
 
     private void setInjectStatusWhenNoInjectorContractExists(Inject inject) {
-        InjectStatus status = new InjectStatus();
-        status.getTraces().add(InjectStatusExecution.traceError("The inject has no injector contract"));
-        status.setName(ExecutionStatus.ERROR);
-        status.setTrackingSentDate(Instant.now());
-        status.setInject(inject);
-        status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
-        injectStatusRepository.save(status);
+        if (inject.getStatus().isEmpty()) {
+            InjectStatus status = new InjectStatus();
+            status.getTraces().add(InjectStatusExecution.traceError("Inject does not have a contract"));
+            status.setName(ExecutionStatus.ERROR);
+            status.setTrackingSentDate(Instant.now());
+            status.setInject(inject);
+            status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
+            injectStatusRepository.save(status);
+        } else {
+            InjectStatus status = inject.getStatus().get();
+            status.getTraces().add(InjectStatusExecution.traceError("Inject does not have a contract"));
+            status.setName(ExecutionStatus.ERROR);
+            status.setTrackingSentDate(Instant.now());
+            status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
+            injectStatusRepository.save(status);
+        }
     }
 
     public void updateExercise(String exerciseId) {
