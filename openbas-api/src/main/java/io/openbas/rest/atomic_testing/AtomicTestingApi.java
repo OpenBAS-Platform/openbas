@@ -1,5 +1,6 @@
 package io.openbas.rest.atomic_testing;
 
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.inject_expectation.InjectExpectationService;
@@ -31,6 +32,7 @@ public class AtomicTestingApi extends RestBehavior {
   private final AtomicTestingService atomicTestingService;
   private final InjectExpectationService injectExpectationService;
 
+  @LogExecutionTime
   @PostMapping("/search")
   @Transactional(readOnly = true)
   public Page<AtomicTestingOutput> findAllAtomicTestings(
@@ -38,6 +40,7 @@ public class AtomicTestingApi extends RestBehavior {
     return atomicTestingService.findAllAtomicTestings(searchPaginationInput);
   }
 
+  @LogExecutionTime
   @GetMapping("/{injectId}")
   public InjectResultDTO findAtomicTesting(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId);
@@ -89,6 +92,4 @@ public class AtomicTestingApi extends RestBehavior {
       @Valid @RequestBody final AtomicTestingUpdateTagsInput input) {
     return atomicTestingService.updateAtomicTestingTags(injectId, input);
   }
-
-
 }
