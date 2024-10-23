@@ -156,8 +156,11 @@ public class InjectsExecutionJob implements Job {
         Inject inject = executableInject.getInjection().getInject();
 
         // We are now checking if we depend on another inject and if it did not failed
-        Optional<List<String>> errorMessages = getErrorMessagesPreExecution(executableInject.getExercise().getId(), inject);
-        if (errorMessages.isPresent()) {
+        Optional<List<String>> errorMessages = null;
+        if(executableInject.getExercise() != null) {
+            errorMessages = getErrorMessagesPreExecution(executableInject.getExercise().getId(), inject);
+        }
+        if (errorMessages != null && errorMessages.isPresent()) {
             InjectStatus status = new InjectStatus();
             if (inject.getStatus().isEmpty()) {
                 status.setInject(inject);
