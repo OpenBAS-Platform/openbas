@@ -196,7 +196,6 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
         }
         return element;
       });
-
     setParents(newParents);
 
     const baseInjectDependency: InjectDependency = {
@@ -215,15 +214,12 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
         mode: 'and',
       },
     };
+    setParentConditions(getConditionContentParent([baseInjectDependency]));
 
     form.mutators.setValue(
       'inject_depends_on',
       [baseInjectDependency],
     );
-
-    if (newInject!.inject_depends_on !== null) {
-      setParentConditions(getConditionContentParent(injectDependencyFromDependency(newParents)));
-    }
   };
 
   /**
