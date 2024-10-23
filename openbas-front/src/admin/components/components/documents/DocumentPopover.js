@@ -164,7 +164,7 @@ const DocumentPopover = (props) => {
           </MenuItem>
         )}
         {!onRemoveDocument && (
-          <MenuItem onClick={handleOpenDelete}>
+          <MenuItem onClick={handleOpenDelete} disabled={!document.document_can_be_deleted}>
             {t('Delete')}
           </MenuItem>
         )}
