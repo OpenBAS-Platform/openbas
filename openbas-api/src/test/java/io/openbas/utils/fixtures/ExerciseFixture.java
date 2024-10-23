@@ -44,4 +44,5 @@ public class ExerciseFixture {
     exercise.setStart(Instant.now());
     return exercise;
   }
+
 }
