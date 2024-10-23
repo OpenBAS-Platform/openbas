@@ -19,7 +19,6 @@ import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-
 import type { Exercise, Inject } from '../../../../../utils/api-types';
 import { fetchExerciseInjects, updateInjectForExercise } from '../../../../../actions/Inject';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import Timeline from '../../../../../components/Timeline';
 import SearchFilter from '../../../../../components/SearchFilter';
@@ -27,6 +26,7 @@ import TagsFilter from '../../../common/filters/TagsFilter';
 import useSearchAnFilter from '../../../../../utils/SortingFiltering';
 import { isNotEmptyField } from '../../../../../utils/utils';
 import type { InjectStore } from '../../../../../actions/injects/Inject';
+import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -315,7 +315,6 @@ const TimelineOverview = () => {
           handleClose={() => setSelectedInjectId(null)}
           onUpdateInject={onUpdateInject}
           injectId={selectedInjectId}
-          teamsFromExerciseOrScenario={teams}
           isAtomic={false}
           injects={injects}
         />

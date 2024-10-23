@@ -59,8 +59,8 @@ export const teamContextForExercise = (exerciseId: ExerciseStore['exercise_id'],
         dispatch(enableExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: [userId] }));
       }
     },
-    searchTeams(input: SearchPaginationInput): Promise<{ data: Page<TeamOutput> }> {
-      return searchExerciseTeams(exerciseId, input);
+    searchTeams(input: SearchPaginationInput, contextualOnly?: boolean): Promise<{ data: Page<TeamOutput> }> {
+      return searchExerciseTeams(exerciseId, input, contextualOnly);
     },
   };
 };

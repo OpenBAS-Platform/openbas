@@ -4,9 +4,8 @@ import { putReferential, simplePostCall } from '../../utils/Action';
 import { EXERCISE_URI } from './exercise-action';
 import * as schema from '../Schema';
 
-// eslint-disable-next-line import/prefer-default-export
-export const searchExerciseTeams = (exerciseId: Scenario['scenario_id'], paginationInput: SearchPaginationInput) => {
-  const uri = `${EXERCISE_URI}/${exerciseId}/teams/search`;
+export const searchExerciseTeams = (exerciseId: Scenario['scenario_id'], paginationInput: SearchPaginationInput, contextualOnly: boolean = false) => {
+  const uri = `${EXERCISE_URI}/${exerciseId}/teams/search?contextualOnly=${contextualOnly}`;
   return simplePostCall(uri, paginationInput);
 };
 
