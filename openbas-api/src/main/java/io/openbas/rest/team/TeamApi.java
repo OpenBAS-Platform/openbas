@@ -83,7 +83,6 @@ public class TeamApi extends RestBehavior {
   @PostMapping("/api/teams/search")
   @PreAuthorize("isObserver()")
   @Transactional(readOnly = true)
-    @LogExecutionTime
   public Page<TeamOutput> searchTeams(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     final Specification<Team> teamSpecification = contextual(false);
     return this.teamService.teamPagination(searchPaginationInput, teamSpecification);
@@ -92,7 +91,7 @@ public class TeamApi extends RestBehavior {
   @PostMapping("/api/teams/find")
   @PreAuthorize("isObserver()")
   @Transactional(readOnly = true)
-    @LogExecutionTime
+  @LogExecutionTime
   public List<TeamOutput> findTeams(@RequestBody @Valid @NotNull final List<String> teamIds) {
     return this.teamService.find(fromIds(teamIds));
   }
