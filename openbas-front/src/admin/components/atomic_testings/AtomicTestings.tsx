@@ -14,6 +14,8 @@ import { useQueryableWithLocalStorage } from '../../../components/common/queryab
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import { initSorting } from '../../../components/common/queryable/Page';
 import ButtonCreate from '../../../components/common/ButtonCreate';
+import teamContextForAtomicTesting from './atomic_testing/context/TeamContextForAtomicTesting';
+import { TeamContext } from '../common/Context';
 
 // eslint-disable-next-line consistent-return
 const AtomicTestings = () => {
@@ -76,13 +78,15 @@ const AtomicTestings = () => {
       />
       {userAdmin && (<>
         <ButtonCreate onClick={() => setOpenCreateDrawer(true)} />
-        <CreateInject
-          title={t('Create a new atomic test')}
-          onCreateInject={onCreateAtomicTesting}
-          isAtomic
-          open={openCreateDrawer}
-          handleClose={() => setOpenCreateDrawer(false)}
-        />
+        <TeamContext.Provider value={teamContextForAtomicTesting()}>
+          <CreateInject
+            title={t('Create a new atomic test')}
+            onCreateInject={onCreateAtomicTesting}
+            isAtomic
+            open={openCreateDrawer}
+            handleClose={() => setOpenCreateDrawer(false)}
+          />
+        </TeamContext.Provider>
       </>)
       }
     </>

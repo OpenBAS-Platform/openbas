@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
+import static io.openbas.utils.JpaUtils.createLeftJoin;
 
 public class TeamQueryHelper {
 
@@ -29,6 +30,7 @@ public class TeamQueryHelper {
     // Array aggregations
     Expression<String[]> tagIdsExpression = createJoinArrayAggOnId(cb, teamRoot, "tags");
     Expression<String[]> userIdsExpression = createJoinArrayAggOnId(cb, teamRoot, "users");
+    Expression<String[]> organizationIdExpression = createLeftJoin(teamRoot, "organization").get("id");
 
     // Multiselect
     cq.multiselect(
@@ -38,7 +40,8 @@ public class TeamQueryHelper {
         teamRoot.get("contextual").alias("team_contextual"),
         teamRoot.get("updatedAt").alias("team_updated_at"),
         tagIdsExpression.alias("team_tags"),
-        userIdsExpression.alias("team_users")
+        userIdsExpression.alias("team_users"),
+        organizationIdExpression.alias("team_organization")
     ).distinct(true);
 
     // Group by
@@ -60,6 +63,7 @@ public class TeamQueryHelper {
             .updatedAt(tuple.get("team_updated_at", Instant.class))
             .tags(Arrays.stream(tuple.get("team_tags", String[].class)).collect(Collectors.toSet()))
             .users(Arrays.stream(tuple.get("team_users", String[].class)).collect(Collectors.toSet()))
+            .organization(tuple.get("team_organization", String.class))
             .build())
         .toList();
   }

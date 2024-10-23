@@ -357,8 +357,6 @@ class InjectDefinition extends Component {
       challengesIds: props.inject.inject_content?.challenges || [],
       documents: props.inject.inject_documents || [],
       expectations: props.inject.inject_content?.expectations || [],
-      teamsSortBy: 'team_name',
-      teamsOrderAsc: true,
       documentsSortBy: 'document_name',
       documentsOrderAsc: true,
       articlesSortBy: 'article_name',
@@ -964,14 +962,12 @@ class InjectDefinition extends Component {
       submitting,
       inject,
       injectorContract,
-      teamsMap,
       endpointsMap,
       assetGroupsMap,
       documentsMap,
       articlesMap,
       channelsMap,
       challengesMap,
-      teamsFromExerciseOrScenario,
       articlesFromExerciseOrScenario,
       isAtomic,
     } = this.props;
@@ -985,8 +981,6 @@ class InjectDefinition extends Component {
       assetGroupIds,
       documents,
       expectations,
-      teamsSortBy,
-      teamsOrderAsc,
       documentsSortBy,
       documentsOrderAsc,
       articlesOrderAsc,
@@ -998,18 +992,6 @@ class InjectDefinition extends Component {
       openVariables,
     } = this.state;
     // -- TEAMS --
-    const teams = teamsIds
-      .map((a) => teamsMap[a])
-      .filter((a) => a !== undefined);
-    const sortTeams = R.sortWith(
-      teamsOrderAsc
-        ? [R.ascend(R.prop(teamsSortBy))]
-        : [R.descend(R.prop(teamsSortBy))],
-    );
-    const sortedTeams = sortTeams(teams.map((n) => ({
-      team_users_enabled_number: this.props.teamsUsers.filter((o) => o.team_id === n.team_id).length,
-      ...n,
-    })));
     const fieldTeams = injectorContract.fields.filter((n) => n.key === 'teams').at(0);
     const hasTeams = injectorContract.fields
       .map((f) => f.key)
@@ -1169,11 +1151,10 @@ class InjectDefinition extends Component {
                 ) : (
                   <>
                     <InjectTeamsList
-                      teams={sortedTeams}
+                      teamIds={teamsIds}
                       handleRemoveTeam={this.handleRemoveTeam.bind(this)}
                     />
                     <InjectAddTeams
-                      teams={teamsFromExerciseOrScenario}
                       injectTeamsIds={teamsIds}
                       handleAddTeams={this.handleAddTeams.bind(this)}
                     />
@@ -1559,7 +1540,6 @@ InjectDefinition.propTypes = {
   injectorContract: PropTypes.object,
   fetchDocuments: PropTypes.func,
   tagsMap: PropTypes.object,
-  teamsFromExerciseOrScenario: PropTypes.array,
   articlesFromExerciseOrScenario: PropTypes.array,
   variablesFromExerciseOrScenario: PropTypes.array,
   permissions: PropTypes.object,
@@ -1575,7 +1555,6 @@ InjectDefinition.propTypes = {
 const select = (state) => {
   const helper = storeHelper(state);
   const documentsMap = helper.getDocumentsMap();
-  const teamsMap = helper.getTeamsMap();
   const endpointsMap = helper.getEndpointsMap();
   const assetGroupsMap = helper.getAssetGroupMaps();
   const channelsMap = helper.getChannelsMap();
@@ -1583,7 +1562,6 @@ const select = (state) => {
   const challengesMap = helper.getChallengesMap();
   return {
     documentsMap,
-    teamsMap,
     endpointsMap,
     assetGroupsMap,
     articlesMap,

@@ -65,8 +65,8 @@ export const teamContextForScenario = (scenarioId: ScenarioStore['scenario_id'],
         dispatch(enableScenarioTeamPlayers(scenarioId, teamId, { scenario_team_players: [userId] }));
       }
     },
-    searchTeams(input: SearchPaginationInput): Promise<{ data: Page<TeamOutput> }> {
-      return searchScenarioTeams(scenarioId, input);
+    searchTeams(input: SearchPaginationInput, contextualOnly?: boolean): Promise<{ data: Page<TeamOutput> }> {
+      return searchScenarioTeams(scenarioId, input, contextualOnly);
     },
   };
 };

@@ -9,7 +9,6 @@ import InjectDefinition from './InjectDefinition';
 import { PermissionsContext } from '../Context';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { fetchTeams } from '../../../../actions/teams/team-actions';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../../actions/Tag';
 import InjectForm from './InjectForm';
@@ -58,7 +57,6 @@ const UpdateInjectDetails = ({
   onUpdateInject,
   isAtomic = false,
   drawerRef,
-  teamsFromExerciseOrScenario,
   ...props
 }) => {
   const { t, tPick } = useFormatter();
@@ -71,7 +69,6 @@ const UpdateInjectDetails = ({
     tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
-    dispatch(fetchTeams());
     dispatch(fetchTags());
   });
 
@@ -355,7 +352,6 @@ const UpdateInjectDetails = ({
                       handleClose={handleClose}
                       tagsMap={tagsMap}
                       permissions={permissions}
-                      teamsFromExerciseOrScenario={teamsFromExerciseOrScenario}
                       articlesFromExerciseOrScenario={[]}
                       variablesFromExerciseOrScenario={[]}
                       onUpdateInject={onUpdateInject}
