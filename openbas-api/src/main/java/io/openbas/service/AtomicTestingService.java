@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawAsset;
 import io.openbas.database.raw.RawAssetGroup;
@@ -75,6 +76,7 @@ public class AtomicTestingService {
     private final TeamRepository teamRepository;
     private final TagRepository tagRepository;
     private final DocumentRepository documentRepository;
+    private final AssetGroupService assetGroupService;
     private ApplicationContext context;
 
     private static final String PRE_DEFINE_EXPECTATIONS = "predefinedExpectations";
@@ -90,6 +92,12 @@ public class AtomicTestingService {
 
     public InjectResultDTO findById(String injectId) {
         Optional<Inject> inject = injectRepository.findWithStatusById(injectId);
+
+        if(inject.isPresent()) {
+            List<AssetGroup> computedAssetGroup = inject.get().getAssetGroups().stream().map(assetGroupService::computeDynamicAssets).toList();
+            inject.get().getAssetGroups().clear();
+            inject.get().getAssetGroups().addAll(computedAssetGroup);
+        }
         InjectResultDTO result = inject
                 .map(AtomicTestingMapper::toDtoWithTargetResults)
                 .orElseThrow(ElementNotFoundException::new);
