@@ -73,6 +73,7 @@ public class Payload implements Base {
   @Type(StringArrayType.class)
   @Column(name = "payload_platforms", columnDefinition = "text[]")
   @JsonProperty("payload_platforms")
+  @Enumerated(EnumType.STRING)
   private PLATFORM_TYPE[] platforms = new PLATFORM_TYPE[0];
 
   @Setter

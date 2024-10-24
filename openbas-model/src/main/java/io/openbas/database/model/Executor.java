@@ -39,6 +39,7 @@ public class Executor implements Base {
     @NotBlank
     private String type;
 
+    @Getter
     @Type(StringArrayType.class)
     @Column(name = "executor_platforms", columnDefinition = "text[]")
     @JsonProperty("executor_platforms")
