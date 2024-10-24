@@ -26,7 +26,7 @@ steps:
       - apk --no-cache add git
       - yarn -v
       - node -v
-      - corepack enabled
+      - corepack enable
       - yarn install --immutable
       - yarn install
       - yarn build
