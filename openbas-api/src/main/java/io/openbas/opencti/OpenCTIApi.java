@@ -1,5 +1,7 @@
 package io.openbas.opencti;
 
+import static io.openbas.database.model.User.ROLE_USER;
+
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.service.ScenarioService;
@@ -15,8 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import static io.openbas.database.model.User.ROLE_USER;
-
 @RequiredArgsConstructor
 @RestController
 @Secured(ROLE_USER)
@@ -26,18 +26,24 @@ public class OpenCTIApi {
 
   private final ScenarioService scenarioService;
 
-  @Operation(summary = "Retrieve the latest exercise by external reference ID (example: a report ID")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Found the exercise",
-          content = {
-              @Content(mediaType = "application/json", schema = @Schema(implementation = ExerciseSimple.class))
-          }),
-      @ApiResponse(responseCode = "404", description = "Exercise not found", content = @Content)
-  })
+  @Operation(
+      summary = "Retrieve the latest exercise by external reference ID (example: a report ID")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Found the exercise",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ExerciseSimple.class))
+            }),
+        @ApiResponse(responseCode = "404", description = "Exercise not found", content = @Content)
+      })
   @LogExecutionTime
   @GetMapping(OPENCTI_URI + "/exercises/latest/{externalReferenceId}")
-  public ExerciseSimple latestExerciseByExternalReference(@PathVariable @NotBlank final String externalReferenceId) {
+  public ExerciseSimple latestExerciseByExternalReference(
+      @PathVariable @NotBlank final String externalReferenceId) {
     return scenarioService.latestExerciseByExternalReference(externalReferenceId);
   }
-
 }

@@ -1,5 +1,7 @@
 package io.openbas.rest.exercise.form;
 
+import static java.time.Instant.now;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -12,16 +14,13 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static java.time.Instant.now;
+import lombok.Getter;
+import lombok.Setter;
 
 @Setter
 @Getter
@@ -55,11 +54,11 @@ public class ExerciseSimple {
   @JsonProperty("exercise_tags")
   private Set<Tag> tags = new HashSet<>();
 
-  @JsonIgnore
-  private String[] injectIds;
+  @JsonIgnore private String[] injectIds;
 
   @JsonProperty("exercise_global_score")
-  private List<AtomicTestingMapper.ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
+  private List<AtomicTestingMapper.ExpectationResultsByType> expectationResultByTypes =
+      new ArrayList<>();
 
   @JsonProperty("exercise_targets")
   @NotNull

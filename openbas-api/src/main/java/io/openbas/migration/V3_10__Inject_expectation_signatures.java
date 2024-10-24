@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V3_10__Inject_expectation_signatures extends BaseJavaMigration {
@@ -15,6 +14,7 @@ public class V3_10__Inject_expectation_signatures extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     // Migration the data
-    select.execute("ALTER TABLE injects_expectations ADD COLUMN inject_expectation_signatures json;");
+    select.execute(
+        "ALTER TABLE injects_expectations ADD COLUMN inject_expectation_signatures json;");
   }
 }

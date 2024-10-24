@@ -1,5 +1,13 @@
 package io.openbas.rest.document;
 
+import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.specification.DocumentSpecification.findGrantedFor;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.*;
@@ -18,6 +26,11 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -31,21 +44,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
-
-import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.specification.DocumentSpecification.findGrantedFor;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
-
 
 @RestController
 public class DocumentApi extends RestBehavior {
@@ -134,8 +132,10 @@ public class DocumentApi extends RestBehavior {
 
   @PostMapping("/api/documents")
   @Transactional(rollbackOn = Exception.class)
-  public Document uploadDocument(@Valid @RequestPart("input") DocumentCreateInput input,
-      @RequestPart("file") MultipartFile file) throws Exception {
+  public Document uploadDocument(
+      @Valid @RequestPart("input") DocumentCreateInput input,
+      @RequestPart("file") MultipartFile file)
+      throws Exception {
     String extension = FilenameUtils.getExtension(file.getOriginalFilename());
     String fileTarget = DigestUtils.md5Hex(file.getInputStream()) + "." + extension;
     Optional<Document> targetDocument = documentRepository.findByTarget(fileTarget);
@@ -144,14 +144,16 @@ public class DocumentApi extends RestBehavior {
       // Compute exercises
       if (!document.getExercises().isEmpty()) {
         Set<Exercise> exercises = new HashSet<>(document.getExercises());
-        List<Exercise> inputExercises = fromIterable(exerciseRepository.findAllById(input.getExerciseIds()));
+        List<Exercise> inputExercises =
+            fromIterable(exerciseRepository.findAllById(input.getExerciseIds()));
         exercises.addAll(inputExercises);
         document.setExercises(exercises);
       }
       // Compute scenarios
       if (!document.getScenarios().isEmpty()) {
         Set<Scenario> scenarios = new HashSet<>(document.getScenarios());
-        List<Scenario> inputScenarios = fromIterable(scenarioRepository.findAllById(input.getScenarioIds()));
+        List<Scenario> inputScenarios =
+            fromIterable(scenarioRepository.findAllById(input.getScenarioIds()));
         scenarios.addAll(inputScenarios);
         document.setScenarios(scenarios);
       }
@@ -168,10 +170,12 @@ public class DocumentApi extends RestBehavior {
       document.setName(file.getOriginalFilename());
       document.setDescription(input.getDescription());
       if (!input.getExerciseIds().isEmpty()) {
-        document.setExercises(iterableToSet(exerciseRepository.findAllById(input.getExerciseIds())));
+        document.setExercises(
+            iterableToSet(exerciseRepository.findAllById(input.getExerciseIds())));
       }
       if (!input.getScenarioIds().isEmpty()) {
-        document.setScenarios(iterableToSet(scenarioRepository.findAllById(input.getScenarioIds())));
+        document.setScenarios(
+            iterableToSet(scenarioRepository.findAllById(input.getScenarioIds())));
       }
       document.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
       document.setType(file.getContentType());
@@ -181,8 +185,10 @@ public class DocumentApi extends RestBehavior {
 
   @PostMapping("/api/documents/upsert")
   @Transactional(rollbackOn = Exception.class)
-  public Document upsertDocument(@Valid @RequestPart("input") DocumentCreateInput input,
-      @RequestPart("file") MultipartFile file) throws Exception {
+  public Document upsertDocument(
+      @Valid @RequestPart("input") DocumentCreateInput input,
+      @RequestPart("file") MultipartFile file)
+      throws Exception {
     String extension = FilenameUtils.getExtension(file.getOriginalFilename());
     String fileTarget = DigestUtils.md5Hex(file.getInputStream()) + "." + extension;
     Optional<Document> targetDocument = documentRepository.findByTarget(fileTarget);
@@ -192,14 +198,16 @@ public class DocumentApi extends RestBehavior {
       // Compute exercises
       if (!document.getExercises().isEmpty()) {
         Set<Exercise> exercises = new HashSet<>(document.getExercises());
-        List<Exercise> inputExercises = fromIterable(exerciseRepository.findAllById(input.getExerciseIds()));
+        List<Exercise> inputExercises =
+            fromIterable(exerciseRepository.findAllById(input.getExerciseIds()));
         exercises.addAll(inputExercises);
         document.setExercises(exercises);
       }
       // Compute scenarios
       if (!document.getScenarios().isEmpty()) {
         Set<Scenario> scenarios = new HashSet<>(document.getScenarios());
-        List<Scenario> inputScenarios = fromIterable(scenarioRepository.findAllById(input.getScenarioIds()));
+        List<Scenario> inputScenarios =
+            fromIterable(scenarioRepository.findAllById(input.getScenarioIds()));
         scenarios.addAll(inputScenarios);
         document.setScenarios(scenarios);
       }
@@ -210,7 +218,8 @@ public class DocumentApi extends RestBehavior {
       document.setTags(tags);
       return documentRepository.save(document);
     } else {
-      Optional<Document> existingDocument = documentRepository.findByName(file.getOriginalFilename());
+      Optional<Document> existingDocument =
+          documentRepository.findByName(file.getOriginalFilename());
       if (existingDocument.isPresent()) {
         Document document = existingDocument.get();
         // Update doc
@@ -220,14 +229,16 @@ public class DocumentApi extends RestBehavior {
         // Compute exercises
         if (!document.getExercises().isEmpty()) {
           Set<Exercise> exercises = new HashSet<>(document.getExercises());
-          List<Exercise> inputExercises = fromIterable(exerciseRepository.findAllById(input.getExerciseIds()));
+          List<Exercise> inputExercises =
+              fromIterable(exerciseRepository.findAllById(input.getExerciseIds()));
           exercises.addAll(inputExercises);
           document.setExercises(exercises);
         }
         // Compute scenarios
         if (!document.getScenarios().isEmpty()) {
           Set<Scenario> scenarios = new HashSet<>(document.getScenarios());
-          List<Scenario> inputScenarios = fromIterable(scenarioRepository.findAllById(input.getScenarioIds()));
+          List<Scenario> inputScenarios =
+              fromIterable(scenarioRepository.findAllById(input.getScenarioIds()));
           scenarios.addAll(inputScenarios);
           document.setScenarios(scenarios);
         }
@@ -244,10 +255,12 @@ public class DocumentApi extends RestBehavior {
         document.setName(file.getOriginalFilename());
         document.setDescription(input.getDescription());
         if (!input.getExerciseIds().isEmpty()) {
-          document.setExercises(iterableToSet(exerciseRepository.findAllById(input.getExerciseIds())));
+          document.setExercises(
+              iterableToSet(exerciseRepository.findAllById(input.getExerciseIds())));
         }
         if (!input.getScenarioIds().isEmpty()) {
-          document.setScenarios(iterableToSet(scenarioRepository.findAllById(input.getScenarioIds())));
+          document.setScenarios(
+              iterableToSet(scenarioRepository.findAllById(input.getScenarioIds())));
         }
         document.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         document.setType(file.getContentType());
@@ -273,28 +286,31 @@ public class DocumentApi extends RestBehavior {
     List<Document> securityPlatformLogos = securityPlatformRepository.securityPlatformLogo();
     if (user.isAdmin()) {
       return buildPaginationJPA(
-          (Specification<Document> specification, Pageable pageable) -> this.documentRepository.findAll(
-              specification, pageable),
-          searchPaginationInput,
-          Document.class
-      ).map((document) -> {
-        var rawPaginationDocument = new RawPaginationDocument(document);
-        rawPaginationDocument.setDocument_can_be_deleted(!securityPlatformLogos.contains(document));
-        return rawPaginationDocument;
-      });
+              (Specification<Document> specification, Pageable pageable) ->
+                  this.documentRepository.findAll(specification, pageable),
+              searchPaginationInput,
+              Document.class)
+          .map(
+              (document) -> {
+                var rawPaginationDocument = new RawPaginationDocument(document);
+                rawPaginationDocument.setDocument_can_be_deleted(
+                    !securityPlatformLogos.contains(document));
+                return rawPaginationDocument;
+              });
     } else {
       return buildPaginationJPA(
-          (Specification<Document> specification, Pageable pageable) -> this.documentRepository.findAll(
-              findGrantedFor(user.getId()).and(specification),
-              pageable
-          ),
-          searchPaginationInput,
-          Document.class
-      ).map((document) -> {
-        var rawPaginationDocument = new RawPaginationDocument(document);
-        rawPaginationDocument.setDocument_can_be_deleted(!securityPlatformLogos.contains(document));
-        return rawPaginationDocument;
-      });
+              (Specification<Document> specification, Pageable pageable) ->
+                  this.documentRepository.findAll(
+                      findGrantedFor(user.getId()).and(specification), pageable),
+              searchPaginationInput,
+              Document.class)
+          .map(
+              (document) -> {
+                var rawPaginationDocument = new RawPaginationDocument(document);
+                rawPaginationDocument.setDocument_can_be_deleted(
+                    !securityPlatformLogos.contains(document));
+                return rawPaginationDocument;
+              });
     }
   }
 
@@ -310,7 +326,8 @@ public class DocumentApi extends RestBehavior {
   }
 
   @PutMapping("/api/documents/{documentId}/tags")
-  public Document documentTags(@PathVariable String documentId, @RequestBody DocumentTagUpdateInput input) {
+  public Document documentTags(
+      @PathVariable String documentId, @RequestBody DocumentTagUpdateInput input) {
     Document document = resolveDocument(documentId).orElseThrow(ElementNotFoundException::new);
     document.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     return documentRepository.save(document);
@@ -318,56 +335,75 @@ public class DocumentApi extends RestBehavior {
 
   @Transactional(rollbackOn = Exception.class)
   @PutMapping("/api/documents/{documentId}")
-  public Document updateDocumentInformation(@PathVariable String documentId,
-      @Valid @RequestBody DocumentUpdateInput input) {
+  public Document updateDocumentInformation(
+      @PathVariable String documentId, @Valid @RequestBody DocumentUpdateInput input) {
     Document document = resolveDocument(documentId).orElseThrow(ElementNotFoundException::new);
     document.setUpdateAttributes(input);
     document.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
 
     // Get removed exercises
-    Stream<String> askExerciseIdsStream = document.getExercises()
-        .stream()
-        .filter(exercise -> !exercise.isUserHasAccess(
-            userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new)))
-        .map(Exercise::getId);
-    List<String> askExerciseIds = Stream.concat(askExerciseIdsStream, input.getExerciseIds().stream()).distinct()
-        .toList();
-    List<Exercise> removedExercises = document.getExercises().stream()
-        .filter(exercise -> !askExerciseIds.contains(exercise.getId())).toList();
+    Stream<String> askExerciseIdsStream =
+        document.getExercises().stream()
+            .filter(
+                exercise ->
+                    !exercise.isUserHasAccess(
+                        userRepository
+                            .findById(currentUser().getId())
+                            .orElseThrow(ElementNotFoundException::new)))
+            .map(Exercise::getId);
+    List<String> askExerciseIds =
+        Stream.concat(askExerciseIdsStream, input.getExerciseIds().stream()).distinct().toList();
+    List<Exercise> removedExercises =
+        document.getExercises().stream()
+            .filter(exercise -> !askExerciseIds.contains(exercise.getId()))
+            .toList();
     document.setExercises(iterableToSet(exerciseRepository.findAllById(askExerciseIds)));
     // In case of exercise removal, all inject doc attachment for exercise
-    removedExercises.forEach(exercise -> injectService.cleanInjectsDocExercise(exercise.getId(), documentId));
+    removedExercises.forEach(
+        exercise -> injectService.cleanInjectsDocExercise(exercise.getId(), documentId));
 
     // Get removed scenarios
-    Stream<String> askScenarioIdsStream = document.getScenarios().stream()
-        .filter(scenario -> !scenario.isUserHasAccess(
-            userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new)))
-        .map(Scenario::getId);
-    List<String> askScenarioIds = Stream.concat(askScenarioIdsStream, input.getScenarioIds().stream()).distinct()
-        .toList();
-    List<Scenario> removedScenarios = document.getScenarios().stream()
-        .filter(scenario -> !askScenarioIds.contains(scenario.getId())).toList();
+    Stream<String> askScenarioIdsStream =
+        document.getScenarios().stream()
+            .filter(
+                scenario ->
+                    !scenario.isUserHasAccess(
+                        userRepository
+                            .findById(currentUser().getId())
+                            .orElseThrow(ElementNotFoundException::new)))
+            .map(Scenario::getId);
+    List<String> askScenarioIds =
+        Stream.concat(askScenarioIdsStream, input.getScenarioIds().stream()).distinct().toList();
+    List<Scenario> removedScenarios =
+        document.getScenarios().stream()
+            .filter(scenario -> !askScenarioIds.contains(scenario.getId()))
+            .toList();
     document.setScenarios(iterableToSet(scenarioRepository.findAllById(askScenarioIds)));
     // In case of scenario removal, all inject doc attachment for scenario
-    removedScenarios.forEach(scenario -> injectService.cleanInjectsDocScenario(scenario.getId(), documentId));
+    removedScenarios.forEach(
+        scenario -> injectService.cleanInjectsDocScenario(scenario.getId(), documentId));
 
     // Save and return
     return documentRepository.save(document);
   }
 
   @GetMapping("/api/documents/{documentId}/file")
-  public void downloadDocument(@PathVariable String documentId, HttpServletResponse response) throws IOException {
+  public void downloadDocument(@PathVariable String documentId, HttpServletResponse response)
+      throws IOException {
     Document document = resolveDocument(documentId).orElseThrow(ElementNotFoundException::new);
-    response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
+    response.addHeader(
+        HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
     response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
     response.setStatus(HttpServletResponse.SC_OK);
-    try (InputStream fileStream = fileService.getFile(document).orElseThrow(ElementNotFoundException::new)) {
+    try (InputStream fileStream =
+        fileService.getFile(document).orElseThrow(ElementNotFoundException::new)) {
       fileStream.transferTo(response.getOutputStream());
     }
   }
 
   @GetMapping(value = "/api/images/injectors/{injectorType}", produces = MediaType.IMAGE_PNG_VALUE)
-  public @ResponseBody ResponseEntity<byte[]> getInjectorImage(@PathVariable String injectorType) throws IOException {
+  public @ResponseBody ResponseEntity<byte[]> getInjectorImage(@PathVariable String injectorType)
+      throws IOException {
     Optional<InputStream> fileStream = fileService.getInjectorImage(injectorType);
     if (fileStream.isPresent()) {
       return ResponseEntity.ok()
@@ -378,9 +414,10 @@ public class DocumentApi extends RestBehavior {
   }
 
   @GetMapping(value = "/api/images/injectors/id/{injectorId}", produces = MediaType.IMAGE_PNG_VALUE)
-  public @ResponseBody ResponseEntity<byte[]> getInjectorImageFromId(@PathVariable String injectorId)
-      throws IOException {
-    Injector injector = this.injectorRepository.findById(injectorId).orElseThrow(ElementNotFoundException::new);
+  public @ResponseBody ResponseEntity<byte[]> getInjectorImageFromId(
+      @PathVariable String injectorId) throws IOException {
+    Injector injector =
+        this.injectorRepository.findById(injectorId).orElseThrow(ElementNotFoundException::new);
     Optional<InputStream> fileStream = fileService.getInjectorImage(injector.getType());
     if (fileStream.isPresent()) {
       return ResponseEntity.ok()
@@ -390,8 +427,11 @@ public class DocumentApi extends RestBehavior {
     return null;
   }
 
-  @GetMapping(value = "/api/images/collectors/{collectorType}", produces = MediaType.IMAGE_PNG_VALUE)
-  public @ResponseBody ResponseEntity<byte[]> getCollectorImage(@PathVariable String collectorType) throws IOException {
+  @GetMapping(
+      value = "/api/images/collectors/{collectorType}",
+      produces = MediaType.IMAGE_PNG_VALUE)
+  public @ResponseBody ResponseEntity<byte[]> getCollectorImage(@PathVariable String collectorType)
+      throws IOException {
     Optional<InputStream> fileStream = fileService.getCollectorImage(collectorType);
     if (fileStream.isPresent()) {
       return ResponseEntity.ok()
@@ -401,21 +441,25 @@ public class DocumentApi extends RestBehavior {
     return null;
   }
 
-  public void downloadCollectorImage(@PathVariable String collectorType, HttpServletResponse response)
-      throws IOException {
-    response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + collectorType + ".png");
+  public void downloadCollectorImage(
+      @PathVariable String collectorType, HttpServletResponse response) throws IOException {
+    response.addHeader(
+        HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + collectorType + ".png");
     response.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_PNG_VALUE);
     response.setStatus(HttpServletResponse.SC_OK);
-    try (InputStream fileStream = fileService.getCollectorImage(collectorType)
-        .orElseThrow(ElementNotFoundException::new)) {
+    try (InputStream fileStream =
+        fileService.getCollectorImage(collectorType).orElseThrow(ElementNotFoundException::new)) {
       fileStream.transferTo(response.getOutputStream());
     }
   }
 
-  @GetMapping(value = "/api/images/collectors/id/{collectorId}", produces = MediaType.IMAGE_PNG_VALUE)
-  public @ResponseBody ResponseEntity<byte[]> getCollectorImageFromId(@PathVariable String collectorId)
-      throws IOException {
-    Collector collector = this.collectorRepository.findById(collectorId).orElseThrow(ElementNotFoundException::new);
+  @GetMapping(
+      value = "/api/images/collectors/id/{collectorId}",
+      produces = MediaType.IMAGE_PNG_VALUE)
+  public @ResponseBody ResponseEntity<byte[]> getCollectorImageFromId(
+      @PathVariable String collectorId) throws IOException {
+    Collector collector =
+        this.collectorRepository.findById(collectorId).orElseThrow(ElementNotFoundException::new);
     Optional<InputStream> fileStream = fileService.getCollectorImage(collector.getType());
     if (fileStream.isPresent()) {
       return ResponseEntity.ok()
@@ -426,10 +470,13 @@ public class DocumentApi extends RestBehavior {
   }
 
   @GetMapping(value = "/api/images/security_platforms/id/{assetId}/{theme}")
-  public void getSecurityPlatformImageFromId(@PathVariable String assetId, @PathVariable String theme,
-      HttpServletResponse response) throws IOException {
-    SecurityPlatform securityPlatform = this.securityPlatformRepository.findById(assetId)
-        .orElseThrow(ElementNotFoundException::new);
+  public void getSecurityPlatformImageFromId(
+      @PathVariable String assetId, @PathVariable String theme, HttpServletResponse response)
+      throws IOException {
+    SecurityPlatform securityPlatform =
+        this.securityPlatformRepository
+            .findById(assetId)
+            .orElseThrow(ElementNotFoundException::new);
     if (theme.equals("dark") && securityPlatform.getLogoDark() != null) {
       downloadDocument(securityPlatform.getLogoDark().getId(), response);
     } else if (securityPlatform.getLogoLight() != null) {
@@ -440,7 +487,8 @@ public class DocumentApi extends RestBehavior {
   }
 
   @GetMapping(value = "/api/images/executors/{executorId}", produces = MediaType.IMAGE_PNG_VALUE)
-  public @ResponseBody ResponseEntity<byte[]> getExecutorImage(@PathVariable String executorId) throws IOException {
+  public @ResponseBody ResponseEntity<byte[]> getExecutorImage(@PathVariable String executorId)
+      throws IOException {
     Optional<InputStream> fileStream = fileService.getExecutorImage(executorId);
     if (fileStream.isPresent()) {
       return ResponseEntity.ok()
@@ -463,28 +511,36 @@ public class DocumentApi extends RestBehavior {
   }
 
   private List<Document> getPlayerDocuments(List<Article> articles, List<Inject> injects) {
-    Stream<Document> channelsDocs = articles.stream()
-        .map(Article::getChannel)
-        .flatMap(channel -> channel.getLogos().stream());
-    Stream<Document> articlesDocs = articles.stream()
-        .flatMap(article -> article.getDocuments().stream());
-    List<String> challenges = injects.stream()
-        .filter(inject -> inject.getInjectorContract()
-            .map(contract -> contract.getId().equals(CHALLENGE_PUBLISH))
-            .orElse(false))
-        .filter(inject -> inject.getContent() != null)
-        .flatMap(inject -> {
-          try {
-            ChallengeContent content = mapper.treeToValue(inject.getContent(), ChallengeContent.class);
-            return content.getChallenges().stream();
-          } catch (JsonProcessingException e) {
-            return Stream.empty();
-          }
-        })
-        .toList();
-    Stream<Document> challengesDocs = fromIterable(challengeRepository.findAllById(challenges)).stream()
-        .flatMap(challenge -> challenge.getDocuments().stream());
-    return Stream.of(channelsDocs, articlesDocs, challengesDocs).flatMap(documentStream -> documentStream).distinct()
+    Stream<Document> channelsDocs =
+        articles.stream().map(Article::getChannel).flatMap(channel -> channel.getLogos().stream());
+    Stream<Document> articlesDocs =
+        articles.stream().flatMap(article -> article.getDocuments().stream());
+    List<String> challenges =
+        injects.stream()
+            .filter(
+                inject ->
+                    inject
+                        .getInjectorContract()
+                        .map(contract -> contract.getId().equals(CHALLENGE_PUBLISH))
+                        .orElse(false))
+            .filter(inject -> inject.getContent() != null)
+            .flatMap(
+                inject -> {
+                  try {
+                    ChallengeContent content =
+                        mapper.treeToValue(inject.getContent(), ChallengeContent.class);
+                    return content.getChallenges().stream();
+                  } catch (JsonProcessingException e) {
+                    return Stream.empty();
+                  }
+                })
+            .toList();
+    Stream<Document> challengesDocs =
+        fromIterable(challengeRepository.findAllById(challenges)).stream()
+            .flatMap(challenge -> challenge.getDocuments().stream());
+    return Stream.of(channelsDocs, articlesDocs, challengesDocs)
+        .flatMap(documentStream -> documentStream)
+        .distinct()
         .toList();
   }
 
@@ -493,20 +549,21 @@ public class DocumentApi extends RestBehavior {
   public void deleteDocument(@PathVariable String documentId) {
     injectDocumentRepository.deleteDocumentFromAllReferences(documentId);
     List<Document> documents = documentRepository.removeById(documentId);
-    documents.forEach(document -> {
-      try {
-        fileService.deleteFile(document.getTarget());
-      } catch (Exception e) {
-        // Fail no longer available in the storage.
-      }
-    });
+    documents.forEach(
+        document -> {
+          try {
+            fileService.deleteFile(document.getTarget());
+          } catch (Exception e) {
+            // Fail no longer available in the storage.
+          }
+        });
   }
 
   // -- EXERCISE & SENARIO--
 
   @GetMapping("/api/player/{exerciseOrScenarioId}/documents")
-  public List<Document> playerDocuments(@PathVariable String exerciseOrScenarioId,
-      @RequestParam Optional<String> userId) {
+  public List<Document> playerDocuments(
+      @PathVariable String exerciseOrScenarioId, @RequestParam Optional<String> userId) {
     Optional<Exercise> exerciseOpt = this.exerciseRepository.findById(exerciseOrScenarioId);
     Optional<Scenario> scenarioOpt = this.scenarioRepository.findById(exerciseOrScenarioId);
 
@@ -516,12 +573,14 @@ public class DocumentApi extends RestBehavior {
     }
 
     if (exerciseOpt.isPresent()) {
-      if (!exerciseOpt.get().isUserHasAccess(user) && !exerciseOpt.get().getUsers().contains(user)) {
+      if (!exerciseOpt.get().isUserHasAccess(user)
+          && !exerciseOpt.get().getUsers().contains(user)) {
         throw new UnsupportedOperationException("The given player is not in this exercise");
       }
       return getExercisePlayerDocuments(exerciseOpt.get());
     } else if (scenarioOpt.isPresent()) {
-      if (!scenarioOpt.get().isUserHasAccess(user) && !scenarioOpt.get().getUsers().contains(user)) {
+      if (!scenarioOpt.get().isUserHasAccess(user)
+          && !scenarioOpt.get().getUsers().contains(user)) {
         throw new UnsupportedOperationException("The given player is not in this exercise");
       }
       return getScenarioPlayerDocuments(scenarioOpt.get());
@@ -534,7 +593,9 @@ public class DocumentApi extends RestBehavior {
   public void downloadPlayerDocument(
       @PathVariable String exerciseOrScenarioId,
       @PathVariable String documentId,
-      @RequestParam Optional<String> userId, HttpServletResponse response) throws IOException {
+      @RequestParam Optional<String> userId,
+      HttpServletResponse response)
+      throws IOException {
     Optional<Exercise> exerciseOpt = this.exerciseRepository.findById(exerciseOrScenarioId);
     Optional<Scenario> scenarioOpt = this.scenarioRepository.findById(exerciseOrScenarioId);
 
@@ -545,33 +606,36 @@ public class DocumentApi extends RestBehavior {
 
     Document document = null;
     if (exerciseOpt.isPresent()) {
-      if (!exerciseOpt.get().isUserHasAccess(user) && !exerciseOpt.get().getUsers().contains(user)) {
+      if (!exerciseOpt.get().isUserHasAccess(user)
+          && !exerciseOpt.get().getUsers().contains(user)) {
         throw new UnsupportedOperationException("The given player is not in this exercise");
       }
-      document = getExercisePlayerDocuments(exerciseOpt.get())
-          .stream()
-          .filter(doc -> doc.getId().equals(documentId))
-          .findFirst()
-          .orElseThrow(ElementNotFoundException::new);
+      document =
+          getExercisePlayerDocuments(exerciseOpt.get()).stream()
+              .filter(doc -> doc.getId().equals(documentId))
+              .findFirst()
+              .orElseThrow(ElementNotFoundException::new);
     } else if (scenarioOpt.isPresent()) {
-      if (!scenarioOpt.get().isUserHasAccess(user) && !scenarioOpt.get().getUsers().contains(user)) {
+      if (!scenarioOpt.get().isUserHasAccess(user)
+          && !scenarioOpt.get().getUsers().contains(user)) {
         throw new UnsupportedOperationException("The given player is not in this exercise");
       }
-      document = getScenarioPlayerDocuments(scenarioOpt.get())
-          .stream()
-          .filter(doc -> doc.getId().equals(documentId))
-          .findFirst()
-          .orElseThrow(ElementNotFoundException::new);
+      document =
+          getScenarioPlayerDocuments(scenarioOpt.get()).stream()
+              .filter(doc -> doc.getId().equals(documentId))
+              .findFirst()
+              .orElseThrow(ElementNotFoundException::new);
     }
 
     if (document != null) {
-      response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
+      response.addHeader(
+          HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
       response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
       response.setStatus(HttpServletResponse.SC_OK);
-      try (InputStream fileStream = fileService.getFile(document).orElseThrow(ElementNotFoundException::new)) {
+      try (InputStream fileStream =
+          fileService.getFile(document).orElseThrow(ElementNotFoundException::new)) {
         fileStream.transferTo(response.getOutputStream());
       }
     }
   }
-
 }

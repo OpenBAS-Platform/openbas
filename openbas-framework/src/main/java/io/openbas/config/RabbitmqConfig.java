@@ -47,5 +47,4 @@ public class RabbitmqConfig {
 
   @Value("${openbas.rabbitmq.trust.store}")
   private Resource trustStore;
-
 }

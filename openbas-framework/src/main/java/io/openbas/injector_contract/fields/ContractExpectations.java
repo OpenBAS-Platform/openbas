@@ -1,15 +1,14 @@
 package io.openbas.injector_contract.fields;
 
+import static io.openbas.injector_contract.ContractCardinality.Multiple;
+
 import io.openbas.injector_contract.ContractType;
 import io.openbas.model.inject.form.Expectation;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-
 import java.util.List;
-
-import static io.openbas.injector_contract.ContractCardinality.Multiple;
+import lombok.Getter;
 
 @Getter
 public class ContractExpectations extends ContractCardinalityElement {
@@ -25,8 +24,7 @@ public class ContractExpectations extends ContractCardinalityElement {
   }
 
   public static ContractExpectations expectationsField(
-      @NotBlank final String key,
-      @NotBlank final String label) {
+      @NotBlank final String key, @NotBlank final String label) {
     return new ContractExpectations(key, label, List.of());
   }
 
@@ -41,5 +39,4 @@ public class ContractExpectations extends ContractCardinalityElement {
   public ContractType getType() {
     return ContractType.Expectation;
   }
-
 }

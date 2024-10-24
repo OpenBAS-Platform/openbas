@@ -1,5 +1,11 @@
 package io.openbas.rest.asset_group;
 
+import static io.openbas.database.criteria.GenericCriteria.countQuery;
+import static io.openbas.rest.asset_group.AssetGroupQueryHelper.execution;
+import static io.openbas.rest.asset_group.AssetGroupQueryHelper.select;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
+import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.rest.asset_group.form.AssetGroupOutput;
@@ -10,6 +16,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
@@ -18,31 +25,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
-import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.rest.asset_group.AssetGroupQueryHelper.execution;
-import static io.openbas.rest.asset_group.AssetGroupQueryHelper.select;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
-import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
-
 @RequiredArgsConstructor
 @Service
 public class AssetGroupCriteriaBuilderService {
 
-  @Resource
-  protected ObjectMapper mapper;
+  @Resource protected ObjectMapper mapper;
 
-  @PersistenceContext
-  private EntityManager entityManager;
+  @PersistenceContext private EntityManager entityManager;
 
   public Page<AssetGroupOutput> assetGroupPagination(
       @NotNull SearchPaginationInput searchPaginationInput) {
-    return buildPaginationCriteriaBuilder(
-        this::paginate,
-        searchPaginationInput,
-        AssetGroup.class
-    );
+    return buildPaginationCriteriaBuilder(this::paginate, searchPaginationInput, AssetGroup.class);
   }
 
   public List<AssetGroupOutput> find(Specification<AssetGroup> specification) {
@@ -102,5 +95,4 @@ public class AssetGroupCriteriaBuilderService {
 
     return new PageImpl<>(assetGroups, pageable, total);
   }
-
 }

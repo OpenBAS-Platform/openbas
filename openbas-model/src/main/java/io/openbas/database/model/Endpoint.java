@@ -86,9 +86,7 @@ public class Endpoint extends Asset {
   @JsonProperty("endpoint_mac_addresses")
   private String[] macAddresses;
 
-  public Endpoint() {
-
-  }
+  public Endpoint() {}
 
   public Endpoint(String id, String type, String name, PLATFORM_TYPE platform) {
     super(id, type, name);

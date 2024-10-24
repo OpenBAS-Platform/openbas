@@ -7,11 +7,10 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ChallengeResult {
-    @JsonProperty("result")
-    private Boolean result;
+  @JsonProperty("result")
+  private Boolean result;
 
-    public ChallengeResult(Boolean result) {
-        this.result = result;
-    }
-
+  public ChallengeResult(Boolean result) {
+    this.result = result;
+  }
 }

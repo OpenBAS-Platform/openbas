@@ -1,15 +1,14 @@
 package io.openbas.rest.scenario.form;
 
+import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Scenario.SEVERITY;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
+import lombok.Data;
 
 @Data
 public class ScenarioInput {
@@ -46,5 +45,4 @@ public class ScenarioInput {
 
   @JsonProperty("scenario_tags")
   private List<String> tagIds = new ArrayList<>();
-
 }

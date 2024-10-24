@@ -3,16 +3,13 @@ package io.openbas.utils;
 import io.openbas.database.model.Base;
 import io.openbas.database.model.Filters;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import java.util.function.UnaryOperator;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.function.UnaryOperator;
-
 public class CustomFilterUtils {
 
-  private CustomFilterUtils() {
-
-  }
+  private CustomFilterUtils() {}
 
   public static <T extends Base> UnaryOperator<Specification<T>> computeMode(
       @NotNull final SearchPaginationInput searchPaginationInput,
@@ -25,5 +22,4 @@ public class CustomFilterUtils {
       return (Specification<T> specification) -> specification;
     }
   }
-
 }

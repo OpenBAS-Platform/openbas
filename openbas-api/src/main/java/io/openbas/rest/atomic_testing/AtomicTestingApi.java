@@ -12,13 +12,12 @@ import io.openbas.service.AtomicTestingService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(AtomicTestingApi.ATOMIC_TESTING_URI)
@@ -63,8 +62,7 @@ public class AtomicTestingApi extends RestBehavior {
   }
 
   @DeleteMapping("/{injectId}")
-  public void deleteAtomicTesting(
-      @PathVariable @NotBlank final String injectId) {
+  public void deleteAtomicTesting(@PathVariable @NotBlank final String injectId) {
     atomicTestingService.deleteAtomicTesting(injectId);
   }
 
@@ -78,8 +76,9 @@ public class AtomicTestingApi extends RestBehavior {
       @PathVariable String injectId,
       @PathVariable String targetId,
       @PathVariable String targetType,
-      @RequestParam(required = false) String parentTargetId ) {
-    return injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(injectId, targetId, parentTargetId, targetType);
+      @RequestParam(required = false) String parentTargetId) {
+    return injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(
+        injectId, targetId, parentTargetId, targetType);
   }
 
   @PutMapping("/{injectId}/tags")
@@ -89,6 +88,4 @@ public class AtomicTestingApi extends RestBehavior {
       @Valid @RequestBody final AtomicTestingUpdateTagsInput input) {
     return atomicTestingService.updateAtomicTestingTags(injectId, input);
   }
-
-
 }

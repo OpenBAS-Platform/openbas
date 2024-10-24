@@ -7,5 +7,4 @@ public class Obfuscator {
 
   private String name;
   private String description;
-
 }

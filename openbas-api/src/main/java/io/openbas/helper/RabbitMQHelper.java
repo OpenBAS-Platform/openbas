@@ -1,6 +1,16 @@
 package io.openbas.helper;
 
 import io.openbas.config.RabbitmqConfig;
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.time.Duration;
+import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.net.ssl.SSLContext;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager;
@@ -23,106 +33,115 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.net.ssl.SSLContext;
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.time.Duration;
-import java.util.Collections;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class RabbitMQHelper {
 
-    private static final Logger LOGGER = Logger.getLogger(RabbitMQHelper.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(RabbitMQHelper.class.getName());
 
-    private static String rabbitMQVersion;
+  private static String rabbitMQVersion;
 
-    /**
-     * Return the version of Rabbit MQ we're using
-     *
-     * @return the rabbit MQ version
-     */
-    public static String getRabbitMQVersion(RabbitmqConfig rabbitmqConfig) {
-        // If we already have the version, we don't need to get it again
-        if (rabbitMQVersion == null) {
-            // Init the rabbit MQ management api overview url
-            String uri = "http://"
-                    + rabbitmqConfig.getHostname() + ":" + rabbitmqConfig.getManagementPort()
-                    + "/api/overview";
+  /**
+   * Return the version of Rabbit MQ we're using
+   *
+   * @return the rabbit MQ version
+   */
+  public static String getRabbitMQVersion(RabbitmqConfig rabbitmqConfig) {
+    // If we already have the version, we don't need to get it again
+    if (rabbitMQVersion == null) {
+      // Init the rabbit MQ management api overview url
+      String uri =
+          "http://"
+              + rabbitmqConfig.getHostname()
+              + ":"
+              + rabbitmqConfig.getManagementPort()
+              + "/api/overview";
 
-            RestTemplate restTemplate;
-            try {
-                restTemplate = restTemplate(rabbitmqConfig);
-            } catch (KeyStoreException | NoSuchAlgorithmException | KeyManagementException | CertificateException | IOException e) {
-                LOGGER.severe(e.getMessage());
-                return null;
-            }
+      RestTemplate restTemplate;
+      try {
+        restTemplate = restTemplate(rabbitmqConfig);
+      } catch (KeyStoreException
+          | NoSuchAlgorithmException
+          | KeyManagementException
+          | CertificateException
+          | IOException e) {
+        LOGGER.severe(e.getMessage());
+        return null;
+      }
 
-            // Init the headers
-            HttpHeaders headers = new HttpHeaders();
-            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-            headers.setBasicAuth(rabbitmqConfig.getUser(), rabbitmqConfig.getPass());
-            HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+      // Init the headers
+      HttpHeaders headers = new HttpHeaders();
+      headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+      headers.setBasicAuth(rabbitmqConfig.getUser(), rabbitmqConfig.getPass());
+      HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
 
-            // Make the call
-            ResponseEntity<?> result;
-            try {
-                result = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
-            } catch (RestClientException e) {
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
-                return null;
-            }
+      // Make the call
+      ResponseEntity<?> result;
+      try {
+        result = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
+      } catch (RestClientException e) {
+        LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        return null;
+      }
 
-            // Init the parser to get the rabbit_mq version
-            BasicJsonParser jsonParser = new BasicJsonParser();
-            rabbitMQVersion = (String) jsonParser.parseMap((String) result.getBody()).get("rabbitmq_version");
-        }
-
-        return rabbitMQVersion;
+      // Init the parser to get the rabbit_mq version
+      BasicJsonParser jsonParser = new BasicJsonParser();
+      rabbitMQVersion =
+          (String) jsonParser.parseMap((String) result.getBody()).get("rabbitmq_version");
     }
 
-    private static RestTemplate restTemplate(RabbitmqConfig rabbitmqConfig)
-            throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException, IOException, CertificateException {
-        RestTemplate restTemplate = new RestTemplateBuilder()
-                .setConnectTimeout(Duration.ofSeconds(2))
-                .setReadTimeout(Duration.ofSeconds(2))
-                .build();
+    return rabbitMQVersion;
+  }
 
-        if(rabbitmqConfig.isSsl() && rabbitmqConfig.isManagementInsecure()) {
-            HttpComponentsClientHttpRequestFactory requestFactoryHttp = new HttpComponentsClientHttpRequestFactory();
+  private static RestTemplate restTemplate(RabbitmqConfig rabbitmqConfig)
+      throws KeyStoreException,
+          NoSuchAlgorithmException,
+          KeyManagementException,
+          IOException,
+          CertificateException {
+    RestTemplate restTemplate =
+        new RestTemplateBuilder()
+            .setConnectTimeout(Duration.ofSeconds(2))
+            .setReadTimeout(Duration.ofSeconds(2))
+            .build();
 
-            TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
-            SSLContext sslContext = SSLContexts.custom()
-                    .loadTrustMaterial(null, acceptingTrustStrategy)
-                    .build();
-            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
-            Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory> create()
-                    .register("https", sslsf)
-                    .register("http", new PlainConnectionSocketFactory())
-                    .build();
+    if (rabbitmqConfig.isSsl() && rabbitmqConfig.isManagementInsecure()) {
+      HttpComponentsClientHttpRequestFactory requestFactoryHttp =
+          new HttpComponentsClientHttpRequestFactory();
 
-            BasicHttpClientConnectionManager connectionManager =
-                    new BasicHttpClientConnectionManager(socketFactoryRegistry);
-            CloseableHttpClient httpClient = HttpClients.custom()
-                    .setConnectionManager(connectionManager)
-                    .build();
-            requestFactoryHttp.setHttpClient(httpClient);
-            restTemplate = new RestTemplate(requestFactoryHttp);
-        } else if (rabbitmqConfig.isSsl()) {
-            SSLContext sslContext = new SSLContextBuilder()
-                    .loadTrustMaterial(rabbitmqConfig.getTrustStore().getURL(), rabbitmqConfig.getTrustStorePassword().toCharArray()).build();
-            SSLConnectionSocketFactory sslConFactory = new SSLConnectionSocketFactory(sslContext);
-            HttpClientConnectionManager cm = PoolingHttpClientConnectionManagerBuilder.create()
-                    .setSSLSocketFactory(sslConFactory)
-                    .build();
-            CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(cm).build();
-            ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-            restTemplate = new RestTemplate(requestFactory);
-        }
+      TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
+      SSLContext sslContext =
+          SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+      SSLConnectionSocketFactory sslsf =
+          new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+      Registry<ConnectionSocketFactory> socketFactoryRegistry =
+          RegistryBuilder.<ConnectionSocketFactory>create()
+              .register("https", sslsf)
+              .register("http", new PlainConnectionSocketFactory())
+              .build();
 
-        return restTemplate;
+      BasicHttpClientConnectionManager connectionManager =
+          new BasicHttpClientConnectionManager(socketFactoryRegistry);
+      CloseableHttpClient httpClient =
+          HttpClients.custom().setConnectionManager(connectionManager).build();
+      requestFactoryHttp.setHttpClient(httpClient);
+      restTemplate = new RestTemplate(requestFactoryHttp);
+    } else if (rabbitmqConfig.isSsl()) {
+      SSLContext sslContext =
+          new SSLContextBuilder()
+              .loadTrustMaterial(
+                  rabbitmqConfig.getTrustStore().getURL(),
+                  rabbitmqConfig.getTrustStorePassword().toCharArray())
+              .build();
+      SSLConnectionSocketFactory sslConFactory = new SSLConnectionSocketFactory(sslContext);
+      HttpClientConnectionManager cm =
+          PoolingHttpClientConnectionManagerBuilder.create()
+              .setSSLSocketFactory(sslConFactory)
+              .build();
+      CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(cm).build();
+      ClientHttpRequestFactory requestFactory =
+          new HttpComponentsClientHttpRequestFactory(httpClient);
+      restTemplate = new RestTemplate(requestFactory);
     }
+
+    return restTemplate;
+  }
 }

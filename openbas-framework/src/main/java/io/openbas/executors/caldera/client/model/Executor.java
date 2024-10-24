@@ -7,6 +7,6 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Executor {
 
-    private String name;
-    private String platform;
+  private String name;
+  private String platform;
 }

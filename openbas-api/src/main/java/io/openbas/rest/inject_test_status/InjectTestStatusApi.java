@@ -1,16 +1,14 @@
 package io.openbas.rest.inject_test_status;
 
 import io.openbas.database.model.InjectTestStatus;
-import io.openbas.database.repository.InjectTestStatusRepository;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.InjectTestStatusService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @PreAuthorize("isAdmin()")
@@ -39,5 +37,4 @@ public class InjectTestStatusApi extends RestBehavior {
   public void deleteInjectTest(@PathVariable String testId) {
     injectTestStatusService.deleteInjectTest(testId);
   }
-
 }

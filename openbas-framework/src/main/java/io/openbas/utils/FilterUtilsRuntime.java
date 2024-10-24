@@ -1,5 +1,10 @@
 package io.openbas.utils;
 
+import static io.openbas.database.model.Filters.FilterMode.and;
+import static io.openbas.database.model.Filters.FilterMode.or;
+import static io.openbas.utils.schema.SchemaUtils.getFilterableProperties;
+import static io.openbas.utils.schema.SchemaUtils.retrieveProperty;
+
 import io.openbas.database.model.Filters.Filter;
 import io.openbas.database.model.Filters.FilterGroup;
 import io.openbas.database.model.Filters.FilterMode;
@@ -7,27 +12,20 @@ import io.openbas.database.model.Filters.FilterOperator;
 import io.openbas.utils.schema.PropertySchema;
 import io.openbas.utils.schema.SchemaUtils;
 import jakarta.validation.constraints.NotNull;
-
-import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
-
-import static io.openbas.database.model.Filters.FilterMode.and;
-import static io.openbas.database.model.Filters.FilterMode.or;
-import static io.openbas.utils.schema.SchemaUtils.getFilterableProperties;
-import static io.openbas.utils.schema.SchemaUtils.retrieveProperty;
+import javax.annotation.Nullable;
 
 public class FilterUtilsRuntime {
 
-  private FilterUtilsRuntime() {
-
-  }
+  private FilterUtilsRuntime() {}
 
   private static final Predicate<Object> EMPTY_PREDICATE = (value) -> true;
 
-  public static Predicate<Object> computeFilterGroupRuntime(@Nullable final FilterGroup filterGroup) {
+  public static Predicate<Object> computeFilterGroupRuntime(
+      @Nullable final FilterGroup filterGroup) {
     if (filterGroup == null) {
       return EMPTY_PREDICATE;
     }
@@ -35,10 +33,8 @@ public class FilterUtilsRuntime {
     FilterMode mode = Optional.ofNullable(filterGroup.getMode()).orElse(and);
 
     if (!filters.isEmpty()) {
-      List<Predicate<Object>> list = filters
-          .stream()
-          .map(FilterUtilsRuntime::computeFilter)
-          .toList();
+      List<Predicate<Object>> list =
+          filters.stream().map(FilterUtilsRuntime::computeFilter).toList();
       Predicate<Object> result = null;
       for (Predicate<Object> el : list) {
         if (result == null) {
@@ -86,9 +82,8 @@ public class FilterUtilsRuntime {
 
     if (entry.getKey().isAssignableFrom(Map.class)
         || entry.getKey().getName().contains("ImmutableCollections")) {
-      return ((Map) entry.getValue()).values()
-          .stream()
-          .anyMatch(v -> operation.apply(v, filter.getValues()));
+      return ((Map) entry.getValue())
+          .values().stream().anyMatch(v -> operation.apply(v, filter.getValues()));
     } else if (entry.getKey().isArray()) {
       return Arrays.stream(((Object[]) entry.getValue()))
           .anyMatch(v -> operation.apply(v, filter.getValues()));
@@ -98,7 +93,8 @@ public class FilterUtilsRuntime {
   }
 
   @SuppressWarnings("unchecked")
-  private static Map.Entry<Class<Object>, Object> getPropertyInfo(Object obj, PropertySchema propertySchema) {
+  private static Map.Entry<Class<Object>, Object> getPropertyInfo(
+      Object obj, PropertySchema propertySchema) {
     if (obj == null) {
       return null;
     }
@@ -119,7 +115,8 @@ public class FilterUtilsRuntime {
 
   // -- OPERATOR --
 
-  private static BiFunction<Object, List<String>, Boolean> computeOperation(@NotNull final FilterOperator operator) {
+  private static BiFunction<Object, List<String>, Boolean> computeOperation(
+      @NotNull final FilterOperator operator) {
     if (operator == null) {
       // Default case
       return OperationUtilsRuntime::equalsTexts;
@@ -143,5 +140,4 @@ public class FilterUtilsRuntime {
       return OperationUtilsRuntime::equalsTexts;
     }
   }
-
 }

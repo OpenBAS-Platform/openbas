@@ -1,29 +1,26 @@
 package io.openbas.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Variable;
 import io.openbas.database.model.Variable.VariableType;
 import io.openbas.database.repository.ExerciseRepository;
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 @SpringBootTest
 @TestInstance(PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class VariableServiceTest {
 
-  @Autowired
-  private VariableService variableService;
+  @Autowired private VariableService variableService;
 
-  @Autowired
-  private ExerciseRepository exerciseRepository;
+  @Autowired private ExerciseRepository exerciseRepository;
 
   static Exercise EXERCISE;
   static String VARIABLE_ID;
@@ -97,5 +94,4 @@ public class VariableServiceTest {
     this.variableService.deleteVariable(VARIABLE_ID);
     assertThrows(NoSuchElementException.class, () -> this.variableService.variable(VARIABLE_ID));
   }
-
 }

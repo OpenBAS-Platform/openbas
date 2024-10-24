@@ -1,5 +1,8 @@
 package io.openbas.rest.team;
 
+import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
+import static io.openbas.utils.JpaUtils.createLeftJoin;
+
 import io.openbas.database.model.Team;
 import io.openbas.rest.team.output.TeamOutput;
 import jakarta.persistence.Tuple;
@@ -8,21 +11,15 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Root;
-
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
-import static io.openbas.utils.JpaUtils.createLeftJoin;
-
 public class TeamQueryHelper {
 
-  private TeamQueryHelper() {
-
-  }
+  private TeamQueryHelper() {}
 
   // -- SELECT --
 
@@ -30,42 +27,45 @@ public class TeamQueryHelper {
     // Array aggregations
     Expression<String[]> tagIdsExpression = createJoinArrayAggOnId(cb, teamRoot, "tags");
     Expression<String[]> userIdsExpression = createJoinArrayAggOnId(cb, teamRoot, "users");
-    Expression<String[]> organizationIdExpression = createLeftJoin(teamRoot, "organization").get("id");
+    Expression<String[]> organizationIdExpression =
+        createLeftJoin(teamRoot, "organization").get("id");
 
     // Multiselect
     cq.multiselect(
-        teamRoot.get("id").alias("team_id"),
-        teamRoot.get("name").alias("team_name"),
-        teamRoot.get("description").alias("team_description"),
-        teamRoot.get("contextual").alias("team_contextual"),
-        teamRoot.get("updatedAt").alias("team_updated_at"),
-        tagIdsExpression.alias("team_tags"),
-        userIdsExpression.alias("team_users"),
-        organizationIdExpression.alias("team_organization")
-    ).distinct(true);
+            teamRoot.get("id").alias("team_id"),
+            teamRoot.get("name").alias("team_name"),
+            teamRoot.get("description").alias("team_description"),
+            teamRoot.get("contextual").alias("team_contextual"),
+            teamRoot.get("updatedAt").alias("team_updated_at"),
+            tagIdsExpression.alias("team_tags"),
+            userIdsExpression.alias("team_users"),
+            organizationIdExpression.alias("team_organization"))
+        .distinct(true);
 
     // Group by
-    cq.groupBy(Collections.singletonList(
-        teamRoot.get("id")
-    ));
+    cq.groupBy(Collections.singletonList(teamRoot.get("id")));
   }
 
   // -- EXECUTION --
 
   public static List<TeamOutput> execution(TypedQuery<Tuple> query) {
-    return query.getResultList()
-        .stream()
-        .map(tuple -> TeamOutput.builder()
-            .id(tuple.get("team_id", String.class))
-            .name(tuple.get("team_name", String.class))
-            .description(tuple.get("team_description", String.class))
-            .contextual(tuple.get("team_contextual", Boolean.class))
-            .updatedAt(tuple.get("team_updated_at", Instant.class))
-            .tags(Arrays.stream(tuple.get("team_tags", String[].class)).collect(Collectors.toSet()))
-            .users(Arrays.stream(tuple.get("team_users", String[].class)).collect(Collectors.toSet()))
-            .organization(tuple.get("team_organization", String.class))
-            .build())
+    return query.getResultList().stream()
+        .map(
+            tuple ->
+                TeamOutput.builder()
+                    .id(tuple.get("team_id", String.class))
+                    .name(tuple.get("team_name", String.class))
+                    .description(tuple.get("team_description", String.class))
+                    .contextual(tuple.get("team_contextual", Boolean.class))
+                    .updatedAt(tuple.get("team_updated_at", Instant.class))
+                    .tags(
+                        Arrays.stream(tuple.get("team_tags", String[].class))
+                            .collect(Collectors.toSet()))
+                    .users(
+                        Arrays.stream(tuple.get("team_users", String[].class))
+                            .collect(Collectors.toSet()))
+                    .organization(tuple.get("team_organization", String.class))
+                    .build())
         .toList();
   }
-
 }

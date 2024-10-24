@@ -1,22 +1,22 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
-import java.sql.Connection;
-import java.sql.Statement;
-
 @Component
 public class V2_54__LessonsLearned extends BaseJavaMigration {
 
-    @Override
-    public void migrate(Context context) throws Exception {
-        Connection connection = context.getConnection();
-        Statement select = connection.createStatement();
-        select.execute("DROP TABLE IF EXISTS answers;");
-        select.execute("DROP TABLE IF EXISTS polls;");
-        select.execute("""
+  @Override
+  public void migrate(Context context) throws Exception {
+    Connection connection = context.getConnection();
+    Statement select = connection.createStatement();
+    select.execute("DROP TABLE IF EXISTS answers;");
+    select.execute("DROP TABLE IF EXISTS polls;");
+    select.execute(
+        """
                 CREATE TABLE lessons_templates (
                     lessons_template_id varchar(255) not null constraint lessons_templates_pkey primary key,
                     lessons_template_created_at timestamp not null default now(),
@@ -48,7 +48,8 @@ public class V2_54__LessonsLearned extends BaseJavaMigration {
                 CREATE INDEX idx_lessons_template_questions on lessons_template_questions (lessons_template_question_id);
                 CREATE INDEX idx_lessons_template_question_category on lessons_template_questions (lessons_template_question_category);
         """);
-        select.execute("""
+    select.execute(
+        """
                 CREATE TABLE lessons_categories (
                     lessons_category_id varchar(255) not null constraint lessons_categories_pkey primary key,
                     lessons_category_created_at timestamp not null default now(),
@@ -79,7 +80,8 @@ public class V2_54__LessonsLearned extends BaseJavaMigration {
                 CREATE INDEX idx_lessons_questions_audiences_question on lessons_questions_audiences (lessons_question_id);
                 CREATE INDEX idx_lessons_questions_audiences_audience on lessons_questions_audiences (audience_id);
         """);
-        select.execute("""
+    select.execute(
+        """
                 CREATE TABLE lessons_answers (
                     lessons_answer_id varchar(255) not null constraint lessons_answers_pkey primary key,
                     lessons_answer_created_at timestamp not null default now(),
@@ -94,5 +96,5 @@ public class V2_54__LessonsLearned extends BaseJavaMigration {
                 CREATE INDEX idx_lessons_answer_question on lessons_answers (lessons_answer_question);
                 CREATE INDEX idx_lessons_answer_user on lessons_answers (lessons_answer_user);
         """);
-    }
+  }
 }

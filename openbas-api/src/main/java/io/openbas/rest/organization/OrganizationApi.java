@@ -1,5 +1,12 @@
 package io.openbas.rest.organization;
 
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.database.specification.OrganizationSpecification.byName;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
+import static java.time.Instant.now;
+
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Organization;
 import io.openbas.database.raw.RawOrganization;
@@ -13,20 +20,12 @@ import io.openbas.rest.organization.form.OrganizationUpdateInput;
 import io.openbas.utils.FilterUtilsJpa;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.specification.OrganizationSpecification.byName;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.helper.StreamHelper.iterableToSet;
-import static java.time.Instant.now;
 
 @RestController
 public class OrganizationApi extends RestBehavior {
@@ -77,16 +76,16 @@ public class OrganizationApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping(ORGANIZATION_URI + "/{organizationId}")
-  public Organization updateOrganization(@PathVariable String organizationId,
-      @Valid @RequestBody OrganizationUpdateInput input) {
+  public Organization updateOrganization(
+      @PathVariable String organizationId, @Valid @RequestBody OrganizationUpdateInput input) {
     checkOrganizationAccess(userRepository, organizationId);
-    Organization organization = organizationRepository.findById(organizationId).orElseThrow(ElementNotFoundException::new);
+    Organization organization =
+        organizationRepository.findById(organizationId).orElseThrow(ElementNotFoundException::new);
     organization.setUpdateAttributes(input);
     organization.setUpdatedAt(now());
     organization.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     return organizationRepository.save(organization);
   }
-
 
   @Secured(ROLE_ADMIN)
   @DeleteMapping(ORGANIZATION_URI + "/{organizationId}")
@@ -98,8 +97,11 @@ public class OrganizationApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(ORGANIZATION_URI + "/options")
-  public List<FilterUtilsJpa.Option> optionsByName(@RequestParam(required = false) final String searchText) {
-    return fromIterable(this.organizationRepository.findAll(byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
+  public List<FilterUtilsJpa.Option> optionsByName(
+      @RequestParam(required = false) final String searchText) {
+    return fromIterable(
+            this.organizationRepository.findAll(
+                byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
         .stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
@@ -107,8 +109,7 @@ public class OrganizationApi extends RestBehavior {
 
   @PostMapping(ORGANIZATION_URI + "/options")
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
-    return fromIterable(this.organizationRepository.findAllById(ids))
-        .stream()
+    return fromIterable(this.organizationRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
   }

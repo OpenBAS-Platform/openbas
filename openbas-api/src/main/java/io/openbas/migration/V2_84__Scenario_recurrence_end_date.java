@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V2_84__Scenario_recurrence_end_date extends BaseJavaMigration {
@@ -15,7 +14,8 @@ public class V2_84__Scenario_recurrence_end_date extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     // Add end date recurrence to scenario
-    select.executeUpdate("""
+    select.executeUpdate(
+        """
         ALTER TABLE scenarios ADD COLUMN scenario_recurrence_end timestamp;
         """);
   }

@@ -1,22 +1,5 @@
 package io.openbas.injectors.channel;
 
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Variable.VariableType;
-import io.openbas.expectation.ExpectationBuilderService;
-import io.openbas.injector_contract.Contract;
-import io.openbas.injector_contract.ContractConfig;
-import io.openbas.injector_contract.Contractor;
-import io.openbas.injector_contract.ContractorIcon;
-import io.openbas.injector_contract.fields.ContractCheckbox;
-import io.openbas.injector_contract.fields.ContractElement;
-import io.openbas.injector_contract.fields.ContractExpectations;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-
 import static io.openbas.helper.SupportedLanguage.en;
 import static io.openbas.helper.SupportedLanguage.fr;
 import static io.openbas.injector_contract.Contract.executableContract;
@@ -33,6 +16,22 @@ import static io.openbas.injector_contract.fields.ContractText.textField;
 import static io.openbas.injector_contract.fields.ContractTextArea.richTextareaField;
 import static io.openbas.injectors.channel.ChannelExecutor.VARIABLE_ARTICLE;
 import static io.openbas.injectors.channel.ChannelExecutor.VARIABLE_ARTICLES;
+
+import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Variable.VariableType;
+import io.openbas.expectation.ExpectationBuilderService;
+import io.openbas.injector_contract.Contract;
+import io.openbas.injector_contract.ContractConfig;
+import io.openbas.injector_contract.Contractor;
+import io.openbas.injector_contract.ContractorIcon;
+import io.openbas.injector_contract.fields.ContractCheckbox;
+import io.openbas.injector_contract.fields.ContractElement;
+import io.openbas.injector_contract.fields.ContractExpectations;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -56,8 +55,13 @@ public class ChannelContract extends Contractor {
 
   @Override
   public ContractConfig getConfig() {
-    return new ContractConfig(TYPE, Map.of(en, "Media pressure", fr, "Pression médiatique"), "#ff9800", "#ff9800",
-        "/img/channel.png", isExpose());
+    return new ContractConfig(
+        TYPE,
+        Map.of(en, "Media pressure", fr, "Pression médiatique"),
+        "#ff9800",
+        "#ff9800",
+        "/img/channel.png",
+        isExpose());
   }
 
   @Override
@@ -65,7 +69,8 @@ public class ChannelContract extends Contractor {
     ContractConfig contractConfig = getConfig();
     // In this "internal" contract we can't express choices.
     // Choices are contextual to a specific exercise.
-    String messageBody = """
+    String messageBody =
+        """
             Dear player,<br /><br />
             New media pressure entries have been published.<br /><br />
             <#list articles as article>
@@ -76,38 +81,58 @@ public class ChannelContract extends Contractor {
             The animation team
         """;
     ContractCheckbox emailingField = checkboxField("emailing", "Send email", true);
-    ContractExpectations expectationsField = expectationsField(
-        "expectations",
-        "Expectations",
-        List.of(this.expectationBuilderService.buildArticleExpectation())
-    );
-    List<ContractElement> publishInstance = contractBuilder()
-        // built in
-        .optional(teamField("teams", "Teams", Multiple))
-        .optional(attachmentField("attachments", "Attachments", Multiple))
-        .mandatory(articleField("articles", "Articles", Multiple))
-        // Contract specific
-        .optional(expectationsField)
-        // Emailing zone
-        .optional(emailingField)
-        .mandatory(textField("subject", "Subject", "New media pressure entries published for ${user.email}",
-            List.of(emailingField)))
-        .mandatory(richTextareaField("body", "Body", messageBody,
-            List.of(emailingField)))
-        .optional(checkboxField("encrypted", "Encrypted", false,
-            List.of(emailingField)))
-        .build();
-    Contract publishArticle = executableContract(contractConfig,
-        CHANNEL_PUBLISH, Map.of(en, "Publish a media pressure", fr, "Publier de la pression médiatique"),
-        publishInstance, List.of(Endpoint.PLATFORM_TYPE.Internal), false);
+    ContractExpectations expectationsField =
+        expectationsField(
+            "expectations",
+            "Expectations",
+            List.of(this.expectationBuilderService.buildArticleExpectation()));
+    List<ContractElement> publishInstance =
+        contractBuilder()
+            // built in
+            .optional(teamField("teams", "Teams", Multiple))
+            .optional(attachmentField("attachments", "Attachments", Multiple))
+            .mandatory(articleField("articles", "Articles", Multiple))
+            // Contract specific
+            .optional(expectationsField)
+            // Emailing zone
+            .optional(emailingField)
+            .mandatory(
+                textField(
+                    "subject",
+                    "Subject",
+                    "New media pressure entries published for ${user.email}",
+                    List.of(emailingField)))
+            .mandatory(richTextareaField("body", "Body", messageBody, List.of(emailingField)))
+            .optional(checkboxField("encrypted", "Encrypted", false, List.of(emailingField)))
+            .build();
+    Contract publishArticle =
+        executableContract(
+            contractConfig,
+            CHANNEL_PUBLISH,
+            Map.of(en, "Publish a media pressure", fr, "Publier de la pression médiatique"),
+            publishInstance,
+            List.of(Endpoint.PLATFORM_TYPE.Internal),
+            false);
     // Adding generated variables
     publishArticle.addVariable(
-        variable(VARIABLE_ARTICLES, "List of articles published by the injection", VariableType.Object, Multiple,
+        variable(
+            VARIABLE_ARTICLES,
+            "List of articles published by the injection",
+            VariableType.Object,
+            Multiple,
             List.of(
-                variable(VARIABLE_ARTICLE + ".id", "Id of the article in the platform", VariableType.String, One),
-                variable(VARIABLE_ARTICLE + ".name", "Name of the article", VariableType.String, One),
-                variable(VARIABLE_ARTICLE + ".uri", "Http user link to access the article", VariableType.String, One)
-            )));
+                variable(
+                    VARIABLE_ARTICLE + ".id",
+                    "Id of the article in the platform",
+                    VariableType.String,
+                    One),
+                variable(
+                    VARIABLE_ARTICLE + ".name", "Name of the article", VariableType.String, One),
+                variable(
+                    VARIABLE_ARTICLE + ".uri",
+                    "Http user link to access the article",
+                    VariableType.String,
+                    One))));
     publishArticle.setAtomicTesting(false);
     return List.of(publishArticle);
   }

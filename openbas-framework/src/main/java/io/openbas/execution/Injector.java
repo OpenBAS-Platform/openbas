@@ -1,5 +1,9 @@
 package io.openbas.execution;
 
+import static io.openbas.database.model.InjectStatusExecution.traceError;
+import static io.openbas.expectation.ExpectationPropertiesConfig.DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME;
+import static java.util.Optional.ofNullable;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
@@ -12,10 +16,6 @@ import io.openbas.model.expectation.*;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
-import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.io.InputStream;
 import java.time.Duration;
 import java.time.Instant;
@@ -24,22 +24,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static io.openbas.database.model.InjectStatusExecution.traceError;
-import static io.openbas.expectation.ExpectationPropertiesConfig.DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME;
-import static java.util.Optional.ofNullable;
-
+import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 public abstract class Injector {
 
-  @Resource
-  protected ObjectMapper mapper;
+  @Resource protected ObjectMapper mapper;
   private FileService fileService;
   private DocumentRepository documentRepository;
   private InjectExpectationRepository injectExpectationRepository;
 
   @Autowired
-  public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
+  public void setInjectExpectationRepository(
+      InjectExpectationRepository injectExpectationRepository) {
     this.injectExpectationRepository = injectExpectationRepository;
   }
 
@@ -53,15 +51,15 @@ public abstract class Injector {
     this.fileService = fileService;
   }
 
-  public abstract ExecutionProcess process(Execution execution, ExecutableInject injection) throws Exception;
+  public abstract ExecutionProcess process(Execution execution, ExecutableInject injection)
+      throws Exception;
 
   public InjectStatusCommandLine getCommandsLines(String externalId) {
     return null;
   }
 
   private InjectExpectation expectationConverter(
-      @NotNull final ExecutableInject executableInject,
-      Expectation expectation) {
+      @NotNull final ExecutableInject executableInject, Expectation expectation) {
     InjectExpectation expectationExecution = new InjectExpectation();
     return this.expectationConverter(expectationExecution, executableInject, expectation);
   }
@@ -95,8 +93,8 @@ public abstract class Injector {
     expectationExecution.setExpectedScore(expectation.getScore());
     expectationExecution.setExpectationGroup(expectation.isExpectationGroup());
     expectationExecution.setExpirationTime(
-        ofNullable(expectation.getExpirationTime()).orElse(DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME)
-    );
+        ofNullable(expectation.getExpirationTime())
+            .orElse(DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME));
     switch (expectation.type()) {
       case ARTICLE -> {
         expectationExecution.setName(expectation.getName());
@@ -111,19 +109,22 @@ public abstract class Injector {
       case DETECTION -> {
         DetectionExpectation detectionExpectation = (DetectionExpectation) expectation;
         expectationExecution.setName(detectionExpectation.getName());
-        expectationExecution.setDetection(detectionExpectation.getAsset(), detectionExpectation.getAssetGroup());
+        expectationExecution.setDetection(
+            detectionExpectation.getAsset(), detectionExpectation.getAssetGroup());
         expectationExecution.setSignatures(detectionExpectation.getInjectExpectationSignatures());
       }
       case PREVENTION -> {
         PreventionExpectation preventionExpectation = (PreventionExpectation) expectation;
         expectationExecution.setName(preventionExpectation.getName());
-        expectationExecution.setPrevention(preventionExpectation.getAsset(), preventionExpectation.getAssetGroup());
+        expectationExecution.setPrevention(
+            preventionExpectation.getAsset(), preventionExpectation.getAssetGroup());
         expectationExecution.setSignatures(preventionExpectation.getInjectExpectationSignatures());
       }
       case MANUAL -> {
         ManualExpectation manualExpectation = (ManualExpectation) expectation;
         expectationExecution.setName(((ManualExpectation) expectation).getName());
-        expectationExecution.setManual(manualExpectation.getAsset(), manualExpectation.getAssetGroup());
+        expectationExecution.setManual(
+            manualExpectation.getAsset(), manualExpectation.getAssetGroup());
         expectationExecution.setDescription(((ManualExpectation) expectation).getDescription());
       }
       default -> throw new IllegalStateException("Unexpected value: " + expectation);
@@ -160,45 +161,86 @@ public abstract class Injector {
           List<InjectExpectation> injectExpectationsByUserAndTeam;
           // If atomicTesting, We create expectation for every player and every team
           if (isAtomicTesting) {
-            injectExpectationsByTeam = teams.stream()
-                .flatMap(team -> expectations.stream()
-                    .map(expectation -> expectationConverter(team, executableInject, expectation)))
-                .collect(Collectors.toList());
+            injectExpectationsByTeam =
+                teams.stream()
+                    .flatMap(
+                        team ->
+                            expectations.stream()
+                                .map(
+                                    expectation ->
+                                        expectationConverter(team, executableInject, expectation)))
+                    .collect(Collectors.toList());
 
-            injectExpectationsByUserAndTeam = teams.stream()
-                .flatMap(team -> team.getUsers().stream()
-                    .flatMap(user -> expectations.stream()
-                        .map(expectation -> expectationConverter(team, user, executableInject, expectation))))
-                .toList();
+            injectExpectationsByUserAndTeam =
+                teams.stream()
+                    .flatMap(
+                        team ->
+                            team.getUsers().stream()
+                                .flatMap(
+                                    user ->
+                                        expectations.stream()
+                                            .map(
+                                                expectation ->
+                                                    expectationConverter(
+                                                        team,
+                                                        user,
+                                                        executableInject,
+                                                        expectation))))
+                    .toList();
           } else {
             // Create expectations for every enabled player in every team
-            injectExpectationsByUserAndTeam = teams.stream()
-                .flatMap(team -> team.getExerciseTeamUsers().stream()
-                    .filter(exerciseTeamUser -> exerciseTeamUser.getExercise().getId()
-                        .equals(executableInject.getInjection().getExercise().getId()))
-                    .flatMap(exerciseTeamUser -> expectations.stream()
-                        .map(expectation -> expectationConverter(team, exerciseTeamUser.getUser(), executableInject,
-                            expectation))))
-                .toList();
+            injectExpectationsByUserAndTeam =
+                teams.stream()
+                    .flatMap(
+                        team ->
+                            team.getExerciseTeamUsers().stream()
+                                .filter(
+                                    exerciseTeamUser ->
+                                        exerciseTeamUser
+                                            .getExercise()
+                                            .getId()
+                                            .equals(
+                                                executableInject
+                                                    .getInjection()
+                                                    .getExercise()
+                                                    .getId()))
+                                .flatMap(
+                                    exerciseTeamUser ->
+                                        expectations.stream()
+                                            .map(
+                                                expectation ->
+                                                    expectationConverter(
+                                                        team,
+                                                        exerciseTeamUser.getUser(),
+                                                        executableInject,
+                                                        expectation))))
+                    .toList();
 
             // Create a set of teams that have at least one enabled player
-            Set<Team> teamsWithEnabledPlayers = injectExpectationsByUserAndTeam.stream()
-                .map(InjectExpectation::getTeam)
-                .collect(Collectors.toSet());
+            Set<Team> teamsWithEnabledPlayers =
+                injectExpectationsByUserAndTeam.stream()
+                    .map(InjectExpectation::getTeam)
+                    .collect(Collectors.toSet());
 
             // Add only the expectations where the team has at least one enabled player
-            injectExpectationsByTeam = teamsWithEnabledPlayers.stream()
-                .flatMap(team -> expectations.stream()
-                    .map(expectation -> expectationConverter(team, executableInject, expectation)))
-                .collect(Collectors.toList());
+            injectExpectationsByTeam =
+                teamsWithEnabledPlayers.stream()
+                    .flatMap(
+                        team ->
+                            expectations.stream()
+                                .map(
+                                    expectation ->
+                                        expectationConverter(team, executableInject, expectation)))
+                    .collect(Collectors.toList());
           }
 
           injectExpectationsByTeam.addAll(injectExpectationsByUserAndTeam);
           this.injectExpectationRepository.saveAll(injectExpectationsByTeam);
         } else if (!assets.isEmpty() || !assetGroups.isEmpty()) {
-          List<InjectExpectation> injectExpectations = expectations.stream()
-              .map(expectation -> expectationConverter(executableInject, expectation))
-              .toList();
+          List<InjectExpectation> injectExpectations =
+              expectations.stream()
+                  .map(expectation -> expectationConverter(executableInject, expectation))
+                  .toList();
           this.injectExpectationRepository.saveAll(injectExpectations);
         }
       }
@@ -222,42 +264,49 @@ public abstract class Injector {
     return injectWhen.isAfter(start) && injectWhen.isBefore(now);
   }
 
-  public <T> T contentConvert(@NotNull final ExecutableInject injection, @NotNull final Class<T> converter)
+  public <T> T contentConvert(
+      @NotNull final ExecutableInject injection, @NotNull final Class<T> converter)
       throws Exception {
     Inject inject = injection.getInjection().getInject();
     ObjectNode content = inject.getContent();
     return this.mapper.treeToValue(content, converter);
   }
 
-  public List<DataAttachment> resolveAttachments(Execution execution, ExecutableInject injection,
-      List<Document> documents) {
+  public List<DataAttachment> resolveAttachments(
+      Execution execution, ExecutableInject injection, List<Document> documents) {
     List<DataAttachment> resolved = new ArrayList<>();
     // Add attachments from direct configuration
-    injection.getDirectAttachments().forEach(doc -> {
-      try {
-        byte[] content = IOUtils.toByteArray(doc.getInputStream());
-        resolved.add(new DataAttachment(doc.getName(), doc.getOriginalFilename(), content, doc.getContentType()));
-      } catch (Exception e) {
-        String message = "Error getting direct attachment " + doc.getName();
-        execution.addTrace(traceError(message));
-      }
-    });
+    injection
+        .getDirectAttachments()
+        .forEach(
+            doc -> {
+              try {
+                byte[] content = IOUtils.toByteArray(doc.getInputStream());
+                resolved.add(
+                    new DataAttachment(
+                        doc.getName(), doc.getOriginalFilename(), content, doc.getContentType()));
+              } catch (Exception e) {
+                String message = "Error getting direct attachment " + doc.getName();
+                execution.addTrace(traceError(message));
+              }
+            });
     // Add attachments from configuration
-    documents.forEach(attachment -> {
-      String documentId = attachment.getId();
-      Optional<Document> askedDocument = documentRepository.findById(documentId);
-      try {
-        Document doc = askedDocument.orElseThrow();
-        InputStream fileInputStream = fileService.getFile(doc).orElseThrow();
-        byte[] content = IOUtils.toByteArray(fileInputStream);
-        resolved.add(new DataAttachment(documentId, doc.getName(), content, doc.getType()));
-      } catch (Exception e) {
-        // Can't fetch the attachments, ignore
-        String docInfo = askedDocument.map(Document::getName).orElse(documentId);
-        String message = "Error getting doc attachment " + docInfo;
-        execution.addTrace(traceError(message));
-      }
-    });
+    documents.forEach(
+        attachment -> {
+          String documentId = attachment.getId();
+          Optional<Document> askedDocument = documentRepository.findById(documentId);
+          try {
+            Document doc = askedDocument.orElseThrow();
+            InputStream fileInputStream = fileService.getFile(doc).orElseThrow();
+            byte[] content = IOUtils.toByteArray(fileInputStream);
+            resolved.add(new DataAttachment(documentId, doc.getName(), content, doc.getType()));
+          } catch (Exception e) {
+            // Can't fetch the attachments, ignore
+            String docInfo = askedDocument.map(Document::getName).orElse(documentId);
+            String message = "Error getting doc attachment " + docInfo;
+            execution.addTrace(traceError(message));
+          }
+        });
     return resolved;
   }
   // endregion

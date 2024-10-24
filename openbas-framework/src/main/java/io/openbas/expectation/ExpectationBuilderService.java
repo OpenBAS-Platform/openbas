@@ -1,10 +1,10 @@
 package io.openbas.expectation;
 
+import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.*;
+
 import io.openbas.model.inject.form.Expectation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.*;
 
 @RequiredArgsConstructor
 @Service
@@ -20,7 +20,8 @@ public class ExpectationBuilderService {
     preventionExpectation.setType(PREVENTION);
     preventionExpectation.setName("Expect inject to be prevented");
     preventionExpectation.setScore(DEFAULT_TECHNICAL_EXPECTATION_SCORE);
-    preventionExpectation.setExpirationTime(this.expectationPropertiesConfig.getPreventionExpirationTime());
+    preventionExpectation.setExpirationTime(
+        this.expectationPropertiesConfig.getPreventionExpirationTime());
     return preventionExpectation;
   }
 
@@ -29,7 +30,8 @@ public class ExpectationBuilderService {
     detectionExpectation.setType(DETECTION);
     detectionExpectation.setName("Expect inject to be detected");
     detectionExpectation.setScore(DEFAULT_TECHNICAL_EXPECTATION_SCORE);
-    detectionExpectation.setExpirationTime(this.expectationPropertiesConfig.getDetectionExpirationTime());
+    detectionExpectation.setExpirationTime(
+        this.expectationPropertiesConfig.getDetectionExpirationTime());
     return detectionExpectation;
   }
 
@@ -38,7 +40,8 @@ public class ExpectationBuilderService {
     challengeExpectation.setType(CHALLENGE);
     challengeExpectation.setName("Expect targets to complete the challenge(s)");
     challengeExpectation.setScore(DEFAULT_HUMAN_EXPECTATION_SCORE);
-    challengeExpectation.setExpirationTime(this.expectationPropertiesConfig.getChallengeExpirationTime());
+    challengeExpectation.setExpirationTime(
+        this.expectationPropertiesConfig.getChallengeExpirationTime());
     return challengeExpectation;
   }
 
@@ -47,8 +50,8 @@ public class ExpectationBuilderService {
     articleExpectation.setType(ARTICLE);
     articleExpectation.setName("Expect targets to read the article(s)");
     articleExpectation.setScore(DEFAULT_HUMAN_EXPECTATION_SCORE);
-    articleExpectation.setExpirationTime(this.expectationPropertiesConfig.getArticleExpirationTime());
+    articleExpectation.setExpirationTime(
+        this.expectationPropertiesConfig.getArticleExpirationTime());
     return articleExpectation;
   }
-
 }

@@ -14,5 +14,4 @@ public class Link {
   private Ability ability;
   private String finish;
   private String command;
-
 }

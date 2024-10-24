@@ -11,5 +11,4 @@ public class ObjectiveFixture {
     objective.setTitle(OBJECTIVE_NAME);
     return objective;
   }
-
 }

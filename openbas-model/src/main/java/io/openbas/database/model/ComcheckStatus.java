@@ -1,142 +1,146 @@
 package io.openbas.database.model;
 
+import static io.openbas.database.model.Comcheck.COMCHECK_STATUS.EXPIRED;
+import static java.util.Optional.ofNullable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
-import org.hibernate.annotations.UuidGenerator;
-
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
-
-import static io.openbas.database.model.Comcheck.COMCHECK_STATUS.EXPIRED;
-import static java.util.Optional.ofNullable;
+import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Table(name = "comchecks_statuses")
 @EntityListeners(ModelBaseListener.class)
 public class ComcheckStatus implements Base {
 
-    public enum CHECK_STATUS {
-        RUNNING,
-        SUCCESS,
-        FAILURE
-    }
+  public enum CHECK_STATUS {
+    RUNNING,
+    SUCCESS,
+    FAILURE
+  }
 
-    @Id
-    @Column(name = "status_id")
-    @GeneratedValue(generator = "UUID")
-    @UuidGenerator
-    @JsonProperty("comcheckstatus_id")
-    private String id;
+  @Id
+  @Column(name = "status_id")
+  @GeneratedValue(generator = "UUID")
+  @UuidGenerator
+  @JsonProperty("comcheckstatus_id")
+  private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "status_user")
-    @JsonSerialize(using = MonoIdDeserializer.class)
-    @JsonProperty("comcheckstatus_user")
-    private User user;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "status_user")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("comcheckstatus_user")
+  private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "status_comcheck")
-    @JsonSerialize(using = MonoIdDeserializer.class)
-    @JsonProperty("comcheckstatus_comcheck")
-    private Comcheck comcheck;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "status_comcheck")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("comcheckstatus_comcheck")
+  private Comcheck comcheck;
 
-    @Column(name = "status_sent_date")
-    @JsonProperty("comcheckstatus_sent_date")
-    private Instant lastSent;
+  @Column(name = "status_sent_date")
+  @JsonProperty("comcheckstatus_sent_date")
+  private Instant lastSent;
 
-    @Column(name = "status_receive_date")
-    @JsonProperty("comcheckstatus_receive_date")
-    private Instant receiveDate;
+  @Column(name = "status_receive_date")
+  @JsonProperty("comcheckstatus_receive_date")
+  private Instant receiveDate;
 
-    @Column(name = "status_sent_retry")
-    @JsonProperty("comcheckstatus_sent_retry")
-    private int sentNumber = 0;
+  @Column(name = "status_sent_retry")
+  @JsonProperty("comcheckstatus_sent_retry")
+  private int sentNumber = 0;
 
-    public ComcheckStatus() {
-        // Default constructor
-    }
+  public ComcheckStatus() {
+    // Default constructor
+  }
 
-    public ComcheckStatus(User user) {
-        this.user = user;
-    }
+  public ComcheckStatus(User user) {
+    this.user = user;
+  }
 
-    // region transient
-    @JsonProperty("comcheckstatus_state")
-    public CHECK_STATUS getState() {
-        return getReceiveDate().map(receive -> CHECK_STATUS.SUCCESS)
-                .orElseGet(() -> EXPIRED.equals(getComcheck().getState())
-                        ? CHECK_STATUS.FAILURE : CHECK_STATUS.RUNNING);
-    }
-    // endregion
+  // region transient
+  @JsonProperty("comcheckstatus_state")
+  public CHECK_STATUS getState() {
+    return getReceiveDate()
+        .map(receive -> CHECK_STATUS.SUCCESS)
+        .orElseGet(
+            () ->
+                EXPIRED.equals(getComcheck().getState())
+                    ? CHECK_STATUS.FAILURE
+                    : CHECK_STATUS.RUNNING);
+  }
 
-    @Override
-    public String getId() {
-        return id;
-    }
+  // endregion
 
-    @Override
-    public boolean isUserHasAccess(User user) {
-        return comcheck.isUserHasAccess(user);
-    }
+  @Override
+  public String getId() {
+    return id;
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  @Override
+  public boolean isUserHasAccess(User user) {
+    return comcheck.isUserHasAccess(user);
+  }
 
-    public User getUser() {
-        return user;
-    }
+  public void setId(String id) {
+    this.id = id;
+  }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+  public User getUser() {
+    return user;
+  }
 
-    public Comcheck getComcheck() {
-        return comcheck;
-    }
+  public void setUser(User user) {
+    this.user = user;
+  }
 
-    public void setComcheck(Comcheck comcheck) {
-        this.comcheck = comcheck;
-    }
+  public Comcheck getComcheck() {
+    return comcheck;
+  }
 
-    public Optional<Instant> getLastSent() {
-        return ofNullable(lastSent);
-    }
+  public void setComcheck(Comcheck comcheck) {
+    this.comcheck = comcheck;
+  }
 
-    public void setLastSent(Instant lastSent) {
-        this.lastSent = lastSent;
-    }
+  public Optional<Instant> getLastSent() {
+    return ofNullable(lastSent);
+  }
 
-    public int getSentNumber() {
-        return sentNumber;
-    }
+  public void setLastSent(Instant lastSent) {
+    this.lastSent = lastSent;
+  }
 
-    public void setSentNumber(int sentNumber) {
-        this.sentNumber = sentNumber;
-    }
+  public int getSentNumber() {
+    return sentNumber;
+  }
 
-    public Optional<Instant> getReceiveDate() {
-        return ofNullable(receiveDate);
-    }
+  public void setSentNumber(int sentNumber) {
+    this.sentNumber = sentNumber;
+  }
 
-    public void setReceiveDate(Instant receiveDate) {
-        this.receiveDate = receiveDate;
-    }
+  public Optional<Instant> getReceiveDate() {
+    return ofNullable(receiveDate);
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
-        Base base = (Base) o;
-        return id.equals(base.getId());
-    }
+  public void setReceiveDate(Instant receiveDate) {
+    this.receiveDate = receiveDate;
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
+    Base base = (Base) o;
+    return id.equals(base.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 }

@@ -1,20 +1,19 @@
 package io.openbas.rest.settings.response;
 
+import static lombok.AccessLevel.NONE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.rest.settings.form.PolicyInput;
 import io.openbas.rest.settings.form.ThemeInput;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static lombok.AccessLevel.NONE;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Setter
 @Getter
@@ -127,8 +126,9 @@ public class PlatformSettings {
 
   public Map<String, List<String>> getPlatformBannerByLevel() {
     Map<String, List<String>> platformBannerByLevelLowerCase = new HashMap<>();
-    if(this.platformBannerByLevel != null) {
-      this.platformBannerByLevel.forEach((key, value) -> platformBannerByLevelLowerCase.put(key.toLowerCase(), value));
+    if (this.platformBannerByLevel != null) {
+      this.platformBannerByLevel.forEach(
+          (key, value) -> platformBannerByLevelLowerCase.put(key.toLowerCase(), value));
       return platformBannerByLevelLowerCase;
     }
     return null;
@@ -158,5 +158,4 @@ public class PlatformSettings {
   @NotNull
   @JsonProperty("expectation_manual_default_score_value")
   private int expectationDefaultScoreValue;
-
 }
