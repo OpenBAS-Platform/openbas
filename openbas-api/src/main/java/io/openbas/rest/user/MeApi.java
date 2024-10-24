@@ -1,5 +1,10 @@
 package io.openbas.rest.user;
 
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.database.specification.TokenSpecification.fromUser;
+import static io.openbas.helper.DatabaseHelper.updateRelation;
+
 import io.openbas.config.SessionManager;
 import io.openbas.database.model.Token;
 import io.openbas.database.model.User;
@@ -17,25 +22,18 @@ import io.openbas.service.UserService;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.UUID;
-
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.database.specification.TokenSpecification.fromUser;
-import static io.openbas.helper.DatabaseHelper.updateRelation;
-
 @RestController
 public class MeApi extends RestBehavior {
 
-  @Resource
-  private SessionManager sessionManager;
+  @Resource private SessionManager sessionManager;
 
   private OrganizationRepository organizationRepository;
   private TokenRepository tokenRepository;
@@ -71,15 +69,19 @@ public class MeApi extends RestBehavior {
   @Secured(ROLE_USER)
   @GetMapping("/api/me")
   public User me() {
-    return userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
+    return userRepository
+        .findById(currentUser().getId())
+        .orElseThrow(ElementNotFoundException::new);
   }
 
   @Secured(ROLE_USER)
   @PutMapping("/api/me/profile")
   public User updateProfile(@Valid @RequestBody UpdateProfileInput input) {
-    User user = userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
+    User user =
+        userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
     user.setUpdateAttributes(input);
-    user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
+    user.setOrganization(
+        updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
     User savedUser = userRepository.save(user);
     sessionManager.refreshUserSessions(savedUser);
     return savedUser;
@@ -88,7 +90,8 @@ public class MeApi extends RestBehavior {
   @Secured(ROLE_USER)
   @PutMapping("/api/me/information")
   public User updateInformation(@Valid @RequestBody UpdateUserInfoInput input) {
-    User user = userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
+    User user =
+        userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
     user.setUpdateAttributes(input);
     User savedUser = userRepository.save(user);
     sessionManager.refreshUserSessions(savedUser);
@@ -97,8 +100,10 @@ public class MeApi extends RestBehavior {
 
   @Secured(ROLE_USER)
   @PutMapping("/api/me/password")
-  public User updatePassword(@Valid @RequestBody UpdateMePasswordInput input) throws InputValidationException {
-    User user = userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
+  public User updatePassword(@Valid @RequestBody UpdateMePasswordInput input)
+      throws InputValidationException {
+    User user =
+        userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
     if (userService.isUserPasswordValid(user, input.getCurrentPassword())) {
       user.setPassword(userService.encodeUserPassword(input.getPassword()));
       return userRepository.save(user);
@@ -110,9 +115,12 @@ public class MeApi extends RestBehavior {
   @Secured(ROLE_USER)
   @PostMapping("/api/me/token/refresh")
   @Transactional(rollbackOn = Exception.class)
-  public Token renewToken(@Valid @RequestBody RenewTokenInput input) throws InputValidationException {
-    User user = userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
-    Token token = tokenRepository.findById(input.getTokenId()).orElseThrow(ElementNotFoundException::new);
+  public Token renewToken(@Valid @RequestBody RenewTokenInput input)
+      throws InputValidationException {
+    User user =
+        userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
+    Token token =
+        tokenRepository.findById(input.getTokenId()).orElseThrow(ElementNotFoundException::new);
     if (!user.equals(token.getUser())) {
       throw new AccessDeniedException("You are not allowed to renew this token");
     }

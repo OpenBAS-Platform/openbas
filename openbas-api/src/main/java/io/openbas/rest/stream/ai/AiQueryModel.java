@@ -1,43 +1,42 @@
 package io.openbas.rest.stream.ai;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-
 import java.util.List;
+import lombok.Getter;
 
 @Getter
 public class AiQueryModel {
 
-    @JsonProperty("model")
-    private String model;
+  @JsonProperty("model")
+  private String model;
 
-    @JsonProperty("stream")
-    private Boolean stream;
+  @JsonProperty("stream")
+  private Boolean stream;
 
-    @JsonProperty("messages")
-    private List<AiQueryMessageModel> messages;
+  @JsonProperty("messages")
+  private List<AiQueryMessageModel> messages;
 
-    public String getModel() {
-        return model;
-    }
+  public String getModel() {
+    return model;
+  }
 
-    public void setModel(String model) {
-        this.model = model;
-    }
+  public void setModel(String model) {
+    this.model = model;
+  }
 
-    public Boolean getStream() {
-        return stream;
-    }
+  public Boolean getStream() {
+    return stream;
+  }
 
-    public void setStream(Boolean stream) {
-        this.stream = stream;
-    }
+  public void setStream(Boolean stream) {
+    this.stream = stream;
+  }
 
-    public List<AiQueryMessageModel> getMessages() {
-        return messages;
-    }
+  public List<AiQueryMessageModel> getMessages() {
+    return messages;
+  }
 
-    public void setMessages(List<AiQueryMessageModel> messages) {
-        this.messages = messages;
-    }
+  public void setMessages(List<AiQueryMessageModel> messages) {
+    this.messages = messages;
+  }
 }

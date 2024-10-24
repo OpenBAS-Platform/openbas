@@ -23,5 +23,4 @@ public class KillChainPhaseUtils {
     map.put("initial-access", 2L);
     return map;
   }
-
 }

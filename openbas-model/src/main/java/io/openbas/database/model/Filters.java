@@ -2,11 +2,10 @@ package io.openbas.database.model;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
+import lombok.Data;
 
 public class Filters {
 
@@ -33,8 +32,7 @@ public class Filters {
   @Data
   public static class FilterGroup {
 
-    @NotNull
-    private FilterMode mode; // Between filters
+    @NotNull private FilterMode mode; // Between filters
     private List<Filter> filters;
 
     // -- UTILS --
@@ -44,8 +42,7 @@ public class Filters {
         return Optional.empty();
       }
 
-      return this.getFilters()
-          .stream()
+      return this.getFilters().stream()
           .filter(filter -> filter.getKey().equals(filterKey))
           .findFirst();
     }
@@ -55,27 +52,24 @@ public class Filters {
         return;
       }
 
-      List<Filter> newFilters = this.getFilters()
-          .stream()
-          .filter(filter -> !filter.getKey().equals(filterKey))
-          .toList();
+      List<Filter> newFilters =
+          this.getFilters().stream().filter(filter -> !filter.getKey().equals(filterKey)).toList();
       this.setFilters(newFilters);
     }
-
   }
 
   @Data
   public static class Filter {
 
-    @NotNull
-    private String key;
+    @NotNull private String key;
     private FilterMode mode; // Between values: name = name1 OR name = name2
     private List<String> values;
     private FilterOperator operator;
   }
 
   public static boolean isEmptyFilterGroup(@Nullable final FilterGroup filterGroup) {
-    return filterGroup == null || filterGroup.getFilters() == null || filterGroup.getFilters().isEmpty();
+    return filterGroup == null
+        || filterGroup.getFilters() == null
+        || filterGroup.getFilters().isEmpty();
   }
-
 }

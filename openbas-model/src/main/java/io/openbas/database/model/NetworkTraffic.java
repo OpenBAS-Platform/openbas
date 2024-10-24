@@ -53,9 +53,7 @@ public class NetworkTraffic extends Payload {
   @NotNull
   private String protocol;
 
-  public NetworkTraffic() {
-
-  }
+  public NetworkTraffic() {}
 
   public NetworkTraffic(String id, String type, String name) {
     super(id, type, name);

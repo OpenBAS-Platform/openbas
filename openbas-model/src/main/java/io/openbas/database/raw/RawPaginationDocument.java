@@ -4,9 +4,8 @@ import io.openbas.database.model.Document;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Tag;
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class RawPaginationDocument {

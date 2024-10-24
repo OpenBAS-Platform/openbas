@@ -1,15 +1,14 @@
 package io.openbas.config;
 
+import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.database.model.User.ROLE_USER;
+
 import io.openbas.database.model.User;
+import java.util.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-
-import java.util.*;
-
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.model.User.ROLE_USER;
 
 public class OpenBASOAuth2User implements OpenBASPrincipal, OAuth2User {
 
@@ -52,9 +51,9 @@ public class OpenBASOAuth2User implements OpenBASPrincipal, OAuth2User {
   public String getLang() {
     return this.user.getLang();
   }
+
   @Override
   public String getName() {
     return this.user.getFirstname() + " " + this.user.getLastname();
   }
-
 }

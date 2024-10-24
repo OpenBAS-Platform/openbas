@@ -6,11 +6,10 @@ import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
-
-import java.util.Objects;
 
 @Entity
 @Table(name = "tags")

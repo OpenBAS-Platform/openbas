@@ -7,10 +7,10 @@ import lombok.Setter;
 @Getter
 public class ComcheckContext {
 
-    private String url;
+  private String url;
 
-    @Override
-    public String toString() {
-        return url;
-    }
+  @Override
+  public String toString() {
+    return url;
+  }
 }

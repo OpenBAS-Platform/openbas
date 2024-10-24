@@ -1,21 +1,5 @@
 package io.openbas.rest.scenario;
 
-import io.openbas.IntegrationTest;
-import io.openbas.database.model.Scenario;
-import io.openbas.database.repository.ScenarioRepository;
-import io.openbas.utils.fixtures.PaginationFixture;
-import io.openbas.utils.fixtures.ScenarioFixture;
-import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.pagination.SearchPaginationInput;
-import io.openbas.utils.pagination.SortField;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static io.openbas.database.model.Filters.FilterOperator.contains;
 import static io.openbas.database.model.Scenario.SEVERITY.critical;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
@@ -26,14 +10,27 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import io.openbas.IntegrationTest;
+import io.openbas.database.model.Scenario;
+import io.openbas.database.repository.ScenarioRepository;
+import io.openbas.utils.fixtures.PaginationFixture;
+import io.openbas.utils.fixtures.ScenarioFixture;
+import io.openbas.utils.mockUser.WithMockAdminUser;
+import io.openbas.utils.pagination.SearchPaginationInput;
+import io.openbas.utils.pagination.SortField;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
 @TestInstance(PER_CLASS)
 public class ScenarioApiSearchTest extends IntegrationTest {
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
-  @Autowired
-  private ScenarioRepository scenarioRepository;
+  @Autowired private ScenarioRepository scenarioRepository;
 
   private static final List<String> SCENARIO_IDS = new ArrayList<>();
 
@@ -66,11 +63,13 @@ public class ScenarioApiSearchTest extends IntegrationTest {
       @Test
       @DisplayName("Retrieving first page of scenarios by textsearch")
       void given_working_search_input_should_return_a_page_of_scenarios() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().textSearch("Crisis").build();
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.getDefault().textSearch("Crisis").build();
 
-        mvc.perform(post(SCENARIO_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(SCENARIO_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(1));
       }
@@ -78,11 +77,13 @@ public class ScenarioApiSearchTest extends IntegrationTest {
       @Test
       @DisplayName("Not retrieving first page of scenario by textsearch")
       void given_not_working_search_input_should_return_a_page_of_scenarios() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().textSearch("wrong").build();
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.getDefault().textSearch("wrong").build();
 
-        mvc.perform(post(SCENARIO_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(SCENARIO_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(0));
       }
@@ -94,14 +95,17 @@ public class ScenarioApiSearchTest extends IntegrationTest {
 
       @Test
       @DisplayName("Sorting page of scenarios by name")
-      void given_sorting_input_by_name_should_return_a_page_of_scenarios_sort_by_name() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
-            .sorts(List.of(SortField.builder().property("scenario_name").build()))
-            .build();
+      void given_sorting_input_by_name_should_return_a_page_of_scenarios_sort_by_name()
+          throws Exception {
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.getDefault()
+                .sorts(List.of(SortField.builder().property("scenario_name").build()))
+                .build();
 
-        mvc.perform(post(SCENARIO_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(SCENARIO_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.content.[0].scenario_name").value("Crisis scenario"))
             .andExpect(jsonPath("$.content.[1].scenario_name").value("Incident response scenario"));
@@ -111,13 +115,20 @@ public class ScenarioApiSearchTest extends IntegrationTest {
       @DisplayName("Sorting page of scenarios by category")
       void given_sorting_input_by_category_should_return_a_page_of_scenarios_sort_by_category()
           throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
-            .sorts(List.of(SortField.builder().property("scenario_category").direction("desc").build()))
-            .build();
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.getDefault()
+                .sorts(
+                    List.of(
+                        SortField.builder()
+                            .property("scenario_category")
+                            .direction("desc")
+                            .build()))
+                .build();
 
-        mvc.perform(post(SCENARIO_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(SCENARIO_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.content.[0].scenario_name").value("Incident response scenario"))
             .andExpect(jsonPath("$.content.[1].scenario_name").value("Crisis scenario"));
@@ -130,48 +141,48 @@ public class ScenarioApiSearchTest extends IntegrationTest {
 
       @Test
       @DisplayName("Filtering page of scenarios by name")
-      void given_filter_input_by_name_should_return_a_page_of_scenarios_filter_by_name() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.simpleFilter(
-            "scenario_name", "Crisis", contains
-        );
+      void given_filter_input_by_name_should_return_a_page_of_scenarios_filter_by_name()
+          throws Exception {
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.simpleFilter("scenario_name", "Crisis", contains);
 
-        mvc.perform(post(SCENARIO_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(SCENARIO_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(1));
       }
 
       @Test
       @DisplayName("Filtering page of scenarios by category")
-      void given_filter_input_by_category_should_return_a_page_of_scenarios_filter_by_category() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.simpleFilter(
-            "scenario_category", "incident-response", contains
-        );
+      void given_filter_input_by_category_should_return_a_page_of_scenarios_filter_by_category()
+          throws Exception {
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.simpleFilter("scenario_category", "incident-response", contains);
 
-        mvc.perform(post(SCENARIO_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(SCENARIO_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(1));
       }
 
       @Test
       @DisplayName("Filtering page of scenarios by severity")
-      void given_filter_input_by_severity_should_return_a_page_of_scenarios_filter_by_severity() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.simpleFilter(
-            "scenario_severity", valueOf(critical), contains
-        );
+      void given_filter_input_by_severity_should_return_a_page_of_scenarios_filter_by_severity()
+          throws Exception {
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.simpleFilter("scenario_severity", valueOf(critical), contains);
 
-        mvc.perform(post(SCENARIO_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(SCENARIO_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(1));
       }
-
     }
-
   }
-
 }

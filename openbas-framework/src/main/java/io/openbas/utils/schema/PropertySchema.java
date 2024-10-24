@@ -1,29 +1,26 @@
 package io.openbas.utils.schema;
 
+import static lombok.AccessLevel.NONE;
+import static org.springframework.util.StringUtils.hasText;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
-
-import java.util.List;
-import java.util.Optional;
-
-import static lombok.AccessLevel.NONE;
-import static org.springframework.util.StringUtils.hasText;
 
 @Builder
 @Getter
 public class PropertySchema {
 
-  @NotBlank
-  private final String name;
+  @NotBlank private final String name;
 
   @Getter(NONE)
   private final String jsonName;
 
-  @NotNull
-  private final Class<?> type;
+  @NotNull private final Class<?> type;
 
   private final boolean unicity;
   private final boolean mandatory;
@@ -70,5 +67,4 @@ public class PropertySchema {
       return super.build();
     }
   }
-
 }

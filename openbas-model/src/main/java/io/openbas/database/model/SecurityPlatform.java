@@ -53,11 +53,10 @@ public class SecurityPlatform extends Asset {
   @JsonProperty("security_platform_logo_dark")
   private Document logoDark;
 
-  public SecurityPlatform() {
+  public SecurityPlatform() {}
 
-  }
-
-  public SecurityPlatform(String id, String type, String name, SECURITY_PLATFORM_TYPE securityPlatformType) {
+  public SecurityPlatform(
+      String id, String type, String name, SECURITY_PLATFORM_TYPE securityPlatformType) {
     super(id, type, name);
     this.securityPlatformType = securityPlatformType;
   }
