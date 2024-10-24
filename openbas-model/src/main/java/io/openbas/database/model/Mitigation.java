@@ -55,6 +55,7 @@ public class Mitigation implements Base {
   @NotBlank
   private String externalId;
 
+  @Type(StringArrayType.class)
   @Column(name = "mitigation_log_sources", columnDefinition = "text[]")
   @JsonProperty("mitigation_log_sources")
   private String[] logSources = new String[0];

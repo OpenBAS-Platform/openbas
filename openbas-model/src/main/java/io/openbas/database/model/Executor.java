@@ -2,12 +2,14 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -38,6 +40,7 @@ public class Executor implements Base {
     private String type;
 
     @Getter
+    @Type(StringArrayType.class)
     @Column(name = "executor_platforms", columnDefinition = "text[]")
     @JsonProperty("executor_platforms")
     private String[] platforms = new String[0];
