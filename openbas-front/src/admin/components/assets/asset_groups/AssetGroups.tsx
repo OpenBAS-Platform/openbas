@@ -16,7 +16,6 @@ import Breadcrumbs from '../../../../components/Breadcrumbs';
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { AssetGroupOutput } from '../../../../utils/api-types';
 import { initSorting } from '../../../../components/common/queryable/Page';
-import { useAppDispatch } from '../../../../utils/hooks';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import ExportButton from '../../../../components/common/ExportButton';
@@ -126,7 +125,6 @@ const computeRuleValues = (assetGroup: AssetGroupOutput, t: (value: string) => s
 const AssetGroups = () => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useAppDispatch();
   const { t } = useFormatter();
 
   const [selectedAssetGroupId, setSelectedAssetGroupId] = useState<AssetGroupStore['asset_group_id'] | undefined>(undefined);
