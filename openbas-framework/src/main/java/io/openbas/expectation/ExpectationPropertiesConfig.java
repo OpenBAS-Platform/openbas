@@ -1,13 +1,17 @@
 package io.openbas.expectation;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 import static java.util.Optional.ofNullable;
 
 @Component
 @Setter
+@Validated
 public class ExpectationPropertiesConfig {
 
   public static long DEFAULT_TECHNICAL_EXPECTATION_EXPIRATION_TIME = 21600L; // 6 hours
@@ -29,7 +33,9 @@ public class ExpectationPropertiesConfig {
   private Long articleExpirationTime;
   @Value("${openbas.expectation.manual.expiration-time:#{null}}")
   private Long manualExpirationTime;
-  @Value("${openbas.expectation.manual.default-score-value:#{null}}")
+  @Value("${openbas.expectation.manual.default-score-value:50}")
+  @Max(100)
+  @Min(0)
   private Integer defaultManualExpectationScore;
 
   public long getDetectionExpirationTime() {
