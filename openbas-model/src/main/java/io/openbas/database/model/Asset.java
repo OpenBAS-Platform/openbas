@@ -47,7 +47,7 @@ public class Asset implements Base {
   @Setter(NONE)
   private String type;
 
-  @Queryable(searchable = true, sortable = true)
+  @Queryable(searchable = true, filterable = true, sortable = true)
   @Column(name = "asset_name")
   @JsonProperty("asset_name")
   @NotBlank
@@ -58,6 +58,7 @@ public class Asset implements Base {
   @JsonProperty("asset_description")
   private String description;
 
+  @Queryable(filterable = true)
   @Column(name = "asset_last_seen")
   @JsonProperty("asset_last_seen")
   private Instant lastSeen;
@@ -76,7 +77,7 @@ public class Asset implements Base {
 
   // -- TAG --
 
-  @Queryable(filterable = true, sortable = true, dynamicValues = true, path = "tags.id")
+  @Queryable(searchable = true, filterable = true, sortable = true, dynamicValues = true, path = "tags.id")
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "assets_tags",
       joinColumns = @JoinColumn(name = "asset_id"),
@@ -85,7 +86,7 @@ public class Asset implements Base {
   @JsonProperty("asset_tags")
   private Set<Tag> tags = new HashSet<>();
 
-  @Queryable(sortable = true)
+  @Queryable(searchable = true, filterable = true, sortable = true, dynamicValues = true)
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "asset_executor")
   @JsonSerialize(using = MonoIdDeserializer.class)
