@@ -24,6 +24,9 @@ steps:
     commands:
       - cd openbas-front
       - apk --no-cache add git
+      - yarn -v
+      - node -v
+      - yarn install --immutable
       - yarn install
       - yarn build
       - yarn check-ts
