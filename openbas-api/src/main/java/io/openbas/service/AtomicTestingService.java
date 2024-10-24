@@ -129,7 +129,6 @@ public class AtomicTestingService {
         injectToSave.setExercise(null);
 
         // Set dependencies
-        injectToSave.setDependsOn(null);
         injectToSave.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
         injectToSave.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         injectToSave.setAssets(fromIterable(this.assetRepository.findAllById(input.getAssets())));
