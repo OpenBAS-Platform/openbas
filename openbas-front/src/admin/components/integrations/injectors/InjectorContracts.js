@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
 import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -12,9 +11,6 @@ import SortHeadersComponent from '../../../../components/common/pagination/SortH
 import { initSorting } from '../../../../components/common/queryable/Page';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
-import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
 import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
 
 const useStyles = makeStyles(() => ({
@@ -100,7 +96,6 @@ const inlineStyles = {
 const InjectorContracts = () => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { injectorId } = useParams();
   const { t, tPick, nsdt } = useFormatter();
   const { injector, attackPatternsMap, killChainPhasesMap } = useHelper((helper) => ({
@@ -108,10 +103,6 @@ const InjectorContracts = () => {
     attackPatternsMap: helper.getAttackPatternsMap(),
     killChainPhasesMap: helper.getKillChainPhasesMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchKillChainPhases());
-    dispatch(fetchAttackPatterns());
-  });
 
   // Headers
   const headers = [

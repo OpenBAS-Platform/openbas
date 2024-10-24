@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useDispatch } from 'react-redux';
 import { DynamicFormOutlined } from '@mui/icons-material';
 import { searchMitigations } from '../../../actions/Mitigation';
 import CreateMitigation from './CreateMitigation';
@@ -12,9 +11,6 @@ import { initSorting } from '../../../components/common/queryable/Page';
 import { useFormatter } from '../../../components/i18n';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useHelper } from '../../../store';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
-import { fetchAttackPatterns } from '../../../actions/AttackPattern';
-import { fetchKillChainPhases } from '../../../actions/KillChainPhase';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -99,16 +95,11 @@ const inlineStyles = {
 const Mitigations = () => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { t, nsdt } = useFormatter();
   const { attackPatternsMap, killChainPhasesMap } = useHelper((helper) => ({
     attackPatternsMap: helper.getAttackPatternsMap(),
     killChainPhasesMap: helper.getKillChainPhasesMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchAttackPatterns());
-    dispatch(fetchKillChainPhases());
-  });
 
   // Headers
   const headers = [

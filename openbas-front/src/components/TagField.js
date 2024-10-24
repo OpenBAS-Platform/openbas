@@ -5,7 +5,7 @@ import { Box, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { connect } from 'react-redux';
 import TagForm from '../admin/components/settings/tags/TagForm';
-import { fetchTags, addTag } from '../actions/Tag';
+import { addTag } from '../actions/Tag';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
 import { storeHelper } from '../actions/Schema';
@@ -29,10 +29,6 @@ class TagField extends Component {
   constructor(props) {
     super(props);
     this.state = { tagCreation: false, tagInput: '' };
-  }
-
-  componentDidMount() {
-    this.props.fetchTags();
   }
 
   handleOpenTagCreation() {
@@ -138,7 +134,7 @@ const select = (state) => {
 };
 
 export default R.compose(
-  connect(select, { fetchTags, addTag }),
+  connect(select, { addTag }),
   inject18n,
   withStyles(styles),
 )(TagField);

@@ -8,8 +8,6 @@ import CreateTeam from '../../components/teams/CreateTeam';
 import Transition from '../../../../components/common/Transition';
 import ItemTags from '../../../../components/ItemTags';
 import type { Theme } from '../../../../components/Theme';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { useAppDispatch } from '../../../../utils/hooks';
 import { PermissionsContext, TeamContext } from '../Context';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import SelectList, { SelectListElements } from '../../../../components/common/SelectList';
@@ -18,7 +16,6 @@ import type { EndpointStore } from '../../assets/endpoints/Endpoint';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
-import { fetchTags } from '../../../../actions/Tag';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -44,14 +41,8 @@ const InjectAddTeams: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();
-  const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
   const { searchTeams } = useContext(TeamContext);
-
-  // Fetch datas
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
 
   const [teamValues, setTeamValues] = useState<TeamOutput[]>([]);
   const [selectedTeamValues, setSelectedTeamValues] = useState<TeamOutput[]>([]);

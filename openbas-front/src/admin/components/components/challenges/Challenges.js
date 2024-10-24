@@ -12,7 +12,6 @@ import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { fetchChallenges } from '../../../../actions/Challenge';
 import ChallengePopover from './ChallengePopover';
 import CreateChallenge from './CreateChallenge';
-import { fetchTags } from '../../../../actions/Tag';
 import TagsFilter from '../../common/filters/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
 import { fetchDocuments } from '../../../../actions/Document';
@@ -153,7 +152,6 @@ const Challenges = () => {
   useDataLoader(() => {
     dispatch(fetchExercises());
     dispatch(fetchChallenges());
-    dispatch(fetchTags());
     dispatch(fetchDocuments());
   });
   const sortedChallenges = filtering.filterAndSort(challenges);
@@ -171,7 +169,6 @@ const Challenges = () => {
             onAddTag={filtering.handleAddTag}
             onRemoveTag={filtering.handleRemoveTag}
             currentTags={filtering.tags}
-            tagsFetched
           />
         </div>
       </div>

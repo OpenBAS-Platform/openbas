@@ -7,7 +7,6 @@ import { DescriptionOutlined, RowingOutlined } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useFormatter } from '../../../../components/i18n';
 import { searchDocuments } from '../../../../actions/Document';
-import { fetchTags } from '../../../../actions/Tag';
 import { fetchExercises } from '../../../../actions/Exercise';
 import ItemTags from '../../../../components/ItemTags';
 import CreateDocument from './CreateDocument';
@@ -95,7 +94,6 @@ const Documents = () => {
   useDataLoader(() => {
     dispatch(fetchExercises());
     dispatch(fetchScenarios());
-    dispatch(fetchTags());
   });
 
   // Headers

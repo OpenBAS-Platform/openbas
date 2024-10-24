@@ -13,8 +13,10 @@ import Loader from '../components/Loader';
 import NotFound from '../components/NotFound';
 import InjectIndex from './components/simulations/simulation/injects/InjectIndex';
 import SystemBanners, { computeBannerSettings } from '../public/components/systembanners/SystemBanners';
-import { fetchTags } from '../actions/Tag';
 import { useAppDispatch } from '../utils/hooks';
+import { fetchAttackPatterns } from '../actions/AttackPattern';
+import { fetchKillChainPhases } from '../actions/KillChainPhase';
+import { fetchTags } from '../actions/Tag';
 
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));
@@ -42,6 +44,7 @@ const Index = () => {
   const theme = useTheme<Theme>();
   const classes = useStyles();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { logged, settings } = useHelper((helper: LoggedHelper) => {
     return { logged: helper.logged(), settings: helper.getPlatformSettings() };
   });
@@ -58,8 +61,10 @@ const Index = () => {
     overflowX: 'hidden',
     overflowY: 'hidden',
   };
-  const dispatch = useAppDispatch();
+  // load taxonomics at login
   useDataLoader(() => {
+    dispatch(fetchAttackPatterns());
+    dispatch(fetchKillChainPhases());
     dispatch(fetchTags());
   });
   const { bannerHeight } = computeBannerSettings(settings);

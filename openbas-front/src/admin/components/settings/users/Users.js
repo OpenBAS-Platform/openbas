@@ -7,7 +7,6 @@ import { searchUsers } from '../../../../actions/User';
 import { fetchOrganizations } from '../../../../actions/Organization';
 import ItemTags from '../../../../components/ItemTags';
 import CreateUser from './CreateUser';
-import { fetchTags } from '../../../../actions/Tag';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../store';
 import UserPopover from './UserPopover';
@@ -77,7 +76,6 @@ const Users = () => {
     tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
-    dispatch(fetchTags());
     dispatch(fetchOrganizations());
   });
 

@@ -23,8 +23,6 @@ import { daysAgo, fillTimeSeries, getNextWeek, groupBy } from '../../utils/Time'
 import type { AttackPatternHelper } from '../../actions/attack_patterns/attackpattern-helper';
 import type { KillChainPhaseHelper } from '../../actions/kill_chain_phases/killchainphase-helper';
 import type { InjectorHelper } from '../../actions/injectors/injector-helper';
-import { fetchKillChainPhases } from '../../actions/KillChainPhase';
-import { fetchAttackPatterns } from '../../actions/AttackPattern';
 import Empty from '../../components/Empty';
 import { attackPatternsFakeData, categoriesDataFakeData, categoriesLabelsFakeData, exercisesTimeSeriesFakeData } from '../../utils/fakeData';
 import ExerciseList from './simulations/ExerciseList';
@@ -79,15 +77,12 @@ const Dashboard = () => {
   const statistics = useHelper((helper: StatisticsHelper) => helper.getStatistics());
   const [loadingExercises, setLoadingExercises] = useState(true);
   useDataLoader(() => {
-    dispatch(fetchKillChainPhases());
     setLoadingExercises(true);
     dispatch(fetchExercises()).finally(() => setLoadingExercises(false));
     dispatch(fetchStatistics());
-    dispatch(fetchAttackPatterns());
   });
   const { attackPatterns } = useHelper((helper: AttackPatternHelper & KillChainPhaseHelper & InjectorHelper) => ({
     attackPatterns: helper.getAttackPatterns(),
-    killChainPhasesMap: helper.getKillChainPhasesMap(),
   }));
   const exercisesOverTime = groupBy(exercisesFromStore.filter((e: ExerciseSimple) => e.exercise_start_date !== null), 'exercise_start_date', 'week');
   const exercisesTimeSeries = fillTimeSeries(daysAgo(150), getNextWeek(), 'week', exercisesOverTime);
@@ -235,8 +230,8 @@ const Dashboard = () => {
         <Typography variant="h4">{t('MITRE ATT&CK Coverage')}</Typography>
         <Paper variant="outlined" style={{ minWidth: '100%', padding: 16 }}>
           {(statistics?.inject_expectation_results ?? []).length > 0
-            ? <MitreMatrix ttpAlreadyLoaded injectResults={statistics?.inject_expectation_results ?? []} />
-            : <MitreMatrixDummy ttpAlreadyLoaded />
+            ? <MitreMatrix injectResults={statistics?.inject_expectation_results ?? []} />
+            : <MitreMatrixDummy />
           }
         </Paper>
       </Grid>

@@ -14,9 +14,6 @@ import PaginationComponentV2 from '../../../../components/common/queryable/pagin
 import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import { TeamContext } from '../../common/Context';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchTags } from '../../../../actions/Tag';
-import { useAppDispatch } from '../../../../utils/hooks';
 import CreateTeam from './CreateTeam';
 
 const useStyles = makeStyles(() => ({
@@ -38,13 +35,7 @@ const UpdateTeams: React.FC<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();
-  const dispatch = useAppDispatch();
   const { searchTeams, onReplaceTeam } = useContext(TeamContext);
-
-  // Fetch datas
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
 
   const [teamValues, setTeamValues] = useState<TeamOutput[]>([]);
   const [selectedTeamValues, setSelectedTeamValues] = useState<TeamOutput[]>([]);

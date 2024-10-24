@@ -10,9 +10,6 @@ import type { ExerciseSimpleStore, ExerciseStore } from '../../../actions/exerci
 import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
 import ItemTargets from '../../../components/ItemTargets';
 import type { ExerciseSimple } from '../../../utils/api-types';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
-import { fetchTags } from '../../../actions/Tag';
-import { useAppDispatch } from '../../../utils/hooks';
 import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
 import { Header } from '../../../components/common/SortHeadersList';
@@ -80,15 +77,9 @@ const ExerciseList: FunctionComponent<Props> = ({
   secondaryAction,
 }) => {
   // Standard hooks
-  const dispatch = useAppDispatch();
   const classes = useStyles();
   const inlineStyles = getInlineStyles(variant);
   const { nsdt, vnsdt } = useFormatter();
-
-  // Fetching data
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
 
   // Headers
   const headers: Header[] = [

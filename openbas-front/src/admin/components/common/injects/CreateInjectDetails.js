@@ -8,9 +8,6 @@ import { ArrowDropDownOutlined, ArrowDropUpOutlined, HelpOutlined, HighlightOffO
 import InjectDefinition from './InjectDefinition';
 import { PermissionsContext } from '../Context';
 import { useHelper } from '../../../../store';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchTags } from '../../../../actions/Tag';
 import InjectForm from './InjectForm';
 import { useFormatter } from '../../../../components/i18n';
 import { isEmptyField, isNotEmptyField } from '../../../../utils/utils';
@@ -82,13 +79,10 @@ const CreateInjectDetails = ({
   const { permissions } = useContext(PermissionsContext);
   const [openDetails, setOpenDetails] = useState(false);
   const [injectDetailsState, setInjectDetailsState] = useState({});
-  const dispatch = useAppDispatch();
   const { tagsMap } = useHelper((helper) => ({
     tagsMap: helper.getTagsMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
+
   const toggleInjectContent = () => {
     if (openDetails) {
       // eslint-disable-next-line no-param-reassign
@@ -146,9 +140,9 @@ const CreateInjectDetails = ({
             finalData[field.key] = parseInt(data[field.key], 10);
           } else if (
             field.type === 'textarea'
-                  && field.richText
-                  && data[field.key]
-                  && data[field.key].length > 0
+            && field.richText
+            && data[field.key]
+            && data[field.key].length > 0
           ) {
             const regex = /&lt;#list\s+(\w+)\s+as\s+(\w+)&gt;/g;
             finalData[field.key] = data[field.key]
@@ -182,8 +176,8 @@ const CreateInjectDetails = ({
 
       const { allTeams, teamsIds, assetIds, assetGroupIds, documents } = injectDetailsState;
       const inject_depends_duration = data.inject_depends_duration_days * 3600 * 24
-          + data.inject_depends_duration_hours * 3600
-          + data.inject_depends_duration_minutes * 60;
+        + data.inject_depends_duration_hours * 3600
+        + data.inject_depends_duration_minutes * 60;
       const inject_tags = !R.isEmpty(data.inject_tags) ? R.pluck('id', data.inject_tags) : [];
       const values = {
         inject_title: data.inject_title,
@@ -237,9 +231,9 @@ const CreateInjectDetails = ({
       .forEach((field) => {
         if (
           field.type === 'textarea'
-              && field.richText
-              && initialValues[field.key]
-              && initialValues[field.key].length > 0
+          && field.richText
+          && initialValues[field.key]
+          && initialValues[field.key].length > 0
         ) {
           initialValues[field.key] = initialValues[field.key]
             .replaceAll(
@@ -255,9 +249,9 @@ const CreateInjectDetails = ({
           if (field.cardinality && field.cardinality === '1') {
             if (
               initialValues[field.key].value
-                  && initialValues[field.key].value.includes(
-                    `${field.tupleFilePrefix}`,
-                  )
+              && initialValues[field.key].value.includes(
+                `${field.tupleFilePrefix}`,
+              )
             ) {
               initialValues[field.key] = {
                 type: 'attachment',
@@ -278,7 +272,7 @@ const CreateInjectDetails = ({
             initialValues[field.key] = initialValues[field.key].map((pair) => {
               if (
                 pair.value
-                    && pair.value.includes(`${field.tupleFilePrefix}`)
+                && pair.value.includes(`${field.tupleFilePrefix}`)
               ) {
                 return {
                   type: 'attachment',
@@ -300,10 +294,10 @@ const CreateInjectDetails = ({
           avatar={contractContent ? (
             <InjectIcon
               type={
-              contract.injector_contract_payload
-                ? contract.injector_contract_payload?.payload_collector_type
-                    || contract.injector_contract_payload?.payload_type
-                : contract.injector_contract_injector_type
+                contract.injector_contract_payload
+                  ? contract.injector_contract_payload?.payload_collector_type
+                  || contract.injector_contract_payload?.payload_type
+                  : contract.injector_contract_injector_type
               }
               isPayload={isNotEmptyField(contract.injector_contract_payload)}
             />
@@ -338,41 +332,41 @@ const CreateInjectDetails = ({
             <form id="injectContentForm" onSubmit={handleSubmit} style={{ marginTop: 40 }}>
               <InjectForm form={form} values={values} disabled={!contractContent} isAtomic={isAtomic} />
               {contractContent && (
-              <div className={classes.details}>
-                {openDetails && (
-                  <InjectDefinition
-                    form={form}
-                    values={values}
-                    submitting={submitting}
-                    inject={{
-                      inject_injector_contract: { injector_contract_id: contractId },
-                      inject_type: contractContent.config.type,
-                      inject_teams: [],
-                      inject_assets: [],
-                      inject_asset_groups: [],
-                      inject_documents: [],
-                    }}
-                    injectorContract={{ ...contractContent, payloadType: contract.injector_contract_payload_type, payloadArch: contract.injector_contract_arch }}
-                    handleClose={handleClose}
-                    tagsMap={tagsMap}
-                    permissions={permissions}
-                    articlesFromExerciseOrScenario={[]}
-                    variablesFromExerciseOrScenario={[]}
-                    onCreateInject={onCreateInject}
-                    setInjectDetailsState={setInjectDetailsState}
-                    uriVariable={''}
-                    allUsersNumber={0}
-                    usersNumber={0}
-                    teamsUsers={[]}
-                    isAtomic={isAtomic}
-                    {...props}
-                  />
-                )}
-                <div className={classes.openDetails} onClick={toggleInjectContent}>
-                  {openDetails ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}
-                  {t('Inject content')}
+                <div className={classes.details}>
+                  {openDetails && (
+                    <InjectDefinition
+                      form={form}
+                      values={values}
+                      submitting={submitting}
+                      inject={{
+                        inject_injector_contract: { injector_contract_id: contractId },
+                        inject_type: contractContent.config.type,
+                        inject_teams: [],
+                        inject_assets: [],
+                        inject_asset_groups: [],
+                        inject_documents: [],
+                      }}
+                      injectorContract={{ ...contractContent, payloadType: contract.injector_contract_payload_type, payloadArch: contract.injector_contract_arch }}
+                      handleClose={handleClose}
+                      tagsMap={tagsMap}
+                      permissions={permissions}
+                      articlesFromExerciseOrScenario={[]}
+                      variablesFromExerciseOrScenario={[]}
+                      onCreateInject={onCreateInject}
+                      setInjectDetailsState={setInjectDetailsState}
+                      uriVariable={''}
+                      allUsersNumber={0}
+                      usersNumber={0}
+                      teamsUsers={[]}
+                      isAtomic={isAtomic}
+                      {...props}
+                    />
+                  )}
+                  <div className={classes.openDetails} onClick={toggleInjectContent}>
+                    {openDetails ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}
+                    {t('Inject content')}
+                  </div>
                 </div>
-              </div>
               )}
               <div style={{ float: 'right', marginTop: 20 }}>
                 <Button

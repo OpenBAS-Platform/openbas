@@ -9,7 +9,6 @@ import { fetchOrganizations } from '../../../../../actions/Organization';
 import ItemTags from '../../../../../components/ItemTags';
 import TagsFilter from '../../../common/filters/TagsFilter';
 import SearchFilter from '../../../../../components/SearchFilter';
-import { fetchTags } from '../../../../../actions/Tag';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../../store';
 import useSearchAnFilter from '../../../../../utils/SortingFiltering';
@@ -220,7 +219,6 @@ const Comcheck = () => {
   });
   // Fetching data
   useDataLoader(() => {
-    dispatch(fetchTags());
     dispatch(fetchOrganizations());
     dispatch(fetchPlayers());
     dispatch(fetchComcheck(exerciseId, comcheckId));

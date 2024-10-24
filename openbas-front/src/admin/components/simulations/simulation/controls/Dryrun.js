@@ -5,7 +5,6 @@ import { useDispatch } from 'react-redux';
 import { CastOutlined, CheckCircleOutlineOutlined, PersonOutlined } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import SearchFilter from '../../../../../components/SearchFilter';
-import { fetchTags } from '../../../../../actions/Tag';
 import { fetchPlayers } from '../../../../../actions/User';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../../store';
@@ -184,7 +183,6 @@ const Dryrun = () => {
     };
   });
   useDataLoader(() => {
-    dispatch(fetchTags());
     dispatch(fetchPlayers());
     dispatch(fetchDryrun(exerciseId, dryrunId));
     dispatch(fetchDryinjects(exerciseId, dryrunId));
@@ -336,7 +334,7 @@ const Dryrun = () => {
                 disabled={!dryinject.dryinject_inject.inject_enabled}
               >
                 <ListItemIcon style={{ paddingTop: 5 }}>
-                  <InjectIcon type={dryinject.dryinject_inject.inject_type} disabled={!dryinject.dryinject_inject.inject_enabled}/>
+                  <InjectIcon type={dryinject.dryinject_inject.inject_type} disabled={!dryinject.dryinject_inject.inject_enabled} />
                 </ListItemIcon>
                 <ListItemText
                   primary={

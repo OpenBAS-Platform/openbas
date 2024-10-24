@@ -5,11 +5,9 @@ import { Box, Dialog, DialogTitle, DialogContent, Autocomplete, TextField, IconB
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from './i18n';
 import AttackPatternForm from '../admin/components/settings/attack_patterns/AttackPatternForm';
-import { fetchAttackPatterns, addAttackPattern } from '../actions/AttackPattern';
+import { addAttackPattern } from '../actions/AttackPattern';
 import type { AttackPattern, AttackPatternCreateInput } from '../utils/api-types';
 import { useAppDispatch } from '../utils/hooks';
-import useDataLoader from '../utils/hooks/useDataLoader';
-import { fetchKillChainPhases } from '../actions/KillChainPhase';
 import { useHelper } from '../store';
 import type { AttackPatternHelper } from '../actions/attack_patterns/attackpattern-helper';
 import type { KillChainPhaseHelper } from '../actions/kill_chain_phases/killchainphase-helper';
@@ -57,10 +55,6 @@ const AttackPatternField: FunctionComponent<Props> = ({
     killChainPhasesMap: helper.getKillChainPhasesMap(),
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
-  useDataLoader(() => {
-    dispatch(fetchAttackPatterns());
-    dispatch(fetchKillChainPhases());
-  });
 
   const [attackPatternCreation, setAttackPatternCreation] = React.useState(false);
 

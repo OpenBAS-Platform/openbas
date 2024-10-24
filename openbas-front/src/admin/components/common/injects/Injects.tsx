@@ -325,12 +325,13 @@ const Injects: FunctionComponent<Props> = ({
     onToggleEntity,
     numberOfSelectedElements,
   } = useEntityToggle<{ inject_id: string }>('inject', injects.length);
+  const hasSelectedElements = selectedElements && !R.isEmpty(selectedElements);
   const onRowShiftClick = (currentIndex: number, currentEntity: { inject_id: string }, event: React.SyntheticEvent | null = null) => {
     if (event) {
       event.stopPropagation();
       event.preventDefault();
     }
-    if (selectedElements && !R.isEmpty(selectedElements)) {
+    if (hasSelectedElements) {
       // Find the indexes of the first and last selected entities
       let firstIndex = R.findIndex(
         (n: Inject) => n.inject_id === R.head(R.values(selectedElements)).inject_id,
@@ -645,33 +646,39 @@ const Injects: FunctionComponent<Props> = ({
             setPresetCreationValues(undefined);
           }}
           />
-          <ToolBar
-            numberOfSelectedElements={numberOfSelectedElements}
-            selectedElements={selectedElements}
-            deSelectedElements={deSelectedElements}
-            selectAll={selectAll}
-            handleClearSelectedElements={handleClearSelectedElements}
-            teamsFromExerciseOrScenario={teams}
-            id={exerciseOrScenarioId}
-            handleUpdate={massUpdateInjects}
-            handleBulkDelete={bulkDeleteInjects}
-            handleBulkTest={massTestInjects}
-          />
-          <CreateInject
-            title={t('Create a new inject')}
-            open={openCreateDrawer}
-            handleClose={() => setOpenCreateDrawer(false)}
-            onCreateInject={onCreateInject}
-            presetValues={presetCreationValues}
-            // @ts-expect-error typing
-            teamsFromExerciseOrScenario={teams}
-            articlesFromExerciseOrScenario={articles}
-            variablesFromExerciseOrScenario={variables}
-            uriVariable={uriVariable}
-            allUsersNumber={allUsersNumber}
-            usersNumber={usersNumber}
-            teamsUsers={teamsUsers}
-          />
+          {
+            hasSelectedElements
+            && <ToolBar
+              numberOfSelectedElements={numberOfSelectedElements}
+              selectedElements={selectedElements}
+              deSelectedElements={deSelectedElements}
+              selectAll={selectAll}
+              handleClearSelectedElements={handleClearSelectedElements}
+              teamsFromExerciseOrScenario={teams}
+              id={exerciseOrScenarioId}
+              handleUpdate={massUpdateInjects}
+              handleBulkDelete={bulkDeleteInjects}
+              handleBulkTest={massTestInjects}
+               />
+          }
+          {openCreateDrawer
+            && <CreateInject
+              title={t('Create a new inject')}
+              open={openCreateDrawer}
+              handleClose={() => setOpenCreateDrawer(false)}
+              onCreateInject={onCreateInject}
+              presetValues={presetCreationValues}
+              // @ts-expect-error typing
+              teamsFromExerciseOrScenario={teams}
+              articlesFromExerciseOrScenario={articles}
+              variablesFromExerciseOrScenario={variables}
+              uriVariable={uriVariable}
+              allUsersNumber={allUsersNumber}
+              usersNumber={usersNumber}
+              teamsUsers={teamsUsers}
+               />
+          }
+
         </>
       )}
     </>

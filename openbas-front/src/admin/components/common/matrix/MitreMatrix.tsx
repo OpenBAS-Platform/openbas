@@ -2,12 +2,8 @@ import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
-import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
-import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
-import { useAppDispatch } from '../../../../utils/hooks';
 import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import type { InjectExpectationResultsByAttackPatternStore } from '../../../../actions/exercises/Exercise';
@@ -27,17 +23,14 @@ const useStyles = makeStyles(() => ({
 interface Props {
   goToLink?: string;
   injectResults: InjectExpectationResultsByAttackPatternStore[];
-  ttpAlreadyLoaded?: boolean;
 }
 
 const MitreMatrix: FunctionComponent<Props> = ({
   goToLink,
   injectResults,
-  ttpAlreadyLoaded,
 }) => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useAppDispatch();
   // Fetching data
   const { attackPatternMap, killChainPhaseMap }: {
     attackPatternMap: Record<string, AttackPattern>,
@@ -46,12 +39,6 @@ const MitreMatrix: FunctionComponent<Props> = ({
     attackPatternMap: helper.getAttackPatternsMap(),
     killChainPhaseMap: helper.getKillChainPhasesMap(),
   }));
-  if (!ttpAlreadyLoaded) {
-    useDataLoader(() => {
-      dispatch(fetchKillChainPhases());
-      dispatch(fetchAttackPatterns());
-    });
-  }
   // Attack Pattern
   const resultAttackPatternIds = R.uniq(
     injectResults
