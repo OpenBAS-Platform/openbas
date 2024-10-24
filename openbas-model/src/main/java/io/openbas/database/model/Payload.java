@@ -72,7 +72,7 @@ public class Payload implements Base {
   @Column(name = "payload_platforms", columnDefinition = "text[]")
   @JsonProperty("payload_platforms")
   @Enumerated(EnumType.STRING)
-  private List<PLATFORM_TYPE> platforms = new ArrayList<>();
+  private PLATFORM_TYPE[] platforms = new PLATFORM_TYPE[0];
 
   @Setter
   @ManyToMany(fetch = FetchType.EAGER)
