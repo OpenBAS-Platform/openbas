@@ -107,7 +107,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
 
   const proOptions = { account: 'paid-pro', hideAttribution: true };
   const defaultEdgeOptions = {
-    type: 'smoothstep',
+    type: ConnectionLineType.Bezier,
     markerEnd: { type: MarkerType.ArrowClosed,
       width: 30,
       height: 30,
