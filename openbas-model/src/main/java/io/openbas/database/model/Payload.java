@@ -2,7 +2,6 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
@@ -72,7 +71,8 @@ public class Payload implements Base {
   @Queryable(filterable = true, searchable = true)
   @Column(name = "payload_platforms", columnDefinition = "text[]")
   @JsonProperty("payload_platforms")
-  private PLATFORM_TYPE[] platforms = new PLATFORM_TYPE[0];
+  @Enumerated(EnumType.STRING)
+  private List<PLATFORM_TYPE> platforms = new ArrayList<>();
 
   @Setter
   @ManyToMany(fetch = FetchType.EAGER)
