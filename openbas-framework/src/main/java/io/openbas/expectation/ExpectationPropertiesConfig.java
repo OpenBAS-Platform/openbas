@@ -33,9 +33,7 @@ public class ExpectationPropertiesConfig {
   private Long articleExpirationTime;
   @Value("${openbas.expectation.manual.expiration-time:#{null}}")
   private Long manualExpirationTime;
-  @Value("${openbas.expectation.manual.default-score-value:50}")
-  @Max(100)
-  @Min(0)
+  @Value("${openbas.expectation.manual.default-score-value:#{null}}")
   private Integer defaultManualExpectationScore;
 
   public long getDetectionExpirationTime() {
@@ -79,8 +77,12 @@ public class ExpectationPropertiesConfig {
   }
 
   public int getDefaultExpectationScoreValue() {
-    return ofNullable(this.defaultManualExpectationScore)
-            .orElse(DEFAULT_MANUAL_EXPECTATION_SCORE);
+    if (defaultManualExpectationScore == null ||
+        defaultManualExpectationScore < 1 ||
+        defaultManualExpectationScore > 100) {
+      return DEFAULT_MANUAL_EXPECTATION_SCORE;
+    }
+    return defaultManualExpectationScore;
   }
 
 }
