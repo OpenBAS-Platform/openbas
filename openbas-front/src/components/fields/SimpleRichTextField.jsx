@@ -5,7 +5,7 @@ import Editor from 'ckeditor5-custom-build/build/ckeditor';
 import 'ckeditor5-custom-build/build/translations/fr';
 import { useHelper } from '../../store';
 import locale from '../../utils/BrowserLanguage';
-// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import-x/no-cycle
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 
 const SimpleRichTextField = (props) => {

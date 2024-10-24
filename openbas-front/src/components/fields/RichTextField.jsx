@@ -9,7 +9,7 @@ import classNames from 'classnames';
 import { useHelper } from '../../store';
 import locale from '../../utils/BrowserLanguage';
 import { useFormatter } from '../i18n';
-// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import-x/no-cycle
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 
 const useStyles = makeStyles((theme) => ({
