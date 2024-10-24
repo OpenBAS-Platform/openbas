@@ -3,13 +3,11 @@ package io.openbas.expectation;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
 
 import static java.util.Optional.ofNullable;
 
 @Component
 @Setter
-@Validated
 public class ExpectationPropertiesConfig {
 
   public static long DEFAULT_TECHNICAL_EXPECTATION_EXPIRATION_TIME = 21600L; // 6 hours
