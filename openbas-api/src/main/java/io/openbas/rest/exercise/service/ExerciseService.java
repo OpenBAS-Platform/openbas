@@ -107,7 +107,7 @@ public class ExerciseService {
       Specification<Exercise> specification,
       Specification<Exercise> specificationCount,
       Pageable pageable,
-        Map<String, Join<Base, Base>> joinMap) {
+      Map<String, Join<Base, Base>> joinMap) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();

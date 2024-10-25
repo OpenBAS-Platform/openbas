@@ -226,7 +226,7 @@ public class Exercise implements Base {
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("exercise_tags")
-  @Queryable(filterable = true, dynamicValues = true)
+  @Queryable(filterable = true, dynamicValues = true, path = "tags.id")
   private Set<Tag> tags = new HashSet<>();
 
   @Getter
