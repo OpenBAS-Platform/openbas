@@ -16,8 +16,8 @@ import type { VariablesHelper } from '../../../../../actions/variables/variable-
 import { fetchVariablesForExercise } from '../../../../../actions/variables/variable-actions';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import { fetchExerciseArticles } from '../../../../../actions/channels/article-action';
-import { articleContextForExercise } from '../articles/ExerciseArticles';
-import { teamContextForExercise } from '../teams/ExerciseTeams';
+import articleContextForExercise  from '../articles/articleContextForExercise';
+import teamContextForExercise from '../teams/teamContextForExercise';
 import InjectDistributionByType from '../../../common/injects/InjectDistributionByType';
 import InjectDistributionByTeam from '../../../common/injects/InjectDistributionByTeam';
 import ExerciseDistributionScoreByTeamInPercentage from '../overview/ExerciseDistributionScoreByTeamInPercentage';
@@ -37,11 +37,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-interface Props {
-
-}
-
-const ExerciseInjects: FunctionComponent<Props> = () => {
+const ExerciseInjects: FunctionComponent = () => {
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();

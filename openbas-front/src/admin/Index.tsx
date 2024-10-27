@@ -12,9 +12,10 @@ import type { LoggedHelper } from '../actions/helper';
 import Loader from '../components/Loader';
 import NotFound from '../components/NotFound';
 import InjectIndex from './components/simulations/simulation/injects/InjectIndex';
-import SystemBanners, { computeBannerSettings } from '../public/components/systembanners/SystemBanners';
+import SystemBanners from '../public/components/systembanners/SystemBanners';
 import { fetchTags } from '../actions/Tag';
 import { useAppDispatch } from '../utils/hooks';
+import { computeBannerSettings } from '../public/components/systembanners/utils';
 
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));

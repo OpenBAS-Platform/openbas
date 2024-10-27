@@ -2,13 +2,13 @@ import Markdown from 'react-markdown';
 import remarkParse from 'remark-parse';
 import remarkFlexibleMarkers from 'remark-flexible-markers';
 import { useTheme } from '@mui/styles';
-import { PluggableList } from 'react-markdown/lib';
 import { FunctionComponent, SyntheticEvent, useState } from 'react';
 import remarkGfm from 'remark-gfm';
 import type { Theme } from './Theme';
 import { truncate } from '../utils/String';
 import ExternalLinkPopover from './ExternalLinkPopover';
 import FieldOrEmpty from './FieldOrEmpty';
+import type { PluggableList } from 'react-markdown/lib';
 
 export const MarkDownComponents = (
   theme: Theme,

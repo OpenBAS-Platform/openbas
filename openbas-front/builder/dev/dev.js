@@ -8,7 +8,9 @@ import esbuild from "esbuild";
 import chokidar from "chokidar";
 
 // mimic CommonJS variables -- not needed if using CommonJS
+// eslint-disable-next-line no-underscore-dangle
 const __filename = fileURLToPath(import.meta.url);
+// eslint-disable-next-line no-underscore-dangle
 const __dirname = path.dirname(__filename);
 
 const basePath = "";
@@ -75,11 +77,13 @@ esbuild
         "all",
         debounce(() => {
           const start = new Date().getTime();
+          // eslint-disable-next-line no-console
           console.log(`[HOT RELOAD] Update of front detected`);
           return builder
             .rebuild()
             .then(() => {
               const time = new Date().getTime() - start;
+              // eslint-disable-next-line no-console
               console.log(
                 `[HOT RELOAD] Rebuild done in ${time} ms, updating frontend`,
               );
@@ -87,6 +91,7 @@ esbuild
               clients.length = 0;
             })
             .catch((error) => {
+              // eslint-disable-next-line no-console
               console.error(error);
             });
         }),

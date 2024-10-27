@@ -9,6 +9,7 @@ import { useFormatter } from '../../../components/i18n';
 import TagField from '../../../components/fields/TagField';
 import TextField from '../../../components/fields/TextField';
 import SelectField from '../../../components/fields/SelectField';
+import { scenarioCategories } from './constants';
 
 interface Props {
   onSubmit: SubmitHandler<ScenarioInput>;
@@ -16,17 +17,6 @@ interface Props {
   editing?: boolean;
   initialValues?: ScenarioInput;
 }
-
-export const scenarioCategories = new Map([
-  ['global-crisis', 'Global Crisis'],
-  ['attack-scenario', 'Attack Scenario'],
-  ['media-pressure', 'Media Pressure'],
-  ['data-exfiltration', 'Data Exfiltration'],
-  ['capture-the-flag', 'Capture The Flag'],
-  ['vulnerability-exploitation', 'Vulnerability Exploitation'],
-  ['lateral-movement', 'Lateral Movement'],
-  ['url-filtering', 'URL Filtering'],
-]);
 
 const ScenarioForm: FunctionComponent<Props> = ({
   onSubmit,

@@ -12,16 +12,12 @@ import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
 import type { Scenario } from '../../../../../utils/api-types';
-import { articleContextForScenario } from '../articles/ScenarioArticles';
-import { teamContextForScenario } from '../teams/ScenarioTeams';
+import articleContextForScenario  from '../articles/articleContextForScenario';
+import teamContextForScenario from '../teams/teamContextForScenario';
 import { fetchScenarioInjectsSimple } from '../../../../../actions/injects/inject-action';
 import Injects from '../../../common/injects/Injects';
 
-interface Props {
-
-}
-
-const ScenarioInjects: FunctionComponent<Props> = () => {
+const ScenarioInjects: FunctionComponent = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };

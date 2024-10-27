@@ -41,7 +41,7 @@ import logoFiligranTextDark from '../../../static/images/logo_filigran_text_dark
 import logoFiligranTextLight from '../../../static/images/logo_filigran_text_light.png';
 import useDimensions from '../../../utils/hooks/useDimensions';
 import useAuth from '../../../utils/hooks/useAuth';
-import { computeBannerSettings } from '../../../public/components/systembanners/SystemBanners';
+import { computeBannerSettings } from '../../../public/components/systembanners/utils';
 
 type entry = {
   type?: string,

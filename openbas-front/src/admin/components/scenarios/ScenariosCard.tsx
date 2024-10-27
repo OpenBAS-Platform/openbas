@@ -3,7 +3,7 @@ import { Card, CardActionArea, CardContent } from '@mui/material';
 import { FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import ItemCategory from '../../../components/ItemCategory';
-import { scenarioCategories } from './ScenarioForm';
+import { scenarioCategories } from './constants';
 import type { Theme } from '../../../components/Theme';
 import { useFormatter } from '../../../components/i18n';
 import type { ScenarioStatistic, SearchPaginationInput } from '../../../utils/api-types';

@@ -51,7 +51,7 @@ const TechnicalExpectationAsset: FunctionComponent<Props> = ({
       return JSON.parse(result).map((entry: string[], idx: number) => (
         <p key={idx}>{Object.entries(entry).map(([key, value]) => `${key}: ${value}\n`)}</p>
       ));
-    } catch (e) {
+    } catch {
       return (<p>{result}</p>);
     }
   };

@@ -1,8 +1,7 @@
 import Chart from 'react-apexcharts';
 import { FunctionComponent } from 'react';
-import * as R from 'ramda';
 import { useTheme } from '@mui/styles';
-import { colors, horizontalBarsChartOptions } from '../../../../utils/Charts';
+import { horizontalBarsChartOptions } from '../../../../utils/Charts';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
@@ -13,19 +12,6 @@ interface Props {
   distributionChartData: ApexAxisChartSeries;
   maxInjectsNumber: number;
 }
-
-export const getTeamsColors: (teams: TeamStore[]) => Record<string, string> = (teams: TeamStore[]) => {
-  const theme = useTheme<Theme>();
-
-  const mapIndexed = R.addIndex(R.map);
-  return R.pipe(
-    mapIndexed((a: TeamStore, index: number) => [
-      a.team_id,
-      colors(theme.palette.mode === 'dark' ? 400 : 600)[index],
-    ]),
-    R.fromPairs,
-  )(teams);
-};
 
 const InjectsDistribution: FunctionComponent<Props> = ({
   topTeams,

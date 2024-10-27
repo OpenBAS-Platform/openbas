@@ -19,7 +19,7 @@ import oermLight from '../../../static/images/xtm/oerm_light.png';
 import omtdDark from '../../../static/images/xtm/omtd_dark.png';
 import omtdLight from '../../../static/images/xtm/omtd_light.png';
 import useAuth from '../../../utils/hooks/useAuth';
-import { computeBannerSettings } from '../../../public/components/systembanners/SystemBanners';
+import { computeBannerSettings } from '../../../public/components/systembanners/utils';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   appBar: {

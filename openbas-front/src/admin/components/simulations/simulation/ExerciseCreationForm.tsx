@@ -10,7 +10,7 @@ import type { ExerciseCreateInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
 import TextField from '../../../../components/fields/TextField';
 import SelectField from '../../../../components/fields/SelectField';
-import { scenarioCategories } from '../../scenarios/ScenarioForm';
+import { scenarioCategories } from '../../scenarios/constants';
 
 interface Props {
   onSubmit: SubmitHandler<ExerciseCreateInput>;

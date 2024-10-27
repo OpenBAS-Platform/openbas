@@ -6,7 +6,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 
 import { useDispatch } from 'react-redux';
-import { TDocumentDefinitions } from 'pdfmake/interfaces';
+import type { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { useFormatter } from './i18n';
 import Loader from './Loader';
 import { useHelper } from '../store';

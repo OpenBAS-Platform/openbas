@@ -2,7 +2,8 @@ import { FunctionComponent } from 'react';
 import * as R from 'ramda';
 import { useFormatter } from '../../../../components/i18n';
 import type { TeamStore } from '../../../../actions/teams/Team';
-import InjectsDistribution, { getTeamsColors } from './InjectsDistribution';
+import InjectsDistribution from './InjectsDistribution';
+import { getTeamsColors } from './teams/utils';
 
 interface Props {
   teams: TeamStore[];

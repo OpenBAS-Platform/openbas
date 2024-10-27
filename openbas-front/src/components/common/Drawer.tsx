@@ -5,7 +5,7 @@ import { Close } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import type { Theme } from '../Theme';
 import useAuth from '../../utils/hooks/useAuth';
-import { computeBannerSettings } from '../../public/components/systembanners/SystemBanners';
+import { computeBannerSettings } from '../../public/components/systembanners/utils';
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
   drawerPaperHalf: {

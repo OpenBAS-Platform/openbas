@@ -10,10 +10,10 @@ import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { horizontalBarsChartOptions } from '../../../../utils/Charts';
 import type { Theme } from '../../../../components/Theme';
-import { getTeamsColors } from './InjectsDistribution';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 import { fetchExerciseTeams } from '../../../../actions/Exercise';
 import type { TeamStore } from '../../../../actions/teams/Team';
+import { getTeamsColors } from './teams/utils';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];

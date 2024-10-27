@@ -11,7 +11,7 @@ import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import type { Communication } from '../../../../../utils/api-types';
 import { lineChartOptions } from '../../../../../utils/Charts';
-import { getTeamsColors } from '../../../common/injects/InjectsDistribution';
+import { getTeamsColors } from '../../../common/injects/teams/utils';
 import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import type { TeamStore } from '../../../../../actions/teams/Team';
