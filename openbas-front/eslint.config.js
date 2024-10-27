@@ -45,9 +45,9 @@ export default [
   },
 
   // rules recommended by @stylistic/eslint-plugin
-  // stylistic.configs.customize({
-  //   semi: true,
-  // }),
+  stylistic.configs.customize({
+    semi: true,
+  }),
 
   // rules recommended by eslint-plugin-i18next
   i18next.configs['flat/recommended'],
@@ -58,7 +58,7 @@ export default [
       // eslint-plugin-react-refresh
       'react-refresh': reactRefresh,
       // eslint-plugin-simple-import-sort
-      // 'simple-import-sort': simpleImportSort,
+      'simple-import-sort': simpleImportSort,
       // local package eslint-plugin-custom-rules
       'custom-rules': customRules,
     },
@@ -72,8 +72,8 @@ export default [
       ],
 
       // eslint-plugin-simple-import-sort rules
-      // 'simple-import-sort/imports': 'error',
-      // 'simple-import-sort/exports': 'error',
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
 
       // local package eslint-plugin-custom-rules rules
       'custom-rules/classes-rule': 1,
@@ -103,8 +103,8 @@ export default [
       'react/prop-types': 0,
 
       // @stylistic rules
-      // '@stylistic/brace-style': ['error', '1tbs'],
-      // '@stylistic/multiline-ternary': ['error', 'always-multiline', { ignoreJSX: true }],
+      '@stylistic/brace-style': ['error', '1tbs'],
+      '@stylistic/multiline-ternary': ['error', 'always-multiline', { ignoreJSX: true }],
 
       // eslint-plugin-import rules
       'import/no-named-as-default-member': 'off',
