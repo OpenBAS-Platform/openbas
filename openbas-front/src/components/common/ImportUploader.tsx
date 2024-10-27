@@ -1,9 +1,10 @@
-import { ChangeEvent, FunctionComponent, useRef, useState } from 'react';
-import { CircularProgress, CircularProgressProps, IconButton, ToggleButton, Tooltip } from '@mui/material';
 import { CloudUploadOutlined } from '@mui/icons-material';
-import { useFormatter } from '../i18n';
-import { useHelper } from '../../store';
+import { CircularProgress, CircularProgressProps, IconButton, ToggleButton, Tooltip } from '@mui/material';
+import { ChangeEvent, FunctionComponent, useRef, useState } from 'react';
+
 import type { UserHelper } from '../../actions/helper';
+import { useHelper } from '../../store';
+import { useFormatter } from '../i18n';
 
 interface Props {
   title: string;
@@ -63,8 +64,11 @@ const ImportUploader: FunctionComponent<Props> = ({
         </Tooltip>
       ) : (
         <ToggleButton
-          value="import" aria-label="import" size="small"
-          onClick={handleOpenUpload} disabled={!userAdmin}
+          value="import"
+          aria-label="import"
+          size="small"
+          onClick={handleOpenUpload}
+          disabled={!userAdmin}
         >
           <Tooltip
             title={t(title)}

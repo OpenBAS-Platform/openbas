@@ -1,8 +1,8 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any, no-underscore-dangle */
+import { test as baseTest } from '@playwright/test';
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as crypto from 'crypto';
-import { test as baseTest } from '@playwright/test';
 
 const istanbulCLIOutput = path.join(process.cwd(), '.nyc_output');
 

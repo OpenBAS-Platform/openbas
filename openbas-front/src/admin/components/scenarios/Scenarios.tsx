@@ -1,34 +1,35 @@
-import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
 import { MovieFilterOutlined } from '@mui/icons-material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { CSSProperties, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useFormatter } from '../../../components/i18n';
-import { useHelper } from '../../../store';
-import type { TagHelper, UserHelper } from '../../../actions/helper';
-import { searchScenarios } from '../../../actions/scenarios/scenario-actions';
-import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
-import ScenarioCreation from './ScenarioCreation';
-import Breadcrumbs from '../../../components/Breadcrumbs';
-import { initSorting } from '../../../components/common/queryable/Page';
-import ItemTags from '../../../components/ItemTags';
-import ItemSeverity from '../../../components/ItemSeverity';
-import PlatformIcon from '../../../components/PlatformIcon';
-import ItemCategory from '../../../components/ItemCategory';
-import ImportUploaderScenario from './ImportUploaderScenario';
-import ScenarioStatus from './scenario/ScenarioStatus';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
-import { fetchTags } from '../../../actions/Tag';
-import { useAppDispatch } from '../../../utils/hooks';
-import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
-import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
-import ScenarioPopover from './scenario/ScenarioPopover';
+
 import { fetchStatistics } from '../../../actions/Application';
-import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
-import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
-import type { FilterGroup } from '../../../utils/api-types';
-import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
+import type { TagHelper, UserHelper } from '../../../actions/helper';
+import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
+import { searchScenarios } from '../../../actions/scenarios/scenario-actions';
+import { fetchTags } from '../../../actions/Tag';
+import Breadcrumbs from '../../../components/Breadcrumbs';
 import ExportButton from '../../../components/common/ExportButton';
+import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
+import { initSorting } from '../../../components/common/queryable/Page';
+import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
+import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
+import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
+import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
+import { useFormatter } from '../../../components/i18n';
+import ItemCategory from '../../../components/ItemCategory';
+import ItemSeverity from '../../../components/ItemSeverity';
+import ItemTags from '../../../components/ItemTags';
+import PlatformIcon from '../../../components/PlatformIcon';
+import { useHelper } from '../../../store';
+import type { FilterGroup } from '../../../utils/api-types';
+import { useAppDispatch } from '../../../utils/hooks';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
+import ImportUploaderScenario from './ImportUploaderScenario';
+import ScenarioPopover from './scenario/ScenarioPopover';
+import ScenarioStatus from './scenario/ScenarioStatus';
+import ScenarioCreation from './ScenarioCreation';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -100,21 +101,25 @@ const Scenarios = () => {
       field: 'scenario_severity',
       label: 'Severity',
       isSortable: true,
-      value: (scenario: ScenarioStore) => <ItemSeverity
-        label={t(scenario.scenario_severity ?? 'Unknown')}
-        severity={scenario.scenario_severity ?? 'Unknown'}
-        variant="inList"
-                                          />,
+      value: (scenario: ScenarioStore) => (
+        <ItemSeverity
+          label={t(scenario.scenario_severity ?? 'Unknown')}
+          severity={scenario.scenario_severity ?? 'Unknown'}
+          variant="inList"
+        />
+      ),
     },
     {
       field: 'scenario_category',
       label: 'Category',
       isSortable: true,
-      value: (scenario: ScenarioStore) => <ItemCategory
-        category={scenario.scenario_category ?? 'Unknown'}
-        label={t(scenario.scenario_category ?? 'Unknown')}
-        size="medium"
-                                          />,
+      value: (scenario: ScenarioStore) => (
+        <ItemCategory
+          category={scenario.scenario_category ?? 'Unknown'}
+          label={t(scenario.scenario_category ?? 'Unknown')}
+          size="medium"
+        />
+      ),
     },
     {
       field: 'scenario_recurrence',
@@ -204,12 +209,12 @@ const Scenarios = () => {
         entityPrefix="scenario"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
-        topBarButtons={
+        topBarButtons={(
           <ToggleButtonGroup value="fake" exclusive>
             <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
             <ImportUploaderScenario />
           </ToggleButtonGroup>
-        }
+        )}
       />
       <List>
         <ListItem
@@ -220,13 +225,13 @@ const Scenarios = () => {
         >
           <ListItemIcon />
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponentV2
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
                 sortHelpers={queryableHelpers.sortHelpers}
               />
-            }
+            )}
           />
         </ListItem>
         {scenarios.map((scenario: ScenarioStore) => {
@@ -234,14 +239,14 @@ const Scenarios = () => {
             <ListItem
               key={scenario.scenario_id}
               divider
-              secondaryAction={
+              secondaryAction={(
                 <ScenarioPopover
                   scenario={scenario}
                   actions={['Duplicate', 'Export', 'Delete']}
-                  onDelete={(result) => setScenarios(scenarios.filter((e) => (e.scenario_id !== result)))}
+                  onDelete={result => setScenarios(scenarios.filter(e => (e.scenario_id !== result)))}
                   inList
                 />
-              }
+              )}
               disablePadding
             >
               <ListItemButton
@@ -253,9 +258,9 @@ const Scenarios = () => {
                   <MovieFilterOutlined color="primary" />
                 </ListItemIcon>
                 <ListItemText
-                  primary={
+                  primary={(
                     <div className={classes.bodyItems}>
-                      {headers.map((header) => (
+                      {headers.map(header => (
                         <div
                           key={header.field}
                           className={classes.bodyItem}
@@ -265,20 +270,21 @@ const Scenarios = () => {
                         </div>
                       ))}
                     </div>
-                  }
+                  )}
                 />
               </ListItemButton>
             </ListItem>
           );
         })}
       </List>
-      {userAdmin && <ScenarioCreation
-        onCreate={(result: ScenarioStore) => {
-          setScenarios([result, ...scenarios]);
-          fetchStatistics();
-        }}
-                    />
-      }
+      {userAdmin && (
+        <ScenarioCreation
+          onCreate={(result: ScenarioStore) => {
+            setScenarios([result, ...scenarios]);
+            fetchStatistics();
+          }}
+        />
+      )}
     </>
   );
 };

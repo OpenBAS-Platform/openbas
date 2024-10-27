@@ -1,4 +1,5 @@
 import { Dispatch } from 'redux';
+
 import { delReferential, getReferential, postReferential, putReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import type {
   Exercise,
@@ -12,8 +13,8 @@ import type {
   LessonsSendInput,
   SearchPaginationInput,
 } from '../../utils/api-types';
-import * as schema from '../Schema';
 import { MESSAGING$ } from '../../utils/Environment';
+import * as schema from '../Schema';
 
 export const EXERCISE_URI = '/api/exercises';
 

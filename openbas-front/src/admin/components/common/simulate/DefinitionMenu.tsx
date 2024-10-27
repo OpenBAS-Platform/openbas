@@ -1,8 +1,9 @@
-import * as React from 'react';
 import { AttachMoneyOutlined, EmojiEventsOutlined, GroupsOutlined } from '@mui/icons-material';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
-import type { Exercise, Scenario } from '../../../../utils/api-types';
+import * as React from 'react';
+
 import RightMenu, { RightMenuEntry } from '../../../../components/common/RightMenu';
+import type { Exercise, Scenario } from '../../../../utils/api-types';
 
 interface Numbers {
   teamsNumber?: number;

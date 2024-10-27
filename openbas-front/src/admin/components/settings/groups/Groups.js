@@ -1,23 +1,24 @@
-import { useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
-import { useDispatch } from 'react-redux';
 import { CheckCircleOutlined, GroupsOutlined } from '@mui/icons-material';
-import { useFormatter } from '../../../../components/i18n';
-import { fetchUsers } from '../../../../actions/User';
-import { fetchOrganizations } from '../../../../actions/Organization';
-import CreateGroup from './CreateGroup';
-import { searchGroups } from '../../../../actions/Group';
+import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+
 import { fetchExercises } from '../../../../actions/Exercise';
-import { fetchTags } from '../../../../actions/Tag';
-import GroupPopover from './GroupPopover';
-import SecurityMenu from '../SecurityMenu';
+import { searchGroups } from '../../../../actions/Group';
+import { fetchOrganizations } from '../../../../actions/Organization';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { initSorting } from '../../../../components/common/queryable/Page';
+import { fetchTags } from '../../../../actions/Tag';
+import { fetchUsers } from '../../../../actions/User';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
+import { initSorting } from '../../../../components/common/queryable/Page';
+import { useFormatter } from '../../../../components/i18n';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import SecurityMenu from '../SecurityMenu';
+import CreateGroup from './CreateGroup';
+import GroupPopover from './GroupPopover';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -144,18 +145,18 @@ const Groups = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponent
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-            }
+            )}
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {groups.map((group) => (
+        {groups.map(group => (
           <ListItem
             key={group.group_id}
             classes={{ root: classes.item }}
@@ -165,7 +166,7 @@ const Groups = () => {
               <GroupsOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div className={classes.bodyItems}>
                   <div className={classes.bodyItem} style={inlineStyles.group_name}>
                     {group.group_name}
@@ -239,21 +240,21 @@ const Groups = () => {
                     {group.group_users_number}
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <GroupPopover
                 group={group}
                 groupUsersIds={group.group_users}
-                onUpdate={(result) => setGroups(groups.map((g) => (g.group_id !== result.group_id ? g : result)))}
-                onDelete={(result) => setGroups(groups.filter((g) => (g.group_id !== result)))}
+                onUpdate={result => setGroups(groups.map(g => (g.group_id !== result.group_id ? g : result)))}
+                onDelete={result => setGroups(groups.filter(g => (g.group_id !== result)))}
               />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
       <CreateGroup
-        onCreate={(result) => setGroups([result, ...groups])}
+        onCreate={result => setGroups([result, ...groups])}
       />
     </div>
   );

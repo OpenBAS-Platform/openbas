@@ -1,16 +1,17 @@
+import { makeStyles } from '@mui/styles';
 import { lazy } from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
-import { makeStyles } from '@mui/styles';
+
 import { fetchChannel } from '../../../../actions/channels/channel-action';
-import Loader from '../../../../components/Loader';
-import ChannelHeader from './ChannelHeader';
-import { errorWrapper } from '../../../../components/Error';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { useHelper } from '../../../../store';
-import { useAppDispatch } from '../../../../utils/hooks';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
-import type { Channel as ChannelType } from '../../../../utils/api-types';
+import { errorWrapper } from '../../../../components/Error';
+import Loader from '../../../../components/Loader';
 import NotFound from '../../../../components/NotFound';
+import { useHelper } from '../../../../store';
+import type { Channel as ChannelType } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import ChannelHeader from './ChannelHeader';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -38,7 +39,7 @@ const Index = () => {
         <Routes>
           <Route path="" element={errorWrapper(Channel)()} />
           {/* Not found */}
-          <Route path="*" element={<NotFound/>}/>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     );

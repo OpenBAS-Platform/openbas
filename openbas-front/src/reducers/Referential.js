@@ -1,5 +1,6 @@
-import Immutable from 'seamless-immutable';
 import * as R from 'ramda';
+import Immutable from 'seamless-immutable';
+
 import * as Constants from '../constants/ActionTypes';
 
 export const entitiesInitializer = Immutable({

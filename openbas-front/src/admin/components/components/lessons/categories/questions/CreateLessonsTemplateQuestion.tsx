@@ -1,11 +1,12 @@
 import { FunctionComponent, useState } from 'react';
-import { useFormatter } from '../../../../../../components/i18n';
-import LessonsTemplateQuestionForm, { LessonsTemplateQuestionInputForm } from './LessonsTemplateQuestionForm';
+
 import { addLessonsTemplateQuestion } from '../../../../../../actions/Lessons';
 import Drawer from '../../../../../../components/common/Drawer';
-import { useAppDispatch } from '../../../../../../utils/hooks';
-import type { LessonsTemplateCategory } from '../../../../../../utils/api-types';
 import ListItemButtonCreate from '../../../../../../components/common/ListItemButtonCreate';
+import { useFormatter } from '../../../../../../components/i18n';
+import type { LessonsTemplateCategory } from '../../../../../../utils/api-types';
+import { useAppDispatch } from '../../../../../../utils/hooks';
+import LessonsTemplateQuestionForm, { LessonsTemplateQuestionInputForm } from './LessonsTemplateQuestionForm';
 
 interface Props {
   lessonsTemplateId: string;
@@ -30,7 +31,7 @@ const CreateLessonsTemplateQuestion: FunctionComponent<Props> = ({
         lessonsTemplateCategoryId,
         data,
       ),
-    ).then((result: { result: string, entities: { lessonstemplatequestions: Record<string, LessonsTemplateCategory> } }) => {
+    ).then((result: { result: string; entities: { lessonstemplatequestions: Record<string, LessonsTemplateCategory> } }) => {
       if (result.result) {
         return handleClose();
       }

@@ -1,6 +1,6 @@
 import { useQueryParameter } from '../../../utils/Environment';
-import ChannelPreview from './ChannelPreview';
 import ChannelPlayer from './ChannelPlayer';
+import ChannelPreview from './ChannelPreview';
 
 const Channel = () => {
   const [preview] = useQueryParameter(['preview']);

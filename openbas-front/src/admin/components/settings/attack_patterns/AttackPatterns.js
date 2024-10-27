@@ -1,20 +1,21 @@
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { LockPattern } from 'mdi-material-ui';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+
 import { searchAttackPatterns } from '../../../../actions/AttackPattern';
-import CreateAttackPattern from './CreateAttackPattern';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { useHelper } from '../../../../store';
-import AttackPatternPopover from './AttackPatternPopover';
-import TaxonomiesMenu from '../TaxonomiesMenu';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import { useFormatter } from '../../../../components/i18n';
-import Breadcrumbs from '../../../../components/Breadcrumbs';
+import { useHelper } from '../../../../store';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import TaxonomiesMenu from '../TaxonomiesMenu';
+import AttackPatternPopover from './AttackPatternPopover';
+import CreateAttackPattern from './CreateAttackPattern';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -67,7 +68,7 @@ const AttackPatterns = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t, nsdt } = useFormatter();
-  const { killChainPhasesMap } = useHelper((helper) => ({
+  const { killChainPhasesMap } = useHelper(helper => ({
     killChainPhasesMap: helper.getKillChainPhasesMap(),
   }));
   useDataLoader(() => {
@@ -129,18 +130,18 @@ const AttackPatterns = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponent
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-            }
+            )}
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {attackPatterns.map((attackPattern) => (
+        {attackPatterns.map(attackPattern => (
           <ListItem
             key={attackPattern.attack_pattern_id}
             classes={{ root: classes.item }}
@@ -150,7 +151,7 @@ const AttackPatterns = () => {
               <LockPattern color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div className={classes.bodyItems}>
                   <div className={classes.bodyItem} style={inlineStyles.kill_chain_phase}>
                     {
@@ -172,21 +173,21 @@ const AttackPatterns = () => {
                     {nsdt(attackPattern.attack_pattern_updated_at)}
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <AttackPatternPopover
                 killChainPhasesMap={killChainPhasesMap}
                 attackPattern={attackPattern}
-                onUpdate={(result) => setAttackPatterns(attackPatterns.map((a) => (a.attack_pattern_id !== result.attack_pattern_id ? a : result)))}
-                onDelete={(result) => setAttackPatterns(attackPatterns.filter((a) => (a.attack_pattern_id !== result)))}
+                onUpdate={result => setAttackPatterns(attackPatterns.map(a => (a.attack_pattern_id !== result.attack_pattern_id ? a : result)))}
+                onDelete={result => setAttackPatterns(attackPatterns.filter(a => (a.attack_pattern_id !== result)))}
               />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
       <CreateAttackPattern
-        onCreate={(result) => setAttackPatterns([result, ...attackPatterns])}
+        onCreate={result => setAttackPatterns([result, ...attackPatterns])}
       />
     </div>
   );

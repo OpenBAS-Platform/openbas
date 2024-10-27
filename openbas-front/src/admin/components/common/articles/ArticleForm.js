@@ -1,22 +1,23 @@
-import { useState } from 'react';
-import { Form } from 'react-final-form';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined } from '@mui/icons-material';
 import { Box, Button, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined } from '@mui/icons-material';
-import { useFormatter } from '../../../../components/i18n';
-import OldTextField from '../../../../components/fields/OldTextField';
-import Autocomplete from '../../../../components/Autocomplete';
-import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { useState } from 'react';
+import { Form } from 'react-final-form';
+import { useDispatch } from 'react-redux';
+
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchDocuments } from '../../../../actions/Document';
-import ChannelIcon from '../../components/channels/ChannelIcon';
+import Autocomplete from '../../../../components/Autocomplete';
 import OldMarkDownField from '../../../../components/fields/OldMarkDownField';
-import DocumentType from '../../components/documents/DocumentType';
+import OldTextField from '../../../../components/fields/OldTextField';
+import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
+import { useHelper } from '../../../../store';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import ChannelIcon from '../../components/channels/ChannelIcon';
 import DocumentPopover from '../../components/documents/DocumentPopover';
+import DocumentType from '../../components/documents/DocumentType';
 import ArticleAddDocuments from './ArticleAddDocuments';
 
 const useStyles = makeStyles(() => ({
@@ -127,7 +128,7 @@ const ArticleForm = ({
   };
   // Fetching data
   const { channels, documentsMap } = useHelper(
-    (helper) => ({
+    helper => ({
       channels: helper.getChannels(),
       documentsMap: helper.getDocumentsMap(),
     }),
@@ -136,14 +137,14 @@ const ArticleForm = ({
     dispatch(fetchChannels());
     dispatch(fetchDocuments());
   });
-  const handleAddDocuments = (docsIds) => setDocuments([...documents, ...docsIds]);
-  const handleRemoveDocument = (docId) => setDocuments(documents.filter((n) => n !== docId));
+  const handleAddDocuments = docsIds => setDocuments([...documents, ...docsIds]);
+  const handleRemoveDocument = docId => setDocuments(documents.filter(n => n !== docId));
   // Preparing data
   const sortedChannels = R.sortWith([R.ascend(R.prop('channel_name'))], channels).map(
-    (n) => ({ id: n.channel_id, label: n.channel_name, type: n.channel_type }),
+    n => ({ id: n.channel_id, label: n.channel_name, type: n.channel_type }),
   );
   const currentChannel = sortedChannels.find(
-    (m) => m.id === initialValues.article_channel,
+    m => m.id === initialValues.article_channel,
   );
   const formData = { ...initialValues, article_channel: currentChannel };
 
@@ -153,11 +154,13 @@ const ArticleForm = ({
   };
 
   const documentsSortHeader = (field, label, isSortable) => {
-    const sortComponent = documentsOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = documentsOrderAsc
+      ? (
+          <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+          <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -287,13 +290,13 @@ const ArticleForm = ({
                   </span>
                 </ListItemIcon>
                 <ListItemText
-                  primary={
+                  primary={(
                     <div>
                       {documentsSortHeader('document_name', 'Name', true)}
                       {documentsSortHeader('document_type', 'Type', true)}
                       {documentsSortHeader('document_tags', 'Tags', true)}
                     </div>
-                  }
+                  )}
                 />
                 <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
               </ListItem>
@@ -312,7 +315,7 @@ const ArticleForm = ({
                       <AttachmentOutlined />
                     </ListItemIcon>
                     <ListItemText
-                      primary={
+                      primary={(
                         <div>
                           <div
                             className={classes.bodyItem}
@@ -339,7 +342,7 @@ const ArticleForm = ({
                             />
                           </div>
                         </div>
-                      }
+                      )}
                     />
                     <ListItemSecondaryAction>
                       <DocumentPopover

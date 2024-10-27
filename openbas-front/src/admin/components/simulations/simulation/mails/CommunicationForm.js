@@ -1,9 +1,10 @@
-import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import { useFormatter } from '../../../../../components/i18n';
+import { Form } from 'react-final-form';
+
 import OldTextField from '../../../../../components/fields/OldTextField';
 import RichTextField from '../../../../../components/fields/RichTextField';
 import FileField from '../../../../../components/FileField';
+import { useFormatter } from '../../../../../components/i18n';
 
 const CommunicationForm = ({ onSubmit, handleClose, initialValues }) => {
   const { t } = useFormatter();

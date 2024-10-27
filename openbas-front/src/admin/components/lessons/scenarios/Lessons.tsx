@@ -1,5 +1,3 @@
-import { useContext, useState } from 'react';
-import * as React from 'react';
 import { ContentPasteGoOutlined, DeleteSweepOutlined, VisibilityOutlined } from '@mui/icons-material';
 import {
   Alert,
@@ -21,13 +19,16 @@ import {
   useTheme,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import ObjectiveEvaluations from '../ObjectiveEvaluations';
-import CreateLessonsCategory from '../categories/CreateLessonsCategory';
+import { useContext, useState } from 'react';
+import * as React from 'react';
+
+import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import type { Inject, LessonsAnswer, LessonsCategory, LessonsQuestion, LessonsTemplate, Objective, Team, User } from '../../../../utils/api-types';
-import Transition from '../../../../components/common/Transition';
-import CreateLessonsTemplate from '../../components/lessons/CreateLessonsTemplate';
 import { LessonContext } from '../../common/Context';
+import CreateLessonsTemplate from '../../components/lessons/CreateLessonsTemplate';
+import CreateLessonsCategory from '../categories/CreateLessonsCategory';
+import ObjectiveEvaluations from '../ObjectiveEvaluations';
 import LessonsCategories from './LessonsCategories';
 import LessonsObjectives from './LessonsObjectives';
 
@@ -61,16 +62,16 @@ interface GenericSource {
 }
 
 interface Props {
-  source: GenericSource,
-  objectives: Objective[],
-  injects: Inject[],
-  teamsMap: Record<string, Team>,
-  teams: Team[],
-  lessonsCategories: LessonsCategory[],
-  lessonsQuestions: LessonsQuestion[],
-  lessonsAnswers?: LessonsAnswer[],
-  lessonsTemplates: LessonsTemplate[],
-  usersMap: Record<string, User>,
+  source: GenericSource;
+  objectives: Objective[];
+  injects: Inject[];
+  teamsMap: Record<string, Team>;
+  teams: Team[];
+  lessonsCategories: LessonsCategory[];
+  lessonsQuestions: LessonsQuestion[];
+  lessonsAnswers?: LessonsAnswer[];
+  lessonsTemplates: LessonsTemplate[];
+  usersMap: Record<string, User>;
 }
 
 const Lessons: React.FC<Props> = ({
@@ -130,7 +131,7 @@ const Lessons: React.FC<Props> = ({
               <Grid item xs={6}>
                 <Typography variant="h3">{t('Questionnaire mode')}</Typography>
                 <FormControlLabel
-                  control={
+                  control={(
                     <Switch
                       disabled={false}
                       checked={source.lessons_anonymized}
@@ -143,14 +144,14 @@ const Lessons: React.FC<Props> = ({
                       }}
                       name="anonymized"
                     />
-                                    }
+                  )}
                   label={t('Anonymize answers')}
                 />
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="h3">{t('Template')}</Typography>
                 <Button
-                  startIcon={<ContentPasteGoOutlined/>}
+                  startIcon={<ContentPasteGoOutlined />}
                   color="primary"
                   variant="contained"
                   onClick={() => setOpenApplyTemplate(true)}
@@ -161,7 +162,7 @@ const Lessons: React.FC<Props> = ({
               <Grid item xs={6}>
                 <Typography variant="h3">{t('Check')}</Typography>
                 <Button
-                  startIcon={<VisibilityOutlined/>}
+                  startIcon={<VisibilityOutlined />}
                   color="secondary"
                   variant="contained"
                   component={Link}
@@ -175,7 +176,7 @@ const Lessons: React.FC<Props> = ({
                   {t('Categories and questions')}
                 </Typography>
                 <Button
-                  startIcon={<DeleteSweepOutlined/>}
+                  startIcon={<DeleteSweepOutlined />}
                   color="error"
                   variant="contained"
                   onClick={() => setOpenEmptyLessons(true)}
@@ -202,7 +203,7 @@ const Lessons: React.FC<Props> = ({
         teams={teams}
         isReport={false}
       />
-      <CreateLessonsCategory/>
+      <CreateLessonsCategory />
       <Dialog
         TransitionComponent={Transition}
         keepMounted={false}
@@ -255,8 +256,8 @@ const Lessons: React.FC<Props> = ({
                       margin: 0,
                     }}
                     value={template.lessonstemplate_id}
-                    control={<Radio/>}
-                    label={
+                    control={<Radio />}
+                    label={(
                       <div style={{ margin: '15px 0 15px 10px' }}>
                         <Typography variant="h4">
                           {template.lessons_template_name}
@@ -265,14 +266,14 @@ const Lessons: React.FC<Props> = ({
                           {template.lessons_template_description || t('No description')}
                         </Typography>
                       </div>
-                                        }
+                    )}
                   />
                 );
               })}
             </RadioGroup>
           </FormControl>
-          <CreateLessonsTemplate inline/>
-          <div className="clearfix"/>
+          <CreateLessonsTemplate inline />
+          <div className="clearfix" />
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button
               onClick={() => setOpenApplyTemplate(false)}

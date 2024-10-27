@@ -1,15 +1,16 @@
+import { MoreVert } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
+import * as R from 'ramda';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import * as R from 'ramda';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
-import { MoreVert } from '@mui/icons-material';
-import InjectorContractForm from './InjectorContractForm';
+
+import { deleteInjectorContract, updateInjectorContract, updateInjectorContractMapping } from '../../../../../actions/InjectorContracts';
+import Drawer from '../../../../../components/common/Drawer';
+import Transition from '../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../components/i18n';
 import { attackPatternOptions } from '../../../../../utils/Option';
-import Transition from '../../../../../components/common/Transition';
-import { deleteInjectorContract, updateInjectorContract, updateInjectorContractMapping } from '../../../../../actions/InjectorContracts';
 import InjectorContractCustomForm from './InjectorContractCustomForm';
-import Drawer from '../../../../../components/common/Drawer';
+import InjectorContractForm from './InjectorContractForm';
 
 const InjectorContractPopover = ({ injectorContract, killChainPhasesMap, attackPatternsMap, onUpdate }) => {
   const [openDelete, setOpenDelete] = useState(false);

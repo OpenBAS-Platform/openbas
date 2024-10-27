@@ -1,22 +1,21 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useHelper } from '../../../../../store';
-import type { ReportsHelper } from '../../../../../actions/reports/report-helper';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { fetchReport } from '../../../../../actions/reports/report-actions';
-import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
-import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
-import ReportInformationType from './ReportInformationType';
+
 import { fetchExercise, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import {
-  fetchPlayersByExercise,
   exerciseInjectsResultDTO,
   fetchExerciseExpectationResult,
   fetchLessonsAnswers,
   fetchLessonsCategories,
   fetchLessonsQuestions,
+  fetchPlayersByExercise,
 } from '../../../../../actions/exercises/exercise-action';
-import { useAppDispatch } from '../../../../../utils/hooks';
+import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
+import type { UserHelper } from '../../../../../actions/helper';
+import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
+import { fetchReport } from '../../../../../actions/reports/report-actions';
+import type { ReportsHelper } from '../../../../../actions/reports/report-helper';
+import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
+import { useHelper } from '../../../../../store';
 import type {
   Exercise,
   ExpectationResultsByType,
@@ -29,26 +28,28 @@ import type {
   Team,
   User,
 } from '../../../../../utils/api-types';
-import type { UserHelper } from '../../../../../actions/helper';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import ReportInformationType from './ReportInformationType';
 
 export interface ExerciseReportData {
-  injects: InjectResultDTO[],
-  exerciseExpectationResults: ExpectationResultsByType[],
-  exercise: Exercise,
-  lessonsCategories: LessonsCategory[],
-  lessonsQuestions: LessonsQuestion[],
-  lessonsAnswers: LessonsAnswer[],
-  teams: Team[],
-  teamsMap: Record<string, Team>,
-  usersMap: Record<string, User>,
+  injects: InjectResultDTO[];
+  exerciseExpectationResults: ExpectationResultsByType[];
+  exercise: Exercise;
+  lessonsCategories: LessonsCategory[];
+  lessonsQuestions: LessonsQuestion[];
+  lessonsAnswers: LessonsAnswer[];
+  teams: Team[];
+  teamsMap: Record<string, Team>;
+  usersMap: Record<string, User>;
 }
 
 interface ReturnType {
-  loading: boolean,
-  report: Report,
-  displayModule: (moduleType: ReportInformationType)=>boolean,
-  setReloadReportDataCount: Dispatch<SetStateAction<number>>
-  reportData: ExerciseReportData
+  loading: boolean;
+  report: Report;
+  displayModule: (moduleType: ReportInformationType) => boolean;
+  setReloadReportDataCount: Dispatch<SetStateAction<number>>;
+  reportData: ExerciseReportData;
 }
 
 const useExerciseReportData = (reportId: Report['report_id'], exerciseId: Exercise['exercise_id']): ReturnType => {
@@ -86,7 +87,7 @@ const useExerciseReportData = (reportId: Report['report_id'], exerciseId: Exerci
 
   useDataLoader(() => {
     dispatch(fetchReport(reportId)).then(() => {
-      setReloadReportDataCount((prev) => prev + 1);
+      setReloadReportDataCount(prev => prev + 1);
     });
   });
 
@@ -105,11 +106,11 @@ const useExerciseReportData = (reportId: Report['report_id'], exerciseId: Exerci
         );
       }
       if (displayModule(ReportInformationType.SCORE_DETAILS)) {
-        fetchPromises.push(fetchExerciseExpectationResult(exerciseId).then((result) => setResults(result.data)));
+        fetchPromises.push(fetchExerciseExpectationResult(exerciseId).then(result => setResults(result.data)));
       }
 
       if (displayModule(ReportInformationType.INJECT_RESULT)) {
-        fetchPromises.push(exerciseInjectsResultDTO(exerciseId).then((result) => setInjects(result.data)));
+        fetchPromises.push(exerciseInjectsResultDTO(exerciseId).then(result => setInjects(result.data)));
       }
       Promise.all(fetchPromises).then(() => {
         setLoading(false);

@@ -1,13 +1,15 @@
-import { FunctionComponent, useEffect, useState } from 'react';
-import * as React from 'react';
+import { CropFree, UnfoldLess, UnfoldMore } from '@mui/icons-material';
+import { Tooltip } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import {
   Connection,
   ConnectionLineType,
+  ConnectionState,
   ControlButton,
   Controls,
   Edge,
   MarkerType,
+  MiniMap,
   ReactFlow,
   ReactFlowProvider,
   useEdgesState,
@@ -15,30 +17,29 @@ import {
   useReactFlow,
   Viewport,
   XYPosition,
-  MiniMap,
-  ConnectionState,
 } from '@xyflow/react';
-import { Tooltip } from '@mui/material';
 import moment from 'moment-timezone';
-import { UnfoldLess, UnfoldMore, CropFree } from '@mui/icons-material';
-import type { InjectOutputType, InjectStore } from '../actions/injects/Inject';
-import type { Theme } from './Theme';
-import nodeTypes from './nodes';
-import CustomTimelineBackground from './CustomTimelineBackground';
-import { NodeInject } from './nodes/NodeInject';
-import CustomTimelinePanel from './CustomTimelinePanel';
-import { useHelper } from '../store';
-import type { InjectHelper } from '../actions/injects/inject-helper';
-import type { ScenariosHelper } from '../actions/scenarios/scenario-helper';
-import type { ExercisesHelper } from '../actions/exercises/exercise-helper';
-import { parseCron } from '../utils/Cron';
-import type { TeamsHelper } from '../actions/teams/team-helper';
-import NodePhantom from './nodes/NodePhantom';
-import { useFormatter } from './i18n';
+import { FunctionComponent, useEffect, useState } from 'react';
+import * as React from 'react';
+
 import type { AssetGroupsHelper } from '../actions/asset_groups/assetgroup-helper';
 import type { EndpointHelper } from '../actions/assets/asset-helper';
+import type { ExercisesHelper } from '../actions/exercises/exercise-helper';
+import type { InjectOutputType, InjectStore } from '../actions/injects/Inject';
+import type { InjectHelper } from '../actions/injects/inject-helper';
+import type { ScenariosHelper } from '../actions/scenarios/scenario-helper';
+import type { TeamsHelper } from '../actions/teams/team-helper';
+import { useHelper } from '../store';
 import type { Inject, InjectDependency } from '../utils/api-types';
+import { parseCron } from '../utils/Cron';
 import ChainingUtils from './common/chaining/ChainingUtils';
+import CustomTimelineBackground from './CustomTimelineBackground';
+import CustomTimelinePanel from './CustomTimelinePanel';
+import { useFormatter } from './i18n';
+import nodeTypes from './nodes';
+import { NodeInject } from './nodes/NodeInject';
+import NodePhantom from './nodes/NodePhantom';
+import type { Theme } from './Theme';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -57,18 +58,18 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  injects: InjectOutputType[],
-  exerciseOrScenarioId: string,
-  onSelectedInject(inject?: InjectOutputType): void,
+  injects: InjectOutputType[];
+  exerciseOrScenarioId: string;
+  onSelectedInject(inject?: InjectOutputType): void;
   openCreateInjectDrawer(data: {
-    inject_depends_duration_days: number,
-    inject_depends_duration_minutes: number,
-    inject_depends_duration_hours: number
-  }): void,
-  onUpdateInject: (data: Inject[]) => void
-  onCreate: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void,
-  onUpdate: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void,
-  onDelete: (result: string) => void,
+    inject_depends_duration_days: number;
+    inject_depends_duration_minutes: number;
+    inject_depends_duration_hours: number;
+  }): void;
+  onUpdateInject: (data: Inject[]) => void;
+  onCreate: (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => void;
+  onUpdate: (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => void;
+  onDelete: (result: string) => void;
 }
 
 const ChainedTimelineFlow: FunctionComponent<Props> = ({
@@ -171,12 +172,12 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
    */
   const calculateBoundingBox = (currentNode: NodeInject, nodesAvailable: NodeInject[]) => {
     if (currentNode.data.inject?.inject_depends_on) {
-      const nodesId = currentNode.data.inject?.inject_depends_on.map((value) => value.dependency_relationship?.inject_parent_id);
-      const dependencies = nodesAvailable.filter((dependencyNode) => nodesId.includes(dependencyNode.id));
-      const minX = Math.min(currentNode.position.x, ...dependencies.map((value) => value.data.boundingBox!.topLeft.x));
-      const minY = Math.min(currentNode.position.y, ...dependencies.map((value) => value.data.boundingBox!.topLeft.y));
-      const maxX = Math.max(currentNode.position.x + nodeWidthClearance, ...dependencies.map((value) => value.data.boundingBox!.bottomRight.x));
-      const maxY = Math.max(currentNode.position.y + nodeHeightClearance, ...dependencies.map((value) => value.data.boundingBox!.bottomRight.y));
+      const nodesId = currentNode.data.inject?.inject_depends_on.map(value => value.dependency_relationship?.inject_parent_id);
+      const dependencies = nodesAvailable.filter(dependencyNode => nodesId.includes(dependencyNode.id));
+      const minX = Math.min(currentNode.position.x, ...dependencies.map(value => value.data.boundingBox!.topLeft.x));
+      const minY = Math.min(currentNode.position.y, ...dependencies.map(value => value.data.boundingBox!.topLeft.y));
+      const maxX = Math.max(currentNode.position.x + nodeWidthClearance, ...dependencies.map(value => value.data.boundingBox!.bottomRight.x));
+      const maxY = Math.max(currentNode.position.y + nodeHeightClearance, ...dependencies.map(value => value.data.boundingBox!.bottomRight.y));
       return {
         topLeft: { x: minX, y: minY },
         bottomRight: { x: maxX, y: maxY },
@@ -196,11 +197,11 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
     let reorganizedInjects = nodeInjects;
 
     nodeInjects.forEach((node, i) => {
-      let childrens = reorganizedInjects.slice(i).filter((nextNode) => nextNode.id !== node.id
-          && nextNode.data.inject?.inject_depends_on !== undefined
-          && nextNode.data.inject?.inject_depends_on !== null
-          && nextNode.data.inject!.inject_depends_on
-            .find((dependsOn) => dependsOn.dependency_relationship?.inject_parent_id === node.id) !== undefined);
+      let childrens = reorganizedInjects.slice(i).filter(nextNode => nextNode.id !== node.id
+        && nextNode.data.inject?.inject_depends_on !== undefined
+        && nextNode.data.inject?.inject_depends_on !== null
+        && nextNode.data.inject!.inject_depends_on
+          .find(dependsOn => dependsOn.dependency_relationship?.inject_parent_id === node.id) !== undefined);
 
       childrens = childrens.sort((a, b) => a.data.inject!.inject_depends_duration - b.data.inject!.inject_depends_duration);
 
@@ -214,13 +215,13 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
       const nodeInjectData = nodeInject.data;
 
       const previousNodes = reorganizedInjects.slice(0, index)
-        .filter((previousNode) => previousNode.data.boundingBox !== undefined
-            && nodeInjectData.boundingBox !== undefined
-            && nodeInjectData.boundingBox?.topLeft.x >= previousNode.data.boundingBox.topLeft.x
-            && nodeInjectData.boundingBox?.topLeft.x < previousNode.data.boundingBox.bottomRight.x);
+        .filter(previousNode => previousNode.data.boundingBox !== undefined
+          && nodeInjectData.boundingBox !== undefined
+          && nodeInjectData.boundingBox?.topLeft.x >= previousNode.data.boundingBox.topLeft.x
+          && nodeInjectData.boundingBox?.topLeft.x < previousNode.data.boundingBox.bottomRight.x);
 
       const arrayOfY = previousNodes
-        .map((previousNode) => (previousNode.data.boundingBox?.bottomRight.y ? previousNode.data.boundingBox?.bottomRight.y : 0));
+        .map(previousNode => (previousNode.data.boundingBox?.bottomRight.y ? previousNode.data.boundingBox?.bottomRight.y : 0));
       const maxY = Math.max(0, ...arrayOfY);
 
       nodeInjectPosition.y = 0;
@@ -237,9 +238,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
         nodeInjectPosition.y = previousNodes.length === 0 ? 0 : maxY;
       }
       if (nodeInject.data.inject?.inject_depends_on) {
-        const nodesId = nodeInject.data.inject?.inject_depends_on.map((value) => value.dependency_relationship?.inject_parent_id);
-        const dependencies = reorganizedInjects.filter((dependencyNode) => nodesId.includes(dependencyNode.id));
-        const minY = dependencies.length > 0 ? Math.min(...dependencies.map((value) => value.data.boundingBox!.topLeft.y)) : 0;
+        const nodesId = nodeInject.data.inject?.inject_depends_on.map(value => value.dependency_relationship?.inject_parent_id);
+        const dependencies = reorganizedInjects.filter(dependencyNode => nodesId.includes(dependencyNode.id));
+        const minY = dependencies.length > 0 ? Math.min(...dependencies.map(value => value.data.boundingBox!.topLeft.y)) : 0;
 
         nodeInjectPosition.y = nodeInjectPosition.y < minY ? minY : nodeInjectPosition.y;
       }
@@ -251,7 +252,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
   };
 
   const updateEdges = () => {
-    const newEdges = injects.filter((inject) => inject.inject_depends_on !== null && inject.inject_depends_on !== undefined)
+    const newEdges = injects.filter(inject => inject.inject_depends_on !== null && inject.inject_depends_on !== undefined)
       .flatMap((inject) => {
         const results = [];
         if (inject.inject_depends_on !== undefined) {
@@ -294,7 +295,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
                 theme.palette.mode === 'dark'
                   ? '#09101e'
                   : '#e5e5e5',
-            isTargeted: injects.find((anyInject) => anyInject.inject_id === inject.inject_id) !== undefined,
+            isTargeted: injects.find(anyInject => anyInject.inject_id === inject.inject_id) !== undefined,
             isTargeting: inject.inject_depends_on !== undefined,
             inject,
             fixedY: 0,
@@ -304,9 +305,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
               topLeft: { x: (inject.inject_depends_duration / 60) * (gapSize / minutesPerGapAllowed[minutesPerGapIndex]), y: 0 },
               bottomRight: { x: (inject.inject_depends_duration / 60) * (gapSize / minutesPerGapAllowed[minutesPerGapIndex]) + nodeWidthClearance, y: nodeHeightClearance },
             },
-            targets: inject.inject_assets!.map((asset) => assets[asset]?.asset_name)
-              .concat(inject.inject_asset_groups!.map((assetGroup) => assetGroups[assetGroup]?.asset_group_name))
-              .concat(inject.inject_teams!.map((team) => teams[team]?.team_name)),
+            targets: inject.inject_assets!.map(asset => assets[asset]?.asset_name)
+              .concat(inject.inject_asset_groups!.map(assetGroup => assetGroups[assetGroup]?.asset_group_name))
+              .concat(inject.inject_teams!.map(team => teams[team]?.team_name)),
             exerciseOrScenarioId,
             onCreate,
             onUpdate,
@@ -319,7 +320,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
         }));
 
       if (currentUpdatedNode !== null) {
-        injectsNodes.find((inject) => inject.id === currentUpdatedNode.id)!.position.x = currentUpdatedNode.position.x;
+        injectsNodes.find(inject => inject.id === currentUpdatedNode.id)!.position.x = currentUpdatedNode.position.x;
       }
 
       setCurrentUpdatedNode(null);
@@ -368,7 +369,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
         inject_id: node.id,
         inject_depends_duration: convertCoordinatesToTime(node.position),
         inject_depends_on: injectFromMap.inject_depends_on !== null
-          ? injectFromMap.inject_depends_on : null,
+          ? injectFromMap.inject_depends_on
+          : null,
       };
       onUpdateInject([inject]);
       setCurrentUpdatedNode(node);
@@ -380,7 +382,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
    * Small function to do some stuff when draggind is starting
    */
   const nodeDragStart = () => {
-    const nodesList = nodes.filter((currentNode) => currentNode.type !== 'phantom');
+    const nodesList = nodes.filter(currentNode => currentNode.type !== 'phantom');
     setNodes(nodesList);
   };
 
@@ -403,8 +405,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
   };
 
   const connect = (connection: Connection) => {
-    const inject = injects.find((currentInject) => currentInject.inject_id === connection.target);
-    const injectParent = injects.find((currentInject) => currentInject.inject_id === connection.source);
+    const inject = injects.find(currentInject => currentInject.inject_id === connection.target);
+    const injectParent = injects.find(currentInject => currentInject.inject_id === connection.source);
     if (inject !== undefined && injectParent !== undefined && inject.inject_depends_duration > injectParent.inject_depends_duration) {
       const newDependsOn: InjectDependency = {
         dependency_relationship: {
@@ -441,12 +443,12 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
     setDraggingOnGoing(true);
     const { position } = node;
     const { data } = node;
-    const dependsOn = nodes.find((currentNode) => (data.inject?.inject_depends_on !== null
-      && data.inject?.inject_depends_on!.find((value) => value.dependency_relationship?.inject_parent_id === currentNode.id)));
+    const dependsOn = nodes.find(currentNode => (data.inject?.inject_depends_on !== null
+      && data.inject?.inject_depends_on!.find(value => value.dependency_relationship?.inject_parent_id === currentNode.id)));
     const dependsTo = nodes
-      .filter((currentNode) => (currentNode.data.inject?.inject_depends_on !== undefined
-          && currentNode.data.inject?.inject_depends_on !== null
-          && currentNode.data.inject?.inject_depends_on.find((value) => value.dependency_relationship?.inject_parent_id === node.id) !== undefined))
+      .filter(currentNode => (currentNode.data.inject?.inject_depends_on !== undefined
+        && currentNode.data.inject?.inject_depends_on !== null
+        && currentNode.data.inject?.inject_depends_on.find(value => value.dependency_relationship?.inject_parent_id === node.id) !== undefined))
       .sort((a, b) => a.data.inject!.inject_depends_duration - b.data.inject!.inject_depends_duration)[0];
     const aSecond = gapSize / (minutesPerGapAllowed[minutesPerGapIndex] * 60);
     if (dependsOn?.position && position.x <= dependsOn?.position.x) {
@@ -535,7 +537,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
    * @param incrementIndex increment or decrement the index to get the current minutesPerGap
    */
   const updateMinutesPerGap = (incrementIndex: number) => {
-    const nodesList = nodes.filter((currentNode) => currentNode.type !== 'phantom');
+    const nodesList = nodes.filter(currentNode => currentNode.type !== 'phantom');
     setNodes(nodesList);
     setDraggingOnGoing(true);
     setMinutesPerGapIndex(minutesPerGapIndex + incrementIndex);
@@ -544,7 +546,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
 
   const onReconnectEnd = (event: React.MouseEvent, edge: Edge, handleType: 'source' | 'target', connectionState: Omit<ConnectionState, 'inProgress'>) => {
     if (!connectionState.isValid) {
-      const inject = injects.find((currentInject) => currentInject.inject_id === edge.target);
+      const inject = injects.find(currentInject => currentInject.inject_id === edge.target);
       if (inject !== undefined) {
         const injectToUpdate = {
           ...injectsMap[inject.inject_id],
@@ -556,15 +558,15 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
       }
     } else if (handleType === 'source') {
       const updates = [];
-      const injectToRemove = injects.find((currentInject) => currentInject.inject_id === edge.target);
-      const injectToUpdate = injects.find((currentInject) => currentInject.inject_id === connectionState.toNode?.id);
+      const injectToRemove = injects.find(currentInject => currentInject.inject_id === edge.target);
+      const injectToUpdate = injects.find(currentInject => currentInject.inject_id === connectionState.toNode?.id);
 
-      const parent = injects.find((currentInject) => currentInject.inject_id === connectionState.fromNode?.id);
+      const parent = injects.find(currentInject => currentInject.inject_id === connectionState.fromNode?.id);
 
       if (parent !== undefined
-          && injectToUpdate !== undefined
-          && injectToRemove !== undefined
-          && parent.inject_depends_duration < injectToUpdate.inject_depends_duration) {
+        && injectToUpdate !== undefined
+        && injectToRemove !== undefined
+        && parent.inject_depends_duration < injectToUpdate.inject_depends_duration) {
         const injectToRemoveEdge = {
           ...injectsMap[injectToRemove.inject_id],
           inject_injector_contract: injectToRemove.inject_injector_contract.injector_contract_id,
@@ -597,8 +599,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
         onUpdateInject(updates);
       }
     } else {
-      const inject = injects.find((currentInject) => currentInject.inject_id === edge.target);
-      const parent = injects.find((currentInject) => currentInject.inject_id === connectionState.toNode?.id);
+      const inject = injects.find(currentInject => currentInject.inject_id === edge.target);
+      const parent = injects.find(currentInject => currentInject.inject_id === connectionState.toNode?.id);
       if (inject !== undefined && parent !== undefined && parent.inject_depends_duration < inject.inject_depends_duration) {
         const newDependsOn: InjectDependency = {
           dependency_relationship: {
@@ -668,7 +670,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
             onReconnectEnd={onReconnectEnd}
             edgesReconnectable={true}
           >
-            <div id={'newBox'} className={!connectOnGoing ? classes.newBox : ''}
+            <div
+              id="newBox"
+              className={!connectOnGoing ? classes.newBox : ''}
               style={{
                 top: currentMousePosition.y,
                 left: currentMousePosition.x,
@@ -688,14 +692,14 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
                 showFitView={false}
                 showZoom={false}
                 showInteractive={false}
-                orientation={'horizontal'}
+                orientation="horizontal"
               >
                 <Tooltip title={t('Fit view')}>
                   <div>
                     <ControlButton
                       onClick={() => reactFlow.fitView({ duration: 500 })}
                     >
-                      <CropFree/>
+                      <CropFree />
                     </ControlButton>
                   </div>
                 </Tooltip>
@@ -705,7 +709,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
                       disabled={minutesPerGapAllowed.length - 1 === minutesPerGapIndex}
                       onClick={() => updateMinutesPerGap(1)}
                     >
-                      <UnfoldLess className={classes.rotatedIcon}/>
+                      <UnfoldLess className={classes.rotatedIcon} />
                     </ControlButton>
                   </div>
                 </Tooltip>
@@ -715,7 +719,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
                       disabled={minutesPerGapIndex === 0}
                       onClick={() => updateMinutesPerGap(-1)}
                     >
-                      <UnfoldMore className={classes.rotatedIcon}/>
+                      <UnfoldMore className={classes.rotatedIcon} />
                     </ControlButton>
                   </div>
                 </Tooltip>
@@ -740,8 +744,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
             />
           </ReactFlow>
         </div>
-      ) : null
-      }
+      ) : null}
     </>
   );
 };

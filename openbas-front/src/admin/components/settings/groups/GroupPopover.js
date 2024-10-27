@@ -1,7 +1,4 @@
-import { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import * as R from 'ramda';
+import { MoreVert, PersonOutlined } from '@mui/icons-material';
 import {
   Avatar,
   Box,
@@ -29,19 +26,23 @@ import {
   Tabs,
   Typography,
 } from '@mui/material';
-import { MoreVert, PersonOutlined } from '@mui/icons-material';
 import { withStyles } from '@mui/styles';
-import { deleteGroup, fetchGroup, updateGroupInformation, updateGroupUsers } from '../../../../actions/Group';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component } from 'react';
+import { connect } from 'react-redux';
+
 import { addGrant, addGroupOrganization, deleteGrant, deleteGroupOrganization } from '../../../../actions/Grant';
-import GroupForm from './GroupForm';
-import SearchFilter from '../../../../components/SearchFilter';
-import inject18n from '../../../../components/i18n';
+import { deleteGroup, fetchGroup, updateGroupInformation, updateGroupUsers } from '../../../../actions/Group';
 import { storeHelper } from '../../../../actions/Schema';
-import Transition from '../../../../components/common/Transition';
-import ItemTags from '../../../../components/ItemTags';
-import TagsFilter from '../../common/filters/TagsFilter';
-import { resolveUserName, truncate } from '../../../../utils/String';
 import Drawer from '../../../../components/common/Drawer';
+import Transition from '../../../../components/common/Transition';
+import inject18n from '../../../../components/i18n';
+import ItemTags from '../../../../components/ItemTags';
+import SearchFilter from '../../../../components/SearchFilter';
+import { resolveUserName, truncate } from '../../../../utils/String';
+import TagsFilter from '../../common/filters/TagsFilter';
+import GroupForm from './GroupForm';
 
 const styles = () => ({
   box: {
@@ -144,7 +145,7 @@ class GroupPopover extends Component {
 
   removeUser(userId) {
     this.setState({
-      usersIds: R.filter((u) => u !== userId, this.state.usersIds),
+      usersIds: R.filter(u => u !== userId, this.state.usersIds),
     });
   }
 
@@ -267,7 +268,7 @@ class GroupPopover extends Component {
       group,
     );
     const { keyword, tags } = this.state;
-    const filterByKeyword = (n) => keyword === ''
+    const filterByKeyword = n => keyword === ''
       || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
       !== -1
       || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase())
@@ -279,11 +280,11 @@ class GroupPopover extends Component {
       || (n.organization_name || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
-      || (n.organization_description || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1;
+        || (n.organization_description || '')
+          .toLowerCase()
+          .indexOf(keyword.toLowerCase()) !== -1;
     const filteredUsers = R.pipe(
-      R.map((u) => ({
+      R.map(u => ({
         organization_name:
           organizationsMap[u.user_organization]?.organization_name ?? '-',
         organization_description:
@@ -292,9 +293,9 @@ class GroupPopover extends Component {
         ...u,
       })),
       R.filter(
-        (n) => tags.length === 0
+        n => tags.length === 0
           || R.any(
-            (filter) => R.includes(filter, n.user_tags),
+            filter => R.includes(filter, n.user_tags),
             R.pluck('id', tags),
           ),
       ),
@@ -471,11 +472,11 @@ class GroupPopover extends Component {
                 <TableBody displayRowCheckbox={false}>
                   {this.props.scenarios.map((scenario) => {
                     const grantPlanner = R.find(
-                      (g) => g.grant_scenario === scenario.scenario_id
+                      g => g.grant_scenario === scenario.scenario_id
                         && g.grant_name === 'PLANNER',
                     )(group.group_grants);
                     const grantObserver = R.find(
-                      (g) => g.grant_scenario === scenario.scenario_id
+                      g => g.grant_scenario === scenario.scenario_id
                         && g.grant_name === 'OBSERVER',
                     )(group.group_grants);
                     const grantPlannerId = R.propOr(
@@ -539,11 +540,11 @@ class GroupPopover extends Component {
                 <TableBody displayRowCheckbox={false}>
                   {this.props.exercises.map((exercise) => {
                     const grantPlanner = R.find(
-                      (g) => g.grant_exercise === exercise.exercise_id
+                      g => g.grant_exercise === exercise.exercise_id
                         && g.grant_name === 'PLANNER',
                     )(group.group_grants);
                     const grantObserver = R.find(
-                      (g) => g.grant_exercise === exercise.exercise_id
+                      g => g.grant_exercise === exercise.exercise_id
                         && g.grant_name === 'OBSERVER',
                     )(group.group_grants);
                     const grantPlannerId = R.propOr(

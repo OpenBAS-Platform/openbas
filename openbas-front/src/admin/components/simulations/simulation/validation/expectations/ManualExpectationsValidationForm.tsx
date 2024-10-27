@@ -1,23 +1,24 @@
-import { FunctionComponent, useEffect } from 'react';
-import { Button, Chip, Grid, MenuItem, Select, Slider, TextField as MuiTextField, Typography } from '@mui/material';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { Button, Chip, Grid, MenuItem, Select, Slider, TextField as MuiTextField, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
-import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
-import { useFormatter } from '../../../../../../components/i18n';
+import { FunctionComponent, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
 import { updateInjectExpectation } from '../../../../../../actions/Exercise';
-import { useAppDispatch } from '../../../../../../utils/hooks';
-import type { Theme } from '../../../../../../components/Theme';
-import { zodImplement } from '../../../../../../utils/Zod';
-import type { TeamsHelper } from '../../../../../../actions/teams/team-helper';
 import type { UserHelper } from '../../../../../../actions/helper';
+import { fetchTeams } from '../../../../../../actions/teams/team-actions';
+import type { TeamsHelper } from '../../../../../../actions/teams/team-helper';
+import { fetchUsers } from '../../../../../../actions/User';
+import { useFormatter } from '../../../../../../components/i18n';
+import type { Theme } from '../../../../../../components/Theme';
 import { useHelper } from '../../../../../../store';
 import type { Team, User } from '../../../../../../utils/api-types';
-import { computeColorStyle, computeLabel, resolveUserName, truncate } from '../../../../../../utils/String';
+import { useAppDispatch } from '../../../../../../utils/hooks';
 import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
-import { fetchUsers } from '../../../../../../actions/User';
-import { fetchTeams } from '../../../../../../actions/teams/team-actions';
+import { computeColorStyle, computeLabel, resolveUserName, truncate } from '../../../../../../utils/String';
+import { zodImplement } from '../../../../../../utils/Zod';
+import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
@@ -51,8 +52,8 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
   const { t } = useFormatter();
   const theme = useTheme<Theme>();
   const { teamsMap, usersMap }: {
-    teamsMap: Record<string, Team>,
-    usersMap: Record<string, User>
+    teamsMap: Record<string, Team>;
+    usersMap: Record<string, User>;
   } = useHelper((helper: TeamsHelper & UserHelper) => {
     return ({
       teamsMap: helper.getTeamsMap(),
@@ -115,7 +116,8 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
             classes={{ root: classes.chipInList }}
             style={computeColorStyle(expectation.inject_expectation_status)}
             label={t(computeLabel(expectation.inject_expectation_status))}
-          />)}
+          />
+        )}
         {withSummary && (<Typography variant="h3">{expectation.inject_expectation_user ? t('Player') : t('Team')}</Typography>)}
         {withSummary && targetLabel(expectation)}
         <Grid container spacing={3} className={withSummary ? classes.marginTop_2 : classes.scoreAcc}>
@@ -140,14 +142,14 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
             <Select
               fullWidth
               value={watch('expectation_score') < expectation.inject_expectation_expected_score ? 'Failed' : 'Success'}
-              onChange={(event) => setValue('expectation_score', event.target.value === 'Success' ? 100 : 0)}
+              onChange={event => setValue('expectation_score', event.target.value === 'Success' ? 100 : 0)}
               renderValue={(value) => {
                 return value;
               }}
               sx={{ marginTop: 2 }}
             >
-              <MenuItem value={'Success'}>{t('Success')}</MenuItem>
-              <MenuItem value={'Failed'}>{t('Failed')}</MenuItem>
+              <MenuItem value="Success">{t('Success')}</MenuItem>
+              <MenuItem value="Failed">{t('Failed')}</MenuItem>
             </Select>
           </Grid>
         </Grid>

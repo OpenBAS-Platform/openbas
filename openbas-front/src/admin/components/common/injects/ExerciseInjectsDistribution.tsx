@@ -1,7 +1,8 @@
-import { FunctionComponent } from 'react';
 import * as R from 'ramda';
-import { useFormatter } from '../../../../components/i18n';
+import { FunctionComponent } from 'react';
+
 import type { TeamStore } from '../../../../actions/teams/Team';
+import { useFormatter } from '../../../../components/i18n';
 import InjectsDistribution from './InjectsDistribution';
 import { getTeamsColors } from './teams/utils';
 
@@ -35,7 +36,8 @@ const ExerciseInjectsDistribution: FunctionComponent<Props> = ({
   );
 
   return (
-    <InjectsDistribution topTeams={topTeams}
+    <InjectsDistribution
+      topTeams={topTeams}
       distributionChartData={distributionChartData}
       maxInjectsNumber={maxInjectsNumber}
     />

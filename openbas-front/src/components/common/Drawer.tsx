@@ -1,11 +1,12 @@
+import { Close } from '@mui/icons-material';
 import { Drawer as DrawerMUI, IconButton, type PaperProps, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent } from 'react';
 import * as React from 'react';
-import { Close } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
-import type { Theme } from '../Theme';
-import useAuth from '../../utils/hooks/useAuth';
+
 import { computeBannerSettings } from '../../public/components/systembanners/utils';
+import useAuth from '../../utils/hooks/useAuth';
+import type { Theme } from '../Theme';
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
   drawerPaperHalf: {
@@ -53,9 +54,9 @@ interface DrawerProps {
   | React.ReactElement
   | null;
   variant?: 'full' | 'half';
-  PaperProps?: PaperProps
-  disableEnforceFocus?: boolean
-  containerStyle?: CSSProperties
+  PaperProps?: PaperProps;
+  disableEnforceFocus?: boolean;
+  containerStyle?: CSSProperties;
 }
 
 const Drawer: FunctionComponent<DrawerProps> = ({

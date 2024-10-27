@@ -1,15 +1,16 @@
-import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Add } from '@mui/icons-material';
+import { Button, IconButton, TextField, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import * as React from 'react';
-import { Button, IconButton, TextField, Typography } from '@mui/material';
-import { Add } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import type { ImportMapperAddInput } from '../../../../../utils/api-types';
+
 import { useFormatter } from '../../../../../components/i18n';
-import { zodImplement } from '../../../../../utils/Zod';
 import RegexComponent from '../../../../../components/RegexComponent';
+import type { ImportMapperAddInput } from '../../../../../utils/api-types';
+import { zodImplement } from '../../../../../utils/Zod';
 import RulesContractContent from './RulesContractContent';
 import XlsMapperTestDialog from './XlsMapperTestDialog';
 
@@ -96,7 +97,7 @@ const MapperForm: React.FC<Props> = ({
         <div style={{ marginTop: 20 }}>
           <Controller
             control={control}
-            name={'import_mapper_inject_type_column'}
+            name="import_mapper_inject_type_column"
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <RegexComponent
                 label={t('Inject type column')}

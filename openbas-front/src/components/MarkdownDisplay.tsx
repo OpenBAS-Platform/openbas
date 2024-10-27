@@ -1,14 +1,15 @@
-import Markdown from 'react-markdown';
-import remarkParse from 'remark-parse';
-import remarkFlexibleMarkers from 'remark-flexible-markers';
 import { useTheme } from '@mui/styles';
 import { FunctionComponent, SyntheticEvent, useState } from 'react';
+import Markdown from 'react-markdown';
+import type { PluggableList } from 'react-markdown/lib';
+import remarkFlexibleMarkers from 'remark-flexible-markers';
 import remarkGfm from 'remark-gfm';
-import type { Theme } from './Theme';
+import remarkParse from 'remark-parse';
+
 import { truncate } from '../utils/String';
 import ExternalLinkPopover from './ExternalLinkPopover';
 import FieldOrEmpty from './FieldOrEmpty';
-import type { PluggableList } from 'react-markdown/lib';
+import type { Theme } from './Theme';
 
 export const MarkDownComponents = (
   theme: Theme,
@@ -59,7 +60,7 @@ interface MarkdownWithRedirectionWarningProps {
 }
 
 const MarkdownDisplay: FunctionComponent<
-MarkdownWithRedirectionWarningProps
+  MarkdownWithRedirectionWarningProps
 > = ({
   content,
   expand,
@@ -167,7 +168,7 @@ MarkdownWithRedirectionWarningProps
   }
   return (
     <FieldOrEmpty source={content}>
-      <div onClick={(event) => browseLinkWarning(event)} style={{ wordBreak: 'break-word' }}>
+      <div onClick={event => browseLinkWarning(event)} style={{ wordBreak: 'break-word' }}>
         {remarkGfmPlugin ? remarkGfmMarkdownElement() : markdownElement()}
       </div>
       <ExternalLinkPopover

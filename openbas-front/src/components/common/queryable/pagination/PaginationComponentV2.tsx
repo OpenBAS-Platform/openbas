@@ -1,22 +1,23 @@
 import { Box, Button, Chip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from 'react';
 import * as React from 'react';
-import { makeStyles } from '@mui/styles';
-import type { Page } from '../Page';
-import type { Filter, PropertySchemaDTO, SearchPaginationInput } from '../../../../utils/api-types';
-import mitreAttack from '../../../../static/images/misc/attack.png';
-import Drawer from '../../Drawer';
-import MitreFilter, { MITRE_FILTER_KEY } from '../../../../admin/components/common/filters/MitreFilter';
-import { useFormatter } from '../../../i18n';
-import { availableOperators, isEmptyFilter } from '../filter/FilterUtils';
+
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
+import InjectorContractSwitchFilter from '../../../../admin/components/common/filters/InjectorContractSwitchFilter';
+import MitreFilter, { MITRE_FILTER_KEY } from '../../../../admin/components/common/filters/MitreFilter';
+import mitreAttack from '../../../../static/images/misc/attack.png';
+import type { Filter, PropertySchemaDTO, SearchPaginationInput } from '../../../../utils/api-types';
+import { useFormatter } from '../../../i18n';
+import ClickableModeChip from '../../chips/ClickableModeChip';
+import Drawer from '../../Drawer';
+import FilterAutocomplete, { OptionPropertySchema } from '../filter/FilterAutocomplete';
+import FilterChips from '../filter/FilterChips';
+import { availableOperators, isEmptyFilter } from '../filter/FilterUtils';
+import useFilterableProperties from '../filter/useFilterableProperties';
+import type { Page } from '../Page';
 import { QueryableHelpers } from '../QueryableHelpers';
 import TextSearchComponent from '../textSearch/TextSearchComponent';
-import FilterAutocomplete, { OptionPropertySchema } from '../filter/FilterAutocomplete';
-import useFilterableProperties from '../filter/useFilterableProperties';
-import FilterChips from '../filter/FilterChips';
-import ClickableModeChip from '../../chips/ClickableModeChip';
-import InjectorContractSwitchFilter from '../../../../admin/components/common/filters/InjectorContractSwitchFilter';
 import TablePaginationComponentV2 from './TablePaginationComponentV2';
 
 const useStyles = makeStyles(() => ({
@@ -47,8 +48,8 @@ interface Props<T> {
   availableFilterNames?: string[];
   queryableHelpers: QueryableHelpers;
   topBarButtons?: React.ReactElement | null;
-  attackPatterns?: AttackPatternStore[],
-  reloadContentCount?: number
+  attackPatterns?: AttackPatternStore[];
+  reloadContentCount?: number;
 }
 
 const PaginationComponentV2 = <T extends object>({
@@ -74,8 +75,8 @@ const PaginationComponentV2 = <T extends object>({
   useEffect(() => {
     if (entityPrefix) {
       useFilterableProperties(entityPrefix, availableFilterNames).then((propertySchemas: PropertySchemaDTO[]) => {
-        const newOptions = propertySchemas.filter((property) => property.schema_property_name !== MITRE_FILTER_KEY)
-          .map((property) => (
+        const newOptions = propertySchemas.filter(property => property.schema_property_name !== MITRE_FILTER_KEY)
+          .map(property => (
             { id: property.schema_property_name, label: t(property.schema_property_name), operator: availableOperators(property)[0] } as OptionPropertySchema
           ));
         setOptions(newOptions);
@@ -183,10 +184,18 @@ const PaginationComponentV2 = <T extends object>({
             >
               <Chip
                 style={{ borderRadius: 4 }}
-                label={<><strong>{'Attack Pattern'}</strong> = {computeAttackPatternNameForFilter()}</>}
+                label={(
+                  <>
+                    <strong>{t('Attack Pattern')}</strong>
+                    {' '}
+                    =
+                    {' '}
+                    {computeAttackPatternNameForFilter()}
+                  </>
+                )}
                 onDelete={() => queryableHelpers.filterHelpers.handleRemoveFilterByKey(MITRE_FILTER_KEY)}
               />
-              {(searchPaginationInput.filterGroup?.filters?.filter((f) => availableFilterNames?.filter((n) => n !== MITRE_FILTER_KEY).includes(f.key)).length ?? 0) > 0 && (
+              {(searchPaginationInput.filterGroup?.filters?.filter(f => availableFilterNames?.filter(n => n !== MITRE_FILTER_KEY).includes(f.key)).length ?? 0) > 0 && (
                 <ClickableModeChip
                   onClick={queryableHelpers.filterHelpers.handleSwitchMode}
                   mode={searchPaginationInput.filterGroup.mode}
@@ -199,7 +208,7 @@ const PaginationComponentV2 = <T extends object>({
       <FilterChips
         propertySchemas={properties}
         filterGroup={searchPaginationInput.filterGroup}
-        availableFilterNames={availableFilterNames?.filter((n) => n !== MITRE_FILTER_KEY)}
+        availableFilterNames={availableFilterNames?.filter(n => n !== MITRE_FILTER_KEY)}
         helpers={queryableHelpers.filterHelpers}
         pristine={pristine}
       />

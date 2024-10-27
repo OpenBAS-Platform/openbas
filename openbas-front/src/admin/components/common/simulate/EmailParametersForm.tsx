@@ -1,10 +1,11 @@
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, AlertTitle, Autocomplete, Button, Chip, TextField, TextField as MuiTextField } from '@mui/material';
+import { Alert, AlertTitle, Autocomplete, Button, Chip, TextField as MuiTextField, TextField } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import * as React from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { makeStyles } from '@mui/styles';
+
 import { useFormatter } from '../../../../components/i18n';
 import { zodImplement } from '../../../../utils/Zod';
 
@@ -127,14 +128,14 @@ const EmailParametersForm: React.FC<Props> = ({
                     }}
                   />
                 ))}
-                renderInput={(params) => (
+                renderInput={params => (
                   <TextField
                     {...params}
                     variant="standard"
                     label={t('Reply to')}
                     style={{ marginTop: 20 }}
                     error={!!fieldState.error}
-                    helperText={errors.setting_mails_reply_to?.find ? errors.setting_mails_reply_to?.find((value) => value != null)?.message ?? '' : ''}
+                    helperText={errors.setting_mails_reply_to?.find ? errors.setting_mails_reply_to?.find(value => value != null)?.message ?? '' : ''}
                   />
                 )}
               />
@@ -158,7 +159,8 @@ const EmailParametersForm: React.FC<Props> = ({
           color="primary"
           type="submit"
           disabled={!isDirty || isSubmitting}
-        >{t('Update')}
+        >
+          {t('Update')}
         </Button>
       </div>
     </form>

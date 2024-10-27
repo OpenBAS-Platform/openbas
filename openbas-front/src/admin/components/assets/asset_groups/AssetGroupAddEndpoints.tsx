@@ -1,10 +1,11 @@
 import { FunctionComponent, useState } from 'react';
-import { useAppDispatch } from '../../../../utils/hooks';
+
 import { updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
-import EndpointsDialogAdding from '../endpoints/EndpointsDialogAdding';
 import { useFormatter } from '../../../../components/i18n';
+import { useAppDispatch } from '../../../../utils/hooks';
 import type { UserStore } from '../../teams/players/Player';
+import EndpointsDialogAdding from '../endpoints/EndpointsDialogAdding';
 import type { AssetGroupStore } from './AssetGroup';
 
 interface Props {
@@ -31,7 +32,7 @@ const AssetGroupAddEndpoints: FunctionComponent<Props> = ({
     return dispatch(updateAssetsOnAssetGroup(assetGroupId, {
       asset_group_assets: endpointIds,
     })).then(
-      (result: { result: string, entities: { asset_groups: Record<string, UserStore> } }) => {
+      (result: { result: string; entities: { asset_groups: Record<string, UserStore> } }) => {
         if (result.result) {
           if (onUpdate) {
             const created = result.entities.asset_groups[result.result];
@@ -47,8 +48,11 @@ const AssetGroupAddEndpoints: FunctionComponent<Props> = ({
   return (
     <>
       <ButtonCreate onClick={() => setOpen(true)} />
-      <EndpointsDialogAdding initialState={assetGroupEndpointIds} open={open}
-        onClose={onClose} onSubmit={onSubmit}
+      <EndpointsDialogAdding
+        initialState={assetGroupEndpointIds}
+        open={open}
+        onClose={onClose}
+        onSubmit={onSubmit}
         title={t('Add assets in this asset group')}
       />
     </>

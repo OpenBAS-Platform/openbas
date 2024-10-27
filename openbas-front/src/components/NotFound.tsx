@@ -1,4 +1,5 @@
 import { Alert, AlertTitle } from '@mui/material';
+
 import { useFormatter } from './i18n';
 
 const NotFound = () => {

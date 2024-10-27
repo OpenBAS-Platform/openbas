@@ -1,12 +1,13 @@
-import { Component } from 'react';
+import { MoreVert } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem } from '@mui/material';
-import { MoreVert } from '@mui/icons-material';
-import ObjectiveForm from './ObjectiveForm';
-import inject18n from '../../../components/i18n';
+import { Component } from 'react';
+
 import Transition from '../../../components/common/Transition';
+import inject18n from '../../../components/i18n';
 import { LessonContext } from '../common/Context';
+import ObjectiveForm from './ObjectiveForm';
 
 class ObjectivePopover extends Component {
   // Context

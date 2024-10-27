@@ -1,6 +1,7 @@
-import { Suspense, lazy } from 'react';
 import { makeStyles } from '@mui/styles';
+import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+
 import { errorWrapper } from '../../../components/Error';
 import Loader from '../../../components/Loader';
 import NotFound from '../../../components/NotFound';
@@ -26,7 +27,7 @@ const Index = () => {
           <Route path="teams" element={errorWrapper(Teams)()} />
           <Route path="organizations" element={errorWrapper(Organizations)()} />
           {/* Not found */}
-          <Route path="*" element={<NotFound/>}/>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </div>

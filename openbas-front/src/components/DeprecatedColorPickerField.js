@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Field } from 'react-final-form';
-import { TextField as MuiTextField, IconButton, Popover, InputAdornment } from '@mui/material';
-import { SketchPicker } from 'react-color';
 import { ColorLensOutlined } from '@mui/icons-material';
+import { IconButton, InputAdornment, Popover, TextField as MuiTextField } from '@mui/material';
+import { useState } from 'react';
+import { SketchPicker } from 'react-color';
+import { Field } from 'react-final-form';
 
 const ColorPickerFieldBase = ({
   label,
@@ -28,7 +28,7 @@ const ColorPickerFieldBase = ({
             <InputAdornment position="end">
               <IconButton
                 aria-label="open"
-                onClick={(event) => setAnchorEl(event.currentTarget)}
+                onClick={event => setAnchorEl(event.currentTarget)}
                 disabled={others.disabled}
               >
                 <ColorLensOutlined />
@@ -52,7 +52,7 @@ const ColorPickerFieldBase = ({
       >
         <SketchPicker
           color={inputProps.value || ''}
-          onChangeComplete={(color) => handleChange(color)}
+          onChangeComplete={color => handleChange(color)}
         />
       </Popover>
     </>
@@ -62,7 +62,7 @@ const ColorPickerFieldBase = ({
 /**
  * @deprecated The component use old form libnary react-final-form
  */
-const DeprecatedColorPickerField = (props) => (
+const DeprecatedColorPickerField = props => (
   <Field name={props.name} component={ColorPickerFieldBase} {...props} />
 );
 

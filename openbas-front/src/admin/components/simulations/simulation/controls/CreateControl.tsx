@@ -1,26 +1,26 @@
 /* eslint-disable no-template-curly-in-string */
-import { useState } from 'react';
-
-import * as React from 'react';
-import { SpeedDial, SpeedDialIcon, SpeedDialAction, Dialog, DialogTitle, DialogContent, Grid, Typography, Button } from '@mui/material';
-import { VideoSettingsOutlined, MarkEmailReadOutlined } from '@mui/icons-material';
+import { MarkEmailReadOutlined, VideoSettingsOutlined } from '@mui/icons-material';
+import { Button, Dialog, DialogContent, DialogTitle, Grid, SpeedDial, SpeedDialAction, SpeedDialIcon, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { useState } from 'react';
+import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import ComcheckForm from './ComcheckForm';
-import DryrunForm from './DryrunForm';
-import { resolveUserName } from '../../../../../utils/String';
-import { isExerciseReadOnly, usePermissions } from '../../../../../utils/Exercise';
-import type { Theme } from '../../../../../components/Theme';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import type { ComcheckInput, Exercise } from '../../../../../utils/api-types';
+
 import { addComcheck } from '../../../../../actions/Comcheck';
 import { addDryrun } from '../../../../../actions/Dryrun';
-import { useFormatter } from '../../../../../components/i18n';
-import Transition from '../../../../../components/common/Transition';
-import { useHelper } from '../../../../../store';
+import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import type { UserHelper } from '../../../../../actions/helper';
 import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
-import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
+import Transition from '../../../../../components/common/Transition';
+import { useFormatter } from '../../../../../components/i18n';
+import type { Theme } from '../../../../../components/Theme';
+import { useHelper } from '../../../../../store';
+import type { ComcheckInput, Exercise } from '../../../../../utils/api-types';
+import { isExerciseReadOnly, usePermissions } from '../../../../../utils/Exercise';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import { resolveUserName } from '../../../../../utils/String';
+import ComcheckForm from './ComcheckForm';
+import DryrunForm from './DryrunForm';
 
 const useStyles = makeStyles<Theme>(() => ({
   createButton: {

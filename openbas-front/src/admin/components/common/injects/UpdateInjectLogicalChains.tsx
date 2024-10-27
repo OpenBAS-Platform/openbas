@@ -1,19 +1,20 @@
-import * as React from 'react';
-import arrayMutators from 'final-form-arrays';
-import { Form } from 'react-final-form';
-import { makeStyles } from '@mui/styles';
-import { Avatar, Button, Card, CardContent, CardHeader } from '@mui/material';
 import { HelpOutlined } from '@mui/icons-material';
+import { Avatar, Button, Card, CardContent, CardHeader } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import arrayMutators from 'final-form-arrays';
+import * as React from 'react';
+import { Form } from 'react-final-form';
+
+import type { InjectOutputType } from '../../../../actions/injects/Inject';
+import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import InjectChainsForm from './InjectChainsForm';
 import type { Theme } from '../../../../components/Theme';
-import type { Inject, InjectDependency } from '../../../../utils/api-types';
-import type { InjectOutputType } from '../../../../actions/injects/Inject';
 import { useHelper } from '../../../../store';
-import type { InjectHelper } from '../../../../actions/injects/inject-helper';
+import type { Inject, InjectDependency } from '../../../../utils/api-types';
+import InjectChainsForm from './InjectChainsForm';
 
-const useStyles = makeStyles<Theme>((theme) => ({
+const useStyles = makeStyles<Theme>(theme => ({
   injectorContract: {
     margin: '10px 0 20px 0',
     width: '100%',
@@ -30,10 +31,10 @@ const useStyles = makeStyles<Theme>((theme) => ({
 }));
 
 interface Props {
-  inject: Inject,
+  inject: Inject;
   handleClose: () => void;
   onUpdateInject?: (data: Inject[]) => Promise<void>;
-  injects?: InjectOutputType[],
+  injects?: InjectOutputType[];
 }
 
 const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpdateInject, injects }) => {
@@ -46,15 +47,17 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
 
   const initialValues = {
     ...inject,
-    inject_depends_to: injects !== undefined ? injects
-      .filter((currentInject) => currentInject.inject_depends_on !== undefined
+    inject_depends_to: injects !== undefined
+      ? injects
+        .filter(currentInject => currentInject.inject_depends_on !== undefined
           && currentInject.inject_depends_on !== null
           && currentInject.inject_depends_on
-            .find((searchInject) => searchInject.dependency_relationship?.inject_parent_id === inject.inject_id)
-          !== undefined)
-      .flatMap((currentInject) => {
-        return currentInject.inject_depends_on;
-      }) : undefined,
+            .find(searchInject => searchInject.dependency_relationship?.inject_parent_id === inject.inject_id)
+            !== undefined)
+        .flatMap((currentInject) => {
+          return currentInject.inject_depends_on;
+        })
+      : undefined,
     inject_depends_on: inject.inject_depends_on,
   };
 
@@ -70,27 +73,29 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
 
     const childrenIds = data.inject_depends_to.map((childrenInject: InjectDependency) => childrenInject.dependency_relationship?.inject_children_id);
 
-    const injectsWithoutDependencies = injects ? injects
-      .filter((currentInject) => currentInject.inject_depends_on !== null
-        && currentInject.inject_depends_on?.find((searchInject) => searchInject.dependency_relationship?.inject_parent_id === data.inject_id) !== undefined
-        && !childrenIds.includes(currentInject.inject_id))
-      .map((currentInject) => {
-        return {
-          ...injectsMap[currentInject.inject_id],
-          inject_id: currentInject.inject_id,
-          inject_injector_contract: currentInject.inject_injector_contract.injector_contract_id,
-          inject_depends_on: undefined,
-        } as unknown as Inject;
-      }) : [];
+    const injectsWithoutDependencies = injects
+      ? injects
+        .filter(currentInject => currentInject.inject_depends_on !== null
+          && currentInject.inject_depends_on?.find(searchInject => searchInject.dependency_relationship?.inject_parent_id === data.inject_id) !== undefined
+          && !childrenIds.includes(currentInject.inject_id))
+        .map((currentInject) => {
+          return {
+            ...injectsMap[currentInject.inject_id],
+            inject_id: currentInject.inject_id,
+            inject_injector_contract: currentInject.inject_injector_contract.injector_contract_id,
+            inject_depends_on: undefined,
+          } as unknown as Inject;
+        })
+      : [];
 
     injectsToUpdate.push(...injectsWithoutDependencies);
 
     childrenIds.forEach((childrenId) => {
       if (injects === undefined || childrenId === undefined) return;
-      const children = injects.find((currentInject) => currentInject.inject_id === childrenId);
+      const children = injects.find(currentInject => currentInject.inject_id === childrenId);
       if (children !== undefined) {
         const injectDependsOnUpdate = data.inject_depends_to
-          .find((dependsTo) => dependsTo.dependency_relationship?.inject_children_id === childrenId);
+          .find(dependsTo => dependsTo.dependency_relationship?.inject_children_id === childrenId);
 
         const injectChildrenUpdate: Inject = {
           ...injectsMap[children.inject_id],
@@ -115,12 +120,14 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
           classes={{ root: classes.injectorContractHeader }}
           avatar={injectorContractContent?.config?.type ? <Avatar sx={{ width: 24, height: 24 }} src={`/api/images/injectors/${injectorContractContent.config.type}`} />
             : <Avatar sx={{ width: 24, height: 24 }}><HelpOutlined /></Avatar>}
-          title={inject?.inject_attack_patterns?.map((value) => value.attack_pattern_external_id)?.join(', ')}
-          action={<div style={{ display: 'flex', alignItems: 'center' }}>
-            {inject?.inject_injector_contract?.injector_contract_platforms?.map(
-              (platform) => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
-            )}
-          </div>}
+          title={inject?.inject_attack_patterns?.map(value => value.attack_pattern_external_id)?.join(', ')}
+          action={(
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              {inject?.inject_injector_contract?.injector_contract_platforms?.map(
+                platform => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
+              )}
+            </div>
+          )}
         />
         <CardContent classes={{ root: classes.injectorContractContent }}>
           {tPick(inject?.inject_injector_contract?.injector_contract_labels)}
@@ -157,7 +164,7 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
                   variant="contained"
                   color="secondary"
                   type="submit"
-                  disabled={errors !== undefined && Object.keys(errors).length > 0 }
+                  disabled={errors !== undefined && Object.keys(errors).length > 0}
                 >
                   {t('Update')}
                 </Button>

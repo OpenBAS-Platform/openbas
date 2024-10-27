@@ -1,23 +1,24 @@
-import { FunctionComponent, useContext, useState } from 'react';
-import * as R from 'ramda';
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { ControlPointOutlined, EmojiEventsOutlined } from '@mui/icons-material';
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import SearchFilter from '../../../../components/SearchFilter';
-import { useFormatter } from '../../../../components/i18n';
+import * as R from 'ramda';
+import { FunctionComponent, useContext, useState } from 'react';
+
 import { fetchChallenges } from '../../../../actions/Challenge';
-import CreateChallenge from '../../components/challenges/CreateChallenge';
-import { truncate } from '../../../../utils/String';
-import Transition from '../../../../components/common/Transition';
-import TagsFilter from '../filters/TagsFilter';
-import type { Theme } from '../../../../components/Theme';
-import type { Option } from '../../../../utils/Option';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { useHelper } from '../../../../store';
 import type { ChallengeHelper } from '../../../../actions/helper';
-import { PermissionsContext } from '../Context';
+import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import SearchFilter from '../../../../components/SearchFilter';
+import type { Theme } from '../../../../components/Theme';
+import { useHelper } from '../../../../store';
 import type { Challenge } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import type { Option } from '../../../../utils/Option';
+import { truncate } from '../../../../utils/String';
+import CreateChallenge from '../../components/challenges/CreateChallenge';
+import { PermissionsContext } from '../Context';
+import TagsFilter from '../filters/TagsFilter';
 
 const useStyles = makeStyles((theme: Theme) => ({
   box: {
@@ -96,7 +97,7 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
   };
 
   const removeChallenge = (challengeId: string) => {
-    setChallengesIds(challengesIds.filter((u) => u !== challengeId));
+    setChallengesIds(challengesIds.filter(u => u !== challengeId));
   };
 
   const submitAddChallenges = () => {
@@ -114,9 +115,9 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
     || (n.challenge_content || '')
       .toLowerCase()
       .indexOf(keyword.toLowerCase()) !== -1
-    || (n.challenge_category || '')
-      .toLowerCase()
-      .indexOf(keyword.toLowerCase()) !== -1;
+      || (n.challenge_category || '')
+        .toLowerCase()
+        .indexOf(keyword.toLowerCase()) !== -1;
   const filteredChallenges = R.pipe(
     R.filter(
       (n: Challenge) => tags.length === 0

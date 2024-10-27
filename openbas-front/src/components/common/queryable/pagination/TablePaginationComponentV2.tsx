@@ -1,8 +1,9 @@
 import { TablePagination } from '@mui/material';
 import { FunctionComponent } from 'react';
 import * as React from 'react';
-import { ROWS_PER_PAGE_OPTIONS } from './usPaginationState';
+
 import { PaginationHelpers } from './PaginationHelpers';
+import { ROWS_PER_PAGE_OPTIONS } from './usPaginationState';
 
 interface Props {
   page: number;

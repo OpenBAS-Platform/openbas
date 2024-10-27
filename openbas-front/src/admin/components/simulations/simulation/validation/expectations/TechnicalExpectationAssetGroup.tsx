@@ -1,18 +1,19 @@
-import { FunctionComponent } from 'react';
-import { ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { DnsOutlined } from '@mui/icons-material';
+import { ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
-import type { Team } from '../../../../../../utils/api-types';
-import type { Contract } from '../../../../../../actions/contract/contract';
-import ExpectationLine from './ExpectationLine';
-import { typeIcon } from '../../../../common/injects/expectations/ExpectationUtils';
-import type { EndpointStore } from '../../../../assets/endpoints/Endpoint';
-import TechnicalExpectationAsset from './TechnicalExpectationAsset';
-import { useHelper } from '../../../../../../store';
+import { FunctionComponent } from 'react';
+
 import type { EndpointHelper } from '../../../../../../actions/assets/asset-helper';
+import type { Contract } from '../../../../../../actions/contract/contract';
+import { useHelper } from '../../../../../../store';
+import type { Team } from '../../../../../../utils/api-types';
 import type { AssetGroupStore } from '../../../../assets/asset_groups/AssetGroup';
+import type { EndpointStore } from '../../../../assets/endpoints/Endpoint';
+import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
+import { typeIcon } from '../../../../common/injects/expectations/ExpectationUtils';
+import ExpectationLine from './ExpectationLine';
 import groupedByAsset from './ExpectationUtils';
+import TechnicalExpectationAsset from './TechnicalExpectationAsset';
 
 const useStyles = makeStyles(() => ({
   item: {
@@ -73,11 +74,11 @@ const TechnicalExpectationAssetGroup: FunctionComponent<Props> = ({
                 {!!relatedAsset && <DnsOutlined fontSize="small" />}
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div className={classes.bodyItem} style={{ width: '20%' }}>
                     {team?.team_name || relatedAsset?.asset_name || assetGroup?.asset_group_name}
                   </div>
-                }
+                )}
               />
             </ListItem>
             {groupedExpectations.map((e: InjectExpectationsStore) => (

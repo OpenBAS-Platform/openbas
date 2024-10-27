@@ -1,32 +1,33 @@
-import { useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
-import { Link, useParams } from 'react-router-dom';
 import { PreviewOutlined } from '@mui/icons-material';
-import { useFormatter } from '../../../../../components/i18n';
-import { useHelper } from '../../../../../store';
+import { Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+
+import { fetchExerciseTeams } from '../../../../../actions/Exercise';
+import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
+import { fetchExerciseInjects, updateInjectForExercise } from '../../../../../actions/Inject';
+import type { InjectStore } from '../../../../../actions/injects/Inject';
+import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import Empty from '../../../../../components/Empty';
+import { useFormatter } from '../../../../../components/i18n';
+import ItemStatus from '../../../../../components/ItemStatus';
+import ProgressBarCountdown from '../../../../../components/ProgressBarCountdown';
+import SearchFilter from '../../../../../components/SearchFilter';
+import Timeline from '../../../../../components/Timeline';
+import { useHelper } from '../../../../../store';
+import type { Exercise, Inject } from '../../../../../utils/api-types';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import useSearchAnFilter from '../../../../../utils/SortingFiltering';
+import { isNotEmptyField } from '../../../../../utils/utils';
+import TagsFilter from '../../../common/filters/TagsFilter';
 import InjectIcon from '../../../common/injects/InjectIcon';
 import InjectPopover from '../../../common/injects/InjectPopover';
-import ProgressBarCountdown from '../../../../../components/ProgressBarCountdown';
+import UpdateInject from '../../../common/injects/UpdateInject';
 import AnimationMenu from '../AnimationMenu';
 import InjectOverTimeArea from './InjectOverTimeArea';
 import InjectOverTimeLine from './InjectOverTimeLine';
-import UpdateInject from '../../../common/injects/UpdateInject';
-import ItemStatus from '../../../../../components/ItemStatus';
-import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
-import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import type { Exercise, Inject } from '../../../../../utils/api-types';
-import { fetchExerciseInjects, updateInjectForExercise } from '../../../../../actions/Inject';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import Timeline from '../../../../../components/Timeline';
-import SearchFilter from '../../../../../components/SearchFilter';
-import TagsFilter from '../../../common/filters/TagsFilter';
-import useSearchAnFilter from '../../../../../utils/SortingFiltering';
-import { isNotEmptyField } from '../../../../../utils/utils';
-import type { InjectStore } from '../../../../../actions/injects/Inject';
-import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -134,7 +135,8 @@ const TimelineOverview = () => {
         injects={filteredInjects}
         teams={teams}
         onSelectInject={(id: string) => setSelectedInjectId(id)}
-      ></Timeline>
+      >
+      </Timeline>
       <div className="clearfix" />
       <Grid container spacing={3} style={{ marginTop: 50, paddingBottom: 24 }}>
         <Grid container item spacing={3}>
@@ -168,7 +170,7 @@ const TimelineOverview = () => {
                           />
                         </ListItemIcon>
                         <ListItemText
-                          primary={
+                          primary={(
                             <div className={classes.bodyItems}>
                               <div
                                 className={classes.bodyItem}
@@ -198,7 +200,7 @@ const TimelineOverview = () => {
                                 {fndt(inject.inject_date)}
                               </div>
                             </div>
-                          }
+                          )}
                         />
                         <ListItemSecondaryAction>
                           <InjectPopover
@@ -245,7 +247,7 @@ const TimelineOverview = () => {
                         />
                       </ListItemIcon>
                       <ListItemText
-                        primary={
+                        primary={(
                           <div className={classes.bodyItems}>
                             <div
                               className={classes.bodyItem}
@@ -271,12 +273,15 @@ const TimelineOverview = () => {
                                 fontSize: 12,
                               }}
                             >
-                              {fndt(inject.inject_status?.tracking_sent_date)} (
+                              {fndt(inject.inject_status?.tracking_sent_date)}
+                              {' '}
+                              (
                               {inject.inject_status && inject.inject_status.tracking_total_execution_time && (inject.inject_status.tracking_total_execution_time / 1000).toFixed(2)}
-                              {t('s')})
+                              {t('s')}
+                              )
                             </div>
                           </div>
-                        }
+                        )}
                       />
                       <ListItemSecondaryAction>
                         <PreviewOutlined />

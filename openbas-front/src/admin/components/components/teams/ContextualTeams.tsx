@@ -1,15 +1,16 @@
-import { Drawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { CheckCircleOutlined, GroupsOutlined } from '@mui/icons-material';
+import { Drawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { CSSProperties, useContext, useState } from 'react';
 import * as React from 'react';
-import { makeStyles } from '@mui/styles';
 import { useSearchParams } from 'react-router-dom';
-import ItemTags from '../../../../components/ItemTags';
-import TeamPopover from './TeamPopover';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
+
 import type { TeamStore } from '../../../../actions/teams/Team';
-import TeamPlayers from './TeamPlayers';
+import ItemTags from '../../../../components/ItemTags';
+import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { PermissionsContext, TeamContext } from '../../common/Context';
+import TeamPlayers from './TeamPlayers';
+import TeamPopover from './TeamPopover';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -174,7 +175,7 @@ const ContextualTeams: React.FC<Props> = ({ teams }) => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <>
                 {filtering.buildHeader(
                   'team_name',
@@ -207,7 +208,7 @@ const ContextualTeams: React.FC<Props> = ({ teams }) => {
                   headerStylesContextual,
                 )}
               </>
-            }
+            )}
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
@@ -223,7 +224,7 @@ const ContextualTeams: React.FC<Props> = ({ teams }) => {
               <GroupsOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <>
                   <div
                     className={classes.bodyItem}
@@ -258,7 +259,7 @@ const ContextualTeams: React.FC<Props> = ({ teams }) => {
                     {team.team_contextual ? <CheckCircleOutlined fontSize="small" /> : '-'}
                   </div>
                 </>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <TeamPopover

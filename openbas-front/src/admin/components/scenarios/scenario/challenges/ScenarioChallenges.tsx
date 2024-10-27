@@ -1,10 +1,11 @@
 import { useParams } from 'react-router-dom';
-import { useAppDispatch } from '../../../../../utils/hooks';
+
+import { fetchScenarioChallenges } from '../../../../../actions/Challenge';
+import type { ChallengeHelper } from '../../../../../actions/helper';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import { useHelper } from '../../../../../store';
-import type { ChallengeHelper } from '../../../../../actions/helper';
+import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { fetchScenarioChallenges } from '../../../../../actions/Challenge';
 import ContextualChallenges from '../../../common/challenges/ContextualChallenges';
 import { ChallengeContext, ChallengeContextType } from '../../../common/Context';
 

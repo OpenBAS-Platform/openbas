@@ -1,12 +1,13 @@
-import { FunctionComponent } from 'react';
-import { Button } from '@mui/material';
-import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@mui/material';
+import { FunctionComponent } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { zodImplement } from '../../../../utils/Zod';
-import { useFormatter } from '../../../../components/i18n';
+
 import TextField from '../../../../components/fields/TextField';
+import { useFormatter } from '../../../../components/i18n';
 import type { LessonsTemplateInput } from '../../../../utils/api-types';
+import { zodImplement } from '../../../../utils/Zod';
 
 interface Props {
   onSubmit: SubmitHandler<LessonsTemplateInput>;

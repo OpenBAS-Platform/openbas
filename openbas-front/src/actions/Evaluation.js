@@ -1,5 +1,5 @@
-import * as schema from './Schema';
 import { getReferential, postReferential, putReferential } from '../utils/Action';
+import * as schema from './Schema';
 
 export const fetchExerciseEvaluations = (exerciseId, objectiveId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/objectives/${objectiveId}/evaluations`;

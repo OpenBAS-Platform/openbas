@@ -1,8 +1,9 @@
+import { Typography } from '@mui/material';
+import { ICommand } from '@uiw/react-md-editor';
+import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
 import { useState } from 'react';
 import * as React from 'react';
-import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
-import { ICommand } from '@uiw/react-md-editor';
-import { Typography } from '@mui/material';
+
 import { useFormatter } from '../i18n';
 
 interface Props {
@@ -34,7 +35,7 @@ const MarkDownField: React.FC<Props> = ({
     keyCommand: 'preview',
     buttonProps: {
       'aria-label': 'write',
-      style: { backgroundColor: 'transparent' },
+      'style': { backgroundColor: 'transparent' },
     },
     icon: (
       <div
@@ -53,7 +54,7 @@ const MarkDownField: React.FC<Props> = ({
     keyCommand: 'preview',
     buttonProps: {
       'aria-label': 'preview',
-      style: { backgroundColor: 'transparent' },
+      'style': { backgroundColor: 'transparent' },
     },
     icon: (
       <div
@@ -75,29 +76,32 @@ const MarkDownField: React.FC<Props> = ({
         disabled,
       }}
       preview={isEdit ? 'edit' : 'preview'}
-      onChange={(val) => onChange(val || '')}
+      onChange={val => onChange(val || '')}
       onBlur={onBlur}
       commands={[
         writeCommand,
         previewCommand,
-        ...(isEdit ? [
-          { ...commands.title, buttonProps: { disabled } },
-          { ...commands.bold, buttonProps: { disabled } },
-          { ...commands.italic, buttonProps: { disabled } },
-          { ...commands.strikethrough, buttonProps: { disabled } },
-          { ...commands.divider },
-          { ...commands.link, buttonProps: { disabled } },
-          { ...commands.quote, buttonProps: { disabled } },
-          { ...commands.code, buttonProps: { disabled } },
-          { ...commands.image, buttonProps: { disabled } },
-          { ...commands.divider, buttonProps: { disabled } },
-          { ...commands.unorderedListCommand, buttonProps: { disabled } },
-          { ...commands.orderedListCommand, buttonProps: { disabled } },
-          { ...commands.checkedListCommand, buttonProps: { disabled } },
-        ] : []),
+        ...(isEdit
+          ? [
+              { ...commands.title, buttonProps: { disabled } },
+              { ...commands.bold, buttonProps: { disabled } },
+              { ...commands.italic, buttonProps: { disabled } },
+              { ...commands.strikethrough, buttonProps: { disabled } },
+              { ...commands.divider },
+              { ...commands.link, buttonProps: { disabled } },
+              { ...commands.quote, buttonProps: { disabled } },
+              { ...commands.code, buttonProps: { disabled } },
+              { ...commands.image, buttonProps: { disabled } },
+              { ...commands.divider, buttonProps: { disabled } },
+              { ...commands.unorderedListCommand, buttonProps: { disabled } },
+              { ...commands.orderedListCommand, buttonProps: { disabled } },
+              { ...commands.checkedListCommand, buttonProps: { disabled } },
+            ]
+          : []),
       ]}
       extraCommands={[]}
-    />);
+    />
+  );
 };
 
 export default MarkDownField;

@@ -1,16 +1,17 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQueryParameter } from '../../../utils/Environment';
-import LessonsPreview from './LessonsPreview';
-import { useHelper } from '../../../store';
+
 import { fetchMe } from '../../../actions/Application';
-import { ViewLessonContext, ViewLessonContextType } from '../../../admin/components/common/Context';
-import { useAppDispatch } from '../../../utils/hooks';
-import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import type { UserHelper } from '../../../actions/helper';
-import type { ScenariosHelper } from '../../../actions/scenarios/scenario-helper';
+import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import { fetchLessonsCategories, fetchLessonsQuestions, fetchScenario } from '../../../actions/scenarios/scenario-actions';
+import type { ScenariosHelper } from '../../../actions/scenarios/scenario-helper';
+import { ViewLessonContext, ViewLessonContextType } from '../../../admin/components/common/Context';
+import { useHelper } from '../../../store';
+import { useQueryParameter } from '../../../utils/Environment';
+import { useAppDispatch } from '../../../utils/hooks';
 import useScenarioPermissions from '../../../utils/Scenario';
+import LessonsPreview from './LessonsPreview';
 
 const ScenarioViewLessons = () => {
   const dispatch = useAppDispatch();

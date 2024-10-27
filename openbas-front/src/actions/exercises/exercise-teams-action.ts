@@ -1,8 +1,9 @@
 import { Dispatch } from 'redux';
-import type { ExerciseUpdateTeamsInput, Scenario, SearchPaginationInput } from '../../utils/api-types';
+
 import { putReferential, simplePostCall } from '../../utils/Action';
-import { EXERCISE_URI } from './exercise-action';
+import type { ExerciseUpdateTeamsInput, Scenario, SearchPaginationInput } from '../../utils/api-types';
 import * as schema from '../Schema';
+import { EXERCISE_URI } from './exercise-action';
 
 export const searchExerciseTeams = (exerciseId: Scenario['scenario_id'], paginationInput: SearchPaginationInput, contextualOnly: boolean = false) => {
   const uri = `${EXERCISE_URI}/${exerciseId}/teams/search?contextualOnly=${contextualOnly}`;

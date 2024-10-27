@@ -1,29 +1,30 @@
-import { CSSProperties, useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { DevicesOtherOutlined } from '@mui/icons-material';
+import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { CSSProperties, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useAppDispatch } from '../../../../utils/hooks';
-import EndpointCreation from './EndpointCreation';
-import EndpointPopover from './EndpointPopover';
-import { useHelper } from '../../../../store';
-import { useFormatter } from '../../../../components/i18n';
+
+import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
+import { fetchExecutors } from '../../../../actions/Executor';
+import type { ExecutorHelper } from '../../../../actions/executors/executor-helper';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
-import type { EndpointStore } from './Endpoint';
-import ItemTags from '../../../../components/ItemTags';
-import AssetStatus from '../AssetStatus';
+import { fetchTags } from '../../../../actions/Tag';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
-import type { SearchPaginationInput } from '../../../../utils/api-types';
-import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
-import PlatformIcon from '../../../../components/PlatformIcon';
-import type { ExecutorHelper } from '../../../../actions/executors/executor-helper';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchExecutors } from '../../../../actions/Executor';
-import { fetchTags } from '../../../../actions/Tag';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import { useFormatter } from '../../../../components/i18n';
+import ItemTags from '../../../../components/ItemTags';
+import PlatformIcon from '../../../../components/PlatformIcon';
+import { useHelper } from '../../../../store';
+import type { SearchPaginationInput } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import AssetStatus from '../AssetStatus';
+import type { EndpointStore } from './Endpoint';
+import EndpointCreation from './EndpointCreation';
+import EndpointPopover from './EndpointPopover';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -148,14 +149,14 @@ const Endpoints = () => {
         >
           <ListItemIcon />
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponent
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-            }
+            )}
           />
           <ListItemSecondaryAction />
         </ListItem>
@@ -168,44 +169,46 @@ const Endpoints = () => {
               divider
             >
               <ListItemIcon>
-                <DevicesOtherOutlined color="primary"/>
+                <DevicesOtherOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div className={classes.bodyItems}>
                     <div className={classes.bodyItem} style={inlineStyles.asset_name}>
                       {endpoint.asset_name}
                     </div>
                     <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
-                      <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10}/> {endpoint.endpoint_platform}
+                      <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
+                      {' '}
+                      {endpoint.endpoint_platform}
                     </div>
                     <div className={classes.bodyItem} style={inlineStyles.endpoint_arch}>
                       {endpoint.endpoint_arch}
                     </div>
                     <div className={classes.bodyItem} style={inlineStyles.asset_executor}>
                       {executor && (
-                      <img
-                        src={`/api/images/executors/${executor.executor_type}`}
-                        alt={executor.executor_type}
-                        style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
-                      />
+                        <img
+                          src={`/api/images/executors/${executor.executor_type}`}
+                          alt={executor.executor_type}
+                          style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
+                        />
                       )}
                       {executor?.executor_name ?? t('Unknown')}
                     </div>
                     <div className={classes.bodyItem} style={inlineStyles.asset_tags}>
-                      <ItemTags variant="list" tags={endpoint.asset_tags}/>
+                      <ItemTags variant="list" tags={endpoint.asset_tags} />
                     </div>
                     <div className={classes.bodyItem} style={inlineStyles.asset_status}>
-                      <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'}/>
+                      <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'} />
                     </div>
                   </div>
-                    }
+                )}
               />
               <ListItemSecondaryAction>
                 <EndpointPopover
                   endpoint={{ ...endpoint, type: 'static' }}
-                  onUpdate={(result) => setEndpoints(endpoints.map((e) => (e.asset_id !== result.asset_id ? e : result)))}
-                  onDelete={(result) => setEndpoints(endpoints.filter((e) => (e.asset_id !== result)))}
+                  onUpdate={result => setEndpoints(endpoints.map(e => (e.asset_id !== result.asset_id ? e : result)))}
+                  onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
                   openEditOnInit={endpoint.asset_id === searchId}
                 />
               </ListItemSecondaryAction>
@@ -213,7 +216,7 @@ const Endpoints = () => {
           );
         })}
       </List>
-      {userAdmin && <EndpointCreation onCreate={(result) => setEndpoints([result, ...endpoints])} />}
+      {userAdmin && <EndpointCreation onCreate={result => setEndpoints([result, ...endpoints])} />}
     </>
   );
 };

@@ -1,24 +1,25 @@
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, ControlPointOutlined, DeleteOutlined } from '@mui/icons-material';
+import { Button, Grid, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import arrayMutators from 'final-form-arrays';
 import { useState } from 'react';
 import { Form } from 'react-final-form';
-import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
-import { Button, Grid, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Typography } from '@mui/material';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, ControlPointOutlined, DeleteOutlined } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
+
+import { fetchDocuments } from '../../../../actions/Document';
+import { fetchExercises } from '../../../../actions/Exercise';
+import MultipleFileLoader from '../../../../components/fields/MultipleFileLoader';
+import OldMarkDownField from '../../../../components/fields/OldMarkDownField';
+import OldSelectField from '../../../../components/fields/OldSelectField';
 import OldTextField from '../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
-import OldSelectField from '../../../../components/fields/OldSelectField';
-import OldMarkDownField from '../../../../components/fields/OldMarkDownField';
-import DocumentType from '../documents/DocumentType';
 import ItemTags from '../../../../components/ItemTags';
-import DocumentPopover from '../documents/DocumentPopover';
+import TagField from '../../../../components/TagField';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchExercises } from '../../../../actions/Exercise';
-import { fetchDocuments } from '../../../../actions/Document';
-import TagField from '../../../../components/TagField';
-import MultipleFileLoader from '../../../../components/fields/MultipleFileLoader';
+import DocumentPopover from '../documents/DocumentPopover';
+import DocumentType from '../documents/DocumentType';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -104,9 +105,9 @@ const ChallengeForm = (props) => {
   const [documentsOrderAsc, setDocumentsOrderAsc] = useState(true);
   const [documents, setDocuments] = useState(documentsIds || []);
   const handleAddDocuments = (updatedDocuments) => {
-    setDocuments(updatedDocuments.map((document) => document.document_id));
+    setDocuments(updatedDocuments.map(document => document.document_id));
   };
-  const handleRemoveDocument = (docId) => setDocuments(documents.filter((n) => n !== docId));
+  const handleRemoveDocument = docId => setDocuments(documents.filter(n => n !== docId));
   // Functions
   const validate = (values) => {
     const errors = {};
@@ -118,9 +119,9 @@ const ChallengeForm = (props) => {
     });
     return errors;
   };
-  const required = (value) => (value ? undefined : t('This field is required.'));
-  const requiredArray = (value) => (value && value.length > 0 ? undefined : t('This field is required.'));
-  const { documentsMap } = useHelper((helper) => ({
+  const required = value => (value ? undefined : t('This field is required.'));
+  const requiredArray = value => (value && value.length > 0 ? undefined : t('This field is required.'));
+  const { documentsMap } = useHelper(helper => ({
     documentsMap: helper.getDocumentsMap(),
   }));
   useDataLoader(() => {
@@ -132,11 +133,13 @@ const ChallengeForm = (props) => {
     setDocumentsOrderAsc(!documentsSortBy);
   };
   const documentsSortHeader = (field, label, isSortable) => {
-    const sortComponent = documentsOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = documentsOrderAsc
+      ? (
+          <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+          <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -238,13 +241,13 @@ const ChallengeForm = (props) => {
                 </span>
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div>
                     {documentsSortHeader('document_name', 'Name', true)}
                     {documentsSortHeader('document_type', 'Type', true)}
                     {documentsSortHeader('document_tags', 'Tags', true)}
                   </div>
-                }
+                )}
               />
               <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
             </ListItem>
@@ -263,7 +266,7 @@ const ChallengeForm = (props) => {
                     <AttachmentOutlined />
                   </ListItemIcon>
                   <ListItemText
-                    primary={
+                    primary={(
                       <div>
                         <div
                           className={classes.bodyItem}
@@ -290,7 +293,7 @@ const ChallengeForm = (props) => {
                           />
                         </div>
                       </div>
-                    }
+                    )}
                   />
                   <ListItemSecondaryAction>
                     <DocumentPopover
@@ -302,7 +305,8 @@ const ChallengeForm = (props) => {
                 </ListItem>
               );
             })}
-            <MultipleFileLoader initialDocumentIds={documents}
+            <MultipleFileLoader
+              initialDocumentIds={documents}
               handleAddDocuments={handleAddDocuments}
             />
           </List>
@@ -313,8 +317,7 @@ const ChallengeForm = (props) => {
                   {t('Flags')}
                 </Typography>
                 <IconButton
-                  onClick={() => fields.push({ flag_type: 'VALUE', flag_value: '' })
-                  }
+                  onClick={() => fields.push({ flag_type: 'VALUE', flag_value: '' })}
                   size="small"
                   color="primary"
                   style={{ float: 'left', margin: '-8px 0 0 10px' }}

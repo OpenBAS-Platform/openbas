@@ -1,14 +1,15 @@
+import { MoreVert } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
+import * as R from 'ramda';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import * as R from 'ramda';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
-import { MoreVert } from '@mui/icons-material';
+
 import { deletePayload, duplicatePayload, updatePayload } from '../../../actions/Payload';
-import PayloadForm from './PayloadForm';
+import Drawer from '../../../components/common/Drawer';
+import Transition from '../../../components/common/Transition';
 import { useFormatter } from '../../../components/i18n';
 import { documentOptions, platformOptions } from '../../../utils/Option';
-import Transition from '../../../components/common/Transition';
-import Drawer from '../../../components/common/Drawer';
+import PayloadForm from './PayloadForm';
 
 const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate, disabled }) => {
   const [openDelete, setOpenDelete] = useState(false);

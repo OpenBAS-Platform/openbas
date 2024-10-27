@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+
 import type { AttackPatternStore } from '../../actions/attack_patterns/AttackPattern';
 import type { InjectorContractOutput } from '../api-types';
 

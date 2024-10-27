@@ -1,13 +1,14 @@
-import { forwardRef, Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
-import { Fab, Dialog, DialogTitle, DialogContent, Slide } from '@mui/material';
 import { Add } from '@mui/icons-material';
-import OrganizationForm from './OrganizationForm';
+import { Dialog, DialogContent, DialogTitle, Fab, Slide } from '@mui/material';
+import { withStyles } from '@mui/styles';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component, forwardRef } from 'react';
+import { connect } from 'react-redux';
+
 import { addOrganization } from '../../../../actions/Organization';
 import inject18n from '../../../../components/i18n';
+import OrganizationForm from './OrganizationForm';
 
 const Transition = forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -42,7 +43,7 @@ class CreateOrganization extends Component {
     )(data);
     return this.props
       .addOrganization(inputValues)
-      .then((result) => (result.result ? this.handleClose() : result));
+      .then(result => (result.result ? this.handleClose() : result));
   }
 
   render() {

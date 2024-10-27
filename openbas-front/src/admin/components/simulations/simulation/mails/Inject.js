@@ -1,21 +1,22 @@
-import { useState } from 'react';
-import * as R from 'ramda';
+import { ReplyOutlined } from '@mui/icons-material';
+import { Button, Dialog, DialogContent, DialogTitle, Grid, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { Grid, Typography, Paper, Dialog, DialogTitle, DialogContent, Button } from '@mui/material';
-import { ReplyOutlined } from '@mui/icons-material';
-import { executeInject, fetchExerciseInjects } from '../../../../../actions/Inject';
-import { useFormatter } from '../../../../../components/i18n';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { useHelper } from '../../../../../store';
-import AnimationMenu from '../AnimationMenu';
-import Loader from '../../../../../components/Loader';
+
 import { fetchInjectCommunications } from '../../../../../actions/Communication';
-import ItemTags from '../../../../../components/ItemTags';
+import { executeInject, fetchExerciseInjects } from '../../../../../actions/Inject';
 import { fetchPlayers } from '../../../../../actions/User';
-import Communication from './Communication';
 import Transition from '../../../../../components/common/Transition';
+import { useFormatter } from '../../../../../components/i18n';
+import ItemTags from '../../../../../components/ItemTags';
+import Loader from '../../../../../components/Loader';
+import { useHelper } from '../../../../../store';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import AnimationMenu from '../AnimationMenu';
+import Communication from './Communication';
 import CommunicationForm from './CommunicationForm';
 
 const useStyles = makeStyles(() => ({
@@ -56,7 +57,7 @@ const Inject = () => {
     R.descend(R.prop('communication_received_at')),
   ]);
   // Rendering
-  const handleOpenReply = (communicationId) => setReply(communicationId);
+  const handleOpenReply = communicationId => setReply(communicationId);
   const handleCloseReply = () => setReply(null);
   const onSubmitReply = (topic, data) => {
     let body = data.communication_content;
@@ -68,8 +69,8 @@ const Inject = () => {
 <div id=3D"divRplyFwdMsg" dir=3D"ltr">
 <font face=3D"Calibri, sans-serif" style=3D"font-size:11pt">
 <b>From:</b> ${lastCommunication.communication_from
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')}<br>
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;')}<br>
 <b>Sent:</b> ${fldt(lastCommunication.communication_sent_at)}<br>
 <b>Subject:</b> ${lastCommunication.communication_subject}
 </font>
@@ -78,11 +79,11 @@ const Inject = () => {
 <div dir=3D"ltr">
 <div class=3D"x_elementToProof" style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12pt;">
  ${
-  lastCommunication.communication_content
-   && lastCommunication.communication_content.length > 10
-    ? lastCommunication.communication_content.replaceAll('\n', '<br />')
-    : lastCommunication.communication_content_html
-}
+    lastCommunication.communication_content
+    && lastCommunication.communication_content.length > 10
+      ? lastCommunication.communication_content.replaceAll('\n', '<br />')
+      : lastCommunication.communication_content_html
+  }
 </div>
 </div>
 </blockquote>`;
@@ -104,10 +105,10 @@ const Inject = () => {
   if (inject && communications) {
     // Group communication by subject
     const communicationsWithMails = R.map(
-      (n) => R.assoc(
+      n => R.assoc(
         'communication_mails',
         R.map(
-          (o) => (usersMap[o] ? usersMap[o].user_email : '').toLowerCase(),
+          o => (usersMap[o] ? usersMap[o].user_email : '').toLowerCase(),
           n.communication_users,
         ),
         n,
@@ -115,25 +116,25 @@ const Inject = () => {
       communications,
     );
     const topics = R.pipe(
-      R.filter((n) => !n.communication_subject.toLowerCase().includes('re: ')),
-      R.map((n) => R.assoc(
+      R.filter(n => !n.communication_subject.toLowerCase().includes('re: ')),
+      R.map(n => R.assoc(
         'communication_communications',
         sortCommunications(
           R.filter(
-            (o) => o.communication_subject.toLowerCase().includes('re: ')
-                && ((o.communication_animation
-                  && R.any(
-                    (p) => o.communication_to
-                      .toLowerCase()
-                      .includes(p.toLowerCase()),
-                    n.communication_mails,
-                  ))
-                  || R.any(
-                    (p) => o.communication_from
-                      .toLowerCase()
-                      .includes(p.toLowerCase()),
-                    n.communication_mails,
-                  )),
+            o => o.communication_subject.toLowerCase().includes('re: ')
+              && ((o.communication_animation
+                && R.any(
+                  p => o.communication_to
+                    .toLowerCase()
+                    .includes(p.toLowerCase()),
+                  n.communication_mails,
+                ))
+                || R.any(
+                  p => o.communication_from
+                    .toLowerCase()
+                    .includes(p.toLowerCase()),
+                  n.communication_mails,
+                )),
             communicationsWithMails,
           ),
         ),
@@ -144,7 +145,7 @@ const Inject = () => {
     let topic = null;
     const defaultContent = '';
     if (reply) {
-      topic = R.head(R.filter((n) => n.communication_id === reply, topics));
+      topic = R.head(R.filter(n => n.communication_id === reply, topics));
       defaultSubject = `Re: ${topic.communication_subject}`;
     }
     return (
@@ -206,7 +207,7 @@ const Inject = () => {
           <div className="clearfix" />
           {topics.map((currentTopic) => {
             const topicUsers = currentTopic.communication_users.map(
-              (userId) => usersMap[userId] ?? {},
+              userId => usersMap[userId] ?? {},
             );
             return (
               <div key={currentTopic.communication_id}>
@@ -218,7 +219,7 @@ const Inject = () => {
                 {currentTopic.communication_communications.toReversed().map(
                   (communication) => {
                     const communicationUsers = communication.communication_users.map(
-                      (userId) => usersMap[userId] ?? {},
+                      userId => usersMap[userId] ?? {},
                     );
                     return (
                       <Communication
@@ -259,7 +260,7 @@ const Inject = () => {
                 communication_subject: defaultSubject,
                 communication_content: defaultContent,
               }}
-              onSubmit={(data) => onSubmitReply(topic, data)}
+              onSubmit={data => onSubmitReply(topic, data)}
               handleClose={handleCloseReply}
             />
           </DialogContent>

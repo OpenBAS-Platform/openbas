@@ -1,7 +1,8 @@
 /* eslint-disable no-underscore-dangle */
 import fs from 'node:fs';
-import { fileURLToPath } from 'url';
+
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 

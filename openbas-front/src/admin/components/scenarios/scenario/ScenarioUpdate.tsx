@@ -1,15 +1,16 @@
 import { Box, Tab, Tabs } from '@mui/material';
 import { FunctionComponent, useState } from 'react';
 import * as React from 'react';
-import ScenarioForm from '../ScenarioForm';
-import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
+
+import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
+import { updateScenario, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import type { ScenarioInformationInput, ScenarioInput } from '../../../../utils/api-types';
-import { updateScenario, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import useScenarioPermissions from '../../../../utils/Scenario';
+import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
+import ScenarioForm from '../ScenarioForm';
 
 interface Props {
   scenario: ScenarioStore;

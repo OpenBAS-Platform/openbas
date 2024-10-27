@@ -1,13 +1,14 @@
-import { FunctionComponent, useEffect } from 'react';
-import { makeStyles } from '@mui/styles';
 import { Box } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
+import { FunctionComponent, useEffect } from 'react';
+
 import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
-import { useFormatter } from '../../../i18n';
-import { convertOperatorToIcon } from './FilterUtils';
 import { Option } from '../../../../utils/Option';
-import useRetrieveOptions from './useRetrieveOptions';
+import { useFormatter } from '../../../i18n';
 import type { Theme } from '../../../Theme';
+import { convertOperatorToIcon } from './FilterUtils';
+import useRetrieveOptions from './useRetrieveOptions';
 
 const useStyles = makeStyles((theme: Theme) => ({
   mode: {
@@ -31,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     textOverflow: 'ellipsis',
   },
   label: {
-    cursor: 'pointer',
+    'cursor': 'pointer',
     '&:hover': {
       textDecorationLine: 'underline',
     },
@@ -67,20 +68,36 @@ const FilterChipValues: FunctionComponent<Props> = ({
     return opts.map((o, idx) => {
       let or = <></>;
       if (idx > 0) {
-        or = <div className={classNames({
-          [classes.mode]: !isTooltip,
-          [classes.modeTooltip]: isTooltip,
-        })}
-             >
-          {t('OR')}
-        </div>;
+        or = (
+          <div className={classNames({
+            [classes.mode]: !isTooltip,
+            [classes.modeTooltip]: isTooltip,
+          })}
+          >
+            {t('OR')}
+          </div>
+        );
       }
       if (propertySchema?.schema_property_type.includes('instant')) {
         return (
-          <>{or}<span key={o.id}> {fldt(o.label)}</span></>
+          <>
+            {or}
+            <span key={o.id}>
+              {' '}
+              {fldt(o.label)}
+            </span>
+          </>
         );
       }
-      return (<>{or}<span key={o.id}> {o.label}</span></>);
+      return (
+        <>
+          {or}
+          <span key={o.id}>
+            {' '}
+            {o.label}
+          </span>
+        </>
+      );
     });
   };
 
@@ -94,7 +111,8 @@ const FilterChipValues: FunctionComponent<Props> = ({
           onClick={handleOpen}
         >
           {t(filter.key)}
-        </strong>{' '}
+        </strong>
+        {' '}
         <span>
           {operator === 'empty' ? t('is empty') : t('is not empty')}
         </span>

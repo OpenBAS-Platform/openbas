@@ -1,6 +1,7 @@
-import { makeStyles } from '@mui/styles';
 import { Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
+
 import { useHelper } from '../../../../store';
 
 const useStyles = makeStyles(() => ({
@@ -12,7 +13,7 @@ const useStyles = makeStyles(() => ({
 const InjectorHeader = () => {
   const classes = useStyles();
   const { injectorId } = useParams();
-  const { injector } = useHelper((helper) => ({
+  const { injector } = useHelper(helper => ({
     injector: helper.getInjector(injectorId),
   }));
   return (

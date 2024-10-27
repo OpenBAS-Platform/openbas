@@ -1,6 +1,7 @@
-import { Component } from 'react';
-import { useIntl, injectIntl } from 'react-intl';
 import moment from 'moment-timezone';
+import { Component } from 'react';
+import { injectIntl, useIntl } from 'react-intl';
+
 import { bytesFormat, numberFormat } from '../utils/Number';
 
 export const isNone = (date) => {
@@ -27,7 +28,7 @@ const inject18n = (WrappedComponent) => {
           numberFormat(number).symbol
         }`;
       };
-      const formatBytes = (number) => `${this.props.intl.formatNumber(bytesFormat(number).number)}${
+      const formatBytes = number => `${this.props.intl.formatNumber(bytesFormat(number).number)}${
         bytesFormat(number).symbol
       }`;
       const longDate = (date) => {
@@ -147,7 +148,7 @@ const inject18n = (WrappedComponent) => {
           {...this.props}
           {...{ t: translate }}
           {...{
-            tPick: (label) => label[this.props.intl.locale]
+            tPick: label => label[this.props.intl.locale]
               ?? label[this.props.intl.defaultLocale],
           }}
           {...{ n: formatNumber }}
@@ -184,7 +185,7 @@ export const useFormatter = () => {
       numberFormat(number).symbol
     }`;
   };
-  const formatBytes = (number) => `${intl.formatNumber(bytesFormat(number).number)}${
+  const formatBytes = number => `${intl.formatNumber(bytesFormat(number).number)}${
     bytesFormat(number).symbol
   }`;
   const longDate = (date) => {
@@ -309,7 +310,7 @@ export const useFormatter = () => {
   return {
     t: translate,
     locale: intl.locale ?? intl.defaultLocale,
-    tPick: (label) => (label ? label[intl.locale] ?? label[intl.defaultLocale] : ''),
+    tPick: label => (label ? label[intl.locale] ?? label[intl.defaultLocale] : ''),
     n: formatNumber,
     b: formatBytes,
     fld: longDate,

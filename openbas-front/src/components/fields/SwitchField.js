@@ -1,5 +1,5 @@
+import { FormControl, FormControlLabel, FormGroup, FormHelperText, Switch as MuiSwitch } from '@mui/material';
 import { Field } from 'react-final-form';
-import { FormGroup, FormControlLabel, Switch as MuiSwitch, FormHelperText, FormControl } from '@mui/material';
 
 const renderSwitch = ({
   label,
@@ -11,7 +11,7 @@ const renderSwitch = ({
   <FormControl error={touched && invalid}>
     <FormGroup row={true} style={{ ...style, marginLeft: 5 }}>
       <FormControlLabel
-        control={
+        control={(
           <MuiSwitch
             checked={!!input.value}
             onChange={(event) => {
@@ -19,7 +19,7 @@ const renderSwitch = ({
             }}
             {...others}
           />
-        }
+        )}
         label={label}
       />
     </FormGroup>
@@ -27,7 +27,7 @@ const renderSwitch = ({
   </FormControl>
 );
 
-const SwitchField = (props) => (
+const SwitchField = props => (
   <Field name={props.name} component={renderSwitch} {...props} />
 );
 

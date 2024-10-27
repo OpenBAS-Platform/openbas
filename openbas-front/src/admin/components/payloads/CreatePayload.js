@@ -1,15 +1,16 @@
-import { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import * as R from 'ramda';
+import { Add, DnsOutlined } from '@mui/icons-material';
 import { Fab, List, ListItemButton, ListItemIcon, ListItemText, Step, StepLabel, Stepper } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import { Add, DnsOutlined } from '@mui/icons-material';
 import { ApplicationCogOutline, Console, FileImportOutline, LanConnect } from 'mdi-material-ui';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component } from 'react';
+import { connect } from 'react-redux';
+
 import { addPayload } from '../../../actions/Payload';
-import PayloadForm from './PayloadForm';
-import inject18n from '../../../components/i18n';
 import Drawer from '../../../components/common/Drawer';
+import inject18n from '../../../components/i18n';
+import PayloadForm from './PayloadForm';
 
 const styles = () => ({
   createButton: {

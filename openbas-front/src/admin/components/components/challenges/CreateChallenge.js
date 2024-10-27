@@ -1,16 +1,17 @@
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Dialog, DialogContent, DialogTitle, Fab, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
+import { Dialog, DialogContent, DialogTitle, Fab, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
-import { useFormatter } from '../../../../components/i18n';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+
 import { addChallenge } from '../../../../actions/Challenge';
-import ChallengeForm from './ChallengeForm';
 import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import ChallengeForm from './ChallengeForm';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   createButton: {
     position: 'fixed',
     bottom: 30,

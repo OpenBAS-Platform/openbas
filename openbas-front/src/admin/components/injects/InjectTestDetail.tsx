@@ -1,14 +1,15 @@
+import { Card, CardContent, CardHeader, Grid, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
-import { Card, CardContent, CardHeader, Grid, Paper, Typography } from '@mui/material';
-import { useFormatter } from '../../../components/i18n';
-import type { InjectTestStatus } from '../../../utils/api-types';
-import ItemStatus from '../../../components/ItemStatus';
+
 import Drawer from '../../../components/common/Drawer';
+import { useFormatter } from '../../../components/i18n';
+import ItemStatus from '../../../components/ItemStatus';
+import type { Theme } from '../../../components/Theme';
+import type { InjectTestStatus } from '../../../utils/api-types';
+import { truncate } from '../../../utils/String';
 import { isNotEmptyField } from '../../../utils/utils';
 import InjectIcon from '../common/injects/InjectIcon';
-import type { Theme } from '../../../components/Theme';
-import { truncate } from '../../../utils/String';
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -63,25 +64,27 @@ const InjectTestDetail: FunctionComponent<Props> = ({
         <Card elevation={0} classes={{ root: classes.injectorContract }}>
           {test
             ? (
-              <CardHeader
-                classes={{ root: classes.injectorContractHeader }}
-                avatar={<InjectIcon
-                  isPayload={isNotEmptyField(test.injector_contract?.injector_contract_payload)}
-                  type={
-                    test.injector_contract?.injector_contract_payload
-                      ? test.injector_contract?.injector_contract_payload.payload_collector_type
-                      || test.injector_contract?.injector_contract_payload.payload_type
-                      : test.inject_type
-                  }
-                  variant="list"
-                        />}
+                <CardHeader
+                  classes={{ root: classes.injectorContractHeader }}
+                  avatar={(
+                    <InjectIcon
+                      isPayload={isNotEmptyField(test.injector_contract?.injector_contract_payload)}
+                      type={
+                        test.injector_contract?.injector_contract_payload
+                          ? test.injector_contract?.injector_contract_payload.payload_collector_type
+                          || test.injector_contract?.injector_contract_payload.payload_type
+                          : test.inject_type
+                      }
+                      variant="list"
+                    />
+                  )}
 
-              />
-            ) : (
-              <Paper variant="outlined" classes={{ root: classes.paper }}>
-                <Typography variant="body1">{t('No data available')}</Typography>
-              </Paper>
-            )}
+                />
+              ) : (
+                <Paper variant="outlined" classes={{ root: classes.paper }}>
+                  <Typography variant="body1">{t('No data available')}</Typography>
+                </Paper>
+              )}
           <CardContent classes={{ root: classes.injectorContractContent }}>
             {truncate(test?.inject_title, 80)}
           </CardContent>
@@ -94,8 +97,7 @@ const InjectTestDetail: FunctionComponent<Props> = ({
                 {t('Status')}
               </Typography>
               {test.status_name
-                && <ItemStatus isInject={true} status={test.status_name} label={t(test.status_name)} />
-              }
+              && <ItemStatus isInject={true} status={test.status_name} label={t(test.status_name)} />}
               <Typography variant="subtitle1" className={classes.header} style={{ marginTop: 20 }} gutterBottom>
                 {t('Traces')}
               </Typography>
@@ -103,26 +105,42 @@ const InjectTestDetail: FunctionComponent<Props> = ({
                 {test.tracking_sent_date ? (
                   <>
                     <Typography variant="body1" gutterBottom>
-                      {t('Tracking Sent Date')}: {test.tracking_sent_date}
+                      {t('Tracking Sent Date')}
+                      :
+                      {test.tracking_sent_date}
                     </Typography>
                     <Typography variant="body1" gutterBottom>
-                      {t('Tracking Ack Date')}: {test.tracking_ack_date}
+                      {t('Tracking Ack Date')}
+                      :
+                      {test.tracking_ack_date}
                     </Typography>
                     <Typography variant="body1" gutterBottom>
-                      {t('Tracking End Date')}: {test.tracking_end_date}
+                      {t('Tracking End Date')}
+                      :
+                      {test.tracking_end_date}
                     </Typography>
                     <Typography variant="body1" gutterBottom>
                       {t('Tracking Total Execution')}
-                      {t('Time')}: {test.tracking_total_execution_time} {t('ms')}
+                      {t('Time')}
+                      :
+                      {test.tracking_total_execution_time}
+                      {' '}
+                      {t('ms')}
                     </Typography>
                     <Typography variant="body1" gutterBottom>
-                      {t('Tracking Total Count')}: {test.tracking_total_count}
+                      {t('Tracking Total Count')}
+                      :
+                      {test.tracking_total_count}
                     </Typography>
                     <Typography variant="body1" gutterBottom>
-                      {t('Tracking Total Error')}: {test.tracking_total_error}
+                      {t('Tracking Total Error')}
+                      :
+                      {test.tracking_total_error}
                     </Typography>
                     <Typography variant="body1" gutterBottom>
-                      {t('Tracking Total Success')}: {test.tracking_total_success}
+                      {t('Tracking Total Success')}
+                      :
+                      {test.tracking_total_success}
                     </Typography>
                   </>
                 ) : (
@@ -133,7 +151,8 @@ const InjectTestDetail: FunctionComponent<Props> = ({
                 {(test.status_traces?.length ?? 0) > 0 && (
                   <>
                     <Typography variant="body1" gutterBottom>
-                      {t('Traces')}:
+                      {t('Traces')}
+                      :
                     </Typography>
                     <ul>
                       {test.status_traces?.map((trace, index) => (

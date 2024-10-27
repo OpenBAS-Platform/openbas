@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+
 import TopBarPage from '../model/topBar.page';
 
 const logout = async (page: Page) => {

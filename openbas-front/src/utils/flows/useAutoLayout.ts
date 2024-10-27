@@ -1,9 +1,9 @@
+import { type Edge, type Node, useNodesInitialized, useReactFlow, useStore } from '@xyflow/react';
 import { useEffect } from 'react';
-import { type Node, type Edge, useReactFlow, useNodesInitialized, useStore } from '@xyflow/react';
 
-import { getSourceHandlePosition, getTargetHandlePosition } from './utils';
-import layoutAlgorithms, { type LayoutAlgorithmOptions } from './algorithms';
 import type { InjectExpectationsStore } from '../../admin/components/common/injects/expectations/Expectation';
+import layoutAlgorithms, { type LayoutAlgorithmOptions } from './algorithms';
+import { getSourceHandlePosition, getTargetHandlePosition } from './utils';
 
 export type LayoutOptions = {
   algorithm: keyof typeof layoutAlgorithms;
@@ -12,7 +12,7 @@ export type LayoutOptions = {
 function useAutoLayout(options: LayoutOptions, targetResults: InjectExpectationsStore[]) {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
   const elements = useStore(
-    (state) => ({
+    state => ({
       nodeMap: state.nodeLookup,
       edgeMap: state.edges.reduce(
         (acc, edge) => acc.set(edge.id, edge),

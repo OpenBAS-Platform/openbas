@@ -1,19 +1,20 @@
+import { Box, Tab, Tabs } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { interval } from 'rxjs';
-import { Box, Tab, Tabs } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import Loader from '../../../../components/Loader';
-import { errorWrapper } from '../../../../components/Error';
-import NotFound from '../../../../components/NotFound';
-import { useFormatter } from '../../../../components/i18n';
-import Breadcrumbs from '../../../../components/Breadcrumbs';
-import AtomicTestingHeader from './AtomicTestingHeader';
+
 import { fetchInjectResultDto } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
+import { errorWrapper } from '../../../../components/Error';
+import { useFormatter } from '../../../../components/i18n';
+import Loader from '../../../../components/Loader';
+import NotFound from '../../../../components/NotFound';
 import type { InjectResultDTO } from '../../../../utils/api-types';
-import { InjectResultDtoContext } from '../InjectResultDtoContext';
 import { FIVE_SECONDS } from '../../../../utils/Time';
 import { TeamContext } from '../../common/Context';
+import { InjectResultDtoContext } from '../InjectResultDtoContext';
+import AtomicTestingHeader from './AtomicTestingHeader';
 import teamContextForAtomicTesting from './context/TeamContextForAtomicTesting';
 
 const interval$ = interval(FIVE_SECONDS);
@@ -75,10 +76,12 @@ const Index = () => {
     return (
       <TeamContext.Provider value={teamContextForAtomicTesting()}>
         <InjectResultDtoContext.Provider value={{ injectResultDto, updateInjectResultDto }}>
-          <Breadcrumbs variant="object" elements={[
-            { label: t('Atomic testings'), link: '/admin/atomic_testings' },
-            { label: injectResultDto.inject_title, current: true },
-          ]}
+          <Breadcrumbs
+            variant="object"
+            elements={[
+              { label: t('Atomic testings'), link: '/admin/atomic_testings' },
+              { label: injectResultDto.inject_title, current: true },
+            ]}
           />
           <AtomicTestingHeader />
           <Box

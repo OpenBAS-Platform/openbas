@@ -1,13 +1,14 @@
-import { makeStyles, useTheme } from '@mui/styles';
-import { Box, Grid, LinearProgress, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
 import { FlagOutlined } from '@mui/icons-material';
+import { Box, Grid, LinearProgress, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
 import Chart from 'react-apexcharts';
-import CreateObjective from '../CreateObjective';
+
 import Empty from '../../../../components/Empty';
-import ObjectivePopover from '../ObjectivePopover';
-import { areaChartOptions } from '../../../../utils/Charts';
 import { useFormatter } from '../../../../components/i18n';
+import { areaChartOptions } from '../../../../utils/Charts';
+import CreateObjective from '../CreateObjective';
+import ObjectivePopover from '../ObjectivePopover';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -39,7 +40,7 @@ const LessonsObjectives = ({
     objectives,
   );
   const injectsData = R.pipe(
-    R.filter((n) => n.inject_sent_at !== null),
+    R.filter(n => n.inject_sent_at !== null),
     R.map((n) => {
       const date = new Date(n.inject_sent_at);
       date.setHours(0, 0, 0, 0);
@@ -47,7 +48,7 @@ const LessonsObjectives = ({
     }),
     R.groupBy(R.prop('inject_sent_at_date')),
     R.toPairs,
-    R.map((n) => ({
+    R.map(n => ({
       x: n[0],
       y: n[1].length,
     })),
@@ -71,14 +72,13 @@ const LessonsObjectives = ({
         <Paper variant="outlined" classes={{ root: classes.paper }}>
           {sortedObjectives.length > 0 ? (
             <List style={{ padding: 0 }}>
-              {sortedObjectives.map((objective) => (
+              {sortedObjectives.map(objective => (
                 <ListItem
                   key={objective.objective_id}
                   divider
                   button
                   onClick={() => setSelectedObjective
-                    && setSelectedObjective(objective.objective_id)
-                  }
+                    && setSelectedObjective(objective.objective_id)}
                 >
                   <ListItemIcon>
                     <FlagOutlined />
@@ -104,7 +104,8 @@ const LessonsObjectives = ({
                     </Box>
                     <Box sx={{ minWidth: 35 }}>
                       <Typography variant="body2" color="text.secondary">
-                        {objective.objective_score}%
+                        {objective.objective_score}
+                        %
                       </Typography>
                     </Box>
                   </Box>

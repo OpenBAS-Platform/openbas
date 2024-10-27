@@ -1,14 +1,15 @@
+import { MoreVert } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
+import * as R from 'ramda';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import * as R from 'ramda';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
-import { MoreVert } from '@mui/icons-material';
+
 import { deleteAttackPattern, updateAttackPattern } from '../../../../actions/AttackPattern';
-import AttackPatternForm from './AttackPatternForm';
+import Drawer from '../../../../components/common/Drawer';
+import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { killChainPhaseOptions } from '../../../../utils/Option';
-import Transition from '../../../../components/common/Transition';
-import Drawer from '../../../../components/common/Drawer';
+import AttackPatternForm from './AttackPatternForm';
 
 const AttackPatternPopover = ({ attackPattern, killChainPhasesMap, onUpdate, onDelete }) => {
   const [openDelete, setOpenDelete] = useState(false);

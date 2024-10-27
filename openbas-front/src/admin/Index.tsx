@@ -1,21 +1,22 @@
+import { Box } from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
 import { lazy, Suspense } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { makeStyles, useTheme } from '@mui/styles';
-import { Box } from '@mui/material';
-import TopBar from './components/nav/TopBar';
-import LeftBar from './components/nav/LeftBar';
-import { errorWrapper } from '../components/Error';
-import useDataLoader from '../utils/hooks/useDataLoader';
-import { useHelper } from '../store';
-import type { Theme } from '../components/Theme';
+
 import type { LoggedHelper } from '../actions/helper';
+import { fetchTags } from '../actions/Tag';
+import { errorWrapper } from '../components/Error';
 import Loader from '../components/Loader';
 import NotFound from '../components/NotFound';
-import InjectIndex from './components/simulations/simulation/injects/InjectIndex';
+import type { Theme } from '../components/Theme';
 import SystemBanners from '../public/components/systembanners/SystemBanners';
-import { fetchTags } from '../actions/Tag';
-import { useAppDispatch } from '../utils/hooks';
 import { computeBannerSettings } from '../public/components/systembanners/utils';
+import { useHelper } from '../store';
+import { useAppDispatch } from '../utils/hooks';
+import useDataLoader from '../utils/hooks/useDataLoader';
+import LeftBar from './components/nav/LeftBar';
+import TopBar from './components/nav/TopBar';
+import InjectIndex from './components/simulations/simulation/injects/InjectIndex';
 
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));
@@ -35,7 +36,7 @@ const Payloads = lazy(() => import('./components/payloads/Payloads'));
 const Mitigations = lazy(() => import('./components/mitigations/Mitigations'));
 const IndexSettings = lazy(() => import('./components/settings/Index'));
 
-const useStyles = makeStyles<Theme>((theme) => ({
+const useStyles = makeStyles<Theme>(theme => ({
   toolbar: theme.mixins.toolbar,
 }));
 

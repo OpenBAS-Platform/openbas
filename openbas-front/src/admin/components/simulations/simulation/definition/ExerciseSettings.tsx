@@ -1,22 +1,23 @@
+import { Groups3Outlined, MailOutlined, NotificationsOutlined, PersonOutlined } from '@mui/icons-material';
 import { Alert, Grid, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
-import { Groups3Outlined, MailOutlined, NotificationsOutlined, PersonOutlined } from '@mui/icons-material';
-import ExerciseInformation from './ExerciseInformation';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import { useFormatter } from '../../../../../components/i18n';
-import EmailParametersForm, { SettingUpdateInput } from '../../../common/simulate/EmailParametersForm';
+
 import { fetchExercise, updateExercise } from '../../../../../actions/Exercise';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import { usePermissions } from '../../../../../utils/Exercise';
-import DefinitionMenu from '../../../common/simulate/DefinitionMenu';
-import { useHelper } from '../../../../../store';
+import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
+import { useFormatter } from '../../../../../components/i18n';
+import { useHelper } from '../../../../../store';
+import { usePermissions } from '../../../../../utils/Exercise';
+import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import CreateControl from '../controls/CreateControl';
-import ExerciseControlDryRuns from './ExerciseControlDryRuns';
-import ExerciseControlComChecks from './ExerciseControlComChecks';
+import DefinitionMenu from '../../../common/simulate/DefinitionMenu';
+import EmailParametersForm, { SettingUpdateInput } from '../../../common/simulate/EmailParametersForm';
 import PaperMetric from '../../../common/simulate/PaperMetric';
+import CreateControl from '../controls/CreateControl';
+import ExerciseControlComChecks from './ExerciseControlComChecks';
+import ExerciseControlDryRuns from './ExerciseControlDryRuns';
+import ExerciseInformation from './ExerciseInformation';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -63,16 +64,16 @@ const ExerciseSettings = () => {
       <DefinitionMenu base="/admin/exercises" id={exercise.exercise_id} />
       <Grid container spacing={3} style={{ marginBottom: 24 }}>
         <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
-          <PaperMetric title={t('Players')} icon={<PersonOutlined />} number={exercise.exercise_users_number ?? '-'}/>
+          <PaperMetric title={t('Players')} icon={<PersonOutlined />} number={exercise.exercise_users_number ?? '-'} />
         </Grid>
         <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
-          <PaperMetric title={t('Injects')} icon={<NotificationsOutlined />} number={exercise.exercise_injects_statistics?.total_count ?? '-'}/>
+          <PaperMetric title={t('Injects')} icon={<NotificationsOutlined />} number={exercise.exercise_injects_statistics?.total_count ?? '-'} />
         </Grid>
         <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
-          <PaperMetric title={t('Teams')} icon={<Groups3Outlined />} number={exercise.exercise_teams.length ?? '-'}/>
+          <PaperMetric title={t('Teams')} icon={<Groups3Outlined />} number={exercise.exercise_teams.length ?? '-'} />
         </Grid>
         <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
-          <PaperMetric title={t('Messages')} icon={<MailOutlined />} number={exercise.exercise_communications_number ?? '-'}/>
+          <PaperMetric title={t('Messages')} icon={<MailOutlined />} number={exercise.exercise_communications_number ?? '-'} />
         </Grid>
       </Grid>
       <Grid container spacing={3} style={{ marginBottom: 24 }}>

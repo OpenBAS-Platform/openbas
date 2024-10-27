@@ -1,7 +1,7 @@
-import { FunctionComponent } from 'react';
 import { Add } from '@mui/icons-material';
 import { Fab } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { FunctionComponent } from 'react';
 
 const useStyles = makeStyles(() => ({
   createButton: {
@@ -12,7 +12,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  onClick: () => void
+  onClick: () => void;
 }
 
 const ButtonCreate: FunctionComponent<Props> = ({

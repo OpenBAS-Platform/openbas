@@ -1,14 +1,15 @@
-import { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import * as R from 'ramda';
-import { Fab } from '@mui/material';
 import { Add } from '@mui/icons-material';
+import { Fab } from '@mui/material';
 import { withStyles } from '@mui/styles';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component } from 'react';
+import { connect } from 'react-redux';
+
 import { addTag } from '../../../../actions/Tag';
-import TagForm from './TagForm';
-import inject18n from '../../../../components/i18n';
 import Drawer from '../../../../components/common/Drawer';
+import inject18n from '../../../../components/i18n';
+import TagForm from './TagForm';
 
 const styles = () => ({
   createButton: {

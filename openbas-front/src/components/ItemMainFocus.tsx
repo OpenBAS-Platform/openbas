@@ -1,6 +1,6 @@
-import { FunctionComponent } from 'react';
 import { AccountBalanceOutlined, FireTruckOutlined, ImportantDevicesOutlined, KeyboardVoiceOutlined, QuizOutlined } from '@mui/icons-material';
 import { BookOpenBlankVariantOutline, FilterMultipleOutline } from 'mdi-material-ui';
+import { FunctionComponent } from 'react';
 
 interface ItemMainFocusProps {
   mainFocus: string;
@@ -11,7 +11,7 @@ interface ItemMainFocusProps {
 const renderIcon = (mainFocus: string, size: 'small' | 'medium' | 'large' | 'inherit' | undefined) => {
   switch (mainFocus) {
     case 'endpoint-protection':
-      return <ImportantDevicesOutlined fontSize={size ?? 'medium'} style={{ marginRight: 10 }}/>;
+      return <ImportantDevicesOutlined fontSize={size ?? 'medium'} style={{ marginRight: 10 }} />;
     case 'web-filtering':
       return <FilterMultipleOutline fontSize={size ?? 'medium'} style={{ marginRight: 10 }} />;
     case 'incident-response':

@@ -1,11 +1,12 @@
-import { InputLabel, Tooltip } from '@mui/material';
 import { InfoOutlined } from '@mui/icons-material';
+import { InputLabel, Tooltip } from '@mui/material';
 import { FunctionComponent } from 'react';
+
 import FilterField from '../../../../components/common/queryable/filter/FilterField';
-import useFiltersState from '../../../../components/common/queryable/filter/useFiltersState';
 import { emptyFilterGroup } from '../../../../components/common/queryable/filter/FilterUtils';
-import type { FilterGroup } from '../../../../utils/api-types';
+import useFiltersState from '../../../../components/common/queryable/filter/useFiltersState';
 import { useFormatter } from '../../../../components/i18n';
+import type { FilterGroup } from '../../../../utils/api-types';
 
 interface Props {
   value?: FilterGroup;

@@ -1,13 +1,14 @@
-import { Route, Routes } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
-import TopBar from './components/nav/TopBar';
-import Dashboard from './components/Dashboard';
-import useDataLoader from '../utils/hooks/useDataLoader';
-import { errorWrapper } from '../components/Error';
-import type { Theme } from '../components/Theme';
-import NotFound from '../components/NotFound';
+import { Route, Routes } from 'react-router-dom';
 
-const useStyles = makeStyles<Theme>((theme) => ({
+import { errorWrapper } from '../components/Error';
+import NotFound from '../components/NotFound';
+import type { Theme } from '../components/Theme';
+import useDataLoader from '../utils/hooks/useDataLoader';
+import Dashboard from './components/Dashboard';
+import TopBar from './components/nav/TopBar';
+
+const useStyles = makeStyles<Theme>(theme => ({
   root: {
     minWidth: 1280,
     height: '100%',
@@ -33,7 +34,7 @@ const Index = () => {
         <Routes>
           <Route path="/" element={errorWrapper(Dashboard)()} />
           {/* Not found */}
-          <Route path="*" element={<NotFound/>}/>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
     </div>

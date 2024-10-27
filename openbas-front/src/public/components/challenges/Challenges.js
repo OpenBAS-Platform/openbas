@@ -1,6 +1,6 @@
 import { useQueryParameter } from '../../../utils/Environment';
-import ChallengesPreview from './ChallengesPreview';
 import ChallengesPlayer from './ChallengesPlayer';
+import ChallengesPreview from './ChallengesPreview';
 
 const Challenges = () => {
   const [preview] = useQueryParameter(['preview']);

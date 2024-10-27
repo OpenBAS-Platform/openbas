@@ -1,14 +1,15 @@
+import { MoreVert } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Slide } from '@mui/material';
+import * as R from 'ramda';
 import { forwardRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import * as R from 'ramda';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Slide } from '@mui/material';
-import { MoreVert } from '@mui/icons-material';
+
 import { deleteUser, updateUser, updateUserPassword } from '../../../../actions/User';
-import UserForm from './UserForm';
-import { useFormatter } from '../../../../components/i18n';
-import UserPasswordForm from './UserPasswordForm';
-import { tagOptions } from '../../../../utils/Option';
 import Drawer from '../../../../components/common/Drawer';
+import { useFormatter } from '../../../../components/i18n';
+import { tagOptions } from '../../../../utils/Option';
+import UserForm from './UserForm';
+import UserPasswordForm from './UserPasswordForm';
 
 const Transition = forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

@@ -1,6 +1,7 @@
+import { Button } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import { Button } from '@mui/material';
+
 import OldTextField from '../../../components/fields/OldTextField';
 import inject18n from '../../../components/i18n';
 

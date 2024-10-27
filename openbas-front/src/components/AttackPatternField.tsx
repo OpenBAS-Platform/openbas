@@ -1,20 +1,21 @@
-import { useState, FunctionComponent } from 'react';
-import * as R from 'ramda';
 import { AddOutlined, RouteOutlined } from '@mui/icons-material';
-import { Box, Dialog, DialogTitle, DialogContent, Autocomplete, TextField, IconButton } from '@mui/material';
+import { Autocomplete, Box, Dialog, DialogContent, DialogTitle, IconButton, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from './i18n';
+import * as R from 'ramda';
+import { FunctionComponent, useState } from 'react';
+
+import type { AttackPatternHelper } from '../actions/attack_patterns/attackpattern-helper';
+import { addAttackPattern, fetchAttackPatterns } from '../actions/AttackPattern';
+import type { UserHelper } from '../actions/helper';
+import type { KillChainPhaseHelper } from '../actions/kill_chain_phases/killchainphase-helper';
+import { fetchKillChainPhases } from '../actions/KillChainPhase';
 import AttackPatternForm from '../admin/components/settings/attack_patterns/AttackPatternForm';
-import { fetchAttackPatterns, addAttackPattern } from '../actions/AttackPattern';
+import { useHelper } from '../store';
 import type { AttackPattern, AttackPatternCreateInput } from '../utils/api-types';
 import { useAppDispatch } from '../utils/hooks';
 import useDataLoader from '../utils/hooks/useDataLoader';
-import { fetchKillChainPhases } from '../actions/KillChainPhase';
-import { useHelper } from '../store';
-import type { AttackPatternHelper } from '../actions/attack_patterns/attackpattern-helper';
-import type { KillChainPhaseHelper } from '../actions/kill_chain_phases/killchainphase-helper';
-import type { UserHelper } from '../actions/helper';
 import { Option } from '../utils/Option';
+import { useFormatter } from './i18n';
 
 const useStyles = makeStyles(() => ({
   icon: {
@@ -72,12 +73,12 @@ const AttackPatternField: FunctionComponent<Props> = ({
     setAttackPatternCreation(false);
   };
 
-  const onSubmit = ((data: AttackPatternCreateInputForm) => {
+  const onSubmit = (data: AttackPatternCreateInputForm) => {
     const inputValues: AttackPatternCreateInput = {
       ...data,
-      attack_pattern_kill_chain_phases: data.attack_pattern_kill_chain_phases?.map((k) => k.id),
+      attack_pattern_kill_chain_phases: data.attack_pattern_kill_chain_phases?.map(k => k.id),
     };
-    dispatch(addAttackPattern(inputValues)).then((result: { result: string, entities: { attackpatterns: Record<string, AttackPattern> } }) => {
+    dispatch(addAttackPattern(inputValues)).then((result: { result: string; entities: { attackpatterns: Record<string, AttackPattern> } }) => {
       if (result.result) {
         const newAttackPattern = result.entities.attackpatterns[result.result];
         const newAttackPatterns = [...fieldValues, useExternalId ? newAttackPattern.attack_pattern_external_id : newAttackPattern.attack_pattern_id];
@@ -86,7 +87,7 @@ const AttackPatternField: FunctionComponent<Props> = ({
       }
       return result;
     });
-  });
+  };
 
   const attackPatternsOptions = attackPatterns.map(
     (n: AttackPattern) => {
@@ -116,7 +117,7 @@ const AttackPatternField: FunctionComponent<Props> = ({
         noOptionsText={t('No available options')}
         disableClearable
         renderInput={
-          (params) => (
+          params => (
             <TextField
               {...params}
               label={t(label)}
@@ -145,9 +146,9 @@ const AttackPatternField: FunctionComponent<Props> = ({
             />
           )
         }
-        value={attackPatternsOptions.filter((a: { id: string, label: string }) => fieldValues?.includes(a.id)) ?? null}
+        value={attackPatternsOptions.filter((a: { id: string; label: string }) => fieldValues?.includes(a.id)) ?? null}
         onChange={(_event, pattern) => {
-          onChange(pattern.map((p) => p.id));
+          onChange(pattern.map(p => p.id));
         }}
         renderOption={(props, option) => (
           <Box component="li" {...props} key={option.id}>

@@ -1,19 +1,20 @@
+import { Tooltip } from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
+import { Handle, Node, NodeProps, OnConnect, Position, XYPosition } from '@xyflow/react';
+import moment from 'moment';
 import { memo } from 'react';
 import * as React from 'react';
-import { Handle, NodeProps, Position, Node, OnConnect, XYPosition } from '@xyflow/react';
-import { makeStyles, useTheme } from '@mui/styles';
-import { Tooltip } from '@mui/material';
-import moment from 'moment';
-import type { Theme } from '../Theme';
-import { isNotEmptyField } from '../../utils/utils';
+
+import type { InjectOutputType, InjectStore } from '../../actions/injects/Inject';
 import InjectIcon from '../../admin/components/common/injects/InjectIcon';
 import InjectPopover from '../../admin/components/common/injects/InjectPopover';
-import type { InjectOutputType, InjectStore } from '../../actions/injects/Inject';
+import { isNotEmptyField } from '../../utils/utils';
 import { useFormatter } from '../i18n';
+import type { Theme } from '../Theme';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
-const useStyles = makeStyles<Theme>((theme) => ({
+const useStyles = makeStyles<Theme>(theme => ({
   node: {
     position: 'relative',
     border:
@@ -78,27 +79,27 @@ const useStyles = makeStyles<Theme>((theme) => ({
 }));
 
 export type NodeInject = Node<{
-  background?: string,
-  color?: string,
-  key: string,
-  label: string,
-  description?: string,
-  isTargeted?: boolean,
-  isTargeting?: boolean,
-  onConnectInjects?: OnConnect
-  inject?: InjectOutputType,
-  fixedY?: number,
-  startDate?: string,
-  targets: string[],
+  background?: string;
+  color?: string;
+  key: string;
+  label: string;
+  description?: string;
+  isTargeted?: boolean;
+  isTargeting?: boolean;
+  onConnectInjects?: OnConnect;
+  inject?: InjectOutputType;
+  fixedY?: number;
+  startDate?: string;
+  targets: string[];
   boundingBox?: {
-    topLeft: XYPosition,
-    bottomRight: XYPosition
-  },
-  exerciseOrScenarioId: string,
-  onSelectedInject(inject?: InjectOutputType): void,
-  onCreate: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void,
-  onUpdate: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void,
-  onDelete: (result: string) => void,
+    topLeft: XYPosition;
+    bottomRight: XYPosition;
+  };
+  exerciseOrScenarioId: string;
+  onSelectedInject(inject?: InjectOutputType): void;
+  onCreate: (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => void;
+  onUpdate: (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => void;
+  onDelete: (result: string) => void;
 }
 
 >;
@@ -167,11 +168,14 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
   }
 
   return (
-    <div className={classes.node} style={{
-      backgroundColor: data.background,
-      color: 'white',
-      borderLeftColor,
-    }} onClick={onClick}
+    <div
+      className={classes.node}
+      style={{
+        backgroundColor: data.background,
+        color: 'white',
+        borderLeftColor,
+      }}
+      onClick={onClick}
     >
       <div className={classes.icon} style={{ opacity: dimNode ? '0.3' : '1' }}>
         <InjectIcon
@@ -179,22 +183,26 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
           type={
             data.inject?.inject_injector_contract?.injector_contract_payload
               ? data.inject?.inject_injector_contract?.injector_contract_payload?.payload_collector_type
-                  || data.inject?.inject_injector_contract?.injector_contract_payload?.payload_type
+              || data.inject?.inject_injector_contract?.injector_contract_payload?.payload_type
               : data.inject?.inject_type
-            }
+          }
         />
       </div>
       { data.startDate !== undefined ? (
         <div
           className={classes.triggerTime}
           style={{ opacity: dimNode ? '0.3' : '1' }}
-        >{convertToAbsoluteTime(data.startDate, data.inject!.inject_depends_duration)}</div>
+        >
+          {convertToAbsoluteTime(data.startDate, data.inject!.inject_depends_duration)}
+        </div>
 
       ) : (
         <div
           className={classes.triggerTime}
           style={{ opacity: dimNode ? '0.3' : '1' }}
-        >{convertToRelativeTime(data.inject!.inject_depends_duration)}</div>
+        >
+          {convertToRelativeTime(data.inject!.inject_depends_duration)}
+        </div>
 
       )}
       <Tooltip title={data.label} style={{ opacity: dimNode ? '0.3' : '1' }}>
@@ -223,13 +231,23 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
 
       </div>
       {(data.isTargeted ? (
-        <Handle type="target" id={`target-${data.key}`} position={Position.Left} isConnectable={true}
+        <Handle
+          type="target"
+          id={`target-${data.key}`}
+          position={Position.Left}
+          isConnectable={true}
           onConnect={data.onConnectInjects}
-        />) : null)}
+        />
+      ) : null)}
       {(data.isTargeting ? (
-        <Handle type="source" id={`source-${data.key}`} position={Position.Right} isConnectable={true}
+        <Handle
+          type="source"
+          id={`source-${data.key}`}
+          position={Position.Right}
+          isConnectable={true}
           onConnect={data.onConnectInjects}
-        />) : null)}
+        />
+      ) : null)}
     </div>
   );
 };

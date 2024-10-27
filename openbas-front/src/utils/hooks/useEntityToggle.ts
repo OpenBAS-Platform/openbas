@@ -1,6 +1,6 @@
+import * as R from 'ramda';
 import { useState } from 'react';
 import * as React from 'react';
-import * as R from 'ramda';
 
 export interface UseEntityToggle<T> {
   selectedElements: Record<string, T>;
@@ -25,7 +25,7 @@ const useEntityToggle = <T extends Record<string, string>>(
     {},
   );
   const [deSelectedElements, setDeSelectedElements] = useState<
-  Record<string, T>
+    Record<string, T>
   >({});
   const [selectAll, setSelectAll] = useState(false);
   const onToggleEntity = (
@@ -39,18 +39,18 @@ const useEntityToggle = <T extends Record<string, string>>(
     }
     if (Array.isArray(entity)) {
       const currentIds = R.values(selectedElements).map((n: Record<string, string>) => n[`${prefix}_id`]);
-      const givenIds = entity.map((n) => n[`${prefix}_id`]);
-      const addedIds = givenIds.filter((n) => !currentIds.includes(n));
+      const givenIds = entity.map(n => n[`${prefix}_id`]);
+      const addedIds = givenIds.filter(n => !currentIds.includes(n));
       let newSelectedElements = {
         ...selectedElements,
         ...R.indexBy(
           R.prop(`${prefix}_id`),
-          entity.filter((n) => addedIds.includes(n[`${prefix}_id`])),
+          entity.filter(n => addedIds.includes(n[`${prefix}_id`])),
         ),
       };
       if (forceRemove.length > 0) {
         newSelectedElements = R.omit(
-          forceRemove.map((n) => n[`${prefix}_id`]),
+          forceRemove.map(n => n[`${prefix}_id`]),
           newSelectedElements,
         );
       }

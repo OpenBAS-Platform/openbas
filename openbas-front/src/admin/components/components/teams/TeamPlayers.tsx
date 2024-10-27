@@ -1,28 +1,29 @@
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, CloseRounded, EmailOutlined, KeyOutlined, PersonOutlined, SmartphoneOutlined } from '@mui/icons-material';
+import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
 import { CSSProperties, useContext, useState } from 'react';
 import * as React from 'react';
-import { makeStyles } from '@mui/styles';
-import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined, CloseRounded, EmailOutlined, KeyOutlined, PersonOutlined, SmartphoneOutlined } from '@mui/icons-material';
-import * as R from 'ramda';
+
+import type { OrganizationHelper, UserHelper } from '../../../../actions/helper';
+import { fetchOrganizations } from '../../../../actions/Organization';
+import { fetchTeam, fetchTeamPlayers } from '../../../../actions/teams/team-actions';
+import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 import { useFormatter } from '../../../../components/i18n';
-import type { Theme } from '../../../../components/Theme';
-import TagsFilter from '../../common/filters/TagsFilter';
-import SearchFilter from '../../../../components/SearchFilter';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import ItemTags from '../../../../components/ItemTags';
+import SearchFilter from '../../../../components/SearchFilter';
+import type { Theme } from '../../../../components/Theme';
+import { useHelper } from '../../../../store';
+import type { Organization, Team } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import type { Option } from '../../../../utils/Option';
+import { PermissionsContext, TeamContext } from '../../common/Context';
+import TagsFilter from '../../common/filters/TagsFilter';
+import type { UserStore } from '../../teams/players/Player';
 import PlayerPopover from '../../teams/players/PlayerPopover';
 import TeamAddPlayers from './TeamAddPlayers';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchTeam, fetchTeamPlayers } from '../../../../actions/teams/team-actions';
-import { fetchOrganizations } from '../../../../actions/Organization';
-import { useAppDispatch } from '../../../../utils/hooks';
-import type { Organization, Team } from '../../../../utils/api-types';
-import { useHelper } from '../../../../store';
-import type { OrganizationHelper, UserHelper } from '../../../../actions/helper';
-import type { UserStore } from '../../teams/players/Player';
-import type { Option } from '../../../../utils/Option';
-import type { TeamsHelper } from '../../../../actions/teams/team-helper';
-import { PermissionsContext, TeamContext } from '../../common/Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   header: {
@@ -153,8 +154,8 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  teamId: Team['team_id']
-  handleClose: () => void
+  teamId: Team['team_id'];
+  handleClose: () => void;
 }
 
 type UserStoreExtended = UserStore & {
@@ -172,9 +173,9 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
   const [tags, setTags] = useState<Option['id'][]>([]);
 
   const { organizationsMap, team, users }: {
-    organizationsMap: Record<string, Organization>,
-    team: Team,
-    users: UserStore[]
+    organizationsMap: Record<string, Organization>;
+    team: Team;
+    users: UserStore[];
   } = useHelper((helper: UserHelper & TeamsHelper & OrganizationHelper) => ({
     organizationsMap: helper.getOrganizationsMap(),
     team: helper.getTeam(teamId),
@@ -220,11 +221,13 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
   )(users);
 
   const sortHeader = (field: string, label: string, isSortable: boolean) => {
-    const sortComponent = orderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = orderAsc
+      ? (
+          <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+          <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -304,7 +307,7 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <>
                 {onToggleUser && sortHeader('user_enabled', 'Enabled', true)}
                 {sortHeader('user_email', 'Email address', true)}
@@ -312,11 +315,11 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
                 {sortHeader('user_organization', 'Organization', true)}
                 {sortHeader('user_tags', 'Tags', true)}
               </>
-            }
+            )}
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {sortedUsers.map((user) => (
+        {sortedUsers.map(user => (
           <ListItem
             key={user.user_id}
             classes={{ root: classes.item }}
@@ -326,7 +329,7 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
               <PersonOutlined />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <>
                   {onToggleUser && (
                     <div
@@ -353,46 +356,46 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
                   >
                     {R.isNil(user.user_email)
                     || R.isEmpty(user.user_email) ? (
-                      <EmailOutlined
-                        color="warning"
-                        fontSize="small"
-                        className={classes.icon}
-                      />
-                      ) : (
-                        <EmailOutlined
-                          color="success"
-                          fontSize="small"
-                          className={classes.icon}
-                        />
-                      )}
+                          <EmailOutlined
+                            color="warning"
+                            fontSize="small"
+                            className={classes.icon}
+                          />
+                        ) : (
+                          <EmailOutlined
+                            color="success"
+                            fontSize="small"
+                            className={classes.icon}
+                          />
+                        )}
                     {R.isNil(user.user_pgp_key)
                     || R.isEmpty(user.user_pgp_key) ? (
-                      <KeyOutlined
-                        color="warning"
-                        fontSize="small"
-                        className={classes.icon}
-                      />
-                      ) : (
-                        <KeyOutlined
-                          color="success"
-                          fontSize="small"
-                          className={classes.icon}
-                        />
-                      )}
+                          <KeyOutlined
+                            color="warning"
+                            fontSize="small"
+                            className={classes.icon}
+                          />
+                        ) : (
+                          <KeyOutlined
+                            color="success"
+                            fontSize="small"
+                            className={classes.icon}
+                          />
+                        )}
                     {R.isNil(user.user_phone)
                     || R.isEmpty(user.user_phone) ? (
-                      <SmartphoneOutlined
-                        color="warning"
-                        fontSize="small"
-                        className={classes.icon}
-                      />
-                      ) : (
-                        <SmartphoneOutlined
-                          color="success"
-                          fontSize="small"
-                          className={classes.icon}
-                        />
-                      )}
+                          <SmartphoneOutlined
+                            color="warning"
+                            fontSize="small"
+                            className={classes.icon}
+                          />
+                        ) : (
+                          <SmartphoneOutlined
+                            color="success"
+                            fontSize="small"
+                            className={classes.icon}
+                          />
+                        )}
                   </div>
                   <div
                     className={classes.bodyItem}
@@ -411,18 +414,17 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
                     <ItemTags variant="reduced-view" tags={user.user_tags} />
                   </div>
                 </>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               {permissions.canWrite
                 ? (
-                  <PlayerPopover
-                    user={user}
-                    teamId={teamId}
-                  />
-                )
-                : <span> &nbsp; </span>
-              }
+                    <PlayerPopover
+                      user={user}
+                      teamId={teamId}
+                    />
+                  )
+                : <span> &nbsp; </span>}
             </ListItemSecondaryAction>
           </ListItem>
         ))}
@@ -432,7 +434,7 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
         && (
           <TeamAddPlayers
             teamId={teamId}
-            addedUsersIds={users.map((u) => u.user_id)}
+            addedUsersIds={users.map(u => u.user_id)}
           />
         )
       }

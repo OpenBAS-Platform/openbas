@@ -1,15 +1,16 @@
+import { InfoOutlined } from '@mui/icons-material';
+import { Button, InputAdornment, Tooltip } from '@mui/material';
 import { FunctionComponent } from 'react';
 import { Form } from 'react-final-form';
-import { Button, InputAdornment, Tooltip } from '@mui/material';
 import { z } from 'zod';
-import { InfoOutlined } from '@mui/icons-material';
+
+import CountryField from '../../../../components/CountryField';
 import OldTextField from '../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
-import TagField from '../../../../components/TagField';
 import OrganizationField from '../../../../components/OrganizationField';
-import CountryField from '../../../../components/CountryField';
-import type { PlayerInputForm } from './Player';
+import TagField from '../../../../components/TagField';
 import { schemaValidator } from '../../../../utils/Zod';
+import type { PlayerInputForm } from './Player';
 
 interface PlayerFormProps {
   initialValues: Partial<PlayerInputForm>;

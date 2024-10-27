@@ -1,23 +1,24 @@
-import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Tooltip, Chip } from '@mui/material';
-import { useDispatch } from 'react-redux';
 import { RowingOutlined } from '@mui/icons-material';
+import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
-import SearchFilter from '../../../../components/SearchFilter';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { useHelper } from '../../../../store';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
+
 import { fetchChallenges } from '../../../../actions/Challenge';
-import ChallengePopover from './ChallengePopover';
-import CreateChallenge from './CreateChallenge';
-import { fetchTags } from '../../../../actions/Tag';
-import TagsFilter from '../../common/filters/TagsFilter';
-import ItemTags from '../../../../components/ItemTags';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
+import { fetchTags } from '../../../../actions/Tag';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { useFormatter } from '../../../../components/i18n';
+import ItemTags from '../../../../components/ItemTags';
+import SearchFilter from '../../../../components/SearchFilter';
+import { useHelper } from '../../../../store';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import TagsFilter from '../../common/filters/TagsFilter';
+import ChallengePopover from './ChallengePopover';
+import CreateChallenge from './CreateChallenge';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -144,7 +145,7 @@ const Challenges = () => {
   const searchColumns = ['name', 'content', 'category'];
   const filtering = useSearchAnFilter('challenge', 'name', searchColumns);
   // Fetching data
-  const { challenges, documentsMap, exercisesMap } = useHelper((helper) => ({
+  const { challenges, documentsMap, exercisesMap } = useHelper(helper => ({
     exercisesMap: helper.getExercisesMap(),
     challenges: helper.getChallenges(),
     documentsMap: helper.getDocumentsMap(),
@@ -189,7 +190,7 @@ const Challenges = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div>
                 {filtering.buildHeader(
                   'challenge_name',
@@ -222,14 +223,14 @@ const Challenges = () => {
                   headerStyles,
                 )}
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
         {sortedChallenges.map((challenge) => {
           const docs = challenge.challenge_documents
-            .map((d) => (documentsMap[d] ? documentsMap[d] : undefined))
-            .filter((d) => d !== undefined);
+            .map(d => (documentsMap[d] ? documentsMap[d] : undefined))
+            .filter(d => d !== undefined);
           return (
             <ListItem
               key={challenge.challenge_id}
@@ -240,7 +241,7 @@ const Challenges = () => {
                 <RowingOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -294,7 +295,7 @@ const Challenges = () => {
                       />
                     </div>
                   </div>
-                }
+                )}
               />
               <ListItemSecondaryAction>
                 <ChallengePopover challenge={challenge} documents={docs} />

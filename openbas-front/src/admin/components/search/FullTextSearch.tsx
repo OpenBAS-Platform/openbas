@@ -1,21 +1,22 @@
+import { KeyboardArrowRight } from '@mui/icons-material';
+import { TabPanelProps } from '@mui/lab';
+import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tab, Tabs } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { CSSProperties, useEffect, useState } from 'react';
 import * as React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tab, Tabs } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import { TabPanelProps } from '@mui/lab';
-import { KeyboardArrowRight } from '@mui/icons-material';
+
 import { fullTextSearch, fullTextSearchByClass } from '../../../actions/fullTextSearch-action';
-import type { FullTextSearchCountResult, FullTextSearchResult, SearchPaginationInput } from '../../../utils/api-types';
-import { useFormatter } from '../../../components/i18n';
 import Breadcrumbs from '../../../components/Breadcrumbs';
-import { Header } from '../../../components/common/SortHeadersList';
-import useEntityLink from './useEntityLink';
-import useEntityIcon from '../../../utils/hooks/useEntityIcon';
-import type { Theme } from '../../../components/Theme';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
-import ItemTags from '../../../components/ItemTags';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
+import { Header } from '../../../components/common/SortHeadersList';
+import { useFormatter } from '../../../components/i18n';
+import ItemTags from '../../../components/ItemTags';
+import type { Theme } from '../../../components/Theme';
+import type { FullTextSearchCountResult, FullTextSearchResult, SearchPaginationInput } from '../../../utils/api-types';
+import useEntityIcon from '../../../utils/hooks/useEntityIcon';
+import useEntityLink from './useEntityLink';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -61,7 +62,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
 };
 
-const TabPanel = (props: TabPanelProps & { index: number, entity: string, searchPaginationInput: SearchPaginationInput }) => {
+const TabPanel = (props: TabPanelProps & { index: number; entity: string; searchPaginationInput: SearchPaginationInput }) => {
   const { value, index, entity, searchPaginationInput } = props;
 
   // Standard hooks
@@ -87,7 +88,7 @@ const TabPanel = (props: TabPanelProps & { index: number, entity: string, search
       {value === index.toString() && (
         <>
           <PaginationComponent
-            fetch={(input) => fullTextSearchByClass(entity, { ...input, ...searchPaginationInput })}
+            fetch={input => fullTextSearchByClass(entity, { ...input, ...searchPaginationInput })}
             searchPaginationInput={searchPaginationInput}
             setContent={setElements}
             searchEnable={false}
@@ -100,10 +101,11 @@ const TabPanel = (props: TabPanelProps & { index: number, entity: string, search
             >
               <ListItemIcon />
               <ListItemText
-                primary={
+                primary={(
                   <div className={classes.container}>
-                    {fields.map((header) => (
-                      <div key={header.field}
+                    {fields.map(header => (
+                      <div
+                        key={header.field}
                         className={classes.bodyItemHeader}
                         style={inlineStyles[header.field]}
                       >
@@ -111,11 +113,11 @@ const TabPanel = (props: TabPanelProps & { index: number, entity: string, search
                       </div>
                     ))}
                   </div>
-                }
+                )}
               />
               <ListItemIcon />
             </ListItem>
-            {elements.map((result) => (
+            {elements.map(result => (
               <ListItemButton
                 key={result.id}
                 classes={{ root: classes.item }}
@@ -127,9 +129,9 @@ const TabPanel = (props: TabPanelProps & { index: number, entity: string, search
                   {useEntityIcon(result.clazz)}
                 </ListItemIcon>
                 <ListItemText
-                  primary={
+                  primary={(
                     <div className={classes.container}>
-                      {fields.map((field) => (
+                      {fields.map(field => (
                         <div
                           key={field.field}
                           className={classes.bodyItem}
@@ -139,7 +141,7 @@ const TabPanel = (props: TabPanelProps & { index: number, entity: string, search
                         </div>
                       ))}
                     </div>
-                  }
+                  )}
                 />
                 <ListItemIcon classes={{ root: classes.goIcon }}>
                   <KeyboardArrowRight />
@@ -187,9 +189,11 @@ const FullTextSearch = () => {
 
   return (
     <>
-      <Breadcrumbs variant="object" elements={[
-        { label: t('Search'), current: true },
-      ]}
+      <Breadcrumbs
+        variant="object"
+        elements={[
+          { label: t('Search'), current: true },
+        ]}
       />
       <Box className={classes.container}>
         <Tabs

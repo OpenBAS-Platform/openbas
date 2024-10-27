@@ -1,24 +1,25 @@
-import { IconButton, Typography } from '@mui/material';
 import { CloseRounded } from '@mui/icons-material';
-import { FunctionComponent } from 'react';
+import { IconButton, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import type { Theme } from '../../../../components/Theme';
-import TagsFilter from '../../common/filters/TagsFilter';
-import SearchFilter from '../../../../components/SearchFilter';
-import AssetGroupAddEndpoints from './AssetGroupAddEndpoints';
-import { useHelper } from '../../../../store';
-import type { UserHelper } from '../../../../actions/helper';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchEndpoints } from '../../../../actions/assets/endpoint-actions';
-import { useAppDispatch } from '../../../../utils/hooks';
+import { FunctionComponent } from 'react';
+
 import { fetchAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import type { AssetGroupsHelper } from '../../../../actions/asset_groups/assetgroup-helper';
-import EndpointsList, { EndpointStoreWithType } from '../endpoints/EndpointsList';
-import EndpointPopover from '../endpoints/EndpointPopover';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
-import type { AssetGroupStore } from './AssetGroup';
+import { fetchEndpoints } from '../../../../actions/assets/endpoint-actions';
+import type { UserHelper } from '../../../../actions/helper';
+import SearchFilter from '../../../../components/SearchFilter';
+import type { Theme } from '../../../../components/Theme';
+import { useHelper } from '../../../../store';
 import type { Asset } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import TagsFilter from '../../common/filters/TagsFilter';
+import EndpointPopover from '../endpoints/EndpointPopover';
+import EndpointsList, { EndpointStoreWithType } from '../endpoints/EndpointsList';
+import type { AssetGroupStore } from './AssetGroup';
+import AssetGroupAddEndpoints from './AssetGroupAddEndpoints';
 
 const useStyles = makeStyles((theme: Theme) => ({
   // Drawer Header
@@ -83,8 +84,8 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
   const getAssetFromMap = (assets: string[]) => assets?.filter((endpointId: string) => !!endpointsMap[endpointId]).map((endpointId: string) => endpointsMap[endpointId]);
 
   const filteringAssets = useSearchAnFilter('asset', 'name', ['name']);
-  const assets = getAssetFromMap(assetGroup?.asset_group_assets ?? [])?.map((a) => ({ ...a, type: 'static' }))
-    .concat(getAssetFromMap(assetGroup?.asset_group_dynamic_assets ?? [])?.map((a) => ({ ...a, type: 'dynamic' })));
+  const assets = getAssetFromMap(assetGroup?.asset_group_assets ?? [])?.map(a => ({ ...a, type: 'static' }))
+    .concat(getAssetFromMap(assetGroup?.asset_group_dynamic_assets ?? [])?.map(a => ({ ...a, type: 'dynamic' })));
   const sortedAsset: EndpointStoreWithType[] = filteringAssets.filterAndSort(assets);
 
   return (
@@ -123,27 +124,28 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
       </div>
       <EndpointsList
         endpoints={sortedAsset}
-        actions=
-          {userAdmin
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore: Endpoint property handle by EndpointsList
-            ? (<EndpointPopover
+        actions={userAdmin
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore: Endpoint property handle by EndpointsList
+          ? (
+              <EndpointPopover
                 inline
                 assetGroupId={assetGroup?.asset_group_id}
                 assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
                 onUpdate={onUpdate}
                 onRemoveEndpointFromAssetGroup={onRemoveEndpointFromAssetGroup}
-               />)
-            : <span> &nbsp; </span>
-          }
+              />
+            )
+          : <span> &nbsp; </span>}
       />
       {userAdmin
-        && (<AssetGroupAddEndpoints
+      && (
+        <AssetGroupAddEndpoints
           assetGroupId={assetGroup?.asset_group_id}
           assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
           onUpdate={onUpdate}
-            />)
-       }
+        />
+      )}
     </>
   );
 };

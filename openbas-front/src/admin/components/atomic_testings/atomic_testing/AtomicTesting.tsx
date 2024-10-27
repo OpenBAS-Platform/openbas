@@ -1,21 +1,22 @@
-import { useContext, useEffect, useState } from 'react';
 import { Chip, Grid, List, Paper, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import type { AttackPattern, InjectTargetWithResult, KillChainPhase } from '../../../../utils/api-types';
-import ResponsePie from '../../common/injects/ResponsePie';
+import { useContext, useEffect, useState } from 'react';
+
 import Empty from '../../../../components/Empty';
-import { useFormatter } from '../../../../components/i18n';
-import TargetResultsDetail from './TargetResultsDetail';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import TargetListItem from './TargetListItem';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
+import { useFormatter } from '../../../../components/i18n';
 import ItemStatus from '../../../../components/ItemStatus';
-import SearchFilter from '../../../../components/SearchFilter';
-import InjectIcon from '../../common/injects/InjectIcon';
-import PlatformIcon from '../../../../components/PlatformIcon';
 import Loader from '../../../../components/Loader';
-import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
+import PlatformIcon from '../../../../components/PlatformIcon';
+import SearchFilter from '../../../../components/SearchFilter';
+import type { AttackPattern, InjectTargetWithResult, KillChainPhase } from '../../../../utils/api-types';
+import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { isNotEmptyField } from '../../../../utils/utils';
+import InjectIcon from '../../common/injects/InjectIcon';
+import ResponsePie from '../../common/injects/ResponsePie';
+import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
+import TargetListItem from './TargetListItem';
+import TargetResultsDetail from './TargetResultsDetail';
 
 const useStyles = makeStyles(() => ({
   chip: {
@@ -104,11 +105,11 @@ const AtomicTesting = () => {
                   variant="inline"
                   isPayload={isNotEmptyField(injectResultDto.inject_injector_contract?.injector_contract_payload)}
                   type={
-                        injectResultDto.inject_injector_contract?.injector_contract_payload
-                          ? injectResultDto.inject_injector_contract.injector_contract_payload?.payload_collector_type
-                            || injectResultDto.inject_injector_contract.injector_contract_payload?.payload_type
-                          : injectResultDto.inject_type
-                    }
+                    injectResultDto.inject_injector_contract?.injector_contract_payload
+                      ? injectResultDto.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                      || injectResultDto.inject_injector_contract.injector_contract_payload?.payload_type
+                      : injectResultDto.inject_type
+                  }
                 />
                 <Tooltip title={tPick(injectResultDto.inject_injector_contract?.injector_contract_labels)}>
                   <div style={{
@@ -227,13 +228,17 @@ const AtomicTesting = () => {
         <Paper classes={{ root: classes.paper }} variant="outlined">
           {sortedTargets.length > 0 ? (
             <List>
-              {sortedTargets.map((target) => (
+              {sortedTargets.map(target => (
                 <div key={target?.id} style={{ marginBottom: 15 }}>
                   <TargetListItem onClick={() => handleTargetClick(target)} target={target} selected={selectedTarget?.id === target.id} />
                   <List component="div" disablePadding>
-                    {target?.children?.map((child) => (
-                      <TargetListItem key={child?.id} isChild onClick={() => handleTargetClick(child, target)}
-                        target={child} selected={selectedTarget?.id === child.id && currentParentTarget?.id === target.id}
+                    {target?.children?.map(child => (
+                      <TargetListItem
+                        key={child?.id}
+                        isChild
+                        onClick={() => handleTargetClick(child, target)}
+                        target={child}
+                        selected={selectedTarget?.id === child.id && currentParentTarget?.id === target.id}
                       />
                     ))}
                   </List>
@@ -251,16 +256,16 @@ const AtomicTesting = () => {
         </Typography>
         <Paper classes={{ root: classes.paper }} variant="outlined" style={{ marginTop: 18 }}>
           {selectedTarget && !!injectResultDto.inject_type && (
-          <TargetResultsDetail
-            inject={injectResultDto}
-            parentTargetId={currentParentTarget?.id}
-            target={selectedTarget}
-            lastExecutionStartDate={injectResultDto.inject_status?.tracking_sent_date || ''}
-            lastExecutionEndDate={injectResultDto.inject_status?.tracking_end_date || ''}
-          />
+            <TargetResultsDetail
+              inject={injectResultDto}
+              parentTargetId={currentParentTarget?.id}
+              target={selectedTarget}
+              lastExecutionStartDate={injectResultDto.inject_status?.tracking_sent_date || ''}
+              lastExecutionEndDate={injectResultDto.inject_status?.tracking_end_date || ''}
+            />
           )}
           {!selectedTarget && (
-          <Empty message={t('No target data available.')} />
+            <Empty message={t('No target data available.')} />
           )}
         </Paper>
       </Grid>

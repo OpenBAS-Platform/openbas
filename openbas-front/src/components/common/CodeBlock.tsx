@@ -1,8 +1,8 @@
+import { Theme } from '@mui/material';
+import { useTheme } from '@mui/styles';
 import { FunctionComponent } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { a11yDark, coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { useTheme } from '@mui/styles';
-import { Theme } from '@mui/material';
 
 interface CodeBlockProps {
   code: string;

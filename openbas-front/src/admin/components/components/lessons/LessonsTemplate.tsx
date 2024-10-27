@@ -1,20 +1,21 @@
+import { HelpOutlined } from '@mui/icons-material';
+import { Grid, List, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
-import { Grid, List, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
-import { HelpOutlined } from '@mui/icons-material';
-import { useHelper } from '../../../../store';
-import { useFormatter } from '../../../../components/i18n';
-import CreateLessonsTemplateCategory from './categories/CreateLessonsTemplateCategory';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
+
+import type { UserHelper } from '../../../../actions/helper';
 import { fetchLessonsTemplateCategories, fetchLessonsTemplateQuestions } from '../../../../actions/Lessons';
+import type { LessonsTemplatesHelper } from '../../../../actions/lessons/lesson-helper';
+import type { LessonsTemplateQuestionStore } from '../../../../actions/lessons/Lessons';
+import { useFormatter } from '../../../../components/i18n';
+import { useHelper } from '../../../../store';
+import type { LessonsTemplateCategory } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import CreateLessonsTemplateCategory from './categories/CreateLessonsTemplateCategory';
 import LessonsTemplateCategoryPopover from './categories/LessonsTemplateCategoryPopover';
 import CreateLessonsTemplateQuestion from './categories/questions/CreateLessonsTemplateQuestion';
 import LessonsTemplateQuestionPopover from './categories/questions/LessonsTemplateQuestionPopover';
-import { useAppDispatch } from '../../../../utils/hooks';
-import type { LessonsTemplatesHelper } from '../../../../actions/lessons/lesson-helper';
-import type { UserHelper } from '../../../../actions/helper';
-import type { LessonsTemplateCategory } from '../../../../utils/api-types';
-import type { LessonsTemplateQuestionStore } from '../../../../actions/lessons/Lessons';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -36,9 +37,9 @@ const LessonsTemplate = () => {
     categories,
     questions,
   }: {
-    userAdmin: boolean,
-    categories: LessonsTemplateCategory[],
-    questions: LessonsTemplateQuestionStore[]
+    userAdmin: boolean;
+    categories: LessonsTemplateCategory[];
+    questions: LessonsTemplateQuestionStore[];
   } = useHelper((helper: LessonsTemplatesHelper & UserHelper) => {
     return {
       categories: helper.getLessonsTemplateCategories(lessonsTemplateId),
@@ -64,12 +65,12 @@ const LessonsTemplate = () => {
       <Grid container columnSpacing={3} rowSpacing={5} style={{ marginTop: '0px' }}>
         {categoriesSorted.map((category) => {
           const questionsSorted = sortQuestions(
-            questions.filter((q) => q.lessons_template_question_category === category.lessonstemplatecategory_id),
+            questions.filter(q => q.lessons_template_question_category === category.lessonstemplatecategory_id),
           );
           return (
             <Grid key={category.lessonstemplatecategory_id} item xs={6}>
               <div className={classes.container}>
-                <Typography variant="h2" margin='0'>
+                <Typography variant="h2" margin="0">
                   {category.lessons_template_category_name}
                 </Typography>
                 <LessonsTemplateCategoryPopover

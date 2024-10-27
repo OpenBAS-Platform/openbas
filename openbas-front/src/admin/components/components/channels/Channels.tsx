@@ -1,21 +1,22 @@
-import { CSSProperties } from 'react';
-import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { ChevronRightOutlined } from '@mui/icons-material';
+import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import SearchFilter from '../../../../components/SearchFilter';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { useHelper } from '../../../../store';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
+
 import { fetchChannels } from '../../../../actions/channels/channel-action';
-import CreateChannel from './CreateChannel';
-import { useFormatter } from '../../../../components/i18n';
-import ChannelIcon from './ChannelIcon';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
 import type { UserHelper } from '../../../../actions/helper';
-import { useAppDispatch } from '../../../../utils/hooks';
-import type { Channel } from '../../../../utils/api-types';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
+import { useFormatter } from '../../../../components/i18n';
+import SearchFilter from '../../../../components/SearchFilter';
+import { useHelper } from '../../../../store';
+import type { Channel } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import ChannelIcon from './ChannelIcon';
+import CreateChannel from './CreateChannel';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -106,7 +107,7 @@ const Channels = () => {
   const searchColumns = ['type', 'name', 'description'];
   const filtering = useSearchAnFilter('channel', 'name', searchColumns);
   // Fetching data
-  const { channels, userAdmin }: { channels: Channel[], userAdmin: boolean } = useHelper((helper: ChannelsHelper & UserHelper) => ({
+  const { channels, userAdmin }: { channels: Channel[]; userAdmin: boolean } = useHelper((helper: ChannelsHelper & UserHelper) => ({
     channels: helper.getChannels(),
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
@@ -141,7 +142,7 @@ const Channels = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div>
                 {filtering.buildHeader(
                   'channel_type',
@@ -162,11 +163,11 @@ const Channels = () => {
                   headerStyles,
                 )}
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
-        {sortedChannels.map((channel) => (
+        {sortedChannels.map(channel => (
           <ListItem
             key={channel.channel_id}
             classes={{ root: classes.item }}
@@ -182,7 +183,7 @@ const Channels = () => {
               />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   <div
                     className={classes.bodyItem}
@@ -203,7 +204,7 @@ const Channels = () => {
                     {channel.channel_description}
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <ChevronRightOutlined />

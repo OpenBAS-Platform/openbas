@@ -1,7 +1,7 @@
-import { TeamContextType } from '../../../common/Context';
-import type { SearchPaginationInput, TeamOutput } from '../../../../../utils/api-types';
-import type { Page } from '../../../../../components/common/queryable/Page';
 import { searchAtomicTestingTeams } from '../../../../../actions/atomic_testings/atomic-testing-actions';
+import type { Page } from '../../../../../components/common/queryable/Page';
+import type { SearchPaginationInput, TeamOutput } from '../../../../../utils/api-types';
+import { TeamContextType } from '../../../common/Context';
 
 const teamContextForAtomicTesting = (): TeamContextType => {
   return {

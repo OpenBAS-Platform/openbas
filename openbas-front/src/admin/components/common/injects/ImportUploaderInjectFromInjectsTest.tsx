@@ -1,15 +1,16 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Autocomplete as MuiAutocomplete, Box, Button, MenuItem, TextField } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import moment from 'moment-timezone';
 import { FunctionComponent, SyntheticEvent, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import moment from 'moment-timezone';
-import { makeStyles } from '@mui/styles';
-import { zodImplement } from '../../../../utils/Zod';
+
+import { testXlsFile } from '../../../../actions/mapper/mapper-actions';
+import CodeBlock from '../../../../components/common/CodeBlock';
 import { useFormatter } from '../../../../components/i18n';
 import type { ImportMapperAddInput, ImportTestSummary, InjectsImportTestInput } from '../../../../utils/api-types';
-import CodeBlock from '../../../../components/common/CodeBlock';
-import { testXlsFile } from '../../../../actions/mapper/mapper-actions';
+import { zodImplement } from '../../../../utils/Zod';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -106,10 +107,10 @@ const ImportUploaderInjectFromInjectsTest: FunctionComponent<Props> = ({
               onChange={(_, v) => {
                 onChange(v);
               }}
-              renderInput={(params) => (
+              renderInput={params => (
                 <TextField
                   {...params}
-                  label={'Sheet'}
+                  label="Sheet"
                   variant="standard"
                   fullWidth
                   error={!!errors.sheetName}
@@ -133,27 +134,38 @@ const ImportUploaderInjectFromInjectsTest: FunctionComponent<Props> = ({
               error={!!errors.timezone}
               helperText={errors.timezone?.message}
               inputProps={register('timezone')}
-            >{timezones.map((tz) => (
-              <MenuItem key={tz} value={tz}>{t(tz)}</MenuItem>
-            ))}
+            >
+              {timezones.map(tz => (
+                <MenuItem key={tz} value={tz}>{t(tz)}</MenuItem>
+              ))}
             </TextField>
           )}
         />
       </div>
       <Box sx={{ marginTop: '8px' }}>
-        <span>{t('Result')} : </span>
+        <span>
+          {t('Result')}
+          {' '}
+          :
+          {' '}
+        </span>
         <CodeBlock
           code={JSON.stringify(result?.injects, null, ' ') || t('You will find here the result in JSON format.')}
-          language={'json'}
-          maxHeight={'250px'}
+          language="json"
+          maxHeight="250px"
         />
       </Box>
       <Box sx={{ marginTop: '8px' }}>
-        <span>{t('Log')} : </span>
+        <span>
+          {t('Log')}
+          {' '}
+          :
+          {' '}
+        </span>
         <CodeBlock
-          code={JSON.stringify(result?.import_message?.filter((i) => i.message_level === 'ERROR' || i.message_level === 'CRITICAL'), null, ' ') || t('You will find here the result log in JSON format.')}
-          language={'json'}
-          maxHeight={'200px'}
+          code={JSON.stringify(result?.import_message?.filter(i => i.message_level === 'ERROR' || i.message_level === 'CRITICAL'), null, ' ') || t('You will find here the result log in JSON format.')}
+          language="json"
+          maxHeight="200px"
         />
       </Box>
       <div className={classes.buttons}>

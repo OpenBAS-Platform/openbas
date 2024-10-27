@@ -1,10 +1,11 @@
-import { makeStyles } from '@mui/styles';
 import { Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
+
+import type { UserHelper } from '../../../../actions/helper';
+import type { LessonsTemplatesHelper } from '../../../../actions/lessons/lesson-helper';
 import { useHelper } from '../../../../store';
 import LessonsTemplatePopover from './LessonsTemplatePopover';
-import type { LessonsTemplatesHelper } from '../../../../actions/lessons/lesson-helper';
-import type { UserHelper } from '../../../../actions/helper';
 
 const useStyles = makeStyles(() => ({
   containerTitle: {

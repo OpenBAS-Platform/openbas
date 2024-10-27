@@ -1,31 +1,32 @@
-import { CSSProperties, FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
+import { KeyboardArrowRight } from '@mui/icons-material';
 import { Chip, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { KeyboardArrowRight } from '@mui/icons-material';
-import { useFormatter } from '../../../../components/i18n';
-import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
-import computeAttackPatterns from '../../../../utils/injector_contract/InjectorContractUtils';
-import type { FilterGroup, Inject, InjectorContractOutput, KillChainPhase } from '../../../../utils/api-types';
-import { initSorting } from '../../../../components/common/queryable/Page';
-import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { useHelper } from '../../../../store';
-import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
-import Drawer from '../../../../components/common/Drawer';
-import CreateInjectDetails from './CreateInjectDetails';
+import { CSSProperties, FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
+
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
-import InjectIcon from './InjectIcon';
+import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
+import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
+import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
 import type { InjectorHelper } from '../../../../actions/injectors/injector-helper';
-import PlatformIcon from '../../../../components/PlatformIcon';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
-import { isNotEmptyField } from '../../../../utils/utils';
+import Drawer from '../../../../components/common/Drawer';
+import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
-import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
+import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { Header } from '../../../../components/common/SortHeadersList';
+import { useFormatter } from '../../../../components/i18n';
+import PlatformIcon from '../../../../components/PlatformIcon';
+import { useHelper } from '../../../../store';
+import type { FilterGroup, Inject, InjectorContractOutput, KillChainPhase } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import computeAttackPatterns from '../../../../utils/injector_contract/InjectorContractUtils';
+import { isNotEmptyField } from '../../../../utils/utils';
+import CreateInjectDetails from './CreateInjectDetails';
+import InjectIcon from './InjectIcon';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -78,9 +79,9 @@ interface Props {
   open?: boolean;
   handleClose: () => void;
   presetValues?: {
-    inject_depends_duration_days?: number,
-    inject_depends_duration_hours?: number,
-    inject_depends_duration_minutes?: number,
+    inject_depends_duration_days?: number;
+    inject_depends_duration_hours?: number;
+    inject_depends_duration_minutes?: number;
   };
 }
 
@@ -116,9 +117,11 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
       field: 'injector_contract_labels',
       label: 'Label',
       isSortable: false,
-      value: (contract: InjectorContractOutput, _: KillChainPhase, __: Record<string, AttackPatternStore>) => <Tooltip title={tPick(contract.injector_contract_labels)}>
-        {tPick(contract.injector_contract_labels)}
-      </Tooltip>,
+      value: (contract: InjectorContractOutput, _: KillChainPhase, __: Record<string, AttackPatternStore>) => (
+        <Tooltip title={tPick(contract.injector_contract_labels)}>
+          {tPick(contract.injector_contract_labels)}
+        </Tooltip>
+      ),
     },
     {
       field: 'injector_contract_platforms',
@@ -157,7 +160,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
 
   const addAtomicFilter = (filterGroup: FilterGroup) => {
     const filters = filterGroup.filters ?? [];
-    if (filters.map((f) => f.key).includes('injector_contract_atomic_testing')) {
+    if (filters.map(f => f.key).includes('injector_contract_atomic_testing')) {
       return filterGroup;
     }
 
@@ -212,7 +215,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
   };
   useEffect(() => {
     if (contracts && contracts.length > 0) {
-      setParsedContentContracts(contracts.map((c) => JSON.parse(c.injector_contract_content)));
+      setParsedContentContracts(contracts.map(c => JSON.parse(c.injector_contract_content)));
     }
     setSelectedContract(null);
   }, [contracts]);
@@ -258,13 +261,13 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
               >
                 <ListItemIcon />
                 <ListItemText
-                  primary={
+                  primary={(
                     <SortHeadersComponentV2
                       headers={headers}
                       inlineStylesHeaders={inlineStyles}
                       sortHelpers={queryableHelpers.sortHelpers}
                     />
-                  }
+                  )}
                 />
               </ListItem>
               {contracts.map((contract, index) => {
@@ -282,14 +285,15 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
                   >
                     <ListItemIcon>
                       <InjectIcon
-                        variant="list" type={contract.injector_contract_payload_type ?? contract.injector_contract_injector_type}
+                        variant="list"
+                        type={contract.injector_contract_payload_type ?? contract.injector_contract_injector_type}
                         isPayload={isNotEmptyField(contract.injector_contract_payload_type)}
                       />
                     </ListItemIcon>
                     <ListItemText
-                      primary={
+                      primary={(
                         <div className={classes.bodyItems}>
-                          {headers.map((header) => (
+                          {headers.map(header => (
                             <div
                               key={header.field}
                               className={classes.bodyItem}
@@ -299,7 +303,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
                             </div>
                           ))}
                         </div>
-                      }
+                      )}
                     />
                     <ListItemIcon classes={{ root: classes.goIcon }}>
                       <KeyboardArrowRight />

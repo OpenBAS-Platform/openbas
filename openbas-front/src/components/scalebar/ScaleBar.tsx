@@ -1,10 +1,11 @@
-import { FunctionComponent } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { useFormatter } from '../i18n';
-import { Scale } from './Tick';
-import type { Theme } from '../Theme';
+import { FunctionComponent } from 'react';
 
-const useStyles = makeStyles<Theme>((theme) => ({
+import { useFormatter } from '../i18n';
+import type { Theme } from '../Theme';
+import { Scale } from './Tick';
+
+const useStyles = makeStyles<Theme>(theme => ({
   scaleBar: {
     position: 'relative',
   },
@@ -103,13 +104,15 @@ const ScaleBar: FunctionComponent<Props> = ({
               {expectationExpectedScore < 100 && (
                 <div className={classes.expectationScoreValue} style={{ display: 'flex', justifyContent: 'flex-end' }}>
                   <span>{expectationExpectedScore}</span>
-                </div>)}
+                </div>
+              )}
               <div className={classes.failureLabel}><span>{scale.min.label}</span></div>
             </div>
             <div style={{ width: '5%' }}>
               <div className={classes.successLabel} style={{ top: 0, marginTop: '3px' }}><span>{scale.ticks[0].label}</span></div>
             </div>
-          </>)}
+          </>
+        )}
       </div>
     </div>
   );

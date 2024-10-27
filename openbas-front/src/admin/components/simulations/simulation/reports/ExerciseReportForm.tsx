@@ -1,12 +1,11 @@
-import * as React from 'react';
-import { z, ZodBoolean } from 'zod';
-import { SubmitHandler, useForm } from 'react-hook-form';
-
-import { Button, Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
+import * as React from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { z, ZodBoolean } from 'zod';
 
-import type { ReportInput, ReportInformationInput, Report } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
+import type { Report, ReportInformationInput, ReportInput } from '../../../../../utils/api-types';
 import ReportInformationType from './ReportInformationType';
 
 interface ExerciseReportFormInput {
@@ -62,7 +61,7 @@ interface Props {
   onSubmit: SubmitHandler<ReportInput>;
   handleCancel: () => void;
   editing?: boolean;
-  initialValues?: Report,
+  initialValues?: Report;
 }
 const ExerciseReportForm: React.FC<Props> = ({
   onSubmit,
@@ -74,7 +73,7 @@ const ExerciseReportForm: React.FC<Props> = ({
   const { t } = useFormatter();
 
   const findReportInfo = (type: string) => {
-    return initialValues?.report_informations?.find((info) => info.report_informations_type === type)?.report_informations_display ?? true;
+    return initialValues?.report_informations?.find(info => info.report_informations_type === type)?.report_informations_display ?? true;
   };
 
   const initialModulesValues: Record<string, boolean> = {};
@@ -136,12 +135,12 @@ const ExerciseReportForm: React.FC<Props> = ({
         return (
           <FormControlLabel
             key={moduleConfig.name}
-            control={
+            control={(
               <Checkbox
                 {...register(moduleConfig.name)}
                 defaultChecked={initialModulesValues[moduleConfig.name]}
               />
-          }
+            )}
             label={t(moduleConfig.label)}
           />
         );

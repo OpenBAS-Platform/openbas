@@ -1,25 +1,26 @@
-import { useState } from 'react';
-import { makeStyles } from '@mui/styles';
+import { BarChartOutlined, KeyboardArrowRight, ReorderOutlined } from '@mui/icons-material';
 import { Chip, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import { BarChartOutlined, KeyboardArrowRight, ReorderOutlined } from '@mui/icons-material';
+
+import { fetchExerciseInjects } from '../../../../../actions/Inject';
+import { useFormatter } from '../../../../../components/i18n';
 import ItemTags from '../../../../../components/ItemTags';
 import SearchFilter from '../../../../../components/SearchFilter';
-import TagsFilter from '../../../common/filters/TagsFilter';
-import { fetchExerciseInjects } from '../../../../../actions/Inject';
-import InjectIcon from '../../../common/injects/InjectIcon';
-import useSearchAnFilter from '../../../../../utils/SortingFiltering';
-import { useFormatter } from '../../../../../components/i18n';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../../store';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import useSearchAnFilter from '../../../../../utils/SortingFiltering';
+import TagsFilter from '../../../common/filters/TagsFilter';
+import InjectIcon from '../../../common/injects/InjectIcon';
 import AnimationMenu from '../AnimationMenu';
 import CreateQuickInject from '../injects/CreateQuickInject';
+import MailDistributionByInject from './MailDistributionByInject';
+import MailDistributionByPlayer from './MailDistributionByPlayer';
+import MailDistributionByTeam from './MailDistributionByTeam';
 import MailDistributionOverTimeChart from './MailDistributionOverTimeChart';
 import MailDistributionOverTimeLine from './MailDistributionOverTimeLine';
-import MailDistributionByTeam from './MailDistributionByTeam';
-import MailDistributionByPlayer from './MailDistributionByPlayer';
-import MailDistributionByInject from './MailDistributionByInject';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -198,7 +199,7 @@ const Mails = () => {
   });
   const sortedInjects = filtering
     .filterAndSort(injects)
-    .filter((i) => i.inject_communications_number > 0);
+    .filter(i => i.inject_communications_number > 0);
   // Rendering
   return (
     <div style={{ marginTop: -13 }}>
@@ -211,7 +212,7 @@ const Mails = () => {
       >
         <Tooltip title={t('List view')}>
           <ToggleButton
-            value='list'
+            value="list"
             onClick={() => setViewMode('list')}
             selected={viewMode === 'list'}
             aria-label="List view mode"
@@ -221,7 +222,7 @@ const Mails = () => {
         </Tooltip>
         <Tooltip title={t('Distribution view')}>
           <ToggleButton
-            value='distribution'
+            value="distribution"
             onClick={() => setViewMode('distribution')}
             selected={viewMode === 'distribution'}
             aria-label="Distribution view mode"
@@ -231,199 +232,199 @@ const Mails = () => {
         </Tooltip>
       </ToggleButtonGroup>
       {viewMode === 'distribution' && (
-      <>
-        <Grid container spacing={3} classes={{ container: classes.gridContainer }}>
-          <Grid item xs={6} style={{ paddingTop: 10 }}>
-            <Typography variant="h4">
-              {t('Sent mails over time')}
-            </Typography>
-            <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-              <MailDistributionOverTimeChart exerciseId={exerciseId} />
-            </Paper>
+        <>
+          <Grid container spacing={3} classes={{ container: classes.gridContainer }}>
+            <Grid item xs={6} style={{ paddingTop: 10 }}>
+              <Typography variant="h4">
+                {t('Sent mails over time')}
+              </Typography>
+              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                <MailDistributionOverTimeChart exerciseId={exerciseId} />
+              </Paper>
+            </Grid>
+            <Grid item xs={6} style={{ paddingTop: 10 }}>
+              <Typography variant="h4">
+                {t('Sent mails over time')}
+              </Typography>
+              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                <MailDistributionOverTimeLine exerciseId={exerciseId} />
+              </Paper>
+            </Grid>
+            <Grid item xs={4} style={{ marginTop: 25 }}>
+              <Typography variant="h4">
+                {t('Distribution of mails by team')}
+              </Typography>
+              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                <MailDistributionByTeam exerciseId={exerciseId} />
+              </Paper>
+            </Grid>
+            <Grid item xs={4} style={{ marginTop: 25 }}>
+              <Typography variant="h4">
+                {t('Distribution of mails by player')}
+              </Typography>
+              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                <MailDistributionByPlayer exerciseId={exerciseId} />
+              </Paper>
+            </Grid>
+            <Grid item xs={4} style={{ marginTop: 25 }}>
+              <Typography variant="h4">
+                {t('Distribution of mails by inject')}
+              </Typography>
+              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                <MailDistributionByInject exerciseId={exerciseId} />
+              </Paper>
+            </Grid>
           </Grid>
-          <Grid item xs={6} style={{ paddingTop: 10 }}>
-            <Typography variant="h4">
-              {t('Sent mails over time')}
-            </Typography>
-            <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-              <MailDistributionOverTimeLine exerciseId={exerciseId} />
-            </Paper>
-          </Grid>
-          <Grid item xs={4} style={{ marginTop: 25 }}>
-            <Typography variant="h4">
-              {t('Distribution of mails by team')}
-            </Typography>
-            <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-              <MailDistributionByTeam exerciseId={exerciseId} />
-            </Paper>
-          </Grid>
-          <Grid item xs={4} style={{ marginTop: 25 }}>
-            <Typography variant="h4">
-              {t('Distribution of mails by player')}
-            </Typography>
-            <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-              <MailDistributionByPlayer exerciseId={exerciseId} />
-            </Paper>
-          </Grid>
-          <Grid item xs={4} style={{ marginTop: 25 }}>
-            <Typography variant="h4">
-              {t('Distribution of mails by inject')}
-            </Typography>
-            <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-              <MailDistributionByInject exerciseId={exerciseId} />
-            </Paper>
-          </Grid>
-        </Grid>
-      </>
+        </>
       )}
       {viewMode === 'list' && (
-      <>
-        <div style={{ float: 'left', marginRight: 10 }}>
-          <SearchFilter
-            variant="small"
-            onChange={filtering.handleSearch}
-            keyword={filtering.keyword}
-          />
-        </div>
-        <div style={{ float: 'left', marginRight: 10 }}>
-          <TagsFilter
-            onAddTag={filtering.handleAddTag}
-            onRemoveTag={filtering.handleRemoveTag}
-            currentTags={filtering.tags}
-          />
-        </div>
-        <div className="clearfix" />
-        <List style={{ marginTop: 10 }}>
-          <ListItem
-            classes={{ root: classes.itemHead }}
-            divider={false}
-            style={{ paddingTop: 0 }}
-          >
-            <ListItemIcon>
-              <span
-                style={{
-                  padding: '0 8px 0 8px',
-                  fontWeight: 700,
-                  fontSize: 12,
-                }}
-              >
-                &nbsp;
-              </span>
-            </ListItemIcon>
-            <ListItemText
-              primary={
-                <div>
-                  {filtering.buildHeader(
-                    'inject_title',
-                    'Title',
-                    false,
-                    headerStyles,
-                  )}
-                  {filtering.buildHeader(
-                    'inject_users_number',
-                    'Players',
-                    true,
-                    headerStyles,
-                  )}
-                  {filtering.buildHeader(
-                    'inject_sent_at',
-                    'Sent at',
-                    true,
-                    headerStyles,
-                  )}
-                  {filtering.buildHeader(
-                    'inject_communications_not_ack_number',
-                    'Mails not read',
-                    true,
-                    headerStyles,
-                  )}
-                  {filtering.buildHeader(
-                    'inject_communications_number',
-                    'Total mails',
-                    true,
-                    headerStyles,
-                  )}
-                  {filtering.buildHeader(
-                    'inject_tags',
-                    'Tags',
-                    true,
-                    headerStyles,
-                  )}
-                </div>
-            }
+        <>
+          <div style={{ float: 'left', marginRight: 10 }}>
+            <SearchFilter
+              variant="small"
+              onChange={filtering.handleSearch}
+              keyword={filtering.keyword}
             />
-            <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
-          </ListItem>
-          {sortedInjects.map((inject) => {
-            return (
-              <ListItem
-                key={inject.inject_id}
-                component={Link}
-                to={`/admin/exercises/${exerciseId}/animation/mails/${inject.inject_id}`}
-                classes={{ root: classes.item }}
-                divider={true}
-                button={true}
-              >
-                <ListItemIcon style={{ paddingTop: 5 }}>
-                  <InjectIcon type={inject.inject_type} disabled={!inject.inject_enabled}/>
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_title}
-                      >
-                        {inject.inject_title}
+          </div>
+          <div style={{ float: 'left', marginRight: 10 }}>
+            <TagsFilter
+              onAddTag={filtering.handleAddTag}
+              onRemoveTag={filtering.handleRemoveTag}
+              currentTags={filtering.tags}
+            />
+          </div>
+          <div className="clearfix" />
+          <List style={{ marginTop: 10 }}>
+            <ListItem
+              classes={{ root: classes.itemHead }}
+              divider={false}
+              style={{ paddingTop: 0 }}
+            >
+              <ListItemIcon>
+                <span
+                  style={{
+                    padding: '0 8px 0 8px',
+                    fontWeight: 700,
+                    fontSize: 12,
+                  }}
+                >
+                &nbsp;
+                </span>
+              </ListItemIcon>
+              <ListItemText
+                primary={(
+                  <div>
+                    {filtering.buildHeader(
+                      'inject_title',
+                      'Title',
+                      false,
+                      headerStyles,
+                    )}
+                    {filtering.buildHeader(
+                      'inject_users_number',
+                      'Players',
+                      true,
+                      headerStyles,
+                    )}
+                    {filtering.buildHeader(
+                      'inject_sent_at',
+                      'Sent at',
+                      true,
+                      headerStyles,
+                    )}
+                    {filtering.buildHeader(
+                      'inject_communications_not_ack_number',
+                      'Mails not read',
+                      true,
+                      headerStyles,
+                    )}
+                    {filtering.buildHeader(
+                      'inject_communications_number',
+                      'Total mails',
+                      true,
+                      headerStyles,
+                    )}
+                    {filtering.buildHeader(
+                      'inject_tags',
+                      'Tags',
+                      true,
+                      headerStyles,
+                    )}
+                  </div>
+                )}
+              />
+              <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
+            </ListItem>
+            {sortedInjects.map((inject) => {
+              return (
+                <ListItem
+                  key={inject.inject_id}
+                  component={Link}
+                  to={`/admin/exercises/${exerciseId}/animation/mails/${inject.inject_id}`}
+                  classes={{ root: classes.item }}
+                  divider={true}
+                  button={true}
+                >
+                  <ListItemIcon style={{ paddingTop: 5 }}>
+                    <InjectIcon type={inject.inject_type} disabled={!inject.inject_enabled} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={(
+                      <div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.inject_title}
+                        >
+                          {inject.inject_title}
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.inject_users_number}
+                        >
+                          {inject.inject_users_number}
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.inject_sent_at}
+                        >
+                          {fndt(inject.inject_sent_at)}
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.inject_communications_not_ack_number}
+                        >
+                          <Chip
+                            classes={{ root: classes.comsNotRead }}
+                            label={inject.inject_communications_not_ack_number}
+                          />
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.inject_communications_number}
+                        >
+                          <Chip
+                            classes={{ root: classes.coms }}
+                            label={inject.inject_communications_number}
+                          />
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.inject_tags}
+                        >
+                          <ItemTags variant="list" tags={inject.inject_tags} />
+                        </div>
                       </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_users_number}
-                      >
-                        {inject.inject_users_number}
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_sent_at}
-                      >
-                        {fndt(inject.inject_sent_at)}
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_communications_not_ack_number}
-                      >
-                        <Chip
-                          classes={{ root: classes.comsNotRead }}
-                          label={inject.inject_communications_not_ack_number}
-                        />
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_communications_number}
-                      >
-                        <Chip
-                          classes={{ root: classes.coms }}
-                          label={inject.inject_communications_number}
-                        />
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_tags}
-                      >
-                        <ItemTags variant="list" tags={inject.inject_tags} />
-                      </div>
-                    </div>
-                  }
-                />
-                <ListItemSecondaryAction classes={{ root: classes.goIcon }}>
-                  <KeyboardArrowRight />
-                </ListItemSecondaryAction>
-              </ListItem>
-            );
-          })}
-        </List>
-        <CreateQuickInject exercise={exercise} />
-      </>
+                    )}
+                  />
+                  <ListItemSecondaryAction classes={{ root: classes.goIcon }}>
+                    <KeyboardArrowRight />
+                  </ListItemSecondaryAction>
+                </ListItem>
+              );
+            })}
+          </List>
+          <CreateQuickInject exercise={exercise} />
+        </>
       )}
     </div>
   );

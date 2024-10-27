@@ -1,10 +1,11 @@
-import { FunctionComponent, useState } from 'react';
-import { IconButton, Tooltip } from '@mui/material';
 import { ForwardToInbox } from '@mui/icons-material';
-import { useFormatter } from '../../../components/i18n';
-import type { InjectTestStatus } from '../../../utils/api-types';
+import { IconButton, Tooltip } from '@mui/material';
+import { FunctionComponent, useState } from 'react';
+
 import { bulkTestInjects } from '../../../actions/injects/inject-action';
 import DialogTest from '../../../components/common/DialogTest';
+import { useFormatter } from '../../../components/i18n';
+import type { InjectTestStatus } from '../../../utils/api-types';
 import { MESSAGING$ } from '../../../utils/Environment';
 
 interface Props {

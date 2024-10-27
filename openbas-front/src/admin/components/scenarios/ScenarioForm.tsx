@@ -1,14 +1,15 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, MenuItem } from '@mui/material';
 import { FunctionComponent } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button, MenuItem } from '@mui/material';
-import { zodImplement } from '../../../utils/Zod';
-import type { ScenarioInput } from '../../../utils/api-types';
-import { useFormatter } from '../../../components/i18n';
+
+import SelectField from '../../../components/fields/SelectField';
 import TagField from '../../../components/fields/TagField';
 import TextField from '../../../components/fields/TextField';
-import SelectField from '../../../components/fields/SelectField';
+import { useFormatter } from '../../../components/i18n';
+import type { ScenarioInput } from '../../../utils/api-types';
+import { zodImplement } from '../../../utils/Zod';
 import { scenarioCategories } from './constants';
 
 interface Props {
@@ -78,7 +79,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
       <SelectField
         variant="standard"
         fullWidth={true}
-        name='scenario_category'
+        name="scenario_category"
         label={t('Category')}
         style={{ marginTop: 20 }}
         error={!!errors.scenario_category}
@@ -94,7 +95,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
       <SelectField
         variant="standard"
         fullWidth={true}
-        name='scenario_main_focus'
+        name="scenario_main_focus"
         label={t('Main focus')}
         style={{ marginTop: 20 }}
         error={!!errors.scenario_main_focus}
@@ -123,7 +124,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
       <SelectField
         variant="standard"
         fullWidth={true}
-        name='scenario_severity'
+        name="scenario_severity"
         label={t('Severity')}
         style={{ marginTop: 20 }}
         error={!!errors.scenario_severity}

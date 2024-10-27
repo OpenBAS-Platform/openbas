@@ -1,24 +1,25 @@
-import { useParams } from 'react-router-dom';
+import { Paper, Typography } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import * as React from 'react';
-import { Paper, Typography } from '@mui/material';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { useAppDispatch } from '../../../../../utils/hooks';
+import { useParams } from 'react-router-dom';
+
+import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import {
   fetchScenarioTeams,
 } from '../../../../../actions/scenarios/scenario-actions';
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
-import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import type { TeamStore } from '../../../../../actions/teams/Team';
-import { PermissionsContext, TeamContext } from '../../../common/Context';
-import UpdateTeams from '../../../components/teams/UpdateTeams';
 import { useFormatter } from '../../../../../components/i18n';
+import { useHelper } from '../../../../../store';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { PermissionsContext, TeamContext } from '../../../common/Context';
 import ContextualTeams from '../../../components/teams/ContextualTeams';
+import UpdateTeams from '../../../components/teams/UpdateTeams';
 import teamContextForScenario from './teamContextForScenario';
 
 interface Props {
-  scenarioTeamsUsers: ScenarioStore['scenario_teams_users'],
+  scenarioTeamsUsers: ScenarioStore['scenario_teams_users'];
 }
 
 const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
@@ -47,11 +48,12 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
         {t('Teams')}
       </Typography>
       {permissions.canWrite
-        && <UpdateTeams
+      && (
+        <UpdateTeams
           addedTeamIds={teams.map((team: TeamStore) => team.team_id)}
           setTeams={(ts: TeamStore[]) => setTeams(ts)}
-           />
-      }
+        />
+      )}
       <div className="clearfix" />
       <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
         <ContextualTeams teams={teams} />

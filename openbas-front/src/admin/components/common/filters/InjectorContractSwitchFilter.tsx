@@ -1,10 +1,11 @@
 import { Switch } from '@mui/material';
 import { FunctionComponent, useEffect, useState } from 'react';
 import * as React from 'react';
-import { useFormatter } from '../../../../components/i18n';
+
 import { FilterHelpers } from '../../../../components/common/queryable/filter/FilterHelpers';
-import type { FilterGroup } from '../../../../utils/api-types';
 import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
+import { useFormatter } from '../../../../components/i18n';
+import type { FilterGroup } from '../../../../utils/api-types';
 import { INJECTOR_CONTRACT_INJECTOR_FILTER_KEY, INJECTOR_CONTRACT_PLAYERS_ONLY } from './constants';
 
 interface Props {
@@ -20,7 +21,7 @@ const InjectorContractSwitchFilter: FunctionComponent<Props> = ({
   const { t } = useFormatter();
 
   const retrieveFilter = () => {
-    return filterGroup?.filters?.find((f) => f.key === INJECTOR_CONTRACT_INJECTOR_FILTER_KEY);
+    return filterGroup?.filters?.find(f => f.key === INJECTOR_CONTRACT_INJECTOR_FILTER_KEY);
   };
 
   const isChecked = () => {
@@ -28,7 +29,7 @@ const InjectorContractSwitchFilter: FunctionComponent<Props> = ({
     if (!filter) {
       return false;
     }
-    return filter.values?.some((v) => INJECTOR_CONTRACT_PLAYERS_ONLY.includes(v));
+    return filter.values?.some(v => INJECTOR_CONTRACT_PLAYERS_ONLY.includes(v));
   };
 
   const [enablePlayerFilter, setEnablePlayerFilter] = useState(isChecked);

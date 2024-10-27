@@ -1,11 +1,12 @@
-import { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { Form } from 'react-final-form';
 import { Button, Grid, MenuItem } from '@mui/material';
-import inject18n from '../../../../components/i18n';
+import * as PropTypes from 'prop-types';
+import { Component } from 'react';
+import { Form } from 'react-final-form';
+
 import DeprecatedColorPickerField from '../../../../components/DeprecatedColorPickerField';
 import OldSelectField from '../../../../components/fields/OldSelectField';
 import OldTextField from '../../../../components/fields/OldTextField';
+import inject18n from '../../../../components/i18n';
 
 class ChannelParametersForm extends Component {
   render() {

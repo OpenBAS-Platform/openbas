@@ -1,10 +1,11 @@
-import { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { Form } from 'react-final-form';
 import { Button, MenuItem } from '@mui/material';
+import * as PropTypes from 'prop-types';
+import { Component } from 'react';
+import { Form } from 'react-final-form';
+
+import OldSelectField from '../../../../components/fields/OldSelectField';
 import OldTextField from '../../../../components/fields/OldTextField';
 import inject18n from '../../../../components/i18n';
-import OldSelectField from '../../../../components/fields/OldSelectField';
 
 class ChannelForm extends Component {
   validate(values) {

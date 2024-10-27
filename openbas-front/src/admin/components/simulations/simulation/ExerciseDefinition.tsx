@@ -1,14 +1,15 @@
-import { useParams } from 'react-router-dom';
 import { Grid, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useHelper } from '../../../../store';
-import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
+import { useParams } from 'react-router-dom';
+
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
+import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { useFormatter } from '../../../../components/i18n';
+import { useHelper } from '../../../../store';
+import ExerciseArticles from './articles/ExerciseArticles';
+import ExerciseChallenges from './challenges/ExerciseChallenges';
 import ExerciseTeams from './teams/ExerciseTeams';
 import ExerciseVariables from './variables/ExerciseVariables';
-import ExerciseChallenges from './challenges/ExerciseChallenges';
-import ExerciseArticles from './articles/ExerciseArticles';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.

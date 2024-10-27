@@ -1,21 +1,22 @@
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import * as R from 'ramda';
+import { SmartButtonOutlined } from '@mui/icons-material';
 import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { SmartButtonOutlined } from '@mui/icons-material';
-import CreateInjectorContract from './injector_contracts/CreateInjectorContract';
-import InjectorContractPopover from './injector_contracts/InjectorContractPopover';
+
+import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
+import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
+import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
-import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
-import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
+import CreateInjectorContract from './injector_contracts/CreateInjectorContract';
+import InjectorContractPopover from './injector_contracts/InjectorContractPopover';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -103,7 +104,7 @@ const InjectorContracts = () => {
   const dispatch = useDispatch();
   const { injectorId } = useParams();
   const { t, tPick, nsdt } = useFormatter();
-  const { injector, attackPatternsMap, killChainPhasesMap } = useHelper((helper) => ({
+  const { injector, attackPatternsMap, killChainPhasesMap } = useHelper(helper => ({
     injector: helper.getInjector(injectorId),
     attackPatternsMap: helper.getAttackPatternsMap(),
     killChainPhasesMap: helper.getKillChainPhasesMap(),
@@ -174,18 +175,18 @@ const InjectorContracts = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponent
                 headers={headers}
                 inlineStylesHeaders={headerStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-            }
+            )}
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {injectorContracts.map((injectorContract) => (
+        {injectorContracts.map(injectorContract => (
           <ListItem
             key={injectorContract.injector_contract_id}
             classes={{ root: classes.item }}
@@ -195,7 +196,7 @@ const InjectorContracts = () => {
               <SmartButtonOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   <div
                     className={classes.bodyItem}
@@ -209,8 +210,8 @@ const InjectorContracts = () => {
                   >
                     {
                       R.uniq(injectorContract.injector_contract_attack_patterns.map(
-                        (n) => attackPatternsMap[n]?.attack_pattern_kill_chain_phases ?? [],
-                      ).flat().map((o) => killChainPhasesMap[o]?.phase_kill_chain_name ?? '')).map((killChain) => {
+                        n => attackPatternsMap[n]?.attack_pattern_kill_chain_phases ?? [],
+                      ).flat().map(o => killChainPhasesMap[o]?.phase_kill_chain_name ?? '')).map((killChain) => {
                         return (
                           <Chip
                             key={killChain}
@@ -228,7 +229,7 @@ const InjectorContracts = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.attack_patterns}
                   >
-                    {injectorContract.injector_contract_attack_patterns.map((n) => `[${attackPatternsMap[n]?.attack_pattern_external_id ?? ''}] ${attackPatternsMap[n]?.attack_pattern_name ?? ''}`).join(', ')}
+                    {injectorContract.injector_contract_attack_patterns.map(n => `[${attackPatternsMap[n]?.attack_pattern_external_id ?? ''}] ${attackPatternsMap[n]?.attack_pattern_name ?? ''}`).join(', ')}
                   </div>
                   <div
                     className={classes.bodyItem}
@@ -237,14 +238,14 @@ const InjectorContracts = () => {
                     {nsdt(injectorContract.injector_contract_updated_at)}
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <InjectorContractPopover
                 injectorContract={injectorContract}
                 killChainPhasesMap={killChainPhasesMap}
                 attackPatternsMap={attackPatternsMap}
-                onUpdate={(result) => setInjectorContracts(injectorContracts.map((ic) => (ic.injector_contract_id !== result.injector_contract_id ? ic : result)))}
+                onUpdate={result => setInjectorContracts(injectorContracts.map(ic => (ic.injector_contract_id !== result.injector_contract_id ? ic : result)))}
               />
             </ListItemSecondaryAction>
           </ListItem>

@@ -1,5 +1,9 @@
 import { createContext, ReactElement } from 'react';
+
 import type { ArticleStore, FullArticleStore } from '../../../actions/channels/Article';
+import type { InjectOutputType, InjectStore } from '../../../actions/injects/Inject';
+import type { TeamStore } from '../../../actions/teams/Team';
+import { Page } from '../../../components/common/queryable/Page';
 import type {
   ArticleCreateInput,
   ArticleUpdateInput,
@@ -31,12 +35,9 @@ import type {
   VariableInput,
 } from '../../../utils/api-types';
 import type { UserStore } from '../teams/players/Player';
-import type { InjectOutputType, InjectStore } from '../../../actions/injects/Inject';
-import { Page } from '../../../components/common/queryable/Page';
-import type { TeamStore } from '../../../actions/teams/Team';
 
 export type PermissionsContextType = {
-  permissions: { readOnly: boolean, canWrite: boolean, isRunning: boolean }
+  permissions: { readOnly: boolean; canWrite: boolean; isRunning: boolean };
 };
 
 export type ArticleContextType = {
@@ -47,82 +48,82 @@ export type ArticleContextType = {
 };
 
 export type ChallengeContextType = {
-  previewChallengeUrl: () => string
+  previewChallengeUrl: () => string;
 };
 
 export type DocumentContextType = {
   onInitDocument: () => {
-    document_tags: { id: string, label: string }[],
-    document_exercises: { id: string, label: string }[],
-    document_scenarios: { id: string, label: string }[]
-  }
+    document_tags: { id: string; label: string }[];
+    document_exercises: { id: string; label: string }[];
+    document_scenarios: { id: string; label: string }[];
+  };
 };
 
 export type VariableContextType = {
-  onCreateVariable: (data: VariableInput) => void,
-  onEditVariable: (variable: Variable, data: VariableInput) => void,
-  onDeleteVariable: (variable: Variable) => void,
+  onCreateVariable: (data: VariableInput) => void;
+  onEditVariable: (variable: Variable, data: VariableInput) => void;
+  onDeleteVariable: (variable: Variable) => void;
 };
 
 export type ReportContextType = {
-  onDeleteReport: (report: Report) => void,
-  onUpdateReport: (reportId: Report['report_id'], report: ReportInput) => void
-  renderReportForm: (onSubmitForm: (data: ReportInput) => void, onHandleCancel: () => void, report: Report) => ReactElement,
+  onDeleteReport: (report: Report) => void;
+  onUpdateReport: (reportId: Report['report_id'], report: ReportInput) => void;
+  renderReportForm: (onSubmitForm: (data: ReportInput) => void, onHandleCancel: () => void, report: Report) => ReactElement;
 };
 
 export type TeamContextType = {
-  onAddUsersTeam?: (teamId: Team['team_id'], userIds: UserStore['user_id'][]) => Promise<void>,
-  onRemoveUsersTeam?: (teamId: Team['team_id'], userIds: UserStore['user_id'][]) => Promise<void>,
-  onAddTeam?: (teamId: Team['team_id']) => Promise<void>,
-  onCreateTeam?: (team: TeamCreateInput) => Promise<{ result: string }>,
-  onRemoveTeam?: (teamId: Team['team_id']) => void,
-  onReplaceTeam?: (teamIds: Team['team_id'][]) => Promise<{ result: string[], entities: { teams: Record<string, TeamStore> } }>,
-  onToggleUser?: (teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean) => void,
-  checkUserEnabled?: (teamId: Team['team_id'], userId: UserStore['user_id']) => boolean,
-  computeTeamUsersEnabled?: (teamId: Team['team_id']) => number,
-  searchTeams: (input: SearchPaginationInput, contextualOnly?: boolean) => Promise<{ data: Page<TeamOutput> }>,
+  onAddUsersTeam?: (teamId: Team['team_id'], userIds: UserStore['user_id'][]) => Promise<void>;
+  onRemoveUsersTeam?: (teamId: Team['team_id'], userIds: UserStore['user_id'][]) => Promise<void>;
+  onAddTeam?: (teamId: Team['team_id']) => Promise<void>;
+  onCreateTeam?: (team: TeamCreateInput) => Promise<{ result: string }>;
+  onRemoveTeam?: (teamId: Team['team_id']) => void;
+  onReplaceTeam?: (teamIds: Team['team_id'][]) => Promise<{ result: string[]; entities: { teams: Record<string, TeamStore> } }>;
+  onToggleUser?: (teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean) => void;
+  checkUserEnabled?: (teamId: Team['team_id'], userId: UserStore['user_id']) => boolean;
+  computeTeamUsersEnabled?: (teamId: Team['team_id']) => number;
+  searchTeams: (input: SearchPaginationInput, contextualOnly?: boolean) => Promise<{ data: Page<TeamOutput> }>;
 };
 
 export type InjectContextType = {
-  searchInjects: (input: SearchPaginationInput) => Promise<{ data: Page<InjectOutputType> }>,
-  onAddInject: (inject: Inject) => Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }>,
-  onBulkUpdateInject: (injectId: Inject['inject_id'], inject: Inject) => Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }>,
-  onUpdateInject: (injectId: Inject['inject_id'], inject: Inject) => Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }>,
-  onUpdateInjectTrigger?: (injectId: Inject['inject_id']) => Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }>,
+  searchInjects: (input: SearchPaginationInput) => Promise<{ data: Page<InjectOutputType> }>;
+  onAddInject: (inject: Inject) => Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }>;
+  onBulkUpdateInject: (injectId: Inject['inject_id'], inject: Inject) => Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }>;
+  onUpdateInject: (injectId: Inject['inject_id'], inject: Inject) => Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }>;
+  onUpdateInjectTrigger?: (injectId: Inject['inject_id']) => Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }>;
   onUpdateInjectActivation: (injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }) => Promise<{
-    result: string,
-    entities: { injects: Record<string, InjectStore> }
-  }>,
-  onInjectDone?: (injectId: Inject['inject_id']) => Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }>,
-  onDeleteInject: (injectId: Inject['inject_id']) => Promise<void>,
-  onImportInjectFromXls?: (importId: string, input: InjectsImportInput) => Promise<ImportTestSummary>
-  onDryImportInjectFromXls?: (importId: string, input: InjectsImportInput) => Promise<ImportTestSummary>
-  onBulkDeleteInjects: (injectIds: string[]) => void
-  bulkTestInjects: (injectIds: string[]) => Promise<{ uri: string, data: InjectTestStatus[] }>
+    result: string;
+    entities: { injects: Record<string, InjectStore> };
+  }>;
+  onInjectDone?: (injectId: Inject['inject_id']) => Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }>;
+  onDeleteInject: (injectId: Inject['inject_id']) => Promise<void>;
+  onImportInjectFromXls?: (importId: string, input: InjectsImportInput) => Promise<ImportTestSummary>;
+  onDryImportInjectFromXls?: (importId: string, input: InjectsImportInput) => Promise<ImportTestSummary>;
+  onBulkDeleteInjects: (injectIds: string[]) => void;
+  bulkTestInjects: (injectIds: string[]) => Promise<{ uri: string; data: InjectTestStatus[] }>;
 };
 export type LessonContextType = {
-  onApplyLessonsTemplate: (data: string) => Promise<LessonsCategory[]>,
-  onResetLessonsAnswers?: () => Promise<LessonsCategory[]>,
-  onEmptyLessonsCategories: () => Promise<LessonsCategory[]>,
-  onUpdateSourceLessons: (data: boolean) => Promise<{ result: string }>,
-  onSendLessons?: (data: LessonsSendInput) => void,
-  onAddLessonsCategory: (data: LessonsCategoryCreateInput) => Promise<LessonsCategory>,
-  onDeleteLessonsCategory: (data: string) => void,
-  onUpdateLessonsCategory: (lessonCategoryId: string, data: LessonsCategoryUpdateInput) => Promise<LessonsCategory>,
-  onUpdateLessonsCategoryTeams: (lessonCategoryId: string, data: LessonsCategoryTeamsInput) => Promise<LessonsCategory>,
-  onDeleteLessonsQuestion: (lessonsCategoryId: string, lessonsQuestionId: string) => void,
-  onUpdateLessonsQuestion: (lessonsCategoryId: string, lessonsQuestionId: string, data: LessonsQuestionUpdateInput) => Promise<LessonsQuestion>,
-  onAddLessonsQuestion: (lessonsCategoryId: string, data: LessonsQuestionCreateInput) => Promise<LessonsQuestion>,
-  onAddObjective: (data: ObjectiveInput) => Promise<Objective>,
-  onUpdateObjective: (objectiveId: string, data: ObjectiveInput) => Promise<Objective>,
-  onDeleteObjective: (objectiveId: string) => void,
-  onAddEvaluation: (objectiveId: string, data: EvaluationInput) => Promise<Evaluation>,
-  onUpdateEvaluation: (objectiveId: string, evaluationId: string, data: EvaluationInput) => Promise<Evaluation>,
-  onFetchEvaluation: (objectiveId: string) => Promise<Evaluation[]>,
+  onApplyLessonsTemplate: (data: string) => Promise<LessonsCategory[]>;
+  onResetLessonsAnswers?: () => Promise<LessonsCategory[]>;
+  onEmptyLessonsCategories: () => Promise<LessonsCategory[]>;
+  onUpdateSourceLessons: (data: boolean) => Promise<{ result: string }>;
+  onSendLessons?: (data: LessonsSendInput) => void;
+  onAddLessonsCategory: (data: LessonsCategoryCreateInput) => Promise<LessonsCategory>;
+  onDeleteLessonsCategory: (data: string) => void;
+  onUpdateLessonsCategory: (lessonCategoryId: string, data: LessonsCategoryUpdateInput) => Promise<LessonsCategory>;
+  onUpdateLessonsCategoryTeams: (lessonCategoryId: string, data: LessonsCategoryTeamsInput) => Promise<LessonsCategory>;
+  onDeleteLessonsQuestion: (lessonsCategoryId: string, lessonsQuestionId: string) => void;
+  onUpdateLessonsQuestion: (lessonsCategoryId: string, lessonsQuestionId: string, data: LessonsQuestionUpdateInput) => Promise<LessonsQuestion>;
+  onAddLessonsQuestion: (lessonsCategoryId: string, data: LessonsQuestionCreateInput) => Promise<LessonsQuestion>;
+  onAddObjective: (data: ObjectiveInput) => Promise<Objective>;
+  onUpdateObjective: (objectiveId: string, data: ObjectiveInput) => Promise<Objective>;
+  onDeleteObjective: (objectiveId: string) => void;
+  onAddEvaluation: (objectiveId: string, data: EvaluationInput) => Promise<Evaluation>;
+  onUpdateEvaluation: (objectiveId: string, evaluationId: string, data: EvaluationInput) => Promise<Evaluation>;
+  onFetchEvaluation: (objectiveId: string) => Promise<Evaluation[]>;
 };
 export type ViewLessonContextType = {
-  onAddLessonsAnswers?: (questionCategory: string, lessonsQuestionId: string, answerData: LessonsAnswerCreateInput) => Promise<LessonsAnswer>,
-  onFetchPlayerLessonsAnswers?: () => Promise<LessonsAnswer[]>,
+  onAddLessonsAnswers?: (questionCategory: string, lessonsQuestionId: string, answerData: LessonsAnswerCreateInput) => Promise<LessonsAnswer>;
+  onFetchPlayerLessonsAnswers?: () => Promise<LessonsAnswer[]>;
 };
 
 export const PermissionsContext = createContext<PermissionsContextType>({
@@ -151,7 +152,7 @@ export const DocumentContext = createContext<DocumentContextType>({
   onInitDocument(): {
     document_tags: { id: string; label: string }[];
     document_exercises: { id: string; label: string }[];
-    document_scenarios: { id: string; label: string }[]
+    document_scenarios: { id: string; label: string }[];
   } {
     return { document_exercises: [], document_scenarios: [], document_tags: [] };
   },
@@ -191,25 +192,25 @@ export const InjectContext = createContext<InjectContextType>({
     return new Promise<{ data: Page<InjectOutputType> }>(() => {
     });
   },
-  onAddInject(_inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
+  onAddInject(_inject: Inject): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
     return Promise.resolve({ result: '', entities: { injects: {} } });
   },
-  onBulkUpdateInject(_injectId: Inject['inject_id'], _inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
+  onBulkUpdateInject(_injectId: Inject['inject_id'], _inject: Inject): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
     return Promise.resolve({ result: '', entities: { injects: {} } });
   },
-  onUpdateInject(_injectId: Inject['inject_id'], _inject: Inject): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
+  onUpdateInject(_injectId: Inject['inject_id'], _inject: Inject): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
     return Promise.resolve({ result: '', entities: { injects: {} } });
   },
-  onUpdateInjectTrigger(_injectId: Inject['inject_id']): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
+  onUpdateInjectTrigger(_injectId: Inject['inject_id']): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
     return Promise.resolve({ result: '', entities: { injects: {} } });
   },
   onUpdateInjectActivation(_injectId: Inject['inject_id'], _injectEnabled: { inject_enabled: boolean }): Promise<{
-    result: string,
-    entities: { injects: Record<string, InjectStore> }
+    result: string;
+    entities: { injects: Record<string, InjectStore> };
   }> {
     return Promise.resolve({ result: '', entities: { injects: {} } });
   },
-  onInjectDone(_injectId: Inject['inject_id']): Promise<{ result: string, entities: { injects: Record<string, InjectStore> } }> {
+  onInjectDone(_injectId: Inject['inject_id']): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
     return Promise.resolve({ result: '', entities: { injects: {} } });
   },
   onDeleteInject(_injectId: Inject['inject_id']): Promise<void> {
@@ -225,8 +226,8 @@ export const InjectContext = createContext<InjectContextType>({
   },
   onBulkDeleteInjects(_injectIds: string[]): void {
   },
-  bulkTestInjects(_injectIds: string[]): Promise<{ uri: string, data: InjectTestStatus[] }> {
-    return new Promise<{ uri: string, data: InjectTestStatus[] }>(() => {
+  bulkTestInjects(_injectIds: string[]): Promise<{ uri: string; data: InjectTestStatus[] }> {
+    return new Promise<{ uri: string; data: InjectTestStatus[] }>(() => {
     });
   },
 });

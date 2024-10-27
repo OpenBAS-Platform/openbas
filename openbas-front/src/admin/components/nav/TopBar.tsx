@@ -1,27 +1,28 @@
+import { AccountCircleOutlined, AppsOutlined, ImportantDevicesOutlined, NotificationsOutlined } from '@mui/icons-material';
+import { AppBar, Badge, Box, Grid, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
 import { useEffect, useState } from 'react';
 import * as React from 'react';
-import { AppBar, Badge, Box, Grid, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { AccountCircleOutlined, AppsOutlined, ImportantDevicesOutlined, NotificationsOutlined } from '@mui/icons-material';
-import { makeStyles, useTheme } from '@mui/styles';
+
 import { logout } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';
-import type { Theme } from '../../../components/Theme';
-import { useAppDispatch } from '../../../utils/hooks';
-import { MESSAGING$ } from '../../../utils/Environment';
 import SearchInput from '../../../components/SearchFilter';
-import octiDark from '../../../static/images/xtm/octi_dark.png';
-import octiLight from '../../../static/images/xtm/octi_light.png';
+import type { Theme } from '../../../components/Theme';
+import { computeBannerSettings } from '../../../public/components/systembanners/utils';
 import obasDark from '../../../static/images/xtm/obas_dark.png';
 import obasLight from '../../../static/images/xtm/obas_light.png';
+import octiDark from '../../../static/images/xtm/octi_dark.png';
+import octiLight from '../../../static/images/xtm/octi_light.png';
 import oermDark from '../../../static/images/xtm/oerm_dark.png';
 import oermLight from '../../../static/images/xtm/oerm_light.png';
 import omtdDark from '../../../static/images/xtm/omtd_dark.png';
 import omtdLight from '../../../static/images/xtm/omtd_light.png';
+import { MESSAGING$ } from '../../../utils/Environment';
+import { useAppDispatch } from '../../../utils/hooks';
 import useAuth from '../../../utils/hooks/useAuth';
-import { computeBannerSettings } from '../../../public/components/systembanners/utils';
 
-const useStyles = makeStyles<Theme>((theme) => ({
+const useStyles = makeStyles<Theme>(theme => ({
   appBar: {
     width: '100%',
     zIndex: theme.zIndex.drawer + 1,
@@ -67,11 +68,11 @@ const useStyles = makeStyles<Theme>((theme) => ({
     marginBottom: 20,
   },
   xtmItem: {
-    display: 'block',
-    color: theme.palette.text?.primary,
-    textAlign: 'center',
-    padding: '15px 0 10px 0',
-    borderRadius: 4,
+    'display': 'block',
+    'color': theme.palette.text?.primary,
+    'textAlign': 'center',
+    'padding': '15px 0 10px 0',
+    'borderRadius': 4,
     '&:hover': {
       backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
     },
@@ -239,9 +240,12 @@ const TopBar: React.FC = () => {
                 <Grid container={true} spacing={3}>
                   <Grid item={true} xs={6}>
                     <Tooltip title={settings.xtm_opencti_enable && settings.xtm_opencti_url ? t('Platform connected') : t('Get OpenCTI now')}>
-                      <a className={classes.xtmItem}
+                      <a
+                        className={classes.xtmItem}
                         href={settings.xtm_opencti_enable && settings.xtm_opencti_url ? settings.xtm_opencti_url : 'https://filigran.io'}
-                        target="_blank" rel="noreferrer" onClick={handleCloseXtm}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={handleCloseXtm}
                       >
                         <Badge variant="dot" color={settings.xtm_opencti_enable && settings.xtm_opencti_url ? 'success' : 'warning'}>
                           <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? octiDark : octiLight} alt="OCTI" />
@@ -293,7 +297,8 @@ const TopBar: React.FC = () => {
             >
               <AccountCircleOutlined fontSize="medium" />
             </IconButton>
-            <Menu id="menu-appbar"
+            <Menu
+              id="menu-appbar"
               anchorEl={menuOpen.anchorEl}
               open={menuOpen.open}
               onClose={handleCloseMenu}

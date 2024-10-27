@@ -1,16 +1,17 @@
-import { FunctionComponent, useContext } from 'react';
-import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { FunctionComponent, useContext } from 'react';
+import { Form } from 'react-final-form';
 import { z } from 'zod';
+
+import type { TeamInputForm } from '../../../../actions/teams/Team';
+import CheckboxField from '../../../../components/CheckboxField';
 import OldTextField from '../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
-import TagField from '../../../../components/TagField';
 import OrganizationField from '../../../../components/OrganizationField';
+import TagField from '../../../../components/TagField';
 import type { Theme } from '../../../../components/Theme';
-import type { TeamInputForm } from '../../../../actions/teams/Team';
 import { schemaValidator } from '../../../../utils/Zod';
-import CheckboxField from '../../../../components/CheckboxField';
 import { TeamContext, TeamContextType } from '../../common/Context';
 
 const useStyles = makeStyles((theme: Theme) => ({

@@ -1,26 +1,27 @@
-import { makeStyles } from '@mui/styles';
-import { Chip, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
-import { useDispatch } from 'react-redux';
 import { CastOutlined, CheckCircleOutlineOutlined, PersonOutlined } from '@mui/icons-material';
+import { Chip, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import SearchFilter from '../../../../../components/SearchFilter';
+
+import { fetchDryinjects } from '../../../../../actions/Dryinject';
+import { fetchDryrun } from '../../../../../actions/Dryrun';
 import { fetchTags } from '../../../../../actions/Tag';
 import { fetchPlayers } from '../../../../../actions/User';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { useHelper } from '../../../../../store';
-import useSearchAnFilter from '../../../../../utils/SortingFiltering';
-import { fetchDryrun } from '../../../../../actions/Dryrun';
 import { useFormatter } from '../../../../../components/i18n';
-import DryrunStatus from './DryrunStatus';
-import { fetchDryinjects } from '../../../../../actions/Dryinject';
+import ItemStatus from '../../../../../components/ItemStatus';
+import SearchFilter from '../../../../../components/SearchFilter';
+import { useHelper } from '../../../../../store';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import useSearchAnFilter from '../../../../../utils/SortingFiltering';
+import { resolveUserName } from '../../../../../utils/String';
 import InjectIcon from '../../../common/injects/InjectIcon';
 import InjectorContract from '../../../common/injects/InjectorContract';
 import InjectStatusDetails from '../../../common/injects/InjectStatusDetails';
-import { resolveUserName } from '../../../../../utils/String';
 import DryrunProgress from './DryrunProgress';
-import ItemStatus from '../../../../../components/ItemStatus';
+import DryrunStatus from './DryrunStatus';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   parameters: {
     padding: '20px 15px 0 15px',
     float: 'left',
@@ -207,7 +208,7 @@ const Dryrun = () => {
                   {t('Dryrun recipients')}
                 </Typography>
                 <List>
-                  {users.map((user) => (
+                  {users.map(user => (
                     <ListItem
                       key={user.user_id}
                       divider={true}
@@ -287,7 +288,7 @@ const Dryrun = () => {
               </span>
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   {filtering.buildHeader(
                     'dryinject_type',
@@ -320,7 +321,7 @@ const Dryrun = () => {
                     headerStyles,
                   )}
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
@@ -335,10 +336,10 @@ const Dryrun = () => {
                 disabled={!dryinject.dryinject_inject.inject_enabled}
               >
                 <ListItemIcon style={{ paddingTop: 5 }}>
-                  <InjectIcon type={dryinject.dryinject_inject.inject_type} disabled={!dryinject.dryinject_inject.inject_enabled}/>
+                  <InjectIcon type={dryinject.dryinject_inject.inject_type} disabled={!dryinject.dryinject_inject.inject_enabled} />
                 </ListItemIcon>
                 <ListItemText
-                  primary={
+                  primary={(
                     <div>
                       <div
                         className={classes.bodyItem}
@@ -385,15 +386,18 @@ const Dryrun = () => {
                           float: 'left',
                         }}
                       >
-                        {fndt(dryinject.dryinject_status?.status_date)} (
+                        {fndt(dryinject.dryinject_status?.status_date)}
+                        {' '}
+                        (
                         {dryinject.dryinject_status
-                          && (
-                            dryinject.dryinject_status.status_execution / 1000
-                          ).toFixed(2)}
-                        {t('s')})
+                        && (
+                          dryinject.dryinject_status.status_execution / 1000
+                        ).toFixed(2)}
+                        {t('s')}
+                        )
                       </div>
                     </div>
-                  }
+                  )}
                 />
                 <ListItemSecondaryAction>
                   <InjectStatusDetails status={dryinject.dryinject_status} />

@@ -1,5 +1,6 @@
 import { normalize, schema } from 'normalizr';
 import { useEffect } from 'react';
+
 import { DATA_DELETE_SUCCESS } from '../../constants/ActionTypes';
 import { store } from '../../store';
 import { buildUri } from '../Action';
@@ -35,7 +36,7 @@ const useDataLoader = (loader = () => {}, refetchArg = []) => {
     }, EVENT_TRY_DELAY);
     sseClient.addEventListener('open', () => {
       pristine = false;
-      [...listeners.keys()].forEach((load) => load());
+      [...listeners.keys()].forEach(load => load());
     });
     sseClient.addEventListener('message', (event) => {
       const data = JSON.parse(event.data);

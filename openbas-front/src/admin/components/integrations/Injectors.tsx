@@ -1,18 +1,19 @@
+import { AutoModeOutlined, SubscriptionsOutlined } from '@mui/icons-material';
+import { Card, CardActionArea, CardContent, Chip, Grid, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { Link } from 'react-router-dom';
-import { Card, CardActionArea, CardContent, Chip, Grid, Tooltip, Typography } from '@mui/material';
-import { AutoModeOutlined, SubscriptionsOutlined } from '@mui/icons-material';
-import { useFormatter } from '../../../components/i18n';
-import { useHelper } from '../../../store';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
-import { useAppDispatch } from '../../../utils/hooks';
-import type { Injector } from '../../../utils/api-types';
-import type { InjectorHelper } from '../../../actions/injectors/injector-helper';
+
 import { fetchInjectors } from '../../../actions/Injectors';
-import useSearchAnFilter from '../../../utils/SortingFiltering';
+import type { InjectorHelper } from '../../../actions/injectors/injector-helper';
+import Breadcrumbs from '../../../components/Breadcrumbs';
+import { useFormatter } from '../../../components/i18n';
 import SearchFilter from '../../../components/SearchFilter';
 import type { Theme } from '../../../components/Theme';
-import Breadcrumbs from '../../../components/Breadcrumbs';
+import { useHelper } from '../../../store';
+import type { Injector } from '../../../utils/api-types';
+import { useAppDispatch } from '../../../utils/hooks';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
+import useSearchAnFilter from '../../../utils/SortingFiltering';
 
 const useStyles = makeStyles((theme: Theme) => ({
   parameters: {
@@ -138,9 +139,9 @@ const Injectors = () => {
                     />
                     <div style={{ display: 'flex', marginTop: 30 }}>
                       {
-                    (injector.injector_external && injector.injector_updated_at) || !injector.injector_external
-                      ? <div className={classes.dotGreen} /> : <div className={classes.dotRed} />
-                  }
+                        (injector.injector_external && injector.injector_updated_at) || !injector.injector_external
+                          ? <div className={classes.dotGreen} /> : <div className={classes.dotRed} />
+                      }
                       <Typography
                         variant="h4"
                         style={{
@@ -150,19 +151,25 @@ const Injectors = () => {
                           textOverflow: 'ellipsis',
                         }}
                       >
-                        {t('Updated at')} {nsdt(injector.injector_updated_at)}
+                        {t('Updated at')}
+                        {' '}
+                        {nsdt(injector.injector_updated_at)}
                       </Typography>
                     </div>
-                    {injector.injector_custom_contracts && <div className={classes.customizable}>
-                      <Tooltip title={t('Supporting adding new contracts')}>
-                        <AutoModeOutlined color="success" />
-                      </Tooltip>
-                    </div>}
-                    {injector.injector_payloads && <div className={classes.payload} style={{ right: injector.injector_custom_contracts ? 40 : 10 }}>
-                      <Tooltip title={t('Supporting payloads')}>
-                        <SubscriptionsOutlined color="success" />
-                      </Tooltip>
-                    </div>}
+                    {injector.injector_custom_contracts && (
+                      <div className={classes.customizable}>
+                        <Tooltip title={t('Supporting adding new contracts')}>
+                          <AutoModeOutlined color="success" />
+                        </Tooltip>
+                      </div>
+                    )}
+                    {injector.injector_payloads && (
+                      <div className={classes.payload} style={{ right: injector.injector_custom_contracts ? 40 : 10 }}>
+                        <Tooltip title={t('Supporting payloads')}>
+                          <SubscriptionsOutlined color="success" />
+                        </Tooltip>
+                      </div>
+                    )}
                   </CardContent>
                 </CardActionArea>
               </Card>

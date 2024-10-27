@@ -1,4 +1,4 @@
-import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayRemove, UseFormReturn } from 'react-hook-form';
+import { DeleteOutlined, ExpandMore } from '@mui/icons-material';
 import {
   Accordion,
   AccordionActions,
@@ -16,18 +16,19 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { DeleteOutlined, ExpandMore } from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
+import classNames from 'classnames';
 import { CogOutline, InformationOutline } from 'mdi-material-ui';
 import { useEffect, useState } from 'react';
 import * as React from 'react';
-import { makeStyles } from '@mui/styles';
-import classNames from 'classnames';
+import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayRemove, UseFormReturn } from 'react-hook-form';
+
+import type { ContractElement, InjectorContractConverted } from '../../../../../actions/injector_contracts/InjectorContract';
 import { directFetchInjectorContract } from '../../../../../actions/InjectorContracts';
-import InjectContractComponent from '../../../../../components/InjectContractComponent';
 import { useFormatter } from '../../../../../components/i18n';
+import InjectContractComponent from '../../../../../components/InjectContractComponent';
 import RegexComponent from '../../../../../components/RegexComponent';
 import type { ImportMapperAddInput } from '../../../../../utils/api-types';
-import type { ContractElement, InjectorContractConverted } from '../../../../../actions/injector_contracts/InjectorContract';
 
 const useStyles = makeStyles(() => ({
   rulesArray: {
@@ -80,7 +81,7 @@ const RulesContractContent: React.FC<Props> = ({
   const [injectorContractLabel, setInjectorContractLabel] = useState<string | undefined>(undefined);
 
   const isMandatoryField = (fieldKey: string) => {
-    return ['title'].includes(fieldKey) || contractFields.find((f) => f.key === fieldKey)?.mandatory;
+    return ['title'].includes(fieldKey) || contractFields.find(f => f.key === fieldKey)?.mandatory;
   };
 
   const addRules = (contractFieldKeys: string[]) => {
@@ -127,12 +128,12 @@ const RulesContractContent: React.FC<Props> = ({
   useEffect(() => {
     if (methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_injector_contract`)) {
       directFetchInjectorContract(methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_injector_contract`)).then((result: {
-        data: InjectorContractConverted
+        data: InjectorContractConverted;
       }) => {
         const injectorContract = result.data;
         setInjectorContractLabel(tPick(injectorContract.injector_contract_labels));
         const tmp = injectorContract?.convertedContent?.fields
-          .filter((f) => !['checkbox', 'attachment', 'expectation'].includes(f.type));
+          .filter(f => !['checkbox', 'attachment', 'expectation'].includes(f.type));
         setContractFields(tmp);
       });
     }
@@ -143,9 +144,9 @@ const RulesContractContent: React.FC<Props> = ({
       const injectorContract = result.data;
       setInjectorContractLabel(tPick(injectorContract.injector_contract_labels));
       const tmp = injectorContract?.convertedContent?.fields
-        .filter((f) => !['checkbox', 'attachment', 'expectation'].includes(f.type));
+        .filter(f => !['checkbox', 'attachment', 'expectation'].includes(f.type));
       setContractFields(tmp);
-      const contractFieldKeys = tmp.map((f) => f.key);
+      const contractFieldKeys = tmp.map(f => f.key);
       rulesRemove();
       addRules(contractFieldKeys);
     });
@@ -184,7 +185,10 @@ const RulesContractContent: React.FC<Props> = ({
         >
           <div className={classes.container}>
             <Typography>
-              #{index + 1} {injectorContractLabel ?? t('New representation')}
+              #
+              {index + 1}
+              {' '}
+              {injectorContractLabel ?? t('New representation')}
             </Typography>
             <Tooltip title={t('Delete')}>
               <IconButton color="error" onClick={handleClickOpenAlertDelete}>
@@ -236,45 +240,54 @@ const RulesContractContent: React.FC<Props> = ({
           {rulesFields.map((ruleField, rulesIndex) => {
             let cogIcon;
             if (ruleField.rule_attribute_name === 'trigger_time') {
-              cogIcon = <Badge
-                color="secondary" variant="dot"
-                invisible={(!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
-                          || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0)
-                      && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern`)
-                          || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.timePattern?.length === 0)}
-                        >
-                <CogOutline />
-              </Badge>;
+              cogIcon = (
+                <Badge
+                  color="secondary"
+                  variant="dot"
+                  invisible={(!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
+                    || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0)
+                    && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern`)
+                      || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.timePattern?.length === 0)}
+                >
+                  <CogOutline />
+                </Badge>
+              );
             } else if (ruleField.rule_attribute_name === 'teams') {
-              cogIcon = <Badge
-                color="secondary" variant="dot"
-                invisible={(!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
-                          || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0)
-                      && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.allTeamsValue`)
-                          || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.allTeamsValue?.length === 0)}
-                        >
-                <CogOutline />
-              </Badge>;
+              cogIcon = (
+                <Badge
+                  color="secondary"
+                  variant="dot"
+                  invisible={(!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
+                    || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0)
+                    && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.allTeamsValue`)
+                      || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.allTeamsValue?.length === 0)}
+                >
+                  <CogOutline />
+                </Badge>
+              );
             } else {
-              cogIcon = <Badge
-                color="secondary" variant="dot"
-                invisible={!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
-                        || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0}
-                        >
-                <CogOutline />
-              </Badge>;
+              cogIcon = (
+                <Badge
+                  color="secondary"
+                  variant="dot"
+                  invisible={!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
+                  || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0}
+                >
+                  <CogOutline />
+                </Badge>
+              );
             }
             return (
               <div key={ruleField.id} style={{ marginTop: 20 }}>
                 <div className={classes.rulesArray}>
                   <Typography
                     style={{ textTransform: 'capitalize' }}
-                    variant="body1" {...methods.register(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_name` as const)}
+                    variant="body1"
+                    {...methods.register(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_name` as const)}
                   >
                     {t(ruleField.rule_attribute_name[0].toUpperCase() + ruleField.rule_attribute_name.slice(1))}
                     {isMandatoryField(ruleField.rule_attribute_name)
-                      && <span className={classes.redStar}>*</span>
-                    }
+                    && <span className={classes.redStar}>*</span>}
                   </Typography>
                   <Controller
                     control={control}
@@ -296,12 +309,13 @@ const RulesContractContent: React.FC<Props> = ({
                   </IconButton>
                 </div>
                 {currentRuleIndex !== null
-                  && <Dialog
+                && (
+                  <Dialog
                     open
                     PaperProps={{ elevation: 1 }}
                     BackdropProps={{ style: { backgroundColor: 'transparent' } }}
                     onClose={handleDefaultValueClose}
-                     >
+                  >
                     <DialogTitle>
                       {t('Attribute mapping configuration')}
                     </DialogTitle>
@@ -311,8 +325,9 @@ const RulesContractContent: React.FC<Props> = ({
                         label={t('Default value')}
                         inputProps={methods.register(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_default_value`)}
                       />
-                      {currentRuleIndex === rulesFields.findIndex((r) => r.rule_attribute_name === 'trigger_time')
-                        && <div style={{ display: 'flex', alignItems: 'end', gap: '8px' }}>
+                      {currentRuleIndex === rulesFields.findIndex(r => r.rule_attribute_name === 'trigger_time')
+                      && (
+                        <div style={{ display: 'flex', alignItems: 'end', gap: '8px' }}>
                           <TextField
                             label={t('Time pattern')}
                             fullWidth
@@ -331,28 +346,29 @@ const RulesContractContent: React.FC<Props> = ({
                             />
                           </Tooltip>
                         </div>
-                      }
-                      {currentRuleIndex === rulesFields.findIndex((r) => r.rule_attribute_name === 'teams')
-                          && <div style={{ display: 'flex', alignItems: 'end', gap: '8px' }}>
-                            <TextField
-                              label={t('All teams value')}
-                              fullWidth
-                              style={{ marginTop: 10 }}
-                              inputProps={methods.register(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_additional_config.allTeamsValue`)}
+                      )}
+                      {currentRuleIndex === rulesFields.findIndex(r => r.rule_attribute_name === 'teams')
+                      && (
+                        <div style={{ display: 'flex', alignItems: 'end', gap: '8px' }}>
+                          <TextField
+                            label={t('All teams value')}
+                            fullWidth
+                            style={{ marginTop: 10 }}
+                            inputProps={methods.register(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_additional_config.allTeamsValue`)}
+                          />
+                          <Tooltip
+                            title={t(
+                              'Value that signifies all teams are targeted. A regex can be used.',
+                            )}
+                          >
+                            <InformationOutline
+                              fontSize="medium"
+                              color="primary"
+                              style={{ cursor: 'default' }}
                             />
-                            <Tooltip
-                              title={t(
-                                'Value that signifies all teams are targeted. A regex can be used.',
-                              )}
-                            >
-                              <InformationOutline
-                                fontSize="medium"
-                                color="primary"
-                                style={{ cursor: 'default' }}
-                              />
-                            </Tooltip>
-                          </div>
-                      }
+                          </Tooltip>
+                        </div>
+                      )}
                     </DialogContent>
                     <DialogActions>
                       <Button onClick={handleDefaultValueClose} autoFocus>
@@ -360,11 +376,10 @@ const RulesContractContent: React.FC<Props> = ({
                       </Button>
                     </DialogActions>
                   </Dialog>
-                }
+                )}
               </div>
             );
-          })
-          }
+          })}
 
         </AccordionDetails>
         <AccordionActions sx={{ padding: '16px' }}>
@@ -383,10 +398,12 @@ const RulesContractContent: React.FC<Props> = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseAlertDelete}>{t('Cancel')}</Button>
-          <Button color="secondary" onClick={() => {
-            remove(index);
-            handleCloseAlertDelete();
-          }}
+          <Button
+            color="secondary"
+            onClick={() => {
+              remove(index);
+              handleCloseAlertDelete();
+            }}
           >
             {t('Delete')}
           </Button>

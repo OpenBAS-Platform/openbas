@@ -1,16 +1,17 @@
+import { CopyAllOutlined } from '@mui/icons-material';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Alert, Button, Dialog, DialogActions, DialogContent, List, ListItem, ListItemButton, ListItemText, Tab } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useState } from 'react';
 import * as React from 'react';
-import { makeStyles } from '@mui/styles';
 import { Link } from 'react-router-dom';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { CopyAllOutlined } from '@mui/icons-material';
+
+import type { Contract } from '../../../../../actions/contract/contract';
+import type { UserHelper } from '../../../../../actions/helper';
 import Transition from '../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../components/i18n';
-import type { Variable } from '../../../../../utils/api-types';
 import { useHelper } from '../../../../../store';
-import type { UserHelper } from '../../../../../actions/helper';
-import type { Contract } from '../../../../../actions/contract/contract';
+import type { Variable } from '../../../../../utils/api-types';
 import { copyToClipboard } from '../../../../../utils/utils';
 
 interface VariableChildItemProps {
@@ -80,7 +81,7 @@ interface AvailableVariablesDialogProps {
 }
 
 const AvailableVariablesDialog: FunctionComponent<
-AvailableVariablesDialogProps
+  AvailableVariablesDialogProps
 > = ({ open, handleClose, variables, injectorContract, uriVariable }) => {
   const classes = useStyles();
   const { t } = useFormatter();
@@ -112,11 +113,13 @@ AvailableVariablesDialogProps
             label={t('Builtin variables')}
             value="1"
           />
-          {uriVariable && <Tab
-            sx={{ textTransform: 'none' }}
-            label={t('Custom variables')}
-            value="2"
-                          />}
+          {uriVariable && (
+            <Tab
+              sx={{ textTransform: 'none' }}
+              label={t('Custom variables')}
+              value="2"
+            />
+          )}
         </TabList>
         <DialogContent>
           <TabPanel
@@ -162,39 +165,41 @@ AvailableVariablesDialogProps
               })}
             </List>
           </TabPanel>
-          {uriVariable && <TabPanel
-            value="2"
-            style={{ maxHeight: '100%', overflow: 'auto', padding: 0 }}
-                          >
-            <Alert severity="info">
-              {t('Please follow this link to')}
-              {/* TODO: validate when migrate to new react router version */}
-              {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-              {/* @ts-ignore */}
-              <Button
-                component={Link}
-                to={uriVariable}
-                color="primary"
-                variant="text"
-                size="small"
-                className={classes.button}
-              >
-                {me.user_is_planner
-                  ? t('manage custom variables')
-                  : t('view custom variables')}
-              </Button>
-            </Alert>
-            <List>
-              {variables.map((variable) => (
-                <div key={variable.variable_key}>
-                  <VariableChildItem
-                    variableKey={variable.variable_key}
-                    variableValue={variable.variable_value}
-                  />
-                </div>
-              ))}
-            </List>
-          </TabPanel>}
+          {uriVariable && (
+            <TabPanel
+              value="2"
+              style={{ maxHeight: '100%', overflow: 'auto', padding: 0 }}
+            >
+              <Alert severity="info">
+                {t('Please follow this link to')}
+                {/* TODO: validate when migrate to new react router version */}
+                {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                {/* @ts-ignore */}
+                <Button
+                  component={Link}
+                  to={uriVariable}
+                  color="primary"
+                  variant="text"
+                  size="small"
+                  className={classes.button}
+                >
+                  {me.user_is_planner
+                    ? t('manage custom variables')
+                    : t('view custom variables')}
+                </Button>
+              </Alert>
+              <List>
+                {variables.map(variable => (
+                  <div key={variable.variable_key}>
+                    <VariableChildItem
+                      variableKey={variable.variable_key}
+                      variableValue={variable.variable_value}
+                    />
+                  </div>
+                ))}
+              </List>
+            </TabPanel>
+          )}
         </DialogContent>
       </TabContext>
 

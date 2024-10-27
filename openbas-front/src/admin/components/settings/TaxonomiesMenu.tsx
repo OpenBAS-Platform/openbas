@@ -1,9 +1,10 @@
+import { RouteOutlined, StyleOutlined } from '@mui/icons-material';
+import { Drawer, ListItemIcon, ListItemText, MenuItem, MenuList } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { LockPattern } from 'mdi-material-ui';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Drawer, MenuList, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
-import { LockPattern } from 'mdi-material-ui';
-import { StyleOutlined, RouteOutlined } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
+
 import { useFormatter } from '../../../components/i18n';
 import type { Theme } from '../../../components/Theme';
 
@@ -37,7 +38,7 @@ const DefinitionMenu: React.FC = () => {
       <MenuList component="nav">
         <MenuItem
           component={Link}
-          to='/admin/settings/taxonomies/tags'
+          to="/admin/settings/taxonomies/tags"
           selected={location.pathname === '/admin/settings/taxonomies/tags'}
           classes={{ root: classes.item }}
           dense={false}
@@ -49,7 +50,7 @@ const DefinitionMenu: React.FC = () => {
         </MenuItem>
         <MenuItem
           component={Link}
-          to='/admin/settings/taxonomies/attack_patterns'
+          to="/admin/settings/taxonomies/attack_patterns"
           selected={location.pathname === '/admin/settings/taxonomies/attack_patterns'}
           classes={{ root: classes.item }}
           dense={false}
@@ -61,7 +62,7 @@ const DefinitionMenu: React.FC = () => {
         </MenuItem>
         <MenuItem
           component={Link}
-          to='/admin/settings/taxonomies/kill_chain_phases'
+          to="/admin/settings/taxonomies/kill_chain_phases"
           selected={location.pathname === '/admin/settings/taxonomies/kill_chain_phases'}
           classes={{ root: classes.item }}
           dense={false}

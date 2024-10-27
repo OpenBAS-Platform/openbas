@@ -1,16 +1,18 @@
-import { FunctionComponent, useRef, useEffect } from 'react';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import Editor from 'ckeditor5-custom-build/build/ckeditor';
 import 'ckeditor5-custom-build/build/translations/fr';
 import 'ckeditor5-custom-build/build/translations/zh-cn';
+
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import { LoadingButton } from '@mui/lab';
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 // As we can ask AI after and follow up, there is a dependency lifecycle here that can be accepted
 // TODO: Cleanup a bit in upcoming version
 // eslint-disable-next-line import/no-cycle
 import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import Editor from 'ckeditor5-custom-build/build/ckeditor';
+import { FunctionComponent, useEffect, useRef } from 'react';
+
 // eslint-disable-next-line import/no-cycle
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 import { useFormatter } from '../../components/i18n';
@@ -30,7 +32,7 @@ interface ResponseDialogProps {
   followUpActions: {
     key: string;
     label: string;
-  }[]
+  }[];
 }
 
 const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
@@ -86,7 +88,7 @@ const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
                 rows={Math.round(height / 23)}
                 value={content}
                 multiline={true}
-                onChange={(event) => setContent(event.target.value)}
+                onChange={event => setContent(event.target.value)}
                 fullWidth={true}
                 InputProps={{
                   endAdornment: (
@@ -127,7 +129,7 @@ const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
                   disabled: isDisabled,
                 }}
                 preview="edit"
-                onChange={(data) => setContent(data ?? '')}
+                onChange={data => setContent(data ?? '')}
                 commands={[
                   { ...commands.title, buttonProps: { disabled: isDisabled } },
                   { ...commands.bold, buttonProps: { disabled: isDisabled } },
@@ -160,7 +162,7 @@ const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
             )}
           </div>
           <div className="clearfix" />
-          <Alert severity="warning" variant="outlined" style={ format === 'html' ? { marginTop: 30 } : {}}>
+          <Alert severity="warning" variant="outlined" style={format === 'html' ? { marginTop: 30 } : {}}>
             {t('Generative AI is a beta feature as we are currently fine-tuning our models. Consider checking important information.')}
           </Alert>
         </DialogContent>

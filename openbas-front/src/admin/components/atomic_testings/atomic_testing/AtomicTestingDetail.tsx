@@ -1,15 +1,16 @@
-import { FunctionComponent, useContext } from 'react';
-import { Props } from 'html-react-parser/lib/attributes-to-props';
 import { Grid, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../../../../components/i18n';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { useHelper } from '../../../../store';
-import ItemStatus from '../../../../components/ItemStatus';
-import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { Props } from 'html-react-parser/lib/attributes-to-props';
+import { FunctionComponent, useContext } from 'react';
+
 import { fetchDocuments } from '../../../../actions/Document';
 import type { DocumentHelper } from '../../../../actions/helper';
+import { useFormatter } from '../../../../components/i18n';
+import ItemStatus from '../../../../components/ItemStatus';
+import { useHelper } from '../../../../store';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -73,15 +74,17 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
                 </Typography>
                 {
                   injectResultDto.inject_expectations !== undefined && injectResultDto.inject_expectations.length > 0
-                    ? Array.from(new Set(injectResultDto.inject_expectations.map((expectation) => expectation.inject_expectation_name)))
+                    ? Array.from(new Set(injectResultDto.inject_expectations.map(expectation => expectation.inject_expectation_name)))
                       .map((name, index) => (
                         <Typography key={index} variant="body1">
                           {name}
                         </Typography>
                       ))
-                    : <Typography variant="body1" gutterBottom>
-                      {'-'}
-                    </Typography>
+                    : (
+                        <Typography variant="body1" gutterBottom>
+                          -
+                        </Typography>
+                      )
                 }
               </div>
               <div style={{ marginRight: 50 }}>
@@ -97,9 +100,11 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
                           {document?.document_name ?? '-'}
                         </Typography>
                       );
-                    }) : <Typography variant="body1" gutterBottom>
-                      {'-'}
-                    </Typography>
+                    }) : (
+                      <Typography variant="body1" gutterBottom>
+                        -
+                      </Typography>
+                    )
                 }
               </div>
             </div>
@@ -117,33 +122,39 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
             <Typography variant="subtitle1" className={classes.header} gutterBottom>
               {t('Content')}
             </Typography>
-            {(injectResultDto.inject_commands_lines?.content?.length ?? 0) > 0 ? <pre>
-              <Typography variant="body1" gutterBottom>
-                {injectResultDto.inject_commands_lines?.content?.map((content, index) => (
-                  <li key={index}>{content}</li>
-                ))}
-              </Typography>
-            </pre> : '-'}
+            {(injectResultDto.inject_commands_lines?.content?.length ?? 0) > 0 ? (
+              <pre>
+                <Typography variant="body1" gutterBottom>
+                  {injectResultDto.inject_commands_lines?.content?.map((content, index) => (
+                    <li key={index}>{content}</li>
+                  ))}
+                </Typography>
+              </pre>
+            ) : '-'}
             <Typography variant="subtitle1" className={classes.header} gutterBottom>
               {t('Cleanup command')}
             </Typography>
-            {(injectResultDto.inject_commands_lines?.cleanup_command?.length ?? 0) > 0 ? <pre>
-              <Typography variant="body1" gutterBottom>
-                {injectResultDto.inject_commands_lines?.cleanup_command?.map((content, index) => (
-                  <li key={index}>{content}</li>
-                ))}
-              </Typography>
-            </pre> : '-'}
+            {(injectResultDto.inject_commands_lines?.cleanup_command?.length ?? 0) > 0 ? (
+              <pre>
+                <Typography variant="body1" gutterBottom>
+                  {injectResultDto.inject_commands_lines?.cleanup_command?.map((content, index) => (
+                    <li key={index}>{content}</li>
+                  ))}
+                </Typography>
+              </pre>
+            ) : '-'}
             <Typography variant="subtitle1" className={classes.header} gutterBottom>
               {t('External ID')}
             </Typography>
-            {injectResultDto.inject_commands_lines?.external_id ? <pre>
-              <Typography variant="body1" gutterBottom>
-                {injectResultDto.inject_commands_lines?.external_id}
-              </Typography>
-            </pre> : '-'}
+            {injectResultDto.inject_commands_lines?.external_id ? (
+              <pre>
+                <Typography variant="body1" gutterBottom>
+                  {injectResultDto.inject_commands_lines?.external_id}
+                </Typography>
+              </pre>
+            ) : '-'}
           </Paper>
-          </Grid>
+        </Grid>
       )}
       <Grid item xs={injectResultDto?.inject_commands_lines ? 6 : 12} style={{ marginBottom: 30 }}>
         <Typography variant="h4">{t('Execution logs')}</Typography>
@@ -153,8 +164,7 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
               {t('Status')}
             </Typography>
             {injectResultDto.inject_status?.status_name
-              && <ItemStatus isInject={true} status={injectResultDto.inject_status?.status_name} label={t(injectResultDto.inject_status?.status_name)} />
-            }
+            && <ItemStatus isInject={true} status={injectResultDto.inject_status?.status_name} label={t(injectResultDto.inject_status?.status_name)} />}
             <Typography variant="subtitle1" className={classes.header} style={{ marginTop: 20 }} gutterBottom>
               {t('Traces')}
             </Typography>
@@ -162,26 +172,42 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
               {injectResultDto.inject_status?.tracking_sent_date ? (
                 <>
                   <Typography variant="body1" gutterBottom>
-                    {t('Tracking Sent Date')}: {injectResultDto.inject_status?.tracking_sent_date}
+                    {t('Tracking Sent Date')}
+                    :
+                    {injectResultDto.inject_status?.tracking_sent_date}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    {t('Tracking Ack Date')}: {injectResultDto.inject_status?.tracking_ack_date}
+                    {t('Tracking Ack Date')}
+                    :
+                    {injectResultDto.inject_status?.tracking_ack_date}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    {t('Tracking End Date')}: {injectResultDto.inject_status?.tracking_end_date}
+                    {t('Tracking End Date')}
+                    :
+                    {injectResultDto.inject_status?.tracking_end_date}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
                     {t('Tracking Total Execution')}
-                    {t('Time')}: {injectResultDto.inject_status?.tracking_total_execution_time} {t('ms')}
+                    {t('Time')}
+                    :
+                    {injectResultDto.inject_status?.tracking_total_execution_time}
+                    {' '}
+                    {t('ms')}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    {t('Tracking Total Count')}: {injectResultDto.inject_status?.tracking_total_count}
+                    {t('Tracking Total Count')}
+                    :
+                    {injectResultDto.inject_status?.tracking_total_count}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    {t('Tracking Total Error')}: {injectResultDto.inject_status?.tracking_total_error}
+                    {t('Tracking Total Error')}
+                    :
+                    {injectResultDto.inject_status?.tracking_total_error}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    {t('Tracking Total Success')}: {injectResultDto.inject_status?.tracking_total_success}
+                    {t('Tracking Total Success')}
+                    :
+                    {injectResultDto.inject_status?.tracking_total_success}
                   </Typography>
                 </>
               ) : (
@@ -192,7 +218,8 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
               {(injectResultDto.inject_status?.status_traces?.length ?? 0) > 0 && (
                 <>
                   <Typography variant="body1" gutterBottom>
-                    {t('Traces')}:
+                    {t('Traces')}
+                    :
                   </Typography>
                   <ul>
                     {injectResultDto.inject_status?.status_traces?.map((trace, index) => (

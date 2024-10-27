@@ -1,19 +1,20 @@
-import { FunctionComponent } from 'react';
-import Chart from 'react-apexcharts';
 import { useTheme } from '@mui/styles';
 import * as R from 'ramda';
+import { FunctionComponent } from 'react';
+import Chart from 'react-apexcharts';
+
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
+import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
+import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
+import type { TeamStore } from '../../../../../actions/teams/Team';
+import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
-import type { InjectExpectation } from '../../../../../utils/api-types';
 import { useHelper } from '../../../../../store';
-import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
-import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
-import type { TeamStore } from '../../../../../actions/teams/Team';
+import type { InjectExpectation } from '../../../../../utils/api-types';
+import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
 import { computeTeamsColors } from './DistributionUtils';
-import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
@@ -66,7 +67,7 @@ const ExerciseDistributionScoreByTeam: FunctionComponent<Props> = ({
     <>
       {teamsTotalScores.length > 0 ? (
         <Chart
-          id='exercise_distribution_total_score_by_team'
+          id="exercise_distribution_total_score_by_team"
           // @ts-expect-error: Need to migrate Chart.js file
           options={horizontalBarsChartOptions(theme)}
           series={totalScoreByTeamData}

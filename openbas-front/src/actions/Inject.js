@@ -1,16 +1,16 @@
-import * as schema from './Schema';
 import { bulkDeleteReferential, delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
+import * as schema from './Schema';
 
 // -- INJECTS --
 
-export const fetchInject = (injectId) => (dispatch) => {
+export const fetchInject = injectId => (dispatch) => {
   const uri = `/api/injects/${injectId}`;
   return getReferential(schema.inject, uri)(dispatch);
 };
 
 // -- EXERCISES --
 
-export const fetchExerciseInjects = (exerciseId) => (dispatch) => {
+export const fetchExerciseInjects = exerciseId => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects`;
   return getReferential(schema.arrayOfInjects, uri)(dispatch);
 };
@@ -87,7 +87,7 @@ export const duplicateInjectForScenario = (scenarioId, injectId) => (dispatch) =
   return postReferential(schema.inject, uri, null)(dispatch);
 };
 
-export const fetchScenarioInjects = (scenarioId) => (dispatch) => {
+export const fetchScenarioInjects = scenarioId => (dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/injects`;
   return getReferential(schema.arrayOfInjects, uri)(dispatch);
 };

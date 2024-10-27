@@ -1,9 +1,10 @@
+import { CheckCircleOutlineOutlined } from '@mui/icons-material';
+import { AppBar, Paper, Toolbar } from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { makeStyles, useTheme } from '@mui/styles';
-import { AppBar, Toolbar, Paper } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { CheckCircleOutlineOutlined } from '@mui/icons-material';
+
 import { fetchComcheckStatus } from '../../../actions/Comcheck';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
@@ -40,7 +41,7 @@ const Comcheck = () => {
   const dispatch = useDispatch();
   const { fldt, t } = useFormatter();
   const { statusId } = useParams();
-  const status = useHelper((helper) => helper.getComcheckStatus(statusId));
+  const status = useHelper(helper => helper.getComcheckStatus(statusId));
   useEffect(() => {
     dispatch(fetchComcheckStatus(statusId));
   }, []);
@@ -79,8 +80,10 @@ const Comcheck = () => {
           <CheckCircleOutlineOutlined color="success" sx={{ fontSize: 50 }} />
           <br />
           <pre>
-            {t('Verification done at')}{' '}
-            {fldt(status?.comcheckstatus_receive_date)}.
+            {t('Verification done at')}
+            {' '}
+            {fldt(status?.comcheckstatus_receive_date)}
+            .
           </pre>
         </div>
       </Paper>

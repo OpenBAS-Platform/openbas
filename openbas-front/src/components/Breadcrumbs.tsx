@@ -1,7 +1,8 @@
-import { FunctionComponent } from 'react';
 import { Breadcrumbs as MUIBreadcrumbs, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
+import { FunctionComponent } from 'react';
+import { Link } from 'react-router-dom';
+
 import { truncate } from '../utils/String';
 
 export interface BreadcrumbsElement {
@@ -11,8 +12,8 @@ export interface BreadcrumbsElement {
 }
 
 interface BreadcrumbsProps {
-  variant: 'standard' | 'list' | 'object',
-  elements: BreadcrumbsElement[],
+  variant: 'standard' | 'list' | 'object';
+  elements: BreadcrumbsElement[];
 }
 
 // Deprecated - https://mui.com/system/styles/basics/

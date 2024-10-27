@@ -1,16 +1,17 @@
-import { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import * as R from 'ramda';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { updateLog, deleteLog } from '../../../../../actions/Log';
-import LogForm from './LogForm';
-import inject18n from '../../../../../components/i18n';
-import Transition from '../../../../../components/common/Transition';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem } from '@mui/material';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component } from 'react';
+import { connect } from 'react-redux';
+
+import { deleteLog, updateLog } from '../../../../../actions/Log';
 import { storeHelper } from '../../../../../actions/Schema';
+import Transition from '../../../../../components/common/Transition';
+import inject18n from '../../../../../components/i18n';
 import { isExerciseReadOnly } from '../../../../../utils/Exercise';
 import { tagOptions } from '../../../../../utils/Option';
+import LogForm from './LogForm';
 
 class LogPopover extends Component {
   constructor(props) {

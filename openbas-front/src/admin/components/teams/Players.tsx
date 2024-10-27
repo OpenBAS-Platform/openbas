@@ -1,28 +1,29 @@
-import { CSSProperties, useMemo, useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { PersonOutlined } from '@mui/icons-material';
+import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { CSSProperties, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+
+import type { OrganizationHelper, UserHelper } from '../../../actions/helper';
 import { fetchOrganizations } from '../../../actions/Organization';
+import { searchPlayers } from '../../../actions/players/player-actions';
+import { fetchTags } from '../../../actions/Tag';
+import Breadcrumbs from '../../../components/Breadcrumbs';
+import ExportButton from '../../../components/common/ExportButton';
+import { initSorting } from '../../../components/common/queryable/Page';
+import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
+import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
+import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
+import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
+import { Header } from '../../../components/common/SortHeadersList';
+import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
+import { useHelper } from '../../../store';
+import type { PlayerOutput } from '../../../utils/api-types';
+import { useAppDispatch } from '../../../utils/hooks';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
 import CreatePlayer from './players/CreatePlayer';
 import PlayerPopover from './players/PlayerPopover';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
-import { useHelper } from '../../../store';
-import { useFormatter } from '../../../components/i18n';
-import Breadcrumbs from '../../../components/Breadcrumbs';
-import { initSorting } from '../../../components/common/queryable/Page';
-import type { OrganizationHelper, UserHelper } from '../../../actions/helper';
-import { useAppDispatch } from '../../../utils/hooks';
-import { fetchTags } from '../../../actions/Tag';
-import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
-import { searchPlayers } from '../../../actions/players/player-actions';
-import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
-import ExportButton from '../../../components/common/ExportButton';
-import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
-import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
-import { Header } from '../../../components/common/SortHeadersList';
-import type { PlayerOutput } from '../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -171,13 +172,13 @@ const Players = () => {
         >
           <ListItemIcon />
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponentV2
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
                 sortHelpers={queryableHelpers.sortHelpers}
               />
-            }
+            )}
           />
         </ListItem>
         {players.map((player: PlayerOutput) => (
@@ -190,9 +191,9 @@ const Players = () => {
               <PersonOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div className={classes.bodyItems}>
-                  {headers.map((header) => (
+                  {headers.map(header => (
                     <div
                       key={header.field}
                       className={classes.bodyItem}
@@ -202,24 +203,25 @@ const Players = () => {
                     </div>
                   ))}
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <PlayerPopover
                 user={player}
                 openEditOnInit={player.user_id === searchId}
-                onUpdate={(result) => setPlayers(players.map((p) => (p.user_id !== result.user_id ? p : result)))}
-                onDelete={(result) => setPlayers(players.filter((p) => (p.user_id !== result)))}
+                onUpdate={result => setPlayers(players.map(p => (p.user_id !== result.user_id ? p : result)))}
+                onDelete={result => setPlayers(players.filter(p => (p.user_id !== result)))}
               />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
       {isPlanner
-        && <CreatePlayer
-          onCreate={(result) => setPlayers([result, ...players])}
-           />
-      }
+      && (
+        <CreatePlayer
+          onCreate={result => setPlayers([result, ...players])}
+        />
+      )}
     </>
   );
 };

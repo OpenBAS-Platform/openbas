@@ -1,13 +1,14 @@
-import { Component } from 'react';
-import * as R from 'ramda';
 import { Box } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import { connect } from 'react-redux';
 import { FileOutline } from 'mdi-material-ui';
+import * as R from 'ramda';
+import { Component } from 'react';
+import { connect } from 'react-redux';
+
 import { addDocument, fetchDocuments } from '../actions/Document';
+import { storeHelper } from '../actions/Schema';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
-import { storeHelper } from '../actions/Schema';
 
 const styles = () => ({
   icon: {
@@ -37,7 +38,7 @@ class DocumentField extends Component {
   render() {
     const { t, name, documents, classes } = this.props;
     const documentsOptions = R.map(
-      (n) => ({
+      n => ({
         id: n.document_id,
         label: n.document_name,
       }),

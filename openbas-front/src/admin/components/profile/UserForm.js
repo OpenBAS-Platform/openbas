@@ -1,11 +1,12 @@
+import { Button, MenuItem } from '@mui/material';
 import { Form } from 'react-final-form';
-import { MenuItem, Button } from '@mui/material';
 import { z } from 'zod';
+
+import CountryField from '../../../components/CountryField';
 import OldSelectField from '../../../components/fields/OldSelectField';
 import OldTextField from '../../../components/fields/OldTextField';
 import { useFormatter } from '../../../components/i18n';
 import OrganizationField from '../../../components/OrganizationField';
-import CountryField from '../../../components/CountryField';
 import { schemaValidator } from '../../../utils/Zod';
 
 const UserForm = ({ onSubmit, initialValues }) => {

@@ -1,6 +1,7 @@
 import { Chip } from '@mui/material';
-import { CSSProperties, FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
+import { CSSProperties, FunctionComponent } from 'react';
+
 import { useFormatter } from '../i18n';
 
 const useStyles = makeStyles(() => ({

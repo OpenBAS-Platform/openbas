@@ -1,8 +1,9 @@
 import { Dispatch } from 'redux';
-import * as schema from '../Schema';
-import { getReferential, putReferential, postReferential, delReferential } from '../../utils/Action';
+
+import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
 import type { Exercise, Variable, VariableInput } from '../../utils/api-types';
 import type { ScenarioStore } from '../scenarios/Scenario';
+import * as schema from '../Schema';
 
 // -- EXERCISES --
 

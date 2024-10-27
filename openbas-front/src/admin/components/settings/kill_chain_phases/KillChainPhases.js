@@ -1,16 +1,17 @@
-import { useState } from 'react';
-import { List, ListItem, ListItemIcon, ListItemSecondaryAction, Chip, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { RouteOutlined } from '@mui/icons-material';
+import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { useState } from 'react';
+
 import { searchKillChainPhases } from '../../../../actions/KillChainPhase';
-import CreateKillChainPhase from './CreateKillChainPhase';
-import KillChainPhasePopover from './KillChainPhasePopover';
-import TaxonomiesMenu from '../TaxonomiesMenu';
-import { useFormatter } from '../../../../components/i18n';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
-import Breadcrumbs from '../../../../components/Breadcrumbs';
+import { useFormatter } from '../../../../components/i18n';
+import TaxonomiesMenu from '../TaxonomiesMenu';
+import CreateKillChainPhase from './CreateKillChainPhase';
+import KillChainPhasePopover from './KillChainPhasePopover';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -121,18 +122,18 @@ const KillChainPhases = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponent
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-            }
+            )}
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {killChainPhases.map((killChainPhase) => (
+        {killChainPhases.map(killChainPhase => (
           <ListItem
             key={killChainPhase.phase_id}
             classes={{ root: classes.item }}
@@ -142,7 +143,7 @@ const KillChainPhases = () => {
               <RouteOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div className={classes.bodyItems}>
                   <div className={classes.bodyItem} style={inlineStyles.phase_kill_chain_name}>
                     <Chip
@@ -162,20 +163,20 @@ const KillChainPhases = () => {
                     {nsdt(killChainPhase.phase_created_at)}
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <KillChainPhasePopover
                 killChainPhase={killChainPhase}
-                onUpdate={(result) => setKillChainPhases(killChainPhases.map((k) => (k.phase_id !== result.phase_id ? k : result)))}
-                onDelete={(result) => setKillChainPhases(killChainPhases.filter((k) => (k.phase_id !== result)))}
+                onUpdate={result => setKillChainPhases(killChainPhases.map(k => (k.phase_id !== result.phase_id ? k : result)))}
+                onDelete={result => setKillChainPhases(killChainPhases.filter(k => (k.phase_id !== result)))}
               />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
       <CreateKillChainPhase
-        onCreate={(result) => setKillChainPhases([result, ...killChainPhases])}
+        onCreate={result => setKillChainPhases([result, ...killChainPhases])}
       />
     </div>
   );

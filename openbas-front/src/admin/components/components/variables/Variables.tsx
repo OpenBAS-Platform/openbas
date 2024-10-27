@@ -1,11 +1,12 @@
-import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { AttachMoneyOutlined } from '@mui/icons-material';
-import { CSSProperties, FunctionComponent, useContext } from 'react';
+import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import VariablePopover from './VariablePopover';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import { CSSProperties, FunctionComponent, useContext } from 'react';
+
 import type { Variable } from '../../../../utils/api-types';
+import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { PermissionsContext, VariableContext } from '../../common/Context';
+import VariablePopover from './VariablePopover';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -115,7 +116,7 @@ const Variables: FunctionComponent<Props> = ({ variables }) => {
           </span>
         </ListItemIcon>
         <ListItemText
-          primary={
+          primary={(
             <>
               {filtering.buildHeader(
                 'variable_key',
@@ -136,11 +137,11 @@ const Variables: FunctionComponent<Props> = ({ variables }) => {
                 headerStyles,
               )}
             </>
-            }
+          )}
         />
         <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
       </ListItem>
-      {sortedVariables.map((variable) => (
+      {sortedVariables.map(variable => (
         <ListItem
           key={variable.variable_id}
           classes={{ root: classes.item }}
@@ -150,7 +151,7 @@ const Variables: FunctionComponent<Props> = ({ variables }) => {
             <AttachMoneyOutlined color="primary" />
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <>
                 <div
                   className={classes.bodyItem}
@@ -171,7 +172,7 @@ const Variables: FunctionComponent<Props> = ({ variables }) => {
                   {variable.variable_value}
                 </div>
               </>
-              }
+            )}
           />
           <ListItemSecondaryAction>
             <VariablePopover

@@ -1,6 +1,7 @@
-import * as React from 'react';
 import { Autocomplete, TextField } from '@mui/material';
+import * as React from 'react';
 import { FieldError } from 'react-hook-form';
+
 import alphabet from '../admin/components/settings/data_ingestion/AttributeUtils';
 import { useFormatter } from './i18n';
 
@@ -34,7 +35,7 @@ const RegexComponent: React.FC<Props> = ({
       autoHighlight
       noOptionsText={t('No available options')}
       renderInput={
-        (params) => (
+        params => (
           <TextField
             {...params}
             label={t(label)}
@@ -47,7 +48,7 @@ const RegexComponent: React.FC<Props> = ({
         )
       }
       options={regexOptions}
-      value={regexOptions.find((r) => r === value) ?? null}
+      value={regexOptions.find(r => r === value) ?? null}
       onChange={(_event, newValue) => {
         setValue(newValue);
         onChange(newValue);

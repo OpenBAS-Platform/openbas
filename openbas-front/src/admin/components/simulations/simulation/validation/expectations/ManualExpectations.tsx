@@ -1,5 +1,4 @@
-import { FunctionComponent, useState } from 'react';
-import * as React from 'react';
+import { AssignmentTurnedIn, ExpandMore, PersonOutlined } from '@mui/icons-material';
 import {
   Accordion,
   AccordionDetails,
@@ -15,24 +14,26 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { AssignmentTurnedIn, ExpandMore, PersonOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
-import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
-import { useFormatter } from '../../../../../../components/i18n';
-import type { Theme } from '../../../../../../components/Theme';
+import { FunctionComponent, useState } from 'react';
+import * as React from 'react';
+
+import type { UserHelper } from '../../../../../../actions/helper';
+import { fetchUsers } from '../../../../../../actions/User';
 import colorStyles from '../../../../../../components/Color';
 import Drawer from '../../../../../../components/common/Drawer';
-import ManualExpectationsValidationForm from './ManualExpectationsValidationForm';
 import ExpandableText from '../../../../../../components/common/ExpendableText';
-import type { Inject, User } from '../../../../../../utils/api-types';
 import Paper from '../../../../../../components/common/Paper';
-import { computeColorStyle, computeLabel, resolveUserName, truncate } from '../../../../../../utils/String';
+import { useFormatter } from '../../../../../../components/i18n';
+import type { Theme } from '../../../../../../components/Theme';
 import { useHelper } from '../../../../../../store';
-import type { UserHelper } from '../../../../../../actions/helper';
+import type { Inject, User } from '../../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../../utils/hooks';
 import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
-import { fetchUsers } from '../../../../../../actions/User';
+import { computeColorStyle, computeLabel, resolveUserName, truncate } from '../../../../../../utils/String';
+import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
+import ManualExpectationsValidationForm from './ManualExpectationsValidationForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -91,7 +92,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
   const [expanded, setExpanded] = useState<string | false>(false);
 
   const { usersMap }: {
-    usersMap: Record<string, User>
+    usersMap: Record<string, User>;
   } = useHelper((helper: UserHelper) => {
     return ({
       usersMap: helper.getUsersMap(),
@@ -115,9 +116,9 @@ const ManualExpectations: FunctionComponent<Props> = ({
     setExpanded(isExpanded ? panel : false);
   };
 
-  const parentExpectation = expectations.filter((e) => !e.inject_expectation_user)[0];
-  const childrenExpectations = expectations.filter((e) => e.inject_expectation_user);
-  const validatedCount = expectations.filter((v) => !R.isEmpty(v.inject_expectation_results)).length;
+  const parentExpectation = expectations.filter(e => !e.inject_expectation_user)[0];
+  const childrenExpectations = expectations.filter(e => e.inject_expectation_user);
+  const validatedCount = expectations.filter(v => !R.isEmpty(v.inject_expectation_results)).length;
   const isAllValidated = validatedCount === expectations.length;
 
   const label = isAllValidated

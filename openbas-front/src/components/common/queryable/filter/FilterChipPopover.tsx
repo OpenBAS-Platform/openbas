@@ -1,10 +1,11 @@
-import { FunctionComponent } from 'react';
 import { MenuItem, Popover, Select, SelectChangeEvent } from '@mui/material';
-import { useFormatter } from '../../../i18n';
-import { FilterHelpers } from './FilterHelpers';
+import { FunctionComponent } from 'react';
+
 import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
-import { availableOperators, OperatorKeyValues } from './FilterUtils';
+import { useFormatter } from '../../../i18n';
 import { FilterChipPopoverInput } from './FilterChipPopoverInput';
+import { FilterHelpers } from './FilterHelpers';
+import { availableOperators, OperatorKeyValues } from './FilterUtils';
 import ScenarioStatusFilter from './specific/ScenarioStatusFilter';
 
 interface Props {
@@ -48,13 +49,13 @@ const FilterChipPopover: FunctionComponent<Props> = ({
           onChange={handleChangeOperator}
           style={{ marginBottom: 15 }}
         >
-          {operators.map((value) => (
+          {operators.map(value => (
             <MenuItem key={value} value={value}>
               {t(OperatorKeyValues[value])}
             </MenuItem>
           ))}
         </Select>
-        {<FilterChipPopoverInput filter={filter} helpers={helpers} propertySchema={propertySchema} />}
+        <FilterChipPopoverInput filter={filter} helpers={helpers} propertySchema={propertySchema} />
       </>
     );
   };

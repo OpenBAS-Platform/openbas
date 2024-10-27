@@ -1,16 +1,17 @@
-import { makeStyles } from '@mui/styles';
 import { Card, CardContent, Chip, Grid, Typography } from '@mui/material';
-import { useFormatter } from '../../../components/i18n';
-import { useHelper } from '../../../store';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
-import { useAppDispatch } from '../../../utils/hooks';
-import type { Executor } from '../../../utils/api-types';
-import type { ExecutorHelper } from '../../../actions/executors/executor-helper';
+import { makeStyles } from '@mui/styles';
+
 import { fetchExecutors } from '../../../actions/Executor';
-import useSearchAnFilter from '../../../utils/SortingFiltering';
+import type { ExecutorHelper } from '../../../actions/executors/executor-helper';
+import Breadcrumbs from '../../../components/Breadcrumbs';
+import { useFormatter } from '../../../components/i18n';
 import SearchFilter from '../../../components/SearchFilter';
 import type { Theme } from '../../../components/Theme';
-import Breadcrumbs from '../../../components/Breadcrumbs';
+import { useHelper } from '../../../store';
+import type { Executor } from '../../../utils/api-types';
+import { useAppDispatch } from '../../../utils/hooks';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
+import useSearchAnFilter from '../../../utils/SortingFiltering';
 
 const useStyles = makeStyles((theme: Theme) => ({
   parameters: {
@@ -107,7 +108,7 @@ const Executors = () => {
                     variant="outlined"
                     classes={{ root: classes.chipInList }}
                     style={{ width: 120 }}
-                    color='secondary'
+                    color="secondary"
                     label={t('Built-in')}
                   />
                   <div style={{ display: 'flex', marginTop: 30 }}>
@@ -121,7 +122,9 @@ const Executors = () => {
                         textOverflow: 'ellipsis',
                       }}
                     >
-                      {t('Updated at')} {nsdt(executor.executor_updated_at)}
+                      {t('Updated at')}
+                      {' '}
+                      {nsdt(executor.executor_updated_at)}
                     </Typography>
                   </div>
                 </CardContent>

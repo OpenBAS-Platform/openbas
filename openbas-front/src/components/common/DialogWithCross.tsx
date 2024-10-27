@@ -1,10 +1,11 @@
-import { Dialog as DialogMUI, DialogTitle, DialogContent, IconButton, Breakpoint } from '@mui/material';
 import { Close } from '@mui/icons-material';
+import { Breakpoint, Dialog as DialogMUI, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 import * as React from 'react';
-import { makeStyles } from '@mui/styles';
-import Transition from './Transition';
+
 import type { Theme } from '../Theme';
+import Transition from './Transition';
 
 const useStyles = makeStyles((theme: Theme) => ({
   header: {

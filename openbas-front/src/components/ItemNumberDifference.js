@@ -1,11 +1,12 @@
-import { Component } from 'react';
-import { compose } from 'ramda';
-import * as PropTypes from 'prop-types';
+import { ArrowDownwardOutlined, ArrowForwardOutlined, ArrowUpwardOutlined } from '@mui/icons-material';
 import { withStyles } from '@mui/styles';
-import { ArrowUpwardOutlined, ArrowDownwardOutlined, ArrowForwardOutlined } from '@mui/icons-material';
+import * as PropTypes from 'prop-types';
+import { compose } from 'ramda';
+import { Component } from 'react';
+
 import inject18n from './i18n';
 
-const styles = (theme) => ({
+const styles = theme => ({
   diff: {
     float: 'left',
     margin: '23px 0 0 10px',
@@ -56,7 +57,11 @@ class ItemNumberDifference extends Component {
           />
           <div className={classes.diffNumber}>{difference ?? ''}</div>
           {description && (
-            <div className={classes.diffDescription}>({t(description)})</div>
+            <div className={classes.diffDescription}>
+              (
+              {t(description)}
+              )
+            </div>
           )}
         </div>
       );
@@ -71,7 +76,11 @@ class ItemNumberDifference extends Component {
           />
           <div className={classes.diffNumber}>{difference}</div>
           {description && (
-            <div className={classes.diffDescription}>({t(description)})</div>
+            <div className={classes.diffDescription}>
+              (
+              {t(description)}
+              )
+            </div>
           )}
         </div>
       );
@@ -84,7 +93,11 @@ class ItemNumberDifference extends Component {
         />
         <div className={classes.diffNumber}>{difference}</div>
         {description && (
-          <div className={classes.diffDescription}>({t(description)})</div>
+          <div className={classes.diffDescription}>
+            (
+            {t(description)}
+            )
+          </div>
         )}
       </div>
     );

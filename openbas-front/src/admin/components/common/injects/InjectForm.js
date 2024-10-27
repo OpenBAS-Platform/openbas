@@ -1,12 +1,13 @@
-import { Component } from 'react';
+import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
+import { Component } from 'react';
+
 import OldTextField from '../../../../components/fields/OldTextField';
 import inject18n from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
 
-const styles = (theme) => ({
+const styles = theme => ({
   duration: {
     marginTop: 20,
     width: '100%',
@@ -89,35 +90,35 @@ class InjectForm extends Component {
           disabled={disabled}
         />
         {!isAtomic
-          && (
-            <div className={disabled ? classes.durationDisabled : classes.duration}>
-              <div className={disabled ? classes.triggerDisabled : classes.trigger}>{t('Trigger after')}</div>
-              <OldTextField
-                variant="standard"
-                name="inject_depends_duration_days"
-                type="number"
-                label={t('Days')}
-                style={{ width: '20%' }}
-                disabled={disabled}
-              />
-              <OldTextField
-                variant="standard"
-                name="inject_depends_duration_hours"
-                type="number"
-                label={t('Hours')}
-                style={{ width: '20%' }}
-                disabled={disabled}
-              />
-              <OldTextField
-                variant="standard"
-                name="inject_depends_duration_minutes"
-                type="number"
-                label={t('Minutes')}
-                style={{ width: '20%' }}
-                disabled={disabled}
-              />
-            </div>
-          )}
+        && (
+          <div className={disabled ? classes.durationDisabled : classes.duration}>
+            <div className={disabled ? classes.triggerDisabled : classes.trigger}>{t('Trigger after')}</div>
+            <OldTextField
+              variant="standard"
+              name="inject_depends_duration_days"
+              type="number"
+              label={t('Days')}
+              style={{ width: '20%' }}
+              disabled={disabled}
+            />
+            <OldTextField
+              variant="standard"
+              name="inject_depends_duration_hours"
+              type="number"
+              label={t('Hours')}
+              style={{ width: '20%' }}
+              disabled={disabled}
+            />
+            <OldTextField
+              variant="standard"
+              name="inject_depends_duration_minutes"
+              type="number"
+              label={t('Minutes')}
+              style={{ width: '20%' }}
+              disabled={disabled}
+            />
+          </div>
+        )}
       </>
     );
   }

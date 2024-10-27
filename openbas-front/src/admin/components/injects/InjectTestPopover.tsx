@@ -1,15 +1,16 @@
-import { FunctionComponent, useContext, useState } from 'react';
-import * as React from 'react';
 import { MoreVert } from '@mui/icons-material';
 import { IconButton, Menu, MenuItem } from '@mui/material';
-import type { InjectTestStatus } from '../../../utils/api-types';
-import { useFormatter } from '../../../components/i18n';
+import { FunctionComponent, useContext, useState } from 'react';
+import * as React from 'react';
+
 import { deleteInjectTest } from '../../../actions/inject_test/inject-test-actions';
 import { testInject } from '../../../actions/injects/inject-action';
-import { PermissionsContext } from '../common/Context';
 import DialogDelete from '../../../components/common/DialogDelete';
 import DialogTest from '../../../components/common/DialogTest';
+import { useFormatter } from '../../../components/i18n';
+import type { InjectTestStatus } from '../../../utils/api-types';
 import { MESSAGING$ } from '../../../utils/Environment';
+import { PermissionsContext } from '../common/Context';
 
 interface Props {
   injectTestStatus: InjectTestStatus;

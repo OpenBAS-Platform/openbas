@@ -1,23 +1,24 @@
-import { FunctionComponent, lazy, Suspense, useState } from 'react';
-import { Link, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { Alert, AlertTitle, Box, Tab, Tabs } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { FunctionComponent, lazy, Suspense, useState } from 'react';
+import { Link, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
+
 import { fetchExercise } from '../../../../actions/Exercise';
-import { errorWrapper } from '../../../../components/Error';
-import Loader from '../../../../components/Loader';
-import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { useAppDispatch } from '../../../../utils/hooks';
-import ExerciseHeader from './ExerciseHeader';
-import type { Exercise as ExerciseType } from '../../../../utils/api-types';
-import { DocumentContext, DocumentContextType, InjectContext, PermissionsContext, PermissionsContextType } from '../../common/Context';
-import { usePermissions } from '../../../../utils/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
-import NotFound from '../../../../components/NotFound';
-import { useFormatter } from '../../../../components/i18n';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
-import ExerciseDatePopover from './ExerciseDatePopover';
+import { errorWrapper } from '../../../../components/Error';
+import { useFormatter } from '../../../../components/i18n';
+import Loader from '../../../../components/Loader';
+import NotFound from '../../../../components/NotFound';
+import { useHelper } from '../../../../store';
+import type { Exercise as ExerciseType } from '../../../../utils/api-types';
+import { usePermissions } from '../../../../utils/Exercise';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { DocumentContext, DocumentContextType, InjectContext, PermissionsContext, PermissionsContextType } from '../../common/Context';
 import injectContextForExercise from './ExerciseContext';
+import ExerciseDatePopover from './ExerciseDatePopover';
+import ExerciseHeader from './ExerciseHeader';
 
 const Exercise = lazy(() => import('./overview/Exercise'));
 const Dryrun = lazy(() => import('./controls/Dryrun'));
@@ -71,11 +72,13 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
   return (
     <PermissionsContext.Provider value={permissionsContext}>
       <DocumentContext.Provider value={documentContext}>
-        <div style={{ paddingRight: ['/results', '/animation'].some((el) => location.pathname.includes(el)) ? 200 : 0 }}>
-          <Breadcrumbs variant="object" elements={[
-            { label: t('Simulations'), link: '/admin/exercises' },
-            { label: exercise.exercise_name, current: true },
-          ]}
+        <div style={{ paddingRight: ['/results', '/animation'].some(el => location.pathname.includes(el)) ? 200 : 0 }}>
+          <Breadcrumbs
+            variant="object"
+            elements={[
+              { label: t('Simulations'), link: '/admin/exercises' },
+              { label: exercise.exercise_name, current: true },
+            ]}
           />
           <ExerciseHeader />
           <Box

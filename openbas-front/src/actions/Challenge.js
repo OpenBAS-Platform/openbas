@@ -1,4 +1,5 @@
 import { schema } from 'normalizr';
+
 import { delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
 import { challengesReader } from './Schema';
 
@@ -14,12 +15,12 @@ export const fetchChallenges = () => (dispatch) => {
   return getReferential(arrayOfChallenges, uri)(dispatch);
 };
 
-export const fetchExerciseChallenges = (exerciseId) => (dispatch) => {
+export const fetchExerciseChallenges = exerciseId => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/challenges`;
   return getReferential(arrayOfChallenges, uri)(dispatch);
 };
 
-export const fetchChallenge = (challengeId) => (dispatch) => {
+export const fetchChallenge = challengeId => (dispatch) => {
   const uri = `/api/challenges/${challengeId}`;
   return getReferential(challengeId, uri)(dispatch);
 };
@@ -29,17 +30,17 @@ export const updateChallenge = (challengeId, data) => (dispatch) => {
   return putReferential(challengeId, uri, data)(dispatch);
 };
 
-export const addChallenge = (data) => (dispatch) => postReferential(challenge, '/api/challenges', data)(dispatch);
+export const addChallenge = data => dispatch => postReferential(challenge, '/api/challenges', data)(dispatch);
 
-export const tryChallenge = (challengeId, data) => (dispatch) => postReferential(null, `/api/challenges/${challengeId}/try`, data)(dispatch);
+export const tryChallenge = (challengeId, data) => dispatch => postReferential(null, `/api/challenges/${challengeId}/try`, data)(dispatch);
 
-export const validateChallenge = (exerciseId, challengeId, userId, data) => (dispatch) => postReferential(
+export const validateChallenge = (exerciseId, challengeId, userId, data) => dispatch => postReferential(
   challengesReader,
   `/api/player/challenges/${exerciseId}/${challengeId}/validate?userId=${userId}`,
   data,
 )(dispatch);
 
-export const deleteChallenge = (channelId) => (dispatch) => {
+export const deleteChallenge = channelId => (dispatch) => {
   const uri = `/api/challenges/${channelId}`;
   return delReferential(uri, 'challenges', channelId)(dispatch);
 };
@@ -56,7 +57,7 @@ export const fetchObserverChallenges = (exerciseId, userId) => (dispatch) => {
 
 // -- SCENARIOS --
 
-export const fetchScenarioChallenges = (scenarioId) => (dispatch) => {
+export const fetchScenarioChallenges = scenarioId => (dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/challenges`;
   return getReferential(arrayOfChallenges, uri)(dispatch);
 };

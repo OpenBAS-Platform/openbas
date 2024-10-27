@@ -1,11 +1,12 @@
-import { FormControlLabel, FormLabel, Radio, RadioGroup, Tooltip } from '@mui/material';
 import { InfoOutlined } from '@mui/icons-material';
+import { FormControlLabel, FormLabel, Radio, RadioGroup, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 import * as React from 'react';
 import { Control, Controller } from 'react-hook-form';
-import { makeStyles } from '@mui/styles';
-import type { Theme } from '../../../../../../components/Theme';
+
 import { useFormatter } from '../../../../../../components/i18n';
+import type { Theme } from '../../../../../../components/Theme';
 import { ExpectationInput } from '../Expectation';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -58,11 +59,17 @@ const ExpectationGroupField: FunctionComponent<Props> = ({
               onChange((event.target as HTMLInputElement).value === 'true');
             }}
           >
-            <FormControlLabel value={false} control={<Radio />} label={isTechnicalExpectation ? t('All assets (per group) must validate the expectation')
-              : t('All players (per team) must validate the expectation')}
+            <FormControlLabel
+              value={false}
+              control={<Radio />}
+              label={isTechnicalExpectation ? t('All assets (per group) must validate the expectation')
+                : t('All players (per team) must validate the expectation')}
             />
-            <FormControlLabel value={true} control={<Radio />} label={isTechnicalExpectation ? t('At least one asset (per group) must validate the expectation')
-              : t('At least one player (per team) must validate the expectation')}
+            <FormControlLabel
+              value={true}
+              control={<Radio />}
+              label={isTechnicalExpectation ? t('At least one asset (per group) must validate the expectation')
+                : t('At least one player (per team) must validate the expectation')}
             />
           </RadioGroup>
         </div>

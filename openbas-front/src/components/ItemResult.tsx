@@ -1,6 +1,6 @@
-import { FunctionComponent } from 'react';
 import { Chip, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { FunctionComponent } from 'react';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -59,7 +59,7 @@ interface ItemStatusProps {
   label: string;
   status?: string | null;
   variant?: 'inList';
-  isInject?: boolean,
+  isInject?: boolean;
 }
 
 const computeStatusStyle = (status: string | undefined | null) => {

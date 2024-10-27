@@ -1,16 +1,17 @@
-import { useContext, useState } from 'react';
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
 import { PlayArrowOutlined, SettingsOutlined } from '@mui/icons-material';
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { fetchInjectResultDto, tryAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
-import AtomicTestingPopover from './AtomicTestingPopover';
-import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
-import { truncate } from '../../../../utils/String';
+import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
-import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
 import type { InjectResultDTO } from '../../../../utils/api-types';
+import { truncate } from '../../../../utils/String';
+import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
+import AtomicTestingPopover from './AtomicTestingPopover';
 import AtomicTestingUpdate from './AtomicTestingUpdate';
 
 const useStyles = makeStyles(() => ({
@@ -71,38 +72,39 @@ const AtomicTestingHeader = () => {
       <div className={classes.actions}>
         {/* eslint-disable-next-line no-nested-ternary */}
         {injectResultDto.inject_injector_contract ? (
-          !injectResultDto.inject_ready ? (
-            <>
-              <Button
-                style={{ marginRight: 10 }}
-                startIcon={<SettingsOutlined />}
-                variant="contained"
-                color="warning"
-                size="small"
-                onClick={handleOpenEdit}
-              >
-                {t('Configure')}
-              </Button>
-              <AtomicTestingUpdate
-                open={edition}
-                handleClose={handleCloseEdit}
-                atomic={injectResultDto}
-              />
-            </>
-          ) : (
-            <Button
-              style={{ marginRight: 10 }}
-              startIcon={<PlayArrowOutlined />}
-              variant="contained"
-              color="primary"
-              size="small"
-              onClick={() => setOpen(true)}
-              disabled={!availableLaunch}
-            >
-              {t('Launch')}
-            </Button>
-          )) : null
-        }
+          !injectResultDto.inject_ready
+            ? (
+                <>
+                  <Button
+                    style={{ marginRight: 10 }}
+                    startIcon={<SettingsOutlined />}
+                    variant="contained"
+                    color="warning"
+                    size="small"
+                    onClick={handleOpenEdit}
+                  >
+                    {t('Configure')}
+                  </Button>
+                  <AtomicTestingUpdate
+                    open={edition}
+                    handleClose={handleCloseEdit}
+                    atomic={injectResultDto}
+                  />
+                </>
+              )
+            : (
+                <Button
+                  style={{ marginRight: 10 }}
+                  startIcon={<PlayArrowOutlined />}
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  onClick={() => setOpen(true)}
+                  disabled={!availableLaunch}
+                >
+                  {t('Launch')}
+                </Button>
+              )) : null}
         <AtomicTestingPopover
           atomic={injectResultDto}
           actions={['Update', 'Duplicate', 'Delete']}

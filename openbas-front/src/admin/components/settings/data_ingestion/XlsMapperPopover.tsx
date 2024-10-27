@@ -1,14 +1,15 @@
 import { FunctionComponent, useState } from 'react';
-import { PopoverEntry } from '../../../../components/common/ButtonPopover';
-import IconPopover from '../../../../components/common/IconPopover';
-import type { RawPaginationImportMapper } from '../../../../utils/api-types';
+
 import { deleteMapper, duplicateMapper, exportMapper } from '../../../../actions/mapper/mapper-actions';
+import { PopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
-import { useFormatter } from '../../../../components/i18n';
-import Drawer from '../../../../components/common/Drawer';
-import XlsMapperUpdate from './xls_mapper/XlsMapperUpdate';
-import { download } from '../../../../utils/utils';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
+import Drawer from '../../../../components/common/Drawer';
+import IconPopover from '../../../../components/common/IconPopover';
+import { useFormatter } from '../../../../components/i18n';
+import type { RawPaginationImportMapper } from '../../../../utils/api-types';
+import { download } from '../../../../utils/utils';
+import XlsMapperUpdate from './xls_mapper/XlsMapperUpdate';
 
 interface Props {
   mapper: RawPaginationImportMapper;
@@ -66,7 +67,7 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
       ids_to_export: [mapper.import_mapper_id],
       export_mapper_name: mapper.import_mapper_name,
     }).then(
-      (result:{ data: string, filename: string }) => {
+      (result: { data: string; filename: string }) => {
         download(JSON.stringify(result.data, null, 2), result.filename, 'application/json');
       },
     );

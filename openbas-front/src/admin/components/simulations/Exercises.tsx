@@ -1,24 +1,25 @@
-import { useState } from 'react';
 import { ToggleButtonGroup } from '@mui/material';
-import { useFormatter } from '../../../components/i18n';
-import { useHelper } from '../../../store';
-import Breadcrumbs from '../../../components/Breadcrumbs';
-import ExerciseCreation from './simulation/ExerciseCreation';
+import { useState } from 'react';
+
+import { searchExercises } from '../../../actions/Exercise';
+import type { ExerciseStore } from '../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
 import type { UserHelper } from '../../../actions/helper';
+import Breadcrumbs from '../../../components/Breadcrumbs';
+import ExportButton from '../../../components/common/ExportButton';
+import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
 import { initSorting } from '../../../components/common/queryable/Page';
-import type { EndpointStore } from '../assets/endpoints/Endpoint';
-import ExerciseList from './ExerciseList';
-import { searchExercises } from '../../../actions/Exercise';
-import ImportUploaderExercise from './ImportUploaderExercise';
+import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
-import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
-import ExercisePopover from './simulation/ExercisePopover';
-import type { ExerciseStore } from '../../../actions/exercises/Exercise';
+import { useFormatter } from '../../../components/i18n';
+import { useHelper } from '../../../store';
 import type { FilterGroup } from '../../../utils/api-types';
-import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
-import ExportButton from '../../../components/common/ExportButton';
+import type { EndpointStore } from '../assets/endpoints/Endpoint';
+import ExerciseList from './ExerciseList';
+import ImportUploaderExercise from './ImportUploaderExercise';
+import ExerciseCreation from './simulation/ExerciseCreation';
+import ExercisePopover from './simulation/ExercisePopover';
 
 const Exercises = () => {
   // Standard hooks
@@ -73,7 +74,7 @@ const Exercises = () => {
     <ExercisePopover
       exercise={exercise}
       actions={['Duplicate', 'Export', 'Delete']}
-      onDelete={(result) => setExercises(exercises.filter((e) => (e.exercise_id !== result)))}
+      onDelete={result => setExercises(exercises.filter(e => (e.exercise_id !== result)))}
       inList
     />
   );
@@ -88,12 +89,12 @@ const Exercises = () => {
         entityPrefix="exercise"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
-        topBarButtons={
+        topBarButtons={(
           <ToggleButtonGroup value="fake" exclusive>
             <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
             <ImportUploaderExercise />
           </ToggleButtonGroup>
-        }
+        )}
       />
       <ExerciseList
         exercises={exercises}

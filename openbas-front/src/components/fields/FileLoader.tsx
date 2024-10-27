@@ -1,19 +1,20 @@
-import { CSSProperties, useEffect, useState } from 'react';
-import * as React from 'react';
+import { AttachmentOutlined, ControlPointOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { AttachmentOutlined, ControlPointOutlined } from '@mui/icons-material';
+import { CSSProperties, useEffect, useState } from 'react';
+import * as React from 'react';
+
+import { fetchDocuments } from '../../actions/Document';
+import type { DocumentHelper } from '../../actions/helper';
+import DocumentType from '../../admin/components/components/documents/DocumentType';
+import { useHelper } from '../../store';
+import type { RawDocument } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
-import type { RawDocument } from '../../utils/api-types';
-import { useHelper } from '../../store';
-import type { DocumentHelper } from '../../actions/helper';
-import { fetchDocuments } from '../../actions/Document';
+import ButtonPopover, { PopoverEntry } from '../common/ButtonPopover';
+import { useFormatter } from '../i18n';
 import ItemTags from '../ItemTags';
 import type { Theme } from '../Theme';
-import { useFormatter } from '../i18n';
-import DocumentType from '../../admin/components/components/documents/DocumentType';
-import ButtonPopover, { PopoverEntry } from '../common/ButtonPopover';
 import FileTransferDialog from './FileTransferDialog';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -22,9 +23,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     fontSize: 13,
   },
   item: {
-    paddingLeft: 10,
-    height: 50,
-    cursor: 'pointer',
+    'paddingLeft': 10,
+    'height': 50,
+    'cursor': 'pointer',
     '&:hover': {
       backgroundColor: theme.palette.action?.hover,
     },
@@ -79,11 +80,11 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  initialValue?: { id?: string, label?: string };
+  initialValue?: { id?: string; label?: string };
   extensions?: string[];
   label: string;
   name: string;
-  setFieldValue: (field: string, value: { id?: string, label?: string } | undefined) => void;
+  setFieldValue: (field: string, value: { id?: string; label?: string } | undefined) => void;
   /* For mandatory fields */
   InputLabelProps?: { required: boolean };
   error?: boolean;
@@ -109,7 +110,7 @@ const FileLoader: React.FC<Props> = ({
 
   // Fetching data
   const { documents }: {
-    documents: [RawDocument],
+    documents: [RawDocument];
   } = useHelper((helper: DocumentHelper) => ({
     documents: helper.getDocuments(),
   }));
@@ -119,7 +120,7 @@ const FileLoader: React.FC<Props> = ({
 
   useEffect(() => {
     if (initialValue?.id && documents.length > 0) {
-      const resolvedDocument = documents.find((doc) => doc.document_id === initialValue.id);
+      const resolvedDocument = documents.find(doc => doc.document_id === initialValue.id);
       if (resolvedDocument) {
         setSelectedDocument(resolvedDocument);
       }
@@ -167,64 +168,66 @@ const FileLoader: React.FC<Props> = ({
         className={`${classes.title} ${InputLabelProps?.required && error ? classes.errorText : ''}`}
       >
         {label}
-        {InputLabelProps?.required && <span className={ error ? classes.errorText : ''}> *</span>}
+        {InputLabelProps?.required && <span className={error ? classes.errorText : ''}> *</span>}
       </Typography>
       <List style={{ marginTop: 0, paddingTop: 0 }}>
         {!selectedDocument && (
-        <ListItem
-          className={`${classes.item} ${InputLabelProps?.required && error ? classes.errorDivider : ''}`}
-          divider
-          onClick={handleOpen}
-          color="primary"
-        >
-          <ListItemIcon color="primary">
-            <ControlPointOutlined color="primary"/>
-          </ListItemIcon>
-          <ListItemText
-            primary={'Add document'}
-            classes={{ primary: classes.text }}
-          />
-        </ListItem>
+          <ListItem
+            className={`${classes.item} ${InputLabelProps?.required && error ? classes.errorDivider : ''}`}
+            divider
+            onClick={handleOpen}
+            color="primary"
+          >
+            <ListItemIcon color="primary">
+              <ControlPointOutlined color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary="Add document"
+              classes={{ primary: classes.text }}
+            />
+          </ListItem>
         )}
         {InputLabelProps?.required && error && (
-        <Typography className={classes.errorMessage}>{t('Should not be empty')}
-        </Typography>
+          <Typography className={classes.errorMessage}>
+            {t('Should not be empty')}
+          </Typography>
         )}
         {selectedDocument && (
-        <ListItem
-          classes={{ root: classes.item }}
-          key={selectedDocument.document_id}
-          divider
-          onClick={handleOpen}
-        >
-          <ListItemIcon>
-            <AttachmentOutlined/>
-          </ListItemIcon>
-          <ListItemText
-            primary={
-              <>
-                <div className={classes.bodyItem} style={inlineStyles.document_name}>
-                  {selectedDocument.document_name}
-                </div>
-                <div className={classes.bodyItem} style={inlineStyles.document_type}>
-                  <DocumentType type={selectedDocument.document_type} variant="list"/>
-                </div>
-                <div className={classes.bodyItem} style={inlineStyles.document_tags}>
-                  <ItemTags
-                    variant="reduced-view"
-                    tags={selectedDocument.document_tags}
-                  />
-                </div>
-              </>
-          }
-          />
-          <ListItemSecondaryAction>
-            <ButtonPopover
-              entries={entries}
-              variant={'icon'}
+          <ListItem
+            classes={{ root: classes.item }}
+            key={selectedDocument.document_id}
+            divider
+            onClick={handleOpen}
+          >
+            <ListItemIcon>
+              <AttachmentOutlined />
+            </ListItemIcon>
+            <ListItemText
+              primary={(
+                <>
+                  <div className={classes.bodyItem} style={inlineStyles.document_name}>
+                    {selectedDocument.document_name}
+                  </div>
+                  <div className={classes.bodyItem} style={inlineStyles.document_type}>
+                    <DocumentType type={selectedDocument.document_type} variant="list" />
+                  </div>
+                  <div className={classes.bodyItem} style={inlineStyles.document_tags}>
+                    <ItemTags
+                      variant="reduced-view"
+                      tags={selectedDocument.document_tags}
+                    />
+                  </div>
+                </>
+              )}
             />
-          </ListItemSecondaryAction>
-        </ListItem>)}
+            <ListItemSecondaryAction>
+              <ButtonPopover
+                entries={entries}
+                variant="icon"
+              />
+            </ListItemSecondaryAction>
+          </ListItem>
+        )}
       </List>
       {open && (
         <FileTransferDialog
@@ -234,7 +237,8 @@ const FileLoader: React.FC<Props> = ({
           onAddDocument={setSelectedDocument}
           extensions={extensions}
         >
-        </FileTransferDialog>)}
+        </FileTransferDialog>
+      )}
     </>
   );
 };

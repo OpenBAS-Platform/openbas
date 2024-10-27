@@ -1,12 +1,13 @@
-import { useContext, useState } from 'react';
-import { Box, Button, LinearProgress, List, ListItem, ListItemIcon, ListItemText, Slider, Typography } from '@mui/material';
 import { HowToVoteOutlined } from '@mui/icons-material';
+import { Box, Button, LinearProgress, List, ListItem, ListItemIcon, ListItemText, Slider, Typography } from '@mui/material';
 import * as R from 'ramda';
+import { useContext, useState } from 'react';
+
 import { useFormatter } from '../../../components/i18n';
+import Loader from '../../../components/Loader';
 import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { resolveUserName } from '../../../utils/String';
-import Loader from '../../../components/Loader';
 import { LessonContext } from '../common/Context';
 
 const ObjectiveEvaluations = ({ objectiveId, handleClose, isUpdatable }) => {
@@ -35,7 +36,7 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose, isUpdatable }) => {
     onFetchEvaluation(objectiveId);
   });
   const currentUserEvaluation = R.head(
-    R.filter((n) => n.evaluation_user === me.user_id, evaluations),
+    R.filter(n => n.evaluation_user === me.user_id, evaluations),
   );
   const submitEvaluation = () => {
     setSubmitting(true);
@@ -70,7 +71,7 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose, isUpdatable }) => {
     <div>
       {evaluations.length > 0 ? (
         <List style={{ padding: 0 }}>
-          {evaluations.map((evaluation) => (
+          {evaluations.map(evaluation => (
             <ListItem key={evaluation.evaluation_id} divider>
               <ListItemIcon>
                 <HowToVoteOutlined />
@@ -95,7 +96,8 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose, isUpdatable }) => {
                 </Box>
                 <Box sx={{ minWidth: 35 }}>
                   <Typography variant="body2" color="text.secondary">
-                    {evaluation.evaluation_score}%
+                    {evaluation.evaluation_score}
+                    %
                   </Typography>
                 </Box>
               </Box>

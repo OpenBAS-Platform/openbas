@@ -1,12 +1,13 @@
+import { Add } from '@mui/icons-material';
+import { Fab } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import * as React from 'react';
-import { makeStyles } from '@mui/styles';
-import { Fab } from '@mui/material';
-import { Add } from '@mui/icons-material';
-import { useFormatter } from '../../../../../components/i18n';
-import type { ImportMapperAddInput, RawPaginationImportMapper } from '../../../../../utils/api-types';
+
 import { createMapper } from '../../../../../actions/mapper/mapper-actions';
 import Drawer from '../../../../../components/common/Drawer';
+import { useFormatter } from '../../../../../components/i18n';
+import type { ImportMapperAddInput, RawPaginationImportMapper } from '../../../../../utils/api-types';
 import MapperForm from './MapperForm';
 
 const useStyles = makeStyles(() => ({
@@ -27,7 +28,7 @@ const XlsMapperCreation: React.FC<Props> = ({ onCreate }) => {
 
   const [open, setOpen] = useState(false);
 
-  const onSubmit = ((data: ImportMapperAddInput) => {
+  const onSubmit = (data: ImportMapperAddInput) => {
     createMapper(data).then(
       (result: { data: RawPaginationImportMapper }) => {
         onCreate?.(result.data);
@@ -35,7 +36,7 @@ const XlsMapperCreation: React.FC<Props> = ({ onCreate }) => {
       },
     );
     setOpen(false);
-  });
+  };
 
   return (
     <>

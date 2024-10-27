@@ -1,8 +1,3 @@
-import { forwardRef, Component } from 'react';
-import * as PropTypes from 'prop-types';
-import * as R from 'ramda';
-import { withStyles, withTheme } from '@mui/styles';
-import { Autocomplete, Button, Drawer, FormControl, Grid, IconButton, InputLabel, MenuItem, Select, Slide, TextField, Toolbar, Tooltip, Typography } from '@mui/material';
 import {
   AddOutlined,
   BrushOutlined,
@@ -14,17 +9,23 @@ import {
   ForwardToInbox,
   GroupsOutlined,
 } from '@mui/icons-material';
+import { Autocomplete, Button, Drawer, FormControl, Grid, IconButton, InputLabel, MenuItem, Select, Slide, TextField, Toolbar, Tooltip, Typography } from '@mui/material';
+import { withStyles, withTheme } from '@mui/styles';
 import { SelectGroup } from 'mdi-material-ui';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component, forwardRef } from 'react';
 import { connect } from 'react-redux';
-import inject18n from '../../../components/i18n';
-import { MESSAGING$ } from '../../../utils/Environment';
+
 import { fetchAssetGroups } from '../../../actions/asset_groups/assetgroup-action';
 import { fetchEndpoints } from '../../../actions/assets/endpoint-actions';
 import { storeHelper } from '../../../actions/Schema';
 import DialogDelete from '../../../components/common/DialogDelete';
 import DialogTest from '../../../components/common/DialogTest';
+import inject18n from '../../../components/i18n';
+import { MESSAGING$ } from '../../../utils/Environment';
 
-const styles = (theme) => ({
+const styles = theme => ({
   bottomNav: {
     padding: 0,
     zIndex: 1100,
@@ -303,7 +304,7 @@ class ToolBar extends Component {
       >
         {options.length > 0 ? (
           R.map(
-            (n) => (
+            n => (
               <MenuItem key={n.value} value={n.value}>
                 {n.label}
               </MenuItem>
@@ -341,10 +342,10 @@ class ToolBar extends Component {
             fullWidth={true}
             selectOnFocus={true}
             autoHighlight={true}
-            getOptionLabel={(option) => (option.label ? option.label : '')}
+            getOptionLabel={option => (option.label ? option.label : '')}
             value={actionsInputs[i]?.values || []}
             multiple={true}
-            renderInput={(params) => (
+            renderInput={params => (
               <TextField
                 {...params}
                 variant="standard"
@@ -376,10 +377,10 @@ class ToolBar extends Component {
             fullWidth={true}
             selectOnFocus={true}
             autoHighlight={true}
-            getOptionLabel={(option) => (option.label ? option.label : '')}
+            getOptionLabel={option => (option.label ? option.label : '')}
             value={actionsInputs[i]?.values || []}
             multiple={true}
-            renderInput={(params) => (
+            renderInput={params => (
               <TextField
                 {...params}
                 variant="standard"
@@ -411,10 +412,10 @@ class ToolBar extends Component {
             fullWidth={true}
             selectOnFocus={true}
             autoHighlight={true}
-            getOptionLabel={(option) => (option.label ? option.label : '')}
+            getOptionLabel={option => (option.label ? option.label : '')}
             value={actionsInputs[i]?.values || []}
             multiple={true}
-            renderInput={(params) => (
+            renderInput={params => (
               <TextField
                 {...params}
                 variant="standard"
@@ -527,7 +528,7 @@ class ToolBar extends Component {
             style: { paddingLeft: navOpen ? 185 : 60 },
           }}
         >
-          <Toolbar style={{ minHeight: 54 }} data-testid='opencti-toolbar'>
+          <Toolbar style={{ minHeight: 54 }} data-testid="opencti-toolbar">
             <Typography
               className={classes.title}
               color="inherit"
@@ -541,8 +542,10 @@ class ToolBar extends Component {
                 }}
               >
                 {numberOfSelectedElements}
-              </span>{' '}
-              {t('selected')}{' '}
+              </span>
+              {' '}
+              {t('selected')}
+              {' '}
               <IconButton
                 aria-label="clear"
                 disabled={
@@ -739,13 +742,13 @@ ToolBar.propTypes = {
 const select = (state, ownProps) => {
   const helper = storeHelper(state);
   const endpoints = helper.getEndpoints()
-    .map((n) => ({ label: n.asset_name, value: n.asset_id }))
+    .map(n => ({ label: n.asset_name, value: n.asset_id }))
     .sort((a, b) => a.label.localeCompare(b.label));
   const assetGroups = helper.getAssetGroups()
-    .map((n) => ({ label: n.asset_group_name, value: n.asset_group_id }))
+    .map(n => ({ label: n.asset_group_name, value: n.asset_group_id }))
     .sort((a, b) => a.label.localeCompare(b.label));
   const teams = ownProps.teamsFromExerciseOrScenario
-    .map((n) => ({ label: n.team_name, value: n.team_id }))
+    .map(n => ({ label: n.team_name, value: n.team_id }))
     .sort((a, b) => a.label.localeCompare(b.label));
   return { endpoints, assetGroups, teams };
 };

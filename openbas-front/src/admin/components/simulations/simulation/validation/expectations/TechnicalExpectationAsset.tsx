@@ -1,17 +1,18 @@
-import { FunctionComponent, useState } from 'react';
+import { KeyboardArrowRightOutlined } from '@mui/icons-material';
 import { Alert, Button, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { KeyboardArrowRightOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
-import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
-import ExpectationLine from './ExpectationLine';
+import { FunctionComponent, useState } from 'react';
+
+import type { Contract } from '../../../../../../actions/contract/contract';
 import Drawer from '../../../../../../components/common/Drawer';
 import { useFormatter } from '../../../../../../components/i18n';
 import type { Theme } from '../../../../../../components/Theme';
-import { typeIcon } from '../../../../common/injects/expectations/ExpectationUtils';
-import { truncate } from '../../../../../../utils/String';
 import type { InjectExpectationResult } from '../../../../../../utils/api-types';
-import type { Contract } from '../../../../../../actions/contract/contract';
+import { truncate } from '../../../../../../utils/String';
+import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
+import { typeIcon } from '../../../../common/injects/expectations/ExpectationUtils';
+import ExpectationLine from './ExpectationLine';
 
 const useStyles = makeStyles((theme: Theme) => ({
   buttons: {
@@ -80,9 +81,11 @@ const TechnicalExpectationAsset: FunctionComponent<Props> = ({
             className={classes.marginBottom_2}
           >
             {selected == null
-              && <>
+            && (
+              <>
                 {!R.isEmpty(expectation.inject_expectation_results)
-                  && <>
+                && (
+                  <>
                     <ListItem divider>
                       <ListItemText style={{ maxWidth: '200px' }} primary={<span>{t('Source')}</span>} />
                       <ListItemText primary={<span>{t('Result')}</span>} />
@@ -92,7 +95,7 @@ const TechnicalExpectationAsset: FunctionComponent<Props> = ({
                       component="div"
                       disablePadding
                     >
-                      {expectation.inject_expectation_results?.map((result) => (
+                      {expectation.inject_expectation_results?.map(result => (
                         <ListItem
                           key={result.sourceId}
                           divider
@@ -108,26 +111,28 @@ const TechnicalExpectationAsset: FunctionComponent<Props> = ({
                       ))}
                     </List>
                   </>
-                }
+                )}
                 {R.isEmpty(expectation.inject_expectation_results) && t('Pending result')}
               </>
-            }
+            )}
             {selected !== null
-              && <pre>
+            && (
+              <pre>
                 {toJsonFormat(selected.result)}
               </pre>
-            }
+            )}
           </Alert>
           <div className={classes.buttons}>
             <div>
               {selected != null
-                && <Button
+              && (
+                <Button
                   variant="contained"
                   onClick={() => setSelected(null)}
-                   >
+                >
                   {t('Back')}
                 </Button>
-              }
+              )}
             </div>
             <Button
               color="secondary"

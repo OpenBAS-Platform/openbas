@@ -1,11 +1,12 @@
 import { Provider } from 'react-redux';
 import { Route, Routes } from 'react-router-dom';
 import { HistoryRouter as Router } from 'redux-first-history/rr6';
-import { history, store } from './store';
+
+import NotFound from './components/NotFound';
 import RedirectManager from './components/RedirectManager';
 import Root from './root';
+import { history, store } from './store';
 import { APP_BASE_PATH } from './utils/Action';
-import NotFound from './components/NotFound';
 
 const App = () => (
   <Provider store={store}>
@@ -14,7 +15,7 @@ const App = () => (
         <Routes>
           <Route path="/*" element={<Root />} />
           {/* Not found */}
-          <Route path="*" element={<NotFound/>}/>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </RedirectManager>
     </Router>

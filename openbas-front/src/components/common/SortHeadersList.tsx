@@ -1,8 +1,9 @@
-import { CSSProperties, FunctionComponent, useState } from 'react';
-import * as React from 'react';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
+import { CSSProperties, FunctionComponent, useState } from 'react';
+import * as React from 'react';
+
 import { useFormatter } from '../i18n';
 
 const useStyles = makeStyles(() => ({
@@ -59,11 +60,13 @@ const SortHeadersList: FunctionComponent<Props> = ({
   };
 
   const sortComponent = (asc: boolean) => {
-    return asc ? (
-      <ArrowDropDownOutlined className={classes.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined className={classes.iconSort} />
-    );
+    return asc
+      ? (
+          <ArrowDropDownOutlined className={classes.iconSort} />
+        )
+      : (
+          <ArrowDropUpOutlined className={classes.iconSort} />
+        );
   };
 
   const sortHeader = (header: Header, style: CSSProperties) => {

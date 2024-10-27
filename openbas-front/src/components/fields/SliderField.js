@@ -1,5 +1,5 @@
-import * as PropTypes from 'prop-types';
 import { Slider as MUISlider } from '@mui/material';
+import * as PropTypes from 'prop-types';
 import { Field } from 'react-final-form';
 
 const renderSliderField = ({
@@ -41,7 +41,7 @@ renderSliderField.propTypes = {
   disabled: PropTypes.bool,
 };
 
-const SliderField = (props) => (
+const SliderField = props => (
   <Field component={renderSliderField} {...props} />
 );
 

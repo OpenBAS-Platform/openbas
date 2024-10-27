@@ -1,17 +1,18 @@
+import { Paper, Typography } from '@mui/material';
 import { useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import { Paper, Typography } from '@mui/material';
-import Variables from '../../../components/variables/Variables';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+
+import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import { addVariableForScenario, deleteVariableForScenario, fetchVariablesForScenario, updateVariableForScenario } from '../../../../../actions/variables/variable-actions';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
-import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
-import { PermissionsContext, VariableContext, VariableContextType } from '../../../common/Context';
-import type { Variable, VariableInput } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
+import { useHelper } from '../../../../../store';
+import type { Variable, VariableInput } from '../../../../../utils/api-types';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { PermissionsContext, VariableContext, VariableContextType } from '../../../common/Context';
 import CreateVariable from '../../../components/variables/CreateVariable';
+import Variables from '../../../components/variables/Variables';
 
 const ScenarioVariables = () => {
   // Standard hooks

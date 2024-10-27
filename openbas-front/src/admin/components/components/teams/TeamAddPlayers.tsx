@@ -1,25 +1,26 @@
+import { Add, PersonOutlined } from '@mui/icons-material';
+import { Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Fab, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
 import { useContext, useState } from 'react';
 import * as React from 'react';
-import * as R from 'ramda';
-import { Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Fab, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { Add, PersonOutlined } from '@mui/icons-material';
+
+import type { OrganizationHelper, UserHelper } from '../../../../actions/helper';
+import { fetchPlayers } from '../../../../actions/User';
+import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import ItemTags from '../../../../components/ItemTags';
+import SearchFilter from '../../../../components/SearchFilter';
+import { useHelper } from '../../../../store';
 import type { Organization, Team } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { useFormatter } from '../../../../components/i18n';
-import { useHelper } from '../../../../store';
-import type { OrganizationHelper, UserHelper } from '../../../../actions/helper';
-import type { UserStore } from '../../teams/players/Player';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchPlayers } from '../../../../actions/User';
 import type { Option } from '../../../../utils/Option';
-import SearchFilter from '../../../../components/SearchFilter';
-import TagsFilter from '../../common/filters/TagsFilter';
 import { resolveUserName, truncate } from '../../../../utils/String';
-import ItemTags from '../../../../components/ItemTags';
-import CreatePlayer from '../../teams/players/CreatePlayer';
-import Transition from '../../../../components/common/Transition';
 import { TeamContext } from '../../common/Context';
+import TagsFilter from '../../common/filters/TagsFilter';
+import CreatePlayer from '../../teams/players/CreatePlayer';
+import type { UserStore } from '../../teams/players/Player';
 
 const useStyles = makeStyles(() => ({
   createButton: {
@@ -40,12 +41,12 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   addedUsersIds: UserStore['user_id'][];
-  teamId: Team['team_id']
+  teamId: Team['team_id'];
 }
 
 type UserStoreExtended = UserStore & {
   organization_name: Organization['organization_name'];
-  organization_description: Organization['organization_description']
+  organization_description: Organization['organization_description'];
 };
 
 const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
@@ -60,8 +61,8 @@ const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
   const { onAddUsersTeam } = useContext(TeamContext);
 
   const { usersMap, organizationsMap }: {
-    organizationsMap: Record<string, Organization>,
-    usersMap: Record<string, UserStore>
+    organizationsMap: Record<string, Organization>;
+    usersMap: Record<string, UserStore>;
   } = useHelper((helper: UserHelper & OrganizationHelper) => ({
     usersMap: helper.getUsersMap(),
     organizationsMap: helper.getOrganizationsMap(),
@@ -83,8 +84,10 @@ const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
       organization_name:
         u.user_organization ? (organizationsMap[u.user_organization]?.organization_name ?? '-') : '-',
       organization_description:
-        u.user_organization ? (organizationsMap[u.user_organization]?.organization_description
-          ?? '-') : '-',
+        u.user_organization
+          ? (organizationsMap[u.user_organization]?.organization_description
+            ?? '-')
+          : '-',
       ...u,
     })),
     R.filter(
@@ -183,7 +186,7 @@ const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
                 })}
                 <CreatePlayer
                   inline
-                  onCreate={(user) => setUsersIds([...usersIds, user.user_id])}
+                  onCreate={user => setUsersIds([...usersIds, user.user_id])}
                 />
               </List>
             </Grid>
@@ -214,7 +217,9 @@ const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
             setKeyword('');
             setUsersIds([]);
           }}
-          >{t('Cancel')}</Button>
+          >
+            {t('Cancel')}
+          </Button>
           <Button color="secondary" onClick={submitAddUsers}>
             {t('Add')}
           </Button>

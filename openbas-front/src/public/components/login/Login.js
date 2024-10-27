@@ -1,23 +1,24 @@
-import { useEffect, useState } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { useTheme, withStyles } from '@mui/styles';
 import { Box, Checkbox, Paper } from '@mui/material';
+import { useTheme, withStyles } from '@mui/styles';
+import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
+import { useEffect, useState } from 'react';
 import Markdown from 'react-markdown';
-import logoDark from '../../../static/images/logo_text_dark.png';
-import logoLight from '../../../static/images/logo_text_light.png';
+import { connect } from 'react-redux';
+
+import { askToken, checkKerberos, fetchPlatformParameters } from '../../../actions/Application';
+import { storeHelper } from '../../../actions/Schema';
+import inject18n from '../../../components/i18n';
 import byFiligranDark from '../../../static/images/by_filigran_dark.png';
 import byFiligranLight from '../../../static/images/by_filigran_light.png';
-import { askToken, checkKerberos, fetchPlatformParameters } from '../../../actions/Application';
-import LoginForm from './LoginForm';
-import inject18n from '../../../components/i18n';
-import { storeHelper } from '../../../actions/Schema';
-import Reset from './Reset';
-import LoginError from './LoginError';
-import LoginSSOButton from './LoginSSOButton';
+import logoDark from '../../../static/images/logo_text_dark.png';
+import logoLight from '../../../static/images/logo_text_light.png';
 import { fileUri } from '../../../utils/Environment';
 import { isNotEmptyField } from '../../../utils/utils';
+import LoginError from './LoginError';
+import LoginForm from './LoginForm';
+import LoginSSOButton from './LoginSSOButton';
+import Reset from './Reset';
 
 const styles = () => ({
   container: {
@@ -80,7 +81,7 @@ const Login = (props) => {
     props.fetchPlatformParameters();
     props.checkKerberos();
   }, []);
-  const onSubmit = (data) => props.askToken(data.username, data.password);
+  const onSubmit = data => props.askToken(data.username, data.password);
   let loginHeight = 320;
   if ((isOpenId || isSaml2) && isLocal) {
     loginHeight = 440;
@@ -93,7 +94,7 @@ const Login = (props) => {
     : parameters?.platform_light_theme?.logo_login_url;
 
   const isWhitemarkEnable = parameters.platform_whitemark === 'true'
-      && parameters.platform_enterprise_edition === 'true';
+    && parameters.platform_enterprise_edition === 'true';
 
   // POLICIES
   const loginMessage = parameters.platform_policies?.platform_login_message;
@@ -114,7 +115,9 @@ const Login = (props) => {
   };
 
   return (
-    <div data-testid="login-page" className={classes.container}
+    <div
+      data-testid="login-page"
+      className={classes.container}
       style={{ marginTop }}
     >
       <img
@@ -128,7 +131,8 @@ const Login = (props) => {
       {!isWhitemarkEnable && (
         <div className={classes.byFiligran} style={{ marginBottom: 20 }}>
           <img
-            src={fileUri(theme.palette.mode === 'dark' ? byFiligranDark
+            src={fileUri(theme.palette.mode === 'dark'
+              ? byFiligranDark
               : byFiligranLight)}
             className={classes.byFiligranLogo}
           />
@@ -149,23 +153,26 @@ const Login = (props) => {
               edge="start"
               onChange={handleChange}
               style={{ margin: 0 }}
-            ></Checkbox>
+            >
+            </Checkbox>
           </Box>
         </Paper>
       )}
       {(!isConsentMessage || (isConsentMessage && checked)) && (
         <>
           {isLocal && !reset && (
-          <Paper variant="outlined" classes={{ root: classes.login }}>
-            <LoginForm onSubmit={onSubmit}/>
-            <div style={{ marginBottom: 10, cursor: 'pointer' }}>
-              <a onClick={() => setReset(true)}>{t(
-                'I forgot my password',
-              )}</a>
-            </div>
-          </Paper>
+            <Paper variant="outlined" classes={{ root: classes.login }}>
+              <LoginForm onSubmit={onSubmit} />
+              <div style={{ marginBottom: 10, cursor: 'pointer' }}>
+                <a onClick={() => setReset(true)}>
+                  {t(
+                    'I forgot my password',
+                  )}
+                </a>
+              </div>
+            </Paper>
           )}
-          {isLocal && reset && <Reset onCancel={() => setReset(false)}/>}
+          {isLocal && reset && <Reset onCancel={() => setReset(false)} />}
           <Box
             sx={{
               marginTop: 2.5,
@@ -177,7 +184,7 @@ const Login = (props) => {
           >
             {(isOpenId || isSaml2) && [...(openidProviders ?? []),
               ...(saml2Providers ?? [])].map(
-              (provider) => (
+              provider => (
                 <LoginSSOButton
                   key={provider.provider_name}
                   providerName={provider.provider_login}
@@ -185,7 +192,7 @@ const Login = (props) => {
                 />
               ),
             )}
-            <LoginError/>
+            <LoginError />
           </Box>
         </>
       )}

@@ -1,19 +1,20 @@
 import { useTheme } from '@mui/styles';
+import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
-import * as R from 'ramda';
-import Empty from '../../../../../components/Empty';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import { useFormatter } from '../../../../../components/i18n';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
-import { computeTeamsColors } from '../overview/DistributionUtils';
-import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
+
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
+import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
+import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
+import Empty from '../../../../../components/Empty';
+import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
+import { useHelper } from '../../../../../store';
 import type { Team } from '../../../../../utils/api-types';
+import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { computeTeamsColors } from '../overview/DistributionUtils';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];

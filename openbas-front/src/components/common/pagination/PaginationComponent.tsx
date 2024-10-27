@@ -1,18 +1,19 @@
 import { Button, Chip, TablePagination, ToggleButtonGroup } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from 'react';
 import * as React from 'react';
-import { makeStyles } from '@mui/styles';
-import SearchFilter from '../../SearchFilter';
-import type { Page } from '../queryable/Page';
-import type { Filter, SearchPaginationInput } from '../../../utils/api-types';
-import ExportButton, { ExportProps } from '../ExportButton';
-import mitreAttack from '../../../static/images/misc/attack.png';
-import Drawer from '../Drawer';
+
+import type { AttackPatternStore } from '../../../actions/attack_patterns/AttackPattern';
 import MitreFilter, { MITRE_FILTER_KEY } from '../../../admin/components/common/filters/MitreFilter';
+import mitreAttack from '../../../static/images/misc/attack.png';
+import type { Filter, SearchPaginationInput } from '../../../utils/api-types';
 import { useFormatter } from '../../i18n';
+import SearchFilter from '../../SearchFilter';
+import Drawer from '../Drawer';
+import ExportButton, { ExportProps } from '../ExportButton';
 import { FilterHelpers } from '../queryable/filter/FilterHelpers';
 import { isEmptyFilter } from '../queryable/filter/FilterUtils';
-import type { AttackPatternStore } from '../../../actions/attack_patterns/AttackPattern';
+import type { Page } from '../queryable/Page';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -51,7 +52,7 @@ interface Props<T> {
   availableFilters?: string[];
   helpers?: FilterHelpers;
   children?: React.ReactElement | null;
-  attackPatterns?: AttackPatternStore[],
+  attackPatterns?: AttackPatternStore[];
 }
 
 /**

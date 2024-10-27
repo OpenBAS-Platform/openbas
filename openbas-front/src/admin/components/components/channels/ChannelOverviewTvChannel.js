@@ -1,5 +1,5 @@
+import { Card, CardHeader, Grid, Skeleton, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
-import { Typography, Grid, Card, CardHeader, Skeleton } from '@mui/material';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -55,22 +55,22 @@ const ChannelOverviewTvChannel = ({ channel }) => {
         <Grid item={true} xs={8}>
           <Card sx={{ width: '100%' }}>
             <CardHeader
-              avatar={
+              avatar={(
                 <Skeleton
                   animation={false}
                   variant="circular"
                   width={40}
                   height={40}
                 />
-              }
-              title={
+              )}
+              title={(
                 <Skeleton
                   animation={false}
                   height={10}
                   width="80%"
                   style={{ marginBottom: 6 }}
                 />
-              }
+              )}
               subheader={<Skeleton animation={false} height={10} width="40%" />}
             />
             <Skeleton
@@ -83,22 +83,22 @@ const ChannelOverviewTvChannel = ({ channel }) => {
         <Grid item={true} xs={4}>
           <Card sx={{ width: '100%' }}>
             <CardHeader
-              avatar={
+              avatar={(
                 <Skeleton
                   animation={false}
                   variant="circular"
                   width={40}
                   height={40}
                 />
-              }
-              title={
+              )}
+              title={(
                 <Skeleton
                   animation={false}
                   height={10}
                   width="80%"
                   style={{ marginBottom: 6 }}
                 />
-              }
+              )}
               subheader={<Skeleton animation={false} height={10} width="40%" />}
             />
             <Skeleton
@@ -109,22 +109,22 @@ const ChannelOverviewTvChannel = ({ channel }) => {
           </Card>
           <Card sx={{ width: '100%' }} style={{ marginTop: 20 }}>
             <CardHeader
-              avatar={
+              avatar={(
                 <Skeleton
                   animation={false}
                   variant="circular"
                   width={40}
                   height={40}
                 />
-              }
-              title={
+              )}
+              title={(
                 <Skeleton
                   animation={false}
                   height={10}
                   width="80%"
                   style={{ marginBottom: 6 }}
                 />
-              }
+              )}
               subheader={<Skeleton animation={false} height={10} width="40%" />}
             />
             <Skeleton
@@ -139,22 +139,22 @@ const ChannelOverviewTvChannel = ({ channel }) => {
         <Grid item={true} xs={4}>
           <Card sx={{ width: '100%' }}>
             <CardHeader
-              avatar={
+              avatar={(
                 <Skeleton
                   animation={false}
                   variant="circular"
                   width={40}
                   height={40}
                 />
-              }
-              title={
+              )}
+              title={(
                 <Skeleton
                   animation={false}
                   height={10}
                   width="80%"
                   style={{ marginBottom: 6 }}
                 />
-              }
+              )}
               subheader={<Skeleton animation={false} height={10} width="40%" />}
             />
             <Skeleton
@@ -167,22 +167,22 @@ const ChannelOverviewTvChannel = ({ channel }) => {
         <Grid item={true} xs={4}>
           <Card sx={{ width: '100%' }}>
             <CardHeader
-              avatar={
+              avatar={(
                 <Skeleton
                   animation={false}
                   variant="circular"
                   width={40}
                   height={40}
                 />
-              }
-              title={
+              )}
+              title={(
                 <Skeleton
                   animation={false}
                   height={10}
                   width="80%"
                   style={{ marginBottom: 6 }}
                 />
-              }
+              )}
               subheader={<Skeleton animation={false} height={10} width="40%" />}
             />
             <Skeleton
@@ -195,22 +195,22 @@ const ChannelOverviewTvChannel = ({ channel }) => {
         <Grid item={true} xs={4}>
           <Card sx={{ width: '100%' }}>
             <CardHeader
-              avatar={
+              avatar={(
                 <Skeleton
                   animation={false}
                   variant="circular"
                   width={40}
                   height={40}
                 />
-              }
-              title={
+              )}
+              title={(
                 <Skeleton
                   animation={false}
                   height={10}
                   width="80%"
                   style={{ marginBottom: 6 }}
                 />
-              }
+              )}
               subheader={<Skeleton animation={false} height={10} width="40%" />}
             />
             <Skeleton

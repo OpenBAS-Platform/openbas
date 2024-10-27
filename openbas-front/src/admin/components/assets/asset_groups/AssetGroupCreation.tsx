@@ -1,18 +1,18 @@
-import { FunctionComponent, useState } from 'react';
-import { ListItemButton, ListItemIcon, ListItemText, Theme } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
+import { ListItemButton, ListItemIcon, ListItemText, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { FunctionComponent, useState } from 'react';
 
-import { useFormatter } from '../../../../components/i18n';
-import { useAppDispatch } from '../../../../utils/hooks';
-import type { AssetGroupInput } from '../../../../utils/api-types';
-import Drawer from '../../../../components/common/Drawer';
 import { addAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
-import AssetGroupForm from './AssetGroupForm';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Dialog from '../../../../components/common/Dialog';
-import type { AssetGroupStore } from './AssetGroup';
+import Drawer from '../../../../components/common/Drawer';
+import { useFormatter } from '../../../../components/i18n';
+import type { AssetGroupInput } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
 import type { UserStore } from '../../teams/players/Player';
+import type { AssetGroupStore } from './AssetGroup';
+import AssetGroupForm from './AssetGroupForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
   text: {
@@ -39,7 +39,7 @@ const AssetGroupCreation: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const onSubmit = (data: AssetGroupInput) => {
     dispatch(addAssetGroup(data)).then(
-      (result: { result: string, entities: { asset_groups: Record<string, UserStore> } }) => {
+      (result: { result: string; entities: { asset_groups: Record<string, UserStore> } }) => {
         if (result.result) {
           if (onCreate) {
             const created = result.entities.asset_groups[result.result];

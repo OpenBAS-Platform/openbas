@@ -1,27 +1,28 @@
-import { CSSProperties } from 'react';
-import { makeStyles } from '@mui/styles';
-import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
-import { CSVLink } from 'react-csv';
 import { DomainOutlined, FileDownloadOutlined } from '@mui/icons-material';
+import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { CSSProperties } from 'react';
+import { CSVLink } from 'react-csv';
 import { useSearchParams } from 'react-router-dom';
-import { useFormatter } from '../../../components/i18n';
+
+import type { OrganizationHelper, TagHelper, UserHelper } from '../../../actions/helper';
 import { fetchOrganizations } from '../../../actions/Organization';
-import ItemTags from '../../../components/ItemTags';
-import { truncate } from '../../../utils/String';
-import CreateOrganization from './organizations/CreateOrganization';
-import OrganizationPopover from './organizations/OrganizationPopover';
 import { fetchTags } from '../../../actions/Tag';
-import SearchFilter from '../../../components/SearchFilter';
-import TagsFilter from '../common/filters/TagsFilter';
-import { exportData } from '../../../utils/Environment';
 import Breadcrumbs from '../../../components/Breadcrumbs';
+import { useFormatter } from '../../../components/i18n';
+import ItemTags from '../../../components/ItemTags';
+import SearchFilter from '../../../components/SearchFilter';
+import type { Theme } from '../../../components/Theme';
+import { useHelper } from '../../../store';
+import type { Organization } from '../../../utils/api-types';
+import { exportData } from '../../../utils/Environment';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
-import { useHelper } from '../../../store';
-import type { OrganizationHelper, TagHelper, UserHelper } from '../../../actions/helper';
-import type { Theme } from '../../../components/Theme';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
-import type { Organization } from '../../../utils/api-types';
+import { truncate } from '../../../utils/String';
+import TagsFilter from '../common/filters/TagsFilter';
+import CreateOrganization from './organizations/CreateOrganization';
+import OrganizationPopover from './organizations/OrganizationPopover';
 
 const useStyles = makeStyles((theme: Theme) => ({
   parameters: {
@@ -182,7 +183,7 @@ const Organizations = () => {
         >
           <ListItemIcon />
           <ListItemText
-            primary={
+            primary={(
               <div className={classes.container}>
                 {filtering.buildHeader(
                   'organization_name',
@@ -203,11 +204,11 @@ const Organizations = () => {
                   inlineStylesHeaders,
                 )}
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {sortedOrganizations.map((organization) => (
+        {sortedOrganizations.map(organization => (
           <ListItem
             key={organization.organization_id}
             classes={{ root: classes.item }}
@@ -217,7 +218,7 @@ const Organizations = () => {
               <DomainOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div className={classes.container}>
                   <div
                     className={classes.bodyItem}
@@ -244,7 +245,7 @@ const Organizations = () => {
                     />
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <OrganizationPopover

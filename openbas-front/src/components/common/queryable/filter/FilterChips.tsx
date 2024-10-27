@@ -1,9 +1,10 @@
-import { Fragment, FunctionComponent } from 'react';
 import { Box } from '@mui/material';
-import { FilterHelpers } from './FilterHelpers';
+import { Fragment, FunctionComponent } from 'react';
+
 import type { Filter, FilterGroup, PropertySchemaDTO } from '../../../../utils/api-types';
-import FilterChip from './FilterChip';
 import ClickableModeChip from '../../chips/ClickableModeChip';
+import FilterChip from './FilterChip';
+import { FilterHelpers } from './FilterHelpers';
 
 interface Props {
   propertySchemas: PropertySchemaDTO[];
@@ -20,10 +21,10 @@ const FilterChips: FunctionComponent<Props> = ({
   helpers,
   pristine,
 }) => {
-  const filters = filterGroup?.filters?.filter((f) => availableFilterNames.length === 0 || availableFilterNames.includes(f.key)) ?? [];
+  const filters = filterGroup?.filters?.filter(f => availableFilterNames.length === 0 || availableFilterNames.includes(f.key)) ?? [];
 
   const propertySchema = (filter: Filter) => {
-    return propertySchemas.find((p) => p.schema_property_name === filter.key);
+    return propertySchemas.find(p => p.schema_property_name === filter.key);
   };
 
   const handleSwitchMode = () => helpers.handleSwitchMode();
@@ -57,8 +58,7 @@ const FilterChips: FunctionComponent<Props> = ({
             />
           </Fragment>
         );
-      })
-      }
+      })}
     </Box>
   );
 };

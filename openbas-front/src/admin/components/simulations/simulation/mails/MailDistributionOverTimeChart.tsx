@@ -1,18 +1,19 @@
+import { Theme } from '@mui/material';
 import { useTheme } from '@mui/styles';
+import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
-import * as R from 'ramda';
-import { Theme } from '@mui/material';
-import Empty from '../../../../../components/Empty';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import { useFormatter } from '../../../../../components/i18n';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+
 import { fetchExerciseCommunications } from '../../../../../actions/Communication';
 import type { CommunicationHelper } from '../../../../../actions/communications/communication-helper';
+import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
+import Empty from '../../../../../components/Empty';
+import { useFormatter } from '../../../../../components/i18n';
+import { useHelper } from '../../../../../store';
 import type { Communication } from '../../../../../utils/api-types';
 import { areaChartOptions } from '../../../../../utils/Charts';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];

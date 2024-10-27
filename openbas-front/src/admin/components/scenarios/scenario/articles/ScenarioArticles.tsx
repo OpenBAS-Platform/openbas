@@ -1,11 +1,12 @@
 import { useParams } from 'react-router-dom';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+
 import { fetchScenarioArticles } from '../../../../../actions/channels/article-action';
-import Articles from '../../../common/articles/Articles';
-import { useAppDispatch } from '../../../../../utils/hooks';
 import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
+import { useHelper } from '../../../../../store';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import Articles from '../../../common/articles/Articles';
 import { ArticleContext } from '../../../common/Context';
 import articleContextForScenario from './articleContextForScenario';
 

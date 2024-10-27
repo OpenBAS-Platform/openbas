@@ -1,8 +1,9 @@
-import { CSSProperties, FunctionComponent, useState } from 'react';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../../i18n';
+import { CSSProperties, FunctionComponent, useState } from 'react';
+
 import type { SearchPaginationInput } from '../../../utils/api-types';
+import { useFormatter } from '../../i18n';
 
 const useStyles = makeStyles(() => ({
   sortableHeaderItem: {

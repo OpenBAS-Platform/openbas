@@ -1,9 +1,10 @@
-import { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import OldTextField from '../../../../components/fields/OldTextField';
+import * as PropTypes from 'prop-types';
+import { Component } from 'react';
+import { Form } from 'react-final-form';
+
 import DeprecatedColorPickerField from '../../../../components/DeprecatedColorPickerField';
+import OldTextField from '../../../../components/fields/OldTextField';
 import inject18n from '../../../../components/i18n';
 
 class TagForm extends Component {

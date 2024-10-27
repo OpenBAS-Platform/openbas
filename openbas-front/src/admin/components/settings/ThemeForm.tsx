@@ -1,13 +1,14 @@
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { Button, TextField as MuiTextField } from '@mui/material';
-import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { Button, TextField as MuiTextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import * as React from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import ColorPickerField from '../../../components/ColorPickerField';
 import { useFormatter } from '../../../components/i18n';
 import type { ThemeInput } from '../../../utils/api-types';
 import { zodImplement } from '../../../utils/Zod';
-import ColorPickerField from '../../../components/ColorPickerField';
 
 interface Props {
   onSubmit: SubmitHandler<ThemeInput>;

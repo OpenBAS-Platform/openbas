@@ -1,11 +1,12 @@
-import { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { Form } from 'react-final-form';
-import { Button, Grid, Tooltip, Typography } from '@mui/material';
 import { InfoOutlined } from '@mui/icons-material';
+import { Button, Grid, Tooltip, Typography } from '@mui/material';
+import * as PropTypes from 'prop-types';
+import { Component } from 'react';
+import { Form } from 'react-final-form';
+
 import OldTextField from '../../../../components/fields/OldTextField';
-import inject18n from '../../../../components/i18n';
 import SwitchField from '../../../../components/fields/SwitchField';
+import inject18n from '../../../../components/i18n';
 
 class GroupForm extends Component {
   validate(values) {

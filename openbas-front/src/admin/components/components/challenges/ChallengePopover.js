@@ -1,14 +1,15 @@
-import { forwardRef, useState } from 'react';
-import * as R from 'ramda';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Slide } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Slide } from '@mui/material';
+import * as R from 'ramda';
+import { forwardRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import ChallengeForm from './ChallengeForm';
-import { useFormatter } from '../../../../components/i18n';
+
 import { deleteChallenge, updateChallenge } from '../../../../actions/Challenge';
+import Drawer from '../../../../components/common/Drawer';
+import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import { tagOptions } from '../../../../utils/Option';
-import Drawer from '../../../../components/common/Drawer';
+import ChallengeForm from './ChallengeForm';
 
 const Transition = forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -25,7 +26,7 @@ const ChallengePopover = ({ challenge, documents, onRemoveChallenge, inline }) =
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   // popover management
-  const { tagsMap } = useHelper((helper) => ({
+  const { tagsMap } = useHelper(helper => ({
     tagsMap: helper.getTagsMap(),
   }));
   const handlePopoverOpen = (event) => {
@@ -134,7 +135,7 @@ const ChallengePopover = ({ challenge, documents, onRemoveChallenge, inline }) =
               onSubmit={onSubmitEdit}
               handleClose={handleCloseEdit}
               initialValues={initialValues}
-              documentsIds={(documents || []).map((i) => i.document_id)}
+              documentsIds={(documents || []).map(i => i.document_id)}
             />
           </DialogContent>
         </Dialog>
@@ -149,7 +150,7 @@ const ChallengePopover = ({ challenge, documents, onRemoveChallenge, inline }) =
             onSubmit={onSubmitEdit}
             handleClose={handleCloseEdit}
             initialValues={initialValues}
-            documentsIds={(documents || []).map((i) => i.document_id)}
+            documentsIds={(documents || []).map(i => i.document_id)}
           />
         </Drawer>
       )}

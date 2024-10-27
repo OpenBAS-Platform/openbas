@@ -1,12 +1,13 @@
 import { FunctionComponent, useState } from 'react';
-import LessonsTemplateQuestionForm, { LessonsTemplateQuestionInputForm } from './LessonsTemplateQuestionForm';
-import { useFormatter } from '../../../../../../components/i18n';
+
 import { deleteLessonsTemplateQuestion, updateLessonsTemplateQuestion } from '../../../../../../actions/Lessons';
-import { useAppDispatch } from '../../../../../../utils/hooks';
+import type { LessonsTemplateQuestionStore } from '../../../../../../actions/lessons/Lessons';
 import ButtonPopover from '../../../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../../../components/common/DialogDelete';
 import Drawer from '../../../../../../components/common/Drawer';
-import type { LessonsTemplateQuestionStore } from '../../../../../../actions/lessons/Lessons';
+import { useFormatter } from '../../../../../../components/i18n';
+import { useAppDispatch } from '../../../../../../utils/hooks';
+import LessonsTemplateQuestionForm, { LessonsTemplateQuestionInputForm } from './LessonsTemplateQuestionForm';
 
 interface Props {
   lessonsTemplateId: string;
@@ -65,7 +66,7 @@ const LessonsTemplateQuestionPopover: FunctionComponent<Props> = ({
 
   return (
     <>
-      <ButtonPopover entries={entries} variant={'icon'} />
+      <ButtonPopover entries={entries} variant="icon" />
       <DialogDelete
         open={openDelete}
         handleClose={handleCloseDelete}

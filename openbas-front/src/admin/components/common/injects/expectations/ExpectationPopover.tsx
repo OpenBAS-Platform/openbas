@@ -1,17 +1,18 @@
+import { MoreVert } from '@mui/icons-material';
+import { Button, Dialog as DialogMUI, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { FunctionComponent, useContext, useState } from 'react';
 import * as React from 'react';
-import { Button, Dialog as DialogMUI, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
-import { MoreVert } from '@mui/icons-material';
+
+import type { LoggedHelper } from '../../../../../actions/helper';
+import Dialog from '../../../../../components/common/Dialog';
 import Transition from '../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../components/i18n';
-import ExpectationFormUpdate from './ExpectationFormUpdate';
-import { ExpectationInput, ExpectationInputForm } from './Expectation';
-import Dialog from '../../../../../components/common/Dialog';
-import { PermissionsContext } from '../../Context';
-import useExpectationExpirationTime from './useExpectationExpirationTime';
-import type { InjectExpectation, PlatformSettings } from '../../../../../utils/api-types';
 import { useHelper } from '../../../../../store';
-import type { LoggedHelper } from '../../../../../actions/helper';
+import type { InjectExpectation, PlatformSettings } from '../../../../../utils/api-types';
+import { PermissionsContext } from '../../Context';
+import { ExpectationInput, ExpectationInputForm } from './Expectation';
+import ExpectationFormUpdate from './ExpectationFormUpdate';
+import useExpectationExpirationTime from './useExpectationExpirationTime';
 
 interface ExpectationPopoverProps {
   index: number;
@@ -93,7 +94,7 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   return (
     <div>
       <IconButton
-        onClick={(event) => handlePopoverOpen(event)}
+        onClick={event => handlePopoverOpen(event)}
         aria-haspopup="true"
         size="large"
         disabled={permissions.readOnly}

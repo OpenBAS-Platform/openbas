@@ -1,13 +1,14 @@
+import { FactCheckOutlined, MailOutlined, NoteAltOutlined, TheatersOutlined } from '@mui/icons-material';
+import { Drawer, ListItemIcon, ListItemText, MenuItem, MenuList } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Drawer, MenuList, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
-import { TheatersOutlined, FactCheckOutlined, MailOutlined, NoteAltOutlined } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../../../../components/i18n';
-import type { Exercise } from '../../../../utils/api-types';
-import type { Theme } from '../../../../components/Theme';
 
-const useStyles = makeStyles<Theme>((theme) => ({
+import { useFormatter } from '../../../../components/i18n';
+import type { Theme } from '../../../../components/Theme';
+import type { Exercise } from '../../../../utils/api-types';
+
+const useStyles = makeStyles<Theme>(theme => ({
   drawer: {
     minHeight: '100vh',
     width: 200,

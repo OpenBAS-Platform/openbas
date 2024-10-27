@@ -1,19 +1,20 @@
 import { useTheme } from '@mui/styles';
+import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
-import * as R from 'ramda';
-import Empty from '../../../../components/Empty';
+
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
-import { useFormatter } from '../../../../components/i18n';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { horizontalBarsChartOptions } from '../../../../utils/Charts';
-import type { Theme } from '../../../../components/Theme';
-import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import { fetchExerciseInjects } from '../../../../actions/Inject';
-import type { InjectExpectationStore, InjectStore } from '../../../../actions/injects/Inject';
 import type { InjectorContractHelper } from '../../../../actions/injector_contracts/injector-contract-helper';
+import type { InjectExpectationStore, InjectStore } from '../../../../actions/injects/Inject';
+import type { InjectHelper } from '../../../../actions/injects/inject-helper';
+import Empty from '../../../../components/Empty';
+import { useFormatter } from '../../../../components/i18n';
+import type { Theme } from '../../../../components/Theme';
+import { useHelper } from '../../../../store';
+import { horizontalBarsChartOptions } from '../../../../utils/Charts';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];

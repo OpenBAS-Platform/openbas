@@ -1,14 +1,15 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import XlsMappers from './data_ingestion/XlsMappers';
-import Parameters from './Parameters';
-import Users from './users/Users';
-import Groups from './groups/Groups';
-import Tags from './tags/Tags';
-import AttackPatterns from './attack_patterns/AttackPatterns';
-import KillChainPhases from './kill_chain_phases/KillChainPhases';
-import Policies from './policies/Policies';
+
 import { errorWrapper } from '../../../components/Error';
 import NotFound from '../../../components/NotFound';
+import AttackPatterns from './attack_patterns/AttackPatterns';
+import XlsMappers from './data_ingestion/XlsMappers';
+import Groups from './groups/Groups';
+import KillChainPhases from './kill_chain_phases/KillChainPhases';
+import Parameters from './Parameters';
+import Policies from './policies/Policies';
+import Tags from './tags/Tags';
+import Users from './users/Users';
 
 const Index = () => (
   <Routes>

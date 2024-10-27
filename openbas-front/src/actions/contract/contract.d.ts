@@ -25,20 +25,20 @@ export interface ContractElement {
   mandatory?: boolean;
   mandatoryGroups?: string[];
   type?:
-  | 'text'
-  | 'number'
-  | 'tuple'
-  | 'checkbox'
-  | 'textarea'
-  | 'select'
-  | 'article'
-  | 'challenge'
-  | 'dependency-select'
-  | 'attachment'
-  | 'team'
-  | 'expectation'
-  | 'asset'
-  | 'asset-group';
+    | 'text'
+    | 'number'
+    | 'tuple'
+    | 'checkbox'
+    | 'textarea'
+    | 'select'
+    | 'article'
+    | 'challenge'
+    | 'dependency-select'
+    | 'attachment'
+    | 'team'
+    | 'expectation'
+    | 'asset'
+    | 'asset-group';
 }
 
 export interface ContractVariable {

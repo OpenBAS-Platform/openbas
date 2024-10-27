@@ -1,5 +1,6 @@
 import { TextField as MuiTextField } from '@mui/material';
 import { useWatch } from 'react-hook-form';
+
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 
 const TextFieldBase = ({ askAi, control, setValue, ...props }) => {
@@ -9,13 +10,13 @@ const TextFieldBase = ({ askAi, control, setValue, ...props }) => {
       {...props}
       InputProps={{
         endAdornment: askAi && (
-        <TextFieldAskAI
-          variant="text"
-          currentValue={currentValue ?? ''}
-          setFieldValue={(val) => setValue(props.inputProps.name, val)}
-          format="text"
-          disabled={props.disabled}
-        />
+          <TextFieldAskAI
+            variant="text"
+            currentValue={currentValue ?? ''}
+            setFieldValue={val => setValue(props.inputProps.name, val)}
+            format="text"
+            disabled={props.disabled}
+          />
         ),
       }}
     />

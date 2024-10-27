@@ -1,6 +1,6 @@
 import * as C from '@mui/material/colors';
 
-export const colors = (temp) => [
+export const colors = temp => [
   C.red[temp],
   C.pink[temp],
   C.purple[temp],
@@ -50,13 +50,13 @@ export const colors = (temp) => [
  *
  * @param {Theme} theme
  */
-const simpleLabelTooltip = (theme) => ({ seriesIndex, w }) => (`
+const simpleLabelTooltip = theme => ({ seriesIndex, w }) => (`
   <div style="background: ${theme.palette.background.nav}; color: ${theme.palette.text.primary}; padding: 2px 6px; font-size: 12px">
     ${w.config.labels[seriesIndex]}
   </div>
 `);
 
-export const resultColors = (temp) => [
+export const resultColors = temp => [
   C.deepPurple[temp],
   C.indigo[temp],
   C.lightBlue[temp],
@@ -135,7 +135,7 @@ export const lineChartOptions = (
     tickAmount,
     tickPlacement: 'on',
     labels: {
-      formatter: (value) => (xFormatter ? xFormatter(value) : value),
+      formatter: value => (xFormatter ? xFormatter(value) : value),
       style: {
         fontSize: '12px',
         fontFamily: '"IBM Plex Sans", sans-serif',
@@ -147,7 +147,7 @@ export const lineChartOptions = (
   },
   yaxis: {
     labels: {
-      formatter: (value) => (yFormatter ? yFormatter(value) : value),
+      formatter: value => (yFormatter ? yFormatter(value) : value),
       style: {
         fontSize: '14px',
         fontFamily: '"IBM Plex Sans", sans-serif',
@@ -224,7 +224,7 @@ export const areaChartOptions = (
     tickAmount,
     tickPlacement: 'on',
     labels: {
-      formatter: (value) => (xFormatter ? xFormatter(value) : value),
+      formatter: value => (xFormatter ? xFormatter(value) : value),
       style: {
         fontSize: '12px',
         fontFamily: '"IBM Plex Sans", sans-serif',
@@ -236,7 +236,7 @@ export const areaChartOptions = (
   },
   yaxis: {
     labels: {
-      formatter: (value) => (yFormatter ? yFormatter(value) : value),
+      formatter: value => (yFormatter ? yFormatter(value) : value),
       style: {
         fontSize: '14px',
         fontFamily: '"IBM Plex Sans", sans-serif',
@@ -341,7 +341,7 @@ export const verticalBarsChartOptions = (
     tickAmount,
     tickPlacement: 'on',
     labels: {
-      formatter: (value) => (xFormatter ? xFormatter(value) : value),
+      formatter: value => (xFormatter ? xFormatter(value) : value),
       style: {
         fontSize: '12px',
         fontFamily: '"IBM Plex Sans", sans-serif',
@@ -361,7 +361,7 @@ export const verticalBarsChartOptions = (
   },
   yaxis: {
     labels: {
-      formatter: (value) => (yFormatter ? yFormatter(value) : value),
+      formatter: value => (yFormatter ? yFormatter(value) : value),
       style: {
         fontFamily: '"IBM Plex Sans", sans-serif',
       },
@@ -465,7 +465,7 @@ export const horizontalBarsChartOptions = (
   xaxis: {
     categories: categories ?? [],
     labels: {
-      formatter: (value) => (xFormatter ? xFormatter(value) : value),
+      formatter: value => (xFormatter ? xFormatter(value) : value),
       style: {
         fontFamily: '"IBM Plex Sans", sans-serif',
       },
@@ -477,7 +477,7 @@ export const horizontalBarsChartOptions = (
   },
   yaxis: {
     labels: {
-      formatter: (value) => (yFormatter ? yFormatter(value) : value),
+      formatter: value => (yFormatter ? yFormatter(value) : value),
       style: {
         fontFamily: '"IBM Plex Sans", sans-serif',
       },
@@ -650,7 +650,7 @@ export const polarAreaChartOptions = (
     },
     yaxis: {
       labels: {
-        formatter: (value) => (formatter ? formatter(value) : value),
+        formatter: value => (formatter ? formatter(value) : value),
         style: {
           fontFamily: '"IBM Plex Sans", sans-serif',
         },
@@ -709,7 +709,7 @@ export const donutChartOptions = ({
   const temp = theme.palette.mode === 'dark' ? 400 : 600;
   let dataLabelsColors = labels.map(() => theme.palette.text.primary);
   if (chartColors.length > 0) {
-    dataLabelsColors = chartColors.map((n) => (n === '#ffffff' ? '#000000' : theme.palette.text.primary));
+    dataLabelsColors = chartColors.map(n => (n === '#ffffff' ? '#000000' : theme.palette.text.primary));
   }
   let chartFinalColors = chartColors;
   if (chartFinalColors.length === 0) {

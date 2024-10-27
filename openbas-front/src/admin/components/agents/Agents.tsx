@@ -1,6 +1,4 @@
-import { useState } from 'react';
-import * as React from 'react';
-import { makeStyles, useTheme } from '@mui/styles';
+import { ArticleOutlined, ContentCopyOutlined, DownloadingOutlined, TerminalOutlined } from '@mui/icons-material';
 import {
   Alert,
   Button,
@@ -20,24 +18,27 @@ import {
   Tabs,
   Typography,
 } from '@mui/material';
-import { ArticleOutlined, ContentCopyOutlined, DownloadingOutlined, TerminalOutlined } from '@mui/icons-material';
+import { makeStyles, useTheme } from '@mui/styles';
 import { Bash, DownloadCircleOutline, Powershell } from 'mdi-material-ui';
 import * as R from 'ramda';
-import { useFormatter } from '../../../components/i18n';
-import { useHelper } from '../../../store';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
-import { useAppDispatch } from '../../../utils/hooks';
-import type { Executor } from '../../../utils/api-types';
-import type { ExecutorHelper } from '../../../actions/executors/executor-helper';
+import { useState } from 'react';
+import * as React from 'react';
+
 import { fetchExecutors } from '../../../actions/Executor';
-import type { Theme } from '../../../components/Theme';
+import type { ExecutorHelper } from '../../../actions/executors/executor-helper';
+import type { MeTokensHelper } from '../../../actions/helper';
+import { meTokens } from '../../../actions/User';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Transition from '../../../components/common/Transition';
-import { copyToClipboard, download } from '../../../utils/utils';
-import useAuth from '../../../utils/hooks/useAuth';
+import { useFormatter } from '../../../components/i18n';
 import PlatformIcon from '../../../components/PlatformIcon';
-import { meTokens } from '../../../actions/User';
-import type { MeTokensHelper } from '../../../actions/helper';
+import type { Theme } from '../../../components/Theme';
+import { useHelper } from '../../../store';
+import type { Executor } from '../../../utils/api-types';
+import { useAppDispatch } from '../../../utils/hooks';
+import useAuth from '../../../utils/hooks/useAuth';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
+import { copyToClipboard, download } from '../../../utils/utils';
 
 const useStyles = makeStyles(() => ({
   card: {
@@ -98,7 +99,7 @@ const Executors = () => {
   const windowsExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.includes('Windows'));
   const linuxExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.includes('Linux'));
   const macOsExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.includes('MacOS'));
-  const browserExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.some((n) => ['Chrome', 'Firefox', 'Edge', 'Safari'].includes(n)));
+  const browserExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.some(n => ['Chrome', 'Firefox', 'Edge', 'Safari'].includes(n)));
 
   // Selection
   const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
@@ -116,7 +117,7 @@ const Executors = () => {
     setAgentFolder(null);
     setArch('x86_64');
   };
-  const currentSelectedExecutor = (selectedExecutors ?? []).filter((executor) => executor.executor_type === activeTab).at(0);
+  const currentSelectedExecutor = (selectedExecutors ?? []).filter(executor => executor.executor_type === activeTab).at(0);
   const platformSelector = () => {
     switch (platform) {
       case 'windows':
@@ -268,8 +269,13 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Agents'), current: true }]} />
       <Alert variant="outlined" severity="info" style={{ marginBottom: 30 }}>
-        {t('Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable.')}<br /><br />
-        {t('Learn more information about how to setup simulation agents')} <a href="https://docs.openbas.io" target="_blank" rel="noreferrer">{t('in the documentation')}</a>.
+        {t('Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable.')}
+        <br />
+        <br />
+        {t('Learn more information about how to setup simulation agents')}
+        {' '}
+        <a href="https://docs.openbas.io" target="_blank" rel="noreferrer">{t('in the documentation')}</a>
+        .
       </Alert>
       <Grid container={true} spacing={3}>
         <Grid item={true} xs={3}>
@@ -277,7 +283,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
             <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('windows', windowsExecutors)} disabled={windowsExecutors.length === 0}>
               <CardContent className={classes.content}>
                 <div className={classes.icon}>
-                  <PlatformIcon platform='Windows' />
+                  <PlatformIcon platform="Windows" />
                 </div>
                 <Typography
                   variant="h6"
@@ -290,7 +296,9 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                     color: windowsExecutors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
                   }}
                 >
-                  <DownloadingOutlined style={{ marginRight: 10 }} /> {t('Install Windows Agent')}
+                  <DownloadingOutlined style={{ marginRight: 10 }} />
+                  {' '}
+                  {t('Install Windows Agent')}
                 </Typography>
                 <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {windowsExecutors.map((executor: Executor) => {
@@ -326,7 +334,9 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                     color: linuxExecutors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
                   }}
                 >
-                  <DownloadingOutlined style={{ marginRight: 10 }} /> {t('Install Linux Agent')}
+                  <DownloadingOutlined style={{ marginRight: 10 }} />
+                  {' '}
+                  {t('Install Linux Agent')}
                 </Typography>
                 <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {linuxExecutors.map((executor: Executor) => {
@@ -362,7 +372,9 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                     color: macOsExecutors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
                   }}
                 >
-                  <DownloadingOutlined style={{ marginRight: 10 }} /> {t('Install MacOS Agent')}
+                  <DownloadingOutlined style={{ marginRight: 10 }} />
+                  {' '}
+                  {t('Install MacOS Agent')}
                 </Typography>
                 <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {macOsExecutors.map((executor: Executor) => {
@@ -398,7 +410,9 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                     color: browserExecutors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
                   }}
                 >
-                  <DownloadingOutlined style={{ marginRight: 10 }} /> {t('Install Browser Agent')}
+                  <DownloadingOutlined style={{ marginRight: 10 }} />
+                  {' '}
+                  {t('Install Browser Agent')}
                 </Typography>
                 <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {browserExecutors.map((executor: Executor) => {
@@ -430,123 +444,130 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
           <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">
             {(selectedExecutors ?? []).map((executor) => {
               return (
-                <Tab key={executor.executor_id} label={executor.executor_name} value={executor.executor_type}/>
+                <Tab key={executor.executor_id} label={executor.executor_name} value={executor.executor_type} />
               );
             })}
           </Tabs>
           {currentSelectedExecutor && (
-          <div style={{ marginTop: 20 }}>
-              {currentSelectedExecutor.executor_type === 'openbas_caldera' && (
-              <div style={{ marginTop: 20 }}>
-                {platform === 'macos' && (
-                <FormControl style={{ width: '100%' }}>
-                  <InputLabel id="arch">{t('Architecture')}</InputLabel>
-                  <Select
-                    labelId="arch"
-                    value={arch}
-                    onChange={(event) => setArch(event.target.value ?? 'x86_64')}
-                    fullWidth={true}
-                  >
-                    <MenuItem value="x86_64">{t('x86_64')}</MenuItem>
-                    <MenuItem value="arm64">{t('arm64')}</MenuItem>
-                  </Select>
-                </FormControl>
-                )}
-                <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 1 - Install the agent')}</Typography>
-                <Alert variant="outlined" severity="info">
-                  {t('Installing the agent is requiring local administrator privileges.')}
-                </Alert>
-                {platform === 'windows' && (
-                <>
-                  <p>
-                    {t('You can whether directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
-                  </p>
-                  <pre style={{ margin: '20px 0 10px 0' }}>{platformSelector().displayedCode}</pre>
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
-                    <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformSelector().code)}>{t('Copy')}</Button>
-                    <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformSelector().displayedCode, 'openbas.ps1', 'text/plain')}>{t('Download')}</Button>
-                  </div>
-                </>
-                )}
-                {platform !== 'windows' && (
-                <>
-                  <p>
-                    {t('You can whether directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
-                  </p>
-                  <Alert variant="outlined" severity="warning">
-                    {t('For the moment, the following snippet or script will not add the agent at boot. Please be sure to add it in rc.local or other files to make it persistent. We will release proper packages in the near future.')}
-                  </Alert>
-                  <pre style={{ margin: '20px 0 10px 0' }}>{platformSelector().displayedCode}</pre>
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
-                    <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformSelector().code)}>{t('Copy')}</Button>
-                    <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformSelector().displayedCode, 'openbas.sh', 'text/plain')}>{t('Download')}</Button>
-                  </div>
-                </>
-                )}
-                <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 2 - Add antivirus exclusions')}</Typography>
-                <Alert variant="outlined" severity="info">
-                  {t('The agent will never execute directly any payload.')}
-                </Alert>
-                <p>
-                  {t('You will need to add proper antivirus exclusions for this agent (to ensure Caldera injects execution to work properly). It may not be necessary in the future but this is generally a good practice to ensure the agent will be always available.')}
-                </p>
-                <pre style={{ margin: '20px 0 10px 0' }}>{platformSelector().exclusions}</pre>
-              </div>
-              )}
-            {currentSelectedExecutor.executor_type === 'openbas_agent' && (
             <div style={{ marginTop: 20 }}>
-              <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 1 - Install the agent')}</Typography>
-              <Alert variant="outlined" severity="info">
-                {t('Installing the agent is requiring local administrator privileges.')}
-              </Alert>
-              {platform === 'windows' && (
-              <>
-                <p>
-                  {t('You can whether directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
-                </p>
-                <pre style={{ margin: '20px 0 10px 0' }}>{platformAgentSelector().displayedCode}</pre>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
-                  <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformAgentSelector().code)}>{t('Copy')}</Button>
-                  <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformAgentSelector().displayedCode, 'openbas.ps1', 'text/plain')}>{t('Download')}</Button>
+              {currentSelectedExecutor.executor_type === 'openbas_caldera' && (
+                <div style={{ marginTop: 20 }}>
+                  {platform === 'macos' && (
+                    <FormControl style={{ width: '100%' }}>
+                      <InputLabel id="arch">{t('Architecture')}</InputLabel>
+                      <Select
+                        labelId="arch"
+                        value={arch}
+                        onChange={event => setArch(event.target.value ?? 'x86_64')}
+                        fullWidth={true}
+                      >
+                        <MenuItem value="x86_64">{t('x86_64')}</MenuItem>
+                        <MenuItem value="arm64">{t('arm64')}</MenuItem>
+                      </Select>
+                    </FormControl>
+                  )}
+                  <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 1 - Install the agent')}</Typography>
+                  <Alert variant="outlined" severity="info">
+                    {t('Installing the agent is requiring local administrator privileges.')}
+                  </Alert>
+                  {platform === 'windows' && (
+                    <>
+                      <p>
+                        {t('You can whether directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
+                      </p>
+                      <pre style={{ margin: '20px 0 10px 0' }}>{platformSelector().displayedCode}</pre>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
+                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformSelector().code)}>{t('Copy')}</Button>
+                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformSelector().displayedCode, 'openbas.ps1', 'text/plain')}>{t('Download')}</Button>
+                      </div>
+                    </>
+                  )}
+                  {platform !== 'windows' && (
+                    <>
+                      <p>
+                        {t('You can whether directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
+                      </p>
+                      <Alert variant="outlined" severity="warning">
+                        {t('For the moment, the following snippet or script will not add the agent at boot. Please be sure to add it in rc.local or other files to make it persistent. We will release proper packages in the near future.')}
+                      </Alert>
+                      <pre style={{ margin: '20px 0 10px 0' }}>{platformSelector().displayedCode}</pre>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
+                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformSelector().code)}>{t('Copy')}</Button>
+                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformSelector().displayedCode, 'openbas.sh', 'text/plain')}>{t('Download')}</Button>
+                      </div>
+                    </>
+                  )}
+                  <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 2 - Add antivirus exclusions')}</Typography>
+                  <Alert variant="outlined" severity="info">
+                    {t('The agent will never execute directly any payload.')}
+                  </Alert>
+                  <p>
+                    {t('You will need to add proper antivirus exclusions for this agent (to ensure Caldera injects execution to work properly). It may not be necessary in the future but this is generally a good practice to ensure the agent will be always available.')}
+                  </p>
+                  <pre style={{ margin: '20px 0 10px 0' }}>{platformSelector().exclusions}</pre>
                 </div>
-              </>
               )}
-              {platform !== 'windows' && (
-              <>
-                <p>
-                  {t('You can whether directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
-                </p>
-                <pre style={{ margin: '20px 0 10px 0' }}>{platformAgentSelector().displayedCode}</pre>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
-                  <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformAgentSelector().code)}>{t('Copy')}</Button>
-                  <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformAgentSelector().displayedCode, 'openbas.sh', 'text/plain')}>{t('Download')}</Button>
+              {currentSelectedExecutor.executor_type === 'openbas_agent' && (
+                <div style={{ marginTop: 20 }}>
+                  <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 1 - Install the agent')}</Typography>
+                  <Alert variant="outlined" severity="info">
+                    {t('Installing the agent is requiring local administrator privileges.')}
+                  </Alert>
+                  {platform === 'windows' && (
+                    <>
+                      <p>
+                        {t('You can whether directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
+                      </p>
+                      <pre style={{ margin: '20px 0 10px 0' }}>{platformAgentSelector().displayedCode}</pre>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
+                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformAgentSelector().code)}>{t('Copy')}</Button>
+                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformAgentSelector().displayedCode, 'openbas.ps1', 'text/plain')}>{t('Download')}</Button>
+                      </div>
+                    </>
+                  )}
+                  {platform !== 'windows' && (
+                    <>
+                      <p>
+                        {t('You can whether directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
+                      </p>
+                      <pre style={{ margin: '20px 0 10px 0' }}>{platformAgentSelector().displayedCode}</pre>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
+                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformAgentSelector().code)}>{t('Copy')}</Button>
+                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformAgentSelector().displayedCode, 'openbas.sh', 'text/plain')}>{t('Download')}</Button>
+                      </div>
+                    </>
+                  )}
+                  <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 2 - Add antivirus exclusions')}</Typography>
+                  <Alert variant="outlined" severity="info">
+                    {t('The agent will never execute directly any payload.')}
+                  </Alert>
+                  <p>
+                    {t('You will need to add proper antivirus exclusions for this agent (to ensure Caldera injects execution to work properly). It may not be necessary in the future but this is generally a good practice to ensure the agent will be always available.')}
+                  </p>
+                  <pre style={{ margin: '20px 0 10px 0' }}>{platformAgentSelector().exclusions}</pre>
                 </div>
-              </>
               )}
-              <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 2 - Add antivirus exclusions')}</Typography>
-              <Alert variant="outlined" severity="info">
-                {t('The agent will never execute directly any payload.')}
-              </Alert>
-              <p>
-                {t('You will need to add proper antivirus exclusions for this agent (to ensure Caldera injects execution to work properly). It may not be necessary in the future but this is generally a good practice to ensure the agent will be always available.')}
-              </p>
-              <pre style={{ margin: '20px 0 10px 0' }}>{platformAgentSelector().exclusions}</pre>
+              {currentSelectedExecutor.executor_type === 'openbas_tanium' && (
+                <div style={{ marginTop: 20 }}>
+                  <Chip
+                    variant="outlined"
+                    icon={<ArticleOutlined />}
+                    classes={{ root: classes.chip }}
+                    label={t('documentation')}
+                  />
+                  <Typography variant="body1" style={{ marginBottom: 20 }}>
+                    {t('To install the agent please follow the')}
+                    {' '}
+                    <a target="_blank" href={currentSelectedExecutor.executor_doc} rel="noreferrer">
+                      {currentSelectedExecutor.executor_name}
+                      {' '}
+                      {t('documentation')}
+                    </a>
+                    .
+                  </Typography>
+                </div>
+              )}
             </div>
-            )}
-            {currentSelectedExecutor.executor_type === 'openbas_tanium' && (
-              <div style={{ marginTop: 20 }}>
-                <Chip
-                  variant="outlined"
-                  icon={<ArticleOutlined />}
-                  classes={{ root: classes.chip }}
-                  label={t('documentation')}
-                />
-                <Typography variant="body1" style={{ marginBottom: 20 }}>
-                  {t('To install the agent please follow the')} <a target="_blank" href={currentSelectedExecutor.executor_doc} rel="noreferrer">{currentSelectedExecutor.executor_name} {t('documentation')}</a>.
-                </Typography>
-              </div>
-            )}
-          </div>
           )}
         </DialogContent>
       </Dialog>

@@ -1,7 +1,7 @@
-import LogoText from '../static/images/logo_text_light.png';
 import LogoCollapsed from '../static/images/logo_light.png';
-import { fileUri } from '../utils/Environment';
+import LogoText from '../static/images/logo_text_light.png';
 import { hexToRGB } from '../utils/Colors';
+import { fileUri } from '../utils/Environment';
 import type { ExtendedThemeOptions } from './Theme';
 
 const EE_COLOR = '#0c7e69';
@@ -147,12 +147,12 @@ const ThemeLight = (
           scrollbarWidth: 'thin',
         },
         body: {
-          scrollbarColor: `${accent || THEME_LIGHT_DEFAULT_ACCENT} ${paper || THEME_LIGHT_DEFAULT_PAPER}`,
-          scrollbarWidth: 'thin',
-          html: {
+          'scrollbarColor': `${accent || THEME_LIGHT_DEFAULT_ACCENT} ${paper || THEME_LIGHT_DEFAULT_PAPER}`,
+          'scrollbarWidth': 'thin',
+          'html': {
             WebkitFontSmoothing: 'auto',
           },
-          a: {
+          'a': {
             color: primary || THEME_LIGHT_DEFAULT_PRIMARY,
           },
           'input:-webkit-autofill': {
@@ -165,12 +165,12 @@ const ThemeLight = (
             borderTopLeftRadius: 'inherit',
             borderTopRightRadius: 'inherit',
           },
-          pre: {
+          'pre': {
             fontFamily: 'Consolas, monaco, monospace',
             color: '#000000 !important',
             background: `${accent || '#c0dfff'} !important`,
           },
-          code: {
+          'code': {
             fontFamily: 'Consolas, monaco, monospace',
             color: '#000000 !important',
             background: `${accent || THEME_LIGHT_DEFAULT_ACCENT} !important`,
@@ -179,10 +179,10 @@ const ThemeLight = (
             fontWeight: 400,
           },
           '.w-md-editor': {
-            boxShadow: 'none',
-            background: 'transparent',
-            borderBottom: '1px solid rgba(0, 0, 0, 0.87) !important',
-            transition: 'borderBottom .3s',
+            'boxShadow': 'none',
+            'background': 'transparent',
+            'borderBottom': '1px solid rgba(0, 0, 0, 0.87) !important',
+            'transition': 'borderBottom .3s',
             '&:hover': {
               borderBottom: '2px solid #000000 !important',
             },
@@ -191,8 +191,8 @@ const ThemeLight = (
             },
           },
           '.error .w-md-editor': {
-            border: '0 !important',
-            borderBottom: '2px solid #f44336 !important',
+            'border': '0 !important',
+            'borderBottom': '2px solid #f44336 !important',
             '&:hover': {
               border: '0 !important',
               borderBottom: '2px solid #f44336 !important',

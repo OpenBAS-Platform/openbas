@@ -1,7 +1,7 @@
-import { FunctionComponent } from 'react';
+import { DnsOutlined, SubscriptionsOutlined } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import { ApplicationCogOutline, Console, FileImportOutline, LanConnect } from 'mdi-material-ui';
-import { DnsOutlined, SubscriptionsOutlined } from '@mui/icons-material';
+import { FunctionComponent } from 'react';
 
 interface PayloadIconProps {
   payloadType: string;

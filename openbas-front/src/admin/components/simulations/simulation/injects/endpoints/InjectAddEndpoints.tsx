@@ -1,7 +1,8 @@
-import { FunctionComponent, useContext, useState } from 'react';
-import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
+import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { FunctionComponent, useContext, useState } from 'react';
+
 import { useFormatter } from '../../../../../../components/i18n';
 import type { Theme } from '../../../../../../components/Theme';
 import EndpointsDialogAdding from '../../../../assets/endpoints/EndpointsDialogAdding';
@@ -63,8 +64,14 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
           classes={{ primary: classes.text }}
         />
       </ListItemButton>
-      <EndpointsDialogAdding initialState={endpointIds} open={openDialog} platforms={platforms} payloadType={payloadType} payloadArch={payloadArch}
-        onClose={handleClose} onSubmit={onSubmit}
+      <EndpointsDialogAdding
+        initialState={endpointIds}
+        open={openDialog}
+        platforms={platforms}
+        payloadType={payloadType}
+        payloadArch={payloadArch}
+        onClose={handleClose}
+        onSubmit={onSubmit}
         title={t('Add assets in this inject')}
       />
     </>

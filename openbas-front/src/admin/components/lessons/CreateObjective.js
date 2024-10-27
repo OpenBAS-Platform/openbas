@@ -1,13 +1,14 @@
-import { Component } from 'react';
+import { Add } from '@mui/icons-material';
+import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
-import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import { Component } from 'react';
+
+import Transition from '../../../components/common/Transition';
 import inject18n from '../../../components/i18n';
 import { LessonContext } from '../common/Context';
 import ObjectiveForm from './ObjectiveForm';
-import Transition from '../../../components/common/Transition';
 
 const styles = () => ({
   createButton: {

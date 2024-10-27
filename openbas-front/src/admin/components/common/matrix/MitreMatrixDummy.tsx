@@ -1,17 +1,18 @@
-import { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
-import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { FunctionComponent } from 'react';
+
+import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
+import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
-import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
-import { useAppDispatch } from '../../../../utils/hooks';
+import { useHelper } from '../../../../store';
 import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
-import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
-import KillChainPhaseColumn from './KillChainPhaseColumn';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { random } from '../../../../utils/Number';
+import KillChainPhaseColumn from './KillChainPhaseColumn';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -35,8 +36,8 @@ const MitreMatrixDummy: FunctionComponent<Props> = ({ ttpAlreadyLoaded }) => {
   const dispatch = useAppDispatch();
   // Fetching data
   const { attackPatterns, killChainPhaseMap }: {
-    attackPatterns: AttackPattern[],
-    killChainPhaseMap: Record<string, KillChainPhase>
+    attackPatterns: AttackPattern[];
+    killChainPhaseMap: Record<string, KillChainPhase>;
   } = useHelper((helper: AttackPatternHelper & KillChainPhaseHelper) => ({
     attackPatterns: helper.getAttackPatterns(),
     killChainPhaseMap: helper.getKillChainPhasesMap(),

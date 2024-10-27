@@ -1,18 +1,19 @@
+import { MoreVert } from '@mui/icons-material';
+import { IconButton, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
 import * as React from 'react';
-import { IconButton, Menu, MenuItem } from '@mui/material';
-import { MoreVert } from '@mui/icons-material';
+
+import { updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
+import { deleteEndpoint, updateEndpoint } from '../../../../actions/assets/endpoint-actions';
+import Dialog from '../../../../components/common/Dialog';
+import DialogDelete from '../../../../components/common/DialogDelete';
+import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import type { EndpointInput } from '../../../../utils/api-types';
-import EndpointForm from './EndpointForm';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { deleteEndpoint, updateEndpoint } from '../../../../actions/assets/endpoint-actions';
-import Drawer from '../../../../components/common/Drawer';
-import DialogDelete from '../../../../components/common/DialogDelete';
-import { updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
-import Dialog from '../../../../components/common/Dialog';
-import { EndpointStoreWithType } from './EndpointsList';
 import type { EndpointStore } from './Endpoint';
+import EndpointForm from './EndpointForm';
+import { EndpointStoreWithType } from './EndpointsList';
 
 interface Props {
   inline?: boolean;
@@ -64,7 +65,7 @@ const EndpointPopover: React.FC<Props> = ({
   };
   const submitEdit = (data: EndpointInput) => {
     dispatch(updateEndpoint(endpoint.asset_id, data)).then(
-      (result: { result: string, entities: { endpoints: Record<string, EndpointStore> } }) => {
+      (result: { result: string; entities: { endpoints: Record<string, EndpointStore> } }) => {
         if (result.entities) {
           if (onUpdate) {
             const endpointUpdated = result.entities.endpoints[result.result];
@@ -88,7 +89,7 @@ const EndpointPopover: React.FC<Props> = ({
     if (assetGroupId) {
       dispatch(
         updateAssetsOnAssetGroup(assetGroupId, {
-          asset_group_assets: assetGroupEndpointIds?.filter((id) => id !== endpoint.asset_id),
+          asset_group_assets: assetGroupEndpointIds?.filter(id => id !== endpoint.asset_id),
         }),
       ).then(() => {
         if (onRemoveEndpointFromAssetGroup) {

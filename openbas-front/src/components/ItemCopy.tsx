@@ -1,14 +1,15 @@
-import { FunctionComponent } from 'react';
 import { ContentCopyOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from './i18n';
-import { copyToClipboard } from '../utils/utils';
-import type { Theme } from './Theme';
+import { FunctionComponent } from 'react';
+
 import { truncate } from '../utils/String';
+import { copyToClipboard } from '../utils/utils';
+import { useFormatter } from './i18n';
+import type { Theme } from './Theme';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
-const useStyles = makeStyles<Theme>((theme) => ({
+const useStyles = makeStyles<Theme>(theme => ({
   containerInline: {
     position: 'relative',
     padding: '2px 25px 2px 5px',
@@ -27,18 +28,18 @@ const useStyles = makeStyles<Theme>((theme) => ({
     textOverflow: 'ellipsis',
   },
   icon: {
-    position: 'absolute',
-    right: 0,
-    cursor: 'pointer',
+    'position': 'absolute',
+    'right': 0,
+    'cursor': 'pointer',
     '&:hover': {
       color: theme.palette.primary.main,
     },
   },
   iconInline: {
-    position: 'absolute',
-    right: 5,
-    top: 4,
-    cursor: 'pointer',
+    'position': 'absolute',
+    'right': 5,
+    'top': 4,
+    'cursor': 'pointer',
     '&:hover': {
       color: theme.palette.primary.main,
     },

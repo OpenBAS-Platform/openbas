@@ -1,7 +1,8 @@
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
-import AnimationMenu from '../AnimationMenu';
+
 import { useFormatter } from '../../../../../components/i18n';
+import AnimationMenu from '../AnimationMenu';
 
 const useStyles = makeStyles(() => ({
   container: {

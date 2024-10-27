@@ -1,13 +1,13 @@
-import { CSSProperties, memo, useRef } from 'react';
+import { useTheme } from '@mui/styles';
+import { type BackgroundProps, type ReactFlowState, useStore } from '@xyflow/react';
 import cc from 'classcat';
+import { CSSProperties, memo, useRef } from 'react';
 import { shallow } from 'zustand/shallow';
 
-import { useStore, type ReactFlowState, type BackgroundProps } from '@xyflow/react';
-import { useTheme } from '@mui/styles';
 import type { Theme } from './Theme';
 
 interface Props extends BackgroundProps {
-  minutesPerGap: number,
+  minutesPerGap: number;
 }
 
 const selector = (s: ReactFlowState) => ({ transform: s.transform, patternId: `pattern-${s.rfId}` });
@@ -66,9 +66,11 @@ function BackgroundComponent({
         patternUnits="userSpaceOnUse"
         patternTransform={`translate(-${patternOffset[0]},-${patternOffset[1]})`}
       >
-        <svg style={{
-          transform: `scale(${transform[2]})`,
-        }} xmlns="http://www.w3.org/2000/svg"
+        <svg
+          style={{
+            transform: `scale(${transform[2]})`,
+          }}
+          xmlns="http://www.w3.org/2000/svg"
         >
           <path
             d="M0,0 L0,1000"
@@ -77,7 +79,7 @@ function BackgroundComponent({
           />
         </svg>
       </pattern>
-      <rect x="0" y="0" width="100%" height="100%" fill={`url(#${modifiedPatternId})`}/>
+      <rect x="0" y="0" width="100%" height="100%" fill={`url(#${modifiedPatternId})`} />
     </svg>
   );
 }

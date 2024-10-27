@@ -1,15 +1,16 @@
+import { MoreVert } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, PopoverProps } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import * as React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem, PopoverProps } from '@mui/material';
-import { MoreVert } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../../../../components/i18n';
+
 import { deleteChannel, updateChannel } from '../../../../actions/channels/channel-action';
-import ChannelForm from './ChannelForm';
-import { useAppDispatch } from '../../../../utils/hooks';
 import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
 import type { Channel, ChannelUpdateInput } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import ChannelForm from './ChannelForm';
 
 const useStyles = makeStyles(() => ({
   button: {

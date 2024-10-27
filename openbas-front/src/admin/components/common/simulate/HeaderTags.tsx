@@ -1,13 +1,14 @@
-import { Button, Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import { AddOutlined } from '@mui/icons-material';
-import { Form } from 'react-final-form';
+import { Button, Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import * as R from 'ramda';
 import { FunctionComponent, useState } from 'react';
+import { Form } from 'react-final-form';
+
 import Transition from '../../../../components/common/Transition';
-import TagField from '../../../../components/TagField';
-import TagChip from '../tags/TagChip';
 import { useFormatter } from '../../../../components/i18n';
+import TagField from '../../../../components/TagField';
 import { Option } from '../../../../utils/Option';
+import TagChip from '../tags/TagChip';
 
 interface Props {
   tags: string[] | undefined;
@@ -32,7 +33,7 @@ const HeaderTags: FunctionComponent<Props> = ({
   const submitTags = (values: { tags: Option[] }) => {
     handleToggleAddTag();
     updateTags(R.uniq([
-      ...values.tags.map((tag) => tag.id),
+      ...values.tags.map(tag => tag.id),
       ...(tags ?? []),
     ]));
   };

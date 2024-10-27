@@ -1,13 +1,14 @@
-import { CSSProperties, FunctionComponent } from 'react';
 import { Autocomplete as MuiAutocomplete, Box, TextField } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
+import { CSSProperties, FunctionComponent } from 'react';
 import { FieldErrors } from 'react-hook-form';
+
+import type { SecurityPlatformHelper } from '../../actions/assets/asset-helper';
+import { fetchSecurityPlatforms } from '../../actions/assets/securityPlatform-actions';
+import { useHelper } from '../../store';
+import type { SecurityPlatform } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
-import type { SecurityPlatform } from '../../utils/api-types';
-import { useHelper } from '../../store';
-import { fetchSecurityPlatforms } from '../../actions/assets/securityPlatform-actions';
-import type { SecurityPlatformHelper } from '../../actions/assets/asset-helper';
 import type { Theme } from '../Theme';
 
 const useStyles = makeStyles(() => ({
@@ -39,7 +40,7 @@ interface Props {
 const securityPlatformsToOptions = (securityPlatforms: SecurityPlatform[], filterOptions: (securityPlatform: SecurityPlatform) => boolean) => {
   return securityPlatforms
     .filter(filterOptions)
-    .map((n) => ({
+    .map(n => ({
       id: n.asset_id,
       label: n.asset_name,
       logo_dark: n.security_platform_logo_dark,
@@ -63,7 +64,7 @@ const SecurityPlatformField: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
 
   // Fetching data
-  const { securityPlatforms }: { securityPlatforms: SecurityPlatform[]; } = useHelper((helper: SecurityPlatformHelper) => ({
+  const { securityPlatforms }: { securityPlatforms: SecurityPlatform[] } = useHelper((helper: SecurityPlatformHelper) => ({
     securityPlatforms: helper.getSecurityPlatforms(),
   }));
   useDataLoader(() => {
@@ -73,7 +74,7 @@ const SecurityPlatformField: FunctionComponent<Props> = ({
   // Form
   const securityPlatformsOptions = securityPlatformsToOptions(securityPlatforms, filterOptions);
 
-  const selectedValue = securityPlatformsOptions.find((option) => option.id === fieldValue) || null;
+  const selectedValue = securityPlatformsOptions.find(option => option.id === fieldValue) || null;
 
   return (
     <div style={{ position: 'relative' }}>
@@ -105,7 +106,7 @@ const SecurityPlatformField: FunctionComponent<Props> = ({
           );
         }}
         isOptionEqualToValue={(option, value) => option.id === value.id}
-        renderInput={(params) => (
+        renderInput={params => (
           <TextField
             {...params}
             label={label}

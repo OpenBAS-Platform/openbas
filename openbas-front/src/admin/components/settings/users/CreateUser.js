@@ -1,14 +1,15 @@
-import { forwardRef, Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import * as R from 'ramda';
+import { Add } from '@mui/icons-material';
 import { Fab, Slide } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import { Add } from '@mui/icons-material';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component, forwardRef } from 'react';
+import { connect } from 'react-redux';
+
 import { addUser } from '../../../../actions/User';
-import UserForm from './UserForm';
-import inject18n from '../../../../components/i18n';
 import Drawer from '../../../../components/common/Drawer';
+import inject18n from '../../../../components/i18n';
+import UserForm from './UserForm';
 
 const styles = () => ({
   createButton: {

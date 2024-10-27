@@ -1,7 +1,7 @@
-import { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { withStyles } from '@mui/styles';
 import { CircularProgress } from '@mui/material';
+import { withStyles } from '@mui/styles';
+import * as PropTypes from 'prop-types';
+import { Component } from 'react';
 
 const styles = () => ({
   container: {

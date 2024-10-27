@@ -1,8 +1,9 @@
-import { makeStyles } from '@mui/styles';
 import { ReportProblem } from '@mui/icons-material';
-import { isEmptyField, recordEntries, recordKeys } from '../../../utils/utils';
-import type { Theme } from '../../../components/Theme';
+import { makeStyles } from '@mui/styles';
+
 import { useFormatter } from '../../../components/i18n';
+import type { Theme } from '../../../components/Theme';
+import { isEmptyField, recordEntries, recordKeys } from '../../../utils/utils';
 
 export const SYSTEM_BANNER_HEIGHT_PER_MESSAGE = 18;
 
@@ -49,8 +50,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const SystemBanners = (settings: {
   settings: {
-    platform_banner_by_level: Record<'debug' | 'info' | 'warn' | 'error' | 'fatal', string[]>,
-  }
+    platform_banner_by_level: Record<'debug' | 'info' | 'warn' | 'error' | 'fatal', string[]>;
+  };
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -80,7 +81,7 @@ const SystemBanners = (settings: {
             {settings.settings.platform_banner_by_level[key].map((message) => {
               return (
                 <div key={`${key}.${message}`} className={classes.container}>
-                  <ReportProblem color="error" fontSize="small" style={{ marginRight: 8 }}/>
+                  <ReportProblem color="error" fontSize="small" style={{ marginRight: 8 }} />
                   <span className={classes.bannerText}>
                     {t(message)}
                   </span>

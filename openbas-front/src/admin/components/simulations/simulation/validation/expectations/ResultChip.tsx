@@ -1,7 +1,8 @@
 import { Chip } from '@mui/material';
-import { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
+import { FunctionComponent } from 'react';
+
 import colorStyles from '../../../../../../components/Color';
 import { useFormatter } from '../../../../../../components/i18n';
 import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';

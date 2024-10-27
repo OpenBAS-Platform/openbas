@@ -1,8 +1,9 @@
-import { FunctionComponent } from 'react';
-import { makeStyles } from '@mui/styles';
-import { Chip, Tooltip } from '@mui/material';
 import { DevicesOtherOutlined, Groups3Outlined, HorizontalRule } from '@mui/icons-material';
+import { Chip, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { SelectGroup } from 'mdi-material-ui';
+import { FunctionComponent } from 'react';
+
 import type { InjectTargetWithResult } from '../utils/api-types';
 import { getLabelOfRemainingItems, getRemainingItemsCount, getVisibleItems, truncate } from '../utils/String';
 
@@ -21,7 +22,7 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   targets: InjectTargetWithResult[] | undefined;
-  variant?: string,
+  variant?: string;
 }
 
 const ItemTargets: FunctionComponent<Props> = ({
@@ -41,17 +42,17 @@ const ItemTargets: FunctionComponent<Props> = ({
   const remainingTargetsCount = getRemainingItemsCount(targets, visibleTargets);
 
   if (!targets || targets.length === 0) {
-    return <HorizontalRule/>;
+    return <HorizontalRule />;
   }
 
   const getIcon = (type: string) => {
     if (type === 'ASSETS') {
-      return <DevicesOtherOutlined style={{ fontSize: '1rem' }}/>;
+      return <DevicesOtherOutlined style={{ fontSize: '1rem' }} />;
     }
     if (type === 'ASSETS_GROUPS') {
-      return <SelectGroup style={{ fontSize: '1rem' }}/>;
+      return <SelectGroup style={{ fontSize: '1rem' }} />;
     }
-    return <Groups3Outlined style={{ fontSize: '1rem' }}/>; // Teams
+    return <Groups3Outlined style={{ fontSize: '1rem' }} />; // Teams
   };
 
   return (

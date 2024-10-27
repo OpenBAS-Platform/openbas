@@ -1,8 +1,9 @@
+import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 import * as React from 'react';
-import { makeStyles } from '@mui/styles';
-import EEChip from './EEChip';
+
 import { useFormatter } from '../../../../components/i18n';
+import EEChip from './EEChip';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -24,7 +25,11 @@ const EEField: FunctionComponent<EEFieldProps> = ({
   const classes = useStyles();
   const { t } = useFormatter();
   const component = React.cloneElement(children, {
-    label: <>{t(children.props.label)}<EEChip /></>,
+    label:
+      <>
+        {t(children.props.label)}
+        <EEChip />
+      </>,
   });
   return (
     <div className={classes.labelRoot}>

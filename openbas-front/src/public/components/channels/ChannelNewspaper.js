@@ -1,12 +1,13 @@
-import { forwardRef, useState } from 'react';
+import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, MoreHorizOutlined, ShareOutlined } from '@mui/icons-material';
+import { Avatar, Button, Card, CardContent, CardHeader, CardMedia, Dialog, DialogContent, DialogTitle, Grid, Slide, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
-import { Typography, Grid, Card, CardHeader, CardContent, Avatar, CardMedia, Button, Dialog, DialogTitle, DialogContent, Slide } from '@mui/material';
-import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, ShareOutlined, MoreHorizOutlined } from '@mui/icons-material';
-import { useFormatter } from '../../../components/i18n';
+import { forwardRef, useState } from 'react';
+
 import Empty from '../../../components/Empty';
-import { useHelper } from '../../../store';
 import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
+import { useFormatter } from '../../../components/i18n';
+import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
 
 const Transition = forwardRef((props, ref) => (
@@ -49,15 +50,15 @@ const ChannelNewspaper = ({ channelReader }) => {
     channel_information: channel,
   } = channelReader;
   const baseUri = `/api/player/${exercise?.exercise_id ?? scenario?.scenario_id}`;
-  const { documentsMap } = useHelper((helper) => ({
+  const { documentsMap } = useHelper(helper => ({
     documentsMap: helper.getDocumentsMap(),
   }));
   const logo = isDark ? channel.channel_logo_dark : channel.channel_logo_light;
   const firstArticle = R.head(articles) || null;
   const firstArticleImages = (firstArticle?.article_documents || [])
-    .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
-    .filter((d) => d !== undefined)
-    .filter((d) => d.document_type.includes('image/'));
+    .map(docId => (documentsMap[docId] ? documentsMap[docId] : undefined))
+    .filter(d => d !== undefined)
+    .filter(d => d.document_type.includes('image/'));
   let firstArticleColumns = 12;
   if (firstArticleImages.length === 2) {
     firstArticleColumns = 6;
@@ -82,18 +83,18 @@ const ChannelNewspaper = ({ channelReader }) => {
         </div>
       )}
       {channel.channel_mode !== 'logo' && (
-      <Typography
-        variant="h1"
-        style={{
-          textAlign: 'center',
-          color: isDark
-            ? channel.channel_primary_color_dark
-            : channel.channel_primary_color_light,
-          fontSize: 40,
-        }}
-      >
-        {channel.channel_name}
-      </Typography>
+        <Typography
+          variant="h1"
+          style={{
+            textAlign: 'center',
+            color: isDark
+              ? channel.channel_primary_color_dark
+              : channel.channel_primary_color_light,
+            fontSize: 40,
+          }}
+        >
+          {channel.channel_name}
+        </Typography>
       )}
       <Typography
         variant="h2"
@@ -117,16 +118,16 @@ const ChannelNewspaper = ({ channelReader }) => {
               sx={{ width: '100%', height: '100%' }}
             >
               <CardHeader
-                avatar={
+                avatar={(
                   <Avatar>
                     {(firstArticle.article_author || t('Unknown')).charAt(0)}
                   </Avatar>
-                }
+                )}
                 title={firstArticle.article_author || t('Unknown')}
                 subheader={fldt(firstArticle.article_virtual_publication)}
               />
               <Grid container={true} spacing={3}>
-                {firstArticleImages.map((doc) => (
+                {firstArticleImages.map(doc => (
                   <Grid
                     key={doc.document_id}
                     item={true}
@@ -196,9 +197,9 @@ const ChannelNewspaper = ({ channelReader }) => {
           <Grid item={true} xs={4}>
             {headArticles.map((article, index) => {
               const images = article.article_documents
-                .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
-                .filter((d) => d !== undefined)
-                .filter((d) => d.document_type.includes('image/'));
+                .map(docId => (documentsMap[docId] ? documentsMap[docId] : undefined))
+                .filter(d => d !== undefined)
+                .filter(d => d.document_type.includes('image/'));
               let columns = 12;
               if (images.length === 2) {
                 columns = 6;
@@ -216,16 +217,16 @@ const ChannelNewspaper = ({ channelReader }) => {
                   style={{ marginTop: index > 0 ? 20 : 0 }}
                 >
                   <CardHeader
-                    avatar={
+                    avatar={(
                       <Avatar>
                         {(article.article_author || t('Unknown')).charAt(0)}
                       </Avatar>
-                    }
+                    )}
                     title={article.article_author || t('Unknown')}
                     subheader={fldt(article.article_virtual_publication)}
                   />
                   <Grid container={true} spacing={3}>
-                    {images.map((doc) => (
+                    {images.map(doc => (
                       <Grid key={doc.document_id} item={true} xs={columns}>
                         <CardMedia
                           component="img"
@@ -289,9 +290,9 @@ const ChannelNewspaper = ({ channelReader }) => {
       <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
         {otherArticles.map((article) => {
           const images = article.article_documents
-            .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
-            .filter((d) => d !== undefined)
-            .filter((d) => d.document_type.includes('image/'));
+            .map(docId => (documentsMap[docId] ? documentsMap[docId] : undefined))
+            .filter(d => d !== undefined)
+            .filter(d => d.document_type.includes('image/'));
           let columns = 12;
           if (images.length === 2) {
             columns = 6;
@@ -308,16 +309,16 @@ const ChannelNewspaper = ({ channelReader }) => {
                 sx={{ width: '100%', height: '100%' }}
               >
                 <CardHeader
-                  avatar={
+                  avatar={(
                     <Avatar>
                       {(article.article_author || t('Unknown')).charAt(0)}
                     </Avatar>
-                  }
+                  )}
                   title={article.article_author || t('Unknown')}
                   subheader={fldt(article.article_virtual_publication)}
                 />
                 <Grid container={true} spacing={3}>
-                  {images.map((doc) => (
+                  {images.map(doc => (
                     <Grid key={doc.document_id} item={true} xs={columns}>
                       <CardMedia
                         component="img"
@@ -388,7 +389,11 @@ const ChannelNewspaper = ({ channelReader }) => {
         <DialogTitle>{currentArticle?.article_name}</DialogTitle>
         <DialogContent>
           <Typography variant="body2">
-            {t('By')} {currentArticle?.article_author || t('Unknown')},{' '}
+            {t('By')}
+            {' '}
+            {currentArticle?.article_author || t('Unknown')}
+            ,
+            {' '}
             {fldt(currentArticle?.article_virtual_publication)}
           </Typography>
           <ExpandableMarkdown

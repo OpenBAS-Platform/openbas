@@ -1,12 +1,13 @@
-import { Autocomplete as MuiAutocomplete, IconButton, TextField, Tooltip } from '@mui/material';
 import { FilterListOffOutlined } from '@mui/icons-material';
-import { useState, CSSProperties, FunctionComponent } from 'react';
+import { Autocomplete as MuiAutocomplete, IconButton, TextField, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { CSSProperties, FunctionComponent, useState } from 'react';
+
 import type { Filter, FilterGroup } from '../../../../utils/api-types';
-import { FilterHelpers } from './FilterHelpers';
-import { buildEmptyFilter } from './FilterUtils';
 import { Option } from '../../../../utils/Option';
 import { useFormatter } from '../../../i18n';
+import { FilterHelpers } from './FilterHelpers';
+import { buildEmptyFilter } from './FilterUtils';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -48,7 +49,7 @@ const FilterAutocomplete: FunctionComponent<Props> = ({
   };
 
   const computeOptions = () => {
-    return options.filter((o) => !filterGroup?.filters?.map((f) => f.key).includes(o.id));
+    return options.filter(o => !filterGroup?.filters?.map(f => f.key).includes(o.id));
   };
 
   return (
@@ -69,7 +70,7 @@ const FilterAutocomplete: FunctionComponent<Props> = ({
           }
           setInputValue(newValue);
         }}
-        renderInput={(params) => (
+        renderInput={params => (
           <TextField
             {...params}
             variant="outlined"

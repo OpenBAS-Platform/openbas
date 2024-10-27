@@ -1,6 +1,6 @@
-import type { InjectExpectation, PlatformSettings } from '../../../../../utils/api-types';
-import { useHelper } from '../../../../../store';
 import type { LoggedHelper } from '../../../../../actions/helper';
+import { useHelper } from '../../../../../store';
+import type { InjectExpectation, PlatformSettings } from '../../../../../utils/api-types';
 
 const useExpectationExpirationTime = (expectationType: InjectExpectation['inject_expectation_type']): number => {
   const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({

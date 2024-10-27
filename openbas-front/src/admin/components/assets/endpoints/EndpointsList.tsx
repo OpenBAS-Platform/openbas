@@ -1,11 +1,12 @@
+import { DevicesOtherOutlined } from '@mui/icons-material';
+import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import * as React from 'react';
-import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { DevicesOtherOutlined } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
-import type { EndpointStore } from './Endpoint';
+
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
+import type { EndpointStore } from './Endpoint';
 
 const useStyles = makeStyles(() => ({
   item: {
@@ -80,7 +81,7 @@ const EndpointsList: FunctionComponent<Props> = ({
               <DevicesOtherOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <>
                   <div
                     className={classes.bodyItem}
@@ -92,7 +93,9 @@ const EndpointsList: FunctionComponent<Props> = ({
                     className={classes.bodyItem}
                     style={inlineStyles.asset_platform}
                   >
-                    <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} /> {endpoint.endpoint_platform}
+                    <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
+                    {' '}
+                    {endpoint.endpoint_platform}
                   </div>
                   <div
                     className={classes.bodyItem}
@@ -111,7 +114,7 @@ const EndpointsList: FunctionComponent<Props> = ({
                     />
                   </div>
                 </>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               {component(endpoint)}

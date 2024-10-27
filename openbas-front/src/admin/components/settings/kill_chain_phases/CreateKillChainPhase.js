@@ -1,14 +1,15 @@
-import { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import * as R from 'ramda';
+import { Add } from '@mui/icons-material';
 import { Fab } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import { Add } from '@mui/icons-material';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component } from 'react';
+import { connect } from 'react-redux';
+
 import { addKillChainPhase } from '../../../../actions/KillChainPhase';
-import KillChainPhaseForm from './KillChainPhaseForm';
-import inject18n from '../../../../components/i18n';
 import Drawer from '../../../../components/common/Drawer';
+import inject18n from '../../../../components/i18n';
+import KillChainPhaseForm from './KillChainPhaseForm';
 
 const styles = () => ({
   createButton: {
@@ -78,7 +79,7 @@ CreateKillChainPhase.propTypes = {
   onCreate: PropTypes.func,
 };
 
-const select = (state) => ({
+const select = state => ({
   organizations: state.referential.entities.organizations,
 });
 

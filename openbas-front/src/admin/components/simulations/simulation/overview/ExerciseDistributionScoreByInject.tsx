@@ -1,16 +1,17 @@
-import Chart from 'react-apexcharts';
-import { FunctionComponent } from 'react';
 import { useTheme } from '@mui/styles';
 import * as R from 'ramda';
-import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
+import { FunctionComponent } from 'react';
+import Chart from 'react-apexcharts';
+
+import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
+import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
+import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
-import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 import type { Inject } from '../../../../../utils/api-types';
+import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
@@ -58,7 +59,7 @@ const ExerciseDistributionScoreByInject: FunctionComponent<Props> = ({
     <>
       {injectsTotalScores.length > 0 ? (
         <Chart
-          id='exercise_distribution_total_score_by_inject'
+          id="exercise_distribution_total_score_by_inject"
           // @ts-expect-error: Need to migrate Chart.js file
           options={horizontalBarsChartOptions(
             theme,

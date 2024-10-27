@@ -1,29 +1,8 @@
 import { useParams } from 'react-router-dom';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { LessonContext, LessonContextType } from '../../../common/Context';
-import type {
-  EvaluationInput,
-  Exercise,
-  LessonsCategoryCreateInput,
-  LessonsCategoryTeamsInput,
-  LessonsCategoryUpdateInput,
-  LessonsQuestionCreateInput,
-  LessonsQuestionUpdateInput,
-  LessonsSendInput,
-  ObjectiveInput,
-} from '../../../../../utils/api-types';
-import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
-import type { LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
-import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
-import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
-import type { UserHelper } from '../../../../../actions/helper';
-import { fetchLessonsTemplates } from '../../../../../actions/Lessons';
-import { fetchExerciseInjects } from '../../../../../actions/Inject';
+
+import { addExerciseEvaluation, fetchExerciseEvaluations, updateExerciseEvaluation } from '../../../../../actions/Evaluation';
 import { fetchExerciseTeams, updateExerciseLessons } from '../../../../../actions/Exercise';
-import Lessons from '../../../lessons/exercises/Lessons';
+import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import {
   addLessonsCategory,
   addLessonsQuestion,
@@ -41,10 +20,32 @@ import {
   updateLessonsCategoryTeams,
   updateLessonsQuestion,
 } from '../../../../../actions/exercises/exercise-action';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import { usePermissions } from '../../../../../utils/Exercise';
+import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
+import type { UserHelper } from '../../../../../actions/helper';
+import { fetchExerciseInjects } from '../../../../../actions/Inject';
+import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
+import { fetchLessonsTemplates } from '../../../../../actions/Lessons';
+import type { LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
 import { addExerciseObjective, deleteExerciseObjective, fetchExerciseObjectives, updateExerciseObjective } from '../../../../../actions/Objective';
-import { addExerciseEvaluation, fetchExerciseEvaluations, updateExerciseEvaluation } from '../../../../../actions/Evaluation';
+import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
+import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
+import { useHelper } from '../../../../../store';
+import type {
+  EvaluationInput,
+  Exercise,
+  LessonsCategoryCreateInput,
+  LessonsCategoryTeamsInput,
+  LessonsCategoryUpdateInput,
+  LessonsQuestionCreateInput,
+  LessonsQuestionUpdateInput,
+  LessonsSendInput,
+  ObjectiveInput,
+} from '../../../../../utils/api-types';
+import { usePermissions } from '../../../../../utils/Exercise';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { LessonContext, LessonContextType } from '../../../common/Context';
+import Lessons from '../../../lessons/exercises/Lessons';
 
 const ExerciseLessons = () => {
   const dispatch = useAppDispatch();
@@ -151,7 +152,8 @@ const ExerciseLessons = () => {
 
   return (
     <LessonContext.Provider value={context}>
-      <Lessons source={{ ...source, isReadOnly: permissions.readOnly, isUpdatable: permissions.canWrite }}
+      <Lessons
+        source={{ ...source, isReadOnly: permissions.readOnly, isUpdatable: permissions.canWrite }}
         objectives={objectives}
         injects={injects}
         teamsMap={teamsMap}
@@ -161,7 +163,8 @@ const ExerciseLessons = () => {
         lessonsAnswers={lessonsAnswers}
         lessonsTemplates={lessonsTemplates}
         usersMap={usersMap}
-      ></Lessons>
+      >
+      </Lessons>
     </LessonContext.Provider>
   );
 };

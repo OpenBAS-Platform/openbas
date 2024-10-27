@@ -1,19 +1,20 @@
-import { lazy, Suspense, useEffect } from 'react';
-import * as R from 'ramda';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import { StyledEngineProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
-import { useHelper } from './store';
+import { StyledEngineProvider } from '@mui/material/styles';
+import * as R from 'ramda';
+import { lazy, Suspense, useEffect } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
+
 import { fetchMe, fetchPlatformParameters } from './actions/Application';
-import NotFound from './components/NotFound';
-import ConnectedThemeProvider from './components/AppThemeProvider';
-import ConnectedIntlProvider from './components/AppIntlProvider';
-import { errorWrapper } from './components/Error';
-import { useAppDispatch } from './utils/hooks';
 import type { LoggedHelper } from './actions/helper';
+import ConnectedIntlProvider from './components/AppIntlProvider';
+import ConnectedThemeProvider from './components/AppThemeProvider';
+import { errorWrapper } from './components/Error';
 import Loader from './components/Loader';
-import { UserContext } from './utils/hooks/useAuth';
 import Message from './components/Message';
+import NotFound from './components/NotFound';
+import { useHelper } from './store';
+import { useAppDispatch } from './utils/hooks';
+import { UserContext } from './utils/hooks/useAuth';
 
 const RootPublic = lazy(() => import('./public/Root'));
 const IndexPrivate = lazy(() => import('./private/Index'));
@@ -58,8 +59,10 @@ const Root = () => {
             <Message />
             <Suspense fallback={<Loader />}>
               <Routes>
-                <Route path="" element={logged.isOnlyPlayer ? <Navigate to="private" replace={true} />
-                  : <Navigate to="admin" replace={true} />}
+                <Route
+                  path=""
+                  element={logged.isOnlyPlayer ? <Navigate to="private" replace={true} />
+                    : <Navigate to="admin" replace={true} />}
                 />
                 <Route path="private/*" element={errorWrapper(IndexPrivate)()} />
                 <Route path="admin/*" element={errorWrapper(IndexAdmin)()} />

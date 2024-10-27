@@ -1,14 +1,15 @@
-import { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import * as R from 'ramda';
+import { Add } from '@mui/icons-material';
 import { Fab } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import { Add } from '@mui/icons-material';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component } from 'react';
+import { connect } from 'react-redux';
+
 import { addMitigation } from '../../../actions/Mitigation';
-import MitigationForm from './MitigationForm';
-import inject18n from '../../../components/i18n';
 import Drawer from '../../../components/common/Drawer';
+import inject18n from '../../../components/i18n';
+import MitigationForm from './MitigationForm';
 
 const styles = () => ({
   createButton: {

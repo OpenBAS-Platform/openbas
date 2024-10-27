@@ -1,11 +1,12 @@
 import { useParams } from 'react-router-dom';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+
 import { fetchExerciseArticles } from '../../../../../actions/channels/article-action';
-import Articles from '../../../common/articles/Articles';
-import { useAppDispatch } from '../../../../../utils/hooks';
 import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
+import { useHelper } from '../../../../../store';
 import type { Exercise } from '../../../../../utils/api-types';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import Articles from '../../../common/articles/Articles';
 import { ArticleContext } from '../../../common/Context';
 import articleContextForExercise from './articleContextForExercise';
 

@@ -1,11 +1,12 @@
+import { Button } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import { Button } from '@mui/material';
+
 import OldTextField from '../../../../components/fields/OldTextField';
-import { useFormatter } from '../../../../components/i18n';
 import SwitchField from '../../../../components/fields/SwitchField';
-import TagField from '../../../../components/TagField';
+import { useFormatter } from '../../../../components/i18n';
 import OrganizationField from '../../../../components/OrganizationField';
+import TagField from '../../../../components/TagField';
 
 const UserForm = (props) => {
   const { onSubmit, initialValues, editing, handleClose } = props;

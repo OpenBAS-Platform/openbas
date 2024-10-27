@@ -29,7 +29,7 @@ export const tryAtomicTesting = (injectId: string) => {
   return simpleCall(uri);
 };
 
-export const fetchTargetResult = (injectId: string, targetId: string, targetType: string, parentTargetId ?: string) => {
+export const fetchTargetResult = (injectId: string, targetId: string, targetType: string, parentTargetId?: string) => {
   let uri = `${ATOMIC_TESTING_URI}/${injectId}/target_results/${targetId}/types/${targetType}`;
   if (parentTargetId) {
     uri += `?parentTargetId=${encodeURIComponent(parentTargetId)}`;

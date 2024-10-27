@@ -1,23 +1,24 @@
-import { FunctionComponent, useContext, useState } from 'react';
-import * as R from 'ramda';
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import SearchFilter from '../../../../components/SearchFilter';
-import { useFormatter } from '../../../../components/i18n';
-import { fetchChannels } from '../../../../actions/channels/channel-action';
-import CreateArticle from '../articles/CreateArticle';
-import { truncate } from '../../../../utils/String';
-import Transition from '../../../../components/common/Transition';
-import ChannelIcon from '../../components/channels/ChannelIcon';
-import type { Theme } from '../../../../components/Theme';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { PermissionsContext } from '../Context';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { useHelper } from '../../../../store';
-import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
-import type { ArticlesHelper } from '../../../../actions/channels/article-helper';
+import * as R from 'ramda';
+import { FunctionComponent, useContext, useState } from 'react';
+
 import type { ArticleStore, FullArticleStore } from '../../../../actions/channels/Article';
+import type { ArticlesHelper } from '../../../../actions/channels/article-helper';
+import { fetchChannels } from '../../../../actions/channels/channel-action';
+import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
+import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import SearchFilter from '../../../../components/SearchFilter';
+import type { Theme } from '../../../../components/Theme';
+import { useHelper } from '../../../../store';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { truncate } from '../../../../utils/String';
+import ChannelIcon from '../../components/channels/ChannelIcon';
+import CreateArticle from '../articles/CreateArticle';
+import { PermissionsContext } from '../Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   box: {
@@ -84,7 +85,7 @@ const InjectAddArticles: FunctionComponent<Props> = ({
 
   const addArticle = (articleId: string) => setArticleIds(R.append(articleId, articleIds));
 
-  const removeArticle = (articleId: string) => setArticleIds(articleIds.filter((u) => u !== articleId));
+  const removeArticle = (articleId: string) => setArticleIds(articleIds.filter(u => u !== articleId));
 
   const submitAddArticles = () => {
     handleAddArticles(articleIds);
@@ -105,7 +106,7 @@ const InjectAddArticles: FunctionComponent<Props> = ({
     || (n.article_fullchannel?.channel_name || '')
       .toLowerCase()
       .indexOf(keyword.toLowerCase()) !== -1;
-  const fullArticles = articles.map((item) => ({
+  const fullArticles = articles.map(item => ({
     ...item,
     article_fullchannel: item.article_channel ? channelsMap[item.article_channel] : {},
   }));

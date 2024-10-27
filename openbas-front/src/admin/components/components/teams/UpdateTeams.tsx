@@ -1,23 +1,24 @@
+import { Add, GroupsOutlined } from '@mui/icons-material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import * as React from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
-import { Add, GroupsOutlined } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
-import ItemTags from '../../../../components/ItemTags';
+
+import { fetchTags } from '../../../../actions/Tag';
+import type { TeamStore } from '../../../../actions/teams/Team';
+import { findTeams } from '../../../../actions/teams/team-actions';
+import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
+import SelectList, { SelectListElements } from '../../../../components/common/SelectList';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import { findTeams } from '../../../../actions/teams/team-actions';
+import ItemTags from '../../../../components/ItemTags';
 import type { Team, TeamOutput } from '../../../../utils/api-types';
-import type { TeamStore } from '../../../../actions/teams/Team';
-import SelectList, { SelectListElements } from '../../../../components/common/SelectList';
-import type { EndpointStore } from '../../assets/endpoints/Endpoint';
-import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
-import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
-import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
-import { TeamContext } from '../../common/Context';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchTags } from '../../../../actions/Tag';
 import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import type { EndpointStore } from '../../assets/endpoints/Endpoint';
+import { TeamContext } from '../../common/Context';
 import CreateTeam from './CreateTeam';
 
 const useStyles = makeStyles(() => ({
@@ -60,7 +61,7 @@ const UpdateTeams: React.FC<Props> = ({
 
   const handleSubmit = async () => {
     setOpen(false);
-    onReplaceTeam?.(selectedTeamValues.map((v) => v.team_id)).then((result) => {
+    onReplaceTeam?.(selectedTeamValues.map(v => v.team_id)).then((result) => {
       if (result.result.length === 0) {
         setTeams([]);
       } else {
@@ -71,13 +72,13 @@ const UpdateTeams: React.FC<Props> = ({
 
   useEffect(() => {
     if (open) {
-      findTeams(addedTeamIds).then((result) => setSelectedTeamValues(result.data));
+      findTeams(addedTeamIds).then(result => setSelectedTeamValues(result.data));
     }
   }, [open, addedTeamIds]);
 
   // Pagination
   const addTeam = (_teamId: string, team: TeamOutput) => setSelectedTeamValues([...selectedTeamValues, team]);
-  const removeTeam = (teamId: string) => setSelectedTeamValues(selectedTeamValues.filter((v) => v.team_id !== teamId));
+  const removeTeam = (teamId: string) => setSelectedTeamValues(selectedTeamValues.filter(v => v.team_id !== teamId));
 
   // Headers
   const elements: SelectListElements<EndpointStore> = useMemo(() => ({
@@ -103,14 +104,16 @@ const UpdateTeams: React.FC<Props> = ({
   ];
   const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({}));
 
-  const paginationComponent = <PaginationComponentV2
-    fetch={(input) => searchTeams(input)}
-    searchPaginationInput={searchPaginationInput}
-    setContent={setTeamValues}
-    entityPrefix="team"
-    availableFilterNames={availableFilterNames}
-    queryableHelpers={queryableHelpers}
-                              />;
+  const paginationComponent = (
+    <PaginationComponentV2
+      fetch={input => searchTeams(input)}
+      searchPaginationInput={searchPaginationInput}
+      setContent={setTeamValues}
+      entityPrefix="team"
+      availableFilterNames={availableFilterNames}
+      queryableHelpers={queryableHelpers}
+    />
+  );
 
   return (
     <>
@@ -148,10 +151,12 @@ const UpdateTeams: React.FC<Props> = ({
               onSelect={addTeam}
               onDelete={removeTeam}
               paginationComponent={paginationComponent}
-              buttonComponent={<CreateTeam
-                inline
-                onCreate={(team) => setSelectedTeamValues([...selectedTeamValues, team])}
-                               />}
+              buttonComponent={(
+                <CreateTeam
+                  inline
+                  onCreate={team => setSelectedTeamValues([...selectedTeamValues, team])}
+                />
+              )}
             />
           </Box>
         </DialogContent>

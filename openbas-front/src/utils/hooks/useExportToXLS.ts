@@ -1,6 +1,6 @@
+import fileDownload from 'js-file-download';
 import { useCallback } from 'react';
 import * as XLSX from 'xlsx';
-import fileDownload from 'js-file-download';
 
 interface UseExportToXLSProps<T> {
   data: T[];

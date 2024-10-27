@@ -1,6 +1,7 @@
-import { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
+import { FunctionComponent } from 'react';
+
 import { useFormatter } from '../../i18n';
 import type { Theme } from '../../Theme';
 
@@ -14,7 +15,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     alignItems: 'center',
   },
   hasClickEvent: {
-    cursor: 'pointer',
+    'cursor': 'pointer',
     '&:hover': {
       backgroundColor: theme.palette.action?.disabled,
       textDecorationLine: 'underline',

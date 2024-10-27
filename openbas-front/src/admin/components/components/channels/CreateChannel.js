@@ -1,14 +1,15 @@
-import { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
-import { Fab } from '@mui/material';
 import { Add } from '@mui/icons-material';
-import inject18n from '../../../../components/i18n';
+import { Fab } from '@mui/material';
+import { withStyles } from '@mui/styles';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component } from 'react';
+import { connect } from 'react-redux';
+
 import { addChannel } from '../../../../actions/channels/channel-action';
-import ChannelForm from './ChannelForm';
 import Drawer from '../../../../components/common/Drawer';
+import inject18n from '../../../../components/i18n';
+import ChannelForm from './ChannelForm';
 
 const styles = () => ({
   createButton: {
@@ -35,7 +36,7 @@ class CreateChannel extends Component {
   onSubmit(data) {
     return this.props
       .addChannel(data)
-      .then((result) => (result.result ? this.handleClose() : result));
+      .then(result => (result.result ? this.handleClose() : result));
   }
 
   render() {

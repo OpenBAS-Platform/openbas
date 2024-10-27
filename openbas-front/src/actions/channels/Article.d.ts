@@ -6,5 +6,5 @@ export type ArticleStore = Omit<Article, 'article_channel' | 'article_documents'
 };
 
 export type FullArticleStore = ArticleStore & {
-  article_fullchannel: Channel
+  article_fullchannel: Channel;
 };

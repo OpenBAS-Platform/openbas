@@ -1,6 +1,7 @@
-import * as PropTypes from 'prop-types';
 import { DnsOutlined, HelpOutlineOutlined } from '@mui/icons-material';
 import { ApplicationCogOutline, Console, FileImportOutline, LanConnect } from 'mdi-material-ui';
+import * as PropTypes from 'prop-types';
+
 import CustomTooltip from '../../../../components/CustomTooltip';
 import { useFormatter } from '../../../../components/i18n';
 
@@ -16,18 +17,18 @@ const iconSelector = (type, isPayload, variant, fontSize, done, disabled, onClic
   };
   if (!type) {
     return (
-      <HelpOutlineOutlined onClick={onClick} style={style}/>
+      <HelpOutlineOutlined onClick={onClick} style={style} />
     );
   }
   if (isPayload) {
     if (type.startsWith('openbas_')) {
       return (
-        <img onClick={onClick} src={`/api/images/collectors/${type}`} alt={type} style={style}/>
+        <img onClick={onClick} src={`/api/images/collectors/${type}`} alt={type} style={style} />
       );
     }
     switch (type) {
       case 'Command':
-        return <Console color="primary" onClick={onClick} style={style}/>;
+        return <Console color="primary" onClick={onClick} style={style} />;
       case 'Executable':
         return <ApplicationCogOutline color="primary" onClick={onClick} style={style} />;
       case 'FileDrop':

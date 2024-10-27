@@ -1,11 +1,12 @@
-import { lazy, Suspense } from 'react';
-import * as PropTypes from 'prop-types';
-import { Route, Routes } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
+import * as PropTypes from 'prop-types';
+import { lazy, Suspense } from 'react';
+import { Route, Routes } from 'react-router-dom';
+
 import { errorWrapper } from '../components/Error';
-import Reset from './components/login/Reset';
-import type { Theme } from '../components/Theme';
 import Loader from '../components/Loader';
+import type { Theme } from '../components/Theme';
+import Reset from './components/login/Reset';
 
 const Login = lazy(() => import('./components/login/Login'));
 const Comcheck = lazy(() => import('./components/comcheck/Comcheck'));
@@ -14,7 +15,7 @@ const Challenges = lazy(() => import('./components/challenges/Challenges'));
 const ExerciseViewLessons = lazy(() => import('./components/lessons/ExerciseViewLessons'));
 const ScenarioViewLessons = lazy(() => import('./components/lessons/ScenarioViewLessons'));
 
-const useStyles = makeStyles<Theme>((theme) => ({
+const useStyles = makeStyles<Theme>(theme => ({
   root: {
     minWidth: 1280,
     height: '100%',

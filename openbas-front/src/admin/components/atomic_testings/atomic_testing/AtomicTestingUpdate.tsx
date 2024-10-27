@@ -1,8 +1,9 @@
-import { FunctionComponent, useContext } from 'react';
 import * as R from 'ramda';
-import UpdateInject from '../../common/injects/UpdateInject';
-import type { Inject, InjectResultDTO } from '../../../../utils/api-types';
+import { FunctionComponent, useContext } from 'react';
+
 import { updateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import type { Inject, InjectResultDTO } from '../../../../utils/api-types';
+import UpdateInject from '../../common/injects/UpdateInject';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
 
 interface Props {

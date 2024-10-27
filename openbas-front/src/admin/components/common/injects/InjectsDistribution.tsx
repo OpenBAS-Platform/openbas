@@ -1,11 +1,12 @@
-import Chart from 'react-apexcharts';
-import { FunctionComponent } from 'react';
 import { useTheme } from '@mui/styles';
-import { horizontalBarsChartOptions } from '../../../../utils/Charts';
+import { FunctionComponent } from 'react';
+import Chart from 'react-apexcharts';
+
+import type { TeamStore } from '../../../../actions/teams/Team';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
-import type { TeamStore } from '../../../../actions/teams/Team';
+import { horizontalBarsChartOptions } from '../../../../utils/Charts';
 
 interface Props {
   topTeams: TeamStore[];

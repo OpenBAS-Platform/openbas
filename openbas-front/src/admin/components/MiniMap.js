@@ -1,12 +1,14 @@
+import '../../static/css/leaflet.css';
+
+import { withStyles, withTheme } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import { withTheme, withStyles } from '@mui/styles';
-import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+import { GeoJSON, MapContainer, TileLayer } from 'react-leaflet';
 import { connect } from 'react-redux';
-import countries from '../../static/geo/countries.json';
+
 import { storeHelper } from '../../actions/Schema';
 import Loader from '../../components/Loader';
-import '../../static/css/leaflet.css';
+import countries from '../../static/geo/countries.json';
 
 const styles = () => ({
   paper: {

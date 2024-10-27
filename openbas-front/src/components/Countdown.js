@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+
 import { splitDuration } from '../utils/Time';
 
 const Countdown = ({ date, paused }) => {
@@ -34,7 +35,13 @@ const Countdown = ({ date, paused }) => {
   });
   return (
     <span>
-      {duration.days}:{duration.hours}:{duration.minutes}:{duration.seconds}
+      {duration.days}
+      :
+      {duration.hours}
+      :
+      {duration.minutes}
+      :
+      {duration.seconds}
     </span>
   );
 };

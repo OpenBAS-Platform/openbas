@@ -1,7 +1,8 @@
-import { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { NewspaperOutlined, HelpOutlined, OndemandVideoOutlined } from '@mui/icons-material';
+import { HelpOutlined, NewspaperOutlined, OndemandVideoOutlined } from '@mui/icons-material';
 import { PostOutline } from 'mdi-material-ui';
+import * as PropTypes from 'prop-types';
+import { Component } from 'react';
+
 import CustomTooltip from '../../../../components/CustomTooltip';
 
 const iconSelector = (type, variant, fontSize) => {

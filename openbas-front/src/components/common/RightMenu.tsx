@@ -1,11 +1,12 @@
+import { Drawer, ListItemIcon, ListItemText, MenuItem, MenuList } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 import * as React from 'react';
-import { makeStyles } from '@mui/styles';
-import { Drawer, ListItemIcon, ListItemText, MenuItem, MenuList } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
-import type { Theme } from '../Theme';
-import { useFormatter } from '../i18n';
+
 import { isNotEmptyField } from '../../utils/utils';
+import { useFormatter } from '../i18n';
+import type { Theme } from '../Theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   drawer: {

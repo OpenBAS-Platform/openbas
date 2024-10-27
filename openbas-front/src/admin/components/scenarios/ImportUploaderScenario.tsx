@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../../../utils/hooks';
-import ImportUploader from '../../../components/common/ImportUploader';
+
 import { importScenario } from '../../../actions/scenarios/scenario-actions';
+import ImportUploader from '../../../components/common/ImportUploader';
+import { useAppDispatch } from '../../../utils/hooks';
 
 const ImportUploaderScenario = () => {
   // Standard hooks
@@ -9,7 +10,7 @@ const ImportUploaderScenario = () => {
   const navigate = useNavigate();
 
   const handleUpload = async (formData: FormData) => {
-    await dispatch(importScenario(formData)).then((result: { [x: string]: string; }) => {
+    await dispatch(importScenario(formData)).then((result: { [x: string]: string }) => {
       if (!Object.prototype.hasOwnProperty.call(result, 'FINAL_FORM/form-error')) {
         navigate(0);
       }
@@ -18,7 +19,7 @@ const ImportUploaderScenario = () => {
 
   return (
     <ImportUploader
-      title={'Import a scenario'}
+      title="Import a scenario"
       handleUpload={handleUpload}
     />
   );

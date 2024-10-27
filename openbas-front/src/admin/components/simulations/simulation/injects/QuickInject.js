@@ -1,7 +1,13 @@
-import { forwardRef, Component } from 'react';
-import * as PropTypes from 'prop-types';
-import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
+import {
+  ArrowDropDownOutlined,
+  ArrowDropUpOutlined,
+  AttachmentOutlined,
+  CastForEducationOutlined,
+  CloseRounded,
+  ControlPointOutlined,
+  DeleteOutlined,
+  HelpOutlineOutlined,
+} from '@mui/icons-material';
 import {
   Button,
   FormControlLabel,
@@ -18,39 +24,34 @@ import {
   Switch,
   Typography,
 } from '@mui/material';
-import { Form } from 'react-final-form';
-import { connect } from 'react-redux';
-import {
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
-  AttachmentOutlined,
-  CastForEducationOutlined,
-  CloseRounded,
-  ControlPointOutlined,
-  DeleteOutlined,
-  HelpOutlineOutlined,
-} from '@mui/icons-material';
+import { withStyles } from '@mui/styles';
 import arrayMutators from 'final-form-arrays';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component, forwardRef } from 'react';
+import { Form } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
-import inject18n from '../../../../../components/i18n';
-import { addInjectForExercise } from '../../../../../actions/Inject';
+import { connect } from 'react-redux';
+
 import { fetchDocuments } from '../../../../../actions/Document';
-import ItemTags from '../../../../../components/ItemTags';
+import { addInjectForExercise } from '../../../../../actions/Inject';
 import { storeHelper } from '../../../../../actions/Schema';
-import TeamPopover from '../../../components/teams/TeamPopover';
-import ItemBoolean from '../../../../../components/ItemBoolean';
-import InjectAddTeams from '../../../common/injects/InjectAddTeams';
-import { isExerciseReadOnly, isExerciseUpdatable, secondsFromToNow } from '../../../../../utils/Exercise';
-import OldTextField from '../../../../../components/fields/OldTextField';
-import SwitchField from '../../../../../components/fields/SwitchField';
-import RichTextField from '../../../../../components/fields/RichTextField';
-import MultipleFileLoader from '../../../../../components/fields/MultipleFileLoader';
-import DocumentType from '../../../components/documents/DocumentType';
-import DocumentPopover from '../../../components/documents/DocumentPopover';
-import OldSelectField from '../../../../../components/fields/OldSelectField';
-import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
-import InjectExpectations from '../../../common/injects/expectations/InjectExpectations';
 import { fetchVariablesForExercise } from '../../../../../actions/variables/variable-actions';
+import MultipleFileLoader from '../../../../../components/fields/MultipleFileLoader';
+import OldSelectField from '../../../../../components/fields/OldSelectField';
+import OldTextField from '../../../../../components/fields/OldTextField';
+import RichTextField from '../../../../../components/fields/RichTextField';
+import SwitchField from '../../../../../components/fields/SwitchField';
+import inject18n from '../../../../../components/i18n';
+import ItemBoolean from '../../../../../components/ItemBoolean';
+import ItemTags from '../../../../../components/ItemTags';
+import { isExerciseReadOnly, isExerciseUpdatable, secondsFromToNow } from '../../../../../utils/Exercise';
+import InjectExpectations from '../../../common/injects/expectations/InjectExpectations';
+import InjectAddTeams from '../../../common/injects/InjectAddTeams';
+import DocumentPopover from '../../../components/documents/DocumentPopover';
+import DocumentType from '../../../components/documents/DocumentType';
+import TeamPopover from '../../../components/teams/TeamPopover';
+import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
 
 export const EMAIL_CONTRACT = '138ad8f8-32f8-4a22-8114-aaa12322bd09';
 
@@ -59,7 +60,7 @@ const Transition = forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-const styles = (theme) => ({
+const styles = theme => ({
   header: {
     backgroundColor: theme.palette.background.nav,
     padding: '20px 20px 20px 60px',
@@ -269,7 +270,7 @@ class QuickInject extends Component {
 
   handleRemoveTeam(teamId) {
     this.setState({
-      teamsIds: this.state.teamsIds.filter((a) => a !== teamId),
+      teamsIds: this.state.teamsIds.filter(a => a !== teamId),
     });
   }
 
@@ -282,7 +283,7 @@ class QuickInject extends Component {
   handleRemoveDocument(documentId) {
     this.setState({
       documents: this.state.documents.filter(
-        (d) => d.document_id !== documentId,
+        d => d.document_id !== documentId,
       ),
     });
   }
@@ -293,11 +294,11 @@ class QuickInject extends Component {
 
   toggleAttachment(documentId) {
     this.setState({
-      documents: this.state.documents.map((d) => (d.document_id === documentId
+      documents: this.state.documents.map(d => (d.document_id === documentId
         ? {
-          document_id: d.document_id,
-          document_attached: !d.document_attached,
-        }
+            document_id: d.document_id,
+            document_attached: !d.document_attached,
+          }
         : d)),
     });
   }
@@ -318,11 +319,13 @@ class QuickInject extends Component {
   teamsSortHeader(field, label, isSortable) {
     const { t } = this.props;
     const { teamsSortBy, teamsOrderAsc } = this.state;
-    const sortComponent = teamsOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = teamsOrderAsc
+      ? (
+          <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+          <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -351,11 +354,13 @@ class QuickInject extends Component {
   documentsSortHeader(field, label, isSortable) {
     const { t } = this.props;
     const { documentsSortBy, documentsOrderAsc } = this.state;
-    const sortComponent = documentsOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = documentsOrderAsc
+      ? (
+          <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+          <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -378,14 +383,14 @@ class QuickInject extends Component {
     const { injectorContract } = this.props;
     const finalData = {};
     const hasExpectations = injectorContract.fields
-      .map((f) => f.key)
+      .map(f => f.key)
       .includes('expectations');
     if (hasExpectations) {
       finalData.expectations = this.state.expectations;
     }
     injectorContract.fields
       .filter(
-        (f) => !['teams', 'attachments', 'expectations'].includes(
+        f => !['teams', 'attachments', 'expectations'].includes(
           f.key,
         ),
       )
@@ -450,7 +455,7 @@ class QuickInject extends Component {
     if (injectorContract && Array.isArray(injectorContract.fields)) {
       injectorContract.fields
         .filter(
-          (f) => !['teams', 'attachments', 'expectations'].includes(
+          f => !['teams', 'attachments', 'expectations'].includes(
             f.key,
           ),
         )
@@ -471,28 +476,30 @@ class QuickInject extends Component {
         {renderedFields.map((field, position) => {
           switch (field.type) {
             case 'textarea':
-              return field.richText ? (
-                <RichTextField
-                  key={field.key}
-                  name={field.key}
-                  label={t(field.label)}
-                  fullWidth={true}
-                  style={{ marginTop: 20, height: 250 }}
-                  disabled={isExerciseReadOnly(exercise)}
-                />
-              ) : (
-                <OldTextField
-                  variant="standard"
-                  key={field.key}
-                  name={field.key}
-                  fullWidth={true}
-                  multiline={true}
-                  rows={10}
-                  label={t(field.label)}
-                  style={{ marginTop: 20 }}
-                  disabled={isExerciseReadOnly(exercise)}
-                />
-              );
+              return field.richText
+                ? (
+                    <RichTextField
+                      key={field.key}
+                      name={field.key}
+                      label={t(field.label)}
+                      fullWidth={true}
+                      style={{ marginTop: 20, height: 250 }}
+                      disabled={isExerciseReadOnly(exercise)}
+                    />
+                  )
+                : (
+                    <OldTextField
+                      variant="standard"
+                      key={field.key}
+                      name={field.key}
+                      fullWidth={true}
+                      multiline={true}
+                      rows={10}
+                      label={t(field.label)}
+                      style={{ marginTop: 20 }}
+                      disabled={isExerciseReadOnly(exercise)}
+                    />
+                  );
             case 'number':
               return (
                 <OldTextField
@@ -535,8 +542,7 @@ class QuickInject extends Component {
                                   type: 'text',
                                   key: '',
                                   value: '',
-                                })
-                                }
+                                })}
                                 aria-haspopup="true"
                                 size="medium"
                                 style={{ marginTop: -2 }}
@@ -591,35 +597,35 @@ class QuickInject extends Component {
                                 && values[field.key][index]
                                 && values[field.key][index].type
                                 === 'attachment' ? (
-                                  <OldSelectField
-                                    variant="standard"
-                                    name={`${name}.value`}
-                                    fullWidth={true}
-                                    label={t('Value')}
-                                    style={{ marginRight: 20 }}
-                                    disabled={isExerciseReadOnly(exercise)}
-                                  >
-                                    {attachedDocs.map((doc) => (
-                                      <MenuItem
-                                        key={doc.document_id}
-                                        value={doc.document_id}
+                                      <OldSelectField
+                                        variant="standard"
+                                        name={`${name}.value`}
+                                        fullWidth={true}
+                                        label={t('Value')}
+                                        style={{ marginRight: 20 }}
+                                        disabled={isExerciseReadOnly(exercise)}
                                       >
-                                        <ListItemText>
-                                          {doc.document_name}
-                                        </ListItemText>
-                                      </MenuItem>
-                                    ))}
-                                  </OldSelectField>
-                                  ) : (
-                                    <OldTextField
-                                      variant="standard"
-                                      name={`${name}.value`}
-                                      fullWidth={true}
-                                      label={t('Value')}
-                                      style={{ marginRight: 20 }}
-                                      disabled={isExerciseReadOnly(exercise)}
-                                    />
-                                  )}
+                                        {attachedDocs.map(doc => (
+                                          <MenuItem
+                                            key={doc.document_id}
+                                            value={doc.document_id}
+                                          >
+                                            <ListItemText>
+                                              {doc.document_name}
+                                            </ListItemText>
+                                          </MenuItem>
+                                        ))}
+                                      </OldSelectField>
+                                    ) : (
+                                      <OldTextField
+                                        variant="standard"
+                                        name={`${name}.value`}
+                                        fullWidth={true}
+                                        label={t('Value')}
+                                        style={{ marginRight: 20 }}
+                                        disabled={isExerciseReadOnly(exercise)}
+                                      />
+                                    )}
                                 {field.cardinality === 'n' && (
                                   <IconButton
                                     onClick={() => fields.remove(index)}
@@ -641,100 +647,102 @@ class QuickInject extends Component {
                 </div>
               );
             case 'select':
-              return field.cardinality === 'n' ? (
-                <OldSelectField
-                  variant="standard"
-                  label={t(field.label)}
-                  key={field.key}
-                  multiple
-                  renderValue={(v) => v.map((a) => field.choices[a]).join(', ')}
-                  name={field.key}
-                  fullWidth={true}
-                  style={{ marginTop: 20 }}
-                  disabled={isExerciseReadOnly(exercise)}
-                >
-                  {Object.entries(field.choices)
-                    .sort((a, b) => a[1].localeCompare(b[1]))
-                    .map(([k, v]) => (
-                      <MenuItem key={k} value={k}>
-                        <ListItemText>
-                          {field.expectation ? t(v || 'Unknown') : v}
-                        </ListItemText>
-                      </MenuItem>
-                    ))}
-                </OldSelectField>
-              ) : (
-                <OldSelectField
-                  variant="standard"
-                  label={t(field.label)}
-                  key={field.key}
-                  renderValue={(v) => (field.expectation
-                    ? t(field.choices[v] || 'Unknown')
-                    : field.choices[v])
-                  }
-                  name={field.key}
-                  fullWidth={true}
-                  style={{ marginTop: 20 }}
-                  disabled={isExerciseReadOnly(exercise)}
-                >
-                  {Object.entries(field.choices)
-                    .sort((a, b) => a[1].localeCompare(b[1]))
-                    .map(([k, v]) => (
-                      <MenuItem key={k} value={k}>
-                        <ListItemText>
-                          {field.expectation ? t(v || 'Unknown') : v}
-                        </ListItemText>
-                      </MenuItem>
-                    ))}
-                </OldSelectField>
-              );
+              return field.cardinality === 'n'
+                ? (
+                    <OldSelectField
+                      variant="standard"
+                      label={t(field.label)}
+                      key={field.key}
+                      multiple
+                      renderValue={v => v.map(a => field.choices[a]).join(', ')}
+                      name={field.key}
+                      fullWidth={true}
+                      style={{ marginTop: 20 }}
+                      disabled={isExerciseReadOnly(exercise)}
+                    >
+                      {Object.entries(field.choices)
+                        .sort((a, b) => a[1].localeCompare(b[1]))
+                        .map(([k, v]) => (
+                          <MenuItem key={k} value={k}>
+                            <ListItemText>
+                              {field.expectation ? t(v || 'Unknown') : v}
+                            </ListItemText>
+                          </MenuItem>
+                        ))}
+                    </OldSelectField>
+                  )
+                : (
+                    <OldSelectField
+                      variant="standard"
+                      label={t(field.label)}
+                      key={field.key}
+                      renderValue={v => (field.expectation
+                        ? t(field.choices[v] || 'Unknown')
+                        : field.choices[v])}
+                      name={field.key}
+                      fullWidth={true}
+                      style={{ marginTop: 20 }}
+                      disabled={isExerciseReadOnly(exercise)}
+                    >
+                      {Object.entries(field.choices)
+                        .sort((a, b) => a[1].localeCompare(b[1]))
+                        .map(([k, v]) => (
+                          <MenuItem key={k} value={k}>
+                            <ListItemText>
+                              {field.expectation ? t(v || 'Unknown') : v}
+                            </ListItemText>
+                          </MenuItem>
+                        ))}
+                    </OldSelectField>
+                  );
             case 'dependency-select':
               // eslint-disable-next-line no-case-declarations
               const depValue = values[field.dependencyField];
               // eslint-disable-next-line no-case-declarations
               const choices = field.choices[depValue] ?? {};
-              return field.cardinality === 'n' ? (
-                <OldSelectField
-                  variant="standard"
-                  label={t(field.label)}
-                  key={field.key}
-                  multiple
-                  renderValue={(v) => v.map((a) => choices[a]).join(', ')}
-                  name={field.key}
-                  fullWidth={true}
-                  style={{ marginTop: 20 }}
-                  disabled={isExerciseReadOnly(exercise)}
-                >
-                  {Object.entries(choices)
-                    .sort((a, b) => a[1].localeCompare(b[1]))
-                    .map(([k, v]) => (
-                      <MenuItem key={k} value={k}>
-                        <ListItemText>{v}</ListItemText>
-                      </MenuItem>
-                    ))}
-                </OldSelectField>
-              ) : (
-                <OldSelectField
-                  variant="standard"
-                  label={t(field.label)}
-                  key={field.key}
-                  renderValue={(v) => (field.expectation ? t(choices[v] || 'Unknown') : choices[v])
-                  }
-                  name={field.key}
-                  fullWidth={true}
-                  style={{ marginTop: 20 }}
-                >
-                  {Object.entries(choices)
-                    .sort((a, b) => a[1].localeCompare(b[1]))
-                    .map(([k, v]) => (
-                      <MenuItem key={k} value={k}>
-                        <ListItemText>
-                          {field.expectation ? t(v || 'Unknown') : v}
-                        </ListItemText>
-                      </MenuItem>
-                    ))}
-                </OldSelectField>
-              );
+              return field.cardinality === 'n'
+                ? (
+                    <OldSelectField
+                      variant="standard"
+                      label={t(field.label)}
+                      key={field.key}
+                      multiple
+                      renderValue={v => v.map(a => choices[a]).join(', ')}
+                      name={field.key}
+                      fullWidth={true}
+                      style={{ marginTop: 20 }}
+                      disabled={isExerciseReadOnly(exercise)}
+                    >
+                      {Object.entries(choices)
+                        .sort((a, b) => a[1].localeCompare(b[1]))
+                        .map(([k, v]) => (
+                          <MenuItem key={k} value={k}>
+                            <ListItemText>{v}</ListItemText>
+                          </MenuItem>
+                        ))}
+                    </OldSelectField>
+                  )
+                : (
+                    <OldSelectField
+                      variant="standard"
+                      label={t(field.label)}
+                      key={field.key}
+                      renderValue={v => (field.expectation ? t(choices[v] || 'Unknown') : choices[v])}
+                      name={field.key}
+                      fullWidth={true}
+                      style={{ marginTop: 20 }}
+                    >
+                      {Object.entries(choices)
+                        .sort((a, b) => a[1].localeCompare(b[1]))
+                        .map(([k, v]) => (
+                          <MenuItem key={k} value={k}>
+                            <ListItemText>
+                              {field.expectation ? t(v || 'Unknown') : v}
+                            </ListItemText>
+                          </MenuItem>
+                        ))}
+                    </OldSelectField>
+                  );
             default:
               return (
                 <OldTextField
@@ -756,7 +764,7 @@ class QuickInject extends Component {
   resetDefaultvalues(setFieldValue, builtInFields) {
     const { injectorContract } = this.props;
     injectorContract.fields
-      .filter((f) => !builtInFields.includes(f.key) && !f.expectation)
+      .filter(f => !builtInFields.includes(f.key) && !f.expectation)
       .forEach((field) => {
         if (field.cardinality && field.cardinality === '1') {
           let defaultValue = R.head(field.defaultValue);
@@ -810,8 +818,8 @@ class QuickInject extends Component {
     } = this.state;
     // -- TEAMS --
     const teams = teamsIds
-      .map((a) => teamsMap[a])
-      .filter((a) => a !== undefined);
+      .map(a => teamsMap[a])
+      .filter(a => a !== undefined);
     const sortTeams = R.sortWith(
       teamsOrderAsc
         ? [R.ascend(R.prop(teamsSortBy))]
@@ -819,18 +827,18 @@ class QuickInject extends Component {
     );
     const sortedTeams = sortTeams(teams);
     const hasTeams = injectorContract.fields
-      .map((f) => f.key)
+      .map(f => f.key)
       .includes('teams');
     // -- DOCUMENTS --
     const docs = documents
-      .map((d) => (documentsMap[d.document_id]
+      .map(d => (documentsMap[d.document_id]
         ? {
-          ...documentsMap[d.document_id],
-          document_attached: d.document_attached,
-        }
+            ...documentsMap[d.document_id],
+            document_attached: d.document_attached,
+          }
         : undefined))
-      .filter((d) => d !== undefined);
-    const attachedDocs = docs.filter((n) => n.document_attached);
+      .filter(d => d !== undefined);
+    const attachedDocs = docs.filter(n => n.document_attached);
     const sortDocuments = R.sortWith(
       documentsOrderAsc
         ? [R.ascend(R.prop(documentsSortBy))]
@@ -838,17 +846,17 @@ class QuickInject extends Component {
     );
     const sortedDocuments = sortDocuments(docs);
     const hasAttachments = injectorContract.fields
-      .map((f) => f.key)
+      .map(f => f.key)
       .includes('attachments');
     // -- EXPECTATIONS --
     const hasExpectations = injectorContract.fields
-      .map((f) => f.key)
+      .map(f => f.key)
       .includes('expectations');
     const predefinedExpectations = injectorContract.fields.filter(
-      (f) => f.key === 'expectations',
-    ).flatMap((f) => f.predefinedExpectations);
+      f => f.key === 'expectations',
+    ).flatMap(f => f.predefinedExpectations);
     const expectationsNotManual = injectorContract.fields.filter(
-      (f) => f.expectation === true,
+      f => f.expectation === true,
     );
     const initialValues = {};
     // Enrich initialValues with default contract value
@@ -858,7 +866,7 @@ class QuickInject extends Component {
       'expectations',
     ];
     injectorContract.fields
-      .filter((f) => !builtInFields.includes(f.key))
+      .filter(f => !builtInFields.includes(f.key))
       .forEach((field) => {
         if (!initialValues[field.key]) {
           if (field.cardinality && field.cardinality === '1') {
@@ -870,7 +878,7 @@ class QuickInject extends Component {
       });
     // Specific processing for some fields
     injectorContract.fields
-      .filter((f) => !builtInFields.includes(f.key))
+      .filter(f => !builtInFields.includes(f.key))
       .forEach((field) => {
         if (
           field.type === 'textarea'
@@ -962,14 +970,14 @@ class QuickInject extends Component {
                       classes={{ root: classes.allTeams }}
                     >
                       <FormControlLabel
-                        control={
+                        control={(
                           <Switch
                             checked={allTeams}
                             onChange={this.toggleAll.bind(this)}
                             color="primary"
                             disabled={isExerciseReadOnly(exercise)}
                           />
-                        }
+                        )}
                         label={<strong>{t('All teams')}</strong>}
                       />
                     </FormGroup>
@@ -992,7 +1000,7 @@ class QuickInject extends Component {
                           </span>
                         </ListItemIcon>
                         <ListItemText
-                          primary={
+                          primary={(
                             <div>
                               {this.teamsSortHeader(
                                 'team_name',
@@ -1015,7 +1023,7 @@ class QuickInject extends Component {
                                 true,
                               )}
                             </div>
-                          }
+                          )}
                         />
                         <ListItemSecondaryAction>
                           &nbsp;
@@ -1030,7 +1038,7 @@ class QuickInject extends Component {
                             <CastForEducationOutlined />
                           </ListItemIcon>
                           <ListItemText
-                            primary={
+                            primary={(
                               <div>
                                 <div
                                   className={classes.bodyItem}
@@ -1063,7 +1071,7 @@ class QuickInject extends Component {
                                   <ItemTags variant="reduced-view" tags={[]} />
                                 </div>
                               </div>
-                            }
+                            )}
                           />
                           <ListItemSecondaryAction>
                             &nbsp;
@@ -1071,7 +1079,7 @@ class QuickInject extends Component {
                         </ListItem>
                       ) : (
                         <div>
-                          {sortedTeams.map((team) => (
+                          {sortedTeams.map(team => (
                             <ListItem
                               key={team.team_id}
                               classes={{ root: classes.item }}
@@ -1081,7 +1089,7 @@ class QuickInject extends Component {
                                 <CastForEducationOutlined />
                               </ListItemIcon>
                               <ListItemText
-                                primary={
+                                primary={(
                                   <div>
                                     <div
                                       className={classes.bodyItem}
@@ -1119,17 +1127,19 @@ class QuickInject extends Component {
                                       />
                                     </div>
                                   </div>
-                                }
+                                )}
                               />
                               <ListItemSecondaryAction>
                                 {isExerciseUpdatable(exercise)
-                                  ? (<TeamPopover
-                                      exerciseId={exerciseId}
-                                      team={team}
-                                      onRemoveTeam={this.handleRemoveTeam.bind(
-                                        this,
-                                      )}
-                                     />) : <span> &nbsp; </span>}
+                                  ? (
+                                      <TeamPopover
+                                        exerciseId={exerciseId}
+                                        team={team}
+                                        onRemoveTeam={this.handleRemoveTeam.bind(
+                                          this,
+                                        )}
+                                      />
+                                    ) : <span> &nbsp; </span>}
                               </ListItemSecondaryAction>
                             </ListItem>
                           ))}
@@ -1164,7 +1174,7 @@ class QuickInject extends Component {
                   {this.renderFields(
                     injectorContract.fields
                       .filter(
-                        (f) => !builtInFields.includes(f.key) && !f.expectation,
+                        f => !builtInFields.includes(f.key) && !f.expectation,
                       )
                       .filter((f) => {
                         // Filter display if linked fields
@@ -1207,7 +1217,8 @@ class QuickInject extends Component {
                   </Button>
                 </div>
                 {(hasExpectations || expectationsNotManual.length > 0)
-                  && <>
+                && (
+                  <>
                     <Typography variant="h2" style={{ marginTop: 30 }}>
                       {t('Inject expectations')}
                     </Typography>
@@ -1245,14 +1256,15 @@ class QuickInject extends Component {
                       </div>
                     )}
                     {hasExpectations
-                      && <InjectExpectations
+                    && (
+                      <InjectExpectations
                         predefinedExpectationDatas={predefinedExpectations}
                         expectationDatas={(expectations && expectations.length > 0) ? expectations : predefinedExpectations}
                         handleExpectations={this.handleExpectations.bind(this)}
-                         />
-                    }
+                      />
+                    )}
                   </>
-                }
+                )}
                 <div>
                   <Typography variant="h2" style={{ marginTop: 30 }}>
                     {t('Inject documents')}
@@ -1275,7 +1287,7 @@ class QuickInject extends Component {
                         </span>
                       </ListItemIcon>
                       <ListItemText
-                        primary={
+                        primary={(
                           <div>
                             {this.documentsSortHeader(
                               'document_name',
@@ -1298,11 +1310,11 @@ class QuickInject extends Component {
                               true,
                             )}
                           </div>
-                        }
+                        )}
                       />
                       <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
                     </ListItem>
-                    {sortedDocuments.map((document) => (
+                    {sortedDocuments.map(document => (
                       <ListItem
                         key={document.document_id}
                         classes={{ root: classes.item }}
@@ -1315,7 +1327,7 @@ class QuickInject extends Component {
                           <AttachmentOutlined />
                         </ListItemIcon>
                         <ListItemText
-                          primary={
+                          primary={(
                             <div>
                               <div
                                 className={classes.bodyItem}
@@ -1368,7 +1380,7 @@ class QuickInject extends Component {
                                 />
                               </div>
                             </div>
-                          }
+                          )}
                         />
                         <ListItemSecondaryAction>
                           <DocumentPopover
@@ -1392,8 +1404,8 @@ class QuickInject extends Component {
                     <MultipleFileLoader
                       exerciseId={exerciseId}
                       initialDocumentIds={documents
-                        .filter((a) => !a.inject_document_attached)
-                        .map((d) => d.document_id)}
+                        .filter(a => !a.inject_document_attached)
+                        .map(d => d.document_id)}
                       handleAddDocuments={this.handleAddDocuments.bind(this)}
                       hasAttachments={hasAttachments}
                     />

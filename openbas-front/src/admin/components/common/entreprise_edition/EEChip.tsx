@@ -1,14 +1,15 @@
-import { useState } from 'react';
 import { makeStyles } from '@mui/styles';
-import EnterpriseEditionAgreement from './EnterpriseEditionAgreement';
-import type { Theme } from '../../../../components/Theme';
-import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
-import { useHelper } from '../../../../store';
+import { useState } from 'react';
+
 import type { UserHelper } from '../../../../actions/helper';
+import type { Theme } from '../../../../components/Theme';
+import { useHelper } from '../../../../store';
+import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
+import EnterpriseEditionAgreement from './EnterpriseEditionAgreement';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
-const useStyles = makeStyles<Theme>((theme) => ({
+const useStyles = makeStyles<Theme>(theme => ({
   container: {
     fontSize: 'xx-small',
     height: 14,
@@ -41,7 +42,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }));
 
-const EEChip = ({ clickable = true, floating = false }: { clickable?: boolean, floating?: boolean }) => {
+const EEChip = ({ clickable = true, floating = false }: { clickable?: boolean; floating?: boolean }) => {
   const classes = useStyles();
   const isEnterpriseEdition = useEnterpriseEdition();
   const [displayDialog, setDisplayDialog] = useState(false);

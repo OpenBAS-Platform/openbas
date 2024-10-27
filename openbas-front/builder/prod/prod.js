@@ -1,6 +1,7 @@
+import fs from 'node:fs';
+
 import { build } from 'esbuild';
 import fsExtra from 'fs-extra/esm';
-import fs from 'node:fs';
 
 const buildPath = './builder/prod/build/';
 build({
@@ -36,12 +37,12 @@ build({
   // region Generate index.html
   const cssStaticFiles = fs.readdirSync(buildPath + 'static/css');
   const cssLinks = cssStaticFiles.map(
-    (f) => `<link href="%BASE_PATH%/static/css/${f}" rel="stylesheet">`,
+    f => `<link href="%BASE_PATH%/static/css/${f}" rel="stylesheet">`,
   );
   const cssImport = cssLinks.join('\n');
   const jsStaticFiles = fs.readdirSync(buildPath + 'static/js');
   const jsLinks = jsStaticFiles.map(
-    (f) => `<script defer="defer" src="%BASE_PATH%/static/js/${f}"></script>`,
+    f => `<script defer="defer" src="%BASE_PATH%/static/js/${f}"></script>`,
   );
   const jsImport = jsLinks.join('\n');
   const indexHtml = `
