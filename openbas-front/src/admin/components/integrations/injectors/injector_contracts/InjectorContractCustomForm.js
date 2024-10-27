@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import * as R from 'ramda';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';

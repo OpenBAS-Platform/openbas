@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import { ListItemButton, ListItemIcon, ListItemText, Theme } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';

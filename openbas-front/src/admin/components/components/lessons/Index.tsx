@@ -1,4 +1,3 @@
-import React from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 import Loader from '../../../../components/Loader';
 import LessonsTemplate from './LessonsTemplate';

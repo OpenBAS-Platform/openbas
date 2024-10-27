@@ -18,7 +18,8 @@ import {
 } from '@mui/material';
 import { DeleteOutlined, ExpandMore } from '@mui/icons-material';
 import { CogOutline, InformationOutline } from 'mdi-material-ui';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import * as React from 'react';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
 import { directFetchInjectorContract } from '../../../../../actions/InjectorContracts';

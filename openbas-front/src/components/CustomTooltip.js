@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Tooltip } from '@mui/material';
 
 export default function CustomTooltip({ children, ...rest }) {

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, lazy, Suspense, useState } from 'react';
+import { FunctionComponent, lazy, Suspense, useState } from 'react';
 import { Link, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { Alert, AlertTitle, Box, IconButton, Tab, Tabs, Tooltip } from '@mui/material';
 import cronstrue from 'cronstrue';

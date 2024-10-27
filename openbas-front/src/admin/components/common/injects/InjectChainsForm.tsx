@@ -1,4 +1,5 @@
-import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
+import { ReactElement, ReactNode, useEffect, useState } from 'react';
+import * as React from 'react';
 import { makeStyles } from '@mui/styles';
 import {
   Accordion,

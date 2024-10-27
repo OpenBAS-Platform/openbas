@@ -1,4 +1,3 @@
-import React from 'react';
 import { InputLabel } from '@mui/material';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import Editor from 'ckeditor5-custom-build/build/ckeditor';

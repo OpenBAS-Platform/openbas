@@ -1,4 +1,4 @@
-import React, { CSSProperties, FunctionComponent, useMemo, useState } from 'react';
+import { CSSProperties, FunctionComponent, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';

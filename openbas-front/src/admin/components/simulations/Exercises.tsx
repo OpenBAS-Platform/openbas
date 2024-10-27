@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ToggleButtonGroup } from '@mui/material';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';

@@ -1,4 +1,5 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
+import * as React from 'react';
 import ButtonPopover, { VariantButtonPopover } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Dialog from '../../../../components/common/Dialog';

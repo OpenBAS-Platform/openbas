@@ -3,7 +3,7 @@ import remarkParse from 'remark-parse';
 import remarkFlexibleMarkers from 'remark-flexible-markers';
 import { useTheme } from '@mui/styles';
 import { PluggableList } from 'react-markdown/lib';
-import React, { FunctionComponent, SyntheticEvent, useState } from 'react';
+import { FunctionComponent, SyntheticEvent, useState } from 'react';
 import remarkGfm from 'remark-gfm';
 import type { Theme } from './Theme';
 import { truncate } from '../utils/String';

@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { EmojiEventsOutlined } from '@mui/icons-material';
 import type { Challenge } from '../../../../../../utils/api-types';
 import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';

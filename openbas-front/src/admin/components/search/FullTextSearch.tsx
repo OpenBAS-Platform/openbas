@@ -1,4 +1,5 @@
-import React, { CSSProperties, useEffect, useState } from 'react';
+import { CSSProperties, useEffect, useState } from 'react';
+import * as React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tab, Tabs } from '@mui/material';
 import { makeStyles } from '@mui/styles';

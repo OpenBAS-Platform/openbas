@@ -1,4 +1,4 @@
-import React, { FunctionComponent, Suspense, useEffect, useState } from 'react';
+import { FunctionComponent, Suspense, useEffect, useState } from 'react';
 import { Box, Tab, Tabs } from '@mui/material';
 import { Link, Route, Routes, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';

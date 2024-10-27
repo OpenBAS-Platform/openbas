@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext } from 'react';
+import { FunctionComponent, useContext } from 'react';
 import * as R from 'ramda';
 import UpdateInject from '../../common/injects/UpdateInject';
 import type { Inject, InjectResultDTO } from '../../../../utils/api-types';

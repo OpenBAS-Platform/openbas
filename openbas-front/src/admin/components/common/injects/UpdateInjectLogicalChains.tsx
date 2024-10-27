@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import arrayMutators from 'final-form-arrays';
 import { Form } from 'react-final-form';
 import { makeStyles } from '@mui/styles';

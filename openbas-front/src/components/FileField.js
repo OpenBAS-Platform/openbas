@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import * as R from 'ramda';
 import { Field } from 'react-final-form';
 import { useDropzone } from 'react-dropzone';

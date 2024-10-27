@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { Chip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../components/i18n';

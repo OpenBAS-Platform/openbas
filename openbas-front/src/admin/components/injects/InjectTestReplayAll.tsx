@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import { IconButton, Tooltip } from '@mui/material';
 import { ForwardToInbox } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';

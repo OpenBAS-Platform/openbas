@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { Paper, Typography } from '@mui/material';
 import Variables from '../../../components/variables/Variables';

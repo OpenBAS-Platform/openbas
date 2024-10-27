@@ -1,6 +1,7 @@
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { HubOutlined } from '@mui/icons-material';
-import React, { CSSProperties, FunctionComponent } from 'react';
+import { CSSProperties, FunctionComponent } from 'react';
+import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import ExerciseStatus from './simulation/ExerciseStatus';

@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { useParams } from 'react-router-dom';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import type { InjectTestStatus } from '../../../../../utils/api-types';

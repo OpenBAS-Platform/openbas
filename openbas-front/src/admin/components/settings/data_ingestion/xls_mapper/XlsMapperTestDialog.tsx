@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import { useFormatter } from '../../../../../components/i18n';
 import ImportUploaderInjectFromXlsFile from '../../../common/injects/ImportUploaderInjectFromXlsFile';
 import type { ImportMapperAddInput, ImportPostSummary } from '../../../../../utils/api-types';

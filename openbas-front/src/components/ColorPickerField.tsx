@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { TextField as MuiTextField, IconButton, Popover, InputAdornment, TextFieldProps } from '@mui/material';
 // @ts-expect-error react-color does not have types
 import { SketchPicker } from 'react-color';

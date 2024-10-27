@@ -1,4 +1,3 @@
-import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import type { Exercise } from '../../../../../utils/api-types';

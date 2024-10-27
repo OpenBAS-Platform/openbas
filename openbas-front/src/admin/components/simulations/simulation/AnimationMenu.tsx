@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Drawer, MenuList, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
 import { TheatersOutlined, FactCheckOutlined, MailOutlined, NoteAltOutlined } from '@mui/icons-material';

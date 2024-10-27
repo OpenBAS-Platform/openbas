@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
 import MapperForm from './MapperForm';
 import { fetchMapper, updateMapper } from '../../../../../actions/mapper/mapper-actions';
 import type { ImportMapperUpdateInput, RawPaginationImportMapper } from '../../../../../utils/api-types';

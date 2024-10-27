@@ -1,4 +1,3 @@
-import React from 'react';
 import { useDispatch } from 'react-redux';
 import { Kayaking } from '@mui/icons-material';
 import { Box } from '@mui/material';

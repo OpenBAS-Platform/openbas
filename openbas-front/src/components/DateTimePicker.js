@@ -1,4 +1,3 @@
-import React from 'react';
 import { useIntl } from 'react-intl';
 import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
 import { Field } from 'react-final-form';

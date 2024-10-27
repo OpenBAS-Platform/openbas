@@ -1,5 +1,5 @@
 import { Chip } from '@mui/material';
-import React, { CSSProperties, FunctionComponent } from 'react';
+import { CSSProperties, FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../i18n';
 

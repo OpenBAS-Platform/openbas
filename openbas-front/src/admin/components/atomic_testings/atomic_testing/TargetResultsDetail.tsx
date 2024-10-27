@@ -1,4 +1,5 @@
-import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
+import { FunctionComponent, useContext, useEffect, useState } from 'react';
+import * as React from 'react';
 import {
   Box,
   Button,

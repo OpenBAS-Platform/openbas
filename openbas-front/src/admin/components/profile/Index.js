@@ -1,4 +1,3 @@
-import React from 'react';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
 import { Button, Typography } from '@mui/material';

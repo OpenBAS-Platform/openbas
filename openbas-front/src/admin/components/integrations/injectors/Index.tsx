@@ -1,4 +1,4 @@
-import React, { lazy } from 'react';
+import { lazy } from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { fetchInjector } from '../../../../actions/Injectors';

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import LessonsTemplateForm from './LessonsTemplateForm';
 import { useFormatter } from '../../../../components/i18n';

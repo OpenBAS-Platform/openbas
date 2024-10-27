@@ -1,5 +1,5 @@
 import { makeStyles } from '@mui/styles';
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { Card, CardContent, CardHeader, Grid, Paper, Typography } from '@mui/material';
 import { useFormatter } from '../../../components/i18n';
 import type { InjectTestStatus } from '../../../utils/api-types';

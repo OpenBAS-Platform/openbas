@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import * as React from 'react';
 import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
 import { ICommand } from '@uiw/react-md-editor';
 import { Typography } from '@mui/material';

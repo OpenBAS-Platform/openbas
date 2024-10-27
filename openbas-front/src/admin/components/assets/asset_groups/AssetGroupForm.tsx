@@ -1,6 +1,7 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Button, TextField } from '@mui/material';
-import React, { SyntheticEvent } from 'react';
+import { SyntheticEvent } from 'react';
+import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useFormatter } from '../../../../components/i18n';

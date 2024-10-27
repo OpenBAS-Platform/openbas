@@ -1,7 +1,7 @@
 import { Subject, timer } from 'rxjs';
 import { debounce } from 'rxjs/operators';
 import * as R from 'ramda';
-import React from 'react';
+import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 
 // Service bus
@@ -24,7 +24,7 @@ export class ApplicationError extends Error {
 
 export const useQueryParameter = (parameters) => {
   const { search } = useLocation();
-  const query = React.useMemo(() => new URLSearchParams(search), [search]);
+  const query = useMemo(() => new URLSearchParams(search), [search]);
   return parameters.map((p) => query.get(p));
 };
 

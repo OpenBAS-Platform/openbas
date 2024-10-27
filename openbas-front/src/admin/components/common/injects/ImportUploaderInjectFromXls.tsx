@@ -1,6 +1,6 @@
 import { ToggleButton, Tooltip } from '@mui/material';
 import { CloudUploadOutlined } from '@mui/icons-material';
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import Dialog from '../../../../components/common/Dialog';
 import { useFormatter } from '../../../../components/i18n';
 import type { ImportPostSummary, InjectsImportInput, ImportMessage, ImportTestSummary } from '../../../../utils/api-types';

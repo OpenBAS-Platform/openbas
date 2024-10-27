@@ -1,4 +1,5 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
+import * as React from 'react';
 import { Handle, NodeProps, Position, Node, OnConnect, XYPosition } from '@xyflow/react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { Tooltip } from '@mui/material';

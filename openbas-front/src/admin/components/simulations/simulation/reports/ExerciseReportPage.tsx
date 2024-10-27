@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import * as React from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import { Alert, Button, Paper, ToggleButtonGroup, Typography } from '@mui/material';

@@ -1,6 +1,6 @@
 import { InputLabel, Tooltip } from '@mui/material';
 import { InfoOutlined } from '@mui/icons-material';
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import FilterField from '../../../../components/common/queryable/filter/FilterField';
 import useFiltersState from '../../../../components/common/queryable/filter/useFiltersState';
 import { emptyFilterGroup } from '../../../../components/common/queryable/filter/FilterUtils';

@@ -1,6 +1,6 @@
 import { ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { GroupsOutlined } from '@mui/icons-material';
-import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
+import { FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import ItemTags from '../../../../../components/ItemTags';

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { forwardRef, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
 import { Typography, Grid, Card, CardHeader, CardContent, Avatar, CardMedia, Button, Dialog, DialogTitle, DialogContent, Slide } from '@mui/material';
@@ -9,7 +9,7 @@ import { useHelper } from '../../../store';
 import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
 import { useQueryParameter } from '../../../utils/Environment';
 
-const Transition = React.forwardRef((props, ref) => (
+const Transition = forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';

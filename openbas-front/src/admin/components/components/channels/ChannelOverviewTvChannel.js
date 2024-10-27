@@ -1,4 +1,3 @@
-import React from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { Typography, Grid, Card, CardHeader, Skeleton } from '@mui/material';
 

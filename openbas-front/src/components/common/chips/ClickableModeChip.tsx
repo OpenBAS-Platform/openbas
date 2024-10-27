@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
 import { useFormatter } from '../../i18n';

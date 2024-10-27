@@ -1,5 +1,6 @@
 import { Dialog as DialogMUI, DialogTitle, DialogContent, Breakpoint } from '@mui/material';
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
+import * as React from 'react';
 import Transition from './Transition';
 
 interface DialogProps {

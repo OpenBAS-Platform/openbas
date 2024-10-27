@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { forwardRef, Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { withStyles, withTheme } from '@mui/styles';
@@ -144,7 +144,7 @@ const styles = (theme) => ({
   },
 });
 
-const Transition = React.forwardRef((props, ref) => (
+const Transition = forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';

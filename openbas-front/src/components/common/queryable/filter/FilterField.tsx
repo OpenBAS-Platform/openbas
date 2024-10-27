@@ -1,4 +1,4 @@
-import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
+import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import { availableOperators } from './FilterUtils';
 import { useFormatter } from '../../../i18n';
 import type { FilterGroup, PropertySchemaDTO } from '../../../../utils/api-types';

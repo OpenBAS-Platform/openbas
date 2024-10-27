@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useRef, useState } from 'react';
+import { FunctionComponent, useRef, useState } from 'react';
 import { Chip, Tooltip } from '@mui/material';
 import * as R from 'ramda';
 import { FilterHelpers } from './FilterHelpers';

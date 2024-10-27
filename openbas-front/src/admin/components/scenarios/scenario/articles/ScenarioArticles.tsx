@@ -1,5 +1,4 @@
 import { useParams } from 'react-router-dom';
-import React from 'react';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { addScenarioArticle, deleteScenarioArticle, fetchScenarioArticles, updateScenarioArticle } from '../../../../../actions/channels/article-action';

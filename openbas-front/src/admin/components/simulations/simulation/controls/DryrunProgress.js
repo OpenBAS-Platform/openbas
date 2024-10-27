@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { styled } from '@mui/styles';
 import { LinearProgress, linearProgressClasses } from '@mui/material';
 import { progression } from '../../../../../utils/Time';

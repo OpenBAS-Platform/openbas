@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { useState, FunctionComponent } from 'react';
 import * as R from 'ramda';
 import { AddOutlined, RouteOutlined } from '@mui/icons-material';
 import { Box, Dialog, DialogTitle, DialogContent, Autocomplete, TextField, IconButton } from '@mui/material';
@@ -62,7 +62,7 @@ const AttackPatternField: FunctionComponent<Props> = ({
     dispatch(fetchKillChainPhases());
   });
 
-  const [attackPatternCreation, setAttackPatternCreation] = React.useState(false);
+  const [attackPatternCreation, setAttackPatternCreation] = useState(false);
 
   const handleOpenAttackPatternCreation = () => {
     setAttackPatternCreation(true);

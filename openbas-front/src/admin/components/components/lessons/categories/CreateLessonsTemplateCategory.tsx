@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import { useFormatter } from '../../../../../components/i18n';
 import LessonsTemplateCategoryForm, { LessonsTemplateCategoryInputForm } from './LessonsTemplateCategoryForm';
 import { addLessonsTemplateCategory } from '../../../../../actions/Lessons';

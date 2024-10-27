@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { Chip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 

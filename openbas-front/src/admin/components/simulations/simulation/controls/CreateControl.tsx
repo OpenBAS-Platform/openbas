@@ -1,5 +1,7 @@
 /* eslint-disable no-template-curly-in-string */
-import React, { useState } from 'react';
+import { useState } from 'react';
+
+import * as React from 'react';
 import { SpeedDial, SpeedDialIcon, SpeedDialAction, Dialog, DialogTitle, DialogContent, Grid, Typography, Button } from '@mui/material';
 import { VideoSettingsOutlined, MarkEmailReadOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';

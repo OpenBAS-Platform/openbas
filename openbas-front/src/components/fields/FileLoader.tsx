@@ -1,4 +1,5 @@
-import React, { CSSProperties, useEffect, useState } from 'react';
+import { CSSProperties, useEffect, useState } from 'react';
+import * as React from 'react';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { AttachmentOutlined, ControlPointOutlined } from '@mui/icons-material';

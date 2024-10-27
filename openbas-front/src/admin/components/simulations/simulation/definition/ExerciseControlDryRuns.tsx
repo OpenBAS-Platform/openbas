@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { DeleteOutlined, VideoSettingsOutlined } from '@mui/icons-material';

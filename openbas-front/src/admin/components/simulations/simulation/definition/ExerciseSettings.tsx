@@ -1,5 +1,4 @@
 import { Alert, Grid, Paper, Typography } from '@mui/material';
-import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
 import { Groups3Outlined, MailOutlined, NotificationsOutlined, PersonOutlined } from '@mui/icons-material';

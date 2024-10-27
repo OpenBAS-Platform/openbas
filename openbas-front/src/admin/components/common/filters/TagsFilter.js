@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
 import { Box, Autocomplete, TextField, Chip } from '@mui/material';

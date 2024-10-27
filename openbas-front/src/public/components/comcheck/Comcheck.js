@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { makeStyles, useTheme } from '@mui/styles';
 import { AppBar, Toolbar, Paper } from '@mui/material';

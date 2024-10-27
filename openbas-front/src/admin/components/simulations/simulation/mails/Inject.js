@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';

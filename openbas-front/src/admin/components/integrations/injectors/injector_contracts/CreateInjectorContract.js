@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { v4 as uuid } from 'uuid';
 import { connect } from 'react-redux';

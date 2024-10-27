@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { Typography, Grid, Card, CardHeader, CardContent, Skeleton } from '@mui/material';
 
@@ -86,14 +86,14 @@ const ChannelOverviewNewspaper = ({ channel }) => {
                 width="80%"
                 style={{ marginBottom: 15 }}
               />
-              <React.Fragment>
+              <Fragment>
                 <Skeleton
                   animation={false}
                   height={10}
                   style={{ marginBottom: 6 }}
                 />
                 <Skeleton animation={false} height={10} width="80%" />
-              </React.Fragment>
+              </Fragment>
             </CardContent>
           </Card>
         </Grid>
@@ -130,14 +130,14 @@ const ChannelOverviewNewspaper = ({ channel }) => {
                 width="80%"
                 style={{ marginBottom: 15 }}
               />
-              <React.Fragment>
+              <Fragment>
                 <Skeleton
                   animation={false}
                   height={10}
                   style={{ marginBottom: 6 }}
                 />
                 <Skeleton animation={false} height={10} width="80%" />
-              </React.Fragment>
+              </Fragment>
             </CardContent>
           </Card>
           <Card sx={{ width: '100%' }} style={{ marginTop: 20 }}>
@@ -172,14 +172,14 @@ const ChannelOverviewNewspaper = ({ channel }) => {
                 width="80%"
                 style={{ marginBottom: 15 }}
               />
-              <React.Fragment>
+              <Fragment>
                 <Skeleton
                   animation={false}
                   height={10}
                   style={{ marginBottom: 6 }}
                 />
                 <Skeleton animation={false} height={10} width="80%" />
-              </React.Fragment>
+              </Fragment>
             </CardContent>
           </Card>
         </Grid>
@@ -218,14 +218,14 @@ const ChannelOverviewNewspaper = ({ channel }) => {
                 width="80%"
                 style={{ marginBottom: 15 }}
               />
-              <React.Fragment>
+              <Fragment>
                 <Skeleton
                   animation={false}
                   height={10}
                   style={{ marginBottom: 6 }}
                 />
                 <Skeleton animation={false} height={10} width="80%" />
-              </React.Fragment>
+              </Fragment>
             </CardContent>
           </Card>
         </Grid>
@@ -262,14 +262,14 @@ const ChannelOverviewNewspaper = ({ channel }) => {
                 width="80%"
                 style={{ marginBottom: 15 }}
               />
-              <React.Fragment>
+              <Fragment>
                 <Skeleton
                   animation={false}
                   height={10}
                   style={{ marginBottom: 6 }}
                 />
                 <Skeleton animation={false} height={10} width="80%" />
-              </React.Fragment>
+              </Fragment>
             </CardContent>
           </Card>
         </Grid>
@@ -306,14 +306,14 @@ const ChannelOverviewNewspaper = ({ channel }) => {
                 width="80%"
                 style={{ marginBottom: 15 }}
               />
-              <React.Fragment>
+              <Fragment>
                 <Skeleton
                   animation={false}
                   height={10}
                   style={{ marginBottom: 6 }}
                 />
                 <Skeleton animation={false} height={10} width="80%" />
-              </React.Fragment>
+              </Fragment>
             </CardContent>
           </Card>
         </Grid>

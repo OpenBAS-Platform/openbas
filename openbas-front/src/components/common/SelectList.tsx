@@ -1,5 +1,6 @@
 import { Box, Chip, Grid, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
+import * as React from 'react';
 import { truncate } from '../../utils/String';
 
 export interface SelectListIcon {

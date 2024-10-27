@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { useFormatter } from '../i18n';
 import { Scale } from './Tick';

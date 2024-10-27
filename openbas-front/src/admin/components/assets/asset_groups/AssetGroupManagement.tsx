@@ -1,6 +1,6 @@
 import { IconButton, Typography } from '@mui/material';
 import { CloseRounded } from '@mui/icons-material';
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import type { Theme } from '../../../../components/Theme';
 import TagsFilter from '../../common/filters/TagsFilter';

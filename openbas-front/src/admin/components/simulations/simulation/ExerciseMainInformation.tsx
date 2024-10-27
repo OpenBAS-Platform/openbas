@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import * as R from 'ramda';
 import { Chip, Grid, Paper, Typography } from '@mui/material';
 import type { Exercise, KillChainPhase } from '../../../../utils/api-types';

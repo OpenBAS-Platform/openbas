@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import * as R from 'ramda';
 import { FlagOutlined } from '@mui/icons-material';
 import { Box } from '@mui/material';

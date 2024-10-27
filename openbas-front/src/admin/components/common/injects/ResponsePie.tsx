@@ -1,5 +1,5 @@
 import Chart from 'react-apexcharts';
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { Button, Grid } from '@mui/material';
 import { InfoOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';

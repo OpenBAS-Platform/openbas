@@ -1,6 +1,6 @@
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { AttachMoneyOutlined } from '@mui/icons-material';
-import React, { CSSProperties, FunctionComponent, useContext } from 'react';
+import { CSSProperties, FunctionComponent, useContext } from 'react';
 import { makeStyles } from '@mui/styles';
 import VariablePopover from './VariablePopover';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';

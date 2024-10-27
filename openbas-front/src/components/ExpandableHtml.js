@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import * as PropTypes from 'prop-types';
 import parse from 'html-react-parser';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';

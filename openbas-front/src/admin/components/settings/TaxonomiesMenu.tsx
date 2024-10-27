@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Drawer, MenuList, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import { LockPattern } from 'mdi-material-ui';

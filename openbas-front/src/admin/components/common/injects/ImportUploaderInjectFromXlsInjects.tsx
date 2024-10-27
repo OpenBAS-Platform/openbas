@@ -1,7 +1,7 @@
 import { Autocomplete as MuiAutocomplete, Box, Button, MenuItem, TextField, Tooltip } from '@mui/material';
 import { TableViewOutlined } from '@mui/icons-material';
 import { InformationOutline } from 'mdi-material-ui';
-import React, { FunctionComponent, SyntheticEvent, useContext, useEffect, useState } from 'react';
+import { FunctionComponent, SyntheticEvent, useContext, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';

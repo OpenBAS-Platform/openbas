@@ -1,4 +1,3 @@
-import React from 'react';
 import { Field } from 'react-final-form';
 import { TextField, IconButton, Autocomplete as MuiAutocomplete } from '@mui/material';
 import { AddOutlined } from '@mui/icons-material';

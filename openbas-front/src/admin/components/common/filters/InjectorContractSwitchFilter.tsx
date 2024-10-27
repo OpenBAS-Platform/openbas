@@ -1,5 +1,6 @@
 import { Switch } from '@mui/material';
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
+import * as React from 'react';
 import { useFormatter } from '../../../../components/i18n';
 import { FilterHelpers } from '../../../../components/common/queryable/filter/FilterHelpers';
 import type { FilterGroup } from '../../../../utils/api-types';

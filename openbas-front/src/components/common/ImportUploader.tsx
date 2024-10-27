@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FunctionComponent, useRef, useState } from 'react';
+import { ChangeEvent, FunctionComponent, useRef, useState } from 'react';
 import { CircularProgress, CircularProgressProps, IconButton, ToggleButton, Tooltip } from '@mui/material';
 import { CloudUploadOutlined } from '@mui/icons-material';
 import { useFormatter } from '../i18n';

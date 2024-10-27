@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { AttachMoneyOutlined, EmojiEventsOutlined, GroupsOutlined } from '@mui/icons-material';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import type { Exercise, Scenario } from '../../../../utils/api-types';

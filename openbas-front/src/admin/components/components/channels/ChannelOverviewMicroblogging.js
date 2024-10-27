@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { Typography, Grid, Card, CardHeader, Skeleton } from '@mui/material';
 
@@ -71,14 +71,14 @@ const ChannelOverviewMicroblogging = ({ channel }) => {
             />
           }
           subheader={
-            <React.Fragment>
+            <Fragment>
               <Skeleton
                 animation={false}
                 height={10}
                 style={{ marginBottom: 6 }}
               />
               <Skeleton animation={false} height={10} width="80%" />
-            </React.Fragment>
+            </Fragment>
           }
         />
       </Card>
@@ -101,14 +101,14 @@ const ChannelOverviewMicroblogging = ({ channel }) => {
             />
           }
           subheader={
-            <React.Fragment>
+            <Fragment>
               <Skeleton
                 animation={false}
                 height={10}
                 style={{ marginBottom: 6 }}
               />
               <Skeleton animation={false} height={10} width="80%" />
-            </React.Fragment>
+            </Fragment>
           }
         />
       </Card>
@@ -131,14 +131,14 @@ const ChannelOverviewMicroblogging = ({ channel }) => {
             />
           }
           subheader={
-            <React.Fragment>
+            <Fragment>
               <Skeleton
                 animation={false}
                 height={10}
                 style={{ marginBottom: 6 }}
               />
               <Skeleton animation={false} height={10} width="80%" />
-            </React.Fragment>
+            </Fragment>
           }
         />
         <Grid container={true} spacing={3}>
@@ -184,14 +184,14 @@ const ChannelOverviewMicroblogging = ({ channel }) => {
             />
           }
           subheader={
-            <React.Fragment>
+            <Fragment>
               <Skeleton
                 animation={false}
                 height={10}
                 style={{ marginBottom: 6 }}
               />
               <Skeleton animation={false} height={10} width="80%" />
-            </React.Fragment>
+            </Fragment>
           }
         />
       </Card>
@@ -214,14 +214,14 @@ const ChannelOverviewMicroblogging = ({ channel }) => {
             />
           }
           subheader={
-            <React.Fragment>
+            <Fragment>
               <Skeleton
                 animation={false}
                 height={10}
                 style={{ marginBottom: 6 }}
               />
               <Skeleton animation={false} height={10} width="80%" />
-            </React.Fragment>
+            </Fragment>
           }
         />
       </Card>

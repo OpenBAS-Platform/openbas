@@ -1,4 +1,4 @@
-import React, { CSSProperties, FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSProperties, FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 import { Chip, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { KeyboardArrowRight } from '@mui/icons-material';

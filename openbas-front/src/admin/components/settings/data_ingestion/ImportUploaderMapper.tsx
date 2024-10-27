@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ImportUploader from '../../../../components/common/ImportUploader';
 import { importMapper } from '../../../../actions/mapper/mapper-actions';

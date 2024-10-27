@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import * as React from 'react';
 import { AppBar, Toolbar, IconButton, Menu, MenuProps, MenuItem } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { AccountCircleOutlined } from '@mui/icons-material';

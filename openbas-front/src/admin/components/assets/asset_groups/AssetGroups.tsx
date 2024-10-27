@@ -1,5 +1,5 @@
 import { makeStyles } from '@mui/styles';
-import React, { CSSProperties, useMemo, useState } from 'react';
+import { Fragment, CSSProperties, useMemo, useState } from 'react';
 import { Box, Chip, Drawer as MuiDrawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { SelectGroup } from 'mdi-material-ui';
 import { useSearchParams } from 'react-router-dom';
@@ -73,21 +73,19 @@ const inlineStyles: Record<string, CSSProperties> = {
 const computeRuleValues = (assetGroup: AssetGroupOutput, t: (value: string) => string) => {
   const computeDynamic = () => {
     if (assetGroup.asset_group_dynamic_filter?.filters && assetGroup.asset_group_dynamic_filter?.filters.length > 0) {
-      return (
-        <>
-          {assetGroup.asset_group_dynamic_filter.filters.map((filter, idx) => (
-            <React.Fragment key={filter.key}>
-              {idx !== 0 && <ClickableModeChip mode={assetGroup.asset_group_dynamic_filter?.mode} />}
-              <Chip
-                key={filter.key}
-                variant={'filled'}
-                size="small"
-                sx={{ borderRadius: 1 }}
-                label={<FilterChipValues filter={filter} />}
-              />
-            </React.Fragment>))}
-        </>
-      );
+      return <>
+        {assetGroup.asset_group_dynamic_filter.filters.map((filter, idx) => (
+          <Fragment key={filter.key}>
+            {idx !== 0 && <ClickableModeChip mode={assetGroup.asset_group_dynamic_filter?.mode} />}
+            <Chip
+              key={filter.key}
+              variant={'filled'}
+              size="small"
+              sx={{ borderRadius: 1 }}
+              label={<FilterChipValues filter={filter} />}
+            />
+          </Fragment>))}
+      </>;
     }
     return (<></>);
   };

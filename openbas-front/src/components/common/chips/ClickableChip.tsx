@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useRef, useState } from 'react';
+import { FunctionComponent, useRef, useState } from 'react';
 import { Box, Chip, SelectChangeEvent, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';

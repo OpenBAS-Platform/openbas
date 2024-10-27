@@ -1,5 +1,5 @@
 import { Autocomplete, Checkbox, TextField } from '@mui/material';
-import React, { FunctionComponent, useEffect } from 'react';
+import { FunctionComponent, useEffect } from 'react';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { useFormatter } from '../../../i18n';
 import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
@@ -68,7 +68,7 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
     const isIncluded = filter.values?.includes(optionId);
     const newValues = isIncluded
       ? (filter.values?.filter((v) => v !== optionId) ?? [])
-      : [...filter.values ?? [], optionId];
+      : [...(filter.values ?? []), optionId];
     helpers.handleAddMultipleValueFilter(filter.key, newValues);
   };
 

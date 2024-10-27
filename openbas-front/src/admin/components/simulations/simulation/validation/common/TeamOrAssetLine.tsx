@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { CastForEducationOutlined, DnsOutlined, LanOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';

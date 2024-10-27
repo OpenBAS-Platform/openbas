@@ -1,4 +1,3 @@
-import React from 'react';
 import TeamsComponent from '../components/teams/Teams';
 import { PermissionsContext, PermissionsContextType, TeamContext, type TeamContextType } from '../common/Context';
 import { useHelper } from '../../../store';
@@ -29,7 +28,7 @@ const Teams = () => {
   const teamContext: TeamContextType = {
     onAddUsersTeam(teamId: Team['team_id'], userIds: UserStore['user_id'][]): Promise<void> {
       return dispatch(updateTeamPlayers(teamId, {
-        team_users: [...(teams.find((t) => t.team_id === teamId)?.team_users) || [], ...userIds],
+        team_users: [...(teams.find((t) => t.team_id === teamId)?.team_users || []), ...userIds],
       }));
     },
     onRemoveUsersTeam(teamId: TeamStore['team_id'], userIds: UserStore['user_id'][]): Promise<void> {

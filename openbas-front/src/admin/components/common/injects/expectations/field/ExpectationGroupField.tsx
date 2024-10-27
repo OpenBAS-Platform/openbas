@@ -1,6 +1,7 @@
 import { FormControlLabel, FormLabel, Radio, RadioGroup, Tooltip } from '@mui/material';
 import { InfoOutlined } from '@mui/icons-material';
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
+import * as React from 'react';
 import { Control, Controller } from 'react-hook-form';
 import { makeStyles } from '@mui/styles';
 import type { Theme } from '../../../../../../components/Theme';

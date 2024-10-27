@@ -1,4 +1,3 @@
-import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import XlsMappers from './data_ingestion/XlsMappers';
 import Parameters from './Parameters';

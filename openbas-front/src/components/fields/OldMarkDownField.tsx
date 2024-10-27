@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
 import { Field, FieldInputProps, FieldMetaState } from 'react-final-form';
 import { FormHelperText, InputLabel, useTheme } from '@mui/material';

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import { Fragment, useContext, useState } from 'react';
 import * as R from 'ramda';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
@@ -70,7 +70,7 @@ const ArticlePopover = ({ article, onRemoveArticle = null }) => {
   )(article);
 
   return (
-    <React.Fragment>
+    <Fragment>
       <IconButton disabled={!permissions.canWrite}
         onClick={handlePopoverOpen}
         aria-haspopup="true"
@@ -146,7 +146,7 @@ const ArticlePopover = ({ article, onRemoveArticle = null }) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </React.Fragment>
+    </Fragment>
   );
 };
 

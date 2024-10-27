@@ -1,5 +1,5 @@
 import Chart from 'react-apexcharts';
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { useTheme } from '@mui/styles';
 import type { ApexOptions } from 'apexcharts';
 import type { ExerciseSimpleStore } from '../../../../actions/exercises/Exercise';

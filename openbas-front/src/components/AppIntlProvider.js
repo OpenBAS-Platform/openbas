@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import * as PropTypes from 'prop-types';
 import { IntlProvider } from 'react-intl';
 import moment from 'moment';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Field } from 'react-final-form';
 import { FormHelperText, InputLabel } from '@mui/material';
 import { CKEditor } from '@ckeditor/ckeditor5-react';

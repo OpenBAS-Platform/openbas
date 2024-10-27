@@ -1,4 +1,3 @@
-import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { ReportProblem } from '@mui/icons-material';
 import { isEmptyField, isNotEmptyField, recordEntries, recordKeys } from '../../../utils/utils';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useQueryParameter } from '../../../utils/Environment';
 import ChallengesPreview from './ChallengesPreview';
 import ChallengesPlayer from './ChallengesPlayer';

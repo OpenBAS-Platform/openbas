@@ -1,4 +1,3 @@
-import React from 'react';
 import * as PropTypes from 'prop-types';
 import { withStyles, useTheme } from '@mui/styles';
 import { Chip, CircularProgress, Tooltip } from '@mui/material';

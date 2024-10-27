@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import { forwardRef, useContext, useState } from 'react';
 import { IconButton, Dialog, DialogTitle, DialogContent, Slide, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
@@ -6,7 +6,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import LessonsQuestionForm from './LessonsQuestionForm';
 import { LessonContext } from '../../../common/Context';
 
-const Transition = React.forwardRef((props, ref) => (
+const Transition = forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';

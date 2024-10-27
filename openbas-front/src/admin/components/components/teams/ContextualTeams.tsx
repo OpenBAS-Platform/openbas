@@ -1,6 +1,7 @@
 import { Drawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { CheckCircleOutlined, GroupsOutlined } from '@mui/icons-material';
-import React, { CSSProperties, useContext, useState } from 'react';
+import { CSSProperties, useContext, useState } from 'react';
+import * as React from 'react';
 import { makeStyles } from '@mui/styles';
 import { useSearchParams } from 'react-router-dom';
 import ItemTags from '../../../../components/ItemTags';

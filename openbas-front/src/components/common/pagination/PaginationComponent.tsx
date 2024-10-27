@@ -1,5 +1,6 @@
 import { Button, Chip, TablePagination, ToggleButtonGroup } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import * as React from 'react';
 import { makeStyles } from '@mui/styles';
 import SearchFilter from '../../SearchFilter';
 import type { Page } from '../queryable/Page';

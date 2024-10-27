@@ -1,5 +1,6 @@
 import { Box, Tab, Tabs } from '@mui/material';
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
+import * as React from 'react';
 import ScenarioForm from '../ScenarioForm';
 import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
 import Drawer from '../../../../components/common/Drawer';

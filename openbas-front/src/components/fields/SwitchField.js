@@ -1,4 +1,3 @@
-import React from 'react';
 import { Field } from 'react-final-form';
 import { FormGroup, FormControlLabel, Switch as MuiSwitch, FormHelperText, FormControl } from '@mui/material';
 

@@ -1,5 +1,5 @@
 import { Grid, Paper, Typography } from '@mui/material';
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { useFormatter } from '../../../../../components/i18n';
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';

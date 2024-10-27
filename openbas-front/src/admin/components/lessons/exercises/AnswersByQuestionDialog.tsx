@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { Button, LinearProgress, Typography, useTheme } from '@mui/material';
 import Dialog from '../../../../components/common/Dialog';
 

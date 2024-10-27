@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { makeStyles } from '@mui/styles';
 import { TextField, InputAdornment } from '@mui/material';
 import { Search } from '@mui/icons-material';

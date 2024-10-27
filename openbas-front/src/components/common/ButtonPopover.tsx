@@ -1,6 +1,7 @@
 import { IconButton, Menu, MenuItem, ToggleButton, ToggleButtonProps } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
+import * as React from 'react';
 import { useFormatter } from '../i18n';
 
 export interface PopoverEntry {

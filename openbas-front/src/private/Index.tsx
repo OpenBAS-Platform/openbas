@@ -1,4 +1,3 @@
-import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import TopBar from './components/nav/TopBar';

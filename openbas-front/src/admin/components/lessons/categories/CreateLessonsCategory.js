@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import { forwardRef, useContext, useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, ListItem, ListItemIcon, ListItemText, Slide } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
@@ -7,7 +7,7 @@ import LessonsCategoryForm from './LessonsCategoryForm';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import { LessonContext } from '../../common/Context';
 
-const Transition = React.forwardRef((props, ref) => (
+const Transition = forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';

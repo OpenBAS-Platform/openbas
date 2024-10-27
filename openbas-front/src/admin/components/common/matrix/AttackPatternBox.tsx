@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button, ListItemText, Menu, MenuItem, Typography } from '@mui/material';
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
+import * as React from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import type { AttackPattern, ExpectationResultsByType } from '../../../../utils/api-types';
 import type { InjectExpectationResultsByAttackPatternStore, InjectExpectationResultsByTypeStore } from '../../../../actions/exercises/Exercise';

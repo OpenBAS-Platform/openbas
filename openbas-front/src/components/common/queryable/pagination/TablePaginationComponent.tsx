@@ -1,5 +1,5 @@
 import { TablePagination, ToggleButtonGroup } from '@mui/material';
-import React from 'react';
+import * as React from 'react';
 import { makeStyles } from '@mui/styles';
 import { ROWS_PER_PAGE_OPTIONS } from './usPaginationState';
 import ExportButton, { ExportProps } from '../../ExportButton';

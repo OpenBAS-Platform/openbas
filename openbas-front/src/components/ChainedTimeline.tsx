@@ -1,4 +1,5 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
+import * as React from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import {
   Connection,

@@ -1,5 +1,5 @@
 import { Chip } from '@mui/material';
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import colorStyles from '../../../../../../components/Color';

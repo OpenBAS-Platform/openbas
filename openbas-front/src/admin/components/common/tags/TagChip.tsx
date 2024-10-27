@@ -1,5 +1,5 @@
 import { Chip } from '@mui/material';
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../store';
 import type { TagHelper } from '../../../../actions/helper';

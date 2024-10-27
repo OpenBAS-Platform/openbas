@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { forwardRef, Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
@@ -9,7 +9,7 @@ import TagForm from './TagForm';
 import inject18n from '../../../../components/i18n';
 import Drawer from '../../../../components/common/Drawer';
 
-const Transition = React.forwardRef((props, ref) => (
+const Transition = forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';

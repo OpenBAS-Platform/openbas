@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import * as React from 'react';
 import { Dialog, DialogContent, DialogTitle, IconButton, Tooltip } from '@mui/material';
 import { UpdateOutlined } from '@mui/icons-material';
 import { updateExerciseStartDate } from '../../../../actions/Exercise';

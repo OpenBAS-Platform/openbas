@@ -1,4 +1,3 @@
-import React from 'react';
 import * as R from 'ramda';
 import type { Filter, FilterGroup, PropertySchemaDTO } from '../../../../utils/api-types';
 

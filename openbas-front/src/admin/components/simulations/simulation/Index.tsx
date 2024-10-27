@@ -1,4 +1,4 @@
-import React, { FunctionComponent, lazy, Suspense, useState } from 'react';
+import { FunctionComponent, lazy, Suspense, useState } from 'react';
 import { Link, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { Alert, AlertTitle, Box, Tab, Tabs } from '@mui/material';
 import { makeStyles } from '@mui/styles';

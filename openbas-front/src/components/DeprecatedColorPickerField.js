@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { Field } from 'react-final-form';
 import { TextField as MuiTextField, IconButton, Popover, InputAdornment } from '@mui/material';
 import { SketchPicker } from 'react-color';
@@ -10,7 +10,7 @@ const ColorPickerFieldBase = ({
   meta: { touched, invalid, error, submitError },
   ...others
 }) => {
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const handleChange = (color) => {
     onChange(color && color.hex ? color.hex : '');
   };

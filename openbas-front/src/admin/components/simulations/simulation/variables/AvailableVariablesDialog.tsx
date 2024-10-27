@@ -1,5 +1,6 @@
 import { Alert, Button, Dialog, DialogActions, DialogContent, List, ListItem, ListItemButton, ListItemText, Tab } from '@mui/material';
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
+import * as React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Link } from 'react-router-dom';
 import { TabContext, TabList, TabPanel } from '@mui/lab';

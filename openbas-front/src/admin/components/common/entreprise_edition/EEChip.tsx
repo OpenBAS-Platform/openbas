@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import EnterpriseEditionAgreement from './EnterpriseEditionAgreement';
 import type { Theme } from '../../../../components/Theme';

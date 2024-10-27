@@ -1,4 +1,3 @@
-import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Link } from 'react-router-dom';
 import { Card, CardActionArea, CardContent, Chip, Grid, Tooltip, Typography } from '@mui/material';

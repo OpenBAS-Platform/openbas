@@ -1,4 +1,5 @@
-import React, { FunctionComponent, useContext, useState } from 'react';
+import { FunctionComponent, useContext, useState } from 'react';
+import * as React from 'react';
 import { MoreVert } from '@mui/icons-material';
 import { IconButton, Menu, MenuItem } from '@mui/material';
 import type { InjectTestStatus } from '../../../utils/api-types';

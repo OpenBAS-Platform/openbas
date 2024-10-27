@@ -1,6 +1,6 @@
 import { Avatar, Button, Card, CardContent, CardHeader, CardMedia, Chip, Grid, IconButton, Tooltip, Typography } from '@mui/material';
 import { green, orange } from '@mui/material/colors';
-import React, { FunctionComponent, useContext, useState } from 'react';
+import { Fragment, FunctionComponent, useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, NewspaperOutlined, ShareOutlined, VisibilityOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
@@ -98,198 +98,196 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
   const { previewArticleUrl } = useContext(ArticleContext);
   const { permissions } = useContext(PermissionsContext);
 
-  return (
-    <>
-      {permissions.canWrite && (
-        <CreateArticle
-          openCreate={openCreate}
-          handleOpenCreate={handleOpenCreate}
-          handleCloseCreate={handleCloseCreate}
-        />
-      )}
-      {fullArticles.length > 0 && (
-        <ChannelsFilter
-          onChannelsChange={handleChannelsChange}
-          onClearChannels={handleClearChannels}
-        />
-      )}
-      <div className="clearfix" />
-      {sortedArticles.length === 0 && (
-        <Empty message={
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 18 }}>
-              {t('No media pressure article available in this simulation yet.')}
-            </div>
-            <Button
-              style={{ marginTop: 20 }}
-              startIcon={<NewspaperOutlined />}
-              variant="outlined"
-              color="primary"
-              size="small"
-              onClick={handleOpenCreate}
-            >
-              {t('Create an article')}
-            </Button>
+  return <>
+    {permissions.canWrite && (
+      <CreateArticle
+        openCreate={openCreate}
+        handleOpenCreate={handleOpenCreate}
+        handleCloseCreate={handleCloseCreate}
+      />
+    )}
+    {fullArticles.length > 0 && (
+      <ChannelsFilter
+        onChannelsChange={handleChannelsChange}
+        onClearChannels={handleClearChannels}
+      />
+    )}
+    <div className="clearfix" />
+    {sortedArticles.length === 0 && (
+      <Empty message={
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 18 }}>
+            {t('No media pressure article available in this simulation yet.')}
           </div>
-            }
-        />
-      )}
-      <Grid container spacing={3}>
-        {sortedArticles.map((article, index) => {
-          const docs = (article.article_documents ?? [])
-            .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
-            .filter((d) => d !== undefined);
-          const images = docs.filter((d) => d.document_type.includes('image/'));
-          const videos = docs.filter((d) => d.document_type.includes('video/'));
-          let headersDocs = [];
-          if (article.article_fullchannel?.channel_type === 'newspaper') {
-            headersDocs = images;
-          } else if (article.article_fullchannel?.channel_type === 'tv') {
-            headersDocs = videos;
-          } else {
-            headersDocs = [...images, ...videos];
+          <Button
+            style={{ marginTop: 20 }}
+            startIcon={<NewspaperOutlined />}
+            variant="outlined"
+            color="primary"
+            size="small"
+            onClick={handleOpenCreate}
+          >
+            {t('Create an article')}
+          </Button>
+        </div>
           }
-          let columns = 12;
-          if (headersDocs.length === 2) {
-            columns = 6;
-          } else if (headersDocs.length === 3) {
-            columns = 4;
-          } else if (headersDocs.length >= 4) {
-            columns = 3;
-          }
-          // const shouldBeTruncated = (article.article_content || '').length > 500;
-          return (
-            <Grid key={article.article_id} item xs={4} style={index < 3 ? { paddingTop: 0 } : undefined}>
-              <Card
-                variant="outlined"
-                classes={{ root: classes.card }}
-                sx={{ width: '100%', height: '100%' }}
-              >
-                <CardHeader
-                  avatar={
-                    <Avatar
-                      sx={{
-                        bgcolor: ChannelColor(
-                          article.article_fullchannel?.channel_type,
-                        ),
-                      }}
-                    >
-                      {(article.article_author || t('Unknown')).charAt(0)}
-                    </Avatar>
-                  }
-                  title={article.article_author || t('Unknown')}
-                  subheader={
-                    article.article_is_scheduled ? (
-                      <span style={{ color: green[500] }}>
-                        {t('Scheduled')}
-                      </span>
-                    ) : (
-                      <span style={{ color: orange[500] }}>
-                        {t('Not used in the context')}
-                      </span>
-                    )
-                  }
-                  action={
-                    <React.Fragment>
-                      <IconButton
-                        aria-haspopup="true"
-                        size="large"
-                        component={Link}
-                        to={previewArticleUrl(article)}
-                      >
-                        <VisibilityOutlined />
-                      </IconButton>
-                      <ArticlePopover article={article} />
-                    </React.Fragment>
-                  }
-                />
-                <Grid container={true} spacing={3}>
-                  {headersDocs.map((doc) => (
-                    <Grid key={doc.document_id} item xs={columns}>
-                      {doc.document_type.includes('image/') && (
-                        <CardMedia
-                          component="img"
-                          height="150"
-                          src={`/api/documents/${doc.document_id}/file`}
-                        />
-                      )}
-                      {doc.document_type.includes('video/') && (
-                        <CardMedia
-                          component="video"
-                          height="150"
-                          src={`/api/documents/${doc.document_id}/file`}
-                          controls
-                        />
-                      )}
-                    </Grid>
-                  ))}
-                </Grid>
-                <CardContent style={{ marginBottom: 30 }}>
-                  <Typography
-                    gutterBottom
-                    variant="h1"
-                    component="div"
-                    style={{ margin: '0 auto', textAlign: 'center' }}
+      />
+    )}
+    <Grid container spacing={3}>
+      {sortedArticles.map((article, index) => {
+        const docs = (article.article_documents ?? [])
+          .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
+          .filter((d) => d !== undefined);
+        const images = docs.filter((d) => d.document_type.includes('image/'));
+        const videos = docs.filter((d) => d.document_type.includes('video/'));
+        let headersDocs = [];
+        if (article.article_fullchannel?.channel_type === 'newspaper') {
+          headersDocs = images;
+        } else if (article.article_fullchannel?.channel_type === 'tv') {
+          headersDocs = videos;
+        } else {
+          headersDocs = [...images, ...videos];
+        }
+        let columns = 12;
+        if (headersDocs.length === 2) {
+          columns = 6;
+        } else if (headersDocs.length === 3) {
+          columns = 4;
+        } else if (headersDocs.length >= 4) {
+          columns = 3;
+        }
+        // const shouldBeTruncated = (article.article_content || '').length > 500;
+        return (
+          <Grid key={article.article_id} item xs={4} style={index < 3 ? { paddingTop: 0 } : undefined}>
+            <Card
+              variant="outlined"
+              classes={{ root: classes.card }}
+              sx={{ width: '100%', height: '100%' }}
+            >
+              <CardHeader
+                avatar={
+                  <Avatar
+                    sx={{
+                      bgcolor: ChannelColor(
+                        article.article_fullchannel?.channel_type,
+                      ),
+                    }}
                   >
-                    {article.article_name}
-                  </Typography>
-                  <ExpandableMarkdown source={article.article_content ?? ''} limit={500} />
-                  <div className={classes.footer}>
-                    <div style={{ float: 'left' }}>
-                      <Tooltip title={article.article_fullchannel?.channel_name}>
-                        <Chip
-                          icon={
-                            <ChannelIcon
-                              type={article.article_fullchannel?.channel_type}
-                              variant="chip"
-                            />
-                          }
-                          classes={{ root: classes.channel }}
-                          style={{
-                            color: ChannelColor(
-                              article.article_fullchannel?.channel_type,
-                            ),
-                            borderColor: ChannelColor(
-                              article.article_fullchannel?.channel_type,
-                            ),
-                          }}
-                          variant="outlined"
-                          label={article.article_fullchannel?.channel_name}
-                        />
-                      </Tooltip>
-                    </div>
-                    <div style={{ float: 'right' }}>
-                      <Button
-                        size="small"
-                        startIcon={<ChatBubbleOutlineOutlined />}
-                        className={classes.button}
-                      >
-                        {article.article_comments || 0}
-                      </Button>
-                      <Button
-                        size="small"
-                        startIcon={<ShareOutlined />}
-                        className={classes.button}
-                      >
-                        {article.article_shares || 0}
-                      </Button>
-                      <Button
-                        size="small"
-                        startIcon={<FavoriteBorderOutlined />}
-                        className={classes.button}
-                      >
-                        {article.article_likes || 0}
-                      </Button>
-                    </div>
+                    {(article.article_author || t('Unknown')).charAt(0)}
+                  </Avatar>
+                }
+                title={article.article_author || t('Unknown')}
+                subheader={
+                  article.article_is_scheduled ? (
+                    <span style={{ color: green[500] }}>
+                      {t('Scheduled')}
+                    </span>
+                  ) : (
+                    <span style={{ color: orange[500] }}>
+                      {t('Not used in the context')}
+                    </span>
+                  )
+                }
+                action={
+                  <Fragment>
+                    <IconButton
+                      aria-haspopup="true"
+                      size="large"
+                      component={Link}
+                      to={previewArticleUrl(article)}
+                    >
+                      <VisibilityOutlined />
+                    </IconButton>
+                    <ArticlePopover article={article} />
+                  </Fragment>
+                }
+              />
+              <Grid container={true} spacing={3}>
+                {headersDocs.map((doc) => (
+                  <Grid key={doc.document_id} item xs={columns}>
+                    {doc.document_type.includes('image/') && (
+                      <CardMedia
+                        component="img"
+                        height="150"
+                        src={`/api/documents/${doc.document_id}/file`}
+                      />
+                    )}
+                    {doc.document_type.includes('video/') && (
+                      <CardMedia
+                        component="video"
+                        height="150"
+                        src={`/api/documents/${doc.document_id}/file`}
+                        controls
+                      />
+                    )}
+                  </Grid>
+                ))}
+              </Grid>
+              <CardContent style={{ marginBottom: 30 }}>
+                <Typography
+                  gutterBottom
+                  variant="h1"
+                  component="div"
+                  style={{ margin: '0 auto', textAlign: 'center' }}
+                >
+                  {article.article_name}
+                </Typography>
+                <ExpandableMarkdown source={article.article_content ?? ''} limit={500} />
+                <div className={classes.footer}>
+                  <div style={{ float: 'left' }}>
+                    <Tooltip title={article.article_fullchannel?.channel_name}>
+                      <Chip
+                        icon={
+                          <ChannelIcon
+                            type={article.article_fullchannel?.channel_type}
+                            variant="chip"
+                          />
+                        }
+                        classes={{ root: classes.channel }}
+                        style={{
+                          color: ChannelColor(
+                            article.article_fullchannel?.channel_type,
+                          ),
+                          borderColor: ChannelColor(
+                            article.article_fullchannel?.channel_type,
+                          ),
+                        }}
+                        variant="outlined"
+                        label={article.article_fullchannel?.channel_name}
+                      />
+                    </Tooltip>
                   </div>
-                </CardContent>
-              </Card>
-            </Grid>
-          );
-        })}
-      </Grid>
-    </>
-  );
+                  <div style={{ float: 'right' }}>
+                    <Button
+                      size="small"
+                      startIcon={<ChatBubbleOutlineOutlined />}
+                      className={classes.button}
+                    >
+                      {article.article_comments || 0}
+                    </Button>
+                    <Button
+                      size="small"
+                      startIcon={<ShareOutlined />}
+                      className={classes.button}
+                    >
+                      {article.article_shares || 0}
+                    </Button>
+                    <Button
+                      size="small"
+                      startIcon={<FavoriteBorderOutlined />}
+                      className={classes.button}
+                    >
+                      {article.article_likes || 0}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Grid>
+        );
+      })}
+    </Grid>
+  </>;
 };
 
 export default Articles;

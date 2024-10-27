@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../../utils/hooks';
 import ImportUploader from '../../../components/common/ImportUploader';

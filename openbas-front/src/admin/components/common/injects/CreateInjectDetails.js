@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import * as R from 'ramda';
 import arrayMutators from 'final-form-arrays';
 import { Form } from 'react-final-form';

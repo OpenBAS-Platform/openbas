@@ -1,4 +1,5 @@
-import React, { JSXElementConstructor } from 'react';
+import { JSXElementConstructor } from 'react';
+import * as React from 'react';
 import { Slide } from '@mui/material';
 import type { TransitionProps } from '@mui/material/transitions';
 

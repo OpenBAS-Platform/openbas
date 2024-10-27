@@ -1,4 +1,3 @@
-import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Slider as MUISlider } from '@mui/material';
 import { Field } from 'react-final-form';

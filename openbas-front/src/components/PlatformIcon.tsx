@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { useTheme } from '@mui/styles';
 import { PaletteMode, Tooltip } from '@mui/material';
 import type { Theme } from './Theme';

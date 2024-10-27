@@ -1,5 +1,5 @@
 import { makeStyles } from '@mui/styles';
-import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
+import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import type { InjectTestStatus, SearchPaginationInput } from '../../../utils/api-types';
 import { useFormatter } from '../../../components/i18n';

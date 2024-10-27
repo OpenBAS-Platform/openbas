@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { VpnKeyOutlined } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { useFormatter } from '../../../components/i18n';

@@ -2,7 +2,7 @@ import { Button, Dialog, DialogContent, DialogTitle, IconButton } from '@mui/mat
 import { AddOutlined } from '@mui/icons-material';
 import { Form } from 'react-final-form';
 import * as R from 'ramda';
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import Transition from '../../../../components/common/Transition';
 import TagField from '../../../../components/TagField';
 import TagChip from '../tags/TagChip';

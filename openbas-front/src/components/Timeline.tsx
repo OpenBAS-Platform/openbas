@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { Fragment, FunctionComponent } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { CastForEducationOutlined, CastOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
@@ -203,123 +203,121 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
     ? '1px dashed rgba(0, 0, 0, 0.15)'
     : '1px dashed rgba(255, 255, 255, 0.15)';
 
-  return (
-    <>
-      {injects.length > 0 && sortedTeams.length > 0 ? (
-        <div className={classes.container}>
-          <div className={classes.names}>
-            {sortedTeams.map((team) => (
-              <div key={team.team_id} className={classes.lineName}>
-                <div className={classes.name}>
-                  {team.team_name.startsWith('openbas_') ? (
-                    <CastOutlined fontSize="small"/>
-                  ) : (
-                    <CastForEducationOutlined fontSize="small"/>
-                  )}
-                        &nbsp;&nbsp;
-                  {team.team_name.startsWith('openbas_')
-                    ? t(team.team_name)
-                    : truncate(team.team_name, 20)}
-                </div>
+  return <>
+    {injects.length > 0 && sortedTeams.length > 0 ? (
+      <div className={classes.container}>
+        <div className={classes.names}>
+          {sortedTeams.map((team) => (
+            <div key={team.team_id} className={classes.lineName}>
+              <div className={classes.name}>
+                {team.team_name.startsWith('openbas_') ? (
+                  <CastOutlined fontSize="small"/>
+                ) : (
+                  <CastForEducationOutlined fontSize="small"/>
+                )}
+                      &nbsp;&nbsp;
+                {team.team_name.startsWith('openbas_')
+                  ? t(team.team_name)
+                  : truncate(team.team_name, 20)}
               </div>
-            ))}
-          </div>
-          <div className={classes.timeline}>
-            {sortedTeams.map((team, index) => {
-              const injectsGroupedByTick = byTick(
-                filtering.filterAndSort(injectsMap[team.team_id] ?? []),
-              );
+            </div>
+          ))}
+        </div>
+        <div className={classes.timeline}>
+          {sortedTeams.map((team, index) => {
+            const injectsGroupedByTick = byTick(
+              filtering.filterAndSort(injectsMap[team.team_id] ?? []),
+            );
+            return (
+              <div
+                key={team.team_id}
+                className={classes.line}
+                style={{ backgroundColor: index % 2 === 0 ? grid0 : grid5 }}
+              >
+                {Object.keys(injectsGroupedByTick).map((key, i) => {
+                  const injectGroupPosition = (parseFloat(key) * 100) / totalDuration;
+                  return (
+                    <div
+                      key={i}
+                      className={classes.injectGroup}
+                      style={{ left: `${injectGroupPosition}%` }}
+                    >
+                      {injectsGroupedByTick[key].map((inject: InjectStore) => {
+                        const duration = splitDuration(inject.inject_depends_duration || 0);
+                        const tooltipContent = (
+                          <Fragment>
+                            {inject.inject_title}
+                            <br/>
+                            <span style={{ display: 'block', textAlign: 'center', fontWeight: 'bold' }}>
+                              {`${duration.days} ${t('d')}, ${duration.hours} ${t('h')}, ${duration.minutes} ${t('m')}`}
+                            </span>
+                          </Fragment>
+                        );
+                        return (
+                          <InjectIcon
+                            key={inject.inject_id}
+                            isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
+                            type={
+                              inject.inject_injector_contract.injector_contract_payload
+                                ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                                  || inject.inject_injector_contract.injector_contract_payload?.payload_type
+                                : inject.inject_type
+                            }
+                            onClick={() => handleSelectInject(inject.inject_id)}
+                            done={inject.inject_status !== null}
+                            disabled={!inject.inject_enabled}
+                            size="small"
+                            variant='timeline'
+                            tooltip={tooltipContent}
+                          />
+                        );
+                      })
+                              }
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+          <div className={classes.scale}>
+            {ticks.map((tick, index) => {
+              const duration = splitDuration(tick);
               return (
                 <div
-                  key={team.team_id}
-                  className={classes.line}
-                  style={{ backgroundColor: index % 2 === 0 ? grid0 : grid5 }}
+                  key={tick}
+                  className={classes.tick}
+                  style={{
+                    left: `${index * 5}%`,
+                    height: index % 5 === 0 ? 'calc(100% + 30px)' : '100%',
+                    top: index % 5 === 0 ? -15 : 0,
+                    borderRight: index % 5 === 0 ? grid25 : grid15,
+                  }}
                 >
-                  {Object.keys(injectsGroupedByTick).map((key, i) => {
-                    const injectGroupPosition = (parseFloat(key) * 100) / totalDuration;
-                    return (
-                      <div
-                        key={i}
-                        className={classes.injectGroup}
-                        style={{ left: `${injectGroupPosition}%` }}
-                      >
-                        {injectsGroupedByTick[key].map((inject: InjectStore) => {
-                          const duration = splitDuration(inject.inject_depends_duration || 0);
-                          const tooltipContent = (
-                            <React.Fragment>
-                              {inject.inject_title}
-                              <br/>
-                              <span style={{ display: 'block', textAlign: 'center', fontWeight: 'bold' }}>
-                                {`${duration.days} ${t('d')}, ${duration.hours} ${t('h')}, ${duration.minutes} ${t('m')}`}
-                              </span>
-                            </React.Fragment>
-                          );
-                          return (
-                            <InjectIcon
-                              key={inject.inject_id}
-                              isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
-                              type={
-                                inject.inject_injector_contract.injector_contract_payload
-                                  ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
-                                    || inject.inject_injector_contract.injector_contract_payload?.payload_type
-                                  : inject.inject_type
-                              }
-                              onClick={() => handleSelectInject(inject.inject_id)}
-                              done={inject.inject_status !== null}
-                              disabled={!inject.inject_enabled}
-                              size="small"
-                              variant='timeline'
-                              tooltip={tooltipContent}
-                            />
-                          );
-                        })
-                                }
-                      </div>
-                    );
-                  })}
+                  <div className={classes.tickLabelTop}>
+                    {index % 5 === 0
+                      ? `${duration.days}
+                        ${t('d')}, ${duration.hours}
+                        ${t('h')}, ${duration.minutes}
+                        ${t('m')}`
+                      : ''}
+                  </div>
+                  <div className={classes.tickLabelBottom}>
+                    {index % 5 === 0
+                      ? `${duration.days}
+                        ${t('d')}, ${duration.hours}
+                        ${t('h')}, ${duration.minutes}
+                        ${t('m')}`
+                      : ''}
+                  </div>
                 </div>
               );
             })}
-            <div className={classes.scale}>
-              {ticks.map((tick, index) => {
-                const duration = splitDuration(tick);
-                return (
-                  <div
-                    key={tick}
-                    className={classes.tick}
-                    style={{
-                      left: `${index * 5}%`,
-                      height: index % 5 === 0 ? 'calc(100% + 30px)' : '100%',
-                      top: index % 5 === 0 ? -15 : 0,
-                      borderRight: index % 5 === 0 ? grid25 : grid15,
-                    }}
-                  >
-                    <div className={classes.tickLabelTop}>
-                      {index % 5 === 0
-                        ? `${duration.days}
-                          ${t('d')}, ${duration.hours}
-                          ${t('h')}, ${duration.minutes}
-                          ${t('m')}`
-                        : ''}
-                    </div>
-                    <div className={classes.tickLabelBottom}>
-                      {index % 5 === 0
-                        ? `${duration.days}
-                          ${t('d')}, ${duration.hours}
-                          ${t('h')}, ${duration.minutes}
-                          ${t('m')}`
-                        : ''}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           </div>
         </div>
-      ) : null
-        }
-    </>
-  );
+      </div>
+    ) : null
+      }
+  </>;
 };
 
 export default Timeline;

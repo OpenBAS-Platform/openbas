@@ -1,4 +1,5 @@
-import React, { CSSProperties, FunctionComponent, useState } from 'react';
+import { CSSProperties, FunctionComponent, useState } from 'react';
+import * as React from 'react';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import { PopoverEntry } from '../../../../components/common/ButtonPopover';
 import IconPopover from '../../../../components/common/IconPopover';
 import type { RawPaginationImportMapper } from '../../../../utils/api-types';

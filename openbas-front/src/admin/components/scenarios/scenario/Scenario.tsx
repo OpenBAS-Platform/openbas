@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
-import React, { useState } from 'react';
+import { useState } from 'react';
+import * as React from 'react';
 import { Avatar, Button, Chip, Grid, Paper, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { PlayArrowOutlined } from '@mui/icons-material';

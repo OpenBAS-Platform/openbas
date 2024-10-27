@@ -1,4 +1,4 @@
-import React, { CSSProperties, FunctionComponent, useState } from 'react';
+import { CSSProperties, FunctionComponent, useState } from 'react';
 import * as R from 'ramda';
 import { AddOutlined, LabelOutlined } from '@mui/icons-material';
 import { Autocomplete as MuiAutocomplete, Box, Dialog, DialogContent, DialogTitle, IconButton, TextField } from '@mui/material';

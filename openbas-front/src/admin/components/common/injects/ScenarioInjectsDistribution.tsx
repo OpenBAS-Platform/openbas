@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import * as R from 'ramda';
 import { useFormatter } from '../../../../components/i18n';
 import type { TeamStore } from '../../../../actions/teams/Team';

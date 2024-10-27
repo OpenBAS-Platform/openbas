@@ -1,4 +1,5 @@
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
+import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,

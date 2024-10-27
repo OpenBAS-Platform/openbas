@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { Box, Autocomplete, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FieldError } from 'react-hook-form';

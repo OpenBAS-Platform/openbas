@@ -1,6 +1,5 @@
 import { ToggleButton, Tooltip } from '@mui/material';
 import { FileDownloadOutlined } from '@mui/icons-material';
-import React from 'react';
 import { CSVLink } from 'react-csv';
 import { exportData } from '../../utils/Environment';
 import { useFormatter } from '../i18n';

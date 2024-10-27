@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { Divider, ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { DevicesOtherOutlined, Groups3Outlined, PersonOutlined } from '@mui/icons-material';

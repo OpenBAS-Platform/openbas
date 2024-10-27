@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Dialog, DialogContent, DialogActions, Button, IconButton, TableRow, TableCell, TableBody, Table } from '@mui/material';

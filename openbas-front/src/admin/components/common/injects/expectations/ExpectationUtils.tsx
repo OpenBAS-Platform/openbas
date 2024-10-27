@@ -1,6 +1,5 @@
 import { AssignmentTurnedIn, PublishedWithChangesOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
-import React from 'react';
 import { ExpectationType } from './Expectation';
 
 export const isAutomatic = (type: string) => {

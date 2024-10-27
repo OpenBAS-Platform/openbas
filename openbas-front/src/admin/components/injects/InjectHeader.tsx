@@ -1,5 +1,5 @@
 import { Tooltip, Typography } from '@mui/material';
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { truncate } from '../../../utils/String';
 import type { InjectResultDTO } from '../../../utils/api-types';
 

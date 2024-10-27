@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { compose } from 'ramda';
 import * as PropTypes from 'prop-types';
 import { withStyles } from '@mui/styles';

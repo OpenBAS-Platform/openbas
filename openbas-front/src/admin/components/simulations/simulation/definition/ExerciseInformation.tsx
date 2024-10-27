@@ -1,5 +1,5 @@
 import { Grid, Typography } from '@mui/material';
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { useFormatter } from '../../../../../components/i18n';
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 

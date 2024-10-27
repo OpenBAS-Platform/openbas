@@ -1,4 +1,5 @@
-import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
+import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
+import * as React from 'react';
 import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { DevicesOtherOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';

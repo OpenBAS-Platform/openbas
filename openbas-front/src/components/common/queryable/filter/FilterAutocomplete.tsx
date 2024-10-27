@@ -1,6 +1,6 @@
 import { Autocomplete as MuiAutocomplete, IconButton, TextField, Tooltip } from '@mui/material';
 import { FilterListOffOutlined } from '@mui/icons-material';
-import React, { CSSProperties, FunctionComponent } from 'react';
+import { useState, CSSProperties, FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import type { Filter, FilterGroup } from '../../../../utils/api-types';
 import { FilterHelpers } from './FilterHelpers';
@@ -36,7 +36,7 @@ const FilterAutocomplete: FunctionComponent<Props> = ({
   const classes = useStyles();
   const { t } = useFormatter();
 
-  const [inputValue, setInputValue] = React.useState('');
+  const [inputValue, setInputValue] = useState('');
 
   const handleChange = (value: string, operator: Filter['operator']) => {
     setPristine(false);

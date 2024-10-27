@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { AdsClickOutlined, AppsOutlined, BlurLinearOutlined, CrisisAlertOutlined, NewspaperOutlined, TourOutlined } from '@mui/icons-material';
 import { AirFilter, CarShiftPattern, CrosshairsQuestion, DatabaseEyeOutline } from 'mdi-material-ui';
 

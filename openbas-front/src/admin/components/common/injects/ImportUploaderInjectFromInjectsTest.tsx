@@ -1,5 +1,5 @@
 import { Autocomplete as MuiAutocomplete, Box, Button, MenuItem, TextField } from '@mui/material';
-import React, { FunctionComponent, SyntheticEvent, useState } from 'react';
+import { FunctionComponent, SyntheticEvent, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';

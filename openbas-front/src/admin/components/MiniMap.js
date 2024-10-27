@@ -1,4 +1,3 @@
-import React from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { withTheme, withStyles } from '@mui/styles';

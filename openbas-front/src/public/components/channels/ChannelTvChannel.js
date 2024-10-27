@@ -1,4 +1,3 @@
-import React from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
 import { Typography, Grid, Card, CardHeader, CardContent, Avatar, CardMedia, Button } from '@mui/material';

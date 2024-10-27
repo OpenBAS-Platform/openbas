@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { forwardRef, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -18,7 +18,7 @@ import ItemTags from '../../../../../components/ItemTags';
 import TeamOrAssetLine from './common/TeamOrAssetLine';
 import { isNotEmptyField } from '../../../../../utils/utils';
 
-const Transition = React.forwardRef((props, ref) => (
+const Transition = forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { TableViewOutlined } from '@mui/icons-material';
 import RightMenu, { RightMenuEntry } from '../../../components/common/RightMenu';
 

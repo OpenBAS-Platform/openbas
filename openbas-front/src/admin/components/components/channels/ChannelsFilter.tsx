@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
+import * as React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Autocomplete, Box, TextField } from '@mui/material';
 import { fetchChannels } from '../../../../actions/channels/channel-action';

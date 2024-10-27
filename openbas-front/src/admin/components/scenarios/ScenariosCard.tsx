@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import { Card, CardActionArea, CardContent } from '@mui/material';
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import ItemCategory from '../../../components/ItemCategory';
 import { scenarioCategories } from './ScenarioForm';

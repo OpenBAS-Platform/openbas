@@ -1,4 +1,3 @@
-import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Card, CardContent, Chip, Grid, Typography } from '@mui/material';
 import { useFormatter } from '../../../components/i18n';

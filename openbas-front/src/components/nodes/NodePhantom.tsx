@@ -1,4 +1,4 @@
-import React, { FunctionComponent, memo } from 'react';
+import { FunctionComponent, memo } from 'react';
 import { makeStyles } from '@mui/styles';
 import { AddCircleOutline } from '@mui/icons-material';
 import type { Theme } from '../Theme';

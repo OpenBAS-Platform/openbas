@@ -1,5 +1,6 @@
 import { Drawer as DrawerMUI, IconButton, type PaperProps, Typography } from '@mui/material';
-import React, { CSSProperties, FunctionComponent } from 'react';
+import { CSSProperties, FunctionComponent } from 'react';
+import * as React from 'react';
 import { Close } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import type { Theme } from '../Theme';

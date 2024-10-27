@@ -1,4 +1,3 @@
-import React from 'react';
 import { Select as MUISelect, FormControl, InputLabel, FormHelperText } from '@mui/material';
 import { Field } from 'react-final-form';
 

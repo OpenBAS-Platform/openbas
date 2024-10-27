@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/styles';
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 import * as R from 'ramda';
 import { Theme } from '@mui/material';

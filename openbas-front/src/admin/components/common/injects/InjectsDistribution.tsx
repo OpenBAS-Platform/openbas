@@ -1,5 +1,5 @@
 import Chart from 'react-apexcharts';
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import * as R from 'ramda';
 import { useTheme } from '@mui/styles';
 import { colors, horizontalBarsChartOptions } from '../../../../utils/Charts';

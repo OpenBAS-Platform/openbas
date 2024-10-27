@@ -1,5 +1,6 @@
 import { Box, Button, Chip } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import * as React from 'react';
 import { makeStyles } from '@mui/styles';
 import type { Page } from '../Page';
 import type { Filter, PropertySchemaDTO, SearchPaginationInput } from '../../../../utils/api-types';

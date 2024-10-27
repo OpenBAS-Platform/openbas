@@ -1,4 +1,4 @@
-import React, { FunctionComponent, SyntheticEvent } from 'react';
+import { FunctionComponent, SyntheticEvent } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField, TextField as MuiTextField, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';

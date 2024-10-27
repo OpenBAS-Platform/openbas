@@ -1,4 +1,4 @@
-import React, { CSSProperties, memo, useRef } from 'react';
+import { CSSProperties, memo, useRef } from 'react';
 import cc from 'classcat';
 import { shallow } from 'zustand/shallow';
 

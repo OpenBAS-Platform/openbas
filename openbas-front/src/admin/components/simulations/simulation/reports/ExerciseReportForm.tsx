@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { z, ZodBoolean } from 'zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 

@@ -1,5 +1,5 @@
 import { Autocomplete, MenuItem, Select, TextField } from '@mui/material';
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { useFormatter } from '../../../../i18n';
 import { SCENARIO_NOT_SCHEDULED_STATUS, SCENARIO_SCHEDULED_STATUS } from '../../../../../admin/components/scenarios/scenario/ScenarioStatus';
 import type { PropertySchemaDTO } from '../../../../../utils/api-types';

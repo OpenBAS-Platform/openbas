@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { useController, useFormContext } from 'react-hook-form';
 import { Box, FormHelperText, InputLabel } from '@mui/material';
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';

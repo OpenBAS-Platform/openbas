@@ -1,4 +1,5 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
+import * as React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Drawer, ListItemIcon, ListItemText, MenuItem, MenuList } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';

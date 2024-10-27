@@ -1,5 +1,5 @@
 import { makeStyles } from '@mui/styles';
-import React, { FunctionComponent, useContext, useState } from 'react';
+import { FunctionComponent, useContext, useState } from 'react';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
 import type { Theme } from '../../../../../../components/Theme';

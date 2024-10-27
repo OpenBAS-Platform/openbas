@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { AccountBalanceOutlined, FireTruckOutlined, ImportantDevicesOutlined, KeyboardVoiceOutlined, QuizOutlined } from '@mui/icons-material';
 import { BookOpenBlankVariantOutline, FilterMultipleOutline } from 'mdi-material-ui';
 

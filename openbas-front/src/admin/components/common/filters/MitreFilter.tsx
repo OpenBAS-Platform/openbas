@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import { FunctionComponent, useEffect } from 'react';
 import { makeStyles } from '@mui/styles';
 import { Button, Typography } from '@mui/material';
 import { useHelper } from '../../../../store';

@@ -1,5 +1,5 @@
 import { Grid, Paper, Theme, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as R from 'ramda';
 import { ComputerOutlined, HubOutlined, MovieFilterOutlined, PersonOutlined } from '@mui/icons-material';
 import { makeStyles, useTheme } from '@mui/styles';

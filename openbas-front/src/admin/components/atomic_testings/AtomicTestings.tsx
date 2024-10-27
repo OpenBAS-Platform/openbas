@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as R from 'ramda';
 import { useFormatter } from '../../../components/i18n';

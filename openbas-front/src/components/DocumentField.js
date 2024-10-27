@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import * as R from 'ramda';
 import { Box } from '@mui/material';
 import { withStyles } from '@mui/styles';

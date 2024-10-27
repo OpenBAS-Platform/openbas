@@ -1,7 +1,8 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, AlertTitle, Autocomplete, Button, Chip, TextField, TextField as MuiTextField } from '@mui/material';
-import React, { useState } from 'react';
+import { useState } from 'react';
+import * as React from 'react';
 import { z } from 'zod';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';

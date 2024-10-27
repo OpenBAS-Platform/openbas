@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import type { ExpectationResultsByType, InjectResultDTO } from '../../../../utils/api-types';

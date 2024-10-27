@@ -1,5 +1,4 @@
 import { useParams } from 'react-router-dom';
-import React from 'react';
 import { Grid, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../store';

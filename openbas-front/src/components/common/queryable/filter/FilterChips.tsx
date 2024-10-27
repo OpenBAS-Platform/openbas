@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { Fragment, FunctionComponent } from 'react';
 import { Box } from '@mui/material';
 import { FilterHelpers } from './FilterHelpers';
 import type { Filter, FilterGroup, PropertySchemaDTO } from '../../../../utils/api-types';
@@ -44,10 +44,10 @@ const FilterChips: FunctionComponent<Props> = ({
       {filters.map((filter, idx) => {
         const property = propertySchema(filter);
         if (!property) {
-          return (<React.Fragment key={filter.key}></React.Fragment>);
+          return <Fragment key={filter.key}></Fragment>;
         }
         return (
-          <React.Fragment key={filter.key}>
+          <Fragment key={filter.key}>
             {idx !== 0 && <ClickableModeChip onClick={handleSwitchMode} mode={filterGroup?.mode} />}
             <FilterChip
               filter={filter}
@@ -55,7 +55,7 @@ const FilterChips: FunctionComponent<Props> = ({
               propertySchema={property}
               pristine={pristine}
             />
-          </React.Fragment>
+          </Fragment>
         );
       })
       }

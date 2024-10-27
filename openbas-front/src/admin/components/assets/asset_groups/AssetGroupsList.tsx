@@ -1,4 +1,5 @@
-import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
+import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
+import * as React from 'react';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { SelectGroup } from 'mdi-material-ui';
 import { makeStyles } from '@mui/styles';

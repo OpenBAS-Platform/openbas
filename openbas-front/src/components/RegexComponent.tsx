@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { Autocomplete, TextField } from '@mui/material';
 import { FieldError } from 'react-hook-form';
 import alphabet from '../admin/components/settings/data_ingestion/AttributeUtils';

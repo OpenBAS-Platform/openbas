@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import * as React from 'react';
 import { Paper, Typography } from '@mui/material';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';

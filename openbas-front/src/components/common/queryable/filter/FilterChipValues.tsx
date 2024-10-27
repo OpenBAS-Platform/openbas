@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import { FunctionComponent, useEffect } from 'react';
 import { makeStyles } from '@mui/styles';
 import { Box } from '@mui/material';
 import classNames from 'classnames';
