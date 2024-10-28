@@ -8,7 +8,6 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.AtomicTestingUtils.*;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
-import static io.openbas.utils.JpaUtils.createLeftJoin;
 import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
@@ -298,35 +297,39 @@ public class AtomicTestingService {
 
   // -- PAGINATION --
 
-  public Page<AtomicTestingOutput> findAllAtomicTestings(
-      @NotNull final SearchPaginationInput searchPaginationInput) {
-    Specification<Inject> customSpec =
-        Specification.where(
-            (root, query, cb) -> {
-              Predicate predicate = cb.conjunction();
-              predicate = cb.and(predicate, cb.isNull(root.get("scenario")));
-              predicate = cb.and(predicate, cb.isNull(root.get("exercise")));
-              return predicate;
-            });
-    return buildPaginationCriteriaBuilder(
-        (Specification<Inject> specification,
-            Specification<Inject> specificationCount,
-            Pageable pageable) ->
-            this.atomicTestings(
-                customSpec.and(specification), customSpec.and(specificationCount), pageable),
-        searchPaginationInput,
-        Inject.class);
-  }
+    public Page<AtomicTestingOutput> findAllAtomicTestings(@NotNull final SearchPaginationInput searchPaginationInput) {
+        Map<String, Join<Base, Base>> joinMap = new HashMap<>();
 
-  public Page<AtomicTestingOutput> atomicTestings(
-      Specification<Inject> specification,
-      Specification<Inject> specificationCount,
-      Pageable pageable) {
-    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+        Specification<Inject> customSpec = Specification.where((root, query, cb) -> {
+            Predicate predicate = cb.conjunction();
+            predicate = cb.and(predicate, cb.isNull(root.get("scenario")));
+            predicate = cb.and(predicate, cb.isNull(root.get("exercise")));
+            return predicate;
+        });
+        return buildPaginationCriteriaBuilder(
+                (Specification<Inject> specification, Specification<Inject> specificationCount, Pageable pageable) -> this.atomicTestings(
+                    customSpec.and(specification),
+                    customSpec.and(specificationCount),
+                    pageable,
+                    joinMap
+                ),
+                searchPaginationInput,
+                Inject.class,
+            joinMap
+        );
+    }
 
-    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
-    Root<Inject> injectRoot = cq.from(Inject.class);
-    selectForAtomicTesting(cb, cq, injectRoot);
+
+    public Page<AtomicTestingOutput> atomicTestings(
+        Specification<Inject> specification,
+        Specification<Inject> specificationCount,
+        Pageable pageable,
+        Map<String, Join<Base, Base>> joinMap) {
+        CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+
+        CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+        Root<Inject> injectRoot = cq.from(Inject.class);
+        selectForAtomicTesting(cb, cq, injectRoot, joinMap);
 
     // -- Text Search and Filters --
     if (specification != null) {
@@ -399,10 +402,13 @@ public class AtomicTestingService {
     return new PageImpl<>(injects, pageable, total);
   }
 
-    private void selectForAtomicTesting(CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Inject> injectRoot) {
+    private void selectForAtomicTesting(CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Inject> injectRoot, Map<String, Join<Base, Base>> joinMap) {
         // Joins
-        Join<Inject, InjectorContract> injectorContractJoin = createLeftJoin(injectRoot, "injectorContract");
-        Join<InjectorContract, Injector> injectorJoin = injectorContractJoin.join("injector", JoinType.LEFT);
+        Join<Base, Base> injectorContractJoin = injectRoot.join("injectorContract", JoinType.LEFT);
+        joinMap.put("injectorContract", injectorContractJoin);
+
+        Join<Base, Base> injectorJoin = injectorContractJoin.join("injector", JoinType.LEFT);
+        joinMap.put("injector", injectorJoin);
 
         // Subquery for InjectStatus
         Subquery<Tuple> statusSubquery = cq.subquery(Tuple.class);
