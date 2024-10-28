@@ -416,7 +416,6 @@ public class AtomicTestingService {
         Subquery<Tuple> dateSubquery = cq.subquery(Tuple.class);
         Root<InjectStatus> dateRoot = dateSubquery.from(InjectStatus.class);
 
-        // Define the subquery to select the necessary fields
         statusSubquery.select(statusRoot.get("name")
             )
             .where(cb.equal(statusRoot.get("inject").get("id"), injectRoot.get("id")));
