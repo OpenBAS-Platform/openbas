@@ -125,9 +125,8 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
       <EndpointsList
         endpoints={sortedAsset}
         actions={userAdmin
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore: Endpoint property handle by EndpointsList
           ? (
+        // @ts-expect-error: Endpoint property handle by EndpointsList
               <EndpointPopover
                 inline
                 assetGroupId={assetGroup?.asset_group_id}
