@@ -1,4 +1,4 @@
-import { Select as MUISelect, FormControl, InputLabel, FormHelperText } from '@mui/material';
+import { FormControl, FormHelperText, InputLabel, Select as MUISelect } from '@mui/material';
 import { Field } from 'react-final-form';
 
 const renderHelper = ({ touched, error, submitError, helperText, variant }) => {
@@ -64,7 +64,7 @@ const renderSelectField = ({
   </FormControl>
 );
 
-const OldSelectField = (props) => (
+const OldSelectField = props => (
   <Field name={props.name} component={renderSelectField} {...props} />
 );
 

@@ -92,7 +92,6 @@ const CreateInjectDetails = ({
   });
   const toggleInjectContent = () => {
     if (openDetails) {
-      // eslint-disable-next-line no-param-reassign
       drawerRef.current.scrollTop = 0;
       setOpenDetails(false);
     } else {

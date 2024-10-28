@@ -18,7 +18,6 @@ import CreateInject from '../common/injects/CreateInject';
 import teamContextForAtomicTesting from './atomic_testing/context/TeamContextForAtomicTesting';
 import InjectDtoList from './InjectDtoList';
 
-// eslint-disable-next-line consistent-return
 const AtomicTestings = () => {
   // Standard hooks
   const { t } = useFormatter();

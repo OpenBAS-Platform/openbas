@@ -1,3 +1,5 @@
+/* eslint import/no-extraneous-dependencies: 0 */
+
 import fs from 'node:fs';
 
 import { build } from 'esbuild';

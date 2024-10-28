@@ -92,7 +92,6 @@ const Validations = () => {
     sort,
   )(injectExpectations);
 
-  /* eslint-disable no-param-reassign */
   const groupedByInject = sortedInjectExpectations.reduce((group, expectation) => {
     const { inject_expectation_inject } = expectation;
     const { inject_id } = inject_expectation_inject;

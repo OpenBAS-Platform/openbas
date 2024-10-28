@@ -23,7 +23,7 @@ export const api = (schema) => {
         // eslint-disable-next-line no-underscore-dangle
         && !err.config.__isRetryRequest
       ) {
-        // eslint-disable-next-line no-param-reassign,no-underscore-dangle
+        // eslint-disable-next-line no-underscore-dangle
         err.config.__isRetryRequest = true;
         return axios(err.config);
       }

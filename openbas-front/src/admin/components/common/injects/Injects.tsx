@@ -355,7 +355,7 @@ const Injects: FunctionComponent<Props> = ({
         let entities: InjectOutputType[] = [];
         while (firstIndex <= currentIndex) {
           entities = [...entities, injects[firstIndex]];
-          // eslint-disable-next-line no-plusplus
+
           firstIndex++;
         }
         const forcedRemove = R.values(selectedElements).filter(
@@ -368,7 +368,7 @@ const Injects: FunctionComponent<Props> = ({
       let entities: InjectOutputType[] = [];
       while (firstIndex >= currentIndex) {
         entities = [...entities, injects[firstIndex]];
-        // eslint-disable-next-line no-plusplus
+
         firstIndex--;
       }
       const forcedRemove = R.values(selectedElements).filter(
@@ -460,7 +460,6 @@ const Injects: FunctionComponent<Props> = ({
           default:
             return;
         }
-        /* eslint-enable */
       }
     }
   };

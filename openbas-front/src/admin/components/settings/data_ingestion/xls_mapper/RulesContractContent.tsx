@@ -100,7 +100,7 @@ const RulesContractContent: React.FC<Props> = ({
       rule_attribute_columns: '',
       rule_attribute_default_value: '',
     });
-    // eslint-disable-next-line no-plusplus
+
     for (let i = 0; i < contractFieldKeys?.length; i++) {
       rulesAppend({
         rule_attribute_name: contractFieldKeys[i],

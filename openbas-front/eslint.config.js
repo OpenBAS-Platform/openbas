@@ -1,3 +1,5 @@
+/* eslint import/no-extraneous-dependencies: 0 */
+
 // imports to not let tools report them as unused
 import 'eslint-import-resolver-oxc';
 
@@ -109,9 +111,22 @@ export default [
       // eslint-plugin-import rules
       'import/no-named-as-default-member': 'off',
       'import/prefer-default-export': 'error',
-      'import/namespace': 'off',
+      'import/no-mutable-exports': 'error',
+      'import/namespace': 'off', // off to reduce computing time for one file, on when doing yarn lint
+      'import/no-extraneous-dependencies': [
+        'error',
+        {
+          devDependencies: [
+            '**/*.test.tsx',
+            '**/*.test.ts',
+            'vite.config.ts',
+            'vitest.config.ts',
+            'playwright.config.ts',
+          ],
+        },
+      ],
 
-      // custom rules inspired from airbnb
+      // custom rules
       'sort-imports': 'off',
       'no-underscore-dangle': 'error',
       'no-await-in-loop': 'error',
@@ -123,7 +138,31 @@ export default [
       'no-nested-ternary': 'error',
       'prefer-promise-reject-errors': 'error',
       'no-console': 'error',
+      'max-len': [
+        'error', 180, 2, {
+          ignoreUrls: true,
+          ignoreComments: false,
+          ignoreRegExpLiterals: true,
+          ignoreStrings: true,
+          ignoreTemplateLiterals: true,
+        },
+      ],
+      'no-restricted-imports': [
+        'error', {
+          patterns: [
+            {
+              group: ['@mui/material/*', '!@mui/material/locale', '!@mui/material/styles', '!@mui/material/colors', '!@mui/material/transitions'],
+              message: 'Please use named import from @mui/material instead.',
+            },
+            {
+              group: ['@mui/styles/*'],
+              message: 'Please use named import from @mui/styles instead.',
+            },
+          ],
+        },
+      ],
     },
+    files: ['**/*.js', '**/*.ts', '**/*.jsx', '**/*.tsx'],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -142,6 +181,17 @@ export default [
     files: ['tests_e2e/**/*'],
     // rules recommended by eslint-plugin-playwright
     ...playwright.configs['flat/recommended'],
+    rules: {
+      ...playwright.configs['flat/recommended'].rules,
+      'import/no-extraneous-dependencies': [
+        'error',
+        {
+          devDependencies: [
+            '**/*.ts',
+          ],
+        },
+      ],
+    },
   },
 
   // ignores patterns

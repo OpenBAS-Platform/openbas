@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle,max-len */
 import { schema } from 'normalizr';
 import * as R from 'ramda';
 
@@ -369,7 +368,6 @@ export const storeHelper = state => ({
   getAtomicTestings: () => entities('atomics', state),
   getTargetResults: (id, injectId) => entities('targetresults', state).filter(r => (r.target_id === id) && (r.target_inject_id === injectId)),
   getInjectsMap: () => getInjectsWithParsedInjectorContractContent(entities('injects', state)).reduce((map, i) => {
-    // eslint-disable-next-line no-param-reassign
     map[i.inject_id] = i;
     return map;
   }, {}),

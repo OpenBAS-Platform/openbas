@@ -1,3 +1,5 @@
+/* eslint import/no-extraneous-dependencies: 0 */
+
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 

@@ -188,8 +188,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   const computeInitialSteps = (currentInitialSteps: Steptarget[]) => {
     return currentInitialSteps.map((step, index) => {
       if (index === 0) {
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define,no-nested-ternary,@typescript-eslint/ban-ts-comment
-        // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-use-before-define,no-nested-ternary
         return { ...step, status: injectResultDto?.inject_status?.status_name === 'QUEUING' ? 'QUEUING' : lastExecutionStartDate ? 'SUCCESS' : 'PENDING' };
       }

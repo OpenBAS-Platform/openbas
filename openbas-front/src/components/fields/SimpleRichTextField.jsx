@@ -1,11 +1,13 @@
-import { InputLabel } from '@mui/material';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import Editor from 'ckeditor5-custom-build/build/ckeditor';
 import 'ckeditor5-custom-build/build/translations/fr';
-import { useHelper } from '../../store';
-import locale from '../../utils/BrowserLanguage';
+
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import { InputLabel } from '@mui/material';
+import Editor from 'ckeditor5-custom-build/build/ckeditor';
+
 // eslint-disable-next-line import/no-cycle
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
+import { useHelper } from '../../store';
+import locale from '../../utils/BrowserLanguage';
 
 const SimpleRichTextField = (props) => {
   const {
