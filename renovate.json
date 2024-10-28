@@ -20,11 +20,25 @@
       "prPriority": 5
     },
     {
-      "matchPackagePatterns": [
+      "matchPackageNames": [
         "react-apexcharts",
         "org.flywaydb:flyway-core"
       ],
       "commitMessage": "[DANGER] Do not merge, breaking changes incoming"
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "openbas-front/package.json"
+      ],
+      "matchStrings": [
+        "xlsx\": \"https:\/\/cdn\\.sheetjs\\.com\/xlsx-(?<currentValue>[\\d.]+)\/xlsx"
+      ],
+      "registryUrlTemplate": "https://git.sheetjs.com",
+      "depNameTemplate": "sheetjs/sheetjs",
+      "datasourceTemplate": "gitea-tags"
     }
   ],
   "schedule": [

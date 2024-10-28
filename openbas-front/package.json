@@ -74,7 +74,7 @@
     "seamless-immutable": "7.1.4",
     "usehooks-ts": "3.1.0",
     "uuid": "10.0.0",
-    "xlsx": "0.18.5",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "zod": "3.23.8",
     "zustand": "^4.5.4"
   },
@@ -149,5 +149,5 @@
   "workspaces": [
     "packages/*"
   ],
-  "packageManager": "yarn@4.5.0"
+  "packageManager": "yarn@4.5.1"
 }
