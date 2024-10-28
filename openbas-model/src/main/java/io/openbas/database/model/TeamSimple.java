@@ -1,19 +1,18 @@
 package io.openbas.database.model;
 
+import static java.time.Instant.now;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.raw.RawTeam;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static java.time.Instant.now;
+import lombok.Getter;
+import lombok.Setter;
 
 @Setter
 @Getter
@@ -80,12 +79,13 @@ public class TeamSimple {
     return this.scenariosInjects.size();
   }
 
-  @JsonIgnore
-  private List<InjectExpectation> injectExpectations = new ArrayList<>();
+  @JsonIgnore private List<InjectExpectation> injectExpectations = new ArrayList<>();
 
   @JsonProperty("team_inject_expectations")
   private Set<String> getInjectExpectationsAsStringList() {
-    return getInjectExpectations().stream().map(InjectExpectation::getId).collect(Collectors.toSet());
+    return getInjectExpectations().stream()
+        .map(InjectExpectation::getId)
+        .collect(Collectors.toSet());
   }
 
   @JsonProperty("team_injects_expectations_number")
@@ -98,34 +98,46 @@ public class TeamSimple {
   public double getInjectExceptationsTotalScore() {
     return getInjectExpectations().stream()
         .filter((inject) -> inject.getScore() != null)
-        .mapToDouble(InjectExpectation::getScore).sum();
+        .mapToDouble(InjectExpectation::getScore)
+        .sum();
   }
 
   @JsonProperty("team_injects_expectations_total_score_by_exercise")
   @NotNull
   public Map<String, Double> getInjectExceptationsTotalScoreByExercise() {
     return getInjectExpectations().stream()
-        .filter(expectation -> Objects.nonNull(expectation.getExercise()) && Objects.nonNull(expectation.getScore()))
-        .collect(Collectors.groupingBy(expectation -> expectation.getExercise().getId(),
-            Collectors.summingDouble(InjectExpectation::getScore)));
+        .filter(
+            expectation ->
+                Objects.nonNull(expectation.getExercise())
+                    && Objects.nonNull(expectation.getScore()))
+        .collect(
+            Collectors.groupingBy(
+                expectation -> expectation.getExercise().getId(),
+                Collectors.summingDouble(InjectExpectation::getScore)));
   }
 
   @JsonProperty("team_injects_expectations_total_expected_score")
   @NotNull
   public double getInjectExceptationsTotalExpectedScore() {
-    return getInjectExpectations().stream().filter(expectation -> Objects.nonNull(expectation.getExpectedScore()))
-        .mapToDouble(InjectExpectation::getExpectedScore).sum();
+    return getInjectExpectations().stream()
+        .filter(expectation -> Objects.nonNull(expectation.getExpectedScore()))
+        .mapToDouble(InjectExpectation::getExpectedScore)
+        .sum();
   }
 
   @JsonProperty("team_injects_expectations_total_expected_score_by_exercise")
   @NotNull
   public Map<String, Double> getInjectExpectationsTotalExpectedScoreByExercise() {
-    Map<String, Double> result = getInjectExpectations().stream()
-        .filter(expectation -> Objects.nonNull(expectation.getExercise()))
-        .collect(Collectors.groupingBy(expectation -> expectation.getExercise().getId(),
-            Collectors.summingDouble(InjectExpectation::getExpectedScore)));
+    Map<String, Double> result =
+        getInjectExpectations().stream()
+            .filter(expectation -> Objects.nonNull(expectation.getExercise()))
+            .collect(
+                Collectors.groupingBy(
+                    expectation -> expectation.getExercise().getId(),
+                    Collectors.summingDouble(InjectExpectation::getExpectedScore)));
     return result;
   }
+
   // endregion
 
   @JsonProperty("team_communications")
@@ -135,7 +147,8 @@ public class TeamSimple {
     super();
     this.id = raw.getTeam_id();
     this.scenarios = Optional.ofNullable(raw.getTeam_scenarios()).orElse(new HashSet<>());
-    this.exercisesInjects = Optional.ofNullable(raw.getTeam_exercise_injects()).orElse(new HashSet<>());
+    this.exercisesInjects =
+        Optional.ofNullable(raw.getTeam_exercise_injects()).orElse(new HashSet<>());
     this.contextual = raw.getTeam_contextual();
     this.exercises = Optional.ofNullable(raw.getTeam_exercises()).orElse(new HashSet<>());
     this.createdAt = raw.getTeam_created_at();

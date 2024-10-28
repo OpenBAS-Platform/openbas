@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V3_13__Payloads_Attack_Patterns extends BaseJavaMigration {
@@ -15,7 +14,8 @@ public class V3_13__Payloads_Attack_Patterns extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     // Create relations between contracts and attack_patterns
-    select.execute("""
+    select.execute(
+        """
                CREATE TABLE payloads_attack_patterns (
                    attack_pattern_id varchar(255) not null
                        constraint attack_pattern_id_fk

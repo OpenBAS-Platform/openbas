@@ -16,5 +16,4 @@ public class ArticleVariable {
     this.name = name;
     this.uri = uri;
   }
-
 }

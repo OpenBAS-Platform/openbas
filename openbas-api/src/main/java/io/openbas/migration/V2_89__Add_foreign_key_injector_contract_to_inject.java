@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class V2_89__Add_foreign_key_injector_contract_to_inject extends BaseJavaMigration {
 
-    @Override
-    public void migrate(Context context) throws Exception {
-        // DO NOTHING
-    }
+  @Override
+  public void migrate(Context context) throws Exception {
+    // DO NOTHING
+  }
 }

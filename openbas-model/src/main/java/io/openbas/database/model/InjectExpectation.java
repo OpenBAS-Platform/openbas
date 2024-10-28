@@ -1,5 +1,7 @@
 package io.openbas.database.model;
 
+import static java.time.Instant.now;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -9,17 +11,14 @@ import io.openbas.helper.MonoIdDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.UuidGenerator;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static java.time.Instant.now;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UuidGenerator;
 
 @Getter
 @Entity
@@ -126,9 +125,7 @@ public class InjectExpectation implements Base {
   @NotNull
   private Double expectedScore;
 
-  /**
-   * Expiration time in seconds
-   */
+  /** Expiration time in seconds */
   @Setter
   @Column(name = "inject_expiration_time")
   @JsonProperty("inject_expiration_time")
@@ -149,6 +146,7 @@ public class InjectExpectation implements Base {
   @Column(name = "inject_expectation_group")
   @JsonProperty("inject_expectation_group")
   private boolean expectationGroup;
+
   // endregion
 
   // region contextual relations
@@ -193,6 +191,7 @@ public class InjectExpectation implements Base {
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_expectation_asset_group")
   private AssetGroup assetGroup;
+
   // endregion
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -217,25 +216,19 @@ public class InjectExpectation implements Base {
     this.challenge = challenge;
   }
 
-  public void setManual(
-      @NotNull final Asset asset,
-      @NotNull final AssetGroup assetGroup) {
+  public void setManual(@NotNull final Asset asset, @NotNull final AssetGroup assetGroup) {
     this.type = EXPECTATION_TYPE.MANUAL;
     this.asset = asset;
     this.assetGroup = assetGroup;
   }
 
-  public void setPrevention(
-      @NotNull final Asset asset,
-      @NotNull final AssetGroup assetGroup) {
+  public void setPrevention(@NotNull final Asset asset, @NotNull final AssetGroup assetGroup) {
     this.type = EXPECTATION_TYPE.PREVENTION;
     this.asset = asset;
     this.assetGroup = assetGroup;
   }
 
-  public void setDetection(
-      @NotNull final Asset asset,
-      @NotNull final AssetGroup assetGroup) {
+  public void setDetection(@NotNull final Asset asset, @NotNull final AssetGroup assetGroup) {
     this.type = EXPECTATION_TYPE.DETECTION;
     this.asset = asset;
     this.assetGroup = assetGroup;

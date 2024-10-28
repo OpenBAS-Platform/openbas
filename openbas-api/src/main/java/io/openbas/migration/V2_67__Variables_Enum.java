@@ -1,14 +1,13 @@
 package io.openbas.migration;
 
 import io.openbas.database.model.Variable;
-import org.flywaydb.core.api.migration.BaseJavaMigration;
-import org.flywaydb.core.api.migration.Context;
-import org.springframework.stereotype.Component;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
+import org.springframework.stereotype.Component;
 
 @Component
 public class V2_67__Variables_Enum extends BaseJavaMigration {
@@ -21,9 +20,8 @@ public class V2_67__Variables_Enum extends BaseJavaMigration {
     select.execute("ALTER TABLE variables ALTER COLUMN variable_type TYPE varchar(255)");
     // Migration datas
     ResultSet results = select.executeQuery("SELECT * FROM variables");
-    PreparedStatement statement = connection.prepareStatement(
-        "UPDATE variables SET variable_type = ? WHERE variable_id = ?"
-    );
+    PreparedStatement statement =
+        connection.prepareStatement("UPDATE variables SET variable_type = ? WHERE variable_id = ?");
     while (results.next()) {
       String id = results.getString("variable_id");
       int type = results.getInt("variable_type");

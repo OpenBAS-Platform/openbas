@@ -37,19 +37,22 @@ public class PlatformSettingsApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping()
-  public PlatformSettings updateBasicConfigurationSettings(@Valid @RequestBody SettingsUpdateInput input) {
+  public PlatformSettings updateBasicConfigurationSettings(
+      @Valid @RequestBody SettingsUpdateInput input) {
     return platformSettingsService.updateBasicConfigurationSettings(input);
   }
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/enterprise_edition")
-  public PlatformSettings updateSettingsEnterpriseEdition(@Valid @RequestBody SettingsEnterpriseEditionUpdateInput input) {
+  public PlatformSettings updateSettingsEnterpriseEdition(
+      @Valid @RequestBody SettingsEnterpriseEditionUpdateInput input) {
     return platformSettingsService.updateSettingsEnterpriseEdition(input);
   }
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/platform_whitemark")
-  public PlatformSettings updateSettingsPlatformWhitemark(@Valid @RequestBody SettingsPlatformWhitemarkUpdateInput input) {
+  public PlatformSettings updateSettingsPlatformWhitemark(
+      @Valid @RequestBody SettingsPlatformWhitemarkUpdateInput input) {
     return platformSettingsService.updateSettingsPlatformWhitemark(input);
   }
 

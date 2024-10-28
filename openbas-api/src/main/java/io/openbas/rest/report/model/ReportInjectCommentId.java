@@ -6,13 +6,12 @@ import java.util.UUID;
 
 public class ReportInjectCommentId implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = 1L;
 
-    private String injectId;
-    private UUID reportId;
+  private String injectId;
+  private UUID reportId;
 
-    public ReportInjectCommentId() {
-        // Default constructor
-    }
+  public ReportInjectCommentId() {
+    // Default constructor
+  }
 }

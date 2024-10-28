@@ -8,11 +8,11 @@ import lombok.Data;
 
 @Data
 public class ReportInformationInput {
-    @JsonProperty("report_informations_type")
-    @NotBlank
-    private ReportInformationsType reportInformationsType;
+  @JsonProperty("report_informations_type")
+  @NotBlank
+  private ReportInformationsType reportInformationsType;
 
-    @JsonProperty("report_informations_display")
-    @NotNull
-    private Boolean reportInformationsDisplay;
+  @JsonProperty("report_informations_display")
+  @NotNull
+  private Boolean reportInformationsDisplay;
 }

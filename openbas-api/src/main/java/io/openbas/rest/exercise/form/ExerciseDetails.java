@@ -8,14 +8,13 @@ import io.openbas.helper.InjectStatisticsHelper;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 @Setter
 @Getter
@@ -164,23 +163,26 @@ public class ExerciseDetails {
 
   @JsonProperty("exercise_score")
   public Double getEvaluationAverage() {
-    double evaluationAverage = getObjectives().stream().mapToDouble(Objective::getEvaluationAverage).average()
-            .orElse(0D);
+    double evaluationAverage =
+        getObjectives().stream().mapToDouble(Objective::getEvaluationAverage).average().orElse(0D);
     return Math.round(evaluationAverage * 100.0) / 100.0;
   }
 
-  @JsonIgnore
-  private List<Inject> injects;
+  @JsonIgnore private List<Inject> injects;
 
-  @JsonIgnore
-  private List<Objective> objectives;
+  @JsonIgnore private List<Objective> objectives;
 
   /**
    * Create an Exercise Details object different from the one used in the lists from a Raw one
+   *
    * @param exercise the raw exercise
    * @return an Exercise Simple object
    */
-  public static ExerciseDetails fromRawExercise(RawExercise exercise, List<Inject> injects, List<ExerciseTeamUser> exerciseTeamsUsers, List<Objective> objectives) {
+  public static ExerciseDetails fromRawExercise(
+      RawExercise exercise,
+      List<Inject> injects,
+      List<ExerciseTeamUser> exerciseTeamsUsers,
+      List<Objective> objectives) {
     ExerciseDetails details = new ExerciseDetails();
 
     details.setId(exercise.getExercise_id());
@@ -196,7 +198,7 @@ public class ExerciseDetails {
     details.setHeader(exercise.getExercise_message_header());
     details.setFooter(exercise.getExercise_message_footer());
     details.setFrom(exercise.getExercise_mail_from());
-    if(exercise.getExercise_reply_to() != null) {
+    if (exercise.getExercise_reply_to() != null) {
       details.setReplyTo(exercise.getExercise_reply_to().stream().toList());
     }
     details.setLessonsAnonymized(exercise.getExercise_lessons_anonymized());
@@ -205,7 +207,8 @@ public class ExerciseDetails {
     details.setUpdatedAt(exercise.getExercise_updated_at());
     details.setInjects(injects);
     details.setExerciseTeams(exercise.getExercise_teams());
-    details.setExerciseTeamUsers(exerciseTeamsUsers != null ? new HashSet<>(exerciseTeamsUsers) : null);
+    details.setExerciseTeamUsers(
+        exerciseTeamsUsers != null ? new HashSet<>(exerciseTeamsUsers) : null);
     details.setPauses(exercise.getExercise_pauses());
     details.setTags(new HashSet<>(exercise.getExercise_tags()));
     details.setExerciseInjects(new HashSet<>(exercise.getInject_ids()));
@@ -216,13 +219,14 @@ public class ExerciseDetails {
 
     details.setInjects(injects);
     details.setObjectives(objectives);
-    details.setLessonsAnswersNumber(exercise.getLessons_answers().stream().distinct().toList().size());
+    details.setLessonsAnswersNumber(
+        exercise.getLessons_answers().stream().distinct().toList().size());
 
     details.setAllUsersNumber(exercise.getUsers().stream().distinct().toList().size());
-    details.setUsersNumber(details.getExerciseTeamUsers().stream().map(ExerciseTeamUser::getUser).distinct().count());
+    details.setUsersNumber(
+        details.getExerciseTeamUsers().stream().map(ExerciseTeamUser::getUser).distinct().count());
     details.setLogsNumber(exercise.getLogs().stream().distinct().toList().size());
 
     return details;
   }
-
 }

@@ -9,5 +9,4 @@ public class Result {
 
   private Link link;
   private String output;
-
 }

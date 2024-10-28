@@ -3,11 +3,10 @@ package io.openbas.rest.team.output;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Data;
-
 import java.time.Instant;
 import java.util.Set;
+import lombok.Builder;
+import lombok.Data;
 
 @Builder
 @Data
@@ -44,5 +43,4 @@ public class TeamOutput {
   public long getUsersNumber() {
     return getUsers().size();
   }
-
 }

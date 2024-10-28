@@ -1,6 +1,5 @@
 package io.openbas.database.model;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;

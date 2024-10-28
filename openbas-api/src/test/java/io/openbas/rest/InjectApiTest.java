@@ -1,24 +1,5 @@
 package io.openbas.rest;
 
-import com.jayway.jsonpath.JsonPath;
-import io.openbas.IntegrationTest;
-import io.openbas.database.model.InjectorContract;
-import io.openbas.database.model.*;
-import io.openbas.database.repository.*;
-import io.openbas.rest.exercise.service.ExerciseService;
-import io.openbas.rest.inject.form.InjectInput;
-import io.openbas.service.ScenarioService;
-import io.openbas.utils.fixtures.InjectExpectationFixture;
-import io.openbas.utils.mockUser.WithMockObserverUser;
-import io.openbas.utils.mockUser.WithMockPlannerUser;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-
-import java.time.Instant;
-import java.util.List;
-
 import static io.openbas.database.model.ExerciseStatus.RUNNING;
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
@@ -29,6 +10,24 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.jayway.jsonpath.JsonPath;
+import io.openbas.IntegrationTest;
+import io.openbas.database.model.*;
+import io.openbas.database.model.InjectorContract;
+import io.openbas.database.repository.*;
+import io.openbas.rest.exercise.service.ExerciseService;
+import io.openbas.rest.inject.form.InjectInput;
+import io.openbas.service.ScenarioService;
+import io.openbas.utils.fixtures.InjectExpectationFixture;
+import io.openbas.utils.mockUser.WithMockObserverUser;
+import io.openbas.utils.mockUser.WithMockPlannerUser;
+import java.time.Instant;
+import java.util.List;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
@@ -41,28 +40,17 @@ class InjectApiTest extends IntegrationTest {
   static Team TEAM;
   static String SCENARIO_INJECT_ID;
 
-  @Autowired
-  private MockMvc mvc;
-  @Autowired
-  private ScenarioService scenarioService;
-  @Autowired
-  private ExerciseService exerciseService;
-  @Autowired
-  private ExerciseRepository exerciseRepository;
-  @Autowired
-  private ScenarioRepository scenarioRepository;
-  @Autowired
-  private InjectRepository injectRepository;
-  @Autowired
-  private DocumentRepository documentRepository;
-  @Autowired
-  private CommunicationRepository communicationRepository;
-  @Autowired
-  private InjectExpectationRepository injectExpectationRepository;
-  @Autowired
-  private TeamRepository teamRepository;
-  @Autowired
-  private InjectorContractRepository injectorContractRepository;
+  @Autowired private MockMvc mvc;
+  @Autowired private ScenarioService scenarioService;
+  @Autowired private ExerciseService exerciseService;
+  @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private ScenarioRepository scenarioRepository;
+  @Autowired private InjectRepository injectRepository;
+  @Autowired private DocumentRepository documentRepository;
+  @Autowired private CommunicationRepository communicationRepository;
+  @Autowired private InjectExpectationRepository injectExpectationRepository;
+  @Autowired private TeamRepository teamRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
 
   @BeforeAll
   void beforeAll() {
@@ -116,26 +104,26 @@ class InjectApiTest extends IntegrationTest {
     input.setDependsDuration(0L);
 
     // -- EXECUTE --
-    String response = mvc
-        .perform(post(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects")
-            .content(asJsonString(input))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        mvc.perform(
+                post(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects")
+                    .content(asJsonString(input))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
     SCENARIO_INJECT_ID = JsonPath.read(response, "$.inject_id");
-    response = mvc
-        .perform(get(SCENARIO_URI + "/" + SCENARIO.getId())
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    response =
+        mvc.perform(get(SCENARIO_URI + "/" + SCENARIO.getId()).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
     assertEquals(SCENARIO_INJECT_ID, JsonPath.read(response, "$.scenario_injects[0]"));
   }
 
@@ -145,13 +133,14 @@ class InjectApiTest extends IntegrationTest {
   @WithMockObserverUser
   void retrieveInjectsForScenarioTest() throws Exception {
     // -- EXECUTE --
-    String response = mvc
-        .perform(get(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects")
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        mvc.perform(
+                get(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects")
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -164,13 +153,14 @@ class InjectApiTest extends IntegrationTest {
   @WithMockObserverUser
   void retrieveInjectForScenarioTest() throws Exception {
     // -- EXECUTE --
-    String response = mvc
-        .perform(get(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects/" + SCENARIO_INJECT_ID)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        mvc.perform(
+                get(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects/" + SCENARIO_INJECT_ID)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -187,19 +177,21 @@ class InjectApiTest extends IntegrationTest {
     InjectInput input = new InjectInput();
     String injectTitle = "A new title";
     input.setTitle(injectTitle);
-    input.setInjectorContract(inject.getInjectorContract().map(InjectorContract::getId).orElse(null));
+    input.setInjectorContract(
+        inject.getInjectorContract().map(InjectorContract::getId).orElse(null));
     input.setDependsDuration(inject.getDependsDuration());
 
     // -- EXECUTE --
-    String response = mvc
-        .perform(put(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects/" + SCENARIO_INJECT_ID)
-            .content(asJsonString(input))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        mvc.perform(
+                put(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects/" + SCENARIO_INJECT_ID)
+                    .content(asJsonString(input))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -230,7 +222,8 @@ class InjectApiTest extends IntegrationTest {
     injectForScenario1.setCreatedAt(Instant.now());
     injectForScenario1.setUpdatedAt(Instant.now());
     injectForScenario1.setDependsDuration(5L);
-    injectForScenario1.setInjectorContract(injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+    injectForScenario1.setInjectorContract(
+        injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
     injectForScenario1.setScenario(SCENARIO);
     Inject createdInject = injectRepository.save(injectForScenario1);
 
@@ -239,33 +232,50 @@ class InjectApiTest extends IntegrationTest {
     injectDocument4.setDocument(DOCUMENT2);
     createdInject.setDocuments(List.of(injectDocument4));
 
-    injectExpectationRepository.save(InjectExpectationFixture.createArticleInjectExpectation(TEAM, createdInject));
+    injectExpectationRepository.save(
+        InjectExpectationFixture.createArticleInjectExpectation(TEAM, createdInject));
 
     // -- ASSERT --
-    assertTrue(injectRepository.existsById(createdInject.getId()), "The inject should exist from the database");
-    assertFalse(injectRepository.findByScenarioId(SCENARIO.getId()).isEmpty(),
+    assertTrue(
+        injectRepository.existsById(createdInject.getId()),
+        "The inject should exist from the database");
+    assertFalse(
+        injectRepository.findByScenarioId(SCENARIO.getId()).isEmpty(),
         "There should be injects for the scenario in the database");
-    assertFalse(injectExpectationRepository.findAllByInjectAndTeam(createdInject.getId(), TEAM.getId()).isEmpty(),
+    assertFalse(
+        injectExpectationRepository
+            .findAllByInjectAndTeam(createdInject.getId(), TEAM.getId())
+            .isEmpty(),
         "There should be expectations for the scenario in the database");
 
     // -- EXECUTE --
-    mvc.perform(delete(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects")
-            .content(asJsonString(List.of(createdInject.getId())))
-            .contentType(MediaType.APPLICATION_JSON))
+    mvc.perform(
+            delete(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects")
+                .content(asJsonString(List.of(createdInject.getId())))
+                .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().is2xxSuccessful());
 
     // -- ASSERT --
-    assertFalse(injectRepository.existsById(createdInject.getId()), "The inject should be deleted from the database");
-    assertTrue(scenarioRepository.existsById(SCENARIO.getId()), "The scenario should still exist in the database");
-    assertTrue(injectRepository.findByScenarioId(SCENARIO.getId()).isEmpty(),
+    assertFalse(
+        injectRepository.existsById(createdInject.getId()),
+        "The inject should be deleted from the database");
+    assertTrue(
+        scenarioRepository.existsById(SCENARIO.getId()),
+        "The scenario should still exist in the database");
+    assertTrue(
+        injectRepository.findByScenarioId(SCENARIO.getId()).isEmpty(),
         "There should be no injects for the scenario in the database");
-    assertTrue(documentRepository.existsById(DOCUMENT2.getId()), "The document should still exist in the database");
-    assertTrue(injectExpectationRepository.findAllByInjectAndTeam(createdInject.getId(), TEAM.getId()).isEmpty(),
+    assertTrue(
+        documentRepository.existsById(DOCUMENT2.getId()),
+        "The document should still exist in the database");
+    assertTrue(
+        injectExpectationRepository
+            .findAllByInjectAndTeam(createdInject.getId(), TEAM.getId())
+            .isEmpty(),
         "There should be no expectations related to the inject in the database");
   }
 
   // -- EXERCISES --
-
 
   @DisplayName("Add an inject for simulation")
   @Test
@@ -278,20 +288,20 @@ class InjectApiTest extends IntegrationTest {
     input.setDependsDuration(0L);
 
     // -- EXECUTE --
-    String response = mvc
-        .perform(post(EXERCISE_URI + "/" + EXERCISE.getId() + "/injects")
-            .content(asJsonString(input))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        mvc.perform(
+                post(EXERCISE_URI + "/" + EXERCISE.getId() + "/injects")
+                    .content(asJsonString(input))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
     assertEquals("Test inject", JsonPath.read(response, "$.inject_title"));
-
   }
 
   @DisplayName("Update inject for simulation")
@@ -302,7 +312,8 @@ class InjectApiTest extends IntegrationTest {
     InjectInput injectInput = new InjectInput();
     injectInput.setTitle("Test inject");
     injectInput.setDependsDuration(0L);
-    Inject inject = injectInput.toInject(injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+    Inject inject =
+        injectInput.toInject(injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
     Inject savedInject = injectRepository.save(inject);
 
     Inject injectToUpdate = injectRepository.findById(savedInject.getId()).orElseThrow();
@@ -312,15 +323,16 @@ class InjectApiTest extends IntegrationTest {
     input.setDependsDuration(inject.getDependsDuration());
 
     // -- EXECUTE --
-    String response = mvc
-        .perform(put(INJECT_URI + "/" + EXERCISE.getId() + "/" + injectToUpdate.getId())
-            .content(asJsonString(input))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        mvc.perform(
+                put(INJECT_URI + "/" + EXERCISE.getId() + "/" + injectToUpdate.getId())
+                    .content(asJsonString(input))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -379,35 +391,62 @@ class InjectApiTest extends IntegrationTest {
     communication.setReceivedAt(Instant.now());
     Communication createdCommunication = communicationRepository.save(communication);
 
-    injectExpectationRepository.save(InjectExpectationFixture.createPreventionInjectExpectation(TEAM, createdInject1));
-    injectExpectationRepository.save(InjectExpectationFixture.createDetectionInjectExpectation(TEAM, createdInject1));
-    injectExpectationRepository.save(InjectExpectationFixture.createManualInjectExpectation(TEAM, createdInject2));
+    injectExpectationRepository.save(
+        InjectExpectationFixture.createPreventionInjectExpectation(TEAM, createdInject1));
+    injectExpectationRepository.save(
+        InjectExpectationFixture.createDetectionInjectExpectation(TEAM, createdInject1));
+    injectExpectationRepository.save(
+        InjectExpectationFixture.createManualInjectExpectation(TEAM, createdInject2));
 
     // -- ASSERT --
-    assertTrue(injectRepository.existsById(createdInject1.getId()), "The inject should exist from the database");
-    assertFalse(injectRepository.findByExerciseId(EXERCISE.getId()).isEmpty(),
+    assertTrue(
+        injectRepository.existsById(createdInject1.getId()),
+        "The inject should exist from the database");
+    assertFalse(
+        injectRepository.findByExerciseId(EXERCISE.getId()).isEmpty(),
         "There should be injects for the exercise in the database");
     assertEquals(1, communicationRepository.findByInjectId(createdInject1.getId()).size());
-    assertEquals(2, injectExpectationRepository.findAllByInjectAndTeam(createdInject1.getId(), TEAM.getId()).size());
-    assertEquals(1, injectExpectationRepository.findAllByInjectAndTeam(createdInject2.getId(), TEAM.getId()).size());
+    assertEquals(
+        2,
+        injectExpectationRepository
+            .findAllByInjectAndTeam(createdInject1.getId(), TEAM.getId())
+            .size());
+    assertEquals(
+        1,
+        injectExpectationRepository
+            .findAllByInjectAndTeam(createdInject2.getId(), TEAM.getId())
+            .size());
 
     // -- EXECUTE --
-    mvc.perform(delete(EXERCISE_URI + "/" + EXERCISE.getId() + "/injects")
-            .content(asJsonString(List.of(createdInject1.getId(), createdInject2.getId())))
-            .contentType(MediaType.APPLICATION_JSON))
+    mvc.perform(
+            delete(EXERCISE_URI + "/" + EXERCISE.getId() + "/injects")
+                .content(asJsonString(List.of(createdInject1.getId(), createdInject2.getId())))
+                .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().is2xxSuccessful());
 
     // -- ASSERT --
-    assertFalse(injectRepository.existsById(createdInject1.getId()), "The inject should be deleted from the database");
-    assertFalse(injectRepository.existsById(createdInject2.getId()), "The inject should be deleted from the database");
-    assertTrue(exerciseRepository.existsById(EXERCISE.getId()), "The exercise should still exist in the database");
-    assertTrue(injectRepository.findByExerciseId(EXERCISE.getId()).isEmpty(),
+    assertFalse(
+        injectRepository.existsById(createdInject1.getId()),
+        "The inject should be deleted from the database");
+    assertFalse(
+        injectRepository.existsById(createdInject2.getId()),
+        "The inject should be deleted from the database");
+    assertTrue(
+        exerciseRepository.existsById(EXERCISE.getId()),
+        "The exercise should still exist in the database");
+    assertTrue(
+        injectRepository.findByExerciseId(EXERCISE.getId()).isEmpty(),
         "There should be no injects for the exercise in the database");
-    assertTrue(documentRepository.existsById(DOCUMENT1.getId()), "The document should still exist in the database");
-    assertFalse(communicationRepository.existsById(createdCommunication.getId()),
+    assertTrue(
+        documentRepository.existsById(DOCUMENT1.getId()),
+        "The document should still exist in the database");
+    assertFalse(
+        communicationRepository.existsById(createdCommunication.getId()),
         "The communication should be deleted from the database");
-    assertTrue(injectExpectationRepository.findAllByInjectAndTeam(createdInject1.getId(), TEAM.getId()).isEmpty(),
+    assertTrue(
+        injectExpectationRepository
+            .findAllByInjectAndTeam(createdInject1.getId(), TEAM.getId())
+            .isEmpty(),
         "There should be no expectations related to the inject in the database");
   }
 }
-

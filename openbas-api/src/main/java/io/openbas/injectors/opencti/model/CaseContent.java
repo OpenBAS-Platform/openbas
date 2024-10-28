@@ -2,12 +2,11 @@ package io.openbas.injectors.opencti.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.model.inject.form.Expectation;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -35,8 +34,7 @@ public class CaseContent {
       return false;
     }
     CaseContent that = (CaseContent) o;
-    return Objects.equals(name, that.name)
-        && Objects.equals(description, that.description);
+    return Objects.equals(name, that.name) && Objects.equals(description, that.description);
   }
 
   @Override

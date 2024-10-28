@@ -1,5 +1,7 @@
 package io.openbas.config;
 
+import static org.springframework.util.StringUtils.hasText;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
@@ -7,8 +9,6 @@ import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-
-import static org.springframework.util.StringUtils.hasText;
 
 @Component
 @ConfigurationProperties(prefix = "openbas")
@@ -58,14 +58,11 @@ public class OpenBASConfig {
   @JsonProperty("disabled_dev_features")
   private String disabledDevFeatures = "";
 
-  @JsonIgnore
-  private String cookieName = "openbas_token";
+  @JsonIgnore private String cookieName = "openbas_token";
 
-  @JsonIgnore
-  private String cookieDuration = "P1D";
+  @JsonIgnore private String cookieDuration = "P1D";
 
-  @JsonIgnore
-  private boolean cookieSecure = false;
+  @JsonIgnore private boolean cookieSecure = false;
 
   public String getBaseUrl() {
     return url(baseUrl);
@@ -81,7 +78,7 @@ public class OpenBASConfig {
   private boolean withProxy;
 
   public String getBaseUrlForAgent() {
-    return hasText(agentUrl) ? url(agentUrl) :url(baseUrl);
+    return hasText(agentUrl) ? url(agentUrl) : url(baseUrl);
   }
 
   // -- PRIVATE --

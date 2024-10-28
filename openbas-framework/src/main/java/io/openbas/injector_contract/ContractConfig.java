@@ -1,9 +1,8 @@
 package io.openbas.injector_contract;
 
 import io.openbas.helper.SupportedLanguage;
-import lombok.Getter;
-
 import java.util.Map;
+import lombok.Getter;
 
 @Getter
 public class ContractConfig {
@@ -16,12 +15,17 @@ public class ContractConfig {
   private final String color_dark;
   private final String color_light;
 
-  public ContractConfig(String type, Map<SupportedLanguage, String> label, String color_dark, String color_light, String icon, boolean expose) {
+  public ContractConfig(
+      String type,
+      Map<SupportedLanguage, String> label,
+      String color_dark,
+      String color_light,
+      String icon,
+      boolean expose) {
     this.type = type;
     this.expose = expose;
     this.color_dark = color_dark;
     this.color_light = color_light;
     this.label = label;
   }
-
 }

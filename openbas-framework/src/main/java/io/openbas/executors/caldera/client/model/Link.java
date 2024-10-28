@@ -7,12 +7,11 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Link {
 
-    private String id;
-    private String paw;
-    private int status;
-    private String decide;
-    private Ability ability;
-    private String finish;
-    private String command;
-
+  private String id;
+  private String paw;
+  private int status;
+  private String decide;
+  private Ability ability;
+  private String finish;
+  private String command;
 }

@@ -29,9 +29,7 @@ public class DnsResolution extends Payload {
   @NotNull
   private String hostname;
 
-  public DnsResolution() {
-
-  }
+  public DnsResolution() {}
 
   public DnsResolution(String id, String type, String name) {
     super(id, type, name);

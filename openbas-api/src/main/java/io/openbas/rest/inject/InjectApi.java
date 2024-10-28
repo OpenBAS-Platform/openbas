@@ -1,5 +1,16 @@
 package io.openbas.rest.inject;
 
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.database.specification.CommunicationSpecification.fromInject;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
+import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+import static io.openbas.utils.AtomicTestingUtils.getTargets;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+import static java.time.Instant.now;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -27,6 +38,13 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
@@ -38,27 +56,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.specification.CommunicationSpecification.fromInject;
-import static io.openbas.helper.DatabaseHelper.resolveOptionalRelation;
-import static io.openbas.helper.DatabaseHelper.updateRelation;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
-import static io.openbas.utils.AtomicTestingUtils.getTargets;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
-import static java.time.Instant.now;
 
 @Log
 @RestController
@@ -98,8 +95,8 @@ public class InjectApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/reception/{injectId}")
-  public Inject injectExecutionReception(@PathVariable String injectId,
-      @Valid @RequestBody InjectReceptionInput input) {
+  public Inject injectExecutionReception(
+      @PathVariable String injectId, @Valid @RequestBody InjectReceptionInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
     injectStatus.setName(ExecutionStatus.PENDING);
@@ -112,7 +109,8 @@ public class InjectApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/callback/{injectId}")
-  public Inject injectExecutionCallback(@PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input) {
+  public Inject injectExecutionCallback(
+      @PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
     ExecutionStatus executionStatus = ExecutionStatus.valueOf(input.getStatus());
@@ -128,20 +126,28 @@ public class InjectApi extends RestBehavior {
     } else {
       injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalSuccess() + 1);
     }
-    int currentTotal = injectStatus.getTrackingTotalError() + injectStatus.getTrackingTotalSuccess();
+    int currentTotal =
+        injectStatus.getTrackingTotalError() + injectStatus.getTrackingTotalSuccess();
     if (injectStatus.getTrackingTotalCount() >= currentTotal) {
       injectStatus.setTrackingEndDate(trackingEndDate);
       injectStatus.setTrackingTotalExecutionTime(
           Duration.between(injectStatus.getTrackingSentDate(), trackingEndDate).getSeconds());
       if (injectStatus.getTraces().stream()
-          .filter(injectStatusExecution -> injectStatusExecution.getStatus().equals(ExecutionStatus.ERROR)).count()
+              .filter(
+                  injectStatusExecution ->
+                      injectStatusExecution.getStatus().equals(ExecutionStatus.ERROR))
+              .count()
           >= injectStatus.getTrackingTotalCount()) {
         injectStatus.setName(ExecutionStatus.ERROR);
-      } else if (injectStatus.getTraces().stream().anyMatch(trace -> trace.getStatus().equals(ExecutionStatus.ERROR))) {
+      } else if (injectStatus.getTraces().stream()
+          .anyMatch(trace -> trace.getStatus().equals(ExecutionStatus.ERROR))) {
         injectStatus.setName(ExecutionStatus.PARTIAL);
       } else if (injectStatus.getTraces().stream()
-          .filter(injectStatusExecution -> injectStatusExecution.getStatus().equals(ExecutionStatus.MAYBE_PREVENTED))
-          .count() >= injectStatus.getTrackingTotalCount()) {
+              .filter(
+                  injectStatusExecution ->
+                      injectStatusExecution.getStatus().equals(ExecutionStatus.MAYBE_PREVENTED))
+              .count()
+          >= injectStatus.getTrackingTotalCount()) {
         injectStatus.setName(ExecutionStatus.MAYBE_PREVENTED);
       } else if (injectStatus.getTraces().stream()
           .anyMatch(trace -> trace.getStatus().equals(ExecutionStatus.MAYBE_PREVENTED))) {
@@ -165,15 +171,19 @@ public class InjectApi extends RestBehavior {
       @PathVariable String exerciseId,
       @PathVariable String injectId,
       @Valid @RequestBody InjectInput input) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+    Exercise exercise =
+        exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     Inject inject = updateInject(injectId, input);
 
     // If Documents not yet linked directly to the exercise, attached it
-    inject.getDocuments().forEach(document -> {
-      if (!document.getDocument().getExercises().contains(exercise)) {
-        exercise.getDocuments().add(document.getDocument());
-      }
-    });
+    inject
+        .getDocuments()
+        .forEach(
+            document -> {
+              if (!document.getDocument().getExercises().contains(exercise)) {
+                exercise.getDocuments().add(document.getDocument());
+              }
+            });
     this.exerciseRepository.save(exercise);
     return injectRepository.save(inject);
   }
@@ -194,8 +204,7 @@ public class InjectApi extends RestBehavior {
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Inject> exerciseInjects(@PathVariable @NotBlank final String exerciseId) {
-    return injectRepository.findByExerciseId(exerciseId)
-        .stream()
+    return injectRepository.findByExerciseId(exerciseId).stream()
         .sorted(Inject.executionComparator)
         .toList();
   }
@@ -207,32 +216,30 @@ public class InjectApi extends RestBehavior {
       @PathVariable final String exerciseId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
-        (Specification<Inject> specification, Pageable pageable) -> this.injectRepository.findAll(
-            InjectSpecification.fromExercise(exerciseId).and(specification), pageable),
-        searchPaginationInput,
-        Inject.class
-    ).map(inject -> AtomicTestingMapper.toDto(
-        inject, getTargets(
-            inject.getTeams(),
-            inject.getAssets(),
-            inject.getAssetGroups()
-        )
-    ));
+            (Specification<Inject> specification, Pageable pageable) ->
+                this.injectRepository.findAll(
+                    InjectSpecification.fromExercise(exerciseId).and(specification), pageable),
+            searchPaginationInput,
+            Inject.class)
+        .map(
+            inject ->
+                AtomicTestingMapper.toDto(
+                    inject,
+                    getTargets(inject.getTeams(), inject.getAssets(), inject.getAssetGroups())));
   }
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/resultdto")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
-  public List<InjectResultDTO> exerciseInjectsWithExpectations(@PathVariable final String exerciseId) {
+  public List<InjectResultDTO> exerciseInjectsWithExpectations(
+      @PathVariable final String exerciseId) {
     return this.injectRepository.findAll(InjectSpecification.fromExercise(exerciseId)).stream()
-            .map(inject -> AtomicTestingMapper.toDto(
-                    inject, getTargets(
-                            inject.getTeams(),
-                            inject.getAssets(),
-                            inject.getAssetGroups()
-                    )
-            ))
-            .collect(Collectors.toList());
+        .map(
+            inject ->
+                AtomicTestingMapper.toDto(
+                    inject,
+                    getTargets(inject.getTeams(), inject.getAssets(), inject.getAssetGroups())))
+        .collect(Collectors.toList());
   }
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
@@ -243,16 +250,21 @@ public class InjectApi extends RestBehavior {
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/teams")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Iterable<Team> exerciseInjectTeams(@PathVariable String exerciseId, @PathVariable String injectId) {
-    return injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new).getTeams();
+  public Iterable<Team> exerciseInjectTeams(
+      @PathVariable String exerciseId, @PathVariable String injectId) {
+    return injectRepository
+        .findById(injectId)
+        .orElseThrow(ElementNotFoundException::new)
+        .getTeams();
   }
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/communications")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Iterable<Communication> exerciseInjectCommunications(@PathVariable String exerciseId,
-      @PathVariable String injectId) {
-    List<Communication> coms = communicationRepository.findAll(fromInject(injectId),
-        Sort.by(Sort.Direction.DESC, "receivedAt"));
+  public Iterable<Communication> exerciseInjectCommunications(
+      @PathVariable String exerciseId, @PathVariable String injectId) {
+    List<Communication> coms =
+        communicationRepository.findAll(
+            fromInject(injectId), Sort.by(Sort.Direction.DESC, "receivedAt"));
     List<Communication> ackComs = coms.stream().peek(com -> com.setAck(true)).toList();
     return communicationRepository.saveAll(ackComs);
   }
@@ -260,31 +272,43 @@ public class InjectApi extends RestBehavior {
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackFor = Exception.class)
-  public Inject createInjectForExercise(@PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract())
-        .orElseThrow(ElementNotFoundException::new);
+  public Inject createInjectForExercise(
+      @PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
+    Exercise exercise =
+        exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+    InjectorContract injectorContract =
+        injectorContractRepository
+            .findById(input.getInjectorContract())
+            .orElseThrow(ElementNotFoundException::new);
     // Set expectations
     ObjectNode finalContent = input.getContent();
-    if (input.getContent() == null || input.getContent().get(EXPECTATIONS) == null || input.getContent()
-        .get(EXPECTATIONS).isEmpty()) {
+    if (input.getContent() == null
+        || input.getContent().get(EXPECTATIONS) == null
+        || input.getContent().get(EXPECTATIONS).isEmpty()) {
       try {
         JsonNode jsonNode = mapper.readTree(injectorContract.getContent());
-        List<JsonNode> contractElements = StreamSupport.stream(jsonNode.get("fields").spliterator(), false).filter(
-            contractElement -> contractElement.get("type").asText()
-                .equals(ContractType.Expectation.name().toLowerCase())).toList();
+        List<JsonNode> contractElements =
+            StreamSupport.stream(jsonNode.get("fields").spliterator(), false)
+                .filter(
+                    contractElement ->
+                        contractElement
+                            .get("type")
+                            .asText()
+                            .equals(ContractType.Expectation.name().toLowerCase()))
+                .toList();
         if (!contractElements.isEmpty()) {
           JsonNode contractElement = contractElements.getFirst();
-          if (!contractElement.get(PREDEFINE_EXPECTATIONS).isNull() && !contractElement.get(PREDEFINE_EXPECTATIONS)
-              .isEmpty()) {
+          if (!contractElement.get(PREDEFINE_EXPECTATIONS).isNull()
+              && !contractElement.get(PREDEFINE_EXPECTATIONS).isEmpty()) {
             finalContent = finalContent != null ? finalContent : mapper.createObjectNode();
             ArrayNode predefinedExpectations = mapper.createArrayNode();
             StreamSupport.stream(contractElement.get(PREDEFINE_EXPECTATIONS).spliterator(), false)
-                .forEach(predefinedExpectation -> {
-                  ObjectNode newExpectation = predefinedExpectation.deepCopy();
-                  newExpectation.put("expectation_score", 100);
-                  predefinedExpectations.add(newExpectation);
-                });
+                .forEach(
+                    predefinedExpectation -> {
+                      ObjectNode newExpectation = predefinedExpectation.deepCopy();
+                      newExpectation.put("expectation_score", 100);
+                      predefinedExpectations.add(newExpectation);
+                    });
             finalContent.put(EXPECTATIONS, predefinedExpectations);
           }
         }
@@ -295,49 +319,68 @@ public class InjectApi extends RestBehavior {
     input.setContent(finalContent);
     // Get common attributes
     Inject inject = input.toInject(injectorContract);
-    inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
+    inject.setUser(
+        userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
     inject.setExercise(exercise);
     // Set dependencies
-    if(input.getDependsOn() != null) {
-      inject.getDependsOn().addAll(
-        input.getDependsOn()
-          .stream()
-          .map(injectDependencyInput -> {
-            InjectDependency dependency = new InjectDependency();
-            dependency.setInjectDependencyCondition(injectDependencyInput.getConditions());
-            dependency.setCompositeId(new InjectDependencyId());
-            dependency.getCompositeId().setInjectChildren(inject);
-            dependency.getCompositeId().setInjectParent(injectRepository.findById(injectDependencyInput.getRelationship().getInjectParentId()).orElse(null));
-            return dependency;
-          }).toList()
-      );
+    if (input.getDependsOn() != null) {
+      inject
+          .getDependsOn()
+          .addAll(
+              input.getDependsOn().stream()
+                  .map(
+                      injectDependencyInput -> {
+                        InjectDependency dependency = new InjectDependency();
+                        dependency.setInjectDependencyCondition(
+                            injectDependencyInput.getConditions());
+                        dependency.setCompositeId(new InjectDependencyId());
+                        dependency.getCompositeId().setInjectChildren(inject);
+                        dependency
+                            .getCompositeId()
+                            .setInjectParent(
+                                injectRepository
+                                    .findById(
+                                        injectDependencyInput.getRelationship().getInjectParentId())
+                                    .orElse(null));
+                        return dependency;
+                      })
+                  .toList());
     }
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
     inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
     inject.setAssetGroups(fromIterable(assetGroupService.assetGroups(input.getAssetGroups())));
     inject.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-    List<InjectDocument> injectDocuments = input.getDocuments().stream()
-        .map(i -> {
-          InjectDocument injectDocument = new InjectDocument();
-          injectDocument.setInject(inject);
-          injectDocument.setDocument(
-              documentRepository.findById(i.getDocumentId()).orElseThrow(ElementNotFoundException::new));
-          injectDocument.setAttached(i.isAttached());
-          return injectDocument;
-        }).toList();
+    List<InjectDocument> injectDocuments =
+        input.getDocuments().stream()
+            .map(
+                i -> {
+                  InjectDocument injectDocument = new InjectDocument();
+                  injectDocument.setInject(inject);
+                  injectDocument.setDocument(
+                      documentRepository
+                          .findById(i.getDocumentId())
+                          .orElseThrow(ElementNotFoundException::new));
+                  injectDocument.setAttached(i.isAttached());
+                  return injectDocument;
+                })
+            .toList();
     inject.setDocuments(injectDocuments);
     // Linked documents directly to the exercise
-    inject.getDocuments().forEach(document -> {
-      if (!document.getDocument().getExercises().contains(exercise)) {
-        exercise.getDocuments().add(document.getDocument());
-      }
-    });
+    inject
+        .getDocuments()
+        .forEach(
+            document -> {
+              if (!document.getDocument().getExercises().contains(exercise)) {
+                exercise.getDocuments().add(document.getDocument());
+              }
+            });
     return injectRepository.save(inject);
   }
 
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject duplicateInjectForExercise(@PathVariable final String exerciseId, @PathVariable final String injectId) {
+  public Inject duplicateInjectForExercise(
+      @PathVariable final String exerciseId, @PathVariable final String injectId) {
     return injectDuplicateService.createInjectForExercise(exerciseId, injectId, true);
   }
 
@@ -348,29 +391,38 @@ public class InjectApi extends RestBehavior {
       @PathVariable @NotBlank final String exerciseId,
       @Valid @RequestPart("input") DirectInjectInput input,
       @RequestPart("file") Optional<MultipartFile> file) {
-    Inject inject = input.toInject(
-        this.injectorContractRepository.findById(input.getInjectorContract())
-            .orElseThrow(() -> new ElementNotFoundException("Injector contract not found"))
-    );
+    Inject inject =
+        input.toInject(
+            this.injectorContractRepository
+                .findById(input.getInjectorContract())
+                .orElseThrow(() -> new ElementNotFoundException("Injector contract not found")));
     inject.setUser(
-        this.userRepository.findById(currentUser().getId())
-            .orElseThrow(() -> new ElementNotFoundException("Current user not found"))
-    );
+        this.userRepository
+            .findById(currentUser().getId())
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found")));
     inject.setExercise(
-        this.exerciseRepository.findById(exerciseId)
-            .orElseThrow(() -> new ElementNotFoundException("Exercise not found"))
-    );
+        this.exerciseRepository
+            .findById(exerciseId)
+            .orElseThrow(() -> new ElementNotFoundException("Exercise not found")));
     inject.setDependsDuration(0L);
     Inject savedInject = this.injectRepository.save(inject);
     Iterable<User> users = this.userRepository.findAllById(input.getUserIds());
-    List<ExecutionContext> userInjectContexts = fromIterable(users)
-        .stream()
-        .map(user -> this.executionContextService.executionContext(user, savedInject, "Direct execution"))
-        .collect(Collectors.toList());
-    ExecutableInject injection = new ExecutableInject(
-        true, true, savedInject, List.of(), savedInject.getAssets(),
-        savedInject.getAssetGroups(), userInjectContexts
-    );
+    List<ExecutionContext> userInjectContexts =
+        fromIterable(users).stream()
+            .map(
+                user ->
+                    this.executionContextService.executionContext(
+                        user, savedInject, "Direct execution"))
+            .collect(Collectors.toList());
+    ExecutableInject injection =
+        new ExecutableInject(
+            true,
+            true,
+            savedInject,
+            List.of(),
+            savedInject.getAssets(),
+            savedInject.getAssetGroups(),
+            userInjectContexts);
     file.ifPresent(injection::addDirectAttachment);
     return executor.execute(injection);
   }
@@ -395,8 +447,7 @@ public class InjectApi extends RestBehavior {
   @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/trigger")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject updateInjectTrigger(
-      @PathVariable String exerciseId,
-      @PathVariable String injectId) {
+      @PathVariable String exerciseId, @PathVariable String injectId) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     inject.setTriggerNowDate(now());
     inject.setUpdatedAt(now());
@@ -406,14 +457,18 @@ public class InjectApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/status")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject setInjectStatus(@PathVariable String exerciseId, @PathVariable String injectId,
+  public Inject setInjectStatus(
+      @PathVariable String exerciseId,
+      @PathVariable String injectId,
       @Valid @RequestBody InjectUpdateStatusInput input) {
     return injectService.updateInjectStatus(injectId, input);
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/teams")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject updateInjectTeams(@PathVariable String exerciseId, @PathVariable String injectId,
+  public Inject updateInjectTeams(
+      @PathVariable String exerciseId,
+      @PathVariable String injectId,
       @Valid @RequestBody InjectTeamsInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     Iterable<Team> injectTeams = teamRepository.findAllById(input.getTeamIds());
@@ -426,8 +481,14 @@ public class InjectApi extends RestBehavior {
     return injectRepository.findAll(InjectSpecification.next()).stream()
         // Keep only injects visible by the user
         .filter(inject -> inject.getDate().isPresent())
-        .filter(inject -> inject.getExercise()
-            .isUserHasAccess(userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new)))
+        .filter(
+            inject ->
+                inject
+                    .getExercise()
+                    .isUserHasAccess(
+                        userRepository
+                            .findById(currentUser().getId())
+                            .orElseThrow(ElementNotFoundException::new)))
         // Order by near execution
         .sorted(Inject.executionComparator)
         // Keep only the expected size
@@ -442,32 +503,41 @@ public class InjectApi extends RestBehavior {
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @Transactional(rollbackFor = Exception.class)
   public Inject createInjectForScenario(
-      @PathVariable @NotBlank final String scenarioId,
-      @Valid @RequestBody InjectInput input) {
+      @PathVariable @NotBlank final String scenarioId, @Valid @RequestBody InjectInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
-    InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract())
-        .orElseThrow(ElementNotFoundException::new);
+    InjectorContract injectorContract =
+        injectorContractRepository
+            .findById(input.getInjectorContract())
+            .orElseThrow(ElementNotFoundException::new);
     // Set expectations
     ObjectNode finalContent = input.getContent();
-    if (input.getContent() == null || input.getContent().get(EXPECTATIONS) == null || input.getContent()
-        .get(EXPECTATIONS).isEmpty()) {
+    if (input.getContent() == null
+        || input.getContent().get(EXPECTATIONS) == null
+        || input.getContent().get(EXPECTATIONS).isEmpty()) {
       try {
         JsonNode jsonNode = mapper.readTree(injectorContract.getContent());
-        List<JsonNode> contractElements = StreamSupport.stream(jsonNode.get("fields").spliterator(), false).filter(
-            contractElement -> contractElement.get("type").asText()
-                .equals(ContractType.Expectation.name().toLowerCase())).toList();
+        List<JsonNode> contractElements =
+            StreamSupport.stream(jsonNode.get("fields").spliterator(), false)
+                .filter(
+                    contractElement ->
+                        contractElement
+                            .get("type")
+                            .asText()
+                            .equals(ContractType.Expectation.name().toLowerCase()))
+                .toList();
         if (!contractElements.isEmpty()) {
           JsonNode contractElement = contractElements.getFirst();
-          if (!contractElement.get(PREDEFINE_EXPECTATIONS).isNull() && !contractElement.get(PREDEFINE_EXPECTATIONS)
-              .isEmpty()) {
+          if (!contractElement.get(PREDEFINE_EXPECTATIONS).isNull()
+              && !contractElement.get(PREDEFINE_EXPECTATIONS).isEmpty()) {
             finalContent = finalContent != null ? finalContent : mapper.createObjectNode();
             ArrayNode predefinedExpectations = mapper.createArrayNode();
             StreamSupport.stream(contractElement.get(PREDEFINE_EXPECTATIONS).spliterator(), false)
-                .forEach(predefinedExpectation -> {
-                  ObjectNode newExpectation = predefinedExpectation.deepCopy();
-                  newExpectation.put("expectation_score", 100);
-                  predefinedExpectations.add(newExpectation);
-                });
+                .forEach(
+                    predefinedExpectation -> {
+                      ObjectNode newExpectation = predefinedExpectation.deepCopy();
+                      newExpectation.put("expectation_score", 100);
+                      predefinedExpectations.add(newExpectation);
+                    });
             finalContent.put(EXPECTATIONS, predefinedExpectations);
           }
         }
@@ -478,57 +548,77 @@ public class InjectApi extends RestBehavior {
     input.setContent(finalContent);
     // Get common attributes
     Inject inject = input.toInject(injectorContract);
-    inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
+    inject.setUser(
+        this.userRepository
+            .findById(currentUser().getId())
+            .orElseThrow(ElementNotFoundException::new));
     inject.setScenario(scenario);
     // Set dependencies
-    if(input.getDependsOn() != null) {
-      inject.getDependsOn().addAll(
-        input.getDependsOn()
-          .stream()
-          .map(injectDependencyInput -> {
-            InjectDependency dependency = new InjectDependency();
-            dependency.setInjectDependencyCondition(injectDependencyInput.getConditions());
-            dependency.setCompositeId(new InjectDependencyId());
-            dependency.getCompositeId().setInjectChildren(inject);
-            dependency.getCompositeId().setInjectParent(injectRepository.findById(injectDependencyInput.getRelationship().getInjectParentId()).orElse(null));
-            return dependency;
-          }).toList()
-      );
+    if (input.getDependsOn() != null) {
+      inject
+          .getDependsOn()
+          .addAll(
+              input.getDependsOn().stream()
+                  .map(
+                      injectDependencyInput -> {
+                        InjectDependency dependency = new InjectDependency();
+                        dependency.setInjectDependencyCondition(
+                            injectDependencyInput.getConditions());
+                        dependency.setCompositeId(new InjectDependencyId());
+                        dependency.getCompositeId().setInjectChildren(inject);
+                        dependency
+                            .getCompositeId()
+                            .setInjectParent(
+                                injectRepository
+                                    .findById(
+                                        injectDependencyInput.getRelationship().getInjectParentId())
+                                    .orElse(null));
+                        return dependency;
+                      })
+                  .toList());
     }
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
     inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
     inject.setAssetGroups(fromIterable(assetGroupService.assetGroups(input.getAssetGroups())));
     inject.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-    List<InjectDocument> injectDocuments = input.getDocuments().stream()
-        .map(i -> {
-          InjectDocument injectDocument = new InjectDocument();
-          injectDocument.setInject(inject);
-          injectDocument.setDocument(
-              documentRepository.findById(i.getDocumentId()).orElseThrow(ElementNotFoundException::new));
-          injectDocument.setAttached(i.isAttached());
-          return injectDocument;
-        }).toList();
+    List<InjectDocument> injectDocuments =
+        input.getDocuments().stream()
+            .map(
+                i -> {
+                  InjectDocument injectDocument = new InjectDocument();
+                  injectDocument.setInject(inject);
+                  injectDocument.setDocument(
+                      documentRepository
+                          .findById(i.getDocumentId())
+                          .orElseThrow(ElementNotFoundException::new));
+                  injectDocument.setAttached(i.isAttached());
+                  return injectDocument;
+                })
+            .toList();
     inject.setDocuments(injectDocuments);
     // Linked documents directly to the exercise
-    inject.getDocuments().forEach(document -> {
-      if (!document.getDocument().getScenarios().contains(scenario)) {
-        scenario.getDocuments().add(document.getDocument());
-      }
-    });
+    inject
+        .getDocuments()
+        .forEach(
+            document -> {
+              if (!document.getDocument().getScenarios().contains(scenario)) {
+                scenario.getDocuments().add(document.getDocument());
+              }
+            });
     return injectRepository.save(inject);
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Inject duplicateInjectForScenario(@PathVariable final String scenarioId, @PathVariable final String injectId) {
+  public Inject duplicateInjectForScenario(
+      @PathVariable final String scenarioId, @PathVariable final String injectId) {
     return injectDuplicateService.createInjectForScenario(scenarioId, injectId, true);
   }
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/injects")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<Inject> scenarioInjects(@PathVariable @NotBlank final String scenarioId) {
-    return this.injectRepository.findByScenarioId(scenarioId)
-        .stream()
+    return this.injectRepository.findByScenarioId(scenarioId).stream()
         .sorted(Inject.executionComparator)
         .toList();
   }
@@ -565,11 +655,14 @@ public class InjectApi extends RestBehavior {
     Inject inject = updateInject(injectId, input);
 
     // If Documents not yet linked directly to the exercise, attached it
-    inject.getDocuments().forEach(document -> {
-      if (!document.getDocument().getScenarios().contains(scenario)) {
-        scenario.getDocuments().add(document.getDocument());
-      }
-    });
+    inject
+        .getDocuments()
+        .forEach(
+            document -> {
+              if (!document.getDocument().getScenarios().contains(scenario)) {
+                scenario.getDocuments().add(document.getDocument());
+              }
+            });
     this.scenarioService.updateScenario(scenario);
     return injectRepository.save(inject);
   }
@@ -598,40 +691,73 @@ public class InjectApi extends RestBehavior {
   // -- PRIVATE --
 
   private Inject updateInject(@NotBlank final String injectId, @NotNull InjectInput input) {
-    Inject inject = this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+    Inject inject =
+        this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     inject.setUpdateAttributes(input);
 
     // Set dependencies
-    if(input.getDependsOn() != null) {
-      input.getDependsOn().forEach(entry -> {
-        Optional<InjectDependency> existingDependency = inject.getDependsOn().stream()
-                .filter(injectDependency -> injectDependency.getCompositeId().getInjectParent().getId().equals(entry.getRelationship().getInjectParentId()))
-                .findFirst();
-        if(existingDependency.isPresent()) {
-          existingDependency.get().getInjectDependencyCondition().setConditions(entry.getConditions().getConditions());
-          existingDependency.get().getInjectDependencyCondition().setMode(entry.getConditions().getMode());
-        } else {
-          InjectDependency injectDependency = new InjectDependency();
-          injectDependency.getCompositeId().setInjectChildren(inject);
-          injectDependency.getCompositeId().setInjectParent(injectRepository.findById(entry.getRelationship().getInjectParentId()).orElse(null));
-          injectDependency.setInjectDependencyCondition(new InjectDependencyConditions.InjectDependencyCondition());
-          injectDependency.getInjectDependencyCondition().setConditions(entry.getConditions().getConditions());
-          injectDependency.getInjectDependencyCondition().setMode(entry.getConditions().getMode());
-          inject.getDependsOn().add(injectDependency);
-        }
-      });
+    if (input.getDependsOn() != null) {
+      input
+          .getDependsOn()
+          .forEach(
+              entry -> {
+                Optional<InjectDependency> existingDependency =
+                    inject.getDependsOn().stream()
+                        .filter(
+                            injectDependency ->
+                                injectDependency
+                                    .getCompositeId()
+                                    .getInjectParent()
+                                    .getId()
+                                    .equals(entry.getRelationship().getInjectParentId()))
+                        .findFirst();
+                if (existingDependency.isPresent()) {
+                  existingDependency
+                      .get()
+                      .getInjectDependencyCondition()
+                      .setConditions(entry.getConditions().getConditions());
+                  existingDependency
+                      .get()
+                      .getInjectDependencyCondition()
+                      .setMode(entry.getConditions().getMode());
+                } else {
+                  InjectDependency injectDependency = new InjectDependency();
+                  injectDependency.getCompositeId().setInjectChildren(inject);
+                  injectDependency
+                      .getCompositeId()
+                      .setInjectParent(
+                          injectRepository
+                              .findById(entry.getRelationship().getInjectParentId())
+                              .orElse(null));
+                  injectDependency.setInjectDependencyCondition(
+                      new InjectDependencyConditions.InjectDependencyCondition());
+                  injectDependency
+                      .getInjectDependencyCondition()
+                      .setConditions(entry.getConditions().getConditions());
+                  injectDependency
+                      .getInjectDependencyCondition()
+                      .setMode(entry.getConditions().getMode());
+                  inject.getDependsOn().add(injectDependency);
+                }
+              });
     }
 
     List<InjectDependency> injectDepencyToRemove = new ArrayList<>();
-    if(inject.getDependsOn() != null && !inject.getDependsOn().isEmpty()) {
+    if (inject.getDependsOn() != null && !inject.getDependsOn().isEmpty()) {
       if (input.getDependsOn() != null && !input.getDependsOn().isEmpty()) {
-        inject.getDependsOn().forEach(
-          injectDependency -> {
-            if (!input.getDependsOn().stream().map((injectDependencyInput -> injectDependencyInput.getRelationship().getInjectParentId())).toList().contains(injectDependency.getCompositeId().getInjectParent().getId())) {
-              injectDepencyToRemove.add(injectDependency);
-            }
-          }
-        );
+        inject
+            .getDependsOn()
+            .forEach(
+                injectDependency -> {
+                  if (!input.getDependsOn().stream()
+                      .map(
+                          (injectDependencyInput ->
+                              injectDependencyInput.getRelationship().getInjectParentId()))
+                      .toList()
+                      .contains(injectDependency.getCompositeId().getInjectParent().getId())) {
+                    injectDepencyToRemove.add(injectDependency);
+                  }
+                });
       } else {
         injectDepencyToRemove.addAll(inject.getDependsOn());
       }
@@ -647,41 +773,50 @@ public class InjectApi extends RestBehavior {
     List<InjectDocumentInput> inputDocuments = input.getDocuments();
     List<InjectDocument> injectDocuments = inject.getDocuments();
 
-    List<String> askedDocumentIds = inputDocuments.stream().map(InjectDocumentInput::getDocumentId).toList();
-    List<String> currentDocumentIds = inject.getDocuments().stream().map(document -> document.getDocument().getId())
-        .toList();
+    List<String> askedDocumentIds =
+        inputDocuments.stream().map(InjectDocumentInput::getDocumentId).toList();
+    List<String> currentDocumentIds =
+        inject.getDocuments().stream().map(document -> document.getDocument().getId()).toList();
     // To delete
-    List<InjectDocument> toRemoveDocuments = injectDocuments.stream()
-        .filter(injectDoc -> !askedDocumentIds.contains(injectDoc.getDocument().getId()))
-        .toList();
+    List<InjectDocument> toRemoveDocuments =
+        injectDocuments.stream()
+            .filter(injectDoc -> !askedDocumentIds.contains(injectDoc.getDocument().getId()))
+            .toList();
     injectDocuments.removeAll(toRemoveDocuments);
     // To add
-    inputDocuments.stream().filter(doc -> !currentDocumentIds.contains(doc.getDocumentId())).forEach(in -> {
-      Optional<Document> doc = this.documentRepository.findById(in.getDocumentId());
-      if (doc.isPresent()) {
-        InjectDocument injectDocument = new InjectDocument();
-        injectDocument.setInject(inject);
-        Document document = doc.get();
-        injectDocument.setDocument(document);
-        injectDocument.setAttached(in.isAttached());
-        InjectDocument savedInjectDoc = this.injectDocumentRepository.save(injectDocument);
-        injectDocuments.add(savedInjectDoc);
-      }
-    });
+    inputDocuments.stream()
+        .filter(doc -> !currentDocumentIds.contains(doc.getDocumentId()))
+        .forEach(
+            in -> {
+              Optional<Document> doc = this.documentRepository.findById(in.getDocumentId());
+              if (doc.isPresent()) {
+                InjectDocument injectDocument = new InjectDocument();
+                injectDocument.setInject(inject);
+                Document document = doc.get();
+                injectDocument.setDocument(document);
+                injectDocument.setAttached(in.isAttached());
+                InjectDocument savedInjectDoc = this.injectDocumentRepository.save(injectDocument);
+                injectDocuments.add(savedInjectDoc);
+              }
+            });
     // Remap the attached boolean
-    injectDocuments.forEach(injectDoc -> {
-      Optional<InjectDocumentInput> inputInjectDoc = input.getDocuments().stream()
-          .filter(id -> id.getDocumentId().equals(injectDoc.getDocument().getId())).findFirst();
-      Boolean attached = inputInjectDoc.map(InjectDocumentInput::isAttached).orElse(false);
-      injectDoc.setAttached(attached);
-    });
+    injectDocuments.forEach(
+        injectDoc -> {
+          Optional<InjectDocumentInput> inputInjectDoc =
+              input.getDocuments().stream()
+                  .filter(id -> id.getDocumentId().equals(injectDoc.getDocument().getId()))
+                  .findFirst();
+          Boolean attached = inputInjectDoc.map(InjectDocumentInput::isAttached).orElse(false);
+          injectDoc.setAttached(attached);
+        });
     inject.setDocuments(injectDocuments);
 
     return inject;
   }
 
   private Inject bulkUpdateInject(@NotBlank final String injectId, @NotNull InjectInput input) {
-    Inject inject = this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+    Inject inject =
+        this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
 
     // Set dependencies
     inject.setTeams(fromIterable(this.teamRepository.findAllById(input.getTeams())));
@@ -691,12 +826,12 @@ public class InjectApi extends RestBehavior {
     return inject;
   }
 
-  private Inject updateInjectActivation(@NotBlank final String injectId,
-      @NotNull final InjectUpdateActivationInput input) {
-    Inject inject = this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+  private Inject updateInjectActivation(
+      @NotBlank final String injectId, @NotNull final InjectUpdateActivationInput input) {
+    Inject inject =
+        this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     inject.setEnabled(input.isEnabled());
     inject.setUpdatedAt(now());
     return injectRepository.save(inject);
   }
-
 }

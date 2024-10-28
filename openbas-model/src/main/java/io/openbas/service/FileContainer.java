@@ -4,39 +4,39 @@ import java.io.InputStream;
 
 public class FileContainer {
 
-    private String name;
+  private String name;
 
-    private String contentType;
+  private String contentType;
 
-    private InputStream inputStream;
+  private InputStream inputStream;
 
-    public FileContainer(String name, String contentType, InputStream inputStream) {
-        this.name = name;
-        this.contentType = contentType;
-        this.inputStream = inputStream;
-    }
+  public FileContainer(String name, String contentType, InputStream inputStream) {
+    this.name = name;
+    this.contentType = contentType;
+    this.inputStream = inputStream;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getContentType() {
-        return contentType;
-    }
+  public String getContentType() {
+    return contentType;
+  }
 
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
+  public void setContentType(String contentType) {
+    this.contentType = contentType;
+  }
 
-    public InputStream getInputStream() {
-        return inputStream;
-    }
+  public InputStream getInputStream() {
+    return inputStream;
+  }
 
-    public void setInputStream(InputStream inputStream) {
-        this.inputStream = inputStream;
-    }
+  public void setInputStream(InputStream inputStream) {
+    this.inputStream = inputStream;
+  }
 }

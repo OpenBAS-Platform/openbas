@@ -1,20 +1,19 @@
 package io.openbas.rest.scenario;
 
+import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+import static org.springframework.util.StringUtils.hasText;
+
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.scenario.response.ScenarioStatistic;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
-import static org.springframework.util.StringUtils.hasText;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,5 +43,4 @@ public class ScenarioStatisticApi extends RestBehavior {
     }
     return categoryCount;
   }
-
 }

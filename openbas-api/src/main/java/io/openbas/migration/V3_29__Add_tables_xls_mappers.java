@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V3_29__Add_tables_xls_mappers extends BaseJavaMigration {
@@ -15,19 +14,21 @@ public class V3_29__Add_tables_xls_mappers extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     // Create table
-    select.execute("""
+    select.execute(
+        """
           CREATE TABLE import_mappers (
             mapper_id UUID NOT NULL CONSTRAINT import_mappers_pkey PRIMARY KEY,
             mapper_name VARCHAR(255) NOT NULL,
             mapper_inject_type_column VARCHAR(255) NOT NULL,
             mapper_created_at TIMESTAMP DEFAULT now(),
             mapper_updated_at TIMESTAMP DEFAULT now()
-            
+
           );
           CREATE INDEX idx_import_mappers ON import_mappers(mapper_id);
      """);
 
-    select.execute("""
+    select.execute(
+        """
           CREATE TABLE inject_importers (
             importer_id UUID NOT NULL CONSTRAINT inject_importers_pkey PRIMARY KEY,
             importer_mapper_id UUID NOT NULL
@@ -41,8 +42,8 @@ public class V3_29__Add_tables_xls_mappers extends BaseJavaMigration {
           CREATE INDEX idx_inject_importers ON inject_importers(importer_id);
      """);
 
-
-    select.execute("""
+    select.execute(
+        """
           CREATE TABLE rule_attributes (
             attribute_id UUID NOT NULL CONSTRAINT rule_attributes_pkey PRIMARY KEY,
             attribute_inject_importer_id UUID NOT NULL
@@ -57,14 +58,14 @@ public class V3_29__Add_tables_xls_mappers extends BaseJavaMigration {
           CREATE INDEX idx_rule_attributes on rule_attributes(attribute_id);
      """);
 
-
-    select.execute("""
+    select.execute(
+        """
           ALTER TABLE injectors_contracts ADD COLUMN injector_contract_import_available BOOLEAN NOT NULL DEFAULT FALSE;
      """);
 
-    select.execute("""
+    select.execute(
+        """
           UPDATE injectors_contracts SET injector_contract_import_available = true WHERE injector_contract_labels -> 'en' LIKE ANY(ARRAY['%SMS%', '%Send%mail%']);
      """);
-
   }
 }

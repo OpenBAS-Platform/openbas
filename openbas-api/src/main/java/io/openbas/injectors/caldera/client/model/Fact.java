@@ -9,5 +9,4 @@ public class Fact {
 
   private String name;
   private String value;
-
 }

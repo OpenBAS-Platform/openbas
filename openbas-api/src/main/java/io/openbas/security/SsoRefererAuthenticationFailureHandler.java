@@ -1,18 +1,17 @@
 package io.openbas.security;
 
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
-import org.springframework.security.web.savedrequest.RequestCache;
-import org.springframework.security.web.savedrequest.SavedRequest;
+import static org.springframework.http.HttpHeaders.REFERER;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-
-import static org.springframework.http.HttpHeaders.REFERER;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.RequestCache;
+import org.springframework.security.web.savedrequest.SavedRequest;
 
 public class SsoRefererAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
@@ -20,15 +19,16 @@ public class SsoRefererAuthenticationFailureHandler extends SimpleUrlAuthenticat
 
   @Override
   public void onAuthenticationFailure(
-      HttpServletRequest request,
-      HttpServletResponse response,
-      AuthenticationException exception) throws ServletException, IOException {
+      HttpServletRequest request, HttpServletResponse response, AuthenticationException exception)
+      throws ServletException, IOException {
     this.saveException(request, exception);
     SavedRequest savedRequest = this.requestCache.getRequest(request, response);
     if (savedRequest != null) {
       List<String> refererValues = savedRequest.getHeaderValues(REFERER);
       if (refererValues.size() == 1) {
-        this.getRedirectStrategy().sendRedirect(request, response, refererValues.get(0)+"?error="+exception.getMessage());
+        this.getRedirectStrategy()
+            .sendRedirect(
+                request, response, refererValues.get(0) + "?error=" + exception.getMessage());
         return;
       }
     }

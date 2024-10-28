@@ -1,13 +1,12 @@
 package io.openbas.database.repository;
 
-import org.springframework.data.repository.query.Param;
-
 import java.time.Instant;
+import org.springframework.data.repository.query.Param;
 
 @SuppressWarnings("EmptyMethod")
 public interface StatisticRepository {
 
-    long globalCount(@Param("creationDate") Instant creationDate);
+  long globalCount(@Param("creationDate") Instant creationDate);
 
-    long userCount(@Param("userId") String userId, @Param("creationDate") Instant creationDate);
+  long userCount(@Param("userId") String userId, @Param("creationDate") Instant creationDate);
 }

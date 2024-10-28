@@ -1,5 +1,10 @@
 package io.openbas.database.model;
 
+import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.StreamSupport.stream;
+import static lombok.AccessLevel.NONE;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -12,31 +17,21 @@ import io.openbas.helper.UserHelper;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
-
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static java.time.Instant.now;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.StreamSupport.stream;
-import static lombok.AccessLevel.NONE;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 @Getter
 @Entity
 @Table(name = "users")
 @EntityListeners(ModelBaseListener.class)
 @NamedEntityGraphs({
-    @NamedEntityGraph(
-        name = "Player.tags-organization",
-        attributeNodes = {
-            @NamedAttributeNode("tags"),
-            @NamedAttributeNode("organization")
-        }
-    )
+  @NamedEntityGraph(
+      name = "Player.tags-organization",
+      attributeNodes = {@NamedAttributeNode("tags"), @NamedAttributeNode("organization")})
 })
 public class User implements Base {
 
@@ -153,7 +148,8 @@ public class User implements Base {
   @Setter
   // @ManyToMany(fetch = FetchType.LAZY)
   @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(name = "users_groups",
+  @JoinTable(
+      name = "users_groups",
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "group_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
@@ -162,7 +158,8 @@ public class User implements Base {
 
   @Setter
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "users_teams",
+  @JoinTable(
+      name = "users_teams",
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "team_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
@@ -171,7 +168,8 @@ public class User implements Base {
 
   @Setter
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "users_tags",
+  @JoinTable(
+      name = "users_tags",
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
@@ -181,7 +179,8 @@ public class User implements Base {
 
   @Setter
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "communications_users",
+  @JoinTable(
+      name = "communications_users",
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "communication_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
@@ -211,17 +210,22 @@ public class User implements Base {
   }
 
   public void setEmail(final String email) {
-    this.email = ofNullable(email).map(String::toLowerCase).orElseThrow(() -> new IllegalArgumentException("Email can't be null"));
+    this.email =
+        ofNullable(email)
+            .map(String::toLowerCase)
+            .orElseThrow(() -> new IllegalArgumentException("Email can't be null"));
   }
 
-  @Transient
-  private List<Inject> injects = new ArrayList<>();
+  @Transient private List<Inject> injects = new ArrayList<>();
 
   public void resolveInjects(Iterable<Inject> injects) {
-    this.injects = stream(injects.spliterator(), false)
-        .filter(inject -> inject.isAllTeams() || inject.getTeams().stream()
-            .anyMatch(team -> getTeams().contains(team)))
-        .collect(Collectors.toList());
+    this.injects =
+        stream(injects.spliterator(), false)
+            .filter(
+                inject ->
+                    inject.isAllTeams()
+                        || inject.getTeams().stream().anyMatch(team -> getTeams().contains(team)))
+            .collect(Collectors.toList());
   }
 
   @JsonProperty("user_injects")
@@ -242,15 +246,15 @@ public class User implements Base {
 
   @JsonProperty("user_is_planner")
   public boolean isPlanner() {
-    return isAdmin() || getGroups().stream()
-        .flatMap(group -> group.getGrants().stream())
-        .anyMatch(grant -> Grant.GRANT_TYPE.PLANNER.equals(grant.getName()));
+    return isAdmin()
+        || getGroups().stream()
+            .flatMap(group -> group.getGrants().stream())
+            .anyMatch(grant -> Grant.GRANT_TYPE.PLANNER.equals(grant.getName()));
   }
 
   @JsonProperty("user_is_observer")
   public boolean isObserver() {
-    return isAdmin() || getGroups().stream()
-        .mapToLong(group -> group.getGrants().size()).sum() > 0;
+    return isAdmin() || getGroups().stream().mapToLong(group -> group.getGrants().size()).sum() > 0;
   }
 
   @JsonProperty("user_is_manager")

@@ -1,27 +1,5 @@
 package io.openbas.rest;
 
-import com.jayway.jsonpath.JsonPath;
-import io.openbas.database.model.Scenario;
-import io.openbas.database.model.Team;
-import io.openbas.database.model.User;
-import io.openbas.database.repository.ScenarioRepository;
-import io.openbas.database.repository.TeamRepository;
-import io.openbas.database.repository.UserRepository;
-import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
-import io.openbas.rest.scenario.form.ScenarioUpdateTeamsInput;
-import io.openbas.utils.mockUser.WithMockObserverUser;
-import io.openbas.utils.mockUser.WithMockPlannerUser;
-import io.openbas.service.ScenarioService;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,23 +9,39 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.jayway.jsonpath.JsonPath;
+import io.openbas.database.model.Scenario;
+import io.openbas.database.model.Team;
+import io.openbas.database.model.User;
+import io.openbas.database.repository.ScenarioRepository;
+import io.openbas.database.repository.TeamRepository;
+import io.openbas.database.repository.UserRepository;
+import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
+import io.openbas.rest.scenario.form.ScenarioUpdateTeamsInput;
+import io.openbas.service.ScenarioService;
+import io.openbas.utils.mockUser.WithMockObserverUser;
+import io.openbas.utils.mockUser.WithMockPlannerUser;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
 public class TeamApiTest {
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
-  @Autowired
-  private ScenarioService scenarioService;
-  @Autowired
-  private ScenarioRepository scenarioRepository;
-  @Autowired
-  private TeamRepository teamRepository;
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private ScenarioService scenarioService;
+  @Autowired private ScenarioRepository scenarioRepository;
+  @Autowired private TeamRepository teamRepository;
+  @Autowired private UserRepository userRepository;
 
   static String SCENARIO_ID;
   static String TEAM_ID;
@@ -82,25 +76,27 @@ public class TeamApiTest {
     input.setTeamIds(List.of(TEAM_ID));
 
     // -- EXECUTE --
-    String response = this.mvc
-        .perform(put(SCENARIO_URI + "/" + SCENARIO_ID + "/teams/add")
-            .content(asJsonString(input))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        this.mvc
+            .perform(
+                put(SCENARIO_URI + "/" + SCENARIO_ID + "/teams/add")
+                    .content(asJsonString(input))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
-    response = this.mvc
-        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    response =
+        this.mvc
+            .perform(get(SCENARIO_URI + "/" + SCENARIO_ID).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
     assertEquals(TEAM_ID, JsonPath.read(response, "$.scenario_teams[0]"));
   }
 
@@ -110,13 +106,14 @@ public class TeamApiTest {
   @WithMockObserverUser
   void retrieveTeamsOnScenarioTest() throws Exception {
     // -- EXECUTE --
-    String response = this.mvc
-        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID + "/teams")
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        this.mvc
+            .perform(
+                get(SCENARIO_URI + "/" + SCENARIO_ID + "/teams").accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -137,25 +134,27 @@ public class TeamApiTest {
     input.setPlayersIds(List.of(USER_ID));
 
     // -- EXECUTE --
-    String response = this.mvc
-        .perform(put(SCENARIO_URI + "/" + SCENARIO_ID + "/teams/" + TEAM_ID + "/players/add")
-            .content(asJsonString(input))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        this.mvc
+            .perform(
+                put(SCENARIO_URI + "/" + SCENARIO_ID + "/teams/" + TEAM_ID + "/players/add")
+                    .content(asJsonString(input))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
-    response = this.mvc
-        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    response =
+        this.mvc
+            .perform(get(SCENARIO_URI + "/" + SCENARIO_ID).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
     assertEquals(USER_ID, JsonPath.read(response, "$.scenario_teams_users[0].user_id"));
   }
 
@@ -169,25 +168,27 @@ public class TeamApiTest {
     input.setPlayersIds(List.of(USER_ID));
 
     // -- EXECUTE --
-    String response = this.mvc
-        .perform(put(SCENARIO_URI + "/" + SCENARIO_ID + "/teams/" + TEAM_ID + "/players/remove")
-            .content(asJsonString(input))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        this.mvc
+            .perform(
+                put(SCENARIO_URI + "/" + SCENARIO_ID + "/teams/" + TEAM_ID + "/players/remove")
+                    .content(asJsonString(input))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
-    response = this.mvc
-        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    response =
+        this.mvc
+            .perform(get(SCENARIO_URI + "/" + SCENARIO_ID).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
     assertEquals(new ArrayList<>(), JsonPath.read(response, "$.scenario_teams_users"));
   }
 
@@ -198,30 +199,35 @@ public class TeamApiTest {
   void removeTeamOnScenarioTest() throws Exception {
     // -- PREPARE --
     ScenarioUpdateTeamsInput input = new ScenarioUpdateTeamsInput();
-    input.setTeamIds(new ArrayList<>() {{
-      add(TEAM_ID);
-    }});
+    input.setTeamIds(
+        new ArrayList<>() {
+          {
+            add(TEAM_ID);
+          }
+        });
 
     // -- EXECUTE --
-    String response = this.mvc
-        .perform(put(SCENARIO_URI + "/" + SCENARIO_ID + "/teams/remove")
-            .content(asJsonString(input))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        this.mvc
+            .perform(
+                put(SCENARIO_URI + "/" + SCENARIO_ID + "/teams/remove")
+                    .content(asJsonString(input))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
-    response = this.mvc
-        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    response =
+        this.mvc
+            .perform(get(SCENARIO_URI + "/" + SCENARIO_ID).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
     assertEquals(new ArrayList<>(), JsonPath.read(response, "$.scenario_teams"));
   }
 }

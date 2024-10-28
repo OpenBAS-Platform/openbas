@@ -6,13 +6,12 @@ import io.openbas.database.repository.UserRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.response.PublicExercise;
 import io.openbas.rest.helper.RestBehavior;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,10 +23,11 @@ public class ExercisePlayerApi extends RestBehavior {
   private final ExerciseRepository exerciseRepository;
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}")
-  public PublicExercise playerExercise(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
+  public PublicExercise playerExercise(
+      @PathVariable String exerciseId, @RequestParam Optional<String> userId) {
     impersonateUser(this.userRepository, userId);
-    Exercise exercise = this.exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+    Exercise exercise =
+        this.exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     return new PublicExercise(exercise);
   }
-
 }

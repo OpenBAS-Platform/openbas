@@ -1,5 +1,9 @@
 package io.openbas.database.model;
 
+import static jakarta.persistence.DiscriminatorType.STRING;
+import static java.time.Instant.now;
+import static lombok.AccessLevel.NONE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
@@ -10,19 +14,14 @@ import io.openbas.helper.MultiIdSetDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
-
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
-import static jakarta.persistence.DiscriminatorType.STRING;
-import static java.time.Instant.now;
-import static lombok.AccessLevel.NONE;
+import lombok.Data;
+import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 @Data
 @Entity
@@ -78,7 +77,8 @@ public class Asset implements Base {
 
   @Queryable(filterable = true, sortable = true, dynamicValues = true, path = "tags.id")
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "assets_tags",
+  @JoinTable(
+      name = "assets_tags",
       joinColumns = @JoinColumn(name = "asset_id"),
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
@@ -112,7 +112,8 @@ public class Asset implements Base {
 
   @JsonProperty("asset_active")
   public boolean getActive() {
-    return this.getLastSeen() != null && (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < ACTIVE_THRESHOLD;
+    return this.getLastSeen() != null
+        && (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < ACTIVE_THRESHOLD;
   }
 
   // -- AUDIT --
@@ -132,9 +133,7 @@ public class Asset implements Base {
     return Objects.hash(id);
   }
 
-  public Asset() {
-
-  }
+  public Asset() {}
 
   public Asset(String id, String type, String name) {
     this.name = name;

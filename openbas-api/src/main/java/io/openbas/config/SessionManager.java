@@ -67,36 +67,45 @@ public class SessionManager {
   }
 
   private Stream<HttpSession> getUserSessions(String userId) {
-    return sessions.values().stream().filter(httpSession -> {
-      try {
-        Optional<OpenBASPrincipal> extractPrincipal = extractPrincipal(httpSession);
-        return extractPrincipal.map(user -> user.getId().equals(userId)).orElse(false);
-      } catch (IllegalStateException e) {
-        return false;
-      }
-    });
+    return sessions.values().stream()
+        .filter(
+            httpSession -> {
+              try {
+                Optional<OpenBASPrincipal> extractPrincipal = extractPrincipal(httpSession);
+                return extractPrincipal.map(user -> user.getId().equals(userId)).orElse(false);
+              } catch (IllegalStateException e) {
+                return false;
+              }
+            });
   }
 
   public void refreshUserSessions(User databaseUser) {
-    getUserSessions(databaseUser.getId()).forEach(httpSession -> {
-      Optional<SecurityContext> context = extractSecurityContext(httpSession);
-      Optional<Authentication> auth = extractAuthentication(httpSession);
-      OpenBASPrincipal user = extractPrincipal(httpSession).orElseThrow();
-      if (context.isPresent() && auth.isPresent()) {
-        Authentication authentication = auth.get();
-        SecurityContext securityContext = context.get();
-        if (authentication instanceof OAuth2AuthenticationToken oauth) {
-          OAuth2User oAuth2User = (OAuth2User) user;
-          Authentication newAuth = new OAuth2AuthenticationToken(
-              oAuth2User, oAuth2User.getAuthorities(), oauth.getAuthorizedClientRegistrationId());
-          securityContext.setAuthentication(newAuth);
-        } else if (authentication instanceof PreAuthenticatedAuthenticationToken) {
-          Authentication newAuth = new PreAuthenticatedAuthenticationToken(user, databaseUser.getPassword(), user.getAuthorities());
-          securityContext.setAuthentication(newAuth);
-        }
-        // TODO ADD SAML2
-      }
-    });
+    getUserSessions(databaseUser.getId())
+        .forEach(
+            httpSession -> {
+              Optional<SecurityContext> context = extractSecurityContext(httpSession);
+              Optional<Authentication> auth = extractAuthentication(httpSession);
+              OpenBASPrincipal user = extractPrincipal(httpSession).orElseThrow();
+              if (context.isPresent() && auth.isPresent()) {
+                Authentication authentication = auth.get();
+                SecurityContext securityContext = context.get();
+                if (authentication instanceof OAuth2AuthenticationToken oauth) {
+                  OAuth2User oAuth2User = (OAuth2User) user;
+                  Authentication newAuth =
+                      new OAuth2AuthenticationToken(
+                          oAuth2User,
+                          oAuth2User.getAuthorities(),
+                          oauth.getAuthorizedClientRegistrationId());
+                  securityContext.setAuthentication(newAuth);
+                } else if (authentication instanceof PreAuthenticatedAuthenticationToken) {
+                  Authentication newAuth =
+                      new PreAuthenticatedAuthenticationToken(
+                          user, databaseUser.getPassword(), user.getAuthorities());
+                  securityContext.setAuthentication(newAuth);
+                }
+                // TODO ADD SAML2
+              }
+            });
   }
 
   public void invalidateUserSession(String userId) {

@@ -5,26 +5,25 @@ import java.util.Set;
 
 public interface RawInject {
 
-    String getInject_id();
+  String getInject_id();
 
-    String getAsset_group_id();
+  String getAsset_group_id();
 
-    List<String> getInject_teams();
+  List<String> getInject_teams();
 
-    List<String> getInject_assets();
+  List<String> getInject_assets();
 
-    List<String> getInject_asset_groups();
+  List<String> getInject_asset_groups();
 
-    List<String> getInject_expectations();
+  List<String> getInject_expectations();
 
-    Set<String> getInject_communications();
+  Set<String> getInject_communications();
 
-    Set<String> getInject_platforms();
+  Set<String> getInject_platforms();
 
-    Set<String> getInject_kill_chain_phases();
+  Set<String> getInject_kill_chain_phases();
 
-    String getStatus_name();
+  String getStatus_name();
 
-    String getInject_scenario();
-
+  String getInject_scenario();
 }

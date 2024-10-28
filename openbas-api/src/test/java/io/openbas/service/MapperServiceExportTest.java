@@ -1,24 +1,21 @@
 package io.openbas.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 class MapperServiceExportTest extends IntegrationTest {
 
-  @Autowired
-  private ImportMapperRepository importMapperRepository;
+  @Autowired private ImportMapperRepository importMapperRepository;
 
-  @Autowired
-  private MapperService mapperService;
+  @Autowired private MapperService mapperService;
 
   @DisplayName("Test exporting a mapper")
   @Test
@@ -34,14 +31,15 @@ class MapperServiceExportTest extends IntegrationTest {
     String json = this.mapperService.exportMappers(List.of(mapperSaved.getId()));
 
     // -- ASSERT --
-    assertEquals("[{"
-        + "\"import_mapper_name\":\"Test Mapper\","
-        + "\"import_mapper_inject_type_column\":\"injectType\","
-        + "\"import_mapper_inject_importers\":[]"
-        + "}]", json);
+    assertEquals(
+        "[{"
+            + "\"import_mapper_name\":\"Test Mapper\","
+            + "\"import_mapper_inject_type_column\":\"injectType\","
+            + "\"import_mapper_inject_importers\":[]"
+            + "}]",
+        json);
 
     // -- CLEAN --
     this.importMapperRepository.delete(mapperSaved);
   }
-
 }

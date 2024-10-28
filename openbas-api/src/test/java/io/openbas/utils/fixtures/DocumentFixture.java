@@ -12,5 +12,4 @@ public class DocumentFixture {
     document.setType("image/jpeg");
     return document;
   }
-
 }

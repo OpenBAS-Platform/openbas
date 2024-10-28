@@ -1,5 +1,9 @@
 package io.openbas.database.model;
 
+import static jakarta.persistence.DiscriminatorType.STRING;
+import static java.time.Instant.now;
+import static lombok.AccessLevel.NONE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
@@ -13,18 +17,13 @@ import io.openbas.helper.MultiIdSetDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
+import java.util.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
-
-import java.time.Instant;
-import java.util.*;
-
-import static jakarta.persistence.DiscriminatorType.STRING;
-import static java.time.Instant.now;
-import static lombok.AccessLevel.NONE;
 
 @Data
 @Entity
@@ -77,9 +76,10 @@ public class Payload implements Base {
 
   @Setter
   @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(name = "payloads_attack_patterns",
-          joinColumns = @JoinColumn(name = "payload_id"),
-          inverseJoinColumns = @JoinColumn(name = "attack_pattern_id"))
+  @JoinTable(
+      name = "payloads_attack_patterns",
+      joinColumns = @JoinColumn(name = "payload_id"),
+      inverseJoinColumns = @JoinColumn(name = "attack_pattern_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("payload_attack_patterns")
   @Queryable(filterable = true, searchable = true, dynamicValues = true, path = "attackPatterns.id")
@@ -145,7 +145,8 @@ public class Payload implements Base {
 
   @Queryable(filterable = true, dynamicValues = true)
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "payloads_tags",
+  @JoinTable(
+      name = "payloads_tags",
       joinColumns = @JoinColumn(name = "payload_id"),
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
@@ -175,9 +176,7 @@ public class Payload implements Base {
     return Objects.hash(id);
   }
 
-  public Payload() {
-
-  }
+  public Payload() {}
 
   public Payload(String id, String type, String name) {
     this.name = name;

@@ -1,5 +1,11 @@
 package io.openbas.database.model;
 
+import static io.openbas.database.model.Grant.GRANT_TYPE.OBSERVER;
+import static io.openbas.database.model.Grant.GRANT_TYPE.PLANNER;
+import static io.openbas.helper.UserHelper.getUsersByType;
+import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -14,19 +20,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
-
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static io.openbas.database.model.Grant.GRANT_TYPE.OBSERVER;
-import static io.openbas.database.model.Grant.GRANT_TYPE.PLANNER;
-import static io.openbas.helper.UserHelper.getUsersByType;
-import static java.time.Instant.now;
-import static java.util.Optional.ofNullable;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 @Setter
 @Entity
@@ -116,7 +115,9 @@ public class Exercise implements Base {
 
   @Getter
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "exercise_mails_reply_to", joinColumns = @JoinColumn(name = "exercise_id"))
+  @CollectionTable(
+      name = "exercise_mails_reply_to",
+      joinColumns = @JoinColumn(name = "exercise_id"))
   @Column(name = "exercise_reply_to", nullable = false)
   @JsonProperty("exercise_mails_reply_to")
   private List<String> replyTos = new ArrayList<>();
@@ -144,7 +145,8 @@ public class Exercise implements Base {
 
   @Getter
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinTable(name = "scenarios_exercises",
+  @JoinTable(
+      name = "scenarios_exercises",
       joinColumns = @JoinColumn(name = "exercise_id"),
       inverseJoinColumns = @JoinColumn(name = "scenario_id"))
   @JsonSerialize(using = MonoIdDeserializer.class)
@@ -181,7 +183,8 @@ public class Exercise implements Base {
 
   @Getter
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "exercises_teams",
+  @JoinTable(
+      name = "exercises_teams",
       joinColumns = @JoinColumn(name = "exercise_id"),
       inverseJoinColumns = @JoinColumn(name = "team_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
@@ -190,7 +193,11 @@ public class Exercise implements Base {
   private List<Team> teams = new ArrayList<>();
 
   @Getter
-  @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "exercise",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   @JsonProperty("exercise_teams_users")
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<ExerciseTeamUser> teamUsers = new ArrayList<>();
@@ -213,7 +220,8 @@ public class Exercise implements Base {
 
   @Getter
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "exercises_tags",
+  @JoinTable(
+      name = "exercises_tags",
       joinColumns = @JoinColumn(name = "exercise_id"),
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
@@ -223,7 +231,8 @@ public class Exercise implements Base {
 
   @Getter
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "exercises_documents",
+  @JoinTable(
+      name = "exercises_documents",
       joinColumns = @JoinColumn(name = "exercise_id"),
       inverseJoinColumns = @JoinColumn(name = "document_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
@@ -250,8 +259,12 @@ public class Exercise implements Base {
 
   @JsonProperty("exercise_lessons_answers_number")
   public Long getLessonsAnswersNumbers() {
-    return getLessonsCategories().stream().flatMap(lessonsCategory -> lessonsCategory.getQuestions()
-        .stream().flatMap(lessonsQuestion -> lessonsQuestion.getAnswers().stream())).count();
+    return getLessonsCategories().stream()
+        .flatMap(
+            lessonsCategory ->
+                lessonsCategory.getQuestions().stream()
+                    .flatMap(lessonsQuestion -> lessonsQuestion.getAnswers().stream()))
+        .count();
   }
 
   @JsonProperty("exercise_planners")
@@ -272,7 +285,8 @@ public class Exercise implements Base {
         .filter(inject -> inject.getStatus().isEmpty())
         .filter(inject -> inject.getDate().isPresent())
         .filter(inject -> inject.getDate().get().isAfter(now()))
-        .findFirst().flatMap(Inject::getDate);
+        .findFirst()
+        .flatMap(Inject::getDate);
   }
 
   @JsonIgnore
@@ -299,8 +313,8 @@ public class Exercise implements Base {
 
   @JsonProperty("exercise_score")
   public Double getEvaluationAverage() {
-    double evaluationAverage = getObjectives().stream().mapToDouble(Objective::getEvaluationAverage).average()
-        .orElse(0D);
+    double evaluationAverage =
+        getObjectives().stream().mapToDouble(Objective::getEvaluationAverage).average().orElse(0D);
     return Math.round(evaluationAverage * 100.0) / 100.0;
   }
 
@@ -318,24 +332,27 @@ public class Exercise implements Base {
   @JsonProperty("exercise_platforms")
   public List<PLATFORM_TYPE> getPlatforms() {
     return getInjects().stream()
-        .flatMap(inject -> inject.getInjectorContract()
-            .map(InjectorContract::getPlatforms)
-            .stream()
-            .flatMap(Arrays::stream))
+        .flatMap(
+            inject ->
+                inject.getInjectorContract().map(InjectorContract::getPlatforms).stream()
+                    .flatMap(Arrays::stream))
         .distinct()
         .toList();
   }
 
   // -- KILL CHAIN PHASES --
   @JsonProperty("exercise_kill_chain_phases")
-  @Queryable(filterable = true, dynamicValues = true, path = "injects.injectorContract.attackPatterns.killChainPhases.id")
+  @Queryable(
+      filterable = true,
+      dynamicValues = true,
+      path = "injects.injectorContract.attackPatterns.killChainPhases.id")
   public List<KillChainPhase> getKillChainPhases() {
     return getInjects().stream()
-        .flatMap(inject -> inject.getInjectorContract()
-            .map(InjectorContract::getAttackPatterns)
-            .stream()
-            .flatMap(Collection::stream)
-            .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream()))
+        .flatMap(
+            inject ->
+                inject.getInjectorContract().map(InjectorContract::getAttackPatterns).stream()
+                    .flatMap(Collection::stream)
+                    .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream()))
         .distinct()
         .toList();
   }
@@ -359,6 +376,7 @@ public class Exercise implements Base {
     }
     return List.of();
   }
+
   // endregion
 
   public Optional<Instant> getStart() {
@@ -374,7 +392,9 @@ public class Exercise implements Base {
   }
 
   public List<Inject> getInjects() {
-      return injects.stream().sorted(Inject.executionComparator).collect(Collectors.toList()); // Should be modifiable
+    return injects.stream()
+        .sorted(Inject.executionComparator)
+        .collect(Collectors.toList()); // Should be modifiable
   }
 
   public List<Article> getArticlesForChannel(Channel channel) {

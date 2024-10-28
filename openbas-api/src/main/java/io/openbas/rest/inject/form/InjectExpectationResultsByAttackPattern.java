@@ -8,10 +8,9 @@ import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.utils.AtomicTestingUtils;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.Data;
 
 @Data
 public class InjectExpectationResultsByAttackPattern {
@@ -34,20 +33,20 @@ public class InjectExpectationResultsByAttackPattern {
   }
 
   public InjectExpectationResultsByAttackPattern(
-      final AttackPattern attackPattern,
-      @NotNull final List<Inject> injects) {
-    this.results = injects.stream()
-        .map(inject -> {
-          InjectExpectationResultsByType result = new InjectExpectationResultsByType();
-          result.setInjectTitle(inject.getTitle());
-          result.setResults(AtomicTestingUtils.getExpectationResultByTypes(inject.getExpectations()));
-          return result;
-        })
-        .collect(Collectors.toList());
+      final AttackPattern attackPattern, @NotNull final List<Inject> injects) {
+    this.results =
+        injects.stream()
+            .map(
+                inject -> {
+                  InjectExpectationResultsByType result = new InjectExpectationResultsByType();
+                  result.setInjectTitle(inject.getTitle());
+                  result.setResults(
+                      AtomicTestingUtils.getExpectationResultByTypes(inject.getExpectations()));
+                  return result;
+                })
+            .collect(Collectors.toList());
     this.attackPattern = attackPattern;
   }
 
-    public InjectExpectationResultsByAttackPattern() {
-    }
-
+  public InjectExpectationResultsByAttackPattern() {}
 }

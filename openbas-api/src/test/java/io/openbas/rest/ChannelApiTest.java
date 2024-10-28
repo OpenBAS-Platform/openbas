@@ -1,22 +1,5 @@
 package io.openbas.rest;
 
-import com.jayway.jsonpath.JsonPath;
-import io.openbas.database.model.Channel;
-import io.openbas.database.model.Scenario;
-import io.openbas.database.repository.ArticleRepository;
-import io.openbas.database.repository.ChannelRepository;
-import io.openbas.database.repository.ScenarioRepository;
-import io.openbas.rest.channel.form.ArticleCreateInput;
-import io.openbas.rest.channel.form.ArticleUpdateInput;
-import io.openbas.utils.mockUser.WithMockPlannerUser;
-import io.openbas.service.ScenarioService;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,23 +8,35 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.jayway.jsonpath.JsonPath;
+import io.openbas.database.model.Channel;
+import io.openbas.database.model.Scenario;
+import io.openbas.database.repository.ArticleRepository;
+import io.openbas.database.repository.ChannelRepository;
+import io.openbas.database.repository.ScenarioRepository;
+import io.openbas.rest.channel.form.ArticleCreateInput;
+import io.openbas.rest.channel.form.ArticleUpdateInput;
+import io.openbas.service.ScenarioService;
+import io.openbas.utils.mockUser.WithMockPlannerUser;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
 class ChannelApiTest {
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
-  @Autowired
-  private ScenarioService scenarioService;
-  @Autowired
-  private ScenarioRepository scenarioRepository;
-  @Autowired
-  private ChannelRepository channelRepository;
-  @Autowired
-  private ArticleRepository articleRepository;
+  @Autowired private ScenarioService scenarioService;
+  @Autowired private ScenarioRepository scenarioRepository;
+  @Autowired private ChannelRepository channelRepository;
+  @Autowired private ArticleRepository articleRepository;
 
   static String SCENARIO_ID;
   static String CHANNEL_ID;
@@ -78,15 +73,17 @@ class ChannelApiTest {
     articleCreateInput.setChannelId(CHANNEL_ID);
 
     // -- EXECUTE --
-    String response = this.mvc
-        .perform(post(SCENARIO_URI + "/" + SCENARIO_ID + "/articles")
-            .content(asJsonString(articleCreateInput))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        this.mvc
+            .perform(
+                post(SCENARIO_URI + "/" + SCENARIO_ID + "/articles")
+                    .content(asJsonString(articleCreateInput))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -100,13 +97,15 @@ class ChannelApiTest {
   @WithMockPlannerUser
   void retrieveArticlesForScenarioTest() throws Exception {
     // -- EXECUTE --
-    String response = this.mvc
-        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID + "/articles")
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        this.mvc
+            .perform(
+                get(SCENARIO_URI + "/" + SCENARIO_ID + "/articles")
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -124,15 +123,17 @@ class ChannelApiTest {
     articleUpdateInput.setChannelId(CHANNEL_ID);
 
     // -- EXECUTE --
-    String response = this.mvc
-        .perform(put(SCENARIO_URI + "/" + SCENARIO_ID + "/articles/" + ARTICLE_ID)
-            .content(asJsonString(articleUpdateInput))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        this.mvc
+            .perform(
+                put(SCENARIO_URI + "/" + SCENARIO_ID + "/articles/" + ARTICLE_ID)
+                    .content(asJsonString(articleUpdateInput))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -145,8 +146,8 @@ class ChannelApiTest {
   @WithMockPlannerUser
   void deleteArticleForScenarioTest() throws Exception {
     // -- EXECUTE 1 ASSERT --
-    this.mvc.perform(delete(SCENARIO_URI + "/" + SCENARIO_ID + "/articles/" + ARTICLE_ID))
+    this.mvc
+        .perform(delete(SCENARIO_URI + "/" + SCENARIO_ID + "/articles/" + ARTICLE_ID))
         .andExpect(status().is2xxSuccessful());
   }
-
 }

@@ -18,6 +18,5 @@ public class InjectExpectationResult {
 
   private Double score;
 
-  @NotBlank
-  private String result;
+  @NotBlank private String result;
 }

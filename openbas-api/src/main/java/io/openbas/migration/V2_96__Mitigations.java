@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V2_96__Mitigations extends BaseJavaMigration {
@@ -15,7 +14,8 @@ public class V2_96__Mitigations extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     // Mitigations
-    select.execute("""
+    select.execute(
+        """
           CREATE TABLE mitigations (
             mitigation_id varchar(255) not null constraint mitigations_pkey primary key,
             mitigation_created_at timestamp not null default now(),
@@ -30,7 +30,8 @@ public class V2_96__Mitigations extends BaseJavaMigration {
           CREATE INDEX idx_mitigations on mitigations (mitigation_id);
           CREATE UNIQUE INDEX mitigations_unique on mitigations (mitigation_external_id);
      """);
-    select.execute("""
+    select.execute(
+        """
         CREATE TABLE mitigations_attack_patterns (
             mitigation_id varchar(255) not null
                 constraint mitigation_id_fk
