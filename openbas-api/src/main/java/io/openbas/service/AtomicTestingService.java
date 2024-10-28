@@ -1,5 +1,6 @@
 package io.openbas.service;
 
+import static io.openbas.aop.LoggingAspect.logger;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.database.model.Command.COMMAND_TYPE;
@@ -405,14 +406,28 @@ public class AtomicTestingService {
         createLeftJoin(injectRoot, "injectorContract");
     Join<InjectorContract, Injector> injectorJoin =
         injectorContractJoin.join("injector", JoinType.LEFT);
-    Join<Inject, InjectStatus> injectStatusJoin = createLeftJoin(injectRoot, "status");
-    // Array aggregations
-    Expression<String[]> injectExpectationIdsExpression =
-        createJoinArrayAggOnId(cb, injectRoot, EXPECTATIONS);
-    Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
-    Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
-    Expression<String[]> assetGroupIdsExpression =
-        createJoinArrayAggOnId(cb, injectRoot, "assetGroups");
+    //Join<Inject, InjectStatus> injectStatusJoin = createLeftJoin(injectRoot, "status");
+
+        // Subquery for InjectStatus
+        Subquery<Tuple> statusSubquery = cq.subquery(Tuple.class);
+        Root<InjectStatus> statusRoot = statusSubquery.from(InjectStatus.class);
+        Subquery<Tuple> dateSubquery = cq.subquery(Tuple.class);
+        Root<InjectStatus> dateRoot = dateSubquery.from(InjectStatus.class);
+
+        // Define the subquery to select the necessary fields
+        statusSubquery.select(statusRoot.get("name")
+            )
+            .where(cb.equal(statusRoot.get("inject").get("id"), injectRoot.get("id")));
+        dateSubquery.select(dateRoot.get("trackingSentDate")
+            )
+            .where(cb.equal(dateRoot.get("inject").get("id"), injectRoot.get("id")));
+
+
+        // Array aggregations
+        Expression<String[]> injectExpectationIdsExpression = createJoinArrayAggOnId(cb, injectRoot, EXPECTATIONS);
+        Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
+        Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
+        Expression<String[]> assetGroupIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assetGroups");
 
     // SELECT
     cq.multiselect(
@@ -421,11 +436,17 @@ public class AtomicTestingService {
             injectRoot.get("updatedAt").alias("inject_updated_at"),
             injectorJoin.get("type").alias("inject_type"),
             injectorContractJoin.alias("inject_injector_contract"),
-            injectStatusJoin.alias("inject_status"),
-            injectExpectationIdsExpression.alias("inject_expectations"),
-            teamIdsExpression.alias("inject_teams"),
-            assetIdsExpression.alias("inject_assets"),
-            assetGroupIdsExpression.alias("inject_asset_groups"))
+            //injectStatusJoin.alias("inject_status"),
+            cb.selectCase()
+                .when(cb.exists(statusSubquery), statusSubquery.select(statusRoot.get("name")))
+                .otherwise(cb.nullLiteral(ExecutionStatus.class)).alias("inject_status"),
+            cb.selectCase()
+                .when(cb.exists(dateSubquery), dateSubquery.select(dateRoot.get("trackingSentDate")))
+                .otherwise(cb.nullLiteral(Instant.class)).alias("tracking_sent_date"),
+                injectExpectationIdsExpression.alias("inject_expectations"),
+                teamIdsExpression.alias("inject_teams"),
+                assetIdsExpression.alias("inject_assets"),
+                assetGroupIdsExpression.alias("inject_asset_groups"))
         .distinct(true);
 
     // GROUP BY
@@ -433,25 +454,35 @@ public class AtomicTestingService {
         Arrays.asList(
             injectRoot.get("id"),
             injectorContractJoin.get("id"),
-            injectorJoin.get("id"),
-            injectStatusJoin.get("id")));
+            injectorJoin.get("id")
+        ));
   }
 
   private List<AtomicTestingOutput> execAtomicTesting(TypedQuery<Tuple> query) {
-    return query.getResultList().stream()
-        .map(
-            tuple ->
-                new AtomicTestingOutput(
+    long start = System.currentTimeMillis();
+        List<Tuple> resultList = query.getResultList();
+        long executionTime = System.currentTimeMillis() - start;
+        logger.info("Execution time of execution query true + raw query: " + executionTime + " ms");
+
+        return resultList
+                .stream()
+                .map(tuple -> {
+                    InjectStatus injectStatus = new InjectStatus();
+                    injectStatus.setName(tuple.get("inject_status", ExecutionStatus.class));
+                    injectStatus.setTrackingSentDate(tuple.get("tracking_sent_date", Instant.class));
+                   return new AtomicTestingOutput(
                     tuple.get("inject_id", String.class),
                     tuple.get("inject_title", String.class),
                     tuple.get("inject_updated_at", Instant.class),
                     tuple.get("inject_type", String.class),
                     tuple.get("inject_injector_contract", InjectorContract.class),
-                    tuple.get("inject_status", InjectStatus.class),
+                    injectStatus,
                     tuple.get("inject_expectations", String[].class),
                     tuple.get("inject_teams", String[].class),
                     tuple.get("inject_assets", String[].class),
-                    tuple.get("inject_asset_groups", String[].class)))
+                    tuple.get("inject_asset_groups", String[].class));
+                }
+                )
         .toList();
   }
 
