@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/styles';
-import R from 'ramda';
+import * as R from 'ramda';
 
 import type { TeamStore } from '../../../../../actions/teams/Team';
 import type { Theme } from '../../../../../components/Theme';
