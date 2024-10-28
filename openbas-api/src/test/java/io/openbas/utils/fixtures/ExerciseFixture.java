@@ -45,12 +45,12 @@ public class ExerciseFixture {
     return exercise;
   }
 
-    /*
-    _ create exercise with team containing a user with email (user enabled)
-    _ create exercise with team containing a user with email (user not enabled)
-    _ create exercise without team
-    _ create exercise with team without user
-    _ create email
-     */
+  /*
+  _ create exercise with team containing a user with email (user enabled)
+  _ create exercise with team containing a user with email (user not enabled)
+  _ create exercise without team
+  _ create exercise with team without user
+  _ create email
+   */
 
 }

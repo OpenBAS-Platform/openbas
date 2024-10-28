@@ -15,5 +15,4 @@ public class InjectFixture {
     inject.setDependsDuration(0L);
     return inject;
   }
-
 }
