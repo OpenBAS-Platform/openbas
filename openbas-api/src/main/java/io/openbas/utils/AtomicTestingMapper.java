@@ -9,12 +9,20 @@ import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.rest.atomic_testing.form.InjectResultDTO.InjectResultDTOBuilder;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Set;
+
+@Component
+@RequiredArgsConstructor
 public class AtomicTestingMapper {
 
-  public static InjectResultDTO toDtoWithTargetResults(Inject inject) {
-    List<InjectTargetWithResult> targets = AtomicTestingUtils.getTargetsWithResults(inject);
+  private final ResultUtils resultUtils;
+
+  public InjectResultDTO toDtoWithTargetResults(Inject inject) {
+    List<InjectTargetWithResult> targets = resultUtils.getInjectTargetWithResults(Set.of(inject.getId()));
     List<String> targetIds = targets.stream().map(InjectTargetWithResult::getId).toList();
 
     return getAtomicTestingOutputBuilder(inject)

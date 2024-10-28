@@ -8,9 +8,14 @@ import io.openbas.utils.AtomicTestingMapper;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Data
+@RequiredArgsConstructor
 public class ImportTestSummary {
+
+  private final AtomicTestingMapper atomicTestingMapper;
 
   @JsonProperty("import_message")
   private List<ImportMessage> importMessage = new ArrayList<>();
@@ -22,6 +27,6 @@ public class ImportTestSummary {
 
   @JsonProperty("injects")
   public List<InjectResultDTO> getInjectResults() {
-    return injects.stream().map(AtomicTestingMapper::toDtoWithTargetResults).toList();
+    return injects.stream().map(atomicTestingMapper::toDtoWithTargetResults).toList();
   }
 }

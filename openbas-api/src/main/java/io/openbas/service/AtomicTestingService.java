@@ -31,6 +31,7 @@ import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.output.AtomicTestingOutput;
 import io.openbas.utils.AtomicTestingMapper;
+import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -75,6 +76,7 @@ public class AtomicTestingService {
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
   private final AssetGroupService assetGroupService;
+  private final AtomicTestingMapper atomicTestingMapper;
   private ApplicationContext context;
 
   private static final String PRE_DEFINE_EXPECTATIONS = "predefinedExpectations";
@@ -88,19 +90,19 @@ public class AtomicTestingService {
   }
 
   public InjectResultDTO findById(String injectId) {
-    Optional<Inject> inject = injectRepository.findWithStatusById(injectId);
+    Optional<RawAsset> inject = injectRepository.findWithStatusById(injectId);
 
     if (inject.isPresent()) {
       List<AssetGroup> computedAssetGroup =
           inject.get().getAssetGroups().stream()
-              .map(assetGroupService::computeDynamicAssets)
+              .map(assetGroupService::computeDynamicAssetFromRaw)
               .toList();
       inject.get().getAssetGroups().clear();
       inject.get().getAssetGroups().addAll(computedAssetGroup);
     }
     InjectResultDTO result =
         inject
-            .map(AtomicTestingMapper::toDtoWithTargetResults)
+            .map(atomicTestingMapper::toDtoWithTargetResults)
             .orElseThrow(ElementNotFoundException::new);
     result.setCommandsLines(getCommandsLinesFromInject(inject.get()));
     return result;
