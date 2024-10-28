@@ -2,7 +2,6 @@ package io.openbas.service;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.database.model.Command.COMMAND_TYPE;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.AtomicTestingUtils.*;
@@ -17,12 +16,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.*;
-import io.openbas.database.raw.RawAsset;
-import io.openbas.database.raw.RawAssetGroup;
-import io.openbas.database.raw.RawInjectExpectation;
-import io.openbas.database.raw.RawTeam;
+import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
@@ -31,7 +26,6 @@ import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.output.AtomicTestingOutput;
 import io.openbas.utils.AtomicTestingMapper;
-import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -46,10 +40,7 @@ import java.util.*;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.hibernate.Hibernate;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -63,6 +54,7 @@ import org.springframework.validation.annotation.Validated;
 public class AtomicTestingService {
 
   @Resource protected ObjectMapper mapper;
+  @PersistenceContext private EntityManager entityManager;
 
   private final AssetGroupRepository assetGroupRepository;
   private final AssetRepository assetRepository;
@@ -75,37 +67,13 @@ public class AtomicTestingService {
   private final TeamRepository teamRepository;
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
-  private final AssetGroupService assetGroupService;
   private final AtomicTestingMapper atomicTestingMapper;
-  private ApplicationContext context;
 
   private static final String PRE_DEFINE_EXPECTATIONS = "predefinedExpectations";
   private static final String EXPECTATIONS = "expectations";
 
-  @PersistenceContext private EntityManager entityManager;
-
-  @Autowired
-  public void setContext(ApplicationContext context) {
-    this.context = context;
-  }
-
   public InjectResultDTO findById(String injectId) {
-    Optional<RawAsset> inject = injectRepository.findWithStatusById(injectId);
-
-    if (inject.isPresent()) {
-      List<AssetGroup> computedAssetGroup =
-          inject.get().getAssetGroups().stream()
-              .map(assetGroupService::computeDynamicAssetFromRaw)
-              .toList();
-      inject.get().getAssetGroups().clear();
-      inject.get().getAssetGroups().addAll(computedAssetGroup);
-    }
-    InjectResultDTO result =
-        inject
-            .map(atomicTestingMapper::toDtoWithTargetResults)
-            .orElseThrow(ElementNotFoundException::new);
-    result.setCommandsLines(getCommandsLinesFromInject(inject.get()));
-    return result;
+    return atomicTestingMapper.toInjectResultDTO(injectRepository.findById(injectId).get());
   }
 
   @Transactional
@@ -165,8 +133,7 @@ public class AtomicTestingService {
             .toList();
     injectToSave.getDocuments().addAll(injectDocuments);
     Inject inject = injectRepository.save(injectToSave);
-    return AtomicTestingMapper.toDto(
-        inject, getTargets(inject.getTeams(), inject.getAssets(), inject.getAssetGroups()));
+    return atomicTestingMapper.toInjectResultDTO(inject);
   }
 
   private ObjectNode setExpectations(
@@ -221,8 +188,7 @@ public class AtomicTestingService {
     injectDuplicate.setExercise(injectOrigin.getExercise());
     injectDuplicate.setScenario(injectOrigin.getScenario());
     Inject inject = injectRepository.save(injectDuplicate);
-    return AtomicTestingMapper.toDto(
-        inject, getTargets(inject.getTeams(), inject.getAssets(), inject.getAssetGroups()));
+    return atomicTestingMapper.toInjectResultDTO(inject);
   }
 
   public Inject copyInject(@NotNull Inject injectOrigin, boolean isAtomic) {
@@ -268,8 +234,7 @@ public class AtomicTestingService {
     inject.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
 
     Inject saved = injectRepository.save(inject);
-    return AtomicTestingMapper.toDto(
-        saved, getTargets(saved.getTeams(), saved.getAssets(), saved.getAssetGroups()));
+    return atomicTestingMapper.toInjectResultDTO(saved);
   }
 
   @Transactional
@@ -455,36 +420,5 @@ public class AtomicTestingService {
                     tuple.get("inject_assets", String[].class),
                     tuple.get("inject_asset_groups", String[].class)))
         .toList();
-  }
-
-  public InjectStatusCommandLine getCommandsLinesFromInject(final Inject inject) {
-    if (inject.getStatus().isPresent() && inject.getStatus().get().getCommandsLines() != null) {
-      // Commands lines saved because inject has been executed
-      return inject.getStatus().get().getCommandsLines();
-    } else if (inject.getInjectorContract().isPresent()) {
-      InjectorContract injectorContract = inject.getInjectorContract().get();
-      if (injectorContract.getPayload() != null
-          && COMMAND_TYPE.equals(injectorContract.getPayload().getType())) {
-        // Inject has a command payload
-        Payload payload = injectorContract.getPayload();
-        Command payloadCommand = (Command) Hibernate.unproxy(payload);
-        return new InjectStatusCommandLine(
-            payloadCommand.getContent() != null && !payloadCommand.getContent().isBlank()
-                ? List.of(payloadCommand.getContent())
-                : null,
-            payloadCommand.getCleanupCommand() != null
-                    && !payloadCommand.getCleanupCommand().isBlank()
-                ? List.of(payload.getCleanupCommand())
-                : null,
-            payload.getExternalId());
-      } else {
-        // Inject comes from Caldera ability and tomorrow from other(s) Executor(s)
-        io.openbas.execution.Injector executor =
-            context.getBean(
-                injectorContract.getInjector().getType(), io.openbas.execution.Injector.class);
-        return executor.getCommandsLines(injectorContract.getId());
-      }
-    }
-    return null;
   }
 }

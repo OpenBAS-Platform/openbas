@@ -6,14 +6,12 @@ import static io.openbas.utils.AtomicTestingUtils.getRefinedExpectations;
 import io.openbas.database.model.*;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.InjectResultDTO;
-import io.openbas.rest.atomic_testing.form.InjectResultDTO.InjectResultDTOBuilder;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -21,30 +19,11 @@ public class AtomicTestingMapper {
 
   private final ResultUtils resultUtils;
 
-  public InjectResultDTO toDtoWithTargetResults(Inject inject) {
-    List<InjectTargetWithResult> targets = resultUtils.getInjectTargetWithResults(Set.of(inject.getId()));
+  public InjectResultDTO toInjectResultDTO(Inject inject) {
+    List<InjectTargetWithResult> targets =
+        resultUtils.getInjectTargetWithResults(Set.of(inject.getId()));
     List<String> targetIds = targets.stream().map(InjectTargetWithResult::getId).toList();
 
-    return getAtomicTestingOutputBuilder(inject)
-        .targets(targets)
-        .expectationResultByTypes(
-            AtomicTestingUtils.getExpectationResultByTypes(
-                getRefinedExpectations(inject, targetIds)))
-        .build();
-  }
-
-  public static InjectResultDTO toDto(Inject inject, List<InjectTargetWithResult> targets) {
-    List<String> targetIds = targets.stream().map(InjectTargetWithResult::getId).toList();
-
-    return getAtomicTestingOutputBuilder(inject)
-        .targets(targets)
-        .expectationResultByTypes(
-            AtomicTestingUtils.getExpectationResultByTypes(
-                getRefinedExpectations(inject, targetIds)))
-        .build();
-  }
-
-  private static InjectResultDTOBuilder getAtomicTestingOutputBuilder(Inject inject) {
     return InjectResultDTO.builder()
         .id(inject.getId())
         .title(inject.getTitle())
@@ -67,7 +46,13 @@ public class AtomicTestingMapper {
         .killChainPhases(inject.getKillChainPhases())
         .attackPatterns(inject.getAttackPatterns())
         .isReady(inject.isReady())
-        .updatedAt(inject.getUpdatedAt());
+        .commandsLines(InjectUtils.getCommandsLinesFromInject(inject).orElse(null))
+        .targets(targets)
+        .expectationResultByTypes(
+            AtomicTestingUtils.getExpectationResultByTypes(
+                getRefinedExpectations(inject, targetIds)))
+        .updatedAt(inject.getUpdatedAt())
+        .build();
   }
 
   public record ExpectationResultsByType(
