@@ -1,5 +1,17 @@
 package io.openbas.rest.team;
 
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.database.specification.TeamSpecification.contextual;
+import static io.openbas.database.specification.TeamSpecification.fromIds;
+import static io.openbas.helper.DatabaseHelper.updateRelation;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static java.time.Instant.now;
+import static org.springframework.util.StringUtils.hasText;
+
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Organization;
@@ -20,6 +32,8 @@ import io.openbas.service.TeamService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,21 +41,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
-
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.database.specification.TeamSpecification.contextual;
-import static io.openbas.database.specification.TeamSpecification.fromIds;
-import static io.openbas.helper.DatabaseHelper.updateRelation;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.helper.StreamHelper.iterableToSet;
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import static java.time.Instant.now;
-import static org.springframework.util.StringUtils.hasText;
 
 @RestController
 @Secured(ROLE_USER)
@@ -56,7 +55,6 @@ public class TeamApi extends RestBehavior {
   private final TagRepository tagRepository;
   private final TeamService teamService;
 
-
   @LogExecutionTime
   @GetMapping("/api/teams")
   @PreAuthorize("isObserver()")
@@ -64,15 +62,17 @@ public class TeamApi extends RestBehavior {
     List<RawTeam> teams;
     OpenBASPrincipal currentUser = currentUser();
     if (currentUser.isAdmin()) {
-      //We get all the teams as raw
+      // We get all the teams as raw
       teams = fromIterable(teamRepository.rawTeams());
     } else {
-      //We get the teams that are linked to the organizations we are part of
-      User local = userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
-      List<String> organizationIds = local.getGroups().stream()
-          .flatMap(group -> group.getOrganizations().stream())
-          .map(Organization::getId)
-          .toList();
+      // We get the teams that are linked to the organizations we are part of
+      User local =
+          userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
+      List<String> organizationIds =
+          local.getGroups().stream()
+              .flatMap(group -> group.getOrganizations().stream())
+              .map(Organization::getId)
+              .toList();
       teams = teamRepository.rawTeamsAccessibleFromOrganization(organizationIds);
     }
 
@@ -83,7 +83,8 @@ public class TeamApi extends RestBehavior {
   @PostMapping("/api/teams/search")
   @PreAuthorize("isObserver()")
   @Transactional(readOnly = true)
-  public Page<TeamOutput> searchTeams(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+  public Page<TeamOutput> searchTeams(
+      @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     final Specification<Team> teamSpecification = contextual(false);
     return this.teamService.teamPagination(searchPaginationInput, teamSpecification);
   }
@@ -115,7 +116,8 @@ public class TeamApi extends RestBehavior {
     isTeamAlreadyExists(input);
     Team team = new Team();
     team.setUpdateAttributes(input);
-    team.setOrganization(updateRelation(input.getOrganizationId(), team.getOrganization(), organizationRepository));
+    team.setOrganization(
+        updateRelation(input.getOrganizationId(), team.getOrganization(), organizationRepository));
     team.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     team.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
     team.setScenarios(fromIterable(scenarioRepository.findAllById(input.getScenarioIds())));
@@ -127,7 +129,8 @@ public class TeamApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   public Team upsertTeam(@Valid @RequestBody TeamCreateInput input) {
     if (input.getContextual() && input.getExerciseIds().toArray().length > 1) {
-      throw new UnsupportedOperationException("Contextual team can only be associated to one exercise");
+      throw new UnsupportedOperationException(
+          "Contextual team can only be associated to one exercise");
     }
     Optional<Team> team = teamRepository.findByName(input.getName());
     if (team.isPresent()) {
@@ -136,13 +139,15 @@ public class TeamApi extends RestBehavior {
       existingTeam.setUpdatedAt(now());
       existingTeam.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
       existingTeam.setOrganization(
-          updateRelation(input.getOrganizationId(), existingTeam.getOrganization(), organizationRepository));
+          updateRelation(
+              input.getOrganizationId(), existingTeam.getOrganization(), organizationRepository));
       return teamRepository.save(existingTeam);
     } else {
       Team newTeam = new Team();
       newTeam.setUpdateAttributes(input);
       newTeam.setOrganization(
-          updateRelation(input.getOrganizationId(), newTeam.getOrganization(), organizationRepository));
+          updateRelation(
+              input.getOrganizationId(), newTeam.getOrganization(), organizationRepository));
       newTeam.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
       newTeam.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
       newTeam.setScenarios(fromIterable(scenarioRepository.findAllById(input.getScenarioIds())));
@@ -163,13 +168,15 @@ public class TeamApi extends RestBehavior {
     team.setUpdateAttributes(input);
     team.setUpdatedAt(now());
     team.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-    team.setOrganization(updateRelation(input.getOrganizationId(), team.getOrganization(), organizationRepository));
+    team.setOrganization(
+        updateRelation(input.getOrganizationId(), team.getOrganization(), organizationRepository));
     return teamRepository.save(team);
   }
 
   @PutMapping("/api/teams/{teamId}/players")
   @PreAuthorize("isPlanner()")
-  public Team updateTeamUsers(@PathVariable String teamId, @Valid @RequestBody UpdateUsersTeamInput input) {
+  public Team updateTeamUsers(
+      @PathVariable String teamId, @Valid @RequestBody UpdateUsersTeamInput input) {
     Team team = teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
     Iterable<User> teamUsers = userRepository.findAllById(input.getUserIds());
     team.setUsers(fromIterable(teamUsers));
@@ -180,27 +187,38 @@ public class TeamApi extends RestBehavior {
 
   private void isTeamAlreadyExists(@NotNull final TeamCreateInput input) {
     List<Team> teams = this.teamRepository.findAllByNameIgnoreCase(input.getName());
-      if (teams.isEmpty()) {
-          return;
-      }
+    if (teams.isEmpty()) {
+      return;
+    }
 
-    if (FALSE.equals(input.getContextual()) && teams.stream().anyMatch(t -> FALSE.equals(t.getContextual()))) {
-      throw new AlreadyExistingException("Global teams (non contextual) cannot have the same name (already exists)");
+    if (FALSE.equals(input.getContextual())
+        && teams.stream().anyMatch(t -> FALSE.equals(t.getContextual()))) {
+      throw new AlreadyExistingException(
+          "Global teams (non contextual) cannot have the same name (already exists)");
     }
     if (TRUE.equals(input.getContextual())) {
       String exerciseId = input.getExerciseIds().stream().findFirst().orElse(null);
-      if (hasText(exerciseId) && teams.stream().anyMatch(
-          t -> TRUE.equals(t.getContextual()) && t.getExercises().stream()
-              .anyMatch((e) -> exerciseId.equals(e.getId())))) {
-        throw new AlreadyExistingException("A contextual team with the same name already exists on this simulation");
+      if (hasText(exerciseId)
+          && teams.stream()
+              .anyMatch(
+                  t ->
+                      TRUE.equals(t.getContextual())
+                          && t.getExercises().stream()
+                              .anyMatch((e) -> exerciseId.equals(e.getId())))) {
+        throw new AlreadyExistingException(
+            "A contextual team with the same name already exists on this simulation");
       }
       String scenarioId = input.getScenarioIds().stream().findFirst().orElse(null);
-      if (hasText(scenarioId) && teams.stream().anyMatch(
-          t -> TRUE.equals(t.getContextual()) && t.getScenarios().stream()
-              .anyMatch((e) -> scenarioId.equals(e.getId())))) {
-        throw new AlreadyExistingException("A contextual team with the same name already exists on this scenario");
+      if (hasText(scenarioId)
+          && teams.stream()
+              .anyMatch(
+                  t ->
+                      TRUE.equals(t.getContextual())
+                          && t.getScenarios().stream()
+                              .anyMatch((e) -> scenarioId.equals(e.getId())))) {
+        throw new AlreadyExistingException(
+            "A contextual team with the same name already exists on this scenario");
       }
     }
-
   }
 }

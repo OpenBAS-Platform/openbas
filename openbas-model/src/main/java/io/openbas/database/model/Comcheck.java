@@ -5,17 +5,16 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
-
-import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 @Setter
 @Getter
@@ -24,81 +23,82 @@ import java.util.Objects;
 @EntityListeners(ModelBaseListener.class)
 public class Comcheck implements Base {
 
-    public enum COMCHECK_STATUS {
-        RUNNING,
-        EXPIRED,
-        FINISHED
-    }
+  public enum COMCHECK_STATUS {
+    RUNNING,
+    EXPIRED,
+    FINISHED
+  }
 
-    @Id
-    @Column(name = "comcheck_id")
-    @GeneratedValue(generator = "UUID")
-    @UuidGenerator
-    @JsonProperty("comcheck_id")
-    @NotBlank
-    private String id;
+  @Id
+  @Column(name = "comcheck_id")
+  @GeneratedValue(generator = "UUID")
+  @UuidGenerator
+  @JsonProperty("comcheck_id")
+  @NotBlank
+  private String id;
 
-    @Column(name = "comcheck_name")
-    @JsonProperty("comcheck_name")
-    private String name;
+  @Column(name = "comcheck_name")
+  @JsonProperty("comcheck_name")
+  private String name;
 
-    @Column(name = "comcheck_start_date")
-    @JsonProperty("comcheck_start_date")
-    @NotNull
-    private Instant start;
+  @Column(name = "comcheck_start_date")
+  @JsonProperty("comcheck_start_date")
+  @NotNull
+  private Instant start;
 
-    @Column(name = "comcheck_end_date")
-    @JsonProperty("comcheck_end_date")
-    @NotNull
-    private Instant end;
+  @Column(name = "comcheck_end_date")
+  @JsonProperty("comcheck_end_date")
+  @NotNull
+  private Instant end;
 
-    @Column(name = "comcheck_state")
-    @JsonProperty("comcheck_state")
-    @Enumerated(EnumType.STRING)
-    private COMCHECK_STATUS state = COMCHECK_STATUS.RUNNING;
+  @Column(name = "comcheck_state")
+  @JsonProperty("comcheck_state")
+  @Enumerated(EnumType.STRING)
+  private COMCHECK_STATUS state = COMCHECK_STATUS.RUNNING;
 
-    @Column(name = "comcheck_subject")
-    @JsonProperty("comcheck_subject")
-    private String subject;
+  @Column(name = "comcheck_subject")
+  @JsonProperty("comcheck_subject")
+  private String subject;
 
-    @Column(name = "comcheck_message")
-    @JsonProperty("comcheck_message")
-    private String message;
+  @Column(name = "comcheck_message")
+  @JsonProperty("comcheck_message")
+  private String message;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comcheck_exercise")
-    @JsonSerialize(using = MonoIdDeserializer.class)
-    @JsonProperty("comcheck_exercise")
-    private Exercise exercise;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "comcheck_exercise")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("comcheck_exercise")
+  private Exercise exercise;
 
-    // CascadeType.ALL is required here because comcheck statuses are embedded
-    @OneToMany(mappedBy = "comcheck", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonSerialize(using = MultiIdListDeserializer.class)
-    @JsonProperty("comcheck_statuses")
-    private List<ComcheckStatus> comcheckStatus = new ArrayList<>();
+  // CascadeType.ALL is required here because comcheck statuses are embedded
+  @OneToMany(mappedBy = "comcheck", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
+  @JsonProperty("comcheck_statuses")
+  private List<ComcheckStatus> comcheckStatus = new ArrayList<>();
 
-    // region transient
-    @JsonProperty("comcheck_users_number")
-    public long getUsersNumber() {
-        return getComcheckStatus().size(); // One status for each user.
-    }
-    // endregion
+  // region transient
+  @JsonProperty("comcheck_users_number")
+  public long getUsersNumber() {
+    return getComcheckStatus().size(); // One status for each user.
+  }
 
-  @Override
-    public boolean isUserHasAccess(User user) {
-        return exercise.isUserHasAccess(user);
-    }
+  // endregion
 
   @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
-        Base base = (Base) o;
-        return id.equals(base.getId());
-    }
+  public boolean isUserHasAccess(User user) {
+    return exercise.isUserHasAccess(user);
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
+    Base base = (Base) o;
+    return id.equals(base.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 }

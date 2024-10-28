@@ -1,15 +1,13 @@
 package io.openbas.rest.exercise.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class ExerciseUpdateTeamsInput {
 
-    @JsonProperty("exercise_teams")
-    private List<String> teamIds = new ArrayList<>();
-
+  @JsonProperty("exercise_teams")
+  private List<String> teamIds = new ArrayList<>();
 }

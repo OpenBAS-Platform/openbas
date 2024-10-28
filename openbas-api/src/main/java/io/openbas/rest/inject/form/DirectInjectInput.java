@@ -5,13 +5,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectorContract;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Setter
 @Getter

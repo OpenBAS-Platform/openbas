@@ -1,5 +1,10 @@
 package io.openbas.rest.team;
 
+import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.database.specification.TeamSpecification.contextual;
+import static io.openbas.database.specification.TeamSpecification.fromExercise;
+import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
+
 import io.openbas.database.model.Team;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.team.output.TeamOutput;
@@ -15,11 +20,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.database.specification.TeamSpecification.contextual;
-import static io.openbas.database.specification.TeamSpecification.fromExercise;
-import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 
 @RequiredArgsConstructor
 @RestController
@@ -44,5 +44,4 @@ public class ExerciseTeamApi extends RestBehavior {
     }
     return this.teamService.teamPagination(searchPaginationInput, teamSpecification);
   }
-
 }

@@ -1,15 +1,14 @@
 package io.openbas.rest.asset.form;
 
+import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
-import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
+import lombok.Data;
 
 @Data
 public abstract class AssetInput {

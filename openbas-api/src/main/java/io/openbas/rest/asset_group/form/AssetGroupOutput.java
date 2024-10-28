@@ -3,10 +3,9 @@ package io.openbas.rest.asset_group.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Filters;
 import jakarta.validation.constraints.NotBlank;
+import java.util.Set;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.Set;
 
 @Builder
 @Data
@@ -31,5 +30,4 @@ public class AssetGroupOutput {
 
   @JsonProperty("asset_group_tags")
   private Set<String> tags;
-
 }

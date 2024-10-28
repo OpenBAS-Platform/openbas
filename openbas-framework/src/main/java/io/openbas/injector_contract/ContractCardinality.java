@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @SuppressWarnings("PackageAccessibility")
 public enum ContractCardinality {
-    @JsonProperty("1")
-    One,
-    @JsonProperty("n")
-    Multiple
+  @JsonProperty("1")
+  One,
+  @JsonProperty("n")
+  Multiple
 }

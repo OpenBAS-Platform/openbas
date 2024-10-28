@@ -9,5 +9,4 @@ public class GrantSpecification {
   public static Specification<Grant> fromName(@NotBlank final Grant.GRANT_TYPE name) {
     return (root, query, cb) -> cb.equal(root.get("name"), name);
   }
-
 }

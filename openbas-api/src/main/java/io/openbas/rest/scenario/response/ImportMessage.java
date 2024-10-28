@@ -1,10 +1,9 @@
 package io.openbas.rest.scenario.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Map;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -15,12 +14,13 @@ public class ImportMessage {
     WARN,
     INFO
   }
+
   public enum ErrorCode {
     NO_POTENTIAL_MATCH_FOUND("no_potential_match_found"),
-    SEVERAL_MATCHES ("several_matches"),
-    ABSOLUTE_TIME_WITHOUT_START_DATE ("absolute_time_without_start_date"),
-    DATE_SET_IN_PAST ("date_set_in_past"),
-    DATE_SET_IN_FUTURE ("date_set_in_future"),
+    SEVERAL_MATCHES("several_matches"),
+    ABSOLUTE_TIME_WITHOUT_START_DATE("absolute_time_without_start_date"),
+    DATE_SET_IN_PAST("date_set_in_past"),
+    DATE_SET_IN_FUTURE("date_set_in_future"),
     NO_TEAM_FOUND("no_team_found"),
     EXPECTATION_SCORE_UNDEFINED("expectation_score_undefined");
 
@@ -50,5 +50,4 @@ public class ImportMessage {
     this.messageLevel = level;
     this.errorCode = errorCode;
   }
-
 }

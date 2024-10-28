@@ -2,7 +2,6 @@ package io.openbas.helper;
 
 import io.openbas.database.model.Inject;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,5 +20,4 @@ public class InjectStatisticsHelper {
     stats.put("total_progress", total > 0 ? (executed * 100 / total) : 0);
     return stats;
   }
-
 }

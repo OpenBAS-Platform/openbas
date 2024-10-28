@@ -9,7 +9,8 @@ public class ContractPayload extends ContractCardinalityElement {
     super(key, label, cardinality);
   }
 
-  public static ContractPayload payloadField(String key, String label, ContractCardinality cardinality) {
+  public static ContractPayload payloadField(
+      String key, String label, ContractCardinality cardinality) {
     return new ContractPayload(key, label, cardinality);
   }
 

@@ -8,13 +8,12 @@ import lombok.Setter;
 @Getter
 public class PolicyInput {
 
-    @JsonProperty("platform_login_message")
-    private String loginMessage;
+  @JsonProperty("platform_login_message")
+  private String loginMessage;
 
-    @JsonProperty("platform_consent_message")
-    private String consentMessage;
+  @JsonProperty("platform_consent_message")
+  private String consentMessage;
 
-    @JsonProperty("platform_consent_confirm_text")
-    private String consentConfirmText;
-
+  @JsonProperty("platform_consent_confirm_text")
+  private String consentConfirmText;
 }

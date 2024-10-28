@@ -4,9 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-
 import java.util.*;
+import lombok.Data;
 
 @Data
 public class InjectorContractOutput {
@@ -54,7 +53,8 @@ public class InjectorContractOutput {
     this.payloadType = Optional.ofNullable(collectorType).orElse(payloadType);
     this.injectorType = injectorType;
 
-    this.attackPatterns = attackPatterns != null ? new ArrayList<>(Arrays.asList(attackPatterns)) : new ArrayList<>();
+    this.attackPatterns =
+        attackPatterns != null ? new ArrayList<>(Arrays.asList(attackPatterns)) : new ArrayList<>();
     this.arch = arch;
   }
 }

@@ -1,5 +1,9 @@
 package io.openbas.service;
 
+import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
+import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.config.OpenBASOidcUser;
 import io.openbas.database.model.*;
@@ -12,6 +16,8 @@ import io.openbas.injectors.email.model.EmailContent;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,41 +26,26 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-
-import java.util.Collections;
-import java.util.List;
-
-import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
-import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class InjectTestStatusServiceTest {
 
-  @Autowired
-  private InjectRepository injectRepository;
+  @Autowired private InjectRepository injectRepository;
 
-  @Autowired
-  private ExerciseRepository exerciseRepository;
+  @Autowired private ExerciseRepository exerciseRepository;
 
-  @Autowired
-  private InjectorContractRepository injectorContractRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
 
-  @Autowired
-  private InjectTestStatusService injectTestStatusService;
+  @Autowired private InjectTestStatusService injectTestStatusService;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Resource
-  protected ObjectMapper mapper;
+  @Resource protected ObjectMapper mapper;
 
   private Inject INJECT1;
   private Inject INJECT2;
   private Inject INJECT3;
   private Exercise EXERCISE;
-
 
   @BeforeAll
   void beforeAll() {
@@ -66,7 +57,8 @@ public class InjectTestStatusServiceTest {
 
     Inject inject = new Inject();
     inject.setTitle("test");
-    inject.setInjectorContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+    inject.setInjectorContract(
+        this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
     inject.setExercise(EXERCISE);
     inject.setDependsDuration(0L);
     EmailContent content = new EmailContent();
@@ -77,7 +69,8 @@ public class InjectTestStatusServiceTest {
 
     Inject inject2 = new Inject();
     inject2.setTitle("test2");
-    inject2.setInjectorContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+    inject2.setInjectorContract(
+        this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
     inject2.setExercise(EXERCISE);
     inject2.setDependsDuration(0L);
     EmailContent content2 = new EmailContent();
@@ -88,7 +81,8 @@ public class InjectTestStatusServiceTest {
 
     Inject inject3 = new Inject();
     inject3.setTitle("test3");
-    inject3.setInjectorContract(this.injectorContractRepository.findById(CHANNEL_PUBLISH).orElseThrow());
+    inject3.setInjectorContract(
+        this.injectorContractRepository.findById(CHANNEL_PUBLISH).orElseThrow());
     inject3.setExercise(EXERCISE);
     inject3.setDependsDuration(0L);
     ChannelContent content3 = new ChannelContent();
@@ -112,7 +106,8 @@ public class InjectTestStatusServiceTest {
     // Mock the UserDetails with a custom ID
     User user = this.userRepository.findByEmailIgnoreCase("admin@openbas.io").orElseThrow();
     OpenBASOidcUser oidcUser = new OpenBASOidcUser(user);
-    Authentication auth = new UsernamePasswordAuthenticationToken(oidcUser, "password", Collections.EMPTY_LIST);
+    Authentication auth =
+        new UsernamePasswordAuthenticationToken(oidcUser, "password", Collections.EMPTY_LIST);
     SecurityContextHolder.getContext().setAuthentication(auth);
 
     // -- EXECUTE --
@@ -129,24 +124,27 @@ public class InjectTestStatusServiceTest {
     // Mock the UserDetails with a custom ID
     User user = this.userRepository.findByEmailIgnoreCase("admin@openbas.io").orElseThrow();
     OpenBASOidcUser oidcUser = new OpenBASOidcUser(user);
-    Authentication auth = new UsernamePasswordAuthenticationToken(oidcUser, "password", Collections.EMPTY_LIST);
+    Authentication auth =
+        new UsernamePasswordAuthenticationToken(oidcUser, "password", Collections.EMPTY_LIST);
     SecurityContextHolder.getContext().setAuthentication(auth);
 
     // -- EXECUTE --
-    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-      injectTestStatusService.testInject(INJECT3.getId());
-    });
+    Exception exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+              injectTestStatusService.testInject(INJECT3.getId());
+            });
 
     String expectedMessage = "Inject: " + INJECT3.getId() + " is not testable";
     String actualMessage = exception.getMessage();
     assertTrue(actualMessage.contains(expectedMessage));
 
     // -- CLEAN --
-    SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
-        .size(1110)
-        .build();
-    Page<InjectTestStatus> tests = injectTestStatusService.findAllInjectTestsByExerciseId(EXERCISE.getId(),
-        searchPaginationInput);
+    SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().size(1110).build();
+    Page<InjectTestStatus> tests =
+        injectTestStatusService.findAllInjectTestsByExerciseId(
+            EXERCISE.getId(), searchPaginationInput);
     tests.stream().forEach(test -> this.injectTestStatusService.deleteInjectTest(test.getId()));
   }
 
@@ -156,11 +154,13 @@ public class InjectTestStatusServiceTest {
     // Mock the UserDetails with a custom ID
     User user = this.userRepository.findByEmailIgnoreCase("admin@openbas.io").orElseThrow();
     OpenBASOidcUser oidcUser = new OpenBASOidcUser(user);
-    Authentication auth = new UsernamePasswordAuthenticationToken(oidcUser, "password", Collections.EMPTY_LIST);
+    Authentication auth =
+        new UsernamePasswordAuthenticationToken(oidcUser, "password", Collections.EMPTY_LIST);
     SecurityContextHolder.getContext().setAuthentication(auth);
 
     // -- EXECUTE --
-    List<InjectTestStatus> tests = injectTestStatusService.bulkTestInjects(List.of(INJECT1.getId(), INJECT2.getId()));
+    List<InjectTestStatus> tests =
+        injectTestStatusService.bulkTestInjects(List.of(INJECT1.getId(), INJECT2.getId()));
     assertEquals(2, tests.size());
 
     // -- CLEAN --
@@ -173,24 +173,27 @@ public class InjectTestStatusServiceTest {
     // Mock the UserDetails with a custom ID
     User user = this.userRepository.findByEmailIgnoreCase("admin@openbas.io").orElseThrow();
     OpenBASOidcUser oidcUser = new OpenBASOidcUser(user);
-    Authentication auth = new UsernamePasswordAuthenticationToken(oidcUser, "password", Collections.EMPTY_LIST);
+    Authentication auth =
+        new UsernamePasswordAuthenticationToken(oidcUser, "password", Collections.EMPTY_LIST);
     SecurityContextHolder.getContext().setAuthentication(auth);
 
     // -- EXECUTE --
-    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-      injectTestStatusService.bulkTestInjects(Collections.singletonList(INJECT3.getId()));
-    });
+    Exception exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+              injectTestStatusService.bulkTestInjects(Collections.singletonList(INJECT3.getId()));
+            });
 
     String expectedMessage = "No inject ID is testable";
     String actualMessage = exception.getMessage();
     assertTrue(actualMessage.contains(expectedMessage));
 
     // -- CLEAN --
-    SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
-        .size(1110)
-        .build();
-    Page<InjectTestStatus> tests = injectTestStatusService.findAllInjectTestsByExerciseId(EXERCISE.getId(),
-        searchPaginationInput);
+    SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().size(1110).build();
+    Page<InjectTestStatus> tests =
+        injectTestStatusService.findAllInjectTestsByExerciseId(
+            EXERCISE.getId(), searchPaginationInput);
     tests.stream().forEach(test -> this.injectTestStatusService.deleteInjectTest(test.getId()));
   }
 
@@ -200,19 +203,19 @@ public class InjectTestStatusServiceTest {
     // Mock the UserDetails with a custom ID
     User user = this.userRepository.findByEmailIgnoreCase("admin@openbas.io").orElseThrow();
     OpenBASOidcUser oidcUser = new OpenBASOidcUser(user);
-    Authentication auth = new UsernamePasswordAuthenticationToken(oidcUser, "password", Collections.EMPTY_LIST);
+    Authentication auth =
+        new UsernamePasswordAuthenticationToken(oidcUser, "password", Collections.EMPTY_LIST);
     SecurityContextHolder.getContext().setAuthentication(auth);
 
     // -- PREPARE --
     injectTestStatusService.bulkTestInjects(List.of(INJECT1.getId(), INJECT2.getId()));
 
-    SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
-        .size(1110)
-        .build();
+    SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().size(1110).build();
 
     // -- EXECUTE --
-    Page<InjectTestStatus> tests = injectTestStatusService.findAllInjectTestsByExerciseId(EXERCISE.getId(),
-        searchPaginationInput);
+    Page<InjectTestStatus> tests =
+        injectTestStatusService.findAllInjectTestsByExerciseId(
+            EXERCISE.getId(), searchPaginationInput);
     assertEquals(2, tests.stream().toList().size());
 
     // -- CLEAN --
@@ -225,7 +228,8 @@ public class InjectTestStatusServiceTest {
     // Mock the UserDetails with a custom ID
     User user = this.userRepository.findByEmailIgnoreCase("admin@openbas.io").orElseThrow();
     OpenBASOidcUser oidcUser = new OpenBASOidcUser(user);
-    Authentication auth = new UsernamePasswordAuthenticationToken(oidcUser, "password", Collections.EMPTY_LIST);
+    Authentication auth =
+        new UsernamePasswordAuthenticationToken(oidcUser, "password", Collections.EMPTY_LIST);
     SecurityContextHolder.getContext().setAuthentication(auth);
 
     // -- PREPARE --
@@ -245,7 +249,8 @@ public class InjectTestStatusServiceTest {
     // Mock the UserDetails with a custom ID
     User user = this.userRepository.findByEmailIgnoreCase("admin@openbas.io").orElseThrow();
     OpenBASOidcUser oidcUser = new OpenBASOidcUser(user);
-    Authentication auth = new UsernamePasswordAuthenticationToken(oidcUser, "password", Collections.EMPTY_LIST);
+    Authentication auth =
+        new UsernamePasswordAuthenticationToken(oidcUser, "password", Collections.EMPTY_LIST);
     SecurityContextHolder.getContext().setAuthentication(auth);
 
     // -- PREPARE --
@@ -254,12 +259,10 @@ public class InjectTestStatusServiceTest {
     // --EXECUTE --
     injectTestStatusService.deleteInjectTest(test.getId());
 
-    SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
-        .size(1110)
-        .build();
-    Page<InjectTestStatus> tests = injectTestStatusService.findAllInjectTestsByExerciseId(EXERCISE.getId(),
-        searchPaginationInput);
+    SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().size(1110).build();
+    Page<InjectTestStatus> tests =
+        injectTestStatusService.findAllInjectTestsByExerciseId(
+            EXERCISE.getId(), searchPaginationInput);
     assertEquals(0, tests.stream().toList().size());
   }
-
 }

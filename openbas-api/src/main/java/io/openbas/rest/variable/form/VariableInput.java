@@ -1,19 +1,18 @@
 package io.openbas.rest.variable.form;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-
-import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
+import lombok.Data;
 
 @Data
 public class VariableInput {
 
   @JsonProperty("variable_key")
   @NotBlank(message = MANDATORY_MESSAGE)
-  @Pattern(regexp="^[a-z_]+$")
+  @Pattern(regexp = "^[a-z_]+$")
   private String key;
 
   @JsonProperty("variable_value")
@@ -21,5 +20,4 @@ public class VariableInput {
 
   @JsonProperty("variable_description")
   private String description;
-
 }

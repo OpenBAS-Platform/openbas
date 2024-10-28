@@ -35,9 +35,7 @@ public class Executable extends Payload {
   @NotNull
   private Endpoint.PLATFORM_ARCH executableArch;
 
-  public Executable() {
-
-  }
+  public Executable() {}
 
   public Executable(String id, String type, String name) {
     super(id, type, name);

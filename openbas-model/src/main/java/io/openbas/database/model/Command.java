@@ -35,9 +35,7 @@ public class Command extends Payload {
   @NotNull
   private String content;
 
-  public Command() {
-
-  }
+  public Command() {}
 
   public Command(String id, String type, String name) {
     super(id, type, name);

@@ -1,5 +1,15 @@
 package io.openbas.rest;
 
+import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
+import static io.openbas.utils.JsonUtils.asJsonString;
+import static io.openbas.utils.fixtures.ExerciseFixture.getExercise;
+import static io.openbas.utils.fixtures.ExerciseLessonsCategoryFixture.getLessonsCategory;
+import static io.openbas.utils.fixtures.TeamFixture.getTeam;
+import static io.openbas.utils.fixtures.UserFixture.getUser;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.LessonsCategory;
@@ -13,6 +23,7 @@ import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.lessons.form.LessonsSendInput;
 import io.openbas.service.MailingService;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
+import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,19 +31,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.List;
-
-import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
-import static io.openbas.utils.JsonUtils.asJsonString;
-import static io.openbas.utils.fixtures.ExerciseFixture.getExercise;
-import static io.openbas.utils.fixtures.ExerciseLessonsCategoryFixture.getLessonsCategory;
-import static io.openbas.utils.fixtures.TeamFixture.getTeam;
-import static io.openbas.utils.fixtures.UserFixture.getUser;
-import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -44,20 +42,13 @@ public class ExerciseLessonsApiTest extends IntegrationTest {
   static Team TEAM;
   static User USER;
 
-  @Autowired
-  private MockMvc mvc;
-  @Autowired
-  private ExerciseService exerciseService;
-  @Autowired
-  private ExerciseRepository exerciseRepository;
-  @Autowired
-  private LessonsCategoryRepository lessonsCategoryRepository;
-  @SpyBean
-  private MailingService mailingService;
-  @Autowired
-  private TeamRepository teamRepository;
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private MockMvc mvc;
+  @Autowired private ExerciseService exerciseService;
+  @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
+  @SpyBean private MailingService mailingService;
+  @Autowired private TeamRepository teamRepository;
+  @Autowired private UserRepository userRepository;
 
   @BeforeAll
   void beforeAll() {
@@ -71,7 +62,6 @@ public class ExerciseLessonsApiTest extends IntegrationTest {
     this.teamRepository.delete(TEAM);
     this.userRepository.delete(USER);
   }
-
 
   private LessonsCategory getLessonCategory() {
     USER = this.userRepository.save(getUser());
@@ -94,16 +84,19 @@ public class ExerciseLessonsApiTest extends IntegrationTest {
     User user = userRepository.findById(LESSONCATEGORY.getUsers().getFirst()).orElseThrow();
 
     // -- EXECUTE --
-    mvc.perform(post(EXERCISE_URI + "/" + EXERCISE.getId() + "/lessons_send")
-            .content(asJsonString(lessonsSendInput))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
+    mvc.perform(
+            post(EXERCISE_URI + "/" + EXERCISE.getId() + "/lessons_send")
+                .content(asJsonString(lessonsSendInput))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().is2xxSuccessful());
 
     // -- ASSERT --
-    verify(mailingService).sendEmail(lessonSubject, lessonBody, List.of(user),
-        exerciseRepository.findById(EXERCISE.getId()));
+    verify(mailingService)
+        .sendEmail(
+            lessonSubject,
+            lessonBody,
+            List.of(user),
+            exerciseRepository.findById(EXERCISE.getId()));
   }
-
-
 }

@@ -1,8 +1,7 @@
 package io.openbas.injectors.caldera.model;
 
-import lombok.Data;
-
 import java.time.Instant;
+import lombok.Data;
 
 @Data
 public class ResultStatus {
@@ -12,5 +11,4 @@ public class ResultStatus {
   private boolean fail;
   private Instant finish;
   private String content;
-
 }

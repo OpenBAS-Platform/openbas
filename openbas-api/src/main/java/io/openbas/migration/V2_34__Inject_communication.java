@@ -1,19 +1,19 @@
 package io.openbas.migration;
 
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
-import java.sql.Statement;
-
 @Component
 public class V2_34__Inject_communication extends BaseJavaMigration {
 
-    @Override
-    public void migrate(Context context) throws Exception {
-        Statement select = context.getConnection().createStatement();
-        // Injects
-        select.execute("""
+  @Override
+  public void migrate(Context context) throws Exception {
+    Statement select = context.getConnection().createStatement();
+    // Injects
+    select.execute(
+        """
                             create table communications
                             (
                                 communication_id varchar(255) not null constraint communications_pkey primary key,
@@ -28,8 +28,9 @@ public class V2_34__Inject_communication extends BaseJavaMigration {
                             create index idx_communication_subject on communications (communication_subject);
                             create index idx_communications on communications (communication_id);
                 """);
-        // Create communications_users
-        select.execute("""
+    // Create communications_users
+    select.execute(
+        """
                 CREATE TABLE communications_users (
                     communication_id varchar(255) not null constraint communication_id_fk references communications on delete cascade,
                     user_id varchar(255) not null constraint user_id_fk references users on delete cascade,
@@ -38,5 +39,5 @@ public class V2_34__Inject_communication extends BaseJavaMigration {
                 CREATE INDEX idx_communications_users_communication on communications_users (communication_id);
                 CREATE INDEX idx_communications_users_user on communications_users (user_id);
                 """);
-    }
+  }
 }

@@ -10,11 +10,8 @@ import io.openbas.injectors.ovh.OvhSmsContract;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import lombok.Data;
 
 @Data
 public class InjectOutput {
@@ -70,7 +67,8 @@ public class InjectOutput {
 
   @JsonProperty("inject_testable")
   public boolean canBeTested() {
-    return EmailContract.TYPE.equals(this.getInjectType()) || OvhSmsContract.TYPE.equals(this.getInjectType());
+    return EmailContract.TYPE.equals(this.getInjectType())
+        || OvhSmsContract.TYPE.equals(this.getInjectType());
   }
 
   public InjectOutput(
@@ -100,16 +98,12 @@ public class InjectOutput {
 
     this.teams = teams != null ? new ArrayList<>(Arrays.asList(teams)) : new ArrayList<>();
     this.assets = assets != null ? new ArrayList<>(Arrays.asList(assets)) : new ArrayList<>();
-    this.assetGroups = assetGroups != null ? new ArrayList<>(Arrays.asList(assetGroups)) : new ArrayList<>();
+    this.assetGroups =
+        assetGroups != null ? new ArrayList<>(Arrays.asList(assetGroups)) : new ArrayList<>();
 
-    this.isReady = InjectModelHelper.isReady(
-        injectorContract,
-        content,
-        allTeams,
-        this.teams,
-        this.assets,
-        this.assetGroups
-    );
+    this.isReady =
+        InjectModelHelper.isReady(
+            injectorContract, content, allTeams, this.teams, this.assets, this.assetGroups);
     this.injectType = injectType;
     this.teams = teams != null ? new ArrayList<>(Arrays.asList(teams)) : new ArrayList<>();
     this.content = content;
@@ -117,6 +111,5 @@ public class InjectOutput {
     if (injectDependency != null) {
       this.dependsOn = List.of(injectDependency);
     }
-
   }
 }

@@ -1,21 +1,5 @@
 package io.openbas.rest.asset_group;
 
-import io.openbas.IntegrationTest;
-import io.openbas.database.model.AssetGroup;
-import io.openbas.database.repository.AssetGroupRepository;
-import io.openbas.utils.fixtures.AssetGroupFixture;
-import io.openbas.utils.fixtures.PaginationFixture;
-import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.pagination.SearchPaginationInput;
-import io.openbas.utils.pagination.SortField;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static io.openbas.database.model.Filters.FilterOperator.contains;
 import static io.openbas.database.model.Filters.FilterOperator.not_contains;
 import static io.openbas.rest.asset_group.AssetGroupApi.ASSET_GROUP_URI;
@@ -26,14 +10,27 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import io.openbas.IntegrationTest;
+import io.openbas.database.model.AssetGroup;
+import io.openbas.database.repository.AssetGroupRepository;
+import io.openbas.utils.fixtures.AssetGroupFixture;
+import io.openbas.utils.fixtures.PaginationFixture;
+import io.openbas.utils.mockUser.WithMockAdminUser;
+import io.openbas.utils.pagination.SearchPaginationInput;
+import io.openbas.utils.pagination.SortField;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
 @TestInstance(PER_CLASS)
 public class AssetGroupApiSearchTest extends IntegrationTest {
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
-  @Autowired
-  private AssetGroupRepository assetGroupRepository;
+  @Autowired private AssetGroupRepository assetGroupRepository;
 
   private static final List<String> ASSET_GROUP_IDS = new ArrayList<>();
 
@@ -66,11 +63,13 @@ public class AssetGroupApiSearchTest extends IntegrationTest {
       @Test
       @DisplayName("Retrieving first page of asset groups by text search")
       void given_working_search_input_should_return_a_page_of_asset_groups() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().textSearch("Asset Group").build();
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.getDefault().textSearch("Asset Group").build();
 
-        mvc.perform(post(ASSET_GROUP_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(ASSET_GROUP_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(2));
       }
@@ -78,11 +77,13 @@ public class AssetGroupApiSearchTest extends IntegrationTest {
       @Test
       @DisplayName("Not retrieving first page of asset groups by text search")
       void given_not_working_search_input_should_return_a_page_of_asset_groups() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().textSearch("wrong").build();
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.getDefault().textSearch("wrong").build();
 
-        mvc.perform(post(ASSET_GROUP_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(ASSET_GROUP_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(0));
       }
@@ -94,14 +95,17 @@ public class AssetGroupApiSearchTest extends IntegrationTest {
 
       @Test
       @DisplayName("Sorting page of asset groups by name asc")
-      void given_sorting_input_by_name_should_return_a_page_of_asset_groups_sort_by_name_asc() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
-            .sorts(List.of(SortField.builder().property("asset_group_name").build()))
-            .build();
+      void given_sorting_input_by_name_should_return_a_page_of_asset_groups_sort_by_name_asc()
+          throws Exception {
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.getDefault()
+                .sorts(List.of(SortField.builder().property("asset_group_name").build()))
+                .build();
 
-        mvc.perform(post(ASSET_GROUP_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(ASSET_GROUP_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.content.[0].asset_group_name").value("Asset Group 1"))
             .andExpect(jsonPath("$.content.[1].asset_group_name").value("Asset Group 2"));
@@ -109,14 +113,19 @@ public class AssetGroupApiSearchTest extends IntegrationTest {
 
       @Test
       @DisplayName("Sorting page of asset groups by name desc")
-      void given_sorting_input_by_name_should_return_a_page_of_asset_groups_sort_by_name_desc() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
-            .sorts(List.of(SortField.builder().property("asset_group_name").direction("desc").build()))
-            .build();
+      void given_sorting_input_by_name_should_return_a_page_of_asset_groups_sort_by_name_desc()
+          throws Exception {
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.getDefault()
+                .sorts(
+                    List.of(
+                        SortField.builder().property("asset_group_name").direction("desc").build()))
+                .build();
 
-        mvc.perform(post(ASSET_GROUP_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(ASSET_GROUP_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.content.[0].asset_group_name").value("Asset Group 2"))
             .andExpect(jsonPath("$.content.[1].asset_group_name").value("Asset Group 1"));
@@ -129,28 +138,31 @@ public class AssetGroupApiSearchTest extends IntegrationTest {
 
       @Test
       @DisplayName("Filtering page of asset groups by name")
-      void given_filter_input_by_name_should_return_a_page_of_asset_groups_filter_by_name() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.simpleFilter(
-            "asset_group_name", "Group", contains
-        );
+      void given_filter_input_by_name_should_return_a_page_of_asset_groups_filter_by_name()
+          throws Exception {
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.simpleFilter("asset_group_name", "Group", contains);
 
-        mvc.perform(post(ASSET_GROUP_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(ASSET_GROUP_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(2));
       }
 
       @Test
       @DisplayName("Filtering page of asset groups by description")
-      void given_filter_input_by_sttaus_should_return_a_page_of_asset_groups_filter_by_description() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.simpleFilter(
-            "asset_group_description", valueOf("wrong"), not_contains
-        );
+      void given_filter_input_by_sttaus_should_return_a_page_of_asset_groups_filter_by_description()
+          throws Exception {
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.simpleFilter(
+                "asset_group_description", valueOf("wrong"), not_contains);
 
-        mvc.perform(post(ASSET_GROUP_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(ASSET_GROUP_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(2));
       }

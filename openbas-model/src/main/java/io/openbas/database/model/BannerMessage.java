@@ -3,8 +3,14 @@ package io.openbas.database.model;
 public class BannerMessage {
 
   public enum BANNER_KEYS {
-    IMAP_UNAVAILABLE("imap_unavailable", BANNER_LEVEL.ERROR, "IMAP service is not responding, your injectors may be impacted."),
-    CALDERA_UNAVAILABLE("caldera_unavailable", BANNER_LEVEL.ERROR, "Executor Caldera is not responding, your exercises may be impacted.");
+    IMAP_UNAVAILABLE(
+        "imap_unavailable",
+        BANNER_LEVEL.ERROR,
+        "IMAP service is not responding, your injectors may be impacted."),
+    CALDERA_UNAVAILABLE(
+        "caldera_unavailable",
+        BANNER_LEVEL.ERROR,
+        "Executor Caldera is not responding, your exercises may be impacted.");
 
     private final String key;
     private final BANNER_LEVEL level;
@@ -36,5 +42,4 @@ public class BannerMessage {
     ERROR,
     FATAL
   }
-
 }

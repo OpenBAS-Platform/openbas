@@ -1,16 +1,15 @@
 package io.openbas.rest.exercise.exports;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -59,9 +58,8 @@ public class ExerciseFileExport {
   @JsonProperty("exercise_lessons_questions")
   private List<LessonsQuestion> lessonsQuestions = new ArrayList<>();
 
-  @JsonIgnore
-  public static final String EXERCISE_VARIABLES = "exercise_variables";
+  @JsonIgnore public static final String EXERCISE_VARIABLES = "exercise_variables";
+
   @JsonProperty(EXERCISE_VARIABLES)
   private List<Variable> variables;
-
 }

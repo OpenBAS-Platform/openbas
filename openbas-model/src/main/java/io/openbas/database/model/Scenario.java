@@ -1,5 +1,11 @@
 package io.openbas.database.model;
 
+import static io.openbas.database.model.Grant.GRANT_TYPE.OBSERVER;
+import static io.openbas.database.model.Grant.GRANT_TYPE.PLANNER;
+import static io.openbas.helper.UserHelper.getUsersByType;
+import static java.time.Instant.now;
+import static lombok.AccessLevel.NONE;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -14,31 +20,20 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
+import java.util.*;
 import lombok.Data;
 import lombok.Getter;
 import org.hibernate.annotations.UuidGenerator;
-
-import java.time.Instant;
-import java.util.*;
-
-import static io.openbas.database.model.Grant.GRANT_TYPE.OBSERVER;
-import static io.openbas.database.model.Grant.GRANT_TYPE.PLANNER;
-import static io.openbas.helper.UserHelper.getUsersByType;
-import static java.time.Instant.now;
-import static lombok.AccessLevel.NONE;
 
 @Data
 @Entity
 @Table(name = "scenarios")
 @EntityListeners(ModelBaseListener.class)
 @NamedEntityGraphs({
-    @NamedEntityGraph(
-        name = "Scenario.tags-injects",
-        attributeNodes = {
-            @NamedAttributeNode("tags"),
-            @NamedAttributeNode("injects")
-        }
-    )
+  @NamedEntityGraph(
+      name = "Scenario.tags-injects",
+      attributeNodes = {@NamedAttributeNode("tags"), @NamedAttributeNode("injects")})
 })
 public class Scenario implements Base {
 
@@ -129,7 +124,9 @@ public class Scenario implements Base {
   private String from;
 
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "scenario_mails_reply_to", joinColumns = @JoinColumn(name = "scenario_id"))
+  @CollectionTable(
+      name = "scenario_mails_reply_to",
+      joinColumns = @JoinColumn(name = "scenario_id"))
   @Column(name = "scenario_reply_to", nullable = false)
   @JsonProperty("scenario_mails_reply_to")
   private List<String> replyTos = new ArrayList<>();
@@ -160,14 +157,19 @@ public class Scenario implements Base {
   private Set<Inject> injects = new HashSet<>();
 
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "scenarios_teams",
+  @JoinTable(
+      name = "scenarios_teams",
       joinColumns = @JoinColumn(name = "scenario_id"),
       inverseJoinColumns = @JoinColumn(name = "team_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("scenario_teams")
   private List<Team> teams = new ArrayList<>();
 
-  @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "scenario",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   @JsonProperty("scenario_teams_users")
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<ScenarioTeamUser> teamUsers = new ArrayList<>();
@@ -177,7 +179,8 @@ public class Scenario implements Base {
   private List<Objective> objectives = new ArrayList<>();
 
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "scenarios_tags",
+  @JoinTable(
+      name = "scenarios_tags",
       joinColumns = @JoinColumn(name = "scenario_id"),
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
@@ -186,7 +189,8 @@ public class Scenario implements Base {
   private Set<Tag> tags = new HashSet<>();
 
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "scenarios_documents",
+  @JoinTable(
+      name = "scenarios_documents",
       joinColumns = @JoinColumn(name = "scenario_id"),
       inverseJoinColumns = @JoinColumn(name = "document_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
@@ -204,7 +208,8 @@ public class Scenario implements Base {
   private List<LessonsCategory> lessonsCategories = new ArrayList<>();
 
   @OneToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "scenarios_exercises",
+  @JoinTable(
+      name = "scenarios_exercises",
       joinColumns = @JoinColumn(name = "scenario_id"),
       inverseJoinColumns = @JoinColumn(name = "exercise_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
@@ -256,10 +261,7 @@ public class Scenario implements Base {
   @JsonProperty("scenario_users")
   @JsonSerialize(using = MultiIdListDeserializer.class)
   public List<User> getUsers() {
-    return getTeamUsers().stream()
-        .map(ScenarioTeamUser::getUser)
-        .distinct()
-        .toList();
+    return getTeamUsers().stream().map(ScenarioTeamUser::getUser).distinct().toList();
   }
 
   @JsonProperty("scenario_communications_number")
@@ -270,9 +272,7 @@ public class Scenario implements Base {
   // -- CHANNELS --
 
   public List<Article> getArticlesForChannel(Channel channel) {
-    return this.articles.stream()
-        .filter(article -> article.getChannel().equals(channel))
-        .toList();
+    return this.articles.stream().filter(article -> article.getChannel().equals(channel)).toList();
   }
 
   // -- PLATFORMS --
@@ -280,9 +280,8 @@ public class Scenario implements Base {
   @Queryable(filterable = true, path = "injects.injectorContract.platforms", clazz = String[].class)
   public List<PLATFORM_TYPE> getPlatforms() {
     return getInjects().stream()
-        .flatMap(inject -> inject.getInjectorContract()
-            .map(InjectorContract::getPlatforms)
-            .stream())
+        .flatMap(
+            inject -> inject.getInjectorContract().map(InjectorContract::getPlatforms).stream())
         .flatMap(Arrays::stream)
         .filter(Objects::nonNull)
         .distinct()
@@ -291,14 +290,17 @@ public class Scenario implements Base {
 
   // -- KILL CHAIN PHASES --
   @JsonProperty("scenario_kill_chain_phases")
-  @Queryable(filterable = true, dynamicValues = true, path = "injects.injectorContract.attackPatterns.killChainPhases.id")
+  @Queryable(
+      filterable = true,
+      dynamicValues = true,
+      path = "injects.injectorContract.attackPatterns.killChainPhases.id")
   public List<KillChainPhase> getKillChainPhases() {
     return getInjects().stream()
-        .flatMap(inject -> inject.getInjectorContract()
-            .map(InjectorContract::getAttackPatterns)
-            .stream()
-            .flatMap(Collection::stream)
-            .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream()))
+        .flatMap(
+            inject ->
+                inject.getInjectorContract().map(InjectorContract::getAttackPatterns).stream()
+                    .flatMap(Collection::stream)
+                    .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream()))
         .distinct()
         .toList();
   }

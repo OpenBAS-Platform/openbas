@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V2_77__Asset_group_dynamic_filter extends BaseJavaMigration {
@@ -15,7 +14,8 @@ public class V2_77__Asset_group_dynamic_filter extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     // Migration the data
-    select.executeUpdate("""
+    select.executeUpdate(
+        """
         ALTER TABLE asset_groups ADD COLUMN asset_group_dynamic_filter json;
       """);
   }

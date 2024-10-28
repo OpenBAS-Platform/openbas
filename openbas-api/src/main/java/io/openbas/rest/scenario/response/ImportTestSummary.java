@@ -5,10 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Inject;
 import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.utils.AtomicTestingMapper;
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class ImportTestSummary {
@@ -19,12 +18,10 @@ public class ImportTestSummary {
   @JsonProperty("total_injects")
   public int totalNumberOfInjects;
 
-  @JsonIgnore
-  private List<Inject> injects = new ArrayList<>();
+  @JsonIgnore private List<Inject> injects = new ArrayList<>();
 
   @JsonProperty("injects")
   public List<InjectResultDTO> getInjectResults() {
     return injects.stream().map(AtomicTestingMapper::toDtoWithTargetResults).toList();
   }
-
 }

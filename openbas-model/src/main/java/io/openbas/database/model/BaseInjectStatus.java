@@ -6,14 +6,13 @@ import io.openbas.annotation.Queryable;
 import io.openbas.database.converter.InjectStatusExecutionConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 @Setter
 @Getter
@@ -54,6 +53,7 @@ public abstract class BaseInjectStatus implements Base {
   @Column(name = "tracking_total_execution_time")
   @JsonProperty("tracking_total_execution_time")
   private Long trackingTotalExecutionTime;
+
   // endregion
 
   // region count
@@ -68,6 +68,7 @@ public abstract class BaseInjectStatus implements Base {
   @Column(name = "tracking_total_success")
   @JsonProperty("tracking_total_success")
   private Integer trackingTotalSuccess;
+
   // endregion
 
   @Queryable(searchable = true, path = "inject.title")
@@ -102,5 +103,4 @@ public abstract class BaseInjectStatus implements Base {
   public int hashCode() {
     return Objects.hash(id);
   }
-
 }

@@ -7,8 +7,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class LessonsInput {
-    
-    @JsonProperty("lessons_anonymized")
-    private boolean lessonsAnonymized;
 
+  @JsonProperty("lessons_anonymized")
+  private boolean lessonsAnonymized;
 }

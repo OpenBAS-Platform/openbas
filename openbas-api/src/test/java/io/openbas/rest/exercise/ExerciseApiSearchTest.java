@@ -1,21 +1,5 @@
 package io.openbas.rest.exercise;
 
-import io.openbas.IntegrationTest;
-import io.openbas.database.model.Exercise;
-import io.openbas.database.repository.ExerciseRepository;
-import io.openbas.utils.fixtures.ExerciseFixture;
-import io.openbas.utils.fixtures.PaginationFixture;
-import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.pagination.SearchPaginationInput;
-import io.openbas.utils.pagination.SortField;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static io.openbas.database.model.ExerciseStatus.SCHEDULED;
 import static io.openbas.database.model.Filters.FilterOperator.contains;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
@@ -26,14 +10,27 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import io.openbas.IntegrationTest;
+import io.openbas.database.model.Exercise;
+import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.utils.fixtures.ExerciseFixture;
+import io.openbas.utils.fixtures.PaginationFixture;
+import io.openbas.utils.mockUser.WithMockAdminUser;
+import io.openbas.utils.pagination.SearchPaginationInput;
+import io.openbas.utils.pagination.SortField;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
 @TestInstance(PER_CLASS)
 public class ExerciseApiSearchTest extends IntegrationTest {
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
-  @Autowired
-  private ExerciseRepository exerciseRepository;
+  @Autowired private ExerciseRepository exerciseRepository;
 
   private static final List<String> EXERCISE_IDS = new ArrayList<>();
 
@@ -66,11 +63,13 @@ public class ExerciseApiSearchTest extends IntegrationTest {
       @Test
       @DisplayName("Retrieving first page of exercises by text search")
       void given_working_search_input_should_return_a_page_of_exercises() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().textSearch("Crisis").build();
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.getDefault().textSearch("Crisis").build();
 
-        mvc.perform(post(EXERCISE_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(EXERCISE_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(1));
       }
@@ -78,11 +77,13 @@ public class ExerciseApiSearchTest extends IntegrationTest {
       @Test
       @DisplayName("Not retrieving first page of exercises by text search")
       void given_not_working_search_input_should_return_a_page_of_exercises() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().textSearch("wrong").build();
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.getDefault().textSearch("wrong").build();
 
-        mvc.perform(post(EXERCISE_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(EXERCISE_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(0));
       }
@@ -94,14 +95,17 @@ public class ExerciseApiSearchTest extends IntegrationTest {
 
       @Test
       @DisplayName("Sorting page of exercises by name")
-      void given_sorting_input_by_name_should_return_a_page_of_exercises_sort_by_name() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
-            .sorts(List.of(SortField.builder().property("exercise_name").build()))
-            .build();
+      void given_sorting_input_by_name_should_return_a_page_of_exercises_sort_by_name()
+          throws Exception {
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.getDefault()
+                .sorts(List.of(SortField.builder().property("exercise_name").build()))
+                .build();
 
-        mvc.perform(post(EXERCISE_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(EXERCISE_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.content.[0].exercise_name").value("Crisis exercise"))
             .andExpect(jsonPath("$.content.[1].exercise_name").value("Incident response exercise"));
@@ -109,14 +113,22 @@ public class ExerciseApiSearchTest extends IntegrationTest {
 
       @Test
       @DisplayName("Sorting page of exercises by start date")
-      void given_sorting_input_by_start_date_should_return_a_page_of_exercises_sort_by_start_date() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
-            .sorts(List.of(SortField.builder().property("exercise_start_date").direction("desc").build()))
-            .build();
+      void given_sorting_input_by_start_date_should_return_a_page_of_exercises_sort_by_start_date()
+          throws Exception {
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.getDefault()
+                .sorts(
+                    List.of(
+                        SortField.builder()
+                            .property("exercise_start_date")
+                            .direction("desc")
+                            .build()))
+                .build();
 
-        mvc.perform(post(EXERCISE_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(EXERCISE_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.content.[1].exercise_name").value("Incident response exercise"))
             .andExpect(jsonPath("$.content.[0].exercise_name").value("Crisis exercise"));
@@ -129,28 +141,30 @@ public class ExerciseApiSearchTest extends IntegrationTest {
 
       @Test
       @DisplayName("Filtering page of exercises by name")
-      void given_filter_input_by_name_should_return_a_page_of_exercises_filter_by_name() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.simpleFilter(
-            "exercise_name", "Crisis", contains
-        );
+      void given_filter_input_by_name_should_return_a_page_of_exercises_filter_by_name()
+          throws Exception {
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.simpleFilter("exercise_name", "Crisis", contains);
 
-        mvc.perform(post(EXERCISE_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(EXERCISE_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(1));
       }
 
       @Test
       @DisplayName("Filtering page of exercises by status")
-      void given_filter_input_by_sttaus_should_return_a_page_of_exercises_filter_by_status() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.simpleFilter(
-            "exercise_status", valueOf(SCHEDULED), contains
-        );
+      void given_filter_input_by_sttaus_should_return_a_page_of_exercises_filter_by_status()
+          throws Exception {
+        SearchPaginationInput searchPaginationInput =
+            PaginationFixture.simpleFilter("exercise_status", valueOf(SCHEDULED), contains);
 
-        mvc.perform(post(EXERCISE_URI + "/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
+        mvc.perform(
+                post(EXERCISE_URI + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(2));
       }

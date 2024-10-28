@@ -9,7 +9,8 @@ public class ContractAsset extends ContractCardinalityElement {
     super(key, label, cardinality);
   }
 
-  public static ContractAsset assetField(String key, String label, ContractCardinality cardinality) {
+  public static ContractAsset assetField(
+      String key, String label, ContractCardinality cardinality) {
     return new ContractAsset(key, label, cardinality);
   }
 

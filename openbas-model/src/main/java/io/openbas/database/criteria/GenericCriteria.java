@@ -10,9 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class GenericCriteria {
 
-  private GenericCriteria() {
-
-  }
+  private GenericCriteria() {}
 
   public static <T> Long countQuery(
       @NotNull final CriteriaBuilder cb,
@@ -30,5 +28,4 @@ public class GenericCriteria {
     }
     return entityManager.createQuery(countQuery).getSingleResult();
   }
-
 }

@@ -11,5 +11,4 @@ public class AssetGroupFixture {
     assetGroup.setDescription("An asset group");
     return assetGroup;
   }
-
 }

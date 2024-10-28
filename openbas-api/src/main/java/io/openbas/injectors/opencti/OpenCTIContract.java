@@ -1,19 +1,7 @@
 package io.openbas.injectors.opencti;
 
-import io.openbas.injector_contract.*;
-import io.openbas.injector_contract.fields.ContractElement;
-import io.openbas.injector_contract.fields.ContractExpectations;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Variable.VariableType;
-import io.openbas.injectors.opencti.config.OpenCTIConfig;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
+import static io.openbas.helper.SupportedLanguage.en;
+import static io.openbas.helper.SupportedLanguage.fr;
 import static io.openbas.injector_contract.Contract.executableContract;
 import static io.openbas.injector_contract.ContractCardinality.Multiple;
 import static io.openbas.injector_contract.ContractCardinality.One;
@@ -23,8 +11,19 @@ import static io.openbas.injector_contract.fields.ContractAttachment.attachmentF
 import static io.openbas.injector_contract.fields.ContractExpectations.expectationsField;
 import static io.openbas.injector_contract.fields.ContractText.textField;
 import static io.openbas.injector_contract.fields.ContractTextArea.richTextareaField;
-import static io.openbas.helper.SupportedLanguage.en;
-import static io.openbas.helper.SupportedLanguage.fr;
+
+import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Variable.VariableType;
+import io.openbas.injector_contract.*;
+import io.openbas.injector_contract.fields.ContractElement;
+import io.openbas.injector_contract.fields.ContractExpectations;
+import io.openbas.injectors.opencti.config.OpenCTIConfig;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class OpenCTIContract extends Contractor {
@@ -53,36 +52,58 @@ public class OpenCTIContract extends Contractor {
 
   @Override
   public ContractConfig getConfig() {
-    return new ContractConfig(TYPE, Map.of(en, "OpenCTI", fr, "OpenCTI"), "#0fbcff", "#001bda", "/img/icon-opencti.png", isExpose());
+    return new ContractConfig(
+        TYPE,
+        Map.of(en, "OpenCTI", fr, "OpenCTI"),
+        "#0fbcff",
+        "#001bda",
+        "/img/icon-opencti.png",
+        isExpose());
   }
 
   @Override
   public List<Contract> contracts() {
     // variables
-    ContractVariable documentUriVariable = variable("document_uri",
-        "Http user link to upload the document (only for document expectation)", VariableType.String, One);
+    ContractVariable documentUriVariable =
+        variable(
+            "document_uri",
+            "Http user link to upload the document (only for document expectation)",
+            VariableType.String,
+            One);
     // Contracts
-    ContractExpectations expectationsField = expectationsField(
-        "expectations", "Expectations"
-    );
+    ContractExpectations expectationsField = expectationsField("expectations", "Expectations");
     ContractConfig contractConfig = getConfig();
-    List<ContractElement> createCaseInstance = contractBuilder()
-        .mandatory(textField("name", "Name"))
-        .mandatory(richTextareaField("description", "Description"))
-        .optional(attachmentField("attachments", "Attachments", Multiple))
-        .optional(expectationsField)
-        .build();
-    Contract createCase = executableContract(contractConfig, OPENCTI_CREATE_CASE,
-        Map.of(en, "Create a new case", fr, "Créer un nouveau case"), createCaseInstance, List.of(Endpoint.PLATFORM_TYPE.Service), false);
+    List<ContractElement> createCaseInstance =
+        contractBuilder()
+            .mandatory(textField("name", "Name"))
+            .mandatory(richTextareaField("description", "Description"))
+            .optional(attachmentField("attachments", "Attachments", Multiple))
+            .optional(expectationsField)
+            .build();
+    Contract createCase =
+        executableContract(
+            contractConfig,
+            OPENCTI_CREATE_CASE,
+            Map.of(en, "Create a new case", fr, "Créer un nouveau case"),
+            createCaseInstance,
+            List.of(Endpoint.PLATFORM_TYPE.Service),
+            false);
     createCase.addVariable(documentUriVariable);
-    List<ContractElement> createReportInstance = contractBuilder()
-        .mandatory(textField("name", "Name"))
-        .mandatory(richTextareaField("description", "Description"))
-        .optional(attachmentField("attachments", "Attachments", Multiple))
-        .optional(expectationsField)
-        .build();
-    Contract createReport = executableContract(contractConfig, OPENCTI_CREATE_REPORT,
-        Map.of(en, "Create a new report", fr, "Créer un nouveau rapport"), createReportInstance, List.of(Endpoint.PLATFORM_TYPE.Service), false);
+    List<ContractElement> createReportInstance =
+        contractBuilder()
+            .mandatory(textField("name", "Name"))
+            .mandatory(richTextareaField("description", "Description"))
+            .optional(attachmentField("attachments", "Attachments", Multiple))
+            .optional(expectationsField)
+            .build();
+    Contract createReport =
+        executableContract(
+            contractConfig,
+            OPENCTI_CREATE_REPORT,
+            Map.of(en, "Create a new report", fr, "Créer un nouveau rapport"),
+            createReportInstance,
+            List.of(Endpoint.PLATFORM_TYPE.Service),
+            false);
     createReport.addVariable(documentUriVariable);
     return List.of(createCase, createReport);
   }

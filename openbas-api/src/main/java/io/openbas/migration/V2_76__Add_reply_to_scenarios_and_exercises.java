@@ -1,21 +1,21 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
-import java.sql.Connection;
-import java.sql.Statement;
-
 @Component
 public class V2_76__Add_reply_to_scenarios_and_exercises extends BaseJavaMigration {
 
-    @Override
-    public void migrate(Context context) throws Exception {
-        Connection connection = context.getConnection();
-        Statement select = connection.createStatement();
-        // Scenario
-        select.execute("""
+  @Override
+  public void migrate(Context context) throws Exception {
+    Connection connection = context.getConnection();
+    Statement select = connection.createStatement();
+    // Scenario
+    select.execute(
+        """
                 create table scenario_mails_reply_to
                 (
                     scenario_id varchar(255) not null
@@ -24,8 +24,9 @@ public class V2_76__Add_reply_to_scenarios_and_exercises extends BaseJavaMigrati
                     scenario_reply_to varchar(255)
                 );
                 """);
-        // Exercise
-        select.execute("""
+    // Exercise
+    select.execute(
+        """
                 create table exercise_mails_reply_to
                 (
                     exercise_id varchar(255) not null
@@ -34,5 +35,5 @@ public class V2_76__Add_reply_to_scenarios_and_exercises extends BaseJavaMigrati
                     exercise_reply_to varchar(255)
                 );
                 """);
-    }
+  }
 }

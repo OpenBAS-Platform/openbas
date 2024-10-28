@@ -7,6 +7,5 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Os {
 
-    private String platform;
-
+  private String platform;
 }

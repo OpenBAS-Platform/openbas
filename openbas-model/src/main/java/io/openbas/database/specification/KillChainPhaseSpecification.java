@@ -6,12 +6,9 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class KillChainPhaseSpecification {
 
-  private KillChainPhaseSpecification() {
-
-  }
+  private KillChainPhaseSpecification() {}
 
   public static Specification<KillChainPhase> byName(@Nullable final String searchText) {
     return UtilsSpecification.byName(searchText, "name");
   }
-
 }

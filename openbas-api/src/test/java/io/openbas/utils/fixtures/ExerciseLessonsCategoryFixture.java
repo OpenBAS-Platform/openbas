@@ -3,7 +3,6 @@ package io.openbas.utils.fixtures;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.LessonsCategory;
 import io.openbas.database.model.Team;
-
 import java.util.List;
 
 public class ExerciseLessonsCategoryFixture {
@@ -21,5 +20,4 @@ public class ExerciseLessonsCategoryFixture {
     lessonsCategory.setTeams(categoryTeams);
     return lessonsCategory;
   }
-
 }

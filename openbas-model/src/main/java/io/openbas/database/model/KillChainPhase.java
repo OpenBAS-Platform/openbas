@@ -1,17 +1,16 @@
 package io.openbas.database.model;
 
+import static java.time.Instant.now;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
-
-import java.time.Instant;
-
-import static java.time.Instant.now;
 
 @Data
 @Entity
@@ -72,5 +71,4 @@ public class KillChainPhase implements Base {
   @JsonProperty("phase_updated_at")
   @NotNull
   private Instant updatedAt = now();
-
 }
