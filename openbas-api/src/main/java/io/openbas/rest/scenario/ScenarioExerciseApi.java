@@ -14,20 +14,14 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.criteria.Join;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.database.specification.ExerciseSpecification.fromScenario;
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
 @RestController
 @Secured(ROLE_USER)
@@ -52,12 +46,14 @@ public class ScenarioExerciseApi {
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     Map<String, Join<Base, Base>> joinMap = new HashMap<>();
     return buildPaginationCriteriaBuilder(
-        (Specification<Exercise> specification, Specification<Exercise> specificationCount, Pageable pageable) -> this.exerciseService.exercises(
-            fromScenario(scenarioId).and(specification),
-            fromScenario(scenarioId).and(specificationCount),
-            pageable,
-            joinMap
-        ),
+        (Specification<Exercise> specification,
+            Specification<Exercise> specificationCount,
+            Pageable pageable) ->
+            this.exerciseService.exercises(
+                fromScenario(scenarioId).and(specification),
+                fromScenario(scenarioId).and(specificationCount),
+                pageable,
+                joinMap),
         searchPaginationInput,
         Exercise.class);
   }

@@ -3,7 +3,7 @@ package io.openbas.rest.exercise.service;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.utils.Constants.ARTICLES;
-import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
+import static io.openbas.utils.JpaUtils.arrayAggOnId;
 import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static java.time.Instant.now;
@@ -44,19 +44,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
-import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.utils.Constants.ARTICLES;
-import static io.openbas.utils.JpaUtils.arrayAggOnId;
-import static io.openbas.utils.StringUtils.duplicateString;
-import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
-import static java.time.Instant.now;
-import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
 @Validated
@@ -154,7 +141,10 @@ public class ExerciseService {
 
   // -- SELECT --
 
-  private void select(CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Exercise> exerciseRoot,
+  private void select(
+      CriteriaBuilder cb,
+      CriteriaQuery<Tuple> cq,
+      Root<Exercise> exerciseRoot,
       Map<String, Join<Base, Base>> joinMap) {
     // Array aggregations
     Join<Base, Base> exerciseTagsJoin = exerciseRoot.join("tags", JoinType.LEFT);
