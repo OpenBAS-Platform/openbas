@@ -399,14 +399,10 @@ public class AtomicTestingService {
     return new PageImpl<>(injects, pageable, total);
   }
 
-  private void selectForAtomicTesting(
-      CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Inject> injectRoot) {
-    // Joins
-    Join<Inject, InjectorContract> injectorContractJoin =
-        createLeftJoin(injectRoot, "injectorContract");
-    Join<InjectorContract, Injector> injectorJoin =
-        injectorContractJoin.join("injector", JoinType.LEFT);
-    //Join<Inject, InjectStatus> injectStatusJoin = createLeftJoin(injectRoot, "status");
+    private void selectForAtomicTesting(CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Inject> injectRoot) {
+        // Joins
+        Join<Inject, InjectorContract> injectorContractJoin = createLeftJoin(injectRoot, "injectorContract");
+        Join<InjectorContract, Injector> injectorJoin = injectorContractJoin.join("injector", JoinType.LEFT);
 
         // Subquery for InjectStatus
         Subquery<Tuple> statusSubquery = cq.subquery(Tuple.class);
@@ -422,21 +418,19 @@ public class AtomicTestingService {
             )
             .where(cb.equal(dateRoot.get("inject").get("id"), injectRoot.get("id")));
 
-
         // Array aggregations
         Expression<String[]> injectExpectationIdsExpression = createJoinArrayAggOnId(cb, injectRoot, EXPECTATIONS);
         Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
         Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
         Expression<String[]> assetGroupIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assetGroups");
 
-    // SELECT
-    cq.multiselect(
-            injectRoot.get("id").alias("inject_id"),
-            injectRoot.get("title").alias("inject_title"),
-            injectRoot.get("updatedAt").alias("inject_updated_at"),
-            injectorJoin.get("type").alias("inject_type"),
-            injectorContractJoin.alias("inject_injector_contract"),
-            //injectStatusJoin.alias("inject_status"),
+        // SELECT
+        cq.multiselect(
+                injectRoot.get("id").alias("inject_id"),
+                injectRoot.get("title").alias("inject_title"),
+                injectRoot.get("updatedAt").alias("inject_updated_at"),
+                injectorJoin.get("type").alias("inject_type"),
+                injectorContractJoin.alias("inject_injector_contract"),
             cb.selectCase()
                 .when(cb.exists(statusSubquery), statusSubquery.select(statusRoot.get("name")))
                 .otherwise(cb.nullLiteral(ExecutionStatus.class)).alias("inject_status"),
@@ -459,12 +453,7 @@ public class AtomicTestingService {
   }
 
   private List<AtomicTestingOutput> execAtomicTesting(TypedQuery<Tuple> query) {
-    long start = System.currentTimeMillis();
-        List<Tuple> resultList = query.getResultList();
-        long executionTime = System.currentTimeMillis() - start;
-        logger.info("Execution time of execution query true + raw query: " + executionTime + " ms");
-
-        return resultList
+    return query.getResultList()
                 .stream()
                 .map(tuple -> {
                     InjectStatus injectStatus = new InjectStatus();
