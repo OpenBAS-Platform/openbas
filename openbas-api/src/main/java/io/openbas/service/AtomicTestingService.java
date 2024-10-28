@@ -1,6 +1,5 @@
 package io.openbas.service;
 
-import static io.openbas.aop.LoggingAspect.logger;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.database.model.Command.COMMAND_TYPE;
@@ -297,39 +296,42 @@ public class AtomicTestingService {
 
   // -- PAGINATION --
 
-    public Page<AtomicTestingOutput> findAllAtomicTestings(@NotNull final SearchPaginationInput searchPaginationInput) {
-        Map<String, Join<Base, Base>> joinMap = new HashMap<>();
+  public Page<AtomicTestingOutput> findAllAtomicTestings(
+      @NotNull final SearchPaginationInput searchPaginationInput) {
+    Map<String, Join<Base, Base>> joinMap = new HashMap<>();
 
-        Specification<Inject> customSpec = Specification.where((root, query, cb) -> {
-            Predicate predicate = cb.conjunction();
-            predicate = cb.and(predicate, cb.isNull(root.get("scenario")));
-            predicate = cb.and(predicate, cb.isNull(root.get("exercise")));
-            return predicate;
-        });
-        return buildPaginationCriteriaBuilder(
-                (Specification<Inject> specification, Specification<Inject> specificationCount, Pageable pageable) -> this.atomicTestings(
-                    customSpec.and(specification),
-                    customSpec.and(specificationCount),
-                    pageable,
-                    joinMap
-                ),
-                searchPaginationInput,
-                Inject.class,
-            joinMap
-        );
-    }
+    Specification<Inject> customSpec =
+        Specification.where(
+            (root, query, cb) -> {
+              Predicate predicate = cb.conjunction();
+              predicate = cb.and(predicate, cb.isNull(root.get("scenario")));
+              predicate = cb.and(predicate, cb.isNull(root.get("exercise")));
+              return predicate;
+            });
+    return buildPaginationCriteriaBuilder(
+        (Specification<Inject> specification,
+            Specification<Inject> specificationCount,
+            Pageable pageable) ->
+            this.atomicTestings(
+                customSpec.and(specification),
+                customSpec.and(specificationCount),
+                pageable,
+                joinMap),
+        searchPaginationInput,
+        Inject.class,
+        joinMap);
+  }
 
+  public Page<AtomicTestingOutput> atomicTestings(
+      Specification<Inject> specification,
+      Specification<Inject> specificationCount,
+      Pageable pageable,
+      Map<String, Join<Base, Base>> joinMap) {
+    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
-    public Page<AtomicTestingOutput> atomicTestings(
-        Specification<Inject> specification,
-        Specification<Inject> specificationCount,
-        Pageable pageable,
-        Map<String, Join<Base, Base>> joinMap) {
-        CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
-
-        CriteriaQuery<Tuple> cq = cb.createTupleQuery();
-        Root<Inject> injectRoot = cq.from(Inject.class);
-        selectForAtomicTesting(cb, cq, injectRoot, joinMap);
+    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+    Root<Inject> injectRoot = cq.from(Inject.class);
+    selectForAtomicTesting(cb, cq, injectRoot, joinMap);
 
     // -- Text Search and Filters --
     if (specification != null) {
@@ -402,81 +404,86 @@ public class AtomicTestingService {
     return new PageImpl<>(injects, pageable, total);
   }
 
-    private void selectForAtomicTesting(CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Inject> injectRoot, Map<String, Join<Base, Base>> joinMap) {
-        // Joins
-        Join<Base, Base> injectorContractJoin = injectRoot.join("injectorContract", JoinType.LEFT);
-        joinMap.put("injectorContract", injectorContractJoin);
+  private void selectForAtomicTesting(
+      CriteriaBuilder cb,
+      CriteriaQuery<Tuple> cq,
+      Root<Inject> injectRoot,
+      Map<String, Join<Base, Base>> joinMap) {
+    // Joins
+    Join<Base, Base> injectorContractJoin = injectRoot.join("injectorContract", JoinType.LEFT);
+    joinMap.put("injectorContract", injectorContractJoin);
 
-        Join<Base, Base> injectorJoin = injectorContractJoin.join("injector", JoinType.LEFT);
-        joinMap.put("injector", injectorJoin);
+    Join<Base, Base> injectorJoin = injectorContractJoin.join("injector", JoinType.LEFT);
+    joinMap.put("injector", injectorJoin);
 
-        // Subquery for InjectStatus
-        Subquery<Tuple> statusSubquery = cq.subquery(Tuple.class);
-        Root<InjectStatus> statusRoot = statusSubquery.from(InjectStatus.class);
-        Subquery<Tuple> dateSubquery = cq.subquery(Tuple.class);
-        Root<InjectStatus> dateRoot = dateSubquery.from(InjectStatus.class);
+    // Subquery for InjectStatus
+    Subquery<Tuple> statusSubquery = cq.subquery(Tuple.class);
+    Root<InjectStatus> statusRoot = statusSubquery.from(InjectStatus.class);
+    Subquery<Tuple> dateSubquery = cq.subquery(Tuple.class);
+    Root<InjectStatus> dateRoot = dateSubquery.from(InjectStatus.class);
 
-        statusSubquery.select(statusRoot.get("name")
-            )
-            .where(cb.equal(statusRoot.get("inject").get("id"), injectRoot.get("id")));
-        dateSubquery.select(dateRoot.get("trackingSentDate")
-            )
-            .where(cb.equal(dateRoot.get("inject").get("id"), injectRoot.get("id")));
+    statusSubquery
+        .select(statusRoot.get("name"))
+        .where(cb.equal(statusRoot.get("inject").get("id"), injectRoot.get("id")));
+    dateSubquery
+        .select(dateRoot.get("trackingSentDate"))
+        .where(cb.equal(dateRoot.get("inject").get("id"), injectRoot.get("id")));
 
-        // Array aggregations
-        Expression<String[]> injectExpectationIdsExpression = createJoinArrayAggOnId(cb, injectRoot, EXPECTATIONS);
-        Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
-        Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
-        Expression<String[]> assetGroupIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assetGroups");
+    // Array aggregations
+    Expression<String[]> injectExpectationIdsExpression =
+        createJoinArrayAggOnId(cb, injectRoot, EXPECTATIONS);
+    Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
+    Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
+    Expression<String[]> assetGroupIdsExpression =
+        createJoinArrayAggOnId(cb, injectRoot, "assetGroups");
 
-        // SELECT
-        cq.multiselect(
-                injectRoot.get("id").alias("inject_id"),
-                injectRoot.get("title").alias("inject_title"),
-                injectRoot.get("updatedAt").alias("inject_updated_at"),
-                injectorJoin.get("type").alias("inject_type"),
-                injectorContractJoin.alias("inject_injector_contract"),
+    // SELECT
+    cq.multiselect(
+            injectRoot.get("id").alias("inject_id"),
+            injectRoot.get("title").alias("inject_title"),
+            injectRoot.get("updatedAt").alias("inject_updated_at"),
+            injectorJoin.get("type").alias("inject_type"),
+            injectorContractJoin.alias("inject_injector_contract"),
             cb.selectCase()
                 .when(cb.exists(statusSubquery), statusSubquery.select(statusRoot.get("name")))
-                .otherwise(cb.nullLiteral(ExecutionStatus.class)).alias("inject_status"),
+                .otherwise(cb.nullLiteral(ExecutionStatus.class))
+                .alias("inject_status"),
             cb.selectCase()
-                .when(cb.exists(dateSubquery), dateSubquery.select(dateRoot.get("trackingSentDate")))
-                .otherwise(cb.nullLiteral(Instant.class)).alias("tracking_sent_date"),
-                injectExpectationIdsExpression.alias("inject_expectations"),
-                teamIdsExpression.alias("inject_teams"),
-                assetIdsExpression.alias("inject_assets"),
-                assetGroupIdsExpression.alias("inject_asset_groups"))
+                .when(
+                    cb.exists(dateSubquery), dateSubquery.select(dateRoot.get("trackingSentDate")))
+                .otherwise(cb.nullLiteral(Instant.class))
+                .alias("tracking_sent_date"),
+            injectExpectationIdsExpression.alias("inject_expectations"),
+            teamIdsExpression.alias("inject_teams"),
+            assetIdsExpression.alias("inject_assets"),
+            assetGroupIdsExpression.alias("inject_asset_groups"))
         .distinct(true);
 
     // GROUP BY
     cq.groupBy(
         Arrays.asList(
-            injectRoot.get("id"),
-            injectorContractJoin.get("id"),
-            injectorJoin.get("id")
-        ));
+            injectRoot.get("id"), injectorContractJoin.get("id"), injectorJoin.get("id")));
   }
 
   private List<AtomicTestingOutput> execAtomicTesting(TypedQuery<Tuple> query) {
-    return query.getResultList()
-                .stream()
-                .map(tuple -> {
-                    InjectStatus injectStatus = new InjectStatus();
-                    injectStatus.setName(tuple.get("inject_status", ExecutionStatus.class));
-                    injectStatus.setTrackingSentDate(tuple.get("tracking_sent_date", Instant.class));
-                   return new AtomicTestingOutput(
-                    tuple.get("inject_id", String.class),
-                    tuple.get("inject_title", String.class),
-                    tuple.get("inject_updated_at", Instant.class),
-                    tuple.get("inject_type", String.class),
-                    tuple.get("inject_injector_contract", InjectorContract.class),
-                    injectStatus,
-                    tuple.get("inject_expectations", String[].class),
-                    tuple.get("inject_teams", String[].class),
-                    tuple.get("inject_assets", String[].class),
-                    tuple.get("inject_asset_groups", String[].class));
-                }
-                )
+    return query.getResultList().stream()
+        .map(
+            tuple -> {
+              InjectStatus injectStatus = new InjectStatus();
+              injectStatus.setName(tuple.get("inject_status", ExecutionStatus.class));
+              injectStatus.setTrackingSentDate(tuple.get("tracking_sent_date", Instant.class));
+              return new AtomicTestingOutput(
+                  tuple.get("inject_id", String.class),
+                  tuple.get("inject_title", String.class),
+                  tuple.get("inject_updated_at", Instant.class),
+                  tuple.get("inject_type", String.class),
+                  tuple.get("inject_injector_contract", InjectorContract.class),
+                  injectStatus,
+                  tuple.get("inject_expectations", String[].class),
+                  tuple.get("inject_teams", String[].class),
+                  tuple.get("inject_assets", String[].class),
+                  tuple.get("inject_asset_groups", String[].class));
+            })
         .toList();
   }
 
