@@ -2,6 +2,7 @@ package io.openbas.utils;
 
 import static io.openbas.database.model.InjectStatus.draftInjectStatus;
 import static io.openbas.utils.AtomicTestingUtils.getRefinedExpectations;
+import static io.openbas.utils.AtomicTestingUtils.getTargets;
 
 import io.openbas.database.model.*;
 import io.openbas.expectation.ExpectationType;
@@ -25,7 +26,8 @@ public class AtomicTestingMapper {
         .build();
   }
 
-  public static InjectResultDTO toDto(Inject inject, List<InjectTargetWithResult> targets) {
+  public static InjectResultDTO toDto(Inject inject) {
+    List<InjectTargetWithResult> targets = getTargets(inject.getTeams(), inject.getAssets(), inject.getAssetGroups());
     List<String> targetIds = targets.stream().map(InjectTargetWithResult::getId).toList();
 
     return getAtomicTestingOutputBuilder(inject)
