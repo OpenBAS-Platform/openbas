@@ -469,10 +469,13 @@ public class AtomicTestingService {
     return query.getResultList().stream()
         .map(
             tuple -> {
-              InjectStatus injectStatus = new InjectStatus();
+              InjectStatus injectStatus = null;
               ExecutionStatus status = tuple.get("inject_status", ExecutionStatus.class);
-              injectStatus.setName(status != null ? status : ExecutionStatus.DRAFT);
-              injectStatus.setTrackingSentDate(tuple.get("tracking_sent_date", Instant.class));
+              if (status != null) {
+                injectStatus = new InjectStatus();
+                injectStatus.setName(status);
+                injectStatus.setTrackingSentDate(tuple.get("tracking_sent_date", Instant.class));
+              }
               return new AtomicTestingOutput(
                   tuple.get("inject_id", String.class),
                   tuple.get("inject_title", String.class),
