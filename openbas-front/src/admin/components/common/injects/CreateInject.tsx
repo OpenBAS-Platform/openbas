@@ -119,7 +119,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
       isSortable: false,
       value: (contract: InjectorContractOutput, _: KillChainPhase, __: Record<string, AttackPatternStore>) => (
         <Tooltip title={tPick(contract.injector_contract_labels)}>
-          {tPick(contract.injector_contract_labels)}
+          <>{tPick(contract.injector_contract_labels)}</>
         </Tooltip>
       ),
     },

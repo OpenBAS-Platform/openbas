@@ -1,6 +1,7 @@
 import '@fontsource/ibm-plex-sans';
 import '@fontsource/geologica';
 import '@xyflow/react/dist/style.css';
+import 'ckeditor5/ckeditor5.css';
 import './static/css/index.css';
 import './static/css/CKEditorDark.css';
 import './static/css/CKEditorLight.css';

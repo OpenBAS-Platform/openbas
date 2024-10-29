@@ -1,16 +1,11 @@
-import 'ckeditor5-custom-build/build/translations/fr';
-
-import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { FormHelperText, InputLabel } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import Editor from 'ckeditor5-custom-build/build/ckeditor';
 import classNames from 'classnames';
 import { Field } from 'react-final-form';
 
 // eslint-disable-next-line import/no-cycle
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
-import { useHelper } from '../../store';
-import locale from '../../utils/BrowserLanguage';
+import CKEditor from '../CKEditor';
 import { useFormatter } from '../i18n';
 
 const useStyles = makeStyles(theme => ({
@@ -31,14 +26,6 @@ const RichTextFieldBase = ({
 }) => {
   const { t } = useFormatter();
   const classes = useStyles();
-  const lang = useHelper((helper) => {
-    const me = helper.getMe();
-    const settings = helper.getPlatformSettings();
-    const rawPlatformLang = settings.platform_lang ?? 'auto';
-    const rawUserLang = me.user_lang ?? 'auto';
-    const platformLang = rawPlatformLang !== 'auto' ? rawPlatformLang : locale;
-    return rawUserLang !== 'auto' ? rawUserLang : platformLang;
-  });
   return (
     <div style={{ ...style, position: 'relative' }}>
       <InputLabel
@@ -52,11 +39,6 @@ const RichTextFieldBase = ({
         {label}
       </InputLabel>
       <CKEditor
-        editor={Editor}
-        config={{
-          width: '100%',
-          language: lang,
-        }}
         data={value}
         onChange={(event, editor) => {
           onChange(editor.getData());

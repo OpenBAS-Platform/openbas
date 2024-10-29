@@ -1,13 +1,8 @@
-import 'ckeditor5-custom-build/build/translations/fr';
-
-import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { InputLabel } from '@mui/material';
-import Editor from 'ckeditor5-custom-build/build/ckeditor';
 
 // eslint-disable-next-line import/no-cycle
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
-import { useHelper } from '../../store';
-import locale from '../../utils/BrowserLanguage';
+import CKEditor from '../CKEditor';
 
 const SimpleRichTextField = (props) => {
   const {
@@ -21,14 +16,6 @@ const SimpleRichTextField = (props) => {
     context,
     onBlur = () => {},
   } = props;
-  const lang = useHelper((helper) => {
-    const me = helper.getMe();
-    const settings = helper.getPlatformSettings();
-    const rawPlatformLang = settings.platform_lang ?? 'auto';
-    const rawUserLang = me.user_lang ?? 'auto';
-    const platformLang = rawPlatformLang !== 'auto' ? rawPlatformLang : locale;
-    return rawUserLang !== 'auto' ? rawUserLang : platformLang;
-  });
   return (
     <div style={{ ...style, position: 'relative' }}>
       <InputLabel
@@ -39,17 +26,13 @@ const SimpleRichTextField = (props) => {
         {label}
       </InputLabel>
       <CKEditor
-        editor={Editor}
-        config={{
-          width: '100%',
-          language: lang,
-        }}
         data={value}
         onChange={(_, editor) => {
           onChange(editor.getData());
         }}
         onBlur={onBlur}
         disabled={disabled}
+        toolbarDropdownSize="386px" // set a size for the ckeditor items toolbar to avoid it to be cut off when overflowing
       />
       {askAi && (
         <TextFieldAskAI

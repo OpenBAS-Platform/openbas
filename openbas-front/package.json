@@ -6,7 +6,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "dependencies": {
-    "@ckeditor/ckeditor5-react": "6.2.0",
+    "@ckeditor/ckeditor5-react": "9.3.1",
     "@dagrejs/dagre": "1.1.4",
     "@emotion/react": "11.13.3",
     "@emotion/styled": "11.13.0",
@@ -25,7 +25,7 @@
     "@xyflow/react": "12.3.0",
     "apexcharts": "3.51.0",
     "axios": "1.7.7",
-    "ckeditor5-custom-build": "link:packages/ckeditor5-custom-build",
+    "ckeditor5": "43.2.0",
     "classcat": "5.0.5",
     "classnames": "2.5.1",
     "cronstrue": "2.50.0",

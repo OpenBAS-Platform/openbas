@@ -8,8 +8,7 @@
     "filigran team"
   ],
   "ignorePaths": [
-    "**/node_modules/**",
-    "openbas-front/packages/ckeditor5-custom-build/package.json"
+    "**/node_modules/**"
   ],
   "prConcurrentLimit": 2,
   "packageRules": [
@@ -18,6 +17,27 @@
         "minor"
       ],
       "prPriority": 5
+    },
+    {
+      "matchDatasources": [
+        "npm",
+        "gitea-tags",
+        "node-version"
+      ],
+      "commitMessagePrefix": "[frontend]"
+    },
+    {
+      "matchDatasources": [
+        "maven"
+      ],
+      "commitMessagePrefix": "[backend]"
+    },
+    {
+      "matchDatasources": [
+        "docker",
+        "orb"
+      ],
+      "commitMessagePrefix": "[tool]"
     },
     {
       "matchPackageNames": [
