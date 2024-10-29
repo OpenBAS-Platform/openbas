@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.asset.AssetGroupService;
 import io.openbas.asset.AssetService;
 import io.openbas.database.model.*;
@@ -208,6 +209,7 @@ public class InjectApi extends RestBehavior {
 
   // -- EXERCISES --
 
+  @LogExecutionTime
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Inject> exerciseInjects(@PathVariable @NotBlank final String exerciseId) {
@@ -216,6 +218,7 @@ public class InjectApi extends RestBehavior {
         .toList();
   }
 
+  @LogExecutionTime
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/search")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
@@ -233,6 +236,7 @@ public class InjectApi extends RestBehavior {
                 AtomicTestingMapper.toDto(inject));
   }
 
+  @LogExecutionTime
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/resultdto")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)

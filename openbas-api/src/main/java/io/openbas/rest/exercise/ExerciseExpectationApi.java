@@ -1,5 +1,6 @@
 package io.openbas.rest.exercise;
 
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ExerciseExpectationService;
@@ -17,6 +18,7 @@ public class ExerciseExpectationApi extends RestBehavior {
 
   private final ExerciseExpectationService exerciseExpectationService;
 
+  @LogExecutionTime
   @GetMapping(value = "/api/exercises/{exerciseId}/expectations")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public List<InjectExpectation> exerciseInjectExpectations(

@@ -220,6 +220,7 @@ public class ExerciseApi extends RestBehavior {
   // endregion
 
   // region teams
+  @LogExecutionTime
   @GetMapping(EXERCISE_URI + "/{exerciseId}/teams")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<TeamSimple> getExerciseTeams(@PathVariable String exerciseId) {
@@ -606,6 +607,7 @@ public class ExerciseApi extends RestBehavior {
     return exerciseService.getGlobalResults(exerciseId);
   }
 
+  @LogExecutionTime
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/results")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public List<InjectExpectationResultsByAttackPattern> injectResults(
