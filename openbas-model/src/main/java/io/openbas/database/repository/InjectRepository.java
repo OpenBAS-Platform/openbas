@@ -23,18 +23,6 @@ public interface InjectRepository
   @NotNull
   Optional<Inject> findById(@NotNull String id);
 
-  @Query(value="SELECT i.* FROM injects i "
-      + "LEFT JOIN communications c ON c.communication_inject = i.inject_id "
-      + "LEFT JOIN injects_teams teams ON i.inject_id = teams.inject_id "
-      + "LEFT JOIN injects_tags tags ON i.inject_id = tags.inject_id "
-      + "LEFT JOIN communications com ON com.communication_inject = i.inject_id "
-      + "LEFT JOIN injects_expectations ie ON i.inject_id = ie.inject_id "
-      + "LEFT JOIN injectors_contracts_attack_patterns icap ON icap.injector_contract_id = i.inject_injector_contract "
-      + "LEFT JOIN injectors_contracts injcon ON injcon.injector_contract_id = i.inject_injector_contract "
-      + "LEFT JOIN attack_patterns_kill_chain_phases apkcp ON apkcp.attack_pattern_id = icap.attack_pattern_id "
-      + "LEFT JOIN injects_statuses ins ON ins.status_inject = i.inject_id "
-      + "WHERE i.inject_exercise = :exerciseId ",
-      nativeQuery = true)
   List<Inject> findByExerciseId(@NotNull String exerciseId);
 
   List<Inject> findByScenarioId(@NotNull String scenarioId);
