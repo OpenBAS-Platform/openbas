@@ -230,9 +230,7 @@ public class InjectApi extends RestBehavior {
             Inject.class)
         .map(
             inject ->
-                AtomicTestingMapper.toDto(
-                    inject,
-                    getTargets(inject.getTeams(), inject.getAssets(), inject.getAssetGroups())));
+                AtomicTestingMapper.toDto(inject));
   }
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/resultdto")
@@ -243,9 +241,7 @@ public class InjectApi extends RestBehavior {
     return this.injectRepository.findAll(InjectSpecification.fromExercise(exerciseId)).stream()
         .map(
             inject ->
-                AtomicTestingMapper.toDto(
-                    inject,
-                    getTargets(inject.getTeams(), inject.getAssets(), inject.getAssetGroups())))
+                AtomicTestingMapper.toDto(inject))
         .collect(Collectors.toList());
   }
 

@@ -162,8 +162,7 @@ public class AtomicTestingService {
             .toList();
     injectToSave.getDocuments().addAll(injectDocuments);
     Inject inject = injectRepository.save(injectToSave);
-    return AtomicTestingMapper.toDto(
-        inject, getTargets(inject.getTeams(), inject.getAssets(), inject.getAssetGroups()));
+    return AtomicTestingMapper.toDto(inject);
   }
 
   private ObjectNode setExpectations(
@@ -218,8 +217,7 @@ public class AtomicTestingService {
     injectDuplicate.setExercise(injectOrigin.getExercise());
     injectDuplicate.setScenario(injectOrigin.getScenario());
     Inject inject = injectRepository.save(injectDuplicate);
-    return AtomicTestingMapper.toDto(
-        inject, getTargets(inject.getTeams(), inject.getAssets(), inject.getAssetGroups()));
+    return AtomicTestingMapper.toDto(inject);
   }
 
   public Inject copyInject(@NotNull Inject injectOrigin, boolean isAtomic) {
@@ -265,8 +263,7 @@ public class AtomicTestingService {
     inject.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
 
     Inject saved = injectRepository.save(inject);
-    return AtomicTestingMapper.toDto(
-        saved, getTargets(saved.getTeams(), saved.getAssets(), saved.getAssetGroups()));
+    return AtomicTestingMapper.toDto(saved);
   }
 
   @Transactional
