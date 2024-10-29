@@ -1,14 +1,11 @@
-import 'ckeditor5-custom-build/build/translations/fr';
-
-import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { Button, Grid, Switch, TextField as MUITextField, Typography } from '@mui/material';
 import { useTheme } from '@mui/styles';
-import Editor from 'ckeditor5-custom-build/build/ckeditor';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { useState } from 'react';
 import { Form } from 'react-final-form';
 
+import CKEditor from '../../../../../components/CKEditor';
 import OldTextField from '../../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../../components/i18n';
 import OldAttackPatternField from '../../../../../components/OldAttackPatternField';
@@ -35,11 +32,6 @@ const InjectorContractForm = (props) => {
         return field.richText
           ? (
               <CKEditor
-                editor={Editor}
-                config={{
-                  width: '100%',
-                  language: 'en-us',
-                }}
                 data={!R.isNil(fields[field.key]?.defaultValue) ? fields[field.key].defaultValue : field.defaultValue}
                 onChange={(_, editor) => {
                   setFields({ ...fields, [field.key]: { defaultValue: editor.getData() } });

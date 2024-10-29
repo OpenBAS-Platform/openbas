@@ -1,7 +1,3 @@
-import 'ckeditor5-custom-build/build/translations/fr';
-import 'ckeditor5-custom-build/build/translations/zh-cn';
-
-import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { LoadingButton } from '@mui/lab';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 // As we can ask AI after and follow up, there is a dependency lifecycle here that can be accepted
@@ -10,11 +6,11 @@ import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextF
 import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import Editor from 'ckeditor5-custom-build/build/ckeditor';
 import { FunctionComponent, useEffect, useRef } from 'react';
 
 // eslint-disable-next-line import/no-cycle
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
+import CKEditor from '../../components/CKEditor';
 import { useFormatter } from '../../components/i18n';
 import { isNotEmptyField } from '../utils';
 
@@ -108,10 +104,6 @@ const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
             {format === 'html' && (
               <CKEditor
                 id="response-dialog-editor"
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                editor={Editor}
-                config={{ language: 'en', toolbar: { shouldNotGroupWhenFull: true } }}
                 data={content}
                 onChange={(_, editor) => {
                   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -157,7 +149,7 @@ const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
                 format={format}
                 variant={format}
                 disabled={isDisabled}
-                style={format === 'html' ? { position: 'absolute', top: -2, right: 18 } : undefined}
+                style={format === 'html' ? { position: 'absolute', top: 40, right: 18 } : undefined}
               />
             )}
           </div>
