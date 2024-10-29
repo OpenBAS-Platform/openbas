@@ -31,7 +31,7 @@ const debounce = (func, timeout = 500) => {
 
 const middleware = (target, ws = true) =>
   createProxyMiddleware({
-    target: 'http://localhost:8080' + basePath + target,
+    target: 'https://testing.obas.staging.filigran.io' + basePath + target,
     changeOrigin: true,
     ws,
   });

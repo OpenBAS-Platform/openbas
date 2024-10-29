@@ -6,7 +6,6 @@ import './static/css/index.css';
 import './static/css/CKEditorDark.css';
 import './static/css/CKEditorLight.css';
 
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import App from './app';
@@ -15,8 +14,6 @@ const container = document.getElementById('root');
 if (container) {
   const root = createRoot(container);
   root.render(
-    <StrictMode>
-      <App />
-    </StrictMode>,
+    <App />,
   );
 }

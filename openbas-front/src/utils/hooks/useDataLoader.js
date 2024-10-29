@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { DATA_DELETE_SUCCESS } from '../../constants/ActionTypes';
 import { store } from '../../store';
 import { buildUri } from '../Action';
+import { isFeatureEnabled } from '../utils';
 
 const EVENT_TRY_DELAY = 1500;
 const EVENT_PING_MAX_TIME = 5000;
@@ -22,6 +23,7 @@ let sseClient;
 let lastPingDate = new Date().getTime();
 const listeners = new Map();
 const useDataLoader = (loader = () => {}, refetchArg = []) => {
+  const enableDisableStream = isFeatureEnabled('DISABLE_STREAM');
   const sseConnect = () => {
     sseClient = new EventSource(buildUri('/api/stream'), { withCredentials: true });
     const autoReConnect = setInterval(() => {
@@ -84,9 +86,10 @@ const useDataLoader = (loader = () => {}, refetchArg = []) => {
   };
   useEffect(() => {
     listeners.set(loader, '');
-    if (EventSource !== undefined && sseClient === undefined) {
+    const sseEnable = !enableDisableStream && EventSource !== undefined && sseClient === undefined;
+    if (sseEnable) {
       sseClient = sseConnect();
-    } else if (!pristine) {
+    } else if (!pristine || !sseEnable) {
       const load = async () => {
         await loader();
       };
@@ -96,7 +99,7 @@ const useDataLoader = (loader = () => {}, refetchArg = []) => {
       // Remove the listener
       listeners.delete(loader);
       // If its the last one, disconnect the stream
-      if (listeners.size === 0) {
+      if (sseEnable && listeners.size === 0) {
         sseClient.close();
         sseClient = undefined;
       }
