@@ -65,7 +65,7 @@ import fr from 'ckeditor5/translations/fr.js';
 // @ts-ignore
 // eslint-disable-next-line import/extensions
 import zh from 'ckeditor5/translations/zh.js';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
 const CKEDITOR_DEFAULT_CONFIG: EditorConfig = {
