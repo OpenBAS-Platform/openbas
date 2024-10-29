@@ -149,7 +149,7 @@ const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
                 format={format}
                 variant={format}
                 disabled={isDisabled}
-                style={format === 'html' ? { position: 'absolute', top: -2, right: 18 } : undefined}
+                style={format === 'html' ? { position: 'absolute', top: 40, right: 18 } : undefined}
               />
             )}
           </div>
