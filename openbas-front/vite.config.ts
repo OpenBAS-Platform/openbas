@@ -114,7 +114,7 @@ export default ({ mode }: { mode: string }) => {
           });
         },
       },
-      react({ jsxRuntime: 'classic' }),
+      react(),
       [IstanbulPlugin({
         include: 'src/*',
         exclude: ['node_modules', 'test/'],
