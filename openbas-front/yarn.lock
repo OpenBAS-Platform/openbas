@@ -7160,13 +7160,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-i18next@npm:6.0.9":
-  version: 6.0.9
-  resolution: "eslint-plugin-i18next@npm:6.0.9"
+"eslint-plugin-i18next@npm:6.1.0":
+  version: 6.1.0
+  resolution: "eslint-plugin-i18next@npm:6.1.0"
   dependencies:
     lodash: "npm:^4.17.21"
     requireindex: "npm:~1.1.0"
-  checksum: 10c0/6a90288cd5f3f97be7136fe912ba3d554fe3cafa56884b3ab5c7b5c46212811e94bae3185c5c820935ca5ef2daed9a2601c43c957c8f71e8dbcbe704e701bd43
+  checksum: 10c0/06c36df0de8cc0043c54c3e881d89b51558ed0b8c9dbff6f9cc9028e8df789a254921b7fad1427ce25790bbd8b99089ae413f95742e3536992be6e709cdee302
   languageName: node
   linkType: hard
 
@@ -11189,7 +11189,7 @@ __metadata:
     eslint-config-airbnb-typescript: "npm:18.0.0"
     eslint-config-react-app: "npm:7.0.1"
     eslint-plugin-custom-rules: "link:packages/eslint-plugin-custom-rules"
-    eslint-plugin-i18next: "npm:6.0.9"
+    eslint-plugin-i18next: "npm:6.1.0"
     eslint-plugin-import: "npm:2.29.1"
     eslint-plugin-import-newlines: "npm:1.4.0"
     eslint-plugin-playwright: "npm:1.6.2"
