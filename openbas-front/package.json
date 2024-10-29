@@ -108,7 +108,7 @@
     "eslint-plugin-playwright": "2.0.0",
     "eslint-plugin-react": "7.37.2",
     "eslint-plugin-react-refresh": "0.4.13",
-    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-simple-import-sort": "12.1.1",
     "express": "4.20.0",
     "fs-extra": "11.2.0",
     "globals": "15.9.0",
