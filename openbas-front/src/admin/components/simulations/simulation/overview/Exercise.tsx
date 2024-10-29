@@ -48,9 +48,6 @@ const Exercise = () => {
   const { exercise } = useHelper((helper: ExercisesHelper) => ({
     exercise: helper.getExercise(exerciseId),
   }));
-  useDataLoader(() => {
-    dispatch(fetchExerciseInjects(exerciseId));
-  });
   const [results, setResults] = useState<ExpectationResultsByType[] | null>(null);
   const [injectResults, setInjectResults] = useState<InjectExpectationResultsByAttackPatternStore[] | null>(null);
   useEffect(() => {
