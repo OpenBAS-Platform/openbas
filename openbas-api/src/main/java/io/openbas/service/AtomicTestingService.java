@@ -470,7 +470,8 @@ public class AtomicTestingService {
         .map(
             tuple -> {
               InjectStatus injectStatus = new InjectStatus();
-              injectStatus.setName(tuple.get("inject_status", ExecutionStatus.class));
+              ExecutionStatus status = tuple.get("inject_status", ExecutionStatus.class);
+              injectStatus.setName(status != null ? status : ExecutionStatus.DRAFT);
               injectStatus.setTrackingSentDate(tuple.get("tracking_sent_date", Instant.class));
               return new AtomicTestingOutput(
                   tuple.get("inject_id", String.class),
