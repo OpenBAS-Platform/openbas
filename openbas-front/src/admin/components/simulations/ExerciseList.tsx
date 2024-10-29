@@ -1,21 +1,23 @@
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { HubOutlined } from '@mui/icons-material';
-import React, { CSSProperties, FunctionComponent } from 'react';
-import { Link } from 'react-router-dom';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import ExerciseStatus from './simulation/ExerciseStatus';
-import ItemTags from '../../../components/ItemTags';
-import { useFormatter } from '../../../components/i18n';
+import { CSSProperties, FunctionComponent } from 'react';
+import * as React from 'react';
+import { Link } from 'react-router-dom';
+
 import type { ExerciseSimpleStore, ExerciseStore } from '../../../actions/exercises/Exercise';
-import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
-import ItemTargets from '../../../components/ItemTargets';
-import type { ExerciseSimple } from '../../../utils/api-types';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../actions/Tag';
-import { useAppDispatch } from '../../../utils/hooks';
 import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
 import { Header } from '../../../components/common/SortHeadersList';
+import { useFormatter } from '../../../components/i18n';
+import ItemTags from '../../../components/ItemTags';
+import ItemTargets from '../../../components/ItemTargets';
+import type { ExerciseSimple } from '../../../utils/api-types';
+import { useAppDispatch } from '../../../utils/hooks';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
+import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
+import ExerciseStatus from './simulation/ExerciseStatus';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -149,23 +151,25 @@ const ExerciseList: FunctionComponent<Props> = ({
   return (
     <List>
       {hasHeader && queryableHelpers
-        && <ListItem
+      && (
+        <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
           secondaryAction={<>&nbsp;</>}
-           >
+        >
           <ListItemIcon />
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponentV2
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
                 sortHelpers={queryableHelpers.sortHelpers}
               />
-            }
+            )}
           />
-        </ListItem>}
+        </ListItem>
+      )}
       {exercises.map((exercise: ExerciseStore) => (
         <ListItem
           key={exercise.exercise_id}
@@ -182,9 +186,9 @@ const ExerciseList: FunctionComponent<Props> = ({
               <HubOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div className={classes.bodyItems}>
-                  {headers.map((header) => (
+                  {headers.map(header => (
                     <div
                       key={header.field}
                       className={classes.bodyItem}
@@ -194,7 +198,7 @@ const ExerciseList: FunctionComponent<Props> = ({
                     </div>
                   ))}
                 </div>
-              }
+              )}
             />
           </ListItemButton>
         </ListItem>

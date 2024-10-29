@@ -1,7 +1,8 @@
 import { Tooltip, Typography } from '@mui/material';
-import React, { FunctionComponent } from 'react';
-import { truncate } from '../../../utils/String';
+import { FunctionComponent } from 'react';
+
 import type { InjectResultDTO } from '../../../utils/api-types';
+import { truncate } from '../../../utils/String';
 
 interface Props {
   inject: InjectResultDTO;
@@ -12,7 +13,7 @@ const InjectHeader: FunctionComponent<Props> = ({
 }) => {
   return (
     <Tooltip title={inject.inject_title}>
-      <Typography variant="h1" gutterBottom >
+      <Typography variant="h1" gutterBottom>
         {truncate(inject.inject_title, 80)}
       </Typography>
     </Tooltip>

@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogTitle, IconButton, Tooltip } from '@mui/material';
 import { UpdateOutlined } from '@mui/icons-material';
+import { Dialog, DialogContent, DialogTitle, IconButton, Tooltip } from '@mui/material';
+import { useState } from 'react';
+import * as React from 'react';
+
 import { updateExerciseStartDate } from '../../../../actions/Exercise';
-import { useFormatter } from '../../../../components/i18n';
-import ExerciseDateForm from './ExerciseDateForm';
-import type { Exercise } from '../../../../utils/api-types';
 import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import type { Exercise } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import ExerciseDateForm from './ExerciseDateForm';
 
 interface Props {
   exercise: Exercise;

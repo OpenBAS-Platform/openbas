@@ -1,6 +1,7 @@
-import React, { JSXElementConstructor } from 'react';
 import { Slide } from '@mui/material';
 import type { TransitionProps } from '@mui/material/transitions';
+import { JSXElementConstructor } from 'react';
+import * as React from 'react';
 
 const Transition = React.forwardRef(
   (
@@ -9,7 +10,7 @@ const Transition = React.forwardRef(
       ...props
     }: TransitionProps & {
       children: React.ReactElement<
-      unknown,
+        unknown,
       string | JSXElementConstructor<unknown>
       >;
     },

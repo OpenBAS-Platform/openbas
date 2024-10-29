@@ -1,7 +1,7 @@
-import * as schema from './Schema';
 import { delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
+import * as schema from './Schema';
 
-export const fetchExerciseObjectives = (exerciseId) => (dispatch) => {
+export const fetchExerciseObjectives = exerciseId => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/objectives`;
   return getReferential(schema.arrayOfObjectives, uri)(dispatch);
 };
@@ -21,7 +21,7 @@ export const deleteExerciseObjective = (exerciseId, objectiveId) => (dispatch) =
   return delReferential(uri, 'objectives', objectiveId)(dispatch);
 };
 
-export const fetchScenarioObjectives = (scenarioId) => (dispatch) => {
+export const fetchScenarioObjectives = scenarioId => (dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/objectives`;
   return getReferential(schema.arrayOfObjectives, uri)(dispatch);
 };

@@ -1,17 +1,18 @@
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useFormatter } from '../../../../components/i18n';
-import { useAppDispatch } from '../../../../utils/hooks';
+
+import type { TagHelper, UserHelper } from '../../../../actions/helper';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import { deleteScenario, duplicateScenario, exportScenarioUri } from '../../../../actions/scenarios/scenario-actions';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
-import ScenarioExportDialog from './ScenarioExportDialog';
-import useScenarioPermissions from '../../../../utils/Scenario';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
-import ScenarioUpdate from './ScenarioUpdate';
+import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { TagHelper, UserHelper } from '../../../../actions/helper';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useScenarioPermissions from '../../../../utils/Scenario';
+import ScenarioExportDialog from './ScenarioExportDialog';
+import ScenarioUpdate from './ScenarioUpdate';
 
 type ScenarioActionType = 'Duplicate' | 'Update' | 'Delete' | 'Export';
 
@@ -44,7 +45,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   const handleOpenDuplicate = () => setDuplicate(true);
   const handleCloseDuplicate = () => setDuplicate(false);
   const submitDuplicate = () => {
-    dispatch(duplicateScenario(scenario.scenario_id)).then((result: { result: string, entities: { scenarios: Record<string, ScenarioStore> } }) => {
+    dispatch(duplicateScenario(scenario.scenario_id)).then((result: { result: string; entities: { scenarios: Record<string, ScenarioStore> } }) => {
       handleCloseDuplicate();
       navigate(`/admin/scenarios/${result.result}`);
     });
@@ -87,31 +88,39 @@ const ScenarioPopover: FunctionComponent<Props> = ({
     <>
       {actions.length > 0 && <ButtonPopover entries={entries} variant={inList ? 'icon' : 'toggle'} />}
       {actions.includes('Duplicate')
-        && <DialogDuplicate
+      && (
+        <DialogDuplicate
           open={duplicate}
           handleClose={handleCloseDuplicate}
           handleSubmit={submitDuplicate}
           text={`${t('Do you want to duplicate this scenario:')} ${scenario.scenario_name} ?`}
-           />}
+        />
+      )}
       {actions.includes(('Update'))
-        && <ScenarioUpdate
+      && (
+        <ScenarioUpdate
           scenario={scenario}
           open={edition}
           handleClose={handleCloseEdit}
-           />}
+        />
+      )}
       {actions.includes('Delete')
-        && <DialogDelete
+      && (
+        <DialogDelete
           open={deletion}
           handleClose={handleCloseDelete}
           handleSubmit={submitDelete}
           text={`${t('Do you want to delete this scenario:')} ${scenario.scenario_name} ?`}
-           />}
+        />
+      )}
       {actions.includes('Export')
-        && <ScenarioExportDialog
+      && (
+        <ScenarioExportDialog
           open={exportation}
           handleClose={handleCloseExport}
           handleSubmit={submitExport}
-           />}
+        />
+      )}
     </>
   );
 };

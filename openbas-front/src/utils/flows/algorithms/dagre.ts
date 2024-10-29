@@ -1,4 +1,5 @@
 import dagre from '@dagrejs/dagre';
+
 import { type LayoutAlgorithm } from '.';
 
 const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));

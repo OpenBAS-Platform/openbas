@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import * as R from 'ramda';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
+import * as R from 'ramda';
+import { useState } from 'react';
+
 import { useFormatter } from '../components/i18n';
 
 const useSearchAnFilter = (
@@ -20,19 +21,21 @@ const useSearchAnFilter = (
     setTags(R.uniq(R.append(value, tags)));
   };
   const handleRemoveTag = (value) => {
-    const remainingTags = R.filter((n) => n.id !== value, tags);
+    const remainingTags = R.filter(n => n.id !== value, tags);
     setTags(remainingTags);
   };
-  const handleSearch = (value) => setKeyword(value);
+  const handleSearch = value => setKeyword(value);
   const reverseBy = (field) => {
     setOrder({ sortBy: field, orderAsc: !order.orderAsc });
   };
   const buildHeader = (field, label, isSortable, styles) => {
-    const sortComponent = order.orderAsc ? (
-      <ArrowDropDownOutlined style={styles.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={styles.iconSort} />
-    );
+    const sortComponent = order.orderAsc
+      ? (
+          <ArrowDropDownOutlined style={styles.iconSort} />
+        )
+      : (
+          <ArrowDropUpOutlined style={styles.iconSort} />
+        );
     if (isSortable) {
       return (
         <div style={styles[field]} onClick={() => reverseBy(field)}>
@@ -51,9 +54,9 @@ const useSearchAnFilter = (
     const filterByKeyword = (e) => {
       const isEmptyKeyword = keyword === '';
       const isKnownColumn = searchColumns
-        .map((d) => e[`${schema ? `${schema}_` : ''}${d}`] || '')
-        .map((data) => (typeof data === 'object' ? JSON.stringify(data) : data))
-        .map((info) => info.toLowerCase().indexOf(keyword.toLowerCase()) !== -1)
+        .map(d => e[`${schema ? `${schema}_` : ''}${d}`] || '')
+        .map(data => (typeof data === 'object' ? JSON.stringify(data) : data))
+        .map(info => info.toLowerCase().indexOf(keyword.toLowerCase()) !== -1)
         .reduce((a, b) => a || b);
       return isEmptyKeyword || isKnownColumn;
     };
@@ -65,9 +68,9 @@ const useSearchAnFilter = (
     return defaultSortKey
       ? R.pipe(
         R.filter(
-          (n) => tags.length === 0
+          n => tags.length === 0
             || R.any(
-              (filter) => R.includes(filter, n[`${schema}_tags`] || []),
+              filter => R.includes(filter, n[`${schema}_tags`] || []),
               R.pluck('id', tags),
             ),
         ),

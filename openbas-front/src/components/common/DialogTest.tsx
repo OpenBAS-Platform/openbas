@@ -1,5 +1,6 @@
-import React, { FunctionComponent } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Alert } from '@mui/material';
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
+import { FunctionComponent } from 'react';
+
 import { useFormatter } from '../i18n';
 import Transition from './Transition';
 

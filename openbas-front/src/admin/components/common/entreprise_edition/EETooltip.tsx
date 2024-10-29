@@ -1,11 +1,12 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Tooltip } from '@mui/material';
-import React, { ReactElement, useState } from 'react';
-import EnterpriseEditionAgreement from './EnterpriseEditionAgreement';
-import { useFormatter } from '../../../../components/i18n';
-import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
-import useAI from '../../../../utils/hooks/useAI';
-import { useHelper } from '../../../../store';
+import { ReactElement, useState } from 'react';
+
 import type { UserHelper } from '../../../../actions/helper';
+import { useFormatter } from '../../../../components/i18n';
+import { useHelper } from '../../../../store';
+import useAI from '../../../../utils/hooks/useAI';
+import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
+import EnterpriseEditionAgreement from './EnterpriseEditionAgreement';
 
 const EETooltip = ({
   children,

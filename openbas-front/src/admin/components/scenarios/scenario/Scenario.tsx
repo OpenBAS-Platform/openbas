@@ -1,38 +1,40 @@
-import { Link, useParams } from 'react-router-dom';
-import React, { useState } from 'react';
+import { PlayArrowOutlined } from '@mui/icons-material';
 import { Avatar, Button, Chip, Grid, Paper, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
-import { PlayArrowOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { useHelper } from '../../../../store';
-import octiDark from '../../../../static/images/xtm/octi_dark.png';
-import octiLight from '../../../../static/images/xtm/octi_light.png';
-import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
-import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
+import { useState } from 'react';
+import * as React from 'react';
+import { Link, useParams } from 'react-router-dom';
+
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
-import ScenarioDistributionByExercise from './ScenarioDistributionByExercise';
-import { useFormatter } from '../../../../components/i18n';
+import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
+import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
+import { fetchScenarioExercises, searchScenarioExercises } from '../../../../actions/scenarios/scenario-actions';
+import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
+import { initSorting } from '../../../../components/common/queryable/Page';
+import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
+import { useFormatter } from '../../../../components/i18n';
 import ItemCategory from '../../../../components/ItemCategory';
 import ItemMainFocus from '../../../../components/ItemMainFocus';
-import ItemTags from '../../../../components/ItemTags';
-import PlatformIcon from '../../../../components/PlatformIcon';
 import ItemSeverity from '../../../../components/ItemSeverity';
-import type { KillChainPhase } from '../../../../utils/api-types';
-import { fetchScenarioExercises, searchScenarioExercises } from '../../../../actions/scenarios/scenario-actions';
+import ItemTags from '../../../../components/ItemTags';
+import Loader from '../../../../components/Loader';
+import PlatformIcon from '../../../../components/PlatformIcon';
 import type { Theme } from '../../../../components/Theme';
+import octiDark from '../../../../static/images/xtm/octi_dark.png';
+import octiLight from '../../../../static/images/xtm/octi_light.png';
+import { useHelper } from '../../../../store';
+import type { KillChainPhase } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { isEmptyField } from '../../../../utils/utils';
 import type { EndpointStore } from '../../assets/endpoints/Endpoint';
-import { initSorting } from '../../../../components/common/queryable/Page';
 import ExerciseList from '../../simulations/ExerciseList';
-import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
-import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import ExercisePopover from '../../simulations/simulation/ExercisePopover';
-import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
-import Loader from '../../../../components/Loader';
+import ScenarioDistributionByExercise from './ScenarioDistributionByExercise';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -86,7 +88,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
     <ExercisePopover
       exercise={exercise}
       actions={['Duplicate', 'Export', 'Delete']}
-      onDelete={(result) => setExercises(exercises.filter((e) => (e.exercise_id !== result)))}
+      onDelete={result => setExercises(exercises.filter(e => (e.exercise_id !== result)))}
       inList
     />
   );
@@ -211,7 +213,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
           </Typography>
           <Paper classes={{ root: classes.paper }} variant="outlined">
             {loadingScenarioExercises && (<Loader variant="inElement" />)}
-            {!loadingScenarioExercises && (<ScenarioDistributionByExercise exercises={scenarioExercises}/>)}
+            {!loadingScenarioExercises && (<ScenarioDistributionByExercise exercises={scenarioExercises} />)}
           </Paper>
         </Grid>
         {(scenarioExercises ?? 0).length > 0 && (
@@ -221,7 +223,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
             </Typography>
             <Paper classes={{ root: classes.paper }} variant="outlined">
               <PaginationComponentV2
-                fetch={(input) => searchScenarioExercises(scenarioId, input)}
+                fetch={input => searchScenarioExercises(scenarioId, input)}
                 searchPaginationInput={searchPaginationInput}
                 setContent={setExercises}
                 entityPrefix="exercise"
@@ -256,11 +258,11 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
         </div>
       )}
       {(scenarioExercises ?? 0).length === 0 && scenario.scenario_recurrence && (
-      <div style={{ marginTop: 100, textAlign: 'center' }}>
-        <div style={{ fontSize: 20 }}>
-          {t('This scenario is scheduled to run, results will appear soon.')}
+        <div style={{ marginTop: 100, textAlign: 'center' }}>
+          <div style={{ fontSize: 20 }}>
+            {t('This scenario is scheduled to run, results will appear soon.')}
+          </div>
         </div>
-      </div>
       )}
     </>
   );

@@ -1,14 +1,15 @@
-import React, { FunctionComponent, useState } from 'react';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
-import type { Theme } from '../../../../../components/Theme';
-import InjectAddExpectation from './InjectAddExpectation';
+import { FunctionComponent, useState } from 'react';
+
 import { useFormatter } from '../../../../../components/i18n';
+import type { Theme } from '../../../../../components/Theme';
 import { truncate } from '../../../../../utils/String';
-import ExpectationPopover from './ExpectationPopover';
 import type { ExpectationInput } from './Expectation';
+import ExpectationPopover from './ExpectationPopover';
 import { isAutomatic, typeIcon } from './ExpectationUtils';
+import InjectAddExpectation from './InjectAddExpectation';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -43,7 +44,7 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
 
   // Filter predefinedExpectations already included into expectations
   const predefinedExpectations = predefinedExpectationDatas
-    .filter((pe) => !expectations.map((e) => e.expectation_type).includes(pe.expectation_type));
+    .filter(pe => !expectations.map(e => e.expectation_type).includes(pe.expectation_type));
 
   // -- SORT HEADERS --
 
@@ -99,7 +100,7 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
               {typeIcon(expectation.expectation_type)}
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div className={classes.column}>
                   <div className={classes.bodyItem}>
                     {truncate(expectation.expectation_name || '', 40)}
@@ -114,7 +115,7 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
                     {typeLabel(expectation.expectation_type)}
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <ExpectationPopover

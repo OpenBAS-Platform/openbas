@@ -1,4 +1,4 @@
-import { Content } from 'pdfmake/interfaces';
+import type { Content } from 'pdfmake/interfaces';
 
 const parseMarkdownLine = (line: string): Content[] => {
   const tokens: Content[] = [];

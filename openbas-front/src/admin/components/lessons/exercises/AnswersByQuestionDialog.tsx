@@ -1,18 +1,18 @@
-import React from 'react';
 import { Button, LinearProgress, Typography, useTheme } from '@mui/material';
-import Dialog from '../../../../components/common/Dialog';
+import * as React from 'react';
 
+import Dialog from '../../../../components/common/Dialog';
+import { useFormatter } from '../../../../components/i18n';
 import type { LessonsAnswer, User } from '../../../../utils/api-types';
 import { resolveUserName } from '../../../../utils/String';
-import { useFormatter } from '../../../../components/i18n';
 
 interface Props {
-  open: boolean,
-  onClose: ()=>void,
-  question: string,
-  answers: LessonsAnswer[],
-  anonymized: boolean,
-  usersMap: Record<string, User>
+  open: boolean;
+  onClose: () => void;
+  question: string;
+  answers: LessonsAnswer[];
+  anonymized: boolean;
+  usersMap: Record<string, User>;
 }
 
 const AnswersByQuestionDialog: React.FC<Props> = ({ open, onClose, question, answers, anonymized, usersMap }) => {
@@ -24,7 +24,7 @@ const AnswersByQuestionDialog: React.FC<Props> = ({ open, onClose, question, ans
       open={open}
       handleClose={onClose}
       title={question}
-      maxWidth={'lg'}
+      maxWidth="lg"
     >
       <div style={{ display: 'flex', flexDirection: 'column' }}>
 
@@ -33,7 +33,8 @@ const AnswersByQuestionDialog: React.FC<Props> = ({ open, onClose, question, ans
           if (anonymized) userName = t('Anonymized');
           if (!anonymized && answer.lessons_answer_user) userName = resolveUserName(usersMap[answer.lessons_answer_user as string]);
           return (
-            <div key={answer.lessonsanswer_id}
+            <div
+              key={answer.lessonsanswer_id}
               style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr 1fr 1fr',
@@ -59,7 +60,8 @@ const AnswersByQuestionDialog: React.FC<Props> = ({ open, onClose, question, ans
                   }}
                 />
                 <Typography variant="body2" color="text.secondary">
-                  {answer.lessons_answer_score}%
+                  {answer.lessons_answer_score}
+                  %
                 </Typography>
               </div>
               <Typography>{answer.lessons_answer_positive}</Typography>
@@ -67,7 +69,11 @@ const AnswersByQuestionDialog: React.FC<Props> = ({ open, onClose, question, ans
             </div>
           );
         })}
-        <Button style={{ marginLeft: 'auto' }} onClick={onClose}> {t('Close')} </Button>
+        <Button style={{ marginLeft: 'auto' }} onClick={onClose}>
+          {' '}
+          {t('Close')}
+          {' '}
+        </Button>
       </div>
 
     </Dialog>

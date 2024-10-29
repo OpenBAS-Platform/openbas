@@ -1,8 +1,8 @@
-import type { TeamUpdateInput, Team } from '../../utils/api-types';
+import type { Team, TeamUpdateInput } from '../../utils/api-types';
 import { Option } from '../../utils/Option';
 
 export type TeamInputForm = Omit<
-TeamUpdateInput,
+  TeamUpdateInput,
 'team_organization' | 'team_tags'
 > & {
   team_organization: Option | undefined;

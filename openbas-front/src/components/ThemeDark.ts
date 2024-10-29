@@ -1,8 +1,8 @@
-import type { ExtendedThemeOptions } from './Theme';
-import LogoText from '../static/images/logo_text_dark.png';
 import LogoCollapsed from '../static/images/logo_dark.png';
-import { fileUri } from '../utils/Environment';
+import LogoText from '../static/images/logo_text_dark.png';
 import { hexToRGB } from '../utils/Colors';
+import { fileUri } from '../utils/Environment';
+import type { ExtendedThemeOptions } from './Theme';
 
 const EE_COLOR = '#00f1bd';
 
@@ -152,12 +152,12 @@ const ThemeDark = (
           scrollbarWidth: 'thin',
         },
         body: {
-          scrollbarColor: `${background || THEME_DARK_DEFAULT_BACKGROUND} ${accent || THEME_DARK_DEFAULT_ACCENT}`,
-          scrollbarWidth: 'thin',
-          html: {
+          'scrollbarColor': `${background || THEME_DARK_DEFAULT_BACKGROUND} ${accent || THEME_DARK_DEFAULT_ACCENT}`,
+          'scrollbarWidth': 'thin',
+          'html': {
             WebkitFontSmoothing: 'auto',
           },
-          a: {
+          'a': {
             color: primary || THEME_DARK_DEFAULT_PRIMARY,
           },
           'input:-webkit-autofill': {
@@ -170,12 +170,12 @@ const ThemeDark = (
             borderTopLeftRadius: 'inherit',
             borderTopRightRadius: 'inherit',
           },
-          pre: {
+          'pre': {
             fontFamily: 'Consolas, monaco, monospace',
             color: '#ffffff !important',
             background: `${accent || '#01478d'} !important`,
           },
-          code: {
+          'code': {
             fontFamily: 'Consolas, monaco, monospace',
             color: '#ffffff !important',
             background: `${accent || '#01478d'} !important`,
@@ -184,10 +184,10 @@ const ThemeDark = (
             fontWeight: 400,
           },
           '.w-md-editor': {
-            boxShadow: 'none',
-            background: 'transparent',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.7) !important',
-            transition: 'borderBottom .3s',
+            'boxShadow': 'none',
+            'background': 'transparent',
+            'borderBottom': '1px solid rgba(255, 255, 255, 0.7) !important',
+            'transition': 'borderBottom .3s',
             '&:hover': {
               borderBottom: '2px solid #ffffff !important',
             },
@@ -196,8 +196,8 @@ const ThemeDark = (
             },
           },
           '.error .w-md-editor': {
-            border: '0 !important',
-            borderBottom: '2px solid #f44336 !important',
+            'border': '0 !important',
+            'borderBottom': '2px solid #f44336 !important',
             '&:hover': {
               border: '0 !important',
               borderBottom: '2px solid #f44336 !important',

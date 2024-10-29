@@ -1,14 +1,15 @@
-import React, { Component } from 'react';
-import * as R from 'ramda';
 import { RouteOutlined } from '@mui/icons-material';
-import { Box, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { withStyles } from '@mui/styles';
+import * as R from 'ramda';
+import { Component } from 'react';
 import { connect } from 'react-redux';
+
+import { addKillChainPhase, fetchKillChainPhases } from '../actions/KillChainPhase';
+import { storeHelper } from '../actions/Schema';
 import KillChainPhaseForm from '../admin/components/settings/kill_chain_phases/KillChainPhaseForm';
-import { fetchKillChainPhases, addKillChainPhase } from '../actions/KillChainPhase';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
-import { storeHelper } from '../actions/Schema';
 
 const styles = () => ({
   icon: {
@@ -75,7 +76,7 @@ class KillChainPhaseField extends Component {
       userAdmin,
     } = this.props;
     const killChainPhasesOptions = killChainPhases.map(
-      (n) => ({
+      n => ({
         id: n.phase_id,
         label: `[${n.phase_kill_chain_name}] ${n.phase_name}`,
       }),

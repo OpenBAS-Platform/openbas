@@ -1,17 +1,17 @@
-import React from 'react';
-import { makeStyles } from '@mui/styles';
 import { Card, CardContent, Chip, Grid, Typography } from '@mui/material';
-import { useFormatter } from '../../../components/i18n';
-import { useHelper } from '../../../store';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
-import { useAppDispatch } from '../../../utils/hooks';
-import type { Collector } from '../../../utils/api-types';
-import type { CollectorHelper } from '../../../actions/collectors/collector-helper';
+import { makeStyles } from '@mui/styles';
+
 import { fetchCollectors } from '../../../actions/Collector';
-import useSearchAnFilter from '../../../utils/SortingFiltering';
+import type { CollectorHelper } from '../../../actions/collectors/collector-helper';
+import Breadcrumbs from '../../../components/Breadcrumbs';
+import { useFormatter } from '../../../components/i18n';
 import SearchFilter from '../../../components/SearchFilter';
 import type { Theme } from '../../../components/Theme';
-import Breadcrumbs from '../../../components/Breadcrumbs';
+import { useHelper } from '../../../store';
+import type { Collector } from '../../../utils/api-types';
+import { useAppDispatch } from '../../../utils/hooks';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
+import useSearchAnFilter from '../../../utils/SortingFiltering';
 
 const useStyles = makeStyles((theme: Theme) => ({
   parameters: {
@@ -119,9 +119,9 @@ const Collectors = () => {
                   />
                   <div style={{ display: 'flex', marginTop: 30 }}>
                     {
-                    (collector.collector_external && collector.collector_updated_at) || !collector.collector_external
-                      ? <div className={classes.dotGreen} /> : <div className={classes.dotRed} />
-                  }
+                      (collector.collector_external && collector.collector_updated_at) || !collector.collector_external
+                        ? <div className={classes.dotGreen} /> : <div className={classes.dotRed} />
+                    }
                     <Typography
                       variant="h4"
                       style={{
@@ -131,7 +131,9 @@ const Collectors = () => {
                         textOverflow: 'ellipsis',
                       }}
                     >
-                      {t('Updated at')} {nsdt(collector.collector_updated_at)}
+                      {t('Updated at')}
+                      {' '}
+                      {nsdt(collector.collector_updated_at)}
                     </Typography>
                   </div>
                 </CardContent>

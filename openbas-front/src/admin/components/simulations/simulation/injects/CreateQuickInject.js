@@ -1,18 +1,19 @@
-import React, { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import * as R from 'ramda';
+import { Add } from '@mui/icons-material';
 import { Drawer, Fab } from '@mui/material';
 import { withStyles, withTheme } from '@mui/styles';
-import { Add } from '@mui/icons-material';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component } from 'react';
+import { connect } from 'react-redux';
+
+import { fetchExercises } from '../../../../../actions/Exercise';
+import { fetchInjectorContract } from '../../../../../actions/InjectorContracts';
+import { storeHelper } from '../../../../../actions/Schema';
+import { fetchTags } from '../../../../../actions/Tag';
 import inject18n from '../../../../../components/i18n';
 import QuickInject, { EMAIL_CONTRACT } from './QuickInject';
-import { storeHelper } from '../../../../../actions/Schema';
-import { fetchExercises } from '../../../../../actions/Exercise';
-import { fetchTags } from '../../../../../actions/Tag';
-import { fetchInjectorContract } from '../../../../../actions/InjectorContracts';
 
-const styles = (theme) => ({
+const styles = theme => ({
   createButton: {
     position: 'fixed',
     bottom: 30,
@@ -58,7 +59,8 @@ class CreateQuickInject extends Component {
           <Add />
         </Fab>
         {injectorContract
-          && <Drawer
+        && (
+          <Drawer
             open={open}
             keepMounted={false}
             anchor="right"
@@ -67,7 +69,7 @@ class CreateQuickInject extends Component {
             onClose={this.handleClose.bind(this)}
             elevation={1}
             disableEnforceFocus={true}
-             >
+          >
             <QuickInject
               exerciseId={exercise.exercise_id}
               exercise={exercise}
@@ -77,7 +79,7 @@ class CreateQuickInject extends Component {
               tagsMap={tagsMap}
             />
           </Drawer>
-        }
+        )}
       </>
     );
   }

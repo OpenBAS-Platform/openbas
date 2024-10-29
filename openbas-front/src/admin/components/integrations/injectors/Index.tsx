@@ -1,18 +1,19 @@
-import React, { lazy } from 'react';
-import { Route, Routes, useParams } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
+import { lazy } from 'react';
+import { Route, Routes, useParams } from 'react-router-dom';
+
 import { fetchInjector } from '../../../../actions/Injectors';
-import Loader from '../../../../components/Loader';
-import InjectorHeader from './InjectorHeader';
-import { errorWrapper } from '../../../../components/Error';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { useHelper } from '../../../../store';
-import { useAppDispatch } from '../../../../utils/hooks';
-import type { Injector as InjectorType } from '../../../../utils/api-types';
-import NotFound from '../../../../components/NotFound';
 import type { InjectorHelper } from '../../../../actions/injectors/injector-helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
+import { errorWrapper } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
+import Loader from '../../../../components/Loader';
+import NotFound from '../../../../components/NotFound';
+import { useHelper } from '../../../../store';
+import type { Injector as InjectorType } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import InjectorHeader from './InjectorHeader';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -49,7 +50,7 @@ const Index = () => {
         <Routes>
           <Route path="" element={errorWrapper(InjectorContracts)()} />
           {/* Not found */}
-          <Route path="*" element={<NotFound/>}/>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     );

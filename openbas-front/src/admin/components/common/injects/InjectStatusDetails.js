@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
+import { PreviewOutlined } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, IconButton, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import { Dialog, DialogContent, DialogActions, Button, IconButton, TableRow, TableCell, TableBody, Table } from '@mui/material';
-import { PreviewOutlined } from '@mui/icons-material';
+import { Component } from 'react';
+
 import Transition from '../../../../components/common/Transition';
 import inject18n from '../../../../components/i18n';
 
@@ -51,9 +52,9 @@ class InjectStatusDetails extends Component {
                             <TableCell>{key}</TableCell>
                             <TableCell>
                               <Table selectable={false} size="small" key={key}>
-                                <TableBody displayRowCheckbox={ false}>
-                                  {value.filter((trace) => !!trace.execution_message)
-                                    .map((trace) => (
+                                <TableBody displayRowCheckbox={false}>
+                                  {value.filter(trace => !!trace.execution_message)
+                                    .map(trace => (
                                       <TableRow key={trace.execution_category}>
                                         <TableCell>
                                           {trace.execution_message}

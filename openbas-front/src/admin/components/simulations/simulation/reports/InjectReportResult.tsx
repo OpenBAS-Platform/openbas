@@ -1,10 +1,11 @@
-import React, { CSSProperties } from 'react';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-
+import { CSSProperties } from 'react';
+import * as React from 'react';
 import { SubmitHandler } from 'react-hook-form';
+
 import { useFormatter } from '../../../../../components/i18n';
-import type { InjectResultDTO, ReportInjectComment } from '../../../../../utils/api-types';
 import ItemTargets from '../../../../../components/ItemTargets';
+import type { InjectResultDTO, ReportInjectComment } from '../../../../../utils/api-types';
 import AtomicTestingResult from '../../../atomic_testings/atomic_testing/AtomicTestingResult';
 import InjectorContract from '../../../common/injects/InjectorContract';
 import ReportComment from '../../../components/reports/ReportComment';
@@ -26,7 +27,7 @@ const InjectReportResult: React.FC<Props> = ({
 }) => {
   // Standard hooks
   const { t, fldt, tPick } = useFormatter();
-  const findInjectCommentsByInjectId = (injectId: InjectResultDTO['inject_id']) => (injectsComments ?? []).find((c) => c.inject_id === injectId) ?? null;
+  const findInjectCommentsByInjectId = (injectId: InjectResultDTO['inject_id']) => (injectsComments ?? []).find(c => c.inject_id === injectId) ?? null;
 
   const saveComment = (injectId: ReportInjectComment['inject_id'], value: string) => {
     onCommentSubmit({ inject_id: injectId, report_inject_comment: value });
@@ -61,11 +62,13 @@ const InjectReportResult: React.FC<Props> = ({
       label: 'Comments',
       render: (inject: InjectResultDTO) => {
         const currentInjectComment = findInjectCommentsByInjectId(inject.inject_id);
-        return <ReportComment
-          canEditComment={canEditComment}
-          initialComment={currentInjectComment?.report_inject_comment || ''}
-          saveComment={(value) => saveComment(inject.inject_id, value)}
-               />;
+        return (
+          <ReportComment
+            canEditComment={canEditComment}
+            initialComment={currentInjectComment?.report_inject_comment || ''}
+            saveComment={value => saveComment(inject.inject_id, value)}
+          />
+        );
       },
     },
   ];
@@ -81,26 +84,32 @@ const InjectReportResult: React.FC<Props> = ({
           <Table aria-label="injects results">
             <TableHead>
               <TableRow>
-                {columns.map((col) => (
+                {columns.map(col => (
                   <TableCell
                     sx={col.label === 'Comments' ? { padding: '0px', width: '35%', flexGrow: 1 } : {}}
                     key={col.label}
-                  > {t(col.label)} </TableCell>))}
+                  >
+                    {' '}
+                    {t(col.label)}
+                    {' '}
+
+                  </TableCell>
+                ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {injects.map((inject) => (
+              {injects.map(inject => (
                 <TableRow
                   key={inject.inject_id}
                 >
-                  {columns.map((col) => (
+                  {columns.map(col => (
                     <TableCell
                       sx={col.label === 'Comments' ? { padding: '16px 0 16px 0', width: '35%', flexGrow: 1, alignItems: 'flex-start' } : { verticalAlign: 'top' }}
                       key={`${inject.inject_id}-${col.label}`}
                     >
                       {col.render(inject)}
-                    </TableCell>))
-                  }
+                    </TableCell>
+                  ))}
                 </TableRow>
               ))}
             </TableBody>

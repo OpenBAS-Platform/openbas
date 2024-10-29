@@ -1,21 +1,22 @@
-import React, { FunctionComponent, useEffect } from 'react';
-import { makeStyles } from '@mui/styles';
 import { Button, Typography } from '@mui/material';
-import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
-import { useAppDispatch } from '../../../../utils/hooks';
-import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
-import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
-import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
+import { makeStyles } from '@mui/styles';
+import { FunctionComponent, useEffect } from 'react';
+
+import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
+import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
+import type { InjectorContractHelper } from '../../../../actions/injector_contracts/injector-contract-helper';
+import { fetchInjectorsContracts } from '../../../../actions/InjectorContracts';
+import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
+import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
+import { FilterHelpers } from '../../../../components/common/queryable/filter/FilterHelpers';
+import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
-import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
-import { FilterHelpers } from '../../../../components/common/queryable/filter/FilterHelpers';
-import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
-import { fetchInjectorsContracts } from '../../../../actions/InjectorContracts';
-import type { InjectorContractHelper } from '../../../../actions/injector_contracts/injector-contract-helper';
+import { useHelper } from '../../../../store';
+import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 
 interface InjectorContractLight {
   injector_contract_id: string;
@@ -45,7 +46,7 @@ interface KillChainPhaseComponentProps {
 }
 
 const computeTechnique = (attackPatterns: AttackPattern[]) => {
-  return attackPatterns.filter((attackPattern) => attackPattern.attack_pattern_external_id.indexOf('.') < 0);
+  return attackPatterns.filter(attackPattern => attackPattern.attack_pattern_external_id.indexOf('.') < 0);
 };
 
 export const MITRE_FILTER_KEY = 'injector_contract_attack_patterns';
@@ -76,17 +77,23 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
   const techniques = computeTechnique(attackPatterns);
 
   const computeSubTechnique = (attackPattern: AttackPattern) => {
-    return attackPatterns.filter((value) => value.attack_pattern_external_id.includes(attackPattern.attack_pattern_external_id));
+    return attackPatterns.filter(value => value.attack_pattern_external_id.includes(attackPattern.attack_pattern_external_id));
   };
 
   const injectorsContratComponent = (attackPattern: AttackPattern) => {
     const subTechnique = computeSubTechnique(attackPattern);
-    const externalIds = subTechnique.map((value) => value.attack_pattern_external_id);
+    const externalIds = subTechnique.map(value => value.attack_pattern_external_id);
     externalIds.push(attackPattern.attack_pattern_external_id);
     const injectorsContratList = injectorsContratLight
-      .filter((value) => externalIds.some((value1) => value.injector_contract_attack_patterns_external_id?.includes(value1)));
+      .filter(value => externalIds.some(value1 => value.injector_contract_attack_patterns_external_id?.includes(value1)));
     if (injectorsContratList.length > 0) {
-      return (<span>&nbsp;({injectorsContratList.length})</span>);
+      return (
+        <span>
+&nbsp;(
+          {injectorsContratList.length}
+          )
+        </span>
+      );
     }
     return (<></>);
   };
@@ -103,11 +110,17 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
     <div>
       <div style={{ marginBottom: 10, textAlign: 'center' }}>
         <div>{killChainPhase.phase_name}</div>
-        <div style={{ textWrap: 'nowrap' }}>({techniques.length} {t('techniques')})</div>
+        <div style={{ textWrap: 'nowrap' }}>
+          (
+          {techniques.length}
+          {' '}
+          {t('techniques')}
+          )
+        </div>
       </div>
       <div>
         {techniques.sort(sortAttackPattern)
-          .map((attackPattern) => (
+          .map(attackPattern => (
             <Button
               key={attackPattern.attack_pattern_id}
               variant="outlined"

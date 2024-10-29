@@ -1,5 +1,5 @@
-import * as schema from './Schema';
 import { delReferential, getReferential, postReferential, putReferential, simplePostCall } from '../utils/Action';
+import * as schema from './Schema';
 
 export const fetchLessonsTemplates = () => (dispatch) => {
   const uri = '/api/lessons_templates';
@@ -17,17 +17,17 @@ export const updateLessonsTemplate = (lessonsTemplateId, data) => (dispatch) => 
   return putReferential(schema.lessonsTemplate, uri, data)(dispatch);
 };
 
-export const addLessonsTemplate = (data) => (dispatch) => {
+export const addLessonsTemplate = data => (dispatch) => {
   const uri = '/api/lessons_templates';
   return postReferential(schema.lessonsTemplate, uri, data)(dispatch);
 };
 
-export const deleteLessonsTemplate = (lessonsTemplateId) => (dispatch) => {
+export const deleteLessonsTemplate = lessonsTemplateId => (dispatch) => {
   const uri = `/api/lessons_templates/${lessonsTemplateId}`;
   return delReferential(uri, 'lessons_templates', lessonsTemplateId)(dispatch);
 };
 
-export const fetchLessonsTemplateCategories = (lessonsTemplateId) => (dispatch) => {
+export const fetchLessonsTemplateCategories = lessonsTemplateId => (dispatch) => {
   const uri = `/api/lessons_templates/${lessonsTemplateId}/lessons_template_categories`;
   return getReferential(
     schema.arrayOfLessonsTemplateCategories,
@@ -54,7 +54,7 @@ export const deleteLessonsTemplateCategory = (lessonsTemplateId, lessonsTemplate
   )(dispatch);
 };
 
-export const fetchLessonsTemplateQuestions = (lessonsTemplateId) => (dispatch) => {
+export const fetchLessonsTemplateQuestions = lessonsTemplateId => (dispatch) => {
   const uri = `/api/lessons_templates/${lessonsTemplateId}/lessons_template_questions`;
   return getReferential(
     schema.arrayOfLessonsTemplateQuestions,

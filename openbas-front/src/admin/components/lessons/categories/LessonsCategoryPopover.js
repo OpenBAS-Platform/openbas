@@ -1,13 +1,14 @@
-import React, { useContext, useState } from 'react';
-import * as R from 'ramda';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Slide } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Slide } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import LessonsCategoryForm from './LessonsCategoryForm';
+import * as R from 'ramda';
+import { forwardRef, useContext, useState } from 'react';
+
 import { useFormatter } from '../../../../components/i18n';
 import { LessonContext } from '../../common/Context';
+import LessonsCategoryForm from './LessonsCategoryForm';
 
-const Transition = React.forwardRef((props, ref) => (
+const Transition = forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';

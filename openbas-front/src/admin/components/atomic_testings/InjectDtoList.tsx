@@ -1,22 +1,23 @@
-import React, { CSSProperties, FunctionComponent, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { useFormatter } from '../../../components/i18n';
-import InjectIcon from '../common/injects/InjectIcon';
-import type { InjectResultDTO, SearchPaginationInput } from '../../../utils/api-types';
-import Empty from '../../../components/Empty';
+import { makeStyles } from '@mui/styles';
+import { CSSProperties, FunctionComponent, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+
 import { type Page } from '../../../components/common/queryable/Page';
-import InjectorContract from '../common/injects/InjectorContract';
-import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
-import { isNotEmptyField } from '../../../utils/utils';
-import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
+import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
 import { Header } from '../../../components/common/SortHeadersList';
+import Empty from '../../../components/Empty';
+import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
-import AtomicTestingResult from './atomic_testing/AtomicTestingResult';
 import ItemTargets from '../../../components/ItemTargets';
+import type { InjectResultDTO, SearchPaginationInput } from '../../../utils/api-types';
+import { isNotEmptyField } from '../../../utils/utils';
+import InjectIcon from '../common/injects/InjectIcon';
+import InjectorContract from '../common/injects/InjectorContract';
+import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
+import AtomicTestingResult from './atomic_testing/AtomicTestingResult';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -39,25 +40,25 @@ const useStyles = makeStyles(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  inject_type: {
+  'inject_type': {
     width: '10%',
   },
-  inject_title: {
+  'inject_title': {
     width: '20%',
   },
   'inject_status.tracking_sent_date': {
     width: '15%',
   },
-  inject_status: {
+  'inject_status': {
     width: '10%',
   },
-  inject_targets: {
+  'inject_targets': {
     width: '20%',
   },
-  inject_expectations: {
+  'inject_expectations': {
     width: '10%',
   },
-  inject_updated_at: {
+  'inject_updated_at': {
     width: '15%',
   },
 };
@@ -170,13 +171,13 @@ const InjectDtoList: FunctionComponent<Props> = ({
         >
           <ListItemIcon />
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponentV2
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
                 sortHelpers={queryableHelpers.sortHelpers}
               />
-            }
+            )}
           />
         </ListItem>
         {injects.map((injectDto) => {
@@ -185,14 +186,14 @@ const InjectDtoList: FunctionComponent<Props> = ({
               key={injectDto.inject_id}
               classes={{ root: classes.item }}
               divider
-              secondaryAction={
+              secondaryAction={(
                 <AtomicTestingPopover
                   atomic={injectDto}
                   actions={['Duplicate', 'Delete']}
-                  onDelete={(result) => setInjects(injects.filter((e) => (e.inject_id !== result)))}
+                  onDelete={result => setInjects(injects.filter(e => (e.inject_id !== result)))}
                   inList
                 />
-              }
+              )}
               disablePadding
             >
               <ListItemButton
@@ -212,9 +213,9 @@ const InjectDtoList: FunctionComponent<Props> = ({
                   />
                 </ListItemIcon>
                 <ListItemText
-                  primary={
+                  primary={(
                     <div className={classes.bodyItems}>
-                      {headers.map((header) => (
+                      {headers.map(header => (
                         <div
                           key={header.field}
                           className={classes.bodyItem}
@@ -224,7 +225,7 @@ const InjectDtoList: FunctionComponent<Props> = ({
                         </div>
                       ))}
                     </div>
-                  }
+                  )}
                 />
               </ListItemButton>
             </ListItem>

@@ -1,13 +1,14 @@
 import { Autocomplete, MenuItem, Select, TextField } from '@mui/material';
-import React, { FunctionComponent } from 'react';
-import { useFormatter } from '../../../../i18n';
+import { FunctionComponent } from 'react';
+
 import { SCENARIO_NOT_SCHEDULED_STATUS, SCENARIO_SCHEDULED_STATUS } from '../../../../../admin/components/scenarios/scenario/ScenarioStatus';
 import type { PropertySchemaDTO } from '../../../../../utils/api-types';
-import { OperatorKeyValues } from '../FilterUtils';
-import { FilterHelpers } from '../FilterHelpers';
 import { Option } from '../../../../../utils/Option';
+import { useFormatter } from '../../../../i18n';
+import { FilterHelpers } from '../FilterHelpers';
+import { OperatorKeyValues } from '../FilterUtils';
 
-const ScenarioStatusFilter: FunctionComponent<{ propertySchema: PropertySchemaDTO, helpers: FilterHelpers }> = ({
+const ScenarioStatusFilter: FunctionComponent<{ propertySchema: PropertySchemaDTO; helpers: FilterHelpers }> = ({
   propertySchema,
   helpers,
 }) => {
@@ -35,7 +36,7 @@ const ScenarioStatusFilter: FunctionComponent<{ propertySchema: PropertySchemaDT
         fullWidth
         style={{ marginBottom: 15 }}
       >
-        {operators.map((value) => (
+        {operators.map(value => (
           <MenuItem key={value} value={value}>
             {t(OperatorKeyValues[value])}
           </MenuItem>
@@ -47,12 +48,12 @@ const ScenarioStatusFilter: FunctionComponent<{ propertySchema: PropertySchemaDT
         autoHighlight
         noOptionsText={t('No available options')}
         options={options}
-        getOptionLabel={(option) => option.label ?? ''}
+        getOptionLabel={option => option.label ?? ''}
         isOptionEqualToValue={(option, v) => option.id === v.id}
         onChange={(_event, newValue) => {
           onChange(newValue);
         }}
-        renderInput={(paramsInput) => (
+        renderInput={paramsInput => (
           <TextField
             {...paramsInput}
             label={t(propertySchema.schema_property_name)}

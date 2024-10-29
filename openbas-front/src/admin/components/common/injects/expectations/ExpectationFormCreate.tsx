@@ -1,19 +1,20 @@
-import React, { FunctionComponent, SyntheticEvent, useEffect } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField, TextField as MuiTextField, Typography } from '@mui/material';
+import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField as MuiTextField, TextField, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { FunctionComponent, SyntheticEvent, useEffect } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+
+import type { LoggedHelper } from '../../../../../actions/helper';
+import { useFormatter } from '../../../../../components/i18n';
+import ScaleBar from '../../../../../components/scalebar/ScaleBar';
+import type { Theme } from '../../../../../components/Theme';
+import { useHelper } from '../../../../../store';
+import type { PlatformSettings } from '../../../../../utils/api-types';
+import { splitDuration } from '../../../../../utils/Time';
 import { ExpectationInput, ExpectationInputForm } from './Expectation';
 import { formProps, infoMessage } from './ExpectationFormUtils';
-import { useFormatter } from '../../../../../components/i18n';
-import type { Theme } from '../../../../../components/Theme';
-import ExpectationGroupField from './field/ExpectationGroupField';
 import { isTechnicalExpectation } from './ExpectationUtils';
-import ScaleBar from '../../../../../components/scalebar/ScaleBar';
-import { splitDuration } from '../../../../../utils/Time';
+import ExpectationGroupField from './field/ExpectationGroupField';
 import useExpectationExpirationTime from './useExpectationExpirationTime';
-import type { PlatformSettings } from '../../../../../utils/api-types';
-import { useHelper } from '../../../../../store';
-import type { LoggedHelper } from '../../../../../actions/helper';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
@@ -63,7 +64,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
   const manualExpectationExpirationTime = useExpectationExpirationTime('MANUAL');
 
   const computeValuesFromType = (type: string): ExpectationInputForm => {
-    const predefinedExpectation = predefinedExpectations.filter((pe) => pe.expectation_type === type)[0];
+    const predefinedExpectation = predefinedExpectations.filter(pe => pe.expectation_type === type)[0];
     if (predefinedExpectation) {
       const expirationTime = splitDuration(predefinedExpectation.expectation_expiration_time || 0);
       return {
@@ -90,7 +91,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
     };
   };
 
-  const predefinedTypes = predefinedExpectations.map((e) => e.expectation_type);
+  const predefinedTypes = predefinedExpectations.map(e => e.expectation_type);
   const initialValues: ExpectationInputForm = computeValuesFromType(predefinedTypes[0]);
 
   const {
@@ -126,18 +127,19 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
           error={!!errors.expectation_type}
           inputProps={register('expectation_type')}
         >
-          {predefinedTypes.map((type) => (<MenuItem key={type} value={type}>{t(type)}</MenuItem>))}
-          <MenuItem key={'MANUAL'} value={'MANUAL'}>{t('MANUAL')}</MenuItem>
+          {predefinedTypes.map(type => (<MenuItem key={type} value={type}>{t(type)}</MenuItem>))}
+          <MenuItem key="MANUAL" value="MANUAL">{t('MANUAL')}</MenuItem>
         </MUISelect>
       </div>
       {(watchType === 'ARTICLE' || watchType === 'CHALLENGE')
-        && <Alert
+      && (
+        <Alert
           severity="info"
           className={classes.marginTop_2}
-           >
+        >
           {infoMessage(getValues().expectation_type, t)}
         </Alert>
-      }
+      )}
       <MuiTextField
         variant="standard"
         fullWidth

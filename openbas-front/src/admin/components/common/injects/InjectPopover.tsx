@@ -1,31 +1,33 @@
-import React, { FunctionComponent, useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { useFormatter } from '../../../../components/i18n';
-import Transition from '../../../../components/common/Transition';
-import { InjectContext, PermissionsContext } from '../Context';
-import type { Inject, InjectStatus, InjectStatusExecution, InjectTestStatus } from '../../../../utils/api-types';
-import { duplicateInjectForExercise, duplicateInjectForScenario } from '../../../../actions/Inject';
-import { testInject } from '../../../../actions/injects/inject-action';
-import { useAppDispatch } from '../../../../utils/hooks';
-import DialogDuplicate from '../../../../components/common/DialogDuplicate';
-import { useHelper } from '../../../../store';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableRow } from '@mui/material';
+import { FunctionComponent, useContext, useState } from 'react';
+import * as React from 'react';
+import { Link } from 'react-router-dom';
+
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
-import DialogTest from '../../../../components/common/DialogTest';
-import { MESSAGING$ } from '../../../../utils/Environment';
+import { duplicateInjectForExercise, duplicateInjectForScenario } from '../../../../actions/Inject';
 import type { InjectStore } from '../../../../actions/injects/Inject';
+import { testInject } from '../../../../actions/injects/inject-action';
+import DialogDuplicate from '../../../../components/common/DialogDuplicate';
+import DialogTest from '../../../../components/common/DialogTest';
+import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import { useHelper } from '../../../../store';
+import type { Inject, InjectStatus, InjectStatusExecution, InjectTestStatus } from '../../../../utils/api-types';
+import { MESSAGING$ } from '../../../../utils/Environment';
+import { useAppDispatch } from '../../../../utils/hooks';
+import { InjectContext, PermissionsContext } from '../Context';
 
 type InjectPopoverType = {
-  inject_id: string,
-  inject_exercise?: string,
-  inject_scenario?: string,
-  inject_status?: InjectStatus,
-  inject_testable?: boolean,
-  inject_teams?: string[],
-  inject_type?: string,
-  inject_enabled?: boolean,
-  inject_title?: string,
+  inject_id: string;
+  inject_exercise?: string;
+  inject_scenario?: string;
+  inject_status?: InjectStatus;
+  inject_testable?: boolean;
+  inject_teams?: string[];
+  inject_type?: string;
+  inject_enabled?: boolean;
+  inject_title?: string;
 };
 
 interface Props {
@@ -36,8 +38,8 @@ interface Props {
   canDone?: boolean;
   canTriggerNow?: boolean;
   exerciseOrScenarioId?: string;
-  onCreate?: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void;
-  onUpdate?: (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => void;
+  onCreate?: (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => void;
+  onUpdate?: (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => void;
   onDelete?: (result: string) => void;
 }
 
@@ -92,12 +94,12 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const submitDuplicate = () => {
     if (inject.inject_exercise) {
-      dispatch(duplicateInjectForExercise(inject.inject_exercise, inject.inject_id)).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+      dispatch(duplicateInjectForExercise(inject.inject_exercise, inject.inject_id)).then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
         onCreate?.(result);
       });
     }
     if (inject.inject_scenario) {
-      dispatch(duplicateInjectForScenario(inject.inject_scenario, inject.inject_id)).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+      dispatch(duplicateInjectForScenario(inject.inject_scenario, inject.inject_id)).then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
         onCreate?.(result);
       });
     }
@@ -226,12 +228,12 @@ const InjectPopover: FunctionComponent<Props> = ({
           {t('Update')}
         </MenuItem>
         {!inject.inject_status && onInjectDone && canDone && (
-        <MenuItem
-          onClick={handleOpenDone}
-          disabled={isDisabled}
-        >
-          {t('Mark as done')}
-        </MenuItem>
+          <MenuItem
+            onClick={handleOpenDone}
+            disabled={isDisabled}
+          >
+            {t('Mark as done')}
+          </MenuItem>
         )}
         {inject.inject_testable && canBeTested && (
           <MenuItem onClick={handleOpenTest}>

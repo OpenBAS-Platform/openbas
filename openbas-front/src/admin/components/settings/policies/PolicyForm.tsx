@@ -1,6 +1,8 @@
-import React, { useEffect } from 'react';
-import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
 import { Button } from '@mui/material';
+import { useEffect } from 'react';
+import * as React from 'react';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+
 import MarkDownFieldController from '../../../../components/fields/MarkDownFieldController';
 import { useFormatter } from '../../../../components/i18n';
 import type { PolicyInput } from '../../../../utils/api-types';

@@ -1,5 +1,5 @@
-import React, { FunctionComponent } from 'react';
 import { MenuItem, Popover, Select, SelectChangeEvent } from '@mui/material';
+import { FunctionComponent } from 'react';
 
 interface Props {
   handleChangeValue: (event: SelectChangeEvent) => void;
@@ -7,7 +7,7 @@ interface Props {
   onClose: () => void;
   anchorEl?: HTMLElement;
   availableValues: string[];
-  element?: string,
+  element?: string;
 }
 
 const ClickableChipPopover: FunctionComponent<Props> = ({
@@ -33,7 +33,7 @@ const ClickableChipPopover: FunctionComponent<Props> = ({
           onChange={handleChangeValue}
           style={{ marginBottom: 15 }}
         >
-          {availableValues?.map((value) => (
+          {availableValues?.map(value => (
             <MenuItem key={value} value={value}>
               {value}
             </MenuItem>

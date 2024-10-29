@@ -1,15 +1,16 @@
-import React, { FunctionComponent, useContext, useState } from 'react';
-import { ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
+import { ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../i18n';
+import { FunctionComponent, useContext, useState } from 'react';
+
 import { fetchDocuments } from '../../actions/Document';
-import useDataLoader from '../../utils/hooks/useDataLoader';
-import { useAppDispatch } from '../../utils/hooks';
-import type { Theme } from '../Theme';
 import { PermissionsContext } from '../../admin/components/common/Context';
-import FileTransferDialog from './FileTransferDialog';
 import type { RawDocument } from '../../utils/api-types';
+import { useAppDispatch } from '../../utils/hooks';
+import useDataLoader from '../../utils/hooks/useDataLoader';
+import { useFormatter } from '../i18n';
+import type { Theme } from '../Theme';
+import FileTransferDialog from './FileTransferDialog';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -25,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   hasAttachments?: boolean;
-  handleAddDocuments: (documents: { document_id: string, document_attached: boolean }[]) => void;
+  handleAddDocuments: (documents: { document_id: string; document_attached: boolean }[]) => void;
   initialDocumentIds: string[];
 }
 
@@ -49,7 +50,7 @@ const MultipleFileLoader: FunctionComponent<Props> = ({
   const handleOpen = () => setOpen(true);
 
   const submitAddDocuments = (documents: RawDocument[]) => {
-    handleAddDocuments(documents.filter((doc) => doc.document_id !== undefined)
+    handleAddDocuments(documents.filter(doc => doc.document_id !== undefined)
       .map((document: RawDocument) => ({
         document_id: document.document_id!,
         document_attached: hasAttachments,

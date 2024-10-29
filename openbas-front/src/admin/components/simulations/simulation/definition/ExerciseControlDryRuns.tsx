@@ -1,20 +1,21 @@
-import React, { FunctionComponent, useState } from 'react';
-import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { Link } from 'react-router-dom';
 import { DeleteOutlined, VideoSettingsOutlined } from '@mui/icons-material';
+import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import DryrunStatus from '../controls/DryrunStatus';
+import { FunctionComponent, useState } from 'react';
+import { Link } from 'react-router-dom';
+
+import { deleteDryrun, fetchDryruns } from '../../../../../actions/Dryrun';
+import type { DryRunHelper } from '../../../../../actions/dryruns/dryrun-helper';
+import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
+import DialogDelete from '../../../../../components/common/DialogDelete';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { deleteDryrun, fetchDryruns } from '../../../../../actions/Dryrun';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import type { DryRunHelper } from '../../../../../actions/dryruns/dryrun-helper';
 import type { Dryrun } from '../../../../../utils/api-types';
 import { usePermissions } from '../../../../../utils/Exercise';
-import DialogDelete from '../../../../../components/common/DialogDelete';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import DryrunStatus from '../controls/DryrunStatus';
 
 const useStyles = makeStyles(() => ({
   item: {
@@ -78,7 +79,7 @@ const ExerciseControlDryRuns: FunctionComponent<Props> = ({
                 <VideoSettingsOutlined />
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div className={classes.bodyContainer}>
                     <div
                       className={classes.bodyItem}
@@ -96,8 +97,11 @@ const ExerciseControlDryRuns: FunctionComponent<Props> = ({
                       className={classes.bodyItem}
                       style={{ width: '15%' }}
                     >
-                      {/* eslint-disable-next-line i18next/no-literal-string */}
-                      <code>{dryrun.dryrun_speed}x</code>
+                      <code>
+                        {/* eslint-disable-next-line i18next/no-literal-string */}
+                        {dryrun.dryrun_speed}
+                        x
+                      </code>
                     </div>
                     <div
                       className={classes.bodyItem}
@@ -112,7 +116,7 @@ const ExerciseControlDryRuns: FunctionComponent<Props> = ({
                       />
                     </div>
                   </div>
-                }
+                )}
               />
               <ListItemSecondaryAction>
                 <IconButton

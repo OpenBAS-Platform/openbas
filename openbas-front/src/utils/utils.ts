@@ -1,7 +1,8 @@
 import * as R from 'ramda';
-import { MESSAGING$ } from './Environment';
-import { useHelper } from '../store';
+
 import type { LoggedHelper } from '../actions/helper';
+import { useHelper } from '../store';
+import { MESSAGING$ } from './Environment';
 
 export const export_max_size = 50000;
 
@@ -56,7 +57,6 @@ export const removeEmptyFields = (
 export const deleteElementByValue = (obj: Record<string, string>, val: string) => {
   for (const key in obj) {
     if (obj[key] === val) {
-      // eslint-disable-next-line no-param-reassign
       delete obj[key];
     }
   }
@@ -76,7 +76,7 @@ export const readFileContent = (file: File): Promise<unknown> => {
       }
     };
 
-    reader.onerror = (error) => reject(error);
+    reader.onerror = error => reject(error);
     reader.readAsText(file);
   });
 };

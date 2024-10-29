@@ -1,6 +1,7 @@
-import { IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import React, { FunctionComponent, useState } from 'react';
+import { IconButton, Menu, MenuItem } from '@mui/material';
+import { FunctionComponent, useState } from 'react';
+
 import { useFormatter } from '../i18n';
 import { PopoverEntry } from './ButtonPopover';
 
@@ -24,7 +25,7 @@ const IconPopover: FunctionComponent<Props> = ({
           ev.stopPropagation();
           setAnchorEl(ev.currentTarget);
         }}
-        aria-label={'Xls mapper menu'}
+        aria-label="Xls mapper menu"
         aria-haspopup="true"
         size="large"
       >
@@ -37,7 +38,8 @@ const IconPopover: FunctionComponent<Props> = ({
       >
         {entries.map((entry) => {
           return (
-            <MenuItem key={entry.label}
+            <MenuItem
+              key={entry.label}
               disabled={entry.disabled}
               onClick={() => {
                 entry.action();

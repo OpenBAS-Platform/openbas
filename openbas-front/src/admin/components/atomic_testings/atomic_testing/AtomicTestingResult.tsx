@@ -1,6 +1,7 @@
-import React from 'react';
 import { SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
+import * as React from 'react';
+
 import type { ExpectationResultsByType, InjectResultDTO } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
@@ -13,7 +14,7 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   expectations: ExpectationResultsByType[] | undefined;
-  injectId?: InjectResultDTO['inject_id']
+  injectId?: InjectResultDTO['inject_id'];
 }
 
 const AtomicTestingResult: React.FC<Props> = ({ expectations, injectId }) => {
@@ -52,7 +53,7 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations, injectId }) => {
             IconComponent = SensorOccupiedOutlined;
         }
         return (
-          <IconComponent key={index} style={{ color, marginRight: 10, fontSize: 22 }}/>
+          <IconComponent key={index} style={{ color, marginRight: 10, fontSize: 22 }} />
         );
       })}
     </div>

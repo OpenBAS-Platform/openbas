@@ -1,5 +1,7 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
+import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { MESSAGING$ } from '../utils/Environment';
 
 interface Props {
@@ -11,7 +13,7 @@ const RedirectManager: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     const subscription = MESSAGING$.redirect.subscribe({
-      next: (url) => navigate(url),
+      next: url => navigate(url),
     });
 
     return () => subscription.unsubscribe();

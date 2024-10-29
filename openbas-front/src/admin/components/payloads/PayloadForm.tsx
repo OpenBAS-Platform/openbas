@@ -1,17 +1,18 @@
-import React, { FormEvent, FunctionComponent } from 'react';
-import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ControlPointOutlined, DeleteOutlined } from '@mui/icons-material';
 import { Button, IconButton, InputLabel, List, ListItem, ListItemText, MenuItem, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { FormEvent, FunctionComponent } from 'react';
+import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { ControlPointOutlined, DeleteOutlined } from '@mui/icons-material';
-import PlatformField from '../../../components/PlatformField';
-import SelectField from '../../../components/fields/SelectField';
+
 import AttackPatternField from '../../../components/AttackPatternField';
 import FileLoader from '../../../components/fields/FileLoader';
-import { useFormatter } from '../../../components/i18n';
-import type { PayloadCreateInput } from '../../../utils/api-types';
+import SelectField from '../../../components/fields/SelectField';
 import TagField from '../../../components/fields/TagField';
+import { useFormatter } from '../../../components/i18n';
+import PlatformField from '../../../components/PlatformField';
+import type { PayloadCreateInput } from '../../../utils/api-types';
 import type { Option } from '../../../utils/Option';
 
 const useStyles = makeStyles(() => ({
@@ -193,8 +194,8 @@ const PayloadForm: FunctionComponent<Props> = ({
               inputProps={register('executable_arch')}
               InputLabelProps={{ required: true }}
             >
-              <MenuItem value='x86_64'>{t('x86_64')}</MenuItem>
-              <MenuItem value='arm64'>{t('arm64')}</MenuItem>
+              <MenuItem value="x86_64">{t('x86_64')}</MenuItem>
+              <MenuItem value="arm64">{t('arm64')}</MenuItem>
             </TextField>
           )}
         />

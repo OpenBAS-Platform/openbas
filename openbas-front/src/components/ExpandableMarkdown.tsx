@@ -1,6 +1,7 @@
-import React, { FunctionComponent, useState } from 'react';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
+import { FunctionComponent, useState } from 'react';
+
 import { emptyFilled, truncate } from '../utils/String';
 import MarkdownDisplay from './MarkdownDisplay';
 
@@ -8,7 +9,7 @@ interface ExpandableMarkdownProps {
   source?: string | null;
   limit?: number;
   showAll?: boolean;
-  markdownDOMId?: string,
+  markdownDOMId?: string;
 }
 
 const ExpandableMarkdown: FunctionComponent<ExpandableMarkdownProps> = ({
@@ -23,11 +24,11 @@ const ExpandableMarkdown: FunctionComponent<ExpandableMarkdownProps> = ({
   return (
     <div style={{ position: 'relative' }}>
       {shouldBeTruncated && (
-      <div style={{ position: 'absolute', top: -32, right: 0 }}>
-        <IconButton onClick={onClick} size="large">
-          {expand ? <ExpandLess /> : <ExpandMore />}
-        </IconButton>
-      </div>
+        <div style={{ position: 'absolute', top: -32, right: 0 }}>
+          <IconButton onClick={onClick} size="large">
+            {expand ? <ExpandLess /> : <ExpandMore />}
+          </IconButton>
+        </div>
       )}
       <div id={markdownDOMId} style={{ overflowX: 'auto' }}>
         <MarkdownDisplay

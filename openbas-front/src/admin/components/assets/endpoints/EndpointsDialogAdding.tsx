@@ -1,22 +1,23 @@
-import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { DevicesOtherOutlined } from '@mui/icons-material';
-import Transition from '../../../../components/common/Transition';
-import ItemTags from '../../../../components/ItemTags';
-import type { EndpointStore } from './Endpoint';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { useFormatter } from '../../../../components/i18n';
-import { useHelper } from '../../../../store';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { FunctionComponent, useEffect, useMemo, useState } from 'react';
+
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchEndpoints, searchEndpoints } from '../../../../actions/assets/endpoint-actions';
-import PlatformIcon from '../../../../components/PlatformIcon';
-import SelectList, { SelectListElements } from '../../../../components/common/SelectList';
-import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
-import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
-import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
-import type { FilterGroup } from '../../../../utils/api-types';
 import { buildFilter } from '../../../../components/common/queryable/filter/FilterUtils';
+import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
+import SelectList, { SelectListElements } from '../../../../components/common/SelectList';
+import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import ItemTags from '../../../../components/ItemTags';
+import PlatformIcon from '../../../../components/PlatformIcon';
+import { useHelper } from '../../../../store';
+import type { FilterGroup } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import type { EndpointStore } from './Endpoint';
 
 interface Props {
   initialState: string[];
@@ -51,16 +52,16 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
     dispatch(fetchEndpoints());
   });
 
-  const [endpointValues, setEndpointValues] = useState<EndpointStore[]>(initialState.map((id) => endpointsMap[id]));
+  const [endpointValues, setEndpointValues] = useState<EndpointStore[]>(initialState.map(id => endpointsMap[id]));
   useEffect(() => {
-    setEndpointValues(initialState.map((id) => endpointsMap[id]));
+    setEndpointValues(initialState.map(id => endpointsMap[id]));
   }, [open, initialState]);
 
   const addEndpoint = (endpointId: string) => {
     setEndpointValues([...endpointValues, endpointsMap[endpointId]]);
   };
   const removeEndpoint = (endpointId: string) => {
-    setEndpointValues(endpointValues.filter((v) => v.asset_id !== endpointId));
+    setEndpointValues(endpointValues.filter(v => v.asset_id !== endpointId));
   };
 
   // Dialog
@@ -70,7 +71,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
   };
 
   const handleSubmit = () => {
-    onSubmit(endpointValues.map((v) => v.asset_id));
+    onSubmit(endpointValues.map(v => v.asset_id));
     handleClose();
   };
 
@@ -87,10 +88,12 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
       },
       {
         field: 'endpoint_platform',
-        value: (endpoint: EndpointStore) => <div style={{ display: 'flex', alignItems: 'center' }}>
-          <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
-          {endpoint.endpoint_platform}
-        </div>,
+        value: (endpoint: EndpointStore) => (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
+            {endpoint.endpoint_platform}
+          </div>
+        ),
         width: 20,
       },
       {
@@ -127,14 +130,16 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
     filterGroup: quickFilter,
   }));
 
-  const paginationComponent = <PaginationComponentV2
-    fetch={searchEndpoints}
-    searchPaginationInput={searchPaginationInput}
-    setContent={setEndpoints}
-    entityPrefix="endpoint"
-    availableFilterNames={availableFilterNames}
-    queryableHelpers={queryableHelpers}
-                              />;
+  const paginationComponent = (
+    <PaginationComponentV2
+      fetch={searchEndpoints}
+      searchPaginationInput={searchPaginationInput}
+      setContent={setEndpoints}
+      entityPrefix="endpoint"
+      availableFilterNames={availableFilterNames}
+      queryableHelpers={queryableHelpers}
+    />
+  );
 
   return (
     <Dialog

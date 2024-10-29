@@ -1,6 +1,3 @@
-import React, { LegacyRef, MutableRefObject, ReactNode, useRef, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Collapse, Divider, Drawer, ListItemIcon, ListItemText, MenuItem, MenuList, Popover, Toolbar, Tooltip, tooltipClasses } from '@mui/material';
 import {
   AttachMoneyOutlined,
   BeenhereOutlined,
@@ -28,32 +25,36 @@ import {
   SubscriptionsOutlined,
   TerminalOutlined,
 } from '@mui/icons-material';
-import { DramaMasks, NewspaperVariantMultipleOutline, PostOutline, SecurityNetwork, SelectGroup, Target } from 'mdi-material-ui';
+import { Collapse, Divider, Drawer, ListItemIcon, ListItemText, MenuItem, MenuList, Popover, Toolbar, Tooltip, tooltipClasses } from '@mui/material';
 import { createStyles, makeStyles, styled, useTheme } from '@mui/styles';
-import { fileUri, MESSAGING$ } from '../../../utils/Environment';
-import { useFormatter } from '../../../components/i18n';
-import { useHelper } from '../../../store';
+import { DramaMasks, NewspaperVariantMultipleOutline, PostOutline, SecurityNetwork, SelectGroup, Target } from 'mdi-material-ui';
+import { LegacyRef, MutableRefObject, ReactNode, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+
 import type { UserHelper } from '../../../actions/helper';
+import { useFormatter } from '../../../components/i18n';
 import type { Theme } from '../../../components/Theme';
+import { computeBannerSettings } from '../../../public/components/systembanners/utils';
 import logoFiligranDark from '../../../static/images/logo_filigran_dark.png';
 import logoFiligranLight from '../../../static/images/logo_filigran_light.png';
 import logoFiligranTextDark from '../../../static/images/logo_filigran_text_dark.png';
 import logoFiligranTextLight from '../../../static/images/logo_filigran_text_light.png';
-import useDimensions from '../../../utils/hooks/useDimensions';
+import { useHelper } from '../../../store';
+import { fileUri, MESSAGING$ } from '../../../utils/Environment';
 import useAuth from '../../../utils/hooks/useAuth';
-import { computeBannerSettings } from '../../../public/components/systembanners/SystemBanners';
+import useDimensions from '../../../utils/hooks/useDimensions';
 
 type entry = {
-  type?: string,
-  link: string,
-  label: string,
-  icon?: ReactNode,
-  granted?: boolean,
-  exact?: boolean,
-  disabled?: boolean,
+  type?: string;
+  link: string;
+  label: string;
+  icon?: ReactNode;
+  granted?: boolean;
+  exact?: boolean;
+  disabled?: boolean;
 };
 
-const useStyles = makeStyles<Theme>((theme) => createStyles({
+const useStyles = makeStyles<Theme>(theme => createStyles({
   drawerPaper: {
     width: 55,
     minHeight: '100vh',
@@ -198,116 +199,125 @@ const LeftBar = () => {
   const { dimension } = useDimensions();
   const isMobile = dimension.width < 768;
   const generateSubMenu = (menu: string, entries: entry[]) => {
-    return navOpen ? (
-      <Collapse in={selectedMenu === menu} timeout="auto" unmountOnExit>
-        <MenuList component="nav" disablePadding>
-          {entries.filter((entry) => entry.granted !== false).map((entry) => {
-            return (
-              <StyledTooltip key={entry.label} title={entry.disabled ? t(`${entry.label} - Coming soon`) : t(entry.label)} placement="right">
-                <span>
+    return navOpen
+      ? (
+          <Collapse in={selectedMenu === menu} timeout="auto" unmountOnExit>
+            <MenuList component="nav" disablePadding>
+              {entries.filter(entry => entry.granted !== false).map((entry) => {
+                return (
+                  <StyledTooltip key={entry.label} title={entry.disabled ? t(`${entry.label} - Coming soon`) : t(entry.label)} placement="right">
+                    <span>
+                      <MenuItem
+                        component={Link}
+                        to={entry.link}
+                        selected={entry.exact ? location.pathname === entry.link : location.pathname.includes(entry.link)}
+                        dense
+                        classes={{ root: classes.menuSubItem }}
+                        disabled={entry.disabled}
+                      >
+                        {entry.icon && (
+                          <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
+                            {entry.icon}
+                          </ListItemIcon>
+                        )}
+                        <ListItemText
+                          classes={{ primary: classes.menuSubItemText }}
+                          primary={t(entry.label)}
+                        />
+                      </MenuItem>
+                    </span>
+                  </StyledTooltip>
+                );
+              })}
+            </MenuList>
+          </Collapse>
+        )
+      : (
+          <Popover
+            sx={{ pointerEvents: 'none' }}
+            open={selectedMenu === menu}
+            anchorEl={anchors[menu]?.current}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+            onClose={handleSelectedMenuClose}
+            disableRestoreFocus
+            disableScrollLock
+            slotProps={{
+              paper: {
+                elevation: 1,
+                onMouseEnter: () => handleSelectedMenuOpen(menu),
+                onMouseLeave: handleSelectedMenuClose,
+                sx: {
+                  pointerEvents: 'auto',
+                },
+              },
+            }}
+          >
+            <MenuList component="nav">
+              {entries.filter(entry => entry.granted !== false).map((entry) => {
+                if (entry.disabled) {
+                  return (
+                    <StyledTooltip
+                      key={entry.label}
+                      title={entry.disabled ? t(`${entry.label} - Coming soon`) : t(entry.label)}
+                      placement="right"
+                    >
+                      <span>
+                        <MenuItem
+                          key={entry.label}
+                          component={Link}
+                          to={entry.link}
+                          selected={entry.exact ? location.pathname === entry.link : location.pathname.includes(entry.link)}
+                          dense
+                          classes={{ root: classes.menuHoverItem }}
+                          onClick={handleSelectedMenuClose}
+                          disabled={entry.disabled}
+                        >
+                          {entry.icon && (
+                            <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
+                              {entry.icon}
+                            </ListItemIcon>
+                          )}
+                          <ListItemText
+                            classes={{ primary: classes.menuItemText }}
+                            primary={t(entry.label)}
+                          />
+                        </MenuItem>
+                      </span>
+                    </StyledTooltip>
+                  );
+                }
+                return (
                   <MenuItem
+                    key={entry.label}
                     component={Link}
                     to={entry.link}
                     selected={entry.exact ? location.pathname === entry.link : location.pathname.includes(entry.link)}
                     dense
-                    classes={{ root: classes.menuSubItem }}
-                    disabled={entry.disabled}
+                    classes={{ root: classes.menuHoverItem }}
+                    onClick={handleSelectedMenuClose}
                   >
-                    {entry.icon && <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
-                      {entry.icon}
-                    </ListItemIcon>}
+                    {entry.icon && (
+                      <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
+                        {entry.icon}
+                      </ListItemIcon>
+                    )}
                     <ListItemText
-                      classes={{ primary: classes.menuSubItemText }}
+                      classes={{ primary: classes.menuItemText }}
                       primary={t(entry.label)}
                     />
                   </MenuItem>
-                </span>
-              </StyledTooltip>
-            );
-          })}
-        </MenuList>
-      </Collapse>
-    ) : (
-      <Popover
-        sx={{ pointerEvents: 'none' }}
-        open={selectedMenu === menu}
-        anchorEl={anchors[menu]?.current}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        onClose={handleSelectedMenuClose}
-        disableRestoreFocus
-        disableScrollLock
-        slotProps={{
-          paper: {
-            elevation: 1,
-            onMouseEnter: () => handleSelectedMenuOpen(menu),
-            onMouseLeave: handleSelectedMenuClose,
-            sx: {
-              pointerEvents: 'auto',
-            },
-          },
-        }}
-      >
-        <MenuList component="nav">
-          {entries.filter((entry) => entry.granted !== false).map((entry) => {
-            if (entry.disabled) {
-              return (
-                <StyledTooltip key={entry.label}
-                  title={entry.disabled ? t(`${entry.label} - Coming soon`) : t(entry.label)}
-                  placement="right"
-                >
-                  <span>
-                    <MenuItem
-                      key={entry.label}
-                      component={Link}
-                      to={entry.link}
-                      selected={entry.exact ? location.pathname === entry.link : location.pathname.includes(entry.link)}
-                      dense
-                      classes={{ root: classes.menuHoverItem }}
-                      onClick={handleSelectedMenuClose}
-                      disabled={entry.disabled}
-                    >
-                      {entry.icon && <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
-                        {entry.icon}
-                      </ListItemIcon>}
-                      <ListItemText
-                        classes={{ primary: classes.menuItemText }}
-                        primary={t(entry.label)}
-                      />
-                    </MenuItem>
-                  </span>
-                </StyledTooltip>
-              );
-            }
-            return (
-              <MenuItem
-                key={entry.label}
-                component={Link}
-                to={entry.link}
-                selected={entry.exact ? location.pathname === entry.link : location.pathname.includes(entry.link)}
-                dense
-                classes={{ root: classes.menuHoverItem }}
-                onClick={handleSelectedMenuClose}
-              >
-                {entry.icon && <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
-                  {entry.icon}
-                </ListItemIcon>}
-                <ListItemText
-                  classes={{ primary: classes.menuItemText }}
-                  primary={t(entry.label)}
-                />
-              </MenuItem>
-            );
-          })}
-        </MenuList>
-      </Popover>
-    );
+                );
+              })}
+            </MenuList>
+          </Popover>
+        );
   };
   return (
     <Drawer
@@ -360,10 +370,10 @@ const LeftBar = () => {
                 <MovieFilterOutlined />
               </ListItemIcon>
               {navOpen && (
-              <ListItemText
-                classes={{ primary: classes.menuItemText }}
-                primary={t('Scenarios')}
-              />
+                <ListItemText
+                  classes={{ primary: classes.menuItemText }}
+                  primary={t('Scenarios')}
+                />
               )}
             </MenuItem>
           </StyledTooltip>
@@ -660,7 +670,7 @@ const LeftBar = () => {
               }}
               onClick={() => window.open('https://filigran.io/', '_blank')}
             >
-              <Tooltip title={'By Filigran'}>
+              <Tooltip title="By Filigran">
                 <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
                   <img
                     src={fileUri(theme.palette.mode === 'dark' ? logoFiligranDark : logoFiligranLight)}

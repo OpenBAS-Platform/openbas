@@ -1,11 +1,12 @@
-import React from 'react';
+import { DevicesOtherOutlined, Groups3Outlined, PersonOutlined } from '@mui/icons-material';
 import { Divider, ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { DevicesOtherOutlined, Groups3Outlined, PersonOutlined } from '@mui/icons-material';
 import { SelectGroup } from 'mdi-material-ui';
+import * as React from 'react';
+
+import PlatformIcon from '../../../../components/PlatformIcon';
 import type { InjectTargetWithResult } from '../../../../utils/api-types';
 import AtomicTestingResult from './AtomicTestingResult';
-import PlatformIcon from '../../../../components/PlatformIcon';
 
 const useStyles = makeStyles(() => ({
   bodyTarget: {
@@ -61,7 +62,7 @@ const TargetListItem: React.FC<Props> = ({ isChild, onClick, target, selected })
             {getIcon(target?.targetType)}
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div className={classes.bodyTarget} style={{ width: '50%' }}>
                   {target?.name}
@@ -74,7 +75,7 @@ const TargetListItem: React.FC<Props> = ({ isChild, onClick, target, selected })
                   <AtomicTestingResult expectations={target?.expectationResultsByTypes} />
                 </div>
               </div>
-            }
+            )}
           />
         </ListItemButton>
       </Paper>

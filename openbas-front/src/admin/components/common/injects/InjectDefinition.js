@@ -1,7 +1,14 @@
-import React, { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
+import {
+  ArrowDropDownOutlined,
+  ArrowDropUpOutlined,
+  AttachmentOutlined,
+  ControlPointOutlined,
+  DeleteOutlined,
+  EmojiEventsOutlined,
+  GroupsOutlined,
+  HelpOutlineOutlined,
+  RotateLeftOutlined,
+} from '@mui/icons-material';
 import {
   Button,
   FormControlLabel,
@@ -18,53 +25,47 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { connect } from 'react-redux';
-import {
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
-  AttachmentOutlined,
-  ControlPointOutlined,
-  DeleteOutlined,
-  EmojiEventsOutlined,
-  GroupsOutlined,
-  HelpOutlineOutlined,
-  RotateLeftOutlined,
-} from '@mui/icons-material';
+import { withStyles } from '@mui/styles';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component } from 'react';
 import { FieldArray } from 'react-final-form-arrays';
-import inject18n from '../../../../components/i18n';
-import { fetchInjectTeams } from '../../../../actions/Inject';
-import { fetchDocuments } from '../../../../actions/Document';
-import { fetchChannels } from '../../../../actions/channels/channel-action';
-import { fetchChallenges } from '../../../../actions/Challenge';
-import ItemTags from '../../../../components/ItemTags';
-import { storeHelper } from '../../../../actions/Schema';
-import ItemBoolean from '../../../../components/ItemBoolean';
-import InjectAddTeams from './InjectAddTeams';
-import OldTextField from '../../../../components/fields/OldTextField';
-import SwitchField from '../../../../components/fields/SwitchField';
-import RichTextField from '../../../../components/fields/RichTextField';
-import MultipleFileLoader from '../../../../components/fields/MultipleFileLoader';
-import Loader from '../../../../components/Loader';
-import DocumentType from '../../components/documents/DocumentType';
-import DocumentPopover from '../../components/documents/DocumentPopover';
-import OldSelectField from '../../../../components/fields/OldSelectField';
-import ArticlePopover from '../articles/ArticlePopover';
-import InjectAddArticles from './InjectAddArticles';
-import ChannelIcon from '../../components/channels/ChannelIcon';
-import ChallengePopover from '../../components/challenges/ChallengePopover';
-import InjectAddChallenges from './InjectAddChallenges';
-import AvailableVariablesDialog from '../../simulations/simulation/variables/AvailableVariablesDialog';
-import InjectExpectations from './expectations/InjectExpectations';
-import EndpointsList from '../../assets/endpoints/EndpointsList';
-import EndpointPopover from '../../assets/endpoints/EndpointPopover';
-import InjectAddEndpoints from '../../simulations/simulation/injects/endpoints/InjectAddEndpoints';
-import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
-import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
-import InjectAddAssetGroups from '../../simulations/simulation/injects/asset_groups/InjectAddAssetGroups';
-import InjectTeamsList from './teams/InjectTeamsList';
-import arraysEqual from '../../../../utils/ArrayUtils';
+import { connect } from 'react-redux';
 
-const styles = (theme) => ({
+import { fetchChallenges } from '../../../../actions/Challenge';
+import { fetchChannels } from '../../../../actions/channels/channel-action';
+import { fetchDocuments } from '../../../../actions/Document';
+import { fetchInjectTeams } from '../../../../actions/Inject';
+import { storeHelper } from '../../../../actions/Schema';
+import MultipleFileLoader from '../../../../components/fields/MultipleFileLoader';
+import OldSelectField from '../../../../components/fields/OldSelectField';
+import OldTextField from '../../../../components/fields/OldTextField';
+import RichTextField from '../../../../components/fields/RichTextField';
+import SwitchField from '../../../../components/fields/SwitchField';
+import inject18n from '../../../../components/i18n';
+import ItemBoolean from '../../../../components/ItemBoolean';
+import ItemTags from '../../../../components/ItemTags';
+import Loader from '../../../../components/Loader';
+import arraysEqual from '../../../../utils/ArrayUtils';
+import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
+import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
+import EndpointPopover from '../../assets/endpoints/EndpointPopover';
+import EndpointsList from '../../assets/endpoints/EndpointsList';
+import ChallengePopover from '../../components/challenges/ChallengePopover';
+import ChannelIcon from '../../components/channels/ChannelIcon';
+import DocumentPopover from '../../components/documents/DocumentPopover';
+import DocumentType from '../../components/documents/DocumentType';
+import InjectAddAssetGroups from '../../simulations/simulation/injects/asset_groups/InjectAddAssetGroups';
+import InjectAddEndpoints from '../../simulations/simulation/injects/endpoints/InjectAddEndpoints';
+import AvailableVariablesDialog from '../../simulations/simulation/variables/AvailableVariablesDialog';
+import ArticlePopover from '../articles/ArticlePopover';
+import InjectExpectations from './expectations/InjectExpectations';
+import InjectAddArticles from './InjectAddArticles';
+import InjectAddChallenges from './InjectAddChallenges';
+import InjectAddTeams from './InjectAddTeams';
+import InjectTeamsList from './teams/InjectTeamsList';
+
+const styles = theme => ({
   header: {
     backgroundColor: theme.palette.background.nav,
     padding: '20px 20px 20px 60px',
@@ -418,7 +419,7 @@ class InjectDefinition extends Component {
 
   handleRemoveTeam(teamId) {
     this.setState({
-      teamsIds: this.state.teamsIds.filter((a) => a !== teamId),
+      teamsIds: this.state.teamsIds.filter(a => a !== teamId),
     }, () => this.props.setInjectDetailsState(this.state));
   }
 
@@ -431,7 +432,7 @@ class InjectDefinition extends Component {
 
   handleRemoveAsset(assetId) {
     this.setState({
-      assetIds: this.state.assetIds.filter((a) => a !== assetId),
+      assetIds: this.state.assetIds.filter(a => a !== assetId),
     }, () => this.props.setInjectDetailsState(this.state));
   }
 
@@ -444,7 +445,7 @@ class InjectDefinition extends Component {
 
   handleRemoveAssetGroup(assetGroupId) {
     this.setState({
-      assetGroupIds: this.state.assetGroupIds.filter((a) => a !== assetGroupId),
+      assetGroupIds: this.state.assetGroupIds.filter(a => a !== assetGroupId),
     }, () => this.props.setInjectDetailsState(this.state));
   }
 
@@ -457,7 +458,7 @@ class InjectDefinition extends Component {
 
   handleRemoveArticle(articleId) {
     this.setState({
-      articlesIds: this.state.articlesIds.filter((a) => a !== articleId),
+      articlesIds: this.state.articlesIds.filter(a => a !== articleId),
     }, () => this.props.setInjectDetailsState(this.state));
   }
 
@@ -470,7 +471,7 @@ class InjectDefinition extends Component {
 
   handleRemoveChallenge(challengeId) {
     this.setState({
-      challengesIds: this.state.challengesIds.filter((a) => a !== challengeId),
+      challengesIds: this.state.challengesIds.filter(a => a !== challengeId),
     }, () => this.props.setInjectDetailsState(this.state));
   }
 
@@ -484,7 +485,7 @@ class InjectDefinition extends Component {
   handleRemoveDocument(documentId) {
     this.setState({
       documents: this.state.documents.filter(
-        (d) => d.document_id !== documentId,
+        d => d.document_id !== documentId,
       ),
     }, () => this.props.setInjectDetailsState(this.state));
   }
@@ -496,11 +497,11 @@ class InjectDefinition extends Component {
 
   toggleAttachment(documentId) {
     this.setState({
-      documents: this.state.documents.map((d) => (d.document_id === documentId
+      documents: this.state.documents.map(d => (d.document_id === documentId
         ? {
-          document_id: d.document_id,
-          document_attached: !d.document_attached,
-        }
+            document_id: d.document_id,
+            document_attached: !d.document_attached,
+          }
         : d)),
     }, () => this.props.setInjectDetailsState(this.state));
   }
@@ -515,11 +516,13 @@ class InjectDefinition extends Component {
   articlesSortHeader(field, label, isSortable) {
     const { t } = this.props;
     const { articlesSortBy, articlesOrderAsc } = this.state;
-    const sortComponent = articlesOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = articlesOrderAsc
+      ? (
+          <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+          <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -548,11 +551,13 @@ class InjectDefinition extends Component {
   challengesSortHeader(field, label, isSortable) {
     const { t } = this.props;
     const { challengesSortBy, challengesOrderAsc } = this.state;
-    const sortComponent = challengesOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = challengesOrderAsc
+      ? (
+          <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+          <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -581,11 +586,13 @@ class InjectDefinition extends Component {
   documentsSortHeader(field, label, isSortable) {
     const { t } = this.props;
     const { documentsSortBy, documentsOrderAsc } = this.state;
-    const sortComponent = documentsOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = documentsOrderAsc
+      ? (
+          <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+          <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -611,32 +618,34 @@ class InjectDefinition extends Component {
         {renderedFields.map((field) => {
           switch (field.type) {
             case 'textarea':
-              return field.richText ? (
-                <RichTextField
-                  key={field.key}
-                  name={field.key}
-                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                  fullWidth={true}
-                  style={{ marginTop: 20, height: 250 }}
-                  disabled={this.props.permissions.readOnly || field.readOnly}
-                  askAi={true}
-                  inInject={true}
-                />
-              ) : (
-                <OldTextField
-                  variant="standard"
-                  key={field.key}
-                  name={field.key}
-                  fullWidth={true}
-                  multiline={true}
-                  rows={10}
-                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                  style={{ marginTop: 20 }}
-                  disabled={this.props.permissions.readOnly || field.readOnly}
-                  askAi={true}
-                  inInject={true}
-                />
-              );
+              return field.richText
+                ? (
+                    <RichTextField
+                      key={field.key}
+                      name={field.key}
+                      label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+                      fullWidth={true}
+                      style={{ marginTop: 20, height: 250 }}
+                      disabled={this.props.permissions.readOnly || field.readOnly}
+                      askAi={true}
+                      inInject={true}
+                    />
+                  )
+                : (
+                    <OldTextField
+                      variant="standard"
+                      key={field.key}
+                      name={field.key}
+                      fullWidth={true}
+                      multiline={true}
+                      rows={10}
+                      label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+                      style={{ marginTop: 20 }}
+                      disabled={this.props.permissions.readOnly || field.readOnly}
+                      askAi={true}
+                      inInject={true}
+                    />
+                  );
             case 'number':
               return (
                 <OldTextField
@@ -679,8 +688,7 @@ class InjectDefinition extends Component {
                                   type: 'text',
                                   key: '',
                                   value: '',
-                                })
-                                }
+                                })}
                                 aria-haspopup="true"
                                 size="medium"
                                 style={{ marginTop: -2 }}
@@ -740,35 +748,35 @@ class InjectDefinition extends Component {
                                 && values[field.key][index]
                                 && values[field.key][index].type
                                 === 'attachment' ? (
-                                  <OldSelectField
-                                    variant="standard"
-                                    name={`${name}.value`}
-                                    fullWidth={true}
-                                    label={t('Value')}
-                                    style={{ marginRight: 20 }}
-                                    disabled={this.props.permissions.readOnly || field.readOnly}
-                                  >
-                                    {attachedDocs.map((doc) => (
-                                      <MenuItem
-                                        key={doc.document_id}
-                                        value={doc.document_id}
+                                      <OldSelectField
+                                        variant="standard"
+                                        name={`${name}.value`}
+                                        fullWidth={true}
+                                        label={t('Value')}
+                                        style={{ marginRight: 20 }}
+                                        disabled={this.props.permissions.readOnly || field.readOnly}
                                       >
-                                        <ListItemText>
-                                          {doc.document_name}
-                                        </ListItemText>
-                                      </MenuItem>
-                                    ))}
-                                  </OldSelectField>
-                                  ) : (
-                                    <OldTextField
-                                      variant="standard"
-                                      name={`${name}.value`}
-                                      fullWidth={true}
-                                      label={t('Value')}
-                                      style={{ marginRight: 20 }}
-                                      disabled={this.props.permissions.readOnly || field.readOnly}
-                                    />
-                                  )}
+                                        {attachedDocs.map(doc => (
+                                          <MenuItem
+                                            key={doc.document_id}
+                                            value={doc.document_id}
+                                          >
+                                            <ListItemText>
+                                              {doc.document_name}
+                                            </ListItemText>
+                                          </MenuItem>
+                                        ))}
+                                      </OldSelectField>
+                                    ) : (
+                                      <OldTextField
+                                        variant="standard"
+                                        name={`${name}.value`}
+                                        fullWidth={true}
+                                        label={t('Value')}
+                                        style={{ marginRight: 20 }}
+                                        disabled={this.props.permissions.readOnly || field.readOnly}
+                                      />
+                                    )}
                                 {field.cardinality === 'n' && (
                                   <IconButton
                                     onClick={() => fields.remove(index)}
@@ -790,101 +798,103 @@ class InjectDefinition extends Component {
                 </div>
               );
             case 'select':
-              return field.cardinality === 'n' ? (
-                <OldSelectField
-                  variant="standard"
-                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                  key={field.key}
-                  multiple
-                  renderValue={(v) => v.map((a) => field.choices[a]).join(', ')}
-                  name={field.key}
-                  fullWidth={true}
-                  style={{ marginTop: 20 }}
-                  disabled={this.props.permissions.readOnly || field.readOnly}
-                >
-                  {Object.entries(field.choices)
-                    .sort((a, b) => a[1].localeCompare(b[1]))
-                    .map(([k, v]) => (
-                      <MenuItem key={k} value={k}>
-                        <ListItemText>
-                          {field.expectation ? t(v || 'Unknown') : v}
-                        </ListItemText>
-                      </MenuItem>
-                    ))}
-                </OldSelectField>
-              ) : (
-                <OldSelectField
-                  variant="standard"
-                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                  key={field.key}
-                  renderValue={(v) => (field.expectation
-                    ? t(field.choices[v] || 'Unknown')
-                    : field.choices[v])
-                  }
-                  name={field.key}
-                  fullWidth={true}
-                  style={{ marginTop: 20 }}
-                  disabled={this.props.permissions.readOnly}
-                >
-                  {Object.entries(field.choices)
-                    .sort((a, b) => a[1].localeCompare(b[1]))
-                    .map(([k, v]) => (
-                      <MenuItem key={k} value={k}>
-                        <ListItemText>
-                          {field.expectation ? t(v || 'Unknown') : v}
-                        </ListItemText>
-                      </MenuItem>
-                    ))}
-                </OldSelectField>
-              );
+              return field.cardinality === 'n'
+                ? (
+                    <OldSelectField
+                      variant="standard"
+                      label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+                      key={field.key}
+                      multiple
+                      renderValue={v => v.map(a => field.choices[a]).join(', ')}
+                      name={field.key}
+                      fullWidth={true}
+                      style={{ marginTop: 20 }}
+                      disabled={this.props.permissions.readOnly || field.readOnly}
+                    >
+                      {Object.entries(field.choices)
+                        .sort((a, b) => a[1].localeCompare(b[1]))
+                        .map(([k, v]) => (
+                          <MenuItem key={k} value={k}>
+                            <ListItemText>
+                              {field.expectation ? t(v || 'Unknown') : v}
+                            </ListItemText>
+                          </MenuItem>
+                        ))}
+                    </OldSelectField>
+                  )
+                : (
+                    <OldSelectField
+                      variant="standard"
+                      label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+                      key={field.key}
+                      renderValue={v => (field.expectation
+                        ? t(field.choices[v] || 'Unknown')
+                        : field.choices[v])}
+                      name={field.key}
+                      fullWidth={true}
+                      style={{ marginTop: 20 }}
+                      disabled={this.props.permissions.readOnly}
+                    >
+                      {Object.entries(field.choices)
+                        .sort((a, b) => a[1].localeCompare(b[1]))
+                        .map(([k, v]) => (
+                          <MenuItem key={k} value={k}>
+                            <ListItemText>
+                              {field.expectation ? t(v || 'Unknown') : v}
+                            </ListItemText>
+                          </MenuItem>
+                        ))}
+                    </OldSelectField>
+                  );
             case 'dependency-select':
               // eslint-disable-next-line no-case-declarations
               const depValue = values[field.dependencyField];
               // eslint-disable-next-line no-case-declarations
               const choices = field.choices[depValue] ?? {};
-              return field.cardinality === 'n' ? (
-                <OldSelectField
-                  variant="standard"
-                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                  key={field.key}
-                  multiple
-                  renderValue={(v) => v.map((a) => choices[a]).join(', ')}
-                  name={field.key}
-                  fullWidth={true}
-                  style={{ marginTop: 20 }}
-                  disabled={this.props.permissions.readOnly || field.readOnly}
-                >
-                  {Object.entries(choices)
-                    .sort((a, b) => a[1].localeCompare(b[1]))
-                    .map(([k, v]) => (
-                      <MenuItem key={k} value={k}>
-                        <ListItemText>{v}</ListItemText>
-                      </MenuItem>
-                    ))}
-                </OldSelectField>
-              ) : (
-                <OldSelectField
-                  variant="standard"
-                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                  key={field.key}
-                  renderValue={(v) => (field.expectation ? t(choices[v] || 'Unknown') : choices[v])
-                  }
-                  disabled={this.props.permissions.readOnly || field.readOnly}
-                  name={field.key}
-                  fullWidth={true}
-                  style={{ marginTop: 20 }}
-                >
-                  {Object.entries(choices)
-                    .sort((a, b) => a[1].localeCompare(b[1]))
-                    .map(([k, v]) => (
-                      <MenuItem key={k} value={k}>
-                        <ListItemText>
-                          {field.expectation ? t(v || 'Unknown') : v}
-                        </ListItemText>
-                      </MenuItem>
-                    ))}
-                </OldSelectField>
-              );
+              return field.cardinality === 'n'
+                ? (
+                    <OldSelectField
+                      variant="standard"
+                      label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+                      key={field.key}
+                      multiple
+                      renderValue={v => v.map(a => choices[a]).join(', ')}
+                      name={field.key}
+                      fullWidth={true}
+                      style={{ marginTop: 20 }}
+                      disabled={this.props.permissions.readOnly || field.readOnly}
+                    >
+                      {Object.entries(choices)
+                        .sort((a, b) => a[1].localeCompare(b[1]))
+                        .map(([k, v]) => (
+                          <MenuItem key={k} value={k}>
+                            <ListItemText>{v}</ListItemText>
+                          </MenuItem>
+                        ))}
+                    </OldSelectField>
+                  )
+                : (
+                    <OldSelectField
+                      variant="standard"
+                      label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+                      key={field.key}
+                      renderValue={v => (field.expectation ? t(choices[v] || 'Unknown') : choices[v])}
+                      disabled={this.props.permissions.readOnly || field.readOnly}
+                      name={field.key}
+                      fullWidth={true}
+                      style={{ marginTop: 20 }}
+                    >
+                      {Object.entries(choices)
+                        .sort((a, b) => a[1].localeCompare(b[1]))
+                        .map(([k, v]) => (
+                          <MenuItem key={k} value={k}>
+                            <ListItemText>
+                              {field.expectation ? t(v || 'Unknown') : v}
+                            </ListItemText>
+                          </MenuItem>
+                        ))}
+                    </OldSelectField>
+                  );
             default:
               return (
                 <OldTextField
@@ -907,7 +917,7 @@ class InjectDefinition extends Component {
   resetDefaultvalues(setFieldValue, builtInFields) {
     const { injectorContract } = this.props;
     injectorContract.fields
-      .filter((f) => !builtInFields.includes(f.key) && !f.expectation)
+      .filter(f => !builtInFields.includes(f.key) && !f.expectation)
       .forEach((field) => {
         if (field.cardinality && field.cardinality === '1') {
           let defaultValue = R.head(field.defaultValue);
@@ -992,30 +1002,30 @@ class InjectDefinition extends Component {
       openVariables,
     } = this.state;
     // -- TEAMS --
-    const fieldTeams = injectorContract.fields.filter((n) => n.key === 'teams').at(0);
+    const fieldTeams = injectorContract.fields.filter(n => n.key === 'teams').at(0);
     const hasTeams = injectorContract.fields
-      .map((f) => f.key)
+      .map(f => f.key)
       .includes('teams');
     // -- ASSETS --
-    const fieldAssets = injectorContract.fields.filter((n) => n.key === 'assets').at(0);
+    const fieldAssets = injectorContract.fields.filter(n => n.key === 'assets').at(0);
     const hasAssets = injectorContract.fields
-      .map((f) => f.key)
+      .map(f => f.key)
       .includes('assets');
     const assets = assetIds
-      .map((a) => ({ asset_id: a, ...endpointsMap[a], type: 'static' }))
-      .filter((a) => a !== undefined);
+      .map(a => ({ asset_id: a, ...endpointsMap[a], type: 'static' }))
+      .filter(a => a !== undefined);
     // -- ASSET GROUPS --
     const hasAssetGroups = injectorContract.fields
-      .map((f) => f.key)
+      .map(f => f.key)
       .includes('assetgroups');
     const assetGroups = assetGroupIds
-      .map((a) => assetGroupsMap[a])
-      .filter((a) => a !== undefined);
+      .map(a => assetGroupsMap[a])
+      .filter(a => a !== undefined);
     // -- ARTICLES --
     const articles = articlesIds
-      .map((a) => articlesMap[a])
-      .filter((a) => a !== undefined)
-      .map((a) => ({
+      .map(a => articlesMap[a])
+      .filter(a => a !== undefined)
+      .map(a => ({
         ...a,
         article_channel_type: channelsMap[a.article_channel]?.channel_type || '',
         article_channel_name: channelsMap[a.article_channel]?.channel_name || '',
@@ -1026,53 +1036,53 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(articlesSortBy))],
     );
     const sortedArticles = sortArticles(articles);
-    const fieldArticles = injectorContract.fields.filter((n) => n.key === 'articles').at(0);
+    const fieldArticles = injectorContract.fields.filter(n => n.key === 'articles').at(0);
     const hasArticles = injectorContract.fields
-      .map((f) => f.key)
+      .map(f => f.key)
       .includes('articles');
     // -- CHALLENGES --
     const challenges = challengesIds
-      .map((a) => challengesMap[a])
-      .filter((a) => a !== undefined);
+      .map(a => challengesMap[a])
+      .filter(a => a !== undefined);
     const sortChallenges = R.sortWith(
       challengesOrderAsc
         ? [R.ascend(R.prop(challengesSortBy))]
         : [R.descend(R.prop(challengesSortBy))],
     );
     const sortedChallenges = sortChallenges(challenges);
-    const fieldChallenges = injectorContract.fields.filter((n) => n.key === 'challenges').at(0);
+    const fieldChallenges = injectorContract.fields.filter(n => n.key === 'challenges').at(0);
     const hasChallenges = injectorContract.fields
-      .map((f) => f.key)
+      .map(f => f.key)
       .includes('challenges');
     // -- DOCUMENTS --
     const docs = documents
-      .map((d) => (documentsMap[d.document_id]
+      .map(d => (documentsMap[d.document_id]
         ? {
-          ...documentsMap[d.document_id],
-          document_attached: d.document_attached,
-        }
+            ...documentsMap[d.document_id],
+            document_attached: d.document_attached,
+          }
         : undefined))
-      .filter((d) => d !== undefined);
-    const attachedDocs = docs.filter((n) => n.document_attached);
+      .filter(d => d !== undefined);
+    const attachedDocs = docs.filter(n => n.document_attached);
     const sortDocuments = R.sortWith(
       documentsOrderAsc
         ? [R.ascend(R.prop(documentsSortBy))]
         : [R.descend(R.prop(documentsSortBy))],
     );
     const sortedDocuments = sortDocuments(docs);
-    const fieldAttachements = injectorContract.fields.filter((n) => n.key === 'attachments').at(0);
+    const fieldAttachements = injectorContract.fields.filter(n => n.key === 'attachments').at(0);
     const hasAttachments = injectorContract.fields
-      .map((f) => f.key)
+      .map(f => f.key)
       .includes('attachments');
     // -- EXPECTATIONS --
     const hasExpectations = injectorContract.fields
-      .map((f) => f.key)
+      .map(f => f.key)
       .includes('expectations');
     const predefinedExpectations = injectorContract.fields.filter(
-      (f) => f.key === 'expectations',
-    ).flatMap((f) => f.predefinedExpectations);
+      f => f.key === 'expectations',
+    ).flatMap(f => f.predefinedExpectations);
     const expectationsNotManual = injectorContract.fields.filter(
-      (f) => f.expectation === true,
+      f => f.expectation === true,
     );
     const builtInFields = [
       'teams',
@@ -1093,7 +1103,7 @@ class InjectDefinition extends Component {
               </Typography>
               <FormGroup row={true} classes={{ root: classes.allTeams }}>
                 <FormControlLabel
-                  control={
+                  control={(
                     <Switch
                       checked={allTeams}
                       onChange={this.toggleAll.bind(this)}
@@ -1101,7 +1111,7 @@ class InjectDefinition extends Component {
                       size="small"
                       disabled={this.props.permissions.readOnly || fieldTeams.readOnly}
                     />
-                  }
+                  )}
                   label={<strong>{t('All teams')}</strong>}
                 />
               </FormGroup>
@@ -1113,7 +1123,7 @@ class InjectDefinition extends Component {
                       <GroupsOutlined />
                     </ListItemIcon>
                     <ListItemText
-                      primary={
+                      primary={(
                         <>
                           <div
                             className={classes.bodyItem}
@@ -1144,7 +1154,7 @@ class InjectDefinition extends Component {
                             <ItemTags variant="reduced-view" tags={[]} />
                           </div>
                         </>
-                      }
+                      )}
                     />
                     <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
                   </ListItem>
@@ -1208,7 +1218,7 @@ class InjectDefinition extends Component {
                 {t('Media pressure to publish')}
               </Typography>
               <List>
-                {sortedArticles.map((article) => (
+                {sortedArticles.map(article => (
                   <ListItem
                     key={article.article_id}
                     classes={{ root: classes.item }}
@@ -1221,7 +1231,7 @@ class InjectDefinition extends Component {
                       />
                     </ListItemIcon>
                     <ListItemText
-                      primary={
+                      primary={(
                         <>
                           <div
                             className={classes.bodyItem}
@@ -1248,7 +1258,7 @@ class InjectDefinition extends Component {
                             {article.article_author}
                           </div>
                         </>
-                      }
+                      )}
                     />
                     <ListItemSecondaryAction>
                       <ArticlePopover
@@ -1273,7 +1283,7 @@ class InjectDefinition extends Component {
                 {t('Challenges to publish')}
               </Typography>
               <List>
-                {sortedChallenges.map((challenge) => (
+                {sortedChallenges.map(challenge => (
                   <ListItem
                     key={challenge.challenge_id}
                     classes={{ root: classes.item }}
@@ -1283,7 +1293,7 @@ class InjectDefinition extends Component {
                       <EmojiEventsOutlined />
                     </ListItemIcon>
                     <ListItemText
-                      primary={
+                      primary={(
                         <>
                           <div
                             className={classes.bodyItem}
@@ -1307,7 +1317,7 @@ class InjectDefinition extends Component {
                             />
                           </div>
                         </>
-                      }
+                      )}
                     />
                     <ListItemSecondaryAction>
                       <ChallengePopover
@@ -1366,7 +1376,7 @@ class InjectDefinition extends Component {
             {this.renderFields(
               injectorContract.fields
                 .filter(
-                  (f) => !builtInFields.includes(f.key) && !f.expectation,
+                  f => !builtInFields.includes(f.key) && !f.expectation,
                 )
                 .filter((f) => {
                   // Filter display if linked fields
@@ -1438,7 +1448,7 @@ class InjectDefinition extends Component {
                 {t('Inject documents')}
               </Typography>
               <List>
-                {sortedDocuments.map((document) => (
+                {sortedDocuments.map(document => (
                   <ListItem
                     key={document.document_id}
                     classes={{ root: classes.item }}
@@ -1451,7 +1461,7 @@ class InjectDefinition extends Component {
                       <AttachmentOutlined />
                     </ListItemIcon>
                     <ListItemText
-                      primary={
+                      primary={(
                         <>
                           <div
                             className={classes.bodyItem}
@@ -1493,7 +1503,7 @@ class InjectDefinition extends Component {
                             />
                           </div>
                         </>
-                      }
+                      )}
                     />
                     <ListItemSecondaryAction>
                       <DocumentPopover
@@ -1508,7 +1518,7 @@ class InjectDefinition extends Component {
                   </ListItem>
                 ))}
                 <MultipleFileLoader
-                  initialDocumentIds={documents.filter((a) => !a.inject_document_attached).map((d) => d.document_id)}
+                  initialDocumentIds={documents.filter(a => !a.inject_document_attached).map(d => d.document_id)}
                   handleAddDocuments={this.handleAddDocuments.bind(this)}
                   hasAttachments={hasAttachments}
                 />

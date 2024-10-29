@@ -1,12 +1,12 @@
-import React from 'react';
+import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, ShareOutlined } from '@mui/icons-material';
+import { Avatar, Button, Card, CardContent, CardHeader, CardMedia, Grid, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
-import { Typography, Grid, Card, CardHeader, CardContent, Avatar, CardMedia, Button } from '@mui/material';
-import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, ShareOutlined } from '@mui/icons-material';
-import { useFormatter } from '../../../components/i18n';
+
 import Empty from '../../../components/Empty';
-import { useHelper } from '../../../store';
 import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
+import { useFormatter } from '../../../components/i18n';
+import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
 
 const useStyles = makeStyles(() => ({
@@ -43,15 +43,15 @@ const ChannelTvChannel = ({ channelReader }) => {
     channel_information: channel,
   } = channelReader;
   const baseUri = `/api/player/${exercise?.exercise_id ?? scenario?.scenario_id}`;
-  const { documentsMap } = useHelper((helper) => ({
+  const { documentsMap } = useHelper(helper => ({
     documentsMap: helper.getDocumentsMap(),
   }));
   const logo = isDark ? channel.channel_logo_dark : channel.channel_logo_light;
   const firstArticle = R.head(articles) || null;
   const firstArticleVideos = (firstArticle?.article_documents || [])
-    .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
-    .filter((d) => d !== undefined)
-    .filter((d) => d.document_type.includes('video/'));
+    .map(docId => (documentsMap[docId] ? documentsMap[docId] : undefined))
+    .filter(d => d !== undefined)
+    .filter(d => d.document_type.includes('video/'));
   let firstArticleColumns = 12;
   if (firstArticleVideos.length === 2) {
     firstArticleColumns = 6;
@@ -111,16 +111,16 @@ const ChannelTvChannel = ({ channelReader }) => {
               sx={{ width: '100%', height: '100%' }}
             >
               <CardHeader
-                avatar={
+                avatar={(
                   <Avatar>
                     {(firstArticle.article_author || t('Unknown')).charAt(0)}
                   </Avatar>
-                }
+                )}
                 title={firstArticle.article_author || t('Unknown')}
                 subheader={fldt(firstArticle.article_virtual_publication)}
               />
               <Grid container={true} spacing={3}>
-                {firstArticleVideos.map((doc) => (
+                {firstArticleVideos.map(doc => (
                   <Grid
                     key={doc.document_id}
                     item={true}
@@ -173,9 +173,9 @@ const ChannelTvChannel = ({ channelReader }) => {
           <Grid item={true} xs={4}>
             {headArticles.map((article, index) => {
               const videos = article.article_documents
-                .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
-                .filter((d) => d !== undefined)
-                .filter((d) => d.document_type.includes('video/'));
+                .map(docId => (documentsMap[docId] ? documentsMap[docId] : undefined))
+                .filter(d => d !== undefined)
+                .filter(d => d.document_type.includes('video/'));
               let columns = 12;
               if (videos.length === 2) {
                 columns = 6;
@@ -193,16 +193,16 @@ const ChannelTvChannel = ({ channelReader }) => {
                   style={{ marginTop: index > 0 ? 20 : 0 }}
                 >
                   <CardHeader
-                    avatar={
+                    avatar={(
                       <Avatar>
                         {(article.article_author || t('Unknown')).charAt(0)}
                       </Avatar>
-                    }
+                    )}
                     title={article.article_author || t('Unknown')}
                     subheader={fldt(article.article_virtual_publication)}
                   />
                   <Grid container={true} spacing={3}>
-                    {videos.map((doc) => (
+                    {videos.map(doc => (
                       <Grid key={doc.document_id} item={true} xs={columns}>
                         <CardMedia
                           component="video"
@@ -256,9 +256,9 @@ const ChannelTvChannel = ({ channelReader }) => {
       <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
         {otherArticles.map((article) => {
           const videos = article.article_documents
-            .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
-            .filter((d) => d !== undefined)
-            .filter((d) => d.document_type.includes('video/'));
+            .map(docId => (documentsMap[docId] ? documentsMap[docId] : undefined))
+            .filter(d => d !== undefined)
+            .filter(d => d.document_type.includes('video/'));
           let columns = 12;
           if (videos.length === 2) {
             columns = 6;
@@ -275,16 +275,16 @@ const ChannelTvChannel = ({ channelReader }) => {
                 sx={{ width: '100%', height: '100%' }}
               >
                 <CardHeader
-                  avatar={
+                  avatar={(
                     <Avatar>
                       {(article.article_author || t('Unknown')).charAt(0)}
                     </Avatar>
-                  }
+                  )}
                   title={article.article_author || t('Unknown')}
                   subheader={fldt(article.article_virtual_publication)}
                 />
                 <Grid container={true} spacing={3}>
-                  {videos.map((doc) => (
+                  {videos.map(doc => (
                     <Grid key={doc.document_id} item={true} xs={columns}>
                       <CardMedia
                         component="video"

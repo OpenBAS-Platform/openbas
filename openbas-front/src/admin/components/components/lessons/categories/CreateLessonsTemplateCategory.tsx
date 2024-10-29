@@ -1,11 +1,12 @@
-import React, { FunctionComponent, useState } from 'react';
-import { useFormatter } from '../../../../../components/i18n';
-import LessonsTemplateCategoryForm, { LessonsTemplateCategoryInputForm } from './LessonsTemplateCategoryForm';
+import { FunctionComponent, useState } from 'react';
+
 import { addLessonsTemplateCategory } from '../../../../../actions/Lessons';
 import ButtonCreate from '../../../../../components/common/ButtonCreate.js';
 import Drawer from '../../../../../components/common/Drawer.js';
+import { useFormatter } from '../../../../../components/i18n';
 import type { LessonsTemplateCategory } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
+import LessonsTemplateCategoryForm, { LessonsTemplateCategoryInputForm } from './LessonsTemplateCategoryForm';
 
 interface Props {
   lessonsTemplateId: string;
@@ -23,7 +24,7 @@ const CreateLessonsTemplateCategory: FunctionComponent<Props> = ({
   const handleClose = () => setOpen(false);
   const onSubmit = (data: LessonsTemplateCategoryInputForm) => {
     return dispatch(addLessonsTemplateCategory(lessonsTemplateId, data)).then(
-      (result: { result: string, entities: { lessonstemplatecategorys: Record<string, LessonsTemplateCategory> } }) => {
+      (result: { result: string; entities: { lessonstemplatecategorys: Record<string, LessonsTemplateCategory> } }) => {
         if (result.result) {
           return handleClose();
         }

@@ -1,15 +1,16 @@
-import React, { useContext } from 'react';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { ContentPasteOutlined } from '@mui/icons-material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { useContext } from 'react';
+import * as React from 'react';
 
-import type { Report } from '../../../../utils/api-types';
 import { useFormatter } from '../../../../components/i18n';
-import ReportPopover from './ReportPopover';
+import type { Report } from '../../../../utils/api-types';
 import { PermissionsContext } from '../../common/Context';
+import ReportPopover from './ReportPopover';
 
 interface Props {
-  reports: Report[],
-  navigateToReportPage: (id: string) => void
+  reports: Report[];
+  navigateToReportPage: (id: string) => void;
 }
 
 const Reports: React.FC<Props> = ({ reports, navigateToReportPage }) => {
@@ -33,11 +34,12 @@ const Reports: React.FC<Props> = ({ reports, navigateToReportPage }) => {
             divider={true}
             style={{ height: 50, padding: 0 }}
             secondaryAction={permissions.canWrite
-              && <ReportPopover
+            && (
+              <ReportPopover
                 report={report}
                 actions={['Delete', 'Update']}
-                 />
-            }
+              />
+            )}
           >
             <ListItemButton onClick={() => navigateToReportPage(report.report_id)}>
               <ListItemIcon>

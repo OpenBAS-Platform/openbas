@@ -1,19 +1,21 @@
-import React, { FunctionComponent, useContext, useState } from 'react';
-import { Button, Dialog as MuiDialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { deletePlayer, updatePlayer } from '../../../../actions/User';
-import PlayerForm from './PlayerForm';
-import { useFormatter } from '../../../../components/i18n';
-import { useAppDispatch } from '../../../../utils/hooks';
-import Transition from '../../../../components/common/Transition';
-import type { PlayerInput } from '../../../../utils/api-types';
-import { countryOption, Option, organizationOption, tagOptions } from '../../../../utils/Option';
-import { useHelper } from '../../../../store';
+import { Button, Dialog as MuiDialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
+import { FunctionComponent, useContext, useState } from 'react';
+import * as React from 'react';
+
 import type { OrganizationHelper, TagHelper, UserHelper } from '../../../../actions/helper';
-import type { PlayerInputForm, UserStore } from './Player';
-import { TeamContext } from '../../common/Context';
+import { deletePlayer, updatePlayer } from '../../../../actions/User';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
+import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import { useHelper } from '../../../../store';
+import type { PlayerInput } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import { countryOption, Option, organizationOption, tagOptions } from '../../../../utils/Option';
+import { TeamContext } from '../../common/Context';
+import type { PlayerInputForm, UserStore } from './Player';
+import PlayerForm from './PlayerForm';
 
 interface PlayerPopoverProps {
   user: UserStore;
@@ -75,7 +77,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
       user_tags: data.user_tags?.map((tag: Option) => tag.id),
     };
     return dispatch(updatePlayer(user.user_id, inputValues))
-      .then((result: { result: string, entities: { users: Record<string, UserStore> } }) => {
+      .then((result: { result: string; entities: { users: Record<string, UserStore> } }) => {
         if (onUpdate) {
           const updated = result.entities.users[result.result];
           onUpdate(updated);

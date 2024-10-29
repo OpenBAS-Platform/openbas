@@ -1,24 +1,25 @@
-import React, { useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import * as R from 'ramda';
 import { List, ListItem, ListItemIcon, ListItemText, Slide } from '@mui/material';
-import AnimationMenu from '../AnimationMenu';
+import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
+import { forwardRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useParams } from 'react-router-dom';
+
+import { fetchExerciseInjectExpectations } from '../../../../../actions/Exercise';
+import { fetchExerciseInjects } from '../../../../../actions/Inject';
+import { useFormatter } from '../../../../../components/i18n';
+import ItemTags from '../../../../../components/ItemTags';
+import Loader from '../../../../../components/Loader';
+import SearchFilter from '../../../../../components/SearchFilter';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { fetchExerciseInjects } from '../../../../../actions/Inject';
-import { fetchExerciseInjectExpectations } from '../../../../../actions/Exercise';
-import SearchFilter from '../../../../../components/SearchFilter';
-import Loader from '../../../../../components/Loader';
-import { useFormatter } from '../../../../../components/i18n';
+import { isNotEmptyField } from '../../../../../utils/utils';
 import TagsFilter from '../../../common/filters/TagsFilter';
 import InjectIcon from '../../../common/injects/InjectIcon';
-import ItemTags from '../../../../../components/ItemTags';
+import AnimationMenu from '../AnimationMenu';
 import TeamOrAssetLine from './common/TeamOrAssetLine';
-import { isNotEmptyField } from '../../../../../utils/utils';
 
-const Transition = React.forwardRef((props, ref) => (
+const Transition = forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';
@@ -41,13 +42,13 @@ const Validations = () => {
   const [tags, setTags] = useState([]);
   const { fndt } = useFormatter();
   const [keyword, setKeyword] = useState('');
-  const handleSearch = (value) => setKeyword(value);
+  const handleSearch = value => setKeyword(value);
   const handleAddTag = (value) => {
     if (value) {
       setTags(R.uniq(R.append(value, tags)));
     }
   };
-  const handleRemoveTag = (value) => setTags(R.filter((n) => n.id !== value, tags));
+  const handleRemoveTag = value => setTags(R.filter(n => n.id !== value, tags));
   // Fetching data
   const {
     exercise,
@@ -64,26 +65,26 @@ const Validations = () => {
     dispatch(fetchExerciseInjectExpectations(exerciseId));
     dispatch(fetchExerciseInjects(exerciseId));
   });
-  const filterByKeyword = (n) => keyword === ''
+  const filterByKeyword = n => keyword === ''
     || (n.inject_expectation_inject?.inject_title || '')
       .toLowerCase()
       .indexOf(keyword.toLowerCase()) !== -1
-    || (n.inject_expectation_inject?.inject_description || '')
-      .toLowerCase()
-      .indexOf(keyword.toLowerCase()) !== -1;
+      || (n.inject_expectation_inject?.inject_description || '')
+        .toLowerCase()
+        .indexOf(keyword.toLowerCase()) !== -1;
   const sort = R.sortWith([R.descend(R.prop('inject_expectation_created_at'))]);
   const sortedInjectExpectations = R.pipe(
     R.uniqBy(R.prop('inject_expectation_id')),
-    R.map((n) => R.assoc(
+    R.map(n => R.assoc(
       'inject_expectation_inject',
       injectsMap[n.inject_expectation_inject] || {},
       n,
     )),
-    R.filter((n) => n.inject_expectation_type === 'MANUAL'),
+    R.filter(n => n.inject_expectation_type === 'MANUAL'),
     R.filter(
-      (n) => tags.length === 0
+      n => tags.length === 0
         || R.any(
-          (filter) => R.includes(filter, n.inject_expectation_inject?.inject_tags),
+          filter => R.includes(filter, n.inject_expectation_inject?.inject_tags),
           R.pluck('id', tags),
         ),
     ),
@@ -91,7 +92,6 @@ const Validations = () => {
     sort,
   )(injectExpectations);
 
-  /* eslint-disable no-param-reassign */
   const groupedByInject = sortedInjectExpectations.reduce((group, expectation) => {
     const { inject_expectation_inject } = expectation;
     const { inject_id } = inject_expectation_inject;
@@ -158,17 +158,17 @@ const Validations = () => {
                     <InjectIcon
                       isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
                       type={
-                          inject.inject_injector_contract.injector_contract_payload
-                            ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
-                              || inject.inject_injector_contract.injector_contract_payload?.payload_type
-                            : inject.inject_type
-                        }
+                        inject.inject_injector_contract.injector_contract_payload
+                          ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                          || inject.inject_injector_contract.injector_contract_payload?.payload_type
+                          : inject.inject_type
+                      }
                       disabled={!inject.inject_enabled}
                       size="small"
                     />
                   </ListItemIcon>
                   <ListItemText
-                    primary={
+                    primary={(
                       <>
                         <div className={classes.bodyItem} style={{ width: '55%' }}>
                           {inject.inject_title}
@@ -180,7 +180,7 @@ const Validations = () => {
                           <ItemTags variant="list" tags={inject.inject_tags} />
                         </div>
                       </>
-                    }
+                    )}
                   />
                 </ListItem>
                 <List component="div" disablePadding>

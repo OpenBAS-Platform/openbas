@@ -1,9 +1,10 @@
 import { expect } from '@playwright/test';
-import { test } from '../../fixtures/baseFixtures';
-import appUrl from '../../utils/url';
-import AssetsPage from '../../model/assets/assets.page';
-import AssetFormPage from '../../model/assets/asset-form.page';
+
 import fillLinuxAssetBase from '../../fixtures/assetFixtures';
+import { test } from '../../fixtures/baseFixtures';
+import AssetFormPage from '../../model/assets/asset-form.page';
+import AssetsPage from '../../model/assets/assets.page';
+import appUrl from '../../utils/url';
 
 test('Create an asset', async ({ page }) => {
   // -- PREPARE --

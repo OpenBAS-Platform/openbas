@@ -1,10 +1,11 @@
-import React from 'react';
-import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
-import { Field, FieldInputProps, FieldMetaState } from 'react-final-form';
 import { FormHelperText, InputLabel, useTheme } from '@mui/material';
+import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
+import * as React from 'react';
+import { Field, FieldInputProps, FieldMetaState } from 'react-final-form';
+
+import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 import { useFormatter } from '../i18n';
 import type { Theme } from '../Theme';
-import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 
 interface Props {
   label: string;
@@ -44,7 +45,7 @@ const MarkDownFieldBase: React.FC<Props> = ({
           disabled,
         }}
         preview="edit"
-        onChange={(data) => onChange(data)}
+        onChange={data => onChange(data)}
         commands={[
           { ...commands.title, buttonProps: { disabled } },
           { ...commands.bold, buttonProps: { disabled } },

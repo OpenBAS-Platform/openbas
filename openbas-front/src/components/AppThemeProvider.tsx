@@ -1,13 +1,15 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import { enUS, esES, frFR, Localization, zhCN } from '@mui/material/locale';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { ThemeOptions } from '@mui/material/styles/createTheme';
-import { zhCN, frFR, enUS, esES, Localization } from '@mui/material/locale';
-import themeDark from './ThemeDark';
-import themeLight from './ThemeLight';
-import { useHelper } from '../store';
+import { ReactNode, useEffect, useState } from 'react';
+import * as React from 'react';
+
 import type { LoggedHelper } from '../actions/helper';
+import { useHelper } from '../store';
 import type { PlatformSettings } from '../utils/api-types';
 import { useFormatter } from './i18n';
+import themeDark from './ThemeDark';
+import themeLight from './ThemeLight';
 
 interface Props {
   children: ReactNode;
@@ -26,9 +28,9 @@ const AppThemeProvider: React.FC<Props> = ({
   const [muiLocale, setMuiLocale] = useState<Localization>(enUS);
   const { locale } = useFormatter();
   const { theme, dark, light }: {
-    theme: string,
-    dark: PlatformSettings['platform_dark_theme'],
-    light: PlatformSettings['platform_light_theme']
+    theme: string;
+    dark: PlatformSettings['platform_dark_theme'];
+    light: PlatformSettings['platform_light_theme'];
   } = useHelper((helper: LoggedHelper) => {
     const me = helper.getMe();
     const settings = helper.getPlatformSettings();

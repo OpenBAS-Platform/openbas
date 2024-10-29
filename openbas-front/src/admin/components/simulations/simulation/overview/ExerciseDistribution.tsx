@@ -1,28 +1,29 @@
 import { Grid, Paper, Typography } from '@mui/material';
-import React, { FunctionComponent, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { useFormatter } from '../../../../../components/i18n';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import ExerciseDistributionScoreByInject from './ExerciseDistributionScoreByInject';
-import ExerciseDistributionScoreByPlayer from './ExerciseDistributionScoreByPlayer';
-import ExerciseDistributionScoreByOrganization from './ExerciseDistributionScoreByOrganization';
-import ExerciseDistributionScoreOverTimeByInjectorContract from './ExerciseDistributionScoreOverTimeByInjectorContract';
-import ExerciseDistributionByInjectorContract from './ExerciseDistributionByInjectorContract';
-import ExerciseDistributionScoreOverTimeByTeam from './ExerciseDistributionScoreOverTimeByTeam';
-import ExerciseDistributionScoreByTeam from './ExerciseDistributionScoreByTeam';
-import ExerciseDistributionScoreByTeamInPercentage from './ExerciseDistributionScoreByTeamInPercentage';
-import ExerciseDistributionScoreOverTimeByTeamInPercentage from './ExerciseDistributionScoreOverTimeByTeamInPercentage';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { FunctionComponent, useState } from 'react';
+
 import { fetchExercise, fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
-import { useAppDispatch } from '../../../../../utils/hooks';
+import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
+import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { fetchExerciseInjects } from '../../../../../actions/Inject';
-import { useHelper } from '../../../../../store';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
+import { useFormatter } from '../../../../../components/i18n';
+import Loader from '../../../../../components/Loader';
+import type { Theme } from '../../../../../components/Theme';
 import arrowDark from '../../../../../static/images/misc/arrow_dark.png';
 import arrowLight from '../../../../../static/images/misc/arrow_light.png';
-import type { Theme } from '../../../../../components/Theme';
-import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import Loader from '../../../../../components/Loader';
+import { useHelper } from '../../../../../store';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import ExerciseDistributionByInjectorContract from './ExerciseDistributionByInjectorContract';
+import ExerciseDistributionScoreByInject from './ExerciseDistributionScoreByInject';
+import ExerciseDistributionScoreByOrganization from './ExerciseDistributionScoreByOrganization';
+import ExerciseDistributionScoreByPlayer from './ExerciseDistributionScoreByPlayer';
+import ExerciseDistributionScoreByTeam from './ExerciseDistributionScoreByTeam';
+import ExerciseDistributionScoreByTeamInPercentage from './ExerciseDistributionScoreByTeamInPercentage';
+import ExerciseDistributionScoreOverTimeByInjectorContract from './ExerciseDistributionScoreOverTimeByInjectorContract';
+import ExerciseDistributionScoreOverTimeByTeam from './ExerciseDistributionScoreOverTimeByTeam';
+import ExerciseDistributionScoreOverTimeByTeamInPercentage from './ExerciseDistributionScoreOverTimeByTeamInPercentage';
 
 const useStyles = makeStyles(() => ({
   paperChart: {
@@ -35,7 +36,7 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
-  isReport?: boolean,
+  isReport?: boolean;
 }
 
 const ExerciseDistribution: FunctionComponent<Props> = ({
@@ -86,7 +87,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
     return <div />;
   }
   return (
-    <Grid id='exercise_distribution' container={true} spacing={3}>
+    <Grid id="exercise_distribution" container={true} spacing={3}>
       <Grid item xs={6} style={{ marginTop: 25 }}>
         <Typography variant="h4">
           {t('Distribution of score by team (in % of expectations)')}

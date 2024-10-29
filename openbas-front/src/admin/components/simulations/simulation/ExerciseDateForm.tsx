@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, FormControlLabel, Stack, Switch } from '@mui/material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
+import { useState } from 'react';
+import * as React from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import type { ExerciseUpdateStartDateInput } from '../../../../utils/api-types';
+
 import { useFormatter } from '../../../../components/i18n';
-import { zodImplement } from '../../../../utils/Zod';
+import type { ExerciseUpdateStartDateInput } from '../../../../utils/api-types';
 import { minutesInFuture } from '../../../../utils/Time';
+import { zodImplement } from '../../../../utils/Zod';
 
 interface Props {
   onSubmit: SubmitHandler<ExerciseUpdateStartDateInput>;
@@ -94,7 +96,7 @@ const ExerciseDateForm: React.FC<Props> = ({
           (data) => {
             if (!checked) {
               return new Date(new Date().setHours(0, 0, 0, 0)).getTime() !== new Date(data.date).getTime()
-                          || (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < new Date(data.time).getTime();
+                || (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < new Date(data.time).getTime();
             }
             return true;
           },
@@ -108,7 +110,7 @@ const ExerciseDateForm: React.FC<Props> = ({
             if (!checked) {
               const time = new Date(data.time);
               return new Date(new Date(data.date).setHours(time.getHours(), time.getMinutes(), time.getSeconds(), 0)).getTime()
-                  >= new Date(new Date().setHours(0, 0, 0, 0)).getTime();
+                >= new Date(new Date().setHours(0, 0, 0, 0)).getTime();
             }
             return true;
           },
@@ -135,7 +137,7 @@ const ExerciseDateForm: React.FC<Props> = ({
               disabled={checked}
               minDate={new Date(new Date().setUTCHours(0, 0, 0, 0))}
               value={field.value ? new Date(field.value) : null}
-              onChange={(date) => field.onChange(date?.toISOString())}
+              onChange={date => field.onChange(date?.toISOString())}
               onAccept={() => {
                 clearErrors('time');
               }}
@@ -164,7 +166,7 @@ const ExerciseDateForm: React.FC<Props> = ({
               closeOnSelect={false}
               value={field.value ? new Date(field.value) : null}
               minTime={new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() === new Date(getValues('date')).getTime() ? new Date() : undefined}
-              onChange={(time) => (field.onChange(time?.toISOString()))}
+              onChange={time => (field.onChange(time?.toISOString()))}
               slotProps={{
                 textField: {
                   fullWidth: true,
@@ -179,12 +181,12 @@ const ExerciseDateForm: React.FC<Props> = ({
 
       <div style={{ float: 'right', marginTop: 20 }}>
         {handleClose && (
-        <Button
-          onClick={handleClose.bind(this)}
-          style={{ marginRight: 10 }}
-        >
-          {t('Cancel')}
-        </Button>
+          <Button
+            onClick={handleClose.bind(this)}
+            style={{ marginRight: 10 }}
+          >
+            {t('Cancel')}
+          </Button>
         )}
         <Button
           color="secondary"

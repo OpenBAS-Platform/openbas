@@ -1,10 +1,11 @@
-import React, { FunctionComponent } from 'react';
-import { Box, Autocomplete, TextField } from '@mui/material';
+import { Autocomplete, Box, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { FunctionComponent } from 'react';
 import { FieldError } from 'react-hook-form';
+
+import type { Option } from '../utils/Option';
 import { useFormatter } from './i18n';
 import PlatformIcon from './PlatformIcon';
-import type { Option } from '../utils/Option';
 
 const useStyles = makeStyles(() => ({
   icon: {
@@ -53,7 +54,7 @@ const PlatformField: FunctionComponent<Props> = ({
       autoHighlight
       noOptionsText={t('No available options')}
       renderInput={
-        (params) => (
+        params => (
           <TextField
             {...params}
             label={t(label)}
@@ -67,7 +68,7 @@ const PlatformField: FunctionComponent<Props> = ({
           />
         )
       }
-      value={platformsOptions.filter((p) => value?.map((v) => v.id)?.includes(p.id)) ?? null}
+      value={platformsOptions.filter(p => value?.map(v => v.id)?.includes(p.id)) ?? null}
       onChange={(_event, platform) => {
         onChange(platform);
       }}

@@ -1,10 +1,11 @@
-import React, { CSSProperties, memo, useEffect, useState } from 'react';
-import { shallow } from 'zustand/shallow';
-import { useStore, type ReactFlowState, type BackgroundProps, Panel, Viewport } from '@xyflow/react';
 import { makeStyles, useTheme } from '@mui/styles';
+import { type BackgroundProps, Panel, type ReactFlowState, useStore, Viewport } from '@xyflow/react';
 import moment from 'moment-timezone';
-import type { Theme } from './Theme';
+import { CSSProperties, memo, useEffect, useState } from 'react';
+import { shallow } from 'zustand/shallow';
+
 import { useFormatter } from './i18n';
+import type { Theme } from './Theme';
 
 const selector = (s: ReactFlowState) => ({ transform: s.transform, patternId: `pattern-${s.rfId}` });
 
@@ -22,15 +23,15 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props extends BackgroundProps {
-  minutesPerGap: number,
-  gap?: number | [number, number],
-  viewportData?: Viewport,
-  startDate: string | undefined,
+  minutesPerGap: number;
+  gap?: number | [number, number];
+  viewportData?: Viewport;
+  startDate: string | undefined;
 }
 
 interface TimelineDates {
-  parsedDate: string,
-  dateIndex: number,
+  parsedDate: string;
+  dateIndex: number;
 }
 
 /**
@@ -80,7 +81,8 @@ function BackgroundComponent({
 
         newParsedDates.push({
           parsedDate: viewportData === undefined || viewportData?.zoom > 0.5
-            ? `${fld(date.toDate())} - ${ft(date.toDate())}` : `${vnsdt(date.toDate())}`,
+            ? `${fld(date.toDate())} - ${ft(date.toDate())}`
+            : `${vnsdt(date.toDate())}`,
           dateIndex: Math.round((date.unix() - beginningDate.unix()) / (minutesPerGap * 3 * 60)),
         });
       }

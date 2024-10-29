@@ -1,10 +1,10 @@
-import React from 'react';
+import { Button, MenuItem } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import { MenuItem, Button } from '@mui/material';
+
 import OldSelectField from '../../../components/fields/OldSelectField';
-import inject18n from '../../../components/i18n';
 import OldTextField from '../../../components/fields/OldTextField';
+import inject18n from '../../../components/i18n';
 
 const ParametersForm = (props) => {
   const { t, onSubmit, initialValues } = props;

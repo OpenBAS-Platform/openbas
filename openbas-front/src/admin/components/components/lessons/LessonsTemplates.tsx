@@ -1,19 +1,20 @@
-import React, { CSSProperties, useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { ChevronRightOutlined, SchoolOutlined } from '@mui/icons-material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { CSSProperties, useState } from 'react';
 import { Link } from 'react-router-dom';
-import CreateLessonsTemplate from './CreateLessonsTemplate';
-import { useHelper } from '../../../../store';
+
+import type { UserHelper } from '../../../../actions/helper';
 import { searchLessonsTemplates } from '../../../../actions/Lessons';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
-import { useFormatter } from '../../../../components/i18n';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent.js';
-import { initSorting } from '../../../../components/common/queryable/Page';
-import type { LessonsTemplate, SearchPaginationInput } from '../../../../utils/api-types';
-import type { UserHelper } from '../../../../actions/helper';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import { useFormatter } from '../../../../components/i18n';
+import { useHelper } from '../../../../store';
+import type { LessonsTemplate, SearchPaginationInput } from '../../../../utils/api-types';
+import CreateLessonsTemplate from './CreateLessonsTemplate';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -96,14 +97,14 @@ const LessonsTemplates = () => {
         >
           <ListItemIcon />
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponent
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-            }
+            )}
           />
           <ListItemSecondaryAction />
         </ListItem>
@@ -120,9 +121,9 @@ const LessonsTemplates = () => {
                 <SchoolOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div className={classes.bodyItems}>
-                    {headers.map((header) => (
+                    {headers.map(header => (
                       <div
                         key={header.field}
                         className={classes.bodyItem}
@@ -132,7 +133,7 @@ const LessonsTemplates = () => {
                       </div>
                     ))}
                   </div>
-                }
+                )}
               />
               <ListItemSecondaryAction>
                 <ChevronRightOutlined />
@@ -141,7 +142,7 @@ const LessonsTemplates = () => {
           );
         })}
       </List>
-      {userAdmin && <CreateLessonsTemplate onCreate={(result) => setLessonTemplates([result, ...lessonTemplates])} />}
+      {userAdmin && <CreateLessonsTemplate onCreate={result => setLessonTemplates([result, ...lessonTemplates])} />}
     </>
   );
 };

@@ -1,5 +1,5 @@
-import { createLogger, defineConfig, loadEnv, transformWithEsbuild } from 'vite';
 import react from '@vitejs/plugin-react';
+import { createLogger, defineConfig, loadEnv, transformWithEsbuild } from 'vite';
 import IstanbulPlugin from 'vite-plugin-istanbul';
 
 const logger = createLogger();
@@ -114,7 +114,7 @@ export default ({ mode }: { mode: string }) => {
           });
         },
       },
-      react({ jsxRuntime: 'classic' }),
+      react(),
       [IstanbulPlugin({
         include: 'src/*',
         exclude: ['node_modules', 'test/'],

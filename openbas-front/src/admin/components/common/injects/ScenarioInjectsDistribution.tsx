@@ -1,8 +1,10 @@
-import React, { FunctionComponent } from 'react';
 import * as R from 'ramda';
-import { useFormatter } from '../../../../components/i18n';
+import { FunctionComponent } from 'react';
+
 import type { TeamStore } from '../../../../actions/teams/Team';
-import InjectsDistribution, { getTeamsColors } from './InjectsDistribution';
+import { useFormatter } from '../../../../components/i18n';
+import InjectsDistribution from './InjectsDistribution';
+import { getTeamsColors } from './teams/utils';
 
 interface Props {
   teams: TeamStore[];
@@ -34,7 +36,8 @@ const ScenarioInjectsDistribution: FunctionComponent<Props> = ({
   );
 
   return (
-    <InjectsDistribution topTeams={topTeams}
+    <InjectsDistribution
+      topTeams={topTeams}
       distributionChartData={distributionChartData}
       maxInjectsNumber={maxInjectsNumber}
     />

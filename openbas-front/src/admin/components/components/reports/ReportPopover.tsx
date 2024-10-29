@@ -1,9 +1,11 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
+import * as React from 'react';
+
 import ButtonPopover, { VariantButtonPopover } from '../../../../components/common/ButtonPopover';
-import DialogDelete from '../../../../components/common/DialogDelete';
 import Dialog from '../../../../components/common/Dialog';
-import type { Report, ReportInput } from '../../../../utils/api-types';
+import DialogDelete from '../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../components/i18n';
+import type { Report, ReportInput } from '../../../../utils/api-types';
 import { ReportContext } from '../../common/Context';
 
 type ReportActionType = 'Update' | 'Delete';
@@ -11,7 +13,7 @@ type ReportActionType = 'Update' | 'Delete';
 interface Props {
   actions: ReportActionType[];
   report: Report;
-  variant?: VariantButtonPopover
+  variant?: VariantButtonPopover;
 }
 
 const ReportPopover: React.FC<Props> = ({
@@ -45,7 +47,7 @@ const ReportPopover: React.FC<Props> = ({
 
   return (
     <>
-      <ButtonPopover entries={entries} variant={ variant } />
+      <ButtonPopover entries={entries} variant={variant} />
       <DialogDelete
         open={openDelete}
         handleClose={() => setOpenDelete(false)}

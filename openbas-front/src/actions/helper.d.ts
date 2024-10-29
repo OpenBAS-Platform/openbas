@@ -38,5 +38,5 @@ export interface DocumentHelper {
 }
 
 export interface MeTokensHelper {
-  getMeTokens: () => Token[]
+  getMeTokens: () => Token[];
 }

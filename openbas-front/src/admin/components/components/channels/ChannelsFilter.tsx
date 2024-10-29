@@ -1,14 +1,16 @@
-import React, { useEffect } from 'react';
-import { makeStyles } from '@mui/styles';
 import { Autocomplete, Box, TextField } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { useEffect } from 'react';
+import * as React from 'react';
+
 import { fetchChannels } from '../../../../actions/channels/channel-action';
+import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import ChannelIcon from './ChannelIcon';
-import { useAppDispatch } from '../../../../utils/hooks';
-import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
-import type { ChannelOption } from './ChannelOption';
 import type { Channel } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import ChannelIcon from './ChannelIcon';
+import type { ChannelOption } from './ChannelOption';
 
 const useStyles = makeStyles(() => ({
   icon: {
@@ -23,16 +25,16 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  onChannelsChange: (value: ChannelOption[]) => void
-  onClearChannels?: () => void
-  fullWidth?: boolean
+  onChannelsChange: (value: ChannelOption[]) => void;
+  onClearChannels?: () => void;
+  fullWidth?: boolean;
 }
 
 interface ChannelTransformed {
-  id: string
-  label: string
-  color: string
-  type: string
+  id: string;
+  label: string;
+  color: string;
+  type: string;
 }
 
 const ChannelsFilter: React.FC<Props> = (props) => {
@@ -91,7 +93,7 @@ const ChannelsFilter: React.FC<Props> = (props) => {
             <div className={classes.text}>{option.label}</div>
           </Box>
         )}
-        renderInput={(params) => (
+        renderInput={params => (
           <TextField
             label={t('Channels')}
             variant="outlined"

@@ -1,18 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { DescriptionOutlined } from '@mui/icons-material';
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import SearchFilter from '../SearchFilter';
+import { useEffect, useState } from 'react';
+import * as React from 'react';
+
+import type { DocumentHelper, UserHelper } from '../../actions/helper';
 import TagsFilter from '../../admin/components/common/filters/TagsFilter';
-import type { RawDocument } from '../../utils/api-types';
-import ItemTags from '../ItemTags';
 import CreateDocument from '../../admin/components/components/documents/CreateDocument';
 import { useHelper } from '../../store';
-import type { DocumentHelper, UserHelper } from '../../actions/helper';
-import type { Theme } from '../Theme';
-import { useFormatter } from '../i18n';
+import type { RawDocument } from '../../utils/api-types';
 import { truncate } from '../../utils/String';
 import Transition from '../common/Transition';
+import { useFormatter } from '../i18n';
+import ItemTags from '../ItemTags';
+import SearchFilter from '../SearchFilter';
+import type { Theme } from '../Theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   box: {
@@ -25,9 +27,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     margin: '0 10px 10px 0',
   },
   item: {
-    paddingLeft: 10,
-    height: 50,
-    cursor: 'pointer',
+    'paddingLeft': 10,
+    'height': 50,
+    'cursor': 'pointer',
     '&:hover': {
       backgroundColor: theme.palette.action?.hover,
     },
@@ -60,13 +62,13 @@ const FileTransferDialog: React.FC<Props> = ({
   const { t } = useFormatter();
 
   const [keyword, setKeyword] = useState<string>('');
-  const [tags, setTags] = useState<{ id: string, label: string, color: string }[]>([]);
+  const [tags, setTags] = useState<{ id: string; label: string; color: string }[]>([]);
   const [selectedDocuments, setSelectedDocuments] = useState<RawDocument[]>([]);
 
   // Fetching data
   const { documents, userAdmin }: {
-    documents: [RawDocument],
-    userAdmin: string
+    documents: [RawDocument];
+    userAdmin: string;
   } = useHelper((helper: DocumentHelper & UserHelper) => ({
     documents: helper.getDocuments(),
     userAdmin: helper.getMe()?.user_admin,
@@ -85,7 +87,7 @@ const FileTransferDialog: React.FC<Props> = ({
     setKeyword(value || '');
   };
 
-  const handleAddTag = (value: { id: string, label: string, color: string }) => {
+  const handleAddTag = (value: { id: string; label: string; color: string }) => {
     if (!tags.includes(value)) {
       setTags([...tags, value]);
     }
@@ -101,7 +103,7 @@ const FileTransferDialog: React.FC<Props> = ({
   };
 
   const handleAddDocument = (document: RawDocument) => {
-    if (!selectedDocuments.some((doc) => doc.document_id === document.document_id)) {
+    if (!selectedDocuments.some(doc => doc.document_id === document.document_id)) {
       setSelectedDocuments([...selectedDocuments, document]);
     }
     if (!multiple && onAddDocument) {
@@ -118,31 +120,31 @@ const FileTransferDialog: React.FC<Props> = ({
   };
 
   const handleRemoveDocument = (document: RawDocument) => {
-    setSelectedDocuments(selectedDocuments.filter((doc) => doc.document_id !== document.document_id));
+    setSelectedDocuments(selectedDocuments.filter(doc => doc.document_id !== document.document_id));
   };
 
   const filterByExtensions = (document: RawDocument) => {
     return extensions?.length === 0
-    || extensions?.map((ext) => ext.toLowerCase()).includes(document.document_name?.split('.').pop()?.toLowerCase() || '');
+      || extensions?.map(ext => ext.toLowerCase()).includes(document.document_name?.split('.').pop()?.toLowerCase() || '');
   };
 
   const filterByKeyword = (document: RawDocument) => {
     return keyword === ''
-    || document.document_name?.toLowerCase().includes(keyword.toLowerCase())
-    || document.document_description?.toLowerCase().includes(keyword.toLowerCase())
-    || document.document_type?.toLowerCase().includes(keyword.toLowerCase());
+      || document.document_name?.toLowerCase().includes(keyword.toLowerCase())
+      || document.document_description?.toLowerCase().includes(keyword.toLowerCase())
+      || document.document_type?.toLowerCase().includes(keyword.toLowerCase());
   };
 
   const filterByTag = (document: RawDocument) => {
-    return tags.length === 0 || tags.every((tag) => document.document_tags?.includes(tag.id));
+    return tags.length === 0 || tags.every(tag => document.document_tags?.includes(tag.id));
   };
 
   const filteredDocuments = documents.filter((document) => {
     const isInitialValue = document.document_id && initialDocumentIds?.includes(document.document_id);
     return !isInitialValue
-        && filterByExtensions(document)
-        && filterByKeyword(document)
-        && filterByTag(document);
+      && filterByExtensions(document)
+      && filterByKeyword(document)
+      && filterByTag(document);
   }).slice(0, 10);
 
   return (
@@ -190,7 +192,7 @@ const FileTransferDialog: React.FC<Props> = ({
                     onClick={() => handleAddDocument(document)}
                   >
                     <ListItemIcon>
-                      <DescriptionOutlined/>
+                      <DescriptionOutlined />
                     </ListItemIcon>
                     <ListItemText
                       primary={document.document_name}
@@ -214,7 +216,7 @@ const FileTransferDialog: React.FC<Props> = ({
           {multiple && (
             <Grid item xs={4}>
               <Box className={classes.box}>
-                {selectedDocuments.map((document) => (
+                {selectedDocuments.map(document => (
                   <Chip
                     key={document.document_id}
                     variant="outlined"
@@ -231,12 +233,14 @@ const FileTransferDialog: React.FC<Props> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>{t('Cancel')}</Button>
-        {multiple && (<Button
-          color="secondary"
-          onClick={handleSubmitAddDocuments}
-                      >
-          {t('Add')}
-        </Button>)}
+        {multiple && (
+          <Button
+            color="secondary"
+            onClick={handleSubmitAddDocuments}
+          >
+            {t('Add')}
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );

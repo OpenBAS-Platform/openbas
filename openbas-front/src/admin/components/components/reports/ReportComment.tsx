@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-import { Button, IconButton, Paper } from '@mui/material';
 import { Edit } from '@mui/icons-material';
-import MarkDownField from '../../../../components/fields/MarkDownField';
-import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
+import { Button, IconButton, Paper } from '@mui/material';
+import { useState } from 'react';
+import * as React from 'react';
+
 import Dialog from '../../../../components/common/Dialog';
+import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
+import MarkDownField from '../../../../components/fields/MarkDownField';
 import { useFormatter } from '../../../../components/i18n';
 
 interface Props {
-  initialComment: string,
-  saveComment: (newComment:string) => void
-  canEditComment?:boolean,
+  initialComment: string;
+  saveComment: (newComment: string) => void;
+  canEditComment?: boolean;
 }
 
 const ReportComment: React.FC<Props> = ({ initialComment, saveComment, canEditComment = false }) => {
@@ -19,12 +21,13 @@ const ReportComment: React.FC<Props> = ({ initialComment, saveComment, canEditCo
 
   return (
     <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-      <ExpandableMarkdown showAll source={comment}/>
+      <ExpandableMarkdown showAll source={comment} />
       { canEditComment
-          && <IconButton sx={{ marginLeft: 'auto' }} color="primary" onClick={() => setOpenEdit(true)}>
-            <Edit />
-          </IconButton>
-      }
+      && (
+        <IconButton sx={{ marginLeft: 'auto' }} color="primary" onClick={() => setOpenEdit(true)}>
+          <Edit />
+        </IconButton>
+      )}
 
       <Dialog
         title={t('Update inject comment')}
@@ -34,7 +37,7 @@ const ReportComment: React.FC<Props> = ({ initialComment, saveComment, canEditCo
         <>
           <Paper variant="outlined">
             <MarkDownField
-              onChange={(value) => setComment(value)}
+              onChange={value => setComment(value)}
               initialValue={comment}
             />
           </Paper>

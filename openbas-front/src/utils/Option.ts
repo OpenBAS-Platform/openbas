@@ -1,14 +1,15 @@
 import * as R from 'ramda';
+
 import countriesJson from '../static/geo/countries.json';
-import type { AttackPattern, Exercise, KillChainPhase, Organization, Scenario, Tag, Document } from './api-types';
+import type { AttackPattern, Document, Exercise, KillChainPhase, Organization, Scenario, Tag } from './api-types';
 
 interface Countries {
   features: [{
     properties: {
-      ISO3: string,
-      NAME: string,
-    }
-  }]
+      ISO3: string;
+      NAME: string;
+    };
+  }];
 }
 
 //  eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,10 +25,10 @@ export const documentOptions = (
   document_ids: string[] | undefined,
   documentsMap: Record<string, Document>,
 ) => (document_ids ?? [])
-  .map((documentId) => documentsMap[documentId])
-  .filter((documentItem) => documentItem !== undefined)
+  .map(documentId => documentsMap[documentId])
+  .filter(documentItem => documentItem !== undefined)
   .map(
-    (documentItem) => ({
+    documentItem => ({
       id: documentItem.document_id,
       label: documentItem.document_name,
     }) as Option,
@@ -37,10 +38,10 @@ export const tagOptions = (
   tag_ids: string[] | undefined,
   tagsMap: Record<string, Tag>,
 ) => (tag_ids ?? [])
-  .map((tagId) => tagsMap[tagId])
-  .filter((tagItem) => tagItem !== undefined)
+  .map(tagId => tagsMap[tagId])
+  .filter(tagItem => tagItem !== undefined)
   .map(
-    (tagItem) => ({
+    tagItem => ({
       id: tagItem.tag_id,
       label: tagItem.tag_name,
       color: tagItem.tag_color,
@@ -64,8 +65,8 @@ export const attackPatternOptions = (
   attackPatternsMap: Record<string, AttackPattern>,
   killChainPhasesMap: Record<string, KillChainPhase>,
 ) => (attack_pattern_ids ?? [])
-  .map((attackPatternId) => attackPatternsMap[attackPatternId])
-  .filter((attackPatternItem) => attackPatternItem !== undefined)
+  .map(attackPatternId => attackPatternsMap[attackPatternId])
+  .filter(attackPatternItem => attackPatternItem !== undefined)
   .map(
     (attackPatternItem) => {
       const killChainPhase = R.head(attackPatternItem.attack_pattern_kill_chain_phases);
@@ -81,10 +82,10 @@ export const killChainPhaseOptions = (
   kill_chain_phase_ids: string[] | undefined,
   killChainPhasesMap: Record<string, KillChainPhase>,
 ) => (kill_chain_phase_ids ?? [])
-  .map((killChainPhaseId) => killChainPhasesMap[killChainPhaseId])
-  .filter((killChainPhaseItem) => killChainPhaseItem !== undefined)
+  .map(killChainPhaseId => killChainPhasesMap[killChainPhaseId])
+  .filter(killChainPhaseItem => killChainPhaseItem !== undefined)
   .map(
-    (killChainPhaseItem) => ({
+    killChainPhaseItem => ({
       id: killChainPhaseItem.phase_id,
       label: `[${killChainPhaseItem.phase_kill_chain_name}] ${killChainPhaseItem.phase_name}`,
     }) as Option,
@@ -94,10 +95,10 @@ export const exerciseOptions = (
   exercise_ids: string[],
   exercisesMap: Record<string, Exercise>,
 ) => (exercise_ids ?? [])
-  .map((exerciseId) => exercisesMap[exerciseId])
-  .filter((exerciseItem) => exerciseItem !== undefined)
+  .map(exerciseId => exercisesMap[exerciseId])
+  .filter(exerciseItem => exerciseItem !== undefined)
   .map(
-    (exerciseItem) => ({
+    exerciseItem => ({
       id: exerciseItem.exercise_id,
       label: exerciseItem.exercise_name,
     }) as Option,
@@ -107,10 +108,10 @@ export const scenarioOptions = (
   scenario_ids: string[],
   scenariosMap: Record<string, Scenario>,
 ) => (scenario_ids ?? [])
-  .map((scenarioId) => scenariosMap[scenarioId])
-  .filter((scenarioItem) => scenarioItem !== undefined)
+  .map(scenarioId => scenariosMap[scenarioId])
+  .filter(scenarioItem => scenarioItem !== undefined)
   .map(
-    (scenarioItem) => ({
+    scenarioItem => ({
       id: scenarioItem.scenario_id,
       label: scenarioItem.scenario_name,
     }) as Option,
@@ -126,14 +127,14 @@ export const organizationOption = (
   const value = organizationsMap[organizationId];
   return value
     ? ({
-      id: value.organization_id,
-      label: value.organization_name,
-    } as Option)
+        id: value.organization_id,
+        label: value.organization_name,
+      } as Option)
     : undefined;
 };
 
 export const countryOptions = () => countries.features.map(
-  (n) => ({
+  n => ({
     id: n.properties.ISO3,
     label: n.properties.NAME,
   }) as Option,
@@ -144,7 +145,7 @@ export const countryOption = (iso3: string | undefined) => {
     return undefined;
   }
   const country = R.head(
-    countries.features.filter((n) => n.properties.ISO3 === iso3),
+    countries.features.filter(n => n.properties.ISO3 === iso3),
   );
   return {
     id: country.properties.ISO3,

@@ -19,9 +19,9 @@ export const handleAddFilterWithEmptyValueUtil = (filterGroup: FilterGroup, filt
   const filters = isExistFilter(filterGroup, filter.key)
     ? filterGroup.filters ?? []
     : [
-      ...filterGroup.filters ?? [],
-      filter,
-    ];
+        ...filterGroup.filters ?? [],
+        filter,
+      ];
   return {
     ...filterGroup,
     filters,
@@ -29,20 +29,20 @@ export const handleAddFilterWithEmptyValueUtil = (filterGroup: FilterGroup, filt
 };
 
 export const handleAddSingleValueFilterUtil = (filters: FilterGroup, key: string, value: string) => {
-  return updateFilters(filters, (f) => (f.key === key ? { ...f, values: [value] } : f));
+  return updateFilters(filters, f => (f.key === key ? { ...f, values: [value] } : f));
 };
 
 export const handleAddMultipleValueFilterUtil = (filters: FilterGroup, key: string, values: string[]) => {
-  return updateFilters(filters, (f) => (f.key === key ? { ...f, values } : f));
+  return updateFilters(filters, f => (f.key === key ? { ...f, values } : f));
 };
 
 export const handleChangeOperatorFiltersUtil = (filters: FilterGroup, key: string, operator: Filter['operator']) => {
-  return updateFilters(filters, (f) => (f.key === key ? { ...f, operator, values: operator && ['empty', 'not_empty'].includes(operator) ? [] : f.values } : f));
+  return updateFilters(filters, f => (f.key === key ? { ...f, operator, values: operator && ['empty', 'not_empty'].includes(operator) ? [] : f.values } : f));
 };
 
 export const handleRemoveFilterUtil = (filters: FilterGroup, key: string) => {
   return {
     ...filters,
-    filters: filters.filters?.filter((f) => f.key !== key),
+    filters: filters.filters?.filter(f => f.key !== key),
   };
 };

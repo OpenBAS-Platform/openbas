@@ -1,9 +1,9 @@
-import React from 'react';
-import { makeStyles } from '@mui/styles';
 import { Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
-import ChannelPopover from './ChannelPopover';
+
 import { useHelper } from '../../../../store';
+import ChannelPopover from './ChannelPopover';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -18,7 +18,7 @@ const useStyles = makeStyles(() => ({
 const ChannelHeader = () => {
   const classes = useStyles();
   const { channelId } = useParams();
-  const { channel, userAdmin } = useHelper((helper) => ({
+  const { channel, userAdmin } = useHelper(helper => ({
     channel: helper.getChannel(channelId),
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));

@@ -1,11 +1,12 @@
-import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
-import { availableOperators } from './FilterUtils';
-import { useFormatter } from '../../../i18n';
+import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
+
 import type { FilterGroup, PropertySchemaDTO } from '../../../../utils/api-types';
-import FilterChips from './FilterChips';
-import useFilterableProperties from './useFilterableProperties';
-import { FilterHelpers } from './FilterHelpers';
+import { useFormatter } from '../../../i18n';
 import FilterAutocomplete, { OptionPropertySchema } from './FilterAutocomplete';
+import FilterChips from './FilterChips';
+import { FilterHelpers } from './FilterHelpers';
+import { availableOperators } from './FilterUtils';
+import useFilterableProperties from './useFilterableProperties';
 
 interface Props {
   entityPrefix: string;
@@ -31,7 +32,7 @@ const FilterField: FunctionComponent<Props> = ({
 
   useEffect(() => {
     useFilterableProperties(entityPrefix, availableFilterNames).then((propertySchemas: PropertySchemaDTO[]) => {
-      const newOptions = propertySchemas.map((property) => (
+      const newOptions = propertySchemas.map(property => (
         { id: property.schema_property_name, label: t(property.schema_property_name), operator: availableOperators(property)[0] } as OptionPropertySchema
       ));
       setOptions(newOptions);

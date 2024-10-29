@@ -1,15 +1,16 @@
-import { useLocalStorage } from 'usehooks-ts';
+import * as R from 'ramda';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import * as R from 'ramda';
-import useFiltersState from './filter/useFiltersState';
+import { useLocalStorage } from 'usehooks-ts';
+
 import type { FilterGroup, SearchPaginationInput, SortField } from '../../../utils/api-types';
-import useTextSearchState from './textSearch/useTextSearchState';
+import useFiltersState from './filter/useFiltersState';
 import usPaginationState from './pagination/usPaginationState';
 import { QueryableHelpers } from './QueryableHelpers';
-import useSortState from './sort/useSortState';
-import useUriState, { retrieveFromUri } from './uri/useUriState';
 import { buildSearchPagination } from './QueryableUtils';
+import useSortState from './sort/useSortState';
+import useTextSearchState from './textSearch/useTextSearchState';
+import useUriState, { retrieveFromUri } from './uri/useUriState';
 
 const buildUseQueryable = (
   localStorageKey: string | null,

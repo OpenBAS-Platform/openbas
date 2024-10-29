@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import * as R from 'ramda';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { createAtomicTesting, searchAtomicTestings } from '../../../actions/atomic_testings/atomic-testing-actions';
+import type { UserHelper } from '../../../actions/helper';
+import Breadcrumbs from '../../../components/Breadcrumbs';
+import ButtonCreate from '../../../components/common/ButtonCreate';
+import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
+import { initSorting } from '../../../components/common/queryable/Page';
+import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
+import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
-import Breadcrumbs from '../../../components/Breadcrumbs';
-import type { UserHelper } from '../../../actions/helper';
 import type { FilterGroup, Inject, InjectResultDTO } from '../../../utils/api-types';
-import { createAtomicTesting, searchAtomicTestings } from '../../../actions/atomic_testings/atomic-testing-actions';
-import CreateInject from '../common/injects/CreateInject';
-import InjectDtoList from './InjectDtoList';
-import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
-import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
-import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
-import { initSorting } from '../../../components/common/queryable/Page';
-import ButtonCreate from '../../../components/common/ButtonCreate';
-import teamContextForAtomicTesting from './atomic_testing/context/TeamContextForAtomicTesting';
 import { TeamContext } from '../common/Context';
+import CreateInject from '../common/injects/CreateInject';
+import teamContextForAtomicTesting from './atomic_testing/context/TeamContextForAtomicTesting';
+import InjectDtoList from './InjectDtoList';
 
-// eslint-disable-next-line consistent-return
 const AtomicTestings = () => {
   // Standard hooks
   const { t } = useFormatter();
@@ -71,24 +71,25 @@ const AtomicTestings = () => {
       <Breadcrumbs variant="list" elements={[{ label: t('Atomic testings'), current: true }]} />
       <InjectDtoList
         fetchInjects={searchAtomicTestings}
-        goTo={(injectId) => `/admin/atomic_testings/${injectId}`}
+        goTo={injectId => `/admin/atomic_testings/${injectId}`}
         queryableHelpers={queryableHelpers}
         searchPaginationInput={searchPaginationInput}
         availableFilterNames={availableFilterNames}
       />
-      {userAdmin && (<>
-        <ButtonCreate onClick={() => setOpenCreateDrawer(true)} />
-        <TeamContext.Provider value={teamContextForAtomicTesting()}>
-          <CreateInject
-            title={t('Create a new atomic test')}
-            onCreateInject={onCreateAtomicTesting}
-            isAtomic
-            open={openCreateDrawer}
-            handleClose={() => setOpenCreateDrawer(false)}
-          />
-        </TeamContext.Provider>
-      </>)
-      }
+      {userAdmin && (
+        <>
+          <ButtonCreate onClick={() => setOpenCreateDrawer(true)} />
+          <TeamContext.Provider value={teamContextForAtomicTesting()}>
+            <CreateInject
+              title={t('Create a new atomic test')}
+              onCreateInject={onCreateAtomicTesting}
+              isAtomic
+              open={openCreateDrawer}
+              handleClose={() => setOpenCreateDrawer(false)}
+            />
+          </TeamContext.Provider>
+        </>
+      )}
     </>
   );
 };

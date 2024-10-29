@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
 import { Button } from '@mui/material';
+import { useEffect, useState } from 'react';
+import * as React from 'react';
+
 import { fetchDocuments } from '../../../../actions/Document';
 import FileTransferDialog from '../../../../components/fields/FileTransferDialog';
+import { useFormatter } from '../../../../components/i18n';
 import type { RawDocument } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { useFormatter } from '../../../../components/i18n';
 
 interface Props {
   handleAddLogo: (documentId: string) => void;
@@ -50,7 +52,8 @@ const ChannelAddLogo: React.FC<Props> = ({ handleAddLogo }) => {
           onAddDocument={setSelectedDocument}
           extensions={['png', 'jpg', 'jpeg', 'svg', 'gif']}
         >
-        </FileTransferDialog>)}
+        </FileTransferDialog>
+      )}
     </div>
   );
 };

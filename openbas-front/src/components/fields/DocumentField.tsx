@@ -1,14 +1,15 @@
-import React, { CSSProperties, FunctionComponent } from 'react';
 import { Autocomplete as MuiAutocomplete, Box, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { FieldErrors } from 'react-hook-form';
 import { FileOutline } from 'mdi-material-ui';
+import { CSSProperties, FunctionComponent } from 'react';
+import { FieldErrors } from 'react-hook-form';
+
+import { fetchDocuments } from '../../actions/Document';
+import type { DocumentHelper } from '../../actions/helper';
+import { useHelper } from '../../store';
+import type { Document } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
-import type { Document } from '../../utils/api-types';
-import { useHelper } from '../../store';
-import type { DocumentHelper } from '../../actions/helper';
-import { fetchDocuments } from '../../actions/Document';
 
 const useStyles = makeStyles(() => ({
   icon: {
@@ -58,15 +59,15 @@ const DocumentField: FunctionComponent<Props> = ({
   // Form
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-expect-error
-  const documentsOptions = documents.filter((n) => (extensions.length > 0 ? extensions.includes(n.document_name.split('.').pop()) : true))
+  const documentsOptions = documents.filter(n => (extensions.length > 0 ? extensions.includes(n.document_name.split('.').pop()) : true))
     .map(
-      (n) => ({
+      n => ({
         id: n.document_id,
         label: n.document_name,
       }),
     );
   const valueResolver = () => {
-    return documentsOptions.filter((document) => fieldValue === document.id).at(0);
+    return documentsOptions.filter(document => fieldValue === document.id).at(0);
   };
 
   return (
@@ -92,7 +93,7 @@ const DocumentField: FunctionComponent<Props> = ({
           </Box>
         )}
         isOptionEqualToValue={(option, value) => option.id === value.id}
-        renderInput={(params) => (
+        renderInput={params => (
           <TextField
             {...params}
             label={label}

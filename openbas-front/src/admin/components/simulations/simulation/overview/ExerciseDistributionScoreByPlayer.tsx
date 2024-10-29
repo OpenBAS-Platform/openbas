@@ -1,18 +1,19 @@
-import React, { FunctionComponent } from 'react';
-import Chart from 'react-apexcharts';
 import { useTheme } from '@mui/styles';
 import * as R from 'ramda';
+import { FunctionComponent } from 'react';
+import Chart from 'react-apexcharts';
+
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
+import type { UserHelper } from '../../../../../actions/helper';
+import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
+import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
-import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
-import { resolveUserName } from '../../../../../utils/String';
-import type { UserHelper } from '../../../../../actions/helper';
 import type { InjectExpectation, User } from '../../../../../utils/api-types';
-import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
+import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
+import { resolveUserName } from '../../../../../utils/String';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
@@ -63,7 +64,7 @@ const ExerciseDistributionScoreByPlayer: FunctionComponent<Props> = ({
     <>
       {usersTotalScores.length > 0 ? (
         <Chart
-          id='exercise_distribution_total_score_by_player'
+          id="exercise_distribution_total_score_by_player"
           // @ts-expect-error: Need to migrate Chart.js file
           options={horizontalBarsChartOptions(theme)}
           series={totalScoreByUserData}

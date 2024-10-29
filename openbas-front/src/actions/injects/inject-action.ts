@@ -1,8 +1,9 @@
 import { Dispatch } from 'redux';
+
 import { getReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import type { Exercise, Scenario, SearchPaginationInput } from '../../utils/api-types';
-import * as schema from '../Schema';
 import { MESSAGING$ } from '../../utils/Environment';
+import * as schema from '../Schema';
 
 export const testInject = (injectId: string) => {
   const uri = `/api/injects/${injectId}/test`;

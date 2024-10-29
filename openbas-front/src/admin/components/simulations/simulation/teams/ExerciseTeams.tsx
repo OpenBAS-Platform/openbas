@@ -1,69 +1,24 @@
-import { useParams } from 'react-router-dom';
-import React, { useContext, useEffect, useState } from 'react';
 import { Paper, Typography } from '@mui/material';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import { PermissionsContext, TeamContext, TeamContextType } from '../../../common/Context';
-import type { UserStore } from '../../../teams/players/Player';
-import UpdateTeams from '../../../components/teams/UpdateTeams';
-import type { SearchPaginationInput, Team, TeamCreateInput, TeamOutput } from '../../../../../utils/api-types';
-import type { TeamStore } from '../../../../../actions/teams/Team';
-import { addExerciseTeamPlayers, disableExerciseTeamPlayers, enableExerciseTeamPlayers, fetchExerciseTeams, removeExerciseTeamPlayers } from '../../../../../actions/Exercise';
-import { addTeam, fetchTeams } from '../../../../../actions/teams/team-actions';
+import { useContext, useEffect, useState } from 'react';
+import * as React from 'react';
+import { useParams } from 'react-router-dom';
+
+import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import ContextualTeams from '../../../components/teams/ContextualTeams';
+import type { TeamStore } from '../../../../../actions/teams/Team';
 import { useFormatter } from '../../../../../components/i18n';
-import type { Page } from '../../../../../components/common/queryable/Page';
-import { searchExerciseTeams, addExerciseTeams, removeExerciseTeams, replaceExerciseTeams } from '../../../../../actions/exercises/exercise-teams-action';
+import { useHelper } from '../../../../../store';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { PermissionsContext, TeamContext } from '../../../common/Context';
+import ContextualTeams from '../../../components/teams/ContextualTeams';
+import UpdateTeams from '../../../components/teams/UpdateTeams';
+import teamContextForExercise from './teamContextForExercise';
 
 interface Props {
-  exerciseTeamsUsers: ExerciseStore['exercise_teams_users'],
+  exerciseTeamsUsers: ExerciseStore['exercise_teams_users'];
 }
-
-export const teamContextForExercise = (exerciseId: ExerciseStore['exercise_id'], exerciseTeamsUsers: ExerciseStore['exercise_teams_users']): TeamContextType => {
-  const dispatch = useAppDispatch();
-
-  return {
-    async onAddUsersTeam(teamId: Team['team_id'], userIds: UserStore['user_id'][]): Promise<void> {
-      await dispatch(addExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: userIds }));
-      return dispatch(fetchTeams());
-    },
-    async onRemoveUsersTeam(teamId: Team['team_id'], userIds: UserStore['user_id'][]): Promise<void> {
-      await dispatch(removeExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: userIds }));
-      return dispatch(fetchTeams());
-    },
-    onAddTeam(teamId: Team['team_id']): Promise<void> {
-      return dispatch(addExerciseTeams(exerciseId, { exercise_teams: [teamId] }));
-    },
-    onCreateTeam(team: TeamCreateInput): Promise<{ result: string }> {
-      return dispatch(addTeam({ ...team, team_exercises: [exerciseId] }));
-    },
-    checkUserEnabled(teamId: Team['team_id'], userId: UserStore['user_id']): boolean {
-      return exerciseTeamsUsers.filter((o: ExerciseStore['exercise_teams_users']) => o.exercise_id === exerciseId && o.team_id === teamId && userId === o.user_id).length > 0;
-    },
-    computeTeamUsersEnabled(teamId: Team['team_id']) {
-      return exerciseTeamsUsers.filter((o: ExerciseStore['exercise_teams_users']) => o.team_id === teamId).length;
-    },
-    onRemoveTeam(teamId: Team['team_id']): void {
-      dispatch(removeExerciseTeams(exerciseId, { exercise_teams: [teamId] }));
-    },
-    onReplaceTeam(teamIds: Team['team_id'][]): Promise<{ result: string[], entities: { teams: Record<string, TeamStore> } }> {
-      return dispatch(replaceExerciseTeams(exerciseId, { exercise_teams: teamIds }));
-    },
-    onToggleUser(teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean): void {
-      if (userEnabled) {
-        dispatch(disableExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: [userId] }));
-      } else {
-        dispatch(enableExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: [userId] }));
-      }
-    },
-    searchTeams(input: SearchPaginationInput, contextualOnly?: boolean): Promise<{ data: Page<TeamOutput> }> {
-      return searchExerciseTeams(exerciseId, input, contextualOnly);
-    },
-  };
-};
 
 const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
   // Standard hooks
@@ -91,11 +46,12 @@ const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
         {t('Teams')}
       </Typography>
       {permissions.canWrite
-        && <UpdateTeams
+      && (
+        <UpdateTeams
           addedTeamIds={teams.map((team: TeamStore) => team.team_id)}
           setTeams={(ts: TeamStore[]) => setTeams(ts)}
-           />
-      }
+        />
+      )}
       <div className="clearfix" />
       <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
         <ContextualTeams teams={teams} />

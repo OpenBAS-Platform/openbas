@@ -1,4 +1,5 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source';
+
 import { buildUri } from '../utils/Action';
 
 /**
@@ -14,7 +15,7 @@ export const askAI = async (uri, input, eventCallback) => {
       method: 'POST',
       body: JSON.stringify(input),
       headers: {
-        Accept: 'text/event-stream',
+        'Accept': 'text/event-stream',
         'Content-Type': 'application/json',
       },
       onmessage(event) {

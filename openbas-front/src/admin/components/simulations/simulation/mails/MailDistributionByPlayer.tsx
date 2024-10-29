@@ -1,21 +1,22 @@
 import { useTheme } from '@mui/styles';
-import React, { FunctionComponent } from 'react';
-import Chart from 'react-apexcharts';
 import * as R from 'ramda';
-import Empty from '../../../../../components/Empty';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import { useFormatter } from '../../../../../components/i18n';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
-import type { Theme } from '../../../../../components/Theme';
-import type { Communication, User } from '../../../../../utils/api-types';
-import { resolveUserName } from '../../../../../utils/String';
-import type { CommunicationHelper } from '../../../../../actions/communications/communication-helper';
+import { FunctionComponent } from 'react';
+import Chart from 'react-apexcharts';
+
 import { fetchExerciseCommunications } from '../../../../../actions/Communication';
+import type { CommunicationHelper } from '../../../../../actions/communications/communication-helper';
+import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import type { UserHelper } from '../../../../../actions/helper';
 import { fetchPlayers } from '../../../../../actions/User';
+import Empty from '../../../../../components/Empty';
+import { useFormatter } from '../../../../../components/i18n';
+import type { Theme } from '../../../../../components/Theme';
+import { useHelper } from '../../../../../store';
+import type { Communication, User } from '../../../../../utils/api-types';
+import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { resolveUserName } from '../../../../../utils/String';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];

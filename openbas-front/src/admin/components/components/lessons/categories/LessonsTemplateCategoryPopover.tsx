@@ -1,12 +1,13 @@
-import React, { FunctionComponent, useState } from 'react';
-import LessonsTemplateCategoryForm, { LessonsTemplateCategoryInputForm } from './LessonsTemplateCategoryForm';
-import { useFormatter } from '../../../../../components/i18n';
+import { FunctionComponent, useState } from 'react';
+
 import { deleteLessonsTemplateCategory, updateLessonsTemplateCategory } from '../../../../../actions/Lessons';
-import type { LessonsTemplateCategory } from '../../../../../utils/api-types';
+import ButtonPopover from '../../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../../components/common/DialogDelete';
 import Drawer from '../../../../../components/common/Drawer';
-import ButtonPopover from '../../../../../components/common/ButtonPopover';
+import { useFormatter } from '../../../../../components/i18n';
+import type { LessonsTemplateCategory } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
+import LessonsTemplateCategoryForm, { LessonsTemplateCategoryInputForm } from './LessonsTemplateCategoryForm';
 
 interface Props {
   lessonsTemplateId: string;
@@ -61,7 +62,7 @@ const LessonsTemplateCategoryPopover: FunctionComponent<Props> = ({
 
   return (
     <>
-      <ButtonPopover entries={entries} variant={'icon'} />
+      <ButtonPopover entries={entries} variant="icon" />
       <DialogDelete
         open={openDelete}
         handleClose={handleCloseDelete}

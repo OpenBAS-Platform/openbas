@@ -1,16 +1,17 @@
-import React, { useContext } from 'react';
-import { useParams } from 'react-router-dom';
 import { Paper, Typography } from '@mui/material';
+import { useContext } from 'react';
+import { useParams } from 'react-router-dom';
+
+import { addVariableForExercise, deleteVariableForExercise, fetchVariablesForExercise, updateVariableForExercise } from '../../../../../actions/variables/variable-actions';
+import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
+import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import type { Exercise, Variable, VariableInput } from '../../../../../utils/api-types';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import Variables from '../../../components/variables/Variables';
-import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
-import { addVariableForExercise, deleteVariableForExercise, fetchVariablesForExercise, updateVariableForExercise } from '../../../../../actions/variables/variable-actions';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { PermissionsContext, VariableContext, VariableContextType } from '../../../common/Context';
 import CreateVariable from '../../../components/variables/CreateVariable';
-import { useFormatter } from '../../../../../components/i18n';
+import Variables from '../../../components/variables/Variables';
 
 const ExerciseVariables = () => {
   // Standard hooks

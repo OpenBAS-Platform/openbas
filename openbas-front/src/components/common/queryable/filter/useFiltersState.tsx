@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { emptyFilterGroup } from './FilterUtils';
+
+import type { Filter, FilterGroup } from '../../../../utils/api-types';
 import { FilterHelpers } from './FilterHelpers';
 import {
   handleAddFilterWithEmptyValueUtil,
@@ -9,11 +10,11 @@ import {
   handleRemoveFilterUtil,
   handleSwitchMode,
 } from './filtersManageStateUtils';
-import type { Filter, FilterGroup } from '../../../../utils/api-types';
+import { emptyFilterGroup } from './FilterUtils';
 
 interface Props {
-  filters: FilterGroup,
-  latestAddFilterId?: string
+  filters: FilterGroup;
+  latestAddFilterId?: string;
 }
 
 const useFiltersState = (
@@ -27,35 +28,35 @@ const useFiltersState = (
   const helpers: FilterHelpers = {
     // Switch filter group operator
     handleSwitchMode: () => {
-      setFiltersState((prevState) => ({
+      setFiltersState(prevState => ({
         ...prevState,
         filters: handleSwitchMode(prevState.filters),
       }));
     },
     // Add Filter
     handleAddFilterWithEmptyValue: (filter: Filter) => {
-      setFiltersState((prevState) => ({
+      setFiltersState(prevState => ({
         ...prevState,
         filters: handleAddFilterWithEmptyValueUtil(prevState.filters, filter),
       }));
     },
     // Add value to a filter
     handleAddSingleValueFilter: (key: string, value: string) => {
-      setFiltersState((prevState) => ({
+      setFiltersState(prevState => ({
         ...prevState,
         filters: handleAddSingleValueFilterUtil(prevState.filters, key, value),
       }));
     },
     // Add multiple value to a filter
     handleAddMultipleValueFilter: (key: string, values: string[]) => {
-      setFiltersState((prevState) => ({
+      setFiltersState(prevState => ({
         ...prevState,
         filters: handleAddMultipleValueFilterUtil(prevState.filters, key, values),
       }));
     },
     // Change operator in filter
     handleChangeOperatorFilters: (key: string, operator: Filter['operator']) => {
-      setFiltersState((prevState) => ({
+      setFiltersState(prevState => ({
         ...prevState,
         filters: handleChangeOperatorFiltersUtil(prevState.filters, key, operator),
       }));
@@ -66,7 +67,7 @@ const useFiltersState = (
     },
     // Remove a Filter
     handleRemoveFilterByKey: (key: string) => {
-      setFiltersState((prevState) => ({
+      setFiltersState(prevState => ({
         ...prevState,
         filters: handleRemoveFilterUtil(prevState.filters, key),
       }));

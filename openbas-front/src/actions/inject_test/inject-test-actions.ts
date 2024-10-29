@@ -1,7 +1,6 @@
 import { simpleCall, simpleDelCall, simplePostCall } from '../../utils/Action';
 import type { SearchPaginationInput } from '../../utils/api-types';
 
-// eslint-disable-next-line import/prefer-default-export
 export const searchExerciseInjectTests = (exerciseId: string, searchPaginationInput: SearchPaginationInput) => {
   const uri = `/api/exercise/${exerciseId}/injects/test`;
   return simplePostCall(uri, searchPaginationInput);

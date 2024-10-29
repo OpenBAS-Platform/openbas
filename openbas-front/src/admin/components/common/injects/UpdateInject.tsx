@@ -1,16 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
 import { Tab, Tabs } from '@mui/material';
+import { useEffect, useRef, useState } from 'react';
+import * as React from 'react';
+
+import { fetchInject } from '../../../../actions/Inject';
+import type { InjectOutputType } from '../../../../actions/injects/Inject';
+import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { Inject } from '../../../../utils/api-types';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { useAppDispatch } from '../../../../utils/hooks';
-import UpdateInjectDetails from './UpdateInjectDetails';
-import { fetchInject } from '../../../../actions/Inject';
 import { useHelper } from '../../../../store';
-import type { InjectHelper } from '../../../../actions/injects/inject-helper';
+import type { Inject } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import UpdateInjectDetails from './UpdateInjectDetails';
 import UpdateInjectLogicalChains from './UpdateInjectLogicalChains';
-import type { InjectOutputType } from '../../../../actions/injects/Inject';
 
 interface Props {
   open: boolean;
@@ -62,13 +64,13 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
     >
       <>
         {!isAtomic && (
-        <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">
-          {availableTabs.map((tab) => {
-            return (
-              <Tab key={tab} label={tab} value={tab}/>
-            );
-          })}
-        </Tabs>
+          <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">
+            {availableTabs.map((tab) => {
+              return (
+                <Tab key={tab} label={tab} value={tab} />
+              );
+            })}
+          </Tabs>
         )}
         {!isInjectLoading && (isAtomic || activeTab === 'Inject details') && (
           <UpdateInjectDetails

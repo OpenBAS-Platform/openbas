@@ -1,27 +1,24 @@
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { ArticleContext, TeamContext, ViewModeContext } from '../../../common/Context';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import { useHelper } from '../../../../../store';
-import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
+
 import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
 import type { ChallengeHelper } from '../../../../../actions/helper';
-import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
-import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
-import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
-import type { Scenario } from '../../../../../utils/api-types';
-import { articleContextForScenario } from '../articles/ScenarioArticles';
-import { teamContextForScenario } from '../teams/ScenarioTeams';
 import { fetchScenarioInjectsSimple } from '../../../../../actions/injects/inject-action';
+import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
+import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
+import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
+import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
+import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
+import { useHelper } from '../../../../../store';
+import type { Scenario } from '../../../../../utils/api-types';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { ArticleContext, TeamContext, ViewModeContext } from '../../../common/Context';
 import Injects from '../../../common/injects/Injects';
+import articleContextForScenario from '../articles/articleContextForScenario';
+import teamContextForScenario from '../teams/teamContextForScenario';
 
-interface Props {
-
-}
-
-const ScenarioInjects: FunctionComponent<Props> = () => {
+const ScenarioInjects: FunctionComponent = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };

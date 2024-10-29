@@ -1,8 +1,9 @@
-import React, { FunctionComponent, useState } from 'react';
 import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup } from '@mui/material';
+import { FunctionComponent, useState } from 'react';
+
+import { updatePlatformEnterpriseEditionParameters } from '../../../../actions/Application';
 import { useFormatter } from '../../../../components/i18n';
 import type { SettingsEnterpriseEditionUpdateInput } from '../../../../utils/api-types';
-import { updatePlatformEnterpriseEditionParameters } from '../../../../actions/Application';
 import { useAppDispatch } from '../../../../utils/hooks';
 
 interface EnterpriseEditionAgreementProps {
@@ -11,7 +12,7 @@ interface EnterpriseEditionAgreementProps {
 }
 
 const EnterpriseEditionAgreement: FunctionComponent<
-EnterpriseEditionAgreementProps
+  EnterpriseEditionAgreementProps
 > = ({ open, onClose }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -52,7 +53,8 @@ EnterpriseEditionAgreementProps
           <li>
             {t(
               'For all other usages, you (and your organization) should have entered in a',
-            )}{' '}
+            )}
+            {' '}
             <a href="https://filigran.io/contact/" target="_blank" rel="noreferrer">
               {t('Filigran Enterprise agreement')}
             </a>
@@ -61,25 +63,27 @@ EnterpriseEditionAgreementProps
         </ul>
         <FormGroup>
           <FormControlLabel
-            control={
+            control={(
               <Checkbox
                 checked={enterpriseEditionConsent}
                 disabled={false}
-                onChange={(event) => setEnterpriseEditionConsent(event.target.checked)}
+                onChange={event => setEnterpriseEditionConsent(event.target.checked)}
               />
-            }
-            label={
+            )}
+            label={(
               <>
-                <span>{t('I have read and agree to the')}</span>{' '}
+                <span>{t('I have read and agree to the')}</span>
+                {' '}
                 <a
                   href="https://github.com/OpenBAS-Platform/openbas/blob/master/LICENSE"
-                  target="_blank" rel="noreferrer"
+                  target="_blank"
+                  rel="noreferrer"
                 >
                   {t('OpenBAS EE license terms')}
                 </a>
                 .
               </>
-            }
+            )}
           />
         </FormGroup>
       </DialogContent>

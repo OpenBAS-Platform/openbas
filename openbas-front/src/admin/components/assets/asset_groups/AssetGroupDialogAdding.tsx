@@ -1,13 +1,14 @@
-import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { SelectGroup } from 'mdi-material-ui';
+import { FunctionComponent, useEffect, useMemo, useState } from 'react';
+
+import { findAssetGroups, searchAssetGroups } from '../../../../actions/asset_groups/assetgroup-action';
+import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
+import SelectList, { SelectListElements } from '../../../../components/common/SelectList';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import { findAssetGroups, searchAssetGroups } from '../../../../actions/asset_groups/assetgroup-action';
-import SelectList, { SelectListElements } from '../../../../components/common/SelectList';
-import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
-import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
-import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import type { AssetGroupOutput } from '../../../../utils/api-types';
 
 interface Props {
@@ -29,12 +30,12 @@ const AssetGroupDialogAdding: FunctionComponent<Props> = ({
   const [assetGroupValues, setAssetGroupValues] = useState<AssetGroupOutput[]>([]);
   useEffect(() => {
     if (open) {
-      findAssetGroups(initialState).then((result) => setAssetGroupValues(result.data));
+      findAssetGroups(initialState).then(result => setAssetGroupValues(result.data));
     }
   }, [open, initialState]);
 
   const addAssetGroup = (_assetGroupId: string, assetGroup: AssetGroupOutput) => setAssetGroupValues([...assetGroupValues, assetGroup]);
-  const removeAssetGroup = (assetGroupId: string) => setAssetGroupValues(assetGroupValues.filter((v) => v.asset_group_id !== assetGroupId));
+  const removeAssetGroup = (assetGroupId: string) => setAssetGroupValues(assetGroupValues.filter(v => v.asset_group_id !== assetGroupId));
 
   // Dialog
   const handleClose = () => {
@@ -43,7 +44,7 @@ const AssetGroupDialogAdding: FunctionComponent<Props> = ({
   };
 
   const handleSubmit = () => {
-    onSubmit(assetGroupValues.map((v) => v.asset_group_id));
+    onSubmit(assetGroupValues.map(v => v.asset_group_id));
     handleClose();
   };
 
@@ -69,14 +70,16 @@ const AssetGroupDialogAdding: FunctionComponent<Props> = ({
   ];
   const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({}));
 
-  const paginationComponent = <PaginationComponentV2
-    fetch={searchAssetGroups}
-    searchPaginationInput={searchPaginationInput}
-    setContent={setAssetGroups}
-    entityPrefix="asset_group"
-    availableFilterNames={availableFilterNames}
-    queryableHelpers={queryableHelpers}
-                              />;
+  const paginationComponent = (
+    <PaginationComponentV2
+      fetch={searchAssetGroups}
+      searchPaginationInput={searchPaginationInput}
+      setContent={setAssetGroups}
+      entityPrefix="asset_group"
+      availableFilterNames={availableFilterNames}
+      queryableHelpers={queryableHelpers}
+    />
+  );
 
   return (
     <Dialog

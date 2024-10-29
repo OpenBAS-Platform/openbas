@@ -1,13 +1,14 @@
 import { useTheme } from '@mui/styles';
-import React, { FunctionComponent } from 'react';
-import Chart from 'react-apexcharts';
 import * as R from 'ramda';
+import { FunctionComponent } from 'react';
+import Chart from 'react-apexcharts';
+
+import type { InjectStore } from '../../../../../actions/injects/Inject';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
-import { lineChartOptions } from '../../../../../utils/Charts';
 import type { Theme } from '../../../../../components/Theme';
-import type { InjectStore } from '../../../../../actions/injects/Inject';
 import type { Inject } from '../../../../../utils/api-types';
+import { lineChartOptions } from '../../../../../utils/Charts';
 
 interface Props {
   injects: Inject[];

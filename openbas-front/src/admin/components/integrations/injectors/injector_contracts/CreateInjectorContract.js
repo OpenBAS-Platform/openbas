@@ -1,15 +1,16 @@
-import React, { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { v4 as uuid } from 'uuid';
-import { connect } from 'react-redux';
-import * as R from 'ramda';
+import { Add, SmartButtonOutlined } from '@mui/icons-material';
 import { Fab, List, ListItemButton, ListItemIcon, ListItemText, Step, StepLabel, Stepper } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import { Add, SmartButtonOutlined } from '@mui/icons-material';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component } from 'react';
+import { connect } from 'react-redux';
+import { v4 as uuid } from 'uuid';
+
 import { addInjectorContract } from '../../../../../actions/InjectorContracts';
+import Drawer from '../../../../../components/common/Drawer';
 import inject18n from '../../../../../components/i18n';
 import InjectorContractCustomForm from './InjectorContractCustomForm';
-import Drawer from '../../../../../components/common/Drawer';
 
 const styles = () => ({
   createButton: {
@@ -44,7 +45,7 @@ class CreateInjectorContract extends Component {
   onSubmit(data, fields) {
     const { injector, injectorContracts } = this.props;
     const { selectedInjectorContract } = this.state;
-    const injectorContract = injectorContracts.filter((n) => n.injector_contract_id === selectedInjectorContract).at(0);
+    const injectorContract = injectorContracts.filter(n => n.injector_contract_id === selectedInjectorContract).at(0);
     const injectorContractContent = JSON.parse(injectorContract.injector_contract_content);
     const newInjectorContractContent = {
       ...injectorContractContent,
@@ -70,7 +71,7 @@ class CreateInjectorContract extends Component {
     )(data);
     return this.props
       .addInjectorContract(inputValues)
-      .then((result) => (result.result ? this.handleClose() : result));
+      .then(result => (result.result ? this.handleClose() : result));
   }
 
   renderInjectorContracts() {
@@ -116,10 +117,10 @@ class CreateInjectorContract extends Component {
           <>
             <Stepper activeStep={this.state.activeStep} style={{ marginBottom: 20 }}>
               <Step>
-                <StepLabel >{t('Select the template')}</StepLabel>
+                <StepLabel>{t('Select the template')}</StepLabel>
               </Step>
               <Step>
-                <StepLabel >{t('Create the injector contract')}</StepLabel>
+                <StepLabel>{t('Create the injector contract')}</StepLabel>
               </Step>
             </Stepper>
             {activeStep === 0 && this.renderInjectorContracts()}
@@ -129,7 +130,7 @@ class CreateInjectorContract extends Component {
                 onSubmit={this.onSubmit.bind(this)}
                 initialValues={{ injector_contract_attack_patterns: [] }}
                 handleClose={this.handleClose.bind(this)}
-                contractTemplate={injectorContracts.filter((n) => n.injector_contract_id === selectedInjectorContract).at(0)}
+                contractTemplate={injectorContracts.filter(n => n.injector_contract_id === selectedInjectorContract).at(0)}
               />
             )}
           </>

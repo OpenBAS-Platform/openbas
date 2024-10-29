@@ -1,5 +1,5 @@
-import { z, ZodError, ZodType } from 'zod';
 import { setIn } from 'final-form';
+import { z, ZodError, ZodType } from 'zod';
 
 type ZodImplements<Model> = {
   [key in keyof Model]-?: undefined extends Model[key]

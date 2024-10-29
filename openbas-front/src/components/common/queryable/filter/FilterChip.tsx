@@ -1,10 +1,11 @@
-import React, { FunctionComponent, useRef, useState } from 'react';
 import { Chip, Tooltip } from '@mui/material';
 import * as R from 'ramda';
-import { FilterHelpers } from './FilterHelpers';
-import FilterChipPopover from './FilterChipPopover';
+import { FunctionComponent, useRef, useState } from 'react';
+
 import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
+import FilterChipPopover from './FilterChipPopover';
 import FilterChipValues from './FilterChipValues';
+import { FilterHelpers } from './FilterHelpers';
 
 interface Props {
   filter: Filter;
@@ -31,7 +32,7 @@ const FilterChip: FunctionComponent<Props> = ({
   };
 
   const isEmpty = (values?: string[]) => {
-    return R.isEmpty(values) || values?.some((v) => R.isEmpty(v));
+    return R.isEmpty(values) || values?.some(v => R.isEmpty(v));
   };
 
   const chipVariant = isEmpty(filter.values) && !['empty', 'not_empty'].includes(filter.operator ?? 'eq')
@@ -41,39 +42,40 @@ const FilterChip: FunctionComponent<Props> = ({
   return (
     <>
       <Tooltip
-        title={
+        title={(
           <FilterChipValues
             filter={filter}
             propertySchema={propertySchema}
             isTooltip
             handleOpen={handleOpen}
           />
-        }
+        )}
       >
         <Chip
           variant={chipVariant}
-          label={
+          label={(
             <FilterChipValues
               filter={filter}
               propertySchema={propertySchema}
               handleOpen={handleOpen}
             />
-          }
+          )}
           onDelete={handleRemoveFilter}
           sx={{ borderRadius: 1 }}
           ref={chipRef}
         />
       </Tooltip>
       {chipRef?.current
-        && <FilterChipPopover
+      && (
+        <FilterChipPopover
           filter={filter}
           helpers={helpers}
           open={open}
           onClose={handleClose}
           anchorEl={chipRef.current}
           propertySchema={propertySchema}
-           />
-      }
+        />
+      )}
     </>
   );
 };

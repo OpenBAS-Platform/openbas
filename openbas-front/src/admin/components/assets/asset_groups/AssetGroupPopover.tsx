@@ -1,20 +1,20 @@
-import React, { FunctionComponent, useState } from 'react';
-import { Drawer as MuiDrawer, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-
+import { Drawer as MuiDrawer, IconButton, Menu, MenuItem } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { FunctionComponent, useState } from 'react';
+
+import { deleteAssetGroup, updateAssetGroup, updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
+import Dialog from '../../../../components/common/Dialog';
+import DialogDelete from '../../../../components/common/DialogDelete';
+import Drawer from '../../../../components/common/Drawer';
+import { emptyFilterGroup } from '../../../../components/common/queryable/filter/FilterUtils';
 import { useFormatter } from '../../../../components/i18n';
 import type { AssetGroupInput, AssetGroupOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import Drawer from '../../../../components/common/Drawer';
-import DialogDelete from '../../../../components/common/DialogDelete';
+import EndpointsDialogAdding from '../endpoints/EndpointsDialogAdding';
 import type { AssetGroupStore } from './AssetGroup';
-import { deleteAssetGroup, updateAssetGroup, updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import AssetGroupForm from './AssetGroupForm';
 import AssetGroupManagement from './AssetGroupManagement';
-import Dialog from '../../../../components/common/Dialog';
-import EndpointsDialogAdding from '../endpoints/EndpointsDialogAdding';
-import { emptyFilterGroup } from '../../../../components/common/queryable/filter/FilterUtils';
 
 const useStyles = makeStyles(() => ({
   drawerPaper: {
@@ -72,7 +72,7 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
   };
   const submitEdit = (data: AssetGroupInput) => {
     dispatch(updateAssetGroup(assetGroup.asset_group_id, data)).then(
-      (result: { result: string, entities: { asset_groups: Record<string, AssetGroupStore> } }) => {
+      (result: { result: string; entities: { asset_groups: Record<string, AssetGroupStore> } }) => {
         if (result.entities) {
           if (onUpdate) {
             const updated = result.entities.asset_groups[result.result];
@@ -191,8 +191,10 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
         <>
           {selected !== undefined && (
             <EndpointsDialogAdding
-              initialState={assetGroup.asset_group_assets ?? []} open={selected}
-              onClose={() => setSelected(false)} onSubmit={sumitManage}
+              initialState={assetGroup.asset_group_assets ?? []}
+              open={selected}
+              onClose={() => setSelected(false)}
+              onSubmit={sumitManage}
               title={t('Add assets in this asset group')}
             />
           )}

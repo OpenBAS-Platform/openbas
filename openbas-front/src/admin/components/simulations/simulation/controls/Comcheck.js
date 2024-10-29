@@ -1,25 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import { CastOutlined, CheckCircleOutlineOutlined, HistoryToggleOffOutlined, PersonOutlined } from '@mui/icons-material';
+import { Grid, LinearProgress, linearProgressClasses, List, ListItem, ListItemIcon, ListItemText, Paper, Typography } from '@mui/material';
 import { makeStyles, styled } from '@mui/styles';
-import { List, ListItem, ListItemIcon, ListItemText, Grid, Paper, LinearProgress, linearProgressClasses, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { CastOutlined, CheckCircleOutlineOutlined, PersonOutlined, HistoryToggleOffOutlined } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
-import { fetchPlayers } from '../../../../../actions/User';
-import { fetchOrganizations } from '../../../../../actions/Organization';
-import ItemTags from '../../../../../components/ItemTags';
-import TagsFilter from '../../../common/filters/TagsFilter';
-import SearchFilter from '../../../../../components/SearchFilter';
-import { fetchTags } from '../../../../../actions/Tag';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { useHelper } from '../../../../../store';
-import useSearchAnFilter from '../../../../../utils/SortingFiltering';
-import { fetchComcheck, fetchComcheckStatuses } from '../../../../../actions/Comcheck';
-import { useFormatter } from '../../../../../components/i18n';
-import ComcheckStatusState from './ComcheckStatusState';
-import ComcheckState from './ComcheckState';
-import { progression } from '../../../../../utils/Time';
 
-const useStyles = makeStyles((theme) => ({
+import { fetchComcheck, fetchComcheckStatuses } from '../../../../../actions/Comcheck';
+import { fetchOrganizations } from '../../../../../actions/Organization';
+import { fetchTags } from '../../../../../actions/Tag';
+import { fetchPlayers } from '../../../../../actions/User';
+import { useFormatter } from '../../../../../components/i18n';
+import ItemTags from '../../../../../components/ItemTags';
+import SearchFilter from '../../../../../components/SearchFilter';
+import { useHelper } from '../../../../../store';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import useSearchAnFilter from '../../../../../utils/SortingFiltering';
+import { progression } from '../../../../../utils/Time';
+import TagsFilter from '../../../common/filters/TagsFilter';
+import ComcheckState from './ComcheckState';
+import ComcheckStatusState from './ComcheckStatusState';
+
+const useStyles = makeStyles(theme => ({
   parameters: {
     padding: '20px 15px 0 15px',
     float: 'left',
@@ -226,7 +227,7 @@ const Comcheck = () => {
     dispatch(fetchComcheck(exerciseId, comcheckId));
     dispatch(fetchComcheckStatuses(exerciseId, comcheckId));
   });
-  const players = statuses.map((s) => ({
+  const players = statuses.map(s => ({
     ...(usersMap[s.comcheckstatus_user] || {}),
     user_status_state: s.comcheckstatus_state,
     user_status_sent_date: s.comcheckstatus_sent_date,
@@ -323,7 +324,7 @@ const Comcheck = () => {
               </span>
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   {filtering.buildHeader(
                     'user_email',
@@ -362,10 +363,10 @@ const Comcheck = () => {
                     headerStyles,
                   )}
                 </div>
-              }
+              )}
             />
           </ListItem>
-          {filtering.filterAndSort(players).map((user) => (
+          {filtering.filterAndSort(players).map(user => (
             <ListItem
               key={user.user_id}
               classes={{ root: classes.item }}
@@ -375,7 +376,7 @@ const Comcheck = () => {
                 <PersonOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -417,7 +418,7 @@ const Comcheck = () => {
                       />
                     </div>
                   </div>
-                }
+                )}
               />
             </ListItem>
           ))}

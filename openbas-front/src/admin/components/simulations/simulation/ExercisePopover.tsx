@@ -1,5 +1,3 @@
-import React, { FunctionComponent, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -17,21 +15,25 @@ import {
   TableRow,
   Tabs,
 } from '@mui/material';
-import { useFormatter } from '../../../../components/i18n';
+import { FunctionComponent, useState } from 'react';
+import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { deleteExercise, duplicateExercise, updateExercise } from '../../../../actions/Exercise';
-import { usePermissions } from '../../../../utils/Exercise';
-import Transition from '../../../../components/common/Transition';
-import type { ExerciseUpdateInput } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
-import ButtonPopover from '../../../../components/common/ButtonPopover';
-import ExerciseUpdateForm from './ExerciseUpdateForm';
-import Drawer from '../../../../components/common/Drawer';
-import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
-import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
-import DialogDelete from '../../../../components/common/DialogDelete';
-import { useHelper } from '../../../../store';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
+import ButtonPopover from '../../../../components/common/ButtonPopover';
+import DialogDelete from '../../../../components/common/DialogDelete';
+import DialogDuplicate from '../../../../components/common/DialogDuplicate';
+import Drawer from '../../../../components/common/Drawer';
+import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import { useHelper } from '../../../../store';
+import type { ExerciseUpdateInput } from '../../../../utils/api-types';
+import { usePermissions } from '../../../../utils/Exercise';
+import { useAppDispatch } from '../../../../utils/hooks';
+import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
+import ExerciseUpdateForm from './ExerciseUpdateForm';
 import ExerciseReports from './reports/ExerciseReports';
 
 export type ExerciseActionPopover = 'Duplicate' | 'Update' | 'Delete' | 'Export' | 'Access reports';
@@ -109,7 +111,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const handleCloseDuplicate = () => setOpenDuplicate(false);
 
   const submitDuplicate = () => {
-    dispatch(duplicateExercise(exercise.exercise_id)).then((result: { result: string, entities: { exercises: ExerciseStore } }) => {
+    dispatch(duplicateExercise(exercise.exercise_id)).then((result: { result: string; entities: { exercises: ExerciseStore } }) => {
       handleCloseDuplicate();
       navigate(`/admin/exercises/${result.result}`);
     });

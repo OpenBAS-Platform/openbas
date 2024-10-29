@@ -1,30 +1,11 @@
-import React from 'react';
-import { makeStyles } from '@mui/styles';
 import { ReportProblem } from '@mui/icons-material';
-import { isEmptyField, isNotEmptyField, recordEntries, recordKeys } from '../../../utils/utils';
-import type { Theme } from '../../../components/Theme';
-import type { PlatformSettings } from '../../../utils/api-types';
+import { makeStyles } from '@mui/styles';
+
 import { useFormatter } from '../../../components/i18n';
+import type { Theme } from '../../../components/Theme';
+import { isEmptyField, recordEntries, recordKeys } from '../../../utils/utils';
 
 export const SYSTEM_BANNER_HEIGHT_PER_MESSAGE = 18;
-
-export const computeBannerSettings = (settings: PlatformSettings) => {
-  const bannerByLevel = settings.platform_banner_by_level;
-  const isBannerActivated = bannerByLevel !== undefined && isNotEmptyField(recordKeys(bannerByLevel));
-  let numberOfElements = 0;
-  if (settings.platform_banner_by_level !== undefined) {
-    for (const bannerLevel of recordEntries(settings.platform_banner_by_level)) {
-      numberOfElements += bannerLevel[1].length;
-    }
-  }
-  const bannerHeight = isBannerActivated ? `${(SYSTEM_BANNER_HEIGHT_PER_MESSAGE * numberOfElements) + 16}px` : '0';
-  const bannerHeightNumber = isBannerActivated ? (SYSTEM_BANNER_HEIGHT_PER_MESSAGE * numberOfElements) + 16 : 0;
-  return {
-    bannerByLevel,
-    bannerHeight,
-    bannerHeightNumber,
-  };
-};
 
 /* eslint-disable */
 /* Avoid auto-lint removal using --fix with false positive finding of: */
@@ -69,8 +50,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const SystemBanners = (settings: {
   settings: {
-    platform_banner_by_level: Record<'debug' | 'info' | 'warn' | 'error' | 'fatal', string[]>,
-  }
+    platform_banner_by_level: Record<'debug' | 'info' | 'warn' | 'error' | 'fatal', string[]>;
+  };
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -100,7 +81,7 @@ const SystemBanners = (settings: {
             {settings.settings.platform_banner_by_level[key].map((message) => {
               return (
                 <div key={`${key}.${message}`} className={classes.container}>
-                  <ReportProblem color="error" fontSize="small" style={{ marginRight: 8 }}/>
+                  <ReportProblem color="error" fontSize="small" style={{ marginRight: 8 }} />
                   <span className={classes.bannerText}>
                     {t(message)}
                   </span>

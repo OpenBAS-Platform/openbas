@@ -1,4 +1,3 @@
-import React, { FunctionComponent, useState } from 'react';
 import { AutoAwesomeOutlined } from '@mui/icons-material';
 import {
   Button,
@@ -16,15 +15,18 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material';
-import EETooltip from '../entreprise_edition/EETooltip';
+import { FunctionComponent, useState } from 'react';
+import * as React from 'react';
+
+import { aiChangeTone, aiExplain, aiFixSpelling, aiGenMedia, aiGenMessage, aiGenSubject, aiMakeLonger, aiMakeShorter, aiSummarize } from '../../../../actions/AskAI';
+// eslint-disable-next-line import/no-cycle
+import SimpleRichTextField from '../../../../components/fields/SimpleRichTextField';
 import { useFormatter } from '../../../../components/i18n';
 // eslint-disable-next-line import/no-cycle
 import ResponseDialog from '../../../../utils/ai/ResponseDialog';
-// eslint-disable-next-line import/no-cycle
-import SimpleRichTextField from '../../../../components/fields/SimpleRichTextField';
-import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
 import useAI from '../../../../utils/hooks/useAI';
-import { aiChangeTone, aiExplain, aiFixSpelling, aiGenMedia, aiGenMessage, aiGenSubject, aiMakeLonger, aiMakeShorter, aiSummarize } from '../../../../actions/AskAI';
+import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
+import EETooltip from '../entreprise_edition/EETooltip';
 
 // region types
 interface TextFieldAskAiProps {
@@ -65,7 +67,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
   const [messageSender, setMessageSender] = useState<string>('');
   const [messageRecipient, setMessageRecipient] = useState<string>('');
   const [isAcceptable, setIsAcceptable] = useState(true);
-  const [menuOpen, setMenuOpen] = useState<{ open: boolean; anchorEl: HTMLButtonElement | null; }>({
+  const [menuOpen, setMenuOpen] = useState<{ open: boolean; anchorEl: HTMLButtonElement | null }>({
     open: false,
     anchorEl: null,
   });
@@ -186,11 +188,11 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
             <IconButton
               size="medium"
               color="secondary"
-              onClick={(event) => ((isEnterpriseEdition && enabled && configured) ? handleOpenMenu(event) : null)}
+              onClick={event => ((isEnterpriseEdition && enabled && configured) ? handleOpenMenu(event) : null)}
               disabled={disabled}
               style={{ marginRight: -10 }}
             >
-              <AutoAwesomeOutlined fontSize='medium'/>
+              <AutoAwesomeOutlined fontSize="medium" />
             </IconButton>
           </span>
         </EETooltip>
@@ -201,14 +203,14 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
           onClose={handleCloseMenu}
         >
           {inInject && (
-          <MenuItem onClick={handleOpenGenMessageOptions}>
-            {t('Generate a message')}
-          </MenuItem>
+            <MenuItem onClick={handleOpenGenMessageOptions}>
+              {t('Generate a message')}
+            </MenuItem>
           )}
           {inArticle && (
-          <MenuItem onClick={handleOpenGenMediaOptions}>
-            {t('Generate an article')}
-          </MenuItem>
+            <MenuItem onClick={handleOpenGenMediaOptions}>
+              {t('Generate an article')}
+            </MenuItem>
           )}
           <Tooltip title={isContentEmpty() ? t('Content should not be empty') : ''} placement="left">
             <div>
@@ -228,25 +230,29 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
             <div>
               <MenuItem onClick={() => handleAskAi('longer')} disabled={isContentEmpty()}>
                 {t('Make it longer')}
-              </MenuItem></div>
+              </MenuItem>
+            </div>
           </Tooltip>
           <Tooltip title={isContentEmpty() ? t('Content should not be empty') : ''} placement="left">
             <div>
               <MenuItem onClick={handleOpenToneOptions} disabled={isContentEmpty()}>
                 {t('Change tone')}
-              </MenuItem></div>
+              </MenuItem>
+            </div>
           </Tooltip>
           <Tooltip title={isContentEmpty() ? t('Content should not be empty') : ''} placement="left">
             <div>
               <MenuItem onClick={() => handleAskAi('summarize')} disabled={isContentEmpty()}>
                 {t('Summarize')}
-              </MenuItem></div>
+              </MenuItem>
+            </div>
           </Tooltip>
           <Tooltip title={isContentEmpty() ? t('Content should not be empty') : ''} placement="left">
             <div>
               <MenuItem onClick={() => handleAskAi('explain', false)} disabled={isContentEmpty()}>
                 {t('Explain')}
-              </MenuItem></div>
+              </MenuItem>
+            </div>
           </Tooltip>
         </Menu>
         <ResponseDialog
@@ -284,7 +290,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               <Select
                 labelId="messageTone"
                 value={messageTone}
-                onChange={(event) => setMessageTone(event.target.value as unknown as 'informal' | 'formal' | 'assertive' | 'sarcastic' | 'authoritative' | 'bitter' | 'critical' | 'arrogant' | 'aggressive')}
+                onChange={event => setMessageTone(event.target.value as unknown as 'informal' | 'formal' | 'assertive' | 'sarcastic' | 'authoritative' | 'bitter' | 'critical' | 'arrogant' | 'aggressive')}
                 fullWidth={true}
               >
                 <MenuItem value="formal">{t('Formal')}</MenuItem>
@@ -302,14 +308,14 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               label={t('Who is sending?')}
               fullWidth={true}
               value={messageSender}
-              onChange={(event) => setMessageSender(event.target.value)}
+              onChange={event => setMessageSender(event.target.value)}
               style={{ marginTop: 20 }}
             />
             <TextField
               label={t('Who is receiving?')}
               fullWidth={true}
               value={messageRecipient}
-              onChange={(event) => setMessageRecipient(event.target.value)}
+              onChange={event => setMessageRecipient(event.target.value)}
               style={{ marginTop: 20 }}
             />
             <TextField
@@ -317,7 +323,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               fullWidth={true}
               type="number"
               value={messageParagraphs}
-              onChange={(event) => setMessageParagraphs(Number.isNaN(parseInt(event.target.value, 10)) ? 1 : parseInt(event.target.value, 10))}
+              onChange={event => setMessageParagraphs(Number.isNaN(parseInt(event.target.value, 10)) ? 1 : parseInt(event.target.value, 10))}
               style={{ marginTop: 20 }}
             />
             <TextField
@@ -327,7 +333,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               multiline={true}
               value={messageContext}
               rows={5}
-              onChange={(event) => setMessageContext(event.target.value)}
+              onChange={event => setMessageContext(event.target.value)}
             />
           </DialogContent>
           <DialogActions>
@@ -366,7 +372,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               <Select
                 labelId="messageTone"
                 value={messageTone}
-                onChange={(event) => setMessageTone(event.target.value as unknown as 'informal' | 'formal' | 'assertive' | 'sarcastic' | 'authoritative' | 'bitter' | 'critical' | 'arrogant' | 'aggressive')}
+                onChange={event => setMessageTone(event.target.value as unknown as 'informal' | 'formal' | 'assertive' | 'sarcastic' | 'authoritative' | 'bitter' | 'critical' | 'arrogant' | 'aggressive')}
                 fullWidth={true}
               >
                 <MenuItem value="formal">{t('Formal')}</MenuItem>
@@ -384,7 +390,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               label={t('Author')}
               fullWidth={true}
               value={messageSender}
-              onChange={(event) => setMessageSender(event.target.value)}
+              onChange={event => setMessageSender(event.target.value)}
               style={{ marginTop: 20 }}
             />
             <TextField
@@ -392,7 +398,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               fullWidth={true}
               type="number"
               value={messageParagraphs}
-              onChange={(event) => setMessageParagraphs(Number.isNaN(parseInt(event.target.value, 10)) ? 1 : parseInt(event.target.value, 10))}
+              onChange={event => setMessageParagraphs(Number.isNaN(parseInt(event.target.value, 10)) ? 1 : parseInt(event.target.value, 10))}
               style={{ marginTop: 20 }}
             />
             <TextField
@@ -402,7 +408,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               multiline={true}
               value={messageContext}
               rows={5}
-              onChange={(event) => setMessageContext(event.target.value)}
+              onChange={event => setMessageContext(event.target.value)}
             />
           </DialogContent>
           <DialogActions>
@@ -435,7 +441,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               <Select
                 labelId="tone"
                 value={messageTone}
-                onChange={(event) => setMessageTone(event.target.value as unknown as 'informal' | 'formal' | 'assertive' | 'sarcastic' | 'authoritative' | 'bitter' | 'critical' | 'arrogant' | 'aggressive')}
+                onChange={event => setMessageTone(event.target.value as unknown as 'informal' | 'formal' | 'assertive' | 'sarcastic' | 'authoritative' | 'bitter' | 'critical' | 'arrogant' | 'aggressive')}
                 fullWidth={true}
               >
                 <MenuItem value="informal">{t('Informal')}</MenuItem>

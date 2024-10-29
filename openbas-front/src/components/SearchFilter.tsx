@@ -1,9 +1,10 @@
-import React from 'react';
-import { makeStyles } from '@mui/styles';
-import { TextField, InputAdornment } from '@mui/material';
 import { Search } from '@mui/icons-material';
-import { useFormatter } from './i18n';
+import { InputAdornment, TextField } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import * as React from 'react';
+
 import { debounce } from '../utils/utils';
+import { useFormatter } from './i18n';
 import type { Theme } from './Theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -45,15 +46,15 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.background.default,
   },
   searchInput: {
-    transition: theme.transitions.create('width'),
-    width: 200,
+    'transition': theme.transitions.create('width'),
+    'width': 200,
     '&:focus': {
       width: 350,
     },
   },
   searchInputSmall: {
-    transition: theme.transitions.create('width'),
-    width: 150,
+    'transition': theme.transitions.create('width'),
+    'width': 150,
     '&:focus': {
       width: 250,
     },
@@ -61,13 +62,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  keyword?: string,
-  onChange?: (value?: string) => void,
-  onSubmit?: (value?: string) => void,
-  variant?: string,
-  fullWidth?: boolean,
-  placeholder?: string,
-  debounceMs?: number,
+  keyword?: string;
+  onChange?: (value?: string) => void;
+  onSubmit?: (value?: string) => void;
+  variant?: string;
+  fullWidth?: boolean;
+  placeholder?: string;
+  debounceMs?: number;
 }
 
 const SearchInput: React.FC<Props> = ({

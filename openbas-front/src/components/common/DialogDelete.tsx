@@ -1,7 +1,8 @@
-import React, { FunctionComponent } from 'react';
 import { Button, Dialog as DialogMUI, DialogActions, DialogContent, DialogContentText } from '@mui/material';
-import Transition from './Transition';
+import { FunctionComponent } from 'react';
+
 import { useFormatter } from '../i18n';
+import Transition from './Transition';
 
 interface DialogDeleteProps {
   open: boolean;

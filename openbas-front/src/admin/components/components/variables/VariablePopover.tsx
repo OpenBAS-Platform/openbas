@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem } from '@mui/material';
+import { useState } from 'react';
+import * as React from 'react';
+
+import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import type { Variable, VariableInput } from '../../../../utils/api-types';
 import VariableForm from './VariableForm';
-import Transition from '../../../../components/common/Transition';
 
 interface Props {
   variable: Variable;

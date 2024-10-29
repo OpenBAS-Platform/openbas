@@ -1,12 +1,9 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQueryParameter } from '../../../utils/Environment';
-import { usePermissions } from '../../../utils/Exercise';
-import { useAppDispatch } from '../../../utils/hooks';
-import LessonsPlayer from './LessonsPlayer';
-import LessonsPreview from './LessonsPreview';
+
 import { fetchMe } from '../../../actions/Application';
 import { fetchExercise, fetchPlayerExercise } from '../../../actions/Exercise';
+import type { ExerciseStore } from '../../../actions/exercises/Exercise';
 import {
   addLessonsAnswers,
   fetchLessonsAnswers,
@@ -16,12 +13,16 @@ import {
   fetchPlayerLessonsCategories,
   fetchPlayerLessonsQuestions,
 } from '../../../actions/exercises/exercise-action';
-import { ViewLessonContext, ViewLessonContextType } from '../../../admin/components/common/Context';
-import type { Exercise } from '../../../utils/api-types';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
 import type { UserHelper } from '../../../actions/helper';
-import type { ExerciseStore } from '../../../actions/exercises/Exercise';
+import { ViewLessonContext, ViewLessonContextType } from '../../../admin/components/common/Context';
 import { useHelper } from '../../../store';
+import type { Exercise } from '../../../utils/api-types';
+import { useQueryParameter } from '../../../utils/Environment';
+import { usePermissions } from '../../../utils/Exercise';
+import { useAppDispatch } from '../../../utils/hooks';
+import LessonsPlayer from './LessonsPlayer';
+import LessonsPreview from './LessonsPreview';
 
 const ExerciseViewLessons = () => {
   const dispatch = useAppDispatch();

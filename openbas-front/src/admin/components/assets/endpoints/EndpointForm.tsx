@@ -1,13 +1,15 @@
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { Button, FormHelperText, MenuItem, TextField } from '@mui/material';
-import React, { FormEventHandler, SyntheticEvent } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { Button, FormHelperText, MenuItem, TextField } from '@mui/material';
 import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
+import { FormEventHandler, SyntheticEvent } from 'react';
+import * as React from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import TagField from '../../../../components/fields/TagField';
 import { useFormatter } from '../../../../components/i18n';
 import type { EndpointInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
-import TagField from '../../../../components/fields/TagField';
 
 interface Props {
   onSubmit: SubmitHandler<EndpointInput>;
@@ -111,7 +113,7 @@ const EndpointForm: React.FC<Props> = ({
                 helperText: errors.asset_last_seen?.message,
               },
             }}
-            onChange={(date) => field.onChange(date?.toISOString())}
+            onChange={date => field.onChange(date?.toISOString())}
             ampm={false}
             format="yyyy-MM-dd HH:mm:ss"
           />
@@ -213,9 +215,9 @@ const EndpointForm: React.FC<Props> = ({
             inputProps={register('endpoint_platform')}
             InputLabelProps={{ required: true }}
           >
-            <MenuItem value='Linux'>{t('Linux')}</MenuItem>
-            <MenuItem value='Windows'>{t('Windows')}</MenuItem>
-            <MenuItem value='MacOS'>{t('MacOS')}</MenuItem>
+            <MenuItem value="Linux">{t('Linux')}</MenuItem>
+            <MenuItem value="Windows">{t('Windows')}</MenuItem>
+            <MenuItem value="MacOS">{t('MacOS')}</MenuItem>
           </TextField>
         )}
       />
@@ -235,8 +237,8 @@ const EndpointForm: React.FC<Props> = ({
             inputProps={register('endpoint_arch')}
             InputLabelProps={{ required: true }}
           >
-            <MenuItem value='x86_64'>{t('x86_64')}</MenuItem>
-            <MenuItem value='arm64'>{t('arm64')}</MenuItem>
+            <MenuItem value="x86_64">{t('x86_64')}</MenuItem>
+            <MenuItem value="arm64">{t('arm64')}</MenuItem>
           </TextField>
         )}
       />

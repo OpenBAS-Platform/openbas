@@ -1,8 +1,9 @@
-import React, { FunctionComponent } from 'react';
-import { makeStyles } from '@mui/styles';
 import { Chip } from '@mui/material';
-import { useFormatter } from '../../../../components/i18n';
+import { makeStyles } from '@mui/styles';
+import { FunctionComponent } from 'react';
+
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
+import { useFormatter } from '../../../../components/i18n';
 import { inlineStylesColors } from '../../../../utils/Colors';
 
 const useStyles = makeStyles(() => ({

@@ -1,14 +1,15 @@
-import classNames from 'classnames';
 import { Card, CardActionArea, CardContent } from '@mui/material';
-import React, { FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
-import ItemCategory from '../../../components/ItemCategory';
-import { scenarioCategories } from './ScenarioForm';
-import type { Theme } from '../../../components/Theme';
-import { useFormatter } from '../../../components/i18n';
-import type { ScenarioStatistic, SearchPaginationInput } from '../../../utils/api-types';
+import classNames from 'classnames';
+import { FunctionComponent, useEffect, useState } from 'react';
+
 import { fetchScenarioStatistic } from '../../../actions/scenarios/scenario-actions';
 import { FilterHelpers } from '../../../components/common/queryable/filter/FilterHelpers';
+import { useFormatter } from '../../../components/i18n';
+import ItemCategory from '../../../components/ItemCategory';
+import type { Theme } from '../../../components/Theme';
+import type { ScenarioStatistic, SearchPaginationInput } from '../../../utils/api-types';
+import { scenarioCategories } from './constants';
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -52,11 +53,12 @@ const ScenarioCard: FunctionComponent<ScenarioCardProps> = ({
     );
   };
 
-  const hasCategory = searchPaginationInput.filterGroup?.filters?.find((f) => f.key === CATEGORY_FILTER_KEY)?.values?.includes(category);
+  const hasCategory = searchPaginationInput.filterGroup?.filters?.find(f => f.key === CATEGORY_FILTER_KEY)?.values?.includes(category);
 
   return (
     <Card
-      classes={{ root: classes.card }} variant="outlined"
+      classes={{ root: classes.card }}
+      variant="outlined"
       onClick={handleOnClickCategory}
       className={classNames({ [classes.cardSelected]: hasCategory })}
     >
@@ -69,7 +71,9 @@ const ScenarioCard: FunctionComponent<ScenarioCardProps> = ({
             {t(scenarioCategories.get(category) ?? category)}
           </div>
           <div style={{ marginTop: 10, fontSize: 12, fontWeight: 500 }}>
-            {count} {t('scenarios')}
+            {count}
+            {' '}
+            {t('scenarios')}
           </div>
         </CardContent>
       </CardActionArea>
@@ -98,7 +102,7 @@ const ScenariosCard: FunctionComponent<ScenariosCardProps> = ({
   };
 
   const noCategory = () => {
-    const categoryFilter = searchPaginationInput.filterGroup?.filters?.find((f) => f.key === CATEGORY_FILTER_KEY);
+    const categoryFilter = searchPaginationInput.filterGroup?.filters?.find(f => f.key === CATEGORY_FILTER_KEY);
     if (categoryFilter) {
       return !categoryFilter.values || categoryFilter.values.length === 0;
     }
@@ -118,7 +122,8 @@ const ScenariosCard: FunctionComponent<ScenariosCardProps> = ({
     <div style={{ display: 'flex', marginBottom: 30 }}>
       <Card
         key="all"
-        classes={{ root: classes.card }} variant="outlined"
+        classes={{ root: classes.card }}
+        variant="outlined"
         onClick={handleOnClickCategory}
         className={classNames({ [classes.cardSelected]: noCategory() })}
       >
@@ -131,7 +136,9 @@ const ScenariosCard: FunctionComponent<ScenariosCardProps> = ({
               {t('All categories')}
             </div>
             <div style={{ marginTop: 10, fontSize: 12, fontWeight: 500 }}>
-              {statistic?.scenarios_global_count ?? '-'} {t('scenarios')}
+              {statistic?.scenarios_global_count ?? '-'}
+              {' '}
+              {t('scenarios')}
             </div>
           </CardContent>
         </CardActionArea>

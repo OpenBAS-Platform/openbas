@@ -1,7 +1,8 @@
 import * as R from 'ramda';
-import { useHelper } from '../store';
-import type { ScenariosHelper } from '../actions/scenarios/scenario-helper';
+
 import type { LoggedHelper, UserHelper } from '../actions/helper';
+import type { ScenariosHelper } from '../actions/scenarios/scenario-helper';
+import { useHelper } from '../store';
 
 const useScenarioPermissions = (scenarioId: string, fullScenario = null) => {
   const { scenario, me, logged } = useHelper((helper: ScenariosHelper & UserHelper & LoggedHelper) => {
@@ -22,11 +23,11 @@ const useScenarioPermissions = (scenarioId: string, fullScenario = null) => {
     };
   }
   const canRead = logged.admin
-        || (scenario || fullScenario).scenario_observers?.includes(me.user_id);
+    || (scenario || fullScenario).scenario_observers?.includes(me.user_id);
   const canWrite = logged.admin
-        || (scenario || fullScenario).scenario_planners?.includes(me.user_id);
+    || (scenario || fullScenario).scenario_planners?.includes(me.user_id);
   const canPlay = logged.admin
-        || (scenario || fullScenario).scenario_users?.includes(me.user_id);
+    || (scenario || fullScenario).scenario_users?.includes(me.user_id);
   return {
     canRead,
     canWrite,

@@ -4,10 +4,10 @@ export const ONE_MINUTE = 60 * 1000;
 export const FIVE_SECONDS = 5000;
 export const ONE_SECOND = 1000;
 
-export const utcDate = (date) => (date ? moment(date).utc() : moment().utc());
+export const utcDate = date => (date ? moment(date).utc() : moment().utc());
 export const now = () => utcDate().toISOString();
 
-const minTwoDigits = (n) => (n < 10 ? '0' : '') + n;
+const minTwoDigits = n => (n < 10 ? '0' : '') + n;
 
 export const splitDuration = (duration = 0) => {
   let delta = duration;
@@ -26,15 +26,15 @@ export const splitDuration = (duration = 0) => {
   };
 };
 
-export const yearFormat = (date) => utcDate(date).format('YYYY');
-export const monthFormat = (date) => utcDate(date).format('YYYY-MM');
-export const dayFormat = (date) => utcDate(date).format('YYYY-MM-DD');
-export const timeFormat = (date) => utcDate(date).format('YYYY-MM-DD HH:mm');
+export const yearFormat = date => utcDate(date).format('YYYY');
+export const monthFormat = date => utcDate(date).format('YYYY-MM');
+export const dayFormat = date => utcDate(date).format('YYYY-MM-DD');
+export const timeFormat = date => utcDate(date).format('YYYY-MM-DD HH:mm');
 
-export const minutesInFuture = (minutes) => moment().utc().add(minutes, 'minutes');
-export const minutesAgo = (minutes) => moment().utc().subtract(minutes, 'minutes');
-export const hoursAgo = (hours) => moment().utc().subtract(hours, 'hours');
-export const daysAgo = (days) => moment().utc().subtract(days, 'days');
+export const minutesInFuture = minutes => moment().utc().add(minutes, 'minutes');
+export const minutesAgo = minutes => moment().utc().subtract(minutes, 'minutes');
+export const hoursAgo = hours => moment().utc().subtract(hours, 'hours');
+export const daysAgo = days => moment().utc().subtract(days, 'days');
 
 export const getMonday = (d) => {
   const day = d.getDay();
@@ -50,10 +50,10 @@ export const groupBy = (elements, field, duration) => {
   const formatted = elements.map((elem) => {
     return { date: moment(elem[field]).startOf(duration).format('YYYY-MM-DD'), count: 1 };
   });
-  const dates = formatted.map((elem) => elem.date);
+  const dates = formatted.map(elem => elem.date);
   const uniqueDates = dates.filter((date, index) => dates.indexOf(date) === index);
   return uniqueDates.map((date) => {
-    const count = formatted.filter((elem) => elem.date === date).reduce((c) => c + 1, 0);
+    const count = formatted.filter(elem => elem.date === date).reduce(c => c + 1, 0);
     return { date: duration === 'week' ? dayFormat(getMonday(new Date(date))) : monthFormat(date), value: count };
   });
 };

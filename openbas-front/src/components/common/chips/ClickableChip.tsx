@@ -1,9 +1,10 @@
-import React, { FunctionComponent, useRef, useState } from 'react';
 import { Box, Chip, SelectChangeEvent, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
-import type { Theme } from '../../Theme';
+import { FunctionComponent, useRef, useState } from 'react';
+
 import { useFormatter } from '../../i18n';
+import type { Theme } from '../../Theme';
 import convertOperatorToIcon from './ChipUtils';
 import ClickableChipPopover from './ClickableChipPopover';
 
@@ -29,7 +30,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     textOverflow: 'ellipsis',
   },
   interactive: {
-    cursor: 'pointer',
+    'cursor': 'pointer',
     '&:hover': {
       textDecorationLine: 'underline',
     },
@@ -45,11 +46,11 @@ export interface Element {
 interface Props {
   onChange: (newElement: Element) => void;
   pristine: boolean;
-  selectedElement: Element,
-  availableKeys: string[],
-  availableOperators: string[],
-  availableValues: string[],
-  onDelete?: () => void,
+  selectedElement: Element;
+  availableKeys: string[];
+  availableOperators: string[];
+  availableValues: string[];
+  onDelete?: () => void;
 }
 
 const ClickableChip: FunctionComponent<Props> = ({
@@ -111,18 +112,33 @@ const ClickableChip: FunctionComponent<Props> = ({
       return opts.map((o, idx) => {
         let or = <></>;
         if (idx > 0) {
-          or = <div className={classNames({
-            [classes.mode]: !isTooltip,
-            [classes.modeTooltip]: isTooltip,
-          })}
-               >
-            {t('OR')}
-          </div>;
+          or = (
+            <div className={classNames({
+              [classes.mode]: !isTooltip,
+              [classes.modeTooltip]: isTooltip,
+            })}
+            >
+              {t('OR')}
+            </div>
+          );
         }
-        return (<div key={o}>{or}<span> {o}</span></div>);
+        return (
+          <div key={o}>
+            {or}
+            <span>
+              {' '}
+              {o}
+            </span>
+          </div>
+        );
       });
     }
-    return (<span key={'undefined'}> {t('undefined')}</span>);
+    return (
+      <span key="undefined">
+        {' '}
+        {t('undefined')}
+      </span>
+    );
   };
 
   const filterValues = (isTooltip: boolean) => {
@@ -134,13 +150,15 @@ const ClickableChip: FunctionComponent<Props> = ({
         >
           {t(selectedElement.key)}
         </strong>
-        <Box sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}
+        <Box
+          sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}
           className={availableOperators.length > 1 ? classes.interactive : undefined}
           onClick={() => handleClickOpen(availableOperators, 'operator', selectedElement.operator)}
         >
           {convertOperatorToIcon(t, selectedElement.operator)}
         </Box>
-        <Box sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}
+        <Box
+          sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}
           className={availableValues.length > 1 ? classes.interactive : undefined}
           onClick={() => handleClickOpen(availableValues, 'value', selectedElement.value)}
         >
@@ -166,15 +184,16 @@ const ClickableChip: FunctionComponent<Props> = ({
         />
       </Tooltip>
       {chipRef?.current
-        && <ClickableChipPopover
+      && (
+        <ClickableChipPopover
           handleChangeValue={handleChange}
           open={open}
           onClose={handleClose}
           anchorEl={chipRef.current}
           availableValues={availableOptions}
           element={selectedValue}
-           />
-      }
+        />
+      )}
     </>
   );
 };

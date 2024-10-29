@@ -1,32 +1,34 @@
-import React, { useEffect } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Stack, Switch } from '@mui/material';
-import { TimePicker, DateTimePicker } from '@mui/x-date-pickers';
-import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Stack, Switch } from '@mui/material';
+import { DateTimePicker, TimePicker } from '@mui/x-date-pickers';
+import { useEffect } from 'react';
+import * as React from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
+
+import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import type { ScenarioRecurrenceInput } from '../../../../utils/api-types';
-import { zodImplement } from '../../../../utils/Zod';
 import { generateDailyCron, generateMonthlyCron, generateWeeklyCron, parseCron } from '../../../../utils/Cron';
-import Transition from '../../../../components/common/Transition';
 import { minutesInFuture } from '../../../../utils/Time';
+import { zodImplement } from '../../../../utils/Zod';
 
 interface Props {
-  onSubmit: (cron: string, start: string, end?: string) => void,
-  onSelectRecurring: (selectRecurring: string) => void,
-  selectRecurring: string,
-  initialValues: ScenarioRecurrenceInput
-  open: boolean
-  setOpen: (open: boolean) => void,
+  onSubmit: (cron: string, start: string, end?: string) => void;
+  onSelectRecurring: (selectRecurring: string) => void;
+  selectRecurring: string;
+  initialValues: ScenarioRecurrenceInput;
+  open: boolean;
+  setOpen: (open: boolean) => void;
 }
 
 interface Recurrence {
-  startDate: string,
-  endDate?: string | null,
-  time: string | null,
-  onlyWeekday: boolean,
-  dayOfWeek?: 1 | 2 | 3 | 4 | 5 | 6 | 7,
-  weekOfMonth?: 1 | 2 | 3 | 4 | 5,
+  startDate: string;
+  endDate?: string | null;
+  time: string | null;
+  onlyWeekday: boolean;
+  dayOfWeek?: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  weekOfMonth?: 1 | 2 | 3 | 4 | 5;
 }
 
 const defaultFormValues = () => ({
@@ -167,7 +169,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
               value={selectRecurring}
               label={t('Recurrence')}
               variant="standard"
-              onChange={(event) => onSelectRecurring(event.target.value)}
+              onChange={event => onSelectRecurring(event.target.value)}
             >
               <MenuItem value="noRepeat">{t('Does not repeat')}</MenuItem>
               <MenuItem value="daily">{t('Daily')}</MenuItem>
@@ -182,7 +184,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                   views={['year', 'month', 'day']}
                   value={field.value ? new Date(field.value) : null}
                   minDate={new Date(new Date().setUTCHours(0, 0, 0, 0))}
-                  onChange={(startDate) => field.onChange(startDate?.toISOString())}
+                  onChange={startDate => field.onChange(startDate?.toISOString())}
                   onAccept={() => {
                     clearErrors('time');
                   }}
@@ -199,69 +201,77 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
             />
             {
               ['daily'].includes(selectRecurring)
-              && <Controller
-                control={control}
-                name="onlyWeekday"
-                render={({ field }) => (
-                  <FormControlLabel
-                    control={
-                      <Switch checked={field.value}
-                        onChange={field.onChange}
-                      />
-                    }
-                    label={t('Only weekday')}
-                  />)}
-                 />
+              && (
+                <Controller
+                  control={control}
+                  name="onlyWeekday"
+                  render={({ field }) => (
+                    <FormControlLabel
+                      control={(
+                        <Switch
+                          checked={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                      label={t('Only weekday')}
+                    />
+                  )}
+                />
+              )
             }
             {
               ['monthly'].includes(selectRecurring)
-              && <Controller
-                control={control}
-                name="weekOfMonth"
-                render={({ field }) => (
-                  <FormControl fullWidth>
-                    <InputLabel>{t('Week of month')}</InputLabel>
-                    <Select
-                      value={field.value}
-                      label={t('Week of month')}
-                      variant="standard"
-                      onChange={field.onChange}
-                    >
-                      <MenuItem value={1}>{t('First')}</MenuItem>
-                      <MenuItem value={2}>{t('Second')}</MenuItem>
-                      <MenuItem value={3}>{t('Third')}</MenuItem>
-                      <MenuItem value={4}>{t('Fourth')}</MenuItem>
-                      <MenuItem value={5}>{t('recurrence_Last')}</MenuItem>
-                    </Select>
-                  </FormControl>
-                )}
-                 />
+              && (
+                <Controller
+                  control={control}
+                  name="weekOfMonth"
+                  render={({ field }) => (
+                    <FormControl fullWidth>
+                      <InputLabel>{t('Week of month')}</InputLabel>
+                      <Select
+                        value={field.value}
+                        label={t('Week of month')}
+                        variant="standard"
+                        onChange={field.onChange}
+                      >
+                        <MenuItem value={1}>{t('First')}</MenuItem>
+                        <MenuItem value={2}>{t('Second')}</MenuItem>
+                        <MenuItem value={3}>{t('Third')}</MenuItem>
+                        <MenuItem value={4}>{t('Fourth')}</MenuItem>
+                        <MenuItem value={5}>{t('recurrence_Last')}</MenuItem>
+                      </Select>
+                    </FormControl>
+                  )}
+                />
+              )
             }
             {
               ['weekly', 'monthly'].includes(selectRecurring)
-              && <Controller
-                control={control}
-                name="dayOfWeek"
-                render={({ field }) => (
-                  <FormControl fullWidth>
-                    <InputLabel>{t('Day of week')}</InputLabel>
-                    <Select
-                      value={field.value}
-                      label={t('Day of week')}
-                      variant="standard"
-                      onChange={field.onChange}
-                    >
-                      <MenuItem value={1}>{t('Monday')}</MenuItem>
-                      <MenuItem value={2}>{t('Tuesday')}</MenuItem>
-                      <MenuItem value={3}>{t('Wednesday')}</MenuItem>
-                      <MenuItem value={4}>{t('Thursday')}</MenuItem>
-                      <MenuItem value={5}>{t('Friday')}</MenuItem>
-                      <MenuItem value={6}>{t('Saturday')}</MenuItem>
-                      <MenuItem value={7}>{t('Sunday')}</MenuItem>
-                    </Select>
-                  </FormControl>
-                )}
-                 />
+              && (
+                <Controller
+                  control={control}
+                  name="dayOfWeek"
+                  render={({ field }) => (
+                    <FormControl fullWidth>
+                      <InputLabel>{t('Day of week')}</InputLabel>
+                      <Select
+                        value={field.value}
+                        label={t('Day of week')}
+                        variant="standard"
+                        onChange={field.onChange}
+                      >
+                        <MenuItem value={1}>{t('Monday')}</MenuItem>
+                        <MenuItem value={2}>{t('Tuesday')}</MenuItem>
+                        <MenuItem value={3}>{t('Wednesday')}</MenuItem>
+                        <MenuItem value={4}>{t('Thursday')}</MenuItem>
+                        <MenuItem value={5}>{t('Friday')}</MenuItem>
+                        <MenuItem value={6}>{t('Saturday')}</MenuItem>
+                        <MenuItem value={7}>{t('Sunday')}</MenuItem>
+                      </Select>
+                    </FormControl>
+                  )}
+                />
+              )
             }
             <Controller
               control={control}
@@ -276,7 +286,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                   closeOnSelect={false}
                   value={field.value ? new Date(field.value) : null}
                   minTime={['noRepeat'].includes(selectRecurring) && new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() === new Date(getValues('startDate')).getTime() ? new Date() : undefined}
-                  onChange={(time) => (field.onChange(time?.toISOString()))}
+                  onChange={time => (field.onChange(time?.toISOString()))}
                   slotProps={{
                     textField: {
                       fullWidth: true,
@@ -289,28 +299,30 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
             />
             {
               ['daily', 'weekly', 'monthly'].includes(selectRecurring)
-              && <Controller
-                control={control}
-                name="endDate"
-                render={({ field, fieldState }) => (
-                  <DateTimePicker
-                    views={['year', 'month', 'day']}
-                    value={field.value ? new Date(field.value) : null}
-                    minDate={new Date(new Date().setUTCHours(24, 0, 0, 0))}
-                    onChange={(endDate) => {
-                      return (endDate ? field.onChange(new Date(new Date(endDate).setUTCHours(0, 0, 0, 0)).toISOString()) : null);
-                    }}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        error: !!fieldState.error,
-                        helperText: fieldState.error?.message,
-                      },
-                    }}
-                    label={t('End date')}
-                  />
-                )}
-                 />
+              && (
+                <Controller
+                  control={control}
+                  name="endDate"
+                  render={({ field, fieldState }) => (
+                    <DateTimePicker
+                      views={['year', 'month', 'day']}
+                      value={field.value ? new Date(field.value) : null}
+                      minDate={new Date(new Date().setUTCHours(24, 0, 0, 0))}
+                      onChange={(endDate) => {
+                        return (endDate ? field.onChange(new Date(new Date(endDate).setUTCHours(0, 0, 0, 0)).toISOString()) : null);
+                      }}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          error: !!fieldState.error,
+                          helperText: fieldState.error?.message,
+                        },
+                      }}
+                      label={t('End date')}
+                    />
+                  )}
+                />
+              )
             }
           </Stack>
         </DialogContent>

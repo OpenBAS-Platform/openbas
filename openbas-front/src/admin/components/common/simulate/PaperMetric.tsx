@@ -1,9 +1,11 @@
 import { Paper } from '@mui/material';
-import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
-import type { Theme } from '../../../../components/Theme';
+import { FunctionComponent } from 'react';
+import * as React from 'react';
+
 import { useFormatter } from '../../../../components/i18n';
 import ItemNumberDifference from '../../../../components/ItemNumberDifference';
+import type { Theme } from '../../../../components/Theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   title: {

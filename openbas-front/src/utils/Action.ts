@@ -1,16 +1,17 @@
-import Immutable from 'seamless-immutable';
-import { FORM_ERROR } from 'final-form';
-import * as R from 'ramda';
 import { AxiosError } from 'axios';
+import { FORM_ERROR } from 'final-form';
 import type { Schema } from 'normalizr';
-import { Dispatch } from 'redux';
+import * as R from 'ramda';
 import { createIntl, createIntlCache } from 'react-intl';
+import { Dispatch } from 'redux';
+import Immutable from 'seamless-immutable';
+
+import { LANG } from '../components/AppIntlProvider';
 import * as Constants from '../constants/ActionTypes';
 import { DATA_FETCH_ERROR } from '../constants/ActionTypes';
 import { api } from '../network';
-import { MESSAGING$ } from './Environment';
 import { store } from '../store';
-import { LANG } from '../components/AppIntlProvider';
+import { MESSAGING$ } from './Environment';
 import i18n from './Localization';
 
 const isEmptyPath = R.isNil(window.BASE_PATH) || R.isEmpty(window.BASE_PATH);

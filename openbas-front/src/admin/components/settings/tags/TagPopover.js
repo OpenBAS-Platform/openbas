@@ -1,15 +1,16 @@
-import React, { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import * as R from 'ramda';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Slide } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { deleteTag, updateTag } from '../../../../actions/Tag';
-import TagForm from './TagForm';
-import inject18n from '../../../../components/i18n';
-import Drawer from '../../../../components/common/Drawer';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Slide } from '@mui/material';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component, forwardRef } from 'react';
+import { connect } from 'react-redux';
 
-const Transition = React.forwardRef((props, ref) => (
+import { deleteTag, updateTag } from '../../../../actions/Tag';
+import Drawer from '../../../../components/common/Drawer';
+import inject18n from '../../../../components/i18n';
+import TagForm from './TagForm';
+
+const Transition = forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';

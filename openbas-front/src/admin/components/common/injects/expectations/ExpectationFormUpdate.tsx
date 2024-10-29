@@ -1,15 +1,16 @@
-import React, { FunctionComponent, SyntheticEvent } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField, TextField as MuiTextField, Typography } from '@mui/material';
+import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField as MuiTextField, TextField, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { formProps, infoMessage } from './ExpectationFormUtils';
-import { ExpectationInput, ExpectationInputForm } from './Expectation';
+import { FunctionComponent, SyntheticEvent } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+
 import { useFormatter } from '../../../../../components/i18n';
-import type { Theme } from '../../../../../components/Theme';
-import ExpectationGroupField from './field/ExpectationGroupField';
-import { isTechnicalExpectation } from './ExpectationUtils';
-import { splitDuration } from '../../../../../utils/Time';
 import ScaleBar from '../../../../../components/scalebar/ScaleBar';
+import type { Theme } from '../../../../../components/Theme';
+import { splitDuration } from '../../../../../utils/Time';
+import { ExpectationInput, ExpectationInputForm } from './Expectation';
+import { formProps, infoMessage } from './ExpectationFormUtils';
+import { isTechnicalExpectation } from './ExpectationUtils';
+import ExpectationGroupField from './field/ExpectationGroupField';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
@@ -91,13 +92,14 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
         </MUISelect>
       </div>
       {(getValues().expectation_type === 'ARTICLE' || getValues().expectation_type === 'CHALLENGE')
-        && <Alert
+      && (
+        <Alert
           severity="info"
           className={classes.marginTop_2}
-           >
+        >
           {infoMessage(getValues().expectation_type, t)}
         </Alert>
-      }
+      )}
       <MuiTextField
         variant="standard"
         fullWidth

@@ -1,8 +1,8 @@
-import React from 'react';
-import { Field } from 'react-final-form';
 import { TextField as MuiTextField } from '@mui/material';
-import { useFormatter } from '../i18n';
+import { Field } from 'react-final-form';
+
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
+import { useFormatter } from '../i18n';
 
 const TextFieldBase = ({
   label,
@@ -23,15 +23,15 @@ const TextFieldBase = ({
       {...others}
       InputProps={{
         endAdornment: askAi && (
-        <TextFieldAskAI
-          variant="text"
-          currentValue={input.value}
-          setFieldValue={(val) => {
-            input.onChange(val);
-          }}
-          format="text"
-          disabled={others.disabled}
-        />
+          <TextFieldAskAI
+            variant="text"
+            currentValue={input.value}
+            setFieldValue={(val) => {
+              input.onChange(val);
+            }}
+            format="text"
+            disabled={others.disabled}
+          />
         ),
       }}
     />
@@ -41,7 +41,7 @@ const TextFieldBase = ({
 /**
  * @deprecated The component use old form libnary react-final-form
  */
-const OldTextField = (props) => (
+const OldTextField = props => (
   <Field name={props.name} component={TextFieldBase} {...props} />
 );
 

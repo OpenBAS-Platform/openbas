@@ -1,11 +1,12 @@
-import Chart from 'react-apexcharts';
-import React, { FunctionComponent } from 'react';
 import { useTheme } from '@mui/styles';
 import type { ApexOptions } from 'apexcharts';
+import { FunctionComponent } from 'react';
+import Chart from 'react-apexcharts';
+
 import type { ExerciseSimpleStore } from '../../../../actions/exercises/Exercise';
+import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
-import Empty from '../../../../components/Empty';
 import { verticalBarsChartOptions } from '../../../../utils/Charts';
 
 interface Props {
@@ -40,23 +41,23 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
   const series = [
     {
       name: t('Prevention'),
-      data: data.map((exercise) => ({
+      data: data.map(exercise => ({
         x: exercise.exercise_start_date ? new Date(exercise.exercise_start_date) : new Date(),
-        y: exercise.exercise_global_score?.filter((score) => score.type === 'PREVENTION').at(0)?.distribution?.[0]?.value ?? 0,
+        y: exercise.exercise_global_score?.filter(score => score.type === 'PREVENTION').at(0)?.distribution?.[0]?.value ?? 0,
       })),
     },
     {
       name: t('Detection'),
-      data: data.map((exercise) => ({
+      data: data.map(exercise => ({
         x: exercise.exercise_start_date ? new Date(exercise.exercise_start_date) : new Date(),
-        y: exercise.exercise_global_score?.filter((score) => score.type === 'DETECTION').at(0)?.distribution?.[0]?.value ?? 0,
+        y: exercise.exercise_global_score?.filter(score => score.type === 'DETECTION').at(0)?.distribution?.[0]?.value ?? 0,
       })),
     },
     {
       name: t('Human Response'),
-      data: data.map((exercise) => ({
+      data: data.map(exercise => ({
         x: exercise.exercise_start_date ? new Date(exercise.exercise_start_date) : new Date(),
-        y: exercise.exercise_global_score?.filter((score) => score.type === 'HUMAN_RESPONSE').at(0)?.distribution?.[0]?.value ?? 0,
+        y: exercise.exercise_global_score?.filter(score => score.type === 'HUMAN_RESPONSE').at(0)?.distribution?.[0]?.value ?? 0,
       })),
     },
   ];
@@ -89,8 +90,7 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
             'No data to display',
           )}
         />
-      )
-      }
+      )}
     </>
   );
 };

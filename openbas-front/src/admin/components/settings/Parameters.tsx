@@ -1,8 +1,6 @@
-import React from 'react';
-import { makeStyles } from '@mui/styles';
 import { Button, Grid, List, ListItem, ListItemText, Paper, Switch, TextField, Typography } from '@mui/material';
-import ParametersForm from './ParametersForm';
-import { useFormatter } from '../../../components/i18n';
+import { makeStyles } from '@mui/styles';
+
 import {
   fetchPlatformParameters,
   updatePlatformDarkParameters,
@@ -11,15 +9,17 @@ import {
   updatePlatformParameters,
   updatePlatformWhitemarkParameters,
 } from '../../../actions/Application';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
-import ItemBoolean from '../../../components/ItemBoolean';
-import ThemeForm from './ThemeForm';
-import { useAppDispatch } from '../../../utils/hooks';
-import { useHelper } from '../../../store';
 import type { LoggedHelper } from '../../../actions/helper';
-import type { PlatformSettings, SettingsEnterpriseEditionUpdateInput, SettingsPlatformWhitemarkUpdateInput, SettingsUpdateInput, ThemeInput } from '../../../utils/api-types';
 import Breadcrumbs from '../../../components/Breadcrumbs';
+import { useFormatter } from '../../../components/i18n';
+import ItemBoolean from '../../../components/ItemBoolean';
+import { useHelper } from '../../../store';
+import type { PlatformSettings, SettingsEnterpriseEditionUpdateInput, SettingsPlatformWhitemarkUpdateInput, SettingsUpdateInput, ThemeInput } from '../../../utils/api-types';
+import { useAppDispatch } from '../../../utils/hooks';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
 import EnterpriseEditionButton from '../common/entreprise_edition/EnterpriseEditionButton';
+import ParametersForm from './ParametersForm';
+import ThemeForm from './ThemeForm';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -141,7 +141,9 @@ const Parameters = () => {
                   label={
                     // eslint-disable-next-line no-nested-ternary
                     !settings.platform_ai_enabled ? t('Disabled') : settings.platform_ai_has_token
-                      ? settings.platform_ai_type : `${settings.platform_ai_type} - ${t('Missing token')}`}
+                      ? settings.platform_ai_type
+                      : `${settings.platform_ai_type} - ${t('Missing token')}`
+                  }
                   status={(settings.platform_ai_enabled) && (settings.platform_ai_has_token)}
                   tooltip={settings.platform_ai_has_token ? `${settings.platform_ai_type} - ${settings.platform_ai_model}` : t('The token is missing in your platform configuration, please ask your Filigran representative to provide you with it or with on-premise deployment instructions. Your can open a support ticket to do so.')}
                 />

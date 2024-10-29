@@ -1,5 +1,6 @@
-import React from 'react';
 import { GroupsOutlined, LocalPoliceOutlined, PermIdentityOutlined } from '@mui/icons-material';
+import * as React from 'react';
+
 import RightMenu, { RightMenuEntry } from '../../../components/common/RightMenu';
 
 const SecurityMenu: React.FC = () => {

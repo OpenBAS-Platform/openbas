@@ -1,7 +1,7 @@
-import { type Node, type Edge } from '@xyflow/react';
+import { type Edge, type Node } from '@xyflow/react';
 
-import dagre from './dagre';
 import d3Hierarchy from './d3-hierarchy';
+import dagre from './dagre';
 
 // the layout direction (T = top, R = right, B = bottom, L = left, TB = top to bottom, ...)
 export type Direction = 'TB' | 'LR' | 'RL' | 'BT';

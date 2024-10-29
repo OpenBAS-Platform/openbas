@@ -1,17 +1,17 @@
-import React from 'react';
-import { useDispatch } from 'react-redux';
-import * as R from 'ramda';
 import { Button, Typography } from '@mui/material';
+import * as R from 'ramda';
+import { useDispatch } from 'react-redux';
+
 import { fetchOrganizations } from '../../../actions/Organization';
 import { meTokens, renewToken, updateMeInformation, updateMePassword, updateMeProfile } from '../../../actions/User';
-import UserForm from './UserForm';
-import ProfileForm from './ProfileForm';
-import PasswordForm from './PasswordForm';
-import { useFormatter } from '../../../components/i18n';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
-import { useHelper } from '../../../store';
 import Paper from '../../../components/common/Paper';
+import { useFormatter } from '../../../components/i18n';
+import { useHelper } from '../../../store';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { countryOption } from '../../../utils/Option';
+import PasswordForm from './PasswordForm';
+import ProfileForm from './ProfileForm';
+import UserForm from './UserForm';
 
 const Index = () => {
   const { t } = useFormatter();
@@ -20,12 +20,12 @@ const Index = () => {
     dispatch(fetchOrganizations());
     dispatch(meTokens());
   });
-  const { user, tokens, organizationsMap } = useHelper((helper) => ({
+  const { user, tokens, organizationsMap } = useHelper(helper => ({
     user: helper.getMe(),
     tokens: helper.getMeTokens(),
     organizationsMap: helper.getOrganizationsMap(),
   }));
-  const onRenew = (tokenId) => dispatch(renewToken(tokenId));
+  const onRenew = tokenId => dispatch(renewToken(tokenId));
   const onUpdate = (data) => {
     const inputValues = R.pipe(
       R.assoc(
@@ -43,16 +43,16 @@ const Index = () => {
     )(data);
     return dispatch(updateMeProfile(inputValues));
   };
-  const onUpdateInformation = (data) => dispatch(updateMeInformation(data));
-  const onUpdatePassword = (data) => dispatch(
+  const onUpdateInformation = data => dispatch(updateMeInformation(data));
+  const onUpdatePassword = data => dispatch(
     updateMePassword(data.user_current_password, data.user_plain_password),
   );
   const userOrganizationValue = organizationsMap[user.user_organization];
   const userOrganization = userOrganizationValue
     ? {
-      id: userOrganizationValue.organization_id,
-      label: userOrganizationValue.organization_name,
-    }
+        id: userOrganizationValue.organization_id,
+        label: userOrganizationValue.organization_name,
+      }
     : null;
   const initialValues = R.pipe(
     R.assoc('user_organization', userOrganization),
@@ -108,8 +108,10 @@ const Index = () => {
         <Typography variant="body1">
           {t(
             'The OpenBAS API relies on the REST standard. The token must be passed into the HTTP header',
-          )}{' '}
-          <strong>{t('Authorization')}</strong>.
+          )}
+          {' '}
+          <strong>{t('Authorization')}</strong>
+          .
         </Typography>
         <Typography
           variant="h4"
@@ -142,7 +144,9 @@ const Index = () => {
           Content-Type: application/json
           {/* eslint-disable-next-line i18next/no-literal-string */}
           <br />
-          Authorization: Bearer {userToken?.token_value}
+          Authorization: Bearer
+          {' '}
+          {userToken?.token_value}
         </pre>
 
         <Button

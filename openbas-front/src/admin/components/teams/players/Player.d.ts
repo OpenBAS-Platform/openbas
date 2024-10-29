@@ -2,7 +2,7 @@ import type { PlayerInput, User } from '../../../../utils/api-types';
 import { Option } from '../../../../utils/Option';
 
 export type PlayerInputForm = Omit<
-PlayerInput,
+  PlayerInput,
 'user_organization' | 'user_country' | 'user_tags'
 > & {
   user_organization: Option | undefined;

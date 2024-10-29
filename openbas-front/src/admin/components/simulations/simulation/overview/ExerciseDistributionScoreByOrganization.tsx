@@ -1,18 +1,19 @@
-import Chart from 'react-apexcharts';
-import React, { FunctionComponent } from 'react';
-import * as R from 'ramda';
 import { useTheme } from '@mui/styles';
-import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
-import Empty from '../../../../../components/Empty';
+import * as R from 'ramda';
+import { FunctionComponent } from 'react';
+import Chart from 'react-apexcharts';
+
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
+import type { OrganizationHelper, UserHelper } from '../../../../../actions/helper';
+import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
+import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
+import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
-import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
-import type { OrganizationHelper, UserHelper } from '../../../../../actions/helper';
-import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
-import { computeOrganizationsColors } from './DistributionUtils';
 import type { Organization } from '../../../../../utils/api-types';
+import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
+import { computeOrganizationsColors } from './DistributionUtils';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
@@ -75,7 +76,7 @@ const ExerciseDistributionScoreByOrganization: FunctionComponent<Props> = ({
     <>
       {organizationsTotalScores.length > 0 ? (
         <Chart
-          id='exercise_distribution_total_score_by_organization'
+          id="exercise_distribution_total_score_by_organization"
           // @ts-expect-error: Need to migrate Chart.js file
           options={horizontalBarsChartOptions(theme)}
           series={totalScoreByOrganizationData}

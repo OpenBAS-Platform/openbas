@@ -1,14 +1,15 @@
-import { ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { GroupsOutlined } from '@mui/icons-material';
-import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
+import { ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
-import ItemTags from '../../../../../components/ItemTags';
-import TeamPopover from '../../../components/teams/TeamPopover';
-import type { Theme } from '../../../../../components/Theme';
-import { PermissionsContext, TeamContext } from '../../Context';
+import { FunctionComponent, useContext, useEffect, useState } from 'react';
+
 import { findTeams } from '../../../../../actions/teams/team-actions';
+import ItemTags from '../../../../../components/ItemTags';
+import type { Theme } from '../../../../../components/Theme';
 import type { TeamOutput } from '../../../../../utils/api-types';
+import TeamPopover from '../../../components/teams/TeamPopover';
+import { PermissionsContext, TeamContext } from '../../Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -43,12 +44,12 @@ const InjectTeamsList: FunctionComponent<Props> = ({
     [R.ascend(R.prop('team_name'))],
   );
   useEffect(() => {
-    findTeams(teamIds).then((result) => setTeams(sortTeams(result.data)));
+    findTeams(teamIds).then(result => setTeams(sortTeams(result.data)));
   }, [teamIds]);
 
   return (
     <>
-      {teams.map((team) => (
+      {teams.map(team => (
         <ListItem
           key={team.team_id}
           classes={{ root: classes.item }}
@@ -58,7 +59,7 @@ const InjectTeamsList: FunctionComponent<Props> = ({
             <GroupsOutlined />
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div className={classes.column}>
                 <div className={classes.bodyItem}>
                   {team.team_name}
@@ -73,7 +74,7 @@ const InjectTeamsList: FunctionComponent<Props> = ({
                   <ItemTags variant="reduced-view" tags={team.team_tags} />
                 </div>
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction>
             <TeamPopover

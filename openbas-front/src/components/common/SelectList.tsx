@@ -1,5 +1,7 @@
 import { Box, Chip, Grid, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
+import * as React from 'react';
+
 import { truncate } from '../../utils/String';
 
 export interface SelectListIcon {
@@ -44,7 +46,7 @@ const SelectList = <T extends object>({
   const getName = (v: T) => v[`${prefix}_name`];
 
   const selectedIds = useMemo(
-    () => selectedValues.map((v) => getId(v)),
+    () => selectedValues.map(v => getId(v)),
     [selectedValues, prefix],
   );
 
@@ -68,9 +70,9 @@ const SelectList = <T extends object>({
                     {elements.icon.value()}
                   </ListItemIcon>
                   <ListItemText
-                    primary={
+                    primary={(
                       <Box sx={{ display: 'flex' }}>
-                        {elements.headers.map((header) => (
+                        {elements.headers.map(header => (
                           <Box
                             key={header.field}
                             sx={{
@@ -87,7 +89,7 @@ const SelectList = <T extends object>({
                           </Box>
                         ))}
                       </Box>
-                    }
+                    )}
                   />
                 </ListItemButton>
               );

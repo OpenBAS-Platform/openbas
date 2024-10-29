@@ -1,16 +1,17 @@
-import React, { FunctionComponent, useContext } from 'react';
-import { ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { BarChartOutlined, ReorderOutlined, ViewTimelineOutlined } from '@mui/icons-material';
+import { ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { FunctionComponent, useContext } from 'react';
+
+import type { TagHelper } from '../../../../actions/helper';
 import type { InjectOutputType } from '../../../../actions/injects/Inject';
-import { exportData } from '../../../../utils/Environment';
+import ButtonPopover from '../../../../components/common/ButtonPopover';
 import { useFormatter } from '../../../../components/i18n';
+import { useHelper } from '../../../../store';
+import { exportData } from '../../../../utils/Environment';
+import useExportToXLS from '../../../../utils/hooks/useExportToXLS';
 import { InjectContext, ViewModeContext } from '../Context';
 import ImportUploaderInjectFromXls from './ImportUploaderInjectFromXls';
-import useExportToXLS from '../../../../utils/hooks/useExportToXLS';
-import { useHelper } from '../../../../store';
-import type { TagHelper } from '../../../../actions/helper';
-import ButtonPopover from '../../../../components/common/ButtonPopover';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -46,7 +47,7 @@ const InjectsListButtons: FunctionComponent<Props> = ({
     tagsMap: helper.getTagsMap(),
   }));
 
-  const isAtLeastOneValidInject = injects.some((inject) => !inject.inject_injector_contract?.injector_contract_content_parsed);
+  const isAtLeastOneValidInject = injects.some(inject => !inject.inject_injector_contract?.injector_contract_content_parsed);
 
   const exportInjects = exportData(
     'inject',
@@ -73,7 +74,7 @@ const InjectsListButtons: FunctionComponent<Props> = ({
       <ButtonPopover
         disabled={!isAtLeastOneValidInject}
         entries={entries}
-        variant={'icon'}
+        variant="icon"
       />
       <ToggleButtonGroup
         size="small"
@@ -82,9 +83,10 @@ const InjectsListButtons: FunctionComponent<Props> = ({
         aria-label="Change view mode"
       >
         {injectContext.onImportInjectFromXls
-          && <ImportUploaderInjectFromXls onImportedInjects={onImportedInjects}/>}
+        && <ImportUploaderInjectFromXls onImportedInjects={onImportedInjects} />}
         {(!!setViewMode && availableButtons.includes('list'))
-          && <Tooltip title={t('List view')}>
+        && (
+          <Tooltip title={t('List view')}>
             <ToggleButton
               value="list"
               onClick={() => setViewMode('list')}
@@ -94,9 +96,10 @@ const InjectsListButtons: FunctionComponent<Props> = ({
               <ReorderOutlined fontSize="small" color={viewModeContext === 'list' ? 'inherit' : 'primary'} />
             </ToggleButton>
           </Tooltip>
-        }
+        )}
         {(!!setViewMode && availableButtons.includes('chain'))
-          && <Tooltip title={t('Interactive view')}>
+        && (
+          <Tooltip title={t('Interactive view')}>
             <ToggleButton
               value="chain"
               onClick={() => setViewMode('chain')}
@@ -106,9 +109,10 @@ const InjectsListButtons: FunctionComponent<Props> = ({
               <ViewTimelineOutlined fontSize="small" color={viewModeContext === 'chain' ? 'inherit' : 'primary'} />
             </ToggleButton>
           </Tooltip>
-        }
+        )}
         {(!!setViewMode && availableButtons.includes('distribution'))
-          && <Tooltip title={t('Distribution view')}>
+        && (
+          <Tooltip title={t('Distribution view')}>
             <ToggleButton
               value="distribution"
               onClick={() => setViewMode('distribution')}
@@ -117,7 +121,7 @@ const InjectsListButtons: FunctionComponent<Props> = ({
               <BarChartOutlined fontSize="small" color="primary" />
             </ToggleButton>
           </Tooltip>
-        }
+        )}
       </ToggleButtonGroup>
     </div>
   );

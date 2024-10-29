@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import * as R from 'ramda';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
+import * as R from 'ramda';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+
 import { deleteMitigation, updateMitigation } from '../../../actions/Mitigation';
-import MitigationForm from './MitigationForm';
-import { useFormatter } from '../../../components/i18n';
-import Transition from '../../../components/common/Transition';
 import Drawer from '../../../components/common/Drawer';
+import Transition from '../../../components/common/Transition';
+import { useFormatter } from '../../../components/i18n';
 import { attackPatternOptions } from '../../../utils/Option';
+import MitigationForm from './MitigationForm';
 
 const MitigationPopover = ({ mitigation, attackPatternsMap, killChainPhasesMap, onUpdate, onDelete }) => {
   const [openDelete, setOpenDelete] = useState(false);

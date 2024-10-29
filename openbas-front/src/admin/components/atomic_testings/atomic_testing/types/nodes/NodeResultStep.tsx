@@ -1,13 +1,14 @@
-import React, { memo } from 'react';
-import { Handle, Node, NodeProps, Position } from '@xyflow/react';
-import { makeStyles } from '@mui/styles';
-import { Tooltip } from '@mui/material';
 import { FlagOutlined, HelpOutlined, ModeStandbyOutlined, ScoreOutlined } from '@mui/icons-material';
+import { Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { Handle, Node, NodeProps, Position } from '@xyflow/react';
+import { memo } from 'react';
+
 import type { Theme } from '../../../../../../components/Theme';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
-const useStyles = makeStyles<Theme>((theme) => ({
+const useStyles = makeStyles<Theme>(theme => ({
   node: {
     position: 'relative',
     border:
@@ -58,14 +59,14 @@ const renderIcon = (icon: string) => {
 };
 
 export type NodeResultStep = Node<{
-  background?: string,
-  color?: string,
-  key: string,
-  label: string,
-  description?: string,
-  end: boolean,
-  middle: boolean,
-  start: boolean,
+  background?: string;
+  color?: string;
+  key: string;
+  label: string;
+  description?: string;
+  end: boolean;
+  middle: boolean;
+  start: boolean;
 }
 
 >;

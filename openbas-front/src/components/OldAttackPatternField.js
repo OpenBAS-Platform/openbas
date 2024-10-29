@@ -1,14 +1,15 @@
-import React, { Component } from 'react';
-import * as R from 'ramda';
 import { RouteOutlined } from '@mui/icons-material';
-import { Box, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { withStyles } from '@mui/styles';
+import * as R from 'ramda';
+import { Component } from 'react';
 import { connect } from 'react-redux';
+
+import { addAttackPattern, fetchAttackPatterns } from '../actions/AttackPattern';
+import { storeHelper } from '../actions/Schema';
 import AttackPatternForm from '../admin/components/settings/attack_patterns/AttackPatternForm';
-import { fetchAttackPatterns, addAttackPattern } from '../actions/AttackPattern';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
-import { storeHelper } from '../actions/Schema';
 
 const styles = () => ({
   icon: {

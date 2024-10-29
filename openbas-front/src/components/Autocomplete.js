@@ -1,7 +1,6 @@
-import React from 'react';
-import { Field } from 'react-final-form';
-import { TextField, IconButton, Autocomplete as MuiAutocomplete } from '@mui/material';
 import { AddOutlined } from '@mui/icons-material';
+import { Autocomplete as MuiAutocomplete, IconButton, TextField } from '@mui/material';
+import { Field } from 'react-final-form';
 
 const renderAutocomplete = ({
   label,
@@ -34,7 +33,7 @@ const renderAutocomplete = ({
         {...inputProps}
         {...others}
         isOptionEqualToValue={(option, value) => value === undefined || value === '' || option.id === value.id}
-        renderInput={(params) => (
+        renderInput={params => (
           <TextField
             {...params}
             InputLabelProps={InputLabelProps}

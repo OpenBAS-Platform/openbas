@@ -1,5 +1,5 @@
-import React from 'react';
 import * as R from 'ramda';
+
 import type { Filter, FilterGroup, PropertySchemaDTO } from '../../../../utils/api-types';
 
 export const emptyFilterGroup: FilterGroup = {
@@ -26,14 +26,14 @@ export const buildFilter = (key: string, values: string[], operator: Filter['ope
 };
 
 export const isExistFilter = (filterGroup: FilterGroup, key: string) => {
-  return filterGroup.filters?.some((f) => f.key === key);
+  return filterGroup.filters?.some(f => f.key === key);
 };
 
 export const isEmptyFilter = (filterGroup: FilterGroup, key: string) => {
   if (R.isEmpty(filterGroup.filters)) {
     return true;
   }
-  return !filterGroup.filters?.find((f) => f.key === key) || R.isEmpty(filterGroup.filters?.find((f) => f.key === key)?.values);
+  return !filterGroup.filters?.find(f => f.key === key) || R.isEmpty(filterGroup.filters?.find(f => f.key === key)?.values);
 };
 
 // -- OPERATOR --
@@ -45,13 +45,33 @@ export const convertOperatorToIcon = (t: (text: string) => string, operator: Fil
     case 'not_eq':
       return <>&nbsp;&#8800;</>;
     case 'not_contains':
-      return <>&nbsp;{t('not contains')}</>;
+      return (
+        <>
+&nbsp;
+          {t('not contains')}
+        </>
+      );
     case 'contains':
-      return <>&nbsp;{t('contains')}</>;
+      return (
+        <>
+&nbsp;
+          {t('contains')}
+        </>
+      );
     case 'starts_with':
-      return <>&nbsp;{t('starts with')}</>;
+      return (
+        <>
+&nbsp;
+          {t('starts with')}
+        </>
+      );
     case 'not_starts_with':
-      return <>&nbsp;{t('not starts with')}</>;
+      return (
+        <>
+&nbsp;
+          {t('not starts with')}
+        </>
+      );
     case 'gt':
       return <>&nbsp;&#62;</>;
     case 'gte':
@@ -61,9 +81,19 @@ export const convertOperatorToIcon = (t: (text: string) => string, operator: Fil
     case 'lte':
       return <>&nbsp;&#8804;</>;
     case 'empty':
-      return <>&nbsp;{t('is empty')}</>;
+      return (
+        <>
+&nbsp;
+          {t('is empty')}
+        </>
+      );
     case 'not_empty':
-      return <>&nbsp;{t('is not empty')}</>;
+      return (
+        <>
+&nbsp;
+          {t('is not empty')}
+        </>
+      );
     default:
       return null;
   }

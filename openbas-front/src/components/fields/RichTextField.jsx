@@ -1,18 +1,19 @@
-import React from 'react';
-import { Field } from 'react-final-form';
-import { FormHelperText, InputLabel } from '@mui/material';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import Editor from 'ckeditor5-custom-build/build/ckeditor';
 import 'ckeditor5-custom-build/build/translations/fr';
+
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import { FormHelperText, InputLabel } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import Editor from 'ckeditor5-custom-build/build/ckeditor';
 import classNames from 'classnames';
+import { Field } from 'react-final-form';
+
+// eslint-disable-next-line import/no-cycle
+import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 import { useHelper } from '../../store';
 import locale from '../../utils/BrowserLanguage';
 import { useFormatter } from '../i18n';
-// eslint-disable-next-line import/no-cycle
-import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   errorColor: {
     color: theme.palette.error.main,
   },
@@ -60,14 +61,15 @@ const RichTextFieldBase = ({
         onChange={(event, editor) => {
           onChange(editor.getData());
         }}
-        onBlur={(event) => onBlur(event)}
+        onBlur={event => onBlur(event)}
         disabled={disabled}
       />
       {touched && invalid
-            && <FormHelperText error>
-              {(error && t(error)) || (submitError && t(submitError))}
-            </FormHelperText>
-        }
+      && (
+        <FormHelperText error>
+          {(error && t(error)) || (submitError && t(submitError))}
+        </FormHelperText>
+      )}
       {askAi && (
         <TextFieldAskAI
           currentValue={value ?? ''}
@@ -88,7 +90,7 @@ const RichTextFieldBase = ({
 /**
  * @deprecated The component use old form libnary react-final-form
  */
-const RichTextField = (props) => (
+const RichTextField = props => (
   <Field name={props.name} component={RichTextFieldBase} {...props} />
 );
 

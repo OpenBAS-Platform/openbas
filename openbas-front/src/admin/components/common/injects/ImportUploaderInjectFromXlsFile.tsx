@@ -1,13 +1,14 @@
-import { Button } from '@mui/material';
-import React, { FunctionComponent, SyntheticEvent, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { zodImplement } from '../../../../utils/Zod';
-import { useFormatter } from '../../../../components/i18n';
+import { FunctionComponent, SyntheticEvent, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
+
 import CustomFileUploader from '../../../../components/common/CustomFileUploader';
+import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
+import { zodImplement } from '../../../../utils/Zod';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -72,7 +73,8 @@ const ImportUploaderInjectFromXlsFile: FunctionComponent<Props> = ({
     <>
       {loading && <Loader variant="inElement" />}
       {!loading
-        && <form id="importUploadInjectForm" onSubmit={handleSubmitWithoutPropagation}>
+      && (
+        <form id="importUploadInjectForm" onSubmit={handleSubmitWithoutPropagation}>
           <div className={classes.container}>
             <Controller
               control={control}
@@ -82,7 +84,7 @@ const ImportUploaderInjectFromXlsFile: FunctionComponent<Props> = ({
                   name="file"
                   fieldOnChange={onChange}
                   label={t('Your file should be a XLS')}
-                  acceptMimeTypes={'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'}
+                  acceptMimeTypes="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                   errors={errors}
                 />
               )}
@@ -104,7 +106,7 @@ const ImportUploaderInjectFromXlsFile: FunctionComponent<Props> = ({
             </Button>
           </div>
         </form>
-      }
+      )}
     </>
   );
 };
