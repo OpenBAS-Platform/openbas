@@ -19,23 +19,18 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.Instant;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.jpa.domain.Specification;
 
 public class FilterUtilsJpa {
 
-  private FilterUtilsJpa() {
-  }
+  private FilterUtilsJpa() {}
 
-  public record Option(String id, String label) {
-
-  }
+  public record Option(String id, String label) {}
 
   private static final Specification<?> EMPTY_SPECIFICATION = (root, query, cb) -> cb.conjunction();
 
