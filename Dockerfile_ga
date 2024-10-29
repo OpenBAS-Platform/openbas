@@ -2,7 +2,6 @@ FROM openjdk:21-jdk-slim-buster AS app
 
 WORKDIR /opt
 RUN apt update && apt install -y tini git --no-install-recommends
-
 COPY openbas-build ./
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
