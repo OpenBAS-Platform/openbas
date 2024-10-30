@@ -734,7 +734,7 @@ public class AtomicTestingUtils {
   // -- PRE CALCULATED RESULTS FOR PLAYERS --
   private static List<InjectTargetWithResult> calculateResultsforPlayers(
       Map<User, List<InjectExpectation>> expectationsByUser) {
-    if(expectationsByUser == null) {
+    if (expectationsByUser == null) {
       return new ArrayList<>();
     }
     return expectationsByUser.entrySet().stream()
@@ -751,7 +751,7 @@ public class AtomicTestingUtils {
 
   private static List<InjectTargetWithResult> calculateResultsforPlayersFromRaw(
       Map<String, List<RawInjectExpectation>> expectationsByUser, Map<String, RawUser> rawUserMap) {
-    if(expectationsByUser == null) {
+    if (expectationsByUser == null) {
       return new ArrayList<>();
     }
     return expectationsByUser.entrySet().stream()
