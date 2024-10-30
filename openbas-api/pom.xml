@@ -70,10 +70,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-config</artifactId>
+            <version>3.2.11</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -82,6 +79,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
+            <version>3.2.11</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -155,6 +153,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-saml2-service-provider</artifactId>
+            <version>6.2.7</version>
         </dependency>
         <dependency>
             <groupId>org.opensaml</groupId>
@@ -225,6 +224,7 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
+            <version>6.2.7</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
