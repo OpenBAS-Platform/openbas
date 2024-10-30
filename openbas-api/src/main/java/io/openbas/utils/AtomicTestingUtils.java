@@ -9,10 +9,9 @@ import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.utils.AtomicTestingMapper.ResultDistribution;
 import jakarta.validation.constraints.NotNull;
-import org.hibernate.Hibernate;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import org.hibernate.Hibernate;
 
 public class AtomicTestingUtils {
 
