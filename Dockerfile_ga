@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk-slim-bookworm AS app
+FROM openjdk:21-jdk-slim AS app
 
 WORKDIR /opt
 RUN apt update && apt install -y tini git --no-install-recommends
