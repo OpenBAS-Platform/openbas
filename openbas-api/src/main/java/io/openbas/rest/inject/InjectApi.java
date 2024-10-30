@@ -7,7 +7,6 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
-import static io.openbas.utils.AtomicTestingUtils.getTargets;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
@@ -231,9 +230,7 @@ public class InjectApi extends RestBehavior {
                     InjectSpecification.fromExercise(exerciseId).and(specification), pageable),
             searchPaginationInput,
             Inject.class)
-        .map(
-            inject ->
-                AtomicTestingMapper.toDto(inject));
+        .map(inject -> AtomicTestingMapper.toDto(inject));
   }
 
   @LogExecutionTime
@@ -243,9 +240,7 @@ public class InjectApi extends RestBehavior {
   public List<InjectResultDTO> exerciseInjectsWithExpectations(
       @PathVariable final String exerciseId) {
     return this.injectRepository.findAll(InjectSpecification.fromExercise(exerciseId)).stream()
-        .map(
-            inject ->
-                AtomicTestingMapper.toDto(inject))
+        .map(inject -> AtomicTestingMapper.toDto(inject))
         .collect(Collectors.toList());
   }
 

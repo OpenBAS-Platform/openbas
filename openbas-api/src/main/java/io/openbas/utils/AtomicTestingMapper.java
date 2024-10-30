@@ -27,7 +27,8 @@ public class AtomicTestingMapper {
   }
 
   public static InjectResultDTO toDto(Inject inject) {
-    List<InjectTargetWithResult> targets = getTargets(inject.getTeams(), inject.getAssets(), inject.getAssetGroups());
+    List<InjectTargetWithResult> targets =
+        getTargets(inject.getTeams(), inject.getAssets(), inject.getAssetGroups());
     List<String> targetIds = targets.stream().map(InjectTargetWithResult::getId).toList();
 
     return getAtomicTestingOutputBuilder(inject)
