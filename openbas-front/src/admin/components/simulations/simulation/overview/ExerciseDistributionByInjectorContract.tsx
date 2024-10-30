@@ -62,7 +62,6 @@ const ExerciseDistributionByInjectorContract: FunctionComponent<Props> = ({
       {sortedInjectorContractsByTotalScore.length > 0 ? (
         <Chart
           id="exercise_distribution_total_score_by_inject_type"
-          // @ts-expect-error: Need to migrate Chart.js file
           options={horizontalBarsChartOptions(
             theme,
             false,

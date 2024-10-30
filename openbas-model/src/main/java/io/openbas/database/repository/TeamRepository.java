@@ -43,11 +43,11 @@ public interface TeamRepository
   @Query(
       "select count(distinct u) from User u "
           + "join u.teams as team "
-          + "where u.id = :userId and u.createdAt < :creationDate")
+          + "where u.id = :userId and u.createdAt > :creationDate")
   long userCount(String userId, Instant creationDate);
 
   @Override
-  @Query("select count(distinct t) from Team t where t.createdAt < :creationDate")
+  @Query("select count(distinct t) from Team t where t.createdAt > :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
 
   @Query(

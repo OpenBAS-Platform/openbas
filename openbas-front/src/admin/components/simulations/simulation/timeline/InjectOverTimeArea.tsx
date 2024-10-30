@@ -43,7 +43,6 @@ const InjectOverTimeArea: FunctionComponent<Props> = ({
     <>
       {injectsOverTime.length > 0 ? (
         <Chart
-          // @ts-expect-error: Need to migrate Chart.js file
           options={areaChartOptions(theme, true, nsdt, null, undefined)}
           series={injectsData}
           type="area"

@@ -53,7 +53,6 @@ const MailDistributionByInject: FunctionComponent<Props> = ({
     <>
       {sortedInjectsByCommunicationNumber.length > 0 ? (
         <Chart
-          // @ts-expect-error: Need to migrate Chart.js file
           options={horizontalBarsChartOptions(theme)}
           series={totalMailsByInjectData}
           type="bar"

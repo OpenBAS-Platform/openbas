@@ -22,6 +22,7 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations, injectId }) => {
   const getColor = (result: string | undefined): string => {
     const colorMap: Record<string, string> = {
       SUCCESS: 'rgb(107, 235, 112)',
+      PARTIAL: 'rgb(245, 166, 35)',
       PENDING: 'rgb(128,128,128)',
       FAILED: 'rgb(220, 81, 72)',
       UNKNOWN: 'rgba(128,127,127,0.37)',

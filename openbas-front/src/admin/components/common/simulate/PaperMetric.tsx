@@ -53,7 +53,7 @@ const PaperMetric: FunctionComponent<Props> = ({
         </div>
         <ItemNumberDifference
           difference={progression}
-          description={t('24 hours')}
+          description={t('1 month')}
         />
       </div>
       <div>

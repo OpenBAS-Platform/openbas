@@ -65,7 +65,6 @@ const ExerciseDistributionScoreByPlayer: FunctionComponent<Props> = ({
       {usersTotalScores.length > 0 ? (
         <Chart
           id="exercise_distribution_total_score_by_player"
-          // @ts-expect-error: Need to migrate Chart.js file
           options={horizontalBarsChartOptions(theme)}
           series={totalScoreByUserData}
           type="bar"

@@ -33,11 +33,11 @@ public interface UserRepository
           + "join team.exercises as e "
           + "join e.grants as grant "
           + "join grant.group.users as user "
-          + "where user.id = :userId and u.createdAt < :creationDate")
+          + "where user.id = :userId and u.createdAt > :creationDate")
   long userCount(String userId, Instant creationDate);
 
   @Override
-  @Query("select count(distinct u) from User u where u.createdAt < :creationDate")
+  @Query("select count(distinct u) from User u where u.createdAt > :creationDate")
   long globalCount(Instant creationDate);
 
   // -- ADMIN --
