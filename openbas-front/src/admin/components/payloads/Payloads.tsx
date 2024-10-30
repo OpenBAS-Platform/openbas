@@ -341,7 +341,166 @@ const Payloads = () => {
         handleClose={() => setSelectedPayload(null)}
         title={t('Selected payload')}
       >
+<<<<<<< HEAD
         <Payload selectedPayload={selectedPayload} />
+=======
+        <Grid container spacing={3}>
+          <Grid item xs={6} style={{ paddingTop: 10 }}>
+            <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
+              {t('Name')}
+            </Typography>
+            {selectedPayload?.payload_name}
+            <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
+              {t('Platforms')}
+            </Typography>
+            {(selectedPayload?.payload_platforms ?? []).length === 0 ? (
+              <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
+            ) : selectedPayload?.payload_platforms?.map(
+              platform => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
+            )}
+            {(selectedPayload?.executable_arch) && (
+              <>
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                  style={{ marginTop: 20 }}
+                >
+                  {t('Architecture')}
+                </Typography>
+                {selectedPayload?.executable_arch}
+              </>
+            )}
+            <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
+              {t('Description')}
+            </Typography>
+            {emptyFilled(selectedPayload?.payload_description)}
+          </Grid>
+          <Grid item xs={6} style={{ paddingTop: 10 }}>
+            <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
+              {t('External ID')}
+            </Typography>
+            {selectedPayload?.payload_external_id && selectedPayload?.payload_external_id.length > 0 ? (
+              <pre>
+                <ItemCopy content={selectedPayload?.payload_external_id} />
+              </pre>
+            ) : '-'}
+            <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
+              {t('Content')}
+            </Typography>
+            <pre>
+              <ItemCopy content={
+                selectedPayload?.command_content ?? selectedPayload?.dns_resolution_hostname ?? selectedPayload?.file_drop_file ?? selectedPayload?.executable_file ?? ''
+              }
+              />
+            </pre>
+            <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
+              {t('Command executor')}
+            </Typography>
+            {selectedPayload?.command_executor}
+            <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
+              {t('Cleanup command')}
+            </Typography>
+            {selectedPayload?.payload_cleanup_command && selectedPayload?.payload_cleanup_command.length > 0
+              ? <pre><ItemCopy content={selectedPayload?.payload_cleanup_command} /></pre> : '-'}
+          </Grid>
+          <Grid item xs={10} style={{ paddingTop: 10 }}>
+            <Typography
+              variant="subtitle1"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
+              {t('Prerequisites')}
+            </Typography>
+          </Grid>
+
+          {
+            selectedPayload?.payload_prerequisites && selectedPayload?.payload_prerequisites.length === 0 ? '-'
+              : selectedPayload?.payload_prerequisites?.map((prerequisite: PayloadPrerequisite) => {
+                return (
+                  <>
+
+                    <Grid item xs={4} style={{ paddingTop: 10 }}>
+                      <Typography
+                        variant="h3"
+                        gutterBottom
+                        style={{ marginTop: 20 }}
+                      >
+                        {t('Command executor')}
+                      </Typography>
+                      {prerequisite.executor ? prerequisite.executor : '-'}
+                    </Grid>
+                    <Grid item xs={4} style={{ paddingTop: 10 }}>
+                      <Typography
+                        variant="h3"
+                        gutterBottom
+                        style={{ marginTop: 20 }}
+                      >
+                        {t('Get command')}
+                      </Typography>
+                      {
+                        prerequisite.get_command
+                          ? (
+                              <pre>
+                                <ItemCopy content={prerequisite.get_command} />
+                              </pre>
+                            )
+                          : '-'
+                      }
+                    </Grid>
+                    <Grid item xs={4} style={{ paddingTop: 10 }}>
+                      <Typography
+                        variant="h3"
+                        gutterBottom
+                        style={{ marginTop: 20 }}
+                      >
+                        {t('Check command')}
+                      </Typography>
+                      {
+                        prerequisite.check_command
+                          ? (
+                              <pre>
+                                <ItemCopy content={prerequisite.check_command} />
+                              </pre>
+                            )
+
+                          : '-'
+                      }
+                    </Grid>
+
+                  </>
+                );
+              })
+          }
+        </Grid>
+>>>>>>> 89ccb9756 (Change prerequisites display)
       </Drawer>
     </>
   );
