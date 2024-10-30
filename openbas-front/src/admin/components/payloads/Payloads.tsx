@@ -24,6 +24,7 @@ import ItemTags from '../../../components/ItemTags';
 import PayloadIcon from '../../../components/PayloadIcon';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
+import { PayloadPrerequisite } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { emptyFilled } from '../../../utils/String';
@@ -408,10 +409,78 @@ const Payloads = () => {
               gutterBottom
               style={{ marginTop: 20 }}
             >
+              {t('Command executor')}
+            </Typography>
+            {selectedPayload?.command_executor}
+            <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
               {t('Cleanup command')}
             </Typography>
             {selectedPayload?.payload_cleanup_command && selectedPayload?.payload_cleanup_command.length > 0
               ? <pre><ItemCopy content={selectedPayload?.payload_cleanup_command} /></pre> : '-'}
+          </Grid>
+          <Grid item xs={10} style={{ paddingTop: 10 }}>
+            <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
+              {t('Prerequisites')}
+            </Typography>
+            {
+              selectedPayload?.payload_prerequisites && selectedPayload?.payload_prerequisites.length === 0 ? '-'
+                : selectedPayload?.payload_prerequisites?.map((prerequisite: PayloadPrerequisite) => {
+                  return (
+                    <>
+                      <Typography
+                        variant="h3"
+                        gutterBottom
+                        style={{ marginTop: 20 }}
+                      >
+                        {t('Command executor')}
+                      </Typography>
+                      {prerequisite.executor ? prerequisite.executor : '-'}
+
+                      <Typography
+                        variant="h3"
+                        gutterBottom
+                        style={{ marginTop: 20 }}
+                      >
+                        {t('Get command')}
+                      </Typography>
+                      {
+                        prerequisite.get_command
+                          ? (
+                              <pre>
+                                <ItemCopy content={prerequisite.get_command} />
+                              </pre>
+                            )
+                          : '-'
+                      }
+                      <Typography
+                        variant="h3"
+                        gutterBottom
+                        style={{ marginTop: 20 }}
+                      >
+                        {t('Check command')}
+                      </Typography>
+                      {
+                        prerequisite.check_command
+                          ? (
+                              <pre>
+                                <ItemCopy content={prerequisite.check_command} />
+                              </pre>
+                            )
+
+                          : '-'
+                      }
+                    </>
+                  );
+                })
+            }
           </Grid>
         </Grid>
       </Drawer>
