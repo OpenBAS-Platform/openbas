@@ -1,4 +1,3 @@
-import { Theme } from '@mui/material';
 import { useTheme } from '@mui/styles';
 import * as R from 'ramda';
 import { FunctionComponent } from 'react';
@@ -9,6 +8,7 @@ import type { CommunicationHelper } from '../../../../../actions/communications/
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
+import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
 import type { Communication } from '../../../../../utils/api-types';
 import { areaChartOptions } from '../../../../../utils/Charts';
@@ -57,7 +57,6 @@ const MailDistributionOverTimeChart: FunctionComponent<Props> = ({
     <>
       {communicationsOverTime.length > 0 ? (
         <Chart
-          // @ts-expect-error: Need to migrate Chart.js file
           options={areaChartOptions(theme, true, nsdt, null, undefined)}
           series={communicationsData}
           type="area"

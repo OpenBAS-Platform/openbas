@@ -27,11 +27,11 @@ public interface SecurityPlatformRepository
           + "join i.exercise as e "
           + "join e.grants as grant "
           + "join grant.group.users as user "
-          + "where user.id = :userId and i.createdAt < :creationDate")
+          + "where user.id = :userId and i.createdAt > :creationDate")
   long userCount(@Param("userId") String userId, @Param("creationDate") Instant creationDate);
 
   @Override
-  @Query("select count(distinct s) from SecurityPlatform s where s.createdAt < :creationDate")
+  @Query("select count(distinct s) from SecurityPlatform s where s.createdAt > :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
 
   @Query(

@@ -170,12 +170,12 @@ const ExerciseList: FunctionComponent<Props> = ({
           />
         </ListItem>
       )}
-      {exercises.map((exercise: ExerciseStore) => (
+      {exercises.map((exercise: ExerciseStore, index) => (
         <ListItem
           key={exercise.exercise_id}
           secondaryAction={secondaryAction && secondaryAction(exercise)}
           disablePadding
-          divider
+          divider={exercises.length !== index + 1}
         >
           <ListItemButton
             classes={{ root: classes.item }}

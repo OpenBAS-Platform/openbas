@@ -2395,7 +2395,6 @@ export interface Payload {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
-  executable_arch?: "x86_64" | "arm64";
 }
 
 export interface PayloadArgument {
@@ -2525,9 +2524,12 @@ export interface PlatformStatistic {
   asset_groups_count?: StatisticElement;
   assets_count?: StatisticElement;
   exercises_count?: StatisticElement;
+  exercises_count_by_category?: Record<string, number>;
+  exercises_count_by_week?: Record<string, number>;
   expectation_results?: ExpectationResultsByType[];
   inject_expectation_results?: InjectExpectationResultsByAttackPattern[];
   injects_count?: StatisticElement;
+  injects_count_by_attack_pattern?: Record<string, number>;
   platform_id?: string;
   scenarios_count?: StatisticElement;
   teams_count?: StatisticElement;

@@ -12,6 +12,7 @@ import { initSorting } from '../../../../../components/common/queryable/Page';
 import { buildSearchPagination } from '../../../../../components/common/queryable/QueryableUtils';
 import { useQueryableWithLocalStorage } from '../../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../../../components/i18n';
+import Loader from '../../../../../components/Loader';
 import { useHelper } from '../../../../../store';
 import type { ExpectationResultsByType } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
@@ -87,7 +88,9 @@ const Exercise = () => {
             {t('Results')}
           </Typography>
           <Paper variant="outlined" style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-            <ResponsePie expectationResultsByTypes={results} humanValidationLink={`/admin/exercises/${exerciseId}/animation/validations`} />
+            {!results
+              ? <Loader variant="inElement" />
+              : <ResponsePie expectationResultsByTypes={results} humanValidationLink={`/admin/exercises/${exerciseId}/animation/validations`} />}
           </Paper>
         </Grid>
         {injectResults && resultAttackPatternIds.length > 0 && (

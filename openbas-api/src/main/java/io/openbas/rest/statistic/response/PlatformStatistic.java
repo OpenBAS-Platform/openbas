@@ -3,7 +3,9 @@ package io.openbas.rest.statistic.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -40,6 +42,15 @@ public class PlatformStatistic {
 
   @JsonProperty("inject_expectation_results")
   private List<InjectExpectationResultsByAttackPattern> injectResults;
+
+  @JsonProperty("exercises_count_by_category")
+  private Map<String, Long> exerciseCountByCategory;
+
+  @JsonProperty("exercises_count_by_week")
+  private Map<Instant, Long> exercisesCountByWeek;
+
+  @JsonProperty("injects_count_by_attack_pattern")
+  private Map<String, Long> injectsCountByAttackPattern;
 
   public PlatformStatistic() {
     // Default constructor

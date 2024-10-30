@@ -1,5 +1,4 @@
 import { useTheme } from '@mui/styles';
-import type { ApexOptions } from 'apexcharts';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 
@@ -78,7 +77,7 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
             exercises.length === 0,
             1,
             t('No data to display'),
-          ) as ApexOptions}
+          )}
           series={series}
           type="bar"
           width="100%"

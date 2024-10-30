@@ -57,11 +57,11 @@ public interface ScenarioRepository
           + "join team.scenarios as s "
           + "join s.grants as grant "
           + "join grant.group.users as user "
-          + "where user.id = :userId and u.createdAt < :creationDate")
+          + "where user.id = :userId and u.createdAt > :creationDate")
   long userCount(String userId, Instant creationDate);
 
   @Override
-  @Query("select count(distinct s) from Scenario s where s.createdAt < :creationDate")
+  @Query("select count(distinct s) from Scenario s where s.createdAt > :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
 
   @Query(

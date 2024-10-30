@@ -61,7 +61,6 @@ const InjectDistributionByType: FunctionComponent<Props> = ({
     <>
       {injectsByType.length > 0 ? (
         <Chart
-          // @ts-expect-error: Need to migrate Chart.js file
           options={horizontalBarsChartOptions(theme)}
           series={injectsByInjectorContractData}
           type="bar"

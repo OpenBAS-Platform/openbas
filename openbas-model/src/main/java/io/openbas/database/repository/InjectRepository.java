@@ -117,12 +117,39 @@ public interface InjectRepository
           + "join i.exercise as e "
           + "join e.grants as grant "
           + "join grant.group.users as user "
-          + "where user.id = :userId and i.createdAt < :creationDate")
+          + "where user.id = :userId and i.createdAt > :creationDate")
   long userCount(@Param("userId") String userId, @Param("creationDate") Instant creationDate);
 
   @Override
-  @Query("select count(distinct i) from Inject i where i.createdAt < :creationDate")
+  @Query("select count(distinct i) from Inject i where i.createdAt > :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
+
+  @Query(
+      value =
+          "select icap.attack_pattern_id, count(distinct i) as countInjects from injects i "
+              + "join injectors_contracts_attack_patterns icap ON icap.injector_contract_id = i.inject_injector_contract "
+              + "join exercises e ON e.exercise_id = i.inject_exercise "
+              + "join injects_statuses injectStatus ON injectStatus.status_inject = i.inject_id "
+              + "where i.inject_created_at > :creationDate and i.inject_exercise is not null and e.exercise_start_date is not null and icap.injector_contract_id is not null and injectStatus.status_name = 'SUCCESS'"
+              + "group by icap.attack_pattern_id order by countInjects DESC LIMIT 5",
+      nativeQuery = true)
+  List<Object[]> globalCountGroupByAttackPatternInExercise(
+      @Param("creationDate") Instant creationDate);
+
+  @Query(
+      value =
+          "select icap.attack_pattern_id, count(distinct i) as countInjects from injects i "
+              + "join injectors_contracts_attack_patterns icap ON icap.injector_contract_id = i.inject_injector_contract "
+              + "join exercises e on e.exercise_id = i.inject_exercise "
+              + "inner join grants ON grants.grant_exercise = e.exercise_id "
+              + "inner join groups ON grants.grant_group = groups.group_id "
+              + "inner join users_groups ON groups.group_id = users_groups.group_id "
+              + "join injects_statuses injectStatus ON injectStatus.status_inject = i.inject_id "
+              + "where users_groups.user_id = :userId and i.inject_created_at > :creationDate and i.inject_exercise is not null and e.exercise_start_date is not null and icap.injector_contract_id is not null and injectStatus.status_name = 'SUCCESS'"
+              + "group by icap.attack_pattern_id order by countInjects DESC LIMIT 5",
+      nativeQuery = true)
+  List<Object[]> userCountGroupByAttackPatternInExercise(
+      @Param("userId") String userId, @Param("creationDate") Instant creationDate);
 
   @Query(
       value =
