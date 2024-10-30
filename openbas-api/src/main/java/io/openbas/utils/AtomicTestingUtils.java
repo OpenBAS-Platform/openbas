@@ -9,9 +9,10 @@ import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.utils.AtomicTestingMapper.ResultDistribution;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.Hibernate;
+
 import java.util.*;
 import java.util.stream.Collectors;
-import org.hibernate.Hibernate;
 
 public class AtomicTestingUtils {
 
@@ -733,6 +734,9 @@ public class AtomicTestingUtils {
   // -- PRE CALCULATED RESULTS FOR PLAYERS --
   private static List<InjectTargetWithResult> calculateResultsforPlayers(
       Map<User, List<InjectExpectation>> expectationsByUser) {
+    if(expectationsByUser == null) {
+      return new ArrayList<>();
+    }
     return expectationsByUser.entrySet().stream()
         .map(
             userEntry ->
@@ -747,6 +751,9 @@ public class AtomicTestingUtils {
 
   private static List<InjectTargetWithResult> calculateResultsforPlayersFromRaw(
       Map<String, List<RawInjectExpectation>> expectationsByUser, Map<String, RawUser> rawUserMap) {
+    if(expectationsByUser == null) {
+      return new ArrayList<>();
+    }
     return expectationsByUser.entrySet().stream()
         .map(
             userEntry ->
