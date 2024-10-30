@@ -4,6 +4,7 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.JpaUtils.createLeftJoin;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static java.time.Instant.now;
 
@@ -14,6 +15,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
+import io.openbas.database.specification.InjectSpecification;
+import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
@@ -22,7 +25,9 @@ import io.openbas.rest.scenario.response.ImportMessage;
 import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
 import io.openbas.telemetry.Tracing;
+import io.openbas.utils.AtomicTestingMapper;
 import io.openbas.utils.InjectUtils;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -30,6 +35,7 @@ import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.io.InputStream;
@@ -1600,4 +1606,16 @@ public class InjectService {
                     tuple.get("inject_depends_on", InjectDependency.class)))
         .toList();
   }
+
+  public Page<InjectResultDTO> getPageOfExerciseInjects(String exerciseId, @Valid SearchPaginationInput searchPaginationInput) {
+      return buildPaginationJPA(
+          (Specification<Inject> specification, Pageable pageable) ->
+              this.injects(
+                  InjectSpecification.fromExercise(exerciseId).and(specification),
+                  InjectSpecification.fromExercise(exerciseId).and(specification),
+                  pageable),
+          searchPaginationInput,
+          Inject.class)
+          .map(inject -> AtomicTestingMapper.toDto(inject));
+    }
 }

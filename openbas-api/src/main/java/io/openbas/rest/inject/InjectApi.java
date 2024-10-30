@@ -224,13 +224,7 @@ public class InjectApi extends RestBehavior {
   public Page<InjectResultDTO> exerciseInjects(
       @PathVariable final String exerciseId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    return buildPaginationJPA(
-            (Specification<Inject> specification, Pageable pageable) ->
-                this.injectRepository.findAll(
-                    InjectSpecification.fromExercise(exerciseId).and(specification), pageable),
-            searchPaginationInput,
-            Inject.class)
-        .map(inject -> AtomicTestingMapper.toDto(inject));
+    return injectService.getPageOfExerciseInjects(exerciseId, searchPaginationInput);
   }
 
   @LogExecutionTime

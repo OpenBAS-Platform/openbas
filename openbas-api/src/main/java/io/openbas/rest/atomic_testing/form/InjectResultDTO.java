@@ -43,7 +43,7 @@ public class InjectResultDTO {
   private InjectStatusCommandLine commandsLines;
 
   @JsonProperty("inject_expectations")
-  private List<InjectExpectation> expectations;
+  private List<InjectExpectationDTO> expectations;
 
   @JsonProperty("inject_type")
   private String type;
@@ -51,12 +51,12 @@ public class InjectResultDTO {
   @Schema(description = "Kill Chain Phases")
   @JsonProperty("inject_kill_chain_phases")
   @NotNull
-  private List<KillChainPhase> killChainPhases;
+  private List<KillChainPhaseDTO> killChainPhases;
 
   @Schema(description = "Attack Patterns")
   @JsonProperty("inject_attack_patterns")
   @NotNull
-  private List<AttackPattern> attackPatterns;
+  private List<AttackPatternDTO> attackPatterns;
 
   @Schema(description = "Full contract")
   @JsonProperty("inject_injector_contract")
@@ -64,7 +64,7 @@ public class InjectResultDTO {
   private InjectorContract injectorContract;
 
   @JsonProperty("inject_status")
-  private InjectStatus status;
+  private InjectStatusDTO status;
 
   @Schema(
       description = "Specifies the categories of targetResults for atomic testing.",
