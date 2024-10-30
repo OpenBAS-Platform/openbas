@@ -424,17 +424,21 @@ const Payloads = () => {
           </Grid>
           <Grid item xs={10} style={{ paddingTop: 10 }}>
             <Typography
-              variant="h3"
+              variant="subtitle1"
               gutterBottom
               style={{ marginTop: 20 }}
             >
               {t('Prerequisites')}
             </Typography>
-            {
-              selectedPayload?.payload_prerequisites && selectedPayload?.payload_prerequisites.length === 0 ? '-'
-                : selectedPayload?.payload_prerequisites?.map((prerequisite: PayloadPrerequisite) => {
-                  return (
-                    <>
+          </Grid>
+
+          {
+            selectedPayload?.payload_prerequisites && selectedPayload?.payload_prerequisites.length === 0 ? '-'
+              : selectedPayload?.payload_prerequisites?.map((prerequisite: PayloadPrerequisite) => {
+                return (
+                  <>
+
+                    <Grid item xs={4} style={{ paddingTop: 10 }}>
                       <Typography
                         variant="h3"
                         gutterBottom
@@ -443,7 +447,8 @@ const Payloads = () => {
                         {t('Command executor')}
                       </Typography>
                       {prerequisite.executor ? prerequisite.executor : '-'}
-
+                    </Grid>
+                    <Grid item xs={4} style={{ paddingTop: 10 }}>
                       <Typography
                         variant="h3"
                         gutterBottom
@@ -460,6 +465,8 @@ const Payloads = () => {
                             )
                           : '-'
                       }
+                    </Grid>
+                    <Grid item xs={4} style={{ paddingTop: 10 }}>
                       <Typography
                         variant="h3"
                         gutterBottom
@@ -477,11 +484,12 @@ const Payloads = () => {
 
                           : '-'
                       }
-                    </>
-                  );
-                })
-            }
-          </Grid>
+                    </Grid>
+
+                  </>
+                );
+              })
+          }
         </Grid>
       </Drawer>
     </>
