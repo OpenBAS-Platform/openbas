@@ -35,9 +35,7 @@ const Root = () => {
     dispatch(fetchMe());
     dispatch(fetchPlatformParameters());
   }, []);
-  if (R.isEmpty(logged)) {
-    return <div />;
-  }
+
   if (!logged || !me || !settings) {
     return (
       <Suspense fallback={<Loader />}>

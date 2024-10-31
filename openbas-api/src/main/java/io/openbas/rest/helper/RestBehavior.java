@@ -22,6 +22,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -92,7 +93,7 @@ public class RestBehavior {
   }
 
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
-  @ExceptionHandler(AccessDeniedException.class)
+  @ExceptionHandler(AuthenticationException.class)
   public ValidationErrorBag handleValidationExceptions() {
     ValidationErrorBag bag =
         new ValidationErrorBag(HttpStatus.UNAUTHORIZED.value(), "ACCESS_DENIED");
@@ -102,6 +103,12 @@ public class RestBehavior {
     errors.setChildren(errorsBag);
     bag.setErrors(errors);
     return bag;
+  }
+
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  @ExceptionHandler(AccessDeniedException.class)
+  public ValidationErrorBag handleAccessDeniedExceptions() {
+    return new ValidationErrorBag(HttpStatus.NOT_FOUND.value(), "NOT_FOUND");
   }
 
   @ResponseStatus(HttpStatus.CONFLICT)

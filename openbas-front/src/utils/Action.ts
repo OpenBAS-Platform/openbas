@@ -46,8 +46,8 @@ const notifyError = (error: AxiosError) => {
     locale: LANG,
     messages: i18n.messages[LANG as keyof typeof i18n.messages],
   }, cache);
-  if (error.status === 401) {
-    // Do not notify the user, as a 401 error will already trigger a disconnection
+  if (error.status === 401 || error.status === 404) {
+    // Do not notify the user, as a 401 error will already trigger a disconnection, as 404 already handle inside the app
   } else if (error.status === 409) {
     MESSAGING$.notifyError(intl.formatMessage({ id: 'The element already exists' }));
   } else if (error.status === 500) {
