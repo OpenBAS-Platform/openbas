@@ -14,8 +14,10 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.criteria.Join;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+
 import java.util.HashMap;
 import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -55,6 +57,7 @@ public class ScenarioExerciseApi {
                 pageable,
                 joinMap),
         searchPaginationInput,
-        Exercise.class);
+        Exercise.class,
+        joinMap);
   }
 }
