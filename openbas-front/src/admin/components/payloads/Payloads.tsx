@@ -1,4 +1,4 @@
-import { Chip, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { Chip, Grid, List, ListItem, ListItemIcon, ListItemButton, ListItemText, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, useMemo, useState } from 'react';
 
@@ -49,6 +49,14 @@ const useStyles = makeStyles(() => ({
     textOverflow: 'ellipsis',
     paddingRight: 10,
     boxSizing: 'content-box',
+  },
+  chip: {
+    fontSize: 12,
+    height: 25,
+    margin: '0 7px 7px 0',
+    textTransform: 'uppercase',
+    borderRadius: 4,
+    width: 180,
   },
   chipInList: {
     fontSize: 12,
@@ -386,9 +394,29 @@ const Payloads = () => {
             >
               {t('Tag')}
             </Typography>
-
+            <ItemTags
+              variant="reduced-view"
+              tags={selectedPayload?.payload_tags}
+            />
           </Grid>
           <Grid item xs={6} style={{ paddingTop: 10 }}>
+            <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
+              {t('Attack pattern')}
+            </Typography>
+            {(selectedPayload?.payload_attack_patterns ?? []).length === 0 ? '-' : selectedPayload?.payload_attack_patterns?.map((attackPattern: AttackPattern) => (
+              <Tooltip key={attackPattern.attack_pattern_id} title={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}>
+                <Chip
+                  variant="outlined"
+                  classes={{ root: classes.chip }}
+                  color="primary"
+                  label={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}
+                />
+              </Tooltip>
+            ))}
             <Typography
               variant="h3"
               gutterBottom
@@ -401,6 +429,16 @@ const Payloads = () => {
                 <ItemCopy content={selectedPayload?.payload_external_id} />
               </pre>
             ) : '-'}
+          </Grid>
+          <Grid item xs={12} style={{ paddingTop: 10 }}>
+            <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
+              {t('Command executor')}
+            </Typography>
+            {selectedPayload?.command_executor}
             <Typography
               variant="h3"
               gutterBottom
