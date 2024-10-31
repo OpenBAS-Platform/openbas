@@ -144,18 +144,19 @@ public class InjectApi extends RestBehavior {
           successCounter++;
         } else if (status == ExecutionStatus.ERROR || status == ExecutionStatus.COMMAND_NOT_FOUND) {
           errorCounter++;
-        } else if (status == ExecutionStatus.MAYBE_PREVENTED ||  status == ExecutionStatus.COMMAND_CANNOT_BE_EXECUTED ) {
+        } else if (status == ExecutionStatus.MAYBE_PREVENTED
+            || status == ExecutionStatus.COMMAND_CANNOT_BE_EXECUTED) {
           maybePreventedCounter++;
         }
       }
 
-      if(successCounter >= injectStatus.getTrackingTotalCount()){
+      if (successCounter >= injectStatus.getTrackingTotalCount()) {
         injectStatus.setName(ExecutionStatus.SUCCESS);
       } else if (successCounter > 0) {
         injectStatus.setName(ExecutionStatus.PARTIAL);
-      } else if (errorCounter >= injectStatus.getTrackingTotalCount()){
+      } else if (errorCounter >= injectStatus.getTrackingTotalCount()) {
         injectStatus.setName(ExecutionStatus.ERROR);
-      } else if (maybePreventedCounter >= injectStatus.getTrackingTotalCount()){
+      } else if (maybePreventedCounter >= injectStatus.getTrackingTotalCount()) {
         injectStatus.setName(ExecutionStatus.MAYBE_PREVENTED);
       } else {
         injectStatus.setName(ExecutionStatus.MAYBE_PARTIAL_PREVENTED);
