@@ -1,6 +1,5 @@
 package io.openbas.rest.group;
 
-import static io.openbas.database.audit.ModelBaseListener.DATA_UPDATE;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
@@ -8,7 +7,6 @@ import static java.time.Instant.now;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
-import io.openbas.database.audit.BaseEvent;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -23,8 +21,8 @@ import jakarta.validation.Valid;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Spliterator;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -41,16 +39,10 @@ public class GroupApi extends RestBehavior {
   private OrganizationRepository organizationRepository;
   private GroupRepository groupRepository;
   private UserRepository userRepository;
-  private ApplicationEventPublisher appPublisher;
 
   @Autowired
   public void setOrganizationRepository(OrganizationRepository organizationRepository) {
     this.organizationRepository = organizationRepository;
-  }
-
-  @Autowired
-  public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-    this.appPublisher = applicationEventPublisher;
   }
 
   @Autowired
@@ -119,17 +111,17 @@ public class GroupApi extends RestBehavior {
     group.setUsers(stream(userSpliterator, false).collect(toList()));
     Group savedGroup = groupRepository.save(group);
     // Publish exercises impacted by this group change.
-    savedGroup.getGrants().stream()
-        .map(Grant::getExercise)
-        .filter(Objects::nonNull)
-        .forEach(
-            exercise -> appPublisher.publishEvent(new BaseEvent(DATA_UPDATE, exercise, mapper)));
+    exerciseRepository.saveAll(
+        savedGroup.getGrants().stream()
+            .map(Grant::getExercise)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList()));
     // Publish scenarios impacted by this group change.
-    savedGroup.getGrants().stream()
-        .map(Grant::getScenario)
-        .filter(Objects::nonNull)
-        .forEach(
-            scenario -> appPublisher.publishEvent(new BaseEvent(DATA_UPDATE, scenario, mapper)));
+    scenarioRepository.saveAll(
+        savedGroup.getGrants().stream()
+            .map(Grant::getScenario)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList()));
     return savedGroup;
   }
 
