@@ -336,15 +336,25 @@ const Payloads = () => {
         title={t('Selected payload')}
       >
         <Grid container spacing={3}>
-          <Grid item xs={6} style={{ paddingTop: 10 }}>
+          <Grid item xs={10} style={{ paddingTop: 10 }}>
             <Typography
-              variant="h3"
+              variant="h2"
               gutterBottom
               style={{ marginTop: 20 }}
             >
-              {t('Name')}
+              {selectedPayload?.payload_name}
             </Typography>
-            {selectedPayload?.payload_name}
+
+            <Typography
+              variant="body2"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
+              {emptyFilled(selectedPayload?.payload_description)}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={6} style={{ paddingTop: 10 }}>
             <Typography
               variant="h3"
               gutterBottom
@@ -374,9 +384,9 @@ const Payloads = () => {
               gutterBottom
               style={{ marginTop: 20 }}
             >
-              {t('Description')}
+              {t('Tag')}
             </Typography>
-            {emptyFilled(selectedPayload?.payload_description)}
+
           </Grid>
           <Grid item xs={6} style={{ paddingTop: 10 }}>
             <Typography
