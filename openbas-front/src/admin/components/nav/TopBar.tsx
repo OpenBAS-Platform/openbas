@@ -143,6 +143,7 @@ const TopBar: React.FC = () => {
   });
   const handleLogout = async () => {
     await dispatch(logout());
+    navigate('/');
     handleCloseMenu();
   };
 

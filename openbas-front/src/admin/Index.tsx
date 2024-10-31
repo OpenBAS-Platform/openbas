@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 
 import type { LoggedHelper } from '../actions/helper';
@@ -47,9 +47,13 @@ const Index = () => {
   const { logged, settings } = useHelper((helper: LoggedHelper) => {
     return { logged: helper.logged(), settings: helper.getPlatformSettings() };
   });
-  if (logged.isOnlyPlayer) {
-    navigate('/private');
-  }
+
+  useEffect(() => {
+    if (logged.isOnlyPlayer) {
+      navigate('/');
+    }
+  }, [logged]);
+
   const boxSx = {
     flexGrow: 1,
     padding: 3,
