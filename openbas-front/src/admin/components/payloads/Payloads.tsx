@@ -1,4 +1,4 @@
-import { Chip, Grid, List, ListItem, ListItemIcon, ListItemButton, ListItemText, Tooltip, Typography } from '@mui/material';
+import { Chip, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, useMemo, useState } from 'react';
 
@@ -24,7 +24,7 @@ import ItemTags from '../../../components/ItemTags';
 import PayloadIcon from '../../../components/PayloadIcon';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
-import { PayloadPrerequisite } from '../../../utils/api-types';
+import { AttackPattern, PayloadPrerequisite } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { emptyFilled } from '../../../utils/String';
