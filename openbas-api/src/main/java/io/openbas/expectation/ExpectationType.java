@@ -10,7 +10,13 @@ public enum ExpectationType {
   public final String partialLabel;
   public final String failureLabel;
 
-  ExpectationType(String successLabel, String pendingLabel, String partialLabel, String failureLabel) {
+  public static final String SUCCESS_ID = "SUCCESS";
+  public static final String PENDING_ID = "PENDING";
+  public static final String PARTIAL_ID = "PARTIAL";
+  public static final String FAILED_ID = "FAILED";
+
+  ExpectationType(
+      String successLabel, String pendingLabel, String partialLabel, String failureLabel) {
     this.successLabel = successLabel;
     this.pendingLabel = pendingLabel;
     this.partialLabel = partialLabel;
@@ -27,5 +33,4 @@ public enum ExpectationType {
         return valueOf(value);
     }
   }
-
 }

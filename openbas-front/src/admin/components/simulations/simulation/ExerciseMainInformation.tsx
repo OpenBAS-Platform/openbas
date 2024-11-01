@@ -1,17 +1,18 @@
-import React from 'react';
-import * as R from 'ramda';
 import { Chip, Grid, Paper, Typography } from '@mui/material';
-import type { Exercise, KillChainPhase } from '../../../../utils/api-types';
+import * as R from 'ramda';
+import * as React from 'react';
+
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
-import ItemSeverity from '../../../../components/ItemSeverity';
+import { useFormatter } from '../../../../components/i18n';
 import ItemCategory from '../../../../components/ItemCategory';
 import ItemMainFocus from '../../../../components/ItemMainFocus';
+import ItemSeverity from '../../../../components/ItemSeverity';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import { useFormatter } from '../../../../components/i18n';
+import type { Exercise, KillChainPhase } from '../../../../utils/api-types';
 
 interface Props {
-  exercise: Exercise
+  exercise: Exercise;
 }
 
 const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
@@ -20,7 +21,7 @@ const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
 
   return (
     <Paper sx={{ padding: '15px' }} variant="outlined">
-      <Grid container spacing={3}>
+      <Grid id="main_information" container spacing={3}>
         <Grid item xs={12} style={{ paddingTop: 10 }}>
           <Typography
             variant="h3"

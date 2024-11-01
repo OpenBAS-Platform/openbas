@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
-import * as R from 'ramda';
-import { makeStyles } from '@mui/styles';
-import { Box, Autocomplete, TextField, Chip } from '@mui/material';
 import { LabelOutlined } from '@mui/icons-material';
+import { Autocomplete, Box, Chip, TextField } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
+import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+
 import { fetchTags } from '../../../../actions/Tag';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
@@ -36,9 +37,9 @@ const TagsFilter = (props) => {
       dispatch(fetchTags());
     }
   }, []);
-  const tags = useHelper((helper) => helper.getTags());
+  const tags = useHelper(helper => helper.getTags());
   const { onAddTag, onClearTag, onRemoveTag, currentTags, fullWidth } = props;
-  const tagTransform = (n) => ({
+  const tagTransform = n => ({
     id: n.tag_id,
     label: n.tag_name,
     color: n.tag_color,
@@ -69,7 +70,7 @@ const TagsFilter = (props) => {
             <div className={classes.text}>{option.label}</div>
           </Box>
         )}
-        renderInput={(params) => (
+        renderInput={params => (
           <TextField
             label={t('Tags')}
             size="small"
@@ -82,7 +83,7 @@ const TagsFilter = (props) => {
       {!fullWidth && (
         <div className={classes.filters}>
           {R.map(
-            (currentTag) => (
+            currentTag => (
               <Chip
                 key={currentTag.id}
                 classes={{ root: classes.filter }}

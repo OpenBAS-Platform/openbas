@@ -1,12 +1,12 @@
-import React from 'react';
-import { makeStyles, useTheme } from '@mui/styles';
-import { Typography, Grid, Card, CardHeader, CardContent, Avatar, CardMedia, Button } from '@mui/material';
 import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, ShareOutlined } from '@mui/icons-material';
+import { Avatar, Button, Card, CardContent, CardHeader, CardMedia, Grid, Typography } from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
+
+import Empty from '../../../components/Empty';
+import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
-import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
 import { useQueryParameter } from '../../../utils/Environment';
-import Empty from '../../../components/Empty';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -43,7 +43,7 @@ const ChannelMicroblogging = ({ channelReader }) => {
     channel_information: channel,
   } = channelReader;
   const baseUri = `/api/player/${exercise?.exercise_id ?? scenario?.scenario_id}`;
-  const { documentsMap } = useHelper((helper) => ({
+  const { documentsMap } = useHelper(helper => ({
     documentsMap: helper.getDocumentsMap(),
   }));
   const logo = isDark ? channel.channel_logo_dark : channel.channel_logo_light;
@@ -89,10 +89,10 @@ const ChannelMicroblogging = ({ channelReader }) => {
       )}
       {articles.map((article) => {
         const docs = article.article_documents
-          .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
-          .filter((d) => d !== undefined)
+          .map(docId => (documentsMap[docId] ? documentsMap[docId] : undefined))
+          .filter(d => d !== undefined)
           .filter(
-            (d) => d.document_type.includes('image/')
+            d => d.document_type.includes('image/')
               || d.document_type.includes('video/'),
           );
         let columns = 12;
@@ -111,11 +111,11 @@ const ChannelMicroblogging = ({ channelReader }) => {
             sx={{ width: '100%' }}
           >
             <CardHeader
-              avatar={
+              avatar={(
                 <Avatar>
                   {(article.article_author || t('Unknown')).charAt(0)}
                 </Avatar>
-              }
+              )}
               title={article.article_author || t('Unknown')}
               subheader={fldt(article.article_virtual_publication)}
             />
@@ -126,7 +126,7 @@ const ChannelMicroblogging = ({ channelReader }) => {
                 controlled={true}
               />
               <Grid container={true} spacing={3}>
-                {docs.map((doc) => (
+                {docs.map(doc => (
                   <Grid key={doc.document_id} item={true} xs={columns}>
                     {doc.document_type.includes('image/') && (
                       <CardMedia

@@ -1,5 +1,10 @@
 package io.openbas.service;
 
+import static io.openbas.database.model.ExerciseStatus.SCHEDULED;
+import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
@@ -7,44 +12,29 @@ import io.openbas.database.model.Team;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
 import io.openbas.utils.fixtures.InjectExpectationFixture;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
 import java.time.Instant;
 import java.util.List;
-
-import static io.openbas.database.model.ExerciseStatus.SCHEDULED;
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.MANUAL;
-import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ExerciseExpectationServiceTest {
 
-  public static final String EXPECTATION_NAME = "The animation team can validate the audience reaction";
-  @Autowired
-  private ExerciseExpectationService exerciseExpectationService;
+  public static final String EXPECTATION_NAME =
+      "The animation team can validate the audience reaction";
+  @Autowired private ExerciseExpectationService exerciseExpectationService;
 
-  @Autowired
-  private ExerciseRepository exerciseRepository;
+  @Autowired private ExerciseRepository exerciseRepository;
 
-  @Autowired
-  private InjectRepository injectRepository;
+  @Autowired private InjectRepository injectRepository;
 
-  @Autowired
-  private TeamRepository teamRepository;
+  @Autowired private TeamRepository teamRepository;
 
-  @Autowired
-  private InjectExpectationRepository injectExpectationRepository;
+  @Autowired private InjectExpectationRepository injectExpectationRepository;
 
-  @Autowired
-  private InjectorContractRepository injectorContractRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
 
   static String EXERCISE_ID;
 
@@ -57,10 +47,16 @@ public class ExerciseExpectationServiceTest {
     getInjectExpectation(injectCreated, teamCreated, exerciseCreated);
   }
 
+  @AfterAll
+  void afterAll() {
+    this.exerciseRepository.deleteById(EXERCISE_ID);
+  }
+
   @DisplayName("Retrieve inject expectations")
   @Test
   void retrieveInjectExpectations() {
-    List<InjectExpectation> expectations = this.exerciseExpectationService.injectExpectations(EXERCISE_ID);
+    List<InjectExpectation> expectations =
+        this.exerciseExpectationService.injectExpectations(EXERCISE_ID);
     assertNotNull(expectations);
 
     assertEquals(EXPECTATION_NAME, expectations.getFirst().getName());
@@ -70,14 +66,16 @@ public class ExerciseExpectationServiceTest {
   @Test
   void updateInjectExpectation() {
     // -- PREPARE --
-    List<InjectExpectation> expectations = this.exerciseExpectationService.injectExpectations(EXERCISE_ID);
+    List<InjectExpectation> expectations =
+        this.exerciseExpectationService.injectExpectations(EXERCISE_ID);
     assertNotNull(expectations);
     String id = expectations.getFirst().getId();
 
     // -- EXECUTE --
     ExpectationUpdateInput input = new ExpectationUpdateInput();
     input.setScore(7.0);
-    InjectExpectation expectation = this.exerciseExpectationService.updateInjectExpectation(id, input);
+    InjectExpectation expectation =
+        this.exerciseExpectationService.updateInjectExpectation(id, input);
 
     // -- ASSERT --
     assertNotNull(expectation);
@@ -86,7 +84,7 @@ public class ExerciseExpectationServiceTest {
 
   protected Exercise getExercise() {
     Exercise exercise = new Exercise();
-    exercise.setName("Exercice name");
+    exercise.setName("Exercise name");
     exercise.setStatus(SCHEDULED);
     exercise.setFrom("test@test.com");
     exercise.setReplyTos(List.of("test@test.com"));
@@ -103,15 +101,17 @@ public class ExerciseExpectationServiceTest {
   private Inject getInject(Exercise exerciseCreated) {
     Inject inject = new Inject();
     inject.setTitle("test");
-    inject.setInjectorContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+    inject.setInjectorContract(
+        this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
     inject.setExercise(exerciseCreated);
     inject.setDependsDuration(0L);
     return this.injectRepository.save(inject);
   }
 
-  private void getInjectExpectation(Inject injectCreated, Team teamCreated, Exercise exerciseCreated) {
+  private void getInjectExpectation(
+      Inject injectCreated, Team teamCreated, Exercise exerciseCreated) {
     this.injectExpectationRepository.save(
-        InjectExpectationFixture.createManualInjectExpectationWithExercise(teamCreated, injectCreated,
-            exerciseCreated, EXPECTATION_NAME));
+        InjectExpectationFixture.createManualInjectExpectationWithExercise(
+            teamCreated, injectCreated, exerciseCreated, EXPECTATION_NAME));
   }
 }

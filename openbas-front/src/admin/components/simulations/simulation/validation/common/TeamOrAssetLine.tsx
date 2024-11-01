@@ -1,32 +1,33 @@
-import React, { FunctionComponent } from 'react';
-import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { CastForEducationOutlined, DnsOutlined, LanOutlined } from '@mui/icons-material';
+import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import ChannelExpectation from '../expectations/ChannelExpectation';
-import ChallengeExpectation from '../expectations/ChallengeExpectation';
-import TechnicalExpectationAsset from '../expectations/TechnicalExpectationAsset';
-import TechnicalExpectationAssetGroup from '../expectations/TechnicalExpectationAssetGroup';
-import ManualExpectations from '../expectations/ManualExpectations';
-import type { EndpointStore } from '../../../../assets/endpoints/Endpoint';
-import type { AssetGroupStore } from '../../../../assets/asset_groups/AssetGroup';
-import type { Inject, Team } from '../../../../../../utils/api-types';
-import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
-import { useAppDispatch } from '../../../../../../utils/hooks';
-import { useHelper } from '../../../../../../store';
-import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
-import { fetchChannels } from '../../../../../../actions/channels/channel-action';
-import { fetchExerciseTeams } from '../../../../../../actions/Exercise';
-import { fetchExerciseChallenges } from '../../../../../../actions/Challenge';
-import { fetchEndpoints } from '../../../../../../actions/assets/endpoint-actions';
+import { FunctionComponent } from 'react';
+
 import { fetchAssetGroups } from '../../../../../../actions/asset_groups/assetgroup-action';
 import type { AssetGroupsHelper } from '../../../../../../actions/asset_groups/assetgroup-helper';
 import type { EndpointHelper } from '../../../../../../actions/assets/asset-helper';
-import type { ChallengeHelper } from '../../../../../../actions/helper';
-import type { ArticlesHelper } from '../../../../../../actions/channels/article-helper';
-import type { ChannelsHelper } from '../../../../../../actions/channels/channel-helper';
-import type { TeamsHelper } from '../../../../../../actions/teams/team-helper';
+import { fetchEndpoints } from '../../../../../../actions/assets/endpoint-actions';
+import { fetchExerciseChallenges } from '../../../../../../actions/Challenge';
 import { fetchExerciseArticles } from '../../../../../../actions/channels/article-action';
+import type { ArticlesHelper } from '../../../../../../actions/channels/article-helper';
+import { fetchChannels } from '../../../../../../actions/channels/channel-action';
+import type { ChannelsHelper } from '../../../../../../actions/channels/channel-helper';
 import type { Contract } from '../../../../../../actions/contract/contract';
+import { fetchExerciseTeams } from '../../../../../../actions/Exercise';
+import type { ChallengeHelper } from '../../../../../../actions/helper';
+import type { TeamsHelper } from '../../../../../../actions/teams/team-helper';
+import { useHelper } from '../../../../../../store';
+import type { Inject, Team } from '../../../../../../utils/api-types';
+import { useAppDispatch } from '../../../../../../utils/hooks';
+import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
+import type { AssetGroupStore } from '../../../../assets/asset_groups/AssetGroup';
+import type { EndpointStore } from '../../../../assets/endpoints/Endpoint';
+import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
+import ChallengeExpectation from '../expectations/ChallengeExpectation';
+import ChannelExpectation from '../expectations/ChannelExpectation';
+import ManualExpectations from '../expectations/ManualExpectations';
+import TechnicalExpectationAsset from '../expectations/TechnicalExpectationAsset';
+import TechnicalExpectationAssetGroup from '../expectations/TechnicalExpectationAssetGroup';
 
 const useStyles = makeStyles(() => ({
   item: {
@@ -116,11 +117,11 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
           {!!assetGroup && <LanOutlined fontSize="small" />}
         </ListItemIcon>
         <ListItemText
-          primary={
+          primary={(
             <div className={classes.bodyItem} style={{ width: '20%' }}>
               {team?.team_name || asset?.asset_name || assetGroup?.asset_group_name}
             </div>
-          }
+          )}
         />
       </ListItem>
       <List component="div" disablePadding>
@@ -152,7 +153,7 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
               );
             }
             if (assetGroup) {
-              const relatedExpectations = expectationsByInject.filter((e) => assetGroup.asset_group_assets?.includes(e.inject_expectation_asset ?? '')) ?? [];
+              const relatedExpectations = expectationsByInject.filter(e => assetGroup.asset_group_assets?.includes(e.inject_expectation_asset ?? '')) ?? [];
 
               return (
                 <TechnicalExpectationAssetGroup
@@ -168,7 +169,7 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
             return (<div key={expectationName}></div>);
           }
           return (
-            <ManualExpectations key={expectationName} inject={inject} expectations={es}/>
+            <ManualExpectations key={expectationName} inject={inject} expectations={es} />
           );
         })}
       </List>

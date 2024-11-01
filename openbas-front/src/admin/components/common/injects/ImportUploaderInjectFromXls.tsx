@@ -1,16 +1,21 @@
-import { ToggleButton, Tooltip } from '@mui/material';
 import { CloudUploadOutlined } from '@mui/icons-material';
-import React, { useContext, useState } from 'react';
+import { ToggleButton, Tooltip } from '@mui/material';
+import { useContext, useState } from 'react';
+
+import { storeXlsFile } from '../../../../actions/mapper/mapper-actions';
 import Dialog from '../../../../components/common/Dialog';
 import { useFormatter } from '../../../../components/i18n';
-import type { ImportPostSummary, InjectsImportInput, ImportMessage, ImportTestSummary } from '../../../../utils/api-types';
+import type { ImportMessage, ImportPostSummary, ImportTestSummary, InjectsImportInput } from '../../../../utils/api-types';
+import { MESSAGING$ } from '../../../../utils/Environment';
+import { InjectContext } from '../Context';
 import ImportUploaderInjectFromXlsFile from './ImportUploaderInjectFromXlsFile';
 import ImportUploaderInjectFromXlsInjects from './ImportUploaderInjectFromXlsInjects';
-import { InjectContext } from '../Context';
-import { storeXlsFile } from '../../../../actions/mapper/mapper-actions';
-import { MESSAGING$ } from '../../../../utils/Environment';
 
-const ImportUploaderInjectFromXls = () => {
+interface Props {
+  onImportedInjects?: () => void;
+}
+
+const ImportUploaderInjectFromXls = ({ onImportedInjects = () => {} }: Props) => {
   // Standard hooks
   const { t } = useFormatter();
   const injectContext = useContext(InjectContext);
@@ -42,6 +47,7 @@ const ImportUploaderInjectFromXls = () => {
         if (criticalMessages && criticalMessages?.length > 0) {
           MESSAGING$.notifyError(t(criticalMessages[0].message_code), true);
         }
+        onImportedInjects();
         handleClose();
       });
     }
@@ -50,12 +56,14 @@ const ImportUploaderInjectFromXls = () => {
   return (
     <>
       <ToggleButton
-        value="import" aria-label="import" size="small"
+        value="import"
+        aria-label="import"
+        size="small"
         onClick={handleOpen}
       >
         <Tooltip
           title={t('Import injects')}
-          aria-label={'Import injects'}
+          aria-label="Import injects"
         >
           <CloudUploadOutlined
             color="primary"
@@ -67,23 +75,25 @@ const ImportUploaderInjectFromXls = () => {
         open={open}
         handleClose={handleClose}
         title={t('Import injects')}
-        maxWidth={'sm'}
+        maxWidth="sm"
       >
         <>
           {!importId
-            && <ImportUploaderInjectFromXlsFile
+          && (
+            <ImportUploaderInjectFromXlsFile
               handleClose={handleClose}
               handleSubmit={onSubmitImportFile}
-               />
-          }
+            />
+          )}
           {importId
-            && <ImportUploaderInjectFromXlsInjects
+          && (
+            <ImportUploaderInjectFromXlsInjects
               sheets={sheets}
               handleClose={handleClose}
               importId={importId}
               handleSubmit={onSubmitImportInjects}
-               />
-          }
+            />
+          )}
         </>
       </Dialog>
     </>

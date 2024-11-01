@@ -1,4 +1,5 @@
 import { Dispatch } from 'redux';
+
 import { delReferential, getReferential, postReferential, putReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import type {
   Exercise,
@@ -12,14 +13,19 @@ import type {
   LessonsSendInput,
   SearchPaginationInput,
 } from '../../utils/api-types';
-import * as schema from '../Schema';
 import { MESSAGING$ } from '../../utils/Environment';
+import * as schema from '../Schema';
 
 export const EXERCISE_URI = '/api/exercises';
 
 export const fetchExerciseExpectationResult = (exerciseId: Exercise['exercise_id']) => {
   const uri = `${EXERCISE_URI}/${exerciseId}/results`;
   return simpleCall(uri);
+};
+
+export const fetchPlayersByExercise = (exerciseId: Exercise['exercise_id']) => (dispatch: Dispatch) => {
+  const uri = `${EXERCISE_URI}/${exerciseId}/players`;
+  return getReferential(schema.arrayOfUsers, uri)(dispatch);
 };
 
 export const fetchExerciseInjectExpectationResults = (exerciseId: Exercise['exercise_id']) => {
@@ -31,6 +37,11 @@ export const searchExerciseInjects = (exerciseId: Exercise['exercise_id'], searc
   const data = searchPaginationInput;
   const uri = `${EXERCISE_URI}/${exerciseId}/injects/search`;
   return simplePostCall(uri, data);
+};
+
+export const exerciseInjectsResultDTO = (exerciseId: Exercise['exercise_id']) => {
+  const uri = `${EXERCISE_URI}/${exerciseId}/injects/resultdto`;
+  return simpleCall(uri);
 };
 
 // -- IMPORT --

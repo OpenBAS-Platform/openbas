@@ -17,11 +17,11 @@ const generateMonthlyCron = (w: number, d: number, h: number, m: number) => {
 };
 
 interface ParsedCron {
-  w: number | null,
-  d: number | null,
-  h: number,
-  m: number,
-  owd: boolean,
+  w: number | null;
+  d: number | null;
+  h: number;
+  m: number;
+  owd: boolean;
 }
 
 const parseCron = (cron: string): ParsedCron => {

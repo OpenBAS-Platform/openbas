@@ -1,7 +1,9 @@
-import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { SelectGroup } from 'mdi-material-ui';
 import { makeStyles } from '@mui/styles';
+import { SelectGroup } from 'mdi-material-ui';
+import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
+import * as React from 'react';
+
 import ItemTags from '../../../../components/ItemTags';
 import type { AssetGroupStore } from './AssetGroup';
 
@@ -62,7 +64,7 @@ const AssetGroupsList: FunctionComponent<Props> = ({
               <SelectGroup color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <>
                   <div
                     className={classes.bodyItem}
@@ -77,7 +79,7 @@ const AssetGroupsList: FunctionComponent<Props> = ({
                     <ItemTags variant="reduced-view" tags={assetGroup.asset_group_tags} />
                   </div>
                 </>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               {component(assetGroup)}

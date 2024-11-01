@@ -1,15 +1,10 @@
-import React, { FunctionComponent, useContext } from 'react';
 import * as R from 'ramda';
-import type { TeamStore } from '../../../../actions/teams/Team';
-import UpdateInject from '../../common/injects/UpdateInject';
-import type { Inject, InjectResultDTO } from '../../../../utils/api-types';
+import { FunctionComponent, useContext } from 'react';
+
 import { updateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import type { Inject, InjectResultDTO } from '../../../../utils/api-types';
+import UpdateInject from '../../common/injects/UpdateInject';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
-import { useHelper } from '../../../../store';
-import type { TeamsHelper } from '../../../../actions/teams/team-helper';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchTeams } from '../../../../actions/teams/team-actions';
-import { useAppDispatch } from '../../../../utils/hooks';
 
 interface Props {
   atomic: InjectResultDTO;
@@ -22,17 +17,6 @@ const AtomicTestingUpdate: FunctionComponent<Props> = ({
   open,
   handleClose,
 }) => {
-  // Standard hooks
-  const dispatch = useAppDispatch();
-
-  // Fetching data
-  const { teams } = useHelper((helper: TeamsHelper) => ({
-    teams: helper.getTeams(),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchTeams());
-  });
-
   const { updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
   const onUpdateAtomicTesting = async (data: Inject) => {
     const toUpdate = R.pipe(
@@ -63,7 +47,6 @@ const AtomicTestingUpdate: FunctionComponent<Props> = ({
       onUpdateInject={onUpdateAtomicTesting}
       injectId={atomic.inject_id}
       isAtomic
-      teamsFromExerciseOrScenario={teams?.filter((team: TeamStore) => !team.team_contextual) ?? []}
     />
   );
 };

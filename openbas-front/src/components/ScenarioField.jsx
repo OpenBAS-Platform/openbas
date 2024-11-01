@@ -1,12 +1,12 @@
-import React from 'react';
 import { Kayaking } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import Autocomplete from './Autocomplete';
-import useDataLoader from '../utils/hooks/useDataLoader';
-import { useHelper } from '../store';
+
 import { fetchScenarios } from '../actions/scenarios/scenario-actions';
+import { useHelper } from '../store';
 import { useAppDispatch } from '../utils/hooks';
+import useDataLoader from '../utils/hooks/useDataLoader';
+import Autocomplete from './Autocomplete';
 
 const useStyles = makeStyles(() => ({
   icon: {
@@ -28,13 +28,13 @@ const ScenarioField = (props) => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   // Fetching data
-  const scenarios = useHelper((helper) => helper.getScenarios());
+  const scenarios = useHelper(helper => helper.getScenarios());
   useDataLoader(() => {
     dispatch(fetchScenarios());
   });
 
   const { name, onKeyDown, style, label, placeholder } = props;
-  const scenarioOptions = (scenarios || []).map((n) => ({
+  const scenarioOptions = (scenarios || []).map(n => ({
     id: n.scenario_id,
     label: n.scenario_name,
   }));

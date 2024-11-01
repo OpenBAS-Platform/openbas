@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { searchInjectorsByNameAsOption } from '../../../../actions/injectors/injector-action';
-import { Option } from '../../../../utils/Option';
-import { searchKillChainPhasesByNameAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
-import { searchTagAsOption } from '../../../../actions/tags/tag-action';
-import { searchScenarioAsOption, searchScenarioCategoryAsOption } from '../../../../actions/scenarios/scenario-actions';
+
 import { searchAttackPatternsByNameAsOption } from '../../../../actions/AttackPattern';
+import { searchInjectorsByNameAsOption } from '../../../../actions/injectors/injector-action';
+import { searchKillChainPhasesByNameAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
+import { searchOrganizationsByNameAsOption } from '../../../../actions/organizations/organization-actions';
+import { searchScenarioAsOption, searchScenarioCategoryAsOption } from '../../../../actions/scenarios/scenario-actions';
+import { searchTagAsOption } from '../../../../actions/tags/tag-action';
+import { Option } from '../../../../utils/Option';
 import { useFormatter } from '../../../i18n';
 
 const useSearchOptions = () => {
@@ -41,6 +43,7 @@ const useSearchOptions = () => {
       case 'payload_tags':
       case 'scenario_tags':
       case 'team_tags':
+      case 'user_tags':
         searchTagAsOption(search).then((response) => {
           setOptions(response.data);
         });
@@ -52,7 +55,12 @@ const useSearchOptions = () => {
         break;
       case 'scenario_category':
         searchScenarioCategoryAsOption(search).then((response: { data: Option[] }) => {
-          setOptions(response.data.map((d) => ({ id: d.id, label: t(d.label) })));
+          setOptions(response.data.map(d => ({ id: d.id, label: t(d.label) })));
+        });
+        break;
+      case 'user_organization':
+        searchOrganizationsByNameAsOption(search).then((response: { data: Option[] }) => {
+          setOptions(response.data.map(d => ({ id: d.id, label: t(d.label) })));
         });
         break;
       default:

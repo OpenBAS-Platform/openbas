@@ -1,18 +1,19 @@
 import { useTheme } from '@mui/styles';
-import React, { FunctionComponent } from 'react';
-import Chart from 'react-apexcharts';
 import * as R from 'ramda';
-import { Theme } from '@mui/material';
-import Empty from '../../../../../components/Empty';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import { useFormatter } from '../../../../../components/i18n';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { FunctionComponent } from 'react';
+import Chart from 'react-apexcharts';
+
 import { fetchExerciseCommunications } from '../../../../../actions/Communication';
 import type { CommunicationHelper } from '../../../../../actions/communications/communication-helper';
+import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
+import Empty from '../../../../../components/Empty';
+import { useFormatter } from '../../../../../components/i18n';
+import type { Theme } from '../../../../../components/Theme';
+import { useHelper } from '../../../../../store';
 import type { Communication } from '../../../../../utils/api-types';
 import { areaChartOptions } from '../../../../../utils/Charts';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
@@ -56,7 +57,6 @@ const MailDistributionOverTimeChart: FunctionComponent<Props> = ({
     <>
       {communicationsOverTime.length > 0 ? (
         <Chart
-          // @ts-expect-error: Need to migrate Chart.js file
           options={areaChartOptions(theme, true, nsdt, null, undefined)}
           series={communicationsData}
           type="area"

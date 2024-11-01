@@ -1,7 +1,9 @@
-import React, { useEffect } from 'react';
-import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
 import { Button } from '@mui/material';
-import MarkDownField from '../../../../components/fields/MarkDownField';
+import { useEffect } from 'react';
+import * as React from 'react';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+
+import MarkDownFieldController from '../../../../components/fields/MarkDownFieldController';
 import { useFormatter } from '../../../../components/i18n';
 import type { PolicyInput } from '../../../../utils/api-types';
 
@@ -38,7 +40,7 @@ const PolicyForm: React.FC<Props> = ({
   return (
     <FormProvider {...methods}>
       <form id="policyForm" onSubmit={handleSubmit(onSubmit)}>
-        <MarkDownField
+        <MarkDownFieldController
           name="platform_login_message"
           label={t('Platform login message')}
           style={{ marginTop: 0 }}
@@ -46,7 +48,7 @@ const PolicyForm: React.FC<Props> = ({
           inInject={false}
           inArticle={false}
         />
-        <MarkDownField
+        <MarkDownFieldController
           name="platform_consent_message"
           label={t('Platform consent message')}
           style={{ marginTop: 20 }}
@@ -54,7 +56,7 @@ const PolicyForm: React.FC<Props> = ({
           inInject={false}
           inArticle={false}
         />
-        <MarkDownField
+        <MarkDownFieldController
           name="platform_consent_confirm_text"
           label={t('Platform consent confirm text')}
           style={{ marginTop: 20 }}

@@ -22,4 +22,7 @@ public class Expectation {
   @JsonProperty("expectation_expectation_group")
   private boolean expectationGroup;
 
+  /** Expiration time in seconds */
+  @JsonProperty("expectation_expiration_time")
+  private Long expirationTime;
 }

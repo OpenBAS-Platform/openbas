@@ -1,8 +1,8 @@
 import { z } from 'zod';
+
 import type { SearchPaginationInput } from '../../../utils/api-types';
 import { ROWS_PER_PAGE_OPTIONS } from './pagination/usPaginationState';
 
-// eslint-disable-next-line import/prefer-default-export
 export const buildSearchPagination = (searchPaginationInput: Partial<SearchPaginationInput>) => {
   return ({
     page: 0,

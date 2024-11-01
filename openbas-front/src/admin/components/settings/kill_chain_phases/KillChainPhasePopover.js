@@ -1,14 +1,15 @@
-import React, { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import * as R from 'ramda';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component } from 'react';
+import { connect } from 'react-redux';
+
 import { deleteKillChainPhase, updateKillChainPhase } from '../../../../actions/KillChainPhase';
-import KillChainPhaseForm from './KillChainPhaseForm';
-import inject18n from '../../../../components/i18n';
-import Transition from '../../../../components/common/Transition';
 import Drawer from '../../../../components/common/Drawer';
+import Transition from '../../../../components/common/Transition';
+import inject18n from '../../../../components/i18n';
+import KillChainPhaseForm from './KillChainPhaseForm';
 
 class KillChainPhasePopover extends Component {
   constructor(props) {

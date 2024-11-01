@@ -1,12 +1,12 @@
-import React from 'react';
-import { makeStyles } from '@mui/styles';
-import { Box, Grid, LinearProgress, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
 import { FlagOutlined } from '@mui/icons-material';
+import { Box, Grid, LinearProgress, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
+
+import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import CreateObjective from '../CreateObjective';
 import ObjectivePopover from '../ObjectivePopover';
-import Empty from '../../../../components/Empty';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -41,14 +41,13 @@ const LessonsObjectives = ({
         <Paper variant="outlined" classes={{ root: classes.paper }}>
           {sortedObjectives.length > 0 ? (
             <List style={{ padding: 0 }}>
-              {sortedObjectives.map((objective) => (
+              {sortedObjectives.map(objective => (
                 <ListItem
                   key={objective.objective_id}
                   divider
                   button
                   onClick={() => setSelectedObjective
-                    && setSelectedObjective(objective.objective_id)
-                  }
+                    && setSelectedObjective(objective.objective_id)}
                 >
                   <ListItemIcon>
                     <FlagOutlined />
@@ -74,7 +73,8 @@ const LessonsObjectives = ({
                     </Box>
                     <Box sx={{ minWidth: 35 }}>
                       <Typography variant="body2" color="text.secondary">
-                        {objective.objective_score}%
+                        {objective.objective_score}
+                        %
                       </Typography>
                     </Box>
                   </Box>

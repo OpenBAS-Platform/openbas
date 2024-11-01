@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { makeStyles, useTheme } from '@mui/styles';
-import { Avatar, Card, CardHeader, CardContent, IconButton, Button } from '@mui/material';
+import { AttachFileRounded, ExpandLess, ExpandMore } from '@mui/icons-material';
+import { Avatar, Button, Card, CardContent, CardHeader, IconButton } from '@mui/material';
 import { lightBlue } from '@mui/material/colors';
-import { ExpandLess, ExpandMore, AttachFileRounded } from '@mui/icons-material';
-import parse from 'html-react-parser';
+import { makeStyles, useTheme } from '@mui/styles';
 import DOMPurify from 'dompurify';
+import parse from 'html-react-parser';
+import { useState } from 'react';
+
 import { useFormatter } from '../../../../../components/i18n';
-import { resolveUserNames, truncate } from '../../../../../utils/String';
 import TruncatedText from '../../../../../components/TruncatedText';
+import { resolveUserNames, truncate } from '../../../../../utils/String';
 
 const useStyles = makeStyles(() => ({
   card: {
@@ -46,24 +47,24 @@ const Communication = (props) => {
       variant="outlined"
     >
       <CardHeader
-        avatar={
+        avatar={(
           <Avatar sx={{ bgcolor: lightBlue[500] }}>
             {Array.from(communication.communication_from)[0].toUpperCase()}
           </Avatar>
-        }
-        action={
+        )}
+        action={(
           <div style={{ display: 'flex' }}>
             <IconButton onClick={expandContent} size="small">
               {expand ? <ExpandLess /> : <ExpandMore />}
             </IconButton>
           </div>
-        }
-        title={
+        )}
+        title={(
           <TruncatedText
             content={communication.communication_subject}
             limit={50}
           />
-        }
+        )}
         subheader={
           communication.communication_animation ? (
             <span>
@@ -91,7 +92,9 @@ const Communication = (props) => {
                   color: theme.palette.text.secondary,
                 }}
               >
-                {t('on')} {nsdt(communication.communication_sent_at)}
+                {t('on')}
+                {' '}
+                {nsdt(communication.communication_sent_at)}
               </span>
             </span>
           ) : (

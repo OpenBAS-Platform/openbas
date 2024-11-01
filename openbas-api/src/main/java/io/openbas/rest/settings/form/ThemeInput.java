@@ -35,5 +35,4 @@ public class ThemeInput {
 
   @JsonProperty("logo_login_url")
   private String logoLoginUrl;
-
 }

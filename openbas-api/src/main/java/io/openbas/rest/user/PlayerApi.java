@@ -1,84 +1,52 @@
 package io.openbas.rest.user;
 
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.helper.DatabaseHelper.updateRelation;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
+import static java.time.Instant.now;
+
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.SessionManager;
 import io.openbas.database.model.*;
-import io.openbas.database.raw.RawPaginationPlayer;
 import io.openbas.database.raw.RawPlayer;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.user.form.player.PlayerInput;
+import io.openbas.rest.user.form.player.PlayerOutput;
 import io.openbas.service.UserService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.stream.Stream;
-
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.specification.UserSpecification.accessibleFromOrganizations;
-import static io.openbas.helper.DatabaseHelper.updateRelation;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
-import static java.time.Instant.now;
-
 @RestController
+@RequiredArgsConstructor
 public class PlayerApi extends RestBehavior {
 
-  @Resource
-  private SessionManager sessionManager;
+  public static final String PLAYER_URI = "/api/players";
 
-  private CommunicationRepository communicationRepository;
-  private OrganizationRepository organizationRepository;
-  private UserRepository userRepository;
-  private TagRepository tagRepository;
-  private UserService userService;
+  @Resource private SessionManager sessionManager;
+
+  private final CommunicationRepository communicationRepository;
+  private final OrganizationRepository organizationRepository;
+  private final UserRepository userRepository;
+  private final TagRepository tagRepository;
+  private final UserService userService;
   private final TeamRepository teamRepository;
+  private final PlayerService playerService;
 
-  public PlayerApi(TeamRepository teamRepository) {
-    this.teamRepository = teamRepository;
-  }
-
-  @Autowired
-  public void setCommunicationRepository(CommunicationRepository communicationRepository) {
-    this.communicationRepository = communicationRepository;
-  }
-
-  @Autowired
-  public void setTagRepository(TagRepository tagRepository) {
-    this.tagRepository = tagRepository;
-  }
-
-  @Autowired
-  public void setOrganizationRepository(OrganizationRepository organizationRepository) {
-    this.organizationRepository = organizationRepository;
-  }
-
-  @Autowired
-  public void setUserService(UserService userService) {
-    this.userService = userService;
-  }
-
-  @Autowired
-  public void setUserRepository(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
-
-
-  @GetMapping("/api/players")
+  @GetMapping(PLAYER_URI)
   @Transactional(rollbackOn = Exception.class)
   @PreAuthorize("isObserver()")
   public Iterable<RawPlayer> players() {
@@ -87,37 +55,23 @@ public class PlayerApi extends RestBehavior {
     if (currentUser.isAdmin()) {
       players = fromIterable(userRepository.rawAllPlayers());
     } else {
-      User local = userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
-      List<String> organizationIds = local.getGroups().stream()
-          .flatMap(group -> group.getOrganizations().stream())
-          .map(Organization::getId)
-          .toList();
+      User local =
+          userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
+      List<String> organizationIds =
+          local.getGroups().stream()
+              .flatMap(group -> group.getOrganizations().stream())
+              .map(Organization::getId)
+              .toList();
       players = userRepository.rawPlayersAccessibleFromOrganizations(organizationIds);
     }
     return players;
   }
 
-  @PostMapping("/api/players/search")
-  public Page<RawPaginationPlayer> players(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    BiFunction<Specification<User>, Pageable, Page<User>> playersFunction;
-    OpenBASPrincipal currentUser = currentUser();
-    if (currentUser.isAdmin()) {
-      playersFunction = (Specification<User> specification, Pageable pageable) -> this.userRepository
-          .findAll(specification, pageable);
-    } else {
-      User local = userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
-      List<String> organizationIds = local.getGroups().stream()
-          .flatMap(group -> group.getOrganizations().stream())
-          .map(Organization::getId)
-          .toList();
-      playersFunction = (Specification<User> specification, Pageable pageable) -> this.userRepository
-          .findAll(accessibleFromOrganizations(organizationIds).and(specification), pageable);
-    }
-    return buildPaginationJPA(
-        playersFunction,
-        searchPaginationInput,
-        User.class
-    ).map(RawPaginationPlayer::new);
+  @LogExecutionTime
+  @PostMapping(PLAYER_URI + "/search")
+  public Page<PlayerOutput> players(
+      @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+    return this.playerService.playerPagination(searchPaginationInput);
   }
 
   @GetMapping("/api/player/{userId}/communications")
@@ -127,7 +81,7 @@ public class PlayerApi extends RestBehavior {
     return communicationRepository.findByUser(userId);
   }
 
-  @PostMapping("/api/players")
+  @PostMapping(PLAYER_URI)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public User createPlayer(@Valid @RequestBody PlayerInput input) {
@@ -135,13 +89,14 @@ public class PlayerApi extends RestBehavior {
     User user = new User();
     user.setUpdateAttributes(input);
     user.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-    user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
+    user.setOrganization(
+        updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
     User savedUser = userRepository.save(user);
     userService.createUserToken(savedUser);
     return savedUser;
   }
 
-  @PostMapping("/api/players/upsert")
+  @PostMapping(PLAYER_URI + "/upsert")
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public User upsertPlayer(@Valid @RequestBody PlayerInput input) {
@@ -151,15 +106,24 @@ public class PlayerApi extends RestBehavior {
       User existingUser = user.get();
       existingUser.setUpdateAttributes(input);
       existingUser.setUpdatedAt(now());
-      Iterable<String> tags = Stream.concat(existingUser.getTags().stream().map(Tag::getId).toList().stream(),
-          input.getTagIds().stream()).distinct().toList();
+      Iterable<String> tags =
+          Stream.concat(
+                  existingUser.getTags().stream().map(Tag::getId).toList().stream(),
+                  input.getTagIds().stream())
+              .distinct()
+              .toList();
       existingUser.setTags(iterableToSet(tagRepository.findAllById(tags)));
-      Iterable<String> teams = Stream.concat(existingUser.getTeams().stream().map(Team::getId).toList().stream(),
-          input.getTeamIds().stream()).distinct().toList();
+      Iterable<String> teams =
+          Stream.concat(
+                  existingUser.getTeams().stream().map(Team::getId).toList().stream(),
+                  input.getTeamIds().stream())
+              .distinct()
+              .toList();
       existingUser.setTeams(fromIterable(teamRepository.findAllById(teams)));
       if (StringUtils.hasText(input.getOrganizationId())) {
         existingUser.setOrganization(
-            updateRelation(input.getOrganizationId(), existingUser.getOrganization(), organizationRepository));
+            updateRelation(
+                input.getOrganizationId(), existingUser.getOrganization(), organizationRepository));
       }
       return userRepository.save(existingUser);
     } else {
@@ -167,7 +131,8 @@ public class PlayerApi extends RestBehavior {
       newUser.setUpdateAttributes(input);
       newUser.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
       newUser.setOrganization(
-          updateRelation(input.getOrganizationId(), newUser.getOrganization(), organizationRepository));
+          updateRelation(
+              input.getOrganizationId(), newUser.getOrganization(), organizationRepository));
       newUser.setTeams(fromIterable(teamRepository.findAllById(input.getTeamIds())));
       User savedUser = userRepository.save(newUser);
       userService.createUserToken(savedUser);
@@ -175,7 +140,7 @@ public class PlayerApi extends RestBehavior {
     }
   }
 
-  @PutMapping("/api/players/{userId}")
+  @PutMapping(PLAYER_URI + "/{userId}")
   @PreAuthorize("isPlanner()")
   public User updatePlayer(@PathVariable String userId, @Valid @RequestBody PlayerInput input) {
     checkUserAccess(userRepository, userId);
@@ -185,11 +150,12 @@ public class PlayerApi extends RestBehavior {
     }
     user.setUpdateAttributes(input);
     user.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-    user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
+    user.setOrganization(
+        updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
     return userRepository.save(user);
   }
 
-  @DeleteMapping("/api/players/{userId}")
+  @DeleteMapping(PLAYER_URI + "/{userId}")
   @PreAuthorize("isPlanner()")
   public void deletePlayer(@PathVariable String userId) {
     checkUserAccess(userRepository, userId);

@@ -1,16 +1,17 @@
-import React, { FunctionComponent } from 'react';
-import { makeStyles, useTheme } from '@mui/styles';
 import { CastForEducationOutlined, CastOutlined } from '@mui/icons-material';
+import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
-import type { Inject, Team } from '../utils/api-types';
+import { Fragment, FunctionComponent } from 'react';
+
 import type { InjectStore } from '../actions/injects/Inject';
 import InjectIcon from '../admin/components/common/injects/InjectIcon';
-import { splitDuration } from '../utils/Time';
-import type { Theme } from './Theme';
-import { useFormatter } from './i18n';
+import type { Inject, Team } from '../utils/api-types';
 import useSearchAnFilter from '../utils/SortingFiltering';
 import { truncate } from '../utils/String';
+import { splitDuration } from '../utils/Time';
 import { isNotEmptyField } from '../utils/utils';
+import { useFormatter } from './i18n';
+import type { Theme } from './Theme';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -85,9 +86,9 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  injects: InjectStore[],
-  teams: Team[],
-  onSelectInject: (injectId: string) => void,
+  injects: InjectStore[];
+  teams: Team[];
+  onSelectInject: (injectId: string) => void;
 }
 
 const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) => {
@@ -98,7 +99,7 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
 
   // Retrieve data
   const getInjectsPerTeam = (teamId: string) => {
-    return injects.filter((i) => i.inject_teams?.includes(teamId));
+    return injects.filter(i => i.inject_teams?.includes(teamId));
   };
 
   const injectsPerTeam = R.mergeAll(
@@ -111,18 +112,18 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
 
   // Build map of technical Injects or without team
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  const injectsWithoutTeamMap = injects.reduce((acc: { [x: string]: any[]; }, inject: InjectStore) => {
+  const injectsWithoutTeamMap = injects.reduce((acc: { [x: string]: any[] }, inject: InjectStore) => {
     let keys: any[] = [];
 
     if (!allTeamInjectIds.has(inject.inject_id)) {
       if (
         inject.inject_injector_contract?.convertedContent
-            && 'fields' in inject.inject_injector_contract.convertedContent
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            && inject.inject_injector_contract.convertedContent.fields.some(
-              (field: any) => field.key === 'teams',
-            )
+        && 'fields' in inject.inject_injector_contract.convertedContent
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        && inject.inject_injector_contract.convertedContent.fields.some(
+          (field: any) => field.key === 'teams',
+        )
       ) {
         keys = ['No teams'];
       } else if (inject.inject_type !== null) {
@@ -208,15 +209,15 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
       {injects.length > 0 && sortedTeams.length > 0 ? (
         <div className={classes.container}>
           <div className={classes.names}>
-            {sortedTeams.map((team) => (
+            {sortedTeams.map(team => (
               <div key={team.team_id} className={classes.lineName}>
                 <div className={classes.name}>
                   {team.team_name.startsWith('openbas_') ? (
-                    <CastOutlined fontSize="small"/>
+                    <CastOutlined fontSize="small" />
                   ) : (
-                    <CastForEducationOutlined fontSize="small"/>
+                    <CastForEducationOutlined fontSize="small" />
                   )}
-                        &nbsp;&nbsp;
+                      &nbsp;&nbsp;
                   {team.team_name.startsWith('openbas_')
                     ? t(team.team_name)
                     : truncate(team.team_name, 20)}
@@ -246,13 +247,13 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
                         {injectsGroupedByTick[key].map((inject: InjectStore) => {
                           const duration = splitDuration(inject.inject_depends_duration || 0);
                           const tooltipContent = (
-                            <React.Fragment>
+                            <Fragment>
                               {inject.inject_title}
-                              <br/>
+                              <br />
                               <span style={{ display: 'block', textAlign: 'center', fontWeight: 'bold' }}>
                                 {`${duration.days} ${t('d')}, ${duration.hours} ${t('h')}, ${duration.minutes} ${t('m')}`}
                               </span>
-                            </React.Fragment>
+                            </Fragment>
                           );
                           return (
                             <InjectIcon
@@ -261,19 +262,18 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
                               type={
                                 inject.inject_injector_contract.injector_contract_payload
                                   ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
-                                    || inject.inject_injector_contract.injector_contract_payload?.payload_type
+                                  || inject.inject_injector_contract.injector_contract_payload?.payload_type
                                   : inject.inject_type
                               }
                               onClick={() => handleSelectInject(inject.inject_id)}
                               done={inject.inject_status !== null}
                               disabled={!inject.inject_enabled}
                               size="small"
-                              variant='timeline'
+                              variant="timeline"
                               tooltip={tooltipContent}
                             />
                           );
-                        })
-                                }
+                        })}
                       </div>
                     );
                   })}
@@ -297,17 +297,17 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
                     <div className={classes.tickLabelTop}>
                       {index % 5 === 0
                         ? `${duration.days}
-                          ${t('d')}, ${duration.hours}
-                          ${t('h')}, ${duration.minutes}
-                          ${t('m')}`
+                        ${t('d')}, ${duration.hours}
+                        ${t('h')}, ${duration.minutes}
+                        ${t('m')}`
                         : ''}
                     </div>
                     <div className={classes.tickLabelBottom}>
                       {index % 5 === 0
                         ? `${duration.days}
-                          ${t('d')}, ${duration.hours}
-                          ${t('h')}, ${duration.minutes}
-                          ${t('m')}`
+                        ${t('d')}, ${duration.hours}
+                        ${t('h')}, ${duration.minutes}
+                        ${t('m')}`
                         : ''}
                     </div>
                   </div>
@@ -316,8 +316,7 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
             </div>
           </div>
         </div>
-      ) : null
-        }
+      ) : null}
     </>
   );
 };

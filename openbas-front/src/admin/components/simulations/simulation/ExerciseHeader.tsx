@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { makeStyles, useTheme } from '@mui/styles';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
 import { CancelOutlined, PauseOutlined, PlayArrowOutlined, RestartAltOutlined } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+
 import { updateExerciseStatus } from '../../../../actions/Exercise';
-import ExercisePopover, { ExerciseActionPopover } from './ExercisePopover';
-import { useHelper } from '../../../../store';
-import { useFormatter } from '../../../../components/i18n';
-import Transition from '../../../../components/common/Transition';
-import { usePermissions } from '../../../../utils/Exercise';
-import ExerciseStatus from './ExerciseStatus';
-import { useAppDispatch } from '../../../../utils/hooks';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
-import type { Exercise as ExerciseType } from '../../../../utils/api-types';
-import { truncate } from '../../../../utils/String';
+import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
-import { isFeatureEnabled } from '../../../../utils/utils';
+import { useHelper } from '../../../../store';
+import type { Exercise as ExerciseType } from '../../../../utils/api-types';
+import { usePermissions } from '../../../../utils/Exercise';
+import { useAppDispatch } from '../../../../utils/hooks';
+import { truncate } from '../../../../utils/String';
+import ExercisePopover, { ExerciseActionPopover } from './ExercisePopover';
+import ExerciseStatus from './ExerciseStatus';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -31,9 +31,9 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
-  exerciseId: ExerciseStore['exercise_id'],
-  exerciseStatus: ExerciseStore['exercise_status'],
-  exerciseName: ExerciseStore['exercise_name']
+  exerciseId: ExerciseStore['exercise_id'];
+  exerciseStatus: ExerciseStore['exercise_status'];
+  exerciseName: ExerciseStore['exercise_name'];
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -177,8 +177,7 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
           </Button>
           <Button
             color="secondary"
-            onClick={() => submitUpdateStatus({ exercise_status: openChangeStatus })
-            }
+            onClick={() => submitUpdateStatus({ exercise_status: openChangeStatus })}
           >
             {t('Confirm')}
           </Button>
@@ -201,10 +200,7 @@ const ExerciseHeader = () => {
     };
   });
 
-  const actions: ExerciseActionPopover[] = ['Update', 'Duplicate', 'Export', 'Delete'];
-  if (isFeatureEnabled('report')) {
-    actions.push('Access reports');
-  }
+  const actions: ExerciseActionPopover[] = ['Update', 'Duplicate', 'Export', 'Delete', 'Access reports'];
 
   return (
     <>

@@ -1,6 +1,7 @@
 import { Dispatch } from 'redux';
-import type { AssetGroup, AssetGroupInput, SearchPaginationInput, UpdateAssetsOnAssetGroupInput } from '../../utils/api-types';
+
 import { delReferential, getReferential, postReferential, putReferential, simplePostCall } from '../../utils/Action';
+import type { AssetGroup, AssetGroupInput, SearchPaginationInput, UpdateAssetsOnAssetGroupInput } from '../../utils/api-types';
 import { arrayOfAssetGroups, assetGroup } from './assetgroup-schema';
 
 const ASSET_GROUP_URI = '/api/asset_groups';
@@ -36,6 +37,12 @@ export const fetchAssetGroups = () => (dispatch: Dispatch) => {
 export const searchAssetGroups = (searchPaginationInput: SearchPaginationInput) => {
   const data = searchPaginationInput;
   const uri = `${ASSET_GROUP_URI}/search`;
+  return simplePostCall(uri, data);
+};
+
+export const findAssetGroups = (assetGroupIds: string[]) => {
+  const data = assetGroupIds;
+  const uri = `${ASSET_GROUP_URI}/find`;
   return simplePostCall(uri, data);
 };
 

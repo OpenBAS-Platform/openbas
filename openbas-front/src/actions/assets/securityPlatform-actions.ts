@@ -1,6 +1,7 @@
 import { Dispatch } from 'redux';
+
 import { delReferential, getReferential, postReferential, putReferential, simplePostCall } from '../../utils/Action';
-import type { SecurityPlatform, SecurityPlatformInput, SearchPaginationInput } from '../../utils/api-types';
+import type { SearchPaginationInput, SecurityPlatform, SecurityPlatformInput } from '../../utils/api-types';
 import { arrayOfSecurityPlatforms, securityPlatform } from './asset-schema';
 
 const SECURITY_PLATFORM_URI = '/api/security_platforms';

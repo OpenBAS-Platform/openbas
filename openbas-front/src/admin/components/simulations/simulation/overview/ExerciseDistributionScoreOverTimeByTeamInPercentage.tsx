@@ -1,18 +1,19 @@
-import React, { FunctionComponent } from 'react';
-import Chart from 'react-apexcharts';
 import { useTheme } from '@mui/styles';
 import * as R from 'ramda';
+import { FunctionComponent } from 'react';
+import Chart from 'react-apexcharts';
+
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import { lineChartOptions } from '../../../../../utils/Charts';
+import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
+import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
+import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
-import type { InjectExpectation } from '../../../../../utils/api-types';
 import { useHelper } from '../../../../../store';
-import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
-import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
+import type { InjectExpectation } from '../../../../../utils/api-types';
+import { lineChartOptions } from '../../../../../utils/Charts';
 import { computeTeamsColors } from './DistributionUtils';
-import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
@@ -74,7 +75,7 @@ const ExerciseDistributionScoreOverTimeByTeamInPercentage: FunctionComponent<Pro
     R.map((n: [string, Array<InjectExpectationStore & { inject_expectation_percent_score: number }>]) => ({
       name: teamsMap[n[0]]?.team_name,
       color: teamsColors[n[0]],
-      data: n[1].map((i) => ({
+      data: n[1].map(i => ({
         x: i.inject_expectation_updated_at,
         y: i.inject_expectation_percent_score,
       })),
@@ -85,11 +86,10 @@ const ExerciseDistributionScoreOverTimeByTeamInPercentage: FunctionComponent<Pro
     <>
       {teamsTotalScores.length > 0 ? (
         <Chart
-          // @ts-expect-error: Need to migrate Chart.js file
+          id="exercise_distribution_score_over_time"
           options={lineChartOptions(
             theme,
             true,
-            // @ts-expect-error: Need to migrate i18n.js file
             nsdt,
             null,
             undefined,

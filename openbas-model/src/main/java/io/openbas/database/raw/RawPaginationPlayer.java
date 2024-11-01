@@ -1,13 +1,12 @@
 package io.openbas.database.raw;
 
+import static java.util.Optional.ofNullable;
+
 import io.openbas.database.model.Organization;
 import io.openbas.database.model.Tag;
 import io.openbas.database.model.User;
-import lombok.Data;
-
 import java.util.List;
-
-import static java.util.Optional.ofNullable;
+import lombok.Data;
 
 @Data
 public class RawPaginationPlayer {
@@ -32,7 +31,8 @@ public class RawPaginationPlayer {
     this.user_phone2 = user.getPhone2();
     this.user_country = user.getCountry();
     this.user_pgp_key = user.getPgpKey();
-    this.user_organization = ofNullable(user.getOrganization()).map(Organization::getId).orElse(null);
+    this.user_organization =
+        ofNullable(user.getOrganization()).map(Organization::getId).orElse(null);
     this.user_tags = user.getTags().stream().map(Tag::getId).toList();
   }
 }

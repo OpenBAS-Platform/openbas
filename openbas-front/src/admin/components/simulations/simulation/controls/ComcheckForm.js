@@ -1,13 +1,14 @@
-import React, { Component } from 'react';
+import { Button, MenuItem } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
+import { Component } from 'react';
 import { Form } from 'react-final-form';
-import { Button, MenuItem } from '@mui/material';
-import OldTextField from '../../../../../components/fields/OldTextField';
-import OldSelectField from '../../../../../components/fields/OldSelectField';
-import inject18n from '../../../../../components/i18n';
+
 import DateTimePicker from '../../../../../components/DateTimePicker';
+import OldSelectField from '../../../../../components/fields/OldSelectField';
+import OldTextField from '../../../../../components/fields/OldTextField';
 import RichTextField from '../../../../../components/fields/RichTextField';
+import inject18n from '../../../../../components/i18n';
 
 class ComcheckForm extends Component {
   validate(values) {
@@ -58,18 +59,19 @@ class ComcheckForm extends Component {
               multiple={true}
               displayEmpty={true}
               label={t('Teams')}
-              renderValue={(v) => (v.length === 0 ? (
-                <em>{t('All teams')}</em>
-              ) : (
-                v.map((a) => teamsbyId[a].team_name).join(', ')
-              ))
-              }
+              renderValue={v => (v.length === 0
+                ? (
+                    <em>{t('All teams')}</em>
+                  )
+                : (
+                    v.map(a => teamsbyId[a].team_name).join(', ')
+                  ))}
               style={{ marginTop: 20 }}
             >
               <MenuItem disabled value="">
                 <em>{t('All teams')}</em>
               </MenuItem>
-              {teams.map((team) => (
+              {teams.map(team => (
                 <MenuItem
                   key={team.team_id}
                   value={team.team_id}

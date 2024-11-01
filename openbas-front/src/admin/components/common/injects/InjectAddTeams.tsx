@@ -1,35 +1,27 @@
-import React, { FunctionComponent, useContext, useState } from 'react';
-import * as R from 'ramda';
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { ControlPointOutlined, GroupsOutlined } from '@mui/icons-material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import SearchFilter from '../../../../components/SearchFilter';
-import { useFormatter } from '../../../../components/i18n';
-import { fetchTeams } from '../../../../actions/teams/team-actions';
-import CreateTeam from '../../components/teams/CreateTeam';
-import { truncate } from '../../../../utils/String';
+import { FunctionComponent, useContext, useEffect, useMemo, useState } from 'react';
+
+import { fetchTags } from '../../../../actions/Tag';
+import type { TeamStore } from '../../../../actions/teams/Team';
+import { findTeams } from '../../../../actions/teams/team-actions';
+import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
+import SelectList, { SelectListElements } from '../../../../components/common/SelectList';
 import Transition from '../../../../components/common/Transition';
-import TagsFilter from '../filters/TagsFilter';
+import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import type { Theme } from '../../../../components/Theme';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import type { TeamOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { Option } from '../../../../utils/Option';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import type { EndpointStore } from '../../assets/endpoints/Endpoint';
+import CreateTeam from '../../components/teams/CreateTeam';
 import { PermissionsContext, TeamContext } from '../Context';
-import type { TeamStore } from '../../../../actions/teams/Team';
-import { useHelper } from '../../../../store';
-import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 
 const useStyles = makeStyles((theme: Theme) => ({
-  box: {
-    width: '100%',
-    minHeight: '100%',
-    padding: 20,
-    border: '1px dashed rgba(255, 255, 255, 0.3)',
-  },
-  chip: {
-    margin: '0 10px 10px 0',
-  },
   item: {
     paddingLeft: 10,
     height: 50,
@@ -43,97 +35,93 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   handleAddTeams: (teamIds: string[]) => void;
-  injectTeamsIds: string[]
-  teams: TeamStore[]
+  injectTeamsIds: string[];
 }
 
 const InjectAddTeams: FunctionComponent<Props> = ({
   handleAddTeams,
   injectTeamsIds,
-  teams,
 }) => {
   // Standard hooks
-  const classes = useStyles();
   const { t } = useFormatter();
+  const classes = useStyles();
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
-  const { onAddTeam } = useContext(TeamContext);
+  const { searchTeams } = useContext(TeamContext);
 
-  const teamsMap = useHelper((helper: TeamsHelper) => helper.getTeamsMap());
-
+  // Fetch datas
   useDataLoader(() => {
-    dispatch(fetchTeams());
+    dispatch(fetchTags());
   });
 
-  const [open, setopen] = useState(false);
-  const [keyword, setKeyword] = useState('');
-  const [teamsIds, setTeamsIds] = useState<string[]>([]);
-  const [tags, setTags] = useState<Option[]>([]);
+  const [teamValues, setTeamValues] = useState<TeamOutput[]>([]);
+  const [selectedTeamValues, setSelectedTeamValues] = useState<TeamOutput[]>([]);
 
-  const handleOpen = () => setopen(true);
+  // Dialog
+  const [open, setOpen] = useState(false);
 
   const handleClose = () => {
-    setopen(false);
-    setKeyword('');
-    setTeamsIds([]);
-  };
-
-  const handleSearchTeams = (value?: string) => {
-    setKeyword(value || '');
-  };
-
-  const handleAddTag = (value: Option) => {
-    if (value) {
-      setTags([value]);
-    }
-  };
-
-  const handleClearTag = () => {
-    setTags([]);
-  };
-
-  const addTeam = (teamId: string) => {
-    setTeamsIds(R.append(teamId, teamsIds));
-  };
-
-  const removeTeam = (teamId: string) => {
-    setTeamsIds(teamsIds.filter((u) => u !== teamId));
+    setOpen(false);
+    setSelectedTeamValues([]);
   };
 
   const submitAddTeams = () => {
-    handleAddTeams(teamsIds);
+    handleAddTeams(selectedTeamValues.map(v => v.team_id).filter(id => !injectTeamsIds.includes(id)));
     handleClose();
   };
 
-  const onCreate = async (result: TeamStore) => {
-    addTeam(result.team_id);
-    await onAddTeam?.(result.team_id);
-  };
+  useEffect(() => {
+    if (open) {
+      findTeams(injectTeamsIds).then(result => setSelectedTeamValues(result.data));
+    }
+  }, [open, injectTeamsIds]);
 
-  const filterByKeyword = (n: TeamStore) => keyword === ''
-    || (n.team_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-    !== -1
-    || (n.team_description || '')
-      .toLowerCase()
-      .indexOf(keyword.toLowerCase()) !== -1;
-  const filteredTeams = R.pipe(
-    R.filter(
-      (n: TeamStore) => tags.length === 0
-        || R.any(
-          (filter: string) => R.includes(filter, n.team_tags),
-          R.pluck('id', tags),
-        ),
-    ),
-    R.filter(filterByKeyword),
-    R.take(10),
-  )(teams);
+  // Pagination
+  const addTeam = (_teamId: string, team: TeamOutput) => setSelectedTeamValues([...selectedTeamValues, team]);
+  const removeTeam = (teamId: string) => setSelectedTeamValues(selectedTeamValues.filter(v => v.team_id !== teamId));
+
+  // Headers
+  const elements: SelectListElements<EndpointStore> = useMemo(() => ({
+    icon: {
+      value: () => <GroupsOutlined />,
+    },
+    headers: [
+      {
+        field: 'team_name',
+        value: (team: TeamStore) => team.team_name,
+        width: 70,
+      },
+      {
+        field: 'team_tags',
+        value: (team: TeamStore) => <ItemTags variant="reduced-view" tags={team.team_tags} />,
+        width: 30,
+      },
+    ],
+  }), []);
+
+  const availableFilterNames = [
+    'team_tags',
+  ];
+  const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({}));
+
+  const paginationComponent = (
+    <PaginationComponentV2
+      fetch={input => searchTeams(input, true)}
+      searchPaginationInput={searchPaginationInput}
+      setContent={setTeamValues}
+      entityPrefix="team"
+      availableFilterNames={availableFilterNames}
+      queryableHelpers={queryableHelpers}
+    />
+  );
+
   return (
     <div>
       <ListItem
         classes={{ root: classes.item }}
         button
         divider
-        onClick={handleOpen}
+        onClick={() => setOpen(true)}
         color="primary"
         disabled={permissions.readOnly}
       >
@@ -161,81 +149,30 @@ const InjectAddTeams: FunctionComponent<Props> = ({
       >
         <DialogTitle>{t('Add target teams in this inject')}</DialogTitle>
         <DialogContent>
-          <Grid container spacing={3} style={{ marginTop: -15 }}>
-            <Grid item xs={8}>
-              <Grid container spacing={3}>
-                <Grid item xs={6}>
-                  <SearchFilter
-                    onChange={handleSearchTeams}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TagsFilter
-                    onAddTag={handleAddTag}
-                    onClearTag={handleClearTag}
-                    currentTags={tags}
-                    fullWidth
-                  />
-                </Grid>
-              </Grid>
-              <List>
-                {filteredTeams.map((team: TeamStore) => {
-                  const teamDisabled = teamsIds.includes(team.team_id)
-                    || injectTeamsIds.includes(team.team_id);
-                  return (
-                    <ListItem
-                      key={team.team_id}
-                      disabled={teamDisabled}
-                      button
-                      divider
-                      dense
-                      onClick={() => addTeam(team.team_id)}
-                    >
-                      <ListItemIcon>
-                        <GroupsOutlined />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={team.team_name}
-                        secondary={team.team_description}
-                      />
-                      <ItemTags
-                        variant="reduced-view"
-                        tags={team.team_tags}
-                      />
-                    </ListItem>
-                  );
-                })}
+          <Box sx={{ marginTop: 2 }}>
+            <SelectList
+              values={teamValues}
+              selectedValues={selectedTeamValues}
+              elements={elements}
+              prefix="team"
+              onSelect={addTeam}
+              onDelete={removeTeam}
+              paginationComponent={paginationComponent}
+              buttonComponent={(
                 <CreateTeam
                   inline
-                  onCreate={onCreate}
+                  onCreate={(team) => {
+                    setTeamValues([...teamValues, team]);
+                    setSelectedTeamValues([...selectedTeamValues, team]);
+                  }}
                 />
-              </List>
-            </Grid>
-            <Grid item xs={4}>
-              <Box className={classes.box}>
-                {teamsIds.map((teamId) => {
-                  const team = teamsMap[teamId];
-                  return (
-                    <Chip
-                      key={teamId}
-                      onDelete={() => removeTeam(teamId)}
-                      label={truncate(team?.team_name || '', 22)}
-                      icon={<GroupsOutlined />}
-                      classes={{ root: classes.chip }}
-                    />
-                  );
-                })}
-              </Box>
-            </Grid>
-          </Grid>
+              )}
+            />
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>{t('Cancel')}</Button>
-          <Button
-            color="secondary"
-            onClick={submitAddTeams}
-          >
+          <Button color="secondary" onClick={submitAddTeams}>
             {t('Add')}
           </Button>
         </DialogActions>

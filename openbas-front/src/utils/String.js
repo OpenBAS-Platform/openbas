@@ -1,5 +1,5 @@
-import { isNotEmptyField } from './utils';
 import colorStyles from '../components/Color';
+import { isNotEmptyField } from './utils';
 
 export const truncate = (str, limit) => {
   if (str === undefined || str === null || str.length <= limit) {
@@ -35,7 +35,7 @@ export const resolveUserNames = (users, withEmailAddress = false) => {
     .join(', ');
 };
 
-export const emptyFilled = (str) => (isNotEmptyField(str) ? str : '-');
+export const emptyFilled = str => (isNotEmptyField(str) ? str : '-');
 
 // Extract the first two items as visible chips
 export const getVisibleItems = (items, limit) => {
@@ -45,7 +45,7 @@ export const getVisibleItems = (items, limit) => {
 // Generate label with name of remaining items
 export const getLabelOfRemainingItems = (items, start, property) => {
   return items?.slice(start, items?.length).map(
-    (item) => item[property],
+    item => item[property],
   ).join(', ');
 };
 
@@ -66,6 +66,10 @@ export const computeLabel = (status) => {
     return 'Partial';
   }
   return 'Failed';
+};
+
+export const capitalize = (text) => {
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 };
 
 // compute color for status

@@ -1,13 +1,16 @@
-import React, { FunctionComponent, SyntheticEvent } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField as MuiTextField } from '@mui/material';
+import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField as MuiTextField, TextField, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { formProps, infoMessage } from './ExpectationFormUtils';
-import type { ExpectationInput } from './Expectation';
+import { FunctionComponent, SyntheticEvent } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+
 import { useFormatter } from '../../../../../components/i18n';
+import ScaleBar from '../../../../../components/scalebar/ScaleBar';
 import type { Theme } from '../../../../../components/Theme';
-import ExpectationGroupField from './field/ExpectationGroupField';
+import { splitDuration } from '../../../../../utils/Time';
+import { ExpectationInput, ExpectationInputForm } from './Expectation';
+import { formProps, infoMessage } from './ExpectationFormUtils';
 import { isTechnicalExpectation } from './ExpectationUtils';
+import ExpectationGroupField from './field/ExpectationGroupField';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
@@ -19,10 +22,25 @@ const useStyles = makeStyles((theme: Theme) => ({
     gap: theme.spacing(2),
     marginTop: theme.spacing(2),
   },
+  duration: {
+    marginTop: 20,
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'space-between',
+    border: `1px solid ${theme.palette.primary.main}`,
+    borderRadius: 4,
+    padding: 15,
+  },
+  trigger: {
+    fontFamily: 'Consolas, monaco, monospace',
+    fontSize: 12,
+    paddingTop: 15,
+    color: theme.palette.primary.main,
+  },
 }));
 
 interface Props {
-  onSubmit: SubmitHandler<ExpectationInput>;
+  onSubmit: SubmitHandler<ExpectationInputForm>;
   handleClose: () => void;
   initialValues: ExpectationInput;
 }
@@ -35,13 +53,21 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const classes = useStyles();
 
+  const expirationTime = splitDuration(initialValues.expectation_expiration_time || 0);
+  const formInitialValues: ExpectationInputForm = {
+    ...initialValues,
+    expiration_time_days: parseInt(expirationTime.days, 10),
+    expiration_time_hours: parseInt(expirationTime.hours, 10),
+    expiration_time_minutes: parseInt(expirationTime.minutes, 10),
+  };
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
     getValues,
-    control,
-  } = useForm<ExpectationInput>(formProps(initialValues, t));
+  } = useForm<ExpectationInputForm>(formProps(formInitialValues, t));
+  const { control } = useForm<ExpectationInput>();
 
   const handleSubmitWithoutPropagation = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -66,13 +92,14 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
         </MUISelect>
       </div>
       {(getValues().expectation_type === 'ARTICLE' || getValues().expectation_type === 'CHALLENGE')
-        && <Alert
+      && (
+        <Alert
           severity="info"
           className={classes.marginTop_2}
-           >
+        >
           {infoMessage(getValues().expectation_type, t)}
         </Alert>
-      }
+      )}
       <MuiTextField
         variant="standard"
         fullWidth
@@ -96,10 +123,40 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
         }
         inputProps={register('expectation_description')}
       />
+      <div className={classes.duration}>
+        <div className={classes.trigger}>
+          {t('Expiration time')}
+        </div>
+        <TextField
+          variant="standard"
+          type="number"
+          label={t('Days')}
+          style={{ width: '20%' }}
+          inputProps={register('expiration_time_days')}
+        />
+        <TextField
+          variant="standard"
+          type="number"
+          label={t('Hours')}
+          style={{ width: '20%' }}
+          inputProps={register('expiration_time_hours')}
+        />
+        <TextField
+          variant="standard"
+          type="number"
+          label={t('Minutes')}
+          style={{ width: '20%' }}
+          inputProps={register('expiration_time_minutes')}
+        />
+      </div>
+      <div style={{ marginTop: 20 }}>
+        <Typography variant="h4">{t('Scores')}</Typography>
+        <ScaleBar expectationExpectedScore={initialValues.expectation_score} />
+      </div>
       <MuiTextField
         variant="standard"
         fullWidth
-        label={t('Score')}
+        label={t('Success score')}
         type="number"
         className={classes.marginTop_2}
         error={!!errors.expectation_score}

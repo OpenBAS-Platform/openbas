@@ -1,5 +1,6 @@
 import { styled } from '@mui/material/styles';
-import React, { ReactElement } from 'react';
+import { ReactElement } from 'react';
+
 import EEChip from './EEChip';
 
 const EEDiv = styled('div')(() => ({
@@ -8,7 +9,10 @@ const EEDiv = styled('div')(() => ({
 
 const EEMenu = ({ children }: { children: ReactElement }) => {
   return (
-    <EEDiv>{children}<EEChip /></EEDiv>
+    <EEDiv>
+      {children}
+      <EEChip />
+    </EEDiv>
   );
 };
 

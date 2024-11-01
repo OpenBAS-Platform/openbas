@@ -1,6 +1,7 @@
 import { Dispatch } from 'redux';
-import type { Exercise, Report, ReportInput } from '../../utils/api-types';
+
 import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
+import type { Exercise, Report, ReportInjectComment, ReportInput } from '../../utils/api-types';
 import * as schema from '../Schema';
 
 export const fetchReportsForExercise = (exerciseId: Exercise['exercise_id']) => (dispatch: Dispatch) => {
@@ -24,6 +25,15 @@ export const updateReportForExercise = (
   data: ReportInput,
 ) => (dispatch: Dispatch) => {
   const uri = `/api/exercises/${exerciseId}/reports/${reportId}`;
+  return putReferential(schema.report, uri, data)(dispatch);
+};
+
+export const updateReportInjectCommentForExercise = (
+  exerciseId: Exercise['exercise_id'],
+  reportId: Report['report_id'],
+  data: ReportInjectComment,
+) => (dispatch: Dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/reports/${reportId}/inject-comments`;
   return putReferential(schema.report, uri, data)(dispatch);
 };
 

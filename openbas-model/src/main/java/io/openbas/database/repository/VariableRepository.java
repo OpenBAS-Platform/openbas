@@ -6,6 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface VariableRepository extends CrudRepository<Variable, String>, JpaSpecificationExecutor<Variable> {
-
-}
+public interface VariableRepository
+    extends CrudRepository<Variable, String>, JpaSpecificationExecutor<Variable> {}

@@ -1,11 +1,11 @@
 package io.openbas.injectors.ovh.service;
 
+import static io.openbas.helper.TemplateHelper.buildContextualContent;
+import static java.util.Collections.singletonList;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.injectors.ovh.config.OvhSmsConfig;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import jakarta.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -15,20 +15,22 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Date;
-
-import static io.openbas.helper.TemplateHelper.buildContextualContent;
-import static java.util.Collections.singletonList;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class OvhSmsService {
 
   private static final String METHOD = "POST";
-  @Resource
-  private ObjectMapper mapper;
+  @Resource private ObjectMapper mapper;
 
   private OvhSmsConfig config;
 
-  @SuppressWarnings({"StringBufferMayBeStringBuilder", "ForLoopReplaceableByForEach", "ConstantConditions"})
+  @SuppressWarnings({
+    "StringBufferMayBeStringBuilder",
+    "ForLoopReplaceableByForEach",
+    "ConstantConditions"
+  })
   private static String convertToHex(byte[] data) {
     StringBuffer buf = new StringBuffer();
     for (int i = 0; i < data.length; i++) {
@@ -54,13 +56,25 @@ public class OvhSmsService {
   public String sendSms(ExecutionContext context, String phone, String message) throws Exception {
     String smsMessage = buildContextualContent(message, context);
     URL QUERY = new URL("https://eu.api.ovh.com/1.0/sms/" + config.getService() + "/jobs");
-    String isoMessage = new String(smsMessage.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
-    OvhSmsMessage ovhSmsMessage = new OvhSmsMessage(singletonList(phone), isoMessage, config.getSender());
+    String isoMessage =
+        new String(smsMessage.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
+    OvhSmsMessage ovhSmsMessage =
+        new OvhSmsMessage(singletonList(phone), isoMessage, config.getSender());
     String smsBody = mapper.writeValueAsString(ovhSmsMessage);
 
     long Timestamp = new Date().getTime() / 1000;
     String toSign =
-        config.getAs() + "+" + config.getCk() + "+" + METHOD + "+" + QUERY + "+" + smsBody + "+" + Timestamp;
+        config.getAs()
+            + "+"
+            + config.getCk()
+            + "+"
+            + METHOD
+            + "+"
+            + QUERY
+            + "+"
+            + smsBody
+            + "+"
+            + Timestamp;
     String signature = "$1$" + HashSHA1(toSign);
 
     HttpURLConnection req = (HttpURLConnection) QUERY.openConnection();

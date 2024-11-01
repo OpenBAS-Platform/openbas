@@ -1,18 +1,15 @@
-import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { SelectGroup } from 'mdi-material-ui';
-import Transition from '../../../../components/common/Transition';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { useFormatter } from '../../../../components/i18n';
-import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import type { AssetGroupsHelper } from '../../../../actions/asset_groups/assetgroup-helper';
-import { fetchAssetGroups, searchAssetGroups } from '../../../../actions/asset_groups/assetgroup-action';
-import type { AssetGroupStore } from './AssetGroup';
-import SelectList, { SelectListElements } from '../../../../components/common/SelectList';
-import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
-import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import { FunctionComponent, useEffect, useMemo, useState } from 'react';
+
+import { findAssetGroups, searchAssetGroups } from '../../../../actions/asset_groups/assetgroup-action';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
+import SelectList, { SelectListElements } from '../../../../components/common/SelectList';
+import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import type { AssetGroupOutput } from '../../../../utils/api-types';
 
 interface Props {
   initialState: string[];
@@ -28,28 +25,17 @@ const AssetGroupDialogAdding: FunctionComponent<Props> = ({
   onSubmit,
 }) => {
   // Standard hooks
-  const dispatch = useAppDispatch();
   const { t } = useFormatter();
 
-  // Fetching data
-  const { assetGroupsMap } = useHelper((helper: AssetGroupsHelper) => ({
-    assetGroupsMap: helper.getAssetGroupMaps(),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchAssetGroups());
-  });
-
-  const [assetGroupValues, setAssetGroupValues] = useState<AssetGroupStore[]>(initialState.map((id) => assetGroupsMap[id]));
+  const [assetGroupValues, setAssetGroupValues] = useState<AssetGroupOutput[]>([]);
   useEffect(() => {
-    setAssetGroupValues(initialState.map((id) => assetGroupsMap[id]));
+    if (open) {
+      findAssetGroups(initialState).then(result => setAssetGroupValues(result.data));
+    }
   }, [open, initialState]);
 
-  const addAssetGroup = (assetGroupId: string) => {
-    setAssetGroupValues([...assetGroupValues, assetGroupsMap[assetGroupId]]);
-  };
-  const removeAssetGroup = (assetGroupId: string) => {
-    setAssetGroupValues(assetGroupValues.filter((v) => v.asset_group_id !== assetGroupId));
-  };
+  const addAssetGroup = (_assetGroupId: string, assetGroup: AssetGroupOutput) => setAssetGroupValues([...assetGroupValues, assetGroup]);
+  const removeAssetGroup = (assetGroupId: string) => setAssetGroupValues(assetGroupValues.filter(v => v.asset_group_id !== assetGroupId));
 
   // Dialog
   const handleClose = () => {
@@ -58,40 +44,42 @@ const AssetGroupDialogAdding: FunctionComponent<Props> = ({
   };
 
   const handleSubmit = () => {
-    onSubmit(assetGroupValues.map((v) => v.asset_group_id));
+    onSubmit(assetGroupValues.map(v => v.asset_group_id));
     handleClose();
   };
 
   // Headers
-  const elements: SelectListElements<AssetGroupStore> = useMemo(() => ({
+  const elements: SelectListElements<AssetGroupOutput> = useMemo(() => ({
     icon: {
       value: () => <SelectGroup color="primary" />,
     },
     headers: [
       {
         field: 'asset_group_name',
-        value: (assetGroup: AssetGroupStore) => <>{assetGroup.asset_group_name}</>,
+        value: (assetGroup: AssetGroupOutput) => <>{assetGroup.asset_group_name}</>,
         width: 100,
       },
     ],
   }), []);
 
   // Pagination
-  const [assetGroups, setAssetGroups] = useState<AssetGroupStore[]>([]);
+  const [assetGroups, setAssetGroups] = useState<AssetGroupOutput[]>([]);
 
   const availableFilterNames = [
     'asset_group_tags',
   ];
   const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({}));
 
-  const paginationComponent = <PaginationComponentV2
-    fetch={searchAssetGroups}
-    searchPaginationInput={searchPaginationInput}
-    setContent={setAssetGroups}
-    entityPrefix="asset_group"
-    availableFilterNames={availableFilterNames}
-    queryableHelpers={queryableHelpers}
-                              />;
+  const paginationComponent = (
+    <PaginationComponentV2
+      fetch={searchAssetGroups}
+      searchPaginationInput={searchPaginationInput}
+      setContent={setAssetGroups}
+      entityPrefix="asset_group"
+      availableFilterNames={availableFilterNames}
+      queryableHelpers={queryableHelpers}
+    />
+  );
 
   return (
     <Dialog

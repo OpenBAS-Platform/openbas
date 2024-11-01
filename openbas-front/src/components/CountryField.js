@@ -1,11 +1,12 @@
-import React, { Component } from 'react';
-import * as R from 'ramda';
 import { FlagOutlined } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import { withStyles } from '@mui/styles';
+import * as R from 'ramda';
+import { Component } from 'react';
+
+import { countryOptions } from '../utils/Option';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
-import { countryOptions } from '../utils/Option';
 
 const styles = () => ({
   icon: {

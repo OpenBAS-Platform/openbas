@@ -1,10 +1,11 @@
-import React, { FunctionComponent } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
+import { FunctionComponent } from 'react';
+
+import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import type { InjectExpectationResultsByAttackPatternStore } from '../../../../actions/exercises/Exercise';
+import type { Theme } from '../../../../components/Theme';
 import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
 import AttackPatternBox from './AttackPatternBox';
-import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
-import type { Theme } from '../../../../components/Theme';
 
 const useStyles = makeStyles(() => ({
   column: {
@@ -43,14 +44,14 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
   };
   // Inject Results
   const getInjectResult = (attack: AttackPatternStore) => {
-    return injectResults.find((injectResult) => injectResult.inject_attack_pattern === attack.attack_pattern_id);
+    return injectResults.find(injectResult => injectResult.inject_attack_pattern === attack.attack_pattern_id);
   };
   return (
     <div style={{ marginBottom: 16 }}>
       <div style={{ fontSize: 15, textAlign: 'center', marginBottom: 20, color: dummy ? theme.palette.text?.disabled : theme.palette.text?.primary }}>{killChainPhase.phase_name}</div>
       <div className={classes.column}>
         {[...attackPatterns].sort(sortAttackPattern)
-          .map((attackPattern) => (
+          .map(attackPattern => (
             <AttackPatternBox
               key={attackPattern.attack_pattern_id}
               attackPattern={attackPattern}

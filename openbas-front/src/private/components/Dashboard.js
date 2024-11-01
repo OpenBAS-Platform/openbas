@@ -1,7 +1,7 @@
-import React from 'react';
+import { withStyles, withTheme } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import { withStyles, withTheme } from '@mui/styles';
+
 import inject18n, { useFormatter } from '../../components/i18n';
 
 const styles = () => ({

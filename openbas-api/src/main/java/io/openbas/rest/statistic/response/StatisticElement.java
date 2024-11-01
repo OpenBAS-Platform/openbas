@@ -7,15 +7,14 @@ import lombok.Setter;
 @Setter
 @Getter
 public class StatisticElement {
-    @JsonProperty("global_count")
-    private long global;
+  @JsonProperty("global_count")
+  private long global;
 
-    @JsonProperty("progression_count")
-    private long progression;
+  @JsonProperty("progression_count")
+  private long progression;
 
-    public StatisticElement(long global, long progression) {
-        this.global = global;
-        this.progression = progression;
-    }
-
+  public StatisticElement(long global, long progression) {
+    this.global = global;
+    this.progression = progression;
+  }
 }

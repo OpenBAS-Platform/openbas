@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
-import * as R from 'ramda';
-import * as PropTypes from 'prop-types';
-import { withStyles } from '@mui/styles';
 import { Chip } from '@mui/material';
+import { withStyles } from '@mui/styles';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component } from 'react';
+
 import inject18n from '../../../../../components/i18n';
 
 const styles = () => ({

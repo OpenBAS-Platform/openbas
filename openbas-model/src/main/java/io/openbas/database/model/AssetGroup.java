@@ -1,5 +1,8 @@
 package io.openbas.database.model;
 
+import static java.time.Instant.now;
+import static lombok.AccessLevel.NONE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -11,29 +14,21 @@ import io.openbas.helper.MultiIdSetDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
+import java.util.*;
 import lombok.Data;
 import lombok.Getter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
-
-import java.time.Instant;
-import java.util.*;
-
-import static java.time.Instant.now;
-import static lombok.AccessLevel.NONE;
 
 @Data
 @Entity
 @Table(name = "asset_groups")
 @EntityListeners(ModelBaseListener.class)
 @NamedEntityGraphs({
-    @NamedEntityGraph(
-        name = "AssetGroup.tags-assets",
-        attributeNodes = {
-            @NamedAttributeNode("tags"),
-            @NamedAttributeNode("assets")
-        }
-    )
+  @NamedEntityGraph(
+      name = "AssetGroup.tags-assets",
+      attributeNodes = {@NamedAttributeNode("tags"), @NamedAttributeNode("assets")})
 })
 public class AssetGroup implements Base {
 
@@ -47,13 +42,13 @@ public class AssetGroup implements Base {
 
   @Column(name = "asset_group_name")
   @JsonProperty("asset_group_name")
-  @Queryable(searchable = true, sortable = true)
+  @Queryable(filterable = true, searchable = true, sortable = true)
   @NotBlank
   private String name;
 
   @Column(name = "asset_group_description")
   @JsonProperty("asset_group_description")
-  @Queryable(sortable = true)
+  @Queryable(filterable = true, sortable = true)
   private String description;
 
   // -- ASSET --
@@ -64,7 +59,8 @@ public class AssetGroup implements Base {
   private FilterGroup dynamicFilter;
 
   @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(name = "asset_groups_assets",
+  @JoinTable(
+      name = "asset_groups_assets",
       joinColumns = @JoinColumn(name = "asset_group_id"),
       inverseJoinColumns = @JoinColumn(name = "asset_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
@@ -85,7 +81,8 @@ public class AssetGroup implements Base {
   // -- TAG --
 
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "asset_groups_tags",
+  @JoinTable(
+      name = "asset_groups_tags",
       joinColumns = @JoinColumn(name = "asset_group_id"),
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)

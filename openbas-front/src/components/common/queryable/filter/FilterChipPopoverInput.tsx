@@ -1,10 +1,12 @@
 import { Autocomplete, Checkbox, TextField } from '@mui/material';
-import React, { FunctionComponent, useEffect } from 'react';
 import { DateTimePicker } from '@mui/x-date-pickers';
-import { useFormatter } from '../../../i18n';
+import { FunctionComponent, useEffect } from 'react';
+
 import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
+import { useFormatter } from '../../../i18n';
 import { FilterHelpers } from './FilterHelpers';
 import useSearchOptions from './useSearchOptions';
+import wordsToExcludeFromTranslation from './WordsToExcludeFromTranslation';
 
 interface Props {
   filter: Filter;
@@ -54,7 +56,10 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
   const { options, setOptions, searchOptions } = useSearchOptions();
   useEffect(() => {
     if (propertySchema.schema_property_values && propertySchema.schema_property_values?.length > 0) {
-      setOptions(propertySchema.schema_property_values.map((v) => ({ id: v, label: t(v.charAt(0).toUpperCase() + v.slice(1).toLowerCase()) })));
+      setOptions(propertySchema.schema_property_values.map((value) => {
+        const label = wordsToExcludeFromTranslation.includes(value) ? value : t(value.charAt(0).toUpperCase() + value.slice(1).toLowerCase());
+        return ({ id: value, label });
+      }));
     } else {
       searchOptions(filter.key);
     }
@@ -63,8 +68,8 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
   const onClick = (optionId: string) => {
     const isIncluded = filter.values?.includes(optionId);
     const newValues = isIncluded
-      ? (filter.values?.filter((v) => v !== optionId) ?? [])
-      : [...filter.values ?? [], optionId];
+      ? (filter.values?.filter(v => v !== optionId) ?? [])
+      : [...(filter.values ?? []), optionId];
     helpers.handleAddMultipleValueFilter(filter.key, newValues);
   };
 
@@ -76,9 +81,9 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
       multiple
       noOptionsText={t('No available options')}
       options={options}
-      getOptionLabel={(option) => option.label ?? ''}
+      getOptionLabel={option => option.label ?? ''}
       onInputChange={(_, search) => searchOptions(filter.key, search)}
-      renderInput={(paramsInput) => (
+      renderInput={paramsInput => (
         <TextField
           {...paramsInput}
           label={t(propertySchema.schema_property_name)}

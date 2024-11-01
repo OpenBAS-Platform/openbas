@@ -1,7 +1,6 @@
-import React from 'react';
-import { act, cleanup, render } from '@testing-library/react';
-import { describe, afterEach, it, expect } from 'vitest';
 import { StyledEngineProvider } from '@mui/material/styles';
+import { act, cleanup, render } from '@testing-library/react'; // @testing-library/dom is needed as well as it is a peer dependency of @testing-library/react
+import { afterEach, describe, expect, it } from 'vitest';
 
 describe('App', () => {
   afterEach(cleanup);

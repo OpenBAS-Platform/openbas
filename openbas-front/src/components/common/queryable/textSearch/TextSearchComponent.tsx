@@ -1,4 +1,5 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
+
 import SearchFilter from '../../../SearchFilter';
 import { TextSearchHelpers } from './TextSearchHelpers';
 

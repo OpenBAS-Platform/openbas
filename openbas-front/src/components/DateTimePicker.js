@@ -1,7 +1,6 @@
-import React from 'react';
-import { useIntl } from 'react-intl';
 import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
 import { Field } from 'react-final-form';
+import { useIntl } from 'react-intl';
 
 const dateFormatsMap = {
   'en-us': 'yyyy-MM-dd',
@@ -28,10 +27,9 @@ const DateTimePickerBase = ({
       onBlur={() => onBlur(value ? new Date(value).toISOString() : null)}
       inputFormat={dateFormatsMap[intl.locale] || 'yyyy-MM-dd'}
       error={error && touched}
-      onChange={(date) => (Date.parse(date)
+      onChange={date => (Date.parse(date)
         ? inputProps.onChange(date.toISOString())
-        : inputProps.onChange(null))
-      }
+        : inputProps.onChange(null))}
       slotProps={{
         textField: {
           ...textFieldProps,
@@ -46,7 +44,7 @@ const DateTimePickerBase = ({
 /**
  * @deprecated The component use old form libnary react-final-form
  */
-const DateTimePicker = (props) => (
+const DateTimePicker = props => (
   <Field name={props.name} component={DateTimePickerBase} {...props} />
 );
 

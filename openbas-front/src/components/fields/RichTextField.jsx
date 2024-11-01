@@ -1,18 +1,14 @@
-import React from 'react';
-import { Field } from 'react-final-form';
 import { FormHelperText, InputLabel } from '@mui/material';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import Editor from 'ckeditor5-custom-build/build/ckeditor';
-import 'ckeditor5-custom-build/build/translations/fr';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
-import { useHelper } from '../../store';
-import locale from '../../utils/BrowserLanguage';
-import { useFormatter } from '../i18n';
+import { Field } from 'react-final-form';
+
 // eslint-disable-next-line import/no-cycle
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
+import CKEditor from '../CKEditor';
+import { useFormatter } from '../i18n';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   errorColor: {
     color: theme.palette.error.main,
   },
@@ -30,14 +26,6 @@ const RichTextFieldBase = ({
 }) => {
   const { t } = useFormatter();
   const classes = useStyles();
-  const lang = useHelper((helper) => {
-    const me = helper.getMe();
-    const settings = helper.getPlatformSettings();
-    const rawPlatformLang = settings.platform_lang ?? 'auto';
-    const rawUserLang = me.user_lang ?? 'auto';
-    const platformLang = rawPlatformLang !== 'auto' ? rawPlatformLang : locale;
-    return rawUserLang !== 'auto' ? rawUserLang : platformLang;
-  });
   return (
     <div style={{ ...style, position: 'relative' }}>
       <InputLabel
@@ -51,23 +39,19 @@ const RichTextFieldBase = ({
         {label}
       </InputLabel>
       <CKEditor
-        editor={Editor}
-        config={{
-          width: '100%',
-          language: lang,
-        }}
         data={value}
         onChange={(event, editor) => {
           onChange(editor.getData());
         }}
-        onBlur={(event) => onBlur(event)}
+        onBlur={event => onBlur(event)}
         disabled={disabled}
       />
       {touched && invalid
-            && <FormHelperText error>
-              {(error && t(error)) || (submitError && t(submitError))}
-            </FormHelperText>
-        }
+      && (
+        <FormHelperText error>
+          {(error && t(error)) || (submitError && t(submitError))}
+        </FormHelperText>
+      )}
       {askAi && (
         <TextFieldAskAI
           currentValue={value ?? ''}
@@ -88,7 +72,7 @@ const RichTextFieldBase = ({
 /**
  * @deprecated The component use old form libnary react-final-form
  */
-const RichTextField = (props) => (
+const RichTextField = props => (
   <Field name={props.name} component={RichTextFieldBase} {...props} />
 );
 

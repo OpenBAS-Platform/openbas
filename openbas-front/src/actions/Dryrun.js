@@ -1,7 +1,7 @@
+import { delReferential, getReferential, postReferential } from '../utils/Action';
 import * as schema from './Schema';
-import { getReferential, postReferential, delReferential } from '../utils/Action';
 
-export const fetchDryruns = (exerciseId) => (dispatch) => {
+export const fetchDryruns = exerciseId => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/dryruns`;
   return getReferential(schema.arrayOfDryruns, uri)(dispatch);
 };

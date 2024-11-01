@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Paper, Button } from '@mui/material';
-import { Form } from 'react-final-form';
+import { Button, Paper } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { useState } from 'react';
+import { Form } from 'react-final-form';
+import { useDispatch } from 'react-redux';
+
 import { askReset, resetPassword, validateResetToken } from '../../../actions/Application';
-import { useFormatter } from '../../../components/i18n';
 import OldTextField from '../../../components/fields/OldTextField';
+import { useFormatter } from '../../../components/i18n';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -47,7 +48,7 @@ const Reset = ({ onCancel }) => {
       }
     });
   };
-  const onSubmitValidatePassword = (data) => dispatch(resetPassword(token, data));
+  const onSubmitValidatePassword = data => dispatch(resetPassword(token, data));
   return (
     <div className={classes.container}>
       <Paper variant="outlined">
@@ -55,7 +56,7 @@ const Reset = ({ onCancel }) => {
           {step === STEP_ASK_RESET && (
             <Form
               onSubmit={onSubmitAskToken}
-              validate={(values) => validateFields(t, values, ['username'])}
+              validate={values => validateFields(t, values, ['username'])}
             >
               {({ handleSubmit, submitting, pristine }) => (
                 <form onSubmit={handleSubmit}>
@@ -83,7 +84,7 @@ const Reset = ({ onCancel }) => {
           {step === STEP_VALIDATE_TOKEN && (
             <Form
               onSubmit={onSubmitValidateToken}
-              validate={(values) => validateFields(t, values, ['code'])}
+              validate={values => validateFields(t, values, ['code'])}
             >
               {({ handleSubmit, submitting, pristine }) => (
                 <form onSubmit={handleSubmit}>
@@ -111,8 +112,7 @@ const Reset = ({ onCancel }) => {
           {step === STEP_RESET_PASSWORD && (
             <Form
               onSubmit={onSubmitValidatePassword}
-              validate={(values) => validateFields(t, values, ['password', 'password_validation'])
-              }
+              validate={values => validateFields(t, values, ['password', 'password_validation'])}
             >
               {({ handleSubmit, submitting, pristine }) => (
                 <form onSubmit={handleSubmit}>

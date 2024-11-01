@@ -1,6 +1,6 @@
-import type { ExerciseSimpleStore, ExerciseStore } from './Exercise';
-import type { TeamStore } from '../teams/Team';
 import type { Exercise, InjectExpectation, LessonsAnswer, LessonsCategory, LessonsQuestion, Objective } from '../../utils/api-types';
+import type { TeamStore } from '../teams/Team';
+import type { ExerciseSimpleStore, ExerciseStore } from './Exercise';
 
 export interface ExercisesHelper {
   getExercise: (exerciseId: string) => ExerciseStore;

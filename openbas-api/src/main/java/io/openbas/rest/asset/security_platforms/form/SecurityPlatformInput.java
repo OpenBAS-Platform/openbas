@@ -1,13 +1,13 @@
 package io.openbas.rest.asset.security_platforms.form;
 
+import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.SecurityPlatform;
 import io.openbas.rest.asset.form.AssetInput;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

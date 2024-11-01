@@ -1,23 +1,24 @@
-import React, { CSSProperties, useState } from 'react';
-import { makeStyles, useTheme } from '@mui/styles';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
+import { CSSProperties, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import SecurityPlatformCreation from './SecurityPlatformCreation';
-import SecurityPlatformPopover from './SecurityPlatformPopover';
-import { useHelper } from '../../../../store';
-import { useFormatter } from '../../../../components/i18n';
+
+import { searchSecurityPlatforms } from '../../../../actions/assets/securityPlatform-actions';
 import type { UserHelper } from '../../../../actions/helper';
-import type { SecurityPlatformStore } from './SecurityPlatform';
-import ItemTags from '../../../../components/ItemTags';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
-import type { SearchPaginationInput } from '../../../../utils/api-types';
-import { searchSecurityPlatforms } from '../../../../actions/assets/securityPlatform-actions';
-import type { Theme } from '../../../../components/Theme';
-import { isNotEmptyField } from '../../../../utils/utils';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import { useFormatter } from '../../../../components/i18n';
+import ItemTags from '../../../../components/ItemTags';
+import type { Theme } from '../../../../components/Theme';
+import { useHelper } from '../../../../store';
+import type { SearchPaginationInput } from '../../../../utils/api-types';
+import { isNotEmptyField } from '../../../../utils/utils';
+import type { SecurityPlatformStore } from './SecurityPlatform';
+import SecurityPlatformCreation from './SecurityPlatformCreation';
+import SecurityPlatformPopover from './SecurityPlatformPopover';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -129,14 +130,14 @@ const SecurityPlatforms = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponent
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-            }
+            )}
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
@@ -155,7 +156,7 @@ const SecurityPlatforms = () => {
                 />
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div className={classes.bodyItems}>
                     <div className={classes.bodyItem} style={inlineStyles.asset_name}>
                       {securityPlatform.asset_name}
@@ -167,16 +168,16 @@ const SecurityPlatforms = () => {
                       {securityPlatform.asset_description}
                     </div>
                     <div className={classes.bodyItem} style={inlineStyles.asset_tags}>
-                      <ItemTags variant="list" tags={securityPlatform.asset_tags}/>
+                      <ItemTags variant="list" tags={securityPlatform.asset_tags} />
                     </div>
                   </div>
-                    }
+                )}
               />
               <ListItemSecondaryAction>
                 <SecurityPlatformPopover
                   securityPlatform={{ ...securityPlatform, type: 'static' }}
-                  onUpdate={(result) => setSecurityPlatforms(securityPlatforms.map((e) => (e.asset_id !== result.asset_id ? e : result)))}
-                  onDelete={(result) => setSecurityPlatforms(securityPlatforms.filter((e) => (e.asset_id !== result)))}
+                  onUpdate={result => setSecurityPlatforms(securityPlatforms.map(e => (e.asset_id !== result.asset_id ? e : result)))}
+                  onDelete={result => setSecurityPlatforms(securityPlatforms.filter(e => (e.asset_id !== result)))}
                   openEditOnInit={securityPlatform.asset_id === searchId}
                   disabled={isNotEmptyField(securityPlatform.asset_external_reference)}
                 />
@@ -185,7 +186,7 @@ const SecurityPlatforms = () => {
           );
         })}
       </List>
-      {userAdmin && <SecurityPlatformCreation onCreate={(result) => setSecurityPlatforms([result, ...securityPlatforms])} />}
+      {userAdmin && <SecurityPlatformCreation onCreate={result => setSecurityPlatforms([result, ...securityPlatforms])} />}
     </>
   );
 };

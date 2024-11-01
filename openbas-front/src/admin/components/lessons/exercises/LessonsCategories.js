@@ -1,15 +1,16 @@
-import React, { useContext } from 'react';
-import { makeStyles } from '@mui/styles';
-import { Box, Chip, Grid, LinearProgress, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
 import { CastForEducationOutlined, HelpOutlined } from '@mui/icons-material';
+import { Box, Chip, Grid, LinearProgress, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
-import LessonsCategoryPopover from '../categories/LessonsCategoryPopover';
-import LessonsQuestionPopover from '../categories/questions/LessonsQuestionPopover';
-import CreateLessonsQuestion from '../categories/questions/CreateLessonsQuestion';
-import LessonsCategoryAddTeams from '../categories/LessonsCategoryAddTeams';
+import { useContext } from 'react';
+
 import { useFormatter } from '../../../../components/i18n';
 import { truncate } from '../../../../utils/String';
 import { LessonContext } from '../../common/Context';
+import LessonsCategoryAddTeams from '../categories/LessonsCategoryAddTeams';
+import LessonsCategoryPopover from '../categories/LessonsCategoryPopover';
+import CreateLessonsQuestion from '../categories/questions/CreateLessonsQuestion';
+import LessonsQuestionPopover from '../categories/questions/LessonsQuestionPopover';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -62,14 +63,14 @@ const LessonsCategories = ({
     R.groupBy(R.prop('lessons_answer_question')),
     R.toPairs,
     R.map(([key, values]) => {
-      const totalScore = R.sum(R.map((o) => o.lessons_answer_score, values));
+      const totalScore = R.sum(R.map(o => o.lessons_answer_score, values));
       return [
         key,
         {
           score: Math.round(totalScore / values.length), // Calculate average directly
           number: values.length,
           comments: R.filter(
-            (o) => o.lessons_answer_positive !== null || o.lessons_answer_negative !== null,
+            o => o.lessons_answer_positive !== null || o.lessons_answer_negative !== null,
             values,
           ).length,
         },
@@ -78,11 +79,11 @@ const LessonsCategories = ({
     R.fromPairs,
   )(lessonsAnswers);
   return (
-    <div style={{ marginTop: '30px', ...style }}>
+    <div id="lessons_categories" style={{ marginTop: '30px', ...style }}>
       {sortedCategories.map((category) => {
         const questions = sortQuestions(
           lessonsQuestions.filter(
-            (n) => n.lessons_question_category === category.lessonscategory_id,
+            n => n.lessons_question_category === category.lessonscategory_id,
           ),
         );
         return (
@@ -91,11 +92,11 @@ const LessonsCategories = ({
               {category.lessons_category_name}
             </Typography>
             {!isReport && (
-            <LessonsCategoryPopover
-              lessonsCategory={category}
-            />
+              <LessonsCategoryPopover
+                lessonsCategory={category}
+              />
             )}
-            <div className="clearfix"/>
+            <div className="clearfix" />
             <Grid container spacing={3}>
               <Grid item xs={4} style={{ marginTop: -10 }}>
                 <Typography variant="h4">{t('Questions')}</Typography>
@@ -105,13 +106,13 @@ const LessonsCategories = ({
                   style={{ marginTop: 14 }}
                 >
                   <List style={{ padding: 0 }}>
-                    {questions.map((question) => (
+                    {questions.map(question => (
                       <ListItem
                         key={question.lessonsquestion_id}
                         divider
                       >
                         <ListItemIcon>
-                          <HelpOutlined/>
+                          <HelpOutlined />
                         </ListItemIcon>
                         <ListItemText
                           style={{ width: '50%' }}
@@ -119,20 +120,20 @@ const LessonsCategories = ({
                           secondary={question.lessons_question_explanation || t('No explanation')}
                         />
                         {!isReport && (
-                        <ListItemSecondaryAction>
-                          <LessonsQuestionPopover
-                            lessonsCategoryId={category.lessonscategory_id}
-                            lessonsQuestion={question}
-                          />
-                        </ListItemSecondaryAction>
+                          <ListItemSecondaryAction>
+                            <LessonsQuestionPopover
+                              lessonsCategoryId={category.lessonscategory_id}
+                              lessonsQuestion={question}
+                            />
+                          </ListItemSecondaryAction>
                         )}
                       </ListItem>
                     ))}
                     {!isReport && (
-                    <CreateLessonsQuestion
-                      inline
-                      lessonsCategoryId={category.lessonscategory_id}
-                    />
+                      <CreateLessonsQuestion
+                        inline
+                        lessonsCategoryId={category.lessonscategory_id}
+                      />
                     )}
                   </List>
                 </Paper>
@@ -150,12 +151,10 @@ const LessonsCategories = ({
                         question.lessonsquestion_id
                       ] || { score: 0, number: 0, comments: 0 };
                       return (
-                        <ListItem
+                        <ListItemButton
                           key={question.lessonsquestion_id}
                           divider
-                          button={!isReport}
-                          onClick={() => setSelectedQuestion && setSelectedQuestion(question)
-                                                    }
+                          onClick={() => setSelectedQuestion && setSelectedQuestion(question)}
                         >
                           <ListItemText
                             style={{ width: '50%' }}
@@ -185,11 +184,12 @@ const LessonsCategories = ({
                                 variant="body2"
                                 color="text.secondary"
                               >
-                                {consolidatedAnswer.score}%
+                                {consolidatedAnswer.score}
+                                %
                               </Typography>
                             </Box>
                           </Box>
-                        </ListItem>
+                        </ListItemButton>
                       );
                     })}
                   </List>
@@ -200,15 +200,15 @@ const LessonsCategories = ({
                   {t('Targeted teams')}
                 </Typography>
                 {!isReport && (
-                <LessonsCategoryAddTeams
-                  lessonsCategoryId={category.lessonscategory_id}
-                  lessonsCategoryTeamsIds={category.lessons_category_teams}
-                  handleUpdateTeams={handleUpdateTeams}
-                  teams={teams}
-                  teamsMap={teamsMap}
-                />
+                  <LessonsCategoryAddTeams
+                    lessonsCategoryId={category.lessonscategory_id}
+                    lessonsCategoryTeamsIds={category.lessons_category_teams}
+                    handleUpdateTeams={handleUpdateTeams}
+                    teams={teams}
+                    teamsMap={teamsMap}
+                  />
                 )}
-                <div className="clearfix"/>
+                <div className="clearfix" />
                 <Paper
                   variant="outlined"
                   classes={{ root: classes.paperPadding }}
@@ -222,18 +222,18 @@ const LessonsCategories = ({
                       >
                         <Chip
                           onDelete={
-                                                        isReport
-                                                          ? undefined
-                                                          : () => handleUpdateTeams(
-                                                            category.lessonscategory_id,
-                                                            R.filter(
-                                                              (n) => n !== teamId,
-                                                              category.lessons_category_teams,
-                                                            ),
-                                                          )
-                                                    }
+                            isReport
+                              ? undefined
+                              : () => handleUpdateTeams(
+                                  category.lessonscategory_id,
+                                  R.filter(
+                                    n => n !== teamId,
+                                    category.lessons_category_teams,
+                                  ),
+                                )
+                          }
                           label={truncate(team?.team_name || '', 30)}
-                          icon={<CastForEducationOutlined/>}
+                          icon={<CastForEducationOutlined />}
                           classes={{ root: classes.chip }}
                         />
                       </Tooltip>

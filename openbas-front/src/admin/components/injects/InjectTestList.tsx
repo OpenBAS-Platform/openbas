@@ -1,17 +1,18 @@
-import { makeStyles } from '@mui/styles';
-import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import type { InjectTestStatus, SearchPaginationInput } from '../../../utils/api-types';
+import { makeStyles } from '@mui/styles';
+import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
+
+import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
+import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
+import { Page } from '../../../components/common/queryable/Page';
+import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
+import Empty from '../../../components/Empty';
 import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
-import { Page } from '../../../components/common/queryable/Page';
-import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
-import InjectIcon from '../common/injects/InjectIcon';
+import type { InjectTestStatus, SearchPaginationInput } from '../../../utils/api-types';
 import { isNotEmptyField } from '../../../utils/utils';
-import Empty from '../../../components/Empty';
+import InjectIcon from '../common/injects/InjectIcon';
 import InjectTestDetail from './InjectTestDetail';
-import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
-import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import InjectTestPopover from './InjectTestPopover';
 import InjectTestReplayAll from './InjectTestReplayAll';
 
@@ -112,11 +113,11 @@ const InjectTestList: FunctionComponent<Props> = ({
   return (
     <>
       <PaginationComponent
-        fetch={(input) => searchInjectTests(exerciseOrScenarioId, input)}
+        fetch={input => searchInjectTests(exerciseOrScenarioId, input)}
         searchPaginationInput={searchPaginationInput}
         setContent={setTests}
       >
-        <InjectTestReplayAll injectIds={tests?.map((test: InjectTestStatus) => test.inject_id!)} onTest={(result) => setTests(result)} />
+        <InjectTestReplayAll injectIds={tests?.map((test: InjectTestStatus) => test.inject_id!)} onTest={result => setTests(result)} />
       </PaginationComponent>
       <List style={{ marginTop: 40 }}>
         <ListItem
@@ -127,7 +128,7 @@ const InjectTestList: FunctionComponent<Props> = ({
         >
           <ListItemIcon />
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponent
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
@@ -135,7 +136,7 @@ const InjectTestList: FunctionComponent<Props> = ({
                 setSearchPaginationInput={setSearchPaginationInput}
                 defaultSortAsc
               />
-            }
+            )}
           />
         </ListItem>
         {tests?.map((test) => {
@@ -144,13 +145,13 @@ const InjectTestList: FunctionComponent<Props> = ({
               key={test.status_id}
               classes={{ root: classes.item }}
               divider
-              secondaryAction={
+              secondaryAction={(
                 <InjectTestPopover
                   injectTestStatus={test}
-                  onTest={(result) => setTests(tests?.map((existing) => (existing.status_id !== result.status_id ? existing : result)))}
-                  onDelete={(result) => setTests(tests.filter((existing) => (existing.status_id !== result)))}
+                  onTest={result => setTests(tests?.map(existing => (existing.status_id !== result.status_id ? existing : result)))}
+                  onDelete={result => setTests(tests.filter(existing => (existing.status_id !== result)))}
                 />
-              }
+              )}
               disablePadding
             >
               <ListItemButton
@@ -171,9 +172,9 @@ const InjectTestList: FunctionComponent<Props> = ({
                   />
                 </ListItemIcon>
                 <ListItemText
-                  primary={
+                  primary={(
                     <div className={classes.bodyItems}>
-                      {headers.map((header) => (
+                      {headers.map(header => (
                         <div
                           key={header.field}
                           className={classes.bodyItem}
@@ -183,7 +184,7 @@ const InjectTestList: FunctionComponent<Props> = ({
                         </div>
                       ))}
                     </div>
-                  }
+                  )}
                 />
               </ListItemButton>
             </ListItem>

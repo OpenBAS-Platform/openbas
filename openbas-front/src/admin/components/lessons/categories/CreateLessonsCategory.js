@@ -1,18 +1,19 @@
-import React, { useContext, useState } from 'react';
-import { Dialog, DialogContent, DialogTitle, ListItem, ListItemIcon, ListItemText, Slide } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
+import { Dialog, DialogContent, DialogTitle, ListItem, ListItemIcon, ListItemText, Slide } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../../../../components/i18n';
-import LessonsCategoryForm from './LessonsCategoryForm';
-import ButtonCreate from '../../../../components/common/ButtonCreate';
-import { LessonContext } from '../../common/Context';
+import { forwardRef, useContext, useState } from 'react';
 
-const Transition = React.forwardRef((props, ref) => (
+import ButtonCreate from '../../../../components/common/ButtonCreate';
+import { useFormatter } from '../../../../components/i18n';
+import { LessonContext } from '../../common/Context';
+import LessonsCategoryForm from './LessonsCategoryForm';
+
+const Transition = forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   text: {
     fontSize: 15,
     color: theme.palette.primary.main,

@@ -8,10 +8,9 @@ import lombok.Setter;
 @Getter
 public class InjectDocumentInput {
 
-    @JsonProperty("document_id")
-    private String documentId;
+  @JsonProperty("document_id")
+  private String documentId;
 
-    @JsonProperty("document_attached")
-    private boolean attached = true;
-
+  @JsonProperty("document_attached")
+  private boolean attached = true;
 }

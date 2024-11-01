@@ -1,12 +1,13 @@
-import React, { FormEvent, FunctionComponent, useEffect, useState } from 'react';
 import { Box, Button, InputLabel } from '@mui/material';
 import { Theme } from '@mui/material/styles/createTheme';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
+import { FormEvent, FunctionComponent, useEffect, useState } from 'react';
 import { FieldError, FieldErrors, FieldErrorsImpl, Merge } from 'react-hook-form';
-import VisuallyHiddenInput from './VisuallyHiddenInput';
-import { useFormatter } from '../i18n';
+
 import { truncate } from '../../utils/String';
+import { useFormatter } from '../i18n';
+import VisuallyHiddenInput from './VisuallyHiddenInput';
 
 interface CustomFileUploadProps {
   name: string;
@@ -17,13 +18,13 @@ interface CustomFileUploadProps {
   sizeLimit?: number; // in bytes
 }
 
-const useStyles = makeStyles<Theme>((theme) => ({
+const useStyles = makeStyles<Theme>(theme => ({
   box: {
-    width: '100%',
-    marginTop: '0.2rem',
-    paddingBottom: '0.35rem',
-    borderBottom: `0.1rem solid ${theme.palette.grey['400']}`,
-    cursor: 'default',
+    'width': '100%',
+    'marginTop': '0.2rem',
+    'paddingBottom': '0.35rem',
+    'borderBottom': `0.1rem solid ${theme.palette.grey['400']}`,
+    'cursor': 'default',
     '&:hover': {
       borderBottom: '0.1rem solid white',
     },
@@ -87,7 +88,7 @@ const CustomFileUploader: FunctionComponent<CustomFileUploadProps> = ({
 
     // check the file type; user might still provide something bypassing 'accept'
     // this will work only if accept is using MIME types only
-    const acceptedList = acceptMimeTypes?.split(',').map((a) => a.trim()) || [];
+    const acceptedList = acceptMimeTypes?.split(',').map(a => a.trim()) || [];
     if (
       acceptedList.length > 0
       && !!file?.type

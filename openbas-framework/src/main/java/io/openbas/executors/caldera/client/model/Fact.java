@@ -7,7 +7,6 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Fact {
 
-    private String name;
-    private String value;
-
+  private String name;
+  private String value;
 }

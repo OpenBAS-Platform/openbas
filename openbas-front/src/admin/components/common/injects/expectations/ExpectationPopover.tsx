@@ -1,12 +1,18 @@
-import React, { FunctionComponent, useContext, useState } from 'react';
-import { Button, Dialog as DialogMUI, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
+import { Button, Dialog as DialogMUI, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
+import { FunctionComponent, useContext, useState } from 'react';
+import * as React from 'react';
+
+import type { LoggedHelper } from '../../../../../actions/helper';
+import Dialog from '../../../../../components/common/Dialog';
 import Transition from '../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../components/i18n';
-import ExpectationFormUpdate from './ExpectationFormUpdate';
-import type { ExpectationInput } from './Expectation';
-import Dialog from '../../../../../components/common/Dialog';
+import { useHelper } from '../../../../../store';
+import type { InjectExpectation, PlatformSettings } from '../../../../../utils/api-types';
 import { PermissionsContext } from '../../Context';
+import { ExpectationInput, ExpectationInputForm } from './Expectation';
+import ExpectationFormUpdate from './ExpectationFormUpdate';
+import useExpectationExpirationTime from './useExpectationExpirationTime';
 
 interface ExpectationPopoverProps {
   index: number;
@@ -22,6 +28,9 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   handleDelete,
 }) => {
   // Standard hooks
+  const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({
+    settings: helper.getPlatformSettings(),
+  }));
   const { t } = useFormatter();
   const { permissions } = useContext(PermissionsContext);
 
@@ -29,12 +38,20 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
 
+  const getExpirationTime = (expirationTime: number): number => {
+    if (expirationTime !== null || expirationTime !== undefined) {
+      return expirationTime;
+    }
+    return useExpectationExpirationTime(expectation.expectation_type as InjectExpectation['inject_expectation_type']); // FIXME: should change type of expectation_type property
+  };
+
   const initialValues = {
     expectation_type: expectation.expectation_type ?? '',
     expectation_name: expectation.expectation_name ?? '',
     expectation_description: expectation.expectation_description ?? '',
-    expectation_score: expectation.expectation_score ?? 100,
+    expectation_score: expectation.expectation_score ?? settings.expectation_manual_default_score_value,
     expectation_expectation_group: expectation.expectation_expectation_group ?? false,
+    expectation_expiration_time: getExpirationTime(expectation.expectation_expiration_time),
   };
 
   // Popover
@@ -51,8 +68,14 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   };
   const handleCloseEdit = () => setOpenEdit(false);
 
-  const onSubmitEdit = (data: ExpectationInput) => {
-    handleUpdate(data, index);
+  const onSubmitEdit = (data: ExpectationInputForm) => {
+    const values: ExpectationInput = {
+      ...data,
+      expectation_expiration_time: data.expiration_time_days * 3600 * 24
+        + data.expiration_time_hours * 3600
+        + data.expiration_time_minutes * 60,
+    };
+    handleUpdate(values, index);
     handleCloseEdit();
   };
 
@@ -71,7 +94,7 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   return (
     <div>
       <IconButton
-        onClick={(event) => handlePopoverOpen(event)}
+        onClick={event => handlePopoverOpen(event)}
         aria-haspopup="true"
         size="large"
         disabled={permissions.readOnly}

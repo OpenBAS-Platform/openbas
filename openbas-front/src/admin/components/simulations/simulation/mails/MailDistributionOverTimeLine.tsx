@@ -1,20 +1,21 @@
 import { useTheme } from '@mui/styles';
-import React, { FunctionComponent } from 'react';
-import Chart from 'react-apexcharts';
 import * as R from 'ramda';
-import { Theme } from '@mui/material';
-import Empty from '../../../../../components/Empty';
+import { FunctionComponent } from 'react';
+import Chart from 'react-apexcharts';
+
+import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
+import type { TeamStore } from '../../../../../actions/teams/Team';
+import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
+import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
-import { useAppDispatch } from '../../../../../utils/hooks';
+import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import type { Communication } from '../../../../../utils/api-types';
 import { lineChartOptions } from '../../../../../utils/Charts';
-import { getTeamsColors } from '../../../common/injects/InjectsDistribution';
-import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
-import { fetchExerciseTeams } from '../../../../../actions/Exercise';
-import type { TeamStore } from '../../../../../actions/teams/Team';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { getTeamsColors } from '../../../common/injects/teams/utils';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
@@ -67,11 +68,9 @@ const MailDistributionOverTime: FunctionComponent<Props> = ({
     <>
       {teamsCommunications.length > 0 ? (
         <Chart
-          // @ts-expect-error: Need to migrate Chart.js file
           options={lineChartOptions(
             theme,
             true,
-            // @ts-expect-error: Need to migrate i18n.js file
             nsdt,
             null,
             undefined,

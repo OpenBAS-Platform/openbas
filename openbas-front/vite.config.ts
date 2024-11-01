@@ -1,5 +1,5 @@
-import { createLogger, defineConfig, loadEnv, transformWithEsbuild } from 'vite';
 import react from '@vitejs/plugin-react';
+import { createLogger, defineConfig, loadEnv, transformWithEsbuild } from 'vite';
 import IstanbulPlugin from 'vite-plugin-istanbul';
 
 const logger = createLogger();
@@ -49,7 +49,10 @@ export default ({ mode }: { mode: string }) => {
         '@mui/material/transitions',
         '@mui/styles',
         '@uiw/react-md-editor/nohighlight',
-        'ckeditor5-custom-build/build/ckeditor',
+        'ckeditor5',
+        'ckeditor5/translations/en.js',
+        'ckeditor5/translations/fr.js',
+        'ckeditor5/translations/zh.js',
         'classcat',
         'classnames',
         'cronstrue',
@@ -114,7 +117,7 @@ export default ({ mode }: { mode: string }) => {
           });
         },
       },
-      react({ jsxRuntime: 'classic' }),
+      react(),
       [IstanbulPlugin({
         include: 'src/*',
         exclude: ['node_modules', 'test/'],

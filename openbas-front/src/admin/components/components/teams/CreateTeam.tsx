@@ -1,17 +1,18 @@
-import React, { FunctionComponent, useContext, useState } from 'react';
-import { Fab, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
+import { Fab, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../../../../components/i18n';
-import Dialog from '../../../../components/common/Dialog';
-import type { Theme } from '../../../../components/Theme';
-import { Option } from '../../../../utils/Option';
+import { FunctionComponent, useContext, useState } from 'react';
+
 import type { TeamInputForm, TeamStore } from '../../../../actions/teams/Team';
-import TeamForm from './TeamForm';
-import type { TeamCreateInput } from '../../../../utils/api-types';
 import { addTeam } from '../../../../actions/teams/team-actions';
+import Dialog from '../../../../components/common/Dialog';
+import { useFormatter } from '../../../../components/i18n';
+import type { Theme } from '../../../../components/Theme';
+import type { TeamCreateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { Option } from '../../../../utils/Option';
 import { TeamContext } from '../../common/Context';
+import TeamForm from './TeamForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {

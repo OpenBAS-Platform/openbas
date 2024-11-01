@@ -1,8 +1,9 @@
-import React, { FunctionComponent, ReactElement } from 'react';
 import { ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
+import { FunctionComponent, ReactElement } from 'react';
+
 import type { Theme } from '../../../../../../components/Theme';
+import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 import ResultChip from './ResultChip';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -59,17 +60,21 @@ const ExpectationLine: FunctionComponent<Props> = ({
           {icon}
         </ListItemIcon>
         <ListItemText
-          primary={
+          primary={(
             <div className={classes.container}>
               <div className={classes.details}>
-                <div style={{ width: gap ? 135 : 200 }}> {info} </div>
+                <div style={{ width: gap ? 135 : 200 }}>
+                  {' '}
+                  {info}
+                  {' '}
+                </div>
                 {title}
               </div>
               <div className={classes.chip}>
                 <ResultChip expectation={expectation} />
               </div>
             </div>
-          }
+          )}
         />
       </ListItem>
     </>

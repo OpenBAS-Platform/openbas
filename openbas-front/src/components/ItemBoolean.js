@@ -1,8 +1,8 @@
-import React from 'react';
-import * as PropTypes from 'prop-types';
-import { withStyles, useTheme } from '@mui/styles';
 import { Chip, CircularProgress, Tooltip } from '@mui/material';
+import { useTheme, withStyles } from '@mui/styles';
+import * as PropTypes from 'prop-types';
 import { compose } from 'ramda';
+
 import inject18n from './i18n';
 
 const styles = () => ({
@@ -35,7 +35,7 @@ const styles = () => ({
   },
 });
 
-const computeInlineStyles = (theme) => ({
+const computeInlineStyles = theme => ({
   green: {
     backgroundColor: 'rgba(76, 175, 80, 0.08)',
     color: '#4caf50',

@@ -1,22 +1,24 @@
-import React, { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Fab } from '@mui/material';
 import { Add } from '@mui/icons-material';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { useHelper } from '../../../../../store';
-import { useAppDispatch } from '../../../../../utils/hooks';
+import { Fab } from '@mui/material';
+import { useContext, useState } from 'react';
+import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { addReportForExercise, deleteReportForExercise, fetchReportsForExercise, updateReportForExercise } from '../../../../../actions/reports/report-actions';
 import type { ReportsHelper } from '../../../../../actions/reports/report-helper';
-import Reports from '../../../components/reports/Reports';
-import { PermissionsContext, ReportContextType, ReportContext } from '../../../common/Context';
-import type { Report, ReportInput } from '../../../../../utils/api-types';
-import ExerciseReportForm from './ExerciseReportForm';
 import Dialog from '../../../../../components/common/Dialog';
 import { useFormatter } from '../../../../../components/i18n';
+import { useHelper } from '../../../../../store';
+import type { Report, ReportInput } from '../../../../../utils/api-types';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { PermissionsContext, ReportContext, ReportContextType } from '../../../common/Context';
+import Reports from '../../../components/reports/Reports';
+import ExerciseReportForm from './ExerciseReportForm';
 
 interface ReportListProps {
-  exerciseId: string,
-  exerciseName: string,
+  exerciseId: string;
+  exerciseName: string;
 }
 
 const ExerciseReports: React.FC<ReportListProps> = ({ exerciseId, exerciseName }) => {
@@ -25,7 +27,7 @@ const ExerciseReports: React.FC<ReportListProps> = ({ exerciseId, exerciseName }
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const navigateToReportPage = (reportId:string) => navigate(`/reports/${exerciseId}/${reportId}`);
+  const navigateToReportPage = (reportId: string) => navigate(`/reports/${reportId}/exercise/${exerciseId}`);
 
   const [openCreate, setOpenCreate] = useState(false);
   const handleOpenCreate = () => setOpenCreate(true);
@@ -57,7 +59,7 @@ const ExerciseReports: React.FC<ReportListProps> = ({ exerciseId, exerciseName }
 
   return (
     <ReportContext.Provider value={context}>
-      <Reports reports={reports} navigateToReportPage={navigateToReportPage}/>
+      <Reports reports={reports} navigateToReportPage={navigateToReportPage} />
       {permissions.canWrite && (
         <>
           <Fab

@@ -2,9 +2,11 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -26,9 +28,14 @@ public class Executable extends Payload {
   @JsonProperty("executable_file")
   private Document executableFile;
 
-  public Executable() {
+  @Queryable(filterable = true, searchable = true)
+  @Column(name = "executable_arch")
+  @JsonProperty("executable_arch")
+  @Enumerated(EnumType.STRING)
+  @NotNull
+  private Endpoint.PLATFORM_ARCH executableArch;
 
-  }
+  public Executable() {}
 
   public Executable(String id, String type, String name) {
     super(id, type, name);

@@ -1,4 +1,4 @@
-FROM node:20.17.0-alpine3.20 AS front-builder
+FROM node:20.18.0-alpine3.20 AS front-builder
 
 WORKDIR /opt/openbas-build/openbas-front
 COPY openbas-front/packages ./packages
@@ -8,7 +8,7 @@ RUN yarn install
 COPY openbas-front /opt/openbas-build/openbas-front
 RUN yarn build
 
-FROM maven:3.9.6-eclipse-temurin-21 AS api-builder
+FROM maven:3.9.9-eclipse-temurin-21 AS api-builder
 
 WORKDIR /opt/openbas-build/openbas
 COPY openbas-model ./openbas-model
@@ -18,7 +18,7 @@ COPY pom.xml ./pom.xml
 COPY --from=front-builder /opt/openbas-build/openbas-front/builder/prod/build ./openbas-front/builder/prod/build
 RUN mvn install -DskipTests -Pdev
 
-FROM eclipse-temurin:21.0.3_9-jre AS app
+FROM eclipse-temurin:21.0.4_7-jre AS app
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y tini;
 COPY --from=api-builder /opt/openbas-build/openbas/openbas-api/target/openbas-api.jar ./

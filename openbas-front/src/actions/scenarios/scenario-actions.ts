@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux';
+
 import { delReferential, getReferential, postReferential, putReferential, simpleCall, simplePostCall } from '../../utils/Action';
-import { arrayOfScenarios, scenario } from './scenario-schema';
 import type {
   InjectsImportInput,
   LessonsCategoryCreateInput,
@@ -17,8 +17,9 @@ import type {
   SearchPaginationInput,
   Team,
 } from '../../utils/api-types';
-import * as schema from '../Schema';
 import { MESSAGING$ } from '../../utils/Environment';
+import * as schema from '../Schema';
+import { arrayOfScenarios, scenario } from './scenario-schema';
 
 export const SCENARIO_URI = '/api/scenarios';
 

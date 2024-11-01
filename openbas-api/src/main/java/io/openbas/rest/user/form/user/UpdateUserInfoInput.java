@@ -8,13 +8,12 @@ import lombok.Setter;
 @Setter
 public class UpdateUserInfoInput {
 
-    @JsonProperty("user_pgp_key")
-    private String pgpKey;
+  @JsonProperty("user_pgp_key")
+  private String pgpKey;
 
-    @JsonProperty("user_phone")
-    private String phone;
+  @JsonProperty("user_phone")
+  private String phone;
 
-    @JsonProperty("user_phone2")
-    private String phone2;
-
+  @JsonProperty("user_phone2")
+  private String phone2;
 }

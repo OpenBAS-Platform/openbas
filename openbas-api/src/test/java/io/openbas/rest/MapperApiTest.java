@@ -1,5 +1,12 @@
 package io.openbas.rest;
 
+import static io.openbas.utils.JsonUtils.asJsonString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.database.model.ImportMapper;
@@ -13,6 +20,13 @@ import io.openbas.service.InjectService;
 import io.openbas.service.MapperService;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.mockMapper.MockMapperUtils;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,39 +45,20 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.ResourceUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static io.openbas.utils.JsonUtils.asJsonString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class MapperApiTest {
 
   private MockMvc mvc;
 
-  @Mock
-  private ImportMapperRepository importMapperRepository;
+  @Mock private ImportMapperRepository importMapperRepository;
 
-  @Mock
-  private MapperService mapperService;
-  @Mock
-  private InjectService injectService;
+  @Mock private MapperService mapperService;
+  @Mock private InjectService injectService;
 
   private MapperApi mapperApi;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
   @BeforeEach
   void before() throws IllegalAccessException, NoSuchFieldException {
@@ -74,8 +69,7 @@ public class MapperApiTest {
     sessionContextField.setAccessible(true);
     sessionContextField.set(mapperApi, objectMapper);
 
-    mvc = MockMvcBuilders.standaloneSetup(mapperApi)
-            .build();
+    mvc = MockMvcBuilders.standaloneSetup(mapperApi).build();
   }
 
   // -- SCENARIOS --
@@ -89,10 +83,12 @@ public class MapperApiTest {
     PageImpl page = new PageImpl<>(importMappers, pageable, importMappers.size());
     when(importMapperRepository.findAll(any(), any())).thenReturn(page);
     // -- EXECUTE --
-    String response = this.mvc
-      .perform(MockMvcRequestBuilders.post("/api/mappers/search")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(asJsonString(PaginationFixture.getDefault().textSearch("").build())))
+    String response =
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders.post("/api/mappers/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(PaginationFixture.getDefault().textSearch("").build())))
             .andExpect(status().is2xxSuccessful())
             .andReturn()
             .getResponse()
@@ -100,7 +96,8 @@ public class MapperApiTest {
 
     // -- ASSERT --
     assertNotNull(response);
-    assertEquals(JsonPath.read(response, "$.content[0].import_mapper_id"), importMappers.get(0).getId());
+    assertEquals(
+        JsonPath.read(response, "$.content[0].import_mapper_id"), importMappers.get(0).getId());
   }
 
   @DisplayName("Test search of a specific mapper")
@@ -110,8 +107,10 @@ public class MapperApiTest {
     ImportMapper importMapper = MockMapperUtils.createImportMapper();
     when(importMapperRepository.findById(any())).thenReturn(Optional.of(importMapper));
     // -- EXECUTE --
-    String response = this.mvc
-            .perform(MockMvcRequestBuilders.get("/api/mappers/" + importMapper.getId())
+    String response =
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders.get("/api/mappers/" + importMapper.getId())
                     .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
             .andReturn()
@@ -133,8 +132,10 @@ public class MapperApiTest {
     importMapperInput.setInjectTypeColumn("B");
     when(mapperService.createAndSaveImportMapper(any())).thenReturn(importMapper);
     // -- EXECUTE --
-    String response = this.mvc
-            .perform(MockMvcRequestBuilders.post("/api/mappers/")
+    String response =
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders.post("/api/mappers/")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(asJsonString(importMapperInput)))
             .andExpect(status().is2xxSuccessful())
@@ -156,8 +157,10 @@ public class MapperApiTest {
     when(mapperService.getDuplicateImportMapper(any())).thenReturn(importMapperDuplicated);
 
     // -- EXECUTE --
-    String response = this.mvc
-            .perform(MockMvcRequestBuilders.post("/api/mappers/"+ importMapper.getId())
+    String response =
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders.post("/api/mappers/" + importMapper.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(asJsonString(importMapper)))
             .andExpect(status().is2xxSuccessful())
@@ -177,10 +180,11 @@ public class MapperApiTest {
     ImportMapper importMapper = MockMapperUtils.createImportMapper();
     // -- EXECUTE --
     this.mvc
-            .perform(MockMvcRequestBuilders.delete("/api/mappers/" + importMapper.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(asJsonString(PaginationFixture.getDefault().textSearch("").build())))
-            .andExpect(status().is2xxSuccessful());
+        .perform(
+            MockMvcRequestBuilders.delete("/api/mappers/" + importMapper.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(PaginationFixture.getDefault().textSearch("").build())))
+        .andExpect(status().is2xxSuccessful());
 
     verify(importMapperRepository, times(1)).deleteById(any());
   }
@@ -195,8 +199,10 @@ public class MapperApiTest {
     importMapperInput.setInjectTypeColumn("B");
     when(mapperService.updateImportMapper(any(), any())).thenReturn(importMapper);
     // -- EXECUTE --
-    String response = this.mvc
-            .perform(MockMvcRequestBuilders.put("/api/mappers/" + importMapper.getId())
+    String response =
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders.put("/api/mappers/" + importMapper.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(asJsonString(importMapperInput)))
             .andExpect(status().is2xxSuccessful())
@@ -209,8 +215,6 @@ public class MapperApiTest {
     assertEquals(JsonPath.read(response, "$.import_mapper_id"), importMapper.getId());
   }
 
-
-
   @DisplayName("Test store xls")
   @Test
   void testStoreXls() throws Exception {
@@ -219,15 +223,13 @@ public class MapperApiTest {
     File testFile = ResourceUtils.getFile("classpath:xls-test-files/test_file_1.xlsx");
 
     InputStream in = new FileInputStream(testFile);
-    MockMultipartFile xlsFile = new MockMultipartFile("file",
-            "my-awesome-file.xls",
-            "application/xlsx",
-            in.readAllBytes());
+    MockMultipartFile xlsFile =
+        new MockMultipartFile("file", "my-awesome-file.xls", "application/xlsx", in.readAllBytes());
 
     // -- EXECUTE --
-    String response = this.mvc
-            .perform(MockMvcRequestBuilders.multipart("/api/mappers/store")
-                    .file(xlsFile))
+    String response =
+        this.mvc
+            .perform(MockMvcRequestBuilders.multipart("/api/mappers/store").file(xlsFile))
             .andExpect(status().is2xxSuccessful())
             .andReturn()
             .getResponse()
@@ -236,8 +238,6 @@ public class MapperApiTest {
     // -- ASSERT --
     assertNotNull(response);
   }
-
-
 
   @DisplayName("Test testing an import xls")
   @Test
@@ -251,12 +251,17 @@ public class MapperApiTest {
 
     injectsImportInput.getImportMapper().setName("TEST");
 
-    when(injectService.importInjectIntoScenarioFromXLS(any(), any(), any(), any(), anyInt(), anyBoolean())).thenReturn(new ImportTestSummary());
+    when(injectService.importInjectIntoScenarioFromXLS(
+            any(), any(), any(), any(), anyInt(), anyBoolean()))
+        .thenReturn(new ImportTestSummary());
     when(mapperService.createImportMapper(any())).thenReturn(importMapper);
 
     // -- EXECUTE --
-    String response = this.mvc
-            .perform(MockMvcRequestBuilders.post("/api/mappers/store/{importId}", UUID.randomUUID().toString())
+    String response =
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders.post(
+                        "/api/mappers/store/{importId}", UUID.randomUUID().toString())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(asJsonString(injectsImportInput)))
             .andExpect(status().is2xxSuccessful())
@@ -267,5 +272,4 @@ public class MapperApiTest {
     // -- ASSERT --
     assertNotNull(response);
   }
-
 }

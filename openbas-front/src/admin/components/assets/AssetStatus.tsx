@@ -1,6 +1,7 @@
-import React from 'react';
 import { Chip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import * as React from 'react';
+
 import { useFormatter } from '../../../components/i18n';
 
 const useStyles = makeStyles(() => ({
@@ -33,8 +34,8 @@ const inlineStyles = {
 };
 
 interface Props {
-  variant: string,
-  status: string,
+  variant: string;
+  status: string;
 }
 
 const AssetStatus: React.FC<Props> = ({ variant, status }) => {

@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { CheckCircleOutlined, PersonOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { CheckCircleOutlined, PersonOutlined } from '@mui/icons-material';
-import { searchUsers } from '../../../../actions/User';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+
 import { fetchOrganizations } from '../../../../actions/Organization';
-import ItemTags from '../../../../components/ItemTags';
-import CreateUser from './CreateUser';
 import { fetchTags } from '../../../../actions/Tag';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { useHelper } from '../../../../store';
-import UserPopover from './UserPopover';
-import SecurityMenu from '../SecurityMenu';
-import { useFormatter } from '../../../../components/i18n';
-import { initSorting } from '../../../../components/common/queryable/Page';
+import { searchUsers } from '../../../../actions/User';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
+import { initSorting } from '../../../../components/common/queryable/Page';
+import { useFormatter } from '../../../../components/i18n';
+import ItemTags from '../../../../components/ItemTags';
+import { useHelper } from '../../../../store';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import SecurityMenu from '../SecurityMenu';
+import CreateUser from './CreateUser';
+import UserPopover from './UserPopover';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -72,7 +73,7 @@ const Users = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
-  const { tagsMap, organizationsMap } = useHelper((helper) => ({
+  const { tagsMap, organizationsMap } = useHelper(helper => ({
     organizationsMap: helper.getOrganizationsMap(),
     tagsMap: helper.getTagsMap(),
   }));
@@ -136,18 +137,18 @@ const Users = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponent
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-            }
+            )}
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {users.map((user) => (
+        {users.map(user => (
           <ListItem
             key={user.user_id}
             classes={{ root: classes.item }}
@@ -157,7 +158,7 @@ const Users = () => {
               <PersonOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div className={classes.bodyItems}>
                   <div className={classes.bodyItem} style={inlineStyles.user_email}>
                     {user.user_email}
@@ -178,22 +179,22 @@ const Users = () => {
                     <ItemTags variant="list" tags={user.user_tags} />
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <UserPopover
                 user={user}
                 tagsMap={tagsMap}
                 organizationsMap={organizationsMap}
-                onUpdate={(result) => setUsers(users.map((u) => (u.user_id !== result.user_id ? u : result)))}
-                onDelete={(result) => setUsers(users.filter((u) => (u.user_id !== result)))}
+                onUpdate={result => setUsers(users.map(u => (u.user_id !== result.user_id ? u : result)))}
+                onDelete={result => setUsers(users.filter(u => (u.user_id !== result)))}
               />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
       <CreateUser
-        onCreate={(result) => setUsers([result, ...users])}
+        onCreate={result => setUsers([result, ...users])}
       />
     </div>
   );

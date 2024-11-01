@@ -1,20 +1,23 @@
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { HubOutlined } from '@mui/icons-material';
-import React, { CSSProperties, FunctionComponent } from 'react';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import ExerciseStatus from './simulation/ExerciseStatus';
-import ItemTags from '../../../components/ItemTags';
-import { useFormatter } from '../../../components/i18n';
+import { CSSProperties, FunctionComponent } from 'react';
+import * as React from 'react';
+import { Link } from 'react-router-dom';
+
 import type { ExerciseSimpleStore, ExerciseStore } from '../../../actions/exercises/Exercise';
-import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
-import ItemTargets from '../../../components/ItemTargets';
-import type { ExerciseSimple } from '../../../utils/api-types';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../actions/Tag';
-import { useAppDispatch } from '../../../utils/hooks';
 import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
 import { Header } from '../../../components/common/SortHeadersList';
+import { useFormatter } from '../../../components/i18n';
+import ItemTags from '../../../components/ItemTags';
+import ItemTargets from '../../../components/ItemTargets';
+import type { ExerciseSimple } from '../../../utils/api-types';
+import { useAppDispatch } from '../../../utils/hooks';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
+import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
+import ExerciseStatus from './simulation/ExerciseStatus';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -82,7 +85,7 @@ const ExerciseList: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const inlineStyles = getInlineStyles(variant);
-  const { nsdt } = useFormatter();
+  const { nsdt, vnsdt } = useFormatter();
 
   // Fetching data
   useDataLoader(() => {
@@ -101,7 +104,12 @@ const ExerciseList: FunctionComponent<Props> = ({
       field: 'exercise_start_date',
       label: 'Start date',
       isSortable: true,
-      value: (exercise: ExerciseSimple) => <>{(exercise.exercise_start_date ? (nsdt(exercise.exercise_start_date)) : ('-'))}</>,
+      value: (exercise: ExerciseSimple) => {
+        if (!exercise.exercise_start_date) {
+          return '-';
+        }
+        return <>{(variant === 'reduced-view' ? vnsdt(exercise.exercise_start_date) : nsdt(exercise.exercise_start_date))}</>;
+      },
     },
     {
       field: 'exercise_status',
@@ -131,48 +139,56 @@ const ExerciseList: FunctionComponent<Props> = ({
       field: 'exercise_updated_at',
       label: 'Updated',
       isSortable: true,
-      value: (exercise: ExerciseSimple) => <>{nsdt(exercise.exercise_updated_at)}</>,
+      value: (exercise: ExerciseSimple) => {
+        if (!exercise.exercise_updated_at) {
+          return '-';
+        }
+        return <>{(variant === 'reduced-view' ? vnsdt(exercise.exercise_updated_at) : nsdt(exercise.exercise_updated_at))}</>;
+      },
     },
   ];
 
   return (
     <List>
       {hasHeader && queryableHelpers
-        && <ListItem
+      && (
+        <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
           secondaryAction={<>&nbsp;</>}
-           >
+        >
           <ListItemIcon />
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponentV2
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
                 sortHelpers={queryableHelpers.sortHelpers}
               />
-            }
+            )}
           />
-        </ListItem>}
-      {exercises.map((exercise: ExerciseStore) => (
+        </ListItem>
+      )}
+      {exercises.map((exercise: ExerciseStore, index) => (
         <ListItem
           key={exercise.exercise_id}
           secondaryAction={secondaryAction && secondaryAction(exercise)}
           disablePadding
-          divider
+          divider={exercises.length !== index + 1}
         >
           <ListItemButton
             classes={{ root: classes.item }}
-            href={`/admin/exercises/${exercise.exercise_id}`}
+            component={Link}
+            to={`/admin/exercises/${exercise.exercise_id}`}
           >
             <ListItemIcon>
               <HubOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div className={classes.bodyItems}>
-                  {headers.map((header) => (
+                  {headers.map(header => (
                     <div
                       key={header.field}
                       className={classes.bodyItem}
@@ -182,7 +198,7 @@ const ExerciseList: FunctionComponent<Props> = ({
                     </div>
                   ))}
                 </div>
-              }
+              )}
             />
           </ListItemButton>
         </ListItem>

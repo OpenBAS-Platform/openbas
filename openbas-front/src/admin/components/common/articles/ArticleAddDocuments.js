@@ -1,22 +1,23 @@
-import React, { useContext, useState } from 'react';
-import * as R from 'ramda';
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { ControlPointOutlined, DescriptionOutlined } from '@mui/icons-material';
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import SearchFilter from '../../../../components/SearchFilter';
-import { useFormatter } from '../../../../components/i18n';
-import { fetchDocuments } from '../../../../actions/Document';
-import CreateDocument from '../../components/documents/CreateDocument';
-import { truncate } from '../../../../utils/String';
-import Transition from '../../../../components/common/Transition';
-import TagsFilter from '../filters/TagsFilter';
-import ItemTags from '../../../../components/ItemTags';
-import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { PermissionsContext } from '../Context';
+import * as R from 'ramda';
+import { useContext, useState } from 'react';
 
-const useStyles = makeStyles((theme) => ({
+import { fetchDocuments } from '../../../../actions/Document';
+import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import ItemTags from '../../../../components/ItemTags';
+import SearchFilter from '../../../../components/SearchFilter';
+import { useHelper } from '../../../../store';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { truncate } from '../../../../utils/String';
+import CreateDocument from '../../components/documents/CreateDocument';
+import { PermissionsContext } from '../Context';
+import TagsFilter from '../filters/TagsFilter';
+
+const useStyles = makeStyles(theme => ({
   box: {
     width: '100%',
     minHeight: '100%',
@@ -50,7 +51,7 @@ const ArticleAddDocuments = (props) => {
   const [tags, setTags] = useState([]);
 
   // Fetching data
-  const { documents } = useHelper((helper) => ({
+  const { documents } = useHelper(helper => ({
     documents: helper.getDocumentsMap(),
   }));
   useDataLoader(() => {
@@ -86,7 +87,7 @@ const ArticleAddDocuments = (props) => {
   };
 
   const removeDocument = (documentId) => {
-    setDocumentsIds(R.filter((u) => u !== documentId, documentsIds));
+    setDocumentsIds(R.filter(u => u !== documentId, documentsIds));
   };
 
   const submitAddDocuments = () => {
@@ -97,19 +98,19 @@ const ArticleAddDocuments = (props) => {
   const onCreate = (result) => {
     addDocument(result.document_id);
   };
-  const filterByKeyword = (n) => keyword === ''
+  const filterByKeyword = n => keyword === ''
     || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
     !== -1
     || (n.document_description || '')
       .toLowerCase()
       .indexOf(keyword.toLowerCase()) !== -1
-    || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
-    !== -1;
+      || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
+      !== -1;
   const filteredDocuments = R.pipe(
     R.filter(
-      (n) => tags.length === 0
+      n => tags.length === 0
         || R.any(
-          (filter) => R.includes(filter, n.document_tags),
+          filter => R.includes(filter, n.document_tags),
           R.pluck('id', tags),
         ),
     ),
@@ -120,14 +121,14 @@ const ArticleAddDocuments = (props) => {
   if (channelType === 'newspaper') {
     finalDocuments = R.take(
       10,
-      filteredDocuments.filter((d) => d.document_type.includes('image/')),
+      filteredDocuments.filter(d => d.document_type.includes('image/')),
     );
     filters = ['image/'];
   } else if (channelType === 'microblogging') {
     finalDocuments = R.take(
       10,
       filteredDocuments.filter(
-        (d) => d.document_type.includes('image/')
+        d => d.document_type.includes('image/')
           || d.document_type.includes('video/'),
       ),
     );
@@ -135,7 +136,7 @@ const ArticleAddDocuments = (props) => {
   } else if (channelType === 'tv') {
     finalDocuments = R.take(
       10,
-      filteredDocuments.filter((d) => d.document_type.includes('video/')),
+      filteredDocuments.filter(d => d.document_type.includes('video/')),
     );
     filters = ['video/'];
   }

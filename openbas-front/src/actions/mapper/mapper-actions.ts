@@ -1,3 +1,4 @@
+import { simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
 import type {
   ExportMapperInput,
   ImportMapperAddInput,
@@ -6,7 +7,6 @@ import type {
   RawPaginationImportMapper,
   SearchPaginationInput,
 } from '../../utils/api-types';
-import { simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
 
 const XLS_MAPPER_URI = '/api/mappers';
 

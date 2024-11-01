@@ -1,4 +1,5 @@
 import Immutable from 'seamless-immutable';
+
 import * as Constants from '../constants/ActionTypes';
 
 const app = (state = Immutable({}), action = {}) => {

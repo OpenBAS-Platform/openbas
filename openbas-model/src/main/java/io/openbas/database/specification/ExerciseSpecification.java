@@ -1,31 +1,24 @@
 package io.openbas.database.specification;
 
+import static io.openbas.database.model.ExerciseStatus.SCHEDULED;
+
 import io.openbas.database.model.Exercise;
 import jakarta.persistence.criteria.Path;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 
-import static io.openbas.database.model.ExerciseStatus.SCHEDULED;
-
 public class ExerciseSpecification {
 
-  private ExerciseSpecification() {
-
-  }
+  private ExerciseSpecification() {}
 
   public static Specification<Exercise> recurringInstanceNotStarted() {
-    return (root, query, cb) -> cb.and(
-        cb.equal(root.get("status"), SCHEDULED),
-        cb.isNotNull(root.get("scenario"))
-    );
+    return (root, query, cb) ->
+        cb.and(cb.equal(root.get("status"), SCHEDULED), cb.isNotNull(root.get("scenario")));
   }
 
   public static Specification<Exercise> findGrantedFor(@NotNull final String userId) {
     return (root, query, cb) -> {
-      Path<Object> path = root
-              .join("grants")
-              .join("group")
-              .join("users").get("id");
+      Path<Object> path = root.join("grants").join("group").join("users").get("id");
       return cb.equal(path, userId);
     };
   }

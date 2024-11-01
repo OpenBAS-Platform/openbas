@@ -1,25 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { Grid, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+
 import type { ExerciseStore, InjectExpectationResultsByAttackPatternStore } from '../../../../../actions/exercises/Exercise';
-import ExerciseDistribution from './ExerciseDistribution';
-import ResponsePie from '../../../common/injects/ResponsePie';
-import ExerciseMainInformation from '../ExerciseMainInformation';
 import { fetchExerciseExpectationResult, fetchExerciseInjectExpectationResults, searchExerciseInjects } from '../../../../../actions/exercises/exercise-action';
+import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
+import { fetchExerciseInjects } from '../../../../../actions/Inject';
+import { initSorting } from '../../../../../components/common/queryable/Page';
+import { buildSearchPagination } from '../../../../../components/common/queryable/QueryableUtils';
+import { useQueryableWithLocalStorage } from '../../../../../components/common/queryable/useQueryableWithLocalStorage';
+import { useFormatter } from '../../../../../components/i18n';
+import Loader from '../../../../../components/Loader';
+import { useHelper } from '../../../../../store';
 import type { ExpectationResultsByType } from '../../../../../utils/api-types';
-import MitreMatrix from '../../../common/matrix/MitreMatrix';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { fetchExerciseInjects } from '../../../../../actions/Inject';
-import { useFormatter } from '../../../../../components/i18n';
-import { useHelper } from '../../../../../store';
-import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import InjectDtoList from '../../../atomic_testings/InjectDtoList';
-import { useQueryableWithLocalStorage } from '../../../../../components/common/queryable/useQueryableWithLocalStorage';
-import { buildSearchPagination } from '../../../../../components/common/queryable/QueryableUtils';
-import { initSorting } from '../../../../../components/common/queryable/Page';
+import ResponsePie from '../../../common/injects/ResponsePie';
+import MitreMatrix from '../../../common/matrix/MitreMatrix';
+import ExerciseMainInformation from '../ExerciseMainInformation';
+import ExerciseDistribution from './ExerciseDistribution';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -60,8 +62,8 @@ const Exercise = () => {
   if (injectResults) {
     resultAttackPatternIds = R.uniq(
       injectResults
-        .filter((injectResult) => !!injectResult.inject_attack_pattern)
-        .flatMap((injectResult) => injectResult.inject_attack_pattern) as unknown as string[],
+        .filter(injectResult => !!injectResult.inject_attack_pattern)
+        .flatMap(injectResult => injectResult.inject_attack_pattern) as unknown as string[],
     );
   }
 
@@ -86,7 +88,9 @@ const Exercise = () => {
             {t('Results')}
           </Typography>
           <Paper variant="outlined" style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-            <ResponsePie expectationResultsByTypes={results} humanValidationLink={`/admin/exercises/${exerciseId}/animation/validations`} />
+            {!results
+              ? <Loader variant="inElement" />
+              : <ResponsePie expectationResultsByTypes={results} humanValidationLink={`/admin/exercises/${exerciseId}/animation/validations`} />}
           </Paper>
         </Grid>
         {injectResults && resultAttackPatternIds.length > 0 && (
@@ -102,12 +106,12 @@ const Exercise = () => {
         {exercise.exercise_status !== 'SCHEDULED' && (
           <Grid item xs={12} style={{ marginTop: 25 }}>
             <Typography variant="h4" gutterBottom style={{ marginBottom: 15 }}>
-              {t('Injects Results')}
+              {t('Injects results')}
             </Typography>
             <Paper classes={{ root: classes.paper }} variant="outlined">
               <InjectDtoList
-                fetchInjects={(input) => searchExerciseInjects(exerciseId, input)}
-                goTo={(injectId) => `/admin/exercises/${exerciseId}/injects/${injectId}`}
+                fetchInjects={input => searchExerciseInjects(exerciseId, input)}
+                goTo={injectId => `/admin/exercises/${exerciseId}/injects/${injectId}`}
                 queryableHelpers={queryableHelpers}
                 searchPaginationInput={searchPaginationInput}
               />

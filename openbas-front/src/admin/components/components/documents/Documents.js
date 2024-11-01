@@ -1,25 +1,26 @@
-import React, { useState } from 'react';
-import * as R from 'ramda';
-import { makeStyles } from '@mui/styles';
-import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
-import { useDispatch } from 'react-redux';
 import { DescriptionOutlined, RowingOutlined } from '@mui/icons-material';
+import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useFormatter } from '../../../../components/i18n';
+
 import { searchDocuments } from '../../../../actions/Document';
-import { fetchTags } from '../../../../actions/Tag';
 import { fetchExercises } from '../../../../actions/Exercise';
+import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
+import { fetchTags } from '../../../../actions/Tag';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
+import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
+import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
+import { initSorting } from '../../../../components/common/queryable/Page';
+import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
+import { useHelper } from '../../../../store';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import CreateDocument from './CreateDocument';
 import DocumentPopover from './DocumentPopover';
 import DocumentType from './DocumentType';
-import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
-import Breadcrumbs from '../../../../components/Breadcrumbs';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { initSorting } from '../../../../components/common/queryable/Page';
-import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
-import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
-import { useHelper } from '../../../../store';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -87,7 +88,7 @@ const Documents = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useFormatter();
-  const { exercisesMap, scenariosMap, userAdmin } = useHelper((helper) => ({
+  const { exercisesMap, scenariosMap, userAdmin } = useHelper(helper => ({
     exercisesMap: helper.getExercisesMap(),
     scenariosMap: helper.getScenariosMap(),
     userAdmin: helper.getMe()?.user_admin ?? false,
@@ -152,18 +153,18 @@ const Documents = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponent
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-            }
+            )}
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {documents.map((document) => (
+        {documents.map(document => (
           <ListItem
             key={document.document_id}
             classes={{ root: classes.item }}
@@ -176,7 +177,7 @@ const Documents = () => {
               <DescriptionOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div className={classes.bodyItems}>
                   <div
                     className={classes.bodyItem}
@@ -268,23 +269,25 @@ const Documents = () => {
                     <ItemTags variant="list" tags={document.document_tags} />
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <DocumentPopover
                 document={document}
                 disabled={!userAdmin}
-                onUpdate={(result) => setDocuments(documents.map((d) => (d.document_id !== result.document_id ? d : result)))}
-                onDelete={(result) => setDocuments(documents.filter((d) => (d.document_id !== result)))}
+                onUpdate={result => setDocuments(documents.map(d => (d.document_id !== result.document_id ? d : result)))}
+                onDelete={result => setDocuments(documents.filter(d => (d.document_id !== result)))}
                 scenariosAndExercisesFetched
               />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
-      {userAdmin && <CreateDocument
-        onCreate={(result) => setDocuments([result, ...documents])}
-                    />}
+      {userAdmin && (
+        <CreateDocument
+          onCreate={result => setDocuments([result, ...documents])}
+        />
+      )}
     </>
   );
 };

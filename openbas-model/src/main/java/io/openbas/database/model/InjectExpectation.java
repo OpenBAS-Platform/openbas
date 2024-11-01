@@ -1,5 +1,8 @@
 package io.openbas.database.model;
 
+import static java.time.Instant.now;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -8,17 +11,14 @@ import io.openbas.helper.MonoIdDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.UuidGenerator;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static java.time.Instant.now;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UuidGenerator;
 
 @Getter
 @Entity
@@ -95,11 +95,7 @@ public class InjectExpectation implements Base {
       return EXPECTATION_STATUS.PENDING;
     }
     if (team != null) {
-      return switch (getResults().getFirst().getResult()) {
-        case "Failed" -> EXPECTATION_STATUS.FAILED;
-        case "Success" -> EXPECTATION_STATUS.SUCCESS;
-        default -> EXPECTATION_STATUS.PENDING;
-      };
+      return getExpectationStatus();
     }
 
     if (this.getScore() >= this.getExpectedScore()) {
@@ -111,11 +107,30 @@ public class InjectExpectation implements Base {
     return EXPECTATION_STATUS.PARTIAL;
   }
 
+  @JsonIgnore
+  public EXPECTATION_STATUS getExpectationStatus() {
+    String result = getResults().getFirst().getResult().toUpperCase();
+    return switch (result) {
+      case "FAILED" -> EXPECTATION_STATUS.FAILED;
+      case "SUCCESS" -> EXPECTATION_STATUS.SUCCESS;
+      case "PARTIAL" -> EXPECTATION_STATUS.PARTIAL;
+      case "UNKNOWN" -> EXPECTATION_STATUS.UNKNOWN;
+      default -> EXPECTATION_STATUS.PENDING;
+    };
+  }
+
   @Setter
   @Column(name = "inject_expectation_expected_score")
   @JsonProperty("inject_expectation_expected_score")
   @NotNull
   private Double expectedScore;
+
+  /** Expiration time in seconds */
+  @Setter
+  @Column(name = "inject_expiration_time")
+  @JsonProperty("inject_expiration_time")
+  @NotNull
+  private Long expirationTime;
 
   @Setter
   @Column(name = "inject_expectation_created_at")
@@ -131,6 +146,7 @@ public class InjectExpectation implements Base {
   @Column(name = "inject_expectation_group")
   @JsonProperty("inject_expectation_group")
   private boolean expectationGroup;
+
   // endregion
 
   // region contextual relations
@@ -175,6 +191,7 @@ public class InjectExpectation implements Base {
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_expectation_asset_group")
   private AssetGroup assetGroup;
+
   // endregion
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -199,25 +216,19 @@ public class InjectExpectation implements Base {
     this.challenge = challenge;
   }
 
-  public void setManual(
-      @NotNull final Asset asset,
-      @NotNull final AssetGroup assetGroup) {
+  public void setManual(@NotNull final Asset asset, @NotNull final AssetGroup assetGroup) {
     this.type = EXPECTATION_TYPE.MANUAL;
     this.asset = asset;
     this.assetGroup = assetGroup;
   }
 
-  public void setPrevention(
-      @NotNull final Asset asset,
-      @NotNull final AssetGroup assetGroup) {
+  public void setPrevention(@NotNull final Asset asset, @NotNull final AssetGroup assetGroup) {
     this.type = EXPECTATION_TYPE.PREVENTION;
     this.asset = asset;
     this.assetGroup = assetGroup;
   }
 
-  public void setDetection(
-      @NotNull final Asset asset,
-      @NotNull final AssetGroup assetGroup) {
+  public void setDetection(@NotNull final Asset asset, @NotNull final AssetGroup assetGroup) {
     this.type = EXPECTATION_TYPE.DETECTION;
     this.asset = asset;
     this.assetGroup = assetGroup;

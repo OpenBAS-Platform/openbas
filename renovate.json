@@ -8,8 +8,7 @@
     "filigran team"
   ],
   "ignorePaths": [
-    "**/node_modules/**",
-    "openbas-front/packages/ckeditor5-custom-build/package.json"
+    "**/node_modules/**"
   ],
   "prConcurrentLimit": 2,
   "packageRules": [
@@ -20,11 +19,46 @@
       "prPriority": 5
     },
     {
-      "matchPackagePatterns": [
+      "matchDatasources": [
+        "npm",
+        "gitea-tags",
+        "node-version"
+      ],
+      "commitMessagePrefix": "[frontend]"
+    },
+    {
+      "matchDatasources": [
+        "maven"
+      ],
+      "commitMessagePrefix": "[backend]"
+    },
+    {
+      "matchDatasources": [
+        "docker",
+        "orb"
+      ],
+      "commitMessagePrefix": "[tool]"
+    },
+    {
+      "matchPackageNames": [
         "react-apexcharts",
         "org.flywaydb:flyway-core"
       ],
       "commitMessage": "[DANGER] Do not merge, breaking changes incoming"
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "openbas-front/package.json"
+      ],
+      "matchStrings": [
+        "xlsx\": \"https:\/\/cdn\\.sheetjs\\.com\/xlsx-(?<currentValue>[\\d.]+)\/xlsx"
+      ],
+      "registryUrlTemplate": "https://git.sheetjs.com",
+      "depNameTemplate": "sheetjs/sheetjs",
+      "datasourceTemplate": "gitea-tags"
     }
   ],
   "schedule": [

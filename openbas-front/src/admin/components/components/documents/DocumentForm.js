@@ -1,12 +1,12 @@
-import React from 'react';
-import { Form } from 'react-final-form';
 import { Button, CircularProgress } from '@mui/material';
-import OldTextField from '../../../../components/fields/OldTextField';
-import { useFormatter } from '../../../../components/i18n';
-import TagField from '../../../../components/TagField';
-import FileField from '../../../../components/FileField';
+import { Form } from 'react-final-form';
+
 import ExerciseField from '../../../../components/ExerciseField';
+import OldTextField from '../../../../components/fields/OldTextField';
+import FileField from '../../../../components/FileField';
+import { useFormatter } from '../../../../components/i18n';
 import ScenarioField from '../../../../components/ScenarioField';
+import TagField from '../../../../components/TagField';
 
 const DocumentForm = (props) => {
   // Standard hooks

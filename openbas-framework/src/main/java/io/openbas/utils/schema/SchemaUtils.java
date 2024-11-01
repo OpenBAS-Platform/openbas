@@ -1,42 +1,57 @@
 package io.openbas.utils.schema;
 
+import static org.springframework.util.StringUtils.hasText;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
+import io.openbas.utils.SubclassScanner;
 import jakarta.persistence.Column;
 import jakarta.persistence.JoinTable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static org.springframework.util.StringUtils.hasText;
-
 public class SchemaUtils {
 
-  private SchemaUtils() {
+  private SchemaUtils() {}
 
-  }
+  private static final List<Class<?>> REQUIRED_ANNOTATIONS =
+      List.of(NotNull.class, NotBlank.class, Email.class);
 
-  private static final List<Class<?>> REQUIRED_ANNOTATIONS = List.of(
-      NotNull.class,
-      NotBlank.class,
-      Email.class
-  );
+  private static final String BASE_CLASS_PACKAGE = "io.openbas.database.model";
 
-  private static final ConcurrentHashMap<Class<?>, List<PropertySchema>> cacheMap = new ConcurrentHashMap<>();
+  private static final ConcurrentHashMap<Class<?>, List<PropertySchema>> cacheMap =
+      new ConcurrentHashMap<>();
 
   // -- SCHEMA --
+  public static List<PropertySchema> schemaWithSubtypes(@NotNull Class<?> clazz)
+      throws ClassNotFoundException {
+    List<List<PropertySchema>> propertySchemasAll = new ArrayList<>();
+    propertySchemasAll.add(schema(clazz));
+    propertySchemasAll.addAll(
+        SubclassScanner.getSubclasses(BASE_CLASS_PACKAGE, clazz).stream()
+            .map(SchemaUtils::schema)
+            .toList());
+
+    return propertySchemasAll.stream()
+        .flatMap(List::stream)
+        .collect(
+            Collectors.toMap(
+                PropertySchema::getName,
+                propertySchema -> propertySchema,
+                (existing, replacement) -> existing))
+        .values()
+        .stream()
+        .toList();
+  }
 
   public static List<PropertySchema> schema(@NotNull Class<?> clazz) {
     return cacheMap.computeIfAbsent(clazz, SchemaUtils::computeSchema);
@@ -63,14 +78,18 @@ public class SchemaUtils {
   }
 
   private static PropertySchema buildPropertySchemaFromField(Field field) {
-    PropertySchema.PropertySchemaBuilder builder = PropertySchema.builder()
-        .name(field.getName())
-        .type(field.getType())
-        .multiple(field.getType().isArray() || Collection.class.isAssignableFrom(field.getType()));
+    PropertySchema.PropertySchemaBuilder builder =
+        PropertySchema.builder()
+            .name(field.getName())
+            .type(field.getType())
+            .multiple(
+                field.getType().isArray() || Collection.class.isAssignableFrom(field.getType()));
 
-    if (field.getType().isEnum() || (field.getType().isArray() && field.getType().getComponentType().isEnum())) {
+    if (field.getType().isEnum()
+        || (field.getType().isArray() && field.getType().getComponentType().isEnum())) {
       builder.availableValues(
-          getEnumNames(field.getType().isArray() ? field.getType().getComponentType() : field.getType()));
+          getEnumNames(
+              field.getType().isArray() ? field.getType().getComponentType() : field.getType()));
     }
 
     for (Annotation annotation : field.getDeclaredAnnotations()) {
@@ -89,19 +108,24 @@ public class SchemaUtils {
   }
 
   private static PropertySchema buildPropertySchemaFromMethod(Method method) {
-    PropertySchema.PropertySchemaBuilder builder = PropertySchema.builder()
-        .name(method.getName())
-        .type(method.getReturnType())
-        .multiple(method.getReturnType().isArray() || Collection.class.isAssignableFrom(method.getReturnType()));
+    PropertySchema.PropertySchemaBuilder builder =
+        PropertySchema.builder()
+            .name(method.getName())
+            .type(method.getReturnType())
+            .multiple(
+                method.getReturnType().isArray()
+                    || Collection.class.isAssignableFrom(method.getReturnType()));
 
     if (method.getReturnType().isEnum()) {
       builder.availableValues(getEnumNames(method.getReturnType()));
-    } else if (method.getReturnType().isArray() || method.getGenericReturnType() instanceof ParameterizedType) {
+    } else if (method.getReturnType().isArray()
+        || method.getGenericReturnType() instanceof ParameterizedType) {
       Class enumType = null;
       if (method.getReturnType().isArray()) {
         enumType = method.getReturnType().getComponentType();
       } else {
-        Type typeArgument = ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0];
+        Type typeArgument =
+            ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0];
         if (typeArgument instanceof Class<?>) {
           enumType = (Class<?>) typeArgument;
         }
@@ -136,11 +160,13 @@ public class SchemaUtils {
     } else if (REQUIRED_ANNOTATIONS.contains(annotation.annotationType())) {
       builder.mandatory(true);
     } else if (annotation.annotationType().equals(Queryable.class)) {
-      Queryable queryable = member instanceof Field
-          ? ((Field) member).getAnnotation(Queryable.class)
-          : ((Method) member).getAnnotation(Queryable.class);
+      Queryable queryable =
+          member instanceof Field
+              ? ((Field) member).getAnnotation(Queryable.class)
+              : ((Method) member).getAnnotation(Queryable.class);
       if (queryable != null) {
-        builder.searchable(queryable.searchable())
+        builder
+            .searchable(queryable.searchable())
             .filterable(queryable.filterable())
             .dynamicValues(queryable.dynamicValues())
             .sortable(queryable.sortable())
@@ -152,11 +178,13 @@ public class SchemaUtils {
         }
       }
     } else if (annotation.annotationType().equals(JoinTable.class)) {
-      builder.joinTable(PropertySchema.JoinTable.builder().joinOn(((Field) member).getName()).build());
+      builder.joinTable(
+          PropertySchema.JoinTable.builder().joinOn(((Field) member).getName()).build());
     }
   }
 
-  public static PropertySchema retrieveProperty(List<PropertySchema> propertySchemas, String jsonFieldPath) {
+  public static PropertySchema retrieveProperty(
+      List<PropertySchema> propertySchemas, String jsonFieldPath) {
     if (jsonFieldPath.contains("\\.")) {
       throw new IllegalArgumentException("Deep path is not allowed");
     }
@@ -165,15 +193,21 @@ public class SchemaUtils {
         .filter(p -> jsonFieldPath.equals(p.getJsonName()))
         .findFirst()
         .orElseThrow(
-            () -> new IllegalArgumentException("This path is not handled by Queryable annotation: " + jsonFieldPath));
+            () ->
+                new IllegalArgumentException(
+                    "This path is not handled by Queryable annotation: " + jsonFieldPath));
   }
 
   public static List<PropertySchema> getSearchableProperties(List<PropertySchema> propertySchemas) {
-    return propertySchemas.stream().filter(PropertySchema::isSearchable).collect(Collectors.toList());
+    return propertySchemas.stream()
+        .filter(PropertySchema::isSearchable)
+        .collect(Collectors.toList());
   }
 
   public static List<PropertySchema> getFilterableProperties(List<PropertySchema> propertySchemas) {
-    return propertySchemas.stream().filter(PropertySchema::isFilterable).collect(Collectors.toList());
+    return propertySchemas.stream()
+        .filter(PropertySchema::isFilterable)
+        .collect(Collectors.toList());
   }
 
   public static List<PropertySchema> getSortableProperties(List<PropertySchema> propertySchemas) {

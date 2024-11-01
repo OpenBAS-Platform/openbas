@@ -1,24 +1,25 @@
-import React, { FunctionComponent, Suspense, useEffect, useState } from 'react';
 import { Box, Tab, Tabs } from '@mui/material';
-import { Link, Route, Routes, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
-import Loader from '../../../../../components/Loader';
+import { FunctionComponent, Suspense, useEffect, useState } from 'react';
+import { Link, Route, Routes, useLocation, useParams, useSearchParams } from 'react-router-dom';
+
+import { fetchInjectResultDto } from '../../../../../actions/atomic_testings/atomic-testing-actions';
+import { fetchExercise } from '../../../../../actions/Exercise';
+import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
+import Breadcrumbs, { BreadcrumbsElement } from '../../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../../components/Error';
-import NotFound from '../../../../../components/NotFound';
 import { useFormatter } from '../../../../../components/i18n';
+import Loader from '../../../../../components/Loader';
+import NotFound from '../../../../../components/NotFound';
+import { useHelper } from '../../../../../store';
+import type { Exercise as ExerciseType, InjectResultDTO } from '../../../../../utils/api-types';
+import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import AtomicTesting from '../../../atomic_testings/atomic_testing/AtomicTesting';
 import AtomicTestingDetail from '../../../atomic_testings/atomic_testing/AtomicTestingDetail';
-import type { Exercise as ExerciseType, InjectResultDTO } from '../../../../../utils/api-types';
-import { PermissionsContext, PermissionsContextType } from '../../../common/Context';
-import { usePermissions } from '../../../../../utils/Exercise';
-import Breadcrumbs, { BreadcrumbsElement } from '../../../../../components/Breadcrumbs';
-import { useHelper } from '../../../../../store';
-import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { fetchExercise } from '../../../../../actions/Exercise';
-import { fetchInjectResultDto } from '../../../../../actions/atomic_testings/atomic-testing-actions';
 import { InjectResultDtoContext } from '../../../atomic_testings/InjectResultDtoContext';
+import { PermissionsContext, PermissionsContextType } from '../../../common/Context';
 import InjectHeader from '../../../injects/InjectHeader';
 
 const useStyles = makeStyles(() => ({
@@ -33,7 +34,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType, injectResult: InjectResultDTO }> = ({
+const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType; injectResult: InjectResultDTO }> = ({
   exercise,
   injectResult,
 }) => {

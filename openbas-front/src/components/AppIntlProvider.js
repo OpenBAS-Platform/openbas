@@ -1,20 +1,22 @@
-import React, { useEffect } from 'react';
-import * as PropTypes from 'prop-types';
-import { IntlProvider } from 'react-intl';
-import moment from 'moment';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import frLocale from 'date-fns/locale/fr';
-import enLocale from 'date-fns/locale/en-US';
-import esLocale from 'date-fns/locale/es';
-import cnLocale from 'date-fns/locale/zh-CN';
 import 'cronstrue/locales/fr';
 import 'cronstrue/locales/en';
 import 'cronstrue/locales/es';
 import 'cronstrue/locales/zh_CN';
+
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
+import enLocale from 'date-fns/locale/en-US';
+import esLocale from 'date-fns/locale/es';
+import frLocale from 'date-fns/locale/fr';
+import cnLocale from 'date-fns/locale/zh-CN';
+import moment from 'moment';
+import * as PropTypes from 'prop-types';
+import { useEffect } from 'react';
+import { IntlProvider } from 'react-intl';
+
+import { useHelper } from '../store';
 import locale, { DEFAULT_LANG } from '../utils/BrowserLanguage';
 import i18n from '../utils/Localization';
-import { useHelper } from '../store';
 
 const localeMap = {
   en: enLocale,

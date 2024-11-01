@@ -1,4 +1,5 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
+
 import type { Article, Channel } from '../../../../../../utils/api-types';
 import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 import ChannelIcon from '../../../../components/channels/ChannelIcon';
@@ -16,7 +17,8 @@ const ChannelExpectation: FunctionComponent<Props> = ({
   expectation,
 }) => {
   return (
-    <ExpectationLine expectation={expectation}
+    <ExpectationLine
+      expectation={expectation}
       info={channel.channel_name}
       title={article.article_name ?? ''}
       icon={<ChannelIcon type={channel.channel_type} size="small" />}

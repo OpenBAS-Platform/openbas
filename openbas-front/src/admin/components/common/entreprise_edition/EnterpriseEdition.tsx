@@ -13,16 +13,16 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 */
 
-import React from 'react';
 import { Alert, AlertTitle } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import EnterpriseEditionButton from './EnterpriseEditionButton';
-import type { Theme } from '../../../../components/Theme';
+
 import { useFormatter } from '../../../../components/i18n';
+import type { Theme } from '../../../../components/Theme';
+import EnterpriseEditionButton from './EnterpriseEditionButton';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
-const useStyles = makeStyles<Theme>((theme) => ({
+const useStyles = makeStyles<Theme>(theme => ({
   alert: {
     width: '100%',
     marginBottom: 20,
@@ -31,7 +31,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }));
 
-const EnterpriseEdition = ({ message }: { message?: string, feature?: string }) => {
+const EnterpriseEdition = ({ message }: { message?: string; feature?: string }) => {
   const classes = useStyles();
   const { t } = useFormatter();
   return (

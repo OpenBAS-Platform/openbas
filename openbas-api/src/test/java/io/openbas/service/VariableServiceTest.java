@@ -1,46 +1,53 @@
 package io.openbas.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Variable;
 import io.openbas.database.model.Variable.VariableType;
 import io.openbas.database.repository.ExerciseRepository;
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
+@TestInstance(PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class VariableServiceTest {
 
-  @Autowired
-  private VariableService variableService;
+  @Autowired private VariableService variableService;
 
-  @Autowired
-  private ExerciseRepository exerciseRepository;
+  @Autowired private ExerciseRepository exerciseRepository;
 
-  static String EXERCISE_ID;
+  static Exercise EXERCISE;
   static String VARIABLE_ID;
+
+  @BeforeAll
+  void beforeAll() {
+    Exercise exercise = new Exercise();
+    exercise.setName("Exercise name");
+    exercise.setFrom("test@test.com");
+    exercise.setReplyTos(List.of("test@test.com"));
+    EXERCISE = this.exerciseRepository.save(exercise);
+  }
+
+  @AfterAll
+  void afterAll() {
+    this.exerciseRepository.deleteById(EXERCISE.getId());
+  }
 
   @DisplayName("Create variable")
   @Test
   @Order(1)
   void createVariableTest() {
     // -- PREPARE --
-    Exercise exercise = new Exercise();
-    exercise.setName("Exercice name");
-    exercise.setFrom("test@test.com");
-    exercise.setReplyTos(List.of("test@test.com"));
-    Exercise exerciseCreated = this.exerciseRepository.save(exercise);
-    EXERCISE_ID = exerciseCreated.getId();
     Variable variable = new Variable();
     String variableKey = "key";
     variable.setKey(variableKey);
-    variable.setExercise(exerciseCreated);
+    variable.setExercise(EXERCISE);
 
     // -- EXECUTE --
     Variable variableCreated = this.variableService.createVariable(variable);
@@ -60,7 +67,7 @@ public class VariableServiceTest {
     Variable variable = this.variableService.variable(VARIABLE_ID);
     assertNotNull(variable);
 
-    List<Variable> variables = this.variableService.variablesFromExercise(EXERCISE_ID);
+    List<Variable> variables = this.variableService.variablesFromExercise(EXERCISE.getId());
     assertNotNull(variable);
     assertEquals(VARIABLE_ID, variables.get(0).getId());
   }
@@ -87,5 +94,4 @@ public class VariableServiceTest {
     this.variableService.deleteVariable(VARIABLE_ID);
     assertThrows(NoSuchElementException.class, () -> this.variableService.variable(VARIABLE_ID));
   }
-
 }

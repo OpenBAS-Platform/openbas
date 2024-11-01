@@ -1,5 +1,5 @@
+import { delReferential, getReferential, postReferential, putReferential, simplePostCall } from '../utils/Action';
 import * as schema from './Schema';
-import { getReferential, putReferential, postReferential, delReferential, simplePostCall } from '../utils/Action';
 
 export const fetchMitigations = () => (dispatch) => {
   const uri = '/api/mitigations';
@@ -17,12 +17,12 @@ export const updateMitigation = (mitigationId, data) => (dispatch) => {
   return putReferential(schema.mitigation, uri, data)(dispatch);
 };
 
-export const addMitigation = (data) => (dispatch) => {
+export const addMitigation = data => (dispatch) => {
   const uri = '/api/mitigations';
   return postReferential(schema.mitigation, uri, data)(dispatch);
 };
 
-export const deleteMitigation = (mitigationId) => (dispatch) => {
+export const deleteMitigation = mitigationId => (dispatch) => {
   const uri = `/api/mitigations/${mitigationId}`;
   return delReferential(uri, 'mitigations', mitigationId)(dispatch);
 };

@@ -1,18 +1,21 @@
 package io.openbas.rest.payload.form;
 
+import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
+import io.openbas.database.model.Payload.PAYLOAD_SOURCE;
+import io.openbas.database.model.Payload.PAYLOAD_STATUS;
 import io.openbas.database.model.PayloadArgument;
 import io.openbas.database.model.PayloadPrerequisite;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-import lombok.Setter;
-
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-
-import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -26,13 +29,13 @@ public class PayloadCreateInput {
   @JsonProperty("payload_name")
   private String name;
 
-  @NotBlank(message = MANDATORY_MESSAGE)
+  @NotNull(message = MANDATORY_MESSAGE)
   @JsonProperty("payload_source")
-  private String source;
+  private PAYLOAD_SOURCE source;
 
-  @NotBlank(message = MANDATORY_MESSAGE)
+  @NotNull(message = MANDATORY_MESSAGE)
   @JsonProperty("payload_status")
-  private String status;
+  private PAYLOAD_STATUS status;
 
   @NotEmpty(message = MANDATORY_MESSAGE)
   @JsonProperty("payload_platforms")
@@ -46,6 +49,9 @@ public class PayloadCreateInput {
 
   @JsonProperty("command_content")
   private String content;
+
+  @JsonProperty("executable_arch")
+  private Endpoint.PLATFORM_ARCH executableArch;
 
   @JsonProperty("executable_file")
   private String executableFile;
@@ -74,5 +80,3 @@ public class PayloadCreateInput {
   @JsonProperty("payload_attack_patterns")
   private List<String> attackPatternsIds = new ArrayList<>();
 }
-
-

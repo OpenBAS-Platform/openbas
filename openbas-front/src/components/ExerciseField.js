@@ -1,12 +1,12 @@
-import React from 'react';
-import { useDispatch } from 'react-redux';
 import { Kayaking } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import Autocomplete from './Autocomplete';
-import useDataLoader from '../utils/hooks/useDataLoader';
-import { useHelper } from '../store';
+import { useDispatch } from 'react-redux';
+
 import { fetchExercises } from '../actions/Exercise';
+import { useHelper } from '../store';
+import useDataLoader from '../utils/hooks/useDataLoader';
+import Autocomplete from './Autocomplete';
 
 const useStyles = makeStyles(() => ({
   icon: {
@@ -29,12 +29,12 @@ const useStyles = makeStyles(() => ({
 const ExerciseField = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const exercises = useHelper((helper) => helper.getExercises());
+  const exercises = useHelper(helper => helper.getExercises());
   useDataLoader(() => {
     dispatch(fetchExercises());
   });
   const { name, onKeyDown, style, label, placeholder } = props;
-  const exerciseOptions = (exercises || []).map((n) => ({
+  const exerciseOptions = (exercises || []).map(n => ({
     id: n.exercise_id,
     label: n.exercise_name,
   }));

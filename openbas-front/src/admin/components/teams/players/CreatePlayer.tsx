@@ -1,23 +1,21 @@
-import React, { FunctionComponent, useState } from 'react';
-import { Fab, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { Add, ControlPointOutlined } from '@mui/icons-material';
+import { ControlPointOutlined } from '@mui/icons-material';
+import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { FunctionComponent, useState } from 'react';
+
 import { addPlayer } from '../../../../actions/User';
-import PlayerForm from './PlayerForm';
-import { useFormatter } from '../../../../components/i18n';
+import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Dialog from '../../../../components/common/Dialog';
-import { useAppDispatch } from '../../../../utils/hooks';
+import Drawer from '../../../../components/common/Drawer';
+import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 import type { PlayerInput } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
 import { Option } from '../../../../utils/Option';
 import type { PlayerInputForm, UserStore } from './Player';
+import PlayerForm from './PlayerForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
-  createButton: {
-    position: 'fixed',
-    bottom: 30,
-    right: 30,
-  },
   text: {
     fontSize: theme.typography.h2.fontSize,
     color: theme.palette.primary.main,
@@ -34,6 +32,7 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
   inline = false,
   onCreate,
 }) => {
+  // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -51,7 +50,7 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
       user_tags: data.user_tags?.map((tag: Option) => tag.id),
     };
     return dispatch(addPlayer(inputValues)).then(
-      (result: { result: string, entities: { users: Record<string, UserStore> } }) => {
+      (result: { result: string; entities: { users: Record<string, UserStore> } }) => {
         if (result.result) {
           if (onCreate) {
             const created = result.entities.users[result.result];
@@ -67,36 +66,44 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
   return (
     <div>
       {inline ? (
-        <ListItemButton divider={true} onClick={handleOpen} color="primary">
-          <ListItemIcon color="primary">
-            <ControlPointOutlined color="primary" />
-          </ListItemIcon>
-          <ListItemText
-            primary={t('Create a new player')}
-            classes={{ primary: classes.text }}
-          />
-        </ListItemButton>
+        <>
+          <ListItemButton divider onClick={handleOpen} color="primary">
+            <ListItemIcon color="primary">
+              <ControlPointOutlined color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={t('Create a new player')}
+              classes={{ primary: classes.text }}
+            />
+          </ListItemButton>
+          <Dialog
+            open={openDialog}
+            handleClose={handleClose}
+            title={t('Create a new player')}
+          >
+            <PlayerForm
+              initialValues={{ user_tags: [] }}
+              handleClose={handleClose}
+              onSubmit={onSubmit}
+            />
+          </Dialog>
+        </>
       ) : (
-        <Fab
-          onClick={handleOpen}
-          color="primary"
-          aria-label="Add"
-          className={classes.createButton}
-        >
-          <Add />
-        </Fab>
+        <>
+          <ButtonCreate onClick={handleOpen} />
+          <Drawer
+            open={openDialog}
+            handleClose={handleClose}
+            title={t('Create a new player')}
+          >
+            <PlayerForm
+              initialValues={{ user_tags: [] }}
+              handleClose={handleClose}
+              onSubmit={onSubmit}
+            />
+          </Drawer>
+        </>
       )}
-      <Dialog
-        open={openDialog}
-        handleClose={handleClose}
-        title={t('Create a new player')}
-      >
-        <PlayerForm
-          initialValues={{ user_tags: [] }}
-          handleClose={handleClose}
-          onSubmit={onSubmit}
-        />
-      </Dialog>
     </div>
   );
 };

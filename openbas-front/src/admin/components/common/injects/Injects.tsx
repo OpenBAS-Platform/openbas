@@ -1,36 +1,38 @@
-import React, { CSSProperties, FunctionComponent, useContext, useMemo, useState } from 'react';
 import { Checkbox, Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { Link } from 'react-router-dom';
 import * as R from 'ramda';
-import { splitDuration } from '../../../../utils/Time';
-import ItemTags from '../../../../components/ItemTags';
-import InjectIcon from './InjectIcon';
-import InjectPopover from './InjectPopover';
-import InjectorContract from './InjectorContract';
-import ItemBoolean from '../../../../components/ItemBoolean';
-import PlatformIcon from '../../../../components/PlatformIcon';
-import { isNotEmptyField } from '../../../../utils/utils';
-import { useFormatter } from '../../../../components/i18n';
-import type { FilterGroup, Inject, InjectTestStatus, Variable } from '../../../../utils/api-types';
+import { CSSProperties, FunctionComponent, useContext, useMemo, useState } from 'react';
+import * as React from 'react';
+import { Link } from 'react-router-dom';
+
+import type { ArticleStore } from '../../../../actions/channels/Article';
 import type { InjectorContractConvertedContent, InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
-import { InjectContext, PermissionsContext, ViewModeContext } from '../Context';
+import type { TeamStore } from '../../../../actions/teams/Team';
+import ChainedTimeline from '../../../../components/ChainedTimeline';
+import ButtonCreate from '../../../../components/common/ButtonCreate';
+import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
-import InjectsListButtons from './InjectsListButtons';
-import ChainedTimeline from '../../../../components/ChainedTimeline';
-import { initSorting } from '../../../../components/common/queryable/Page';
-import UpdateInject from './UpdateInject';
-import ButtonCreate from '../../../../components/common/ButtonCreate';
-import CreateInject from './CreateInject';
-import type { TeamStore } from '../../../../actions/teams/Team';
-import type { ArticleStore } from '../../../../actions/channels/Article';
-import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
-import ToolBar from '../ToolBar';
+import { useFormatter } from '../../../../components/i18n';
+import ItemBoolean from '../../../../components/ItemBoolean';
+import ItemTags from '../../../../components/ItemTags';
+import PlatformIcon from '../../../../components/PlatformIcon';
+import type { FilterGroup, Inject, InjectTestStatus, Variable } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
+import { splitDuration } from '../../../../utils/Time';
+import { isNotEmptyField } from '../../../../utils/utils';
+import { InjectContext, PermissionsContext, ViewModeContext } from '../Context';
+import ToolBar from '../ToolBar';
+import CreateInject from './CreateInject';
+import InjectIcon from './InjectIcon';
+import InjectorContract from './InjectorContract';
+import InjectPopover from './InjectPopover';
+import InjectsListButtons from './InjectsListButtons';
+import UpdateInject from './UpdateInject';
 
 const useStyles = makeStyles(() => ({
   disabled: {
@@ -49,7 +51,6 @@ const useStyles = makeStyles(() => ({
     color: '#00b1ff',
     border: '1px solid #00b1ff',
   },
-
   itemHead: {
     textTransform: 'uppercase',
   },
@@ -91,19 +92,16 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  exerciseOrScenarioId: string
-
-  setViewMode?: (mode: string) => void
-
-  availableButtons: string[]
-
-  teams: TeamStore[]
-  articles: ArticleStore[]
-  variables: Variable[]
-  uriVariable: string
-  allUsersNumber?: number
-  usersNumber?: number
-  teamsUsers: never
+  exerciseOrScenarioId: string;
+  setViewMode?: (mode: string) => void;
+  availableButtons: string[];
+  teams: TeamStore[];
+  articles: ArticleStore[];
+  variables: Variable[];
+  uriVariable: string;
+  allUsersNumber?: number;
+  usersNumber?: number;
+  teamsUsers: never;
 }
 
 const Injects: FunctionComponent<Props> = ({
@@ -133,13 +131,15 @@ const Injects: FunctionComponent<Props> = ({
       isSortable: false,
       value: (_: InjectOutputType, injectContract: InjectorContractConvertedContent) => {
         const injectorContractName = tPick(injectContract?.label);
-        return injectContract ? (
-          <InjectorContract
-            variant="list"
-            config={injectContract?.config}
-            label={injectorContractName}
-          />
-        ) : <InjectorContract variant="list" label={t('Deleted')} deleted />;
+        return injectContract
+          ? (
+              <InjectorContract
+                variant="list"
+                config={injectContract?.config}
+                label={injectorContractName}
+              />
+            )
+          : <InjectorContract variant="list" label={t('Deleted')} deleted />;
       }
       ,
     },
@@ -157,28 +157,37 @@ const Injects: FunctionComponent<Props> = ({
         const duration = splitDuration(
           inject.inject_depends_duration || 0,
         );
-        return <Chip
-          classes={{ root: classes.duration }}
-          label={`${duration.days}
+        return (
+          <Chip
+            classes={{ root: classes.duration }}
+            label={`${duration.days}
                           ${t('d')}, ${duration.hours}
                           ${t('h')}, ${duration.minutes}
                           ${t('m')}`}
-               />;
+          />
+        );
       },
     },
     {
       field: 'inject_platforms',
       label: 'Platform(s)',
       isSortable: false,
-      value: (inject: InjectOutputType, _: InjectorContractConvertedContent) => <>{
-        inject.inject_injector_contract?.injector_contract_platforms?.map(
-          (platform) => <PlatformIcon
-            key={platform}
-            width={20}
-            platform={platform}
-            marginRight={10}
-                        />,
-        )}</>,
+      value: (inject: InjectOutputType, _: InjectorContractConvertedContent) => (
+        <>
+          {
+            inject.inject_injector_contract?.injector_contract_platforms?.map(
+              platform => (
+                <PlatformIcon
+                  key={platform}
+                  width={20}
+                  platform={platform}
+                  marginRight={10}
+                />
+              ),
+            )
+          }
+        </>
+      ),
     },
     {
       field: 'inject_enabled',
@@ -191,13 +200,15 @@ const Injects: FunctionComponent<Props> = ({
         if (!inject.inject_ready) {
           injectStatus = t('Missing content');
         }
-        return <ItemBoolean
-          status={inject.inject_ready
-            ? inject.inject_enabled : false}
-          label={injectStatus}
-          variant="inList"
-          tooltip={injectStatus}
-               />;
+        return (
+          <ItemBoolean
+            status={inject.inject_ready
+              ? inject.inject_enabled : false}
+            label={injectStatus}
+            variant="inList"
+            tooltip={injectStatus}
+          />
+        );
       },
     },
     {
@@ -211,42 +222,48 @@ const Injects: FunctionComponent<Props> = ({
   // Injects
   const [injects, setInjects] = useState<InjectOutputType[]>([]);
   const [selectedInjectId, setSelectedInjectId] = useState<string | null>(null);
+  const [reloadInjectCount, setReloadInjectCount] = useState(0);
 
   // Optimistic update
-  const onCreate = (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+  const onCreate = (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
     if (result.entities) {
       const created = result.entities.injects[result.result];
       setInjects([created as InjectOutputType, ...injects]);
     }
   };
-  const onUpdate = (result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+
+  const onUpdate = (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
     if (result.entities) {
       const updated = result.entities.injects[result.result];
-      setInjects(injects.map((i) => (i.inject_id !== updated.inject_id ? i as InjectOutputType : (updated as InjectOutputType))));
+      setInjects(injects.map((i) => {
+        return (i.inject_id !== updated.inject_id ? i as InjectOutputType : (updated as InjectOutputType));
+      }));
     }
   };
 
   const onDelete = (result: string) => {
     if (result) {
-      setInjects(injects.filter((i) => (i.inject_id !== result)));
+      setInjects(injects.filter(i => (i.inject_id !== result)));
     }
   };
 
   const onMassDelete = (results: string[]) => {
     if (results.length !== 0) {
-      setInjects(injects.filter((i) => (!results.includes(i.inject_id))));
+      setInjects(injects.filter(i => (!results.includes(i.inject_id))));
     }
   };
 
   const onCreateInject = async (data: Inject) => {
-    await injectContext.onAddInject(data).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+    await injectContext.onAddInject(data).then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
       onCreate(result);
     });
   };
+
   const onUpdateInject = async (data: Inject) => {
     if (selectedInjectId) {
-      await injectContext.onUpdateInject(selectedInjectId, data).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+      await injectContext.onUpdateInject(selectedInjectId, data).then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
         onUpdate(result);
+        return result;
       });
     }
   };
@@ -254,7 +271,7 @@ const Injects: FunctionComponent<Props> = ({
   const massUpdateInject = async (data: Inject[]) => {
     const promises: Promise<InjectStore | undefined>[] = [];
     data.forEach((inject) => {
-      promises.push(injectContext.onUpdateInject(inject.inject_id, inject).then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+      promises.push(injectContext.onUpdateInject(inject.inject_id, inject).then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
         if (result.entities) {
           return result.entities.injects[result.result];
         }
@@ -265,8 +282,8 @@ const Injects: FunctionComponent<Props> = ({
     Promise.all(promises).then((values) => {
       if (values !== undefined) {
         const updatedInjects = injects
-          .map((inject) => (values.find((value) => value !== undefined && value.inject_id === inject.inject_id)
-            ? (values.find((value) => value !== undefined && value?.inject_id === inject.inject_id) as InjectOutputType)
+          .map(inject => (values.find(value => value !== undefined && value.inject_id === inject.inject_id)
+            ? (values.find(value => value !== undefined && value?.inject_id === inject.inject_id) as InjectOutputType)
             : inject as InjectOutputType));
         setInjects(updatedInjects);
       }
@@ -275,15 +292,15 @@ const Injects: FunctionComponent<Props> = ({
 
   const [openCreateDrawer, setOpenCreateDrawer] = useState(false);
   const [presetCreationValues, setPresetCreationValues] = useState<{
-    inject_depends_duration_days?: number,
-    inject_depends_duration_hours?: number,
-    inject_depends_duration_minutes?: number,
+    inject_depends_duration_days?: number;
+    inject_depends_duration_hours?: number;
+    inject_depends_duration_minutes?: number;
   }>();
 
   const openCreateInjectDrawer = (data: {
-    inject_depends_duration_days?: number,
-    inject_depends_duration_hours?: number,
-    inject_depends_duration_minutes?: number,
+    inject_depends_duration_days?: number;
+    inject_depends_duration_hours?: number;
+    inject_depends_duration_minutes?: number;
   }) => {
     setOpenCreateDrawer(true);
     setPresetCreationValues(data);
@@ -310,7 +327,7 @@ const Injects: FunctionComponent<Props> = ({
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`${exerciseOrScenarioId}-injects`, buildSearchPagination({
     sorts: initSorting('inject_depends_duration', 'ASC'),
     filterGroup: quickFilter,
-    size: 100,
+    size: 20,
   }));
 
   // Toolbar
@@ -338,11 +355,11 @@ const Injects: FunctionComponent<Props> = ({
         let entities: InjectOutputType[] = [];
         while (firstIndex <= currentIndex) {
           entities = [...entities, injects[firstIndex]];
-          // eslint-disable-next-line no-plusplus
+
           firstIndex++;
         }
         const forcedRemove = R.values(selectedElements).filter(
-          (n: Inject) => !entities.map((o) => o.inject_id).includes(n.inject_id),
+          (n: Inject) => !entities.map(o => o.inject_id).includes(n.inject_id),
         );
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
@@ -351,11 +368,11 @@ const Injects: FunctionComponent<Props> = ({
       let entities: InjectOutputType[] = [];
       while (firstIndex >= currentIndex) {
         entities = [...entities, injects[firstIndex]];
-        // eslint-disable-next-line no-plusplus
+
         firstIndex--;
       }
       const forcedRemove = R.values(selectedElements).filter(
-        (n: Inject) => !entities.map((o) => o.inject_id).includes(n.inject_id),
+        (n: Inject) => !entities.map(o => o.inject_id).includes(n.inject_id),
       );
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
@@ -373,16 +390,16 @@ const Injects: FunctionComponent<Props> = ({
     );
 
   const massUpdateInjects = async (actions: {
-    field: string,
-    type: string,
-    values: { value: string }[]
+    field: string;
+    type: string;
+    values: { value: string }[];
   }[]) => {
     const updateFields = [
       'inject_title',
       'inject_description',
       'inject_injector_contract',
       'inject_content',
-      'inject_depends_from_another',
+      'inject_depends_on',
       'inject_depends_duration',
       'inject_teams',
       'inject_assets',
@@ -405,23 +422,23 @@ const Injects: FunctionComponent<Props> = ({
             // @ts-expect-error define type
             if (isNotEmptyField(injectToUpdate[`inject_${action.field}`])) {
               // @ts-expect-error define type
-              injectToUpdate[`inject_${action.field}`] = R.uniq([...injectToUpdate[`inject_${action.field}`], ...action.values.map((n) => n.value)]);
+              injectToUpdate[`inject_${action.field}`] = R.uniq([...injectToUpdate[`inject_${action.field}`], ...action.values.map(n => n.value)]);
             } else {
               // @ts-expect-error define type
-              injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map((n) => n.value));
+              injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map(n => n.value));
             }
             // eslint-disable-next-line no-await-in-loop
-            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
-              .then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+            await injectContext.onBulkUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
+              .then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
                 onUpdate(result);
               });
             break;
           case 'REPLACE':
             // @ts-expect-error define type
-            injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map((n) => n.value));
+            injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map(n => n.value));
             // eslint-disable-next-line no-await-in-loop
-            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
-              .then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+            await injectContext.onBulkUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
+              .then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
                 onUpdate(result);
               });
             break;
@@ -429,21 +446,20 @@ const Injects: FunctionComponent<Props> = ({
             // @ts-expect-error define type
             if (isNotEmptyField(injectToUpdate[`inject_${action.field}`])) {
               // @ts-expect-error define type
-              injectToUpdate[`inject_${action.field}`] = injectToUpdate[`inject_${action.field}`].filter((n: string) => !action.values.map((o) => o.value).includes(n));
+              injectToUpdate[`inject_${action.field}`] = injectToUpdate[`inject_${action.field}`].filter((n: string) => !action.values.map(o => o.value).includes(n));
             } else {
               // @ts-expect-error define type
               injectToUpdate[`inject_${action.field}`] = [];
             }
             // eslint-disable-next-line no-await-in-loop
-            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
-              .then((result: { result: string, entities: { injects: Record<string, InjectStore> } }) => {
+            await injectContext.onBulkUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
+              .then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
                 onUpdate(result);
               });
             break;
           default:
             return;
         }
-        /* eslint-enable */
       }
     }
   };
@@ -455,7 +471,7 @@ const Injects: FunctionComponent<Props> = ({
   };
 
   const massTestInjects = () => {
-    injectContext.bulkTestInjects(injectsToProcess.map((inject: InjectOutputType) => inject.inject_id)).then((result: { uri: string, data: InjectTestStatus[] }) => {
+    injectContext.bulkTestInjects(injectsToProcess.map((inject: InjectOutputType) => inject.inject_id)).then((result: { uri: string; data: InjectTestStatus[] }) => {
       if (numberOfSelectedElements === 1) {
         MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
           itsDedicatedPage: <Link to={`${result.uri}/${result.data[0].status_id}`}>{t('its dedicated page')}</Link>,
@@ -471,20 +487,21 @@ const Injects: FunctionComponent<Props> = ({
   return (
     <>
       <PaginationComponentV2
-        fetch={(input) => injectContext.searchInjects(input)}
+        fetch={input => injectContext.searchInjects(input)}
         searchPaginationInput={searchPaginationInput}
         setContent={setInjects}
         entityPrefix="inject"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
-        disablePagination
-        topBarButtons={
+        reloadContentCount={reloadInjectCount}
+        topBarButtons={(
           <InjectsListButtons
             injects={injects}
             availableButtons={availableButtons}
             setViewMode={setViewMode}
+            onImportedInjects={() => setReloadInjectCount(prev => prev + 1)}
           />
-        }
+        )}
       />
       {viewModeContext === 'chain' && (
         <div style={{ marginBottom: 10 }}>
@@ -527,13 +544,13 @@ const Injects: FunctionComponent<Props> = ({
             </ListItemIcon>
             <ListItemIcon />
             <ListItemText
-              primary={
+              primary={(
                 <SortHeadersComponentV2
                   headers={headers}
                   inlineStylesHeaders={inlineStyles}
                   sortHelpers={queryableHelpers.sortHelpers}
                 />
-              }
+              )}
             />
             <ListItemSecondaryAction />
           </ListItem>
@@ -554,17 +571,16 @@ const Injects: FunctionComponent<Props> = ({
               >
                 <ListItemIcon
                   style={{ minWidth: 40 }}
-                  onClick={(event) => (event.shiftKey
+                  onClick={event => (event.shiftKey
                     ? onRowShiftClick(index, inject, event)
-                    : onToggleEntity(inject, event))
-                  }
+                    : onToggleEntity(inject, event))}
                 >
                   <Checkbox
                     edge="start"
                     checked={
                       (selectAll && !(inject.inject_id
                         in (deSelectedElements || {})))
-                      || inject.inject_id in (selectedElements || {})
+                          || inject.inject_id in (selectedElements || {})
                     }
                     disableRipple
                   />
@@ -582,12 +598,12 @@ const Injects: FunctionComponent<Props> = ({
                   />
                 </ListItemIcon>
                 <ListItemText
-                  primary={
+                  primary={(
                     <div className={(!injectContract || !isContractExposed
                       || !inject.inject_enabled) ? classes.disabled : ''}
                     >
                       <div className={classes.bodyItems}>
-                        {headers.map((header) => (
+                        {headers.map(header => (
                           <div
                             key={header.field}
                             className={classes.bodyItem}
@@ -598,7 +614,7 @@ const Injects: FunctionComponent<Props> = ({
                         ))}
                       </div>
                     </div>
-                  }
+                  )}
                 />
                 <ListItemSecondaryAction>
                   <InjectPopover
@@ -620,13 +636,13 @@ const Injects: FunctionComponent<Props> = ({
       {permissions.canWrite && (
         <>
           {selectedInjectId !== null
-            && <UpdateInject
+          && (
+            <UpdateInject
               open
               handleClose={() => setSelectedInjectId(null)}
               onUpdateInject={onUpdateInject}
               massUpdateInject={massUpdateInject}
               injectId={selectedInjectId}
-              teamsFromExerciseOrScenario={teams}
               // @ts-expect-error typing
               articlesFromExerciseOrScenario={articles}
               variablesFromExerciseOrScenario={variables}
@@ -636,8 +652,8 @@ const Injects: FunctionComponent<Props> = ({
               usersNumber={usersNumber}
               teamsUsers={teamsUsers}
               injects={injects}
-               />
-          }
+            />
+          )}
           <ButtonCreate onClick={() => {
             setOpenCreateDrawer(true);
             setPresetCreationValues(undefined);

@@ -1,11 +1,12 @@
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { InjectResultDTO } from '../../../../utils/api-types';
-import { useFormatter } from '../../../../components/i18n';
+
+import { deleteAtomicTesting, duplicateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
-import { deleteAtomicTesting, duplicateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
+import { useFormatter } from '../../../../components/i18n';
+import type { InjectResultDTO } from '../../../../utils/api-types';
 import AtomicTestingUpdate from './AtomicTestingUpdate';
 
 type AtomicTestingActionType = 'Duplicate' | 'Update' | 'Delete';
@@ -64,27 +65,31 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     <>
       <ButtonPopover entries={entries} variant={inList ? 'icon' : 'toggle'} />
       {actions.includes('Duplicate')
-        && <DialogDuplicate
+      && (
+        <DialogDuplicate
           open={duplicate}
           handleClose={handleCloseDuplicate}
           handleSubmit={submitDuplicate}
           text={`${t('Do you want to duplicate this atomic testing:')} ${atomic.inject_title} ?`}
-           />
-      }
+        />
+      )}
       {actions.includes(('Update'))
-        && <AtomicTestingUpdate
+      && (
+        <AtomicTestingUpdate
           open={edition}
           handleClose={handleCloseEdit}
           atomic={atomic}
-           />
-      }
+        />
+      )}
       {actions.includes('Delete')
-        && <DialogDelete
+      && (
+        <DialogDelete
           open={deletion}
           handleClose={handleCloseDelete}
           handleSubmit={submitDelete}
           text={`${t('Do you want to delete this atomic testing:')} ${atomic.inject_title} ?`}
-           />}
+        />
+      )}
     </>
   );
 };

@@ -1,7 +1,7 @@
+import { delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
 import * as schema from './Schema';
-import { getReferential, putReferential, postReferential, delReferential } from '../utils/Action';
 
-export const fetchLogs = (exerciseId) => (dispatch) => {
+export const fetchLogs = exerciseId => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/logs`;
   return getReferential(schema.arrayOfLogs, uri)(dispatch);
 };

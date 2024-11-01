@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import { AppBar, Toolbar, IconButton, Menu, MenuProps, MenuItem } from '@mui/material';
-import { Link } from 'react-router-dom';
 import { AccountCircleOutlined } from '@mui/icons-material';
+import { AppBar, IconButton, Menu, MenuItem, MenuProps, Toolbar } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
+import { useState } from 'react';
+import * as React from 'react';
+import { Link } from 'react-router-dom';
+
 import { logout } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';
-import { useAppDispatch } from '../../../utils/hooks';
 import type { Theme } from '../../../components/Theme';
+import { useAppDispatch } from '../../../utils/hooks';
 
-const useStyles = makeStyles<Theme>((theme) => ({
+const useStyles = makeStyles<Theme>(theme => ({
   appBar: {
     width: '100%',
     zIndex: theme.zIndex.drawer + 1,

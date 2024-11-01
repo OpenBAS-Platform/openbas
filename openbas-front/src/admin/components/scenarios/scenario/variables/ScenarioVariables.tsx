@@ -1,35 +1,22 @@
-import React, { useContext } from 'react';
-import { useParams } from 'react-router-dom';
 import { Paper, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import Variables from '../../../components/variables/Variables';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { useContext } from 'react';
+import { useParams } from 'react-router-dom';
+
+import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import { addVariableForScenario, deleteVariableForScenario, fetchVariablesForScenario, updateVariableForScenario } from '../../../../../actions/variables/variable-actions';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
-import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
-import { PermissionsContext, VariableContext, VariableContextType } from '../../../common/Context';
-import type { Variable, VariableInput } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
+import { useHelper } from '../../../../../store';
+import type { Variable, VariableInput } from '../../../../../utils/api-types';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { PermissionsContext, VariableContext, VariableContextType } from '../../../common/Context';
 import CreateVariable from '../../../components/variables/CreateVariable';
-
-// Deprecated - https://mui.com/system/styles/basics/
-// Do not use it for new code.
-const useStyles = makeStyles(() => ({
-  paper: {
-    height: '100%',
-    minHeight: '100%',
-    margin: '-4px 0 0 0',
-    padding: 15,
-    borderRadius: 4,
-  },
-}));
+import Variables from '../../../components/variables/Variables';
 
 const ScenarioVariables = () => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
   const dispatch = useAppDispatch();
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
@@ -52,7 +39,7 @@ const ScenarioVariables = () => {
       </Typography>
       {permissions.canWrite && (<CreateVariable />)}
       <div className="clearfix" />
-      <Paper classes={{ root: classes.paper }} variant="outlined">
+      <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
         <Variables variables={variables} />
       </Paper>
     </VariableContext.Provider>

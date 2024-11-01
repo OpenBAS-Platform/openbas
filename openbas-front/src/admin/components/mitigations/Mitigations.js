@@ -1,20 +1,21 @@
-import React, { useState } from 'react';
+import { DynamicFormOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { DynamicFormOutlined } from '@mui/icons-material';
+
+import { fetchAttackPatterns } from '../../../actions/AttackPattern';
+import { fetchKillChainPhases } from '../../../actions/KillChainPhase';
 import { searchMitigations } from '../../../actions/Mitigation';
-import CreateMitigation from './CreateMitigation';
-import MitigationPopover from './MitigationPopover';
+import Breadcrumbs from '../../../components/Breadcrumbs';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../components/common/queryable/Page';
 import { useFormatter } from '../../../components/i18n';
-import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
-import { fetchAttackPatterns } from '../../../actions/AttackPattern';
-import { fetchKillChainPhases } from '../../../actions/KillChainPhase';
+import CreateMitigation from './CreateMitigation';
+import MitigationPopover from './MitigationPopover';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -101,7 +102,7 @@ const Mitigations = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t, nsdt } = useFormatter();
-  const { attackPatternsMap, killChainPhasesMap } = useHelper((helper) => ({
+  const { attackPatternsMap, killChainPhasesMap } = useHelper(helper => ({
     attackPatternsMap: helper.getAttackPatternsMap(),
     killChainPhasesMap: helper.getKillChainPhasesMap(),
   }));
@@ -166,18 +167,18 @@ const Mitigations = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponent
                 headers={headers}
                 inlineStylesHeaders={headerStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-            }
+            )}
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {mitigations.map((mitigation) => (
+        {mitigations.map(mitigation => (
           <ListItem
             key={mitigation.mitigation_id}
             classes={{ root: classes.item }}
@@ -187,7 +188,7 @@ const Mitigations = () => {
               <DynamicFormOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   <div
                     className={classes.bodyItem}
@@ -220,22 +221,22 @@ const Mitigations = () => {
                     {nsdt(mitigation.mitigation_updated_at)}
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <MitigationPopover
                 mitigation={mitigation}
                 attackPatternsMap={attackPatternsMap}
                 killChainPhasesMap={killChainPhasesMap}
-                onUpdate={(result) => setMitigations(mitigations.map((a) => (a.mitigation_id !== result.mitigation_id ? a : result)))}
-                onDelete={(result) => setMitigations(mitigations.filter((a) => (a.mitigation_id !== result)))}
+                onUpdate={result => setMitigations(mitigations.map(a => (a.mitigation_id !== result.mitigation_id ? a : result)))}
+                onDelete={result => setMitigations(mitigations.filter(a => (a.mitigation_id !== result)))}
               />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
       <CreateMitigation
-        onCreate={(result) => setMitigations([result, ...mitigations])}
+        onCreate={result => setMitigations([result, ...mitigations])}
       />
     </div>
   );

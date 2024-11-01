@@ -12,8 +12,7 @@ public class ManualExecutor extends Injector {
 
   @Override
   public ExecutionProcess process(
-      @NotNull final Execution execution,
-      @NotNull final ExecutableInject injection) {
+      @NotNull final Execution execution, @NotNull final ExecutableInject injection) {
     throw new UnsupportedOperationException("Manual inject cannot be executed");
   }
 }

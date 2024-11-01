@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V2_93__Payloads extends BaseJavaMigration {
@@ -19,7 +18,8 @@ public class V2_93__Payloads extends BaseJavaMigration {
     select.execute("TRUNCATE kill_chain_phases CASCADE;");
 
     // Create table payloads
-    select.execute("""
+    select.execute(
+        """
         CREATE TABLE IF NOT EXISTS payloads (
             payload_id varchar(255) not null constraint payloads_pkey primary key,
             payload_type varchar(255) not null,
@@ -32,7 +32,8 @@ public class V2_93__Payloads extends BaseJavaMigration {
         CREATE INDEX IF NOT EXISTS idx_payloads on payloads (payload_id);
         """);
     // Add association table between payload and tag
-    select.execute("""
+    select.execute(
+        """
         CREATE TABLE payloads_tags (
           payload_id varchar(255) not null constraint payload_id_fk references payloads,
           tag_id varchar(255) not null constraint tag_id_fk references tags,
@@ -42,7 +43,8 @@ public class V2_93__Payloads extends BaseJavaMigration {
         CREATE INDEX idx_payloads_tags_tag on payloads_tags (tag_id);
         """);
     // Add association table between payload and inject
-    select.execute("""
+    select.execute(
+        """
         CREATE TABLE injects_payloads (
           inject_id varchar(255) not null constraint inject_id_fk references injects on delete cascade,
           payload_id varchar(255) not null constraint payload_id_fk references payloads on delete cascade,

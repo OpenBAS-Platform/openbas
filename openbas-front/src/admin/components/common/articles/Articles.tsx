@@ -1,29 +1,30 @@
+import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, NewspaperOutlined, ShareOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { Avatar, Button, Card, CardContent, CardHeader, CardMedia, Chip, Grid, IconButton, Tooltip, Typography } from '@mui/material';
 import { green, orange } from '@mui/material/colors';
-import React, { FunctionComponent, useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, NewspaperOutlined, ShareOutlined, VisibilityOutlined } from '@mui/icons-material';
-import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
-import ChannelsFilter from '../../components/channels/ChannelsFilter';
-import ArticlePopover from './ArticlePopover';
-import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
-import ChannelIcon from '../../components/channels/ChannelIcon';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import * as R from 'ramda';
+import { Fragment, FunctionComponent, useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
+
 import type { ArticleStore, FullArticleStore } from '../../../../actions/channels/Article';
-import type { ChannelOption } from '../../components/channels/ChannelOption';
-import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
-import { fetchDocuments } from '../../../../actions/Document';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { useFormatter } from '../../../../components/i18n';
-import type { DocumentHelper } from '../../../../actions/helper';
-import CreateArticle from './CreateArticle';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
-import { ArticleContext, PermissionsContext } from '../Context';
+import { fetchDocuments } from '../../../../actions/Document';
+import type { DocumentHelper } from '../../../../actions/helper';
 import Empty from '../../../../components/Empty';
+import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
+import { useFormatter } from '../../../../components/i18n';
 import ChannelColor from '../../../../public/components/channels/ChannelColor';
+import { useHelper } from '../../../../store';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import ChannelIcon from '../../components/channels/ChannelIcon';
+import type { ChannelOption } from '../../components/channels/ChannelOption';
+import ChannelsFilter from '../../components/channels/ChannelsFilter';
+import { ArticleContext, PermissionsContext } from '../Context';
+import ArticlePopover from './ArticlePopover';
+import CreateArticle from './CreateArticle';
 
 const useStyles = makeStyles(() => ({
   channel: {
@@ -84,13 +85,13 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
   const searchColumns = ['name', 'type', 'content'];
   const filtering = useSearchAnFilter('article', 'name', searchColumns);
   // Rendering
-  const fullArticles = articles.map((item) => ({
+  const fullArticles = articles.map(item => ({
     ...item,
     article_fullchannel: item.article_channel ? channelsMap[item.article_channel] : {},
   }));
   const sortedArticles: FullArticleStore[] = R.filter(
     (n: FullArticleStore) => channels.length === 0
-      || channels.map((o) => o.id).includes(n.article_fullchannel?.channel_id ?? ''),
+      || channels.map(o => o.id).includes(n.article_fullchannel?.channel_id ?? ''),
     filtering.filterAndSort(fullArticles),
   );
 
@@ -115,7 +116,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
       )}
       <div className="clearfix" />
       {sortedArticles.length === 0 && (
-        <Empty message={
+        <Empty message={(
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 18 }}>
               {t('No media pressure article available in this simulation yet.')}
@@ -131,16 +132,16 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
               {t('Create an article')}
             </Button>
           </div>
-            }
+        )}
         />
       )}
       <Grid container spacing={3}>
         {sortedArticles.map((article, index) => {
           const docs = (article.article_documents ?? [])
-            .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
-            .filter((d) => d !== undefined);
-          const images = docs.filter((d) => d.document_type.includes('image/'));
-          const videos = docs.filter((d) => d.document_type.includes('video/'));
+            .map(docId => (documentsMap[docId] ? documentsMap[docId] : undefined))
+            .filter(d => d !== undefined);
+          const images = docs.filter(d => d.document_type.includes('image/'));
+          const videos = docs.filter(d => d.document_type.includes('video/'));
           let headersDocs = [];
           if (article.article_fullchannel?.channel_type === 'newspaper') {
             headersDocs = images;
@@ -166,7 +167,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
                 sx={{ width: '100%', height: '100%' }}
               >
                 <CardHeader
-                  avatar={
+                  avatar={(
                     <Avatar
                       sx={{
                         bgcolor: ChannelColor(
@@ -176,7 +177,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
                     >
                       {(article.article_author || t('Unknown')).charAt(0)}
                     </Avatar>
-                  }
+                  )}
                   title={article.article_author || t('Unknown')}
                   subheader={
                     article.article_is_scheduled ? (
@@ -189,8 +190,8 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
                       </span>
                     )
                   }
-                  action={
-                    <React.Fragment>
+                  action={(
+                    <Fragment>
                       <IconButton
                         aria-haspopup="true"
                         size="large"
@@ -200,11 +201,11 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
                         <VisibilityOutlined />
                       </IconButton>
                       <ArticlePopover article={article} />
-                    </React.Fragment>
-                  }
+                    </Fragment>
+                  )}
                 />
                 <Grid container={true} spacing={3}>
-                  {headersDocs.map((doc) => (
+                  {headersDocs.map(doc => (
                     <Grid key={doc.document_id} item xs={columns}>
                       {doc.document_type.includes('image/') && (
                         <CardMedia
@@ -238,12 +239,12 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
                     <div style={{ float: 'left' }}>
                       <Tooltip title={article.article_fullchannel?.channel_name}>
                         <Chip
-                          icon={
+                          icon={(
                             <ChannelIcon
                               type={article.article_fullchannel?.channel_type}
                               variant="chip"
                             />
-                          }
+                          )}
                           classes={{ root: classes.channel }}
                           style={{
                             color: ChannelColor(

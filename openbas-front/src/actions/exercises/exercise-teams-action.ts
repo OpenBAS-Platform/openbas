@@ -1,12 +1,12 @@
 import { Dispatch } from 'redux';
-import type { ExerciseUpdateTeamsInput, Scenario, SearchPaginationInput } from '../../utils/api-types';
-import { putReferential, simplePostCall } from '../../utils/Action';
-import { EXERCISE_URI } from './exercise-action';
-import * as schema from '../Schema';
 
-// eslint-disable-next-line import/prefer-default-export
-export const searchExerciseTeams = (exerciseId: Scenario['scenario_id'], paginationInput: SearchPaginationInput) => {
-  const uri = `${EXERCISE_URI}/${exerciseId}/teams/search`;
+import { putReferential, simplePostCall } from '../../utils/Action';
+import type { ExerciseUpdateTeamsInput, Scenario, SearchPaginationInput } from '../../utils/api-types';
+import * as schema from '../Schema';
+import { EXERCISE_URI } from './exercise-action';
+
+export const searchExerciseTeams = (exerciseId: Scenario['scenario_id'], paginationInput: SearchPaginationInput, contextualOnly: boolean = false) => {
+  const uri = `${EXERCISE_URI}/${exerciseId}/teams/search?contextualOnly=${contextualOnly}`;
   return simplePostCall(uri, paginationInput);
 };
 

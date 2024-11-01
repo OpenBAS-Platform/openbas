@@ -1,7 +1,7 @@
-import React from 'react';
+import { Button } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import { Button } from '@mui/material';
+
 import { useFormatter } from '../../../../../components/i18n';
 import OldAttackPatternField from '../../../../../components/OldAttackPatternField';
 
@@ -29,6 +29,7 @@ const InjectorContractForm = (props) => {
           />
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button
+              variant="contained"
               onClick={handleClose}
               style={{ marginRight: 10 }}
               disabled={submitting}
@@ -38,6 +39,7 @@ const InjectorContractForm = (props) => {
             <Button
               color="secondary"
               type="submit"
+              variant="contained"
               disabled={pristine || submitting}
             >
               {editing ? t('Update') : t('Create')}

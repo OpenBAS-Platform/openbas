@@ -1,7 +1,8 @@
-import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
-import React, { FunctionComponent } from 'react';
+import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { FunctionComponent } from 'react';
+
 import type { Theme } from '../Theme';
 
 const useStyles = makeStyles((theme: Theme) => ({

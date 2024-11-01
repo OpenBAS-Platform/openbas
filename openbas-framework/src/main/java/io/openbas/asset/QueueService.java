@@ -6,11 +6,10 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import io.openbas.config.RabbitmqConfig;
 import jakarta.annotation.Resource;
-import lombok.extern.java.Log;
-import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
+import lombok.extern.java.Log;
+import org.springframework.stereotype.Service;
 
 @Log
 @Service
@@ -19,13 +18,12 @@ public class QueueService {
   public static final String ROUTING_KEY = "_push_routing_";
   public static final String EXCHANGE_KEY = "_amqp.connector.exchange";
 
-  @Resource
-  protected ObjectMapper mapper;
+  @Resource protected ObjectMapper mapper;
 
-  @Resource
-  private RabbitmqConfig rabbitmqConfig;
+  @Resource private RabbitmqConfig rabbitmqConfig;
 
-  public void publish(String injectType, String publishedJson) throws IOException, TimeoutException {
+  public void publish(String injectType, String publishedJson)
+      throws IOException, TimeoutException {
     ConnectionFactory factory = new ConnectionFactory();
     factory.setHost(rabbitmqConfig.getHostname());
     factory.setPort(rabbitmqConfig.getPort());
@@ -44,7 +42,8 @@ public class QueueService {
         try {
           connection.close();
         } catch (IOException ex) {
-          log.severe("Unable to close RabbitMQ connection. You should worry as this could impact performance");
+          log.severe(
+              "Unable to close RabbitMQ connection. You should worry as this could impact performance");
         }
       }
     }

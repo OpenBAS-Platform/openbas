@@ -1,7 +1,8 @@
-import React from 'react';
 import { SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import type { ExpectationResultsByType } from '../../../../utils/api-types';
+import * as React from 'react';
+
+import type { ExpectationResultsByType, InjectResultDTO } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   inline: {
@@ -13,13 +14,15 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   expectations: ExpectationResultsByType[] | undefined;
+  injectId?: InjectResultDTO['inject_id'];
 }
 
-const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
+const AtomicTestingResult: React.FC<Props> = ({ expectations, injectId }) => {
   const classes = useStyles();
   const getColor = (result: string | undefined): string => {
     const colorMap: Record<string, string> = {
       SUCCESS: 'rgb(107, 235, 112)',
+      PARTIAL: 'rgb(245, 166, 35)',
       PENDING: 'rgb(128,128,128)',
       FAILED: 'rgb(220, 81, 72)',
       UNKNOWN: 'rgba(128,127,127,0.37)',
@@ -36,7 +39,7 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
     );
   }
   return (
-    <div className={classes.inline}>
+    <div className={classes.inline} id={`inject_expectations_${injectId}`}>
       {expectations.map((expectation, index) => {
         const color = getColor(expectation.avgResult);
         let IconComponent;
@@ -51,7 +54,7 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
             IconComponent = SensorOccupiedOutlined;
         }
         return (
-          <IconComponent key={index} style={{ color, marginRight: 10, fontSize: 22 }}/>
+          <IconComponent key={index} style={{ color, marginRight: 10, fontSize: 22 }} />
         );
       })}
     </div>

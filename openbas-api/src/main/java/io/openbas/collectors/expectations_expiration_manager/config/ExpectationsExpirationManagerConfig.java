@@ -27,4 +27,3 @@ public class ExpectationsExpirationManagerConfig {
     return this.expirationTime / 60;
   }
 }
-

@@ -1,18 +1,19 @@
-import Chart from 'react-apexcharts';
-import React, { FunctionComponent } from 'react';
 import { useTheme } from '@mui/styles';
 import * as R from 'ramda';
-import { lineChartOptions } from '../../../../../utils/Charts';
-import Empty from '../../../../../components/Empty';
+import { FunctionComponent } from 'react';
+import Chart from 'react-apexcharts';
+
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import { useFormatter } from '../../../../../components/i18n';
-import type { Theme } from '../../../../../components/Theme';
-import type { InjectExpectation } from '../../../../../utils/api-types';
-import { useHelper } from '../../../../../store';
+import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
+import Empty from '../../../../../components/Empty';
+import { useFormatter } from '../../../../../components/i18n';
+import type { Theme } from '../../../../../components/Theme';
+import { useHelper } from '../../../../../store';
+import type { InjectExpectation } from '../../../../../utils/api-types';
+import { lineChartOptions } from '../../../../../utils/Charts';
 import { computeTeamsColors } from './DistributionUtils';
-import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
@@ -66,11 +67,10 @@ const ExerciseDistributionScoreOverTimeByTeam: FunctionComponent<Props> = ({
     <>
       {teamsScores.length > 0 ? (
         <Chart
-          // @ts-expect-error: Need to migrate Chart.js file
+          id="exercise_distribution_score_over_time_by_team"
           options={lineChartOptions(
             theme,
             true,
-            // @ts-expect-error: Need to migrate i18n.js file
             nsdt,
             null,
             undefined,

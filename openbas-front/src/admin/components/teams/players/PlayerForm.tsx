@@ -1,25 +1,16 @@
-import React, { FunctionComponent } from 'react';
-import { Form } from 'react-final-form';
-import { Button, InputAdornment, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import { z } from 'zod';
 import { InfoOutlined } from '@mui/icons-material';
+import { Button, InputAdornment, Tooltip } from '@mui/material';
+import { FunctionComponent } from 'react';
+import { Form } from 'react-final-form';
+import { z } from 'zod';
+
+import CountryField from '../../../../components/CountryField';
 import OldTextField from '../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
-import TagField from '../../../../components/TagField';
 import OrganizationField from '../../../../components/OrganizationField';
-import CountryField from '../../../../components/CountryField';
-import type { Theme } from '../../../../components/Theme';
-import type { PlayerInputForm } from './Player';
+import TagField from '../../../../components/TagField';
 import { schemaValidator } from '../../../../utils/Zod';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  container: {
-    display: 'flex',
-    gap: theme.spacing(2),
-    placeContent: 'end',
-  },
-}));
+import type { PlayerInputForm } from './Player';
 
 interface PlayerFormProps {
   initialValues: Partial<PlayerInputForm>;
@@ -36,8 +27,9 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
   handleClose,
   canUpdateEmail,
 }) => {
-  const classes = useStyles();
+  // Standard hooks
   const { t } = useFormatter();
+
   const playerFormSchemaValidation = z.object({
     user_email: z.string().email(t('Should be a valid email address')),
     user_phone: z
@@ -150,11 +142,17 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
             setFieldValue={form.mutators.setValue}
             style={{ marginTop: 20 }}
           />
-          <div className={classes.container} style={{ marginTop: 20 }}>
-            <Button onClick={handleClose} disabled={submitting}>
+          <div style={{ float: 'right', marginTop: 20 }}>
+            <Button
+              variant="contained"
+              onClick={handleClose}
+              style={{ marginRight: 10 }}
+              disabled={submitting}
+            >
               {t('Cancel')}
             </Button>
             <Button
+              variant="contained"
               color="secondary"
               type="submit"
               disabled={pristine || submitting}

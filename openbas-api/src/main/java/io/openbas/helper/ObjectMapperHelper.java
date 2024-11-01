@@ -18,5 +18,4 @@ public class ObjectMapperHelper {
     mapper.registerModule(new JavaTimeModule());
     return mapper;
   }
-
 }

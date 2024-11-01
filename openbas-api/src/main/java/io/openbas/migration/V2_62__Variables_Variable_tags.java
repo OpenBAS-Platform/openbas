@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V2_62__Variables_Variable_tags extends BaseJavaMigration {
@@ -15,7 +14,8 @@ public class V2_62__Variables_Variable_tags extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     // Add Variable table
-    select.execute("""
+    select.execute(
+        """
         CREATE TABLE IF NOT EXISTS variables (
             variable_id varchar(255) not null constraint variables_pkey primary key,
             variable_key varchar(255) not null,

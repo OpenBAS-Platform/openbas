@@ -1,22 +1,24 @@
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import React, { useEffect } from 'react';
+import { PlayArrowOutlined, Stop } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
-import { PlayArrowOutlined, Stop } from '@mui/icons-material';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { useHelper } from '../../../../store';
-import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
-import { createRunningExerciseFromScenario, updateScenarioRecurrence } from '../../../../actions/scenarios/scenario-actions';
+import { useEffect } from 'react';
+import * as React from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
-import ScenarioPopover from './ScenarioPopover';
-import { useFormatter } from '../../../../components/i18n';
-import { parseCron, ParsedCron } from '../../../../utils/Cron';
-import ScenarioRecurringFormDialog from './ScenarioRecurringFormDialog';
-import { truncate } from '../../../../utils/String';
-import type { Theme } from '../../../../components/Theme';
+import { createRunningExerciseFromScenario, updateScenarioRecurrence } from '../../../../actions/scenarios/scenario-actions';
+import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import Transition from '../../../../components/common/Transition';
-import { MESSAGING$ } from '../../../../utils/Environment';
+import { useFormatter } from '../../../../components/i18n';
+import type { Theme } from '../../../../components/Theme';
+import { useHelper } from '../../../../store';
 import type { Exercise } from '../../../../utils/api-types';
+import { parseCron, ParsedCron } from '../../../../utils/Cron';
+import { MESSAGING$ } from '../../../../utils/Environment';
+import { useAppDispatch } from '../../../../utils/hooks';
+import { truncate } from '../../../../utils/String';
+import ScenarioPopover from './ScenarioPopover';
+import ScenarioRecurringFormDialog from './ScenarioRecurringFormDialog';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -54,8 +56,8 @@ interface ScenarioHeaderProps {
   selectRecurring: string;
   setOpenScenarioRecurringFormDialog: React.Dispatch<React.SetStateAction<boolean>>;
   setOpenInstantiateSimulationAndStart: React.Dispatch<React.SetStateAction<boolean>>;
-  openScenarioRecurringFormDialog: boolean,
-  openInstantiateSimulationAndStart: boolean,
+  openScenarioRecurringFormDialog: boolean;
+  openInstantiateSimulationAndStart: boolean;
   noRepeat: boolean;
 }
 

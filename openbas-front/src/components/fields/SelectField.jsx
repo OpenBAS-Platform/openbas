@@ -1,4 +1,3 @@
-import React from 'react';
 import { FormControl, FormHelperText, InputLabel, Select as MUISelect } from '@mui/material';
 import { Controller } from 'react-hook-form';
 
@@ -38,7 +37,7 @@ const SelectField = (props) => {
         defaultValue={defaultValue}
         control={control}
         render={({ field }) => (
-          <MUISelect {...field}>
+          <MUISelect {...field} {...others}>
             {children}
           </MUISelect>
         )}

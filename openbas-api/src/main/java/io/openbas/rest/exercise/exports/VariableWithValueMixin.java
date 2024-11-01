@@ -1,20 +1,20 @@
 package io.openbas.rest.exercise.exports;
 
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
-import com.fasterxml.jackson.databind.JsonNode;
-import io.openbas.database.model.Variable;
-
-import jakarta.validation.constraints.NotNull;
-
 import static io.openbas.rest.exercise.exports.VariableMixin.*;
 import static io.openbas.rest.exercise.exports.VariableWithValueMixin.VARIABLE_VALUE;
 
-@JsonIncludeProperties(value = {
-    VARIABLE_ID,
-    VARIABLE_KEY,
-    VARIABLE_VALUE,
-    VARIABLE_DESCRIPTION,
-})
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.databind.JsonNode;
+import io.openbas.database.model.Variable;
+import jakarta.validation.constraints.NotNull;
+
+@JsonIncludeProperties(
+    value = {
+      VARIABLE_ID,
+      VARIABLE_KEY,
+      VARIABLE_VALUE,
+      VARIABLE_DESCRIPTION,
+    })
 public abstract class VariableWithValueMixin {
 
   static final String VARIABLE_VALUE = "variable_value";
@@ -32,5 +32,4 @@ public abstract class VariableWithValueMixin {
     variable.setDescription(node.get(VariableMixin.VARIABLE_DESCRIPTION).asText());
     return variable;
   }
-
 }

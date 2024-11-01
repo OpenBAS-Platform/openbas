@@ -1,5 +1,4 @@
 import { ComputerOutlined, DomainOutlined, GroupsOutlined, Kayaking, LanOutlined, MovieFilterOutlined, PersonOutlined } from '@mui/icons-material';
-import React from 'react';
 
 const useEntityIcon = (entity: string) => {
   switch (entity) {

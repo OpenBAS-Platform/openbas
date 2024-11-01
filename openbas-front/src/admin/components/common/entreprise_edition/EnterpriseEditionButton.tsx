@@ -1,12 +1,13 @@
-import { Button } from '@mui/material';
-import React, { useState } from 'react';
-import { makeStyles } from '@mui/styles';
 import { RocketLaunchOutlined } from '@mui/icons-material';
+import { Button } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
-import EnterpriseEditionAgreement from './EnterpriseEditionAgreement';
+import { useState } from 'react';
+
+import type { UserHelper } from '../../../../actions/helper';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { UserHelper } from '../../../../actions/helper';
+import EnterpriseEditionAgreement from './EnterpriseEditionAgreement';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -20,7 +21,7 @@ const useStyles = makeStyles({
   },
 });
 
-const EnterpriseEditionButton = ({ inLine = false }: { inLine?: boolean; }) => {
+const EnterpriseEditionButton = ({ inLine = false }: { inLine?: boolean }) => {
   const { t } = useFormatter();
   const classes = useStyles();
   const [openEnterpriseEditionConsent, setOpenEnterpriseEditionConsent] = useState(false);

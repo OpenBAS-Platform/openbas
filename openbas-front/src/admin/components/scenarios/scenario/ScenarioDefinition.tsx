@@ -1,15 +1,15 @@
-import { useParams } from 'react-router-dom';
-import React from 'react';
 import { Grid, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useHelper } from '../../../../store';
-import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
+import { useParams } from 'react-router-dom';
+
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
+import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import { useFormatter } from '../../../../components/i18n';
+import { useHelper } from '../../../../store';
+import ScenarioArticles from './articles/ScenarioArticles';
+import ScenarioChallenges from './challenges/ScenarioChallenges';
 import ScenarioTeams from './teams/ScenarioTeams';
 import ScenarioVariables from './variables/ScenarioVariables';
-import ScenarioChallenges from './challenges/ScenarioChallenges';
-import ScenarioArticles from './articles/ScenarioArticles';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.

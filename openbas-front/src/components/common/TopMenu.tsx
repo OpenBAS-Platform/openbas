@@ -1,11 +1,12 @@
-import { makeStyles } from '@mui/styles';
-import React, { FunctionComponent } from 'react';
-import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { FunctionComponent } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+
 import { useFormatter } from '../i18n';
 import type { Theme } from '../Theme';
 
-const useStyles = makeStyles<Theme>((theme) => ({
+const useStyles = makeStyles<Theme>(theme => ({
   button: {
     marginRight: theme.spacing(2),
     padding: '0 5px 0 5px',
@@ -24,7 +25,7 @@ export interface TopMenuEntry {
   label: string;
 }
 
-const TopMenu: FunctionComponent<{ entries: TopMenuEntry[], contextual?: boolean }> = ({
+const TopMenu: FunctionComponent<{ entries: TopMenuEntry[]; contextual?: boolean }> = ({
   entries,
   contextual,
 }) => {

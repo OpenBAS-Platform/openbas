@@ -1,19 +1,19 @@
 package io.openbas.rest.settings.response;
 
+import static lombok.AccessLevel.NONE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.rest.settings.form.PolicyInput;
 import io.openbas.rest.settings.form.ThemeInput;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static lombok.AccessLevel.NONE;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Setter
 @Getter
@@ -126,11 +126,36 @@ public class PlatformSettings {
 
   public Map<String, List<String>> getPlatformBannerByLevel() {
     Map<String, List<String>> platformBannerByLevelLowerCase = new HashMap<>();
-    if(this.platformBannerByLevel != null) {
-      this.platformBannerByLevel.forEach((key, value) -> platformBannerByLevelLowerCase.put(key.toLowerCase(), value));
+    if (this.platformBannerByLevel != null) {
+      this.platformBannerByLevel.forEach(
+          (key, value) -> platformBannerByLevelLowerCase.put(key.toLowerCase(), value));
       return platformBannerByLevelLowerCase;
     }
     return null;
   }
 
+  // EXPECTATION
+  @NotNull
+  @JsonProperty("expectation_detection_expiration_time")
+  private long detectionExpirationTime;
+
+  @NotNull
+  @JsonProperty("expectation_prevention_expiration_time")
+  private long preventionExpirationTime;
+
+  @NotNull
+  @JsonProperty("expectation_challenge_expiration_time")
+  private long challengeExpirationTime;
+
+  @NotNull
+  @JsonProperty("expectation_article_expiration_time")
+  private long articleExpirationTime;
+
+  @NotNull
+  @JsonProperty("expectation_manual_expiration_time")
+  private long manualExpirationTime;
+
+  @NotNull
+  @JsonProperty("expectation_manual_default_score_value")
+  private int expectationDefaultScoreValue;
 }

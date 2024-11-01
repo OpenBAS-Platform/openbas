@@ -1,6 +1,6 @@
-import React, { FunctionComponent } from 'react';
 import { AdsClickOutlined, AppsOutlined, BlurLinearOutlined, CrisisAlertOutlined, NewspaperOutlined, TourOutlined } from '@mui/icons-material';
 import { AirFilter, CarShiftPattern, CrosshairsQuestion, DatabaseEyeOutline } from 'mdi-material-ui';
+import { FunctionComponent } from 'react';
 
 interface ItemCategoryProps {
   category: string;
@@ -11,7 +11,7 @@ interface ItemCategoryProps {
 const renderIcon = (category: string, size: 'small' | 'medium' | 'large' | 'inherit' | undefined) => {
   switch (category) {
     case 'global-crisis':
-      return <CrisisAlertOutlined fontSize={size ?? 'medium'} style={{ marginRight: 10 }}/>;
+      return <CrisisAlertOutlined fontSize={size ?? 'medium'} style={{ marginRight: 10 }} />;
     case 'attack-scenario':
       return <BlurLinearOutlined fontSize={size ?? 'medium'} style={{ marginRight: 10 }} />;
     case 'media-pressure':

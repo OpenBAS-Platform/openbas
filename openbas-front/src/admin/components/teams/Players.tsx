@@ -1,47 +1,48 @@
-import React, { CSSProperties, useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { PersonOutlined } from '@mui/icons-material';
+import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { CSSProperties, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { searchPlayers } from '../../../actions/User';
+
+import type { OrganizationHelper, UserHelper } from '../../../actions/helper';
 import { fetchOrganizations } from '../../../actions/Organization';
+import { searchPlayers } from '../../../actions/players/player-actions';
+import { fetchTags } from '../../../actions/Tag';
+import Breadcrumbs from '../../../components/Breadcrumbs';
+import ExportButton from '../../../components/common/ExportButton';
+import { initSorting } from '../../../components/common/queryable/Page';
+import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
+import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
+import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
+import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
+import { Header } from '../../../components/common/SortHeadersList';
+import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
+import { useHelper } from '../../../store';
+import type { PlayerOutput } from '../../../utils/api-types';
+import { useAppDispatch } from '../../../utils/hooks';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
 import CreatePlayer from './players/CreatePlayer';
 import PlayerPopover from './players/PlayerPopover';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
-import { useHelper } from '../../../store';
-import { useFormatter } from '../../../components/i18n';
-import Breadcrumbs from '../../../components/Breadcrumbs';
-import { initSorting } from '../../../components/common/queryable/Page';
-import type { OrganizationHelper, UserHelper } from '../../../actions/helper';
-import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
-import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
-import type { UserStore } from './players/Player';
-import type { SearchPaginationInput } from '../../../utils/api-types';
-import { useAppDispatch } from '../../../utils/hooks';
-import { fetchTags } from '../../../actions/Tag';
-import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 
 const useStyles = makeStyles(() => ({
-  itemHeader: {
+  itemHead: {
     textTransform: 'uppercase',
-    cursor: 'pointer',
-    paddingLeft: 10,
   },
   item: {
-    paddingLeft: 10,
     height: 50,
   },
   bodyItems: {
     display: 'flex',
-    alignItems: 'center',
   },
   bodyItem: {
+    height: 20,
     fontSize: 13,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     paddingRight: 10,
+    boxSizing: 'content-box',
   },
 }));
 
@@ -70,26 +71,6 @@ const Players = () => {
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
 
-  // Query param
-  const [searchParams] = useSearchParams();
-  const [search] = searchParams.getAll('search');
-  const [searchId] = searchParams.getAll('id');
-
-  // Headers
-  const headers = [
-    { field: 'user_email', label: 'Email address', isSortable: true },
-    { field: 'user_firstname', label: 'Firstname', isSortable: true },
-    { field: 'user_lastname', label: 'Lastname', isSortable: true },
-    { field: 'user_organization', label: 'Organization', isSortable: false },
-    { field: 'user_tags', label: 'Tags', isSortable: true },
-  ];
-
-  const [players, setPlayers] = useState<UserStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
-    sorts: initSorting('user_email'),
-    textSearch: search,
-  }));
-
   // Fetching data
   const { isPlanner, organizationsMap } = useHelper((helper: UserHelper & OrganizationHelper) => ({
     isPlanner: helper.getMe().user_is_planner,
@@ -100,6 +81,59 @@ const Players = () => {
     dispatch(fetchTags());
     dispatch(fetchOrganizations());
   });
+
+  // Query param
+  const [searchParams] = useSearchParams();
+  const [search] = searchParams.getAll('search');
+  const [searchId] = searchParams.getAll('id');
+
+  // Headers
+  const headers: Header[] = useMemo(() => [
+    {
+      field: 'user_email',
+      label: 'Email address',
+      isSortable: true,
+      value: (player: PlayerOutput) => player.user_email,
+    },
+    {
+      field: 'user_firstname',
+      label: 'Firstname',
+      isSortable: true,
+      value: (player: PlayerOutput) => player.user_firstname || '-',
+    },
+    {
+      field: 'user_lastname',
+      label: 'Lastname',
+      isSortable: true,
+      value: (player: PlayerOutput) => player.user_lastname || '-',
+    },
+    {
+      field: 'user_organization',
+      label: 'Organization',
+      isSortable: false,
+      value: (player: PlayerOutput) => (player.user_organization ? organizationsMap[player.user_organization]?.organization_name : '-'),
+    },
+    {
+      field: 'user_tags',
+      label: 'Tags',
+      isSortable: true,
+      value: (player: PlayerOutput) => <ItemTags variant="list" tags={player.user_tags} />,
+    },
+  ], [organizationsMap]);
+
+  const availableFilterNames = [
+    'user_email',
+    'user_firstname',
+    'user_lastname',
+    'user_organization',
+    'user_tags',
+  ];
+
+  const [players, setPlayers] = useState<PlayerOutput[]>([]);
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('players', buildSearchPagination({
+    sorts: initSorting('user_email'),
+    textSearch: search,
+  }));
 
   // Export
   const exportProps = {
@@ -118,32 +152,36 @@ const Players = () => {
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Teams') }, { label: t('Players'), current: true }]} />
-      <PaginationComponent
+      <PaginationComponentV2
         fetch={searchPlayers}
         searchPaginationInput={searchPaginationInput}
         setContent={setPlayers}
-        exportProps={exportProps}
+        entityPrefix="user"
+        availableFilterNames={availableFilterNames}
+        queryableHelpers={queryableHelpers}
+        topBarButtons={
+          <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
+        }
       />
       <List>
         <ListItem
-          classes={{ root: classes.itemHeader }}
+          classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
+          secondaryAction={<>&nbsp;</>}
         >
           <ListItemIcon />
           <ListItemText
-            primary={
-              <SortHeadersComponent
+            primary={(
+              <SortHeadersComponentV2
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
-                searchPaginationInput={searchPaginationInput}
-                setSearchPaginationInput={setSearchPaginationInput}
+                sortHelpers={queryableHelpers.sortHelpers}
               />
-            }
+            )}
           />
-          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {players.map((player: UserStore) => (
+        {players.map((player: PlayerOutput) => (
           <ListItem
             key={player.user_id}
             classes={{ root: classes.item }}
@@ -153,42 +191,37 @@ const Players = () => {
               <PersonOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div className={classes.bodyItems}>
-                  <div className={classes.bodyItem} style={inlineStyles.user_email}>
-                    {player.user_email}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.user_firstname}>
-                    {player.user_firstname}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.user_lastname}>
-                    {player.user_lastname}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.user_organization}>
-                    {organizationsMap[player.user_organization]?.organization_name || '-'}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.user_tags}>
-                    <ItemTags variant="list" tags={player.user_tags} />
-                  </div>
+                  {headers.map(header => (
+                    <div
+                      key={header.field}
+                      className={classes.bodyItem}
+                      style={inlineStyles[header.field]}
+                    >
+                      {header.value?.(player)}
+                    </div>
+                  ))}
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <PlayerPopover
                 user={player}
                 openEditOnInit={player.user_id === searchId}
-                onUpdate={(result) => setPlayers(players.map((p) => (p.user_id !== result.user_id ? p : result)))}
-                onDelete={(result) => setPlayers(players.filter((p) => (p.user_id !== result)))}
+                onUpdate={result => setPlayers(players.map(p => (p.user_id !== result.user_id ? p : result)))}
+                onDelete={result => setPlayers(players.filter(p => (p.user_id !== result)))}
               />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
       {isPlanner
-        && <CreatePlayer
-          onCreate={(result) => setPlayers([result, ...players])}
-           />
-      }
+      && (
+        <CreatePlayer
+          onCreate={result => setPlayers([result, ...players])}
+        />
+      )}
     </>
   );
 };

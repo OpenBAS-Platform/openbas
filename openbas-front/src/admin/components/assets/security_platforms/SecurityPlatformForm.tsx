@@ -1,13 +1,15 @@
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { Button, MenuItem, TextField } from '@mui/material';
-import React, { SyntheticEvent } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, MenuItem, TextField } from '@mui/material';
+import { SyntheticEvent } from 'react';
+import * as React from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
+
+import FileLoader from '../../../../components/fields/FileLoader';
+import TagField from '../../../../components/fields/TagField';
 import { useFormatter } from '../../../../components/i18n';
 import type { SecurityPlatformInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
-import TagField from '../../../../components/fields/TagField';
-import FileLoader from '../../../../components/fields/FileLoader';
 
 interface Props {
   onSubmit: SubmitHandler<SecurityPlatformInput>;
@@ -88,12 +90,12 @@ const SecurityPlatformForm: React.FC<Props> = ({
             inputProps={register('security_platform_type')}
             InputLabelProps={{ required: true }}
           >
-            <MenuItem value='EDR'>{t('EDR')}</MenuItem>
-            <MenuItem value='XDR'>{t('XDR')}</MenuItem>
-            <MenuItem value='SIEM'>{t('SIEM')}</MenuItem>
-            <MenuItem value='SOAR'>{t('SOAR')}</MenuItem>
-            <MenuItem value='NDR'>{t('NDR')}</MenuItem>
-            <MenuItem value='ISPM'>{t('ISPM')}</MenuItem>
+            <MenuItem value="EDR">{t('EDR')}</MenuItem>
+            <MenuItem value="XDR">{t('XDR')}</MenuItem>
+            <MenuItem value="SIEM">{t('SIEM')}</MenuItem>
+            <MenuItem value="SOAR">{t('SOAR')}</MenuItem>
+            <MenuItem value="NDR">{t('NDR')}</MenuItem>
+            <MenuItem value="ISPM">{t('ISPM')}</MenuItem>
           </TextField>
         )}
       />
@@ -116,7 +118,9 @@ const SecurityPlatformForm: React.FC<Props> = ({
             name="security_platform_logo_light"
             label={t('Logo light')}
             extensions={['png', 'jpg', 'jpeg', 'svg', 'gif']}
-            setFieldValue={(_name, document) => { onChange(document?.id); }}
+            setFieldValue={(_name, document) => {
+              onChange(document?.id);
+            }}
             initialValue={{ id: value }}
           />
         )}
@@ -129,7 +133,9 @@ const SecurityPlatformForm: React.FC<Props> = ({
             name="security_platform_logo_dark"
             label={t('Logo dark')}
             extensions={['png', 'jpg', 'tiff', 'tif', 'bmp', 'jpeg', 'svg', 'gif']}
-            setFieldValue={(_name, document) => { onChange(document?.id); }}
+            setFieldValue={(_name, document) => {
+              onChange(document?.id);
+            }}
             initialValue={{ id: value }}
           />
         )}

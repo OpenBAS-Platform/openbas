@@ -1,14 +1,15 @@
-import React, { Component } from 'react';
-import * as R from 'ramda';
 import { DomainOutlined } from '@mui/icons-material';
-import { Box, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { withStyles } from '@mui/styles';
+import * as R from 'ramda';
+import { Component } from 'react';
 import { connect } from 'react-redux';
+
+import { addOrganization, fetchOrganizations } from '../actions/Organization';
+import { storeHelper } from '../actions/Schema';
 import OrganizationForm from '../admin/components/teams/organizations/OrganizationForm';
-import { fetchOrganizations, addOrganization } from '../actions/Organization';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
-import { storeHelper } from '../actions/Schema';
 
 const styles = () => ({
   icon: {
@@ -65,7 +66,7 @@ class OrganizationField extends Component {
   render() {
     const { t, name, organizations, classes } = this.props;
     const organizationsOptions = R.map(
-      (n) => ({
+      n => ({
         id: n.organization_id,
         label: n.organization_name,
       }),

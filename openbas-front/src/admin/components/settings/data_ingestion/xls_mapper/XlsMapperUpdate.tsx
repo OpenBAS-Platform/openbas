@@ -1,9 +1,10 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
-import MapperForm from './MapperForm';
-import { fetchMapper, updateMapper } from '../../../../../actions/mapper/mapper-actions';
-import type { ImportMapperUpdateInput, RawPaginationImportMapper } from '../../../../../utils/api-types';
-import Loader from '../../../../../components/Loader';
+import { FunctionComponent, useEffect, useState } from 'react';
+
 import { ImportMapperStore } from '../../../../../actions/mapper/mapper';
+import { fetchMapper, updateMapper } from '../../../../../actions/mapper/mapper-actions';
+import Loader from '../../../../../components/Loader';
+import type { ImportMapperUpdateInput, RawPaginationImportMapper } from '../../../../../utils/api-types';
+import MapperForm from './MapperForm';
 
 interface XlsMapperUpdateComponentProps {
   xlsMapper: ImportMapperStore;
@@ -19,10 +20,10 @@ const XlsMapperUpdateComponent: FunctionComponent<XlsMapperUpdateComponentProps>
   const initialValues = {
     import_mapper_name: xlsMapper.import_mapper_name ?? '',
     import_mapper_inject_type_column: xlsMapper.import_mapper_inject_type_column ?? '',
-    import_mapper_inject_importers: xlsMapper.import_mapper_inject_importers?.map((i) => ({
+    import_mapper_inject_importers: xlsMapper.import_mapper_inject_importers?.map(i => ({
       inject_importer_injector_contract: i.inject_importer_injector_contract,
       inject_importer_type_value: i.inject_importer_type_value,
-      inject_importer_rule_attributes: i.inject_importer_rule_attributes?.map((r) => ({
+      inject_importer_rule_attributes: i.inject_importer_rule_attributes?.map(r => ({
         rule_attribute_name: r.rule_attribute_name,
         rule_attribute_columns: r.rule_attribute_columns,
         rule_attribute_default_value: r.rule_attribute_default_value,
@@ -31,7 +32,7 @@ const XlsMapperUpdateComponent: FunctionComponent<XlsMapperUpdateComponentProps>
     })) ?? [],
   };
 
-  const onSubmit = ((data: ImportMapperUpdateInput) => {
+  const onSubmit = (data: ImportMapperUpdateInput) => {
     updateMapper(xlsMapper.import_mapper_id, data).then(
       (result: { data: RawPaginationImportMapper }) => {
         onUpdate?.(result.data);
@@ -39,7 +40,7 @@ const XlsMapperUpdateComponent: FunctionComponent<XlsMapperUpdateComponentProps>
       },
     );
     handleClose();
-  });
+  };
 
   return (
     <MapperForm

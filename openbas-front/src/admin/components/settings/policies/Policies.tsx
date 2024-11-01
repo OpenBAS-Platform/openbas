@@ -1,16 +1,17 @@
-import React, { FunctionComponent } from 'react';
 import { Grid, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../../../../components/i18n';
+import { FunctionComponent } from 'react';
+
+import { fetchPlatformParameters, updatePlatformPolicies } from '../../../../actions/Application';
+import type { LoggedHelper } from '../../../../actions/helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
+import { useFormatter } from '../../../../components/i18n';
+import { useHelper } from '../../../../store';
+import type { PlatformSettings, PolicyInput } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import SecurityMenu from '../SecurityMenu';
 import PolicyForm from './PolicyForm';
-import type { PlatformSettings, PolicyInput } from '../../../../utils/api-types';
-import { fetchPlatformParameters, updatePlatformPolicies } from '../../../../actions/Application';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { useHelper } from '../../../../store';
-import type { LoggedHelper } from '../../../../actions/helper';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -49,12 +50,14 @@ const Policies: FunctionComponent = () => {
 
   return (
     <div className={classes.container}>
-      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Security') }, {
-        label: t('Policies'),
-        current: true,
-      }]}
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Settings') }, { label: t('Security') }, {
+          label: t('Policies'),
+          current: true,
+        }]}
       />
-      <SecurityMenu/>
+      <SecurityMenu />
       <Grid item={true} xs={6} style={{ marginTop: 30 }}>
         <Typography variant="h4" gutterBottom={true}>
           {t('Login messages')}

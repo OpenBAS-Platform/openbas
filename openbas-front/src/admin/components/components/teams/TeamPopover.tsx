@@ -1,26 +1,28 @@
-import React, { FunctionComponent, useContext, useState } from 'react';
-import { Button, Dialog as MuiDialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import Dialog from '../../../../components/common/Dialog';
-import { deleteTeam, updateTeam } from '../../../../actions/teams/team-actions';
-import TeamForm from './TeamForm';
-import { useFormatter } from '../../../../components/i18n';
-import { useAppDispatch } from '../../../../utils/hooks';
-import Transition from '../../../../components/common/Transition';
-import type { TeamUpdateInput } from '../../../../utils/api-types';
-import { Option, organizationOption, tagOptions } from '../../../../utils/Option';
-import { useHelper } from '../../../../store';
+import { Button, Dialog as MuiDialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
+import { FunctionComponent, useContext, useState } from 'react';
+import * as React from 'react';
+
+import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import type { OrganizationHelper, TagHelper } from '../../../../actions/helper';
 import type { TeamInputForm, TeamStore } from '../../../../actions/teams/Team';
+import { deleteTeam, updateTeam } from '../../../../actions/teams/team-actions';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
+import Dialog from '../../../../components/common/Dialog';
+import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import { useHelper } from '../../../../store';
+import type { TeamOutput, TeamUpdateInput } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import { Option, organizationOption, tagOptions } from '../../../../utils/Option';
 import { TeamContext } from '../../common/Context';
-import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
+import TeamForm from './TeamForm';
 
 interface TeamPopoverProps {
-  team: TeamStore;
-  managePlayers?: () => void,
-  disabled?: boolean,
-  openEditOnInit?: boolean,
+  team: TeamStore | TeamOutput;
+  managePlayers?: () => void;
+  disabled?: boolean;
+  openEditOnInit?: boolean;
   onRemoveTeamFromInject?: (teamId: string) => void;
   onUpdate?: (result: TeamStore) => void;
   onDelete?: (result: string) => void;
@@ -79,7 +81,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
       team_tags: data.team_tags?.map((tag: Option) => tag.id),
     };
     return dispatch(updateTeam(team.team_id, inputValues)).then(
-      (result: { result: string, entities: { teams: Record<string, TeamStore> } }) => {
+      (result: { result: string; entities: { teams: Record<string, TeamStore> } }) => {
         if (result.entities) {
           if (onUpdate) {
             const updated = result.entities.teams[result.result];
@@ -165,8 +167,18 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
             {t('Manage players')}
           </MenuItem>
         )}
-        {onRemoveTeam && !onRemoveTeamFromInject && !team.team_contextual && <MenuItem onClick={handleOpenRemove}> {t('Remove from the context')}</MenuItem>}
-        {onRemoveTeamFromInject && <MenuItem onClick={handleOpenRemoveFromInject}> {t('Remove from the inject')}</MenuItem>}
+        {onRemoveTeam && !onRemoveTeamFromInject && !team.team_contextual && (
+          <MenuItem onClick={handleOpenRemove}>
+            {' '}
+            {t('Remove from the context')}
+          </MenuItem>
+        )}
+        {onRemoveTeamFromInject && (
+          <MenuItem onClick={handleOpenRemoveFromInject}>
+            {' '}
+            {t('Remove from the inject')}
+          </MenuItem>
+        )}
         <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
       </Menu>
       <MuiDialog

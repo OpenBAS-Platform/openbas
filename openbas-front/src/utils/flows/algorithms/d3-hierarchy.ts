@@ -1,5 +1,6 @@
-import { type Node, getIncomers } from '@xyflow/react';
+import { getIncomers, type Node } from '@xyflow/react';
 import { type HierarchyPointNode, stratify, tree } from 'd3-hierarchy';
+
 import type { Direction, LayoutAlgorithm } from './index';
 
 // D3 Hierarchy doesn't support layouting in different directions, but we can
@@ -76,7 +77,7 @@ const d3HierarchyLayout: LayoutAlgorithm = async (nodes, edges, options) => {
   };
 
   const hierarchy = stratify<NodeWithPosition>()
-    .id((d) => d.id)
+    .id(d => d.id)
     .parentId(getParentId)([rootNode, ...initialNodes]);
 
   // We create a map of the laid out nodes here to avoid multiple traversals when

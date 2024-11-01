@@ -1,16 +1,17 @@
-import React, { FunctionComponent } from 'react';
-import { Button, MenuItem } from '@mui/material';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { Button, MenuItem } from '@mui/material';
 import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
-import { useFormatter } from '../../../../components/i18n';
+import { FunctionComponent } from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import SelectField from '../../../../components/fields/SelectField';
 import TagField from '../../../../components/fields/TagField';
+import TextField from '../../../../components/fields/TextField';
+import { useFormatter } from '../../../../components/i18n';
 import type { ExerciseCreateInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
-import TextField from '../../../../components/fields/TextField';
-import SelectField from '../../../../components/fields/SelectField';
-import { scenarioCategories } from '../../scenarios/ScenarioForm';
+import { scenarioCategories } from '../../scenarios/constants';
 
 interface Props {
   onSubmit: SubmitHandler<ExerciseCreateInput>;
@@ -76,7 +77,7 @@ const ExerciseCreationForm: FunctionComponent<Props> = ({
       <SelectField
         variant="standard"
         fullWidth={true}
-        name='exercise_category'
+        name="exercise_category"
         label={t('Category')}
         style={{ marginTop: 20 }}
         error={!!errors.exercise_category}
@@ -92,7 +93,7 @@ const ExerciseCreationForm: FunctionComponent<Props> = ({
       <SelectField
         variant="standard"
         fullWidth={true}
-        name='exercise_main_focus'
+        name="exercise_main_focus"
         label={t('Main focus')}
         style={{ marginTop: 20 }}
         error={!!errors.exercise_main_focus}
@@ -121,7 +122,7 @@ const ExerciseCreationForm: FunctionComponent<Props> = ({
       <SelectField
         variant="standard"
         fullWidth={true}
-        name='exercise_severity'
+        name="exercise_severity"
         label={t('Severity')}
         style={{ marginTop: 20 }}
         error={!!errors.exercise_severity}
@@ -172,7 +173,7 @@ const ExerciseCreationForm: FunctionComponent<Props> = ({
                 helperText: errors.exercise_start_date?.message,
               },
             }}
-            onChange={(date) => field.onChange(date?.toISOString())}
+            onChange={date => field.onChange(date?.toISOString())}
             ampm={false}
             format="yyyy-MM-dd HH:mm:ss"
           />

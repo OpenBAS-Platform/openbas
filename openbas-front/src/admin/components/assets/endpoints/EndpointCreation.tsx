@@ -1,17 +1,17 @@
-import React, { FunctionComponent, useState } from 'react';
-import { ListItemButton, ListItemIcon, ListItemText, Theme } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
+import { ListItemButton, ListItemIcon, ListItemText, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { FunctionComponent, useState } from 'react';
 
-import { useFormatter } from '../../../../components/i18n';
-import { useAppDispatch } from '../../../../utils/hooks';
-import type { EndpointInput } from '../../../../utils/api-types';
-import EndpointForm from './EndpointForm';
 import { addEndpoint } from '../../../../actions/assets/endpoint-actions';
-import Drawer from '../../../../components/common/Drawer';
-import Dialog from '../../../../components/common/Dialog';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
+import Dialog from '../../../../components/common/Dialog';
+import Drawer from '../../../../components/common/Drawer';
+import { useFormatter } from '../../../../components/i18n';
+import type { EndpointInput } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
 import type { EndpointStore } from './Endpoint';
+import EndpointForm from './EndpointForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
   text: {
@@ -38,7 +38,7 @@ const EndpointCreation: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const onSubmit = (data: EndpointInput) => {
     dispatch(addEndpoint(data)).then(
-      (result: { result: string, entities: { endpoints: Record<string, EndpointStore> } }) => {
+      (result: { result: string; entities: { endpoints: Record<string, EndpointStore> } }) => {
         if (result.entities) {
           if (onCreate) {
             const endpointCreated = result.entities.endpoints[result.result];

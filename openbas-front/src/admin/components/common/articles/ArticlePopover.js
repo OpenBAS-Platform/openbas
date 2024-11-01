@@ -1,11 +1,12 @@
-import React, { useContext, useState } from 'react';
-import * as R from 'ramda';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { useFormatter } from '../../../../components/i18n';
-import ArticleForm from './ArticleForm';
-import { ArticleContext, PermissionsContext } from '../Context';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem } from '@mui/material';
+import * as R from 'ramda';
+import { Fragment, useContext, useState } from 'react';
+
 import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import { ArticleContext, PermissionsContext } from '../Context';
+import ArticleForm from './ArticleForm';
 
 const ArticlePopover = ({ article, onRemoveArticle = null }) => {
   // Standard hooks
@@ -70,8 +71,9 @@ const ArticlePopover = ({ article, onRemoveArticle = null }) => {
   )(article);
 
   return (
-    <React.Fragment>
-      <IconButton disabled={!permissions.canWrite}
+    <Fragment>
+      <IconButton
+        disabled={!permissions.canWrite}
         onClick={handlePopoverOpen}
         aria-haspopup="true"
         size="large"
@@ -146,7 +148,7 @@ const ArticlePopover = ({ article, onRemoveArticle = null }) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </React.Fragment>
+    </Fragment>
   );
 };
 

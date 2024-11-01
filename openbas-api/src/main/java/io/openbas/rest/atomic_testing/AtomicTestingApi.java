@@ -1,5 +1,6 @@
 package io.openbas.rest.atomic_testing;
 
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.inject_expectation.InjectExpectationService;
@@ -12,23 +13,25 @@ import io.openbas.service.AtomicTestingService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/atomic_testings")
+@RequestMapping(AtomicTestingApi.ATOMIC_TESTING_URI)
 @PreAuthorize("isAdmin()")
 @RequiredArgsConstructor
 public class AtomicTestingApi extends RestBehavior {
 
+  public static final String ATOMIC_TESTING_URI = "/api/atomic-testings";
+
   private final AtomicTestingService atomicTestingService;
   private final InjectExpectationService injectExpectationService;
 
+  @LogExecutionTime
   @PostMapping("/search")
   @Transactional(readOnly = true)
   public Page<AtomicTestingOutput> findAllAtomicTestings(
@@ -36,6 +39,7 @@ public class AtomicTestingApi extends RestBehavior {
     return atomicTestingService.findAllAtomicTestings(searchPaginationInput);
   }
 
+  @LogExecutionTime
   @GetMapping("/{injectId}")
   public InjectResultDTO findAtomicTesting(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId);
@@ -61,8 +65,7 @@ public class AtomicTestingApi extends RestBehavior {
   }
 
   @DeleteMapping("/{injectId}")
-  public void deleteAtomicTesting(
-      @PathVariable @NotBlank final String injectId) {
+  public void deleteAtomicTesting(@PathVariable @NotBlank final String injectId) {
     atomicTestingService.deleteAtomicTesting(injectId);
   }
 
@@ -76,8 +79,9 @@ public class AtomicTestingApi extends RestBehavior {
       @PathVariable String injectId,
       @PathVariable String targetId,
       @PathVariable String targetType,
-      @RequestParam(required = false) String parentTargetId ) {
-    return injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(injectId, targetId, parentTargetId, targetType);
+      @RequestParam(required = false) String parentTargetId) {
+    return injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(
+        injectId, targetId, parentTargetId, targetType);
   }
 
   @PutMapping("/{injectId}/tags")
@@ -87,6 +91,4 @@ public class AtomicTestingApi extends RestBehavior {
       @Valid @RequestBody final AtomicTestingUpdateTagsInput input) {
     return atomicTestingService.updateAtomicTestingTags(injectId, input);
   }
-
-
 }

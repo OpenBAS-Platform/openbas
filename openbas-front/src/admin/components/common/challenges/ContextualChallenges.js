@@ -1,7 +1,3 @@
-import React, { useContext } from 'react';
-import { makeStyles } from '@mui/styles';
-import { Avatar, Button, Card, CardContent, CardHeader, Chip, Grid, IconButton, Tooltip } from '@mui/material';
-import { Link } from 'react-router-dom';
 import {
   CrisisAlertOutlined,
   DescriptionOutlined,
@@ -11,11 +7,16 @@ import {
   SportsScoreOutlined,
   VisibilityOutlined,
 } from '@mui/icons-material';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import { Avatar, Button, Card, CardContent, CardHeader, Chip, Grid, IconButton, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { useContext } from 'react';
+import { Link } from 'react-router-dom';
+
+import Empty from '../../../../components/Empty';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
+import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { ChallengeContext } from '../Context';
-import Empty from '../../../../components/Empty';
 
 const useStyles = makeStyles(() => ({
   flag: {
@@ -76,27 +77,27 @@ const ContextualChallenges = ({ challenges, linkToInjects }) => {
       </div>
       <div className="clearfix" />
       {sortedChallenges.length === 0 && (
-      <Empty message={
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 18 }}>
-            {t('No challenge are used in the injects of this simulation.')}
+        <Empty message={(
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 18 }}>
+              {t('No challenge are used in the injects of this simulation.')}
+            </div>
+            {linkToInjects && (
+              <Button
+                style={{ marginTop: 20 }}
+                startIcon={<SlowMotionVideoOutlined />}
+                variant="outlined"
+                color="primary"
+                size="small"
+                component={Link}
+                to={linkToInjects}
+              >
+                {t('Create an inject')}
+              </Button>
+            )}
           </div>
-          {linkToInjects && (
-            <Button
-              style={{ marginTop: 20 }}
-              startIcon={<SlowMotionVideoOutlined />}
-              variant="outlined"
-              color="primary"
-              size="small"
-              component={Link}
-              to={linkToInjects}
-            >
-              {t('Create an inject')}
-            </Button>
-          )}
-        </div>
-          }
-      />
+        )}
+        />
       )}
       <Grid container={true} spacing={3}>
         {sortedChallenges.map((challenge, index) => {
@@ -108,11 +109,11 @@ const ContextualChallenges = ({ challenges, linkToInjects }) => {
                 sx={{ width: '100%', height: '100%' }}
               >
                 <CardHeader
-                  avatar={
+                  avatar={(
                     <Avatar sx={{ bgcolor: '#e91e63' }}>
                       <EmojiEventsOutlined />
                     </Avatar>
-                        }
+                  )}
                   title={challenge.challenge_name}
                   subheader={challenge.challenge_category}
                 />

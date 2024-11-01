@@ -1,9 +1,7 @@
 package io.openbas.utils.pagination;
 
+import javax.annotation.Nullable;
 import lombok.Builder;
 
-import javax.annotation.Nullable;
-
 @Builder
-public record SortField(String property, @Nullable String direction) {
-}
+public record SortField(String property, @Nullable String direction) {}

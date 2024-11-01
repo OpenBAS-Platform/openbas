@@ -1,20 +1,21 @@
-import React, { FunctionComponent, useState } from 'react';
-import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { Link } from 'react-router-dom';
 import { DeleteOutlined, MarkEmailReadOutlined } from '@mui/icons-material';
+import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import { useFormatter } from '../../../../../components/i18n';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import ComcheckState from '../controls/ComcheckState';
-import Empty from '../../../../../components/Empty';
-import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { FunctionComponent, useState } from 'react';
+import { Link } from 'react-router-dom';
+
 import { deleteComcheck, fetchComchecks } from '../../../../../actions/Comcheck';
 import type { ComCheckHelper } from '../../../../../actions/comchecks/comcheck-helper';
+import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
+import DialogDelete from '../../../../../components/common/DialogDelete';
+import Empty from '../../../../../components/Empty';
+import { useFormatter } from '../../../../../components/i18n';
+import { useHelper } from '../../../../../store';
 import type { Comcheck } from '../../../../../utils/api-types';
 import { usePermissions } from '../../../../../utils/Exercise';
-import DialogDelete from '../../../../../components/common/DialogDelete';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import ComcheckState from '../controls/ComcheckState';
 
 const useStyles = makeStyles(() => ({
   item: {
@@ -78,7 +79,7 @@ const ExerciseControlComChecks: FunctionComponent<Props> = ({
                 <MarkEmailReadOutlined />
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div className={classes.bodyContainer}>
                     <div
                       className={classes.bodyItem}
@@ -97,7 +98,9 @@ const ExerciseControlComChecks: FunctionComponent<Props> = ({
                       style={{ width: '20%' }}
                     >
                       <span style={{ fontWeight: 600 }}>
-                        {comcheck.comcheck_users_number} &nbsp;
+                        {comcheck.comcheck_users_number}
+                        {' '}
+&nbsp;
                       </span>
                       {t('players')}
                     </div>
@@ -108,12 +111,11 @@ const ExerciseControlComChecks: FunctionComponent<Props> = ({
                       />
                     </div>
                   </div>
-                }
+                )}
               />
               <ListItemSecondaryAction>
                 <IconButton
-                  onClick={() => setOpenComcheckDelete(comcheck.comcheck_id)
-                  }
+                  onClick={() => setOpenComcheckDelete(comcheck.comcheck_id)}
                   aria-haspopup="true"
                   size="large"
                   disabled={permissions.readOnlyBypassStatus}

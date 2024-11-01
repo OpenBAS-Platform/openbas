@@ -1,20 +1,21 @@
-import React, { CSSProperties, useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { TableViewOutlined } from '@mui/icons-material';
-import { useFormatter } from '../../../../components/i18n';
-import Breadcrumbs from '../../../../components/Breadcrumbs';
-import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
-import type { RawPaginationImportMapper, SearchPaginationInput } from '../../../../utils/api-types';
+import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { CSSProperties, useState } from 'react';
+
 import { searchMappers } from '../../../../actions/mapper/mapper-actions';
-import { initSorting } from '../../../../components/common/queryable/Page';
-import Empty from '../../../../components/Empty';
-import DataIngestionMenu from '../DataIngestionMenu';
-import XlsMapperCreation from './xls_mapper/XlsMapperCreation';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
-import XlsMapperPopover from './XlsMapperPopover';
+import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import Empty from '../../../../components/Empty';
+import { useFormatter } from '../../../../components/i18n';
+import type { RawPaginationImportMapper, SearchPaginationInput } from '../../../../utils/api-types';
+import DataIngestionMenu from '../DataIngestionMenu';
 import ImportUploaderMapper from './ImportUploaderMapper';
+import XlsMapperCreation from './xls_mapper/XlsMapperCreation';
+import XlsMapperPopover from './XlsMapperPopover';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -79,7 +80,7 @@ const XlsMappers = () => {
         searchPaginationInput={searchPaginationInput}
         setContent={setMappers}
       >
-        <ImportUploaderMapper/>
+        <ImportUploaderMapper />
       </PaginationComponent>
       <List>
         <ListItem
@@ -89,7 +90,7 @@ const XlsMappers = () => {
         >
           <ListItemIcon />
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponent
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
@@ -97,7 +98,7 @@ const XlsMappers = () => {
                 setSearchPaginationInput={setSearchPaginationInput}
                 defaultSortAsc
               />
-            }
+            )}
           />
         </ListItem>
         {
@@ -112,9 +113,9 @@ const XlsMappers = () => {
                   <TableViewOutlined color="primary" />
                 </ListItemIcon>
                 <ListItemText
-                  primary={
+                  primary={(
                     <div className={classes.bodyItems}>
-                      {headers.map((header) => (
+                      {headers.map(header => (
                         <div
                           key={header.field}
                           className={classes.bodyItem}
@@ -124,14 +125,14 @@ const XlsMappers = () => {
                         </div>
                       ))}
                     </div>
-                  }
+                  )}
                 />
                 <ListItemSecondaryAction>
                   <XlsMapperPopover
                     mapper={mapper}
-                    onDuplicate={(result) => setMappers([result, ...mappers])}
-                    onUpdate={(result) => setMappers(mappers.map((existing) => (existing.import_mapper_id !== result.import_mapper_id ? existing : result)))}
-                    onDelete={(result) => setMappers(mappers.filter((existing) => (existing.import_mapper_id !== result)))}
+                    onDuplicate={result => setMappers([result, ...mappers])}
+                    onUpdate={result => setMappers(mappers.map(existing => (existing.import_mapper_id !== result.import_mapper_id ? existing : result)))}
+                    onDelete={result => setMappers(mappers.filter(existing => (existing.import_mapper_id !== result)))}
                   />
                 </ListItemSecondaryAction>
               </ListItem>
@@ -140,7 +141,7 @@ const XlsMappers = () => {
         }
         {!mappers ? (<Empty message={t('No data available')} />) : null}
       </List>
-      <XlsMapperCreation onCreate={(result) => setMappers([result, ...mappers])} />
+      <XlsMapperCreation onCreate={result => setMappers([result, ...mappers])} />
     </div>
   );
 };

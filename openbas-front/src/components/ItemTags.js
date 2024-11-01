@@ -1,14 +1,15 @@
-import React from 'react';
+import { Chip, Slide, Tooltip } from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import { makeStyles, useTheme } from '@mui/styles';
-import { Chip, Slide, Tooltip } from '@mui/material';
-import { hexToRGB } from '../utils/Colors';
-import { useFormatter } from './i18n';
-import { useHelper } from '../store';
-import { getLabelOfRemainingItems, getRemainingItemsCount, getVisibleItems, truncate } from '../utils/String';
+import { forwardRef } from 'react';
 
-const Transition = React.forwardRef((props, ref) => (
+import { useHelper } from '../store';
+import { hexToRGB } from '../utils/Colors';
+import { getLabelOfRemainingItems, getRemainingItemsCount, getVisibleItems, truncate } from '../utils/String';
+import { useFormatter } from './i18n';
+
+const Transition = forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';
@@ -50,7 +51,7 @@ const ItemTags = (props) => {
   }
   const resolvedTags = useHelper((helper) => {
     const allTags = helper.getTags() ?? [];
-    return allTags.filter((tag) => (tags ?? []).includes(tag.tag_id));
+    return allTags.filter(tag => (tags ?? []).includes(tag.tag_id));
   });
   const orderedTags = R.sortWith([R.ascend(R.prop('tag_name'))], resolvedTags);
 
@@ -62,37 +63,38 @@ const ItemTags = (props) => {
     <div className={classes.inline}>
       {visibleTags.length > 0
         ? (visibleTags.map(
-          (tag, index) => (
-            <span key={index}>
-              <Tooltip title={tag.tag_name}>
-                <Chip
-                  variant="outlined"
-                  classes={{ root: style }}
-                  label={truncate(tag.tag_name, truncateLimit)}
-                  style={{
-                    color: tag.tag_color,
-                    borderColor: tag.tag_color,
-                    backgroundColor: hexToRGB(tag.tag_color),
-                  }}
-                />
-              </Tooltip>
-            </span>
-          ),
-        )) : (
-          <Chip
-            classes={{ root: style }}
-            variant="outlined"
-            label={t('No tag')}
-            style={{
-              color: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
-              borderColor: theme.palette.mode === 'dark' ? '#ffffff'
-                : '#000000',
-              backgroundColor: hexToRGB(
-                theme.palette.mode === 'dark' ? '#ffffff' : 'transparent',
-              ),
-            }}
-          />
-        )}
+            (tag, index) => (
+              <span key={index}>
+                <Tooltip title={tag.tag_name}>
+                  <Chip
+                    variant="outlined"
+                    classes={{ root: style }}
+                    label={truncate(tag.tag_name, truncateLimit)}
+                    style={{
+                      color: tag.tag_color,
+                      borderColor: tag.tag_color,
+                      backgroundColor: hexToRGB(tag.tag_color),
+                    }}
+                  />
+                </Tooltip>
+              </span>
+            ),
+          )) : (
+            <Chip
+              classes={{ root: style }}
+              variant="outlined"
+              label={t('No tag')}
+              style={{
+                color: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
+                borderColor: theme.palette.mode === 'dark'
+                  ? '#ffffff'
+                  : '#000000',
+                backgroundColor: hexToRGB(
+                  theme.palette.mode === 'dark' ? '#ffffff' : 'transparent',
+                ),
+              }}
+            />
+          )}
       {remainingTagsCount && remainingTagsCount > 0 && (
         <Tooltip title={tooltipLabel}>
           <Chip

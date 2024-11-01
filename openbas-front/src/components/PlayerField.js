@@ -1,15 +1,16 @@
-import React, { Component } from 'react';
-import * as R from 'ramda';
 import { PersonOutlined } from '@mui/icons-material';
-import { Box, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { withStyles } from '@mui/styles';
+import * as R from 'ramda';
+import { Component } from 'react';
 import { connect } from 'react-redux';
-import PlayerForm from '../admin/components/teams/players/PlayerForm';
+
+import { storeHelper } from '../actions/Schema';
 import { addPlayer, fetchPlayers } from '../actions/User';
+import PlayerForm from '../admin/components/teams/players/PlayerForm';
+import { resolveUserName } from '../utils/String';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
-import { storeHelper } from '../actions/Schema';
-import { resolveUserName } from '../utils/String';
 
 const styles = () => ({
   icon: {
@@ -76,7 +77,7 @@ class PlayerField extends Component {
       noMargin,
     } = this.props;
     const usersOptions = R.map(
-      (n) => ({
+      n => ({
         id: n.user_id,
         label: resolveUserName(n),
       }),

@@ -1,12 +1,15 @@
-import { ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { GroupsOutlined } from '@mui/icons-material';
-import React, { FunctionComponent, useContext } from 'react';
+import { ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
+import { FunctionComponent, useContext, useEffect, useState } from 'react';
+
+import { findTeams } from '../../../../../actions/teams/team-actions';
 import ItemTags from '../../../../../components/ItemTags';
-import TeamPopover from '../../../components/teams/TeamPopover';
-import type { TeamStore } from '../../../../../actions/teams/Team';
 import type { Theme } from '../../../../../components/Theme';
-import { PermissionsContext } from '../../Context';
+import type { TeamOutput } from '../../../../../utils/api-types';
+import TeamPopover from '../../../components/teams/TeamPopover';
+import { PermissionsContext, TeamContext } from '../../Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -23,21 +26,30 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  teams: Array<TeamStore & { team_users_enabled_number: number }>;
+  teamIds: Array<string>;
   handleRemoveTeam: (teamId: string) => void;
 }
 
 const InjectTeamsList: FunctionComponent<Props> = ({
-  teams,
+  teamIds,
   handleRemoveTeam,
 }) => {
   // Standard hooks
   const classes = useStyles();
   const { permissions } = useContext(PermissionsContext);
+  const { computeTeamUsersEnabled } = useContext(TeamContext);
+
+  const [teams, setTeams] = useState<TeamOutput[]>([]);
+  const sortTeams = R.sortWith(
+    [R.ascend(R.prop('team_name'))],
+  );
+  useEffect(() => {
+    findTeams(teamIds).then(result => setTeams(sortTeams(result.data)));
+  }, [teamIds]);
 
   return (
     <>
-      {teams.map((team) => (
+      {teams.map(team => (
         <ListItem
           key={team.team_id}
           classes={{ root: classes.item }}
@@ -47,7 +59,7 @@ const InjectTeamsList: FunctionComponent<Props> = ({
             <GroupsOutlined />
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div className={classes.column}>
                 <div className={classes.bodyItem}>
                   {team.team_name}
@@ -56,13 +68,13 @@ const InjectTeamsList: FunctionComponent<Props> = ({
                   {team.team_users_number}
                 </div>
                 <div className={classes.bodyItem}>
-                  {team.team_users_enabled_number}
+                  {computeTeamUsersEnabled?.(team.team_id)}
                 </div>
                 <div className={classes.bodyItem}>
                   <ItemTags variant="reduced-view" tags={team.team_tags} />
                 </div>
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction>
             <TeamPopover

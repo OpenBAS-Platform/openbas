@@ -1,5 +1,6 @@
 import { normalize, schema } from 'normalizr';
 import { useEffect } from 'react';
+
 import { DATA_DELETE_SUCCESS } from '../../constants/ActionTypes';
 import { store } from '../../store';
 import { buildUri } from '../Action';
@@ -15,10 +16,12 @@ const ERROR_2S_DELAY = 2000;
 const ERROR_8S_DELAY = 8000;
 const ERROR_30S_DELAY = 30000;
 
+// pristine is used to avoid duplicate requests at the launch of the app
+let pristine = true;
 let sseClient;
 let lastPingDate = new Date().getTime();
 const listeners = new Map();
-const useDataLoader = (loader = () => {}) => {
+const useDataLoader = (loader = () => {}, refetchArg = []) => {
   const sseConnect = () => {
     sseClient = new EventSource(buildUri('/api/stream'), { withCredentials: true });
     const autoReConnect = setInterval(() => {
@@ -31,7 +34,10 @@ const useDataLoader = (loader = () => {}) => {
         sseConnect();
       }
     }, EVENT_TRY_DELAY);
-    sseClient.addEventListener('open', () => [...listeners.keys()].forEach((load) => load()));
+    sseClient.addEventListener('open', () => {
+      pristine = false;
+      [...listeners.keys()].forEach(load => load());
+    });
     sseClient.addEventListener('message', (event) => {
       const data = JSON.parse(event.data);
       if (data.listened) {
@@ -80,7 +86,7 @@ const useDataLoader = (loader = () => {}) => {
     listeners.set(loader, '');
     if (EventSource !== undefined && sseClient === undefined) {
       sseClient = sseConnect();
-    } else {
+    } else if (!pristine) {
       const load = async () => {
         await loader();
       };
@@ -95,7 +101,7 @@ const useDataLoader = (loader = () => {}) => {
         sseClient = undefined;
       }
     };
-  }, []);
+  }, refetchArg);
 };
 
 export default useDataLoader;

@@ -1,12 +1,14 @@
-import React, { useContext, useState } from 'react';
-import { Dialog, DialogContent, DialogTitle, IconButton, ListItem, ListItemIcon, ListItemText, Theme } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
+import { Dialog, DialogContent, DialogTitle, IconButton, ListItem, ListItemIcon, ListItemText, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../../../../components/i18n';
-import VariableForm from './VariableForm';
-import type { VariableInput } from '../../../../utils/api-types';
+import { useContext, useState } from 'react';
+import * as React from 'react';
+
 import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import type { VariableInput } from '../../../../utils/api-types';
 import { VariableContext } from '../../common/Context';
+import VariableForm from './VariableForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {

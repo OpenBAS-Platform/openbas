@@ -1,25 +1,25 @@
-import React, { useContext, useState } from 'react';
-import * as R from 'ramda';
-import arrayMutators from 'final-form-arrays';
-import { Form } from 'react-final-form';
-import { makeStyles } from '@mui/styles';
-import { Avatar, Button, Card, CardContent, CardHeader } from '@mui/material';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, HelpOutlined } from '@mui/icons-material';
-import InjectDefinition from './InjectDefinition';
-import { PermissionsContext } from '../Context';
+import { Avatar, Button, Card, CardContent, CardHeader } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import arrayMutators from 'final-form-arrays';
+import * as R from 'ramda';
+import { useContext, useState } from 'react';
+import { Form } from 'react-final-form';
+
+import { fetchTags } from '../../../../actions/Tag';
+import { useFormatter } from '../../../../components/i18n';
+import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { fetchTeams } from '../../../../actions/teams/team-actions';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchTags } from '../../../../actions/Tag';
-import InjectForm from './InjectForm';
-import { useFormatter } from '../../../../components/i18n';
-import { isEmptyField } from '../../../../utils/utils';
 import { tagOptions } from '../../../../utils/Option';
 import { splitDuration } from '../../../../utils/Time';
-import PlatformIcon from '../../../../components/PlatformIcon';
+import { isEmptyField } from '../../../../utils/utils';
+import { PermissionsContext } from '../Context';
+import InjectDefinition from './InjectDefinition';
+import InjectForm from './InjectForm';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   details: {
     marginTop: 20,
   },
@@ -58,7 +58,6 @@ const UpdateInjectDetails = ({
   onUpdateInject,
   isAtomic = false,
   drawerRef,
-  teamsFromExerciseOrScenario,
   ...props
 }) => {
   const { t, tPick } = useFormatter();
@@ -67,17 +66,15 @@ const UpdateInjectDetails = ({
   const [openDetails, setOpenDetails] = useState(true);
   const [injectDetailsState, setInjectDetailsState] = useState({});
   const dispatch = useAppDispatch();
-  const { tagsMap } = useHelper((helper) => ({
+  const { tagsMap } = useHelper(helper => ({
     tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
-    dispatch(fetchTeams());
     dispatch(fetchTags());
   });
 
   const toggleInjectContent = () => {
     if (openDetails) {
-      // eslint-disable-next-line no-param-reassign
       drawerRef.current.scrollTop = 0;
       setOpenDetails(false);
     } else {
@@ -86,32 +83,7 @@ const UpdateInjectDetails = ({
   };
   const validate = (values) => {
     const errors = {};
-    if (openDetails && contractContent && Array.isArray(contractContent.fields)) {
-      contractContent.fields
-        .filter(
-          (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
-            f.key,
-          ),
-        )
-        .forEach((field) => {
-          const value = values[field.key];
-          if (field.mandatory && (value === undefined || R.isEmpty(value))) {
-            errors[field.key] = t('This field is required.');
-          }
-          if (field.mandatoryGroups) {
-            const { mandatoryGroups } = field;
-            const conditionOk = mandatoryGroups?.some((mandatoryKey) => {
-              const v = values[mandatoryKey];
-              return v !== undefined && !R.isEmpty(v);
-            });
-            // If condition are not filled
-            if (!conditionOk) {
-              const labels = mandatoryGroups.map((key) => contractContent.fields.find((f) => f.key === key).label).join(', ');
-              errors[field.key] = t(`One of this field is required : ${labels}.`);
-            }
-          }
-        });
-    }
+
     const requiredFields = [
       'inject_title',
       'inject_depends_duration_days',
@@ -129,19 +101,19 @@ const UpdateInjectDetails = ({
     if (contractContent) {
       const finalData = {};
       const hasArticles = contractContent.fields
-        .map((f) => f.key)
+        .map(f => f.key)
         .includes('articles');
       if (hasArticles && injectDetailsState.articlesIds) {
         finalData.articles = injectDetailsState.articlesIds;
       }
       const hasChallenges = contractContent.fields
-        .map((f) => f.key)
+        .map(f => f.key)
         .includes('challenges');
       if (hasChallenges && injectDetailsState.challengesIds) {
         finalData.challenges = injectDetailsState.challengesIds;
       }
       const hasExpectations = contractContent.fields
-        .map((f) => f.key)
+        .map(f => f.key)
         .includes('expectations');
       if (hasExpectations && injectDetailsState.expectations) {
         finalData.expectations = injectDetailsState.expectations;
@@ -149,7 +121,7 @@ const UpdateInjectDetails = ({
       if (openDetails) {
         contractContent.fields
           .filter(
-            (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+            f => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
               f.key,
             ),
           )
@@ -162,15 +134,9 @@ const UpdateInjectDetails = ({
               && data[field.key]
               && data[field.key].length > 0
             ) {
+              const regex = /&lt;#list\s+(\w+)\s+as\s+(\w+)&gt;/g;
               finalData[field.key] = data[field.key]
-                .replaceAll(
-                  '&lt;#list challenges as challenge&gt;',
-                  '<#list challenges as challenge>',
-                )
-                .replaceAll(
-                  '&lt;#list articles as article&gt;',
-                  '<#list articles as article>',
-                )
+                .replace(regex, (_, listName, identifier) => `<#list ${listName} as ${identifier}>`)
                 .replaceAll('&lt;/#list&gt;', '</#list>');
             } else if (data[field.key] && field.type === 'tuple') {
               if (field.cardinality && field.cardinality === '1') {
@@ -215,7 +181,7 @@ const UpdateInjectDetails = ({
         inject_asset_groups: assetGroupIds,
         inject_documents: documents,
         inject_depends_duration,
-        inject_depends_on: data.inject_depends_on,
+        inject_depends_on: data.inject_depends_on ? data.inject_depends_on : [],
       };
       await onUpdateInject(values);
     }
@@ -244,7 +210,7 @@ const UpdateInjectDetails = ({
   ];
   if (isEmptyField(inject?.inject_content)) {
     contractContent?.fields
-      .filter((f) => !builtInFields.includes(f.key))
+      .filter(f => !builtInFields.includes(f.key))
       .forEach((field) => {
         if (!initialValues[field.key]) {
           if (field.cardinality && field.cardinality === '1') {
@@ -257,7 +223,7 @@ const UpdateInjectDetails = ({
   }
   // Specific processing for some fields
   contractContent?.fields
-    .filter((f) => !builtInFields.includes(f.key))
+    .filter(f => !builtInFields.includes(f.key))
     .forEach((field) => {
       if (
         field.type === 'textarea'
@@ -323,14 +289,16 @@ const UpdateInjectDetails = ({
           avatar={contractContent ? <Avatar sx={{ width: 24, height: 24 }} src={`/api/images/injectors/${contractContent.config.type}`} />
             : <Avatar sx={{ width: 24, height: 24 }}><HelpOutlined /></Avatar>}
           title={contractContent?.contract_attack_patterns_external_ids.join(', ')}
-          action={<div style={{ display: 'flex', alignItems: 'center' }}>
-            {inject?.inject_injector_contract?.injector_contract_platforms?.map(
-              (platform) => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
-            )}
-          </div>}
+          action={(
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              {inject?.inject_injector_contract?.injector_contract_platforms?.map(
+                platform => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
+              )}
+            </div>
+          )}
         />
         <CardContent classes={{ root: classes.injectorContractContent }}>
-          {tPick(contractContent.label)}
+          {contractContent !== null ? tPick(contractContent.label) : ''}
         </CardContent>
       </Card>
       <Form
@@ -361,12 +329,11 @@ const UpdateInjectDetails = ({
                       handleClose={handleClose}
                       tagsMap={tagsMap}
                       permissions={permissions}
-                      teamsFromExerciseOrScenario={teamsFromExerciseOrScenario}
                       articlesFromExerciseOrScenario={[]}
                       variablesFromExerciseOrScenario={[]}
                       onUpdateInject={onUpdateInject}
                       setInjectDetailsState={setInjectDetailsState}
-                      uriVariable={''}
+                      uriVariable=""
                       allUsersNumber={0}
                       usersNumber={0}
                       teamsUsers={[]}

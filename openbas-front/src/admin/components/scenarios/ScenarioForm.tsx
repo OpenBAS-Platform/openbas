@@ -1,14 +1,16 @@
-import React, { FunctionComponent } from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Button, MenuItem } from '@mui/material';
-import { zodImplement } from '../../../utils/Zod';
-import type { ScenarioInput } from '../../../utils/api-types';
-import { useFormatter } from '../../../components/i18n';
+import { FunctionComponent } from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import SelectField from '../../../components/fields/SelectField';
 import TagField from '../../../components/fields/TagField';
 import TextField from '../../../components/fields/TextField';
-import SelectField from '../../../components/fields/SelectField';
+import { useFormatter } from '../../../components/i18n';
+import type { ScenarioInput } from '../../../utils/api-types';
+import { zodImplement } from '../../../utils/Zod';
+import { scenarioCategories } from './constants';
 
 interface Props {
   onSubmit: SubmitHandler<ScenarioInput>;
@@ -16,17 +18,6 @@ interface Props {
   editing?: boolean;
   initialValues?: ScenarioInput;
 }
-
-export const scenarioCategories = new Map([
-  ['global-crisis', 'Global Crisis'],
-  ['attack-scenario', 'Attack Scenario'],
-  ['media-pressure', 'Media Pressure'],
-  ['data-exfiltration', 'Data Exfiltration'],
-  ['capture-the-flag', 'Capture The Flag'],
-  ['vulnerability-exploitation', 'Vulnerability Exploitation'],
-  ['lateral-movement', 'Lateral Movement'],
-  ['url-filtering', 'URL Filtering'],
-]);
 
 const ScenarioForm: FunctionComponent<Props> = ({
   onSubmit,
@@ -60,7 +51,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
         scenario_name: z.string().min(1, { message: t('Should not be empty') }),
         scenario_category: z.string().optional(),
         scenario_main_focus: z.string().optional(),
-        scenario_severity: z.string().optional(),
+        scenario_severity: z.enum(['low', 'medium', 'high', 'critical']).optional(),
         scenario_subtitle: z.string().optional(),
         scenario_description: z.string().optional(),
         scenario_tags: z.string().array().optional(),
@@ -88,7 +79,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
       <SelectField
         variant="standard"
         fullWidth={true}
-        name='scenario_category'
+        name="scenario_category"
         label={t('Category')}
         style={{ marginTop: 20 }}
         error={!!errors.scenario_category}
@@ -104,7 +95,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
       <SelectField
         variant="standard"
         fullWidth={true}
-        name='scenario_main_focus'
+        name="scenario_main_focus"
         label={t('Main focus')}
         style={{ marginTop: 20 }}
         error={!!errors.scenario_main_focus}
@@ -133,7 +124,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
       <SelectField
         variant="standard"
         fullWidth={true}
-        name='scenario_severity'
+        name="scenario_severity"
         label={t('Severity')}
         style={{ marginTop: 20 }}
         error={!!errors.scenario_severity}

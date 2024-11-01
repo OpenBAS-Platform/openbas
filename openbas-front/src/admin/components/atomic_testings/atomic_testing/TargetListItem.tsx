@@ -1,11 +1,12 @@
-import React from 'react';
+import { DevicesOtherOutlined, Groups3Outlined, PersonOutlined } from '@mui/icons-material';
 import { Divider, ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { DevicesOtherOutlined, Groups3Outlined } from '@mui/icons-material';
 import { SelectGroup } from 'mdi-material-ui';
+import * as React from 'react';
+
+import PlatformIcon from '../../../../components/PlatformIcon';
 import type { InjectTargetWithResult } from '../../../../utils/api-types';
 import AtomicTestingResult from './AtomicTestingResult';
-import PlatformIcon from '../../../../components/PlatformIcon';
 
 const useStyles = makeStyles(() => ({
   bodyTarget: {
@@ -42,23 +43,26 @@ const TargetListItem: React.FC<Props> = ({ isChild, onClick, target, selected })
   // Icon
   const getIcon = (type: string | undefined) => {
     if (type === 'ASSETS') {
-      return <DevicesOtherOutlined/>;
+      return <DevicesOtherOutlined />;
     }
     if (type === 'ASSETS_GROUPS') {
-      return <SelectGroup/>;
+      return <SelectGroup />;
+    }
+    if (isChild) {
+      return <PersonOutlined fontSize="small" />; // Player in a team
     }
     return <Groups3Outlined />;
   };
   return (
     <>
-      {isChild && <Divider className={classes.dividerL}/>}
+      {isChild && <Divider className={classes.dividerL} />}
       <Paper elevation={1} style={style} key={target?.id}>
         <ListItemButton onClick={handleItemClick} style={{ marginBottom: 15 }} selected={selected}>
           <ListItemIcon>
             {getIcon(target?.targetType)}
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div className={classes.bodyTarget} style={{ width: '50%' }}>
                   {target?.name}
@@ -68,10 +72,10 @@ const TargetListItem: React.FC<Props> = ({ isChild, onClick, target, selected })
                   {target?.platformType ?? 'Unknown'}
                 </div>
                 <div className={classes.bodyTarget} style={{ width: '20%' }}>
-                  <AtomicTestingResult expectations={target?.expectationResultsByTypes}/>
+                  <AtomicTestingResult expectations={target?.expectationResultsByTypes} />
                 </div>
               </div>
-            }
+            )}
           />
         </ListItemButton>
       </Paper>

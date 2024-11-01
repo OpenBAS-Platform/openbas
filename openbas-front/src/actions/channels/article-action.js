@@ -1,9 +1,9 @@
 import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
-import { article, arrayOfArticles } from './article-schema';
+import { arrayOfArticles, article } from './article-schema';
 
 // -- EXERCISES --
 
-export const fetchExerciseArticles = (exerciseId) => (dispatch) => {
+export const fetchExerciseArticles = exerciseId => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/articles`;
   return getReferential(arrayOfArticles, uri)(dispatch);
 };
@@ -27,7 +27,7 @@ export const addScenarioArticle = (scenarioId, data) => (dispatch) => {
   return postReferential(article, uri, data)(dispatch);
 };
 
-export const fetchScenarioArticles = (scenarioId) => (dispatch) => {
+export const fetchScenarioArticles = scenarioId => (dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/articles`;
   return getReferential(arrayOfArticles, uri)(dispatch);
 };

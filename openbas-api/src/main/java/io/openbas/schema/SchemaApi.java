@@ -6,15 +6,12 @@ import io.openbas.utils.schema.PropertySchema;
 import io.openbas.utils.schema.SchemaUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@PreAuthorize("isAdmin()")
 @RequestMapping
 public class SchemaApi extends RestBehavior {
 
@@ -22,21 +19,19 @@ public class SchemaApi extends RestBehavior {
   public List<PropertySchemaDTO> schemas(
       @PathVariable @NotNull final String className,
       @RequestParam final boolean filterableOnly,
-      @RequestBody @Valid @NotNull List<String> filterNames) throws ClassNotFoundException {
+      @RequestBody @Valid @NotNull List<String> filterNames)
+      throws ClassNotFoundException {
     String completeClassName = "io.openbas.database.model." + className;
     if (filterableOnly) {
-      return SchemaUtils.schema(Class.forName(completeClassName))
-          .stream()
+      return SchemaUtils.schemaWithSubtypes(Class.forName(completeClassName)).stream()
           .filter(PropertySchema::isFilterable)
           .filter(p -> filterNames.isEmpty() || filterNames.contains(p.getJsonName()))
           .map(PropertySchemaDTO::new)
           .toList();
     }
-    return SchemaUtils.schema(Class.forName(completeClassName))
-        .stream()
+    return SchemaUtils.schemaWithSubtypes(Class.forName(completeClassName)).stream()
         .filter(p -> filterNames.isEmpty() || filterNames.contains(p.getJsonName()))
         .map(PropertySchemaDTO::new)
         .toList();
   }
-
 }

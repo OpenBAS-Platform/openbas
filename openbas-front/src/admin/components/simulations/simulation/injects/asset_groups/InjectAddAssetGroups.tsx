@@ -1,9 +1,10 @@
-import { makeStyles } from '@mui/styles';
-import React, { FunctionComponent, useContext, useState } from 'react';
-import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
-import type { Theme } from '../../../../../../components/Theme';
+import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { FunctionComponent, useContext, useState } from 'react';
+
 import { useFormatter } from '../../../../../../components/i18n';
+import type { Theme } from '../../../../../../components/Theme';
 import AssetGroupDialogAdding from '../../../../assets/asset_groups/AssetGroupDialogAdding';
 import { PermissionsContext } from '../../../../common/Context';
 

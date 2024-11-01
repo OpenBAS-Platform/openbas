@@ -1,19 +1,19 @@
-import React from 'react';
+import { Grid, Paper, Skeleton, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useParams } from 'react-router-dom';
-import { Grid, Typography, Paper, Skeleton } from '@mui/material';
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
-import { useHelper } from '../../../../store';
-import { useFormatter } from '../../../../components/i18n';
+import { useParams } from 'react-router-dom';
+
 import { updateChannel, updateChannelLogos } from '../../../../actions/channels/channel-action';
-import ChannelParametersForm from './ChannelParametersForm';
-import ChannelOverviewNewspaper from './ChannelOverviewNewspaper';
-import ChannelOverviewMicroblogging from './ChannelOverviewMicroblogging';
-import ChannelOverviewTvChannel from './ChannelOverviewTvChannel';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchDocuments } from '../../../../actions/Document';
+import { useFormatter } from '../../../../components/i18n';
+import { useHelper } from '../../../../store';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import ChannelAddLogo from './ChannelAddLogo';
+import ChannelOverviewMicroblogging from './ChannelOverviewMicroblogging';
+import ChannelOverviewNewspaper from './ChannelOverviewNewspaper';
+import ChannelOverviewTvChannel from './ChannelOverviewTvChannel';
+import ChannelParametersForm from './ChannelParametersForm';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -43,7 +43,7 @@ const Channel = () => {
   useDataLoader(() => {
     dispatch(fetchDocuments());
   });
-  const submitUpdate = (data) => dispatch(updateChannel(channelId, data));
+  const submitUpdate = data => dispatch(updateChannel(channelId, data));
   const submitLogo = (documentId, theme) => {
     const data = {
       channel_logo_dark: theme === 'dark' ? documentId : channel.channel_logo_dark,
@@ -108,8 +108,7 @@ const Channel = () => {
                 )}
                 {userAdmin && (
                   <ChannelAddLogo
-                    handleAddLogo={(documentId) => submitLogo(documentId, 'dark')
-                    }
+                    handleAddLogo={documentId => submitLogo(documentId, 'dark')}
                   />
                 )}
               </Grid>
@@ -131,8 +130,7 @@ const Channel = () => {
                 )}
                 {userAdmin && (
                   <ChannelAddLogo
-                    handleAddLogo={(documentId) => submitLogo(documentId, 'light')
-                    }
+                    handleAddLogo={documentId => submitLogo(documentId, 'light')}
                   />
                 )}
               </Grid>

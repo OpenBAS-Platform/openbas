@@ -1,13 +1,26 @@
 package io.openbas.service;
 
-import io.openbas.database.model.Report;
-import io.openbas.database.model.ReportInformation;
-import io.openbas.database.model.ReportInformationsType;
-import io.openbas.database.repository.ReportRepository;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import io.openbas.database.model.*;
 import io.openbas.rest.report.form.ReportInformationInput;
+import io.openbas.rest.report.form.ReportInjectCommentInput;
 import io.openbas.rest.report.form.ReportInput;
+import io.openbas.rest.report.model.Report;
+import io.openbas.rest.report.model.ReportInformation;
+import io.openbas.rest.report.model.ReportInformationsType;
+import io.openbas.rest.report.model.ReportInjectComment;
+import io.openbas.rest.report.repository.ReportRepository;
+import io.openbas.rest.report.service.ReportService;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -15,117 +28,168 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class ReportServiceTest {
 
-    @Mock
-    private ReportRepository reportRepository;
+  @Mock private ReportRepository reportRepository;
 
-    private ReportService reportService;
+  private ReportService reportService;
 
-    @BeforeEach
-    void before() {
-        // Injecting mocks into the controller
-        reportService = new ReportService(reportRepository);
-    }
+  @BeforeEach
+  void before() {
+    // Injecting mocks into the controller
+    reportService = new ReportService(reportRepository);
+  }
 
-    @DisplayName("Test create a report")
+  @DisplayName("Test create a report")
+  @Test
+  void createReport() throws Exception {
+    // -- PREPARE --
+    Report report = new Report();
+
+    ReportInput reportInput = new ReportInput();
+    reportInput.setName("test");
+    ReportInformationInput reportInformationInput = new ReportInformationInput();
+    reportInformationInput.setReportInformationsType(ReportInformationsType.MAIN_INFORMATION);
+    reportInformationInput.setReportInformationsDisplay(true);
+    ReportInformationInput reportInformationInput2 = new ReportInformationInput();
+    reportInformationInput2.setReportInformationsType(ReportInformationsType.SCORE_DETAILS);
+    reportInformationInput2.setReportInformationsDisplay(true);
+    reportInput.setReportInformations(List.of(reportInformationInput, reportInformationInput2));
+
+    when(reportRepository.save(any(Report.class))).thenReturn(report);
+
+    // -- EXECUTE --
+    reportService.updateReport(report, reportInput);
+
+    // -- ASSERT --
+    ArgumentCaptor<Report> reportCaptor = ArgumentCaptor.forClass(Report.class);
+    verify(reportRepository).save(reportCaptor.capture());
+    Report capturedReport = reportCaptor.getValue();
+    assertEquals(reportInput.getName(), capturedReport.getName());
+    assertEquals(2, capturedReport.getReportInformations().size());
+    ReportInformation reportInformationCaptured =
+        capturedReport.getReportInformations().stream()
+            .filter(r -> r.getReportInformationsType() == ReportInformationsType.MAIN_INFORMATION)
+            .findFirst()
+            .orElse(null);
+    assert reportInformationCaptured != null;
+    assertEquals(true, reportInformationCaptured.getReportInformationsDisplay());
+    ReportInformation reportInformationCaptured2 =
+        capturedReport.getReportInformations().stream()
+            .filter(r -> r.getReportInformationsType() == ReportInformationsType.SCORE_DETAILS)
+            .findFirst()
+            .orElse(null);
+    assert reportInformationCaptured2 != null;
+    assertEquals(true, reportInformationCaptured2.getReportInformationsDisplay());
+  }
+
+  @DisplayName("Test update a report")
+  @Test
+  void updateReport() throws Exception {
+    // -- PREPARE --
+    Report report = new Report();
+    report.setName("test");
+    ReportInformation reportInformation = new ReportInformation();
+    reportInformation.setReportInformationsType(ReportInformationsType.MAIN_INFORMATION);
+    reportInformation.setReportInformationsDisplay(false);
+    report.setReportInformations(List.of(reportInformation));
+
+    ReportInput reportInput = new ReportInput();
+    reportInput.setName("new name test");
+    ReportInformationInput reportInformationInput = new ReportInformationInput();
+    reportInformationInput.setReportInformationsType(ReportInformationsType.MAIN_INFORMATION);
+    reportInformationInput.setReportInformationsDisplay(true);
+    reportInput.setReportInformations(List.of(reportInformationInput));
+
+    when(reportRepository.save(any(Report.class))).thenReturn(report);
+
+    // -- EXECUTE --
+    reportService.updateReport(report, reportInput);
+
+    // -- ASSERT --
+    ArgumentCaptor<Report> reportCaptor = ArgumentCaptor.forClass(Report.class);
+    verify(reportRepository).save(reportCaptor.capture());
+    Report capturedReport = reportCaptor.getValue();
+    assertEquals(reportInput.getName(), capturedReport.getName());
+    assertEquals(1, capturedReport.getReportInformations().size());
+    assertEquals(
+        true, capturedReport.getReportInformations().getFirst().getReportInformationsDisplay());
+  }
+
+  @Nested
+  @DisplayName("Reports inject comment")
+  class ReportInjectCommentTest {
+    @DisplayName("Test update existing report inject comment")
     @Test
-    void createReport() throws Exception {
-        // -- PREPARE --
-        Report report = new Report();
+    void updateExistingReportInjectComment() {
+      // -- PREPARE --
+      Report report = new Report();
+      report.setName("test");
+      report.setId(UUID.randomUUID().toString());
+      Inject inject = new Inject();
+      inject.setId("fakeID123");
 
-        ReportInput reportInput = new ReportInput();
-        reportInput.setName("test");
-        ReportInformationInput reportInformationInput = new ReportInformationInput();
-        reportInformationInput.setReportInformationsType(ReportInformationsType.MAIN_INFORMATION);
-        reportInformationInput.setReportInformationsDisplay(true);
-        ReportInformationInput reportInformationInput2 = new ReportInformationInput();
-        reportInformationInput2.setReportInformationsType(ReportInformationsType.SCORE_DETAILS);
-        reportInformationInput2.setReportInformationsDisplay(true);
-        reportInput.setReportInformations(List.of(reportInformationInput, reportInformationInput2));
+      // add report inject comment
+      ReportInjectComment existingReportInjectComment = new ReportInjectComment();
+      existingReportInjectComment.setReport(report);
+      existingReportInjectComment.setComment("comment");
+      existingReportInjectComment.setInject(inject);
+      report.setReportInjectsComments(List.of(existingReportInjectComment));
 
-        when(reportRepository.save(any(Report.class))).thenReturn(report);
+      ReportInjectCommentInput commentInput = new ReportInjectCommentInput();
+      commentInput.setInjectId(inject.getId());
+      commentInput.setComment("New comment");
 
-        // -- EXECUTE --
-        reportService.updateReport(report, reportInput);
+      // Mock
+      when(reportRepository.findReportInjectComment(
+              eq(UUID.fromString(report.getId())), eq(inject.getId())))
+          .thenReturn(Optional.of(existingReportInjectComment));
 
-        // -- ASSERT --
-        ArgumentCaptor<Report> reportCaptor = ArgumentCaptor.forClass(Report.class);
-        verify(reportRepository).save(reportCaptor.capture());
-        Report capturedReport= reportCaptor.getValue();
-        assertEquals(reportInput.getName(), capturedReport.getName());
-        assertEquals(2, capturedReport.getReportInformations().size());
-        ReportInformation reportInformationCaptured = capturedReport.getReportInformations().stream()
-                .filter(r -> r.getReportInformationsType() == ReportInformationsType.MAIN_INFORMATION)
-                .findFirst()
-                .orElse(null);
-        assert reportInformationCaptured != null;
-        assertEquals(true, reportInformationCaptured.getReportInformationsDisplay());
-        ReportInformation reportInformationCaptured2 = capturedReport.getReportInformations().stream()
-                .filter(r -> r.getReportInformationsType() == ReportInformationsType.SCORE_DETAILS)
-                .findFirst()
-                .orElse(null);
-        assert reportInformationCaptured2 != null;
-        assertEquals(true, reportInformationCaptured2.getReportInformationsDisplay());
+      // -- EXECUTE --
+      reportService.updateReportInjectComment(report, inject, commentInput);
+
+      // -- ASSERT --
+      ArgumentCaptor<Report> reportCaptor = ArgumentCaptor.forClass(Report.class);
+      verify(reportRepository).save(reportCaptor.capture());
+      Report capturedReport = reportCaptor.getValue();
+      assertEquals(1, capturedReport.getReportInjectsComments().size());
+      assertEquals(
+          commentInput.getComment(),
+          capturedReport.getReportInjectsComments().getFirst().getComment());
     }
 
-    @DisplayName("Test update a report")
+    @DisplayName("Test add new report inject comment")
     @Test
-    void updateReport() throws Exception {
-        // -- PREPARE --
-        Report report = new Report();
-        report.setName("test");
-        ReportInformation reportInformation = new ReportInformation();
-        reportInformation.setReportInformationsType(ReportInformationsType.MAIN_INFORMATION);
-        reportInformation.setReportInformationsDisplay(false);
-        report.setReportInformations(List.of(reportInformation));
+    void addReportInjectComment() throws Exception {
+      // -- PREPARE --
+      Report report = new Report();
+      report.setName("test");
+      report.setId(UUID.randomUUID().toString());
+      Inject inject = new Inject();
+      inject.setId("fakeID123");
 
-        ReportInput reportInput = new ReportInput();
-        reportInput.setName("new name test");
-        ReportInformationInput reportInformationInput = new ReportInformationInput();
-        reportInformationInput.setReportInformationsType(ReportInformationsType.MAIN_INFORMATION);
-        reportInformationInput.setReportInformationsDisplay(true);
-        reportInput.setReportInformations(List.of(reportInformationInput));
+      ReportInjectCommentInput commentInput = new ReportInjectCommentInput();
+      commentInput.setInjectId(inject.getId());
+      commentInput.setComment("New test comment");
 
-        when(reportRepository.save(any(Report.class))).thenReturn(report);
+      // Mock
+      when(reportRepository.findReportInjectComment(
+              eq(UUID.fromString(report.getId())), eq(inject.getId())))
+          .thenReturn(Optional.empty());
 
-        // -- EXECUTE --
-       reportService.updateReport(report, reportInput);
+      // -- EXECUTE --
+      reportService.updateReportInjectComment(report, inject, commentInput);
 
-        // -- ASSERT --
-        ArgumentCaptor<Report> reportCaptor = ArgumentCaptor.forClass(Report.class);
-        verify(reportRepository).save(reportCaptor.capture());
-        Report capturedReport= reportCaptor.getValue();
-        assertEquals(reportInput.getName(), capturedReport.getName());
-        assertEquals(1, capturedReport.getReportInformations().size());
-        assertEquals(true, capturedReport.getReportInformations().getFirst().getReportInformationsDisplay());
+      // -- ASSERT --
+      ArgumentCaptor<Report> reportCaptor = ArgumentCaptor.forClass(Report.class);
+      verify(reportRepository).save(reportCaptor.capture());
+      Report capturedReport = reportCaptor.getValue();
+      assertEquals(1, capturedReport.getReportInjectsComments().size());
+      assertEquals(
+          commentInput.getComment(),
+          capturedReport.getReportInjectsComments().getFirst().getComment());
     }
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

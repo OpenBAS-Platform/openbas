@@ -1,23 +1,24 @@
-import React, { FunctionComponent } from 'react';
-import { Button, TextField as MuiTextField, Typography } from '@mui/material';
-import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { Button, TextField as MuiTextField, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
-import { useFormatter } from '../../../../../../components/i18n';
-import { updateInjectExpectation } from '../../../../../../actions/Exercise';
-import { useAppDispatch } from '../../../../../../utils/hooks';
-import ExpandableText from '../../../../../../components/common/ExpendableText';
-import type { Theme } from '../../../../../../components/Theme';
-import { zodImplement } from '../../../../../../utils/Zod';
-import type { InjectExpectationResult, SecurityPlatform } from '../../../../../../utils/api-types';
-import SecurityPlatformField from '../../../../../../components/fields/SecurityPlatformField';
-import { useHelper } from '../../../../../../store';
+import { FunctionComponent } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
+
 import type { SecurityPlatformHelper } from '../../../../../../actions/assets/asset-helper';
-import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
 import { fetchSecurityPlatforms } from '../../../../../../actions/assets/securityPlatform-actions';
+import { updateInjectExpectation } from '../../../../../../actions/Exercise';
+import ExpandableText from '../../../../../../components/common/ExpendableText';
+import SecurityPlatformField from '../../../../../../components/fields/SecurityPlatformField';
+import { useFormatter } from '../../../../../../components/i18n';
 import ItemResult from '../../../../../../components/ItemResult';
+import type { Theme } from '../../../../../../components/Theme';
+import { useHelper } from '../../../../../../store';
+import type { InjectExpectationResult, SecurityPlatform } from '../../../../../../utils/api-types';
+import { useAppDispatch } from '../../../../../../utils/hooks';
+import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
+import { zodImplement } from '../../../../../../utils/Zod';
+import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
@@ -42,13 +43,13 @@ const DetectionPreventionExpectationsValidationForm: FunctionComponent<FormProps
   const classes = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-  const { securityPlatformsMap }: { securityPlatformsMap: Record<string, SecurityPlatform>; } = useHelper((helper: SecurityPlatformHelper) => ({
+  const { securityPlatformsMap }: { securityPlatformsMap: Record<string, SecurityPlatform> } = useHelper((helper: SecurityPlatformHelper) => ({
     securityPlatformsMap: helper.getSecurityPlatformsMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchSecurityPlatforms());
   });
-  const onSubmit = (data: { expectation_score: number, security_platform: string }) => {
+  const onSubmit = (data: { expectation_score: number; security_platform: string }) => {
     dispatch(updateInjectExpectation(expectation.inject_expectation_id, {
       ...data,
       source_id: data.security_platform,
@@ -63,9 +64,9 @@ const DetectionPreventionExpectationsValidationForm: FunctionComponent<FormProps
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<{ expectation_score: number, security_platform: string }>({
+  } = useForm<{ expectation_score: number; security_platform: string }>({
     mode: 'onTouched',
-    resolver: zodResolver(zodImplement<{ expectation_score: number, security_platform: string }>().with({
+    resolver: zodResolver(zodImplement<{ expectation_score: number; security_platform: string }>().with({
       expectation_score: z.coerce.number(),
       security_platform: z.string().min(1, { message: t('Should not be empty') }),
     })),

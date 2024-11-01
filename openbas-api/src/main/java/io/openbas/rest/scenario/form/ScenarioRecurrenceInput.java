@@ -1,9 +1,8 @@
 package io.openbas.rest.scenario.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-
 import java.time.Instant;
+import lombok.Data;
 
 @Data
 public class ScenarioRecurrenceInput {

@@ -1,17 +1,16 @@
 package io.openbas.service;
 
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static java.time.Instant.now;
+
 import io.openbas.database.model.Variable;
 import io.openbas.database.repository.VariableRepository;
 import io.openbas.database.specification.VariableSpecification;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static java.time.Instant.now;
 
 @RequiredArgsConstructor
 @Service
@@ -47,5 +46,4 @@ public class VariableService {
   public void deleteVariable(@NotBlank final String variableId) {
     this.variableRepository.deleteById(variableId);
   }
-
 }

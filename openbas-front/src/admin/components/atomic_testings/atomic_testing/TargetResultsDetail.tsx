@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
+import { AddBoxOutlined, MoreVertOutlined } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -23,27 +23,30 @@ import {
 } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { Edge, MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow } from '@xyflow/react';
-import { AddBoxOutlined, MoreVertOutlined } from '@mui/icons-material';
-import type { InjectResultDTO, InjectTargetWithResult, InjectExpectationResult } from '../../../../utils/api-types';
+import { FunctionComponent, useContext, useEffect, useState } from 'react';
+import * as React from 'react';
+
 import { fetchInjectResultDto, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
-import { useFormatter } from '../../../../components/i18n';
-import type { Theme } from '../../../../components/Theme';
-import ManualExpectationsValidationForm from '../../simulations/simulation/validation/expectations/ManualExpectationsValidationForm';
-import type { InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
-import nodeTypes from './types/nodes';
-import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAutoLayout';
-import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
-import ItemResult from '../../../../components/ItemResult';
-import InjectIcon from '../../common/injects/InjectIcon';
-import { isNotEmptyField } from '../../../../utils/utils';
-import Transition from '../../../../components/common/Transition';
-import { emptyFilled, truncate } from '../../../../utils/String';
-import DetectionPreventionExpectationsValidationForm from '../../simulations/simulation/validation/expectations/DetectionPreventionExpectationsValidationForm';
 import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
-import { useAppDispatch } from '../../../../utils/hooks';
 import type { InjectExpectationStore } from '../../../../actions/injects/Inject';
-import { NodeResultStep } from './types/nodes/NodeResultStep';
+import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import ItemResult from '../../../../components/ItemResult';
+import type { Theme } from '../../../../components/Theme';
+import type { InjectExpectationResult, InjectResultDTO, InjectTargetWithResult } from '../../../../utils/api-types';
+import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAutoLayout';
+import { useAppDispatch } from '../../../../utils/hooks';
+import { emptyFilled, truncate } from '../../../../utils/String';
+import { splitDuration } from '../../../../utils/Time';
+import { isNotEmptyField } from '../../../../utils/utils';
+import type { InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
 import { isTechnicalExpectation } from '../../common/injects/expectations/ExpectationUtils';
+import InjectIcon from '../../common/injects/InjectIcon';
+import DetectionPreventionExpectationsValidationForm from '../../simulations/simulation/validation/expectations/DetectionPreventionExpectationsValidationForm';
+import ManualExpectationsValidationForm from '../../simulations/simulation/validation/expectations/ManualExpectationsValidationForm';
+import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
+import nodeTypes from './types/nodes';
+import { NodeResultStep } from './types/nodes/NodeResultStep';
 
 interface Steptarget {
   label: string;
@@ -52,7 +55,7 @@ interface Steptarget {
   key?: string;
 }
 
-const useStyles = makeStyles<Theme>((theme) => ({
+const useStyles = makeStyles<Theme>(theme => ({
   container: {
     margin: '20px 0 0 0',
     overflow: 'hidden',
@@ -86,14 +89,26 @@ const useStyles = makeStyles<Theme>((theme) => ({
     height: '20px',
     padding: '0 4px',
   },
+  duration: {
+    fontSize: 12,
+    lineHeight: '12px',
+    height: 20,
+    float: 'left',
+    marginRight: 7,
+    borderRadius: 4,
+    width: 180,
+    backgroundColor: 'rgba(0, 177, 255, 0.08)',
+    color: '#00b1ff',
+    border: '1px solid #00b1ff',
+  },
 }));
 
 interface Props {
-  inject: InjectResultDTO,
-  lastExecutionStartDate: string,
-  lastExecutionEndDate: string,
-  target: InjectTargetWithResult,
-  parentTargetId?: string,
+  inject: InjectResultDTO;
+  lastExecutionStartDate: string;
+  lastExecutionEndDate: string;
+  target: InjectTargetWithResult;
+  parentTargetId?: string;
 }
 
 const TargetResultsDetailFlow: FunctionComponent<Props> = ({
@@ -108,9 +123,9 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   const theme = useTheme<Theme>();
   const { nsdt, t } = useFormatter();
   const [anchorEls, setAnchorEls] = useState<Record<string, Element | null>>({});
-  const [selectedExpectationForCreation, setSelectedExpectationForCreation] = useState<{ injectExpectation: InjectExpectationsStore, sourceIds: string[] } | null>(null);
-  const [selectedResultEdition, setSelectedResultEdition] = useState<{ injectExpectation: InjectExpectationsStore, expectationResult: InjectExpectationResult } | null>(null);
-  const [selectedResultDeletion, setSelectedResultDeletion] = useState<{ injectExpectation: InjectExpectationsStore, expectationResult: InjectExpectationResult } | null>(null);
+  const [selectedExpectationForCreation, setSelectedExpectationForCreation] = useState<{ injectExpectation: InjectExpectationsStore; sourceIds: string[] } | null>(null);
+  const [selectedResultEdition, setSelectedResultEdition] = useState<{ injectExpectation: InjectExpectationsStore; expectationResult: InjectExpectationResult } | null>(null);
+  const [selectedResultDeletion, setSelectedResultDeletion] = useState<{ injectExpectation: InjectExpectationsStore; expectationResult: InjectExpectationResult } | null>(null);
   const [initialized, setInitialized] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [targetResults, setTargetResults] = useState<InjectExpectationsStore[]>([]);
@@ -173,8 +188,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   const computeInitialSteps = (currentInitialSteps: Steptarget[]) => {
     return currentInitialSteps.map((step, index) => {
       if (index === 0) {
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define,no-nested-ternary,@typescript-eslint/ban-ts-comment
-        // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-use-before-define,no-nested-ternary
         return { ...step, status: injectResultDto?.inject_status?.status_name === 'QUEUING' ? 'QUEUING' : lastExecutionStartDate ? 'SUCCESS' : 'PENDING' };
       }
@@ -241,7 +254,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     if (status.includes('FAILED')) {
       return 'FAILED';
     }
-    return status.every((s) => s === 'SUCCESS') ? 'SUCCESS' : 'FAILED';
+    return status.every(s => s === 'SUCCESS') ? 'SUCCESS' : 'FAILED';
   };
   const getStatusLabel = (type: string, status: string[]) => {
     switch (type) {
@@ -252,7 +265,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         if (status.includes('PENDING')) {
           return 'Waiting for Detection';
         }
-        return status.every((s) => s === 'SUCCESS') ? 'Attack Detected' : 'Attack Not Detected';
+        return status.every(s => s === 'SUCCESS') ? 'Attack Detected' : 'Attack Not Detected';
       case 'MANUAL':
       case 'ARTICLE':
       case 'CHALLENGE':
@@ -262,7 +275,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         if (status.includes('PENDING')) {
           return 'Waiting for Validation';
         }
-        return status.every((s) => s === 'SUCCESS') ? 'Validation Success' : 'Validation Failed';
+        return status.every(s => s === 'SUCCESS') ? 'Validation Success' : 'Validation Failed';
       case 'PREVENTION':
         if (status.includes('UNKNOWN')) {
           return 'No Expectation';
@@ -270,7 +283,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         if (status.includes('PENDING')) {
           return 'Waiting for Prevention';
         }
-        return status.every((s) => s === 'SUCCESS') ? 'Attack Prevented' : 'Attack Not Prevented';
+        return status.every(s => s === 'SUCCESS') ? 'Attack Prevented' : 'Attack Not Prevented';
       default:
         return '';
     }
@@ -354,7 +367,8 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         label: (
           <span>
             {getStatusLabel(targetType, [expectation.inject_expectation_status])}
-            <br />{truncate(expectation.inject_expectation_name, 20)}
+            <br />
+            {truncate(expectation.inject_expectation_name, 20)}
           </span>
         ),
         type: targetType,
@@ -501,7 +515,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
               }
               return a.inject_expectation_id.localeCompare(b.inject_expectation_id);
             })
-            .map((injectExpectation) => (
+            .map(injectExpectation => (
               <div key={injectExpectation.inject_expectation_id} style={{ marginTop: 20 }}>
                 <Grid container={true} spacing={2}>
                   <Grid item={true} xs={4}>
@@ -527,65 +541,83 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                   {t('Results')}
                 </Typography>
                 <Grid container={true} spacing={2}>
-                  {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => (
-                    <Grid key={index} item xs={4}>
-                      <Card key={injectExpectation.inject_expectation_id}>
-                        <CardHeader
-                          avatar={getAvatar(injectExpectation, expectationResult)}
-                          action={
-                            <>
-                              <IconButton
-                                color="primary"
-                                onClick={(ev) => {
-                                  ev.stopPropagation();
-                                  setAnchorEls({ ...anchorEls, [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: ev.currentTarget });
-                                }}
-                                aria-haspopup="true"
-                                size="large"
-                                disabled={['collector', 'media-pressure', 'challenge'].includes(expectationResult.sourceType ?? 'unknown')}
-                              >
-                                <MoreVertOutlined />
-                              </IconButton>
-                              <Menu
-                                anchorEl={anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]}
-                                open={Boolean(anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`])}
-                                onClose={() => setAnchorEls({ ...anchorEls, [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: null })}
-                              >
-                                <MenuItem onClick={() => handleOpenResultEdition(injectExpectation, expectationResult)}>
-                                  {t('Update')}
-                                </MenuItem>
-                                <MenuItem onClick={() => handleOpenResultDeletion(injectExpectation, expectationResult)}>
-                                  {t('Delete')}
-                                </MenuItem>
-                              </Menu>
-                            </>
-                          }
-                          title={expectationResult.sourceName ? t(expectationResult.sourceName) : t('Unknown')}
-                          subheader={nsdt(expectationResult.date)}
-                        />
-                        <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
-                          <ItemResult label={expectationResult.result} status={expectationResult.result} />
-                          <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={expectationResult.score} /></Tooltip>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  ))}
-                  {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type) || (injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.length === 0))
-                    && (
-                      <Grid item xs={4}>
-                        <Card classes={{ root: classes.resultCardDummy }}>
-                          <CardActionArea classes={{ root: classes.area }}
-                            onClick={() => setSelectedExpectationForCreation({
-                              injectExpectation,
-                              sourceIds: computeExistingSourceIds(injectExpectation.inject_expectation_results ?? []),
-                            })
-                                          }
-                          >
-                            <AddBoxOutlined />
-                          </CardActionArea>
+                  {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
+                    const duration = splitDuration(injectExpectation.inject_expiration_time || 0);
+                    return (
+                      <Grid key={index} item xs={4}>
+                        <Card key={injectExpectation.inject_expectation_id}>
+                          <CardHeader
+                            avatar={getAvatar(injectExpectation, expectationResult)}
+                            action={(
+                              <>
+                                <IconButton
+                                  color="primary"
+                                  onClick={(ev) => {
+                                    ev.stopPropagation();
+                                    setAnchorEls({ ...anchorEls, [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: ev.currentTarget });
+                                  }}
+                                  aria-haspopup="true"
+                                  size="large"
+                                  disabled={['collector', 'media-pressure', 'challenge'].includes(expectationResult.sourceType ?? 'unknown')}
+                                >
+                                  <MoreVertOutlined />
+                                </IconButton>
+                                <Menu
+                                  anchorEl={anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]}
+                                  open={Boolean(anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`])}
+                                  onClose={() => setAnchorEls({ ...anchorEls, [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: null })}
+                                >
+                                  <MenuItem onClick={() => handleOpenResultEdition(injectExpectation, expectationResult)}>
+                                    {t('Update')}
+                                  </MenuItem>
+                                  <MenuItem onClick={() => handleOpenResultDeletion(injectExpectation, expectationResult)}>
+                                    {t('Delete')}
+                                  </MenuItem>
+                                </Menu>
+                              </>
+                            )}
+                            title={expectationResult.sourceName ? t(expectationResult.sourceName) : t('Unknown')}
+                            subheader={(
+                              <>
+                                <div>{nsdt(expectationResult.date)}</div>
+                                <div style={{ marginTop: 10 }}>
+                                  <Typography variant="h4">{t('Expired after')}</Typography>
+                                  <Chip
+                                    classes={{ root: classes.duration }}
+                                    label={`${duration.days}
+                                      ${t('d')}, ${duration.hours}
+                                    ${t('h')}, ${duration.minutes}
+                                    ${t('m')}`}
+                                  />
+                                </div>
+
+                              </>
+                            )}
+                          />
+                          <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
+                            <ItemResult label={expectationResult.result} status={expectationResult.result} />
+                            <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={expectationResult.score} /></Tooltip>
+                          </CardContent>
                         </Card>
                       </Grid>
-                    )}
+                    );
+                  })}
+                  {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type) || (injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.length === 0))
+                  && (
+                    <Grid item xs={4}>
+                      <Card classes={{ root: classes.resultCardDummy }}>
+                        <CardActionArea
+                          classes={{ root: classes.area }}
+                          onClick={() => setSelectedExpectationForCreation({
+                            injectExpectation,
+                            sourceIds: computeExistingSourceIds(injectExpectation.inject_expectation_results ?? []),
+                          })}
+                        >
+                          <AddBoxOutlined />
+                        </CardActionArea>
+                      </Card>
+                    </Grid>
+                  )}
                 </Grid>
                 <Divider style={{ marginTop: 20 }} />
               </div>
@@ -602,13 +634,15 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
               {selectedExpectationForCreation && (
                 <>
                   {selectedExpectationForCreation.injectExpectation.inject_expectation_type === 'MANUAL'
-                    && <ManualExpectationsValidationForm expectation={selectedExpectationForCreation.injectExpectation} onUpdate={onUpdateValidation} />}
+                  && <ManualExpectationsValidationForm expectation={selectedExpectationForCreation.injectExpectation} onUpdate={onUpdateValidation} />}
                   {['DETECTION', 'PREVENTION'].includes(selectedExpectationForCreation.injectExpectation.inject_expectation_type)
-                    && <DetectionPreventionExpectationsValidationForm
+                  && (
+                    <DetectionPreventionExpectationsValidationForm
                       expectation={selectedExpectationForCreation.injectExpectation}
                       sourceIds={selectedExpectationForCreation.sourceIds}
                       onUpdate={onUpdateValidation}
-                       />}
+                    />
+                  )}
                 </>
               )}
             </DialogContent>
@@ -625,18 +659,20 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
               {selectedResultEdition && selectedResultEdition.injectExpectation && (
                 <>
                   {selectedResultEdition.injectExpectation.inject_expectation_type === 'MANUAL'
-                    && <ManualExpectationsValidationForm
+                  && (
+                    <ManualExpectationsValidationForm
                       expectation={selectedResultEdition.injectExpectation}
                       onUpdate={onUpdateValidation}
-                       />
-                  }
+                    />
+                  )}
                   {['DETECTION', 'PREVENTION'].includes(selectedResultEdition.injectExpectation.inject_expectation_type)
-                    && <DetectionPreventionExpectationsValidationForm
+                  && (
+                    <DetectionPreventionExpectationsValidationForm
                       expectation={selectedResultEdition.injectExpectation}
                       result={selectedResultEdition.expectationResult}
                       onUpdate={onUpdateValidation}
-                       />
-                  }
+                    />
+                  )}
                 </>
               )}
             </DialogContent>

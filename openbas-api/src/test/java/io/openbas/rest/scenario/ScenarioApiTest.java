@@ -1,5 +1,14 @@
 package io.openbas.rest.scenario;
 
+import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+import static io.openbas.utils.JsonUtils.asJsonString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.rest.scenario.form.ScenarioInformationInput;
@@ -13,26 +22,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
-import static io.openbas.utils.JsonUtils.asJsonString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
 public class ScenarioApiTest {
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
-  @Autowired
-  private ScenarioRepository scenarioRepository;
+  @Autowired private ScenarioRepository scenarioRepository;
 
   static String SCENARIO_ID;
 
@@ -51,10 +49,11 @@ public class ScenarioApiTest {
 
     // -- EXECUTE & ASSERT --
     this.mvc
-        .perform(post(SCENARIO_URI)
-            .content(asJsonString(scenarioInput))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
+        .perform(
+            post(SCENARIO_URI)
+                .content(asJsonString(scenarioInput))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().is4xxClientError());
 
     // -- PREPARE --
@@ -62,16 +61,18 @@ public class ScenarioApiTest {
     scenarioInput.setName(name);
 
     // -- EXECUTE --
-    String response = this.mvc
-        .perform(post(SCENARIO_URI)
-            .content(asJsonString(scenarioInput))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andExpect(jsonPath("$.scenario_name").value(name))
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        this.mvc
+            .perform(
+                post(SCENARIO_URI)
+                    .content(asJsonString(scenarioInput))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.scenario_name").value(name))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -84,13 +85,13 @@ public class ScenarioApiTest {
   @WithMockObserverUser
   void retrieveScenariosTest() throws Exception {
     // -- EXECUTE --
-    String response = this.mvc
-        .perform(get(SCENARIO_URI)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        this.mvc
+            .perform(get(SCENARIO_URI).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -102,13 +103,13 @@ public class ScenarioApiTest {
   @WithMockObserverUser
   void retrieveScenarioTest() throws Exception {
     // -- EXECUTE --
-    String response = this.mvc
-        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        this.mvc
+            .perform(get(SCENARIO_URI + "/" + SCENARIO_ID).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -120,13 +121,13 @@ public class ScenarioApiTest {
   @WithMockPlannerUser
   void updateScenarioTest() throws Exception {
     // -- PREPARE --
-    String response = this.mvc
-        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        this.mvc
+            .perform(get(SCENARIO_URI + "/" + SCENARIO_ID).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     ScenarioInput scenarioInput = new ScenarioInput();
     String subtitle = "A subtitle";
@@ -134,15 +135,17 @@ public class ScenarioApiTest {
     scenarioInput.setSubtitle(subtitle);
 
     // -- EXECUTE --
-    response = this.mvc
-        .perform(put(SCENARIO_URI + "/" + SCENARIO_ID)
-            .content(asJsonString(scenarioInput))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    response =
+        this.mvc
+            .perform(
+                put(SCENARIO_URI + "/" + SCENARIO_ID)
+                    .content(asJsonString(scenarioInput))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -161,15 +164,17 @@ public class ScenarioApiTest {
     scenarioInformationInput.setHeader(header);
 
     // -- EXECUTE --
-    String response = this.mvc
-        .perform(put(SCENARIO_URI + "/" + SCENARIO_ID + "/information")
-            .content(asJsonString(scenarioInformationInput))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        this.mvc
+            .perform(
+                put(SCENARIO_URI + "/" + SCENARIO_ID + "/information")
+                    .content(asJsonString(scenarioInformationInput))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -182,8 +187,8 @@ public class ScenarioApiTest {
   @WithMockPlannerUser
   void deleteScenarioTest() throws Exception {
     // -- EXECUTE 1 ASSERT --
-    this.mvc.perform(delete(SCENARIO_URI + "/" + SCENARIO_ID))
+    this.mvc
+        .perform(delete(SCENARIO_URI + "/" + SCENARIO_ID))
         .andExpect(status().is2xxSuccessful());
   }
-
 }

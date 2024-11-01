@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
-import * as R from 'ramda';
-import * as PropTypes from 'prop-types';
-import { withStyles } from '@mui/styles';
 import { Chip } from '@mui/material';
+import { withStyles } from '@mui/styles';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Component } from 'react';
+
 import inject18n from '../../../../../components/i18n';
 
 const styles = () => ({
@@ -39,19 +40,21 @@ class DryrunStatus extends Component {
   render() {
     const { t, finished, classes, variant } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
-    return finished ? (
-      <Chip
-        classes={{ root: style }}
-        style={inlineStyles.green}
-        label={t('Finished')}
-      />
-    ) : (
-      <Chip
-        classes={{ root: style }}
-        style={inlineStyles.blue}
-        label={t('Running')}
-      />
-    );
+    return finished
+      ? (
+          <Chip
+            classes={{ root: style }}
+            style={inlineStyles.green}
+            label={t('Finished')}
+          />
+        )
+      : (
+          <Chip
+            classes={{ root: style }}
+            style={inlineStyles.blue}
+            label={t('Running')}
+          />
+        );
   }
 }
 

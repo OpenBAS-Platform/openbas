@@ -3,19 +3,19 @@ package io.openbas.injectors.email.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.model.inject.form.Expectation;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.util.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.util.StringUtils;
 
 @Getter
 @Setter
 public class EmailContent {
 
-  private static final String HEADER_DIV = "<div style=\"text-align: center; margin-bottom: 10px;\">";
+  private static final String HEADER_DIV =
+      "<div style=\"text-align: center; margin-bottom: 10px;\">";
   private static final String START_DIV = "<div>";
   private static final String END_DIV = "</div>";
 
@@ -50,10 +50,14 @@ public class EmailContent {
     if (injection.isRuntime() && imapEnabled) {
       data.append(START_DIV)
           .append("<br/><br/><br/><br/>")
-          .append("---------------------------------------------------------------------------------<br/>")
+          .append(
+              "---------------------------------------------------------------------------------<br/>")
           .append("OpenBAS internal information, do not remove!<br/>")
-          .append("[inject_id=").append(injection.getInjection().getId()).append("]<br/>")
-          .append("---------------------------------------------------------------------------------<br/>")
+          .append("[inject_id=")
+          .append(injection.getInjection().getId())
+          .append("]<br/>")
+          .append(
+              "---------------------------------------------------------------------------------<br/>")
           .append(END_DIV);
     }
     return data.toString();
@@ -68,7 +72,8 @@ public class EmailContent {
       return false;
     }
     EmailContent that = (EmailContent) o;
-    return encrypted == that.encrypted && Objects.equals(body, that.body)
+    return encrypted == that.encrypted
+        && Objects.equals(body, that.body)
         && Objects.equals(subject, that.subject);
   }
 

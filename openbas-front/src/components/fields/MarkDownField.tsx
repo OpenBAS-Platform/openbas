@@ -1,41 +1,26 @@
-import React, { useState } from 'react';
-import { useController, useFormContext } from 'react-hook-form';
-import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
-import { Box, FormHelperText, InputLabel, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { ICommand } from '@uiw/react-md-editor';
-import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
+import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
+import { useState } from 'react';
+import * as React from 'react';
+
 import { useFormatter } from '../i18n';
 
 interface Props {
-  name: string;
-  label: string;
-  style: React.CSSProperties;
   disabled?: boolean;
-  askAi?: boolean;
-  inInject: boolean;
-  inArticle?: boolean;
+  onChange: (value: string) => void;
+  onBlur?: () => void;
+  initialValue: string;
 }
 
 const MarkDownField: React.FC<Props> = ({
-  name,
-  label,
-  style,
-  disabled,
-  askAi,
-  inInject,
-  inArticle,
+  disabled = false,
+  onChange,
+  onBlur = () => {},
+  initialValue,
 }) => {
   const { t } = useFormatter();
-  const { control } = useFormContext();
-  const {
-    field: { onChange, value },
-    fieldState: { invalid, error },
-  } = useController({
-    name,
-    control,
-    defaultValue: '',
-  });
-  const [isEdit, setIsEdit] = useState(true);
+  const [isEdit, setIsEdit] = useState<boolean>(true);
 
   // Commands
   const buttonStyle = {
@@ -50,7 +35,7 @@ const MarkDownField: React.FC<Props> = ({
     keyCommand: 'preview',
     buttonProps: {
       'aria-label': 'write',
-      style: { backgroundColor: 'transparent' },
+      'style': { backgroundColor: 'transparent' },
     },
     icon: (
       <div
@@ -69,7 +54,7 @@ const MarkDownField: React.FC<Props> = ({
     keyCommand: 'preview',
     buttonProps: {
       'aria-label': 'preview',
-      style: { backgroundColor: 'transparent' },
+      'style': { backgroundColor: 'transparent' },
     },
     icon: (
       <div
@@ -85,25 +70,19 @@ const MarkDownField: React.FC<Props> = ({
   };
 
   return (
-    <div
-      style={{ ...style, position: 'relative' }}
-      className={invalid ? 'error' : 'main'}
-    >
-      <InputLabel shrink={true} variant="standard">
-        {label}
-      </InputLabel>
-      <Box flexGrow={1}>
-        <MDEditor
-          value={value}
-          textareaProps={{
-            disabled,
-          }}
-          preview={isEdit ? 'edit' : 'preview'}
-          onChange={(val) => onChange(val || '')}
-          commands={[
-            writeCommand,
-            previewCommand,
-            ...(isEdit ? [
+    <MDEditor
+      value={initialValue}
+      textareaProps={{
+        disabled,
+      }}
+      preview={isEdit ? 'edit' : 'preview'}
+      onChange={val => onChange(val || '')}
+      onBlur={onBlur}
+      commands={[
+        writeCommand,
+        previewCommand,
+        ...(isEdit
+          ? [
               { ...commands.title, buttonProps: { disabled } },
               { ...commands.bold, buttonProps: { disabled } },
               { ...commands.italic, buttonProps: { disabled } },
@@ -117,30 +96,11 @@ const MarkDownField: React.FC<Props> = ({
               { ...commands.unorderedListCommand, buttonProps: { disabled } },
               { ...commands.orderedListCommand, buttonProps: { disabled } },
               { ...commands.checkedListCommand, buttonProps: { disabled } },
-            ] : []),
-          ]}
-          extraCommands={[]}
-        />
-      </Box>
-      {invalid && (
-        <FormHelperText error={true}>
-          {error?.message}
-        </FormHelperText>
-      )}
-      {askAi && (
-        <TextFieldAskAI
-          currentValue={value ?? ''}
-          setFieldValue={(val) => {
-            onChange(val);
-          }}
-          format="markdown"
-          variant="markdown"
-          disabled={disabled}
-          inInject={inInject}
-          inArticle={inArticle}
-        />
-      )}
-    </div>
+            ]
+          : []),
+      ]}
+      extraCommands={[]}
+    />
   );
 };
 

@@ -1,6 +1,7 @@
-import React from 'react';
-import * as PropTypes from 'prop-types';
 import { Alert, AlertTitle } from '@mui/material';
+import * as PropTypes from 'prop-types';
+import * as React from 'react';
+
 import { useFormatter } from './i18n';
 
 class ErrorBoundaryComponent extends React.Component {
@@ -38,7 +39,7 @@ const SimpleError = () => {
 
 export const errorWrapper = (Component) => {
   // eslint-disable-next-line react/display-name
-  return (routeProps) => (
+  return routeProps => (
     <ErrorBoundary display={<SimpleError />}>
       <Component {...routeProps} />
     </ErrorBoundary>

@@ -1,11 +1,11 @@
-import Chart from 'react-apexcharts';
-import React, { FunctionComponent } from 'react';
 import { useTheme } from '@mui/styles';
-import type { ApexOptions } from 'apexcharts';
+import { FunctionComponent } from 'react';
+import Chart from 'react-apexcharts';
+
 import type { ExerciseSimpleStore } from '../../../../actions/exercises/Exercise';
+import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
-import Empty from '../../../../components/Empty';
 import { verticalBarsChartOptions } from '../../../../utils/Charts';
 
 interface Props {
@@ -27,9 +27,9 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
         exercise_name: 'fake',
         exercise_start_date: now.toISOString(),
         exercise_global_score: [
-          { type: 'PREVENTION', distribution: [{ value: 0.69, label: t('Unknown') }], avgResult: 'PARTIAL' },
-          { type: 'DETECTION', distribution: [{ value: 0.84, label: t('Unknown') }], avgResult: 'PARTIAL' },
-          { type: 'HUMAN_RESPONSE', distribution: [{ value: 0.46, label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'PREVENTION', distribution: [{ id: 'PARTIAL_ID', value: 0.69, label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'DETECTION', distribution: [{ id: 'PARTIAL_ID', value: 0.84, label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'HUMAN_RESPONSE', distribution: [{ id: 'PARTIAL_ID', value: 0.46, label: t('Unknown') }], avgResult: 'PARTIAL' },
         ],
         exercise_targets: [],
         exercise_tags: undefined,
@@ -40,23 +40,23 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
   const series = [
     {
       name: t('Prevention'),
-      data: data.map((exercise) => ({
+      data: data.map(exercise => ({
         x: exercise.exercise_start_date ? new Date(exercise.exercise_start_date) : new Date(),
-        y: exercise.exercise_global_score?.filter((score) => score.type === 'PREVENTION').at(0)?.distribution?.[0]?.value ?? 0,
+        y: exercise.exercise_global_score?.filter(score => score.type === 'PREVENTION').at(0)?.distribution?.[0]?.value ?? 0,
       })),
     },
     {
       name: t('Detection'),
-      data: data.map((exercise) => ({
+      data: data.map(exercise => ({
         x: exercise.exercise_start_date ? new Date(exercise.exercise_start_date) : new Date(),
-        y: exercise.exercise_global_score?.filter((score) => score.type === 'DETECTION').at(0)?.distribution?.[0]?.value ?? 0,
+        y: exercise.exercise_global_score?.filter(score => score.type === 'DETECTION').at(0)?.distribution?.[0]?.value ?? 0,
       })),
     },
     {
       name: t('Human Response'),
-      data: data.map((exercise) => ({
+      data: data.map(exercise => ({
         x: exercise.exercise_start_date ? new Date(exercise.exercise_start_date) : new Date(),
-        y: exercise.exercise_global_score?.filter((score) => score.type === 'HUMAN_RESPONSE').at(0)?.distribution?.[0]?.value ?? 0,
+        y: exercise.exercise_global_score?.filter(score => score.type === 'HUMAN_RESPONSE').at(0)?.distribution?.[0]?.value ?? 0,
       })),
     },
   ];
@@ -77,7 +77,7 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
             exercises.length === 0,
             1,
             t('No data to display'),
-          ) as ApexOptions}
+          )}
           series={series}
           type="bar"
           width="100%"
@@ -89,8 +89,7 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
             'No data to display',
           )}
         />
-      )
-      }
+      )}
     </>
   );
 };

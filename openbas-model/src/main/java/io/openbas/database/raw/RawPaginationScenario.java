@@ -1,12 +1,11 @@
 package io.openbas.database.raw;
 
 import io.openbas.database.model.Scenario.SEVERITY;
-import lombok.Data;
-
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Data;
 
 @Data
 public class RawPaginationScenario {
@@ -28,8 +27,7 @@ public class RawPaginationScenario {
       String recurrence,
       Instant updatedAt,
       String[] tags,
-      String[] platforms
-  ) {
+      String[] platforms) {
     this.scenario_id = id;
     this.scenario_name = name;
     this.scenario_severity = severity;
@@ -37,7 +35,7 @@ public class RawPaginationScenario {
     this.scenario_recurrence = recurrence;
     this.scenario_updated_at = updatedAt;
     this.scenario_tags = tags != null ? new HashSet<>(Arrays.asList(tags)) : new HashSet<>();
-    this.scenario_platforms = platforms != null ? new HashSet<>(Arrays.asList(platforms)) : new HashSet<>();
+    this.scenario_platforms =
+        platforms != null ? new HashSet<>(Arrays.asList(platforms)) : new HashSet<>();
   }
-
 }

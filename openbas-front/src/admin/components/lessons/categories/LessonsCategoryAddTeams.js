@@ -1,18 +1,19 @@
-import React, { Component } from 'react';
+import { Add, CastForEducationOutlined } from '@mui/icons-material';
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { Add, CastForEducationOutlined } from '@mui/icons-material';
-import { withStyles } from '@mui/styles';
-import SearchFilter from '../../../../components/SearchFilter';
+import { Component } from 'react';
+
+import Transition from '../../../../components/common/Transition';
 import inject18n from '../../../../components/i18n';
-import CreateTeam from '../../components/teams/CreateTeam';
+import ItemTags from '../../../../components/ItemTags';
+import SearchFilter from '../../../../components/SearchFilter';
 import { truncate } from '../../../../utils/String';
 import TagsFilter from '../../common/filters/TagsFilter';
-import ItemTags from '../../../../components/ItemTags';
-import Transition from '../../../../components/common/Transition';
+import CreateTeam from '../../components/teams/CreateTeam';
 
-const styles = (theme) => ({
+const styles = theme => ({
   createButton: {
     float: 'left',
     margin: '-15px 0 0 5px',
@@ -79,8 +80,8 @@ class LessonsCategoryAddTeams extends Component {
   addAllTeams() {
     const { lessonsCategoryTeamsIds, teams } = this.props;
     const teamsToAdd = R.pipe(
-      R.map((n) => n.team_id),
-      R.filter((n) => !lessonsCategoryTeamsIds.includes(n)),
+      R.map(n => n.team_id),
+      R.filter(n => !lessonsCategoryTeamsIds.includes(n)),
     )(teams);
     this.setState({
       teamsIds: teamsToAdd,
@@ -89,7 +90,7 @@ class LessonsCategoryAddTeams extends Component {
 
   removeTeam(teamId) {
     this.setState({
-      teamsIds: R.filter((u) => u !== teamId, this.state.teamsIds),
+      teamsIds: R.filter(u => u !== teamId, this.state.teamsIds),
     });
   }
 
@@ -119,7 +120,7 @@ class LessonsCategoryAddTeams extends Component {
       teamsMap,
     } = this.props;
     const { keyword, teamsIds, tags } = this.state;
-    const filterByKeyword = (n) => keyword === ''
+    const filterByKeyword = n => keyword === ''
       || (n.team_name || '').toLowerCase().indexOf(keyword.toLowerCase())
       !== -1
       || (n.team_description || '')
@@ -127,9 +128,9 @@ class LessonsCategoryAddTeams extends Component {
         .indexOf(keyword.toLowerCase()) !== -1;
     const filteredTeams = R.pipe(
       R.filter(
-        (n) => tags.length === 0
+        n => tags.length === 0
           || R.any(
-            (filter) => R.includes(filter, n.team_tags),
+            filter => R.includes(filter, n.team_tags),
             R.pluck('id', tags),
           ),
       ),

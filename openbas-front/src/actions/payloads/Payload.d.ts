@@ -7,4 +7,5 @@ export type PayloadStore = Omit<Payload, 'payload_collector'> & {
   dns_resolution_hostname?: string;
   file_drop_file?: string;
   executable_file?: string;
+  executable_arch?: string;
 };

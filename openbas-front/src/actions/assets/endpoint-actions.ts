@@ -1,4 +1,5 @@
 import { Dispatch } from 'redux';
+
 import { delReferential, getReferential, postReferential, putReferential, simplePostCall } from '../../utils/Action';
 import type { Endpoint, EndpointInput, SearchPaginationInput } from '../../utils/api-types';
 import { arrayOfEndpoints, endpoint } from './asset-schema';

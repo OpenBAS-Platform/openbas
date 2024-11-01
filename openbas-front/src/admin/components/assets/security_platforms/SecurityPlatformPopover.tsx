@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-import { IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
+import { IconButton, Menu, MenuItem } from '@mui/material';
+import { useState } from 'react';
+import * as React from 'react';
+
+import { deleteSecurityPlatform, updateSecurityPlatform } from '../../../../actions/assets/securityPlatform-actions';
+import Dialog from '../../../../components/common/Dialog';
+import DialogDelete from '../../../../components/common/DialogDelete';
+import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import type { SecurityPlatformInput } from '../../../../utils/api-types';
-import SecurityPlatformForm from './SecurityPlatformForm';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { deleteSecurityPlatform, updateSecurityPlatform } from '../../../../actions/assets/securityPlatform-actions';
-import Drawer from '../../../../components/common/Drawer';
-import DialogDelete from '../../../../components/common/DialogDelete';
-import Dialog from '../../../../components/common/Dialog';
 import type { SecurityPlatformStore } from './SecurityPlatform';
+import SecurityPlatformForm from './SecurityPlatformForm';
 
 export type SecurityPlatformStoreWithType = SecurityPlatformStore & { type: string };
 
@@ -67,7 +69,7 @@ const SecurityPlatformPopover: React.FC<Props> = ({
   };
   const submitEdit = (data: SecurityPlatformInput) => {
     dispatch(updateSecurityPlatform(securityPlatform.asset_id, data)).then(
-      (result: { result: string, entities: { securityplatforms: Record<string, SecurityPlatformStore> } }) => {
+      (result: { result: string; entities: { securityplatforms: Record<string, SecurityPlatformStore> } }) => {
         if (result.entities) {
           if (onUpdate) {
             const securityPlatformUpdated = result.entities.securityplatforms[result.result];

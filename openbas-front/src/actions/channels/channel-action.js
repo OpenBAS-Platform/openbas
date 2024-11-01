@@ -1,12 +1,12 @@
 import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
 import { channelReader } from '../Schema';
-import { channelAction, arrayOfChannels } from './channel-schema';
+import { arrayOfChannels, channelAction } from './channel-schema';
 
 export const fetchChannels = () => (dispatch) => {
   const uri = '/api/channels';
   return getReferential(arrayOfChannels, uri)(dispatch);
 };
-export const fetchChannel = (channelId) => (dispatch) => {
+export const fetchChannel = channelId => (dispatch) => {
   const uri = `/api/channels/${channelId}`;
   return getReferential(channelAction, uri)(dispatch);
 };
@@ -18,8 +18,8 @@ export const updateChannelLogos = (channelId, data) => (dispatch) => {
   const uri = `/api/channels/${channelId}/logos`;
   return putReferential(channelAction, uri, data)(dispatch);
 };
-export const addChannel = (data) => (dispatch) => postReferential(channelAction, '/api/channels', data)(dispatch);
-export const deleteChannel = (channelId) => (dispatch) => {
+export const addChannel = data => dispatch => postReferential(channelAction, '/api/channels', data)(dispatch);
+export const deleteChannel = channelId => (dispatch) => {
   const uri = `/api/channels/${channelId}`;
   return delReferential(uri, 'channels', channelId)(dispatch);
 };

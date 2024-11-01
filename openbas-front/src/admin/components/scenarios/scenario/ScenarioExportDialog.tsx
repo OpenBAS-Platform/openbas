@@ -1,5 +1,6 @@
 import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import React, { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
+
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 

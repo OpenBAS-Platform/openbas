@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
-import * as R from 'ramda';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
+import * as R from 'ramda';
+import { useState } from 'react';
+
 import { deleteDocument, updateDocument } from '../../../../actions/Document';
-import DocumentForm from './DocumentForm';
-import { useFormatter } from '../../../../components/i18n';
-import Transition from '../../../../components/common/Transition';
-import { exerciseOptions, scenarioOptions, tagOptions } from '../../../../utils/Option';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 import { fetchExercises } from '../../../../actions/Exercise';
+import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 import Drawer from '../../../../components/common/Drawer';
+import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import { useHelper } from '../../../../store';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { exerciseOptions, scenarioOptions, tagOptions } from '../../../../utils/Option';
+import DocumentForm from './DocumentForm';
 
 const DocumentPopover = (props) => {
   // Standard hooks
@@ -22,7 +23,7 @@ const DocumentPopover = (props) => {
   const { document, disabled, onRemoveDocument, attached, onToggleAttach, inline, onUpdate, onDelete } = props;
 
   // Fetching data
-  const { tagsMap, exercisesMap, scenariosMap } = useHelper((helper) => ({
+  const { tagsMap, exercisesMap, scenariosMap } = useHelper(helper => ({
     tagsMap: helper.getTagsMap(),
     exercisesMap: helper.getExercisesMap(),
     scenariosMap: helper.getScenariosMap(),
@@ -150,9 +151,11 @@ const DocumentPopover = (props) => {
         open={Boolean(anchorEl)}
         onClose={handlePopoverClose}
       >
-        {onUpdate && <MenuItem onClick={handleOpenEdit}>
-          {t('Update')}
-        </MenuItem>}
+        {onUpdate && (
+          <MenuItem onClick={handleOpenEdit}>
+            {t('Update')}
+          </MenuItem>
+        )}
         {onToggleAttach && (
           <MenuItem onClick={handleToggleAttachement}>
             {attached ? t('Disable attachment') : t('Enable attachment')}
@@ -164,7 +167,7 @@ const DocumentPopover = (props) => {
           </MenuItem>
         )}
         {!onRemoveDocument && (
-          <MenuItem onClick={handleOpenDelete}>
+          <MenuItem onClick={handleOpenDelete} disabled={!document.document_can_be_deleted}>
             {t('Delete')}
           </MenuItem>
         )}

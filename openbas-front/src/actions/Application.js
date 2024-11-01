@@ -1,13 +1,14 @@
 import { FORM_ERROR } from 'final-form';
+
 import * as Constants from '../constants/ActionTypes';
-import * as schema from './Schema';
 import { getReferential, postReferential, putReferential, simpleCall } from '../utils/Action';
+import * as schema from './Schema';
 
 export const fetchPlatformParameters = () => (dispatch) => {
   return getReferential(schema.platformParameters, '/api/settings')(dispatch);
 };
 
-export const updatePlatformParameters = (data) => (dispatch) => {
+export const updatePlatformParameters = data => (dispatch) => {
   return putReferential(
     schema.platformParameters,
     '/api/settings',
@@ -15,7 +16,7 @@ export const updatePlatformParameters = (data) => (dispatch) => {
   )(dispatch);
 };
 
-export const updatePlatformPolicies = (data) => (dispatch) => {
+export const updatePlatformPolicies = data => (dispatch) => {
   return putReferential(
     schema.platformParameters,
     '/api/settings/policies',
@@ -23,7 +24,7 @@ export const updatePlatformPolicies = (data) => (dispatch) => {
   )(dispatch);
 };
 
-export const updatePlatformEnterpriseEditionParameters = (data) => (dispatch) => {
+export const updatePlatformEnterpriseEditionParameters = data => (dispatch) => {
   return putReferential(
     schema.platformParameters,
     '/api/settings/enterprise_edition',
@@ -31,7 +32,7 @@ export const updatePlatformEnterpriseEditionParameters = (data) => (dispatch) =>
   )(dispatch);
 };
 
-export const updatePlatformWhitemarkParameters = (data) => (dispatch) => {
+export const updatePlatformWhitemarkParameters = data => (dispatch) => {
   return putReferential(
     schema.platformParameters,
     '/api/settings/platform_whitemark',
@@ -39,7 +40,7 @@ export const updatePlatformWhitemarkParameters = (data) => (dispatch) => {
   )(dispatch);
 };
 
-export const updatePlatformLightParameters = (data) => (dispatch) => {
+export const updatePlatformLightParameters = data => (dispatch) => {
   return putReferential(
     schema.platformParameters,
     '/api/settings/theme/light',
@@ -47,7 +48,7 @@ export const updatePlatformLightParameters = (data) => (dispatch) => {
   )(dispatch);
 };
 
-export const updatePlatformDarkParameters = (data) => (dispatch) => {
+export const updatePlatformDarkParameters = data => (dispatch) => {
   return putReferential(
     schema.platformParameters,
     '/api/settings/theme/dark',
@@ -81,7 +82,7 @@ export const resetPassword = (token, values) => (dispatch) => {
   });
 };
 
-export const validateResetToken = (token) => (dispatch) => {
+export const validateResetToken = token => (dispatch) => {
   return getReferential(null, `/api/reset/${token}`)(dispatch);
 };
 
@@ -111,7 +112,7 @@ export const checkKerberos = () => (dispatch) => {
 
 export const fetchMe = () => (dispatch) => {
   const ref = getReferential(schema.user, '/api/me')(dispatch);
-  return ref.then((data) => dispatch({ type: Constants.IDENTITY_LOGIN_SUCCESS, payload: data }));
+  return ref.then(data => dispatch({ type: Constants.IDENTITY_LOGIN_SUCCESS, payload: data }));
 };
 
 export const logout = () => (dispatch) => {

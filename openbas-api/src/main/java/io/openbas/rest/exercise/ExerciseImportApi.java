@@ -1,9 +1,13 @@
 package io.openbas.rest.exercise;
 
+import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
+
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.scenario.form.InjectsImportInput;
 import io.openbas.rest.scenario.response.ImportTestSummary;
@@ -12,6 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.security.access.annotation.Secured;
@@ -19,11 +24,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.UUID;
-
-import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,15 +45,17 @@ public class ExerciseImportApi extends RestBehavior {
     Exercise exercise = this.exerciseService.exercise(exerciseId);
 
     // Getting the mapper to use
-    ImportMapper importMapper = this.importMapperRepository
-        .findById(UUID.fromString(input.getImportMapperId()))
-        .orElseThrow(() -> new ElementNotFoundException(
-            String.format("The import mapper %s was not found", input.getImportMapperId())
-        ));
+    ImportMapper importMapper =
+        this.importMapperRepository
+            .findById(UUID.fromString(input.getImportMapperId()))
+            .orElseThrow(
+                () ->
+                    new ElementNotFoundException(
+                        String.format(
+                            "The import mapper %s was not found", input.getImportMapperId())));
 
     return this.injectService.importInjectIntoExerciseFromXLS(
-        exercise, importMapper, importId, input.getName(), input.getTimezoneOffset(), false
-    );
+        exercise, importMapper, importId, input.getName(), input.getTimezoneOffset(), false);
   }
 
   @PostMapping(EXERCISE_URI + "/{exerciseId}/xls/{importId}/import")
@@ -71,15 +73,18 @@ public class ExerciseImportApi extends RestBehavior {
     }
 
     // Getting the mapper to use
-    ImportMapper importMapper = importMapperRepository
-        .findById(UUID.fromString(input.getImportMapperId()))
-        .orElseThrow(() -> new ElementNotFoundException(
-            String.format("The import mapper %s was not found", input.getImportMapperId())
-        ));
+    ImportMapper importMapper =
+        importMapperRepository
+            .findById(UUID.fromString(input.getImportMapperId()))
+            .orElseThrow(
+                () ->
+                    new ElementNotFoundException(
+                        String.format(
+                            "The import mapper %s was not found", input.getImportMapperId())));
 
-    ImportTestSummary importTestSummary = injectService.importInjectIntoExerciseFromXLS(
-        exercise, importMapper, importId, input.getName(), input.getTimezoneOffset(), true
-    );
+    ImportTestSummary importTestSummary =
+        injectService.importInjectIntoExerciseFromXLS(
+            exercise, importMapper, importId, input.getName(), input.getTimezoneOffset(), true);
     this.exerciseService.updateExercise(exercise);
     return importTestSummary;
   }

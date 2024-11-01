@@ -1,6 +1,6 @@
-import React from 'react';
+import { Card, CardHeader, Grid, Skeleton, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
-import { Typography, Grid, Card, CardHeader, Skeleton } from '@mui/material';
+import { Fragment } from 'react';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -54,92 +54,92 @@ const ChannelOverviewMicroblogging = ({ channel }) => {
       </Typography>
       <Card sx={{ width: '100%' }} style={{ marginBottom: 20 }}>
         <CardHeader
-          avatar={
+          avatar={(
             <Skeleton
               animation={false}
               variant="circular"
               width={40}
               height={40}
             />
-          }
-          title={
+          )}
+          title={(
             <Skeleton
               animation={false}
               height={10}
               width="80%"
               style={{ marginBottom: 6 }}
             />
-          }
-          subheader={
-            <React.Fragment>
+          )}
+          subheader={(
+            <Fragment>
               <Skeleton
                 animation={false}
                 height={10}
                 style={{ marginBottom: 6 }}
               />
               <Skeleton animation={false} height={10} width="80%" />
-            </React.Fragment>
-          }
+            </Fragment>
+          )}
         />
       </Card>
       <Card sx={{ width: '100%' }} style={{ marginBottom: 20 }}>
         <CardHeader
-          avatar={
+          avatar={(
             <Skeleton
               animation={false}
               variant="circular"
               width={40}
               height={40}
             />
-          }
-          title={
+          )}
+          title={(
             <Skeleton
               animation={false}
               height={10}
               width="80%"
               style={{ marginBottom: 6 }}
             />
-          }
-          subheader={
-            <React.Fragment>
+          )}
+          subheader={(
+            <Fragment>
               <Skeleton
                 animation={false}
                 height={10}
                 style={{ marginBottom: 6 }}
               />
               <Skeleton animation={false} height={10} width="80%" />
-            </React.Fragment>
-          }
+            </Fragment>
+          )}
         />
       </Card>
       <Card sx={{ width: '100%' }} style={{ marginBottom: 20 }}>
         <CardHeader
-          avatar={
+          avatar={(
             <Skeleton
               animation={false}
               variant="circular"
               width={40}
               height={40}
             />
-          }
-          title={
+          )}
+          title={(
             <Skeleton
               animation={false}
               height={10}
               width="80%"
               style={{ marginBottom: 6 }}
             />
-          }
-          subheader={
-            <React.Fragment>
+          )}
+          subheader={(
+            <Fragment>
               <Skeleton
                 animation={false}
                 height={10}
                 style={{ marginBottom: 6 }}
               />
               <Skeleton animation={false} height={10} width="80%" />
-            </React.Fragment>
-          }
+            </Fragment>
+          )}
         />
         <Grid container={true} spacing={3}>
           <Grid item={true} xs={4}>
@@ -167,62 +167,62 @@ const ChannelOverviewMicroblogging = ({ channel }) => {
       </Card>
       <Card sx={{ width: '100%' }} style={{ marginBottom: 20 }}>
         <CardHeader
-          avatar={
+          avatar={(
             <Skeleton
               animation={false}
               variant="circular"
               width={40}
               height={40}
             />
-          }
-          title={
+          )}
+          title={(
             <Skeleton
               animation={false}
               height={10}
               width="80%"
               style={{ marginBottom: 6 }}
             />
-          }
-          subheader={
-            <React.Fragment>
+          )}
+          subheader={(
+            <Fragment>
               <Skeleton
                 animation={false}
                 height={10}
                 style={{ marginBottom: 6 }}
               />
               <Skeleton animation={false} height={10} width="80%" />
-            </React.Fragment>
-          }
+            </Fragment>
+          )}
         />
       </Card>
       <Card sx={{ width: '100%' }} style={{ marginBottom: 20 }}>
         <CardHeader
-          avatar={
+          avatar={(
             <Skeleton
               animation={false}
               variant="circular"
               width={40}
               height={40}
             />
-          }
-          title={
+          )}
+          title={(
             <Skeleton
               animation={false}
               height={10}
               width="80%"
               style={{ marginBottom: 6 }}
             />
-          }
-          subheader={
-            <React.Fragment>
+          )}
+          subheader={(
+            <Fragment>
               <Skeleton
                 animation={false}
                 height={10}
                 style={{ marginBottom: 6 }}
               />
               <Skeleton animation={false} height={10} width="80%" />
-            </React.Fragment>
-          }
+            </Fragment>
+          )}
         />
       </Card>
     </div>

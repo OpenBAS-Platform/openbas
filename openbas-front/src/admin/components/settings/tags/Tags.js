@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
 import { LabelOutlined } from '@mui/icons-material';
-import { useFormatter } from '../../../../components/i18n';
+import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { useState } from 'react';
+
 import { searchTags } from '../../../../actions/Tag';
-import CreateTag from './CreateTag';
-import TagPopover from './TagPopover';
-import TaxonomiesMenu from '../TaxonomiesMenu';
-import { initSorting } from '../../../../components/common/queryable/Page';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
-import Breadcrumbs from '../../../../components/Breadcrumbs';
+import { initSorting } from '../../../../components/common/queryable/Page';
+import { useFormatter } from '../../../../components/i18n';
+import TaxonomiesMenu from '../TaxonomiesMenu';
+import CreateTag from './CreateTag';
+import TagPopover from './TagPopover';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -103,18 +104,18 @@ const Tags = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponent
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-            }
+            )}
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {tags.map((tag) => (
+        {tags.map(tag => (
           <ListItem
             key={tag.tag_id}
             classes={{ root: classes.item }}
@@ -124,7 +125,7 @@ const Tags = () => {
               <LabelOutlined />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div className={classes.bodyItems}>
                   <div className={classes.bodyItem} style={inlineStyles.tag_name}>
                     {tag.tag_name}
@@ -133,20 +134,20 @@ const Tags = () => {
                     {tag.tag_color}
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <TagPopover
                 tag={tag}
-                onUpdate={(result) => setTags(tags.map((existingTag) => (existingTag.tag_id !== result.tag_id ? existingTag : result)))}
-                onDelete={(result) => setTags(tags.filter((existingTag) => (existingTag.tag_id !== result)))}
+                onUpdate={result => setTags(tags.map(existingTag => (existingTag.tag_id !== result.tag_id ? existingTag : result)))}
+                onDelete={result => setTags(tags.filter(existingTag => (existingTag.tag_id !== result)))}
               />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
       <CreateTag
-        onCreate={(result) => setTags([result, ...tags])}
+        onCreate={result => setTags([result, ...tags])}
       />
     </div>
   );

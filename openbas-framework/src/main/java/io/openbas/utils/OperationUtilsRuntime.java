@@ -2,14 +2,14 @@ package io.openbas.utils;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.List;
 
 public class OperationUtilsRuntime {
 
   // -- NOT CONTAINS --
 
-  public static boolean notContainsTexts(@NotNull final Object value, @NotNull final List<String> texts) {
+  public static boolean notContainsTexts(
+      @NotNull final Object value, @NotNull final List<String> texts) {
     return texts.stream().anyMatch(text -> notContainsText(value, text));
   }
 
@@ -19,17 +19,22 @@ public class OperationUtilsRuntime {
 
   // -- CONTAINS --
 
-  public static boolean containsTexts(@NotNull final Object value, @NotNull final List<String> texts) {
+  public static boolean containsTexts(
+      @NotNull final Object value, @NotNull final List<String> texts) {
     return texts.stream().anyMatch(text -> containsText(value, text));
   }
 
   public static boolean containsText(@NotNull final Object value, @NotBlank final String text) {
+    if (value instanceof Enum<?>) {
+      return ((Enum<?>) value).name().toLowerCase().contains(text.toLowerCase());
+    }
     return ((String) value).toLowerCase().contains(text.toLowerCase());
   }
 
   // -- NOT EQUALS --
 
-  public static boolean notEqualsTexts(@NotNull final Object value, @NotNull final List<String> texts) {
+  public static boolean notEqualsTexts(
+      @NotNull final Object value, @NotNull final List<String> texts) {
     return texts.stream().anyMatch(text -> notEqualsText(value, text));
   }
 
@@ -39,7 +44,8 @@ public class OperationUtilsRuntime {
 
   // -- EQUALS --
 
-  public static boolean equalsTexts(@NotNull final Object value, @NotNull final List<String> texts) {
+  public static boolean equalsTexts(
+      @NotNull final Object value, @NotNull final List<String> texts) {
     return texts.stream().anyMatch(text -> equalsText(value, text));
   }
 
@@ -53,7 +59,8 @@ public class OperationUtilsRuntime {
 
   // -- NOT START WITH --
 
-  public static boolean notStartWithTexts(@NotNull final Object value, @NotNull final List<String> texts) {
+  public static boolean notStartWithTexts(
+      @NotNull final Object value, @NotNull final List<String> texts) {
     return texts.stream().anyMatch(text -> notStartWithText(value, text));
   }
 
@@ -63,7 +70,8 @@ public class OperationUtilsRuntime {
 
   // -- START WITH --
 
-  public static boolean startWithTexts(@NotNull final Object value, @NotNull final List<String> texts) {
+  public static boolean startWithTexts(
+      @NotNull final Object value, @NotNull final List<String> texts) {
     return texts.stream().anyMatch(text -> startWithText(value, text));
   }
 

@@ -1,16 +1,16 @@
-import * as schema from './Schema';
 import { bulkDeleteReferential, delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
+import * as schema from './Schema';
 
 // -- INJECTS --
 
-export const fetchInject = (injectId) => (dispatch) => {
+export const fetchInject = injectId => (dispatch) => {
   const uri = `/api/injects/${injectId}`;
   return getReferential(schema.inject, uri)(dispatch);
 };
 
 // -- EXERCISES --
 
-export const fetchExerciseInjects = (exerciseId) => (dispatch) => {
+export const fetchExerciseInjects = exerciseId => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects`;
   return getReferential(schema.arrayOfInjects, uri)(dispatch);
 };
@@ -22,6 +22,11 @@ export const fetchInjectTeams = (exerciseId, injectId) => (dispatch) => {
 
 export const updateInjectForExercise = (exerciseId, injectId, data) => (dispatch) => {
   const uri = `/api/injects/${exerciseId}/${injectId}`;
+  return putReferential(schema.inject, uri, data)(dispatch);
+};
+
+export const bulkUpdateInjectForExercise = (exerciseId, injectId, data) => (dispatch) => {
+  const uri = `/api/injects/${exerciseId}/${injectId}/bulk`;
   return putReferential(schema.inject, uri, data)(dispatch);
 };
 
@@ -82,9 +87,14 @@ export const duplicateInjectForScenario = (scenarioId, injectId) => (dispatch) =
   return postReferential(schema.inject, uri, null)(dispatch);
 };
 
-export const fetchScenarioInjects = (scenarioId) => (dispatch) => {
+export const fetchScenarioInjects = scenarioId => (dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/injects`;
   return getReferential(schema.arrayOfInjects, uri)(dispatch);
+};
+
+export const bulkUpdateInjectForScenario = (scenarioId, injectId, data) => (dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/injects/${injectId}/bulk`;
+  return putReferential(schema.inject, uri, data)(dispatch);
 };
 
 export const updateInjectForScenario = (scenarioId, injectId, data) => (dispatch) => {

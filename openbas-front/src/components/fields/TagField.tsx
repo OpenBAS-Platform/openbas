@@ -1,17 +1,18 @@
-import React, { CSSProperties, FunctionComponent, useState } from 'react';
-import * as R from 'ramda';
 import { AddOutlined, LabelOutlined } from '@mui/icons-material';
 import { Autocomplete as MuiAutocomplete, Box, Dialog, DialogContent, DialogTitle, IconButton, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
+import { CSSProperties, FunctionComponent, useState } from 'react';
 import { FieldErrors } from 'react-hook-form';
-import { useAppDispatch } from '../../utils/hooks';
-import useDataLoader from '../../utils/hooks/useDataLoader';
-import type { Tag } from '../../utils/api-types';
-import { useHelper } from '../../store';
+
 import type { TagHelper, UserHelper } from '../../actions/helper';
-import { useFormatter } from '../i18n';
 import { addTag, fetchTags } from '../../actions/Tag';
 import TagForm from '../../admin/components/settings/tags/TagForm';
+import { useHelper } from '../../store';
+import type { Tag } from '../../utils/api-types';
+import { useAppDispatch } from '../../utils/hooks';
+import useDataLoader from '../../utils/hooks/useDataLoader';
+import { useFormatter } from '../i18n';
 
 const useStyles = makeStyles(() => ({
   icon: {
@@ -66,19 +67,19 @@ const TagField: FunctionComponent<Props> = ({
 
   // Form
   const tagsOptions = tags.map(
-    (n) => ({
+    n => ({
       id: n.tag_id,
       label: n.tag_name,
       color: n.tag_color,
     }),
   );
   const values = () => {
-    return tagsOptions.filter((tag) => fieldValue.includes(tag.id));
+    return tagsOptions.filter(tag => fieldValue.includes(tag.id));
   };
 
   const onSubmit = (data: Tag) => {
     dispatch(addTag(data))
-      .then((result: { entities: { tags: Record<string, Tag> }, result: string }) => {
+      .then((result: { entities: { tags: Record<string, Tag> }; result: string }) => {
         if (result.result) {
           const newTag = result.entities.tags[result.result];
           const newTags = R.append(
@@ -108,7 +109,7 @@ const TagField: FunctionComponent<Props> = ({
         clearOnEscape={false}
         options={tagsOptions}
         onChange={(_, value) => {
-          fieldOnChange(value.map((v) => v.id));
+          fieldOnChange(value.map(v => v.id));
         }}
         renderOption={(props, option) => (
           <Box component="li" {...props} key={option.id}>
@@ -119,7 +120,7 @@ const TagField: FunctionComponent<Props> = ({
           </Box>
         )}
         isOptionEqualToValue={(option, value) => option.id === value.id}
-        renderInput={(params) => (
+        renderInput={params => (
           <TextField
             {...params}
             label={label}

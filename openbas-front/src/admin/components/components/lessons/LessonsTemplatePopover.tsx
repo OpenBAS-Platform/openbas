@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import LessonsTemplateForm from './LessonsTemplateForm';
-import { useFormatter } from '../../../../components/i18n';
+
 import { deleteLessonsTemplate, updateLessonsTemplate } from '../../../../actions/Lessons';
+import ButtonPopover from '../../../../components/common/ButtonPopover';
+import DialogDelete from '../../../../components/common/DialogDelete';
+import Drawer from '../../../../components/common/Drawer';
+import { useFormatter } from '../../../../components/i18n';
 import type { LessonsTemplate, LessonsTemplateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import Drawer from '../../../../components/common/Drawer';
-import DialogDelete from '../../../../components/common/DialogDelete';
-import ButtonPopover from '../../../../components/common/ButtonPopover';
+import LessonsTemplateForm from './LessonsTemplateForm';
 
 interface Props {
   lessonsTemplate: LessonsTemplate;
@@ -53,7 +55,7 @@ const LessonsTemplatePopover: React.FC<Props> = ({ lessonsTemplate }) => {
 
   return (
     <>
-      <ButtonPopover entries={entries} variant={'icon'} />
+      <ButtonPopover entries={entries} variant="icon" />
       <DialogDelete
         open={openDelete}
         handleClose={handleCloseDelete}

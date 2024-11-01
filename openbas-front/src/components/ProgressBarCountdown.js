@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
 import { LinearProgress } from '@mui/material';
+import { useEffect, useState } from 'react';
 
 const now = Math.round(Date.now() / 1000);
 

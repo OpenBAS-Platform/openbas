@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
-import * as R from 'ramda';
-import * as PropTypes from 'prop-types';
-import { Form } from 'react-final-form';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import Editor from 'ckeditor5-custom-build/build/ckeditor';
-import 'ckeditor5-custom-build/build/translations/fr';
-import { Button, Typography, Grid, Switch, TextField as MUITextField } from '@mui/material';
+import { Button, Grid, Switch, TextField as MUITextField, Typography } from '@mui/material';
 import { useTheme } from '@mui/styles';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { useState } from 'react';
+import { Form } from 'react-final-form';
+
+import CKEditor from '../../../../../components/CKEditor';
+import OldTextField from '../../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../../components/i18n';
 import OldAttackPatternField from '../../../../../components/OldAttackPatternField';
-import OldTextField from '../../../../../components/fields/OldTextField';
 
 const InjectorContractForm = (props) => {
   const { onSubmit, initialValues, editing, handleClose, contractTemplate } = props;
@@ -30,29 +29,26 @@ const InjectorContractForm = (props) => {
   const renderField = (field) => {
     switch (field.type) {
       case 'textarea':
-        return field.richText ? (
-          <CKEditor
-            editor={Editor}
-            config={{
-              width: '100%',
-              language: 'en-us',
-            }}
-            data={!R.isNil(fields[field.key]?.defaultValue) ? fields[field.key].defaultValue : field.defaultValue}
-            onChange={(_, editor) => {
-              setFields({ ...fields, [field.key]: { defaultValue: editor.getData() } });
-            }}
-          />
-        ) : (
-          <MUITextField
-            variant="standard"
-            fullWidth={true}
-            multiline={true}
-            rows={10}
-            style={{ marginTop: 5 }}
-            value={!R.isNil(fields[field.key]?.defaultValue) ? fields[field.key].defaultValue : field.defaultValue}
-            onChange={(event) => setFields({ ...fields, [field.key]: { defaultValue: event.target.value } })}
-          />
-        );
+        return field.richText
+          ? (
+              <CKEditor
+                data={!R.isNil(fields[field.key]?.defaultValue) ? fields[field.key].defaultValue : field.defaultValue}
+                onChange={(_, editor) => {
+                  setFields({ ...fields, [field.key]: { defaultValue: editor.getData() } });
+                }}
+              />
+            )
+          : (
+              <MUITextField
+                variant="standard"
+                fullWidth={true}
+                multiline={true}
+                rows={10}
+                style={{ marginTop: 5 }}
+                value={!R.isNil(fields[field.key]?.defaultValue) ? fields[field.key].defaultValue : field.defaultValue}
+                onChange={event => setFields({ ...fields, [field.key]: { defaultValue: event.target.value } })}
+              />
+            );
       case 'number':
         return (
           <MUITextField
@@ -61,7 +57,7 @@ const InjectorContractForm = (props) => {
             type="number"
             style={{ marginTop: 5 }}
             value={!R.isNil(fields[field.key]?.defaultValue) ? fields[field.key].defaultValue : field.defaultValue}
-            onChange={(event) => setFields({ ...fields, [field.key]: { defaultValue: event.target.value } })}
+            onChange={event => setFields({ ...fields, [field.key]: { defaultValue: event.target.value } })}
           />
         );
       default:
@@ -71,7 +67,7 @@ const InjectorContractForm = (props) => {
             fullWidth={true}
             style={{ marginTop: 5 }}
             value={!R.isNil(fields[field.key]?.defaultValue) ? fields[field.key].defaultValue : field.defaultValue}
-            onChange={(event) => setFields({ ...fields, [field.key]: { defaultValue: event.target.value } })}
+            onChange={event => setFields({ ...fields, [field.key]: { defaultValue: event.target.value } })}
           />
         );
     }
@@ -80,7 +76,7 @@ const InjectorContractForm = (props) => {
     <Form
       keepDirtyOnReinitialize={true}
       initialValues={initialValues}
-      onSubmit={(data) => onSubmit(data, fields)}
+      onSubmit={data => onSubmit(data, fields)}
       validate={validate}
       mutators={{
         setValue: ([field, value], state, { changeValue }) => {
@@ -134,7 +130,7 @@ const InjectorContractForm = (props) => {
                     <Switch
                       size="small"
                       checked={!R.isNil(fields[field.key]?.readOnly) ? fields[field.key].readOnly : field.readOnly}
-                      onChange={(event) => setFields({ ...fields, [field.key]: { readOnly: event.target.checked } })}
+                      onChange={event => setFields({ ...fields, [field.key]: { readOnly: event.target.checked } })}
                     />
                   </Grid>
                 </Grid>
@@ -154,12 +150,14 @@ const InjectorContractForm = (props) => {
               onClick={handleClose}
               style={{ marginRight: 10 }}
               disabled={submitting}
+              variant="contained"
             >
               {t('Cancel')}
             </Button>
             <Button
               color="secondary"
               type="submit"
+              variant="contained"
               disabled={submitting}
             >
               {editing ? t('Update') : t('Create')}

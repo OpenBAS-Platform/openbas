@@ -1,14 +1,14 @@
-import React from 'react';
+import { Button, Grid, Paper, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
-import { Link } from 'react-router-dom';
 import { Form } from 'react-final-form';
-import { Button, Grid, Paper, Typography } from '@mui/material';
+import { Link } from 'react-router-dom';
+
+import Empty from '../../../components/Empty';
+import OldTextField from '../../../components/fields/OldTextField';
+import SliderField from '../../../components/fields/SliderField';
 import { useFormatter } from '../../../components/i18n';
 import Loader from '../../../components/Loader';
-import Empty from '../../../components/Empty';
-import SliderField from '../../../components/fields/SliderField';
-import OldTextField from '../../../components/fields/OldTextField';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -46,7 +46,7 @@ const LessonsPreview = (props) => {
   const validate = (values) => {
     const errors = {};
     const requiredFields = R.flatten(
-      lessonsQuestions.map((question) => [
+      lessonsQuestions.map(question => [
         `${question.lessonsquestion_id}_score`,
       ]),
     );
@@ -71,30 +71,30 @@ const LessonsPreview = (props) => {
     return (
       <div className={classes.root}>
         {permissions.isLoggedIn && permissions.canRead && source.isPlayerViewAvailable && (
-        <Button
-          color="secondary"
-          variant="outlined"
-          component={Link}
-          to={`/lessons/${source.type}/${source.id}?user=${source.finalUserId}&preview=false`}
-          style={{ position: 'absolute', top: 20, right: 20 }}
-        >
-          {t('Switch to player mode')}
-        </Button>
+          <Button
+            color="secondary"
+            variant="outlined"
+            component={Link}
+            to={`/lessons/${source.type}/${source.id}?user=${source.finalUserId}&preview=false`}
+            style={{ position: 'absolute', top: 20, right: 20 }}
+          >
+            {t('Switch to player mode')}
+          </Button>
         )}
         {permissions.isLoggedIn && permissions.canRead && (
-        <Button
-          color="primary"
-          variant="outlined"
-          component={Link}
-          to={`/admin/${source.type}s/${source.id}/lessons`}
-          style={{ position: 'absolute', top: 20, left: 20 }}
-        >
-          {t('Back to administration')}
-        </Button>
+          <Button
+            color="primary"
+            variant="outlined"
+            component={Link}
+            to={`/admin/${source.type}s/${source.id}/lessons`}
+            style={{ position: 'absolute', top: 20, left: 20 }}
+          >
+            {t('Back to administration')}
+          </Button>
         )}
         <div className={classes.container}>
           <div style={{ margin: '0 auto', textAlign: 'center' }}>
-            <img src={theme.logo} alt="logo" className={classes.logo}/>
+            <img src={theme.logo} alt="logo" className={classes.logo} />
           </div>
           <Typography
             variant="h1"
@@ -114,13 +114,13 @@ const LessonsPreview = (props) => {
             {source.subtitle}
           </Typography>
           {lessonsCategories.length === 0 && (
-          <div style={{ marginTop: 150 }}>
-            <Empty
-              message={t(
-                `No lessons learned categories in this ${source.type} yet.`,
-              )}
-            />
-          </div>
+            <div style={{ marginTop: 150 }}>
+              <Empty
+                message={t(
+                  `No lessons learned categories in this ${source.type} yet.`,
+                )}
+              />
+            </div>
           )}
         </div>
         <Form
@@ -134,7 +134,7 @@ const LessonsPreview = (props) => {
               {sortedCategories.map((category) => {
                 const questions = sortQuestions(
                   lessonsQuestions.filter(
-                    (n) => n.lessons_question_category === category.lessonscategory_id,
+                    n => n.lessons_question_category === category.lessonscategory_id,
                   ),
                 );
                 return (
@@ -172,7 +172,7 @@ const LessonsPreview = (props) => {
                               </Typography>
                               <Typography variant="body2">
                                 {question.lessons_question_explanation
-                                                                    || t('No explanation')}
+                                || t('No explanation')}
                               </Typography>
                             </Grid>
                             <Grid item xs={3}>
@@ -210,7 +210,7 @@ const LessonsPreview = (props) => {
                             </Grid>
                             <Grid item xs={3}>
                               <Typography variant="h4">
-                                {t("What didn't work well")}
+                                {t('What didn\'t work well')}
                               </Typography>
                               <OldTextField
                                 style={{ marginTop: 10 }}
@@ -239,7 +239,7 @@ const LessonsPreview = (props) => {
       </div>
     );
   }
-  return <Loader/>;
+  return <Loader />;
 };
 
 export default LessonsPreview;

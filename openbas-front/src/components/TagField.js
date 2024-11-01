@@ -1,14 +1,15 @@
-import React, { Component } from 'react';
-import * as R from 'ramda';
 import { LabelOutlined } from '@mui/icons-material';
-import { Box, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { withStyles } from '@mui/styles';
+import * as R from 'ramda';
+import { Component } from 'react';
 import { connect } from 'react-redux';
+
+import { storeHelper } from '../actions/Schema';
+import { addTag, fetchTags } from '../actions/Tag';
 import TagForm from '../admin/components/settings/tags/TagForm';
-import { fetchTags, addTag } from '../actions/Tag';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
-import { storeHelper } from '../actions/Schema';
 
 const styles = () => ({
   icon: {
@@ -77,7 +78,7 @@ class TagField extends Component {
       disabled,
     } = this.props;
     const tagsOptions = R.map(
-      (n) => ({
+      n => ({
         id: n.tag_id,
         label: n.tag_name,
         color: n.tag_color,

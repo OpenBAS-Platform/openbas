@@ -16,7 +16,7 @@ export type ExerciseSimpleStore = Omit<ExerciseSimple, 'exercise_tags'> & {
 };
 
 export type InjectExpectationResultsByTypeStore = Omit<InjectExpectationResultsByType, 'inject'> & {
-  inject: string | undefined
+  inject: string | undefined;
 };
 
 export type InjectExpectationResultsByAttackPatternStore = Omit<InjectExpectationResultsByAttackPattern, 'inject_attack_pattern' | 'exercise_inject_results_injects'> & {

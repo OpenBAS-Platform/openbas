@@ -1,27 +1,28 @@
-import { Drawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { GroupsOutlined } from '@mui/icons-material';
-import React, { CSSProperties, useState } from 'react';
+import { Drawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { CSSProperties, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import ItemTags from '../../../../components/ItemTags';
-import TeamPopover from './TeamPopover';
-import { useFormatter } from '../../../../components/i18n';
-import type { TeamStore } from '../../../../actions/teams/Team';
-import type { SearchPaginationInput } from '../../../../utils/api-types';
-import { searchTeams } from '../../../../actions/teams/team-actions';
-import TeamPlayers from './TeamPlayers';
-import Breadcrumbs from '../../../../components/Breadcrumbs';
-import { initSorting } from '../../../../components/common/queryable/Page';
-import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
-import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
-import CreateTeam from './CreateTeam';
-import { useHelper } from '../../../../store';
+
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchTags } from '../../../../actions/Tag';
-import { useAppDispatch } from '../../../../utils/hooks';
+import type { TeamStore } from '../../../../actions/teams/Team';
+import { searchTeams } from '../../../../actions/teams/team-actions';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
+import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
+import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import { useFormatter } from '../../../../components/i18n';
+import ItemTags from '../../../../components/ItemTags';
+import { useHelper } from '../../../../store';
+import type { SearchPaginationInput } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import CreateTeam from './CreateTeam';
+import TeamPlayers from './TeamPlayers';
+import TeamPopover from './TeamPopover';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -138,14 +139,14 @@ const Teams = () => {
         >
           <ListItemIcon />
           <ListItemText
-            primary={
+            primary={(
               <SortHeadersComponent
                 headers={headers}
                 inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-            }
+            )}
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
@@ -159,7 +160,7 @@ const Teams = () => {
               <GroupsOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div className={classes.bodyItems}>
                   <div className={classes.bodyItem} style={inlineStyles.team_name}>
                     {team.team_name}
@@ -177,14 +178,14 @@ const Teams = () => {
                     {nsdt(team.team_updated_at)}
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <TeamPopover
                 team={team}
                 managePlayers={() => setSelectedTeam(team.team_id)}
-                onUpdate={(result) => setTeams(teams.map((v) => (v.team_id !== result.team_id ? v : result)))}
-                onDelete={(result) => setTeams(teams.filter((v) => (v.team_id !== result)))}
+                onUpdate={result => setTeams(teams.map(v => (v.team_id !== result.team_id ? v : result)))}
+                onDelete={result => setTeams(teams.filter(v => (v.team_id !== result)))}
                 openEditOnInit={team.team_id === searchId}
               />
             </ListItemSecondaryAction>
@@ -207,7 +208,7 @@ const Teams = () => {
           />
         )}
       </Drawer>
-      {userAdmin && (<CreateTeam onCreate={(result) => setTeams([result, ...teams])}/>)}
+      {userAdmin && (<CreateTeam onCreate={result => setTeams([result, ...teams])} />)}
     </>
   );
 };

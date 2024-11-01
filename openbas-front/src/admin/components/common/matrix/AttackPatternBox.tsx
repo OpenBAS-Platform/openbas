@@ -1,12 +1,14 @@
-import { Link } from 'react-router-dom';
 import { Button, ListItemText, Menu, MenuItem, Typography } from '@mui/material';
-import React, { FunctionComponent, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import type { AttackPattern, ExpectationResultsByType } from '../../../../utils/api-types';
+import { FunctionComponent, useState } from 'react';
+import * as React from 'react';
+import { Link } from 'react-router-dom';
+
 import type { InjectExpectationResultsByAttackPatternStore, InjectExpectationResultsByTypeStore } from '../../../../actions/exercises/Exercise';
 import type { Theme } from '../../../../components/Theme';
-import AtomicTestingResult from '../../atomic_testings/atomic_testing/AtomicTestingResult';
+import type { AttackPattern, ExpectationResultsByType } from '../../../../utils/api-types';
 import { hexToRGB } from '../../../../utils/Colors';
+import AtomicTestingResult from '../../atomic_testings/atomic_testing/AtomicTestingResult';
 
 const useStyles = makeStyles((theme: Theme) => ({
   button: {
@@ -84,6 +86,9 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
     if (aggregation.includes('FAILED')) {
       return 'FAILED';
     }
+    if (aggregation.includes('PARTIAL')) {
+      return 'PARTIAL';
+    }
     if (aggregation.includes('PENDING')) {
       return 'PENDING';
     }
@@ -92,10 +97,10 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
     }
     return 'SUCCESS';
   };
-  const aggregatedPrevention = (results ?? []).map((result) => result.results?.filter((r) => r.type === 'PREVENTION').map((r) => r.avgResult)).flat();
-  const aggregatedDetection = (results ?? []).map((result) => result.results?.filter((r) => r.type === 'DETECTION').map((r) => r.avgResult)).flat();
-  const aggregatedHumanResponse = (results ?? []).map((result) => result.results?.filter((r) => r.type === 'HUMAN_RESPONSE').map((r) => r.avgResult)).flat();
-  const aggregatedResults : ExpectationResultsByType[] = [
+  const aggregatedPrevention = (results ?? []).map(result => result.results?.filter(r => r.type === 'PREVENTION').map(r => r.avgResult)).flat();
+  const aggregatedDetection = (results ?? []).map(result => result.results?.filter(r => r.type === 'DETECTION').map(r => r.avgResult)).flat();
+  const aggregatedHumanResponse = (results ?? []).map(result => result.results?.filter(r => r.type === 'HUMAN_RESPONSE').map(r => r.avgResult)).flat();
+  const aggregatedResults: ExpectationResultsByType[] = [
     {
       type: 'PREVENTION',
       avgResult: lowestSelector(aggregatedPrevention),
@@ -118,7 +123,7 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
         className={classes.button}
-        onClick={(event) => handleOpen(event)}
+        onClick={event => handleOpen(event)}
       >
         <div className={classes.buttonText}>
           <Typography variant="caption">

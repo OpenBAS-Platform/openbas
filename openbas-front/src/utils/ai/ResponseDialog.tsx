@@ -1,18 +1,16 @@
-import React, { FunctionComponent, useRef, useEffect } from 'react';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import Editor from 'ckeditor5-custom-build/build/ckeditor';
-import 'ckeditor5-custom-build/build/translations/fr';
-import 'ckeditor5-custom-build/build/translations/zh-cn';
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 // As we can ask AI after and follow up, there is a dependency lifecycle here that can be accepted
 // TODO: Cleanup a bit in upcoming version
 // eslint-disable-next-line import/no-cycle
 import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { FunctionComponent, useEffect, useRef } from 'react';
+
 // eslint-disable-next-line import/no-cycle
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
+import CKEditor from '../../components/CKEditor';
 import { useFormatter } from '../../components/i18n';
 import { isNotEmptyField } from '../utils';
 
@@ -30,7 +28,7 @@ interface ResponseDialogProps {
   followUpActions: {
     key: string;
     label: string;
-  }[]
+  }[];
 }
 
 const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
@@ -86,7 +84,7 @@ const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
                 rows={Math.round(height / 23)}
                 value={content}
                 multiline={true}
-                onChange={(event) => setContent(event.target.value)}
+                onChange={event => setContent(event.target.value)}
                 fullWidth={true}
                 InputProps={{
                   endAdornment: (
@@ -106,10 +104,6 @@ const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
             {format === 'html' && (
               <CKEditor
                 id="response-dialog-editor"
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                editor={Editor}
-                config={{ language: 'en', toolbar: { shouldNotGroupWhenFull: true } }}
                 data={content}
                 onChange={(_, editor) => {
                   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -127,7 +121,7 @@ const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
                   disabled: isDisabled,
                 }}
                 preview="edit"
-                onChange={(data) => setContent(data ?? '')}
+                onChange={data => setContent(data ?? '')}
                 commands={[
                   { ...commands.title, buttonProps: { disabled: isDisabled } },
                   { ...commands.bold, buttonProps: { disabled: isDisabled } },
@@ -155,12 +149,12 @@ const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
                 format={format}
                 variant={format}
                 disabled={isDisabled}
-                style={format === 'html' ? { position: 'absolute', top: -2, right: 18 } : undefined}
+                style={format === 'html' ? { position: 'absolute', top: 40, right: 18 } : undefined}
               />
             )}
           </div>
           <div className="clearfix" />
-          <Alert severity="warning" variant="outlined" style={ format === 'html' ? { marginTop: 30 } : {}}>
+          <Alert severity="warning" variant="outlined" style={format === 'html' ? { marginTop: 30 } : {}}>
             {t('Generative AI is a beta feature as we are currently fine-tuning our models. Consider checking important information.')}
           </Alert>
         </DialogContent>

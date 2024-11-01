@@ -1,19 +1,20 @@
-import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { makeStyles } from '@mui/styles';
-import { Link, useParams } from 'react-router-dom';
 import { Button } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { Link, useParams } from 'react-router-dom';
+
+import { fetchMe } from '../../../actions/Application';
 import { fetchPlayerChannel } from '../../../actions/channels/channel-action';
+import { fetchPlayerDocuments } from '../../../actions/Document';
+import { useFormatter } from '../../../components/i18n';
+import Loader from '../../../components/Loader';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
-import ChannelNewspaper from './ChannelNewspaper';
-import ChannelMicroblogging from './ChannelMicroblogging';
-import ChannelTvChannel from './ChannelTvChannel';
-import { useFormatter } from '../../../components/i18n';
 import { usePermissions } from '../../../utils/Exercise';
-import { fetchMe } from '../../../actions/Application';
-import { fetchPlayerDocuments } from '../../../actions/Document';
-import Loader from '../../../components/Loader';
+import ChannelMicroblogging from './ChannelMicroblogging';
+import ChannelNewspaper from './ChannelNewspaper';
+import ChannelTvChannel from './ChannelTvChannel';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -29,7 +30,7 @@ const ChannelPlayer = () => {
   const { t } = useFormatter();
   const [userId, articleId] = useQueryParameter(['user', 'article']);
   const { channelId, exerciseId } = useParams();
-  const { channelReader } = useHelper((helper) => ({
+  const { channelReader } = useHelper(helper => ({
     channelReader: helper.getChannelReader(channelId),
   }));
   const { channel_information: channel, channel_exercise: exercise } = channelReader ?? {};

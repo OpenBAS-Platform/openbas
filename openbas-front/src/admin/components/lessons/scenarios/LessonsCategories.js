@@ -1,15 +1,16 @@
-import React, { useContext } from 'react';
-import { makeStyles } from '@mui/styles';
-import { Chip, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
 import { CastForEducationOutlined, HelpOutlined } from '@mui/icons-material';
+import { Chip, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
+import { useContext } from 'react';
+
 import { useFormatter } from '../../../../components/i18n';
-import { LessonContext } from '../../common/Context';
-import LessonsCategoryPopover from '../categories/LessonsCategoryPopover';
-import LessonsQuestionPopover from '../categories/questions/LessonsQuestionPopover';
-import CreateLessonsQuestion from '../categories/questions/CreateLessonsQuestion';
-import LessonsCategoryAddTeams from '../categories/LessonsCategoryAddTeams';
 import { truncate } from '../../../../utils/String';
+import { LessonContext } from '../../common/Context';
+import LessonsCategoryAddTeams from '../categories/LessonsCategoryAddTeams';
+import LessonsCategoryPopover from '../categories/LessonsCategoryPopover';
+import CreateLessonsQuestion from '../categories/questions/CreateLessonsQuestion';
+import LessonsQuestionPopover from '../categories/questions/LessonsQuestionPopover';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -60,7 +61,7 @@ const LessonsCategories = ({
       {sortedCategories.map((category) => {
         const questions = sortQuestions(
           lessonsQuestions.filter(
-            (n) => n.lessons_question_category === category.lessonscategory_id,
+            n => n.lessons_question_category === category.lessonscategory_id,
           ),
         );
         return (
@@ -83,7 +84,7 @@ const LessonsCategories = ({
                   style={{ marginTop: 14 }}
                 >
                   <List style={{ padding: 0 }}>
-                    {questions.map((question) => (
+                    {questions.map(question => (
                       <ListItem
                         key={question.lessonsquestion_id}
                         divider
@@ -145,12 +146,12 @@ const LessonsCategories = ({
                             isReport
                               ? undefined
                               : () => handleUpdateTeams(
-                                category.lessonscategory_id,
-                                R.filter(
-                                  (n) => n !== teamId,
-                                  category.lessons_category_teams,
-                                ),
-                              )
+                                  category.lessonscategory_id,
+                                  R.filter(
+                                    n => n !== teamId,
+                                    category.lessons_category_teams,
+                                  ),
+                                )
                           }
                           label={truncate(team?.team_name || '', 30)}
                           icon={<CastForEducationOutlined />}

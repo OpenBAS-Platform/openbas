@@ -1,4 +1,3 @@
-import React, { useContext, useState } from 'react';
 import {
   BallotOutlined,
   ContactMailOutlined,
@@ -8,7 +7,6 @@ import {
   SportsScoreOutlined,
   VisibilityOutlined,
 } from '@mui/icons-material';
-import * as R from 'ramda';
 import {
   Alert,
   Button,
@@ -20,7 +18,6 @@ import {
   FormControl,
   FormControlLabel,
   Grid,
-  LinearProgress,
   Link,
   Paper,
   Radio,
@@ -31,17 +28,21 @@ import {
   useTheme,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import ObjectiveEvaluations from '../ObjectiveEvaluations';
-import CreateLessonsCategory from '../categories/CreateLessonsCategory';
-import SendLessonsForm from '../SendLessonsForm';
-import LessonsObjectives from './LessonsObjectives';
-import LessonsCategories from './LessonsCategories';
+import * as R from 'ramda';
+import { useContext, useState } from 'react';
+import * as React from 'react';
+
+import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import type { Inject, LessonsAnswer, LessonsCategory, LessonsQuestion, LessonsSendInput, LessonsTemplate, Objective, Team, User } from '../../../../utils/api-types';
-import Transition from '../../../../components/common/Transition';
-import CreateLessonsTemplate from '../../components/lessons/CreateLessonsTemplate';
-import { resolveUserName } from '../../../../utils/String';
 import { LessonContext } from '../../common/Context';
+import CreateLessonsTemplate from '../../components/lessons/CreateLessonsTemplate';
+import CreateLessonsCategory from '../categories/CreateLessonsCategory';
+import ObjectiveEvaluations from '../ObjectiveEvaluations';
+import SendLessonsForm from '../SendLessonsForm';
+import AnswersByQuestionDialog from './AnswersByQuestionDialog';
+import LessonsCategories from './LessonsCategories';
+import LessonsObjectives from './LessonsObjectives';
 
 const useStyles = makeStyles((theme: Theme) => ({
   metric: {
@@ -97,16 +98,16 @@ interface GenericSource {
 }
 
 interface Props {
-  source: GenericSource,
-  objectives: Objective[],
-  injects: Inject[],
-  teamsMap: Record<string, Team>,
-  teams: Team[],
-  lessonsCategories: LessonsCategory[],
-  lessonsQuestions: LessonsQuestion[],
-  lessonsAnswers: LessonsAnswer[],
-  lessonsTemplates: LessonsTemplate[],
-  usersMap: Record<string, User>,
+  source: GenericSource;
+  objectives: Objective[];
+  injects: Inject[];
+  teamsMap: Record<string, Team>;
+  teams: Team[];
+  lessonsCategories: LessonsCategory[];
+  lessonsQuestions: LessonsQuestion[];
+  lessonsAnswers: LessonsAnswer[];
+  lessonsTemplates: LessonsTemplate[];
+  usersMap: Record<string, User>;
 }
 
 const Lessons: React.FC<Props> = ({
@@ -191,16 +192,19 @@ const Lessons: React.FC<Props> = ({
         <Grid item xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
-              <SportsScoreOutlined color="primary" sx={{ fontSize: 50 }}/>
+              <SportsScoreOutlined color="primary" sx={{ fontSize: 50 }} />
             </div>
             <div className={classes.title}>{t('Overall objectives score')}</div>
-            <div className={classes.number}>{source.score}%</div>
+            <div className={classes.number}>
+              {source.score}
+              %
+            </div>
           </Paper>
         </Grid>
         <Grid item xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
-              <SpeakerNotesOutlined color="primary" sx={{ fontSize: 50 }}/>
+              <SpeakerNotesOutlined color="primary" sx={{ fontSize: 50 }} />
             </div>
             <div className={classes.title}>{t('Simulation logs')}</div>
             <div className={classes.number}>
@@ -211,7 +215,7 @@ const Lessons: React.FC<Props> = ({
         <Grid item xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
-              <BallotOutlined color="primary" sx={{ fontSize: 50 }}/>
+              <BallotOutlined color="primary" sx={{ fontSize: 50 }} />
             </div>
             <div className={classes.title}>{t('Poll replies')}</div>
             <div className={classes.number}>
@@ -222,7 +226,7 @@ const Lessons: React.FC<Props> = ({
         <Grid item xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
-              <ContactMailOutlined color="primary" sx={{ fontSize: 50 }}/>
+              <ContactMailOutlined color="primary" sx={{ fontSize: 50 }} />
             </div>
             <div className={classes.title}>{t('Messages')}</div>
             <div className={classes.number}>
@@ -253,12 +257,15 @@ const Lessons: React.FC<Props> = ({
                   source.end_date
                     ? new Date(source.end_date)
                     : new Date(),
-                )}{' '}
+                )}
+                {' '}
                 {t('hours')}
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="h3">{t('Team')}</Typography>
-                {source.users_number} {t('players')}
+                {source.users_number}
+                {' '}
+                {t('players')}
               </Grid>
             </Grid>
           </Paper>
@@ -270,21 +277,21 @@ const Lessons: React.FC<Props> = ({
               <Grid item xs={6}>
                 <Typography variant="h3">{t('Questionnaire mode')}</Typography>
                 <FormControlLabel
-                  control={
+                  control={(
                     <Switch
                       disabled={source.lessons_anonymized}
                       checked={source.lessons_anonymized}
                       onChange={() => setOpenAnonymize(true)}
                       name="anonymized"
                     />
-                                    }
+                  )}
                   label={t('Anonymize answers')}
                 />
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="h3">{t('Template')}</Typography>
                 <Button
-                  startIcon={<ContentPasteGoOutlined/>}
+                  startIcon={<ContentPasteGoOutlined />}
                   color="primary"
                   variant="contained"
                   onClick={() => setOpenApplyTemplate(true)}
@@ -295,7 +302,7 @@ const Lessons: React.FC<Props> = ({
               <Grid item xs={6}>
                 <Typography variant="h3">{t('Check')}</Typography>
                 <Button
-                  startIcon={<VisibilityOutlined/>}
+                  startIcon={<VisibilityOutlined />}
                   color="secondary"
                   variant="contained"
                   component={Link}
@@ -309,7 +316,7 @@ const Lessons: React.FC<Props> = ({
                   {t('Categories and questions')}
                 </Typography>
                 <Button
-                  startIcon={<DeleteSweepOutlined/>}
+                  startIcon={<DeleteSweepOutlined />}
                   color="error"
                   variant="contained"
                   onClick={() => setOpenEmptyLessons(true)}
@@ -332,7 +339,7 @@ const Lessons: React.FC<Props> = ({
               <Grid item xs={6}>
                 <Typography variant="h3">{t('Questionnaire')}</Typography>
                 <Button
-                  startIcon={<ContentPasteGoOutlined/>}
+                  startIcon={<ContentPasteGoOutlined />}
                   color="success"
                   variant="contained"
                   onClick={() => setOpenSendLessons(true)}
@@ -343,7 +350,7 @@ const Lessons: React.FC<Props> = ({
               <Grid item xs={6}>
                 <Typography variant="h3">{t('Answers')}</Typography>
                 <Button
-                  startIcon={<ContentPasteGoOutlined/>}
+                  startIcon={<ContentPasteGoOutlined />}
                   color="error"
                   variant="contained"
                   onClick={() => setOpenResetAnswers(true)}
@@ -372,7 +379,7 @@ const Lessons: React.FC<Props> = ({
         isReport={false}
         style={{ marginTop: '60px' }}
       />
-      <CreateLessonsCategory/>
+      <CreateLessonsCategory />
       <Dialog
         TransitionComponent={Transition}
         keepMounted={false}
@@ -425,8 +432,8 @@ const Lessons: React.FC<Props> = ({
                       margin: 0,
                     }}
                     value={template.lessonstemplate_id}
-                    control={<Radio/>}
-                    label={
+                    control={<Radio />}
+                    label={(
                       <div style={{ margin: '15px 0 15px 10px' }}>
                         <Typography variant="h4">
                           {template.lessons_template_name}
@@ -435,14 +442,14 @@ const Lessons: React.FC<Props> = ({
                           {template.lessons_template_description || t('No description')}
                         </Typography>
                       </div>
-                                        }
+                    )}
                   />
                 );
               })}
             </RadioGroup>
           </FormControl>
-          <CreateLessonsTemplate inline/>
-          <div className="clearfix"/>
+          <CreateLessonsTemplate inline />
+          <div className="clearfix" />
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button
               onClick={() => setOpenApplyTemplate(false)}
@@ -528,76 +535,14 @@ const Lessons: React.FC<Props> = ({
           />
         </DialogContent>
       </Dialog>
-      <Dialog
-        open={selectedQuestion !== null}
-        TransitionComponent={Transition}
+      <AnswersByQuestionDialog
+        open={!!selectedQuestion}
         onClose={() => setSelectedQuestion(null)}
-        PaperProps={{ elevation: 1 }}
-        maxWidth="lg"
-        fullWidth
-      >
-        <DialogTitle>{selectedQuestion?.lessons_question_content}</DialogTitle>
-        <DialogContent style={{ paddingTop: 20 }}>
-          {selectedQuestionAnswers.map((answer: LessonsAnswer) => {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            const getUserName = answer.lessons_answer_user ? resolveUserName(usersMap[answer.lessons_answer_user]) : '-';
-            return (
-              <div
-                key={answer.lessonsanswer_id}
-                style={{
-                  marginBottom: 70,
-                  borderBottom: `1px solid ${theme.palette.background.paper}`,
-                  paddingBottom: 10,
-                }}
-              >
-                <Grid container spacing={3}>
-                  <Grid item xs={3} style={{ marginTop: -10 }}>
-                    <Typography variant="h4">{t('User')}</Typography>
-                    {source.lessons_anonymized
-                      ? t('Anonymized')
-                      : getUserName
-                                        }
-                  </Grid>
-                  <Grid item xs={3} style={{ marginTop: -10 }}>
-                    <Typography variant="h4" style={{ marginBottom: 20 }}>
-                      {t('Score')}
-                    </Typography>
-                    <div style={{ width: '80%', display: 'flex', alignItems: 'center' }}>
-                      <LinearProgress
-                        variant="determinate"
-                        value={answer.lessons_answer_score}
-                        style={{
-                          flex: 1,
-                          marginRight: 8,
-                        }}
-                      />
-                      <Typography variant="body2" color="text.secondary">
-                        {answer.lessons_answer_score}%
-                      </Typography>
-                    </div>
-                  </Grid>
-                  <Grid item xs={3} style={{ marginTop: -10 }}>
-                    <Typography variant="h4">{t('What worked well')}</Typography>
-                    {answer.lessons_answer_positive}
-                  </Grid>
-                  <Grid item xs={3} style={{ marginTop: -10 }}>
-                    <Typography variant="h4">
-                      {t('What didn\'t work well')}
-                    </Typography>
-                    {answer.lessons_answer_negative}
-                  </Grid>
-                </Grid>
-              </div>
-            );
-          })}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setSelectedQuestion(null)}>
-            {t('Close')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        question={selectedQuestion?.lessons_question_content || ''}
+        answers={selectedQuestionAnswers}
+        anonymized={source.lessons_anonymized}
+        usersMap={usersMap}
+      />
       <Dialog
         open={openAnonymize}
         TransitionComponent={Transition}

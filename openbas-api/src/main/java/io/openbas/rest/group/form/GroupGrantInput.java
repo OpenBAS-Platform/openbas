@@ -9,13 +9,12 @@ import lombok.Setter;
 @Getter
 public class GroupGrantInput {
 
-    @JsonProperty("grant_name")
-    private Grant.GRANT_TYPE name;
+  @JsonProperty("grant_name")
+  private Grant.GRANT_TYPE name;
 
-    @JsonProperty("grant_exercise")
-    private String exerciseId;
+  @JsonProperty("grant_exercise")
+  private String exerciseId;
 
-    @JsonProperty("grant_scenario")
-    private String scenarioId;
-
+  @JsonProperty("grant_scenario")
+  private String scenarioId;
 }

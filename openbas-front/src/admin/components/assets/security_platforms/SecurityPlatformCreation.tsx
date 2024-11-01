@@ -1,17 +1,17 @@
-import React, { FunctionComponent, useState } from 'react';
-import { ListItemButton, ListItemIcon, ListItemText, Theme } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
+import { ListItemButton, ListItemIcon, ListItemText, Theme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { FunctionComponent, useState } from 'react';
 
-import { useFormatter } from '../../../../components/i18n';
-import { useAppDispatch } from '../../../../utils/hooks';
-import type { SecurityPlatformInput } from '../../../../utils/api-types';
-import SecurityPlatformForm from './SecurityPlatformForm';
 import { addSecurityPlatform } from '../../../../actions/assets/securityPlatform-actions';
-import Drawer from '../../../../components/common/Drawer';
-import Dialog from '../../../../components/common/Dialog';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
+import Dialog from '../../../../components/common/Dialog';
+import Drawer from '../../../../components/common/Drawer';
+import { useFormatter } from '../../../../components/i18n';
+import type { SecurityPlatformInput } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
 import type { SecurityPlatformStore } from './SecurityPlatform';
+import SecurityPlatformForm from './SecurityPlatformForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
   text: {
@@ -38,7 +38,7 @@ const SecurityPlatformCreation: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const onSubmit = (data: SecurityPlatformInput) => {
     dispatch(addSecurityPlatform(data)).then(
-      (result: { result: string, entities: { securityplatforms: Record<string, SecurityPlatformStore> } }) => {
+      (result: { result: string; entities: { securityplatforms: Record<string, SecurityPlatformStore> } }) => {
         if (result.entities) {
           if (onCreate) {
             const securityPlatformCreated = result.entities.securityplatforms[result.result];

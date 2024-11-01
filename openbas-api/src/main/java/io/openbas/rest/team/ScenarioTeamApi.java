@@ -1,5 +1,9 @@
 package io.openbas.rest.team;
 
+import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.database.specification.TeamSpecification.*;
+import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+
 import io.openbas.database.model.Team;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.team.output.TeamOutput;
@@ -14,15 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
-import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.database.specification.TeamSpecification.contextual;
-import static io.openbas.database.specification.TeamSpecification.fromScenario;
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -37,9 +33,14 @@ public class ScenarioTeamApi extends RestBehavior {
   @Tracing(name = "Paginate teams for scenario", layer = "api", operation = "POST")
   public Page<TeamOutput> teams(
       @PathVariable @NotBlank final String scenarioId,
-      @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    final Specification<Team> teamSpecification = contextual(false).or(fromScenario(scenarioId).and(contextual(true)));
+      @RequestBody @Valid SearchPaginationInput searchPaginationInput,
+      @RequestParam final boolean contextualOnly) {
+    Specification<Team> teamSpecification;
+    if (!contextualOnly) {
+      teamSpecification = contextual(false).or(fromScenario(scenarioId).and(contextual(true)));
+    } else {
+      teamSpecification = fromScenario(scenarioId);
+    }
     return this.teamService.teamPagination(searchPaginationInput, teamSpecification);
   }
-
 }

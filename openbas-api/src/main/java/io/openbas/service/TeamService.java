@@ -1,11 +1,18 @@
 package io.openbas.service;
 
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.criteria.GenericCriteria.countQuery;
+import static io.openbas.database.specification.TeamSpecification.teamsAccessibleFromOrganizations;
+import static io.openbas.rest.team.TeamQueryHelper.execution;
+import static io.openbas.rest.team.TeamQueryHelper.select;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
+import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
+
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Organization;
 import io.openbas.database.model.Tag;
 import io.openbas.database.model.Team;
 import io.openbas.database.model.User;
-import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.team.output.TeamOutput;
@@ -17,33 +24,21 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.List;
-import java.util.function.BiFunction;
-
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.database.specification.TeamSpecification.teamsAccessibleFromOrganizations;
-import static io.openbas.rest.team.TeamQueryHelper.execution;
-import static io.openbas.rest.team.TeamQueryHelper.select;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
-import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 
 @Service
 @RequiredArgsConstructor
 public class TeamService {
 
-  @PersistenceContext
-  private EntityManager entityManager;
+  @PersistenceContext private EntityManager entityManager;
 
   private final UserRepository userRepository;
 
@@ -60,33 +55,49 @@ public class TeamService {
 
   @Tracing(name = "Paginate teams", layer = "service")
   public Page<TeamOutput> teamPagination(
-      @RequestBody @Valid SearchPaginationInput searchPaginationInput,
+      @NotNull SearchPaginationInput searchPaginationInput,
       @NotNull final Specification<Team> teamSpecification) {
-    BiFunction<Specification<Team>, Pageable, Page<TeamOutput>> teamsFunction;
+    TriFunction<Specification<Team>, Specification<Team>, Pageable, Page<TeamOutput>> teamsFunction;
     OpenBASPrincipal currentUser = currentUser();
     if (currentUser.isAdmin()) {
-      teamsFunction = (Specification<Team> specification, Pageable pageable) -> this.paginate(
-          teamSpecification.and(specification), pageable
-      );
+      teamsFunction =
+          (Specification<Team> specification,
+              Specification<Team> specificationCount,
+              Pageable pageable) ->
+              this.paginate(
+                  teamSpecification.and(specification),
+                  teamSpecification.and(specificationCount),
+                  pageable);
     } else {
-      User user = this.userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
-      List<String> organizationIds = user.getGroups()
-          .stream()
-          .flatMap(group -> group.getOrganizations().stream())
-          .map(Organization::getId)
-          .toList();
-      teamsFunction = (Specification<Team> specification, Pageable pageable) -> this.paginate(
-          teamSpecification.and(teamsAccessibleFromOrganizations(organizationIds)).and(specification), pageable
-      );
+      User user =
+          this.userRepository
+              .findById(currentUser.getId())
+              .orElseThrow(ElementNotFoundException::new);
+      List<String> organizationIds =
+          user.getGroups().stream()
+              .flatMap(group -> group.getOrganizations().stream())
+              .map(Organization::getId)
+              .toList();
+      teamsFunction =
+          (Specification<Team> specification,
+              Specification<Team> specificationCount,
+              Pageable pageable) ->
+              this.paginate(
+                  teamSpecification
+                      .and(teamsAccessibleFromOrganizations(organizationIds))
+                      .and(specification),
+                  teamSpecification
+                      .and(teamsAccessibleFromOrganizations(organizationIds))
+                      .and(specificationCount),
+                  pageable);
     }
-    return buildPaginationCriteriaBuilder(
-        teamsFunction,
-        searchPaginationInput,
-        Team.class
-    );
+    return buildPaginationCriteriaBuilder(teamsFunction, searchPaginationInput, Team.class);
   }
 
-  private Page<TeamOutput> paginate(Specification<Team> specification, Pageable pageable) {
+  private Page<TeamOutput> paginate(
+      Specification<Team> specification,
+      Specification<Team> specificationCount,
+      Pageable pageable) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
@@ -116,7 +127,7 @@ public class TeamService {
     List<TeamOutput> teams = execution(query);
 
     // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, Team.class, specification);
+    Long total = countQuery(cb, this.entityManager, Team.class, specificationCount);
 
     return new PageImpl<>(teams, pageable, total);
   }
@@ -138,5 +149,4 @@ public class TeamService {
     TypedQuery<Tuple> query = entityManager.createQuery(cq);
     return execution(query);
   }
-
 }

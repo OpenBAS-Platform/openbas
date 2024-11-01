@@ -1,21 +1,16 @@
-import { Drawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { CheckCircleOutlined, GroupsOutlined } from '@mui/icons-material';
-import React, { CSSProperties, useContext, useState } from 'react';
+import { Drawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { CSSProperties, useContext, useState } from 'react';
+import * as React from 'react';
 import { useSearchParams } from 'react-router-dom';
-import ItemTags from '../../../../components/ItemTags';
-import TeamPopover from './TeamPopover';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import { useHelper } from '../../../../store';
-import type { TagHelper } from '../../../../actions/helper';
+
 import type { TeamStore } from '../../../../actions/teams/Team';
-import type { Team } from '../../../../utils/api-types';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { fetchTeams } from '../../../../actions/teams/team-actions';
-import { useAppDispatch } from '../../../../utils/hooks';
-import type { TeamsHelper } from '../../../../actions/teams/team-helper';
-import TeamPlayers from './TeamPlayers';
+import ItemTags from '../../../../components/ItemTags';
+import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { PermissionsContext, TeamContext } from '../../common/Context';
+import TeamPlayers from './TeamPlayers';
+import TeamPopover from './TeamPopover';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -125,27 +120,19 @@ const inlineStylesContextual: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  teamIds: Team['team_id'][];
+  teams: TeamStore[];
 }
 
 interface TeamStoreExtended extends TeamStore {
   team_users_enabled_number: number;
 }
 
-const ContextualTeams: React.FC<Props> = ({ teamIds }) => {
+const ContextualTeams: React.FC<Props> = ({ teams }) => {
   // Standard hooks
-  const dispatch = useAppDispatch();
   const classes = useStyles();
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
-  const { teams }: { teams: TeamStore[] } = useHelper((helper: TagHelper & TeamsHelper) => ({
-    teams: helper.getTeams(),
-  }));
   const { computeTeamUsersEnabled } = useContext(TeamContext);
   const { permissions } = useContext(PermissionsContext);
-
-  useDataLoader(() => {
-    dispatch(fetchTeams());
-  });
 
   // Query param
   const [searchParams] = useSearchParams();
@@ -162,7 +149,7 @@ const ContextualTeams: React.FC<Props> = ({ teamIds }) => {
     ],
     { defaultKeyword: search },
   );
-  const sortedTeams = filtering.filterAndSort(teams.filter((team) => teamIds.includes(team.team_id)).map((team) => {
+  const sortedTeams = filtering.filterAndSort(teams.map((team) => {
     if (computeTeamUsersEnabled) {
       return ({
         team_users_enabled_number: computeTeamUsersEnabled(team.team_id),
@@ -188,7 +175,7 @@ const ContextualTeams: React.FC<Props> = ({ teamIds }) => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <>
                 {filtering.buildHeader(
                   'team_name',
@@ -221,7 +208,7 @@ const ContextualTeams: React.FC<Props> = ({ teamIds }) => {
                   headerStylesContextual,
                 )}
               </>
-            }
+            )}
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
@@ -237,7 +224,7 @@ const ContextualTeams: React.FC<Props> = ({ teamIds }) => {
               <GroupsOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <>
                   <div
                     className={classes.bodyItem}
@@ -272,7 +259,7 @@ const ContextualTeams: React.FC<Props> = ({ teamIds }) => {
                     {team.team_contextual ? <CheckCircleOutlined fontSize="small" /> : '-'}
                   </div>
                 </>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <TeamPopover

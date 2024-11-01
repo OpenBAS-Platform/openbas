@@ -2,6 +2,7 @@ package io.openbas.rest.inject.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.database.model.InjectDependency;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.helper.InjectModelHelper;
 import io.openbas.injectors.email.EmailContract;
@@ -9,9 +10,8 @@ import io.openbas.injectors.ovh.OvhSmsContract;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-
 import java.util.*;
+import lombok.Data;
 
 @Data
 public class InjectOutput {
@@ -39,7 +39,7 @@ public class InjectOutput {
   private Long dependsDuration;
 
   @JsonProperty("inject_depends_on")
-  private String dependsOn;
+  private List<InjectDependency> dependsOn;
 
   @JsonProperty("inject_injector_contract")
   private InjectorContract injectorContract;
@@ -67,7 +67,8 @@ public class InjectOutput {
 
   @JsonProperty("inject_testable")
   public boolean canBeTested() {
-    return EmailContract.TYPE.equals(this.getInjectType()) || OvhSmsContract.TYPE.equals(this.getInjectType());
+    return EmailContract.TYPE.equals(this.getInjectType())
+        || OvhSmsContract.TYPE.equals(this.getInjectType());
   }
 
   public InjectOutput(
@@ -79,37 +80,36 @@ public class InjectOutput {
       String exerciseId,
       String scenarioId,
       Long dependsDuration,
-      String dependsOn,
       InjectorContract injectorContract,
       String[] tags,
       String[] teams,
       String[] assets,
       String[] assetGroups,
-      String injectType) {
+      String injectType,
+      InjectDependency injectDependency) {
     this.id = id;
     this.title = title;
     this.enabled = enabled;
     this.exercise = exerciseId;
     this.scenario = scenarioId;
     this.dependsDuration = dependsDuration;
-    this.dependsOn = dependsOn;
     this.injectorContract = injectorContract;
     this.tags = tags != null ? new HashSet<>(Arrays.asList(tags)) : new HashSet<>();
 
     this.teams = teams != null ? new ArrayList<>(Arrays.asList(teams)) : new ArrayList<>();
     this.assets = assets != null ? new ArrayList<>(Arrays.asList(assets)) : new ArrayList<>();
-    this.assetGroups = assetGroups != null ? new ArrayList<>(Arrays.asList(assetGroups)) : new ArrayList<>();
+    this.assetGroups =
+        assetGroups != null ? new ArrayList<>(Arrays.asList(assetGroups)) : new ArrayList<>();
 
-    this.isReady = InjectModelHelper.isReady(
-        injectorContract,
-        content,
-        allTeams,
-        this.teams,
-        this.assets,
-        this.assetGroups
-    );
+    this.isReady =
+        InjectModelHelper.isReady(
+            injectorContract, content, allTeams, this.teams, this.assets, this.assetGroups);
     this.injectType = injectType;
     this.teams = teams != null ? new ArrayList<>(Arrays.asList(teams)) : new ArrayList<>();
     this.content = content;
+
+    if (injectDependency != null) {
+      this.dependsOn = List.of(injectDependency);
+    }
   }
 }

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "openbas.admin")
 @Data
 public class OpenBASAdminConfig {
-    @JsonProperty("admin_token")
-    private String token;
-
+  @JsonProperty("admin_token")
+  private String token;
 }

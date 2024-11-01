@@ -1,7 +1,7 @@
-import React from 'react';
+import { Button } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import { Button } from '@mui/material';
+
 import OldTextField from '../../../components/fields/OldTextField';
 import { useFormatter } from '../../../components/i18n';
 import OldAttackPatternField from '../../../components/OldAttackPatternField';

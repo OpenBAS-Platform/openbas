@@ -1,21 +1,22 @@
-import React, { FunctionComponent } from 'react';
-import { useTheme } from '@mui/styles';
 import { PaletteMode, Tooltip } from '@mui/material';
-import type { Theme } from './Theme';
-import windowsDark from '../static/images/platforms/windows-dark.png';
-import windowsLight from '../static/images/platforms/windows-light.png';
-import linuxDark from '../static/images/platforms/linux-dark.png';
-import linuxLight from '../static/images/platforms/linux-light.png';
+import { useTheme } from '@mui/styles';
+import { FunctionComponent } from 'react';
+
 import browserDark from '../static/images/platforms/browser-dark.png';
 import browserLight from '../static/images/platforms/browser-light.png';
+import internalDark from '../static/images/platforms/internal-dark.png';
+import internalLight from '../static/images/platforms/internal-light.png';
+import linuxDark from '../static/images/platforms/linux-dark.png';
+import linuxLight from '../static/images/platforms/linux-light.png';
 import macosDark from '../static/images/platforms/macos-dark.png';
 import macosLight from '../static/images/platforms/macos-light.png';
 import serviceDark from '../static/images/platforms/service-dark.png';
 import serviceLight from '../static/images/platforms/service-light.png';
-import internalDark from '../static/images/platforms/internal-dark.png';
-import internalLight from '../static/images/platforms/internal-light.png';
 import unknownDark from '../static/images/platforms/unknown-dark.png';
 import unknownLight from '../static/images/platforms/unknown-light.png';
+import windowsDark from '../static/images/platforms/windows-dark.png';
+import windowsLight from '../static/images/platforms/windows-light.png';
+import type { Theme } from './Theme';
 
 interface PlatformIconProps {
   platform: string;
