@@ -75,6 +75,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class InjectService {
 
   private final InjectRepository injectRepository;
+  private final InjectStatusRepository injectStatusRepository;
   private final InjectDocumentRepository injectDocumentRepository;
   private final InjectExpectationRepository injectExpectationRepository;
   private final AssetRepository assetRepository;
@@ -1599,5 +1600,24 @@ public class InjectService {
                     tuple.get("inject_type", String.class),
                     tuple.get("inject_depends_on", InjectDependency.class)))
         .toList();
+  }
+
+  @Transactional
+  public Inject tryInject(String injectId) {
+    Inject inject = injectRepository.findById(injectId).orElseThrow();
+
+    // Reset injects outcome, communications and expectations
+    inject.clean();
+    inject.setUpdatedAt(Instant.now());
+
+    // New inject status
+    InjectStatus injectStatus = new InjectStatus();
+    injectStatus.setInject(inject);
+    injectStatus.setTrackingSentDate(Instant.now());
+    injectStatus.setName(ExecutionStatus.QUEUING);
+    this.injectStatusRepository.save(injectStatus);
+
+    // Return inject
+    return this.injectRepository.save(inject);
   }
 }

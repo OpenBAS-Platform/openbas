@@ -161,7 +161,7 @@ public class InjectApi extends RestBehavior {
 
   @GetMapping("/api/injects/try/{injectId}")
   public Inject tryInject(@PathVariable String injectId) {
-    return atomicTestingService.tryInject(injectId);
+    return injectService.tryInject(injectId);
   }
 
   @Transactional(rollbackFor = Exception.class)

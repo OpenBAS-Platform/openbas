@@ -1,7 +1,13 @@
 package io.openbas.rest.inject.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
+@Builder
 public class InjectUpdateStatusInput {
 
   @JsonProperty("status")
@@ -9,20 +15,4 @@ public class InjectUpdateStatusInput {
 
   @JsonProperty("message")
   private String message;
-
-  public String getStatus() {
-    return status;
-  }
-
-  public void setStatus(String status) {
-    this.status = status;
-  }
-
-  public String getMessage() {
-    return message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
-  }
 }

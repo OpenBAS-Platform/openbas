@@ -4,8 +4,6 @@ public interface RawInjectExpectation {
 
   String getInject_expectation_type();
 
-  String getInject_expectation_name();
-
   Double getInject_expectation_score();
 
   Double getInject_expectation_expected_score();

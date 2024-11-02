@@ -10,6 +10,7 @@ import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.output.AtomicTestingOutput;
 import io.openbas.service.AtomicTestingService;
+import io.openbas.service.InjectService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -29,6 +30,7 @@ public class AtomicTestingApi extends RestBehavior {
   public static final String ATOMIC_TESTING_URI = "/api/atomic-testings";
 
   private final AtomicTestingService atomicTestingService;
+  private final InjectService injectService;
   private final InjectExpectationService injectExpectationService;
 
   @LogExecutionTime
@@ -71,7 +73,7 @@ public class AtomicTestingApi extends RestBehavior {
 
   @GetMapping("/try/{injectId}")
   public Inject tryAtomicTesting(@PathVariable String injectId) {
-    return atomicTestingService.tryInject(injectId);
+    return injectService.tryInject(injectId);
   }
 
   @GetMapping("/{injectId}/target_results/{targetId}/types/{targetType}")

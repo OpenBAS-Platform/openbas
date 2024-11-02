@@ -66,7 +66,6 @@ public class AtomicTestingService {
   private final AssetRepository assetRepository;
   private final InjectRepository injectRepository;
   private final InjectExpectationRepository injectExpectationRepository;
-  private final InjectStatusRepository injectStatusRepository;
   private final InjectorContractRepository injectorContractRepository;
   private final InjectDocumentRepository injectDocumentRepository;
   private final UserRepository userRepository;
@@ -267,25 +266,6 @@ public class AtomicTestingService {
     Inject saved = injectRepository.save(inject);
     return AtomicTestingMapper.toDto(
         saved, getTargets(saved.getTeams(), saved.getAssets(), saved.getAssetGroups()));
-  }
-
-  @Transactional
-  public Inject tryInject(String injectId) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-
-    // Reset injects outcome, communications and expectations
-    inject.clean();
-    inject.setUpdatedAt(Instant.now());
-
-    // New inject status
-    InjectStatus injectStatus = new InjectStatus();
-    injectStatus.setInject(inject);
-    injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setName(ExecutionStatus.QUEUING);
-    this.injectStatusRepository.save(injectStatus);
-
-    // Return inject
-    return this.injectRepository.save(inject);
   }
 
   @Transactional

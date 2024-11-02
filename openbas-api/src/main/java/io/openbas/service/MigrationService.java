@@ -1,42 +1,39 @@
 package io.openbas.service;
 
 import io.openbas.database.model.InjectExpectation;
-import io.openbas.database.raw.RawInjectExpectation;
+import io.openbas.database.model.User;
 import io.openbas.database.repository.InjectExpectationRepository;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.utils.CopyObjectListUtils;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Service;
 
-@Log
 @RequiredArgsConstructor
 @Service
+@Log
 public class MigrationService {
 
+  private static final String MIGRATION_PROCESS_EXPECTATIONS = "Migration process expectations";
+
+  private final InjectService injectService;
   private final InjectExpectationRepository injectExpectationRepository;
 
-  public void processExpectations() {
+  public void processExpectations() throws InvocationTargetException, IllegalAccessException {
     log.info("Process expectations started.");
 
-    Set<RawInjectExpectation> rawInjectExpectations = injectExpectationRepository.rawAll();
-    log.info("Fetched " + rawInjectExpectations.size() + " raw expectations.");
+    Set<InjectExpectation> injectExpectations = injectExpectationRepository.findAll();
+    log.info("Fetched " + injectExpectations.size() + " expectations.");
 
-    Map<String, List<RawInjectExpectation>> groupedExpectations =
-        rawInjectExpectations.stream()
-            .filter(e -> e.getTeam_id() != null)
+    Map<String, List<InjectExpectation>> groupedExpectations =
+        injectExpectations.stream()
+            .filter(e -> e.getTeam() != null)
             .collect(
                 Collectors.groupingBy(
-                    e ->
-                        e.getInject_id()
-                            + "|"
-                            + e.getTeam_id()
-                            + "|"
-                            + e.getInject_expectation_type()));
+                    e -> e.getInject().getId() + "|" + e.getTeam().getId() + "|" + e.getName()));
 
     log.info("Grouped expectations into " + groupedExpectations.size() + " groups.");
 
@@ -49,34 +46,42 @@ public class MigrationService {
   }
 
   private void processGroupedExpectations(
-      Map<String, List<RawInjectExpectation>> groupedExpectations,
+      Map<String, List<InjectExpectation>> groupedExpectations,
       Set<InjectExpectation> expectationsToCreate) {
-    for (Map.Entry<String, List<RawInjectExpectation>> entry : groupedExpectations.entrySet()) {
+    for (Map.Entry<String, List<InjectExpectation>> entry : groupedExpectations.entrySet()) {
       String groupKey = entry.getKey();
-      List<RawInjectExpectation> expectationList = entry.getValue();
+      List<InjectExpectation> expectationList = entry.getValue();
 
-      log.fine("Processing group: " + groupKey);
-      log.fine("Expectations in this group: " + expectationList.size());
+      log.info("Processing group: " + groupKey);
+      log.info("Expectations in this : " + expectationList.size());
 
-      boolean requireTeamExpectation =
-          expectationList.stream().noneMatch(e -> e.getUser_id() == null);
-      boolean requireUserExpectation =
-          expectationList.stream().noneMatch(e -> e.getUser_id() != null);
+      boolean requireTeamExpectation = expectationList.stream().noneMatch(e -> e.getUser() == null);
+      boolean requireUserExpectation = expectationList.stream().noneMatch(e -> e.getUser() != null);
 
       if (requireTeamExpectation) {
-        log.info("Creating team expectation for group: " + groupKey);
-        InjectExpectation newInjectExpectation = new InjectExpectation();
-        BeanUtils.copyProperties(
-            newInjectExpectation, expectationList.stream().findAny().orElse(null));
+        log.info("Creating team expectation for : " + groupKey);
+        InjectExpectation newInjectExpectation =
+            CopyObjectListUtils.copyObjectWithoutId(
+                expectationList.stream().findAny().orElseThrow(ElementNotFoundException::new),
+                InjectExpectation.class);
+        newInjectExpectation.setId(UUID.randomUUID().toString());
         newInjectExpectation.setUser(null);
         expectationsToCreate.add(newInjectExpectation);
       }
       if (requireUserExpectation) {
-        log.info("Creating user expectation for group: " + groupKey);
-        InjectExpectation newInjectExpectation = new InjectExpectation();
-        BeanUtils.copyProperties(
-            newInjectExpectation, expectationList.stream().findAny().orElse(null));
-        expectationsToCreate.add(newInjectExpectation);
+        log.info("Creating user expectation for : " + groupKey);
+        InjectExpectation newInjectExpectation =
+            CopyObjectListUtils.copyObjectWithoutId(
+                expectationList.stream().findAny().orElseThrow(ElementNotFoundException::new),
+                InjectExpectation.class);
+        newInjectExpectation.setId(UUID.randomUUID().toString());
+        List<User> users = expectationList.getFirst().getTeam().getUsers();
+        if (!users.isEmpty()) {
+          newInjectExpectation.setUser(users.get(0));
+          expectationsToCreate.add(newInjectExpectation);
+        } else {
+          injectService.tryInject(expectationList.getFirst().getInject().getId());
+        }
       }
     }
   }

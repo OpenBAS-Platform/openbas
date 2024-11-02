@@ -3,9 +3,6 @@ package io.openbas.rest.migration;
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.MigrationService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
@@ -27,15 +24,6 @@ public class MigrationApi extends RestBehavior {
 
   @Secured("ROLE_ADMIN")
   @PostMapping("/process-expectations")
-  @Operation(
-      summary = "Process Expectations",
-      description =
-          "Process expectations in order to be compatible with currently system of team and player expectations")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Migration completed successfully."),
-        @ApiResponse(responseCode = "500", description = "Migration failed due to server error.")
-      })
   @LogExecutionTime
   public ResponseEntity<String> processExpectations() {
     try {
