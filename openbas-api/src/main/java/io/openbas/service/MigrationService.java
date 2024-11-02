@@ -5,7 +5,6 @@ import io.openbas.database.model.User;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.CopyObjectListUtils;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +16,10 @@ import org.springframework.stereotype.Service;
 @Log
 public class MigrationService {
 
-  private static final String MIGRATION_PROCESS_EXPECTATIONS = "Migration process expectations";
-
   private final InjectService injectService;
   private final InjectExpectationRepository injectExpectationRepository;
 
-  public void processExpectations() throws InvocationTargetException, IllegalAccessException {
+  public void processExpectations() {
     log.info("Process expectations started.");
 
     Set<InjectExpectation> injectExpectations = injectExpectationRepository.findAll();
