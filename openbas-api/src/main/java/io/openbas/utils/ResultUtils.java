@@ -71,7 +71,7 @@ public class ResultUtils {
   public List<ExpectationResultsByType> computeGlobalExpectationResults(
       @NotNull Set<String> injectIds) {
     return AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-        injectExpectationRepository.rawForComputeGlobalByIds(injectIds));
+        injectExpectationRepository.rawForComputeGlobalByInjectIds(injectIds));
   }
 
   // -- TARGETS WITH RESULTS --
@@ -79,7 +79,7 @@ public class ResultUtils {
 
     // -- EXPECTATIONS --
     Set<RawInjectExpectation> rawInjectExpectations =
-        injectExpectationRepository.rawByInjectId(injectIds);
+        injectExpectationRepository.rawByInjectIds(injectIds);
     Map<String, List<RawInjectExpectation>> expectationMap =
         rawInjectExpectations.stream()
             .collect(Collectors.groupingBy(RawInjectExpectation::getInject_id));

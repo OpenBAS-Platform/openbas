@@ -22,6 +22,8 @@ public interface InjectExpectationRepository
 
   List<InjectExpectation> findAll();
 
+  List<InjectExpectation> findByInjectId(String injectId);
+
   @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId")
   List<InjectExpectation> findAllForExercise(@Param("exerciseId") String exerciseId);
 
@@ -116,7 +118,7 @@ public interface InjectExpectationRepository
   @Query(
       value =
           "select i from InjectExpectation i where i.inject.id = :injectId and i.team.id = :teamId and i.user is null")
-  List<InjectExpectation> findAllByInjectAndTeam(
+  List<InjectExpectation> findAllByInjectAndTeamAndUserIsNull(
       @Param("injectId") @NotBlank final String injectId,
       @Param("teamId") @NotBlank final String teamId);
 
@@ -163,7 +165,8 @@ public interface InjectExpectationRepository
               + "AND i.user_id is null ;",
       nativeQuery =
           true) // We don't include expectations for players, only for the team, if applicable
-  List<RawInjectExpectation> rawForComputeGlobalByIds(@Param("injectIds") Set<String> injectIds);
+  List<RawInjectExpectation> rawForComputeGlobalByInjectIds(
+      @Param("injectIds") Set<String> injectIds);
 
   @Query(
       value =
@@ -182,5 +185,5 @@ public interface InjectExpectationRepository
               + "FROM injects_expectations i "
               + "WHERE i.inject_id IN (:injectIds) ; ",
       nativeQuery = true)
-  Set<RawInjectExpectation> rawByInjectId(@Param("injectIds") final Set<String> injectIds);
+  Set<RawInjectExpectation> rawByInjectIds(@Param("injectIds") final Set<String> injectIds);
 }

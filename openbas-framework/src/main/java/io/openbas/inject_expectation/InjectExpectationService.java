@@ -189,7 +189,8 @@ public class InjectExpectationService {
     try {
       TargetType targetTypeEnum = TargetType.valueOf(targetType);
       return switch (targetTypeEnum) {
-        case TEAMS -> injectExpectationRepository.findAllByInjectAndTeam(injectId, targetId);
+        case TEAMS ->
+            injectExpectationRepository.findAllByInjectAndTeamAndUserIsNull(injectId, targetId);
         case PLAYER ->
             injectExpectationRepository.findAllByInjectAndTeamAndPlayer(
                 injectId, parentTargetId, targetId);

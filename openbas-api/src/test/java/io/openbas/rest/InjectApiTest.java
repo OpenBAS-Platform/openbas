@@ -244,7 +244,7 @@ class InjectApiTest extends IntegrationTest {
         "There should be injects for the scenario in the database");
     assertFalse(
         injectExpectationRepository
-            .findAllByInjectAndTeam(createdInject.getId(), TEAM.getId())
+            .findAllByInjectAndTeamAndUserIsNull(createdInject.getId(), TEAM.getId())
             .isEmpty(),
         "There should be expectations for the scenario in the database");
 
@@ -270,7 +270,7 @@ class InjectApiTest extends IntegrationTest {
         "The document should still exist in the database");
     assertTrue(
         injectExpectationRepository
-            .findAllByInjectAndTeam(createdInject.getId(), TEAM.getId())
+            .findAllByInjectAndTeamAndUserIsNull(createdInject.getId(), TEAM.getId())
             .isEmpty(),
         "There should be no expectations related to the inject in the database");
   }
@@ -409,12 +409,12 @@ class InjectApiTest extends IntegrationTest {
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndTeam(createdInject1.getId(), TEAM.getId())
+            .findAllByInjectAndTeamAndUserIsNull(createdInject1.getId(), TEAM.getId())
             .size());
     assertEquals(
         1,
         injectExpectationRepository
-            .findAllByInjectAndTeam(createdInject2.getId(), TEAM.getId())
+            .findAllByInjectAndTeamAndUserIsNull(createdInject2.getId(), TEAM.getId())
             .size());
 
     // -- EXECUTE --
@@ -445,7 +445,7 @@ class InjectApiTest extends IntegrationTest {
         "The communication should be deleted from the database");
     assertTrue(
         injectExpectationRepository
-            .findAllByInjectAndTeam(createdInject1.getId(), TEAM.getId())
+            .findAllByInjectAndTeamAndUserIsNull(createdInject1.getId(), TEAM.getId())
             .isEmpty(),
         "There should be no expectations related to the inject in the database");
   }
