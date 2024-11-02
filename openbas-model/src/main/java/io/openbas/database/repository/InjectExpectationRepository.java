@@ -20,7 +20,7 @@ public interface InjectExpectationRepository
   @NotNull
   Optional<InjectExpectation> findById(@NotNull String id);
 
-  Set<InjectExpectation> findAll();
+  List<InjectExpectation> findAll();
 
   @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId")
   List<InjectExpectation> findAllForExercise(@Param("exerciseId") String exerciseId);

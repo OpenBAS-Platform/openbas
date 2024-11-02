@@ -45,6 +45,7 @@ import org.springframework.util.ResourceUtils;
 class InjectServiceTest {
 
   @Mock InjectRepository injectRepository;
+  @Mock InjectStatusRepository injectStatusRepository;
   @Mock InjectDocumentRepository injectDocumentRepository;
   @Mock InjectExpectationRepository injectExpectationRepository;
   @Mock AssetRepository assetRepository;
@@ -53,7 +54,6 @@ class InjectServiceTest {
   @Mock ScenarioTeamUserRepository scenarioTeamUserRepository;
   @Mock ExerciseTeamUserRepository exerciseTeamUserRepository;
   @Mock UserRepository userRepository;
-  @Mock ImportMapperRepository importMapperRepository;
   @InjectMocks private InjectService injectService;
 
   private Scenario mockedScenario;
@@ -70,6 +70,7 @@ class InjectServiceTest {
     injectService =
         new InjectService(
             injectRepository,
+            injectStatusRepository,
             injectDocumentRepository,
             injectExpectationRepository,
             assetRepository,

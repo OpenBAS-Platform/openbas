@@ -64,8 +64,8 @@ public class ExerciseApiTest {
       User userTom = userRepository.save(UserFixture.getUser("Tom", "TEST", "tom-test@fake.email"));
       User userBen = userRepository.save(UserFixture.getUser("Ben", "TEST", "ben-test@fake.email"));
       USER_IDS.addAll(Arrays.asList(userTom.getId(), userBen.getId()));
-      Team teamA = teamRepository.save(TeamFixture.getTeam(userTom, "TeamA", false));
-      Team teamB = teamRepository.save(TeamFixture.getTeam(userBen, "TeamB", false));
+      Team teamA = teamRepository.save(TeamFixture.getTeam(List.of(userTom), "TeamA", false));
+      Team teamB = teamRepository.save(TeamFixture.getTeam(List.of(userBen), "TeamB", false));
       TEAM_IDS.addAll(Arrays.asList(teamA.getId(), teamB.getId()));
 
       Exercise exercise = ExerciseFixture.createDefaultCrisisExercise();

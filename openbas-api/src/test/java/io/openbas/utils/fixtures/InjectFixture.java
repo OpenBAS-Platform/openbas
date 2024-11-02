@@ -5,11 +5,9 @@ import io.openbas.database.model.InjectorContract;
 
 public class InjectFixture {
 
-  public static final String INJECT_EMAIL_NAME = "Test email inject";
-
-  public static Inject getInjectForEmailContract(InjectorContract injectorContract) {
+  public static Inject getInject(String title, InjectorContract injectorContract) {
     Inject inject = new Inject();
-    inject.setTitle(INJECT_EMAIL_NAME);
+    inject.setTitle(title);
     inject.setInjectorContract(injectorContract);
     inject.setEnabled(true);
     inject.setDependsDuration(0L);

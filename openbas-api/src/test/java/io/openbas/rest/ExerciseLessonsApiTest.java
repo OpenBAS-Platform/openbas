@@ -65,7 +65,7 @@ public class ExerciseLessonsApiTest extends IntegrationTest {
 
   private LessonsCategory getLessonCategory() {
     USER = this.userRepository.save(getUser());
-    TEAM = teamRepository.save(getTeam(USER, "My team", false));
+    TEAM = teamRepository.save(getTeam(List.of(USER), "My team", false));
     EXERCISE = this.exerciseService.createExercise(getExercise(List.of(TEAM)));
     return this.lessonsCategoryRepository.save(getLessonsCategory(EXERCISE, List.of(TEAM)));
   }
