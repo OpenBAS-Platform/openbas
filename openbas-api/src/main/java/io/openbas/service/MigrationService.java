@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -64,32 +65,19 @@ public class MigrationService {
 
       if (requireTeamExpectation) {
         log.info("Creating team expectation for: " + groupKey);
-        InjectExpectation newInjectExpectation =
-            CopyObjectListUtils.copyObjectWithoutId(
-                expectationList.stream()
-                    .findAny()
-                    .orElseThrow(() -> new ElementNotFoundException("No expectations available.")),
-                InjectExpectation.class);
-        newInjectExpectation.setId(UUID.randomUUID().toString());
+        InjectExpectation newInjectExpectation = getNewInjectExpectation(expectationList);
         newInjectExpectation.setUser(null);
         expectationsToCreate.add(newInjectExpectation);
       }
 
       if (requireUserExpectation) {
-        log.info("Creating user expectation for: " + groupKey);
-        InjectExpectation newInjectExpectation =
-            CopyObjectListUtils.copyObjectWithoutId(
-                expectationList.stream()
-                    .findAny()
-                    .orElseThrow(() -> new ElementNotFoundException("No expectations available.")),
-                InjectExpectation.class);
-        newInjectExpectation.setId(UUID.randomUUID().toString());
-
-        // Safely access the team and users
+        // We verify that the team has at least one player
         Team team = expectationList.get(0).getTeam();
         if (team != null) {
           List<User> users = team.getUsers();
           if (users != null && !users.isEmpty()) {
+            log.info("Creating user expectation for: " + groupKey);
+            InjectExpectation newInjectExpectation = getNewInjectExpectation(expectationList);
             newInjectExpectation.setUser(users.get(0));
             expectationsToCreate.add(newInjectExpectation);
           } else {
@@ -103,5 +91,16 @@ public class MigrationService {
         }
       }
     }
+  }
+
+  private InjectExpectation getNewInjectExpectation(List<InjectExpectation> expectationList) {
+    InjectExpectation newInjectExpectation =
+        CopyObjectListUtils.copyObjectWithoutId(
+            expectationList.stream()
+                .findAny()
+                .orElseThrow(() -> new ElementNotFoundException("No expectations available.")),
+            InjectExpectation.class);
+    newInjectExpectation.setId(UUID.randomUUID().toString());
+    return newInjectExpectation;
   }
 }

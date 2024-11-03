@@ -221,15 +221,16 @@ public class MigrationApiTest extends IntegrationTest {
                       result.getResponse().getContentAsString()));
 
       // -- ASSERT --
-      //  If the team has any players, we should re-execute the injection to synchronize the old
-      // expectations with the current team and player expectation behavior.
+      // If the team has any players, we should re-execute the injection to synchronize the old
+      // expectations with the current team and player behavior. Since the team has no players,
+      // all previous expectations will be deleted.
       verify(injectService).tryInject(emailEmptyTeamInject.getId());
       assertEquals(
           0, injectExpectationRepository.findByInjectId(emailEmptyTeamInject.getId()).size());
     }
 
     @Test
-    @DisplayName("With a team expectation and player expectation")
+    @DisplayName("With a team expectation and player expectations")
     public void
         given_one_team_expectation_and_two_player_expectation_should_not_add_any_expectation()
             throws Exception {
