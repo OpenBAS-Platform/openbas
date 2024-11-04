@@ -152,13 +152,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-web</artifactId>
-            <version>6.2.7</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-saml2-service-provider</artifactId>
-            <version>6.2.7</version>
         </dependency>
         <dependency>
             <groupId>org.opensaml</groupId>
@@ -228,7 +222,6 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
-            <version>6.2.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
