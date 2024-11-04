@@ -392,7 +392,7 @@ const Payloads = () => {
               gutterBottom
               style={{ marginTop: 20 }}
             >
-              {t('Tag')}
+              {t('Tags')}
             </Typography>
             <ItemTags
               variant="reduced-view"
@@ -405,7 +405,7 @@ const Payloads = () => {
               gutterBottom
               style={{ marginTop: 20 }}
             >
-              {t('Attack pattern')}
+              {t('Attack patterns')}
             </Typography>
             {(selectedPayload?.payload_attack_patterns ?? []).length === 0 ? '-' : selectedPayload?.payload_attack_patterns?.map((attackPattern: AttackPattern) => (
               <Tooltip key={attackPattern.attack_pattern_id} title={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}>
