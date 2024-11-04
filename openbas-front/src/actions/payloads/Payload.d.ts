@@ -8,4 +8,5 @@ export type PayloadStore = Omit<Payload, 'payload_collector'> & {
   file_drop_file?: string;
   executable_file?: string;
   executable_arch?: string;
+  payload_attack_patterns?: string[];
 };

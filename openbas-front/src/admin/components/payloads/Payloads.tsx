@@ -1,4 +1,4 @@
-import { Chip, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography } from '@mui/material';
+import { Chip, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper,Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, useMemo, useState } from 'react';
 
@@ -457,9 +457,98 @@ const Payloads = () => {
               gutterBottom
               style={{ marginTop: 20 }}
             >
-              {t('Command executor')}
+              {t('Arguments')}
             </Typography>
-            {selectedPayload?.command_executor}
+            {
+              selectedPayload?.payload_arguments && selectedPayload?.payload_arguments.length === 0 ? '-'
+                : (
+                    <TableContainer component={Paper}>
+                      <Table sx={{ minWidth: 650 }}>
+                        <TableHead>
+                          <TableRow sx={{ textTransform: 'uppercase', fontWeight: 'bold' }}>
+                            <TableCell width="30%">{t('Type')}</TableCell>
+                            <TableCell width="30%">{t('Key')}</TableCell>
+                            <TableCell width="30%">{t('Default value')}</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {selectedPayload?.payload_arguments?.map((argument: PayloadArgument) => {
+                            return (
+                              <>
+                                <TableRow
+                                  key={argument.key}
+                                >
+                                  <TableCell>
+                                    {argument.type}
+                                  </TableCell>
+                                  <TableCell>
+                                    {argument.key}
+                                  </TableCell>
+                                  <TableCell>
+                                    {argument.default_value}
+                                  </TableCell>
+                                </TableRow>
+                              </>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )
+            }
+
+            <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
+              {t('Prerequisites')}
+            </Typography>
+            {
+              selectedPayload?.payload_prerequisites && selectedPayload?.payload_prerequisites.length === 0 ? '-'
+                : (
+                    <TableContainer component={Paper}>
+                      <Table sx={{ minWidth: 650 }}>
+                        <TableHead>
+                          <TableRow sx={{ textTransform: 'uppercase', fontWeight: 'bold' }}>
+                            <TableCell width="30%">{t('Command executor')}</TableCell>
+                            <TableCell width="30%">{t('Get command')}</TableCell>
+                            <TableCell width="30%">{t('Check command')}</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {selectedPayload?.payload_prerequisites?.map((prerequisite: PayloadPrerequisite) => {
+                            return (
+                              <>
+                                <TableRow
+                                  key={prerequisite.executor}
+                                >
+                                  <TableCell>
+                                    {prerequisite.executor}
+                                  </TableCell>
+                                  <TableCell>
+                                    {prerequisite.get_command}
+                                  </TableCell>
+                                  <TableCell>
+                                    {prerequisite.check_command}
+                                  </TableCell>
+                                </TableRow>
+                              </>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )
+            }
+            <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
+              {t('Cleanup executor')}
+            </Typography>
+            {selectedPayload?.payload_cleanup_executor}
             <Typography
               variant="h3"
               gutterBottom
@@ -469,75 +558,8 @@ const Payloads = () => {
             </Typography>
             {selectedPayload?.payload_cleanup_command && selectedPayload?.payload_cleanup_command.length > 0
               ? <pre><ItemCopy content={selectedPayload?.payload_cleanup_command} /></pre> : '-'}
+
           </Grid>
-          <Grid item xs={10} style={{ paddingTop: 10 }}>
-            <Typography
-              variant="subtitle1"
-              gutterBottom
-              style={{ marginTop: 20 }}
-            >
-              {t('Prerequisites')}
-            </Typography>
-          </Grid>
-
-          {
-            selectedPayload?.payload_prerequisites && selectedPayload?.payload_prerequisites.length === 0 ? '-'
-              : selectedPayload?.payload_prerequisites?.map((prerequisite: PayloadPrerequisite) => {
-                return (
-                  <>
-
-                    <Grid item xs={4} style={{ paddingTop: 10 }}>
-                      <Typography
-                        variant="h3"
-                        gutterBottom
-                        style={{ marginTop: 20 }}
-                      >
-                        {t('Command executor')}
-                      </Typography>
-                      {prerequisite.executor ? prerequisite.executor : '-'}
-                    </Grid>
-                    <Grid item xs={4} style={{ paddingTop: 10 }}>
-                      <Typography
-                        variant="h3"
-                        gutterBottom
-                        style={{ marginTop: 20 }}
-                      >
-                        {t('Get command')}
-                      </Typography>
-                      {
-                        prerequisite.get_command
-                          ? (
-                              <pre>
-                                <ItemCopy content={prerequisite.get_command} />
-                              </pre>
-                            )
-                          : '-'
-                      }
-                    </Grid>
-                    <Grid item xs={4} style={{ paddingTop: 10 }}>
-                      <Typography
-                        variant="h3"
-                        gutterBottom
-                        style={{ marginTop: 20 }}
-                      >
-                        {t('Check command')}
-                      </Typography>
-                      {
-                        prerequisite.check_command
-                          ? (
-                              <pre>
-                                <ItemCopy content={prerequisite.check_command} />
-                              </pre>
-                            )
-
-                          : '-'
-                      }
-                    </Grid>
-
-                  </>
-                );
-              })
-          }
         </Grid>
       </Drawer>
     </>
