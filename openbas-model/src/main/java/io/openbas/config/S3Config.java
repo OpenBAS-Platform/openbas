@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class S3Config {
 
   @JsonProperty("use_aws_role")
-  private boolean useAwsRole;
+  private boolean useAwsRole = false;
 
   @JsonProperty("sts_endpoint")
   private String stsEndpoint;
