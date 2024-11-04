@@ -142,6 +142,7 @@ const Dashboard = () => {
   );
   const injectsCountByAttackPattern = useMemo(
     () => [{
+      name: t('Number of injects'),
       data: injectsCountByAttackPatternHasValues && Object.keys(attackPatternsMap).length
         ? Object.entries<number>(statistics.injects_count_by_attack_pattern!).map(([attackPatternId, value]) => {
           return ({
