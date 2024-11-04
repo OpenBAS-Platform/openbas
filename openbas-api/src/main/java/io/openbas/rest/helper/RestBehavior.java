@@ -96,7 +96,7 @@ public class RestBehavior {
   @ExceptionHandler(AuthenticationException.class)
   public ValidationErrorBag handleValidationExceptions() {
     ValidationErrorBag bag =
-        new ValidationErrorBag(HttpStatus.UNAUTHORIZED.value(), "ACCESS_DENIED");
+        new ValidationErrorBag(HttpStatus.UNAUTHORIZED.value(), "AUTHENTIFICATION_FAILED");
     ValidationError errors = new ValidationError();
     Map<String, ValidationContent> errorsBag = new HashMap<>();
     errorsBag.put("username", new ValidationContent("Invalid user or password"));
@@ -108,6 +108,11 @@ public class RestBehavior {
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler(AccessDeniedException.class)
   public ValidationErrorBag handleAccessDeniedExceptions() {
+    // When the user does not have the appropriate access rights, return 404 Not Found.
+    // This response indicates that the resource does not exist, preventing any information
+    // disclosure
+    // about the resource and reducing the risk of brute force attacks by not confirming its
+    // existence
     return new ValidationErrorBag(HttpStatus.NOT_FOUND.value(), "NOT_FOUND");
   }
 
