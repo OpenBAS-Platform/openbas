@@ -6,12 +6,16 @@ import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.database.model.Base;
 import io.openbas.database.model.Exercise;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.persistence.criteria.Join;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -40,6 +44,7 @@ public class ScenarioExerciseApi {
   public Iterable<ExerciseSimple> scenarioExercises(
       @PathVariable @NotBlank final String scenarioId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    Map<String, Join<Base, Base>> joinMap = new HashMap<>();
     return buildPaginationCriteriaBuilder(
         (Specification<Exercise> specification,
             Specification<Exercise> specificationCount,
@@ -47,8 +52,10 @@ public class ScenarioExerciseApi {
             this.exerciseService.exercises(
                 fromScenario(scenarioId).and(specification),
                 fromScenario(scenarioId).and(specificationCount),
-                pageable),
+                pageable,
+                joinMap),
         searchPaginationInput,
-        Exercise.class);
+        Exercise.class,
+        joinMap);
   }
 }

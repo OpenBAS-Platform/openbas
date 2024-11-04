@@ -34,6 +34,7 @@ import io.openbas.service.*;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.persistence.criteria.Join;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -740,9 +741,17 @@ public class ExerciseApi extends RestBehavior {
   @PostMapping(EXERCISE_URI + "/search")
   public Page<ExerciseSimple> exercises(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    Map<String, Join<Base, Base>> joinMap = new HashMap<>();
+
     if (currentUser().isAdmin()) {
       return buildPaginationCriteriaBuilder(
-          this.exerciseService::exercises, searchPaginationInput, Exercise.class);
+          (Specification<Exercise> specification,
+              Specification<Exercise> specificationCount,
+              Pageable pageable) ->
+              this.exerciseService.exercises(specification, specificationCount, pageable, joinMap),
+          searchPaginationInput,
+          Exercise.class);
+
     } else {
       return buildPaginationCriteriaBuilder(
           (Specification<Exercise> specification,
@@ -751,7 +760,8 @@ public class ExerciseApi extends RestBehavior {
               this.exerciseService.exercises(
                   findGrantedFor(currentUser().getId()).and(specification),
                   findGrantedFor(currentUser().getId()).and(specificationCount),
-                  pageable),
+                  pageable,
+                  joinMap),
           searchPaginationInput,
           Exercise.class);
     }
