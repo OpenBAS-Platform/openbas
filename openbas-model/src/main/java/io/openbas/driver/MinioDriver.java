@@ -19,19 +19,21 @@ public class MinioDriver {
   @Bean
   public MinioClient minioClient() throws Exception {
     MinioClient minioClient;
-    if(s3Config.isUseAwsRole()) {
+    if (s3Config.isUseAwsRole()) {
       String stsEndpoint = null;
-      if(s3Config.getStsEndpoint() != null && !s3Config.getStsEndpoint().isEmpty()) {
+      if (s3Config.getStsEndpoint() != null && !s3Config.getStsEndpoint().isEmpty()) {
         stsEndpoint = s3Config.getStsEndpoint();
       }
       IamAwsProvider provider = new IamAwsProvider(stsEndpoint, null);
 
-      minioClient = MinioClient.builder()
+      minioClient =
+          MinioClient.builder()
               .endpoint(minioConfig.getEndpoint())
               .credentialsProvider(provider)
               .build();
     } else {
-      minioClient = MinioClient.builder()
+      minioClient =
+          MinioClient.builder()
               .endpoint(minioConfig.getEndpoint(), minioConfig.getPort(), minioConfig.isSecure())
               .credentials(minioConfig.getAccessKey(), minioConfig.getAccessSecret())
               .build();
