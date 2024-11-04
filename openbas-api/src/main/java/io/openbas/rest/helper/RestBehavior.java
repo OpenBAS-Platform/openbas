@@ -17,6 +17,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -88,15 +89,26 @@ public class RestBehavior {
   }
 
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
-  @ExceptionHandler(AccessDeniedException.class)
+  @ExceptionHandler(AuthenticationException.class)
   public ValidationErrorBag handleValidationExceptions() {
-    ValidationErrorBag bag = new ValidationErrorBag(HttpStatus.UNAUTHORIZED.value(), "ACCESS_DENIED");
+    ValidationErrorBag bag = new ValidationErrorBag(HttpStatus.UNAUTHORIZED.value(), "AUTHENTIFICATION_FAILED");
     ValidationError errors = new ValidationError();
     Map<String, ValidationContent> errorsBag = new HashMap<>();
     errorsBag.put("username", new ValidationContent("Invalid user or password"));
     errors.setChildren(errorsBag);
     bag.setErrors(errors);
     return bag;
+  }
+
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  @ExceptionHandler(AccessDeniedException.class)
+  public ValidationErrorBag handleAccessDeniedExceptions() {
+    // When the user does not have the appropriate access rights, return 404 Not Found.
+    // This response indicates that the resource does not exist, preventing any information
+    // disclosure
+    // about the resource and reducing the risk of brute force attacks by not confirming its
+    // existence
+    return new ValidationErrorBag(HttpStatus.NOT_FOUND.value(), "NOT_FOUND");
   }
 
   @ResponseStatus(HttpStatus.CONFLICT)

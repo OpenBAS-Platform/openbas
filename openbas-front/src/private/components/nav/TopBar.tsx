@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, IconButton, Menu, MenuProps, MenuItem } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { AppBar, IconButton, Menu, MenuItem, MenuProps, Toolbar } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
 import { AccountCircleOutlined } from '@mui/icons-material';
 import { makeStyles, useTheme } from '@mui/styles';
+
 import { logout } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';
 import { useAppDispatch } from '../../../utils/hooks';
@@ -36,6 +37,7 @@ const TopBar: React.FC = () => {
   const theme = useTheme<Theme>();
   const classes = useStyles();
   const { t } = useFormatter();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<MenuProps['anchorEl']>(null);
   const dispatch = useAppDispatch();
@@ -49,6 +51,7 @@ const TopBar: React.FC = () => {
   };
   const handleLogout = async () => {
     await dispatch(logout());
+    navigate('/');
     setOpen(false);
   };
   return (

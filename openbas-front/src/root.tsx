@@ -1,8 +1,7 @@
 import React, { lazy, Suspense, useEffect } from 'react';
-import * as R from 'ramda';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import { StyledEngineProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
+import { StyledEngineProvider } from '@mui/material/styles';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { useHelper } from './store';
 import { fetchMe, fetchPlatformParameters } from './actions/Application';
 import NotFound from './components/NotFound';
@@ -34,9 +33,7 @@ const Root = () => {
     dispatch(fetchMe());
     dispatch(fetchPlatformParameters());
   }, []);
-  if (R.isEmpty(logged)) {
-    return <div />;
-  }
+
   if (!logged || !me || !settings) {
     return (
       <Suspense fallback={<Loader />}>
