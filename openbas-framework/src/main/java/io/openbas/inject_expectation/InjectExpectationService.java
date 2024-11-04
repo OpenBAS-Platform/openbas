@@ -53,6 +53,8 @@ public class InjectExpectationService {
     } else if (expectation.getScore() == null) {
       computeResult(expectation, sourceId, sourceType, sourceName, result, 0.0);
       expectation.setScore(0.0);
+    } else {
+      computeResult(expectation, sourceId, sourceType, sourceName, result, expectation.getScore());
     }
     return this.update(expectation);
   }
