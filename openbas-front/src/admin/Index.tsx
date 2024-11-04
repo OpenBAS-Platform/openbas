@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
-import { lazy, Suspense } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 
 import type { LoggedHelper } from '../actions/helper';
 import { fetchTags } from '../actions/Tag';
@@ -47,9 +47,13 @@ const Index = () => {
   const { logged, settings } = useHelper((helper: LoggedHelper) => {
     return { logged: helper.logged(), settings: helper.getPlatformSettings() };
   });
-  if (logged.isOnlyPlayer) {
-    navigate('/private');
-  }
+
+  useEffect(() => {
+    if (logged.isOnlyPlayer) {
+      navigate('/');
+    }
+  }, [logged]);
+
   const boxSx = {
     flexGrow: 1,
     padding: 3,
@@ -99,7 +103,11 @@ const Index = () => {
               <Route path="mitigations" element={errorWrapper(Mitigations)()} />
               <Route path="integrations/*" element={errorWrapper(IndexIntegrations)()} />
               <Route path="agents/*" element={errorWrapper(IndexAgents)()} />
-              <Route path="settings/*" element={errorWrapper(IndexSettings)()} />
+              <Route
+                path="settings/*"
+                element={logged.admin ? errorWrapper(IndexSettings)()
+                  : <Navigate to="/" replace={true} />}
+              />
               {/* Not found */}
               <Route path="*" element={<NotFound />} />
             </Routes>

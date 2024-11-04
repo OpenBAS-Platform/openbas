@@ -3,7 +3,7 @@ import { AppBar, IconButton, Menu, MenuItem, MenuProps, Toolbar } from '@mui/mat
 import { makeStyles, useTheme } from '@mui/styles';
 import { useState } from 'react';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { logout } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';
@@ -38,6 +38,7 @@ const TopBar: React.FC = () => {
   const theme = useTheme<Theme>();
   const classes = useStyles();
   const { t } = useFormatter();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<MenuProps['anchorEl']>(null);
   const dispatch = useAppDispatch();
@@ -51,6 +52,7 @@ const TopBar: React.FC = () => {
   };
   const handleLogout = async () => {
     await dispatch(logout());
+    navigate('/');
     setOpen(false);
   };
   return (

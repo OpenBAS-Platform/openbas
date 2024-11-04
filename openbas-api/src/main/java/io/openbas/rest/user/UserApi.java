@@ -35,6 +35,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -82,7 +83,7 @@ public class UserApi extends RestBehavior {
         return user;
       }
     }
-    throw new AccessDeniedException("Invalid credentials");
+    throw new BadCredentialsException("Invalid credential.");
   }
 
   @PostMapping("/api/reset")
