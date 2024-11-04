@@ -5,7 +5,6 @@ import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.JpaUtils.createLeftJoin;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static java.time.Instant.now;
 
@@ -16,7 +15,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
-import io.openbas.rest.atomic_testing.form.InjectResultDTO;
+import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
@@ -25,7 +24,6 @@ import io.openbas.rest.scenario.response.ImportMessage;
 import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
 import io.openbas.telemetry.Tracing;
-import io.openbas.utils.AtomicTestingMapper;
 import io.openbas.utils.InjectUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
@@ -228,6 +226,7 @@ public class InjectService {
     Long total = countQuery(cb, this.entityManager, Inject.class, specificationCount);
 
     return new PageImpl<>(injects, pageable, total);
+    // ajouter le champ calculé
   }
 
   /**
@@ -1606,15 +1605,124 @@ public class InjectService {
         .toList();
   }
 
-  public Page<InjectResultDTO> getPageOfSearchExerciseInjects(
+  public Page<InjectResultOutput> getPageOfSearchExerciseInjects(
       String exerciseId, @Valid SearchPaginationInput searchPaginationInput) {
     return buildPaginationCriteriaBuilder(
-            (Specification<InjectResultDTO> specification,
-                Specification<InjectResultDTO> specificationCount,
-                Pageable pageable) ->
-                searchExerciseInjectDTOs(),
-            searchPaginationInput,
-            Inject.class)
-        .map(inject -> AtomicTestingMapper.toDto(inject));
+        (Specification<InjectResultOutput> specification,
+            Specification<InjectResultOutput> specificationCount,
+            Pageable pageable) -> getPageOfSearchExerciseInjects(exerciseId),
+        searchPaginationInput,
+        Inject.class);
+  }
+
+  public Page<InjectResultOutput> getPageOfSearchExerciseInjects(
+      Specification<Inject> specification,
+      Specification<Inject> specificationCount,
+      Pageable pageable) {
+    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+
+    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+    Root<Inject> injectRoot = cq.from(Inject.class);
+    selectForSearchExerciseInjects(cb, cq, injectRoot);
+
+    // -- Text Search and Filters --
+    if (specification != null) {
+      Predicate predicate = specification.toPredicate(injectRoot, cq, cb);
+      if (predicate != null) {
+        cq.where(predicate);
+      }
+    }
+
+    // -- Sorting --
+    List<Order> orders = toSortCriteriaBuilder(cb, injectRoot, pageable.getSort());
+    cq.orderBy(orders);
+
+    // Type Query
+    TypedQuery<Tuple> query = this.entityManager.createQuery(cq);
+
+    // -- Pagination --
+    query.setFirstResult((int) pageable.getOffset());
+    query.setMaxResults(pageable.getPageSize());
+
+    // -- EXECUTION --
+    List<InjectResultOutput> injectResults = execSearchExerciseInjects(query);
+
+    // -- Count Query --
+    Long total = countQuery(cb, this.entityManager, Inject.class, specificationCount);
+
+    return new PageImpl<>(injectResults, pageable, total);
+  }
+
+  private void selectForSearchExerciseInjects(
+      CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Inject> injectRoot) {
+    // Joins
+    Join<Inject, Exercise> injectExerciseJoin = createLeftJoin(injectRoot, "exercise");
+    Join<Inject, Scenario> injectScenarioJoin = createLeftJoin(injectRoot, "scenario");
+    Join<Inject, InjectorContract> injectorContractJoin =
+        createLeftJoin(injectRoot, "injectorContract");
+    Join<InjectorContract, Injector> injectorJoin =
+        injectorContractJoin.join("injector", JoinType.LEFT);
+    Join<Inject, InjectDependency> injectDependency = createLeftJoin(injectRoot, "dependsOn");
+
+    // Array aggregations
+    Expression<String[]> tagIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "tags");
+    Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
+    Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
+    Expression<String[]> assetGroupIdsExpression =
+        createJoinArrayAggOnId(cb, injectRoot, "assetGroups");
+
+    // SELECT
+    cq.multiselect(
+            injectRoot.get("id").alias("inject_id"),
+            injectRoot.get("title").alias("inject_title"),
+            injectRoot.get("enabled").alias("inject_enabled"),
+            injectRoot.get("content").alias("inject_content"),
+            injectRoot.get("allTeams").alias("inject_all_teams"),
+            injectExerciseJoin.get("id").alias("inject_exercise"),
+            injectScenarioJoin.get("id").alias("inject_scenario"),
+            injectRoot.get("dependsDuration").alias("inject_depends_duration"),
+            injectorContractJoin.alias("inject_injector_contract"),
+            tagIdsExpression.alias("inject_tags"),
+            teamIdsExpression.alias("inject_teams"),
+            assetIdsExpression.alias("inject_assets"),
+            assetGroupIdsExpression.alias("inject_asset_groups"),
+            injectorJoin.get("type").alias("inject_type"),
+            injectDependency.alias("inject_depends_on"))
+        .distinct(true);
+
+    // GROUP BY
+    cq.groupBy(
+        Arrays.asList(
+            injectRoot.get("id"),
+            injectExerciseJoin.get("id"),
+            injectScenarioJoin.get("id"),
+            injectorContractJoin.get("id"),
+            injectorJoin.get("id"),
+            injectDependency.get("id")));
+  }
+
+  private List<InjectResultOutput> execSearchExerciseInjects(TypedQuery<Tuple> query) {
+    return query.getResultList().stream()
+        .map(
+            tuple ->
+                new InjectResultOutput(
+                    tuple.get("inject_id", String.class),
+                    tuple.get("inject_title", String.class),
+                    tuple.get("inject_description", Boolean.class),
+                    tuple.get("inject_content", ObjectNode.class),
+                    tuple.get("inject_commands_lines", Boolean.class),
+                    tuple.get("inject_expectations", String.class),
+                    tuple.get("inject_type", String.class),
+                    tuple.get("inject_kill_chain_phases", Long.class),
+                    tuple.get("inject_attack_patterns", InjectorContract.class),
+                    tuple.get("inject_injector_contract", String[].class),
+                    tuple.get("inject_status", String[].class),
+                    tuple.get("inject_targets", String[].class),
+                    tuple.get("inject_expectation_results", String[].class),
+                    tuple.get("injects_tags", String.class),
+                    tuple.get("injects_documents", InjectDependency.class),
+                    tuple.get("inject_ready", InjectDependency.class),
+                    tuple.get("inject_updated_at", InjectDependency.class)))
+        .toList();
   }
 }

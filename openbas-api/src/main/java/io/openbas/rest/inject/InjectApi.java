@@ -24,7 +24,7 @@ import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
 import io.openbas.injector_contract.ContractType;
-import io.openbas.rest.atomic_testing.form.InjectResultDTO;
+import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
@@ -218,7 +218,7 @@ public class InjectApi extends RestBehavior {
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/search")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
-  public Page<InjectResultDTO> searchExerciseInjects(
+  public Page<InjectResultOutput> searchExerciseInjects(
       @PathVariable final String exerciseId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return injectService.getPageOfSearchExerciseInjects(exerciseId, searchPaginationInput);
@@ -228,7 +228,7 @@ public class InjectApi extends RestBehavior {
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/resultdto")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
-  public List<InjectResultDTO> exerciseInjectsWithExpectations(
+  public List<InjectResultOutput> exerciseInjectsWithExpectations(
       @PathVariable final String exerciseId) {
     return this.injectRepository.findAll(InjectSpecification.fromExercise(exerciseId)).stream()
         .map(inject -> AtomicTestingMapper.toDto(inject))

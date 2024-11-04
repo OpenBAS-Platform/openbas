@@ -26,7 +26,7 @@ import io.openbas.database.repository.*;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
-import io.openbas.rest.atomic_testing.form.InjectResultDTO;
+import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.output.AtomicTestingOutput;
 import io.openbas.utils.AtomicTestingMapper;
@@ -86,7 +86,7 @@ public class AtomicTestingService {
     this.context = context;
   }
 
-  public InjectResultDTO findById(String injectId) {
+  public InjectResultOutput findById(String injectId) {
     Optional<Inject> inject = injectRepository.findWithStatusById(injectId);
 
     if (inject.isPresent()) {
@@ -97,7 +97,7 @@ public class AtomicTestingService {
       inject.get().getAssetGroups().clear();
       inject.get().getAssetGroups().addAll(computedAssetGroup);
     }
-    InjectResultDTO result =
+    InjectResultOutput result =
         inject
             .map(AtomicTestingMapper::toDtoWithTargetResults)
             .orElseThrow(ElementNotFoundException::new);
@@ -106,7 +106,7 @@ public class AtomicTestingService {
   }
 
   @Transactional
-  public InjectResultDTO createOrUpdate(AtomicTestingInput input, String injectId) {
+  public InjectResultOutput createOrUpdate(AtomicTestingInput input, String injectId) {
     Inject injectToSave = new Inject();
     if (injectId != null) {
       injectToSave = injectRepository.findById(injectId).orElseThrow();
@@ -211,7 +211,7 @@ public class AtomicTestingService {
 
   @Transactional
   @Validated
-  public InjectResultDTO getDuplicateAtomicTesting(@NotBlank String id) {
+  public InjectResultOutput getDuplicateAtomicTesting(@NotBlank String id) {
     Inject injectOrigin = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
     Inject injectDuplicate = copyInject(injectOrigin, true);
     injectDuplicate.setExercise(injectOrigin.getExercise());
@@ -256,7 +256,7 @@ public class AtomicTestingService {
     return injectDuplicate;
   }
 
-  public InjectResultDTO updateAtomicTestingTags(
+  public InjectResultOutput updateAtomicTestingTags(
       String injectId, AtomicTestingUpdateTagsInput input) {
 
     Inject inject = injectRepository.findById(injectId).orElseThrow();

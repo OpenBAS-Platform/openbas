@@ -3,7 +3,7 @@ package io.openbas.rest.scenario.response;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Inject;
-import io.openbas.rest.atomic_testing.form.InjectResultDTO;
+import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.utils.AtomicTestingMapper;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class ImportTestSummary {
   @JsonIgnore private List<Inject> injects = new ArrayList<>();
 
   @JsonProperty("injects")
-  public List<InjectResultDTO> getInjectResults() {
+  public List<InjectResultOutput> getInjectResults() {
     return injects.stream().map(AtomicTestingMapper::toDtoWithTargetResults).toList();
   }
 }

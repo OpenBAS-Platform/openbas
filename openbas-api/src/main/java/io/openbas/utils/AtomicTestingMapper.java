@@ -5,7 +5,7 @@ import static io.openbas.utils.AtomicTestingUtils.getTargets;
 
 import io.openbas.database.model.*;
 import io.openbas.expectation.ExpectationType;
-import io.openbas.rest.atomic_testing.form.InjectResultDTO;
+import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.rest.atomic_testing.form.InjectStatusSimple;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public class AtomicTestingMapper {
 
-  public static InjectResultDTO toDtoWithTargetResults(Inject inject) {
+  public static InjectResultOutput toDtoWithTargetResults(Inject inject) {
     List<InjectTargetWithResult> targets = AtomicTestingUtils.getTargetsWithResults(inject);
     List<String> targetIds = targets.stream().map(InjectTargetWithResult::getId).toList();
 
@@ -26,7 +26,7 @@ public class AtomicTestingMapper {
         .build();
   }
 
-  public static InjectResultDTO toDto(Inject inject) {
+  public static InjectResultOutput toDto(Inject inject) {
     List<InjectTargetWithResult> targets =
         getTargets(inject.getTeams(), inject.getAssets(), inject.getAssetGroups());
     List<String> targetIds = targets.stream().map(InjectTargetWithResult::getId).toList();
@@ -39,9 +39,9 @@ public class AtomicTestingMapper {
         .build();
   }
 
-  private static InjectResultDTO.InjectResultDTOBuilder getAtomicTestingOutputBuilder(
+  private static InjectResultOutput.InjectResultOutputBuilder getAtomicTestingOutputBuilder(
       Inject inject) {
-    return InjectResultDTO.builder()
+    return InjectResultOutput.builder()
         .id(inject.getId())
         .title(inject.getTitle())
         .description(inject.getDescription())

@@ -19,7 +19,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Builder
-public class InjectResultDTO {
+public class InjectResultOutput {
 
   @Schema(description = "Id")
   @JsonProperty("inject_id")

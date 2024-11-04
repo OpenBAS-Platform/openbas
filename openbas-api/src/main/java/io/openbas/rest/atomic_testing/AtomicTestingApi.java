@@ -6,7 +6,7 @@ import io.openbas.database.model.InjectExpectation;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
-import io.openbas.rest.atomic_testing.form.InjectResultDTO;
+import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.output.AtomicTestingOutput;
 import io.openbas.service.AtomicTestingService;
@@ -41,24 +41,24 @@ public class AtomicTestingApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping("/{injectId}")
-  public InjectResultDTO findAtomicTesting(@PathVariable String injectId) {
+  public InjectResultOutput findAtomicTesting(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId);
   }
 
   @PostMapping()
   @Transactional(rollbackFor = Exception.class)
-  public InjectResultDTO createAtomicTesting(@Valid @RequestBody AtomicTestingInput input) {
+  public InjectResultOutput createAtomicTesting(@Valid @RequestBody AtomicTestingInput input) {
     return this.atomicTestingService.createOrUpdate(input, null);
   }
 
   @PostMapping("/{atomicTestingId}")
-  public InjectResultDTO duplicateAtomicTesting(@PathVariable final String atomicTestingId) {
+  public InjectResultOutput duplicateAtomicTesting(@PathVariable final String atomicTestingId) {
     return atomicTestingService.getDuplicateAtomicTesting(atomicTestingId);
   }
 
   @PutMapping("/{injectId}")
   @Transactional(rollbackFor = Exception.class)
-  public InjectResultDTO updateAtomicTesting(
+  public InjectResultOutput updateAtomicTesting(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingInput input) {
     return atomicTestingService.createOrUpdate(input, injectId);
@@ -86,7 +86,7 @@ public class AtomicTestingApi extends RestBehavior {
 
   @PutMapping("/{injectId}/tags")
   @Transactional(rollbackFor = Exception.class)
-  public InjectResultDTO updateAtomicTestingTags(
+  public InjectResultOutput updateAtomicTestingTags(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingUpdateTagsInput input) {
     return atomicTestingService.updateAtomicTestingTags(injectId, input);

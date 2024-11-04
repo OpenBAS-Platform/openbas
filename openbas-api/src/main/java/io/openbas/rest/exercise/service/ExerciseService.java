@@ -77,8 +77,7 @@ public class ExerciseService {
   private String imapUsername;
 
   @Resource private OpenBASConfig openBASConfig;
-  @Autowired
-  private InjectService injectService;
+  @Autowired private InjectService injectService;
 
   // endregion
 
@@ -127,7 +126,7 @@ public class ExerciseService {
     // -- EXECUTION --
     List<ExerciseSimple> exercises = execution(query);
 
-    //TODO mapOfInject: InjectService.mapOfInjects();
+    // TODO mapOfInject: InjectService.mapOfInjects();
 
     for (ExerciseSimple exercise : exercises) {
       if (exercise.getInjectIds() != null) {
