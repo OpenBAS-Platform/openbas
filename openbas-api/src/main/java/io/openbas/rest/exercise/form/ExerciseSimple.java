@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Tag;
 import io.openbas.helper.MultiIdSetDeserializer;
-import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -62,5 +61,5 @@ public class ExerciseSimple {
 
   @JsonProperty("exercise_targets")
   @NotNull
-  private List<InjectTargetWithResult> targets;
+  private List<TargetSimple> targets;
 }

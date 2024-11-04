@@ -1,15 +1,15 @@
 package io.openbas.utils;
 
-import static io.openbas.database.model.InjectStatus.draftInjectStatus;
 import static io.openbas.utils.AtomicTestingUtils.getRefinedExpectations;
 import static io.openbas.utils.AtomicTestingUtils.getTargets;
 
 import io.openbas.database.model.*;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.InjectResultDTO;
-import io.openbas.rest.atomic_testing.form.InjectResultDTO.InjectResultDTOBuilder;
+import io.openbas.rest.atomic_testing.form.InjectStatusSimple;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import jakarta.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.List;
 
 public class AtomicTestingMapper {
@@ -39,13 +39,14 @@ public class AtomicTestingMapper {
         .build();
   }
 
-  private static InjectResultDTOBuilder getAtomicTestingOutputBuilder(Inject inject) {
+  private static InjectResultDTO.InjectResultDTOBuilder getAtomicTestingOutputBuilder(
+      Inject inject) {
     return InjectResultDTO.builder()
         .id(inject.getId())
         .title(inject.getTitle())
         .description(inject.getDescription())
         .content(inject.getContent())
-        .expectations(inject.getExpectations())
+        .expectations(Collections.emptyList())
         .type(
             inject
                 .getInjectorContract()
@@ -58,9 +59,9 @@ public class AtomicTestingMapper {
                 .map(Document::getId)
                 .toList())
         .injectorContract(inject.getInjectorContract().orElse(null))
-        .status(inject.getStatus().orElse(draftInjectStatus()))
-        .killChainPhases(inject.getKillChainPhases())
-        .attackPatterns(inject.getAttackPatterns())
+        .status(InjectStatusSimple.builder().build())
+        .killChainPhases(Collections.emptyList())
+        .attackPatterns(Collections.emptyList())
         .isReady(inject.isReady())
         .updatedAt(inject.getUpdatedAt());
   }

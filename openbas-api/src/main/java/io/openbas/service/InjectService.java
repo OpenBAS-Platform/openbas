@@ -4,6 +4,7 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.JpaUtils.createLeftJoin;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static java.time.Instant.now;
@@ -15,7 +16,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
-import io.openbas.database.specification.InjectSpecification;
 import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -1445,7 +1445,6 @@ public class InjectService {
   }
 
   // -- TEST --
-
   private Map<String, RawInjectExpectation> mapOfInjectsExpectations(
       @NotNull final List<RawInject> rawInjects) {
     return this.injectExpectationRepository
@@ -1607,15 +1606,15 @@ public class InjectService {
         .toList();
   }
 
-  public Page<InjectResultDTO> getPageOfExerciseInjects(String exerciseId, @Valid SearchPaginationInput searchPaginationInput) {
-      return buildPaginationJPA(
-          (Specification<Inject> specification, Pageable pageable) ->
-              this.injects(
-                  InjectSpecification.fromExercise(exerciseId).and(specification),
-                  InjectSpecification.fromExercise(exerciseId).and(specification),
-                  pageable),
-          searchPaginationInput,
-          Inject.class)
-          .map(inject -> AtomicTestingMapper.toDto(inject));
-    }
+  public Page<InjectResultDTO> getPageOfSearchExerciseInjects(
+      String exerciseId, @Valid SearchPaginationInput searchPaginationInput) {
+    return buildPaginationCriteriaBuilder(
+            (Specification<InjectResultDTO> specification,
+                Specification<InjectResultDTO> specificationCount,
+                Pageable pageable) ->
+                searchExerciseInjectDTOs(),
+            searchPaginationInput,
+            Inject.class)
+        .map(inject -> AtomicTestingMapper.toDto(inject));
+  }
 }

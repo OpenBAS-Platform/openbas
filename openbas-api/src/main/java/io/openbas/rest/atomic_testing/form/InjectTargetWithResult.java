@@ -8,9 +8,13 @@ import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
+@Setter
 @Getter
+@Builder
 public class InjectTargetWithResult {
 
   private final TargetType targetType;

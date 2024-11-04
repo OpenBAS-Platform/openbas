@@ -1,30 +1,28 @@
-package io.openbas.rest.atomic_testing.form;
+package io.openbas.rest.exercise.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.atomic_testing.TargetType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.Instant;
-
 @Setter
 @Getter
 @Builder
-public class InjectStatusDTO {
+public class TargetSimple {
 
   @Schema(description = "Id")
-  @JsonProperty("status_id")
+  @JsonProperty("target_id")
   @NotNull
   private String id;
 
   @Schema(description = "Name")
-  @JsonProperty("status_name")
+  @JsonProperty("target_name")
   private String name;
 
-  @Schema(description = "Tracking Send Date")
-  @JsonProperty("tracking_sent_date")
-  private Instant trackingSentDate;
-
+  @Schema(description = "Type")
+  @JsonProperty("target_type")
+  private TargetType type;
 }

@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.rest.inject.form.InjectDocumentInput;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
-@NoArgsConstructor
+@Builder
 public class AtomicTestingInput {
 
   @JsonProperty("inject_title")

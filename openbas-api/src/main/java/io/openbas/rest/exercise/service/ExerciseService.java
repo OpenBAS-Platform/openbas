@@ -19,6 +19,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.GrantService;
+import io.openbas.service.InjectService;
 import io.openbas.service.TeamService;
 import io.openbas.service.VariableService;
 import io.openbas.utils.AtomicTestingMapper;
@@ -36,6 +37,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -75,6 +77,8 @@ public class ExerciseService {
   private String imapUsername;
 
   @Resource private OpenBASConfig openBASConfig;
+  @Autowired
+  private InjectService injectService;
 
   // endregion
 
@@ -123,13 +127,14 @@ public class ExerciseService {
     // -- EXECUTION --
     List<ExerciseSimple> exercises = execution(query);
 
+    //TODO mapOfInject: InjectService.mapOfInjects();
+
     for (ExerciseSimple exercise : exercises) {
       if (exercise.getInjectIds() != null) {
         exercise.setExpectationResultByTypes(
             resultUtils.getResultsByTypes(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
         exercise.setTargets(
-            resultUtils.getInjectTargetWithResults(
-                new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
+            Collections.emptyList()); // TODO fetch targets from injectsIds: TargetSimple
       }
     }
 

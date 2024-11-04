@@ -57,14 +57,14 @@ const ItemTargets: FunctionComponent<Props> = ({
 
   return (
     <div className={classes.inline}>
-      {visibleTargets && visibleTargets.map((target: InjectTargetWithResult, index: number) => (
+      {visibleTargets && visibleTargets.map((target: TargetSimple, index: number) => (
         <span key={index}>
           <Tooltip title={target.name}>
             <Chip
               variant="outlined"
               key={target.id}
               classes={{ root: classes.target }}
-              icon={getIcon(target.targetType!)}
+              icon={getIcon(target.type!)}
               label={truncate(target.name!, truncateLimit)}
             />
           </Tooltip>

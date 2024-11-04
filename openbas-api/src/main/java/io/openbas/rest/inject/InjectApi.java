@@ -7,7 +7,6 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -48,9 +47,7 @@ import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -221,10 +218,10 @@ public class InjectApi extends RestBehavior {
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/search")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
-  public Page<InjectResultDTO> exerciseInjects(
+  public Page<InjectResultDTO> searchExerciseInjects(
       @PathVariable final String exerciseId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    return injectService.getPageOfExerciseInjects(exerciseId, searchPaginationInput);
+    return injectService.getPageOfSearchExerciseInjects(exerciseId, searchPaginationInput);
   }
 
   @LogExecutionTime
