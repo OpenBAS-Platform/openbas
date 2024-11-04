@@ -120,7 +120,7 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
           <Typography variant="h4">{t('Command Lines')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Typography variant="subtitle1" className={classes.header} gutterBottom>
-              {t('Content')}
+              {t('Attack command')}
             </Typography>
             {(injectResultDto.inject_commands_lines?.content?.length ?? 0) > 0 ? (
               <pre>

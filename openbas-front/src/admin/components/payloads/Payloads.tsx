@@ -24,7 +24,7 @@ import ItemTags from '../../../components/ItemTags';
 import PayloadIcon from '../../../components/PayloadIcon';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
-import { AttackPattern, PayloadPrerequisite } from '../../../utils/api-types';
+import { AttackPattern, PayloadPrerequisite, PayloadArgument } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { emptyFilled } from '../../../utils/String';
