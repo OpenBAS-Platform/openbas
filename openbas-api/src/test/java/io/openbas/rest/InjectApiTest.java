@@ -33,13 +33,16 @@ import io.openbas.utils.fixtures.InjectExpectationFixture;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Resource;
+import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.ServletException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.List;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -67,21 +70,36 @@ class InjectApiTest extends IntegrationTest {
   static Team TEAM;
   static String SCENARIO_INJECT_ID;
 
-  @Autowired private MockMvc mvc;
-  @Autowired private ScenarioService scenarioService;
-  @Autowired private ExerciseService exerciseService;
-  @Autowired private ExerciseRepository exerciseRepository;
-  @SpyBean private Executor executor;
-  @Autowired private ScenarioRepository scenarioRepository;
-  @Autowired private InjectRepository injectRepository;
-  @Autowired private DocumentRepository documentRepository;
-  @Autowired private CommunicationRepository communicationRepository;
-  @Autowired private InjectExpectationRepository injectExpectationRepository;
-  @Autowired private TeamRepository teamRepository;
-  @Autowired private InjectorContractRepository injectorContractRepository;
-  @Autowired private UserRepository userRepository;
-  @Resource private ObjectMapper objectMapper;
-  @MockBean private JavaMailSender javaMailSender;
+  @Autowired
+  private MockMvc mvc;
+  @Autowired
+  private ScenarioService scenarioService;
+  @Autowired
+  private ExerciseService exerciseService;
+  @Autowired
+  private ExerciseRepository exerciseRepository;
+  @SpyBean
+  private Executor executor;
+  @Autowired
+  private ScenarioRepository scenarioRepository;
+  @Autowired
+  private InjectRepository injectRepository;
+  @Autowired
+  private DocumentRepository documentRepository;
+  @Autowired
+  private CommunicationRepository communicationRepository;
+  @Autowired
+  private InjectExpectationRepository injectExpectationRepository;
+  @Autowired
+  private TeamRepository teamRepository;
+  @Autowired
+  private InjectorContractRepository injectorContractRepository;
+  @Autowired
+  private UserRepository userRepository;
+  @Resource
+  private ObjectMapper objectMapper;
+  @MockBean
+  private JavaMailSender javaMailSender;
 
   @BeforeAll
   void beforeAll() {
@@ -401,9 +419,9 @@ class InjectApiTest extends IntegrationTest {
         new MockMultipartFile("file", "my-awesome-file.xls", "application/xlsx", in.readAllBytes());
 
     // Mock the behavior of JavaMailSender
+    ArgumentCaptor<MimeMessage> mimeMessageArgumentCaptor = ArgumentCaptor.forClass(MimeMessage.class);
     doNothing().when(javaMailSender).send(ArgumentMatchers.any(SimpleMailMessage.class));
-    MimeMessage mimeMessage = mock(MimeMessage.class);
-    when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
+    when(javaMailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
 
     // -- EXECUTE --
     String response =
@@ -422,7 +440,9 @@ class InjectApiTest extends IntegrationTest {
     ArgumentCaptor<ExecutableInject> executableInjectCaptor =
         ArgumentCaptor.forClass(ExecutableInject.class);
     verify(executor).execute(executableInjectCaptor.capture());
-    verify(executor).execute(executableInjectCaptor.capture());
+
+    verify(javaMailSender).send(mimeMessageArgumentCaptor.capture());
+    assertEquals("Subject", mimeMessageArgumentCaptor.getValue().getSubject());
 
     // -- THEN ---
     userRepository.delete(user);
