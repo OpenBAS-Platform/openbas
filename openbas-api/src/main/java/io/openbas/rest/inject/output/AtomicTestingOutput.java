@@ -1,11 +1,11 @@
 package io.openbas.rest.inject.output;
 
-import static io.openbas.database.model.InjectStatus.draftInjectStatus;
 import static lombok.AccessLevel.NONE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.model.InjectStatus;
+import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.InjectorContract;
+import io.openbas.rest.atomic_testing.form.InjectStatusSimple;
 import io.openbas.rest.exercise.form.TargetSimple;
 import io.openbas.utils.InjectMapper;
 import jakarta.validation.constraints.NotBlank;
@@ -40,11 +40,11 @@ public class AtomicTestingOutput {
 
   @Getter(NONE)
   @JsonProperty("inject_status")
-  private InjectStatus status;
+  private InjectStatusSimple status;
 
-  public InjectStatus getStatus() {
+  public InjectStatusSimple getStatus() {
     if (status == null) {
-      return draftInjectStatus();
+      return InjectStatusSimple.builder().name(ExecutionStatus.DRAFT.name()).build();
     }
     return status;
   }
@@ -79,7 +79,7 @@ public class AtomicTestingOutput {
       Instant updatedAt,
       String injectType,
       InjectorContract injectorContract,
-      InjectStatus injectStatus,
+      InjectStatusSimple injectStatus,
       String[] injectExpectations,
       String[] teams,
       String[] assets,

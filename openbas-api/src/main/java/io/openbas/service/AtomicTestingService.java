@@ -27,6 +27,7 @@ import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
+import io.openbas.rest.atomic_testing.form.InjectStatusSimple;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.output.AtomicTestingOutput;
 import io.openbas.utils.InjectMapper;
@@ -401,19 +402,6 @@ public class AtomicTestingService {
     Join<Base, Base> injectorJoin = injectorContractJoin.join("injector", JoinType.LEFT);
     joinMap.put("injector", injectorJoin);
 
-    // Subquery for InjectStatus
-    Subquery<Tuple> statusSubquery = cq.subquery(Tuple.class);
-    Root<InjectStatus> statusRoot = statusSubquery.from(InjectStatus.class);
-    Subquery<Tuple> dateSubquery = cq.subquery(Tuple.class);
-    Root<InjectStatus> dateRoot = dateSubquery.from(InjectStatus.class);
-
-    statusSubquery
-        .select(statusRoot.get("name"))
-        .where(cb.equal(statusRoot.get("inject").get("id"), injectRoot.get("id")));
-    dateSubquery
-        .select(dateRoot.get("trackingSentDate"))
-        .where(cb.equal(dateRoot.get("inject").get("id"), injectRoot.get("id")));
-
     // Array aggregations
     Expression<String[]> injectExpectationIdsExpression =
         createJoinArrayAggOnId(cb, injectRoot, EXPECTATIONS);
@@ -429,15 +417,8 @@ public class AtomicTestingService {
             injectRoot.get("updatedAt").alias("inject_updated_at"),
             injectorJoin.get("type").alias("inject_type"),
             injectorContractJoin.alias("inject_injector_contract"),
-            cb.selectCase()
-                .when(cb.exists(statusSubquery), statusSubquery.select(statusRoot.get("name")))
-                .otherwise(cb.nullLiteral(ExecutionStatus.class))
-                .alias("inject_status"),
-            cb.selectCase()
-                .when(
-                    cb.exists(dateSubquery), dateSubquery.select(dateRoot.get("trackingSentDate")))
-                .otherwise(cb.nullLiteral(Instant.class))
-                .alias("tracking_sent_date"),
+            injectRoot.get("status").get("name").alias("status_name"),
+            injectRoot.get("status").get("trackingSentDate").alias("status_tracking_sent_date"),
             injectExpectationIdsExpression.alias("inject_expectations"),
             teamIdsExpression.alias("inject_teams"),
             assetIdsExpression.alias("inject_assets"),
@@ -454,12 +435,14 @@ public class AtomicTestingService {
     return query.getResultList().stream()
         .map(
             tuple -> {
-              InjectStatus injectStatus = null;
-              ExecutionStatus status = tuple.get("inject_status", ExecutionStatus.class);
+              InjectStatusSimple injectStatus = null;
+              ExecutionStatus status = tuple.get("status_name", ExecutionStatus.class);
               if (status != null) {
-                injectStatus = new InjectStatus();
-                injectStatus.setName(status);
-                injectStatus.setTrackingSentDate(tuple.get("tracking_sent_date", Instant.class));
+                injectStatus =
+                    InjectStatusSimple.builder()
+                        .name(status.name())
+                        .trackingSentDate(tuple.get("status_tracking_sent_date", Instant.class))
+                        .build();
               }
               return new AtomicTestingOutput(
                   tuple.get("inject_id", String.class),
