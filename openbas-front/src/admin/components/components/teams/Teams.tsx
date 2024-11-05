@@ -17,7 +17,6 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
 import type { SearchPaginationInput } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
 import CreateTeam from './CreateTeam';
 import TeamPlayers from './TeamPlayers';
 import TeamPopover from './TeamPopover';
@@ -72,7 +71,6 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 const Teams = () => {
   // Standard hooks
-  const dispatch = useAppDispatch();
   const classes = useStyles();
   const { t, nsdt } = useFormatter();
 
