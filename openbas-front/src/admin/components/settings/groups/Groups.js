@@ -8,7 +8,6 @@ import { fetchExercises } from '../../../../actions/Exercise';
 import { searchGroups } from '../../../../actions/Group';
 import { fetchOrganizations } from '../../../../actions/Organization';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
-import { fetchTags } from '../../../../actions/Tag';
 import { fetchUsers } from '../../../../actions/User';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
@@ -86,7 +85,6 @@ const Groups = () => {
     dispatch(fetchUsers());
     dispatch(fetchExercises());
     dispatch(fetchScenarios());
-    dispatch(fetchTags());
   });
 
   // Headers

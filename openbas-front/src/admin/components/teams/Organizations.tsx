@@ -7,7 +7,6 @@ import { useSearchParams } from 'react-router-dom';
 
 import type { OrganizationHelper, TagHelper, UserHelper } from '../../../actions/helper';
 import { fetchOrganizations } from '../../../actions/Organization';
-import { fetchTags } from '../../../actions/Tag';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
@@ -107,7 +106,6 @@ const Organizations = () => {
   }));
 
   useDataLoader(() => {
-    dispatch(fetchTags());
     dispatch(fetchOrganizations());
   });
 

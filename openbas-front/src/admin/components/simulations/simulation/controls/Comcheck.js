@@ -7,7 +7,6 @@ import { useParams } from 'react-router-dom';
 
 import { fetchComcheck, fetchComcheckStatuses } from '../../../../../actions/Comcheck';
 import { fetchOrganizations } from '../../../../../actions/Organization';
-import { fetchTags } from '../../../../../actions/Tag';
 import { fetchPlayers } from '../../../../../actions/User';
 import { useFormatter } from '../../../../../components/i18n';
 import ItemTags from '../../../../../components/ItemTags';
@@ -221,7 +220,6 @@ const Comcheck = () => {
   });
   // Fetching data
   useDataLoader(() => {
-    dispatch(fetchTags());
     dispatch(fetchOrganizations());
     dispatch(fetchPlayers());
     dispatch(fetchComcheck(exerciseId, comcheckId));

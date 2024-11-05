@@ -6,7 +6,6 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 
 import type { ExerciseSimpleStore, ExerciseStore } from '../../../actions/exercises/Exercise';
-import { fetchTags } from '../../../actions/Tag';
 import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
 import { Header } from '../../../components/common/SortHeadersList';
@@ -14,8 +13,6 @@ import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
 import ItemTargets from '../../../components/ItemTargets';
 import type { ExerciseSimple } from '../../../utils/api-types';
-import { useAppDispatch } from '../../../utils/hooks';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
 import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
 import ExerciseStatus from './simulation/ExerciseStatus';
 
@@ -82,15 +79,9 @@ const ExerciseList: FunctionComponent<Props> = ({
   secondaryAction,
 }) => {
   // Standard hooks
-  const dispatch = useAppDispatch();
   const classes = useStyles();
   const inlineStyles = getInlineStyles(variant);
   const { nsdt, vnsdt } = useFormatter();
-
-  // Fetching data
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
 
   // Headers
   const headers: Header[] = [

@@ -5,7 +5,7 @@ import * as R from 'ramda';
 import { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { addKillChainPhase, fetchKillChainPhases } from '../actions/KillChainPhase';
+import { addKillChainPhase } from '../actions/KillChainPhase';
 import { storeHelper } from '../actions/Schema';
 import KillChainPhaseForm from '../admin/components/settings/kill_chain_phases/KillChainPhaseForm';
 import Autocomplete from './Autocomplete';
@@ -30,10 +30,6 @@ class KillChainPhaseField extends Component {
   constructor(props) {
     super(props);
     this.state = { killChainPhaseCreation: false, killChainPhaseInput: '' };
-  }
-
-  componentDidMount() {
-    this.props.fetchKillChainPhases();
   }
 
   handleOpenKillChainPhaseCreation() {
@@ -134,7 +130,7 @@ const select = (state) => {
 };
 
 export default R.compose(
-  connect(select, { fetchKillChainPhases, addKillChainPhase }),
+  connect(select, { addKillChainPhase }),
   inject18n,
   withStyles(styles),
 )(KillChainPhaseField);

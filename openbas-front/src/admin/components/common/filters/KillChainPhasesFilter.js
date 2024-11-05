@@ -3,9 +3,7 @@ import { Autocomplete, Box, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 
-import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
@@ -26,10 +24,8 @@ const KillChainPhasesFilter = (props) => {
   const { fullWidth, filterKey, helpers } = props;
   const classes = useStyles();
   const { t } = useFormatter();
-  const dispatch = useDispatch();
   const killChainPhases = useHelper(helper => helper.getKillChainPhases());
   useEffect(() => {
-    dispatch(fetchKillChainPhases());
     helpers.handleAddFilterWithEmptyValue(buildEmptyFilter(filterKey, 'eq'));
   }, []);
   const killChainPhaseTransform = n => ({

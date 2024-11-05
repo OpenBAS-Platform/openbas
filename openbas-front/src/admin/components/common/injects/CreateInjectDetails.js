@@ -6,11 +6,8 @@ import * as R from 'ramda';
 import { useContext, useState } from 'react';
 import { Form } from 'react-final-form';
 
-import { fetchTags } from '../../../../actions/Tag';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { isEmptyField, isNotEmptyField } from '../../../../utils/utils';
 import { PermissionsContext } from '../Context';
 import InjectDefinition from './InjectDefinition';
@@ -83,13 +80,10 @@ const CreateInjectDetails = ({
   const { permissions } = useContext(PermissionsContext);
   const [openDetails, setOpenDetails] = useState(false);
   const [injectDetailsState, setInjectDetailsState] = useState({});
-  const dispatch = useAppDispatch();
+
   const { tagsMap } = useHelper(helper => ({
     tagsMap: helper.getTagsMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
   const toggleInjectContent = () => {
     if (openDetails) {
       drawerRef.current.scrollTop = 0;

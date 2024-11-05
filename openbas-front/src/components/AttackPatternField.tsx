@@ -5,15 +5,13 @@ import * as R from 'ramda';
 import { FunctionComponent, useState } from 'react';
 
 import type { AttackPatternHelper } from '../actions/attack_patterns/attackpattern-helper';
-import { addAttackPattern, fetchAttackPatterns } from '../actions/AttackPattern';
+import { addAttackPattern } from '../actions/AttackPattern';
 import type { UserHelper } from '../actions/helper';
 import type { KillChainPhaseHelper } from '../actions/kill_chain_phases/killchainphase-helper';
-import { fetchKillChainPhases } from '../actions/KillChainPhase';
 import AttackPatternForm from '../admin/components/settings/attack_patterns/AttackPatternForm';
 import { useHelper } from '../store';
 import type { AttackPattern, AttackPatternCreateInput } from '../utils/api-types';
 import { useAppDispatch } from '../utils/hooks';
-import useDataLoader from '../utils/hooks/useDataLoader';
 import { Option } from '../utils/Option';
 import { useFormatter } from './i18n';
 
@@ -58,10 +56,6 @@ const AttackPatternField: FunctionComponent<Props> = ({
     killChainPhasesMap: helper.getKillChainPhasesMap(),
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
-  useDataLoader(() => {
-    dispatch(fetchAttackPatterns());
-    dispatch(fetchKillChainPhases());
-  });
 
   const [attackPatternCreation, setAttackPatternCreation] = useState(false);
 

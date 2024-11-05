@@ -7,7 +7,6 @@ import { useSearchParams } from 'react-router-dom';
 import { searchAssetGroups } from '../../../../actions/asset_groups/assetgroup-action';
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
-import { fetchTags } from '../../../../actions/Tag';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ClickableModeChip from '../../../../components/common/chips/ClickableModeChip';
 import ExportButton from '../../../../components/common/ExportButton';
@@ -22,8 +21,6 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
 import type { AssetGroupOutput } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import type { AssetGroupStore } from './AssetGroup';
 import AssetGroupCreation from './AssetGroupCreation';
 import AssetGroupManagement from './AssetGroupManagement';
@@ -134,7 +131,6 @@ const computeRuleValues = (assetGroup: AssetGroupOutput, t: (value: string) => s
 const AssetGroups = () => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useAppDispatch();
   const { t } = useFormatter();
 
   const [selectedAssetGroupId, setSelectedAssetGroupId] = useState<AssetGroupStore['asset_group_id'] | undefined>(undefined);
@@ -148,10 +144,6 @@ const AssetGroups = () => {
   const { userAdmin } = useHelper((helper: EndpointHelper & UserHelper & TagHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
-
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
 
   // Headers
   const headers: Header[] = useMemo(() => [

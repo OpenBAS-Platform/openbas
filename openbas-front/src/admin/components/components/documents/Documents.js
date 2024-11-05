@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router-dom';
 import { searchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
-import { fetchTags } from '../../../../actions/Tag';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
@@ -96,7 +95,6 @@ const Documents = () => {
   useDataLoader(() => {
     dispatch(fetchExercises());
     dispatch(fetchScenarios());
-    dispatch(fetchTags());
   });
 
   // Headers

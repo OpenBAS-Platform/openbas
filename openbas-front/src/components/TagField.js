@@ -6,7 +6,7 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 
 import { storeHelper } from '../actions/Schema';
-import { addTag, fetchTags } from '../actions/Tag';
+import { addTag } from '../actions/Tag';
 import TagForm from '../admin/components/settings/tags/TagForm';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
@@ -30,10 +30,6 @@ class TagField extends Component {
   constructor(props) {
     super(props);
     this.state = { tagCreation: false, tagInput: '' };
-  }
-
-  componentDidMount() {
-    this.props.fetchTags();
   }
 
   handleOpenTagCreation() {
@@ -139,7 +135,7 @@ const select = (state) => {
 };
 
 export default R.compose(
-  connect(select, { fetchTags, addTag }),
+  connect(select, { addTag }),
   inject18n,
   withStyles(styles),
 )(TagField);

@@ -8,7 +8,6 @@ import { fetchStatistics } from '../../../actions/Application';
 import type { TagHelper, UserHelper } from '../../../actions/helper';
 import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import { searchScenarios } from '../../../actions/scenarios/scenario-actions';
-import { fetchTags } from '../../../actions/Tag';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import ExportButton from '../../../components/common/ExportButton';
 import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
@@ -25,7 +24,6 @@ import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
 import type { FilterGroup } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
 import ImportUploaderScenario from './ImportUploaderScenario';
 import ScenarioPopover from './scenario/ScenarioPopover';
 import ScenarioStatus from './scenario/ScenarioStatus';
@@ -77,7 +75,6 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 const Scenarios = () => {
   // Standard hooks
-  const dispatch = useAppDispatch();
   const classes = useStyles();
   const { t, nsdt } = useFormatter();
 
@@ -85,9 +82,6 @@ const Scenarios = () => {
   const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
 
   // Headers
   const headers = useMemo(() => [

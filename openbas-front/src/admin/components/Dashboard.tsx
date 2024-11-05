@@ -6,10 +6,8 @@ import Chart from 'react-apexcharts';
 
 import { fetchStatistics } from '../../actions/Application';
 import type { AttackPatternHelper } from '../../actions/attack_patterns/attackpattern-helper';
-import { fetchAttackPatterns } from '../../actions/AttackPattern';
 import { searchExercises } from '../../actions/Exercise';
 import type { InjectExpectationResultsByAttackPatternStore } from '../../actions/exercises/Exercise';
-import { fetchKillChainPhases } from '../../actions/KillChainPhase';
 import type { StatisticsHelper } from '../../actions/statistics/statistics-helper';
 import { initSorting, type Page } from '../../components/common/queryable/Page';
 import Empty from '../../components/Empty';
@@ -94,11 +92,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   useDataLoader(() => {
     setLoading(true);
-    Promise.all([
-      dispatch(fetchAttackPatterns()),
-      dispatch(fetchKillChainPhases()),
-      dispatch(fetchStatistics()),
-    ]).finally(() => {
+    dispatch(fetchStatistics()).finally(() => {
       setLoading(false);
     });
   });
@@ -295,7 +289,6 @@ const Dashboard = () => {
               : (
                   <MitreMatrix
                     injectResults={(statistics?.inject_expectation_results as InjectExpectationResultsByAttackPatternStore[])}
-                    ttpAlreadyLoaded
                   />
                 )
           }

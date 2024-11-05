@@ -9,7 +9,6 @@ import { connect } from 'react-redux';
 import { fetchExercises } from '../../../../../actions/Exercise';
 import { fetchInjectorContract } from '../../../../../actions/InjectorContracts';
 import { storeHelper } from '../../../../../actions/Schema';
-import { fetchTags } from '../../../../../actions/Tag';
 import inject18n from '../../../../../components/i18n';
 import QuickInject, { EMAIL_CONTRACT } from './QuickInject';
 
@@ -105,7 +104,6 @@ const select = (state) => {
 export default R.compose(
   connect(select, {
     fetchExercises,
-    fetchTags,
     fetchInjectorContract,
   }),
   inject18n,

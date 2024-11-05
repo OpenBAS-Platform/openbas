@@ -2,17 +2,14 @@ import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } f
 import { makeStyles } from '@mui/styles';
 import { LockPattern } from 'mdi-material-ui';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 import { searchAttackPatterns } from '../../../../actions/AttackPattern';
-import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import TaxonomiesMenu from '../TaxonomiesMenu';
 import AttackPatternPopover from './AttackPatternPopover';
 import CreateAttackPattern from './CreateAttackPattern';
@@ -66,14 +63,10 @@ const inlineStyles = {
 const AttackPatterns = () => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { t, nsdt } = useFormatter();
   const { killChainPhasesMap } = useHelper(helper => ({
     killChainPhasesMap: helper.getKillChainPhasesMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchKillChainPhases());
-  });
 
   // Headers
   const headers = [

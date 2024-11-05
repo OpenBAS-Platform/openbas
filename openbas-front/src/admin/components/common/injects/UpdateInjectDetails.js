@@ -6,12 +6,9 @@ import * as R from 'ramda';
 import { useContext, useState } from 'react';
 import { Form } from 'react-final-form';
 
-import { fetchTags } from '../../../../actions/Tag';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { tagOptions } from '../../../../utils/Option';
 import { splitDuration } from '../../../../utils/Time';
 import { isEmptyField } from '../../../../utils/utils';
@@ -65,13 +62,9 @@ const UpdateInjectDetails = ({
   const { permissions } = useContext(PermissionsContext);
   const [openDetails, setOpenDetails] = useState(true);
   const [injectDetailsState, setInjectDetailsState] = useState({});
-  const dispatch = useAppDispatch();
   const { tagsMap } = useHelper(helper => ({
     tagsMap: helper.getTagsMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
 
   const toggleInjectContent = () => {
     if (openDetails) {

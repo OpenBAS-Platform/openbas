@@ -6,12 +6,11 @@ import { CSSProperties, FunctionComponent, useState } from 'react';
 import { FieldErrors } from 'react-hook-form';
 
 import type { TagHelper, UserHelper } from '../../actions/helper';
-import { addTag, fetchTags } from '../../actions/Tag';
+import { addTag } from '../../actions/Tag';
 import TagForm from '../../admin/components/settings/tags/TagForm';
 import { useHelper } from '../../store';
 import type { Tag } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
-import useDataLoader from '../../utils/hooks/useDataLoader';
 import { useFormatter } from '../i18n';
 
 const useStyles = makeStyles(() => ({
@@ -56,9 +55,6 @@ const TagField: FunctionComponent<Props> = ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
   const dispatch = useAppDispatch();
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
 
   // Handle tag creation
   const [tagCreation, setTagCreation] = useState(false);

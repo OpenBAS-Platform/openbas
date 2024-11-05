@@ -4,7 +4,6 @@ import { makeStyles } from '@mui/styles';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import * as React from 'react';
 
-import { fetchTags } from '../../../../actions/Tag';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import { findTeams } from '../../../../actions/teams/team-actions';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -15,8 +14,6 @@ import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import type { Team, TeamOutput } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import type { EndpointStore } from '../../assets/endpoints/Endpoint';
 import { TeamContext } from '../../common/Context';
 import CreateTeam from './CreateTeam';
@@ -40,13 +37,7 @@ const UpdateTeams: React.FC<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();
-  const dispatch = useAppDispatch();
   const { searchTeams, onReplaceTeam } = useContext(TeamContext);
-
-  // Fetch datas
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
 
   const [teamValues, setTeamValues] = useState<TeamOutput[]>([]);
   const [selectedTeamValues, setSelectedTeamValues] = useState<TeamOutput[]>([]);

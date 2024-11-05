@@ -4,11 +4,9 @@ import { FunctionComponent, useEffect } from 'react';
 
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
-import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
 import type { InjectorContractHelper } from '../../../../actions/injector_contracts/injector-contract-helper';
 import { fetchInjectorsContracts } from '../../../../actions/InjectorContracts';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
-import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import { FilterHelpers } from '../../../../components/common/queryable/filter/FilterHelpers';
 import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 import { useFormatter } from '../../../../components/i18n';
@@ -160,8 +158,6 @@ const MitreFilter: FunctionComponent<MitreFilterProps> = ({
     injectorsContracts: helper.getInjectorContracts(),
   }));
   useDataLoader(() => {
-    dispatch(fetchKillChainPhases());
-    dispatch(fetchAttackPatterns());
     dispatch(fetchInjectorsContracts());
   });
 

@@ -2,10 +2,7 @@ import { DynamicFormOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 
-import { fetchAttackPatterns } from '../../../actions/AttackPattern';
-import { fetchKillChainPhases } from '../../../actions/KillChainPhase';
 import { searchMitigations } from '../../../actions/Mitigation';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
@@ -13,7 +10,6 @@ import SortHeadersComponent from '../../../components/common/pagination/SortHead
 import { initSorting } from '../../../components/common/queryable/Page';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
 import CreateMitigation from './CreateMitigation';
 import MitigationPopover from './MitigationPopover';
 
@@ -100,16 +96,11 @@ const inlineStyles = {
 const Mitigations = () => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { t, nsdt } = useFormatter();
   const { attackPatternsMap, killChainPhasesMap } = useHelper(helper => ({
     attackPatternsMap: helper.getAttackPatternsMap(),
     killChainPhasesMap: helper.getKillChainPhasesMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchAttackPatterns());
-    dispatch(fetchKillChainPhases());
-  });
 
   // Headers
   const headers = [

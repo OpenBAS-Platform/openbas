@@ -6,7 +6,6 @@ import { useParams } from 'react-router-dom';
 
 import { fetchDryinjects } from '../../../../../actions/Dryinject';
 import { fetchDryrun } from '../../../../../actions/Dryrun';
-import { fetchTags } from '../../../../../actions/Tag';
 import { fetchPlayers } from '../../../../../actions/User';
 import { useFormatter } from '../../../../../components/i18n';
 import ItemStatus from '../../../../../components/ItemStatus';
@@ -184,7 +183,6 @@ const Dryrun = () => {
     };
   });
   useDataLoader(() => {
-    dispatch(fetchTags());
     dispatch(fetchPlayers());
     dispatch(fetchDryrun(exerciseId, dryrunId));
     dispatch(fetchDryinjects(exerciseId, dryrunId));

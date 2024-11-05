@@ -3,18 +3,14 @@ import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemTe
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
-import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
 import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
-import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import CreateInjectorContract from './injector_contracts/CreateInjectorContract';
 import InjectorContractPopover from './injector_contracts/InjectorContractPopover';
 
@@ -101,7 +97,6 @@ const inlineStyles = {
 const InjectorContracts = () => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { injectorId } = useParams();
   const { t, tPick, nsdt } = useFormatter();
   const { injector, attackPatternsMap, killChainPhasesMap } = useHelper(helper => ({
@@ -109,10 +104,6 @@ const InjectorContracts = () => {
     attackPatternsMap: helper.getAttackPatternsMap(),
     killChainPhasesMap: helper.getKillChainPhasesMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchKillChainPhases());
-    dispatch(fetchAttackPatterns());
-  });
 
   // Headers
   const headers = [
