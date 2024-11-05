@@ -1610,11 +1610,26 @@ public class InjectService {
 
   public Page<InjectResultOutput> getPageOfSearchExerciseInjects(
       String exerciseId, @Valid SearchPaginationInput searchPaginationInput) {
+    Map<String, Join<Base, Base>> joinMap = new HashMap<>();
+
+    Specification<Inject> customSpec =
+        Specification.where(
+            (root, query, cb) -> {
+              Predicate predicate = cb.conjunction();
+              predicate = cb.and(predicate, cb.equal(root.get("exerciseId"), exerciseId));
+              return predicate;
+            });
+
     return buildPaginationCriteriaBuilder(
         (Specification<Inject> specification,
             Specification<Inject> specificationCount,
             Pageable pageable) ->
-            getPageOfInjectResults(exerciseId, specification, specificationCount, pageable),
+            getPageOfInjectResults(
+                exerciseId,
+                customSpec.and(specification),
+                customSpec.and(specificationCount),
+                pageable,
+                joinMap),
         searchPaginationInput,
         Inject.class);
   }
@@ -1623,12 +1638,13 @@ public class InjectService {
       String exerciseId,
       Specification<Inject> specification,
       Specification<Inject> specificationCount,
-      Pageable pageable) {
+      Pageable pageable,
+      Map<String, Join<Base, Base>> joinMap) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
     Root<Inject> injectRoot = cq.from(Inject.class);
-    selectForSearchExerciseInjects(cb, cq, injectRoot);
+    selectForSearchExerciseInjects(cb, cq, injectRoot, joinMap);
 
     // -- Text Search and Filters --
     if (specification != null) {
@@ -1659,18 +1675,23 @@ public class InjectService {
   }
 
   private void selectForSearchExerciseInjects(
-      CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Inject> injectRoot) {
+      CriteriaBuilder cb,
+      CriteriaQuery<Tuple> cq,
+      Root<Inject> injectRoot,
+      Map<String, Join<Base, Base>> joinMap) {
     // Joins
 
     // Status
     // Expectations
     // InjectContract
+    Join<Base, Base> injectorContractJoin = injectRoot.join("injectorContract", JoinType.LEFT);
+    joinMap.put("injectorContract", injectorContractJoin);
+
     // KillChainPhases
     // Teams
     // Assets
     // Assetgroups
     // Tags
-
 
     // SELECT
     cq.multiselect(

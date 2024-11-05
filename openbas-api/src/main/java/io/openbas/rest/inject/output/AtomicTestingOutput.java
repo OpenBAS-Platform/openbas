@@ -6,8 +6,8 @@ import static lombok.AccessLevel.NONE;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.model.InjectorContract;
-import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
-import io.openbas.utils.AtomicTestingMapper;
+import io.openbas.rest.exercise.form.TargetSimple;
+import io.openbas.utils.InjectMapper;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -68,11 +68,10 @@ public class AtomicTestingOutput {
   // Pre Calcul
 
   @JsonProperty("inject_targets")
-  private List<InjectTargetWithResult> targets;
+  private List<TargetSimple> targets;
 
   @JsonProperty("inject_expectation_results")
-  private List<AtomicTestingMapper.ExpectationResultsByType> expectationResultByTypes =
-      new ArrayList<>();
+  private List<InjectMapper.ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
 
   public AtomicTestingOutput(
       String id,

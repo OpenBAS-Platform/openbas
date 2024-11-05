@@ -38,7 +38,7 @@ public class InjectUtils {
   }
 
   public InjectStatusCommandLine getCommandsLinesFromInject(final Inject inject) {
-    if(inject == null) {
+    if (inject == null) {
       return null;
     }
 

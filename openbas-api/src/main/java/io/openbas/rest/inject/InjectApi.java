@@ -32,7 +32,6 @@ import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.AtomicTestingService;
 import io.openbas.service.InjectService;
 import io.openbas.service.ScenarioService;
-import io.openbas.utils.AtomicTestingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -228,11 +227,8 @@ public class InjectApi extends RestBehavior {
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/resultdto")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
-  public List<InjectResultOutput> exerciseInjectsWithExpectations(
-      @PathVariable final String exerciseId) {
-    return this.injectRepository.findAll(InjectSpecification.fromExercise(exerciseId)).stream()
-        .map(inject -> AtomicTestingMapper.toDto(inject))
-        .collect(Collectors.toList());
+  public List<InjectResultOutput> exerciseInjectsResults(@PathVariable final String exerciseId) {
+    return injectService.exerciseInjects(exerciseId);
   }
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")

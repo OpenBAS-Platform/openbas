@@ -22,8 +22,8 @@ import io.openbas.service.GrantService;
 import io.openbas.service.InjectService;
 import io.openbas.service.TeamService;
 import io.openbas.service.VariableService;
-import io.openbas.utils.AtomicTestingMapper;
 import io.openbas.utils.ExerciseMapper;
+import io.openbas.utils.InjectMapper;
 import io.openbas.utils.ResultUtils;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -447,8 +447,7 @@ public class ExerciseService {
         .toList();
   }
 
-  public List<AtomicTestingMapper.ExpectationResultsByType> getGlobalResults(
-      @NotBlank String exerciseId) {
+  public List<InjectMapper.ExpectationResultsByType> getGlobalResults(@NotBlank String exerciseId) {
     return resultUtils.getResultsByTypes(exerciseRepository.findInjectsByExercise(exerciseId));
   }
 
