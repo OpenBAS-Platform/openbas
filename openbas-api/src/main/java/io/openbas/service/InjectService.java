@@ -25,7 +25,6 @@ import io.openbas.rest.scenario.response.ImportMessage;
 import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
 import io.openbas.telemetry.Tracing;
-import io.openbas.utils.InjectMapper;
 import io.openbas.utils.InjectUtils;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -68,7 +67,6 @@ import org.apache.logging.log4j.util.Strings;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -1718,7 +1716,8 @@ public class InjectService {
                     .killChainPhases(tuple.get("inject_kill_chain_phases", List.class))
                     .status(tuple.get("inject_status", InjectStatusSimple.class))
                     .targets(tuple.get("inject_targets", List.class))
-                    .expectationResultByTypes(resultUtils.getResultsByTypes(Set.of(tuple.get("inject_id", String.class))))
+                    .expectationResultByTypes(
+                        resultUtils.getResultsByTypes(Set.of(tuple.get("inject_id", String.class))))
                     .tagIds(tuple.get("injects_tags", List.class))
                     .updatedAt(tuple.get("inject_updated_at", Instant.class))
                     .build())
