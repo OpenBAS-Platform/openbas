@@ -1678,15 +1678,6 @@ public class InjectService {
       Root<Inject> injectRoot,
       Map<String, Join<Base, Base>> joinMap) {
     // Joins
-
-    // Exercise
-    Join<Base, Base> exerciseJoin = injectRoot.join("exercise", JoinType.LEFT);
-    joinMap.put("exercise", exerciseJoin);
-
-    // Status
-    Join<Base, Base> statusJoin = injectRoot.join("status", JoinType.LEFT);
-    joinMap.put("status", statusJoin);
-
     // Expectations
 
     // InjectContract
@@ -1703,13 +1694,14 @@ public class InjectService {
     cq.multiselect(
             injectRoot.get("id").alias("inject_id"),
             injectRoot.get("title").alias("inject_title"),
-            injectRoot.get("status").alias("inject_status"),
-            injectRoot.get("exercise").alias("inject_exercise"),
+            injectRoot.get("status").get("id").alias("status_id"),
+            injectRoot.get("status").get("name").alias("status_name"),
+            injectRoot.get("status").get("trackingSentDate").alias("status_tracking_sent_date"),
             injectRoot.get("updatedAt").alias("inject_updated_at"))
         .distinct(true);
 
     // GROUP BY
-    cq.groupBy(Arrays.asList(injectRoot.get("id")));
+    cq.groupBy(Arrays.asList(injectRoot.get("id"), injectRoot.get("status").get("id")));
   }
 
   private List<InjectResultOutput> execSearchInjectResults(TypedQuery<Tuple> query) {
