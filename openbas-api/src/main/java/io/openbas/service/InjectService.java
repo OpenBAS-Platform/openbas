@@ -1616,7 +1616,7 @@ public class InjectService {
         Specification.where(
             (root, query, cb) -> {
               Predicate predicate = cb.conjunction();
-              predicate = cb.and(predicate, cb.equal(root.get("inject_exercise.exercise_id"), exerciseId));
+              predicate = cb.and(predicate, cb.equal(root.get("exercise").get("id"), exerciseId));
               return predicate;
             });
 
@@ -1704,6 +1704,7 @@ public class InjectService {
             injectRoot.get("id").alias("inject_id"),
             injectRoot.get("title").alias("inject_title"),
             injectRoot.get("status").alias("inject_status"),
+            injectRoot.get("exercise").alias("inject_exercise"),
             injectRoot.get("updatedAt").alias("inject_updated_at"))
         .distinct(true);
 
