@@ -402,6 +402,8 @@ public class AtomicTestingService {
     Join<Base, Base> injectorJoin = injectorContractJoin.join("injector", JoinType.LEFT);
     joinMap.put("injector", injectorJoin);
 
+    Join<Inject, InjectStatus> statusJoin = injectRoot.join("status", JoinType.LEFT);
+
     // Array aggregations
     Expression<String[]> injectExpectationIdsExpression =
         createJoinArrayAggOnId(cb, injectRoot, EXPECTATIONS);
@@ -417,8 +419,8 @@ public class AtomicTestingService {
             injectRoot.get("updatedAt").alias("inject_updated_at"),
             injectorJoin.get("type").alias("inject_type"),
             injectorContractJoin.alias("inject_injector_contract"),
-            injectRoot.get("status").get("name").alias("status_name"),
-            injectRoot.get("status").get("trackingSentDate").alias("status_tracking_sent_date"),
+            statusJoin.get("name").alias("status_name"), // Fetch the `status.name` safely
+            statusJoin.get("trackingSentDate").alias("status_tracking_sent_date"),
             injectExpectationIdsExpression.alias("inject_expectations"),
             teamIdsExpression.alias("inject_teams"),
             assetIdsExpression.alias("inject_assets"),
@@ -428,7 +430,7 @@ public class AtomicTestingService {
     // GROUP BY
     cq.groupBy(
         Arrays.asList(
-            injectRoot.get("id"), injectorContractJoin.get("id"), injectorJoin.get("id")));
+            injectRoot.get("id"), injectorContractJoin.get("id"), injectorJoin.get("id"), statusJoin.get("id")));
   }
 
   private List<AtomicTestingOutput> execAtomicTesting(TypedQuery<Tuple> query) {

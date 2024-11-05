@@ -11,4 +11,5 @@ public class InjectorContractSimple {
   //  injector_contract_payload.payload_collector_type
   //  injector_contract_payload.payload_type
   //  List<> injector_contract_platforms
+  //  injector.type
 }

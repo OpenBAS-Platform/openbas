@@ -27,6 +27,7 @@ import io.openbas.rest.scenario.response.ImportTestSummary;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.InjectUtils;
+import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -91,6 +92,8 @@ public class InjectService {
   private final TeamRepository teamRepository;
   private final UserRepository userRepository;
 
+  private final ResultUtils resultUtils;
+
   private final List<String> importReservedField = List.of("description", "title", "trigger_time");
 
   @Resource protected ObjectMapper mapper;
@@ -103,7 +106,6 @@ public class InjectService {
   final String pathSeparator = FileSystems.getDefault().getSeparator();
 
   final int FILE_STORAGE_DURATION = 60;
-  @Autowired private InjectMapper injectMapper;
 
   public void cleanInjectsDocExercise(String exerciseId, String documentId) {
     // Delete document from all exercise injects
@@ -1677,9 +1679,8 @@ public class InjectService {
       CriteriaQuery<Tuple> cq,
       Root<Inject> injectRoot,
       Map<String, Join<Base, Base>> joinMap) {
-    // Joins
-    // Expectations
 
+    // Joins
     // InjectContract
     Join<Base, Base> injectorContractJoin = injectRoot.join("injectorContract", JoinType.LEFT);
     joinMap.put("injectorContract", injectorContractJoin);
@@ -1717,8 +1718,7 @@ public class InjectService {
                     .killChainPhases(tuple.get("inject_kill_chain_phases", List.class))
                     .status(tuple.get("inject_status", InjectStatusSimple.class))
                     .targets(tuple.get("inject_targets", List.class))
-                    // AtomicTestingUtils.getExpectationResultByTypes(inject.getExpectations())),
-                    .expectationResultByTypes(emptyList())
+                    .expectationResultByTypes(resultUtils.getResultsByTypes(Set.of(tuple.get("inject_id", String.class))))
                     .tagIds(tuple.get("injects_tags", List.class))
                     .updatedAt(tuple.get("inject_updated_at", Instant.class))
                     .build())
