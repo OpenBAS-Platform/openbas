@@ -1642,7 +1642,7 @@ public class InjectService {
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
     Root<Inject> injectRoot = cq.from(Inject.class);
-    selectForSearchExerciseInjects(cb, cq, injectRoot, joinMap);
+    selectForSearchInjectResults(cb, cq, injectRoot, joinMap);
 
     // -- Text Search and Filters --
     if (specification != null) {
@@ -1672,7 +1672,7 @@ public class InjectService {
     return new PageImpl<>(injectResults, pageable, total);
   }
 
-  private void selectForSearchExerciseInjects(
+  private void selectForSearchInjectResults(
       CriteriaBuilder cb,
       CriteriaQuery<Tuple> cq,
       Root<Inject> injectRoot,
@@ -1680,7 +1680,11 @@ public class InjectService {
     // Joins
 
     // Status
+    Join<Base, Base> statusJoin = injectRoot.join("status", JoinType.LEFT);
+    joinMap.put("status", statusJoin);
+
     // Expectations
+
     // InjectContract
     Join<Base, Base> injectorContractJoin = injectRoot.join("injectorContract", JoinType.LEFT);
     joinMap.put("injectorContract", injectorContractJoin);
@@ -1696,6 +1700,9 @@ public class InjectService {
             injectRoot.get("id").alias("inject_id"),
             injectRoot.get("title").alias("inject_title"),
             injectRoot.get("type").alias("inject_type"),
+            injectRoot.get("status_id").alias("inject_status_id"),
+            injectRoot.get("status_name").alias("inject_status_name"),
+            injectRoot.get("tracking_sent_date").alias("inject_status_tracking_sent_date"),
             injectRoot.get("updatedAt").alias("inject_updated_at"))
         .distinct(true);
 
