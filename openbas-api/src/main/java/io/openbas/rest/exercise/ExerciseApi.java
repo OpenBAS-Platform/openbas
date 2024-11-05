@@ -31,7 +31,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.helper.TeamHelper;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.service.*;
-import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
+import io.openbas.utils.InjectMapper.ExpectationResultsByType;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.criteria.Join;

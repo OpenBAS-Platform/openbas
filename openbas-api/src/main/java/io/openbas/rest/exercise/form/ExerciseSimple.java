@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Tag;
 import io.openbas.helper.MultiIdSetDeserializer;
-import io.openbas.utils.AtomicTestingMapper;
+import io.openbas.utils.InjectMapper;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
@@ -56,8 +56,7 @@ public class ExerciseSimple {
   @JsonIgnore private String[] injectIds;
 
   @JsonProperty("exercise_global_score")
-  private List<AtomicTestingMapper.ExpectationResultsByType> expectationResultByTypes =
-      new ArrayList<>();
+  private List<InjectMapper.ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
 
   @JsonProperty("exercise_targets")
   @NotNull

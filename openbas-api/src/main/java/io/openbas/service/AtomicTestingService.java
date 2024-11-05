@@ -2,7 +2,6 @@ package io.openbas.service;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.database.model.Command.COMMAND_TYPE;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.AtomicTestingUtils.*;
@@ -10,6 +9,7 @@ import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
+import static java.util.Collections.emptyList;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,10 +26,10 @@ import io.openbas.database.repository.*;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
-import io.openbas.rest.atomic_testing.form.InjectResultOutput;
+import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.output.AtomicTestingOutput;
-import io.openbas.utils.AtomicTestingMapper;
+import io.openbas.utils.InjectMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -44,10 +44,7 @@ import java.util.*;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.hibernate.Hibernate;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -74,19 +71,16 @@ public class AtomicTestingService {
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
   private final AssetGroupService assetGroupService;
-  private ApplicationContext context;
+  private final InjectMapper injectMapper;
 
   private static final String PRE_DEFINE_EXPECTATIONS = "predefinedExpectations";
   private static final String EXPECTATIONS = "expectations";
 
   @PersistenceContext private EntityManager entityManager;
 
-  @Autowired
-  public void setContext(ApplicationContext context) {
-    this.context = context;
-  }
+  // -- CRUD --
 
-  public InjectResultOutput findById(String injectId) {
+  public InjectResultOverviewOutput findById(String injectId) {
     Optional<Inject> inject = injectRepository.findWithStatusById(injectId);
 
     if (inject.isPresent()) {
@@ -97,16 +91,13 @@ public class AtomicTestingService {
       inject.get().getAssetGroups().clear();
       inject.get().getAssetGroups().addAll(computedAssetGroup);
     }
-    InjectResultOutput result =
-        inject
-            .map(AtomicTestingMapper::toDtoWithTargetResults)
-            .orElseThrow(ElementNotFoundException::new);
-    result.setCommandsLines(getCommandsLinesFromInject(inject.get()));
+    InjectResultOverviewOutput result =
+        inject.map(injectMapper::toDto).orElseThrow(ElementNotFoundException::new);
     return result;
   }
 
   @Transactional
-  public InjectResultOutput createOrUpdate(AtomicTestingInput input, String injectId) {
+  public InjectResultOverviewOutput createOrUpdate(AtomicTestingInput input, String injectId) {
     Inject injectToSave = new Inject();
     if (injectId != null) {
       injectToSave = injectRepository.findById(injectId).orElseThrow();
@@ -162,7 +153,7 @@ public class AtomicTestingService {
             .toList();
     injectToSave.getDocuments().addAll(injectDocuments);
     Inject inject = injectRepository.save(injectToSave);
-    return AtomicTestingMapper.toDto(inject);
+    return injectMapper.toDto(inject);
   }
 
   private ObjectNode setExpectations(
@@ -210,14 +201,33 @@ public class AtomicTestingService {
   }
 
   @Transactional
+  public InjectResultOverviewOutput updateAtomicTestingTags(
+      String injectId, AtomicTestingUpdateTagsInput input) {
+
+    Inject inject = injectRepository.findById(injectId).orElseThrow();
+    inject.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+
+    Inject saved = injectRepository.save(inject);
+    return injectMapper.toDto(saved);
+  }
+
+  @Transactional
+  public void deleteAtomicTesting(String injectId) {
+    injectDocumentRepository.deleteDocumentsFromInject(injectId);
+    injectRepository.deleteById(injectId);
+  }
+
+  // -- ACTIONS --
+
+  @Transactional
   @Validated
-  public InjectResultOutput getDuplicateAtomicTesting(@NotBlank String id) {
+  public InjectResultOverviewOutput getDuplicateAtomicTesting(@NotBlank String id) {
     Inject injectOrigin = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
     Inject injectDuplicate = copyInject(injectOrigin, true);
     injectDuplicate.setExercise(injectOrigin.getExercise());
     injectDuplicate.setScenario(injectOrigin.getScenario());
     Inject inject = injectRepository.save(injectDuplicate);
-    return AtomicTestingMapper.toDto(inject);
+    return injectMapper.toDto(inject);
   }
 
   public Inject copyInject(@NotNull Inject injectOrigin, boolean isAtomic) {
@@ -256,16 +266,6 @@ public class AtomicTestingService {
     return injectDuplicate;
   }
 
-  public InjectResultOutput updateAtomicTestingTags(
-      String injectId, AtomicTestingUpdateTagsInput input) {
-
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-    inject.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-
-    Inject saved = injectRepository.save(inject);
-    return AtomicTestingMapper.toDto(saved);
-  }
-
   @Transactional
   public Inject tryInject(String injectId) {
     Inject inject = injectRepository.findById(injectId).orElseThrow();
@@ -283,12 +283,6 @@ public class AtomicTestingService {
 
     // Return inject
     return this.injectRepository.save(inject);
-  }
-
-  @Transactional
-  public void deleteAtomicTesting(String injectId) {
-    injectDocumentRepository.deleteDocumentsFromInject(injectId);
-    injectRepository.deleteById(injectId);
   }
 
   // -- PAGINATION --
@@ -381,13 +375,7 @@ public class AtomicTestingService {
       List<String> currentAssetIds = assetIds.get(inject.getId());
       List<String> currentAssetGroupIds = assetGroupIds.get(inject.getId());
       List<String> currentInjectExpectationIds = injectExpectationIds.get(inject.getId());
-      inject.setTargets(
-          getTargetsFromRaw(
-              teams.stream().filter(t -> currentTeamIds.contains(t.getTeam_id())).toList(),
-              assets.stream().filter(a -> currentAssetIds.contains(a.getAsset_id())).toList(),
-              assetGroups.stream()
-                  .filter(ag -> currentAssetGroupIds.contains(ag.getAsset_group_id()))
-                  .toList()));
+      inject.setTargets(emptyList()); // TODO Generate list <TargetSimple>
       inject.setExpectationResultByTypes(
           getExpectationResultByTypesFromRaw(
               expectations.stream()
@@ -486,36 +474,5 @@ public class AtomicTestingService {
                   tuple.get("inject_asset_groups", String[].class));
             })
         .toList();
-  }
-
-  public InjectStatusCommandLine getCommandsLinesFromInject(final Inject inject) {
-    if (inject.getStatus().isPresent() && inject.getStatus().get().getCommandsLines() != null) {
-      // Commands lines saved because inject has been executed
-      return inject.getStatus().get().getCommandsLines();
-    } else if (inject.getInjectorContract().isPresent()) {
-      InjectorContract injectorContract = inject.getInjectorContract().get();
-      if (injectorContract.getPayload() != null
-          && COMMAND_TYPE.equals(injectorContract.getPayload().getType())) {
-        // Inject has a command payload
-        Payload payload = injectorContract.getPayload();
-        Command payloadCommand = (Command) Hibernate.unproxy(payload);
-        return new InjectStatusCommandLine(
-            payloadCommand.getContent() != null && !payloadCommand.getContent().isBlank()
-                ? List.of(payloadCommand.getContent())
-                : null,
-            payloadCommand.getCleanupCommand() != null
-                    && !payloadCommand.getCleanupCommand().isBlank()
-                ? List.of(payload.getCleanupCommand())
-                : null,
-            payload.getExternalId());
-      } else {
-        // Inject comes from Caldera ability and tomorrow from other(s) Executor(s)
-        io.openbas.execution.Injector executor =
-            context.getBean(
-                injectorContract.getInjector().getType(), io.openbas.execution.Injector.class);
-        return executor.getCommandsLines(injectorContract.getId());
-      }
-    }
-    return null;
   }
 }

@@ -3,7 +3,6 @@ package io.openbas.rest.atomic_testing.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.rest.inject.form.InjectDocumentInput;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,20 +26,20 @@ public class AtomicTestingInput {
   private ObjectNode content;
 
   @JsonProperty("inject_teams")
-  private List<String> teams = new ArrayList<>();
+  private List<String> teams;
 
   @JsonProperty("inject_assets")
-  private List<String> assets = new ArrayList<>();
+  private List<String> assets;
 
   @JsonProperty("inject_asset_groups")
-  private List<String> assetGroups = new ArrayList<>();
+  private List<String> assetGroups;
 
   @JsonProperty("inject_documents")
-  private List<InjectDocumentInput> documents = new ArrayList<>();
+  private List<InjectDocumentInput> documents;
 
   @JsonProperty("inject_all_teams")
-  private boolean allTeams = false;
+  private boolean allTeams;
 
   @JsonProperty("inject_tags")
-  private List<String> tagIds = new ArrayList<>();
+  private List<String> tagIds;
 }

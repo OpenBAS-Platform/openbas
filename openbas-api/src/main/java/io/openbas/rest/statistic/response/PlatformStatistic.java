@@ -2,7 +2,7 @@ package io.openbas.rest.statistic.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
-import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
+import io.openbas.utils.InjectMapper.ExpectationResultsByType;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;

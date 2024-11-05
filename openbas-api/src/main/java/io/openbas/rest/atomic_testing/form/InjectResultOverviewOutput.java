@@ -1,7 +1,8 @@
 package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.rest.exercise.form.TargetSimple;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.database.model.InjectStatusCommandLine;
 import io.openbas.utils.InjectMapper.ExpectationResultsByType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +17,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Builder
-public class InjectResultOutput {
+public class InjectResultOverviewOutput {
 
   @Schema(description = "Id")
   @JsonProperty("inject_id")
@@ -28,28 +29,40 @@ public class InjectResultOutput {
   @NotNull
   private String title;
 
+  @Schema(description = "Description")
+  @JsonProperty("inject_description")
+  @NotNull
+  private String description;
+
+  @JsonProperty("inject_content")
+  private ObjectNode content;
+
+  @JsonProperty("inject_commands_lines")
+  private InjectStatusCommandLine commandsLines;
+
+  @JsonProperty("inject_expectations")
+  private List<InjectExpectationSimple> expectations;
+
   @JsonProperty("inject_type")
   private String type;
-
-  @Schema(description = "Full contract")
-  @JsonProperty("inject_injector_contract")
-  @NotNull
-  private InjectorContractSimple injectorContract;
 
   @Schema(description = "Kill Chain Phases")
   @JsonProperty("inject_kill_chain_phases")
   @NotNull
   private List<KillChainPhaseSimple> killChainPhases;
 
+  @Schema(description = "Attack Patterns")
+  @JsonProperty("inject_attack_patterns")
+  @NotNull
+  private List<AttackPatternSimple> attackPatterns;
+
+  @Schema(description = "Full contract")
+  @JsonProperty("inject_injector_contract")
+  @NotNull
+  private InjectorContractSimple injectorContract;
+
   @JsonProperty("inject_status")
   private InjectStatusSimple status;
-
-  @Schema(
-      description = "Specifies the categories of targets for atomic testing.",
-      example = "assets, asset groups, teams, players")
-  @JsonProperty("inject_targets")
-  @NotNull
-  private List<TargetSimple> targets;
 
   @Default
   @Schema(description = "Result of expectations")
@@ -59,6 +72,12 @@ public class InjectResultOutput {
 
   @JsonProperty("injects_tags")
   private List<String> tagIds;
+
+  @JsonProperty("injects_documents")
+  private List<String> documentIds;
+
+  @JsonProperty("inject_ready")
+  private Boolean isReady;
 
   @JsonProperty("inject_updated_at")
   private Instant updatedAt;

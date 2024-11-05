@@ -4,6 +4,7 @@ import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Tag;
 import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.rest.exercise.form.ExerciseSimple;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +38,8 @@ public class ExerciseMapper {
     simple.setStatus(ExerciseStatus.valueOf(rawExercise.getExercise_status()));
     simple.setStart(rawExercise.getExercise_start_date());
     simple.setUpdatedAt(rawExercise.getExercise_updated_at());
-    simple.setTargets(resultUtils.getInjectTargetWithResults(rawExercise.getInject_ids()));
     simple.setExpectationResultByTypes(resultUtils.getResultsByTypes(rawExercise.getInject_ids()));
+    simple.setTargets(Collections.emptyList()); // TODO
 
     return simple;
   }

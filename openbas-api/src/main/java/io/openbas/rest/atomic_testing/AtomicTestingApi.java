@@ -6,7 +6,7 @@ import io.openbas.database.model.InjectExpectation;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
-import io.openbas.rest.atomic_testing.form.InjectResultOutput;
+import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.output.AtomicTestingOutput;
 import io.openbas.service.AtomicTestingService;
@@ -41,24 +41,26 @@ public class AtomicTestingApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping("/{injectId}")
-  public InjectResultOutput findAtomicTesting(@PathVariable String injectId) {
+  public InjectResultOverviewOutput findAtomicTesting(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId);
   }
 
   @PostMapping()
   @Transactional(rollbackFor = Exception.class)
-  public InjectResultOutput createAtomicTesting(@Valid @RequestBody AtomicTestingInput input) {
+  public InjectResultOverviewOutput createAtomicTesting(
+      @Valid @RequestBody AtomicTestingInput input) {
     return this.atomicTestingService.createOrUpdate(input, null);
   }
 
   @PostMapping("/{atomicTestingId}")
-  public InjectResultOutput duplicateAtomicTesting(@PathVariable final String atomicTestingId) {
+  public InjectResultOverviewOutput duplicateAtomicTesting(
+      @PathVariable final String atomicTestingId) {
     return atomicTestingService.getDuplicateAtomicTesting(atomicTestingId);
   }
 
   @PutMapping("/{injectId}")
   @Transactional(rollbackFor = Exception.class)
-  public InjectResultOutput updateAtomicTesting(
+  public InjectResultOverviewOutput updateAtomicTesting(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingInput input) {
     return atomicTestingService.createOrUpdate(input, injectId);
@@ -86,7 +88,7 @@ public class AtomicTestingApi extends RestBehavior {
 
   @PutMapping("/{injectId}/tags")
   @Transactional(rollbackFor = Exception.class)
-  public InjectResultOutput updateAtomicTestingTags(
+  public InjectResultOverviewOutput updateAtomicTestingTags(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingUpdateTagsInput input) {
     return atomicTestingService.updateAtomicTestingTags(injectId, input);

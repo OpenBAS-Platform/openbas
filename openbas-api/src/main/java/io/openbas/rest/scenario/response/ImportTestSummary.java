@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Inject;
 import io.openbas.rest.atomic_testing.form.InjectResultOutput;
-import io.openbas.utils.AtomicTestingMapper;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.Data;
 
@@ -22,6 +22,7 @@ public class ImportTestSummary {
 
   @JsonProperty("injects")
   public List<InjectResultOutput> getInjectResults() {
-    return injects.stream().map(AtomicTestingMapper::toDtoWithTargetResults).toList();
+    // return injects.stream().map(InjectMapper::toDto).toList(); TODO
+    return Collections.emptyList();
   }
 }
