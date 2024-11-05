@@ -14,7 +14,6 @@ import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { useHelper } from '../../../../../store';
 import type { ExpectationResultsByType } from '../../../../../utils/api-types';
-import { useAppDispatch } from '../../../../../utils/hooks';
 import InjectDtoList from '../../../atomic_testings/InjectDtoList';
 import ResponsePie from '../../../common/injects/ResponsePie';
 import MitreMatrix from '../../../common/matrix/MitreMatrix';
@@ -40,7 +39,6 @@ const Exercise = () => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: ExerciseStore['exercise_id'] };
   const { exercise } = useHelper((helper: ExercisesHelper) => ({

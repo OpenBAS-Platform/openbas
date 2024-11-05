@@ -183,8 +183,8 @@ export interface AtomicTestingOutput {
   inject_expectations: string[];
   inject_id: string;
   inject_injector_contract?: InjectorContract;
-  inject_status?: InjectStatus;
-  inject_targets?: InjectTargetWithResult[];
+  inject_status?: InjectStatusSimple;
+  inject_targets?: TargetSimple[];
   inject_teams: string[];
   inject_title: string;
   inject_type?: string;
@@ -222,6 +222,13 @@ export interface AttackPatternCreateInput {
   attack_pattern_permissions_required?: string[];
   attack_pattern_platforms?: string[];
   attack_pattern_stix_id?: string;
+}
+
+/** Attack Patterns */
+export interface AttackPatternSimple {
+  attack_pattern_external_id: string;
+  attack_pattern_id: string;
+  attack_pattern_name: string;
 }
 
 export interface AttackPatternUpdateInput {
@@ -465,7 +472,7 @@ export interface Communication {
 
 export interface Condition {
   key: string;
-  operator: "eq";
+  operator: "==";
   value?: boolean;
 }
 
@@ -847,7 +854,7 @@ export interface ExerciseSimple {
   exercise_subtitle?: string;
   /** @uniqueItems true */
   exercise_tags?: Tag[];
-  exercise_targets: InjectTargetWithResult[];
+  exercise_targets: TargetSimple[];
   /** @format date-time */
   exercise_updated_at?: string;
 }
@@ -1053,7 +1060,7 @@ export interface ImportPostSummary {
 
 export interface ImportTestSummary {
   import_message?: ImportMessage[];
-  injects?: InjectResultDTO[];
+  injects?: InjectResultOutput[];
   /** @format int32 */
   total_injects?: number;
 }
@@ -1124,7 +1131,7 @@ export interface InjectDependency {
 
 export interface InjectDependencyCondition {
   conditions?: Condition[];
-  mode: "and" | "or";
+  mode: "&&" | "||";
 }
 
 export interface InjectDependencyId {
@@ -1218,6 +1225,13 @@ export interface InjectExpectationSignature {
   value?: string;
 }
 
+export interface InjectExpectationSimple {
+  /** Id */
+  inject_expectation_id: string;
+  /** Name */
+  inject_expectation_name?: string;
+}
+
 export interface InjectExpectationUpdateInput {
   collector_id: string;
   is_success: boolean;
@@ -1297,28 +1311,47 @@ export interface InjectReceptionInput {
   tracking_total_count?: number;
 }
 
-export interface InjectResultDTO {
+export interface InjectResultOutput {
+  /** Result of expectations */
+  inject_expectation_results: ExpectationResultsByType[];
+  /** Id */
+  inject_id: string;
+  /** Full contract */
+  inject_injector_contract: InjectorContractSimple;
+  /** Kill Chain Phases */
+  inject_kill_chain_phases: KillChainPhaseSimple[];
+  inject_status?: InjectStatusSimple;
+  /**
+   * Specifies the categories of targets for atomic testing.
+   * @example "assets, asset groups, teams, players"
+   */
+  inject_targets: TargetSimple[];
+  /** Title */
+  inject_title: string;
+  inject_type?: string;
+  /** @format date-time */
+  inject_updated_at?: string;
+  injects_tags?: string[];
+}
+
+export interface InjectResultOverviewOutput {
   /** Attack Patterns */
-  inject_attack_patterns: AttackPattern[];
+  inject_attack_patterns: AttackPatternSimple[];
   inject_commands_lines?: InjectStatusCommandLine;
   inject_content?: object;
   /** Description */
   inject_description: string;
   /** Result of expectations */
   inject_expectation_results: ExpectationResultsByType[];
-  inject_expectations?: InjectExpectation[];
+  inject_expectations?: InjectExpectationSimple[];
   /** Id */
   inject_id: string;
-  inject_injector_contract: InjectorContract;
+  /** Full contract */
+  inject_injector_contract: InjectorContractSimple;
   /** Kill Chain Phases */
-  inject_kill_chain_phases: KillChainPhase[];
+  inject_kill_chain_phases: KillChainPhaseSimple[];
   inject_ready?: boolean;
-  inject_status?: InjectStatus;
-  /**
-   * Specifies the categories of targetResults for atomic testing.
-   * @example "assets, asset groups, teams, players"
-   */
-  inject_targets: InjectTargetWithResult[];
+  inject_status?: InjectStatusSimple;
   /** Title */
   inject_title: string;
   inject_type?: string;
@@ -1393,13 +1426,16 @@ export interface InjectStatusExecution {
   execution_time?: string;
 }
 
-export interface InjectTargetWithResult {
-  children?: InjectTargetWithResult[];
-  expectationResultsByTypes?: ExpectationResultsByType[];
-  id: string;
-  name?: string;
-  platformType?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
-  targetType?: "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
+export interface InjectStatusSimple {
+  /** Id */
+  status_id: string;
+  /** Name */
+  status_name?: string;
+  /**
+   * Tracking Send Date
+   * @format date-time
+   */
+  tracking_sent_date?: string;
 }
 
 export interface InjectTeamsInput {
@@ -1560,6 +1596,9 @@ export interface InjectorContractOutput {
   )[];
 }
 
+/** Full contract */
+export type InjectorContractSimple = object;
+
 export interface InjectorContractUpdateInput {
   atomicTesting?: boolean;
   contract_attack_patterns_ids?: string[];
@@ -1645,6 +1684,14 @@ export interface KillChainPhaseCreateInput {
   phase_order?: number;
   phase_shortname: string;
   phase_stix_id?: string;
+}
+
+/** Kill Chain Phases */
+export interface KillChainPhaseSimple {
+  /** Id */
+  phase_id: string;
+  /** Name */
+  phase_name?: string;
 }
 
 export interface KillChainPhaseUpdateInput {
@@ -2080,8 +2127,8 @@ export interface PageGroup {
   totalPages?: number;
 }
 
-export interface PageInjectResultDTO {
-  content?: InjectResultDTO[];
+export interface PageInjectResultOutput {
+  content?: InjectResultOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -3027,6 +3074,15 @@ export interface TagCreateInput {
 export interface TagUpdateInput {
   tag_color: string;
   tag_name: string;
+}
+
+export interface TargetSimple {
+  /** Id */
+  target_id: string;
+  /** Name */
+  target_name?: string;
+  /** Type */
+  target_type?: "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
 }
 
 export interface Team {
