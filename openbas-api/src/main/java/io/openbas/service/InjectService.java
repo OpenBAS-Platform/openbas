@@ -1625,7 +1625,6 @@ public class InjectService {
             Specification<Inject> specificationCount,
             Pageable pageable) ->
             getPageOfInjectResults(
-                exerciseId,
                 customSpec.and(specification),
                 customSpec.and(specificationCount),
                 pageable,
@@ -1635,7 +1634,6 @@ public class InjectService {
   }
 
   public Page<InjectResultOutput> getPageOfInjectResults(
-      String exerciseId,
       Specification<Inject> specification,
       Specification<Inject> specificationCount,
       Pageable pageable,
