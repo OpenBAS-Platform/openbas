@@ -1616,7 +1616,7 @@ public class InjectService {
         Specification.where(
             (root, query, cb) -> {
               Predicate predicate = cb.conjunction();
-              predicate = cb.and(predicate, cb.equal(root.get("inject_exercise"), exerciseId));
+              predicate = cb.and(predicate, cb.equal(root.get("inject_exercise.exercise_id"), exerciseId));
               return predicate;
             });
 
@@ -1678,6 +1678,10 @@ public class InjectService {
       Root<Inject> injectRoot,
       Map<String, Join<Base, Base>> joinMap) {
     // Joins
+
+    // Exercise
+    Join<Base, Base> exerciseJoin = injectRoot.join("exercise", JoinType.LEFT);
+    joinMap.put("exercise", exerciseJoin);
 
     // Status
     Join<Base, Base> statusJoin = injectRoot.join("status", JoinType.LEFT);
