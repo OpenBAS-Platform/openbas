@@ -213,30 +213,18 @@ public class InjectsExecutionJob implements Job {
             injectorContract -> {
               if (!inject.isReady()) {
                 // Status
-                if (inject.getStatus().isEmpty()) {
-                  InjectStatus status = new InjectStatus();
-                  status
-                      .getTraces()
-                      .add(
-                          InjectStatusExecution.traceError(
-                              "The inject is not ready to be executed (missing mandatory fields)"));
-                  status.setName(ExecutionStatus.ERROR);
-                  status.setTrackingSentDate(Instant.now());
-                  status.setInject(inject);
-                  status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
-                  injectStatusRepository.save(status);
-                } else {
-                  InjectStatus status = inject.getStatus().get();
-                  status
-                      .getTraces()
-                      .add(
-                          InjectStatusExecution.traceError(
-                              "The inject is not ready to be executed (missing mandatory fields)"));
-                  status.setName(ExecutionStatus.ERROR);
-                  status.setTrackingSentDate(Instant.now());
-                  status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
-                  injectStatusRepository.save(status);
-                }
+                InjectStatus status =
+                    inject.getStatus().isEmpty() ? new InjectStatus() : inject.getStatus().get();
+                status
+                    .getTraces()
+                    .add(
+                        InjectStatusExecution.traceError(
+                            "The inject is not ready to be executed (missing mandatory fields)"));
+                status.setName(ExecutionStatus.ERROR);
+                status.setTrackingSentDate(Instant.now());
+                status.setInject(inject);
+                status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
+                injectStatusRepository.save(status);
                 return;
               }
 
@@ -248,27 +236,20 @@ public class InjectsExecutionJob implements Job {
               // Executor logics
               ExecutableInject newExecutableInject = executableInject;
               if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
+                // Status
+                InjectStatus status =
+                    inject.getStatus().isEmpty() ? new InjectStatus() : inject.getStatus().get();
+                status.setName(ExecutionStatus.EXECUTING);
+                status.setTrackingSentDate(Instant.now());
+                status.setInject(inject);
+                status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
+                InjectStatus statusSaved = injectStatusRepository.save(status);
                 try {
-                  // Status
-                  if (inject.getStatus().isEmpty()) {
-                    InjectStatus status = new InjectStatus();
-                    status.setName(ExecutionStatus.EXECUTING);
-                    status.setTrackingSentDate(Instant.now());
-                    status.setInject(inject);
-                    status.setCommandsLines(
-                        atomicTestingService.getCommandsLinesFromInject(inject));
-                    injectStatusRepository.save(status);
-                  } else {
-                    InjectStatus status = inject.getStatus().get();
-                    status.setName(ExecutionStatus.EXECUTING);
-                    status.setTrackingSentDate(Instant.now());
-                    status.setCommandsLines(
-                        atomicTestingService.getCommandsLinesFromInject(inject));
-                    injectStatusRepository.save(status);
-                  }
                   newExecutableInject =
                       this.executionExecutorService.launchExecutorContext(executableInject, inject);
                 } catch (InterruptedException e) {
+                  statusSaved.setName(ExecutionStatus.ERROR);
+                    injectStatusRepository.save(status);
                   throw new RuntimeException(e);
                 }
               }
