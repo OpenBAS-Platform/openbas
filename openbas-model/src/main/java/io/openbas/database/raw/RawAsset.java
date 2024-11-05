@@ -1,6 +1,6 @@
 package io.openbas.database.raw;
 
-public interface RawAsset {
+public interface RawAsset extends RawTarget {
 
   String getAsset_id();
 

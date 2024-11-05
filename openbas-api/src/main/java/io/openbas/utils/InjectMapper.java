@@ -3,9 +3,11 @@ package io.openbas.utils;
 import static io.openbas.utils.AtomicTestingUtils.getRefinedExpectations;
 
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawTarget;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
 import io.openbas.rest.atomic_testing.form.InjectStatusSimple;
+import io.openbas.rest.atomic_testing.form.TargetSimple;
 import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
@@ -47,6 +49,18 @@ public class InjectMapper {
                 getRefinedExpectations(
                     inject,
                     inject.getTeams().stream().map(t -> t.getId()).toList()))) // todo all targets
+        .build();
+  }
+
+  public List<TargetSimple> toTargetSimple(List<RawTarget> rawTargets) {
+    return rawTargets.stream().map(rawTarget -> toTargetSimple(rawTarget)).toList();
+  }
+
+  public TargetSimple toTargetSimple(RawTarget rawTarget) {
+    return TargetSimple.builder()
+        .id(rawTarget.getId())
+        .name(rawTarget.getName())
+        .type(rawTarget.getType())
         .build();
   }
 

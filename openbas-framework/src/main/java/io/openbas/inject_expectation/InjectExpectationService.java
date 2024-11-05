@@ -6,11 +6,11 @@ import static io.openbas.inject_expectation.InjectExpectationUtils.computeResult
 import static java.time.Instant.now;
 
 import io.openbas.asset.AssetGroupService;
-import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
+import io.openbas.database.raw.TargetType;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.specification.InjectExpectationSpecification;

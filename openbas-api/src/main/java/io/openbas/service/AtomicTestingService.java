@@ -9,7 +9,6 @@ import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
-import static java.util.Collections.emptyList;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,18 +17,15 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.*;
-import io.openbas.database.raw.RawAsset;
-import io.openbas.database.raw.RawAssetGroup;
-import io.openbas.database.raw.RawInjectExpectation;
-import io.openbas.database.raw.RawTeam;
+import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
+import io.openbas.rest.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
 import io.openbas.rest.atomic_testing.form.InjectStatusSimple;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.inject.output.AtomicTestingOutput;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
@@ -376,7 +372,31 @@ public class AtomicTestingService {
       List<String> currentAssetIds = assetIds.get(inject.getId());
       List<String> currentAssetGroupIds = assetGroupIds.get(inject.getId());
       List<String> currentInjectExpectationIds = injectExpectationIds.get(inject.getId());
-      inject.setTargets(emptyList()); // TODO Generate list <TargetSimple>
+      inject
+          .getTargets()
+          .addAll(
+              injectMapper.toTargetSimple(
+                  teams.stream()
+                      .filter(t -> currentTeamIds.contains(t.getTeam_id()))
+                      .map(team -> (RawTarget) team)
+                      .toList()));
+      inject
+          .getTargets()
+          .addAll(
+              injectMapper.toTargetSimple(
+                  assets.stream()
+                      .filter(a -> currentAssetIds.contains(a.getAsset_id()))
+                      .map(asset -> (RawTarget) asset)
+                      .toList()));
+      inject
+          .getTargets()
+          .addAll(
+              injectMapper.toTargetSimple(
+                  assetGroups.stream()
+                      .filter(ag -> currentAssetGroupIds.contains(ag.getAsset_group_id()))
+                      .map(assetGroup -> (RawTarget) assetGroup)
+                      .toList()));
+
       inject.setExpectationResultByTypes(
           getExpectationResultByTypesFromRaw(
               expectations.stream()

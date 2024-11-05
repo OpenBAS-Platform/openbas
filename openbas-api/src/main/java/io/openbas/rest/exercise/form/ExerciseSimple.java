@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Tag;
 import io.openbas.helper.MultiIdSetDeserializer;
+import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.utils.InjectMapper;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

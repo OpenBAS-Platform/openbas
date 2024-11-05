@@ -1,7 +1,6 @@
 package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.rest.exercise.form.TargetSimple;
 import io.openbas.utils.InjectMapper.ExpectationResultsByType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
