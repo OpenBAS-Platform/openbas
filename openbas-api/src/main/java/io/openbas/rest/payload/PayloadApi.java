@@ -247,7 +247,6 @@ public class PayloadApi extends RestBehavior {
                   input.getAttackPatternsExternalIds())));
       existingPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
       existingPayload.setUpdatedAt(Instant.now());
-      existingPayload.setPlatforms(Arrays.stream(input.getPlatforms()).map(Endpoint.PLATFORM_TYPE::valueOf).toArray(Endpoint.PLATFORM_TYPE[]::new));
       switch (PayloadType.fromString(existingPayload.getType())) {
         case PayloadType.COMMAND:
           Command payloadCommand = (Command) Hibernate.unproxy(existingPayload);
@@ -293,7 +292,6 @@ public class PayloadApi extends RestBehavior {
         case PayloadType.COMMAND:
           Command commandPayload = new Command();
           commandPayload.setUpdateAttributes(input);
-          commandPayload.setPlatforms(Arrays.stream(input.getPlatforms()).map(Endpoint.PLATFORM_TYPE::valueOf).toArray(Endpoint.PLATFORM_TYPE[]::new));
           if (input.getCollector() != null) {
             commandPayload.setCollector(
                 collectorRepository.findById(input.getCollector()).orElseThrow());
@@ -309,7 +307,6 @@ public class PayloadApi extends RestBehavior {
         case PayloadType.EXECUTABLE:
           Executable executablePayload = new Executable();
           executablePayload.setUpdateAttributes(input);
-          executablePayload.setPlatforms(Arrays.stream(input.getPlatforms()).map(Endpoint.PLATFORM_TYPE::valueOf).toArray(Endpoint.PLATFORM_TYPE[]::new));
           if (input.getCollector() != null) {
             executablePayload.setCollector(
                 collectorRepository.findById(input.getCollector()).orElseThrow());
@@ -327,7 +324,6 @@ public class PayloadApi extends RestBehavior {
         case PayloadType.FILE_DROP:
           FileDrop fileDropPayload = new FileDrop();
           fileDropPayload.setUpdateAttributes(input);
-          fileDropPayload.setPlatforms(Arrays.stream(input.getPlatforms()).map(Endpoint.PLATFORM_TYPE::valueOf).toArray(Endpoint.PLATFORM_TYPE[]::new));
           if (input.getCollector() != null) {
             fileDropPayload.setCollector(
                 collectorRepository.findById(input.getCollector()).orElseThrow());
@@ -345,7 +341,6 @@ public class PayloadApi extends RestBehavior {
         case PayloadType.DNS_RESOLUTION:
           DnsResolution dnsResolutionPayload = new DnsResolution();
           dnsResolutionPayload.setUpdateAttributes(input);
-          dnsResolutionPayload.setPlatforms(Arrays.stream(input.getPlatforms()).map(Endpoint.PLATFORM_TYPE::valueOf).toArray(Endpoint.PLATFORM_TYPE[]::new));
           if (input.getCollector() != null) {
             dnsResolutionPayload.setCollector(
                 collectorRepository.findById(input.getCollector()).orElseThrow());
@@ -361,7 +356,6 @@ public class PayloadApi extends RestBehavior {
         case PayloadType.NETWORK_TRAFFIC:
           NetworkTraffic networkTrafficPayload = new NetworkTraffic();
           networkTrafficPayload.setUpdateAttributes(input);
-          networkTrafficPayload.setPlatforms(Arrays.stream(input.getPlatforms()).map(Endpoint.PLATFORM_TYPE::valueOf).toArray(Endpoint.PLATFORM_TYPE[]::new));
           if (input.getCollector() != null) {
             networkTrafficPayload.setCollector(
                 collectorRepository.findById(input.getCollector()).orElseThrow());
