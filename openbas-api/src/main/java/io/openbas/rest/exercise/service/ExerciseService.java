@@ -153,21 +153,16 @@ public class ExerciseService {
         assetGroupRepository.assetGroupsByExerciseIds(exerciseIds).stream()
             .collect(Collectors.groupingBy(row -> (String) row[0]));
 
-    long start;
-    long executionTime;
-
     for (ExerciseSimple exercise : exercises) {
       if (exercise.getInjectIds() != null) {
-        start = System.currentTimeMillis();
+        // -- GLOBAL SCORE ---
         exercise.setExpectationResultByTypes(
             resultUtils.getResultsByTypes(
                 (exercise.getInjectIds() != null)
                     ? new HashSet<>(Arrays.asList(exercise.getInjectIds()))
                     : new HashSet<>()));
-        executionTime = System.currentTimeMillis() - start;
-        logger.info("global: " + executionTime + " ms");
 
-        start = System.currentTimeMillis();
+        // -- TARGETS
         exercise
             .getTargets()
             .addAll(
@@ -184,8 +179,6 @@ public class ExerciseService {
                 injectMapper.toTargetSimple(
                     assetGroupMap.getOrDefault(exercise.getId(), emptyList()),
                     TargetType.ASSETS_GROUPS));
-        executionTime = System.currentTimeMillis() - start;
-        logger.info("Target: " + executionTime + " ms");
       }
     }
 
