@@ -144,6 +144,143 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(status().isBadRequest());
   }
 
+  @Test
+  @DisplayName("Creating Command Line payload with both null executor and content should succeed")
+  @WithMockAdminUser
+  void createCommandLinePayloadWithBothNullExecutorAndContent() throws Exception {
+    PayloadCreateInput createInput = getCommandLinePayloadCreateInput();
+
+    createInput.setExecutor(null);
+    createInput.setContent(null);
+
+    mvc.perform(
+                    post(PAYLOAD_URI)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(asJsonString(createInput)))
+            .andExpect(status().isOk());
+
+  }
+
+  @Test
+  @DisplayName("Creating Command Line payload with both set executor and content should succeed")
+  @WithMockAdminUser
+  void createCommandLinePayloadWithBothSetExecutorAndContent() throws Exception {
+    PayloadCreateInput createInput = getCommandLinePayloadCreateInput();
+
+    createInput.setExecutor("sh");
+    createInput.setExecutor("echo hello world");
+
+    mvc.perform(
+                    post(PAYLOAD_URI)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(asJsonString(createInput)))
+            .andExpect(status().isOk());
+
+  }
+
+  @Test
+  @DisplayName("Creating Command Line payload with both null cleanup executor and command should succeed")
+  @WithMockAdminUser
+  void createCommandLinePayloadWithBothNullCleanupExecutorAndCommand() throws Exception {
+    PayloadCreateInput createInput = getCommandLinePayloadCreateInput();
+
+    createInput.setCleanupExecutor(null);
+    createInput.setCleanupCommand(null);
+
+    mvc.perform(
+                    post(PAYLOAD_URI)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(asJsonString(createInput)))
+            .andExpect(status().isOk());
+
+  }
+
+  @Test
+  @DisplayName("Creating Command Line payload with both set cleanup executor and command should succeed")
+  @WithMockAdminUser
+  void createCommandLinePayloadWithBothSetCleanupExecutorAndCommand() throws Exception {
+    PayloadCreateInput createInput = getCommandLinePayloadCreateInput();
+
+    createInput.setCleanupExecutor("sh");
+    createInput.setCleanupCommand("cleanup this mess");
+
+    mvc.perform(
+                    post(PAYLOAD_URI)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(asJsonString(createInput)))
+            .andExpect(status().isOk());
+
+  }
+
+  @Test
+  @DisplayName("Creating Command Line payload with only set cleanup executor and null command should fail")
+  @WithMockAdminUser
+  void createCommandLinePayloadWithOnlySetCleanupExecutorAndNullCommand() throws Exception {
+    PayloadCreateInput createInput = getCommandLinePayloadCreateInput();
+
+    createInput.setCleanupExecutor("sh");
+    createInput.setCleanupCommand(null);
+
+    mvc.perform(
+                    post(PAYLOAD_URI)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(asJsonString(createInput)))
+            .andExpect(status().isConflict());
+
+  }
+
+  @Test
+  @DisplayName("Creating Command Line payload with only set cleanup command and null executor should fail")
+  @WithMockAdminUser
+  void createCommandLinePayloadWithOnlySetCommandAndNullExecutor() throws Exception {
+    PayloadCreateInput createInput = getCommandLinePayloadCreateInput();
+
+    createInput.setCleanupExecutor(null);
+    createInput.setCleanupCommand("cleanup this mess");
+
+    mvc.perform(
+                    post(PAYLOAD_URI)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(asJsonString(createInput)))
+            .andExpect(status().isConflict());
+  }
+
+  @Test
+  @DisplayName("Updating Command Line payload with only set cleanup command and null executor should fail")
+  @WithMockAdminUser
+  void updateCommandLinePayloadWithOnlySetCommandAndNullExecutor() throws Exception {
+    PayloadCreateInput createInput = getCommandLinePayloadCreateInput();
+
+    createInput.setCleanupExecutor(null);
+    createInput.setCleanupCommand(null);
+
+    String response =
+      mvc.perform(
+                    post(PAYLOAD_URI)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(asJsonString(createInput)))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    var payloadId = JsonPath.read(response, "$.payload_id");
+
+    PayloadUpdateInput updateInput = new PayloadUpdateInput();
+    updateInput.setExecutor("sh");
+    updateInput.setContent("echo hello world");
+    updateInput.setName("updated command line payload");
+    updateInput.setCleanupCommand("cleanup this mess");
+
+    mvc.perform(
+                    put(PAYLOAD_URI + "/" + payloadId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(asJsonString(updateInput)))
+            .andExpect(status().isConflict());
+
+
+  }
+
   private PayloadCreateInput getExecutablePayloadCreateInput() {
     PayloadCreateInput input = new PayloadCreateInput();
     input.setType("Executable");
@@ -156,6 +293,22 @@ public class PayloadApiTest extends IntegrationTest {
     input.setTagIds(Collections.emptyList());
     input.setExecutableFile(EXECUTABLE_FILE.getId());
     input.setExecutableArch(Endpoint.PLATFORM_ARCH.x86_64);
+    return input;
+  }
+
+  private PayloadCreateInput getCommandLinePayloadCreateInput() {
+    PayloadCreateInput input = new PayloadCreateInput();
+    input.setType("Command");
+    input.setName("Command line payload");
+    input.setDescription("This does something, maybe");
+    input.setSource(Payload.PAYLOAD_SOURCE.MANUAL);
+    input.setStatus(Payload.PAYLOAD_STATUS.VERIFIED);
+    input.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Linux});
+    input.setAttackPatternsIds(Collections.emptyList());
+    input.setTagIds(Collections.emptyList());
+
+    input.setExecutor("bash");
+    input.setContent("echo hello");
     return input;
   }
 }
