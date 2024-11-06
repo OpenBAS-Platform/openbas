@@ -177,15 +177,12 @@ export interface AtomicTestingInput {
 }
 
 export interface AtomicTestingOutput {
-  inject_asset_groups: string[];
-  inject_assets: string[];
   inject_expectation_results?: ExpectationResultsByType[];
-  inject_expectations: string[];
   inject_id: string;
-  inject_injector_contract?: InjectorContract;
+  /** Full contract */
+  inject_injector_contract?: InjectorContractSimple;
   inject_status?: InjectStatusSimple;
   inject_targets?: TargetSimple[];
-  inject_teams: string[];
   inject_title: string;
   inject_type?: string;
   /** @format date-time */
@@ -1597,7 +1594,31 @@ export interface InjectorContractOutput {
 }
 
 /** Full contract */
-export type InjectorContractSimple = object;
+export interface InjectorContractSimple {
+  convertedContent?: object;
+  /** Content */
+  injector_contract_content: string;
+  /** Id */
+  injector_contract_id: string;
+  /** Contract labels */
+  injector_contract_labels: Record<string, string>;
+  injector_contract_platforms?: (
+    | "Linux"
+    | "Windows"
+    | "MacOS"
+    | "Container"
+    | "Service"
+    | "Generic"
+    | "Internal"
+    | "Unknown"
+  )[];
+  /** Payload Collector type */
+  payload_collector_type: string;
+  /** Payload id */
+  payload_id: string;
+  /** Payload type */
+  payload_type: string;
+}
 
 export interface InjectorContractUpdateInput {
   atomicTesting?: boolean;

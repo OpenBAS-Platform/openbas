@@ -343,67 +343,6 @@ public class AtomicTestingService {
     long executionTime = System.currentTimeMillis() - start;
     logger.info("Query : " + executionTime + " ms");
 
-    Map<String, List<String>> teamIds = new HashMap<>();
-    Map<String, List<String>> assetIds = new HashMap<>();
-    Map<String, List<String>> assetGroupIds = new HashMap<>();
-    Map<String, List<String>> injectExpectationIds = new HashMap<>();
-    for (AtomicTestingOutput inject : injects) {
-      teamIds.putIfAbsent(inject.getId(), inject.getTeams());
-      assetIds.putIfAbsent(inject.getId(), inject.getAssets());
-      assetGroupIds.putIfAbsent(inject.getId(), inject.getAssetGroups());
-      injectExpectationIds.putIfAbsent(inject.getId(), inject.getExpectations());
-    }
-
-    List<RawTeam> teams =
-        this.teamRepository.rawTeamByIds(
-            teamIds.values().stream().flatMap(Collection::stream).distinct().toList());
-    List<RawAsset> assets =
-        this.assetRepository.rawByIds(
-            assetIds.values().stream().flatMap(Collection::stream).distinct().toList());
-    List<RawAssetGroup> assetGroups =
-        this.assetGroupRepository.rawAssetGroupByIds(
-            assetGroupIds.values().stream().flatMap(Collection::stream).distinct().toList());
-    List<RawInjectExpectation> expectations =
-        this.injectExpectationRepository.rawByIds(
-            injectExpectationIds.values().stream().flatMap(Collection::stream).distinct().toList());
-
-    start = System.currentTimeMillis();
-    for (AtomicTestingOutput inject : injects) {
-      List<String> currentTeamIds = teamIds.get(inject.getId());
-      List<String> currentAssetIds = assetIds.get(inject.getId());
-      List<String> currentAssetGroupIds = assetGroupIds.get(inject.getId());
-      List<String> currentInjectExpectationIds = injectExpectationIds.get(inject.getId());
-      inject
-          .getTargets()
-          .addAll(
-              injectMapper.toTargetSimple(
-                  teams.stream()
-                      .filter(t -> currentTeamIds.contains(t.getTeam_id()))
-                      .map(team -> (RawTarget) team)
-                      .toList()));
-      inject
-          .getTargets()
-          .addAll(
-              injectMapper.toTargetSimple(
-                  assets.stream()
-                      .filter(a -> currentAssetIds.contains(a.getAsset_id()))
-                      .map(asset -> (RawTarget) asset)
-                      .toList()));
-      inject
-          .getTargets()
-          .addAll(
-              injectMapper.toTargetSimple(
-                  assetGroups.stream()
-                      .filter(ag -> currentAssetGroupIds.contains(ag.getAsset_group_id()))
-                      .map(assetGroup -> (RawTarget) assetGroup)
-                      .toList()));
-
-      inject.setExpectationResultByTypes(
-          getExpectationResultByTypesFromRaw(
-              expectations.stream()
-                  .filter(e -> currentInjectExpectationIds.contains(e.getInject_expectation_id()))
-                  .toList()));
-    }
     executionTime = System.currentTimeMillis() - start;
     logger.info("after calculs: " + executionTime + " ms");
     // -- Count Query --
@@ -491,14 +430,93 @@ public class AtomicTestingService {
                         .build();
               }
 
-              InjectorContractSimple injectorContractSimple =
-                  InjectorContractSimple.builder()
-                      .id(tuple.get("injector_contract_id", String.class))
-                      .content(tuple.get("injector_contract_content", String.class))
-                      .convertedContent(tuple.get("convertedContent", ObjectNode.class))
-                      .platforms(
-                          tuple.get("injector_contract_platforms", Endpoint.PLATFORM_TYPE[].class))
-                      .build();
+              InjectorContractSimple injectorContractSimple = null;
+              String injectorContractId = tuple.get("injector_contract_id", String.class);
+              if (injectorContractId != null) {
+                injectorContractSimple =
+                    InjectorContractSimple.builder()
+                        .id(injectorContractId)
+                        .content(tuple.get("injector_contract_content", String.class))
+                        .convertedContent(tuple.get("convertedContent", ObjectNode.class))
+                        .platforms(
+                            tuple.get(
+                                "injector_contract_platforms", Endpoint.PLATFORM_TYPE[].class))
+                        .labels(tuple.get("injector_contract_labels", Map.class))
+                        .build();
+              }
+
+              //              Map<String, List<String>> teamIds = new HashMap<>();
+              //              Map<String, List<String>> assetIds = new HashMap<>();
+              //              Map<String, List<String>> assetGroupIds = new HashMap<>();
+              //              Map<String, List<String>> injectExpectationIds = new HashMap<>();
+              //              for (AtomicTestingOutput inject : injects) {
+              //                teamIds.putIfAbsent(inject.getId(), inject.getTeams());
+              //                assetIds.putIfAbsent(inject.getId(), inject.getAssets());
+              //                assetGroupIds.putIfAbsent(inject.getId(), inject.getAssetGroups());
+              //                injectExpectationIds.putIfAbsent(inject.getId(),
+              // inject.getExpectations());
+              //              }
+              //
+              //              List<RawTeam> teams =
+              //                  this.teamRepository.rawTeamByIds(
+              //
+              // teamIds.values().stream().flatMap(Collection::stream).distinct().toList());
+              //              List<RawAsset> assets =
+              //                  this.assetRepository.rawByIds(
+              //
+              // assetIds.values().stream().flatMap(Collection::stream).distinct().toList());
+              //              List<RawAssetGroup> assetGroups =
+              //                  this.assetGroupRepository.rawAssetGroupByIds(
+              //
+              // assetGroupIds.values().stream().flatMap(Collection::stream).distinct().toList());
+              //              List<RawInjectExpectation> expectations =
+              //                  this.injectExpectationRepository.rawByIds(
+              //
+              // injectExpectationIds.values().stream().flatMap(Collection::stream).distinct().toList());
+              //
+              //              start = System.currentTimeMillis();
+              //              for (AtomicTestingOutput inject : injects) {
+              //                List<String> currentTeamIds = teamIds.get(inject.getId());
+              //                List<String> currentAssetIds = assetIds.get(inject.getId());
+              //                List<String> currentAssetGroupIds =
+              // assetGroupIds.get(inject.getId());
+              //                List<String> currentInjectExpectationIds =
+              // injectExpectationIds.get(inject.getId());
+              //                inject
+              //                    .getTargets()
+              //                    .addAll(
+              //                        injectMapper.toTargetSimple(
+              //                            teams.stream()
+              //                                .filter(t ->
+              // currentTeamIds.contains(t.getTeam_id()))
+              //                                .map(team -> (RawTarget) team)
+              //                                .toList()));
+              //                inject
+              //                    .getTargets()
+              //                    .addAll(
+              //                        injectMapper.toTargetSimple(
+              //                            assets.stream()
+              //                                .filter(a ->
+              // currentAssetIds.contains(a.getAsset_id()))
+              //                                .map(asset -> (RawTarget) asset)
+              //                                .toList()));
+              //                inject
+              //                    .getTargets()
+              //                    .addAll(
+              //                        injectMapper.toTargetSimple(
+              //                            assetGroups.stream()
+              //                                .filter(ag ->
+              // currentAssetGroupIds.contains(ag.getAsset_group_id()))
+              //                                .map(assetGroup -> (RawTarget) assetGroup)
+              //                                .toList()));
+              //
+              //                inject.setExpectationResultByTypes(
+              //                    getExpectationResultByTypesFromRaw(
+              //                        expectations.stream()
+              //                            .filter(e ->
+              // currentInjectExpectationIds.contains(e.getInject_expectation_id()))
+              //                            .toList()));
+              //              }
 
               return new AtomicTestingOutput(
                   tuple.get("inject_id", String.class),

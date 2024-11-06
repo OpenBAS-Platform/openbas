@@ -36,15 +36,20 @@ public class InjectorContractSimple {
   @JsonProperty("injector_contract_platforms")
   private Endpoint.PLATFORM_TYPE[] platforms;
 
-  @Schema(description = "Payload Collector type")
-  @JsonProperty("payload_collector_type")
+  @Schema(description = "Payload id")
+  @JsonProperty("payload_id")
   @NotBlank
-  private String payloadCollectorType;
+  private String payloadId;
 
   @Schema(description = "Payload type")
   @JsonProperty("payload_type")
   @NotBlank
   private String payloadType;
+
+  @Schema(description = "Payload Collector type")
+  @JsonProperty("payload_collector_type")
+  @NotBlank
+  private String payloadCollectorType;
 
   @Schema(description = "Contract labels")
   @JsonProperty("injector_contract_labels")

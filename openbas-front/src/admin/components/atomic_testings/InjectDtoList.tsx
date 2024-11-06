@@ -14,7 +14,7 @@ import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
 import ItemTargets from '../../../components/ItemTargets';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
-import type { InjectResultDTO, SearchPaginationInput } from '../../../utils/api-types';
+import type { InjectResultOutput, SearchPaginationInput } from '../../../utils/api-types';
 import { isNotEmptyField } from '../../../utils/utils';
 import InjectIcon from '../common/injects/InjectIcon';
 import InjectorContract from '../common/injects/InjectorContract';
@@ -66,7 +66,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  fetchInjects: (input: SearchPaginationInput) => Promise<{ data: Page<InjectResultDTO> }>;
+  fetchInjects: (input: SearchPaginationInput) => Promise<{ data: Page<InjectResultOutput> }>;
   goTo: (injectId: string) => string;
   queryableHelpers: QueryableHelpers;
   searchPaginationInput: SearchPaginationInput;
@@ -87,7 +87,7 @@ const InjectDtoList: FunctionComponent<Props> = ({
   const [loading, setLoading] = useState<boolean>(true);
 
   // Filter and sort hook
-  const [injects, setInjects] = useState<InjectResultDTO[]>([]);
+  const [injects, setInjects] = useState<InjectResultOutput[]>([]);
 
   // Headers
   const headers: Header[] = useMemo(() => [
@@ -95,7 +95,7 @@ const InjectDtoList: FunctionComponent<Props> = ({
       field: 'inject_type',
       label: 'Type',
       isSortable: false,
-      value: (injectDto: InjectResultDTO) => {
+      value: (injectDto: InjectResultOutput) => {
         if (injectDto.inject_injector_contract) {
           return (
             <InjectorContract variant="list" label={tPick(injectDto.inject_injector_contract?.injector_contract_labels)} />
@@ -108,7 +108,7 @@ const InjectDtoList: FunctionComponent<Props> = ({
       field: 'inject_title',
       label: 'Title',
       isSortable: true,
-      value: (injectDto: InjectResultDTO) => {
+      value: (injectDto: InjectResultOutput) => {
         return <>{injectDto.inject_title}</>;
       },
     },
@@ -116,7 +116,7 @@ const InjectDtoList: FunctionComponent<Props> = ({
       field: 'inject_status.tracking_sent_date',
       label: 'Execution Date',
       isSortable: false,
-      value: (injectDto: InjectResultDTO) => {
+      value: (injectDto: InjectResultOutput) => {
         return <>{fldt(injectDto.inject_status?.tracking_sent_date)}</>;
       },
     },
@@ -124,7 +124,7 @@ const InjectDtoList: FunctionComponent<Props> = ({
       field: 'inject_status',
       label: 'Status',
       isSortable: false,
-      value: (injectDto: InjectResultDTO) => {
+      value: (injectDto: InjectResultOutput) => {
         return (<ItemStatus isInject status={injectDto.inject_status?.status_name} label={t(injectDto.inject_status?.status_name)} variant="inList" />);
       },
     },
@@ -132,7 +132,7 @@ const InjectDtoList: FunctionComponent<Props> = ({
       field: 'inject_targets',
       label: 'Target',
       isSortable: false,
-      value: (injectDto: InjectResultDTO) => {
+      value: (injectDto: InjectResultOutput) => {
         return (<ItemTargets targets={injectDto.inject_targets} />);
       },
     },
@@ -140,7 +140,7 @@ const InjectDtoList: FunctionComponent<Props> = ({
       field: 'inject_expectations',
       label: 'Global score',
       isSortable: false,
-      value: (injectDto: InjectResultDTO) => {
+      value: (injectDto: InjectResultOutput) => {
         return (
           <AtomicTestingResult expectations={injectDto.inject_expectation_results} />
         );
@@ -150,7 +150,7 @@ const InjectDtoList: FunctionComponent<Props> = ({
       field: 'inject_updated_at',
       label: 'Updated',
       isSortable: true,
-      value: (injectDto: InjectResultDTO) => {
+      value: (injectDto: InjectResultOutput) => {
         return <>{nsdt(injectDto.inject_updated_at)}</>;
       },
     },
@@ -214,11 +214,11 @@ const InjectDtoList: FunctionComponent<Props> = ({
                   >
                     <ListItemIcon>
                       <InjectIcon
-                        isPayload={isNotEmptyField(injectDto.inject_injector_contract?.injector_contract_payload)}
+                        isPayload={isNotEmptyField(injectDto.inject_injector_contract?.payload_id)}
                         type={
-                          injectDto.inject_injector_contract?.injector_contract_payload
-                            ? injectDto.inject_injector_contract.injector_contract_payload.payload_collector_type
-                            || injectDto.inject_injector_contract.injector_contract_payload.payload_type
+                          injectDto.inject_injector_contract?.payload_id
+                            ? injectDto.inject_injector_contract.payload_collector_type
+                            || injectDto.inject_injector_contract.payload_type
                             : injectDto.inject_type
                         }
                         variant="list"
