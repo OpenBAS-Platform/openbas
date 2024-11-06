@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { fetchOrganizations } from '../../../../actions/Organization';
-import { fetchTags } from '../../../../actions/Tag';
 import { searchUsers } from '../../../../actions/User';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
@@ -78,7 +77,6 @@ const Users = () => {
     tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
-    dispatch(fetchTags());
     dispatch(fetchOrganizations());
   });
 

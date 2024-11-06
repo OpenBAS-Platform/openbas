@@ -3,7 +3,9 @@ import { makeStyles, useTheme } from '@mui/styles';
 import { lazy, Suspense, useEffect } from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 
+import { fetchAttackPatterns } from '../actions/AttackPattern';
 import type { LoggedHelper } from '../actions/helper';
+import { fetchKillChainPhases } from '../actions/KillChainPhase';
 import { fetchTags } from '../actions/Tag';
 import { errorWrapper } from '../components/Error';
 import Loader from '../components/Loader';
@@ -44,6 +46,7 @@ const Index = () => {
   const theme = useTheme<Theme>();
   const classes = useStyles();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { logged, settings } = useHelper((helper: LoggedHelper) => {
     return { logged: helper.logged(), settings: helper.getPlatformSettings() };
   });
@@ -64,8 +67,10 @@ const Index = () => {
     overflowX: 'hidden',
     overflowY: 'hidden',
   };
-  const dispatch = useAppDispatch();
+  // load taxonomics one time at login
   useDataLoader(() => {
+    dispatch(fetchAttackPatterns());
+    dispatch(fetchKillChainPhases());
     dispatch(fetchTags());
   });
   const { bannerHeight } = computeBannerSettings(settings);

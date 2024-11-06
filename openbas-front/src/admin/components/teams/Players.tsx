@@ -7,7 +7,6 @@ import { useSearchParams } from 'react-router-dom';
 import type { OrganizationHelper, UserHelper } from '../../../actions/helper';
 import { fetchOrganizations } from '../../../actions/Organization';
 import { searchPlayers } from '../../../actions/players/player-actions';
-import { fetchTags } from '../../../actions/Tag';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import ExportButton from '../../../components/common/ExportButton';
 import { initSorting } from '../../../components/common/queryable/Page';
@@ -78,7 +77,6 @@ const Players = () => {
   }));
 
   useDataLoader(() => {
-    dispatch(fetchTags());
     dispatch(fetchOrganizations());
   });
 

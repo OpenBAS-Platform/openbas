@@ -2,10 +2,7 @@ import { LabelOutlined } from '@mui/icons-material';
 import { Autocomplete, Box, Chip, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 
-import { fetchTags } from '../../../../actions/Tag';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 
@@ -31,12 +28,6 @@ const useStyles = makeStyles(() => ({
 const TagsFilter = (props) => {
   const classes = useStyles();
   const { t } = useFormatter();
-  const dispatch = useDispatch();
-  useEffect(() => {
-    if (!props.tagsFetched) {
-      dispatch(fetchTags());
-    }
-  }, []);
   const tags = useHelper(helper => helper.getTags());
   const { onAddTag, onClearTag, onRemoveTag, currentTags, fullWidth } = props;
   const tagTransform = n => ({

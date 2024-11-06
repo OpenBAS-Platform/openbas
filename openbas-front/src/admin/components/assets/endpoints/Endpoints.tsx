@@ -8,7 +8,6 @@ import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { fetchExecutors } from '../../../../actions/Executor';
 import type { ExecutorHelper } from '../../../../actions/executors/executor-helper';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
-import { fetchTags } from '../../../../actions/Tag';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
@@ -96,7 +95,6 @@ const Endpoints = () => {
   }));
   useDataLoader(() => {
     dispatch(fetchExecutors());
-    dispatch(fetchTags());
   });
 
   // Headers

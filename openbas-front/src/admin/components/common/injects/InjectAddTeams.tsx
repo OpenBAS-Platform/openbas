@@ -3,7 +3,6 @@ import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, ListIte
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useContext, useEffect, useMemo, useState } from 'react';
 
-import { fetchTags } from '../../../../actions/Tag';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import { findTeams } from '../../../../actions/teams/team-actions';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -15,8 +14,6 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import type { Theme } from '../../../../components/Theme';
 import type { TeamOutput } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import type { EndpointStore } from '../../assets/endpoints/Endpoint';
 import CreateTeam from '../../components/teams/CreateTeam';
 import { PermissionsContext, TeamContext } from '../Context';
@@ -45,14 +42,8 @@ const InjectAddTeams: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();
-  const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
   const { searchTeams } = useContext(TeamContext);
-
-  // Fetch datas
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
 
   const [teamValues, setTeamValues] = useState<TeamOutput[]>([]);
   const [selectedTeamValues, setSelectedTeamValues] = useState<TeamOutput[]>([]);

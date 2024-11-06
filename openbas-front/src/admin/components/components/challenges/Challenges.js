@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom';
 import { fetchChallenges } from '../../../../actions/Challenge';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
-import { fetchTags } from '../../../../actions/Tag';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
@@ -153,7 +152,6 @@ const Challenges = () => {
   useDataLoader(() => {
     dispatch(fetchExercises());
     dispatch(fetchChallenges());
-    dispatch(fetchTags());
     dispatch(fetchDocuments());
   });
   const sortedChallenges = filtering.filterAndSort(challenges);

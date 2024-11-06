@@ -6,7 +6,6 @@ import { useSearchParams } from 'react-router-dom';
 
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
-import { fetchTags } from '../../../../actions/Tag';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import { searchTeams } from '../../../../actions/teams/team-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
@@ -18,8 +17,6 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
 import type { SearchPaginationInput } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import CreateTeam from './CreateTeam';
 import TeamPlayers from './TeamPlayers';
 import TeamPopover from './TeamPopover';
@@ -74,7 +71,6 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 const Teams = () => {
   // Standard hooks
-  const dispatch = useAppDispatch();
   const classes = useStyles();
   const { t, nsdt } = useFormatter();
 
@@ -89,9 +85,6 @@ const Teams = () => {
   const { userAdmin } = useHelper((helper: EndpointHelper & UserHelper & TagHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
 
   // Headers
   const headers = [
