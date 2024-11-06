@@ -1,5 +1,6 @@
 package io.openbas.service;
 
+import static io.openbas.aop.LoggingAspect.logger;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -20,11 +21,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
 import io.openbas.injector_contract.ContractType;
-import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
-import io.openbas.rest.atomic_testing.form.AtomicTestingOutput;
-import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
-import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
-import io.openbas.rest.atomic_testing.form.InjectStatusSimple;
+import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -341,7 +338,10 @@ public class AtomicTestingService {
     query.setMaxResults(pageable.getPageSize());
 
     // -- EXECUTION --
+    long start = System.currentTimeMillis();
     List<AtomicTestingOutput> injects = execAtomicTesting(query);
+    long executionTime = System.currentTimeMillis() - start;
+    logger.info("Query : " + executionTime + " ms");
 
     Map<String, List<String>> teamIds = new HashMap<>();
     Map<String, List<String>> assetIds = new HashMap<>();
@@ -367,6 +367,7 @@ public class AtomicTestingService {
         this.injectExpectationRepository.rawByIds(
             injectExpectationIds.values().stream().flatMap(Collection::stream).distinct().toList());
 
+    start = System.currentTimeMillis();
     for (AtomicTestingOutput inject : injects) {
       List<String> currentTeamIds = teamIds.get(inject.getId());
       List<String> currentAssetIds = assetIds.get(inject.getId());
@@ -403,7 +404,8 @@ public class AtomicTestingService {
                   .filter(e -> currentInjectExpectationIds.contains(e.getInject_expectation_id()))
                   .toList()));
     }
-
+    executionTime = System.currentTimeMillis() - start;
+    logger.info("after calculs: " + executionTime + " ms");
     // -- Count Query --
     Long total = countQuery(cb, this.entityManager, Inject.class, specificationCount);
 
@@ -422,6 +424,12 @@ public class AtomicTestingService {
     Join<Base, Base> injectorJoin = injectorContractJoin.join("injector", JoinType.LEFT);
     joinMap.put("injector", injectorJoin);
 
+    Join<Base, Base> payloadJoin = injectorContractJoin.join("payload", JoinType.LEFT);
+    joinMap.put("payload", injectorJoin);
+
+    Join<Base, Base> collectorJoin = payloadJoin.join("collector", JoinType.LEFT);
+    joinMap.put("collector", injectorJoin);
+
     Join<Inject, InjectStatus> statusJoin = injectRoot.join("status", JoinType.LEFT);
 
     // Array aggregations
@@ -438,7 +446,14 @@ public class AtomicTestingService {
             injectRoot.get("title").alias("inject_title"),
             injectRoot.get("updatedAt").alias("inject_updated_at"),
             injectorJoin.get("type").alias("inject_type"),
-            injectorContractJoin.alias("inject_injector_contract"),
+            injectorContractJoin.get("id").alias("injector_contract_id"),
+            injectorContractJoin.get("content").alias("injector_contract_content"),
+            injectorContractJoin.get("convertedContent").alias("convertedContent"),
+            injectorContractJoin.get("platforms").alias("injector_contract_platforms"),
+            injectorContractJoin.get("labels").alias("injector_contract_labels"),
+            payloadJoin.get("id").alias("payload_id"),
+            payloadJoin.get("type").alias("payload_type"),
+            collectorJoin.get("type").alias("payload_collector_type"),
             statusJoin.get("name").alias("status_name"),
             statusJoin.get("trackingSentDate").alias("status_tracking_sent_date"),
             injectExpectationIdsExpression.alias("inject_expectations"),
@@ -453,11 +468,17 @@ public class AtomicTestingService {
             injectRoot.get("id"),
             injectorContractJoin.get("id"),
             injectorJoin.get("id"),
+            payloadJoin.get("id"),
+            collectorJoin.get("id"),
             statusJoin.get("id")));
   }
 
   private List<AtomicTestingOutput> execAtomicTesting(TypedQuery<Tuple> query) {
-    return query.getResultList().stream()
+    long start = System.currentTimeMillis();
+    List<Tuple> resultList = query.getResultList();
+    long executionTime = System.currentTimeMillis() - start;
+    logger.info("execut query  : " + executionTime + " ms");
+    return resultList.stream()
         .map(
             tuple -> {
               InjectStatusSimple injectStatus = null;
@@ -469,17 +490,23 @@ public class AtomicTestingService {
                         .trackingSentDate(tuple.get("status_tracking_sent_date", Instant.class))
                         .build();
               }
+
+              InjectorContractSimple injectorContractSimple =
+                  InjectorContractSimple.builder()
+                      .id(tuple.get("injector_contract_id", String.class))
+                      .content(tuple.get("injector_contract_content", String.class))
+                      .convertedContent(tuple.get("convertedContent", ObjectNode.class))
+                      .platforms(
+                          tuple.get("injector_contract_platforms", Endpoint.PLATFORM_TYPE[].class))
+                      .build();
+
               return new AtomicTestingOutput(
                   tuple.get("inject_id", String.class),
                   tuple.get("inject_title", String.class),
                   tuple.get("inject_updated_at", Instant.class),
                   tuple.get("inject_type", String.class),
-                  tuple.get("inject_injector_contract", InjectorContract.class),
-                  injectStatus,
-                  tuple.get("inject_expectations", String[].class),
-                  tuple.get("inject_teams", String[].class),
-                  tuple.get("inject_assets", String[].class),
-                  tuple.get("inject_asset_groups", String[].class));
+                  injectorContractSimple,
+                  injectStatus);
             })
         .toList();
   }

@@ -27,8 +27,14 @@ public class InjectResultOutput {
   @NotNull
   private String title;
 
+  @JsonProperty("inject_updated_at")
+  private Instant updatedAt;
+
   @JsonProperty("inject_type")
   private String type;
+
+  @JsonProperty("inject_status")
+  private InjectStatusSimple status;
 
   @Schema(description = "Full contract")
   @JsonProperty("inject_injector_contract")
@@ -40,9 +46,10 @@ public class InjectResultOutput {
   @NotNull
   private List<KillChainPhaseSimple> killChainPhases;
 
-  @JsonProperty("inject_status")
-  private InjectStatusSimple status;
+  @JsonProperty("injects_tags")
+  private List<String> tagIds;
 
+  // -- PROCESSED PROPERTIES
   @Schema(
       description = "Specifies the categories of targets for atomic testing.",
       example = "assets, asset groups, teams, players")
@@ -55,10 +62,4 @@ public class InjectResultOutput {
   @JsonProperty("inject_expectation_results")
   @NotNull
   private List<ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
-
-  @JsonProperty("injects_tags")
-  private List<String> tagIds;
-
-  @JsonProperty("inject_updated_at")
-  private Instant updatedAt;
 }

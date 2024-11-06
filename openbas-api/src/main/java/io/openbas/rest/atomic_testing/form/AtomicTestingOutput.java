@@ -4,13 +4,11 @@ import static lombok.AccessLevel.NONE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ExecutionStatus;
-import io.openbas.database.model.InjectorContract;
 import io.openbas.utils.InjectMapper;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import lombok.Data;
 import lombok.Getter;
@@ -34,7 +32,7 @@ public class AtomicTestingOutput {
   public String injectType;
 
   @JsonProperty("inject_injector_contract")
-  private InjectorContract injectorContract;
+  private InjectorContractSimple injectorContract;
 
   @Getter(NONE)
   @JsonProperty("inject_status")
@@ -46,22 +44,6 @@ public class AtomicTestingOutput {
     }
     return status;
   }
-
-  @JsonProperty("inject_teams")
-  @NotNull
-  private List<String> teams;
-
-  @JsonProperty("inject_assets")
-  @NotNull
-  private List<String> assets;
-
-  @JsonProperty("inject_asset_groups")
-  @NotNull
-  private List<String> assetGroups;
-
-  @JsonProperty("inject_expectations")
-  @NotNull
-  private List<String> expectations;
 
   @JsonProperty("inject_targets")
   private List<TargetSimple> targets = new ArrayList<>();
@@ -76,26 +58,13 @@ public class AtomicTestingOutput {
       String title,
       Instant updatedAt,
       String injectType,
-      InjectorContract injectorContract,
-      InjectStatusSimple injectStatus,
-      String[] injectExpectations,
-      String[] teams,
-      String[] assets,
-      String[] assetGroups) {
+      InjectorContractSimple injectorContract,
+      InjectStatusSimple injectStatus) {
     this.id = id;
     this.title = title;
     this.updatedAt = updatedAt;
     this.injectType = injectType;
     this.injectorContract = injectorContract;
     this.status = injectStatus;
-    this.expectations =
-        injectExpectations != null
-            ? new ArrayList<>(Arrays.asList(injectExpectations))
-            : new ArrayList<>();
-
-    this.teams = teams != null ? new ArrayList<>(Arrays.asList(teams)) : new ArrayList<>();
-    this.assets = assets != null ? new ArrayList<>(Arrays.asList(assets)) : new ArrayList<>();
-    this.assetGroups =
-        assetGroups != null ? new ArrayList<>(Arrays.asList(assetGroups)) : new ArrayList<>();
   }
 }
