@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 @Data
 public class S3Config {
 
-  @JsonProperty("use_aws_role")
+  @JsonProperty("use-aws-role")
   private boolean useAwsRole = false;
 
-  @JsonProperty("sts_endpoint")
+  @JsonProperty("sts-endpoint")
   private String stsEndpoint;
 }
