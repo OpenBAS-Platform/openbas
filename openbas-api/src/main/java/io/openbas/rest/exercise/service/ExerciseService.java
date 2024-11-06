@@ -157,10 +157,7 @@ public class ExerciseService {
       if (exercise.getInjectIds() != null) {
         // -- GLOBAL SCORE ---
         exercise.setExpectationResultByTypes(
-            resultUtils.getResultsByTypes(
-                (exercise.getInjectIds() != null)
-                    ? new HashSet<>(Arrays.asList(exercise.getInjectIds()))
-                    : new HashSet<>()));
+            resultUtils.getResultsByTypes(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
 
         // -- TARGETS
         exercise
