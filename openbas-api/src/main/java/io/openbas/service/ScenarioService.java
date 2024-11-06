@@ -290,7 +290,7 @@ public class ScenarioService {
               // Processed parameters
               simple.setExpectationResultByTypes(
                   resultUtils.getResultsByTypes(exercise.getInject_ids()));
-              simple.setTargets(Collections.emptyList()); //TODO
+              simple.setTargets(Collections.emptyList()); // TODO
 
               return simple;
             })

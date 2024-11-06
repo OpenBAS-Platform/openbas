@@ -20,7 +20,6 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.GrantService;
-import io.openbas.service.InjectService;
 import io.openbas.service.TeamService;
 import io.openbas.service.VariableService;
 import io.openbas.utils.ExerciseMapper;
@@ -38,7 +37,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -63,6 +61,8 @@ public class ExerciseService {
   private final ExerciseMapper exerciseMapper;
   private final InjectMapper injectMapper;
   private final ResultUtils resultUtils;
+  private final AssetRepository assetRepository;
+  private final AssetGroupRepository assetGroupRepository;
 
   private final ArticleRepository articleRepository;
   private final ExerciseRepository exerciseRepository;
@@ -79,7 +79,6 @@ public class ExerciseService {
   private String imapUsername;
 
   @Resource private OpenBASConfig openBASConfig;
-  @Autowired private InjectService injectService;
 
   // endregion
 
@@ -98,7 +97,7 @@ public class ExerciseService {
               // Processed params
               simple.setExpectationResultByTypes(
                   resultUtils.getResultsByTypes(exercise.getInject_ids()));
-              simple.setTargets(Collections.emptyList()); //TODO
+              simple.setTargets(Collections.emptyList()); // TODO
 
               return simple;
             })
@@ -139,18 +138,19 @@ public class ExerciseService {
     List<ExerciseSimple> exercises = execution(query);
 
     // -- MAP TO GENERATE TARGETSIMPLEs
-    List<String> listOfInjectIds =
-        exercises.stream()
-            .filter(exercise -> exercise.getInjectIds() != null)
-            .flatMap(exercise -> Arrays.stream(exercise.getInjectIds()))
-            .distinct()
-            .toList();
+    List<String> exerciseIds = exercises.stream().map(exercise -> exercise.getId()).toList();
 
-    Map<String, List<RawTarget>> rawTeamMap = teamRepository.rawTeamByExerciseId();
-    Map<String, List<RawTarget>> rawAssetMap = new HashMap<>();
-    ;
-    Map<String, List<RawTarget>> rawAssetGroupMap = new HashMap<>();
-    ;
+    Map<String, List<Object[]>> teamMap =
+        teamRepository.teamsByExerciseIds(exerciseIds).stream()
+            .collect(Collectors.groupingBy(row -> (String) row[0]));
+
+    Map<String, List<Object[]>> assetMap =
+        assetRepository.assetsByExerciseIds(exerciseIds).stream()
+            .collect(Collectors.groupingBy(row -> (String) row[0]));
+
+    Map<String, List<Object[]>> assetGroupMap =
+        assetGroupRepository.assetGroupsByExerciseIds(exerciseIds).stream()
+            .collect(Collectors.groupingBy(row -> (String) row[0]));
 
     long start;
     long executionTime;
@@ -162,14 +162,19 @@ public class ExerciseService {
             resultUtils.getResultsByTypes(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
         executionTime = System.currentTimeMillis() - start;
         logger.info("global: " + executionTime + " ms");
+
         start = System.currentTimeMillis();
-        exercise.getTargets().addAll(injectMapper.toTargetSimple(rawTeamMap.get(exercise.getId())));
         exercise
             .getTargets()
-            .addAll(injectMapper.toTargetSimple(rawAssetMap.get(exercise.getId())));
+            .addAll(injectMapper.toTargetSimple(teamMap.get(exercise.getId()), TargetType.TEAMS));
         exercise
             .getTargets()
-            .addAll(injectMapper.toTargetSimple(rawAssetGroupMap.get(exercise.getId())));
+            .addAll(injectMapper.toTargetSimple(assetMap.get(exercise.getId()), TargetType.ASSETS));
+        exercise
+            .getTargets()
+            .addAll(
+                injectMapper.toTargetSimple(
+                    assetGroupMap.get(exercise.getId()), TargetType.ASSETS_GROUPS));
         executionTime = System.currentTimeMillis() - start;
         logger.info("Target: " + executionTime + " ms");
       }
@@ -488,7 +493,7 @@ public class ExerciseService {
               // Processed parameters
               simple.setExpectationResultByTypes(
                   resultUtils.getResultsByTypes(exercise.getInject_ids()));
-              simple.setTargets(Collections.emptyList()); //TODO
+              simple.setTargets(Collections.emptyList()); // TODO
 
               return simple;
             })

@@ -158,4 +158,14 @@ public interface TeamRepository
               + "WHERE scenarios_teams.scenario_id = :scenarioId GROUP BY teams.team_id ;",
       nativeQuery = true)
   List<RawTeam> rawTeamByScenarioId(@Param("scenarioId") String scenarioId);
+
+  @Query(
+      value =
+          "SELECT DISTINCT i.inject_exercise, t.team_id, t.team_name "
+              + "FROM teams t "
+              + "INNER JOIN injects_teams it ON t.team_id = it.team_id "
+              + "INNER JOIN injects i ON it.inject_id = i.inject_id "
+              + "WHERE i.inject_exercise in :exerciseIds",
+      nativeQuery = true)
+  List<Object[]> teamsByExerciseIds(List<String> exerciseIds);
 }

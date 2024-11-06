@@ -4,6 +4,7 @@ import static io.openbas.utils.AtomicTestingUtils.getRefinedExpectations;
 
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawTarget;
+import io.openbas.database.raw.TargetType;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
 import io.openbas.rest.atomic_testing.form.InjectStatusSimple;
@@ -52,6 +53,8 @@ public class InjectMapper {
         .build();
   }
 
+  // -- TEAMS, ASSETS, ASSETGROUPS to TARGET
+
   public List<TargetSimple> toTargetSimple(List<RawTarget> rawTargets) {
     return rawTargets.stream().map(rawTarget -> toTargetSimple(rawTarget)).toList();
   }
@@ -63,6 +66,21 @@ public class InjectMapper {
         .type(rawTarget.getType())
         .build();
   }
+
+  // -- OBJECT[] to TARGET
+  public List<TargetSimple> toTargetSimple(List<Object[]> targets, TargetType type) {
+    return targets.stream().map(target -> toTargetSimple(target, type)).toList();
+  }
+
+  public TargetSimple toTargetSimple(Object[] target, TargetType type) {
+    return TargetSimple.builder()
+        .id((String) target[1])
+        .name((String) target[2])
+        .type(type)
+        .build();
+  }
+
+  //
 
   public record ExpectationResultsByType(
       @NotNull ExpectationType type,
