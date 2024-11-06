@@ -112,6 +112,7 @@ public class InjectApi extends RestBehavior {
   public Inject injectExecutionCallback(
       @PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+
     InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
     ExecutionStatus executionStatus = ExecutionStatus.valueOf(input.getStatus());
     InjectStatusExecution execution = new InjectStatusExecution();
@@ -126,34 +127,39 @@ public class InjectApi extends RestBehavior {
     } else {
       injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalSuccess() + 1);
     }
+
     int currentTotal =
         injectStatus.getTrackingTotalError() + injectStatus.getTrackingTotalSuccess();
     if (injectStatus.getTrackingTotalCount() >= currentTotal) {
       injectStatus.setTrackingEndDate(trackingEndDate);
       injectStatus.setTrackingTotalExecutionTime(
           Duration.between(injectStatus.getTrackingSentDate(), trackingEndDate).getSeconds());
-      if (injectStatus.getTraces().stream()
-              .filter(
-                  injectStatusExecution ->
-                      injectStatusExecution.getStatus().equals(ExecutionStatus.ERROR))
-              .count()
-          >= injectStatus.getTrackingTotalCount()) {
-        injectStatus.setName(ExecutionStatus.ERROR);
-      } else if (injectStatus.getTraces().stream()
-          .anyMatch(trace -> trace.getStatus().equals(ExecutionStatus.ERROR))) {
-        injectStatus.setName(ExecutionStatus.PARTIAL);
-      } else if (injectStatus.getTraces().stream()
-              .filter(
-                  injectStatusExecution ->
-                      injectStatusExecution.getStatus().equals(ExecutionStatus.MAYBE_PREVENTED))
-              .count()
-          >= injectStatus.getTrackingTotalCount()) {
-        injectStatus.setName(ExecutionStatus.MAYBE_PREVENTED);
-      } else if (injectStatus.getTraces().stream()
-          .anyMatch(trace -> trace.getStatus().equals(ExecutionStatus.MAYBE_PREVENTED))) {
-        injectStatus.setName(ExecutionStatus.MAYBE_PARTIAL_PREVENTED);
-      } else {
+
+      long successCounter = 0;
+      long errorCounter = 0;
+      long maybePreventedCounter = 0;
+      for (InjectStatusExecution injectStatusExecution : injectStatus.getTraces()) {
+        ExecutionStatus status = injectStatusExecution.getStatus();
+        if (status == ExecutionStatus.SUCCESS || status == ExecutionStatus.WARNING) {
+          successCounter++;
+        } else if (status == ExecutionStatus.ERROR || status == ExecutionStatus.COMMAND_NOT_FOUND) {
+          errorCounter++;
+        } else if (status == ExecutionStatus.MAYBE_PREVENTED
+            || status == ExecutionStatus.COMMAND_CANNOT_BE_EXECUTED) {
+          maybePreventedCounter++;
+        }
+      }
+
+      if (successCounter >= injectStatus.getTrackingTotalCount()) {
         injectStatus.setName(ExecutionStatus.SUCCESS);
+      } else if (successCounter > 0) {
+        injectStatus.setName(ExecutionStatus.PARTIAL);
+      } else if (errorCounter >= injectStatus.getTrackingTotalCount()) {
+        injectStatus.setName(ExecutionStatus.ERROR);
+      } else if (maybePreventedCounter >= injectStatus.getTrackingTotalCount()) {
+        injectStatus.setName(ExecutionStatus.MAYBE_PREVENTED);
+      } else {
+        injectStatus.setName(ExecutionStatus.MAYBE_PARTIAL_PREVENTED);
       }
     }
     return injectRepository.save(inject);

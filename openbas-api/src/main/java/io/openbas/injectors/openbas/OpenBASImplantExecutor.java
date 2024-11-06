@@ -267,7 +267,8 @@ public class OpenBASImplantExecutor extends Injector {
                             totalActionsCount =
                                 totalActionsCount + payloadCommand.getPrerequisites().size();
                           }
-                          if (payloadCommand.getCleanupCommand() != null) {
+                          if (payloadCommand.getCleanupCommand() != null
+                              && !payloadCommand.getCleanupCommand().isEmpty()) {
                             totalActionsCount = totalActionsCount + 1;
                           }
                           break;
@@ -284,7 +285,8 @@ public class OpenBASImplantExecutor extends Injector {
                             totalActionsCount =
                                 totalActionsCount + payloadExecutable.getPrerequisites().size();
                           }
-                          if (payloadExecutable.getCleanupCommand() != null) {
+                          if (payloadExecutable.getCleanupCommand() != null
+                              && !payloadExecutable.getCleanupCommand().isEmpty()) {
                             totalActionsCount = totalActionsCount + 1;
                           }
                           // TODO File hash
@@ -302,7 +304,8 @@ public class OpenBASImplantExecutor extends Injector {
                             totalActionsCount =
                                 totalActionsCount + payloadFileDrop.getPrerequisites().size();
                           }
-                          if (payloadFileDrop.getCleanupCommand() != null) {
+                          if (payloadFileDrop.getCleanupCommand() != null
+                              && !payloadFileDrop.getCleanupCommand().isEmpty()) {
                             totalActionsCount = totalActionsCount + 1;
                           }
                           // TODO File hash
@@ -327,7 +330,8 @@ public class OpenBASImplantExecutor extends Injector {
                             totalActionsCount =
                                 totalActionsCount + payloadDnsResolution.getPrerequisites().size();
                           }
-                          if (payloadDnsResolution.getCleanupCommand() != null) {
+                          if (payloadDnsResolution.getCleanupCommand() != null
+                              && !payloadDnsResolution.getCleanupCommand().isEmpty()) {
                             totalActionsCount = totalActionsCount + 1;
                           }
                           break;
