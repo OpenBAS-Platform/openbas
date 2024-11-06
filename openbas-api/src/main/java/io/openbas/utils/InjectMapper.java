@@ -53,8 +53,7 @@ public class InjectMapper {
         .build();
   }
 
-  // -- TEAMS, ASSETS, ASSETGROUPS to TARGET
-
+  // -- TEAMS, ASSETS, ASSETGROUPS to TARGET --
   public List<TargetSimple> toTargetSimple(List<RawTarget> rawTargets) {
     return rawTargets.stream().map(rawTarget -> toTargetSimple(rawTarget)).toList();
   }
@@ -67,7 +66,7 @@ public class InjectMapper {
         .build();
   }
 
-  // -- OBJECT[] to TARGET
+  // -- OBJECT[] to TARGET --
   public List<TargetSimple> toTargetSimple(List<Object[]> targets, TargetType type) {
     return targets.stream().map(target -> toTargetSimple(target, type)).toList();
   }
@@ -80,7 +79,7 @@ public class InjectMapper {
         .build();
   }
 
-  //
+  // -- RECORDS --
 
   public record ExpectationResultsByType(
       @NotNull ExpectationType type,
