@@ -112,7 +112,7 @@
     "eslint-plugin-simple-import-sort": "12.1.1",
     "express": "4.20.0",
     "fs-extra": "11.2.0",
-    "globals": "15.9.0",
+    "globals": "15.12.0",
     "jsdom": "25.0.1",
     "nyc": "17.0.0",
     "swagger-typescript-api": "13.0.22",
