@@ -36,7 +36,6 @@ import io.openbas.rest.scenario.export.ScenarioExportMixins;
 import io.openbas.rest.scenario.export.ScenarioFileExport;
 import io.openbas.rest.scenario.form.ScenarioSimple;
 import io.openbas.utils.ExerciseMapper;
-import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -94,7 +93,6 @@ public class ScenarioService {
   private final ArticleRepository articleRepository;
 
   private final ExerciseMapper exerciseMapper;
-  private final ResultUtils resultUtils;
 
   private final GrantService grantService;
   private final VariableService variableService;
@@ -283,17 +281,7 @@ public class ScenarioService {
             .max(Comparator.comparing(RawExerciseSimple::getExercise_end_date));
 
     return latestEndedExercise
-        .map(
-            exercise -> {
-              ExerciseSimple simple = exerciseMapper.fromRawExerciseSimple(exercise);
-
-              // Processed parameters
-              simple.setExpectationResultByTypes(
-                  resultUtils.getResultsByTypes(exercise.getInject_ids()));
-              simple.setTargets(Collections.emptyList()); // TODO
-
-              return simple;
-            })
+        .map(exercise -> exerciseMapper.getExerciseSimple(exercise))
         .orElseThrow(() -> new ElementNotFoundException("Latest exercise not found"));
   }
 
