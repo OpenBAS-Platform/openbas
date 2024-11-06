@@ -338,13 +338,8 @@ public class AtomicTestingService {
     query.setMaxResults(pageable.getPageSize());
 
     // -- EXECUTION --
-    long start = System.currentTimeMillis();
     List<AtomicTestingOutput> injects = execAtomicTesting(query);
-    long executionTime = System.currentTimeMillis() - start;
-    logger.info("Query : " + executionTime + " ms");
 
-    executionTime = System.currentTimeMillis() - start;
-    logger.info("after calculs: " + executionTime + " ms");
     // -- Count Query --
     Long total = countQuery(cb, this.entityManager, Inject.class, specificationCount);
 
