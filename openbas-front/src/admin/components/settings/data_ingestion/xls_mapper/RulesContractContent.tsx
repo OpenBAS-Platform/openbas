@@ -246,8 +246,8 @@ const RulesContractContent: React.FC<Props> = ({
                   variant="dot"
                   invisible={(!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
                     || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0)
-                    && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern`)
-                      || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.timePattern?.length === 0)}
+                  && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern`)
+                    || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.timePattern?.length === 0)}
                 >
                   <CogOutline />
                 </Badge>
@@ -259,8 +259,8 @@ const RulesContractContent: React.FC<Props> = ({
                   variant="dot"
                   invisible={(!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
                     || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0)
-                    && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.allTeamsValue`)
-                      || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.allTeamsValue?.length === 0)}
+                  && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.allTeamsValue`)
+                    || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.allTeamsValue?.length === 0)}
                 >
                   <CogOutline />
                 </Badge>
