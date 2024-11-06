@@ -31,15 +31,17 @@ public class ResultUtils {
 
   // -- UTILS --
   public List<InjectMapper.ExpectationResultsByType> getResultsByTypes(Set<String> injectIds) {
+    if (injectIds == null || injectIds.isEmpty()) {
+      return emptyList();
+    }
     return computeGlobalExpectationResults(injectIds);
   }
 
   public List<InjectTargetWithResult> getInjectTargetWithResults(Set<String> injectIds) {
-    if (injectIds != null) {
-      return computeTargetResults(injectIds);
-    } else {
+    if (injectIds == null || injectIds.isEmpty()) {
       return emptyList();
     }
+    return computeTargetResults(injectIds);
   }
 
   public static List<InjectExpectationResultsByAttackPattern> computeInjectExpectationResults(

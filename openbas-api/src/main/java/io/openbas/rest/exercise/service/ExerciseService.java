@@ -1,6 +1,5 @@
 package io.openbas.rest.exercise.service;
 
-import static io.openbas.aop.LoggingAspect.logger;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.utils.Constants.ARTICLES;
@@ -17,6 +16,7 @@ import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
+import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
@@ -36,6 +36,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -90,19 +91,57 @@ public class ExerciseService {
             ? exerciseRepository.rawAll()
             : exerciseRepository.rawAllGranted(currentUser().getId());
 
-    return exercises.stream()
-        .map(
-            exercise -> {
-              ExerciseSimple simple = exerciseMapper.fromRawExerciseSimple(exercise);
+    // -- MAP TO GENERATE TARGETSIMPLEs
+    List<String> exerciseIds =
+        exercises.stream().map(exercise -> exercise.getExercise_id()).toList();
 
-              // Processed params
-              simple.setExpectationResultByTypes(
-                  resultUtils.getResultsByTypes(exercise.getInject_ids()));
-              simple.setTargets(emptyList()); // TODO
+    Map<String, List<Object[]>> teamMap =
+        teamRepository.teamsByExerciseIds(exerciseIds).stream()
+            .collect(Collectors.groupingBy(row -> (String) row[0]));
 
-              return simple;
-            })
-        .collect(Collectors.toList());
+    Map<String, List<Object[]>> assetMap =
+        assetRepository.assetsByExerciseIds(exerciseIds).stream()
+            .collect(Collectors.groupingBy(row -> (String) row[0]));
+
+    Map<String, List<Object[]>> assetGroupMap =
+        assetGroupRepository.assetGroupsByExerciseIds(exerciseIds).stream()
+            .collect(Collectors.groupingBy(row -> (String) row[0]));
+
+    List<ExerciseSimple> exerciseSimples = new ArrayList<>();
+
+    for (RawExerciseSimple exercise : exercises) {
+      ExerciseSimple simple = exerciseMapper.fromRawExerciseSimple(exercise);
+
+      if (exercise.getInject_ids() != null) {
+        // -- GLOBAL SCORE ---
+        simple.setExpectationResultByTypes(resultUtils.getResultsByTypes(exercise.getInject_ids()));
+
+        // -- TARGETS --
+        List<TargetSimple> allTargets =
+            Stream.concat(
+                    injectMapper
+                        .toTargetSimple(
+                            teamMap.getOrDefault(simple.getId(), emptyList()), TargetType.TEAMS)
+                        .stream(),
+                    Stream.concat(
+                        injectMapper
+                            .toTargetSimple(
+                                assetMap.getOrDefault(simple.getId(), emptyList()),
+                                TargetType.ASSETS)
+                            .stream(),
+                        injectMapper
+                            .toTargetSimple(
+                                assetGroupMap.getOrDefault(simple.getId(), emptyList()),
+                                TargetType.ASSETS_GROUPS)
+                            .stream()))
+                .collect(Collectors.toList());
+
+        simple.getTargets().addAll(allTargets);
+        exerciseSimples.add(simple);
+      }
+    }
+
+    return exerciseSimples;
   }
 
   public Page<ExerciseSimple> exercises(
@@ -159,7 +198,7 @@ public class ExerciseService {
         exercise.setExpectationResultByTypes(
             resultUtils.getResultsByTypes(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
 
-        // -- TARGETS
+        // -- TARGETS --
         exercise
             .getTargets()
             .addAll(

@@ -48,8 +48,8 @@ public class InjectMapper {
         .expectationResultByTypes(
             AtomicTestingUtils.getExpectationResultByTypes(
                 getRefinedExpectations(
-                    inject,
-                    inject.getTeams().stream().map(t -> t.getId()).toList()))) // todo all targets
+                    inject, inject.getTeams().stream().map(t -> t.getId()).toList())))
+        // todo all targets
         .build();
   }
 
