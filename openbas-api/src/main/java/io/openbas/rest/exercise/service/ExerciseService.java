@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
-import io.openbas.database.raw.RawExerciseSimple;
+import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
@@ -61,6 +61,7 @@ public class ExerciseService {
   private final VariableService variableService;
 
   private final ExerciseMapper exerciseMapper;
+  private final InjectMapper injectMapper;
   private final ResultUtils resultUtils;
 
   private final ArticleRepository articleRepository;
@@ -90,7 +91,17 @@ public class ExerciseService {
             : exerciseRepository.rawAllGranted(currentUser().getId());
 
     return exercises.stream()
-        .map(exercise -> exerciseMapper.fromRawExerciseSimple(exercise))
+        .map(
+            exercise -> {
+              ExerciseSimple simple = exerciseMapper.fromRawExerciseSimple(exercise);
+
+              // Processed params
+              simple.setExpectationResultByTypes(
+                  resultUtils.getResultsByTypes(exercise.getInject_ids()));
+              simple.setTargets(Collections.emptyList()); //TODO
+
+              return simple;
+            })
         .collect(Collectors.toList());
   }
 
@@ -127,7 +138,19 @@ public class ExerciseService {
     // -- EXECUTION --
     List<ExerciseSimple> exercises = execution(query);
 
-    // TODO mapOfInject: InjectService.mapOfInjects();
+    // -- MAP TO GENERATE TARGETSIMPLEs
+    List<String> listOfInjectIds =
+        exercises.stream()
+            .filter(exercise -> exercise.getInjectIds() != null)
+            .flatMap(exercise -> Arrays.stream(exercise.getInjectIds()))
+            .distinct()
+            .toList();
+
+    Map<String, List<RawTarget>> rawTeamMap = teamRepository.rawTeamByExerciseId();
+    Map<String, List<RawTarget>> rawAssetMap = new HashMap<>();
+    ;
+    Map<String, List<RawTarget>> rawAssetGroupMap = new HashMap<>();
+    ;
 
     long start;
     long executionTime;
@@ -140,8 +163,13 @@ public class ExerciseService {
         executionTime = System.currentTimeMillis() - start;
         logger.info("global: " + executionTime + " ms");
         start = System.currentTimeMillis();
-        exercise.setTargets(
-            Collections.emptyList()); // TODO fetch targets from injectsIds: TargetSimple
+        exercise.getTargets().addAll(injectMapper.toTargetSimple(rawTeamMap.get(exercise.getId())));
+        exercise
+            .getTargets()
+            .addAll(injectMapper.toTargetSimple(rawAssetMap.get(exercise.getId())));
+        exercise
+            .getTargets()
+            .addAll(injectMapper.toTargetSimple(rawAssetGroupMap.get(exercise.getId())));
         executionTime = System.currentTimeMillis() - start;
         logger.info("Target: " + executionTime + " ms");
       }
@@ -453,7 +481,17 @@ public class ExerciseService {
   // -- ScenarioExercise--
   public Iterable<ExerciseSimple> scenarioExercises(@NotBlank String scenarioId) {
     return exerciseRepository.rawAllByScenarioId(List.of(scenarioId)).stream()
-        .map(rawExerciseSimple -> exerciseMapper.fromRawExerciseSimple(rawExerciseSimple))
+        .map(
+            exercise -> {
+              ExerciseSimple simple = exerciseMapper.fromRawExerciseSimple(exercise);
+
+              // Processed parameters
+              simple.setExpectationResultByTypes(
+                  resultUtils.getResultsByTypes(exercise.getInject_ids()));
+              simple.setTargets(Collections.emptyList()); //TODO
+
+              return simple;
+            })
         .toList();
   }
 

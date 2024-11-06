@@ -14,6 +14,7 @@ import io.openbas.database.repository.*;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.utils.ExerciseMapper;
+import io.openbas.utils.InjectMapper;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.fixtures.ExerciseFixture;
 import java.util.ArrayList;
@@ -32,10 +33,11 @@ class ExerciseServiceTest {
   @Mock GrantService grantService;
   @Mock InjectDuplicateService injectDuplicateService;
   @Mock VariableService variableService;
-  @Autowired private TeamService teamService;
 
-  @Autowired ExerciseMapper exerciseMapper;
-  @Autowired ResultUtils resultUtils;
+  @Autowired private TeamService teamService;
+  @Autowired private ExerciseMapper exerciseMapper;
+  @Autowired private InjectMapper injectMapper;
+  @Autowired private ResultUtils resultUtils;
   @Autowired private ArticleRepository articleRepository;
   @Autowired private ExerciseRepository exerciseRepository;
   @Autowired private TeamRepository teamRepository;
@@ -61,6 +63,7 @@ class ExerciseServiceTest {
             teamService,
             variableService,
             exerciseMapper,
+            injectMapper,
             resultUtils,
             articleRepository,
             exerciseRepository,

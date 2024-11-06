@@ -61,5 +61,5 @@ public class ExerciseSimple {
 
   @JsonProperty("exercise_targets")
   @NotNull
-  private List<TargetSimple> targets;
+  private List<TargetSimple> targets = new ArrayList<>();
 }

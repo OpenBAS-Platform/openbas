@@ -4,7 +4,6 @@ import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Tag;
 import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.rest.exercise.form.ExerciseSimple;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +12,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class ExerciseMapper {
-
-  private final ResultUtils resultUtils;
 
   public ExerciseSimple fromRawExerciseSimple(RawExerciseSimple rawExercise) {
     ExerciseSimple simple = new ExerciseSimple();
@@ -38,8 +35,6 @@ public class ExerciseMapper {
     simple.setStatus(ExerciseStatus.valueOf(rawExercise.getExercise_status()));
     simple.setStart(rawExercise.getExercise_start_date());
     simple.setUpdatedAt(rawExercise.getExercise_updated_at());
-    simple.setExpectationResultByTypes(resultUtils.getResultsByTypes(rawExercise.getInject_ids()));
-    simple.setTargets(Collections.emptyList()); // TODO
 
     return simple;
   }
