@@ -18,7 +18,7 @@ COPY pom.xml ./pom.xml
 COPY --from=front-builder /opt/openbas-build/openbas-front/builder/prod/build ./openbas-front/builder/prod/build
 RUN mvn install -DskipTests -Pdev
 
-FROM eclipse-temurin:21.0.4_7-jre AS app
+FROM eclipse-temurin:21.0.5_11-jre AS app
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y tini;
 COPY --from=api-builder /opt/openbas-build/openbas/openbas-api/target/openbas-api.jar ./
