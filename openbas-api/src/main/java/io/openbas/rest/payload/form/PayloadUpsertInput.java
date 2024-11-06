@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Payload;
 import io.openbas.database.model.PayloadArgument;
 import io.openbas.database.model.PayloadPrerequisite;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -46,9 +47,11 @@ public class PayloadUpsertInput {
   private String description;
 
   @JsonProperty("command_executor")
+  @Schema(nullable = true)
   private String executor;
 
   @JsonProperty("command_content")
+  @Schema(nullable = true)
   private String content;
 
   @JsonProperty("executable_file")
@@ -67,9 +70,11 @@ public class PayloadUpsertInput {
   private List<PayloadPrerequisite> prerequisites;
 
   @JsonProperty("payload_cleanup_executor")
+  @Schema(nullable = true)
   private String cleanupExecutor;
 
   @JsonProperty("payload_cleanup_command")
+  @Schema(nullable = true)
   private String cleanupCommand;
 
   @JsonProperty("payload_tags")

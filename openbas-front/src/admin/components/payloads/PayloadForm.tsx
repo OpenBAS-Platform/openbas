@@ -48,11 +48,11 @@ const PayloadForm: FunctionComponent<Props> = ({
     payload_name: '',
     payload_platforms: [],
     payload_description: '',
-    command_executor: '',
-    command_content: '',
+    command_executor: null,
+    command_content: null,
     payload_attack_patterns: [],
-    payload_cleanup_command: '',
-    payload_cleanup_executor: '',
+    payload_cleanup_command: null,
+    payload_cleanup_executor: null,
     file_drop_file: '',
     dns_resolution_hostname: '',
     payload_tags: [],
@@ -85,8 +85,8 @@ const PayloadForm: FunctionComponent<Props> = ({
       label: z.string(),
     }).array().min(1, { message: t('Should not be empty') }),
     payload_attack_patterns: z.string().array().optional(),
-    payload_cleanup_command: z.string().optional(),
-    payload_cleanup_executor: z.string().optional(),
+    payload_cleanup_command: z.string().nullish(),
+    payload_cleanup_executor: z.string().nullish(),
     payload_tags: z.string().array().optional(),
     payload_arguments: z.array(payloadArgumentZodObject).optional(),
     payload_prerequisites: z.array(payloadPrerequisiteZodObject).optional(),
@@ -124,6 +124,13 @@ const PayloadForm: FunctionComponent<Props> = ({
       extendedSchema = baseSchema;
       break;
   }
+
+  extendedSchema = extendedSchema.refine(input =>
+    (!input.payload_cleanup_executor && !input.payload_cleanup_command)
+    || (input.payload_cleanup_executor && input.payload_cleanup_command), {
+          message: "Command and executor must be defined together or none at all",
+          path: ['payload_cleanup_command', 'payload_cleanup_executor'],
+    });
 
   const {
     register,
@@ -469,6 +476,7 @@ const PayloadForm: FunctionComponent<Props> = ({
         control={control}
         fullWidth={true}
         style={{ marginTop: 10 }}
+        error={!!errors.payload_cleanup_executor}
       >
         <MenuItem value="psh">
           {t('PowerShell')}
@@ -489,6 +497,7 @@ const PayloadForm: FunctionComponent<Props> = ({
         rows={3}
         label={t('Cleanup command')}
         style={{ marginTop: 20 }}
+        error={!!errors.payload_cleanup_command}
         inputProps={register('payload_cleanup_command')}
       />
       <Controller

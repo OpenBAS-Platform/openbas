@@ -9,6 +9,7 @@ import io.openbas.database.model.Payload.PAYLOAD_SOURCE;
 import io.openbas.database.model.Payload.PAYLOAD_STATUS;
 import io.openbas.database.model.PayloadArgument;
 import io.openbas.database.model.PayloadPrerequisite;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -45,9 +46,11 @@ public class PayloadCreateInput {
   private String description;
 
   @JsonProperty("command_executor")
+  @Schema(nullable = true)
   private String executor;
 
   @JsonProperty("command_content")
+  @Schema(nullable = true)
   private String content;
 
   @JsonProperty("executable_arch")
@@ -69,9 +72,11 @@ public class PayloadCreateInput {
   private List<PayloadPrerequisite> prerequisites;
 
   @JsonProperty("payload_cleanup_executor")
+  @Schema(nullable = true)
   private String cleanupExecutor;
 
   @JsonProperty("payload_cleanup_command")
+  @Schema(nullable = true)
   private String cleanupCommand;
 
   @JsonProperty("payload_tags")
