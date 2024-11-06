@@ -16,7 +16,6 @@ import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
-import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
@@ -36,7 +35,6 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -90,58 +88,7 @@ public class ExerciseService {
         currentUser().isAdmin()
             ? exerciseRepository.rawAll()
             : exerciseRepository.rawAllGranted(currentUser().getId());
-
-    // -- MAP TO GENERATE TARGETSIMPLEs
-    List<String> exerciseIds =
-        exercises.stream().map(exercise -> exercise.getExercise_id()).toList();
-
-    Map<String, List<Object[]>> teamMap =
-        teamRepository.teamsByExerciseIds(exerciseIds).stream()
-            .collect(Collectors.groupingBy(row -> (String) row[0]));
-
-    Map<String, List<Object[]>> assetMap =
-        assetRepository.assetsByExerciseIds(exerciseIds).stream()
-            .collect(Collectors.groupingBy(row -> (String) row[0]));
-
-    Map<String, List<Object[]>> assetGroupMap =
-        assetGroupRepository.assetGroupsByExerciseIds(exerciseIds).stream()
-            .collect(Collectors.groupingBy(row -> (String) row[0]));
-
-    List<ExerciseSimple> exerciseSimples = new ArrayList<>();
-
-    for (RawExerciseSimple exercise : exercises) {
-      ExerciseSimple simple = exerciseMapper.fromRawExerciseSimple(exercise);
-
-      if (exercise.getInject_ids() != null) {
-        // -- GLOBAL SCORE ---
-        simple.setExpectationResultByTypes(resultUtils.getResultsByTypes(exercise.getInject_ids()));
-
-        // -- TARGETS --
-        List<TargetSimple> allTargets =
-            Stream.concat(
-                    injectMapper
-                        .toTargetSimple(
-                            teamMap.getOrDefault(simple.getId(), emptyList()), TargetType.TEAMS)
-                        .stream(),
-                    Stream.concat(
-                        injectMapper
-                            .toTargetSimple(
-                                assetMap.getOrDefault(simple.getId(), emptyList()),
-                                TargetType.ASSETS)
-                            .stream(),
-                        injectMapper
-                            .toTargetSimple(
-                                assetGroupMap.getOrDefault(simple.getId(), emptyList()),
-                                TargetType.ASSETS_GROUPS)
-                            .stream()))
-                .collect(Collectors.toList());
-
-        simple.getTargets().addAll(allTargets);
-        exerciseSimples.add(simple);
-      }
-    }
-
-    return exerciseSimples;
+    return exerciseMapper.getExerciseSimples(exercises);
   }
 
   public Page<ExerciseSimple> exercises(
@@ -523,19 +470,8 @@ public class ExerciseService {
 
   // -- ScenarioExercise--
   public Iterable<ExerciseSimple> scenarioExercises(@NotBlank String scenarioId) {
-    return exerciseRepository.rawAllByScenarioId(List.of(scenarioId)).stream()
-        .map(
-            exercise -> {
-              ExerciseSimple simple = exerciseMapper.fromRawExerciseSimple(exercise);
-
-              // Processed parameters
-              simple.setExpectationResultByTypes(
-                  resultUtils.getResultsByTypes(exercise.getInject_ids()));
-              simple.setTargets(emptyList()); // TODO
-
-              return simple;
-            })
-        .toList();
+    List<RawExerciseSimple> exercises = exerciseRepository.rawAllByScenarioId(List.of(scenarioId));
+    return exerciseMapper.getExerciseSimples(exercises);
   }
 
   public List<InjectMapper.ExpectationResultsByType> getGlobalResults(@NotBlank String exerciseId) {
