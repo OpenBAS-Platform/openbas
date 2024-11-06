@@ -16,6 +16,7 @@ import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
+import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
@@ -35,6 +36,8 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -146,22 +149,26 @@ public class ExerciseService {
             resultUtils.getResultsByTypes(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
 
         // -- TARGETS --
-        exercise
-            .getTargets()
-            .addAll(
-                injectMapper.toTargetSimple(
-                    teamMap.getOrDefault(exercise.getId(), emptyList()), TargetType.TEAMS));
-        exercise
-            .getTargets()
-            .addAll(
-                injectMapper.toTargetSimple(
-                    assetMap.getOrDefault(exercise.getId(), emptyList()), TargetType.ASSETS));
-        exercise
-            .getTargets()
-            .addAll(
-                injectMapper.toTargetSimple(
-                    assetGroupMap.getOrDefault(exercise.getId(), emptyList()),
-                    TargetType.ASSETS_GROUPS));
+        List<TargetSimple> allTargets =
+            Stream.concat(
+                    injectMapper
+                        .toTargetSimple(
+                            teamMap.getOrDefault(exercise.getId(), emptyList()), TargetType.TEAMS)
+                        .stream(),
+                    Stream.concat(
+                        injectMapper
+                            .toTargetSimple(
+                                assetMap.getOrDefault(exercise.getId(), emptyList()),
+                                TargetType.ASSETS)
+                            .stream(),
+                        injectMapper
+                            .toTargetSimple(
+                                assetGroupMap.getOrDefault(exercise.getId(), emptyList()),
+                                TargetType.ASSETS_GROUPS)
+                            .stream()))
+                .collect(Collectors.toList());
+
+        exercise.getTargets().addAll(allTargets);
       }
     }
 
