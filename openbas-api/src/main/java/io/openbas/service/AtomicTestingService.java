@@ -436,9 +436,9 @@ public class AtomicTestingService {
                         .platforms(
                             tuple.get(
                                 "injector_contract_platforms", Endpoint.PLATFORM_TYPE[].class))
-                        .payloadId(tuple.get("injector_contract_payload_id", String.class))
-                        .payloadType(tuple.get("injector_contract_payload_type", String.class))
-                        .payloadCollectorType(tuple.get("injector_contract_payload_collector_type", String.class))
+                        .payloadId(tuple.get("payload_id", String.class))
+                        .payloadType(tuple.get("payload_type", String.class))
+                        .payloadCollectorType(tuple.get("payload_collector_type", String.class))
                         .labels(tuple.get("injector_contract_labels", Map.class))
                         .build();
               }
