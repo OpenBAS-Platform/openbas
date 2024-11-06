@@ -1,5 +1,6 @@
 package io.openbas.rest.exercise.service;
 
+import static io.openbas.aop.LoggingAspect.logger;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.utils.Constants.ARTICLES;
@@ -128,12 +129,21 @@ public class ExerciseService {
 
     // TODO mapOfInject: InjectService.mapOfInjects();
 
+    long start;
+    long executionTime;
+
     for (ExerciseSimple exercise : exercises) {
       if (exercise.getInjectIds() != null) {
+        start = System.currentTimeMillis();
         exercise.setExpectationResultByTypes(
             resultUtils.getResultsByTypes(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
+        executionTime = System.currentTimeMillis() - start;
+        logger.info("global: " + executionTime + " ms");
+        start = System.currentTimeMillis();
         exercise.setTargets(
             Collections.emptyList()); // TODO fetch targets from injectsIds: TargetSimple
+        executionTime = System.currentTimeMillis() - start;
+        logger.info("Target: " + executionTime + " ms");
       }
     }
 
