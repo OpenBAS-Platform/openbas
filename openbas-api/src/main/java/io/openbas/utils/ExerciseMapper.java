@@ -6,6 +6,7 @@ import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Tag;
 import io.openbas.database.raw.RawExerciseSimple;
+import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.*;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.exercise.form.ExerciseSimple;
@@ -22,10 +23,12 @@ public class ExerciseMapper {
   private final AssetRepository assetRepository;
   private final AssetGroupRepository assetGroupRepository;
   private final TeamRepository teamRepository;
+  private final InjectExpectationRepository injectExpectationRepository;
 
   private final ResultUtils resultUtils;
   private final InjectMapper injectMapper;
 
+  // -- EXERCISE SIMPLE --
   public ExerciseSimple getExerciseSimple(RawExerciseSimple rawExercise) {
 
     ExerciseSimple simple = fromRawExerciseSimple(rawExercise);
@@ -56,6 +59,7 @@ public class ExerciseMapper {
     return simple;
   }
 
+  // -- LIST OF EXERCISE SIMPLE --
   public List<ExerciseSimple> getExerciseSimples(List<RawExerciseSimple> exercises) {
     // -- MAP TO GENERATE TARGETSIMPLEs
     Set<String> exerciseIds =
@@ -73,6 +77,10 @@ public class ExerciseMapper {
         assetGroupRepository.assetGroupsByExerciseIds(exerciseIds).stream()
             .collect(Collectors.groupingBy(row -> (String) row[0]));
 
+    Map<String, List<RawInjectExpectation>> expectationMap =
+        injectExpectationRepository.rawForComputeGlobalByExerciseIds(exerciseIds).stream()
+            .collect(Collectors.groupingBy(RawInjectExpectation::getExercise_id));
+
     List<ExerciseSimple> exerciseSimples = new ArrayList<>();
 
     for (RawExerciseSimple exercise : exercises) {
@@ -81,7 +89,8 @@ public class ExerciseMapper {
               exercise,
               teamMap.getOrDefault(exercise.getExercise_id(), emptyList()),
               assetMap.getOrDefault(exercise.getExercise_id(), emptyList()),
-              assetGroupMap.getOrDefault(exercise.getExercise_id(), emptyList()));
+              assetGroupMap.getOrDefault(exercise.getExercise_id(), emptyList()),
+              expectationMap.getOrDefault(exercise.getExercise_id(), emptyList()));
       exerciseSimples.add(simple);
     }
 
@@ -92,14 +101,15 @@ public class ExerciseMapper {
       RawExerciseSimple rawExercise,
       List<Object[]> teams,
       List<Object[]> assets,
-      List<Object[]> assetGroups) {
+      List<Object[]> assetGroups,
+      List<RawInjectExpectation> expectations) {
 
     ExerciseSimple simple = fromRawExerciseSimple(rawExercise);
 
     if (rawExercise.getInject_ids() != null) {
       // -- GLOBAL SCORE ---
       simple.setExpectationResultByTypes(
-          resultUtils.getResultsByTypes(rawExercise.getInject_ids()));
+          AtomicTestingUtils.getExpectationResultByTypesFromRaw(expectations));
 
       // -- TARGETS --
       List<TargetSimple> allTargets =
