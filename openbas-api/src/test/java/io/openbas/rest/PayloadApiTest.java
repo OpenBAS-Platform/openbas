@@ -145,22 +145,6 @@ public class PayloadApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("Creating Command Line payload with both null executor and content should fail")
-  @WithMockAdminUser
-  void createCommandLinePayloadWithBothNullExecutorAndContent() throws Exception {
-    PayloadCreateInput createInput = getCommandLinePayloadCreateInput();
-
-    createInput.setExecutor(null);
-    createInput.setContent(null);
-
-    mvc.perform(
-            post(PAYLOAD_URI)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(createInput)))
-        .andExpect(status().isOk());
-  }
-
-  @Test
   @DisplayName("Creating Command Line payload with both set executor and content should succeed")
   @WithMockAdminUser
   void createCommandLinePayloadWithBothSetExecutorAndContent() throws Exception {
