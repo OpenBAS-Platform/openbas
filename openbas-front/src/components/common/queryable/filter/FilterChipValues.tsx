@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
-import { Fragment, FunctionComponent, useEffect, useMemo } from 'react';
+import { Fragment, FunctionComponent, useEffect } from 'react';
 
 import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
 import { Option } from '../../../../utils/Option';
