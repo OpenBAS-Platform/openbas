@@ -22,9 +22,11 @@ import io.openbas.rest.settings.response.PlatformSettings;
 import io.openbas.rest.stream.ai.AiConfig;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
@@ -48,9 +50,12 @@ public class PlatformSettingsService {
   private AiConfig aiConfig;
   private CalderaExecutorConfig calderaExecutorConfig;
 
-  @Resource private OpenBASConfig openBASConfig;
-  @Resource private ExpectationPropertiesConfig expectationPropertiesConfig;
-  @Resource private RabbitmqConfig rabbitmqConfig;
+  @Resource
+  private OpenBASConfig openBASConfig;
+  @Resource
+  private ExpectationPropertiesConfig expectationPropertiesConfig;
+  @Resource
+  private RabbitmqConfig rabbitmqConfig;
 
   @Autowired
   public void setOpenCTIConfig(OpenCTIConfig openCTIConfig) {
@@ -180,6 +185,8 @@ public class PlatformSettingsService {
         ofNullable(dbSettings.get(DEFAULT_LANG.key()))
             .map(Setting::getValue)
             .orElse(DEFAULT_LANG.defaultValue()));
+    platformSettings.setDefaultMailer(openBASConfig.getDefaultMailer());
+    platformSettings.setDefaultReplyTo(openBASConfig.getDefaultReplyTo());
 
     // Build authenticated user settings
     OpenBASPrincipal user = currentUser();

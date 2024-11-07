@@ -6,10 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.rest.settings.form.PolicyInput;
 import io.openbas.rest.settings.form.ThemeInput;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -158,4 +160,11 @@ public class PlatformSettings {
   @NotNull
   @JsonProperty("expectation_manual_default_score_value")
   private int expectationDefaultScoreValue;
+
+  // EMAIL CONFIG
+  @JsonProperty("default_mailer")
+  private String defaultMailer;
+
+  @JsonProperty("default_reply_to")
+  private String defaultReplyTo;
 }

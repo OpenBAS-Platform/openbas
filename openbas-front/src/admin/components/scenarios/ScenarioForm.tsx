@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, MenuItem } from '@mui/material';
-import { FunctionComponent } from 'react';
+import { Alert, AlertTitle, Autocomplete, Button, Chip, Grid, MenuItem, TextField as MuiTextField, Typography } from '@mui/material';
+import { FunctionComponent, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -16,27 +16,20 @@ interface Props {
   onSubmit: SubmitHandler<ScenarioInput>;
   handleClose: () => void;
   editing?: boolean;
-  initialValues?: ScenarioInput;
+  disabled?: boolean;
+  initialValues: ScenarioInput;
 }
 
 const ScenarioForm: FunctionComponent<Props> = ({
   onSubmit,
   handleClose,
   editing,
-  initialValues = {
-    scenario_name: '',
-    scenario_category: 'attack-scenario',
-    scenario_main_focus: 'incident-response',
-    scenario_severity: 'high',
-    scenario_subtitle: '',
-    scenario_description: '',
-    scenario_external_reference: '',
-    scenario_external_url: '',
-    scenario_tags: [],
-  },
+  initialValues,
+  disabled,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
+  const [inputValue, setInputValue] = useState('');
 
   const {
     register,
@@ -57,12 +50,23 @@ const ScenarioForm: FunctionComponent<Props> = ({
         scenario_tags: z.string().array().optional(),
         scenario_external_reference: z.string().optional(),
         scenario_external_url: z.string().optional(),
+        scenario_mail_from: z.string().email(t('Should be a valid email address')),
+        scenario_mails_reply_to: z.array(z.string().email(t('Should be a valid email address'))).optional(),
+        scenario_message_header: z.string().optional(),
+        scenario_message_footer: z.string().optional(),
       }),
     ),
     defaultValues: initialValues,
   });
   return (
     <form id="scenarioForm" onSubmit={handleSubmit(onSubmit)}>
+      <Typography
+        variant="h2"
+        gutterBottom
+        style={{ marginTop: 20 }}
+      >
+        {t('General')}
+      </Typography>
       <TextField
         variant="standard"
         fullWidth
@@ -76,51 +80,58 @@ const ScenarioForm: FunctionComponent<Props> = ({
         setValue={setValue}
         askAi={true}
       />
-      <SelectField
-        variant="standard"
-        fullWidth={true}
-        name="scenario_category"
-        label={t('Category')}
-        style={{ marginTop: 20 }}
-        error={!!errors.scenario_category}
-        control={control}
-        defaultValue={initialValues.scenario_category}
-      >
-        {Array.from(scenarioCategories).map(([key, value]) => (
-          <MenuItem key={key} value={key}>
-            {t(value)}
-          </MenuItem>
-        ))}
-      </SelectField>
-      <SelectField
-        variant="standard"
-        fullWidth={true}
-        name="scenario_main_focus"
-        label={t('Main focus')}
-        style={{ marginTop: 20 }}
-        error={!!errors.scenario_main_focus}
-        control={control}
-        defaultValue={initialValues.scenario_main_focus}
-      >
-        <MenuItem key="endpoint-protection" value="endpoint-protection">
-          {t('Endpoint Protection')}
-        </MenuItem>
-        <MenuItem key="web-filtering" value="web-filtering">
-          {t('Web Filtering')}
-        </MenuItem>
-        <MenuItem key="incident-response" value="incident-response">
-          {t('Incident Response')}
-        </MenuItem>
-        <MenuItem key="standard-operating-procedure" value="standard-operating-procedure">
-          {t('Standard Operating Procedures')}
-        </MenuItem>
-        <MenuItem key="crisis-communication" value="crisis-communication">
-          {t('Crisis Communication')}
-        </MenuItem>
-        <MenuItem key="strategic-reaction" value="strategic-reaction">
-          {t('Strategic Reaction')}
-        </MenuItem>
-      </SelectField>
+      <Grid container spacing={2}>
+        <Grid item xs={7}>
+          <SelectField
+            variant="standard"
+            fullWidth={true}
+            name="scenario_category"
+            label={t('Category')}
+            style={{ marginTop: 20 }}
+            error={!!errors.scenario_category}
+            control={control}
+            defaultValue={initialValues.scenario_category}
+          >
+            {Array.from(scenarioCategories).map(([key, value]) => (
+              <MenuItem key={key} value={key}>
+                {t(value)}
+              </MenuItem>
+            ))}
+          </SelectField>
+        </Grid>
+        <Grid item xs={5}>
+          <SelectField
+            variant="standard"
+            fullWidth={true}
+            name="scenario_main_focus"
+            label={t('Main focus')}
+            style={{ marginTop: 20 }}
+            error={!!errors.scenario_main_focus}
+            control={control}
+            defaultValue={initialValues.scenario_main_focus}
+          >
+            <MenuItem key="endpoint-protection" value="endpoint-protection">
+              {t('Endpoint Protection')}
+            </MenuItem>
+            <MenuItem key="web-filtering" value="web-filtering">
+              {t('Web Filtering')}
+            </MenuItem>
+            <MenuItem key="incident-response" value="incident-response">
+              {t('Incident Response')}
+            </MenuItem>
+            <MenuItem key="standard-operating-procedure" value="standard-operating-procedure">
+              {t('Standard Operating Procedures')}
+            </MenuItem>
+            <MenuItem key="crisis-communication" value="crisis-communication">
+              {t('Crisis Communication')}
+            </MenuItem>
+            <MenuItem key="strategic-reaction" value="strategic-reaction">
+              {t('Strategic Reaction')}
+            </MenuItem>
+          </SelectField>
+        </Grid>
+      </Grid>
+
       <SelectField
         variant="standard"
         fullWidth={true}
@@ -171,6 +182,107 @@ const ScenarioForm: FunctionComponent<Props> = ({
             style={{ marginTop: 20 }}
           />
         )}
+      />
+      <Typography
+        variant="h2"
+        gutterBottom
+        style={{ marginTop: 40 }}
+      >
+        {t('Emails and SMS')}
+      </Typography>
+
+      <MuiTextField
+        variant="standard"
+        fullWidth
+        label={t('Sender email address')}
+        style={{ marginTop: 20 }}
+        error={!!errors.scenario_mail_from}
+        helperText={errors.scenario_mail_from && errors.scenario_mail_from?.message}
+        inputProps={register('scenario_mail_from')}
+        disabled={disabled}
+      />
+
+      <Controller
+        control={control}
+        name="scenario_mails_reply_to"
+        render={({ field, fieldState }) => {
+          return (
+            <Autocomplete
+              multiple
+              id="email-reply-to-input"
+              freeSolo
+              open={false}
+              options={[]}
+              value={field.value}
+              onChange={() => {
+                if (undefined !== field.value && inputValue !== '' && !field.value.includes(inputValue)) {
+                  field.onChange([...(field.value || []), inputValue.trim()]);
+                }
+              }}
+              onBlur={field.onBlur}
+              inputValue={inputValue}
+              onInputChange={(_event, newInputValue) => {
+                setInputValue(newInputValue);
+              }}
+              disableClearable={true}
+              renderTags={(tags: string[], getTagProps) => tags.map((email: string, index: number) => {
+                return (
+                  <Chip
+                    variant="outlined"
+                    label={email}
+                    {...getTagProps({ index })}
+                    key={email}
+                    style={{ borderRadius: 4 }}
+                    onDelete={() => {
+                      const newValue = [...(field.value || [])];
+                      newValue.splice(index, 1);
+                      field.onChange(newValue);
+                    }}
+                  />
+                );
+              })}
+              renderInput={params => (
+                <MuiTextField
+                  {...params}
+                  variant="standard"
+                  label={t('Reply to')}
+                  style={{ marginTop: 20 }}
+                  error={!!fieldState.error}
+                  helperText={errors.scenario_mails_reply_to?.find ? errors.scenario_mails_reply_to?.find(value => value != null)?.message ?? '' : ''}
+                />
+              )}
+            />
+          );
+        }}
+      />
+      <Alert
+        severity="warning"
+        variant="outlined"
+        style={{ position: 'relative', border: 'none' }}
+      >
+        <AlertTitle>
+          {t('If you remove the default email address, the email reception for this simulation / scenario will be disabled.')}
+        </AlertTitle>
+      </Alert>
+      <MuiTextField
+        variant="standard"
+        fullWidth
+        label={t('Messages header')}
+        style={{ marginTop: 20 }}
+        error={!!errors.scenario_message_header}
+        helperText={errors.scenario_message_header && errors.scenario_message_header?.message}
+        inputProps={register('scenario_message_header')}
+        disabled={disabled}
+      />
+      <MuiTextField
+        variant="standard"
+        fullWidth
+        label={t('Messages footer')}
+        style={{ marginTop: 20 }}
+        error={!!errors.scenario_message_footer}
+        helperText={errors.scenario_message_footer && errors.scenario_message_footer?.message}
+        inputProps={register('scenario_message_footer')}
+        disabled={disabled}
       />
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button
