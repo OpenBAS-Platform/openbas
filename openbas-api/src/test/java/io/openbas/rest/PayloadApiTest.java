@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -155,11 +154,10 @@ public class PayloadApiTest extends IntegrationTest {
     createInput.setContent(null);
 
     mvc.perform(
-                    post(PAYLOAD_URI)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(createInput)))
-            .andExpect(status().isOk());
-
+            post(PAYLOAD_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(createInput)))
+        .andExpect(status().isOk());
   }
 
   @Test
@@ -172,15 +170,15 @@ public class PayloadApiTest extends IntegrationTest {
     createInput.setExecutor("echo hello world");
 
     mvc.perform(
-                    post(PAYLOAD_URI)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(createInput)))
-            .andExpect(status().isOk());
-
+            post(PAYLOAD_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(createInput)))
+        .andExpect(status().isOk());
   }
 
   @Test
-  @DisplayName("Creating Command Line payload with both null cleanup executor and command should succeed")
+  @DisplayName(
+      "Creating Command Line payload with both null cleanup executor and command should succeed")
   @WithMockAdminUser
   void createCommandLinePayloadWithBothNullCleanupExecutorAndCommand() throws Exception {
     PayloadCreateInput createInput = getCommandLinePayloadCreateInput();
@@ -189,15 +187,15 @@ public class PayloadApiTest extends IntegrationTest {
     createInput.setCleanupCommand(null);
 
     mvc.perform(
-                    post(PAYLOAD_URI)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(createInput)))
-            .andExpect(status().isOk());
-
+            post(PAYLOAD_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(createInput)))
+        .andExpect(status().isOk());
   }
 
   @Test
-  @DisplayName("Creating Command Line payload with both set cleanup executor and command should succeed")
+  @DisplayName(
+      "Creating Command Line payload with both set cleanup executor and command should succeed")
   @WithMockAdminUser
   void createCommandLinePayloadWithBothSetCleanupExecutorAndCommand() throws Exception {
     PayloadCreateInput createInput = getCommandLinePayloadCreateInput();
@@ -206,15 +204,15 @@ public class PayloadApiTest extends IntegrationTest {
     createInput.setCleanupCommand("cleanup this mess");
 
     mvc.perform(
-                    post(PAYLOAD_URI)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(createInput)))
-            .andExpect(status().isOk());
-
+            post(PAYLOAD_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(createInput)))
+        .andExpect(status().isOk());
   }
 
   @Test
-  @DisplayName("Creating Command Line payload with only set cleanup executor and null command should fail")
+  @DisplayName(
+      "Creating Command Line payload with only set cleanup executor and null command should fail")
   @WithMockAdminUser
   void createCommandLinePayloadWithOnlySetCleanupExecutorAndNullCommand() throws Exception {
     PayloadCreateInput createInput = getCommandLinePayloadCreateInput();
@@ -223,15 +221,15 @@ public class PayloadApiTest extends IntegrationTest {
     createInput.setCleanupCommand(null);
 
     mvc.perform(
-                    post(PAYLOAD_URI)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(createInput)))
-            .andExpect(status().isConflict());
-
+            post(PAYLOAD_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(createInput)))
+        .andExpect(status().isConflict());
   }
 
   @Test
-  @DisplayName("Creating Command Line payload with only set cleanup command and null executor should fail")
+  @DisplayName(
+      "Creating Command Line payload with only set cleanup command and null executor should fail")
   @WithMockAdminUser
   void createCommandLinePayloadWithOnlySetCommandAndNullExecutor() throws Exception {
     PayloadCreateInput createInput = getCommandLinePayloadCreateInput();
@@ -240,14 +238,15 @@ public class PayloadApiTest extends IntegrationTest {
     createInput.setCleanupCommand("cleanup this mess");
 
     mvc.perform(
-                    post(PAYLOAD_URI)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(createInput)))
-            .andExpect(status().isConflict());
+            post(PAYLOAD_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(createInput)))
+        .andExpect(status().isConflict());
   }
 
   @Test
-  @DisplayName("Updating Command Line payload with only set cleanup command and null executor should fail")
+  @DisplayName(
+      "Updating Command Line payload with only set cleanup command and null executor should fail")
   @WithMockAdminUser
   void updateCommandLinePayloadWithOnlySetCommandAndNullExecutor() throws Exception {
     PayloadCreateInput createInput = getCommandLinePayloadCreateInput();
@@ -256,10 +255,10 @@ public class PayloadApiTest extends IntegrationTest {
     createInput.setCleanupCommand(null);
 
     String response =
-      mvc.perform(
-                    post(PAYLOAD_URI)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(createInput)))
+        mvc.perform(
+                post(PAYLOAD_URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(createInput)))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()
@@ -276,12 +275,10 @@ public class PayloadApiTest extends IntegrationTest {
     updateInput.setCleanupCommand("cleanup this mess");
 
     mvc.perform(
-                    put(PAYLOAD_URI + "/" + payloadId)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(updateInput)))
-            .andExpect(status().isConflict());
-
-
+            put(PAYLOAD_URI + "/" + payloadId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(updateInput)))
+        .andExpect(status().isConflict());
   }
 
   private PayloadCreateInput getExecutablePayloadCreateInput() {

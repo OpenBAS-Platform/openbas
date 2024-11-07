@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
-import org.springframework.stereotype.Component;
 
 public class V3_47__Enforce_payload_command_definition_consistency extends BaseJavaMigration {
 
