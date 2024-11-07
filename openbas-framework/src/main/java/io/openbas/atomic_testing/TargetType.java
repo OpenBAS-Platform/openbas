@@ -1,4 +1,4 @@
-package io.openbas.database.raw;
+package io.openbas.atomic_testing;
 
 public enum TargetType {
   ASSETS,

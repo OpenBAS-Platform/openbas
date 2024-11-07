@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawInjectExpectation;
-import io.openbas.database.raw.TargetType;
+import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.repository.*;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.*;

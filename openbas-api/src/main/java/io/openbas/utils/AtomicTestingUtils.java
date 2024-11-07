@@ -3,7 +3,7 @@ package io.openbas.utils;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.raw.*;
-import io.openbas.database.raw.TargetType;
+import io.openbas.atomic_testing.TargetType;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.InjectMapper.ExpectationResultsByType;

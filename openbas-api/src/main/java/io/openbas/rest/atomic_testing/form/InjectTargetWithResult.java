@@ -1,7 +1,7 @@
 package io.openbas.rest.atomic_testing.form;
 
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
-import io.openbas.database.raw.TargetType;
+import io.openbas.atomic_testing.TargetType;
 import io.openbas.utils.InjectMapper.ExpectationResultsByType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
