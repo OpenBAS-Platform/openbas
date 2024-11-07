@@ -29,10 +29,11 @@ import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { ExerciseUpdateInput } from '../../../../utils/api-types';
+import type { ExerciseInput } from '../../../../utils/api-types';
 import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
+import ExerciseForm from './ExerciseForm';
 import ExerciseUpdateForm from './ExerciseUpdateForm';
 import ExerciseReports from './reports/ExerciseReports';
 
@@ -61,7 +62,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const handleOpenEdit = () => setOpenEdit(true);
   const handleCloseEdit = () => setOpenEdit(false);
 
-  const onSubmitEdit = (data: ExerciseUpdateInput) => {
+  const onSubmit = (data: ExerciseInput) => {
     const input = {
       exercise_name: data.exercise_name,
       exercise_subtitle: data.exercise_subtitle,
@@ -70,6 +71,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
       exercise_description: data.exercise_description,
       exercise_main_focus: data.exercise_main_focus,
       exercise_tags: data.exercise_tags,
+      exercise_start_date: data.exercise_start_date,
       exercise_mails_reply_to: exercise.exercise_mails_reply_to,
       exercise_mail_from: exercise.exercise_mail_from,
       exercise_message_header: exercise.exercise_message_header,
@@ -77,7 +79,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     };
     return dispatch(updateExercise(exercise.exercise_id, input)).then(() => handleCloseEdit());
   };
-  const submitUpdateEmailParameters = (data: SettingUpdateInput) => {
+  /* const submitUpdateEmailParameters = (data: SettingUpdateInput) => {
     const exerciseInformationInput: ExerciseUpdateInput = {
       exercise_name: exercise.exercise_name,
       exercise_subtitle: exercise.exercise_subtitle,
@@ -91,7 +93,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
       exercise_message_footer: exercise.exercise_message_footer,
     };
     dispatch(updateExercise(exercise.exercise_id, exerciseInformationInput)).then(() => handleCloseEdit());
-  };
+  }; */
 
   // Delete
   const [openDelete, setOpenDelete] = useState(false);
@@ -147,7 +149,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const handleToggleExportVariableValues = () => setExportVariableValues(!exportVariableValues);
 
   // Form
-  const initialValues: ExerciseUpdateInput = {
+  const initialValues: ExerciseInput = {
     exercise_name: exercise.exercise_name,
     exercise_subtitle: exercise.exercise_subtitle ?? '',
     exercise_description: exercise.exercise_description,
@@ -155,13 +157,17 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     exercise_main_focus: exercise.exercise_main_focus ?? 'incident-response',
     exercise_severity: exercise.exercise_severity ?? 'high',
     exercise_tags: exercise.exercise_tags ?? [],
+    exercise_mail_from: exercise.exercise_mail_from ?? '',
+    exercise_mails_reply_to: exercise.exercise_mails_reply_to ?? '',
+    exercise_message_header: exercise.exercise_message_header ?? '',
+    exercise_message_footer: exercise.exercise_message_footer ?? '',
   };
-  const initialValuesEmailParameters = {
+  /* const initialValuesEmailParameters = {
     setting_mail_from: exercise.exercise_mail_from,
     setting_mails_reply_to: exercise.exercise_mails_reply_to,
     setting_message_header: exercise.exercise_message_header,
     setting_message_footer: exercise.exercise_message_footer,
-  };
+  }; */
   const permissions = usePermissions(exercise.exercise_id);
 
   // Fetching data
@@ -183,9 +189,16 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
       <Drawer
         open={openEdit}
         handleClose={handleCloseEdit}
-        title={t('Update the simulation')}
+        title={t('Update simulation')}
       >
-        <>
+        <ExerciseForm
+          onSubmit={onSubmit}
+          initialValues={initialValues}
+          disabled={permissions.readOnly}
+          handleClose={handleCloseEdit}
+          edit={true}
+        />
+        {/* <>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={currentTab} onChange={handleChangeTab}>
               <Tab label={t('Overview')} />
@@ -206,7 +219,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
               disabled={permissions.readOnly}
             />
           )}
-        </>
+        </> */}
       </Drawer>
       <Drawer
         open={openReports}

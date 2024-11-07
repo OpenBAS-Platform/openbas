@@ -40,6 +40,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
@@ -50,6 +51,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -168,9 +170,9 @@ public class ExerciseApi extends RestBehavior {
     List<User> users =
         userIds.isEmpty()
             ? List.of(
-                userRepository
-                    .findById(currentUser().getId())
-                    .orElseThrow(ElementNotFoundException::new))
+            userRepository
+                .findById(currentUser().getId())
+                .orElseThrow(ElementNotFoundException::new))
             : fromIterable(userRepository.findAllById(userIds));
     return dryrunService.provisionDryrun(exercise, users, input.getName());
   }
@@ -377,7 +379,7 @@ public class ExerciseApi extends RestBehavior {
 
   // region exercises
   @PostMapping(EXERCISE_URI)
-  public Exercise createExercise(@Valid @RequestBody ExerciseCreateInput input) {
+  public Exercise createExercise(@Valid @RequestBody ExerciseInput input) {
     if (input == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Exercise input cannot be null");
     }
@@ -397,7 +399,7 @@ public class ExerciseApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Exercise updateExerciseInformation(
-      @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateInput input) {
+      @PathVariable String exerciseId, @Valid @RequestBody ExerciseInput input) {
     Exercise exercise =
         exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     exercise.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));

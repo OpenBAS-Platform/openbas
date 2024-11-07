@@ -6,9 +6,9 @@ import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { ExerciseCreateInput } from '../../../../utils/api-types';
+import type { ExerciseInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import ExerciseCreationForm from './ExerciseCreationForm';
+import ExerciseForm from './ExerciseForm';
 
 const ExerciseCreation = () => {
   // Standard hooks
@@ -16,7 +16,7 @@ const ExerciseCreation = () => {
   const { t } = useFormatter();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const onSubmit = (data: ExerciseCreateInput) => {
+  const onSubmit = (data: ExerciseInput) => {
     dispatch(addExercise(data)).then((result: { result: string; entities: { scenarios: Record<string, ExerciseStore> } }) => {
       setOpen(false);
       navigate(`/admin/exercises/${result.result}`);
@@ -30,9 +30,10 @@ const ExerciseCreation = () => {
         handleClose={() => setOpen(false)}
         title={t('Create a new simulation')}
       >
-        <ExerciseCreationForm
+        <ExerciseForm
           onSubmit={onSubmit}
           handleClose={() => setOpen(false)}
+          edit={false}
         />
       </Drawer>
     </>
