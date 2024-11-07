@@ -168,4 +168,13 @@ public interface TeamRepository
               + "WHERE i.inject_exercise in :exerciseIds",
       nativeQuery = true)
   List<Object[]> teamsByExerciseIds(List<String> exerciseIds);
+
+  @Query(
+      value =
+          "SELECT DISTINCT it.inject_id, t.team_id, t.team_name "
+              + "FROM teams t "
+              + "INNER JOIN injects_teams it ON t.team_id = it.team_id "
+              + "WHERE it.inject_id in :injectIds",
+      nativeQuery = true)
+  List<Object[]> teamsByInjectIds(List<String> injectIds);
 }

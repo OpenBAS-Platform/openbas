@@ -49,7 +49,8 @@ public class InjectResultOutput {
   @JsonProperty("injects_tags")
   private List<String> tagIds;
 
-  // -- PROCESSED PROPERTIES
+  // PROCESSED ATTRIBUTES
+
   @Schema(
       description = "Specifies the categories of targets for atomic testing.",
       example = "assets, asset groups, teams, players")

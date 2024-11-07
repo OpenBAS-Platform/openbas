@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Filters;
 import java.util.List;
 
-public interface RawAssetGroup extends RawTarget {
+public interface RawAssetGroup {
 
   default Filters.FilterGroup getAssetGroupDynamicFilter() {
     ObjectMapper objectMapper = new ObjectMapper();

@@ -81,4 +81,13 @@ public interface AssetGroupRepository
               + "WHERE i.inject_exercise in :exerciseIds",
       nativeQuery = true)
   List<Object[]> assetGroupsByExerciseIds(List<String> exerciseIds);
+
+  @Query(
+      value =
+          "SELECT DISTINCT iag.inject_id, ag.asset_group_id, ag.asset_group_name "
+              + "FROM asset_groups ag "
+              + "INNER JOIN injects_asset_groups iag ON ag.asset_group_id = iag.asset_group_id "
+              + "WHERE iag.inject_id in :injectIds",
+      nativeQuery = true)
+  List<Object[]> assetGroupsByInjectIds(List<String> injectIds);
 }

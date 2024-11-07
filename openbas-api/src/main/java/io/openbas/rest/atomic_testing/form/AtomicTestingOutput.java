@@ -50,9 +50,8 @@ public class AtomicTestingOutput {
   @JsonIgnore private String[] teamIds;
   @JsonIgnore private String[] assetIds;
   @JsonIgnore private String[] assetGroupIds;
-  @JsonIgnore private String[] expectationIds;
 
-  // PROCESSED ATTRIBUTES
+  // -- PROCESSED ATTRIBUTES --
 
   @JsonProperty("inject_targets")
   private List<TargetSimple> targets = new ArrayList<>();

@@ -9,6 +9,7 @@ import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
+import static java.util.Collections.emptyList;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.TargetType;
 import io.openbas.database.repository.*;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.*;
@@ -34,6 +36,8 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -339,6 +343,49 @@ public class AtomicTestingService {
     // -- EXECUTION --
     List<AtomicTestingOutput> injects = execAtomicTesting(query);
 
+    // -- MAP TO GENERATE TARGETSIMPLEs --
+    List<String> injectIds = injects.stream().map(inject -> inject.getId()).toList();
+
+    Map<String, List<Object[]>> teamMap =
+        teamRepository.teamsByInjectIds(injectIds).stream()
+            .collect(Collectors.groupingBy(row -> (String) row[0]));
+
+    Map<String, List<Object[]>> assetMap =
+        assetRepository.assetsByInjectIds(injectIds).stream()
+            .collect(Collectors.groupingBy(row -> (String) row[0]));
+
+    Map<String, List<Object[]>> assetGroupMap =
+        assetGroupRepository.assetGroupsByInjectIds(injectIds).stream()
+            .collect(Collectors.groupingBy(row -> (String) row[0]));
+
+    for (AtomicTestingOutput inject : injects) {
+
+      // -- GLOBAL SCORE ---
+      inject.setExpectationResultByTypes(
+          resultUtils.getResultsByTypes(new HashSet<>(Arrays.asList(inject.getId()))));
+
+      // -- TARGETS --
+      List<TargetSimple> allTargets =
+          Stream.concat(
+                  injectMapper
+                      .toTargetSimple(
+                          teamMap.getOrDefault(inject.getId(), emptyList()), TargetType.TEAMS)
+                      .stream(),
+                  Stream.concat(
+                      injectMapper
+                          .toTargetSimple(
+                              assetMap.getOrDefault(inject.getId(), emptyList()), TargetType.ASSETS)
+                          .stream(),
+                      injectMapper
+                          .toTargetSimple(
+                              assetGroupMap.getOrDefault(inject.getId(), emptyList()),
+                              TargetType.ASSETS_GROUPS)
+                          .stream()))
+              .collect(Collectors.toList());
+
+      inject.getTargets().addAll(allTargets);
+    }
+
     // -- Count Query --
     Long total = countQuery(cb, this.entityManager, Inject.class, specificationCount);
 
@@ -366,8 +413,6 @@ public class AtomicTestingService {
     Join<Inject, InjectStatus> statusJoin = injectRoot.join("status", JoinType.LEFT);
 
     // Array aggregations
-    Expression<String[]> injectExpectationIdsExpression =
-        createJoinArrayAggOnId(cb, injectRoot, EXPECTATIONS);
     Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
     Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
     Expression<String[]> assetGroupIdsExpression =
@@ -389,7 +434,6 @@ public class AtomicTestingService {
             collectorJoin.get("type").alias("payload_collector_type"),
             statusJoin.get("name").alias("status_name"),
             statusJoin.get("trackingSentDate").alias("status_tracking_sent_date"),
-            injectExpectationIdsExpression.alias("inject_expectations"),
             teamIdsExpression.alias("inject_teams"),
             assetIdsExpression.alias("inject_assets"),
             assetGroupIdsExpression.alias("inject_asset_groups"))
@@ -454,8 +498,6 @@ public class AtomicTestingService {
               atomicTestingOutput.setAssetIds(tuple.get("inject_assets", String[].class));
               atomicTestingOutput.setAssetGroupIds(
                   tuple.get("inject_asset_groups", String[].class));
-              atomicTestingOutput.setExpectationIds(
-                  tuple.get("inject_expectations", String[].class));
 
               return atomicTestingOutput;
             })

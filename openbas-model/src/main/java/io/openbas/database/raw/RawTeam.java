@@ -3,7 +3,7 @@ package io.openbas.database.raw;
 import java.time.Instant;
 import java.util.Set;
 
-public interface RawTeam extends RawTarget {
+public interface RawTeam {
 
   String getTeam_id();
 
