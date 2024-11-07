@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -145,7 +146,7 @@ public class PayloadApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("Creating Command Line payload with both null executor and content should succeed")
+  @DisplayName("Creating Command Line payload with both null executor and content should fail")
   @WithMockAdminUser
   void createCommandLinePayloadWithBothNullExecutorAndContent() throws Exception {
     PayloadCreateInput createInput = getCommandLinePayloadCreateInput();
@@ -267,9 +268,11 @@ public class PayloadApiTest extends IntegrationTest {
     var payloadId = JsonPath.read(response, "$.payload_id");
 
     PayloadUpdateInput updateInput = new PayloadUpdateInput();
-    updateInput.setExecutor("sh");
-    updateInput.setContent("echo hello world");
     updateInput.setName("updated command line payload");
+    updateInput.setContent("echo world again");
+    updateInput.setExecutor("sh");
+    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Linux});
+
     updateInput.setCleanupCommand("cleanup this mess");
 
     mvc.perform(
