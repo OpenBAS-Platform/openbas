@@ -2,6 +2,7 @@ package io.openbas.rest.atomic_testing.form;
 
 import static lombok.AccessLevel.NONE;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.utils.InjectMapper;
@@ -10,10 +11,11 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class AtomicTestingOutput {
 
   @JsonProperty("inject_id")
@@ -45,26 +47,16 @@ public class AtomicTestingOutput {
     return status;
   }
 
+  @JsonIgnore private String[] teamIds;
+  @JsonIgnore private String[] assetIds;
+  @JsonIgnore private String[] assetGroupIds;
+  @JsonIgnore private String[] expectationIds;
+
+  // PROCESSED ATTRIBUTES
+
   @JsonProperty("inject_targets")
   private List<TargetSimple> targets = new ArrayList<>();
 
-  // Pre Calcul
-
   @JsonProperty("inject_expectation_results")
   private List<InjectMapper.ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
-
-  public AtomicTestingOutput(
-      String id,
-      String title,
-      Instant updatedAt,
-      String injectType,
-      InjectorContractSimple injectorContract,
-      InjectStatusSimple injectStatus) {
-    this.id = id;
-    this.title = title;
-    this.updatedAt = updatedAt;
-    this.injectType = injectType;
-    this.injectorContract = injectorContract;
-    this.status = injectStatus;
-  }
 }

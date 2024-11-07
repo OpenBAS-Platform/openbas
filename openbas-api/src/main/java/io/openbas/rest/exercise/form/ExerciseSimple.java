@@ -56,10 +56,12 @@ public class ExerciseSimple {
 
   @JsonIgnore private String[] injectIds;
 
-  @JsonProperty("exercise_global_score")
-  private List<InjectMapper.ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
+  // PROCESSED ATTRIBUTES
 
   @JsonProperty("exercise_targets")
   @NotNull
   private List<TargetSimple> targets = new ArrayList<>();
+
+  @JsonProperty("exercise_global_score")
+  private List<InjectMapper.ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
 }
