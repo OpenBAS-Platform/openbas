@@ -1,5 +1,5 @@
 import { Add, ControlPointOutlined } from '@mui/icons-material';
-import { Fab, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Fab, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
@@ -68,12 +68,7 @@ const CreateDocument = (props) => {
   return (
     <>
       {inline === true ? (
-        <ListItem
-          button
-          divider
-          onClick={() => setOpen(true)}
-          color="primary"
-        >
+        <ListItemButton divider onClick={() => setOpen(true)} color="primary">
           <ListItemIcon color="primary">
             <ControlPointOutlined color="primary" />
           </ListItemIcon>
@@ -81,7 +76,7 @@ const CreateDocument = (props) => {
             primary={t('Create a new document')}
             classes={{ primary: classes.text }}
           />
-        </ListItem>
+        </ListItemButton>
       ) : (
         <Fab
           onClick={() => setOpen(true)}

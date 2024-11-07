@@ -1,5 +1,19 @@
 import { Add, CastForEducationOutlined } from '@mui/icons-material';
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import {
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from '@mui/material';
 import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
@@ -202,10 +216,9 @@ class LessonsCategoryAddTeams extends Component {
                         team.team_id,
                       );
                     return (
-                      <ListItem
+                      <ListItemButton
                         key={team.team_id}
                         disabled={disabled}
-                        button
                         divider
                         dense
                         onClick={this.addTeam.bind(
@@ -224,7 +237,7 @@ class LessonsCategoryAddTeams extends Component {
                           variant="list"
                           tags={team.team_tags}
                         />
-                      </ListItem>
+                      </ListItemButton>
                     );
                   })}
                   <CreateTeam

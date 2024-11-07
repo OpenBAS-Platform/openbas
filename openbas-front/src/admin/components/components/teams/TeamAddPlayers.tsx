@@ -1,5 +1,20 @@
 import { Add, PersonOutlined } from '@mui/icons-material';
-import { Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Fab, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import {
+  Avatar,
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Fab,
+  Grid,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useContext, useState } from 'react';
@@ -165,23 +180,24 @@ const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
                   const disabled = usersIds.includes(user.user_id)
                     || addedUsersIds.includes(user.user_id);
                   return (
-                    <ListItem
-                      key={user.user_id}
-                      disabled={disabled}
-                      button
-                      divider
-                      dense
-                      onClick={() => setUsersIds([...usersIds, user.user_id])}
-                    >
-                      <ListItemIcon>
-                        <PersonOutlined />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={resolveUserName(user)}
-                        secondary={user.organization_name}
-                      />
-                      <ItemTags variant="reduced-view" tags={user.user_tags} />
-                    </ListItem>
+                    (
+                      <ListItemButton
+                        key={user.user_id}
+                        disabled={disabled}
+                        divider
+                        dense
+                        onClick={() => setUsersIds([...usersIds, user.user_id])}
+                      >
+                        <ListItemIcon>
+                          <PersonOutlined />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={resolveUserName(user)}
+                          secondary={user.organization_name}
+                        />
+                        <ItemTags variant="reduced-view" tags={user.user_tags} />
+                      </ListItemButton>
+                    )
                   );
                 })}
                 <CreatePlayer

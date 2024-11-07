@@ -1,5 +1,5 @@
 import { BarChartOutlined, KeyboardArrowRight, ReorderOutlined } from '@mui/icons-material';
-import { Chip, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
+import { Chip, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -357,13 +357,12 @@ const Mails = () => {
             </ListItem>
             {sortedInjects.map((inject) => {
               return (
-                <ListItem
+                <ListItemButton
                   key={inject.inject_id}
                   component={Link}
                   to={`/admin/exercises/${exerciseId}/animation/mails/${inject.inject_id}`}
                   classes={{ root: classes.item }}
                   divider={true}
-                  button={true}
                 >
                   <ListItemIcon style={{ paddingTop: 5 }}>
                     <InjectIcon type={inject.inject_type} disabled={!inject.inject_enabled} />
@@ -419,7 +418,7 @@ const Mails = () => {
                   <ListItemSecondaryAction classes={{ root: classes.goIcon }}>
                     <KeyboardArrowRight />
                   </ListItemSecondaryAction>
-                </ListItem>
+                </ListItemButton>
               );
             })}
           </List>

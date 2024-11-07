@@ -17,6 +17,7 @@ import {
   InputLabel,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
@@ -1379,7 +1380,7 @@ class InjectDefinition extends Component {
                   f => !builtInFields.includes(f.key) && !f.expectation,
                 )
                 .filter((f) => {
-                  // Filter display if linked fields
+                // Filter display if linked fields
                   for (
                     let index = 0;
                     index < f.linkedFields.length;
@@ -1415,7 +1416,7 @@ class InjectDefinition extends Component {
                   <div style={{ marginTop: -15 }}>
                     {this.renderFields(
                       expectationsNotManual.filter((f) => {
-                        // Filter display if linked fields
+                      // Filter display if linked fields
                         for (let index = 0; index < f.linkedFields.length; index += 1) {
                           const linkedField = f.linkedFields[index];
                           if (linkedField.type === 'checkbox' && values[linkedField.key] === false) {
@@ -1449,11 +1450,10 @@ class InjectDefinition extends Component {
               </Typography>
               <List>
                 {sortedDocuments.map(document => (
-                  <ListItem
+                  <ListItemButton
                     key={document.document_id}
                     classes={{ root: classes.item }}
                     divider={true}
-                    button={true}
                     component="a"
                     href={`/api/documents/${document.document_id}/file`}
                   >
@@ -1515,7 +1515,7 @@ class InjectDefinition extends Component {
                         disabled={this.props.permissions.readOnly || (hasAttachments && fieldAttachements.readOnly)}
                       />
                     </ListItemSecondaryAction>
-                  </ListItem>
+                  </ListItemButton>
                 ))}
                 <MultipleFileLoader
                   initialDocumentIds={documents.filter(a => !a.inject_document_attached).map(d => d.document_id)}

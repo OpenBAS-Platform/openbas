@@ -1,4 +1,4 @@
-import { Chip, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
+import { Chip, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, useMemo, useState } from 'react';
 
@@ -268,56 +268,57 @@ const Payloads = () => {
         {payloads.map((payload: PayloadStore) => {
           const collector = payload.payload_collector ? collectorsMap[payload.payload_collector] : null;
           return (
-            <ListItem
-              key={payload.payload_id}
-              classes={{ root: classes.item }}
-              button
-              divider
-              onClick={() => setSelectedPayload(payload)}
-            >
-              <ListItemIcon>
-                {collector ? (
-                  <img
-                    src={`/api/images/collectors/${collector.collector_type}`}
-                    alt={collector.collector_type}
-                    style={{
-                      padding: 0,
-                      cursor: 'pointer',
-                      width: 20,
-                      height: 20,
-                      borderRadius: 4,
-                    }}
-                  />
-                ) : (
-                  <PayloadIcon payloadType={payload.payload_type ?? ''} />
-                )}
-              </ListItemIcon>
-              <ListItemText
-                primary={(
-                  <div className={classes.bodyItems}>
-                    {headers.map(header => (
-                      <div
-                        key={header.field}
-                        className={classes.bodyItem}
-                        style={inlineStyles[header.field]}
-                      >
-                        {header.value?.(payload)}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              />
-              <ListItemSecondaryAction>
-                <PayloadPopover
-                  documentsMap={documentsMap}
-                  payload={payload}
-                  onUpdate={(result: PayloadStore) => setPayloads(payloads.map(a => (a.payload_id !== result.payload_id ? a : result)))}
-                  onDuplicate={(result: PayloadStore) => setPayloads([result, ...payloads])}
-                  onDelete={(result: string) => setPayloads(payloads.filter(a => (a.payload_id !== result)))}
-                  disabled={collector !== null}
+            (
+              <ListItemButton
+                key={payload.payload_id}
+                classes={{ root: classes.item }}
+                divider
+                onClick={() => setSelectedPayload(payload)}
+              >
+                <ListItemIcon>
+                  {collector ? (
+                    <img
+                      src={`/api/images/collectors/${collector.collector_type}`}
+                      alt={collector.collector_type}
+                      style={{
+                        padding: 0,
+                        cursor: 'pointer',
+                        width: 20,
+                        height: 20,
+                        borderRadius: 4,
+                      }}
+                    />
+                  ) : (
+                    <PayloadIcon payloadType={payload.payload_type ?? ''} />
+                  )}
+                </ListItemIcon>
+                <ListItemText
+                  primary={(
+                    <div className={classes.bodyItems}>
+                      {headers.map(header => (
+                        <div
+                          key={header.field}
+                          className={classes.bodyItem}
+                          style={inlineStyles[header.field]}
+                        >
+                          {header.value?.(payload)}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 />
-              </ListItemSecondaryAction>
-            </ListItem>
+                <ListItemSecondaryAction>
+                  <PayloadPopover
+                    documentsMap={documentsMap}
+                    payload={payload}
+                    onUpdate={(result: PayloadStore) => setPayloads(payloads.map(a => (a.payload_id !== result.payload_id ? a : result)))}
+                    onDuplicate={(result: PayloadStore) => setPayloads([result, ...payloads])}
+                    onDelete={(result: string) => setPayloads(payloads.filter(a => (a.payload_id !== result)))}
+                    disabled={collector !== null}
+                  />
+                </ListItemSecondaryAction>
+              </ListItemButton>
+            )
           );
         })}
       </List>

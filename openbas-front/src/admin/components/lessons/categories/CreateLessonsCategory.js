@@ -1,5 +1,5 @@
 import { ControlPointOutlined } from '@mui/icons-material';
-import { Dialog, DialogContent, DialogTitle, ListItem, ListItemIcon, ListItemText, Slide } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, ListItemButton, ListItemIcon, ListItemText, Slide } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { forwardRef, useContext, useState } from 'react';
 
@@ -48,12 +48,7 @@ const CreateLessonsCategory = (props) => {
   return (
     <div>
       {inline === true ? (
-        <ListItem
-          button
-          divider
-          onClick={handleOpen}
-          color="primary"
-        >
+        <ListItemButton divider onClick={handleOpen} color="primary">
           <ListItemIcon color="primary">
             <ControlPointOutlined color="primary" />
           </ListItemIcon>
@@ -61,7 +56,7 @@ const CreateLessonsCategory = (props) => {
             primary={t('Create a new lessons learned category')}
             classes={{ primary: classes.text }}
           />
-        </ListItem>
+        </ListItemButton>
       ) : (
         <ButtonCreate onClick={handleOpen} />
       )}

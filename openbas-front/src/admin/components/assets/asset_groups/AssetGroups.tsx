@@ -1,4 +1,4 @@
-import { Box, Chip, Drawer as MuiDrawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { Box, Chip, Drawer as MuiDrawer, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { SelectGroup } from 'mdi-material-ui';
 import { CSSProperties, Fragment, useMemo, useState } from 'react';
@@ -232,11 +232,10 @@ const AssetGroups = () => {
           />
         </ListItem>
         {assetGroups.map((assetGroup: AssetGroupOutput) => (
-          <ListItem
+          <ListItemButton
             key={assetGroup.asset_group_id}
             classes={{ root: classes.item }}
             divider
-            button
             onClick={() => setSelectedAssetGroupId(assetGroup.asset_group_id)}
           >
             <ListItemIcon>
@@ -271,7 +270,7 @@ const AssetGroups = () => {
                 openEditOnInit={assetGroup.asset_group_id === searchId}
               />
             </ListItemSecondaryAction>
-          </ListItem>
+          </ListItemButton>
         ))}
       </List>
       {userAdmin && <AssetGroupCreation onCreate={result => setAssetGroups([result, ...assetGroups])} />}

@@ -1,5 +1,5 @@
 import { KeyboardArrowRightOutlined } from '@mui/icons-material';
-import { Alert, Button, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Alert, Button, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { FunctionComponent, useState } from 'react';
@@ -96,18 +96,13 @@ const TechnicalExpectationAsset: FunctionComponent<Props> = ({
                       disablePadding
                     >
                       {expectation.inject_expectation_results?.map(result => (
-                        <ListItem
-                          key={result.sourceId}
-                          divider
-                          button
-                          onClick={() => setSelected(result)}
-                        >
+                        <ListItemButton key={result.sourceId} divider onClick={() => setSelected(result)}>
                           <ListItemText style={{ minWidth: '200px', maxWidth: '200px' }} primary={<span>{result.sourceName}</span>} />
                           <ListItemText primary={<span>{truncate(result.result, 40)}</span>} />
                           <ListItemIcon>
                             <KeyboardArrowRightOutlined />
                           </ListItemIcon>
-                        </ListItem>
+                        </ListItemButton>
                       ))}
                     </List>
                   </>

@@ -1,5 +1,14 @@
 import { PreviewOutlined } from '@mui/icons-material';
-import { Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
+import {
+  Grid,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+  Paper,
+  Typography,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -148,12 +157,11 @@ const TimelineOverview = () => {
                   {pendingInjects.map((inject: InjectStore) => {
                     const isDisabled = !inject.inject_injector_contract.injector_contract_content_parsed?.config.expose;
                     return (
-                      <ListItem
+                      <ListItemButton
                         key={inject.inject_id}
                         dense
                         classes={{ root: classes.item }}
                         divider
-                        button
                         disabled={isDisabled || !inject.inject_enabled}
                         onClick={() => setSelectedInjectId(inject.inject_id)}
                       >
@@ -211,7 +219,7 @@ const TimelineOverview = () => {
                             canTriggerNow
                           />
                         </ListItemSecondaryAction>
-                      </ListItem>
+                      </ListItemButton>
                     );
                   })}
                 </List>
@@ -275,10 +283,11 @@ const TimelineOverview = () => {
                             >
                               {fndt(inject.inject_status?.tracking_sent_date)}
                               {' '}
-                              (
-                              {inject.inject_status && inject.inject_status.tracking_total_execution_time && (inject.inject_status.tracking_total_execution_time / 1000).toFixed(2)}
+                              {
+                                inject.inject_status && inject.inject_status.tracking_total_execution_time
+                                && (inject.inject_status.tracking_total_execution_time / 1000).toFixed(2)
+                              }
                               {t('s')}
-                              )
                             </div>
                           </div>
                         )}

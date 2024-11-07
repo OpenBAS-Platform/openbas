@@ -12,7 +12,7 @@ import {
   Grid,
   IconButton,
   List,
-  ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -390,10 +390,9 @@ class GroupPopover extends Component {
                   {filteredUsers.map((user) => {
                     const disabled = this.state.usersIds.includes(user.user_id);
                     return (
-                      <ListItem
+                      <ListItemButton
                         key={user.user_id}
                         disabled={disabled}
-                        button={true}
                         divider={true}
                         dense={true}
                         onClick={this.addUser.bind(this, user.user_id)}
@@ -406,7 +405,7 @@ class GroupPopover extends Component {
                           secondary={user.organization_name}
                         />
                         <ItemTags variant="list" tags={user.user_tags} />
-                      </ListItem>
+                      </ListItemButton>
                     );
                   })}
                 </List>

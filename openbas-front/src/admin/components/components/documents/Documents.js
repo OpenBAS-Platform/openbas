@@ -1,5 +1,5 @@
 import { DescriptionOutlined, RowingOutlined } from '@mui/icons-material';
-import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
@@ -147,7 +147,7 @@ const Documents = () => {
                 fontSize: 12,
               }}
             >
-              &nbsp;
+            &nbsp;
             </span>
           </ListItemIcon>
           <ListItemText
@@ -163,11 +163,10 @@ const Documents = () => {
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
         {documents.map(document => (
-          <ListItem
+          <ListItemButton
             key={document.document_id}
             classes={{ root: classes.item }}
             divider={true}
-            button={true}
             component="a"
             href={`/api/documents/${document.document_id}/file`}
           >
@@ -209,7 +208,7 @@ const Documents = () => {
                             clickable={true}
                             onClick={
                               (event) => {
-                                // prevent parent link from triggering
+                              // prevent parent link from triggering
                                 event.stopPropagation();
                                 event.preventDefault();
                                 navigate(`/admin/exercises/${exercise.exercise_id}`);
@@ -240,7 +239,7 @@ const Documents = () => {
                             clickable={true}
                             onClick={
                               (event) => {
-                                // prevent parent link from triggering
+                              // prevent parent link from triggering
                                 event.stopPropagation();
                                 event.preventDefault();
                                 navigate(`/admin/scenarios/${scenario.scenario_id}`);
@@ -278,7 +277,7 @@ const Documents = () => {
                 scenariosAndExercisesFetched
               />
             </ListItemSecondaryAction>
-          </ListItem>
+          </ListItemButton>
         ))}
       </List>
       {userAdmin && (

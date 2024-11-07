@@ -1,4 +1,4 @@
-import { ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, ReactElement } from 'react';
 
@@ -46,14 +46,11 @@ const ExpectationLine: FunctionComponent<Props> = ({
 
   return (
     <>
-      <ListItem
+      <ListItemButton
         key={expectation.inject_expectation_id}
         divider
         sx={{ pl: gap ?? 8 }}
         classes={{ root: classes.item }}
-        /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
-        // @ts-ignore
-        button={!!onClick}
         onClick={onClick}
       >
         <ListItemIcon>
@@ -76,7 +73,7 @@ const ExpectationLine: FunctionComponent<Props> = ({
             </div>
           )}
         />
-      </ListItem>
+      </ListItemButton>
     </>
   );
 };

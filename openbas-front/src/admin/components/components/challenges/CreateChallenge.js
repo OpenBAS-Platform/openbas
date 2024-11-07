@@ -1,5 +1,5 @@
 import { Add, ControlPointOutlined } from '@mui/icons-material';
-import { Dialog, DialogContent, DialogTitle, Fab, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, Fab, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
@@ -49,12 +49,7 @@ const CreateChallenge = (props) => {
   return (
     <div>
       {inline === true ? (
-        <ListItem
-          button={true}
-          divider={true}
-          onClick={handleOpen}
-          color="primary"
-        >
+        <ListItemButton divider={true} onClick={handleOpen} color="primary">
           <ListItemIcon color="primary">
             <ControlPointOutlined color="primary" />
           </ListItemIcon>
@@ -62,7 +57,7 @@ const CreateChallenge = (props) => {
             primary={t('Create a new challenge')}
             classes={{ primary: classes.text }}
           />
-        </ListItem>
+        </ListItemButton>
       ) : (
         <Fab
           onClick={handleOpen}
@@ -73,7 +68,6 @@ const CreateChallenge = (props) => {
           <Add />
         </Fab>
       )}
-
       {inline ? (
         <Dialog
           open={open}

@@ -1,5 +1,5 @@
 import { ControlPointOutlined } from '@mui/icons-material';
-import { ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useContext, useState } from 'react';
 
@@ -59,9 +59,8 @@ const MultipleFileLoader: FunctionComponent<Props> = ({
 
   return (
     <>
-      <ListItem
+      <ListItemButton
         classes={{ root: classes.item }}
-        button
         divider
         onClick={handleOpen}
         color="primary"
@@ -74,7 +73,7 @@ const MultipleFileLoader: FunctionComponent<Props> = ({
           primary={t('Add documents')}
           classes={{ primary: classes.text }}
         />
-      </ListItem>
+      </ListItemButton>
       <FileTransferDialog
         label={t('Add documents')}
         open={open}

@@ -1,5 +1,5 @@
 import { DeleteOutlined, VideoSettingsOutlined } from '@mui/icons-material';
-import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { IconButton, List, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -66,10 +66,9 @@ const ExerciseControlDryRuns: FunctionComponent<Props> = ({
       {dryruns.length > 0 ? (
         <List style={{ paddingTop: 0 }}>
           {dryruns.map((dryrun: Dryrun) => (
-            <ListItem
+            <ListItemButton
               key={dryrun.dryrun_id}
               dense
-              button
               classes={{ root: classes.item }}
               divider
               component={Link}
@@ -128,13 +127,12 @@ const ExerciseControlDryRuns: FunctionComponent<Props> = ({
                   <DeleteOutlined />
                 </IconButton>
               </ListItemSecondaryAction>
-            </ListItem>
+            </ListItemButton>
           ))}
         </List>
       ) : (
         <Empty message={t('No dryrun in this simulation.')} />
       )}
-
       <DialogDelete
         open={Boolean(openDryrunDelete)}
         handleClose={() => setOpenDryrunDelete(null)}

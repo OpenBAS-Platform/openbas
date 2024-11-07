@@ -16,6 +16,7 @@ import {
   InputLabel,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
@@ -1315,11 +1316,10 @@ class QuickInject extends Component {
                       <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
                     </ListItem>
                     {sortedDocuments.map(document => (
-                      <ListItem
+                      <ListItemButton
                         key={document.document_id}
                         classes={{ root: classes.item }}
                         divider={true}
-                        button={true}
                         component="a"
                         href={`/api/documents/${document.document_id}/file`}
                       >
@@ -1399,7 +1399,7 @@ class QuickInject extends Component {
                             disabled={isExerciseReadOnly(exercise)}
                           />
                         </ListItemSecondaryAction>
-                      </ListItem>
+                      </ListItemButton>
                     ))}
                     <MultipleFileLoader
                       exerciseId={exerciseId}
