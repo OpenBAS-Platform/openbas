@@ -257,6 +257,11 @@ public class OpenBASImplantExecutor extends Injector {
                               (Command) Hibernate.unproxy(injectorContract.getPayload());
                           injectExpectationSignatures.add(
                               InjectExpectationSignature.builder()
+                                  .type(EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME)
+                                  .value("obas-implant-" + inject.getId())
+                                  .build());
+                          injectExpectationSignatures.add(
+                              InjectExpectationSignature.builder()
                                   .type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE)
                                   .value(
                                       Base64.getEncoder()
