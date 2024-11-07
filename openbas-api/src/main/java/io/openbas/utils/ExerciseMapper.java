@@ -2,10 +2,10 @@ package io.openbas.utils;
 
 import static java.util.Collections.emptyList;
 
+import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Tag;
 import io.openbas.database.raw.RawExerciseSimple;
-import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.repository.*;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.exercise.form.ExerciseSimple;

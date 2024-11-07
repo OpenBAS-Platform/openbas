@@ -2,8 +2,8 @@ package io.openbas.utils;
 
 import static io.openbas.utils.AtomicTestingUtils.getRefinedExpectations;
 
-import io.openbas.database.model.*;
 import io.openbas.atomic_testing.TargetType;
+import io.openbas.database.model.*;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
 import io.openbas.rest.atomic_testing.form.InjectStatusSimple;

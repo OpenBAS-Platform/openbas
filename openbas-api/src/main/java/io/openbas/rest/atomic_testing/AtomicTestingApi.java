@@ -5,8 +5,8 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
-import io.openbas.rest.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
+import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.AtomicTestingService;
@@ -34,7 +34,7 @@ public class AtomicTestingApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping("/search")
   @Transactional(readOnly = true)
-  public Page<AtomicTestingOutput> findAllAtomicTestings(
+  public Page<InjectResultOutput> findAllAtomicTestings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return atomicTestingService.findAllAtomicTestings(searchPaginationInput);
   }

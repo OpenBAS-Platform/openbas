@@ -1,66 +1,61 @@
 package io.openbas.rest.atomic_testing.form;
 
+import static lombok.AccessLevel.NONE;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.utils.InjectMapper.ExpectationResultsByType;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.openbas.database.model.ExecutionStatus;
+import io.openbas.utils.InjectMapper;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
-import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
-@Builder
+@Setter
 public class InjectResultOutput {
 
-  @Schema(description = "Id")
   @JsonProperty("inject_id")
-  @NotNull
+  @NotBlank
   private String id;
 
-  @Schema(description = "Title")
   @JsonProperty("inject_title")
-  @NotNull
+  @NotBlank
   private String title;
 
   @JsonProperty("inject_updated_at")
+  @NotNull
   private Instant updatedAt;
 
   @JsonProperty("inject_type")
-  private String type;
+  public String injectType;
 
+  @JsonProperty("inject_injector_contract")
+  private InjectorContractSimple injectorContract;
+
+  @Getter(NONE)
   @JsonProperty("inject_status")
   private InjectStatusSimple status;
 
-  @Schema(description = "Full contract")
-  @JsonProperty("inject_injector_contract")
-  @NotNull
-  private InjectorContractSimple injectorContract;
+  public InjectStatusSimple getStatus() {
+    if (status == null) {
+      return InjectStatusSimple.builder().name(ExecutionStatus.DRAFT.name()).build();
+    }
+    return status;
+  }
 
-  @Schema(description = "Kill Chain Phases")
-  @JsonProperty("inject_kill_chain_phases")
-  @NotNull
-  private List<KillChainPhaseSimple> killChainPhases;
+  @JsonIgnore private String[] teamIds;
+  @JsonIgnore private String[] assetIds;
+  @JsonIgnore private String[] assetGroupIds;
 
-  @JsonProperty("injects_tags")
-  private List<String> tagIds;
+  // -- PROCESSED ATTRIBUTES --
 
-  // PROCESSED ATTRIBUTES
-
-  @Schema(
-      description = "Specifies the categories of targets for atomic testing.",
-      example = "assets, asset groups, teams, players")
   @JsonProperty("inject_targets")
-  @NotNull
-  private List<TargetSimple> targets;
+  private List<TargetSimple> targets = new ArrayList<>();
 
-  @Default
-  @Schema(description = "Result of expectations")
   @JsonProperty("inject_expectation_results")
-  @NotNull
-  private List<ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
+  private List<InjectMapper.ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
 }

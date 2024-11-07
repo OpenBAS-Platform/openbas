@@ -1,5 +1,6 @@
 package io.openbas.service;
 
+import static io.openbas.aop.LoggingAspect.logger;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
@@ -13,10 +14,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.*;
-import io.openbas.database.raw.*;
+import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.*;
-import io.openbas.rest.atomic_testing.form.*;
+import io.openbas.rest.atomic_testing.form.InjectResultOutput;
+import io.openbas.rest.atomic_testing.form.InjectStatusSimple;
+import io.openbas.rest.atomic_testing.form.InjectorContractSimple;
+import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
@@ -25,8 +30,9 @@ import io.openbas.rest.scenario.response.ImportMessage;
 import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
 import io.openbas.telemetry.Tracing;
+import io.openbas.utils.AtomicTestingUtils;
+import io.openbas.utils.InjectMapper;
 import io.openbas.utils.InjectUtils;
-import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -90,7 +96,7 @@ public class InjectService {
   private final TeamRepository teamRepository;
   private final UserRepository userRepository;
 
-  private final ResultUtils resultUtils;
+  private final InjectMapper injectMapper;
 
   private final List<String> importReservedField = List.of("description", "title", "trigger_time");
 
@@ -230,6 +236,312 @@ public class InjectService {
     Long total = countQuery(cb, this.entityManager, Inject.class, specificationCount);
 
     return new PageImpl<>(injects, pageable, total);
+  }
+
+  // -- CRITERIA BUILDER --
+
+  private void selectForInject(
+      CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Inject> injectRoot) {
+    // Joins
+    Join<Inject, Exercise> injectExerciseJoin = createLeftJoin(injectRoot, "exercise");
+    Join<Inject, Scenario> injectScenarioJoin = createLeftJoin(injectRoot, "scenario");
+    Join<Inject, InjectorContract> injectorContractJoin =
+        createLeftJoin(injectRoot, "injectorContract");
+    Join<InjectorContract, Injector> injectorJoin =
+        injectorContractJoin.join("injector", JoinType.LEFT);
+    Join<Inject, InjectDependency> injectDependency = createLeftJoin(injectRoot, "dependsOn");
+
+    // Array aggregations
+    Expression<String[]> tagIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "tags");
+    Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
+    Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
+    Expression<String[]> assetGroupIdsExpression =
+        createJoinArrayAggOnId(cb, injectRoot, "assetGroups");
+
+    // SELECT
+    cq.multiselect(
+            injectRoot.get("id").alias("inject_id"),
+            injectRoot.get("title").alias("inject_title"),
+            injectRoot.get("enabled").alias("inject_enabled"),
+            injectRoot.get("content").alias("inject_content"),
+            injectRoot.get("allTeams").alias("inject_all_teams"),
+            injectExerciseJoin.get("id").alias("inject_exercise"),
+            injectScenarioJoin.get("id").alias("inject_scenario"),
+            injectRoot.get("dependsDuration").alias("inject_depends_duration"),
+            injectorContractJoin.alias("inject_injector_contract"),
+            tagIdsExpression.alias("inject_tags"),
+            teamIdsExpression.alias("inject_teams"),
+            assetIdsExpression.alias("inject_assets"),
+            assetGroupIdsExpression.alias("inject_asset_groups"),
+            injectorJoin.get("type").alias("inject_type"),
+            injectDependency.alias("inject_depends_on"))
+        .distinct(true);
+
+    // GROUP BY
+    cq.groupBy(
+        Arrays.asList(
+            injectRoot.get("id"),
+            injectExerciseJoin.get("id"),
+            injectScenarioJoin.get("id"),
+            injectorContractJoin.get("id"),
+            injectorJoin.get("id"),
+            injectDependency.get("id")));
+  }
+
+  private List<InjectOutput> execInject(TypedQuery<Tuple> query) {
+    return query.getResultList().stream()
+        .map(
+            tuple ->
+                new InjectOutput(
+                    tuple.get("inject_id", String.class),
+                    tuple.get("inject_title", String.class),
+                    tuple.get("inject_enabled", Boolean.class),
+                    tuple.get("inject_content", ObjectNode.class),
+                    tuple.get("inject_all_teams", Boolean.class),
+                    tuple.get("inject_exercise", String.class),
+                    tuple.get("inject_scenario", String.class),
+                    tuple.get("inject_depends_duration", Long.class),
+                    tuple.get("inject_injector_contract", InjectorContract.class),
+                    tuple.get("inject_tags", String[].class),
+                    tuple.get("inject_teams", String[].class),
+                    tuple.get("inject_assets", String[].class),
+                    tuple.get("inject_asset_groups", String[].class),
+                    tuple.get("inject_type", String.class),
+                    tuple.get("inject_depends_on", InjectDependency.class)))
+        .toList();
+  }
+
+  // -- INJECT SEARCH --
+  public Page<InjectResultOutput> getPageOfSearchExerciseInjects(
+      String exerciseId, @Valid SearchPaginationInput searchPaginationInput) {
+    Map<String, Join<Base, Base>> joinMap = new HashMap<>();
+
+    Specification<Inject> customSpec =
+        Specification.where(
+            (root, query, cb) -> {
+              Predicate predicate = cb.conjunction();
+              predicate = cb.and(predicate, cb.equal(root.get("exercise").get("id"), exerciseId));
+              return predicate;
+            });
+
+    return buildPaginationCriteriaBuilder(
+        (Specification<Inject> specification,
+            Specification<Inject> specificationCount,
+            Pageable pageable) ->
+            injects(
+                customSpec.and(specification),
+                customSpec.and(specificationCount),
+                pageable,
+                joinMap),
+        searchPaginationInput,
+        Inject.class);
+  }
+
+  public Page<InjectResultOutput> injects(
+      Specification<Inject> specification,
+      Specification<Inject> specificationCount,
+      Pageable pageable,
+      Map<String, Join<Base, Base>> joinMap) {
+    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+
+    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+    Root<Inject> injectRoot = cq.from(Inject.class);
+    selectForInjects(cb, cq, injectRoot, joinMap);
+
+    // -- Text Search and Filters --
+    if (specification != null) {
+      Predicate predicate = specification.toPredicate(injectRoot, cq, cb);
+      if (predicate != null) {
+        cq.where(predicate);
+      }
+    }
+
+    // -- Sorting --
+    List<Order> orders = toSortCriteriaBuilder(cb, injectRoot, pageable.getSort());
+    cq.orderBy(orders);
+
+    // Type Query
+    TypedQuery<Tuple> query = entityManager.createQuery(cq);
+
+    // -- Pagination --
+    query.setFirstResult((int) pageable.getOffset());
+    query.setMaxResults(pageable.getPageSize());
+
+    // -- EXECUTION --
+    long start = System.currentTimeMillis();
+    List<InjectResultOutput> injects = execInjects(query);
+    long executionTime = System.currentTimeMillis() - start;
+    logger.info("execut query  : " + executionTime + " ms");
+
+    // -- MAP TO GENERATE TARGETSIMPLEs --
+    start = System.currentTimeMillis();
+    Set<String> injectIds =
+        injects.stream().map(inject -> inject.getId()).collect(Collectors.toSet());
+
+    Map<String, List<Object[]>> teamMap =
+        teamRepository.teamsByInjectIds(injectIds).stream()
+            .collect(Collectors.groupingBy(row -> (String) row[0]));
+
+    Map<String, List<Object[]>> assetMap =
+        assetRepository.assetsByInjectIds(injectIds).stream()
+            .collect(Collectors.groupingBy(row -> (String) row[0]));
+
+    Map<String, List<Object[]>> assetGroupMap =
+        assetGroupRepository.assetGroupsByInjectIds(injectIds).stream()
+            .collect(Collectors.groupingBy(row -> (String) row[0]));
+
+    Map<String, List<RawInjectExpectation>> expectationMap =
+        injectExpectationRepository.rawForComputeGlobalByIds(injectIds).stream()
+            .collect(Collectors.groupingBy(RawInjectExpectation::getInject_id));
+
+    for (InjectResultOutput inject : injects) {
+
+      // -- GLOBAL SCORE ---
+      inject.setExpectationResultByTypes(
+          AtomicTestingUtils.getExpectationResultByTypesFromRaw(
+              expectationMap.getOrDefault(inject.getId(), emptyList())));
+
+      // -- TARGETS --
+      List<TargetSimple> allTargets =
+          Stream.concat(
+                  injectMapper
+                      .toTargetSimple(
+                          teamMap.getOrDefault(inject.getId(), emptyList()), TargetType.TEAMS)
+                      .stream(),
+                  Stream.concat(
+                      injectMapper
+                          .toTargetSimple(
+                              assetMap.getOrDefault(inject.getId(), emptyList()), TargetType.ASSETS)
+                          .stream(),
+                      injectMapper
+                          .toTargetSimple(
+                              assetGroupMap.getOrDefault(inject.getId(), emptyList()),
+                              TargetType.ASSETS_GROUPS)
+                          .stream()))
+              .collect(Collectors.toList());
+
+      inject.getTargets().addAll(allTargets);
+    }
+    executionTime = System.currentTimeMillis() - start;
+    logger.info("execut mapper  : " + executionTime + " ms");
+
+    // -- Count Query --
+    Long total = countQuery(cb, this.entityManager, Inject.class, specificationCount);
+
+    return new PageImpl<>(injects, pageable, total);
+  }
+
+  private void selectForInjects(
+      CriteriaBuilder cb,
+      CriteriaQuery<Tuple> cq,
+      Root<Inject> injectRoot,
+      Map<String, Join<Base, Base>> joinMap) {
+    // Joins
+    Join<Base, Base> injectorContractJoin = injectRoot.join("injectorContract", JoinType.LEFT);
+    joinMap.put("injectorContract", injectorContractJoin);
+
+    Join<Base, Base> injectorJoin = injectorContractJoin.join("injector", JoinType.LEFT);
+    joinMap.put("injector", injectorJoin);
+
+    Join<Base, Base> payloadJoin = injectorContractJoin.join("payload", JoinType.LEFT);
+    joinMap.put("payload", injectorJoin);
+
+    Join<Base, Base> collectorJoin = payloadJoin.join("collector", JoinType.LEFT);
+    joinMap.put("collector", injectorJoin);
+
+    Join<Inject, InjectStatus> statusJoin = injectRoot.join("status", JoinType.LEFT);
+
+    // Array aggregations
+    Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
+    Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
+    Expression<String[]> assetGroupIdsExpression =
+        createJoinArrayAggOnId(cb, injectRoot, "assetGroups");
+
+    // SELECT
+    cq.multiselect(
+            injectRoot.get("id").alias("inject_id"),
+            injectRoot.get("title").alias("inject_title"),
+            injectRoot.get("updatedAt").alias("inject_updated_at"),
+            injectorJoin.get("type").alias("inject_type"),
+            injectorContractJoin.get("id").alias("injector_contract_id"),
+            injectorContractJoin.get("content").alias("injector_contract_content"),
+            injectorContractJoin.get("convertedContent").alias("convertedContent"),
+            injectorContractJoin.get("platforms").alias("injector_contract_platforms"),
+            injectorContractJoin.get("labels").alias("injector_contract_labels"),
+            payloadJoin.get("id").alias("payload_id"),
+            payloadJoin.get("type").alias("payload_type"),
+            collectorJoin.get("type").alias("payload_collector_type"),
+            statusJoin.get("name").alias("status_name"),
+            statusJoin.get("trackingSentDate").alias("status_tracking_sent_date"),
+            teamIdsExpression.alias("inject_teams"),
+            assetIdsExpression.alias("inject_assets"),
+            assetGroupIdsExpression.alias("inject_asset_groups"))
+        .distinct(true);
+
+    // GROUP BY
+    cq.groupBy(
+        Arrays.asList(
+            injectRoot.get("id"),
+            injectorContractJoin.get("id"),
+            injectorJoin.get("id"),
+            payloadJoin.get("id"),
+            collectorJoin.get("id"),
+            statusJoin.get("id")));
+  }
+
+  private List<InjectResultOutput> execInjects(TypedQuery<Tuple> query) {
+    return query.getResultList().stream()
+        .map(
+            tuple -> {
+              InjectStatusSimple injectStatus = null;
+              ExecutionStatus status = tuple.get("status_name", ExecutionStatus.class);
+              if (status != null) {
+                injectStatus =
+                    InjectStatusSimple.builder()
+                        .name(status.name())
+                        .trackingSentDate(tuple.get("status_tracking_sent_date", Instant.class))
+                        .build();
+              }
+
+              InjectorContractSimple injectorContractSimple = null;
+              String injectorContractId = tuple.get("injector_contract_id", String.class);
+              if (injectorContractId != null) {
+                injectorContractSimple =
+                    InjectorContractSimple.builder()
+                        .id(injectorContractId)
+                        .content(tuple.get("injector_contract_content", String.class))
+                        .convertedContent(tuple.get("convertedContent", ObjectNode.class))
+                        .platforms(
+                            tuple.get(
+                                "injector_contract_platforms", Endpoint.PLATFORM_TYPE[].class))
+                        .payloadId(tuple.get("payload_id", String.class))
+                        .payloadType(tuple.get("payload_type", String.class))
+                        .payloadCollectorType(tuple.get("payload_collector_type", String.class))
+                        .labels(tuple.get("injector_contract_labels", Map.class))
+                        .build();
+              }
+
+              InjectResultOutput injectResultOutput = new InjectResultOutput();
+              injectResultOutput.setId(tuple.get("inject_id", String.class));
+              injectResultOutput.setTitle(tuple.get("inject_title", String.class));
+              injectResultOutput.setUpdatedAt(tuple.get("inject_updated_at", Instant.class));
+              injectResultOutput.setInjectType(tuple.get("inject_type", String.class));
+              injectResultOutput.setInjectorContract(injectorContractSimple);
+              injectResultOutput.setStatus(injectStatus);
+              injectResultOutput.setTeamIds(tuple.get("inject_teams", String[].class));
+              injectResultOutput.setAssetIds(tuple.get("inject_assets", String[].class));
+              injectResultOutput.setAssetGroupIds(tuple.get("inject_asset_groups", String[].class));
+
+              return injectResultOutput;
+            })
+        .toList();
+  }
+
+  public List<InjectResultOutput> exerciseInjects(String exerciseId) {
+    //    this.injectRepository.findAll(InjectSpecification.fromExercise(exerciseId)).stream()
+    //        .map(inject -> injectMapper.toDto(inject))
+    //        .collect(Collectors.toList());
+    return emptyList();
   }
 
   /**
@@ -912,7 +1224,9 @@ public class InjectService {
 
     if (ruleAttribute.getColumns() != null) {
       int colIndex = CellReference.convertColStringToIndex(ruleAttribute.getColumns());
-      if (colIndex == -1) return;
+      if (colIndex == -1) {
+        return;
+      }
       Cell valueCell = row.getCell(colIndex);
 
       if (valueCell == null) {
@@ -1400,290 +1714,5 @@ public class InjectService {
       }
     }
     return 0.0;
-  }
-
-  // -- TEST --
-  private Map<String, RawInjectExpectation> mapOfInjectsExpectations(
-      @NotNull final List<RawInject> rawInjects) {
-    return this.injectExpectationRepository
-        .rawByIds(
-            rawInjects.stream()
-                .flatMap(rawInject -> rawInject.getInject_expectations().stream())
-                .toList())
-        .stream()
-        .collect(
-            Collectors.toMap(RawInjectExpectation::getInject_expectation_id, Function.identity()));
-  }
-
-  private Map<String, RawAssetGroup> mapOfAssetGroups(
-      @NotNull final List<RawInject> rawInjects,
-      @NotNull final Collection<RawInjectExpectation> rawInjectExpectations) {
-    return this.assetGroupRepository
-        .rawAssetGroupByIds(
-            Stream.concat(
-                    rawInjectExpectations.stream()
-                        .map(RawInjectExpectation::getAsset_group_id)
-                        .filter(Objects::nonNull),
-                    rawInjects.stream().map(RawInject::getAsset_group_id).filter(Objects::nonNull))
-                .toList())
-        .stream()
-        .collect(Collectors.toMap(RawAssetGroup::getAsset_group_id, Function.identity()));
-  }
-
-  private Map<String, RawAsset> mapOfAssets(
-      @NotNull final List<RawInject> rawInjects,
-      @NotNull final Map<String, RawInjectExpectation> mapOfInjectsExpectations,
-      @NotNull final Map<String, RawAssetGroup> mapOfAssetGroups) {
-    return this.assetRepository
-        .rawByIds(
-            rawInjects.stream()
-                .flatMap(
-                    rawInject ->
-                        Stream.concat(
-                            Stream.concat(
-                                rawInject.getInject_asset_groups().stream()
-                                    .flatMap(
-                                        assetGroup ->
-                                            Optional.ofNullable(mapOfAssetGroups.get(assetGroup))
-                                                .map(ag -> ag.getAsset_ids().stream())
-                                                .orElse(Stream.empty())),
-                                rawInject.getInject_assets().stream()),
-                            Stream.concat(
-                                rawInject.getInject_expectations().stream()
-                                    .map(mapOfInjectsExpectations::get)
-                                    .map(RawInjectExpectation::getAsset_id),
-                                rawInject.getInject_expectations().stream()
-                                    .map(mapOfInjectsExpectations::get)
-                                    .flatMap(
-                                        injectExpectation ->
-                                            injectExpectation.getAsset_group_id() != null
-                                                ? mapOfAssetGroups
-                                                    .get(injectExpectation.getAsset_group_id())
-                                                    .getAsset_ids()
-                                                    .stream()
-                                                : Stream.empty()))))
-                .filter(Objects::nonNull)
-                .toList())
-        .stream()
-        .collect(Collectors.toMap(RawAsset::getAsset_id, Function.identity()));
-  }
-
-  private Map<String, RawTeam> mapOfRawTeams(
-      @NotNull final List<RawInject> rawInjects,
-      @NotNull final Map<String, RawInjectExpectation> mapOfInjectsExpectations) {
-    return this.teamRepository
-        .rawTeamByIds(
-            rawInjects.stream()
-                .flatMap(
-                    rawInject ->
-                        Stream.concat(
-                                rawInject.getInject_teams().stream(),
-                                rawInject.getInject_expectations().stream()
-                                    .map(
-                                        expectationId ->
-                                            mapOfInjectsExpectations
-                                                .get(expectationId)
-                                                .getTeam_id()))
-                            .filter(Objects::nonNull))
-                .distinct()
-                .toList())
-        .stream()
-        .collect(Collectors.toMap(RawTeam::getTeam_id, Function.identity()));
-  }
-
-  // -- CRITERIA BUILDER --
-
-  private void selectForInject(
-      CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Inject> injectRoot) {
-    // Joins
-    Join<Inject, Exercise> injectExerciseJoin = createLeftJoin(injectRoot, "exercise");
-    Join<Inject, Scenario> injectScenarioJoin = createLeftJoin(injectRoot, "scenario");
-    Join<Inject, InjectorContract> injectorContractJoin =
-        createLeftJoin(injectRoot, "injectorContract");
-    Join<InjectorContract, Injector> injectorJoin =
-        injectorContractJoin.join("injector", JoinType.LEFT);
-    Join<Inject, InjectDependency> injectDependency = createLeftJoin(injectRoot, "dependsOn");
-
-    // Array aggregations
-    Expression<String[]> tagIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "tags");
-    Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
-    Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
-    Expression<String[]> assetGroupIdsExpression =
-        createJoinArrayAggOnId(cb, injectRoot, "assetGroups");
-
-    // SELECT
-    cq.multiselect(
-            injectRoot.get("id").alias("inject_id"),
-            injectRoot.get("title").alias("inject_title"),
-            injectRoot.get("enabled").alias("inject_enabled"),
-            injectRoot.get("content").alias("inject_content"),
-            injectRoot.get("allTeams").alias("inject_all_teams"),
-            injectExerciseJoin.get("id").alias("inject_exercise"),
-            injectScenarioJoin.get("id").alias("inject_scenario"),
-            injectRoot.get("dependsDuration").alias("inject_depends_duration"),
-            injectorContractJoin.alias("inject_injector_contract"),
-            tagIdsExpression.alias("inject_tags"),
-            teamIdsExpression.alias("inject_teams"),
-            assetIdsExpression.alias("inject_assets"),
-            assetGroupIdsExpression.alias("inject_asset_groups"),
-            injectorJoin.get("type").alias("inject_type"),
-            injectDependency.alias("inject_depends_on"))
-        .distinct(true);
-
-    // GROUP BY
-    cq.groupBy(
-        Arrays.asList(
-            injectRoot.get("id"),
-            injectExerciseJoin.get("id"),
-            injectScenarioJoin.get("id"),
-            injectorContractJoin.get("id"),
-            injectorJoin.get("id"),
-            injectDependency.get("id")));
-  }
-
-  private List<InjectOutput> execInject(TypedQuery<Tuple> query) {
-    return query.getResultList().stream()
-        .map(
-            tuple ->
-                new InjectOutput(
-                    tuple.get("inject_id", String.class),
-                    tuple.get("inject_title", String.class),
-                    tuple.get("inject_enabled", Boolean.class),
-                    tuple.get("inject_content", ObjectNode.class),
-                    tuple.get("inject_all_teams", Boolean.class),
-                    tuple.get("inject_exercise", String.class),
-                    tuple.get("inject_scenario", String.class),
-                    tuple.get("inject_depends_duration", Long.class),
-                    tuple.get("inject_injector_contract", InjectorContract.class),
-                    tuple.get("inject_tags", String[].class),
-                    tuple.get("inject_teams", String[].class),
-                    tuple.get("inject_assets", String[].class),
-                    tuple.get("inject_asset_groups", String[].class),
-                    tuple.get("inject_type", String.class),
-                    tuple.get("inject_depends_on", InjectDependency.class)))
-        .toList();
-  }
-
-  public Page<InjectResultOutput> getPageOfSearchExerciseInjects(
-      String exerciseId, @Valid SearchPaginationInput searchPaginationInput) {
-    Map<String, Join<Base, Base>> joinMap = new HashMap<>();
-
-    Specification<Inject> customSpec =
-        Specification.where(
-            (root, query, cb) -> {
-              Predicate predicate = cb.conjunction();
-              predicate = cb.and(predicate, cb.equal(root.get("exercise").get("id"), exerciseId));
-              return predicate;
-            });
-
-    return buildPaginationCriteriaBuilder(
-        (Specification<Inject> specification,
-            Specification<Inject> specificationCount,
-            Pageable pageable) ->
-            getPageOfInjectResults(
-                customSpec.and(specification),
-                customSpec.and(specificationCount),
-                pageable,
-                joinMap),
-        searchPaginationInput,
-        Inject.class);
-  }
-
-  public Page<InjectResultOutput> getPageOfInjectResults(
-      Specification<Inject> specification,
-      Specification<Inject> specificationCount,
-      Pageable pageable,
-      Map<String, Join<Base, Base>> joinMap) {
-    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
-
-    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
-    Root<Inject> injectRoot = cq.from(Inject.class);
-    selectForSearchInjectResults(cb, cq, injectRoot, joinMap);
-
-    // -- Text Search and Filters --
-    if (specification != null) {
-      Predicate predicate = specification.toPredicate(injectRoot, cq, cb);
-      if (predicate != null) {
-        cq.where(predicate);
-      }
-    }
-
-    // -- Sorting --
-    List<Order> orders = toSortCriteriaBuilder(cb, injectRoot, pageable.getSort());
-    cq.orderBy(orders);
-
-    // Type Query
-    TypedQuery<Tuple> query = this.entityManager.createQuery(cq);
-
-    // -- Pagination --
-    query.setFirstResult((int) pageable.getOffset());
-    query.setMaxResults(pageable.getPageSize());
-
-    // -- EXECUTION --
-    List<InjectResultOutput> injectResults = execSearchInjectResults(query);
-
-    // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, Inject.class, specificationCount);
-
-    return new PageImpl<>(injectResults, pageable, total);
-  }
-
-  private void selectForSearchInjectResults(
-      CriteriaBuilder cb,
-      CriteriaQuery<Tuple> cq,
-      Root<Inject> injectRoot,
-      Map<String, Join<Base, Base>> joinMap) {
-
-    // Joins
-    // InjectContract
-    Join<Base, Base> injectorContractJoin = injectRoot.join("injectorContract", JoinType.LEFT);
-    joinMap.put("injectorContract", injectorContractJoin);
-
-    // KillChainPhases
-    // Teams
-    // Assets
-    // Assetgroups
-    // Tags
-
-    // SELECT
-    cq.multiselect(
-            injectRoot.get("id").alias("inject_id"),
-            injectRoot.get("title").alias("inject_title"),
-            injectRoot.get("status").get("id").alias("status_id"),
-            injectRoot.get("status").get("name").alias("status_name"),
-            injectRoot.get("status").get("trackingSentDate").alias("status_tracking_sent_date"),
-            injectRoot.get("updatedAt").alias("inject_updated_at"))
-        .distinct(true);
-
-    // GROUP BY
-    cq.groupBy(Arrays.asList(injectRoot.get("id"), injectRoot.get("status").get("id")));
-  }
-
-  private List<InjectResultOutput> execSearchInjectResults(TypedQuery<Tuple> query) {
-    return query.getResultList().stream()
-        .map(
-            tuple ->
-                InjectResultOutput.builder()
-                    .id(tuple.get("inject_id", String.class))
-                    .title(tuple.get("inject_title", String.class))
-                    .type(tuple.get("inject_type", String.class))
-                    .injectorContract(
-                        tuple.get("inject_injector_contract", InjectorContractSimple.class))
-                    .killChainPhases(tuple.get("inject_kill_chain_phases", List.class))
-                    .status(tuple.get("inject_status", InjectStatusSimple.class))
-                    .targets(tuple.get("inject_targets", List.class))
-                    .expectationResultByTypes(
-                        resultUtils.getResultsByTypes(Set.of(tuple.get("inject_id", String.class))))
-                    .tagIds(tuple.get("injects_tags", List.class))
-                    .updatedAt(tuple.get("inject_updated_at", Instant.class))
-                    .build())
-        .toList();
-  }
-
-  public List<InjectResultOutput> exerciseInjects(String exerciseId) {
-    //    this.injectRepository.findAll(InjectSpecification.fromExercise(exerciseId)).stream()
-    //        .map(inject -> injectMapper.toDto(inject))
-    //        .collect(Collectors.toList());
-    return emptyList();
   }
 }
