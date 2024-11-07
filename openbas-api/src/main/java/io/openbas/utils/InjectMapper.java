@@ -1,16 +1,16 @@
 package io.openbas.utils;
 
-import static io.openbas.utils.AtomicTestingUtils.getRefinedExpectations;
-
 import io.openbas.atomic_testing.TargetType;
-import io.openbas.database.model.*;
-import io.openbas.expectation.ExpectationType;
+import io.openbas.database.model.Document;
+import io.openbas.database.model.Inject;
+import io.openbas.database.model.InjectDocument;
+import io.openbas.database.model.Tag;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
 import io.openbas.rest.atomic_testing.form.InjectStatusSimple;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
-import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 public class InjectMapper {
 
   private final InjectUtils injectUtils;
+  private final ResultUtils resultUtils;
 
   public InjectResultOverviewOutput toDto(Inject inject) {
     return InjectResultOverviewOutput.builder()
@@ -40,15 +41,13 @@ public class InjectMapper {
                 .toList())
         .injectorContract(null)
         .status(InjectStatusSimple.builder().build())
+        .expectations(null)
         .killChainPhases(Collections.emptyList())
         .attackPatterns(Collections.emptyList())
         .isReady(inject.isReady())
         .updatedAt(inject.getUpdatedAt())
-        .expectationResultByTypes(
-            AtomicTestingUtils.getExpectationResultByTypes(
-                getRefinedExpectations(
-                    inject, inject.getTeams().stream().map(t -> t.getId()).toList())))
-        // todo all targets
+        .expectationResultByTypes(resultUtils.getResultsByTypes(Set.of(inject.getId())))
+        .targets(resultUtils.getInjectTargetWithResults(Set.of(inject.getId())))
         .build();
   }
 
@@ -64,14 +63,4 @@ public class InjectMapper {
         .type(type)
         .build();
   }
-
-  // -- RECORDS --
-
-  public record ExpectationResultsByType(
-      @NotNull ExpectationType type,
-      @NotNull InjectExpectation.EXPECTATION_STATUS avgResult,
-      @NotNull List<ResultDistribution> distribution) {}
-
-  public record ResultDistribution(
-      @NotNull String id, @NotNull String label, @NotNull Integer value) {}
 }

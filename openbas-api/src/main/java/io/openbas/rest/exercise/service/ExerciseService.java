@@ -15,7 +15,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.atomic_testing.TargetType;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
-import io.openbas.database.raw.*;
+import io.openbas.database.raw.RawExerciseSimple;
+import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.*;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -25,6 +26,7 @@ import io.openbas.service.GrantService;
 import io.openbas.service.TeamService;
 import io.openbas.service.VariableService;
 import io.openbas.utils.AtomicTestingUtils;
+import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.ResultUtils;
@@ -65,10 +67,10 @@ public class ExerciseService {
   private final ExerciseMapper exerciseMapper;
   private final InjectMapper injectMapper;
   private final ResultUtils resultUtils;
+
   private final AssetRepository assetRepository;
   private final AssetGroupRepository assetGroupRepository;
   private final InjectExpectationRepository injectExpectationRepository;
-
   private final ArticleRepository articleRepository;
   private final ExerciseRepository exerciseRepository;
   private final TeamRepository teamRepository;
@@ -489,7 +491,7 @@ public class ExerciseService {
     return exerciseMapper.getExerciseSimples(exercises);
   }
 
-  public List<InjectMapper.ExpectationResultsByType> getGlobalResults(@NotBlank String exerciseId) {
+  public List<ExpectationResultsByType> getGlobalResults(@NotBlank String exerciseId) {
     return resultUtils.getResultsByTypes(exerciseRepository.findInjectsByExercise(exerciseId));
   }
 

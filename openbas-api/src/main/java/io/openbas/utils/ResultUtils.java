@@ -10,7 +10,7 @@ import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
-import io.openbas.utils.InjectMapper.ExpectationResultsByType;
+import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,7 +30,7 @@ public class ResultUtils {
   private final AssetGroupService assetGroupService;
 
   // -- UTILS --
-  public List<InjectMapper.ExpectationResultsByType> getResultsByTypes(Set<String> injectIds) {
+  public List<ExpectationResultsByType> getResultsByTypes(Set<String> injectIds) {
     if (injectIds == null || injectIds.isEmpty()) {
       return emptyList();
     }

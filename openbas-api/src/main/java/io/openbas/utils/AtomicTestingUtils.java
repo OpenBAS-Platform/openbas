@@ -6,8 +6,6 @@ import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.raw.*;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
-import io.openbas.utils.InjectMapper.ExpectationResultsByType;
-import io.openbas.utils.InjectMapper.ResultDistribution;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -228,7 +226,7 @@ public class AtomicTestingUtils {
                           entry.getValue(),
                           playerExpectations.isEmpty()
                               ? List.of()
-                              : calculateResultsforPlayersFromRaw(
+                              : calculateResultsForPlayersFromRaw(
                                   groupedByTeamAndUser.get(entry.getKey()), rawUserMap),
                           null))
               .toList());
@@ -377,7 +375,7 @@ public class AtomicTestingUtils {
   }
 
   // -- PRE CALCULATED RESULTS FOR PLAYERS --
-  private static List<InjectTargetWithResult> calculateResultsforPlayersFromRaw(
+  private static List<InjectTargetWithResult> calculateResultsForPlayersFromRaw(
       Map<String, List<RawInjectExpectation>> expectationsByUser, Map<String, RawUser> rawUserMap) {
     if (expectationsByUser == null) {
       return new ArrayList<>();
@@ -402,28 +400,6 @@ public class AtomicTestingUtils {
 
   // -- RESULTS BY EXPECTATION TYPE --
   @NotNull
-  public static List<ExpectationResultsByType> getExpectationResultByTypes(
-      final List<InjectExpectation> expectations) {
-    List<Double> preventionScores = getScores(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
-    List<Double> detectionScores = getScores(List.of(EXPECTATION_TYPE.DETECTION), expectations);
-    List<Double> humanScores =
-        getScores(
-            List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL),
-            expectations);
-
-    List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
-
-    getExpectationByType(ExpectationType.PREVENTION, preventionScores)
-        .map(resultAvgOfExpectations::add);
-    getExpectationByType(ExpectationType.DETECTION, detectionScores)
-        .map(resultAvgOfExpectations::add);
-    getExpectationByType(ExpectationType.HUMAN_RESPONSE, humanScores)
-        .map(resultAvgOfExpectations::add);
-
-    return resultAvgOfExpectations;
-  }
-
-  @NotNull
   public static List<ExpectationResultsByType> getExpectationResultByTypesFromRaw(
       List<RawInjectExpectation> expectations) {
     List<Double> preventionScores =
@@ -447,35 +423,29 @@ public class AtomicTestingUtils {
     return resultAvgOfExpectations;
   }
 
-  // -- NORMALIZED SCORES --
-  public static List<Double> getScores(
-      final List<EXPECTATION_TYPE> types, final List<InjectExpectation> expectations) {
-    return expectations.stream()
-        .filter(e -> types.contains(e.getType()))
-        .map(
-            injectExpectation -> {
-              if (injectExpectation.getScore() == null) {
-                return null;
-              }
-              if (injectExpectation.getTeam() != null) {
-                if (injectExpectation.getScore() >= injectExpectation.getExpectedScore()) {
-                  return 1.0;
-                } else {
-                  return 0.0;
-                }
-              } else {
-                if (injectExpectation.getScore() >= injectExpectation.getExpectedScore()) {
-                  return 1.0;
-                }
-                if (injectExpectation.getScore() == 0) {
-                  return 0.0;
-                }
-                return 0.5;
-              }
-            })
-        .toList();
+  @NotNull
+  public static List<ExpectationResultsByType> getExpectationResultByTypes(
+      final List<InjectExpectation> expectations) {
+    List<Double> preventionScores = getScores(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
+    List<Double> detectionScores = getScores(List.of(EXPECTATION_TYPE.DETECTION), expectations);
+    List<Double> humanScores =
+        getScores(
+            List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL),
+            expectations);
+
+    List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
+
+    getExpectationByType(ExpectationType.PREVENTION, preventionScores)
+        .map(resultAvgOfExpectations::add);
+    getExpectationByType(ExpectationType.DETECTION, detectionScores)
+        .map(resultAvgOfExpectations::add);
+    getExpectationByType(ExpectationType.HUMAN_RESPONSE, humanScores)
+        .map(resultAvgOfExpectations::add);
+
+    return resultAvgOfExpectations;
   }
 
+  // -- NORMALIZED SCORES --
   public static List<Double> getScoresFromRaw(
       List<EXPECTATION_TYPE> types, List<RawInjectExpectation> expectations) {
     return expectations.stream()
@@ -498,6 +468,34 @@ public class AtomicTestingUtils {
                   return 1.0;
                 }
                 if (rawInjectExpectation.getInject_expectation_score() == 0) {
+                  return 0.0;
+                }
+                return 0.5;
+              }
+            })
+        .toList();
+  }
+
+  public static List<Double> getScores(
+      final List<EXPECTATION_TYPE> types, final List<InjectExpectation> expectations) {
+    return expectations.stream()
+        .filter(e -> types.contains(e.getType()))
+        .map(
+            injectExpectation -> {
+              if (injectExpectation.getScore() == null) {
+                return null;
+              }
+              if (injectExpectation.getTeam() != null) {
+                if (injectExpectation.getScore() >= injectExpectation.getExpectedScore()) {
+                  return 1.0;
+                } else {
+                  return 0.0;
+                }
+              } else {
+                if (injectExpectation.getScore() >= injectExpectation.getExpectedScore()) {
+                  return 1.0;
+                }
+                if (injectExpectation.getScore() == 0) {
                   return 0.0;
                 }
                 return 0.5;
@@ -537,18 +535,6 @@ public class AtomicTestingUtils {
             type, InjectExpectation.EXPECTATION_STATUS.PENDING, getResultDetail(type, scores)));
   }
 
-  public static List<InjectExpectation> getRefinedExpectations(
-      Inject inject, List<String> targetIds) {
-    return inject.getExpectations().stream()
-        .filter(expectation -> targetIds.contains(expectation.getTargetId()))
-        .filter(
-            expectation ->
-                expectation.getUser()
-                    == null) // Filter expectations linked to players. For global results, We use
-        // Team expectations
-        .toList();
-  }
-
   public static InjectExpectation.EXPECTATION_STATUS getResult(final OptionalDouble avg) {
     Double avgAsDouble = avg.getAsDouble();
     return avgAsDouble == 0.0
@@ -579,4 +565,13 @@ public class AtomicTestingUtils {
   private static List<InjectTargetWithResult> sortResults(List<InjectTargetWithResult> targets) {
     return targets.stream().sorted(Comparator.comparing(InjectTargetWithResult::getName)).toList();
   }
+
+  // -- RECORDS --
+  public record ExpectationResultsByType(
+      @NotNull ExpectationType type,
+      @NotNull InjectExpectation.EXPECTATION_STATUS avgResult,
+      @NotNull List<ResultDistribution> distribution) {}
+
+  public record ResultDistribution(
+      @NotNull String id, @NotNull String label, @NotNull Integer value) {}
 }

@@ -9,7 +9,7 @@ import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Tag;
 import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
-import io.openbas.utils.InjectMapper;
+import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
@@ -63,5 +63,5 @@ public class ExerciseSimple {
   private List<TargetSimple> targets = new ArrayList<>();
 
   @JsonProperty("exercise_global_score")
-  private List<InjectMapper.ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
+  private List<ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
 }

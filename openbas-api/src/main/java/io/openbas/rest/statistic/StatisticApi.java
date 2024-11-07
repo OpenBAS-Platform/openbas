@@ -17,7 +17,7 @@ import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.rest.statistic.response.PlatformStatistic;
 import io.openbas.rest.statistic.response.StatisticElement;
 import io.openbas.utils.AtomicTestingUtils;
-import io.openbas.utils.InjectMapper.ExpectationResultsByType;
+import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

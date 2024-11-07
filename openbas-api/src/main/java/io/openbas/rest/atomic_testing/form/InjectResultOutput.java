@@ -5,7 +5,7 @@ import static lombok.AccessLevel.NONE;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ExecutionStatus;
-import io.openbas.utils.InjectMapper;
+import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -57,5 +57,5 @@ public class InjectResultOutput {
   private List<TargetSimple> targets = new ArrayList<>();
 
   @JsonProperty("inject_expectation_results")
-  private List<InjectMapper.ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
+  private List<ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
 }

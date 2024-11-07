@@ -238,18 +238,6 @@ public class InjectExpectation implements Base {
     return getExercise().isUserHasAccess(user);
   }
 
-  public String getTargetId() {
-    if (team != null) {
-      return team.getId();
-    } else if (asset != null) {
-      return asset.getId();
-    } else if (assetGroup != null) {
-      return assetGroup.getId();
-    } else {
-      throw new RuntimeException();
-    }
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {

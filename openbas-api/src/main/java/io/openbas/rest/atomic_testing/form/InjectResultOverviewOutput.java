@@ -3,7 +3,7 @@ package io.openbas.rest.atomic_testing.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.InjectStatusCommandLine;
-import io.openbas.utils.InjectMapper.ExpectationResultsByType;
+import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -40,11 +40,25 @@ public class InjectResultOverviewOutput {
   @JsonProperty("inject_commands_lines")
   private InjectStatusCommandLine commandsLines;
 
-  @JsonProperty("inject_expectations")
-  private List<InjectExpectationSimple> expectations;
-
   @JsonProperty("inject_type")
   private String type;
+
+  @JsonProperty("injects_tags")
+  private List<String> tagIds;
+
+  @JsonProperty("injects_documents")
+  private List<String> documentIds;
+
+  @Schema(description = "Full contract")
+  @JsonProperty("inject_injector_contract")
+  @NotNull
+  private InjectorContractSimple injectorContract;
+
+  @JsonProperty("inject_status")
+  private InjectStatusSimple status;
+
+  @JsonProperty("inject_expectations")
+  private List<InjectExpectationSimple> expectations;
 
   @Schema(description = "Kill Chain Phases")
   @JsonProperty("inject_kill_chain_phases")
@@ -56,13 +70,13 @@ public class InjectResultOverviewOutput {
   @NotNull
   private List<AttackPatternSimple> attackPatterns;
 
-  @Schema(description = "Full contract")
-  @JsonProperty("inject_injector_contract")
-  @NotNull
-  private InjectorContractSimple injectorContract;
+  @JsonProperty("inject_ready")
+  private Boolean isReady;
 
-  @JsonProperty("inject_status")
-  private InjectStatusSimple status;
+  @JsonProperty("inject_updated_at")
+  private Instant updatedAt;
+
+  // -- PROCESSED ATTRIBUTES --
 
   @Default
   @Schema(description = "Result of expectations")
@@ -70,15 +84,6 @@ public class InjectResultOverviewOutput {
   @NotNull
   private List<ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
 
-  @JsonProperty("injects_tags")
-  private List<String> tagIds;
-
-  @JsonProperty("injects_documents")
-  private List<String> documentIds;
-
-  @JsonProperty("inject_ready")
-  private Boolean isReady;
-
-  @JsonProperty("inject_updated_at")
-  private Instant updatedAt;
+  @JsonProperty("inject_targets")
+  private List<InjectTargetWithResult> targets;
 }

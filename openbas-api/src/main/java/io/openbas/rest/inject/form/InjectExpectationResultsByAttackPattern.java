@@ -6,7 +6,7 @@ import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Inject;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.utils.AtomicTestingUtils;
-import io.openbas.utils.InjectMapper.ExpectationResultsByType;
+import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -42,6 +42,9 @@ class ExerciseServiceTest {
   @Autowired private ExerciseRepository exerciseRepository;
   @Autowired private TeamRepository teamRepository;
 
+  @Autowired private AssetRepository assetRepository;
+  @Autowired private AssetGroupRepository assetGroupRepository;
+  @Autowired private InjectExpectationRepository injectExpectationRepository;
   @Autowired private UserRepository userRepository;
   @Autowired private InjectRepository injectRepository;
   @Autowired private ExerciseTeamUserRepository exerciseTeamUserRepository;
@@ -65,6 +68,9 @@ class ExerciseServiceTest {
             exerciseMapper,
             injectMapper,
             resultUtils,
+            assetRepository,
+            assetGroupRepository,
+            injectExpectationRepository,
             articleRepository,
             exerciseRepository,
             teamRepository,
