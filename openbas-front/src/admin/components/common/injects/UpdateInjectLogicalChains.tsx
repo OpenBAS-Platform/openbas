@@ -82,7 +82,7 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
           return {
             ...injectsMap[currentInject.inject_id],
             inject_id: currentInject.inject_id,
-            inject_injector_contract: currentInject.inject_injector_contract.injector_contract_id,
+            inject_injector_contract: currentInject.inject_injector_contract?.injector_contract_id,
             inject_depends_on: undefined,
           } as unknown as Inject;
         })
@@ -100,7 +100,7 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
         const injectChildrenUpdate: Inject = {
           ...injectsMap[children.inject_id],
           inject_id: children.inject_id,
-          inject_injector_contract: children.inject_injector_contract.injector_contract_id,
+          inject_injector_contract: children.inject_injector_contract?.injector_contract_id,
           inject_depends_on: injectDependsOnUpdate ? [injectDependsOnUpdate] : [],
         };
         injectsToUpdate.push(injectChildrenUpdate);
