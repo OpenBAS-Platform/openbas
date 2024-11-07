@@ -134,7 +134,7 @@
     "test": "vitest run",
     "check-ts": "tsc --noEmit",
     "i18n-checker": "node i18n-checker.js",
-    "generate-types-from-api": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs.yaml -o src/utils -n api-types.d.ts --sort-types",
+    "generate-types-from-api": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n api-types.d.ts --sort-types",
     "test:e2e": "yarn playwright test",
     "test:e2e:ui": "yarn playwright test --ui",
     "generate-test-e2e": "npx playwright codegen http://localhost:3001/",
