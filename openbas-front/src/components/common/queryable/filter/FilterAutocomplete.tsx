@@ -79,7 +79,7 @@ const FilterAutocomplete: FunctionComponent<Props> = ({
             style={style}
           />
         )}
-        renderOption={(props, option) => <li {...props}>{option.label}</li>}
+        renderOption={(props, option) => <li {...props} key={props.key}>{option.label}</li>}
       />
       <Tooltip title={t('Clear filters')}>
         <IconButton
