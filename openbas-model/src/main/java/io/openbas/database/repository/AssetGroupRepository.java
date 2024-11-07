@@ -89,5 +89,5 @@ public interface AssetGroupRepository
               + "INNER JOIN injects_asset_groups iag ON ag.asset_group_id = iag.asset_group_id "
               + "WHERE iag.inject_id in :injectIds",
       nativeQuery = true)
-  List<Object[]> assetGroupsByInjectIds(List<String> injectIds);
+  List<Object[]> assetGroupsByInjectIds(Set<String> injectIds);
 }

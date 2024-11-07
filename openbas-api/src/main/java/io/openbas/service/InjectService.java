@@ -233,50 +233,6 @@ public class InjectService {
   }
 
   /**
-   * Create inject programmatically based on rawInject, rawInjectExpectation, rawAsset,
-   * rawAssetGroup, rawTeam
-   */
-  public Map<String, Inject> mapOfInjects(@NotNull final List<String> injectIds) {
-    List<Inject> listOfInjects = new ArrayList<>();
-
-    List<RawInject> listOfRawInjects = this.injectRepository.findRawByIds(injectIds);
-    // From the list of injects, we get all the inject expectationsIds that we then get
-    // and put into a map with the expections ids as key
-    Map<String, RawInjectExpectation> mapOfInjectsExpectations =
-        mapOfInjectsExpectations(listOfRawInjects);
-
-    // We get the asset groups from the injects AND the injects expectations as those can also have
-    // asset groups
-    // We then make a map out of it for faster access
-    Map<String, RawAssetGroup> mapOfAssetGroups =
-        mapOfAssetGroups(listOfRawInjects, mapOfInjectsExpectations.values());
-
-    // We get all the assets that are
-    // 1 - linked to an inject
-    // 2 - linked to an asset group linked to an inject
-    // 3 - linked to an inject expectation
-    // 4 - linked to an asset group linked to an inject expectations
-    // We then make a map out of it
-    Map<String, RawAsset> mapOfAssets =
-        mapOfAssets(listOfRawInjects, mapOfInjectsExpectations, mapOfAssetGroups);
-
-    // We get all the teams that are linked to an inject or an asset group
-    // Then we make a map out of it for faster access
-    Map<String, RawTeam> mapOfRawTeams = mapOfRawTeams(listOfRawInjects, mapOfInjectsExpectations);
-
-    // Once we have all of this, we create an Inject for each InjectRaw that we have using all the
-    // Raw objects we got
-    // Then we make a map out of it for faster access
-    listOfRawInjects.stream()
-        .map(
-            (inject) ->
-                Inject.fromRawInject(
-                    inject, mapOfRawTeams, mapOfInjectsExpectations, mapOfAssetGroups, mapOfAssets))
-        .forEach(listOfInjects::add);
-    return listOfInjects.stream().collect(Collectors.toMap(Inject::getId, Function.identity()));
-  }
-
-  /**
    * Store an xls file for ulterior import. The file will be deleted on exit.
    *
    * @param file

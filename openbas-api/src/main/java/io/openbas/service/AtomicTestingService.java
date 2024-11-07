@@ -18,13 +18,14 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.raw.TargetType;
 import io.openbas.database.repository.*;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.InjectMapper;
-import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -68,7 +69,7 @@ public class AtomicTestingService {
   private final DocumentRepository documentRepository;
   private final AssetGroupService assetGroupService;
   private final InjectMapper injectMapper;
-  private final ResultUtils resultUtils;
+  private final InjectExpectationRepository injectExpectationRepository;
 
   private static final String PRE_DEFINE_EXPECTATIONS = "predefinedExpectations";
   private static final String EXPECTATIONS = "expectations";
@@ -341,10 +342,15 @@ public class AtomicTestingService {
     query.setMaxResults(pageable.getPageSize());
 
     // -- EXECUTION --
+    long start = System.currentTimeMillis();
     List<AtomicTestingOutput> injects = execAtomicTesting(query);
+    long executionTime = System.currentTimeMillis() - start;
+    logger.info("execut query  : " + executionTime + " ms");
 
     // -- MAP TO GENERATE TARGETSIMPLEs --
-    List<String> injectIds = injects.stream().map(inject -> inject.getId()).toList();
+    start = System.currentTimeMillis();
+    Set<String> injectIds =
+        injects.stream().map(inject -> inject.getId()).collect(Collectors.toSet());
 
     Map<String, List<Object[]>> teamMap =
         teamRepository.teamsByInjectIds(injectIds).stream()
@@ -358,11 +364,16 @@ public class AtomicTestingService {
         assetGroupRepository.assetGroupsByInjectIds(injectIds).stream()
             .collect(Collectors.groupingBy(row -> (String) row[0]));
 
+    Map<String, List<RawInjectExpectation>> expectationMap =
+        injectExpectationRepository.rawForComputeGlobalByIds(injectIds).stream()
+            .collect(Collectors.groupingBy(RawInjectExpectation::getInject_id));
+
     for (AtomicTestingOutput inject : injects) {
 
       // -- GLOBAL SCORE ---
       inject.setExpectationResultByTypes(
-          resultUtils.getResultsByTypes(new HashSet<>(Arrays.asList(inject.getId()))));
+          AtomicTestingUtils.getExpectationResultByTypesFromRaw(
+              expectationMap.getOrDefault(inject.getId(), emptyList())));
 
       // -- TARGETS --
       List<TargetSimple> allTargets =
@@ -385,6 +396,8 @@ public class AtomicTestingService {
 
       inject.getTargets().addAll(allTargets);
     }
+    executionTime = System.currentTimeMillis() - start;
+    logger.info("execut mapper  : " + executionTime + " ms");
 
     // -- Count Query --
     Long total = countQuery(cb, this.entityManager, Inject.class, specificationCount);
@@ -451,12 +464,7 @@ public class AtomicTestingService {
   }
 
   private List<AtomicTestingOutput> execAtomicTesting(TypedQuery<Tuple> query) {
-    long start = System.currentTimeMillis();
-    List<Tuple> resultList = query.getResultList();
-    long executionTime = System.currentTimeMillis() - start;
-    logger.info("execut query  : " + executionTime + " ms");
-
-    return resultList.stream()
+    return query.getResultList().stream()
         .map(
             tuple -> {
               InjectStatusSimple injectStatus = null;

@@ -176,5 +176,5 @@ public interface TeamRepository
               + "INNER JOIN injects_teams it ON t.team_id = it.team_id "
               + "WHERE it.inject_id in :injectIds",
       nativeQuery = true)
-  List<Object[]> teamsByInjectIds(List<String> injectIds);
+  List<Object[]> teamsByInjectIds(Set<String> injectIds);
 }

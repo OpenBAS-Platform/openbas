@@ -58,5 +58,5 @@ public interface AssetRepository
               + "INNER JOIN injects_assets ia ON a.asset_id = ia.asset_id "
               + "WHERE ia.inject_id in :injectIds",
       nativeQuery = true)
-  List<Object[]> assetsByInjectIds(List<String> injectIds);
+  List<Object[]> assetsByInjectIds(Set<String> injectIds);
 }
