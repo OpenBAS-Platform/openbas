@@ -48,11 +48,11 @@ const PayloadForm: FunctionComponent<Props> = ({
     payload_name: '',
     payload_platforms: [],
     payload_description: '',
-    command_executor: null,
-    command_content: null,
+    command_executor: '',
+    command_content: '',
     payload_attack_patterns: [],
-    payload_cleanup_command: null,
-    payload_cleanup_executor: null,
+    payload_cleanup_command: '',
+    payload_cleanup_executor: '',
     file_drop_file: '',
     dns_resolution_hostname: '',
     payload_tags: [],
@@ -85,8 +85,8 @@ const PayloadForm: FunctionComponent<Props> = ({
       label: z.string(),
     }).array().min(1, { message: t('Should not be empty') }),
     payload_attack_patterns: z.string().array().optional(),
-    payload_cleanup_command: z.string().nullish(),
-    payload_cleanup_executor: z.string().nullish(),
+    payload_cleanup_command: z.string().optional(),
+    payload_cleanup_executor: z.string().optional(),
     payload_tags: z.string().array().optional(),
     payload_arguments: z.array(payloadArgumentZodObject).optional(),
     payload_prerequisites: z.array(payloadPrerequisiteZodObject).optional(),
@@ -477,6 +477,7 @@ const PayloadForm: FunctionComponent<Props> = ({
         fullWidth={true}
         style={{ marginTop: 10 }}
         error={!!errors.payload_cleanup_executor}
+        helperText={errors.payload_cleanup_executor?.message}
       >
         <MenuItem value="psh">
           {t('PowerShell')}
@@ -498,6 +499,7 @@ const PayloadForm: FunctionComponent<Props> = ({
         label={t('Cleanup command')}
         style={{ marginTop: 20 }}
         error={!!errors.payload_cleanup_command}
+        helperText={errors.payload_cleanup_command?.message}
         inputProps={register('payload_cleanup_command')}
       />
       <Controller
