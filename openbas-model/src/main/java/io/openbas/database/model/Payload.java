@@ -90,10 +90,10 @@ public class Payload implements Base {
   private String cleanupExecutor;
 
   public void setCleanupExecutor(String executor) {
-    if(executor==null||executor.trim().isEmpty()) {
-      this.cleanupExecutor=null;
-    }else {
-      this.cleanupExecutor=executor;
+    if (executor == null || executor.trim().isEmpty()) {
+      this.cleanupExecutor = null;
+    } else {
+      this.cleanupExecutor = executor;
     }
   }
 
@@ -106,10 +106,10 @@ public class Payload implements Base {
   private String cleanupCommand;
 
   public void setCleanupCommand(String command) {
-    if(command==null||command.trim().isEmpty()) {
-      this.cleanupCommand=null;
-    }else {
-      this.cleanupCommand=command;
+    if (command == null || command.trim().isEmpty()) {
+      this.cleanupCommand = null;
+    } else {
+      this.cleanupCommand = command;
     }
   }
 
