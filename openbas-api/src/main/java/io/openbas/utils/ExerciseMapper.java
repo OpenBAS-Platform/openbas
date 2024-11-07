@@ -9,10 +9,7 @@ import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.repository.*;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.exercise.form.ExerciseSimple;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -40,11 +37,11 @@ public class ExerciseMapper {
 
       // -- TARGETS --
       List<Object[]> teams =
-          teamRepository.teamsByExerciseIds(List.of(rawExercise.getExercise_id()));
+          teamRepository.teamsByExerciseIds(Set.of(rawExercise.getExercise_id()));
       List<Object[]> assets =
-          assetRepository.assetsByExerciseIds(List.of(rawExercise.getExercise_id()));
+          assetRepository.assetsByExerciseIds(Set.of(rawExercise.getExercise_id()));
       List<Object[]> assetGroups =
-          assetGroupRepository.assetGroupsByExerciseIds(List.of(rawExercise.getExercise_id()));
+          assetGroupRepository.assetGroupsByExerciseIds(Set.of(rawExercise.getExercise_id()));
 
       List<TargetSimple> allTargets =
           Stream.concat(
@@ -56,14 +53,13 @@ public class ExerciseMapper {
 
       simple.getTargets().addAll(allTargets);
     }
-
     return simple;
   }
 
   public List<ExerciseSimple> getExerciseSimples(List<RawExerciseSimple> exercises) {
     // -- MAP TO GENERATE TARGETSIMPLEs
-    List<String> exerciseIds =
-        exercises.stream().map(exercise -> exercise.getExercise_id()).toList();
+    Set<String> exerciseIds =
+        exercises.stream().map(exercise -> exercise.getExercise_id()).collect(Collectors.toSet());
 
     Map<String, List<Object[]>> teamMap =
         teamRepository.teamsByExerciseIds(exerciseIds).stream()

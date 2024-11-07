@@ -72,7 +72,7 @@ public class ResultUtils {
   public List<ExpectationResultsByType> computeGlobalExpectationResults(
       @NotNull Set<String> injectIds) {
     return AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-        injectExpectationRepository.rawForComputeGlobalByIds(injectIds));
+        injectExpectationRepository.rawForComputeGlobalByInjectIds(injectIds));
   }
 
   // -- TARGETS WITH RESULTS --

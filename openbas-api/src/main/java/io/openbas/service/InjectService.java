@@ -391,7 +391,7 @@ public class InjectService {
             .collect(Collectors.groupingBy(row -> (String) row[0]));
 
     Map<String, List<RawInjectExpectation>> expectationMap =
-        injectExpectationRepository.rawForComputeGlobalByIds(injectIds).stream()
+        injectExpectationRepository.rawForComputeGlobalByInjectIds(injectIds).stream()
             .collect(Collectors.groupingBy(RawInjectExpectation::getInject_id));
 
     for (InjectResultOutput inject : injects) {

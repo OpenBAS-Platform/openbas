@@ -80,7 +80,7 @@ public interface AssetGroupRepository
               + "INNER JOIN injects i ON iag.inject_id = i.inject_id "
               + "WHERE i.inject_exercise in :exerciseIds",
       nativeQuery = true)
-  List<Object[]> assetGroupsByExerciseIds(List<String> exerciseIds);
+  List<Object[]> assetGroupsByExerciseIds(Set<String> exerciseIds);
 
   @Query(
       value =

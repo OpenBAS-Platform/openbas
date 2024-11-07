@@ -176,19 +176,6 @@ export interface AtomicTestingInput {
   inject_title?: string;
 }
 
-export interface AtomicTestingOutput {
-  inject_expectation_results?: ExpectationResultsByType[];
-  inject_id: string;
-  /** Full contract */
-  inject_injector_contract?: InjectorContractSimple;
-  inject_status?: InjectStatusSimple;
-  inject_targets?: TargetSimple[];
-  inject_title: string;
-  inject_type?: string;
-  /** @format date-time */
-  inject_updated_at: string;
-}
-
 export interface AtomicTestingUpdateTagsInput {
   atomic_tags?: string[];
 }
@@ -1309,26 +1296,16 @@ export interface InjectReceptionInput {
 }
 
 export interface InjectResultOutput {
-  /** Result of expectations */
-  inject_expectation_results: ExpectationResultsByType[];
-  /** Id */
+  inject_expectation_results?: ExpectationResultsByType[];
   inject_id: string;
   /** Full contract */
-  inject_injector_contract: InjectorContractSimple;
-  /** Kill Chain Phases */
-  inject_kill_chain_phases: KillChainPhaseSimple[];
+  inject_injector_contract?: InjectorContractSimple;
   inject_status?: InjectStatusSimple;
-  /**
-   * Specifies the categories of targets for atomic testing.
-   * @example "assets, asset groups, teams, players"
-   */
-  inject_targets: TargetSimple[];
-  /** Title */
+  inject_targets?: TargetSimple[];
   inject_title: string;
   inject_type?: string;
   /** @format date-time */
-  inject_updated_at?: string;
-  injects_tags?: string[];
+  inject_updated_at: string;
 }
 
 export interface InjectResultOverviewOutput {
@@ -2017,25 +1994,6 @@ export interface OrganizationUpdateInput {
 
 export interface PageAssetGroupOutput {
   content?: AssetGroupOutput[];
-  empty?: boolean;
-  first?: boolean;
-  last?: boolean;
-  /** @format int32 */
-  number?: number;
-  /** @format int32 */
-  numberOfElements?: number;
-  pageable?: PageableObject;
-  /** @format int32 */
-  size?: number;
-  sort?: SortObject[];
-  /** @format int64 */
-  totalElements?: number;
-  /** @format int32 */
-  totalPages?: number;
-}
-
-export interface PageAtomicTestingOutput {
-  content?: AtomicTestingOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;

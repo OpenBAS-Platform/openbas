@@ -49,7 +49,7 @@ public interface AssetRepository
               + "INNER JOIN injects i ON ia.inject_id = i.inject_id "
               + "WHERE i.inject_exercise in :exerciseIds",
       nativeQuery = true)
-  List<Object[]> assetsByExerciseIds(List<String> exerciseIds);
+  List<Object[]> assetsByExerciseIds(Set<String> exerciseIds);
 
   @Query(
       value =

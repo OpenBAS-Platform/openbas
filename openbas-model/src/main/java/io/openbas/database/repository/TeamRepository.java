@@ -167,7 +167,7 @@ public interface TeamRepository
               + "INNER JOIN injects i ON it.inject_id = i.inject_id "
               + "WHERE i.inject_exercise in :exerciseIds",
       nativeQuery = true)
-  List<Object[]> teamsByExerciseIds(List<String> exerciseIds);
+  List<Object[]> teamsByExerciseIds(Set<String> exerciseIds);
 
   @Query(
       value =

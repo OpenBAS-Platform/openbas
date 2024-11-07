@@ -24,6 +24,7 @@ import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.GrantService;
 import io.openbas.service.TeamService;
 import io.openbas.service.VariableService;
+import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.ResultUtils;
@@ -66,6 +67,7 @@ public class ExerciseService {
   private final ResultUtils resultUtils;
   private final AssetRepository assetRepository;
   private final AssetGroupRepository assetGroupRepository;
+  private final InjectExpectationRepository injectExpectationRepository;
 
   private final ArticleRepository articleRepository;
   private final ExerciseRepository exerciseRepository;
@@ -128,7 +130,8 @@ public class ExerciseService {
     List<ExerciseSimple> exercises = execution(query);
 
     // -- MAP TO GENERATE TARGETSIMPLEs
-    List<String> exerciseIds = exercises.stream().map(exercise -> exercise.getId()).toList();
+    Set<String> exerciseIds =
+        exercises.stream().map(exercise -> exercise.getId()).collect(Collectors.toSet());
 
     Map<String, List<Object[]>> teamMap =
         teamRepository.teamsByExerciseIds(exerciseIds).stream()
@@ -142,11 +145,16 @@ public class ExerciseService {
         assetGroupRepository.assetGroupsByExerciseIds(exerciseIds).stream()
             .collect(Collectors.groupingBy(row -> (String) row[0]));
 
+    Map<String, List<RawInjectExpectation>> expectationMap =
+        injectExpectationRepository.rawForComputeGlobalByExerciseIds(exerciseIds).stream()
+            .collect(Collectors.groupingBy(RawInjectExpectation::getExercise_id));
+
     for (ExerciseSimple exercise : exercises) {
       if (exercise.getInjectIds() != null) {
         // -- GLOBAL SCORE ---
         exercise.setExpectationResultByTypes(
-            resultUtils.getResultsByTypes(new HashSet<>(Arrays.asList(exercise.getInjectIds()))));
+            AtomicTestingUtils.getExpectationResultByTypesFromRaw(
+                expectationMap.getOrDefault(exercise.getId(), emptyList())));
 
         // -- TARGETS --
         List<TargetSimple> allTargets =
