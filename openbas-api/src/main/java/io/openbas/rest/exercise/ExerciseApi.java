@@ -40,7 +40,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
@@ -51,7 +50,6 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -170,9 +168,9 @@ public class ExerciseApi extends RestBehavior {
     List<User> users =
         userIds.isEmpty()
             ? List.of(
-            userRepository
-                .findById(currentUser().getId())
-                .orElseThrow(ElementNotFoundException::new))
+                userRepository
+                    .findById(currentUser().getId())
+                    .orElseThrow(ElementNotFoundException::new))
             : fromIterable(userRepository.findAllById(userIds));
     return dryrunService.provisionDryrun(exercise, users, input.getName());
   }

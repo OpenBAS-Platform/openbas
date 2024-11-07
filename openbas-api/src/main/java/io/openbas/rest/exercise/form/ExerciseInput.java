@@ -1,22 +1,21 @@
 package io.openbas.rest.exercise.form;
 
+import static io.openbas.config.AppConfig.*;
+import static lombok.AccessLevel.NONE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-
-import static io.openbas.config.AppConfig.*;
-import static lombok.AccessLevel.NONE;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -71,6 +70,4 @@ public class ExerciseInput {
   public Instant getStart() {
     return start != null ? start.truncatedTo(ChronoUnit.MINUTES) : null;
   }
-
-
 }

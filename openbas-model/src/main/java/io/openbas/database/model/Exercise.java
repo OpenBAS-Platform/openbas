@@ -101,12 +101,12 @@ public class Exercise implements Base {
   @Getter
   @Column(name = "exercise_message_header")
   @JsonProperty("exercise_message_header")
-  private String header;
+  private String header = "SIMULATION HEADER";
 
   @Getter
   @Column(name = "exercise_message_footer")
   @JsonProperty("exercise_message_footer")
-  private String footer;
+  private String footer = "SIMULATION Footer";
 
   @Getter
   @Column(name = "exercise_mail_from")
