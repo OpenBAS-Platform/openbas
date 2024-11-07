@@ -6,10 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.rest.settings.form.PolicyInput;
 import io.openbas.rest.settings.form.ThemeInput;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

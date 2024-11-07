@@ -1,22 +1,18 @@
 import {
-  Box,
   Button,
   Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Tab,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Tabs,
 } from '@mui/material';
 import { FunctionComponent, useState } from 'react';
-import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { deleteExercise, duplicateExercise, updateExercise } from '../../../../actions/Exercise';
@@ -32,9 +28,7 @@ import { useHelper } from '../../../../store';
 import type { ExerciseInput } from '../../../../utils/api-types';
 import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
-import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
 import ExerciseForm from './ExerciseForm';
-import ExerciseUpdateForm from './ExerciseUpdateForm';
 import ExerciseReports from './reports/ExerciseReports';
 
 export type ExerciseActionPopover = 'Duplicate' | 'Update' | 'Delete' | 'Export' | 'Access reports';
@@ -79,21 +73,6 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     };
     return dispatch(updateExercise(exercise.exercise_id, input)).then(() => handleCloseEdit());
   };
-  /* const submitUpdateEmailParameters = (data: SettingUpdateInput) => {
-    const exerciseInformationInput: ExerciseUpdateInput = {
-      exercise_name: exercise.exercise_name,
-      exercise_subtitle: exercise.exercise_subtitle,
-      exercise_severity: exercise.exercise_severity,
-      exercise_category: exercise.exercise_category,
-      exercise_description: exercise.exercise_description,
-      exercise_main_focus: exercise.exercise_main_focus,
-      exercise_mail_from: data.setting_mail_from || '',
-      exercise_mails_reply_to: data.setting_mails_reply_to,
-      exercise_message_header: data.setting_message_header,
-      exercise_message_footer: exercise.exercise_message_footer,
-    };
-    dispatch(updateExercise(exercise.exercise_id, exerciseInformationInput)).then(() => handleCloseEdit());
-  }; */
 
   // Delete
   const [openDelete, setOpenDelete] = useState(false);
@@ -132,11 +111,6 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const handleOpenReports = () => setOpenReports(true);
   const handleCloseReports = () => setOpenReports(false);
 
-  // Tab
-  const [currentTab, setCurrentTab] = useState(0);
-
-  const handleChangeTab = (_: React.SyntheticEvent, value: number) => setCurrentTab(value);
-
   const submitExport = () => {
     const link = document.createElement('a');
     link.href = `/api/exercises/${exercise.exercise_id}/export?isWithTeams=${exportTeams}&isWithPlayers=${exportPlayers}&isWithVariableValues=${exportVariableValues}`;
@@ -162,12 +136,6 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     exercise_message_header: exercise.exercise_message_header ?? '',
     exercise_message_footer: exercise.exercise_message_footer ?? '',
   };
-  /* const initialValuesEmailParameters = {
-    setting_mail_from: exercise.exercise_mail_from,
-    setting_mails_reply_to: exercise.exercise_mails_reply_to,
-    setting_message_header: exercise.exercise_message_header,
-    setting_message_footer: exercise.exercise_message_footer,
-  }; */
   const permissions = usePermissions(exercise.exercise_id);
 
   // Fetching data
@@ -198,28 +166,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
           handleClose={handleCloseEdit}
           edit={true}
         />
-        {/* <>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={currentTab} onChange={handleChangeTab}>
-              <Tab label={t('Overview')} />
-              <Tab label={t('Mail configuration')} />
-            </Tabs>
-          </Box>
-          {currentTab === 0 && (
-            <ExerciseUpdateForm
-              initialValues={initialValues}
-              onSubmit={onSubmitEdit}
-              handleClose={handleCloseEdit}
-            />
-          )}
-          {currentTab === 1 && (
-            <EmailParametersForm
-              initialValues={initialValuesEmailParameters}
-              onSubmit={submitUpdateEmailParameters}
-              disabled={permissions.readOnly}
-            />
-          )}
-        </> */}
+
       </Drawer>
       <Drawer
         open={openReports}

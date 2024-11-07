@@ -1,9 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, AlertTitle, Autocomplete, Button, Chip, Grid, MenuItem, TextField as MuiTextField, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers/DateTimePicker/DateTimePicker';
+import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
 import { FunctionComponent, useState } from 'react';
-import * as React from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -14,8 +12,6 @@ import { useFormatter } from '../../../../components/i18n';
 import type { ExerciseInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
 import { scenarioCategories } from '../../scenarios/constants';
-
-const useStyles = makeStyles(() => ({}));
 
 interface Props {
   onSubmit: SubmitHandler<ExerciseInput>;
@@ -45,7 +41,6 @@ const ExerciseForm: FunctionComponent<Props> = ({
   },
 }) => {
   // Standard hooks
-  const classes = useStyles();
   const { t } = useFormatter();
   const [inputValue, setInputValue] = useState('');
 
@@ -286,7 +281,7 @@ const ExerciseForm: FunctionComponent<Props> = ({
                 );
               })}
               renderInput={params => (
-                <TextField
+                <MuiTextField
                   {...params}
                   variant="standard"
                   label={t('Reply to')}
@@ -316,6 +311,16 @@ const ExerciseForm: FunctionComponent<Props> = ({
         error={!!errors.exercise_message_header}
         helperText={errors.exercise_message_header && errors.exercise_message_header?.message}
         inputProps={register('exercise_message_header')}
+        disabled={disabled}
+      />
+      <MuiTextField
+        variant="standard"
+        fullWidth
+        label={t('Messages footer')}
+        style={{ marginTop: 20 }}
+        error={!!errors.exercise_message_footer}
+        helperText={errors.exercise_message_footer && errors.exercise_message_footer?.message}
+        inputProps={register('exercise_message_footer')}
         disabled={disabled}
       />
 

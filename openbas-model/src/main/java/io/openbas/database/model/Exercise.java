@@ -20,9 +20,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -99,12 +101,12 @@ public class Exercise implements Base {
   @Getter
   @Column(name = "exercise_message_header")
   @JsonProperty("exercise_message_header")
-  private String header = "EXERCISE - EXERCISE - EXERCISE";
+  private String header;
 
   @Getter
   @Column(name = "exercise_message_footer")
   @JsonProperty("exercise_message_footer")
-  private String footer = "EXERCISE - EXERCISE - EXERCISE";
+  private String footer;
 
   @Getter
   @Column(name = "exercise_mail_from")

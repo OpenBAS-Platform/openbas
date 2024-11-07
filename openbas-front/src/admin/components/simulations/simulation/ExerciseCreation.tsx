@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { fetchPlatformParameters } from '../../../../actions/Application';
 import { addExercise } from '../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
+import type { LoggedHelper } from '../../../../actions/helper';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { ExerciseInput } from '../../../../utils/api-types';
+import { useHelper } from '../../../../store';
+import type { ExerciseInput, PlatformSettings } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import ExerciseForm from './ExerciseForm';
 
 const ExerciseCreation = () => {
@@ -22,6 +26,30 @@ const ExerciseCreation = () => {
       navigate(`/admin/exercises/${result.result}`);
     });
   };
+
+  const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({
+    settings: helper.getPlatformSettings(),
+  }));
+  useDataLoader(() => {
+    dispatch(fetchPlatformParameters());
+  });
+
+  // Form
+  const initialValues: ExerciseInput = {
+    exercise_name: '',
+    exercise_subtitle: '',
+    exercise_description: '',
+    exercise_category: 'attack-scenario',
+    exercise_main_focus: 'incident-response',
+    exercise_severity: 'high',
+    exercise_tags: [],
+    exercise_start_date: null,
+    exercise_mail_from: settings.default_mailer,
+    exercise_mails_reply_to: [settings.default_reply_to ? settings.default_reply_to : ''],
+    exercise_message_header: 'SIMULATION HEADER',
+    exercise_message_footer: 'SIMULATION FOOTER',
+  };
+
   return (
     <>
       <ButtonCreate onClick={() => setOpen(true)} />
@@ -33,6 +61,7 @@ const ExerciseCreation = () => {
         <ExerciseForm
           onSubmit={onSubmit}
           handleClose={() => setOpen(false)}
+          initialValues={initialValues}
           edit={false}
         />
       </Drawer>
