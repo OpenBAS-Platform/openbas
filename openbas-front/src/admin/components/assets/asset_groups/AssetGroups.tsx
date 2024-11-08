@@ -1,4 +1,4 @@
-import { Box, Chip, Drawer as MuiDrawer, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { Box, Chip, Drawer as MuiDrawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { SelectGroup } from 'mdi-material-ui';
 import { CSSProperties, Fragment, useMemo, useState } from 'react';
