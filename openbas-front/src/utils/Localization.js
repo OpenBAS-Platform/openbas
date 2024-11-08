@@ -1333,6 +1333,7 @@ const i18n = {
       'Update the security platform': 'Mettre à jour la plateforme de sécurité',
       'Security Platforms': 'Plateformes de sécurité',
       'Content should not be empty': 'Le contenu ne doit pas être vide',
+      'Cleanup command and executor must be defined together or none at all': 'La commande et l\'exécuteur de nettoyage doivent être définis ensemble ou pas du tout',
       'Timezone': 'Fuseau horaire',
       'Log': 'Journal',
       'Your file should be a XLS': 'Votre fichier doit être un XLS',

@@ -90,7 +90,6 @@ public class Payload implements Base {
   @JsonProperty("payload_cleanup_executor")
   private String cleanupExecutor;
 
-
   @Setter
   @Column(name = "payload_cleanup_command")
   @JsonProperty("payload_cleanup_command")
