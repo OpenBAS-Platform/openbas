@@ -2681,6 +2681,7 @@ const i18n = {
       'Update the security platform': '更新安全平台',
       'Security Platforms': '安全平台',
       'Content should not be empty': '内容不可为空',
+      'Cleanup command and executor must be defined together or none at all': '清理命令和执行器必须一起定义，否则根本无法定义',
       'Timezone': '时区',
       'Log': '日志',
       'Your file should be a XLS': '你的文件应该为XLS',
