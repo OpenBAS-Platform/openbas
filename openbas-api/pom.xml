@@ -14,7 +14,7 @@
     <description>OpenBAS api</description>
 
     <properties>
-        <bcpg-jdk15on.version>1.70</bcpg-jdk15on.version>
+        <bcpg-jdk18on.version>1.78.1</bcpg-jdk18on.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <commons-email.version>1.5</commons-email.version>
         <opensaml.version>4.3.2</opensaml.version>
@@ -70,10 +70,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-config</artifactId>
+            <version>3.2.11</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -82,6 +79,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
+            <version>3.2.11</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -104,8 +102,8 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpg-jdk15on</artifactId>
-            <version>${bcpg-jdk15on.version}</version>
+            <artifactId>bcpg-jdk18on</artifactId>
+            <version>${bcpg-jdk18on.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
