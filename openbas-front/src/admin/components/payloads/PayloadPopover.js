@@ -34,6 +34,8 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
       R.assoc('payload_tags', data.payload_tags),
       R.assoc('payload_attack_patterns', data.payload_attack_patterns),
       R.assoc('executable_file', data.executable_file?.id),
+      R.assoc('payload_cleanup_executor', data.payload_cleanup_executor === '' ? null : data.payload_cleanup_executor),
+      R.assoc('payload_cleanup_command', data.payload_cleanup_command === '' ? null : data.payload_cleanup_command),
     )(data);
     return dispatch(updatePayload(payload.payload_id, inputValues)).then((result) => {
       if (onUpdate) {
@@ -79,8 +81,6 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
     R.pick([
       'payload_name',
       'payload_description',
-      'payload_cleanup_executor',
-      'payload_cleanup_command',
       'command_executor',
       'command_content',
       'dns_resolution_hostname',
@@ -93,7 +93,9 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
     ]),
     R.assoc('payload_platforms', payloadPlatforms),
     R.assoc('executable_file', R.head(payloadExecutableFiles)),
-  )(payload);
+    R.assoc('payload_cleanup_executor', payload.payload_cleanup_executor === null ? '' : payload.payload_cleanup_executor),
+    R.assoc('payload_cleanup_command', payload.payload_cleanup_command === null ? '' : payload.payload_cleanup_command),
+    )(payload);
   return (
     <>
       <IconButton color="primary" onClick={handlePopoverOpen} aria-haspopup="true" size="large">

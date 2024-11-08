@@ -85,37 +85,16 @@ public class Payload implements Base {
   @Queryable(filterable = true, searchable = true, dynamicValues = true, path = "attackPatterns.id")
   private List<AttackPattern> attackPatterns = new ArrayList<>();
 
+  @Setter
   @Column(name = "payload_cleanup_executor")
   @JsonProperty("payload_cleanup_executor")
   private String cleanupExecutor;
 
-  public void setCleanupExecutor(String executor) {
-    if (executor == null || executor.trim().isEmpty()) {
-      this.cleanupExecutor = null;
-    } else {
-      this.cleanupExecutor = executor;
-    }
-  }
 
-  public String getCleanupExecutor() {
-    return cleanupExecutor == null ? "" : cleanupExecutor;
-  }
-
+  @Setter
   @Column(name = "payload_cleanup_command")
   @JsonProperty("payload_cleanup_command")
   private String cleanupCommand;
-
-  public void setCleanupCommand(String command) {
-    if (command == null || command.trim().isEmpty()) {
-      this.cleanupCommand = null;
-    } else {
-      this.cleanupCommand = command;
-    }
-  }
-
-  public String getCleanupCommand() {
-    return cleanupCommand == null ? "" : cleanupCommand;
-  }
 
   @Getter
   @Column(name = "payload_elevation_required")
