@@ -42,11 +42,4 @@ public class InjectExpectationUtils {
       expectation.getResults().add(expectationResult);
     }
   }
-
-  public static Optional<String> getCommandLine(@NotNull final InjectExpectation expectation) {
-    return expectation.getInject().getStatus().orElseThrow().getTraces().stream()
-        .filter(trace -> trace.getCategory().equals(EXECUTION_TYPE_COMMAND))
-        .findFirst()
-        .map(InjectStatusExecution::getMessage);
-  }
 }

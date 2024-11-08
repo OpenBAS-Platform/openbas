@@ -61,8 +61,8 @@ public class Execution {
   }
 
   public void addTrace(InjectStatusExecution context) {
-    ExecutionStatus status = context.getStatus();
-    if (status.equals(ExecutionStatus.SUCCESS) || status.equals(ExecutionStatus.INFO)) {
+    ExecutionTraceStatus status = context.getStatus();
+    if (status.equals(ExecutionTraceStatus.SUCCESS) || status.equals(ExecutionTraceStatus.INFO)) {
       LOGGER.log(Level.INFO, context.getMessage());
     } else {
       LOGGER.log(Level.SEVERE, context.getMessage());
@@ -77,9 +77,10 @@ public class Execution {
 
   public ExecutionStatus getStatus() {
     boolean hasSuccess =
-        traces.stream().anyMatch(context -> context.getStatus().equals(ExecutionStatus.SUCCESS));
+        traces.stream()
+            .anyMatch(context -> context.getStatus().equals(ExecutionTraceStatus.SUCCESS));
     boolean hasError =
-        traces.stream().anyMatch(context -> context.getStatus().equals(ExecutionStatus.ERROR));
+        traces.stream().anyMatch(context -> context.getStatus().equals(ExecutionTraceStatus.ERROR));
     if (!hasSuccess && !hasError) {
       return ExecutionStatus.PENDING;
     } else if (hasSuccess && hasError) {

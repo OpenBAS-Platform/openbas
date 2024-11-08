@@ -64,9 +64,6 @@ public class OpenBASExecutorContextService {
     if (platform == null) {
       throw new RuntimeException("Unsupported null platform");
     }
-    if (!asset.getActive()) {
-      throw new RuntimeException("ERROR_ASSET_INACTIVE");
-    }
     AssetAgentJob assetAgentJob = new AssetAgentJob();
     assetAgentJob.setCommand(computeCommand(inject, platform, arch));
     assetAgentJob.setAsset(asset);

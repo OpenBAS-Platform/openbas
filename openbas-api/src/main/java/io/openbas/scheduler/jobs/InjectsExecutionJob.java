@@ -248,9 +248,20 @@ public class InjectsExecutionJob implements Job {
                   newExecutableInject =
                       this.executionExecutorService.launchExecutorContext(executableInject, inject);
                 } catch (InterruptedException e) {
-                  statusSaved.setName(ExecutionStatus.ERROR);
-                    injectStatusRepository.save(status);
                   throw new RuntimeException(e);
+                } catch (RuntimeException e) {
+                  ExecutionTraceStatus traceStatus =
+                      e.getMessage().startsWith("Asset error")
+                          ? ExecutionTraceStatus.ASSET_INACTIVE
+                          : ExecutionTraceStatus.ERROR;
+
+                  statusSaved
+                      .getTraces()
+                      .add(InjectStatusExecution.traceError(traceStatus, e.getMessage()));
+
+                  statusSaved.setName(ExecutionStatus.ERROR);
+                  injectStatusRepository.save(statusSaved);
+                  throw e;
                 }
               }
               if (externalInjector.isExternal()) {
@@ -263,22 +274,18 @@ public class InjectsExecutionJob implements Job {
   }
 
   private void setInjectStatusWhenNoInjectorContractExists(Inject inject) {
+    InjectStatus status;
     if (inject.getStatus().isEmpty()) {
-      InjectStatus status = new InjectStatus();
-      status.getTraces().add(InjectStatusExecution.traceError("Inject does not have a contract"));
-      status.setName(ExecutionStatus.ERROR);
-      status.setTrackingSentDate(Instant.now());
+      status = new InjectStatus();
       status.setInject(inject);
-      status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
-      injectStatusRepository.save(status);
     } else {
-      InjectStatus status = inject.getStatus().get();
-      status.getTraces().add(InjectStatusExecution.traceError("Inject does not have a contract"));
-      status.setName(ExecutionStatus.ERROR);
-      status.setTrackingSentDate(Instant.now());
-      status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
-      injectStatusRepository.save(status);
+      status = inject.getStatus().get();
     }
+    status.getTraces().add(InjectStatusExecution.traceError("Inject does not have a contract"));
+    status.setName(ExecutionStatus.ERROR);
+    status.setTrackingSentDate(Instant.now());
+    status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
+    injectStatusRepository.save(status);
   }
 
   /**
