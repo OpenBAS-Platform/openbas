@@ -12,17 +12,23 @@ public class InjectDependencyConditions {
   @Getter
   public enum DependencyMode {
     and("&&"),
-    or ("||");
+    or("||");
 
     private final String evaluationValue;
-    DependencyMode(String evaluationValue) {this.evaluationValue = evaluationValue;}
+
+    DependencyMode(String evaluationValue) {
+      this.evaluationValue = evaluationValue;
+    }
   }
 
   @Getter
   public enum DependencyOperator {
-    eq ("==");
+    eq("==");
     private final String evaluationValue;
-    DependencyOperator(String evaluationValue) {this.evaluationValue = evaluationValue;}
+
+    DependencyOperator(String evaluationValue) {
+      this.evaluationValue = evaluationValue;
+    }
   }
 
   @Data
