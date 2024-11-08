@@ -20,10 +20,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.Instant;
 import java.util.*;
-
 import lombok.Data;
 import lombok.Getter;
 import org.hibernate.annotations.UuidGenerator;
@@ -33,9 +31,9 @@ import org.hibernate.annotations.UuidGenerator;
 @Table(name = "scenarios")
 @EntityListeners(ModelBaseListener.class)
 @NamedEntityGraphs({
-    @NamedEntityGraph(
-        name = "Scenario.tags-injects",
-        attributeNodes = {@NamedAttributeNode("tags"), @NamedAttributeNode("injects")})
+  @NamedEntityGraph(
+      name = "Scenario.tags-injects",
+      attributeNodes = {@NamedAttributeNode("tags"), @NamedAttributeNode("injects")})
 })
 public class Scenario implements Base {
 
