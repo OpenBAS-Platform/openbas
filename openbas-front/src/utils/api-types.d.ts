@@ -543,6 +543,9 @@ export interface DryInjectStatus {
     | "PENDING"
     | "PARTIAL"
     | "ERROR"
+    | "WARNING"
+    | "COMMAND_NOT_FOUND"
+    | "COMMAND_CANNOT_BE_EXECUTED"
     | "MAYBE_PARTIAL_PREVENTED"
     | "MAYBE_PREVENTED"
     | "SUCCESS";
@@ -1129,10 +1132,14 @@ export interface InjectDependencyId {
   inject_parent_id?: string;
 }
 
+export interface InjectDependencyIdInput {
+  inject_children_id?: string;
+  inject_parent_id?: string;
+}
+
 export interface InjectDependencyInput {
-  dependency_conditions?: Condition[];
-  dependency_mode?: "&&" | "||";
-  dependency_parent?: string;
+  dependency_condition?: InjectDependencyCondition;
+  dependency_relationship?: InjectDependencyIdInput;
 }
 
 export interface InjectDocument {
@@ -1333,6 +1340,9 @@ export interface InjectStatus {
     | "PENDING"
     | "PARTIAL"
     | "ERROR"
+    | "WARNING"
+    | "COMMAND_NOT_FOUND"
+    | "COMMAND_CANNOT_BE_EXECUTED"
     | "MAYBE_PARTIAL_PREVENTED"
     | "MAYBE_PREVENTED"
     | "SUCCESS";
@@ -1373,6 +1383,9 @@ export interface InjectStatusExecution {
     | "PENDING"
     | "PARTIAL"
     | "ERROR"
+    | "WARNING"
+    | "COMMAND_NOT_FOUND"
+    | "COMMAND_CANNOT_BE_EXECUTED"
     | "MAYBE_PARTIAL_PREVENTED"
     | "MAYBE_PREVENTED"
     | "SUCCESS";
@@ -1412,6 +1425,9 @@ export interface InjectTestStatus {
     | "PENDING"
     | "PARTIAL"
     | "ERROR"
+    | "WARNING"
+    | "COMMAND_NOT_FOUND"
+    | "COMMAND_CANNOT_BE_EXECUTED"
     | "MAYBE_PARTIAL_PREVENTED"
     | "MAYBE_PREVENTED"
     | "SUCCESS";
