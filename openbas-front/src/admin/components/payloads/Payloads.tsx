@@ -269,45 +269,10 @@ const Payloads = () => {
           const collector = payload.payload_collector ? collectorsMap[payload.payload_collector] : null;
           return (
             (
-              <ListItemButton
+              <ListItem
                 key={payload.payload_id}
-                classes={{ root: classes.item }}
                 divider
-                onClick={() => setSelectedPayload(payload)}
-              >
-                <ListItemIcon>
-                  {collector ? (
-                    <img
-                      src={`/api/images/collectors/${collector.collector_type}`}
-                      alt={collector.collector_type}
-                      style={{
-                        padding: 0,
-                        cursor: 'pointer',
-                        width: 20,
-                        height: 20,
-                        borderRadius: 4,
-                      }}
-                    />
-                  ) : (
-                    <PayloadIcon payloadType={payload.payload_type ?? ''} />
-                  )}
-                </ListItemIcon>
-                <ListItemText
-                  primary={(
-                    <div className={classes.bodyItems}>
-                      {headers.map(header => (
-                        <div
-                          key={header.field}
-                          className={classes.bodyItem}
-                          style={inlineStyles[header.field]}
-                        >
-                          {header.value?.(payload)}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                />
-                <ListItemSecondaryAction>
+                secondaryAction={(
                   <PayloadPopover
                     documentsMap={documentsMap}
                     payload={payload}
@@ -316,8 +281,47 @@ const Payloads = () => {
                     onDelete={(result: string) => setPayloads(payloads.filter(a => (a.payload_id !== result)))}
                     disabled={collector !== null}
                   />
-                </ListItemSecondaryAction>
-              </ListItemButton>
+                )}
+                disablePadding
+              >
+                <ListItemButton
+                  classes={{ root: classes.item }}
+                  onClick={() => setSelectedPayload(payload)}
+                >
+                  <ListItemIcon>
+                    {collector ? (
+                      <img
+                        src={`/api/images/collectors/${collector.collector_type}`}
+                        alt={collector.collector_type}
+                        style={{
+                          padding: 0,
+                          cursor: 'pointer',
+                          width: 20,
+                          height: 20,
+                          borderRadius: 4,
+                        }}
+                      />
+                    ) : (
+                      <PayloadIcon payloadType={payload.payload_type ?? ''} />
+                    )}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={(
+                      <div className={classes.bodyItems}>
+                        {headers.map(header => (
+                          <div
+                            key={header.field}
+                            className={classes.bodyItem}
+                            style={inlineStyles[header.field]}
+                          >
+                            {header.value?.(payload)}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  />
+                </ListItemButton>
+              </ListItem>
             )
           );
         })}

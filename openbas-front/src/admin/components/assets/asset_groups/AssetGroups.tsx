@@ -232,31 +232,10 @@ const AssetGroups = () => {
           />
         </ListItem>
         {assetGroups.map((assetGroup: AssetGroupOutput) => (
-          <ListItemButton
+          <ListItem
             key={assetGroup.asset_group_id}
-            classes={{ root: classes.item }}
             divider
-            onClick={() => setSelectedAssetGroupId(assetGroup.asset_group_id)}
-          >
-            <ListItemIcon>
-              <SelectGroup color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={(
-                <div className={classes.bodyItems}>
-                  {headers.map(header => (
-                    <div
-                      key={header.field}
-                      className={classes.bodyItem}
-                      style={inlineStyles[header.field]}
-                    >
-                      {header.value?.(assetGroup)}
-                    </div>
-                  ))}
-                </div>
-              )}
-            />
-            <ListItemSecondaryAction>
+            secondaryAction={(
               <AssetGroupPopover
                 assetGroup={assetGroup}
                 onUpdate={result => setAssetGroups(assetGroups.map(ag => (ag.asset_group_id !== result.asset_group_id ? ag : result)))}
@@ -269,8 +248,33 @@ const AssetGroups = () => {
                     })))}
                 openEditOnInit={assetGroup.asset_group_id === searchId}
               />
-            </ListItemSecondaryAction>
-          </ListItemButton>
+            )}
+            disablePadding
+          >
+            <ListItemButton
+              classes={{ root: classes.item }}
+              onClick={() => setSelectedAssetGroupId(assetGroup.asset_group_id)}
+            >
+              <ListItemIcon>
+                <SelectGroup color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={(
+                  <div className={classes.bodyItems}>
+                    {headers.map(header => (
+                      <div
+                        key={header.field}
+                        className={classes.bodyItem}
+                        style={inlineStyles[header.field]}
+                      >
+                        {header.value?.(assetGroup)}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              />
+            </ListItemButton>
+          </ListItem>
         ))}
       </List>
       {userAdmin && <AssetGroupCreation onCreate={result => setAssetGroups([result, ...assetGroups])} />}
