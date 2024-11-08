@@ -3,6 +3,7 @@ package io.openbas.utils.fixtures;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Team;
+
 import java.time.Instant;
 import java.util.List;
 
@@ -44,13 +45,5 @@ public class ExerciseFixture {
     exercise.setStart(Instant.now());
     return exercise;
   }
-
-  /*
-  _ create exercise with team containing a user with email (user enabled)
-  _ create exercise with team containing a user with email (user not enabled)
-  _ create exercise without team
-  _ create exercise with team without user
-  _ create email
-   */
 
 }
