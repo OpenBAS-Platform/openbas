@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { Fragment, FunctionComponent } from 'react';
+import { Fragment, FunctionComponent, useCallback } from 'react';
 
 import type { Filter, FilterGroup, PropertySchemaDTO } from '../../../../utils/api-types';
 import ClickableModeChip from '../../chips/ClickableModeChip';
@@ -23,9 +23,9 @@ const FilterChips: FunctionComponent<Props> = ({
 }) => {
   const filters = filterGroup?.filters?.filter(f => availableFilterNames.length === 0 || availableFilterNames.includes(f.key)) ?? [];
 
-  const propertySchema = (filter: Filter) => {
+  const propertySchema = useCallback((filter: Filter) => {
     return propertySchemas.find(p => p.schema_property_name === filter.key);
-  };
+  }, [propertySchemas]);
 
   const handleSwitchMode = () => helpers.handleSwitchMode();
 
@@ -40,6 +40,7 @@ const FilterChips: FunctionComponent<Props> = ({
         display: 'flex',
         flexWrap: 'wrap',
         gap: 1,
+        minHeight: 56,
       }}
     >
       {filters.map((filter, idx) => {

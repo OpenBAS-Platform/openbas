@@ -69,6 +69,7 @@ const Dashboard = () => {
   const dispatch = useAppDispatch();
 
   // Exercises
+  const [loadingExercises, setLoadingExercises] = useState(true);
   const [exercises, setExercises] = useState<EndpointStore[]>([]);
   const searchPaginationInput = {
     sorts: initSorting('exercise_updated_at', 'DESC'),
@@ -76,10 +77,11 @@ const Dashboard = () => {
     size: 6,
   };
   useEffect(() => {
+    setLoadingExercises(true);
     searchExercises(searchPaginationInput).then((result: { data: Page<ExerciseSimple> }) => {
       const { data } = result;
       setExercises(data.content);
-    });
+    }).finally(() => setLoadingExercises(false));
   }, []);
 
   // Statistics
@@ -278,6 +280,7 @@ const Dashboard = () => {
             exercises={exercises}
             hasHeader={false}
             variant="reduced-view"
+            loading={loadingExercises}
           />
         </Paper>
       </Grid>

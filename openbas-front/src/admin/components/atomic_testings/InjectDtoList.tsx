@@ -1,3 +1,4 @@
+import { HelpOutlineOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent, useMemo, useState } from 'react';
@@ -12,6 +13,7 @@ import Empty from '../../../components/Empty';
 import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
 import ItemTargets from '../../../components/ItemTargets';
+import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import type { InjectResultDTO, SearchPaginationInput } from '../../../utils/api-types';
 import { isNotEmptyField } from '../../../utils/utils';
 import InjectIcon from '../common/injects/InjectIcon';
@@ -81,6 +83,8 @@ const InjectDtoList: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
   const { t, fldt, tPick, nsdt } = useFormatter();
+
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Filter and sort hook
   const [injects, setInjects] = useState<InjectResultDTO[]>([]);
@@ -152,10 +156,15 @@ const InjectDtoList: FunctionComponent<Props> = ({
     },
   ], []);
 
+  const search = (input: SearchPaginationInput) => {
+    setLoading(true);
+    return fetchInjects(input).finally(() => setLoading(false));
+  };
+
   return (
     <>
       <PaginationComponentV2
-        fetch={fetchInjects}
+        fetch={search}
         searchPaginationInput={searchPaginationInput}
         setContent={setInjects}
         entityPrefix="inject"
@@ -180,57 +189,61 @@ const InjectDtoList: FunctionComponent<Props> = ({
             )}
           />
         </ListItem>
-        {injects.map((injectDto) => {
-          return (
-            <ListItem
-              key={injectDto.inject_id}
-              classes={{ root: classes.item }}
-              divider
-              secondaryAction={(
-                <AtomicTestingPopover
-                  atomic={injectDto}
-                  actions={['Duplicate', 'Delete']}
-                  onDelete={result => setInjects(injects.filter(e => (e.inject_id !== result)))}
-                  inList
-                />
-              )}
-              disablePadding
-            >
-              <ListItemButton
-                component={Link}
-                to={goTo(injectDto.inject_id)}
-              >
-                <ListItemIcon>
-                  <InjectIcon
-                    isPayload={isNotEmptyField(injectDto.inject_injector_contract?.injector_contract_payload)}
-                    type={
-                      injectDto.inject_injector_contract?.injector_contract_payload
-                        ? injectDto.inject_injector_contract.injector_contract_payload.payload_collector_type
-                        || injectDto.inject_injector_contract.injector_contract_payload.payload_type
-                        : injectDto.inject_type
-                    }
-                    variant="list"
-                  />
-                </ListItemIcon>
-                <ListItemText
-                  primary={(
-                    <div className={classes.bodyItems}>
-                      {headers.map(header => (
-                        <div
-                          key={header.field}
-                          className={classes.bodyItem}
-                          style={inlineStyles[header.field]}
-                        >
-                          {header.value?.(injectDto)}
-                        </div>
-                      ))}
-                    </div>
+        {
+          loading
+            ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} />
+            : injects.map((injectDto, index) => {
+              return (
+                <ListItem
+                  key={injectDto.inject_id}
+                  classes={{ root: classes.item }}
+                  divider={injects.length !== index + 1}
+                  secondaryAction={(
+                    <AtomicTestingPopover
+                      atomic={injectDto}
+                      actions={['Duplicate', 'Delete']}
+                      onDelete={result => setInjects(injects.filter(e => (e.inject_id !== result)))}
+                      inList
+                    />
                   )}
-                />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
+                  disablePadding
+                >
+                  <ListItemButton
+                    component={Link}
+                    to={goTo(injectDto.inject_id)}
+                  >
+                    <ListItemIcon>
+                      <InjectIcon
+                        isPayload={isNotEmptyField(injectDto.inject_injector_contract?.injector_contract_payload)}
+                        type={
+                          injectDto.inject_injector_contract?.injector_contract_payload
+                            ? injectDto.inject_injector_contract.injector_contract_payload.payload_collector_type
+                            || injectDto.inject_injector_contract.injector_contract_payload.payload_type
+                            : injectDto.inject_type
+                        }
+                        variant="list"
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={(
+                        <div className={classes.bodyItems}>
+                          {headers.map(header => (
+                            <div
+                              key={header.field}
+                              className={classes.bodyItem}
+                              style={inlineStyles[header.field]}
+                            >
+                              {header.value?.(injectDto)}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              );
+            })
+        }
         {!injects ? (<Empty message={t('No data available')} />) : null}
       </List>
     </>
