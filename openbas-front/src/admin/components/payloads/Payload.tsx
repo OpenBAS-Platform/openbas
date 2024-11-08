@@ -24,7 +24,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  selectedPayload: PayloadStore;
+  selectedPayload: PayloadStore | null;
 }
 
 const Payload: FunctionComponent<Props> = ({
