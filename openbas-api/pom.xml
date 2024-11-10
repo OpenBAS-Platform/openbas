@@ -22,7 +22,7 @@
         <springdoc-plugin.version>1.4</springdoc-plugin.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <apache-poi.version>5.3.0</apache-poi.version>
-        <opentelemetry.version>1.42.1</opentelemetry.version>
+        <opentelemetry.version>1.44.1</opentelemetry.version>
         <opentelemetry-semconv.version>1.27.0-alpha</opentelemetry-semconv.version>
     </properties>
 
