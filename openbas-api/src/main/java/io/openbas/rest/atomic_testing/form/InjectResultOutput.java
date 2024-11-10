@@ -1,10 +1,7 @@
 package io.openbas.rest.atomic_testing.form;
 
-import static lombok.AccessLevel.NONE;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.model.ExecutionStatus;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -36,16 +33,8 @@ public class InjectResultOutput {
   @JsonProperty("inject_injector_contract")
   private InjectorContractSimple injectorContract;
 
-  @Getter(NONE)
   @JsonProperty("inject_status")
   private InjectStatusSimple status;
-
-  public InjectStatusSimple getStatus() {
-    if (status == null) {
-      return InjectStatusSimple.builder().name(ExecutionStatus.DRAFT.name()).build();
-    }
-    return status;
-  }
 
   @JsonIgnore private String[] teamIds;
   @JsonIgnore private String[] assetIds;

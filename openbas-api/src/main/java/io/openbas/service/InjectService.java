@@ -73,9 +73,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -311,8 +309,8 @@ public class InjectService {
         .toList();
   }
 
-  // -- INJECT SEARCH --
-  public Page<InjectResultOutput> getPageOfSearchExerciseInjects(
+  // -- PAGE INJECT SEARCH --
+  public Page<InjectResultOutput> getPageOfInjectResults(
       String exerciseId, @Valid SearchPaginationInput searchPaginationInput) {
     Map<String, Join<Base, Base>> joinMap = new HashMap<>();
 
@@ -342,13 +340,67 @@ public class InjectService {
       Specification<Inject> specificationCount,
       Pageable pageable,
       Map<String, Join<Base, Base>> joinMap) {
-    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
+    // Prepare query and execute
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    List<InjectResultOutput> injects = executeInjectQuery(cb, specification, pageable, joinMap);
+
+    // Fetch related data for injects
+    Set<String> injectIds =
+        injects.stream().map(InjectResultOutput::getId).collect(Collectors.toSet());
+    Map<String, List<Object[]>> teamMap = fetchRelatedData(injectIds, "teams");
+    Map<String, List<Object[]>> assetMap = fetchRelatedData(injectIds, "assets");
+    Map<String, List<Object[]>> assetGroupMap = fetchRelatedData(injectIds, "assetGroups");
+    Map<String, List<RawInjectExpectation>> expectationMap = fetchExpectations(injectIds);
+
+    // Map results to InjectResultOutput and set targets
+    mapResultsToInjects(injects, teamMap, assetMap, assetGroupMap, expectationMap);
+
+    long totalCount = countQuery(cb, entityManager, Inject.class, specificationCount);
+    return new PageImpl<>(injects, pageable, totalCount);
+  }
+
+  // -- LIST INJECTRESUTLOUTPUT --
+  public List<InjectResultOutput> getListOfInjectResults(String exerciseId) {
+    // Create specification for filtering by exerciseId
+    Specification<Inject> specification =
+        Specification.where(
+            (root, query, cb) -> cb.equal(root.get("exercise").get("id"), exerciseId));
+
+    // Prepare query and execute
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    Sort sort = Sort.by(Sort.Order.desc("updatedAt"));
+    Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE, sort);
+    List<InjectResultOutput> injects =
+        executeInjectQuery(cb, specification, pageable, new HashMap<>());
+
+    // Fetch related data for injects
+    Set<String> injectIds =
+        injects.stream().map(InjectResultOutput::getId).collect(Collectors.toSet());
+    Map<String, List<Object[]>> teamMap = fetchRelatedData(injectIds, "teams");
+    Map<String, List<Object[]>> assetMap = fetchRelatedData(injectIds, "assets");
+    Map<String, List<Object[]>> assetGroupMap = fetchRelatedData(injectIds, "assetGroups");
+    Map<String, List<RawInjectExpectation>> expectationMap = fetchExpectations(injectIds);
+
+    // Map results to InjectResultOutput and set targets
+    mapResultsToInjects(injects, teamMap, assetMap, assetGroupMap, expectationMap);
+
+    return injects;
+  }
+
+  // -- IN COMMUN --
+  private List<InjectResultOutput> executeInjectQuery(
+      CriteriaBuilder cb,
+      Specification<Inject> specification,
+      Pageable pageable,
+      Map<String, Join<Base, Base>> joinMap) {
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
     Root<Inject> injectRoot = cq.from(Inject.class);
+
+    // Select the injects with possible joins
     selectForInjects(cb, cq, injectRoot, joinMap);
 
-    // -- Text Search and Filters --
+    // Apply filters if any
     if (specification != null) {
       Predicate predicate = specification.toPredicate(injectRoot, cq, cb);
       if (predicate != null) {
@@ -356,52 +408,59 @@ public class InjectService {
       }
     }
 
-    // -- Sorting --
+    // Apply sorting based on Pageable
     List<Order> orders = toSortCriteriaBuilder(cb, injectRoot, pageable.getSort());
     cq.orderBy(orders);
 
-    // Type Query
+    // Execute the query with pagination
     TypedQuery<Tuple> query = entityManager.createQuery(cq);
-
-    // -- Pagination --
     query.setFirstResult((int) pageable.getOffset());
     query.setMaxResults(pageable.getPageSize());
 
-    // -- EXECUTION --
-    long start = System.currentTimeMillis();
+    long startTime = System.currentTimeMillis();
     List<InjectResultOutput> injects = execInjects(query);
-    long executionTime = System.currentTimeMillis() - start;
-    logger.info("execut query  : " + executionTime + " ms");
+    long executionTime = System.currentTimeMillis() - startTime;
+    logger.info("Query execution time: " + executionTime + " ms");
 
-    // -- MAP TO GENERATE TARGETSIMPLEs --
-    start = System.currentTimeMillis();
-    Set<String> injectIds =
-        injects.stream().map(inject -> inject.getId()).collect(Collectors.toSet());
+    return injects;
+  }
 
-    Map<String, List<Object[]>> teamMap =
-        teamRepository.teamsByInjectIds(injectIds).stream()
+  private Map<String, List<Object[]>> fetchRelatedData(Set<String> injectIds, String dataType) {
+    switch (dataType) {
+      case "teams":
+        return teamRepository.teamsByInjectIds(injectIds).stream()
             .collect(Collectors.groupingBy(row -> (String) row[0]));
-
-    Map<String, List<Object[]>> assetMap =
-        assetRepository.assetsByInjectIds(injectIds).stream()
+      case "assets":
+        return assetRepository.assetsByInjectIds(injectIds).stream()
             .collect(Collectors.groupingBy(row -> (String) row[0]));
-
-    Map<String, List<Object[]>> assetGroupMap =
-        assetGroupRepository.assetGroupsByInjectIds(injectIds).stream()
+      case "assetGroups":
+        return assetGroupRepository.assetGroupsByInjectIds(injectIds).stream()
             .collect(Collectors.groupingBy(row -> (String) row[0]));
+      default:
+        throw new IllegalArgumentException("Unknown data type: " + dataType);
+    }
+  }
 
-    Map<String, List<RawInjectExpectation>> expectationMap =
-        injectExpectationRepository.rawForComputeGlobalByInjectIds(injectIds).stream()
-            .collect(Collectors.groupingBy(RawInjectExpectation::getInject_id));
+  private Map<String, List<RawInjectExpectation>> fetchExpectations(Set<String> injectIds) {
+    return injectExpectationRepository.rawForComputeGlobalByInjectIds(injectIds).stream()
+        .collect(Collectors.groupingBy(RawInjectExpectation::getInject_id));
+  }
+
+  private void mapResultsToInjects(
+      List<InjectResultOutput> injects,
+      Map<String, List<Object[]>> teamMap,
+      Map<String, List<Object[]>> assetMap,
+      Map<String, List<Object[]>> assetGroupMap,
+      Map<String, List<RawInjectExpectation>> expectationMap) {
+    long startTime = System.currentTimeMillis();
 
     for (InjectResultOutput inject : injects) {
-
-      // -- GLOBAL SCORE ---
+      // Set global score (expectations)
       inject.setExpectationResultByTypes(
           AtomicTestingUtils.getExpectationResultByTypesFromRaw(
               expectationMap.getOrDefault(inject.getId(), emptyList())));
 
-      // -- TARGETS --
+      // Set targets (teams, assets, asset groups)
       List<TargetSimple> allTargets =
           Stream.concat(
                   injectMapper
@@ -422,13 +481,9 @@ public class InjectService {
 
       inject.getTargets().addAll(allTargets);
     }
-    executionTime = System.currentTimeMillis() - start;
-    logger.info("execut mapper  : " + executionTime + " ms");
 
-    // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, Inject.class, specificationCount);
-
-    return new PageImpl<>(injects, pageable, total);
+    long executionTime = System.currentTimeMillis() - startTime;
+    logger.info("Mapper execution time: " + executionTime + " ms");
   }
 
   private void selectForInjects(
@@ -535,13 +590,6 @@ public class InjectService {
               return injectResultOutput;
             })
         .toList();
-  }
-
-  public List<InjectResultOutput> exerciseInjects(String exerciseId) {
-    //    this.injectRepository.findAll(InjectSpecification.fromExercise(exerciseId)).stream()
-    //        .map(inject -> injectMapper.toDto(inject))
-    //        .collect(Collectors.toList());
-    return emptyList();
   }
 
   /**

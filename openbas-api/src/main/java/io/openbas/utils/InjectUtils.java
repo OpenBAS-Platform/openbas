@@ -3,7 +3,9 @@ package io.openbas.utils;
 import static io.openbas.database.model.Command.COMMAND_TYPE;
 
 import io.openbas.database.model.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -18,24 +20,6 @@ import org.springframework.stereotype.Component;
 public class InjectUtils {
 
   private final ApplicationContext context;
-
-  public static boolean checkIfRowIsEmpty(Row row) {
-    if (row == null) {
-      return true;
-    }
-    if (row.getLastCellNum() <= 0) {
-      return true;
-    }
-    for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
-      Cell cell = row.getCell(cellNum);
-      if (cell != null
-          && cell.getCellType() != CellType.BLANK
-          && StringUtils.isNotBlank(cell.toString())) {
-        return false;
-      }
-    }
-    return true;
-  }
 
   public InjectStatusCommandLine getCommandsLinesFromInject(final Inject inject) {
     if (inject == null) {
@@ -70,5 +54,41 @@ public class InjectUtils {
       }
     }
     return null;
+  }
+
+  public List<InjectExpectation> getPrimaryExpectations(Inject inject) {
+    List<String> firstIds = new ArrayList<>();
+
+    firstIds.addAll(inject.getTeams().stream().map(t -> t.getId()).collect(Collectors.toList()));
+    firstIds.addAll(inject.getAssets().stream().map(t -> t.getId()).collect(Collectors.toList()));
+    firstIds.addAll(
+        inject.getAssetGroups().stream().map(t -> t.getId()).collect(Collectors.toList()));
+
+    // Reject expectations if none of the team, asset, or assetGroup IDs exist in firstIds
+    return inject.getExpectations().stream()
+        .filter(
+            expectation ->
+                firstIds.contains(expectation.getTeam().getId())
+                    || firstIds.contains(expectation.getAsset().getId())
+                    || firstIds.contains(expectation.getAssetGroup().getId()))
+        .collect(Collectors.toList());
+  }
+
+  public static boolean checkIfRowIsEmpty(Row row) {
+    if (row == null) {
+      return true;
+    }
+    if (row.getLastCellNum() <= 0) {
+      return true;
+    }
+    for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
+      Cell cell = row.getCell(cellNum);
+      if (cell != null
+          && cell.getCellType() != CellType.BLANK
+          && StringUtils.isNotBlank(cell.toString())) {
+        return false;
+      }
+    }
+    return true;
   }
 }

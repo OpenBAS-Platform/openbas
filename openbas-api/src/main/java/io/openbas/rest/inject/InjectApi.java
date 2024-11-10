@@ -220,7 +220,7 @@ public class InjectApi extends RestBehavior {
   public Page<InjectResultOutput> searchExerciseInjects(
       @PathVariable final String exerciseId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    return injectService.getPageOfSearchExerciseInjects(exerciseId, searchPaginationInput);
+    return injectService.getPageOfInjectResults(exerciseId, searchPaginationInput);
   }
 
   @LogExecutionTime
@@ -228,7 +228,7 @@ public class InjectApi extends RestBehavior {
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
   public List<InjectResultOutput> exerciseInjectsResults(@PathVariable final String exerciseId) {
-    return injectService.exerciseInjects(exerciseId);
+    return injectService.getListOfInjectResults(exerciseId);
   }
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
