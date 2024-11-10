@@ -32,14 +32,8 @@ public class InjectorContractSimple {
   @JsonProperty("injector_contract_platforms")
   private Endpoint.PLATFORM_TYPE[] platforms;
 
-  @JsonProperty("payload_id")
-  private String payloadId;
-
-  @JsonProperty("payload_type")
-  private String payloadType;
-
-  @JsonProperty("payload_collector_type")
-  private String payloadCollectorType;
+  @JsonProperty("injector_contract_payload")
+  private PayloadSimple payload;
 
   @JsonProperty("injector_contract_labels")
   @NotBlank

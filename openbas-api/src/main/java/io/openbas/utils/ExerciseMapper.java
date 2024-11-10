@@ -4,13 +4,18 @@ import static java.util.Collections.emptyList;
 
 import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.ExerciseStatus;
-import io.openbas.database.model.Tag;
 import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.raw.RawInjectExpectation;
-import io.openbas.database.repository.*;
+import io.openbas.database.repository.AssetGroupRepository;
+import io.openbas.database.repository.AssetRepository;
+import io.openbas.database.repository.InjectExpectationRepository;
+import io.openbas.database.repository.TeamRepository;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.exercise.form.ExerciseSimple;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -130,19 +135,7 @@ public class ExerciseMapper {
     ExerciseSimple simple = new ExerciseSimple();
     simple.setId(rawExercise.getExercise_id());
     simple.setName(rawExercise.getExercise_name());
-    if (rawExercise.getExercise_tags() != null) {
-      simple.setTags(
-          rawExercise.getExercise_tags().stream()
-              .map(
-                  (tagId) -> {
-                    Tag tag = new Tag();
-                    tag.setId(tagId);
-                    return tag;
-                  })
-              .collect(Collectors.toSet()));
-    } else {
-      simple.setTags(new HashSet<>());
-    }
+    simple.setTagIds(rawExercise.getExercise_tags());
     simple.setCategory(rawExercise.getExercise_category());
     simple.setSubtitle(rawExercise.getExercise_subtitle());
     simple.setStatus(ExerciseStatus.valueOf(rawExercise.getExercise_status()));

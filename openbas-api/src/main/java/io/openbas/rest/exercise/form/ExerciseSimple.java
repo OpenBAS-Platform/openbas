@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.model.ExerciseStatus;
-import io.openbas.database.model.Tag;
 import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
@@ -52,7 +51,7 @@ public class ExerciseSimple {
 
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("exercise_tags")
-  private Set<Tag> tags = new HashSet<>();
+  private Set<String> tagIds = new HashSet<>();
 
   @JsonIgnore private String[] injectIds;
 

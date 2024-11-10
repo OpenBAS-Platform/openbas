@@ -18,10 +18,7 @@ import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.*;
-import io.openbas.rest.atomic_testing.form.InjectResultOutput;
-import io.openbas.rest.atomic_testing.form.InjectStatusSimple;
-import io.openbas.rest.atomic_testing.form.InjectorContractSimple;
-import io.openbas.rest.atomic_testing.form.TargetSimple;
+import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
@@ -558,6 +555,18 @@ public class InjectService {
                         .build();
               }
 
+              PayloadSimple payloadSimple = null;
+              String payloadId = tuple.get("payload_id", String.class);
+
+              if (payloadId != null) {
+                payloadSimple =
+                    PayloadSimple.builder()
+                        .id(payloadId)
+                        .type(tuple.get("payload_type", String.class))
+                        .collectorType(tuple.get("payload_collector_type", String.class))
+                        .build();
+              }
+
               InjectorContractSimple injectorContractSimple = null;
               String injectorContractId = tuple.get("injector_contract_id", String.class);
               if (injectorContractId != null) {
@@ -569,9 +578,7 @@ public class InjectService {
                         .platforms(
                             tuple.get(
                                 "injector_contract_platforms", Endpoint.PLATFORM_TYPE[].class))
-                        .payloadId(tuple.get("payload_id", String.class))
-                        .payloadType(tuple.get("payload_type", String.class))
-                        .payloadCollectorType(tuple.get("payload_collector_type", String.class))
+                        .payload(payloadSimple)
                         .labels(tuple.get("injector_contract_labels", Map.class))
                         .build();
               }

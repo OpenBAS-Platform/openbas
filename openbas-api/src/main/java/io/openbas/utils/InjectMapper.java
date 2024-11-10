@@ -73,9 +73,18 @@ public class InjectMapper {
                     .content(contract.getContent())
                     .convertedContent(contract.getConvertedContent())
                     .platforms(contract.getPlatforms())
+                    .payload(toPayloadSimple(contract.getPayload()))
                     .labels(contract.getLabels())
                     .build())
         .orElse(null);
+  }
+
+  private PayloadSimple toPayloadSimple(Payload payload) {
+    return PayloadSimple.builder()
+        .id(payload.getId())
+        .type(payload.getType())
+        .collectorType(payload.getCollectorType())
+        .build();
   }
 
   // -- STATUS to STATUSIMPLE --
