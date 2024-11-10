@@ -208,7 +208,6 @@ export interface AttackPatternCreateInput {
   attack_pattern_stix_id?: string;
 }
 
-/** Attack Patterns */
 export interface AttackPatternSimple {
   attack_pattern_external_id: string;
   attack_pattern_id: string;
@@ -829,7 +828,7 @@ export interface ExerciseDetails {
 
 export interface ExerciseSimple {
   exercise_category?: string;
-  exercise_global_score?: ExpectationResultsByType[];
+  exercise_global_score: ExpectationResultsByType[];
   exercise_id: string;
   exercise_name: string;
   /** @format date-time */
@@ -838,7 +837,7 @@ export interface ExerciseSimple {
   exercise_subtitle?: string;
   /** @uniqueItems true */
   exercise_tags?: Tag[];
-  exercise_targets: TargetSimple[];
+  exercise_targets?: TargetSimple[];
   /** @format date-time */
   exercise_updated_at?: string;
 }
@@ -1209,9 +1208,7 @@ export interface InjectExpectationSignature {
 }
 
 export interface InjectExpectationSimple {
-  /** Id */
   inject_expectation_id: string;
-  /** Name */
   inject_expectation_name?: string;
 }
 
@@ -1295,7 +1292,8 @@ export interface InjectReceptionInput {
 }
 
 export interface InjectResultOutput {
-  inject_expectation_results?: ExpectationResultsByType[];
+  /** Result of expectations */
+  inject_expectation_results: ExpectationResultsByType[];
   inject_id: string;
   /** Full contract */
   inject_injector_contract?: InjectorContractSimple;
@@ -1308,25 +1306,20 @@ export interface InjectResultOutput {
 }
 
 export interface InjectResultOverviewOutput {
-  /** Attack Patterns */
-  inject_attack_patterns: AttackPatternSimple[];
+  inject_attack_patterns?: AttackPatternSimple[];
   inject_commands_lines?: InjectStatusCommandLine;
   inject_content?: object;
-  /** Description */
-  inject_description: string;
+  inject_description?: string;
   /** Result of expectations */
   inject_expectation_results: ExpectationResultsByType[];
   inject_expectations?: InjectExpectationSimple[];
-  /** Id */
   inject_id: string;
   /** Full contract */
   inject_injector_contract: InjectorContractSimple;
-  /** Kill Chain Phases */
-  inject_kill_chain_phases: KillChainPhaseSimple[];
+  inject_kill_chain_phases?: KillChainPhaseSimple[];
   inject_ready?: boolean;
   inject_status?: InjectStatusSimple;
   inject_targets?: InjectTargetWithResult[];
-  /** Title */
   inject_title: string;
   inject_type?: string;
   /** @format date-time */
@@ -1401,14 +1394,9 @@ export interface InjectStatusExecution {
 }
 
 export interface InjectStatusSimple {
-  /** Id */
   status_id: string;
-  /** Name */
   status_name?: string;
-  /**
-   * Tracking Send Date
-   * @format date-time
-   */
+  /** @format date-time */
   tracking_sent_date?: string;
 }
 
@@ -1582,11 +1570,8 @@ export interface InjectorContractOutput {
 /** Full contract */
 export interface InjectorContractSimple {
   convertedContent?: object;
-  /** Content */
   injector_contract_content: string;
-  /** Id */
   injector_contract_id: string;
-  /** Contract labels */
   injector_contract_labels: Record<string, string>;
   injector_contract_platforms?: (
     | "Linux"
@@ -1598,12 +1583,9 @@ export interface InjectorContractSimple {
     | "Internal"
     | "Unknown"
   )[];
-  /** Payload Collector type */
-  payload_collector_type: string;
-  /** Payload id */
-  payload_id: string;
-  /** Payload type */
-  payload_type: string;
+  payload_collector_type?: string;
+  payload_id?: string;
+  payload_type?: string;
 }
 
 export interface InjectorContractUpdateInput {
@@ -1693,11 +1675,8 @@ export interface KillChainPhaseCreateInput {
   phase_stix_id?: string;
 }
 
-/** Kill Chain Phases */
 export interface KillChainPhaseSimple {
-  /** Id */
   phase_id: string;
-  /** Name */
   phase_name?: string;
 }
 
@@ -3065,11 +3044,8 @@ export interface TagUpdateInput {
 }
 
 export interface TargetSimple {
-  /** Id */
   target_id: string;
-  /** Name */
   target_name?: string;
-  /** Type */
   target_type?: "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
 }
 
