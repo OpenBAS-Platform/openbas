@@ -4,10 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.converter.ContentConverter;
 import io.openbas.database.model.Endpoint;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Convert;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Builder;
@@ -19,12 +17,10 @@ import lombok.Setter;
 @Builder
 public class InjectorContractSimple {
 
-  @Schema(description = "Id")
   @JsonProperty("injector_contract_id")
-  @NotNull
+  @NotBlank
   private String id;
 
-  @Schema(description = "Content")
   @JsonProperty("injector_contract_content")
   @NotBlank
   private String content;
@@ -36,22 +32,15 @@ public class InjectorContractSimple {
   @JsonProperty("injector_contract_platforms")
   private Endpoint.PLATFORM_TYPE[] platforms;
 
-  @Schema(description = "Payload id")
   @JsonProperty("payload_id")
-  @NotBlank
   private String payloadId;
 
-  @Schema(description = "Payload type")
   @JsonProperty("payload_type")
-  @NotBlank
   private String payloadType;
 
-  @Schema(description = "Payload Collector type")
   @JsonProperty("payload_collector_type")
-  @NotBlank
   private String payloadCollectorType;
 
-  @Schema(description = "Contract labels")
   @JsonProperty("injector_contract_labels")
   @NotBlank
   private Map<String, String> labels = new HashMap<>();

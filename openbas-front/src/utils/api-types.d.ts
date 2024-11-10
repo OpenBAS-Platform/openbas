@@ -1181,7 +1181,6 @@ export interface InjectExpectation {
   /** @format int64 */
   inject_expiration_time: number;
   listened?: boolean;
-  targetId?: string;
 }
 
 export interface InjectExpectationResult {
@@ -1326,6 +1325,7 @@ export interface InjectResultOverviewOutput {
   inject_kill_chain_phases: KillChainPhaseSimple[];
   inject_ready?: boolean;
   inject_status?: InjectStatusSimple;
+  inject_targets?: InjectTargetWithResult[];
   /** Title */
   inject_title: string;
   inject_type?: string;
@@ -1410,6 +1410,15 @@ export interface InjectStatusSimple {
    * @format date-time
    */
   tracking_sent_date?: string;
+}
+
+export interface InjectTargetWithResult {
+  children?: InjectTargetWithResult[];
+  expectationResultsByTypes?: ExpectationResultsByType[];
+  id: string;
+  name?: string;
+  platformType?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
+  targetType?: "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
 }
 
 export interface InjectTeamsInput {
@@ -2507,7 +2516,7 @@ export interface PayloadUpsertInput {
   payload_elevation_required?: boolean;
   payload_external_id: string;
   payload_name: string;
-  payload_platforms?: string[];
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
   payload_status: "UNVERIFIED" | "VERIFIED";

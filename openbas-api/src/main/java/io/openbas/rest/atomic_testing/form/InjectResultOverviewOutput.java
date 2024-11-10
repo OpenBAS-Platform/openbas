@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.InjectStatusCommandLine;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -19,19 +20,15 @@ import lombok.Setter;
 @Builder
 public class InjectResultOverviewOutput {
 
-  @Schema(description = "Id")
   @JsonProperty("inject_id")
-  @NotNull
+  @NotBlank
   private String id;
 
-  @Schema(description = "Title")
   @JsonProperty("inject_title")
-  @NotNull
+  @NotBlank
   private String title;
 
-  @Schema(description = "Description")
   @JsonProperty("inject_description")
-  @NotNull
   private String description;
 
   @JsonProperty("inject_content")
@@ -60,14 +57,10 @@ public class InjectResultOverviewOutput {
   @JsonProperty("inject_expectations")
   private List<InjectExpectationSimple> expectations;
 
-  @Schema(description = "Kill Chain Phases")
   @JsonProperty("inject_kill_chain_phases")
-  @NotNull
   private List<KillChainPhaseSimple> killChainPhases;
 
-  @Schema(description = "Attack Patterns")
   @JsonProperty("inject_attack_patterns")
-  @NotNull
   private List<AttackPatternSimple> attackPatterns;
 
   @JsonProperty("inject_ready")

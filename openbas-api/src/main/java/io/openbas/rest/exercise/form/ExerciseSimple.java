@@ -58,10 +58,10 @@ public class ExerciseSimple {
 
   // PROCESSED ATTRIBUTES
 
-  @JsonProperty("exercise_targets")
-  @NotNull
-  private List<TargetSimple> targets = new ArrayList<>();
-
   @JsonProperty("exercise_global_score")
+  @NotNull
   private List<ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
+
+  @JsonProperty("exercise_targets")
+  private List<TargetSimple> targets = new ArrayList<>();
 }
