@@ -16,7 +16,7 @@ import type { FilterGroup, Inject, InjectResultOverviewOutput } from '../../../u
 import { TeamContext } from '../common/Context';
 import CreateInject from '../common/injects/CreateInject';
 import teamContextForAtomicTesting from './atomic_testing/context/TeamContextForAtomicTesting';
-import InjectDtoList from './InjectDtoList';
+import InjectResultList from './InjectResultList';
 
 const AtomicTestings = () => {
   // Standard hooks
@@ -69,7 +69,7 @@ const AtomicTestings = () => {
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Atomic testings'), current: true }]} />
-      <InjectDtoList
+      <InjectResultList
         fetchInjects={searchAtomicTestings}
         goTo={injectId => `/admin/atomic_testings/${injectId}`}
         queryableHelpers={queryableHelpers}

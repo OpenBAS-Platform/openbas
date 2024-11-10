@@ -1318,8 +1318,8 @@ export interface InjectResultOverviewOutput {
   inject_injector_contract: InjectorContractSimple;
   inject_kill_chain_phases?: KillChainPhaseSimple[];
   inject_ready?: boolean;
-  inject_status?: InjectStatusSimple;
-  inject_targets?: InjectTargetWithResult[];
+  inject_status?: InjectStatusOutput;
+  inject_targets: InjectTargetWithResult[];
   inject_title: string;
   inject_type?: string;
   /** @format date-time */
@@ -1391,6 +1391,26 @@ export interface InjectStatusExecution {
     | "SUCCESS";
   /** @format date-time */
   execution_time?: string;
+}
+
+export interface InjectStatusOutput {
+  status_id: string;
+  status_name?: string;
+  status_traces?: InjectStatusExecution[];
+  /** @format date-time */
+  tracking_ack_date?: string;
+  /** @format date-time */
+  tracking_end_date?: string;
+  /** @format date-time */
+  tracking_sent_date?: string;
+  /** @format int32 */
+  tracking_total_count?: number;
+  /** @format int32 */
+  tracking_total_error?: number;
+  /** @format int64 */
+  tracking_total_execution_time?: number;
+  /** @format int32 */
+  tracking_total_success?: number;
 }
 
 export interface InjectStatusSimple {

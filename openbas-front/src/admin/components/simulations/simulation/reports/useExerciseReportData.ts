@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 import { fetchExercise, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import {
-  exerciseInjectsResultDTO,
+  exerciseInjectsResultOutput,
   fetchExerciseExpectationResult,
   fetchLessonsAnswers,
   fetchLessonsCategories,
@@ -19,7 +19,7 @@ import { useHelper } from '../../../../../store';
 import type {
   Exercise,
   ExpectationResultsByType,
-  InjectResultDTO,
+  InjectResultOutput,
   LessonsAnswer,
   LessonsCategory,
   LessonsQuestion,
@@ -33,7 +33,7 @@ import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import ReportInformationType from './ReportInformationType';
 
 export interface ExerciseReportData {
-  injects: InjectResultDTO[];
+  injects: InjectResultOutput[];
   exerciseExpectationResults: ExpectationResultsByType[];
   exercise: Exercise;
   lessonsCategories: LessonsCategory[];
@@ -57,7 +57,7 @@ const useExerciseReportData = (reportId: Report['report_id'], exerciseId: Exerci
   const [loading, setLoading] = useState(true);
   const [reloadReportDataCount, setReloadReportDataCount] = useState(0);
   const [exerciseExpectationResults, setResults] = useState<ExpectationResultsByType[]>([]);
-  const [injects, setInjects] = useState<InjectResultDTO[]>([]);
+  const [injects, setInjects] = useState<InjectResultOutput[]>([]);
 
   const {
     report,
@@ -110,7 +110,7 @@ const useExerciseReportData = (reportId: Report['report_id'], exerciseId: Exerci
       }
 
       if (displayModule(ReportInformationType.INJECT_RESULT)) {
-        fetchPromises.push(exerciseInjectsResultDTO(exerciseId).then(result => setInjects(result.data)));
+        fetchPromises.push(exerciseInjectsResultOutput(exerciseId).then(result => setInjects(result.data)));
       }
       Promise.all(fetchPromises).then(() => {
         setLoading(false);

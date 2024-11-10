@@ -224,7 +224,7 @@ public class InjectApi extends RestBehavior {
   }
 
   @LogExecutionTime
-  @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/resultdto")
+  @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/result")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
   public List<InjectResultOutput> exerciseInjectsResults(@PathVariable final String exerciseId) {

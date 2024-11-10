@@ -1,11 +1,11 @@
 import { Tooltip, Typography } from '@mui/material';
 import { FunctionComponent } from 'react';
 
-import type { InjectResultDTO } from '../../../utils/api-types';
+import { type InjectResultOverviewOutput } from '../../../utils/api-types';
 import { truncate } from '../../../utils/String';
 
 interface Props {
-  inject: InjectResultDTO;
+  inject: InjectResultOverviewOutput;
 }
 
 const InjectHeader: FunctionComponent<Props> = ({

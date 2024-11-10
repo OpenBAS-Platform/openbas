@@ -26,14 +26,14 @@ import { Edge, MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodes
 import { FunctionComponent, useContext, useEffect, useState } from 'react';
 import * as React from 'react';
 
-import { fetchInjectResultDto, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import { fetchInjectResultOverviewOutput, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
 import type { InjectExpectationStore } from '../../../../actions/injects/Inject';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemResult from '../../../../components/ItemResult';
 import type { Theme } from '../../../../components/Theme';
-import type { InjectExpectationResult, InjectResultDTO, InjectTargetWithResult } from '../../../../utils/api-types';
+import type { InjectExpectationResult, InjectResultOverviewOutput, InjectTargetWithResult } from '../../../../utils/api-types';
 import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAutoLayout';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { emptyFilled, truncate } from '../../../../utils/String';
@@ -44,7 +44,7 @@ import { isTechnicalExpectation } from '../../common/injects/expectations/Expect
 import InjectIcon from '../../common/injects/InjectIcon';
 import DetectionPreventionExpectationsValidationForm from '../../simulations/simulation/validation/expectations/DetectionPreventionExpectationsValidationForm';
 import ManualExpectationsValidationForm from '../../simulations/simulation/validation/expectations/ManualExpectationsValidationForm';
-import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
+import { InjectResultOverviewOutputContext, InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import nodeTypes from './types/nodes';
 import { NodeResultStep } from './types/nodes/NodeResultStep';
 
@@ -104,7 +104,7 @@ const useStyles = makeStyles<Theme>(theme => ({
 }));
 
 interface Props {
-  inject: InjectResultDTO;
+  inject: InjectResultOverviewOutput;
   lastExecutionStartDate: string;
   lastExecutionEndDate: string;
   target: InjectTargetWithResult;
@@ -189,7 +189,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     return currentInitialSteps.map((step, index) => {
       if (index === 0) {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define,no-nested-ternary
-        return { ...step, status: injectResultDto?.inject_status?.status_name === 'QUEUING' ? 'QUEUING' : lastExecutionStartDate ? 'SUCCESS' : 'PENDING' };
+        return { ...step, status: injectResultOverviewOutput?.inject_status?.status_name === 'QUEUING' ? 'QUEUING' : lastExecutionStartDate ? 'SUCCESS' : 'PENDING' };
       }
       return { ...step, status: lastExecutionEndDate ? 'SUCCESS' : 'PENDING' };
     });
@@ -206,7 +206,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   };
 
   // Fetching data
-  const { injectResultDto, updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
+  const { injectResultOverviewOutput, updateInjectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
   useEffect(() => {
     if (target) {
       setInitialized(false);
@@ -239,7 +239,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
       setActiveTab(0);
       setTimeout(() => setInitialized(true), 1000);
     }
-  }, [injectResultDto, target]);
+  }, [injectResultOverviewOutput, target]);
 
   const getStatus = (status: string[]) => {
     if (status.includes('UNKNOWN')) {
@@ -319,8 +319,8 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   };
 
   const onUpdateValidation = () => {
-    fetchInjectResultDto(inject.inject_id).then((result: { data: InjectResultDTO }) => {
-      updateInjectResultDto(result.data);
+    fetchInjectResultOverviewOutput(inject.inject_id).then((result: { data: InjectResultOverviewOutput }) => {
+      updateInjectResultOverviewOutput(result.data);
       setSelectedExpectationForCreation(null);
       setSelectedResultEdition(null);
     });
@@ -328,8 +328,8 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
 
   const onDelete = () => {
     dispatch(deleteInjectExpectationResult(selectedResultDeletion?.injectExpectation.inject_expectation_id, selectedResultDeletion?.expectationResult.sourceId)).then(() => {
-      fetchInjectResultDto(inject.inject_id).then((result: { data: InjectResultDTO }) => {
-        updateInjectResultDto(result.data);
+      fetchInjectResultOverviewOutput(inject.inject_id).then((result: { data: InjectResultOverviewOutput }) => {
+        updateInjectResultOverviewOutput(result.data);
         setSelectedResultDeletion(null);
       });
     });

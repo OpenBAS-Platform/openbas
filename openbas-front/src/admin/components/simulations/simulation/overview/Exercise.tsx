@@ -14,7 +14,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { useHelper } from '../../../../../store';
 import type { ExpectationResultsByType } from '../../../../../utils/api-types';
-import InjectDtoList from '../../../atomic_testings/InjectDtoList';
+import InjectResultList from '../../../atomic_testings/InjectResultList';
 import ResponsePie from '../../../common/injects/ResponsePie';
 import MitreMatrix from '../../../common/matrix/MitreMatrix';
 import ExerciseMainInformation from '../ExerciseMainInformation';
@@ -102,7 +102,7 @@ const Exercise = () => {
               {t('Injects results')}
             </Typography>
             <Paper classes={{ root: classes.paper }} variant="outlined">
-              <InjectDtoList
+              <InjectResultList
                 fetchInjects={input => searchExerciseInjects(exerciseId, input)}
                 goTo={injectId => `/admin/exercises/${exerciseId}/injects/${injectId}`}
                 queryableHelpers={queryableHelpers}

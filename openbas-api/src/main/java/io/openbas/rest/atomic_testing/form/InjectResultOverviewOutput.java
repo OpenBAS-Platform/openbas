@@ -52,7 +52,7 @@ public class InjectResultOverviewOutput {
   private InjectorContractSimple injectorContract;
 
   @JsonProperty("inject_status")
-  private InjectStatusSimple status;
+  private InjectStatusOutput status;
 
   @JsonProperty("inject_expectations")
   private List<InjectExpectationSimple> expectations;
@@ -78,5 +78,6 @@ public class InjectResultOverviewOutput {
   private List<ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
 
   @JsonProperty("inject_targets")
+  @NotNull
   private List<InjectTargetWithResult> targets;
 }

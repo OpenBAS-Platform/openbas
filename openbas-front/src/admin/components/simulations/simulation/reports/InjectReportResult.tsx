@@ -5,14 +5,14 @@ import { SubmitHandler } from 'react-hook-form';
 
 import { useFormatter } from '../../../../../components/i18n';
 import ItemTargets from '../../../../../components/ItemTargets';
-import type { InjectResultDTO, ReportInjectComment } from '../../../../../utils/api-types';
+import type { InjectResultOutput, ReportInjectComment } from '../../../../../utils/api-types';
 import AtomicTestingResult from '../../../atomic_testings/atomic_testing/AtomicTestingResult';
 import InjectorContract from '../../../common/injects/InjectorContract';
 import ReportComment from '../../../components/reports/ReportComment';
 
 interface Props {
   style?: CSSProperties;
-  injects: InjectResultDTO[];
+  injects: InjectResultOutput[];
   injectsComments?: ReportInjectComment[];
   canEditComment?: boolean;
   onCommentSubmit?: SubmitHandler<ReportInjectComment>;
@@ -27,7 +27,7 @@ const InjectReportResult: React.FC<Props> = ({
 }) => {
   // Standard hooks
   const { t, fldt, tPick } = useFormatter();
-  const findInjectCommentsByInjectId = (injectId: InjectResultDTO['inject_id']) => (injectsComments ?? []).find(c => c.inject_id === injectId) ?? null;
+  const findInjectCommentsByInjectId = (injectId: InjectResultOutput['inject_id']) => (injectsComments ?? []).find(c => c.inject_id === injectId) ?? null;
 
   const saveComment = (injectId: ReportInjectComment['inject_id'], value: string) => {
     onCommentSubmit({ inject_id: injectId, report_inject_comment: value });
@@ -36,7 +36,7 @@ const InjectReportResult: React.FC<Props> = ({
   const columns = [
     {
       label: 'Type',
-      render: (inject: InjectResultDTO) => {
+      render: (inject: InjectResultOutput) => {
         return inject.inject_injector_contract
           ? <InjectorContract variant="list" label={tPick(inject.inject_injector_contract?.injector_contract_labels)} />
           : <InjectorContract variant="list" label={t('Deleted')} deleted={true} />;
@@ -44,23 +44,23 @@ const InjectReportResult: React.FC<Props> = ({
     },
     {
       label: 'Title',
-      render: (inject: InjectResultDTO) => inject.inject_title,
+      render: (inject: InjectResultOutput) => inject.inject_title,
     },
     {
       label: 'Execution date',
-      render: (inject: InjectResultDTO) => <>{fldt(inject.inject_status?.tracking_sent_date)}</>,
+      render: (inject: InjectResultOutput) => <>{fldt(inject.inject_status?.tracking_sent_date)}</>,
     },
     {
       label: 'Scores',
-      render: (inject: InjectResultDTO) => <AtomicTestingResult expectations={inject.inject_expectation_results} injectId={inject.inject_id} />,
+      render: (inject: InjectResultOutput) => <AtomicTestingResult expectations={inject.inject_expectation_results} injectId={inject.inject_id} />,
     },
     {
       label: 'Targets',
-      render: (inject: InjectResultDTO) => <ItemTargets targets={inject.inject_targets} />,
+      render: (inject: InjectResultOutput) => <ItemTargets targets={inject.inject_targets} />,
     },
     {
       label: 'Comments',
-      render: (inject: InjectResultDTO) => {
+      render: (inject: InjectResultOutput) => {
         const currentInjectComment = findInjectCommentsByInjectId(inject.inject_id);
         return (
           <ReportComment

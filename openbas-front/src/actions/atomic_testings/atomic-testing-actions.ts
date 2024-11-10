@@ -9,7 +9,7 @@ export const searchAtomicTestings = (searchPaginationInput: SearchPaginationInpu
   return simplePostCall(uri, data);
 };
 
-export const fetchInjectResultDto = (injectId: string) => {
+export const fetchInjectResultOverviewOutput = (injectId: string) => {
   const uri = `${ATOMIC_TESTING_URI}/${injectId}`;
   return simpleCall(uri);
 };

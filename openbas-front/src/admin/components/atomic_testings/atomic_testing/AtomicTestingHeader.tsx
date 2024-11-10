@@ -4,13 +4,13 @@ import { makeStyles } from '@mui/styles';
 import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { fetchInjectResultDto, tryAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import { fetchInjectResultOverviewOutput, tryAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
-import type { InjectResultDTO } from '../../../../utils/api-types';
+import type { InjectResultOverviewOutput } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
-import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
+import { InjectResultOverviewOutputContext, InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import AtomicTestingPopover from './AtomicTestingPopover';
 import AtomicTestingUpdate from './AtomicTestingUpdate';
 
@@ -31,7 +31,7 @@ const AtomicTestingHeader = () => {
   const classes = useStyles();
   const navigate = useNavigate();
 
-  const { injectResultDto, updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
+  const { injectResultOverviewOutput, updateInjectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
 
   // Launch atomic testing
   const [open, setOpen] = useState(false);
@@ -40,16 +40,16 @@ const AtomicTestingHeader = () => {
   const submitLaunch = async () => {
     setOpen(false);
     setAvailableLaunch(false);
-    if (injectResultDto?.inject_id) {
-      await tryAtomicTesting(injectResultDto.inject_id);
-      fetchInjectResultDto(injectResultDto.inject_id).then((result: { data: InjectResultDTO }) => {
-        updateInjectResultDto(result.data);
+    if (injectResultOverviewOutput?.inject_id) {
+      await tryAtomicTesting(injectResultOverviewOutput.inject_id);
+      fetchInjectResultOverviewOutput(injectResultOverviewOutput.inject_id).then((result: { data: InjectResultOverviewOutput }) => {
+        updateInjectResultOverviewOutput(result.data);
       });
     }
     setAvailableLaunch(true);
   };
 
-  if (!injectResultDto) {
+  if (!injectResultOverviewOutput) {
     return <Loader variant="inElement" />;
   }
 
@@ -60,19 +60,19 @@ const AtomicTestingHeader = () => {
 
   return (
     <>
-      <Tooltip title={injectResultDto.inject_title}>
+      <Tooltip title={injectResultOverviewOutput.inject_title}>
         <Typography
           variant="h1"
           gutterBottom={true}
           classes={{ root: classes.title }}
         >
-          {truncate(injectResultDto.inject_title, 80)}
+          {truncate(injectResultOverviewOutput.inject_title, 80)}
         </Typography>
       </Tooltip>
       <div className={classes.actions}>
         {/* eslint-disable-next-line no-nested-ternary */}
-        {injectResultDto.inject_injector_contract ? (
-          !injectResultDto.inject_ready
+        {injectResultOverviewOutput.inject_injector_contract ? (
+          !injectResultOverviewOutput.inject_ready
             ? (
                 <>
                   <Button
@@ -88,7 +88,7 @@ const AtomicTestingHeader = () => {
                   <AtomicTestingUpdate
                     open={edition}
                     handleClose={handleCloseEdit}
-                    atomic={injectResultDto}
+                    atomic={injectResultOverviewOutput}
                   />
                 </>
               )
@@ -106,7 +106,7 @@ const AtomicTestingHeader = () => {
                 </Button>
               )) : null}
         <AtomicTestingPopover
-          atomic={injectResultDto}
+          atomic={injectResultOverviewOutput}
           actions={['Update', 'Duplicate', 'Delete']}
           onDelete={() => navigate('/admin/atomic_testings')}
         />

@@ -36,7 +36,7 @@ public class InjectMapper {
         .tagIds(inject.getTags().stream().map(Tag::getId).toList())
         .documentIds(documentIds)
         .injectorContract(toInjectorContractSimple(injectorContract))
-        .status(toInjectStatusSimple(inject.getStatus()))
+        .status(toInjectStatusOutput(inject.getStatus()))
         .expectations(toInjectExpectationSimples(inject.getExpectations()))
         .killChainPhases(toKillChainPhasesSimples(inject.getKillChainPhases()))
         .attackPatterns(toAttackPatternSimples(inject.getAttackPatterns()))
@@ -88,16 +88,35 @@ public class InjectMapper {
   }
 
   // -- STATUS to STATUSIMPLE --
-  public InjectStatusSimple toInjectStatusSimple(Optional<InjectStatus> injectStatus) {
-    return InjectStatusSimple.builder()
-        .id(injectStatus.map(status -> status.getId()).orElse(null))
-        .name(
-            injectStatus
-                .map(InjectStatus::getName)
-                .map(ExecutionStatus::name)
-                .orElse(ExecutionStatus.DRAFT.name()))
-        .trackingSentDate(injectStatus.map(status -> status.getTrackingSentDate()).orElse(null))
-        .build();
+  public InjectStatusOutput toInjectStatusOutput(Optional<InjectStatus> injectStatus) {
+    return injectStatus
+        .map(
+            status -> {
+              InjectStatusOutput.InjectStatusOutputBuilder builder =
+                  InjectStatusOutput.builder()
+                      .id(status.getId())
+                      .name(
+                          Optional.ofNullable(status.getName())
+                              .map(ExecutionStatus::name)
+                              .orElse(ExecutionStatus.DRAFT.name()))
+                      .trackingSentDate(status.getTrackingSentDate())
+                      .trackingAckDate(status.getTrackingAckDate())
+                      .trackingEndDate(status.getTrackingEndDate())
+                      .trackingTotalExecutionTime(status.getTrackingTotalExecutionTime())
+                      .trackingTotalCount(status.getTrackingTotalCount())
+                      .trackingTotalError(status.getTrackingTotalError())
+                      .trackingTotalSuccess(status.getTrackingTotalSuccess());
+
+              return builder.build();
+            })
+        .orElseGet(
+            () -> {
+              return InjectStatusOutput.builder()
+                  .id(null)
+                  .name(ExecutionStatus.DRAFT.name())
+                  .trackingSentDate(null)
+                  .build();
+            });
   }
 
   // -- EXPECTATIONS to EXPECTATIONSIMPLE

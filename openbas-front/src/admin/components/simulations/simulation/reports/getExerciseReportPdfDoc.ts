@@ -2,7 +2,7 @@ import { toPng } from 'html-to-image';
 import type { Content, ContentTable, TDocumentDefinitions } from 'pdfmake/interfaces';
 
 import LogoText from '../../../../../static/images/logo_text_light.png';
-import type { InjectResultDTO, LessonsAnswer, Report } from '../../../../../utils/api-types';
+import type { InjectResultOutput, LessonsAnswer, Report } from '../../../../../utils/api-types';
 import { resolveUserName } from '../../../../../utils/String';
 import convertMarkdownToPdfMake from './convertMarkdownToPdfMake';
 import ReportInformationType from './ReportInformationType';
@@ -109,7 +109,7 @@ const getExerciseReportPdfDocDefinition = async ({
   });
 
   // Inject Result page
-  const findCommentsByInjectId = (injectId: InjectResultDTO['inject_id']) => (report?.report_injects_comments ?? []).find(c => c.inject_id === injectId)?.report_inject_comment ?? null;
+  const findCommentsByInjectId = (injectId: InjectResultOutput['inject_id']) => (report?.report_injects_comments ?? []).find(c => c.inject_id === injectId)?.report_inject_comment ?? null;
   const injectResultPage = (imagesMap: Map<string, string>) => ([
     { text: t('Injects results'), tocItem: ['mainToc'], pageBreak: 'before', style: 'header' },
     {
