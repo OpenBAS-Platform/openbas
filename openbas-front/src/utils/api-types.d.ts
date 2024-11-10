@@ -836,7 +836,7 @@ export interface ExerciseSimple {
   exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
   exercise_subtitle?: string;
   /** @uniqueItems true */
-  exercise_tags?: Tag[];
+  exercise_tags?: string[];
   exercise_targets?: TargetSimple[];
   /** @format date-time */
   exercise_updated_at?: string;
@@ -1573,6 +1573,7 @@ export interface InjectorContractSimple {
   injector_contract_content: string;
   injector_contract_id: string;
   injector_contract_labels: Record<string, string>;
+  injector_contract_payload?: PayloadSimple;
   injector_contract_platforms?: (
     | "Linux"
     | "Windows"
@@ -1583,9 +1584,6 @@ export interface InjectorContractSimple {
     | "Internal"
     | "Unknown"
   )[];
-  payload_collector_type?: string;
-  payload_id?: string;
-  payload_type?: string;
 }
 
 export interface InjectorContractUpdateInput {
@@ -2460,6 +2458,12 @@ export interface PayloadPrerequisite {
   description?: string;
   executor: string;
   get_command: string;
+}
+
+export interface PayloadSimple {
+  payload_collector_type?: string;
+  payload_id?: string;
+  payload_type?: string;
 }
 
 export interface PayloadUpdateInput {
