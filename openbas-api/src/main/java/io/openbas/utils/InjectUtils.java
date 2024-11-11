@@ -66,10 +66,17 @@ public class InjectUtils {
     // Reject expectations if none of the team, asset, or assetGroup IDs exist in firstIds
     return inject.getExpectations().stream()
         .filter(
-            expectation ->
-                firstIds.contains(expectation.getTeam().getId())
-                    || firstIds.contains(expectation.getAsset().getId())
-                    || firstIds.contains(expectation.getAssetGroup().getId()))
+            expectation -> {
+              boolean teamMatch =
+                  expectation.getTeam() != null && firstIds.contains(expectation.getTeam().getId());
+              boolean assetMatch =
+                  expectation.getAsset() != null
+                      && firstIds.contains(expectation.getAsset().getId());
+              boolean assetGroupMatch =
+                  expectation.getAssetGroup() != null
+                      && firstIds.contains(expectation.getAssetGroup().getId());
+              return teamMatch || assetMatch || assetGroupMatch;
+            })
         .collect(Collectors.toList());
   }
 

@@ -545,7 +545,7 @@ public class InjectService {
                         .name(status.name())
                         .trackingSentDate(tuple.get("status_tracking_sent_date", Instant.class))
                         .build();
-              }else{
+              } else {
                 injectStatus = InjectStatusSimple.builder().build();
               }
 
