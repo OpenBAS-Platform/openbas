@@ -234,7 +234,8 @@ public class ExerciseService {
               exerciseSimple.setCategory(tuple.get("exercise_category", String.class));
               exerciseSimple.setStart(tuple.get("exercise_start_date", Instant.class));
               exerciseSimple.setUpdatedAt(tuple.get("exercise_updated_at", Instant.class));
-              exerciseSimple.setTagIds(Set.of(tuple.get("exercise_tags", String[].class)));
+              exerciseSimple.setTagIds(
+                  new HashSet<>(Arrays.asList(tuple.get("exercise_tags", String[].class))));
               exerciseSimple.setInjectIds(tuple.get("exercise_injects", String[].class));
               return exerciseSimple;
             })

@@ -1,6 +1,5 @@
 package io.openbas.service;
 
-import static io.openbas.aop.LoggingAspect.logger;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
@@ -414,12 +413,7 @@ public class InjectService {
     query.setFirstResult((int) pageable.getOffset());
     query.setMaxResults(pageable.getPageSize());
 
-    long startTime = System.currentTimeMillis();
-    List<InjectResultOutput> injects = execInjects(query);
-    long executionTime = System.currentTimeMillis() - startTime;
-    logger.info("Query execution time: " + executionTime + " ms");
-
-    return injects;
+    return execInjects(query);
   }
 
   private Map<String, List<Object[]>> fetchRelatedData(Set<String> injectIds, String dataType) {
@@ -449,7 +443,6 @@ public class InjectService {
       Map<String, List<Object[]>> assetMap,
       Map<String, List<Object[]>> assetGroupMap,
       Map<String, List<RawInjectExpectation>> expectationMap) {
-    long startTime = System.currentTimeMillis();
 
     for (InjectResultOutput inject : injects) {
       // Set global score (expectations)
@@ -478,9 +471,6 @@ public class InjectService {
 
       inject.getTargets().addAll(allTargets);
     }
-
-    long executionTime = System.currentTimeMillis() - startTime;
-    logger.info("Mapper execution time: " + executionTime + " ms");
   }
 
   private void selectForInjects(
@@ -523,6 +513,7 @@ public class InjectService {
             payloadJoin.get("id").alias("payload_id"),
             payloadJoin.get("type").alias("payload_type"),
             collectorJoin.get("type").alias("payload_collector_type"),
+            statusJoin.get("id").alias("status_id"),
             statusJoin.get("name").alias("status_name"),
             statusJoin.get("trackingSentDate").alias("status_tracking_sent_date"),
             teamIdsExpression.alias("inject_teams"),
@@ -557,7 +548,6 @@ public class InjectService {
 
               PayloadSimple payloadSimple = null;
               String payloadId = tuple.get("payload_id", String.class);
-
               if (payloadId != null) {
                 payloadSimple =
                     PayloadSimple.builder()

@@ -4,9 +4,7 @@ import static java.time.Instant.now;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.model.ExerciseStatus;
-import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import jakarta.persistence.EnumType;
@@ -49,7 +47,6 @@ public class ExerciseSimple {
   @JsonProperty("exercise_updated_at")
   private Instant updatedAt = now();
 
-  @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("exercise_tags")
   private Set<String> tagIds = new HashSet<>();
 

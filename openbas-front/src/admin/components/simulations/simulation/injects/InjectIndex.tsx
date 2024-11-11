@@ -12,7 +12,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import NotFound from '../../../../../components/NotFound';
 import { useHelper } from '../../../../../store';
-import type { Exercise as ExerciseType, InjectResultOutput, InjectResultOverviewOutput } from '../../../../../utils/api-types';
+import type { Exercise as ExerciseType, InjectResultOverviewOutput } from '../../../../../utils/api-types';
 import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
