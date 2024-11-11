@@ -168,6 +168,8 @@ public class InjectService {
         .orElseThrow(() -> new ElementNotFoundException("Inject not found"));
   }
 
+  // -- LIST INJECTOUTPUT --
+
   @Tracing(name = "Fetch injects with criteria builder", layer = "service", operation = "GET")
   public List<InjectOutput> injects(Specification<Inject> specification) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
@@ -231,8 +233,6 @@ public class InjectService {
 
     return new PageImpl<>(injects, pageable, total);
   }
-
-  // -- CRITERIA BUILDER --
 
   private void selectForInject(
       CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Inject> injectRoot) {
@@ -322,7 +322,7 @@ public class InjectService {
         (Specification<Inject> specification,
             Specification<Inject> specificationCount,
             Pageable pageable) ->
-            injects(
+            injectResults(
                 customSpec.and(specification),
                 customSpec.and(specificationCount),
                 pageable,
@@ -331,7 +331,7 @@ public class InjectService {
         Inject.class);
   }
 
-  public Page<InjectResultOutput> injects(
+  public Page<InjectResultOutput> injectResults(
       Specification<Inject> specification,
       Specification<Inject> specificationCount,
       Pageable pageable,

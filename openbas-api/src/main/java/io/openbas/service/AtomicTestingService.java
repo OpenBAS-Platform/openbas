@@ -288,7 +288,7 @@ public class AtomicTestingService {
         (Specification<Inject> specification,
             Specification<Inject> specificationCount,
             Pageable pageable) ->
-            injectService.injects(
+            injectService.injectResults(
                 customSpec.and(specification),
                 customSpec.and(specificationCount),
                 pageable,
