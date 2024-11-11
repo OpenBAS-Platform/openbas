@@ -4,6 +4,7 @@ import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.*;
 import io.openbas.rest.atomic_testing.form.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ public class InjectMapper {
   private final InjectUtils injectUtils;
   private final ResultUtils resultUtils;
 
-  public InjectResultOverviewOutput toDto(Inject inject) {
+  public InjectResultOverviewOutput toInjectResultOverviewOutput(Inject inject) {
     // --
     Optional<InjectorContract> injectorContract = inject.getInjectorContract();
 
@@ -51,7 +52,10 @@ public class InjectMapper {
 
   // -- OBJECT[] to TARGETSIMPLE --
   public List<TargetSimple> toTargetSimple(List<Object[]> targets, TargetType type) {
-    return targets.stream().map(target -> toTargetSimple(target, type)).toList();
+    return targets.stream()
+        .filter(Objects::nonNull)
+        .map(target -> toTargetSimple(target, type))
+        .toList();
   }
 
   public TargetSimple toTargetSimple(Object[] target, TargetType type) {
@@ -117,7 +121,7 @@ public class InjectMapper {
   // -- EXPECTATIONS to EXPECTATIONSIMPLE
   public List<InjectExpectationSimple> toInjectExpectationSimples(
       List<InjectExpectation> expectations) {
-    return expectations.stream().map(this::toExpectationSimple).toList();
+    return expectations.stream().filter(Objects::nonNull).map(this::toExpectationSimple).toList();
   }
 
   private InjectExpectationSimple toExpectationSimple(InjectExpectation expectation) {
@@ -129,7 +133,10 @@ public class InjectMapper {
 
   // -- KILLCHAINPHASES to KILLCHAINPHASESSIMPLE
   public List<KillChainPhaseSimple> toKillChainPhasesSimples(List<KillChainPhase> killChainPhases) {
-    return killChainPhases.stream().map(this::toKillChainPhasesSimple).toList();
+    return killChainPhases.stream()
+        .filter(Objects::nonNull)
+        .map(this::toKillChainPhasesSimple)
+        .toList();
   }
 
   private KillChainPhaseSimple toKillChainPhasesSimple(KillChainPhase killChainPhase) {
@@ -141,7 +148,10 @@ public class InjectMapper {
 
   // -- ATTACKPATTERN to ATTACKPATTERNSIMPLE
   public List<AttackPatternSimple> toAttackPatternSimples(List<AttackPattern> attackPatterns) {
-    return attackPatterns.stream().map(this::toAttackPatternSimple).toList();
+    return attackPatterns.stream()
+        .filter(Objects::nonNull)
+        .map(this::toAttackPatternSimple)
+        .toList();
   }
 
   private AttackPatternSimple toAttackPatternSimple(AttackPattern attackPattern) {
