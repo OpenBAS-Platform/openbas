@@ -59,10 +59,10 @@ public class InjectUtils {
   public List<InjectExpectation> getPrimaryExpectations(Inject inject) {
     List<String> firstIds = new ArrayList<>();
 
-    firstIds.addAll(inject.getTeams().stream().map(t -> t.getId()).collect(Collectors.toList()));
-    firstIds.addAll(inject.getAssets().stream().map(t -> t.getId()).collect(Collectors.toList()));
+    firstIds.addAll(inject.getTeams().stream().map(Team::getId).toList());
+    firstIds.addAll(inject.getAssets().stream().map(Asset::getId).toList());
     firstIds.addAll(
-        inject.getAssetGroups().stream().map(t -> t.getId()).collect(Collectors.toList()));
+        inject.getAssetGroups().stream().map(AssetGroup::getId).toList());
 
     // Reject expectations if none of the team, asset, or assetGroup IDs exist in firstIds
     return inject.getExpectations().stream()
