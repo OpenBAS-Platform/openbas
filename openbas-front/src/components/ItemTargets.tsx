@@ -36,9 +36,10 @@ const ItemTargets: FunctionComponent<Props> = ({
     truncateLimit = 6;
   }
 
+  console.log(targets);
   // Extract the first two targets as visible chips
   const visibleTargets = getVisibleItems(targets, 2);
-  const tooltipLabel = getLabelOfRemainingItems(targets, 2, 'name');
+  const tooltipLabel = getLabelOfRemainingItems(targets, 2, 'target_name');
   const remainingTargetsCount = getRemainingItemsCount(targets, visibleTargets);
 
   if (!targets || targets.length === 0) {
