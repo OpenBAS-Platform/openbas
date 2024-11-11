@@ -608,7 +608,7 @@ public class ExerciseApi extends RestBehavior {
   }
 
   @LogExecutionTime
-  @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/results")
+  @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/results-by-attack-patterns")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public List<InjectExpectationResultsByAttackPattern> injectResults(
       @NotBlank final @PathVariable String exerciseId) {

@@ -29,7 +29,7 @@ export const fetchPlayersByExercise = (exerciseId: Exercise['exercise_id']) => (
 };
 
 export const fetchExerciseInjectExpectationResults = (exerciseId: Exercise['exercise_id']) => {
-  const uri = `${EXERCISE_URI}/${exerciseId}/injects/results`;
+  const uri = `${EXERCISE_URI}/${exerciseId}/injects/results-by-attack-patterns`;
   return simpleCall(uri);
 };
 
@@ -40,7 +40,7 @@ export const searchExerciseInjects = (exerciseId: Exercise['exercise_id'], searc
 };
 
 export const exerciseInjectsResultOutput = (exerciseId: Exercise['exercise_id']) => {
-  const uri = `${EXERCISE_URI}/${exerciseId}/injects/result`;
+  const uri = `${EXERCISE_URI}/${exerciseId}/injects/results`;
   return simpleCall(uri);
 };
 
