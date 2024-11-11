@@ -480,7 +480,7 @@ public class ExerciseService {
 
   // -- ScenarioExercise--
   public Iterable<ExerciseSimple> scenarioExercises(@NotBlank String scenarioId) {
-    List<RawExerciseSimple> exercises = exerciseRepository.rawAllByScenarioId(List.of(scenarioId));
+    List<RawExerciseSimple> exercises = exerciseRepository.rawAllByScenarioIds(List.of(scenarioId));
     return exerciseMapper.getExerciseSimples(exercises);
   }
 
