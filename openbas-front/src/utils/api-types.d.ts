@@ -1043,7 +1043,7 @@ export interface ImportPostSummary {
 
 export interface ImportTestSummary {
   import_message?: ImportMessage[];
-  injects?: InjectResultOutput[];
+  injects?: InjectOutput[];
   /** @format int32 */
   total_injects?: number;
 }
