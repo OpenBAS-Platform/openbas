@@ -95,25 +95,23 @@ public class InjectMapper {
   public InjectStatusOutput toInjectStatusOutput(Optional<InjectStatus> injectStatus) {
     return injectStatus
         .map(
-            status -> {
-              InjectStatusOutput.InjectStatusOutputBuilder builder =
-                  InjectStatusOutput.builder()
-                      .id(status.getId())
-                      .name(
-                          Optional.ofNullable(status.getName())
-                              .map(ExecutionStatus::name)
-                              .orElse(ExecutionStatus.DRAFT.name()))
-                      .traces(status.getTraces())
-                      .trackingSentDate(status.getTrackingSentDate())
-                      .trackingAckDate(status.getTrackingAckDate())
-                      .trackingEndDate(status.getTrackingEndDate())
-                      .trackingTotalExecutionTime(status.getTrackingTotalExecutionTime())
-                      .trackingTotalCount(status.getTrackingTotalCount())
-                      .trackingTotalError(status.getTrackingTotalError())
-                      .trackingTotalSuccess(status.getTrackingTotalSuccess());
-              return builder.build();
-            })
-        .orElseGet(() -> InjectStatusOutput.builder().name(null).build());
+            status ->
+                InjectStatusOutput.builder()
+                    .id(status.getId())
+                    .name(
+                        Optional.ofNullable(status.getName())
+                            .map(ExecutionStatus::name)
+                            .orElse(null))
+                    .traces(status.getTraces())
+                    .trackingSentDate(status.getTrackingSentDate())
+                    .trackingAckDate(status.getTrackingAckDate())
+                    .trackingEndDate(status.getTrackingEndDate())
+                    .trackingTotalExecutionTime(status.getTrackingTotalExecutionTime())
+                    .trackingTotalCount(status.getTrackingTotalCount())
+                    .trackingTotalError(status.getTrackingTotalError())
+                    .trackingTotalSuccess(status.getTrackingTotalSuccess())
+                    .build())
+        .orElseGet(() -> InjectStatusOutput.builder().build());
   }
 
   // -- EXPECTATIONS to EXPECTATIONSIMPLE
@@ -131,9 +129,7 @@ public class InjectMapper {
 
   // -- KILLCHAINPHASES to KILLCHAINPHASESSIMPLE
   public List<KillChainPhaseSimple> toKillChainPhasesSimples(List<KillChainPhase> killChainPhases) {
-    return killChainPhases.stream()
-        .map(this::toKillChainPhasesSimple)
-        .toList();
+    return killChainPhases.stream().map(this::toKillChainPhasesSimple).toList();
   }
 
   private KillChainPhaseSimple toKillChainPhasesSimple(KillChainPhase killChainPhase) {
@@ -145,9 +141,7 @@ public class InjectMapper {
 
   // -- ATTACKPATTERN to ATTACKPATTERNSIMPLE
   public List<AttackPatternSimple> toAttackPatternSimples(List<AttackPattern> attackPatterns) {
-    return attackPatterns.stream()
-        .map(this::toAttackPatternSimple)
-        .toList();
+    return attackPatterns.stream().map(this::toAttackPatternSimple).toList();
   }
 
   private AttackPatternSimple toAttackPatternSimple(AttackPattern attackPattern) {

@@ -541,9 +541,12 @@ public class InjectService {
               if (status != null) {
                 injectStatus =
                     InjectStatusSimple.builder()
+                        .id(tuple.get("status_id", String.class))
                         .name(status.name())
                         .trackingSentDate(tuple.get("status_tracking_sent_date", Instant.class))
                         .build();
+              }else{
+                injectStatus = InjectStatusSimple.builder().build();
               }
 
               PayloadSimple payloadSimple = null;

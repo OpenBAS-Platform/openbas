@@ -61,8 +61,7 @@ public class InjectUtils {
 
     firstIds.addAll(inject.getTeams().stream().map(Team::getId).toList());
     firstIds.addAll(inject.getAssets().stream().map(Asset::getId).toList());
-    firstIds.addAll(
-        inject.getAssetGroups().stream().map(AssetGroup::getId).toList());
+    firstIds.addAll(inject.getAssetGroups().stream().map(AssetGroup::getId).toList());
 
     // Reject expectations if none of the team, asset, or assetGroup IDs exist in firstIds
     return inject.getExpectations().stream()
