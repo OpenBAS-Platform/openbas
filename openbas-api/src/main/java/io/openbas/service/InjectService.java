@@ -408,9 +408,9 @@ public class InjectService {
             .collect(Collectors.toSet());
 
     if (injectIds != null && !injectIds.isEmpty()) {
-      Map<String, List<Object[]>> teamMap = fetchRelatedData(injectIds, "teams");
-      Map<String, List<Object[]>> assetMap = fetchRelatedData(injectIds, "assets");
-      Map<String, List<Object[]>> assetGroupMap = fetchRelatedData(injectIds, "assetGroups");
+      Map<String, List<Object[]>> teamMap = fetchRelatedTargets(injectIds, "teams");
+      Map<String, List<Object[]>> assetMap = fetchRelatedTargets(injectIds, "assets");
+      Map<String, List<Object[]>> assetGroupMap = fetchRelatedTargets(injectIds, "assetGroups");
       Map<String, List<RawInjectExpectation>> expectationMap = fetchExpectations(injectIds);
 
       // Map results to InjectResultOutput and set targets
@@ -418,7 +418,7 @@ public class InjectService {
     }
   }
 
-  private Map<String, List<Object[]>> fetchRelatedData(Set<String> injectIds, String targetType) {
+  private Map<String, List<Object[]>> fetchRelatedTargets(Set<String> injectIds, String targetType) {
     if (injectIds == null || injectIds.isEmpty()) return new HashMap<>();
 
     Optional<List<Object[]>> data;
