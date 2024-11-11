@@ -52,7 +52,7 @@ public class ExerciseSimple {
 
   @JsonIgnore private String[] injectIds;
 
-  // PROCESSED ATTRIBUTES
+  // COMPUTED ATTRIBUTES
 
   @JsonProperty("exercise_global_score")
   @NotNull

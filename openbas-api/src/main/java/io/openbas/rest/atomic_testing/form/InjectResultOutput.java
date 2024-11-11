@@ -41,7 +41,7 @@ public class InjectResultOutput {
   @JsonIgnore private String[] assetIds;
   @JsonIgnore private String[] assetGroupIds;
 
-  // -- PROCESSED ATTRIBUTES --
+  // -- COMPUTED ATTRIBUTES --
 
   @Schema(description = "Result of expectations")
   @JsonProperty("inject_expectation_results")

@@ -69,7 +69,7 @@ public class InjectResultOverviewOutput {
   @JsonProperty("inject_updated_at")
   private Instant updatedAt;
 
-  // -- PROCESSED ATTRIBUTES --
+  // -- COMPUTED ATTRIBUTES --
 
   @Default
   @Schema(description = "Result of expectations")

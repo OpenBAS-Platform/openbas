@@ -131,61 +131,67 @@ public class ExerciseService {
     // -- EXECUTION --
     List<ExerciseSimple> exercises = execution(query);
 
-    // -- MAP TO GENERATE TARGETSIMPLEs
-    Set<String> exerciseIds =
-        exercises.stream().map(ExerciseSimple::getId).collect(Collectors.toSet());
-
-    Map<String, List<Object[]>> teamMap =
-        teamRepository.teamsByExerciseIds(exerciseIds).stream()
-            .collect(Collectors.groupingBy(row -> (String) row[0]));
-
-    Map<String, List<Object[]>> assetMap =
-        assetRepository.assetsByExerciseIds(exerciseIds).stream()
-            .collect(Collectors.groupingBy(row -> (String) row[0]));
-
-    Map<String, List<Object[]>> assetGroupMap =
-        assetGroupRepository.assetGroupsByExerciseIds(exerciseIds).stream()
-            .collect(Collectors.groupingBy(row -> (String) row[0]));
-
-    Map<String, List<RawInjectExpectation>> expectationMap =
-        injectExpectationRepository.rawForComputeGlobalByExerciseIds(exerciseIds).stream()
-            .collect(Collectors.groupingBy(RawInjectExpectation::getExercise_id));
-
-    for (ExerciseSimple exercise : exercises) {
-      if (exercise.getInjectIds() != null) {
-        // -- GLOBAL SCORE ---
-        exercise.setExpectationResultByTypes(
-            AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-                expectationMap.getOrDefault(exercise.getId(), emptyList())));
-
-        // -- TARGETS --
-        List<TargetSimple> allTargets =
-            Stream.concat(
-                    injectMapper
-                        .toTargetSimple(
-                            teamMap.getOrDefault(exercise.getId(), emptyList()), TargetType.TEAMS)
-                        .stream(),
-                    Stream.concat(
-                        injectMapper
-                            .toTargetSimple(
-                                assetMap.getOrDefault(exercise.getId(), emptyList()),
-                                TargetType.ASSETS)
-                            .stream(),
-                        injectMapper
-                            .toTargetSimple(
-                                assetGroupMap.getOrDefault(exercise.getId(), emptyList()),
-                                TargetType.ASSETS_GROUPS)
-                            .stream()))
-                .toList();
-
-        exercise.getTargets().addAll(allTargets);
-      }
-    }
+    setComputedAttribute(exercises);
 
     // -- Count Query --
     Long total = countQuery(cb, this.entityManager, Exercise.class, specificationCount);
 
     return new PageImpl<>(exercises, pageable, total);
+  }
+
+  private void setComputedAttribute(List<ExerciseSimple> exercises) {
+    // -- MAP TO GENERATE TARGETSIMPLEs
+    Set<String> exerciseIds =
+        exercises.stream().map(ExerciseSimple::getId).collect(Collectors.toSet());
+
+    if (exerciseIds != null && !exerciseIds.isEmpty()) {
+      Map<String, List<Object[]>> teamMap =
+          teamRepository.teamsByExerciseIds(exerciseIds).stream()
+              .collect(Collectors.groupingBy(row -> (String) row[0]));
+
+      Map<String, List<Object[]>> assetMap =
+          assetRepository.assetsByExerciseIds(exerciseIds).stream()
+              .collect(Collectors.groupingBy(row -> (String) row[0]));
+
+      Map<String, List<Object[]>> assetGroupMap =
+          assetGroupRepository.assetGroupsByExerciseIds(exerciseIds).stream()
+              .collect(Collectors.groupingBy(row -> (String) row[0]));
+
+      Map<String, List<RawInjectExpectation>> expectationMap =
+          injectExpectationRepository.rawForComputeGlobalByExerciseIds(exerciseIds).stream()
+              .collect(Collectors.groupingBy(RawInjectExpectation::getExercise_id));
+
+      for (ExerciseSimple exercise : exercises) {
+        if (exercise.getId() != null) {
+          // -- GLOBAL SCORE ---
+          exercise.setExpectationResultByTypes(
+              AtomicTestingUtils.getExpectationResultByTypesFromRaw(
+                  expectationMap.getOrDefault(exercise.getId(), emptyList())));
+
+          // -- TARGETS --
+          List<TargetSimple> allTargets =
+              Stream.concat(
+                      injectMapper
+                          .toTargetSimple(
+                              teamMap.getOrDefault(exercise.getId(), emptyList()), TargetType.TEAMS)
+                          .stream(),
+                      Stream.concat(
+                          injectMapper
+                              .toTargetSimple(
+                                  assetMap.getOrDefault(exercise.getId(), emptyList()),
+                                  TargetType.ASSETS)
+                              .stream(),
+                          injectMapper
+                              .toTargetSimple(
+                                  assetGroupMap.getOrDefault(exercise.getId(), emptyList()),
+                                  TargetType.ASSETS_GROUPS)
+                              .stream()))
+                  .toList();
+
+          exercise.getTargets().addAll(allTargets);
+        }
+      }
+    }
   }
 
   // -- SELECT --

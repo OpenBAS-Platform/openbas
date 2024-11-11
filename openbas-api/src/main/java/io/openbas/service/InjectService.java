@@ -342,15 +342,7 @@ public class InjectService {
     List<InjectResultOutput> injects = executeInjectQuery(cb, specification, pageable, joinMap);
 
     // Fetch related data for injects
-    Set<String> injectIds =
-        injects.stream().map(InjectResultOutput::getId).collect(Collectors.toSet());
-    Map<String, List<Object[]>> teamMap = fetchRelatedData(injectIds, "teams");
-    Map<String, List<Object[]>> assetMap = fetchRelatedData(injectIds, "assets");
-    Map<String, List<Object[]>> assetGroupMap = fetchRelatedData(injectIds, "assetGroups");
-    Map<String, List<RawInjectExpectation>> expectationMap = fetchExpectations(injectIds);
-
-    // Map results to InjectResultOutput and set targets
-    mapResultsToInjects(injects, teamMap, assetMap, assetGroupMap, expectationMap);
+    setComputedAttribute(injects);
 
     long totalCount = countQuery(cb, entityManager, Inject.class, specificationCount);
     return new PageImpl<>(injects, pageable, totalCount);
@@ -370,17 +362,7 @@ public class InjectService {
     List<InjectResultOutput> injects =
         executeInjectQuery(cb, specification, pageable, new HashMap<>());
 
-    // Fetch related data for injects
-    Set<String> injectIds =
-        injects.stream().map(InjectResultOutput::getId).collect(Collectors.toSet());
-    Map<String, List<Object[]>> teamMap = fetchRelatedData(injectIds, "teams");
-    Map<String, List<Object[]>> assetMap = fetchRelatedData(injectIds, "assets");
-    Map<String, List<Object[]>> assetGroupMap = fetchRelatedData(injectIds, "assetGroups");
-    Map<String, List<RawInjectExpectation>> expectationMap = fetchExpectations(injectIds);
-
-    // Map results to InjectResultOutput and set targets
-    mapResultsToInjects(injects, teamMap, assetMap, assetGroupMap, expectationMap);
-
+    setComputedAttribute(injects);
     return injects;
   }
 
@@ -416,24 +398,55 @@ public class InjectService {
     return execInjects(query);
   }
 
-  private Map<String, List<Object[]>> fetchRelatedData(Set<String> injectIds, String dataType) {
-    switch (dataType) {
-      case "teams":
-        return teamRepository.teamsByInjectIds(injectIds).stream()
-            .collect(Collectors.groupingBy(row -> (String) row[0]));
-      case "assets":
-        return assetRepository.assetsByInjectIds(injectIds).stream()
-            .collect(Collectors.groupingBy(row -> (String) row[0]));
-      case "assetGroups":
-        return assetGroupRepository.assetGroupsByInjectIds(injectIds).stream()
-            .collect(Collectors.groupingBy(row -> (String) row[0]));
-      default:
-        throw new IllegalArgumentException("Unknown data type: " + dataType);
+  private void setComputedAttribute(List<InjectResultOutput> injects) {
+    // Fetch related data for injects
+    Set<String> injectIds =
+        injects.stream()
+            .map(InjectResultOutput::getId)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+
+    if (injectIds != null && !injectIds.isEmpty()) {
+      Map<String, List<Object[]>> teamMap = fetchRelatedData(injectIds, "teams");
+      Map<String, List<Object[]>> assetMap = fetchRelatedData(injectIds, "assets");
+      Map<String, List<Object[]>> assetGroupMap = fetchRelatedData(injectIds, "assetGroups");
+      Map<String, List<RawInjectExpectation>> expectationMap = fetchExpectations(injectIds);
+
+      // Map results to InjectResultOutput and set targets
+      mapResultsToInjects(injects, teamMap, assetMap, assetGroupMap, expectationMap);
     }
   }
 
+  private Map<String, List<Object[]>> fetchRelatedData(Set<String> injectIds, String targetType) {
+    if (injectIds == null || injectIds.isEmpty()) return new HashMap<>();
+
+    List<Object[]> data;
+    switch (targetType) {
+      case "teams":
+        data = teamRepository.teamsByInjectIds(injectIds);
+        break;
+      case "assets":
+        data = assetRepository.assetsByInjectIds(injectIds);
+        break;
+      case "assetGroups":
+        data = assetGroupRepository.assetGroupsByInjectIds(injectIds);
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown data type: " + targetType);
+    }
+    if (data == null || data.isEmpty()) return new HashMap<>();
+
+    return data.stream()
+        .filter(Objects::nonNull)
+        .filter(row -> row.length > 0 && row[0] != null) // [0]: id
+        .collect(Collectors.groupingBy(row -> (String) row[0]));
+  }
+
   private Map<String, List<RawInjectExpectation>> fetchExpectations(Set<String> injectIds) {
+    if (injectIds == null || injectIds.isEmpty()) return new HashMap<>();
+
     return injectExpectationRepository.rawForComputeGlobalByInjectIds(injectIds).stream()
+        .filter(Objects::nonNull)
         .collect(Collectors.groupingBy(RawInjectExpectation::getInject_id));
   }
 
@@ -445,31 +458,34 @@ public class InjectService {
       Map<String, List<RawInjectExpectation>> expectationMap) {
 
     for (InjectResultOutput inject : injects) {
-      // Set global score (expectations)
-      inject.setExpectationResultByTypes(
-          AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-              expectationMap.getOrDefault(inject.getId(), emptyList())));
+      if (inject.getId() != null) {
+        // Set global score (expectations)
+        inject.setExpectationResultByTypes(
+            AtomicTestingUtils.getExpectationResultByTypesFromRaw(
+                expectationMap.getOrDefault(inject.getId(), emptyList())));
 
-      // Set targets (teams, assets, asset groups)
-      List<TargetSimple> allTargets =
-          Stream.concat(
-                  injectMapper
-                      .toTargetSimple(
-                          teamMap.getOrDefault(inject.getId(), emptyList()), TargetType.TEAMS)
-                      .stream(),
-                  Stream.concat(
-                      injectMapper
-                          .toTargetSimple(
-                              assetMap.getOrDefault(inject.getId(), emptyList()), TargetType.ASSETS)
-                          .stream(),
-                      injectMapper
-                          .toTargetSimple(
-                              assetGroupMap.getOrDefault(inject.getId(), emptyList()),
-                              TargetType.ASSETS_GROUPS)
-                          .stream()))
-              .collect(Collectors.toList());
+        // Set targets (teams, assets, asset groups)
+        List<TargetSimple> allTargets =
+            Stream.concat(
+                    injectMapper
+                        .toTargetSimple(
+                            teamMap.getOrDefault(inject.getId(), emptyList()), TargetType.TEAMS)
+                        .stream(),
+                    Stream.concat(
+                        injectMapper
+                            .toTargetSimple(
+                                assetMap.getOrDefault(inject.getId(), emptyList()),
+                                TargetType.ASSETS)
+                            .stream(),
+                        injectMapper
+                            .toTargetSimple(
+                                assetGroupMap.getOrDefault(inject.getId(), emptyList()),
+                                TargetType.ASSETS_GROUPS)
+                            .stream()))
+                .collect(Collectors.toList());
 
-      inject.getTargets().addAll(allTargets);
+        inject.getTargets().addAll(allTargets);
+      }
     }
   }
 
