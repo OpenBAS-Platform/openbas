@@ -8,6 +8,7 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteri
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static java.time.Instant.now;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -420,32 +421,34 @@ public class InjectService {
   private Map<String, List<Object[]>> fetchRelatedData(Set<String> injectIds, String targetType) {
     if (injectIds == null || injectIds.isEmpty()) return new HashMap<>();
 
-    List<Object[]> data;
+    Optional<List<Object[]>> data;
     switch (targetType) {
       case "teams":
-        data = teamRepository.teamsByInjectIds(injectIds);
+        data = ofNullable(teamRepository.teamsByInjectIds(injectIds));
         break;
       case "assets":
-        data = assetRepository.assetsByInjectIds(injectIds);
+        data = ofNullable(assetRepository.assetsByInjectIds(injectIds));
         break;
       case "assetGroups":
-        data = assetGroupRepository.assetGroupsByInjectIds(injectIds);
+        data = ofNullable(assetGroupRepository.assetGroupsByInjectIds(injectIds));
         break;
       default:
         throw new IllegalArgumentException("Unknown data type: " + targetType);
     }
     if (data == null || data.isEmpty()) return new HashMap<>();
 
-    return data.stream()
+    return data.orElse(emptyList()).stream()
         .filter(Objects::nonNull)
-        .filter(row -> row.length > 0 && row[0] != null) // [0]: id
+        .filter(row -> 0 < row.length && row[0] != null) // [0]: id
         .collect(Collectors.groupingBy(row -> (String) row[0]));
   }
 
   private Map<String, List<RawInjectExpectation>> fetchExpectations(Set<String> injectIds) {
     if (injectIds == null || injectIds.isEmpty()) return new HashMap<>();
 
-    return injectExpectationRepository.rawForComputeGlobalByInjectIds(injectIds).stream()
+    return ofNullable(injectExpectationRepository.rawForComputeGlobalByInjectIds(injectIds))
+        .orElse(emptyList())
+        .stream()
         .filter(Objects::nonNull)
         .collect(Collectors.groupingBy(RawInjectExpectation::getInject_id));
   }

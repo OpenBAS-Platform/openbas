@@ -146,19 +146,27 @@ public class ExerciseService {
 
     if (exerciseIds != null && !exerciseIds.isEmpty()) {
       Map<String, List<Object[]>> teamMap =
-          teamRepository.teamsByExerciseIds(exerciseIds).stream()
+          ofNullable(teamRepository.teamsByExerciseIds(exerciseIds)).orElse(emptyList()).stream()
+              .filter(row -> 0 < row.length && row[0] != null)
               .collect(Collectors.groupingBy(row -> (String) row[0]));
 
       Map<String, List<Object[]>> assetMap =
-          assetRepository.assetsByExerciseIds(exerciseIds).stream()
+          ofNullable(assetRepository.assetsByExerciseIds(exerciseIds)).orElse(emptyList()).stream()
+              .filter(row -> 0 < row.length && row[0] != null)
               .collect(Collectors.groupingBy(row -> (String) row[0]));
 
       Map<String, List<Object[]>> assetGroupMap =
-          assetGroupRepository.assetGroupsByExerciseIds(exerciseIds).stream()
+          ofNullable(assetGroupRepository.assetGroupsByExerciseIds(exerciseIds))
+              .orElse(emptyList())
+              .stream()
+              .filter(row -> 0 < row.length && row[0] != null)
               .collect(Collectors.groupingBy(row -> (String) row[0]));
 
       Map<String, List<RawInjectExpectation>> expectationMap =
-          injectExpectationRepository.rawForComputeGlobalByExerciseIds(exerciseIds).stream()
+          ofNullable(injectExpectationRepository.rawForComputeGlobalByExerciseIds(exerciseIds))
+              .orElse(emptyList())
+              .stream()
+              .filter(Objects::nonNull)
               .collect(Collectors.groupingBy(RawInjectExpectation::getExercise_id));
 
       for (ExerciseSimple exercise : exercises) {
