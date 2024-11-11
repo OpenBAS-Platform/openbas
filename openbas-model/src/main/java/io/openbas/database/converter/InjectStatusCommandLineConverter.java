@@ -32,7 +32,6 @@ public class InjectStatusCommandLineConverter
     try {
       return mapper.readValue(dbData, InjectStatusCommandLine.class);
     } catch (IOException ex) {
-      // logger.error("Unexpected IOEx decoding json from database: " + dbData);
       return null;
     }
   }

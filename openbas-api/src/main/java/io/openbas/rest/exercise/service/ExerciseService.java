@@ -133,7 +133,7 @@ public class ExerciseService {
 
     // -- MAP TO GENERATE TARGETSIMPLEs
     Set<String> exerciseIds =
-        exercises.stream().map(exercise -> exercise.getId()).collect(Collectors.toSet());
+        exercises.stream().map(ExerciseSimple::getId).collect(Collectors.toSet());
 
     Map<String, List<Object[]>> teamMap =
         teamRepository.teamsByExerciseIds(exerciseIds).stream()
@@ -176,7 +176,7 @@ public class ExerciseService {
                                 assetGroupMap.getOrDefault(exercise.getId(), emptyList()),
                                 TargetType.ASSETS_GROUPS)
                             .stream()))
-                .collect(Collectors.toList());
+                .toList();
 
         exercise.getTargets().addAll(allTargets);
       }

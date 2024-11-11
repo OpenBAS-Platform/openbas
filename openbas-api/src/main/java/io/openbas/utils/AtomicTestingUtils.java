@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 public class AtomicTestingUtils {
 
+  public static final String ENDPOINT = "Endpoint";
+
   // -- TARGETS WITH RESULTS --
   public static List<InjectTargetWithResult> getTargetsWithResultsFromRaw(
       List<RawInjectExpectation> expectations,
@@ -54,26 +56,22 @@ public class AtomicTestingUtils {
     teamExpectations.stream()
         .filter(expectation -> !teamExpectationMap.containsKey(expectation.getTeam_id()))
         .forEach(
-            expectation -> {
-              teamExpectationMap.put(expectation.getTeam_id(), expectation);
-            });
+            expectation -> teamExpectationMap.put(expectation.getTeam_id(), expectation));
 
     Map<String, RawInjectExpectation> assetExpectationMap = new LinkedHashMap<>();
     assetExpectations.stream()
         .filter(expectation -> !assetExpectationMap.containsKey(expectation.getAsset_id()))
         .forEach(
-            expectation -> {
-              assetExpectationMap.put(expectation.getAsset_id(), expectation);
-            });
+            expectation -> assetExpectationMap.put(expectation.getAsset_id(), expectation));
 
     Map<String, RawInjectExpectation> assetGroupExpectationMap = new LinkedHashMap<>();
     assetGroupExpectations.stream()
         .filter(
             expectation -> !assetGroupExpectationMap.containsKey(expectation.getAsset_group_id()))
         .forEach(
-            expectation -> {
-              assetGroupExpectationMap.put(expectation.getAsset_group_id(), expectation);
-            });
+            expectation ->
+              assetGroupExpectationMap.put(expectation.getAsset_group_id(), expectation)
+            );
 
     // Results
     List<InjectTargetWithResult> targets = new ArrayList<>();
@@ -126,7 +124,7 @@ public class AtomicTestingUtils {
                       asset.getAsset_id(),
                       asset.getAsset_name(),
                       defaultExpectationResultsByTypes,
-                      Objects.equals(asset.getAsset_type(), "Endpoint")
+                      Objects.equals(asset.getAsset_type(), ENDPOINT)
                           ? Endpoint.PLATFORM_TYPE.valueOf(asset.getEndpoint_platform())
                           : null);
 
@@ -162,7 +160,7 @@ public class AtomicTestingUtils {
                                 assetId,
                                 finalAsset.getAsset_name(),
                                 defaultExpectationResultsByTypes,
-                                Objects.equals(finalAsset.getAsset_type(), "Endpoint")
+                                Objects.equals(finalAsset.getAsset_type(), ENDPOINT)
                                     ? Endpoint.PLATFORM_TYPE.valueOf(
                                         finalAsset.getEndpoint_platform())
                                     : null));
@@ -174,18 +172,18 @@ public class AtomicTestingUtils {
               dynamicAssetGroupMap
                   .get(assetGroup.getAsset_group_id())
                   .forEach(
-                      dynamicAsset -> {
+                      dynamicAsset ->
                         children.add(
                             new InjectTargetWithResult(
                                 TargetType.ASSETS,
                                 dynamicAsset.getId(),
                                 dynamicAsset.getName(),
                                 defaultExpectationResultsByTypes,
-                                Objects.equals(dynamicAsset.getType(), "Endpoint")
+                                Objects.equals(dynamicAsset.getType(), ENDPOINT)
                                     ? Endpoint.PLATFORM_TYPE.valueOf(
                                         String.valueOf(dynamicAsset.getPlatform()))
-                                    : null));
-                      });
+                                    : null))
+                      );
             }
 
             if (noMatchingExpectations) {
@@ -256,7 +254,7 @@ public class AtomicTestingUtils {
                               .getAsset_name(),
                           entry.getValue(),
                           Objects.equals(
-                                  rawAssetMap.get(entry.getKey()).getAsset_type(), "Endpoint")
+                                  rawAssetMap.get(entry.getKey()).getAsset_type(), ENDPOINT)
                               ? Endpoint.PLATFORM_TYPE.valueOf(
                                   rawAssetMap.get(entry.getKey()).getEndpoint_platform())
                               : null))
@@ -294,7 +292,7 @@ public class AtomicTestingUtils {
                       // Verify if any expectation is related to a dynamic assets
                       boolean foundExpectationForDynamicAssets =
                           dynamicAssetGroupMap.get(entry.getKey()).stream()
-                              .anyMatch(assetChild -> assetChild.equals(asset.getId()));
+                              .anyMatch(assetChild -> assetChild.getId().equals(asset.getId()));
 
                       if (foundExpectationForAsset || foundExpectationForDynamicAssets) {
                         children.add(asset);
@@ -320,7 +318,7 @@ public class AtomicTestingUtils {
                                         rawAssetMap.get(asset).getAsset_name(),
                                         defaultExpectationResultsByTypes,
                                         Objects.equals(
-                                                rawAssetMap.get(asset).getAsset_type(), "Endpoint")
+                                                rawAssetMap.get(asset).getAsset_type(), ENDPOINT)
                                             ? Endpoint.PLATFORM_TYPE.valueOf(
                                                 rawAssetMap.get(asset).getEndpoint_platform())
                                             : null));
@@ -344,7 +342,7 @@ public class AtomicTestingUtils {
                                           dynamicAsset.getId(),
                                           dynamicAsset.getName(),
                                           defaultExpectationResultsByTypes,
-                                          Objects.equals(dynamicAsset.getType(), "Endpoint")
+                                          Objects.equals(dynamicAsset.getType(), ENDPOINT)
                                               ? Endpoint.PLATFORM_TYPE.valueOf(
                                                   String.valueOf(dynamicAsset.getPlatform()))
                                               : null));

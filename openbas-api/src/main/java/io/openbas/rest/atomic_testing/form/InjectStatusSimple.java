@@ -24,10 +24,7 @@ public class InjectStatusSimple {
   private String name;
 
   public String getName() {
-    if (name == null) {
-      return ExecutionStatus.DRAFT.name();
-    }
-    return name;
+    return name != null ? name : ExecutionStatus.DRAFT.name();
   }
 
   @JsonProperty("tracking_sent_date")

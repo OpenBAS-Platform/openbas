@@ -57,7 +57,7 @@ public class ExerciseMapper {
                   Stream.concat(
                       injectMapper.toTargetSimple(assets, TargetType.ASSETS).stream(),
                       injectMapper.toTargetSimple(assetGroups, TargetType.ASSETS_GROUPS).stream()))
-              .collect(Collectors.toList());
+              .toList();
 
       simple.getTargets().addAll(allTargets);
     }
@@ -68,7 +68,7 @@ public class ExerciseMapper {
   public List<ExerciseSimple> getExerciseSimples(List<RawExerciseSimple> exercises) {
     // -- MAP TO GENERATE TARGETSIMPLEs
     Set<String> exerciseIds =
-        exercises.stream().map(exercise -> exercise.getExercise_id()).collect(Collectors.toSet());
+        exercises.stream().map(RawExerciseSimple::getExercise_id).collect(Collectors.toSet());
 
     Map<String, List<Object[]>> teamMap =
         teamRepository.teamsByExerciseIds(exerciseIds).stream()
@@ -123,7 +123,7 @@ public class ExerciseMapper {
                   Stream.concat(
                       injectMapper.toTargetSimple(assets, TargetType.ASSETS).stream(),
                       injectMapper.toTargetSimple(assetGroups, TargetType.ASSETS_GROUPS).stream()))
-              .collect(Collectors.toList());
+              .toList();
 
       simple.getTargets().addAll(allTargets);
     }

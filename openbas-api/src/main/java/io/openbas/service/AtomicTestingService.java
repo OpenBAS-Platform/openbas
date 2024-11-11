@@ -76,9 +76,7 @@ public class AtomicTestingService {
       inject.get().getAssetGroups().clear();
       inject.get().getAssetGroups().addAll(computedAssetGroup);
     }
-    InjectResultOverviewOutput result =
-        inject.map(injectMapper::toDto).orElseThrow(ElementNotFoundException::new);
-    return result;
+    return inject.map(injectMapper::toDto).orElseThrow(ElementNotFoundException::new);
   }
 
   @Transactional
