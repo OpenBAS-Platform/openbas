@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import type { ExerciseStore, InjectExpectationResultsByAttackPatternStore } from '../../../../../actions/exercises/Exercise';
 import { fetchExerciseExpectationResult, fetchExerciseInjectExpectationResults, searchExerciseInjects } from '../../../../../actions/exercises/exercise-action';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
+import { buildEmptyFilter } from '../../../../../components/common/queryable/filter/FilterUtils';
 import { initSorting } from '../../../../../components/common/queryable/Page';
 import { buildSearchPagination } from '../../../../../components/common/queryable/QueryableUtils';
 import { useQueryableWithLocalStorage } from '../../../../../components/common/queryable/useQueryableWithLocalStorage';
@@ -19,7 +20,6 @@ import ResponsePie from '../../../common/injects/ResponsePie';
 import MitreMatrix from '../../../common/matrix/MitreMatrix';
 import ExerciseMainInformation from '../ExerciseMainInformation';
 import ExerciseDistribution from './ExerciseDistribution';
-import { buildEmptyFilter } from '../../../../../components/common/queryable/filter/FilterUtils';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.

@@ -4,7 +4,6 @@ import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
 import { type Page } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
@@ -15,7 +14,7 @@ import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
 import ItemTargets from '../../../components/ItemTargets';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
-import type { FilterGroup, InjectResultOutput, SearchPaginationInput } from '../../../utils/api-types';
+import type { InjectResultOutput, SearchPaginationInput } from '../../../utils/api-types';
 import { isNotEmptyField } from '../../../utils/utils';
 import InjectIcon from '../common/injects/InjectIcon';
 import InjectorContract from '../common/injects/InjectorContract';
