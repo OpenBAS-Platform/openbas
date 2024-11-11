@@ -131,6 +131,7 @@ public class ExerciseMapper {
     return simple;
   }
 
+  // -- RAWEXERCISESIMPLE to EXERCISESIMPLE --
   private ExerciseSimple fromRawExerciseSimple(RawExerciseSimple rawExercise) {
     ExerciseSimple simple = new ExerciseSimple();
     simple.setId(rawExercise.getExercise_id());

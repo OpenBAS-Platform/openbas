@@ -77,7 +77,9 @@ public class InjectResultOverviewOutput {
   @NotNull
   private List<ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
 
+  @Default
+  @Schema(description = "Results of expectations for each target")
   @JsonProperty("inject_targets")
   @NotNull
-  private List<InjectTargetWithResult> targets;
+  private List<InjectTargetWithResult> targets = new ArrayList<>();
 }

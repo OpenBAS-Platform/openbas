@@ -17,6 +17,7 @@ import io.openbas.rest.scenario.response.ImportMessage;
 import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
 import io.openbas.utils.CustomMockMultipartFile;
+import io.openbas.utils.InjectMapper;
 import jakarta.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,7 +54,7 @@ class InjectServiceTest {
   @Mock ScenarioTeamUserRepository scenarioTeamUserRepository;
   @Mock ExerciseTeamUserRepository exerciseTeamUserRepository;
   @Mock UserRepository userRepository;
-  @Mock ImportMapperRepository importMapperRepository;
+  @Mock InjectMapper injectMapper;
   @InjectMocks private InjectService injectService;
 
   private Scenario mockedScenario;
@@ -77,7 +78,8 @@ class InjectServiceTest {
             scenarioTeamUserRepository,
             exerciseTeamUserRepository,
             teamRepository,
-            userRepository);
+            userRepository,
+            injectMapper);
 
     mockedScenario = new Scenario();
     mockedExercise = new Exercise();
