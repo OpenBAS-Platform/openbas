@@ -89,175 +89,9 @@ public class ExerciseService {
 
   // endregion
 
-  public List<ExerciseSimple> exercises() {
-    // We get the exercises depending on whether or not we are granted
-    List<RawExerciseSimple> exercises =
-        currentUser().isAdmin()
-            ? exerciseRepository.rawAll()
-            : exerciseRepository.rawAllGranted(currentUser().getId());
-    return exerciseMapper.getExerciseSimples(exercises);
-  }
-
-  public Page<ExerciseSimple> exercises(
-      Specification<Exercise> specification,
-      Specification<Exercise> specificationCount,
-      Pageable pageable,
-      Map<String, Join<Base, Base>> joinMap) {
-    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
-
-    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
-    Root<Exercise> exerciseRoot = cq.from(Exercise.class);
-    select(cb, cq, exerciseRoot, joinMap);
-
-    // -- Text Search and Filters --
-    if (specification != null) {
-      Predicate predicate = specification.toPredicate(exerciseRoot, cq, cb);
-      if (predicate != null) {
-        cq.where(predicate);
-      }
-    }
-
-    // -- Sorting --
-    List<Order> orders = toSortCriteriaBuilder(cb, exerciseRoot, pageable.getSort());
-    cq.orderBy(orders);
-
-    // Type Query
-    TypedQuery<Tuple> query = entityManager.createQuery(cq);
-
-    // -- Pagination --
-    query.setFirstResult((int) pageable.getOffset());
-    query.setMaxResults(pageable.getPageSize());
-
-    // -- EXECUTION --
-    List<ExerciseSimple> exercises = execution(query);
-
-    setComputedAttribute(exercises);
-
-    // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, Exercise.class, specificationCount);
-
-    return new PageImpl<>(exercises, pageable, total);
-  }
-
-  private void setComputedAttribute(List<ExerciseSimple> exercises) {
-    // -- MAP TO GENERATE TARGETSIMPLEs
-    Set<String> exerciseIds =
-        exercises.stream().map(ExerciseSimple::getId).collect(Collectors.toSet());
-
-    if (exerciseIds != null && !exerciseIds.isEmpty()) {
-      Map<String, List<Object[]>> teamMap =
-          ofNullable(teamRepository.teamsByExerciseIds(exerciseIds)).orElse(emptyList()).stream()
-              .filter(row -> 0 < row.length && row[0] != null)
-              .collect(Collectors.groupingBy(row -> (String) row[0]));
-
-      Map<String, List<Object[]>> assetMap =
-          ofNullable(assetRepository.assetsByExerciseIds(exerciseIds)).orElse(emptyList()).stream()
-              .filter(row -> 0 < row.length && row[0] != null)
-              .collect(Collectors.groupingBy(row -> (String) row[0]));
-
-      Map<String, List<Object[]>> assetGroupMap =
-          ofNullable(assetGroupRepository.assetGroupsByExerciseIds(exerciseIds))
-              .orElse(emptyList())
-              .stream()
-              .filter(row -> 0 < row.length && row[0] != null)
-              .collect(Collectors.groupingBy(row -> (String) row[0]));
-
-      Map<String, List<RawInjectExpectation>> expectationMap =
-          ofNullable(injectExpectationRepository.rawForComputeGlobalByExerciseIds(exerciseIds))
-              .orElse(emptyList())
-              .stream()
-              .filter(Objects::nonNull)
-              .collect(Collectors.groupingBy(RawInjectExpectation::getExercise_id));
-
-      for (ExerciseSimple exercise : exercises) {
-        if (exercise.getId() != null) {
-          // -- GLOBAL SCORE ---
-          exercise.setExpectationResultByTypes(
-              AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-                  expectationMap.getOrDefault(exercise.getId(), emptyList())));
-
-          // -- TARGETS --
-          List<TargetSimple> allTargets =
-              Stream.concat(
-                      injectMapper
-                          .toTargetSimple(
-                              teamMap.getOrDefault(exercise.getId(), emptyList()), TargetType.TEAMS)
-                          .stream(),
-                      Stream.concat(
-                          injectMapper
-                              .toTargetSimple(
-                                  assetMap.getOrDefault(exercise.getId(), emptyList()),
-                                  TargetType.ASSETS)
-                              .stream(),
-                          injectMapper
-                              .toTargetSimple(
-                                  assetGroupMap.getOrDefault(exercise.getId(), emptyList()),
-                                  TargetType.ASSETS_GROUPS)
-                              .stream()))
-                  .toList();
-
-          exercise.getTargets().addAll(allTargets);
-        }
-      }
-    }
-  }
-
-  // -- SELECT --
-
-  private void select(
-      CriteriaBuilder cb,
-      CriteriaQuery<Tuple> cq,
-      Root<Exercise> exerciseRoot,
-      Map<String, Join<Base, Base>> joinMap) {
-    // Array aggregations
-    Join<Base, Base> exerciseTagsJoin = exerciseRoot.join("tags", JoinType.LEFT);
-    joinMap.put("tags", exerciseTagsJoin);
-    Expression<String[]> tagIdsExpression = arrayAggOnId(cb, exerciseTagsJoin);
-
-    Join<Base, Base> injectsJoin = exerciseRoot.join("injects", JoinType.LEFT);
-    joinMap.put("injects", injectsJoin);
-    Expression<String[]> injectIdsExpression = arrayAggOnId(cb, injectsJoin);
-    // SELECT
-    cq.multiselect(
-            exerciseRoot.get("id").alias("exercise_id"),
-            exerciseRoot.get("name").alias("exercise_name"),
-            exerciseRoot.get("status").alias("exercise_status"),
-            exerciseRoot.get("subtitle").alias("exercise_subtitle"),
-            exerciseRoot.get("category").alias("exercise_category"),
-            exerciseRoot.get("start").alias("exercise_start_date"),
-            exerciseRoot.get("updatedAt").alias("exercise_updated_at"),
-            tagIdsExpression.alias("exercise_tags"),
-            injectIdsExpression.alias("exercise_injects"))
-        .distinct(true);
-
-    // GROUP BY
-    cq.groupBy(Collections.singletonList(exerciseRoot.get("id")));
-  }
-
-  // -- EXECUTION --
-
-  private List<ExerciseSimple> execution(TypedQuery<Tuple> query) {
-    return query.getResultList().stream()
-        .map(
-            tuple -> {
-              ExerciseSimple exerciseSimple = new ExerciseSimple();
-              exerciseSimple.setId(tuple.get("exercise_id", String.class));
-              exerciseSimple.setName(tuple.get("exercise_name", String.class));
-              exerciseSimple.setStatus(tuple.get("exercise_status", ExerciseStatus.class));
-              exerciseSimple.setSubtitle(tuple.get("exercise_subtitle", String.class));
-              exerciseSimple.setCategory(tuple.get("exercise_category", String.class));
-              exerciseSimple.setStart(tuple.get("exercise_start_date", Instant.class));
-              exerciseSimple.setUpdatedAt(tuple.get("exercise_updated_at", Instant.class));
-              exerciseSimple.setTagIds(
-                  new HashSet<>(Arrays.asList(tuple.get("exercise_tags", String[].class))));
-              exerciseSimple.setInjectIds(tuple.get("exercise_injects", String[].class));
-              return exerciseSimple;
-            })
-        .toList();
-  }
+  // -- CRUD --
 
   // -- CREATION --
-
   @Transactional(rollbackFor = Exception.class)
   public Exercise createExercise(@NotNull final Exercise exercise) {
     if (imapEnabled) {
@@ -272,7 +106,6 @@ public class ExerciseService {
   }
 
   // -- READ --
-
   public Exercise exercise(@NotBlank final String exerciseId) {
     return this.exerciseRepository
         .findById(exerciseId)
@@ -280,14 +113,12 @@ public class ExerciseService {
   }
 
   // -- UPDATE --
-
   public Exercise updateExercise(@NotNull final Exercise exercise) {
     exercise.setUpdatedAt(now());
     return this.exerciseRepository.save(exercise);
   }
 
   // -- DUPLICATION --
-
   @Transactional
   public Exercise getDuplicateExercise(@NotBlank String exerciseId) {
     Exercise exerciseOrigin = exerciseRepository.findById(exerciseId).orElseThrow();
@@ -492,18 +323,185 @@ public class ExerciseService {
     duplicatedExercise.setObjectives(duplicatedObjectives);
   }
 
-  // -- ScenarioExercise--
+  // -- EXERCISES --
+  public List<ExerciseSimple> exercises() {
+    // We get the exercises depending on whether or not we are granted
+    List<RawExerciseSimple> exercises =
+        currentUser().isAdmin()
+            ? exerciseRepository.rawAll()
+            : exerciseRepository.rawAllGranted(currentUser().getId());
+    return exerciseMapper.getExerciseSimples(exercises);
+  }
+
+  public Page<ExerciseSimple> exercises(
+      Specification<Exercise> specification,
+      Specification<Exercise> specificationCount,
+      Pageable pageable,
+      Map<String, Join<Base, Base>> joinMap) {
+    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+
+    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+    Root<Exercise> exerciseRoot = cq.from(Exercise.class);
+    select(cb, cq, exerciseRoot, joinMap);
+
+    // -- Text Search and Filters --
+    if (specification != null) {
+      Predicate predicate = specification.toPredicate(exerciseRoot, cq, cb);
+      if (predicate != null) {
+        cq.where(predicate);
+      }
+    }
+
+    // -- Sorting --
+    List<Order> orders = toSortCriteriaBuilder(cb, exerciseRoot, pageable.getSort());
+    cq.orderBy(orders);
+
+    // Type Query
+    TypedQuery<Tuple> query = entityManager.createQuery(cq);
+
+    // -- Pagination --
+    query.setFirstResult((int) pageable.getOffset());
+    query.setMaxResults(pageable.getPageSize());
+
+    // -- EXECUTION --
+    List<ExerciseSimple> exercises = execution(query);
+
+    setComputedAttribute(exercises);
+
+    // -- Count Query --
+    Long total = countQuery(cb, this.entityManager, Exercise.class, specificationCount);
+
+    return new PageImpl<>(exercises, pageable, total);
+  }
+
+  // -- SELECT --
+  private void select(
+      CriteriaBuilder cb,
+      CriteriaQuery<Tuple> cq,
+      Root<Exercise> exerciseRoot,
+      Map<String, Join<Base, Base>> joinMap) {
+    // Array aggregations
+    Join<Base, Base> exerciseTagsJoin = exerciseRoot.join("tags", JoinType.LEFT);
+    joinMap.put("tags", exerciseTagsJoin);
+    Expression<String[]> tagIdsExpression = arrayAggOnId(cb, exerciseTagsJoin);
+
+    Join<Base, Base> injectsJoin = exerciseRoot.join("injects", JoinType.LEFT);
+    joinMap.put("injects", injectsJoin);
+    Expression<String[]> injectIdsExpression = arrayAggOnId(cb, injectsJoin);
+    // SELECT
+    cq.multiselect(
+            exerciseRoot.get("id").alias("exercise_id"),
+            exerciseRoot.get("name").alias("exercise_name"),
+            exerciseRoot.get("status").alias("exercise_status"),
+            exerciseRoot.get("subtitle").alias("exercise_subtitle"),
+            exerciseRoot.get("category").alias("exercise_category"),
+            exerciseRoot.get("start").alias("exercise_start_date"),
+            exerciseRoot.get("updatedAt").alias("exercise_updated_at"),
+            tagIdsExpression.alias("exercise_tags"),
+            injectIdsExpression.alias("exercise_injects"))
+        .distinct(true);
+
+    // GROUP BY
+    cq.groupBy(Collections.singletonList(exerciseRoot.get("id")));
+  }
+
+  // -- EXECUTION --
+  private List<ExerciseSimple> execution(TypedQuery<Tuple> query) {
+    return query.getResultList().stream()
+        .map(
+            tuple -> {
+              ExerciseSimple exerciseSimple = new ExerciseSimple();
+              exerciseSimple.setId(tuple.get("exercise_id", String.class));
+              exerciseSimple.setName(tuple.get("exercise_name", String.class));
+              exerciseSimple.setStatus(tuple.get("exercise_status", ExerciseStatus.class));
+              exerciseSimple.setSubtitle(tuple.get("exercise_subtitle", String.class));
+              exerciseSimple.setCategory(tuple.get("exercise_category", String.class));
+              exerciseSimple.setStart(tuple.get("exercise_start_date", Instant.class));
+              exerciseSimple.setUpdatedAt(tuple.get("exercise_updated_at", Instant.class));
+              exerciseSimple.setTagIds(
+                  new HashSet<>(Arrays.asList(tuple.get("exercise_tags", String[].class))));
+              exerciseSimple.setInjectIds(tuple.get("exercise_injects", String[].class));
+              return exerciseSimple;
+            })
+        .toList();
+  }
+
+  // -- COMPUTED ATTRIBUTES --
+  private void setComputedAttribute(List<ExerciseSimple> exercises) {
+    // -- MAP TO GENERATE TARGETSIMPLEs
+    Set<String> exerciseIds =
+        exercises.stream().map(ExerciseSimple::getId).collect(Collectors.toSet());
+
+    if (exerciseIds != null && !exerciseIds.isEmpty()) {
+      Map<String, List<Object[]>> teamMap =
+          ofNullable(teamRepository.teamsByExerciseIds(exerciseIds)).orElse(emptyList()).stream()
+              .filter(row -> 0 < row.length && row[0] != null)
+              .collect(Collectors.groupingBy(row -> (String) row[0]));
+
+      Map<String, List<Object[]>> assetMap =
+          ofNullable(assetRepository.assetsByExerciseIds(exerciseIds)).orElse(emptyList()).stream()
+              .filter(row -> 0 < row.length && row[0] != null)
+              .collect(Collectors.groupingBy(row -> (String) row[0]));
+
+      Map<String, List<Object[]>> assetGroupMap =
+          ofNullable(assetGroupRepository.assetGroupsByExerciseIds(exerciseIds))
+              .orElse(emptyList())
+              .stream()
+              .filter(row -> 0 < row.length && row[0] != null)
+              .collect(Collectors.groupingBy(row -> (String) row[0]));
+
+      Map<String, List<RawInjectExpectation>> expectationMap =
+          ofNullable(injectExpectationRepository.rawForComputeGlobalByExerciseIds(exerciseIds))
+              .orElse(emptyList())
+              .stream()
+              .filter(Objects::nonNull)
+              .collect(Collectors.groupingBy(RawInjectExpectation::getExercise_id));
+
+      for (ExerciseSimple exercise : exercises) {
+        if (exercise.getId() != null) {
+          // -- GLOBAL SCORE ---
+          exercise.setExpectationResultByTypes(
+              AtomicTestingUtils.getExpectationResultByTypesFromRaw(
+                  expectationMap.getOrDefault(exercise.getId(), emptyList())));
+
+          // -- TARGETS --
+          List<TargetSimple> allTargets =
+              Stream.concat(
+                      injectMapper
+                          .toTargetSimple(
+                              teamMap.getOrDefault(exercise.getId(), emptyList()), TargetType.TEAMS)
+                          .stream(),
+                      Stream.concat(
+                          injectMapper
+                              .toTargetSimple(
+                                  assetMap.getOrDefault(exercise.getId(), emptyList()),
+                                  TargetType.ASSETS)
+                              .stream(),
+                          injectMapper
+                              .toTargetSimple(
+                                  assetGroupMap.getOrDefault(exercise.getId(), emptyList()),
+                                  TargetType.ASSETS_GROUPS)
+                              .stream()))
+                  .toList();
+
+          exercise.getTargets().addAll(allTargets);
+        }
+      }
+    }
+  }
+
+  // -- SCENARIO EXERCISES --
   public Iterable<ExerciseSimple> scenarioExercises(@NotBlank String scenarioId) {
     List<RawExerciseSimple> exercises = exerciseRepository.rawAllByScenarioIds(List.of(scenarioId));
     return exerciseMapper.getExerciseSimples(exercises);
   }
 
+  // -- GLOBAL RESULTS --
   public List<ExpectationResultsByType> getGlobalResults(@NotBlank String exerciseId) {
     return resultUtils.getResultsByTypes(exerciseRepository.findInjectsByExercise(exerciseId));
   }
 
   // -- TEAMS --
-
   @Transactional(rollbackFor = Exception.class)
   public Iterable<Team> removeTeams(
       @NotBlank final String exerciseId, @NotNull final List<String> teamIds) {

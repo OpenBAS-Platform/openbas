@@ -170,7 +170,6 @@ public class InjectService {
   }
 
   // -- LIST INJECTOUTPUT --
-
   @Tracing(name = "Fetch injects with criteria builder", layer = "service", operation = "GET")
   public List<InjectOutput> injects(Specification<Inject> specification) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
@@ -367,7 +366,7 @@ public class InjectService {
     return injects;
   }
 
-  // -- IN COMMUN --
+  // -- UTILS --
   private List<InjectResultOutput> executeInjectQuery(
       CriteriaBuilder cb,
       Specification<Inject> specification,
@@ -418,7 +417,8 @@ public class InjectService {
     }
   }
 
-  private Map<String, List<Object[]>> fetchRelatedTargets(Set<String> injectIds, String targetType) {
+  private Map<String, List<Object[]>> fetchRelatedTargets(
+      Set<String> injectIds, String targetType) {
     if (injectIds == null || injectIds.isEmpty()) return new HashMap<>();
 
     Optional<List<Object[]>> data;
