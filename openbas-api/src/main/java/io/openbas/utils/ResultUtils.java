@@ -80,7 +80,7 @@ public class ResultUtils {
 
     // -- EXPECTATIONS --
     Set<RawInjectExpectation> rawInjectExpectations =
-        injectExpectationRepository.rawByInjectId(injectIds);
+        injectExpectationRepository.rawByInjectIds(injectIds);
     Map<String, List<RawInjectExpectation>> expectationMap =
         rawInjectExpectations.stream()
             .collect(Collectors.groupingBy(RawInjectExpectation::getInject_id));

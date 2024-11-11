@@ -140,7 +140,7 @@ public interface InjectExpectationRepository
               + "FROM injects_expectations i "
               + "WHERE i.inject_id IN (:injectIds) ; ",
       nativeQuery = true)
-  Set<RawInjectExpectation> rawByInjectId(@Param("injectIds") final Set<String> injectIds);
+  Set<RawInjectExpectation> rawByInjectIds(@Param("injectIds") final Set<String> injectIds);
 
   @Query(
       value =
