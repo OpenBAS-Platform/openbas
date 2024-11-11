@@ -4,6 +4,7 @@ import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
 import { type Page } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
@@ -20,7 +21,6 @@ import InjectIcon from '../common/injects/InjectIcon';
 import InjectorContract from '../common/injects/InjectorContract';
 import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
 import AtomicTestingResult from './atomic_testing/AtomicTestingResult';
-import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -78,7 +78,7 @@ const InjectResultList: FunctionComponent<Props> = ({
   fetchInjects,
   goTo,
   queryableHelpers,
-  searchPaginationInput
+  searchPaginationInput,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -94,14 +94,6 @@ const InjectResultList: FunctionComponent<Props> = ({
     'inject_type',
     'inject_updated_at',
   ];
-  const quickFilter: FilterGroup = {
-    mode: 'and',
-    filters: [
-      buildEmptyFilter('inject_kill_chain_phases', 'contains'),
-      buildEmptyFilter('inject_tags', 'contains'),
-    ],
-  };
-
   const [injects, setInjects] = useState<InjectResultOutput[]>([]);
 
   // Headers
