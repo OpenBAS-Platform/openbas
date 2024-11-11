@@ -13,12 +13,13 @@ import { useQueryableWithLocalStorage } from '../../../../../components/common/q
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { useHelper } from '../../../../../store';
-import type { ExpectationResultsByType } from '../../../../../utils/api-types';
+import type { ExpectationResultsByType, FilterGroup } from '../../../../../utils/api-types';
 import InjectResultList from '../../../atomic_testings/InjectResultList';
 import ResponsePie from '../../../common/injects/ResponsePie';
 import MitreMatrix from '../../../common/matrix/MitreMatrix';
 import ExerciseMainInformation from '../ExerciseMainInformation';
 import ExerciseDistribution from './ExerciseDistribution';
+import { buildEmptyFilter } from '../../../../../components/common/queryable/filter/FilterUtils';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -60,8 +61,17 @@ const Exercise = () => {
     );
   }
 
+  const quickFilter: FilterGroup = {
+    mode: 'and',
+    filters: [
+      buildEmptyFilter('inject_kill_chain_phases', 'contains'),
+      buildEmptyFilter('inject_tags', 'contains'),
+    ],
+  };
+
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('simulation-injects-results', buildSearchPagination({
     sorts: initSorting('inject_updated_at', 'DESC'),
+    filterGroup: quickFilter,
   }));
   return (
     <>

@@ -14,12 +14,13 @@ import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
 import ItemTargets from '../../../components/ItemTargets';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
-import type { InjectResultOutput, SearchPaginationInput } from '../../../utils/api-types';
+import type { FilterGroup, InjectResultOutput, SearchPaginationInput } from '../../../utils/api-types';
 import { isNotEmptyField } from '../../../utils/utils';
 import InjectIcon from '../common/injects/InjectIcon';
 import InjectorContract from '../common/injects/InjectorContract';
 import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
 import AtomicTestingResult from './atomic_testing/AtomicTestingResult';
+import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -77,8 +78,7 @@ const InjectResultList: FunctionComponent<Props> = ({
   fetchInjects,
   goTo,
   queryableHelpers,
-  searchPaginationInput,
-  availableFilterNames = [],
+  searchPaginationInput
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -87,6 +87,21 @@ const InjectResultList: FunctionComponent<Props> = ({
   const [loading, setLoading] = useState<boolean>(true);
 
   // Filter and sort hook
+  const availableFilterNames = [
+    'inject_kill_chain_phases',
+    'inject_tags',
+    'inject_title',
+    'inject_type',
+    'inject_updated_at',
+  ];
+  const quickFilter: FilterGroup = {
+    mode: 'and',
+    filters: [
+      buildEmptyFilter('inject_kill_chain_phases', 'contains'),
+      buildEmptyFilter('inject_tags', 'contains'),
+    ],
+  };
+
   const [injects, setInjects] = useState<InjectResultOutput[]>([]);
 
   // Headers

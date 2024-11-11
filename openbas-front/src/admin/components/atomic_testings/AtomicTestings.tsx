@@ -46,14 +46,6 @@ const AtomicTestings = () => {
     });
   };
 
-  const availableFilterNames = [
-    'inject_kill_chain_phases',
-    'inject_tags',
-    'inject_title',
-    'inject_type',
-    'inject_updated_at',
-  ];
-
   const quickFilter: FilterGroup = {
     mode: 'and',
     filters: [
@@ -74,7 +66,6 @@ const AtomicTestings = () => {
         goTo={injectId => `/admin/atomic_testings/${injectId}`}
         queryableHelpers={queryableHelpers}
         searchPaginationInput={searchPaginationInput}
-        availableFilterNames={availableFilterNames}
       />
       {userAdmin && (
         <>
