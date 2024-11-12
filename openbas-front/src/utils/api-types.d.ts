@@ -455,7 +455,7 @@ export interface Communication {
 
 export interface Condition {
   key: string;
-  operator: "==";
+  operator: "eq";
   value?: boolean;
 }
 
@@ -1114,7 +1114,7 @@ export interface InjectDependency {
 
 export interface InjectDependencyCondition {
   conditions?: Condition[];
-  mode: "&&" | "||";
+  mode: "and" | "or";
 }
 
 export interface InjectDependencyId {
@@ -1180,6 +1180,7 @@ export interface InjectExpectation {
   /** @format int64 */
   inject_expiration_time: number;
   listened?: boolean;
+  target_id?: string;
 }
 
 export interface InjectExpectationResult {
@@ -1319,6 +1320,7 @@ export interface InjectResultOverviewOutput {
   inject_kill_chain_phases?: KillChainPhaseSimple[];
   inject_ready?: boolean;
   inject_status?: InjectStatusOutput;
+  /** Results of expectations for each target */
   inject_targets: InjectTargetWithResult[];
   inject_title: string;
   inject_type?: string;
@@ -1420,6 +1422,7 @@ export interface InjectStatusSimple {
   tracking_sent_date?: string;
 }
 
+/** Results of expectations for each target */
 export interface InjectTargetWithResult {
   children?: InjectTargetWithResult[];
   expectationResultsByTypes?: ExpectationResultsByType[];
