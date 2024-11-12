@@ -235,6 +235,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
                 exercises={exercises}
                 queryableHelpers={queryableHelpers}
                 secondaryAction={secondaryAction}
+                loading={loadingScenarioExercises}
               />
             </Paper>
           </Grid>

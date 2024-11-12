@@ -20,9 +20,10 @@ import { useFormatter } from '../../../components/i18n';
 import ItemCategory from '../../../components/ItemCategory';
 import ItemSeverity from '../../../components/ItemSeverity';
 import ItemTags from '../../../components/ItemTags';
+import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
-import type { FilterGroup } from '../../../utils/api-types';
+import type { FilterGroup, SearchPaginationInput } from '../../../utils/api-types';
 import ImportUploaderScenario from './ImportUploaderScenario';
 import ScenarioPopover from './scenario/ScenarioPopover';
 import ScenarioStatus from './scenario/ScenarioStatus';
@@ -76,6 +77,8 @@ const Scenarios = () => {
   // Standard hooks
   const classes = useStyles();
   const { t, nsdt } = useFormatter();
+
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Fetching data
   const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({
@@ -192,11 +195,16 @@ const Scenarios = () => {
     exportFileName: `${t('Scenarios')}.csv`,
   };
 
+  const search = (input: SearchPaginationInput) => {
+    setLoading(true);
+    return searchScenarios(input).finally(() => setLoading(false));
+  };
+
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Scenarios'), current: true }]} />
       <PaginationComponentV2
-        fetch={searchScenarios}
+        fetch={search}
         searchPaginationInput={searchPaginationInput}
         setContent={setScenarios}
         entityPrefix="scenario"
@@ -227,48 +235,52 @@ const Scenarios = () => {
             )}
           />
         </ListItem>
-        {scenarios.map((scenario: ScenarioStore) => {
-          return (
-            <ListItem
-              key={scenario.scenario_id}
-              divider
-              secondaryAction={(
-                <ScenarioPopover
-                  scenario={scenario}
-                  actions={['Duplicate', 'Export', 'Delete']}
-                  onDelete={result => setScenarios(scenarios.filter(e => (e.scenario_id !== result)))}
-                  inList
-                />
-              )}
-              disablePadding
-            >
-              <ListItemButton
-                component={Link}
-                to={`/admin/scenarios/${scenario.scenario_id}`}
-                classes={{ root: classes.item }}
-              >
-                <ListItemIcon>
-                  <MovieFilterOutlined color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                  primary={(
-                    <div className={classes.bodyItems}>
-                      {headers.map(header => (
-                        <div
-                          key={header.field}
-                          className={classes.bodyItem}
-                          style={inlineStyles[header.field]}
-                        >
-                          {header.value(scenario)}
-                        </div>
-                      ))}
-                    </div>
+        {
+          loading
+            ? <PaginatedListLoader Icon={MovieFilterOutlined} headers={headers} headerStyles={inlineStyles} />
+            : scenarios.map((scenario: ScenarioStore, index) => {
+              return (
+                <ListItem
+                  key={scenario.scenario_id}
+                  divider={scenarios.length !== index + 1}
+                  secondaryAction={(
+                    <ScenarioPopover
+                      scenario={scenario}
+                      actions={['Duplicate', 'Export', 'Delete']}
+                      onDelete={result => setScenarios(scenarios.filter(e => (e.scenario_id !== result)))}
+                      inList
+                    />
                   )}
-                />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
+                  disablePadding
+                >
+                  <ListItemButton
+                    component={Link}
+                    to={`/admin/scenarios/${scenario.scenario_id}`}
+                    classes={{ root: classes.item }}
+                  >
+                    <ListItemIcon>
+                      <MovieFilterOutlined color="primary" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={(
+                        <div className={classes.bodyItems}>
+                          {headers.map(header => (
+                            <div
+                              key={header.field}
+                              className={classes.bodyItem}
+                              style={inlineStyles[header.field]}
+                            >
+                              {header.value(scenario)}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              );
+            })
+        }
       </List>
       {userAdmin && (
         <ScenarioCreation

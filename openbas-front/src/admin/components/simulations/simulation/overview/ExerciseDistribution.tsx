@@ -69,10 +69,6 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
     injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
   }));
 
-  if (loading) {
-    return <Loader />;
-  }
-
   if (exercise.exercise_status === 'SCHEDULED' && injectExpectations?.length === 0 && !isReport) {
     return (
       <div style={{ marginTop: 100, textAlign: 'center' }}>
@@ -83,9 +79,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
       </div>
     );
   }
-  if (injectExpectations?.length === 0) {
-    return <div />;
-  }
+
   return (
     <Grid id="exercise_distribution" container={true} spacing={3}>
       <Grid item xs={6} style={{ marginTop: 25 }}>
@@ -93,7 +87,11 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
           {t('Distribution of score by team (in % of expectations)')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          <ExerciseDistributionScoreByTeamInPercentage exerciseId={exerciseId} />
+          {
+            loading
+              ? <Loader variant="inline" />
+              : <ExerciseDistributionScoreByTeamInPercentage exerciseId={exerciseId} />
+          }
         </Paper>
       </Grid>
       <Grid item xs={6} style={{ marginTop: 25 }}>
@@ -101,7 +99,11 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
           {t('Teams scores over time (in % of expectations)')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          <ExerciseDistributionScoreOverTimeByTeamInPercentage exerciseId={exerciseId} />
+          {
+            loading
+              ? <Loader variant="inline" />
+              : <ExerciseDistributionScoreOverTimeByTeamInPercentage exerciseId={exerciseId} />
+          }
         </Paper>
       </Grid>
       <Grid item xs={6} style={{ marginTop: 25 }}>
@@ -109,13 +111,21 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
           {t('Distribution of total score by team')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          <ExerciseDistributionScoreByTeam exerciseId={exerciseId} />
+          {
+            loading
+              ? <Loader variant="inline" />
+              : <ExerciseDistributionScoreByTeam exerciseId={exerciseId} />
+          }
         </Paper>
       </Grid>
       <Grid item xs={6} style={{ marginTop: 25 }}>
         <Typography variant="h4">{t('Teams scores over time')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          <ExerciseDistributionScoreOverTimeByTeam exerciseId={exerciseId} />
+          {
+            loading
+              ? <Loader variant="inline" />
+              : <ExerciseDistributionScoreOverTimeByTeam exerciseId={exerciseId} />
+          }
         </Paper>
       </Grid>
       <Grid item xs={6} style={{ marginTop: 25 }}>
@@ -123,7 +133,11 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
           {t('Distribution of total score by inject type')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          <ExerciseDistributionByInjectorContract exerciseId={exerciseId} />
+          {
+            loading
+              ? <Loader variant="inline" />
+              : <ExerciseDistributionByInjectorContract exerciseId={exerciseId} />
+          }
         </Paper>
       </Grid>
       <Grid item xs={6} style={{ marginTop: 25 }}>
@@ -131,7 +145,11 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
           {t('Inject types scores over time')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          <ExerciseDistributionScoreOverTimeByInjectorContract exerciseId={exerciseId} />
+          {
+            loading
+              ? <Loader variant="inline" />
+              : <ExerciseDistributionScoreOverTimeByInjectorContract exerciseId={exerciseId} />
+          }
         </Paper>
       </Grid>
       <Grid item xs={6} style={{ marginTop: 25 }}>
@@ -139,7 +157,11 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
           {t('Distribution of total score by organization')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          <ExerciseDistributionScoreByOrganization exerciseId={exerciseId} />
+          {
+            loading
+              ? <Loader variant="inline" />
+              : <ExerciseDistributionScoreByOrganization exerciseId={exerciseId} />
+          }
         </Paper>
       </Grid>
       <Grid item xs={3} style={{ marginTop: 25 }}>
@@ -147,7 +169,11 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
           {t('Distribution of total score by player')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          <ExerciseDistributionScoreByPlayer exerciseId={exerciseId} />
+          {
+            loading
+              ? <Loader variant="inline" />
+              : <ExerciseDistributionScoreByPlayer exerciseId={exerciseId} />
+          }
         </Paper>
       </Grid>
       <Grid item xs={3} style={{ marginTop: 25 }}>
@@ -155,7 +181,11 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
           {t('Distribution of total score by inject')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          <ExerciseDistributionScoreByInject exerciseId={exerciseId} />
+          {
+            loading
+              ? <Loader variant="inline" />
+              : <ExerciseDistributionScoreByInject exerciseId={exerciseId} />
+          }
         </Paper>
       </Grid>
     </Grid>

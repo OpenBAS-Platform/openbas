@@ -12,6 +12,7 @@ import { Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
 import ItemTargets from '../../../components/ItemTargets';
+import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import type { ExerciseSimple } from '../../../utils/api-types';
 import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
 import ExerciseStatus from './simulation/ExerciseStatus';
@@ -69,6 +70,7 @@ interface Props {
   hasHeader?: boolean;
   variant?: string;
   secondaryAction?: (exercise: ExerciseStore) => React.ReactNode;
+  loading: boolean;
 }
 
 const ExerciseList: FunctionComponent<Props> = ({
@@ -77,6 +79,7 @@ const ExerciseList: FunctionComponent<Props> = ({
   hasHeader = true,
   variant = 'list',
   secondaryAction,
+  loading,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -161,39 +164,43 @@ const ExerciseList: FunctionComponent<Props> = ({
           />
         </ListItem>
       )}
-      {exercises.map((exercise: ExerciseStore, index) => (
-        <ListItem
-          key={exercise.exercise_id}
-          secondaryAction={secondaryAction && secondaryAction(exercise)}
-          disablePadding
-          divider={exercises.length !== index + 1}
-        >
-          <ListItemButton
-            classes={{ root: classes.item }}
-            component={Link}
-            to={`/admin/exercises/${exercise.exercise_id}`}
-          >
-            <ListItemIcon>
-              <HubOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={(
-                <div className={classes.bodyItems}>
-                  {headers.map(header => (
-                    <div
-                      key={header.field}
-                      className={classes.bodyItem}
-                      style={inlineStyles[header.field]}
-                    >
-                      {header.value?.(exercise)}
+      {
+        loading
+          ? <PaginatedListLoader Icon={HubOutlined} headers={headers} headerStyles={inlineStyles} />
+          : exercises.map((exercise: ExerciseStore, index) => (
+            <ListItem
+              key={exercise.exercise_id}
+              secondaryAction={secondaryAction && secondaryAction(exercise)}
+              disablePadding
+              divider={exercises.length !== index + 1}
+            >
+              <ListItemButton
+                classes={{ root: classes.item }}
+                component={Link}
+                to={`/admin/exercises/${exercise.exercise_id}`}
+              >
+                <ListItemIcon>
+                  <HubOutlined color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={(
+                    <div className={classes.bodyItems}>
+                      {headers.map(header => (
+                        <div
+                          key={header.field}
+                          className={classes.bodyItem}
+                          style={inlineStyles[header.field]}
+                        >
+                          {header.value?.(exercise)}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
-            />
-          </ListItemButton>
-        </ListItem>
-      ))}
+                  )}
+                />
+              </ListItemButton>
+            </ListItem>
+          ))
+      }
     </List>
   );
 };
