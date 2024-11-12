@@ -3,7 +3,6 @@ package io.openbas.service;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
-import static io.openbas.utils.JpaUtils.createLeftJoin;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static java.time.Instant.now;
@@ -176,7 +175,7 @@ public class InjectService {
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
     Root<Inject> injectRoot = cq.from(Inject.class);
-    selectForInject(cb, cq, injectRoot);
+    selectForInject(cb, cq, injectRoot, new HashMap<>());
 
     // -- Text Search and Filters --
     if (specification != null) {
@@ -199,12 +198,13 @@ public class InjectService {
   public Page<InjectOutput> injects(
       Specification<Inject> specification,
       Specification<Inject> specificationCount,
-      Pageable pageable) {
+      Pageable pageable,
+      Map<String, Join<Base, Base>> joinMap) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
     Root<Inject> injectRoot = cq.from(Inject.class);
-    selectForInject(cb, cq, injectRoot);
+    selectForInject(cb, cq, injectRoot, joinMap);
 
     // -- Text Search and Filters --
     if (specification != null) {
@@ -235,15 +235,25 @@ public class InjectService {
   }
 
   private void selectForInject(
-      CriteriaBuilder cb, CriteriaQuery<Tuple> cq, Root<Inject> injectRoot) {
+      CriteriaBuilder cb,
+      CriteriaQuery<Tuple> cq,
+      Root<Inject> injectRoot,
+      Map<String, Join<Base, Base>> joinMap) {
     // Joins
-    Join<Inject, Exercise> injectExerciseJoin = createLeftJoin(injectRoot, "exercise");
-    Join<Inject, Scenario> injectScenarioJoin = createLeftJoin(injectRoot, "scenario");
-    Join<Inject, InjectorContract> injectorContractJoin =
-        createLeftJoin(injectRoot, "injectorContract");
-    Join<InjectorContract, Injector> injectorJoin =
-        injectorContractJoin.join("injector", JoinType.LEFT);
-    Join<Inject, InjectDependency> injectDependency = createLeftJoin(injectRoot, "dependsOn");
+    Join<Base, Base> injectExerciseJoin = injectRoot.join("exercise", JoinType.LEFT);
+    joinMap.put("exercise", injectExerciseJoin);
+
+    Join<Base, Base> injectScenarioJoin = injectRoot.join("scenario", JoinType.LEFT);
+    joinMap.put("scenario", injectScenarioJoin);
+
+    Join<Base, Base> injectorContractJoin = injectRoot.join("injectorContract", JoinType.LEFT);
+    joinMap.put("injectorContract", injectorContractJoin);
+
+    Join<Base, Base> injectorJoin = injectorContractJoin.join("injector", JoinType.LEFT);
+    joinMap.put("injector", injectorJoin);
+
+    Join<Base, Base> injectDependency = injectRoot.join("dependsOn", JoinType.LEFT);
+    joinMap.put("dependsOn", injectDependency);
 
     // Array aggregations
     Expression<String[]> tagIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "tags");
@@ -505,12 +515,13 @@ public class InjectService {
     joinMap.put("injector", injectorJoin);
 
     Join<Base, Base> payloadJoin = injectorContractJoin.join("payload", JoinType.LEFT);
-    joinMap.put("payload", injectorJoin);
+    joinMap.put("payload", payloadJoin);
 
     Join<Base, Base> collectorJoin = payloadJoin.join("collector", JoinType.LEFT);
-    joinMap.put("collector", injectorJoin);
+    joinMap.put("collector", collectorJoin);
 
-    Join<Inject, InjectStatus> statusJoin = injectRoot.join("status", JoinType.LEFT);
+    Join<Base, Base> statusJoin = injectRoot.join("status", JoinType.LEFT);
+    joinMap.put("status", statusJoin);
 
     // Array aggregations
     Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");

@@ -4,6 +4,7 @@ import static io.openbas.database.specification.InjectSpecification.fromScenario
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
+import io.openbas.database.model.Base;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectTestStatus;
 import io.openbas.rest.helper.RestBehavior;
@@ -12,9 +13,12 @@ import io.openbas.service.InjectService;
 import io.openbas.service.InjectTestStatusService;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.persistence.criteria.Join;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +50,7 @@ public class ScenarioInjectApi extends RestBehavior {
   public Iterable<InjectOutput> scenarioInjectsSimple(
       @PathVariable @NotBlank final String scenarioId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    Map<String, Join<Base, Base>> joinMap = new HashMap<>();
     return buildPaginationCriteriaBuilder(
         (Specification<Inject> specification,
             Specification<Inject> specificationCount,
@@ -53,7 +58,8 @@ public class ScenarioInjectApi extends RestBehavior {
             this.injectService.injects(
                 fromScenario(scenarioId).and(specification),
                 fromScenario(scenarioId).and(specificationCount),
-                pageable),
+                pageable,
+                joinMap),
         searchPaginationInput,
         Inject.class);
   }

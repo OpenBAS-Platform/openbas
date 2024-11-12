@@ -4,6 +4,7 @@ import static io.openbas.database.specification.InjectSpecification.fromExercise
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
+import io.openbas.database.model.Base;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectTestStatus;
 import io.openbas.rest.helper.RestBehavior;
@@ -16,9 +17,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.persistence.criteria.Join;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -61,6 +65,7 @@ public class ExerciseInjectApi extends RestBehavior {
   public Iterable<InjectOutput> exerciseInjectsSimple(
       @PathVariable @NotBlank final String exerciseId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    Map<String, Join<Base, Base>> joinMap = new HashMap<>();
     return buildPaginationCriteriaBuilder(
         (Specification<Inject> specification,
             Specification<Inject> specificationCount,
@@ -68,7 +73,8 @@ public class ExerciseInjectApi extends RestBehavior {
             this.injectService.injects(
                 fromExercise(exerciseId).and(specification),
                 fromExercise(exerciseId).and(specificationCount),
-                pageable),
+                pageable,
+                joinMap),
         searchPaginationInput,
         Inject.class);
   }
