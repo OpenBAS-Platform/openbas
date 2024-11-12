@@ -27,26 +27,18 @@ public class AtomicTestingInput {
   @JsonProperty("inject_teams")
   private List<String> teams = new ArrayList<>();
 
-  ;
-
   @JsonProperty("inject_assets")
   private List<String> assets = new ArrayList<>();
 
   @JsonProperty("inject_asset_groups")
   private List<String> assetGroups = new ArrayList<>();
 
-  ;
-
   @JsonProperty("inject_documents")
   private List<InjectDocumentInput> documents = new ArrayList<>();
-
-  ;
 
   @JsonProperty("inject_all_teams")
   private boolean allTeams;
 
   @JsonProperty("inject_tags")
   private List<String> tagIds = new ArrayList<>();
-
-  ;
 }
