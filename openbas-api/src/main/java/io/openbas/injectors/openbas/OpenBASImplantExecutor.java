@@ -9,6 +9,7 @@ import static io.openbas.model.expectation.ManualExpectation.manualExpectationFo
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAsset;
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAssetGroup;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
@@ -22,6 +23,8 @@ import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -260,13 +263,21 @@ public class OpenBASImplantExecutor extends Injector {
                                   .type(EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME)
                                   .value("obas-implant-" + inject.getId())
                                   .build());
+
+                          String interpolatedCommand =
+                              interpolateCommand(payloadCommand.getContent(), inject.getContent());
+                          injectExpectationSignatures.add(
+                              InjectExpectationSignature.builder()
+                                  .type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE_BASE64)
+                                  .value(
+                                      Base64.getEncoder()
+                                          .encodeToString(interpolatedCommand.getBytes()))
+                                  .build());
                           injectExpectationSignatures.add(
                               InjectExpectationSignature.builder()
                                   .type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE)
-                                  .value(
-                                      Base64.getEncoder()
-                                          .encodeToString(payloadCommand.getContent().getBytes()))
-                                  .build()); // Add parsing: base64 for example
+                                  .value(interpolatedCommand)
+                                  .build());
                           totalActionsCount = totalActionsCount + 1;
                           if (payloadCommand.getPrerequisites() != null) {
                             totalActionsCount =
@@ -359,5 +370,25 @@ public class OpenBASImplantExecutor extends Injector {
             computeExpectationsForAssetGroup(
                 expectations, content, assetGroup, new ArrayList<>())));
     return new ExecutionProcess(true, expectations);
+  }
+
+  private static String interpolateCommand(String commandMask, ObjectNode injectContent) {
+    List<String> placeholders = extractPlaceholderNames(commandMask);
+    String interpolatedCommand = commandMask;
+    for (String placeholder : placeholders) {
+      String value = injectContent.get(placeholder).asText();
+      interpolatedCommand = interpolatedCommand.replace("#{" + placeholder + "}", value);
+    }
+    return interpolatedCommand;
+  }
+
+  private static List<String> extractPlaceholderNames(String command) {
+    List<String> placeholders = new ArrayList<>();
+    Pattern pattern = Pattern.compile("#\\{(.*?)\\}");
+    Matcher matcher = pattern.matcher(command);
+    while (matcher.find()) {
+      placeholders.add(matcher.group(1));
+    }
+    return placeholders;
   }
 }
