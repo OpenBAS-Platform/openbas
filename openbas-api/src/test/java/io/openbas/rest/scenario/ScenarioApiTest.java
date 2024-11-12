@@ -28,11 +28,9 @@ import org.springframework.test.web.servlet.MockMvc;
 @TestInstance(PER_CLASS)
 public class ScenarioApiTest {
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
-  @Autowired
-  private ScenarioRepository scenarioRepository;
+  @Autowired private ScenarioRepository scenarioRepository;
 
   static String SCENARIO_ID;
 
