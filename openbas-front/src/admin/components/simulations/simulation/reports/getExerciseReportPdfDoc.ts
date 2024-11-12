@@ -127,7 +127,7 @@ const getExerciseReportPdfDocDefinition = async ({
               { text: inject.inject_title },
               { text: fldt(inject.inject_status?.tracking_sent_date) || 'N/A' },
               { image: imagesMap.get(`inject_${inject.inject_id}`), width: 60 },
-              { text: inject.inject_targets.map(target => target.name).join(', ') },
+              { text: inject.inject_targets?.map(target => target.target_name).join(', ') },
               { stack: convertMarkdownToPdfMake(findCommentsByInjectId(inject.inject_id) || '') },
             ];
           }),
