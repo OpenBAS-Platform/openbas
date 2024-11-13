@@ -29,12 +29,12 @@ public class InjectStatus extends BaseInjectStatus {
     int numberOfError =
         (int)
             execution.getTraces().stream()
-                .filter(ex -> ex.getStatus().equals(ExecutionStatus.ERROR))
+                .filter(ex -> ex.getStatus().equals(ExecutionTraceStatus.ERROR))
                 .count();
     int numberOfSuccess =
         (int)
             execution.getTraces().stream()
-                .filter(ex -> ex.getStatus().equals(ExecutionStatus.SUCCESS))
+                .filter(ex -> ex.getStatus().equals(ExecutionTraceStatus.SUCCESS))
                 .count();
     injectStatus.setTrackingTotalError(numberOfError);
     injectStatus.setTrackingTotalSuccess(numberOfSuccess);
