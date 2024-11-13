@@ -140,7 +140,7 @@ const Payload: FunctionComponent<Props> = ({
           gutterBottom
           style={{ marginTop: 20 }}
         >
-          {t('Attack command')}
+          {t('Attack commands')}
         </Typography>
         <pre>
           <ItemCopy content={
@@ -250,7 +250,7 @@ const Payload: FunctionComponent<Props> = ({
           gutterBottom
           style={{ marginTop: 20 }}
         >
-          {t('Cleanup command')}
+          {t('Cleanup commands')}
         </Typography>
         {selectedPayload?.payload_cleanup_command && selectedPayload?.payload_cleanup_command.length > 0
           ? <pre><ItemCopy content={selectedPayload?.payload_cleanup_command} /></pre> : '-'}
