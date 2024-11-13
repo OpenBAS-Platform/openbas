@@ -578,8 +578,7 @@ const Injects: FunctionComponent<Props> = ({
                     edge="start"
                     checked={
                       (selectAll && !(inject.inject_id
-                        in (deSelectedElements || {})))
-                          || inject.inject_id in (selectedElements || {})
+                        in (deSelectedElements || {}))) || inject.inject_id in (selectedElements || {})
                     }
                     disableRipple
                   />
