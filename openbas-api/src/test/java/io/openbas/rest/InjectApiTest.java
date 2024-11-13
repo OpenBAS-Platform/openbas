@@ -36,13 +36,11 @@ import jakarta.annotation.Resource;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.ServletException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.List;
-
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -70,36 +68,21 @@ class InjectApiTest extends IntegrationTest {
   static Team TEAM;
   static String SCENARIO_INJECT_ID;
 
-  @Autowired
-  private MockMvc mvc;
-  @Autowired
-  private ScenarioService scenarioService;
-  @Autowired
-  private ExerciseService exerciseService;
-  @Autowired
-  private ExerciseRepository exerciseRepository;
-  @SpyBean
-  private Executor executor;
-  @Autowired
-  private ScenarioRepository scenarioRepository;
-  @Autowired
-  private InjectRepository injectRepository;
-  @Autowired
-  private DocumentRepository documentRepository;
-  @Autowired
-  private CommunicationRepository communicationRepository;
-  @Autowired
-  private InjectExpectationRepository injectExpectationRepository;
-  @Autowired
-  private TeamRepository teamRepository;
-  @Autowired
-  private InjectorContractRepository injectorContractRepository;
-  @Autowired
-  private UserRepository userRepository;
-  @Resource
-  private ObjectMapper objectMapper;
-  @MockBean
-  private JavaMailSender javaMailSender;
+  @Autowired private MockMvc mvc;
+  @Autowired private ScenarioService scenarioService;
+  @Autowired private ExerciseService exerciseService;
+  @Autowired private ExerciseRepository exerciseRepository;
+  @SpyBean private Executor executor;
+  @Autowired private ScenarioRepository scenarioRepository;
+  @Autowired private InjectRepository injectRepository;
+  @Autowired private DocumentRepository documentRepository;
+  @Autowired private CommunicationRepository communicationRepository;
+  @Autowired private InjectExpectationRepository injectExpectationRepository;
+  @Autowired private TeamRepository teamRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
+  @Autowired private UserRepository userRepository;
+  @Resource private ObjectMapper objectMapper;
+  @MockBean private JavaMailSender javaMailSender;
 
   @BeforeAll
   void beforeAll() {
@@ -486,7 +469,6 @@ class InjectApiTest extends IntegrationTest {
     assertEquals(
         "Email needs at least one user",
         JsonPath.read(response, "$.status_traces[0].execution_message"));
-
   }
 
   @DisplayName("Execute an email inject for exercise with no content")
@@ -519,7 +501,6 @@ class InjectApiTest extends IntegrationTest {
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));
-
   }
 
   // -- BULK DELETE --
