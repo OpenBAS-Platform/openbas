@@ -1,5 +1,5 @@
 import { DeleteOutlined, MarkEmailReadOutlined } from '@mui/icons-material';
-import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { IconButton, List, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -66,10 +66,9 @@ const ExerciseControlComChecks: FunctionComponent<Props> = ({
       {comchecks.length > 0 ? (
         <List style={{ paddingTop: 0 }}>
           {comchecks.map((comcheck: Comcheck) => (
-            <ListItem
+            <ListItemButton
               key={comcheck.comcheck_id}
               dense
-              button
               classes={{ root: classes.item }}
               divider
               component={Link}
@@ -123,13 +122,12 @@ const ExerciseControlComChecks: FunctionComponent<Props> = ({
                   <DeleteOutlined />
                 </IconButton>
               </ListItemSecondaryAction>
-            </ListItem>
+            </ListItemButton>
           ))}
         </List>
       ) : (
         <Empty message={t('No comcheck in this simulation.')} />
       )}
-
       <DialogDelete
         open={Boolean(openComcheckDelete)}
         handleClose={() => setOpenComcheckDelete(null)}

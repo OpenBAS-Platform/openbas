@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
-import { FunctionComponent, useEffect } from 'react';
+import { Fragment, FunctionComponent, useEffect } from 'react';
 
 import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
 import { Option } from '../../../../utils/Option';
@@ -18,18 +18,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     margin: '0 4px',
     padding: '0 4px',
   },
-  modeTooltip: {
-    margin: '0 4px',
-  },
   container: {
     gap: '4px',
     display: 'flex',
-    overflow: 'hidden',
-    maxWidth: '400px',
     alignItems: 'center',
     lineHeight: '32px',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis',
+    maxWidth: '400px',
   },
   label: {
     'cursor': 'pointer',
@@ -64,42 +58,21 @@ const FilterChipValues: FunctionComponent<Props> = ({
     }
   }, [filter]);
 
-  const toValues = (opts: Option[]) => {
-    return opts.map((o, idx) => {
-      let or = <></>;
-      if (idx > 0) {
-        or = (
-          <div className={classNames({
-            [classes.mode]: !isTooltip,
-            [classes.modeTooltip]: isTooltip,
-          })}
-          >
-            {t('OR')}
-          </div>
-        );
-      }
-      if (propertySchema?.schema_property_type.includes('instant')) {
-        return (
-          <>
-            {or}
-            <span key={o.id}>
-              {' '}
-              {fldt(o.label)}
-            </span>
-          </>
-        );
-      }
-      return (
-        <>
-          {or}
-          <span key={o.id}>
-            {' '}
-            {o.label}
-          </span>
-        </>
-      );
-    });
-  };
+  const or = (
+    <div className={classes.mode}>
+      {t('OR')}
+    </div>
+  );
+
+  const toValues = (opts: Option[]) => opts.map((o, idx) => (
+    <Fragment key={o.id}>
+      {idx > 0 && or}
+      <span>
+        {' '}
+        { propertySchema?.schema_property_type.includes('instant') ? (o.label) : o.label}
+      </span>
+    </Fragment>
+  ));
 
   const operator = filter.operator ?? 'eq';
   const isOperatorNil = ['empty', 'not_empty'].includes(operator);
@@ -119,22 +92,36 @@ const FilterChipValues: FunctionComponent<Props> = ({
       </>
     );
   }
+
+  if (isTooltip) {
+    let str = '';
+    options.forEach((o, idx) => {
+      if (idx > 0) {
+        str = `${str} ${t('OR')}`;
+      }
+      if (propertySchema?.schema_property_type.includes('instant')) {
+        str = `${str} ${fldt(o.label)}`;
+      } else {
+        str = `${str} ${o.label}`;
+      }
+    });
+    return str;
+  }
+
   return (
-    <>
-      <span className={classes.container}>
-        <strong
-          className={classNames({ [classes.label]: !!handleOpen })}
-          onClick={handleOpen}
-        >
-          {t(filter.key)}
-          {convertOperatorToIcon(t, filter.operator)}
-        </strong>
-        {' '}
-        <Box sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
-          {toValues(options)}
-        </Box>
-      </span>
-    </>
+    <span className={classes.container}>
+      <strong
+        className={classNames({ [classes.label]: !!handleOpen })}
+        onClick={handleOpen}
+      >
+        {t(filter.key)}
+        {convertOperatorToIcon(t, filter.operator)}
+      </strong>
+      {' '}
+      <Box sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
+        {toValues(options)}
+      </Box>
+    </span>
   );
 };
 

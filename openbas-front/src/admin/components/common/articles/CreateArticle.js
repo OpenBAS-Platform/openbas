@@ -1,5 +1,5 @@
 import { Add, ControlPointOutlined } from '@mui/icons-material';
-import { Dialog, DialogContent, DialogTitle, IconButton, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, IconButton, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useContext } from 'react';
 
@@ -45,12 +45,7 @@ const CreateArticle = (props) => {
   return (
     <>
       {inline === true ? (
-        <ListItem
-          button
-          divider
-          onClick={handleOpenCreate}
-          color="primary"
-        >
+        <ListItemButton divider onClick={handleOpenCreate} color="primary">
           <ListItemIcon color="primary">
             <ControlPointOutlined color="primary" />
           </ListItemIcon>
@@ -58,7 +53,7 @@ const CreateArticle = (props) => {
             primary={t('Create a new media pressure article')}
             classes={{ primary: classes.text }}
           />
-        </ListItem>
+        </ListItemButton>
       ) : (
         <IconButton
           color="primary"

@@ -1,5 +1,14 @@
 import { Add, ControlPointOutlined } from '@mui/icons-material';
-import { Dialog, DialogContent, DialogTitle, IconButton, ListItem, ListItemIcon, ListItemText, Slide } from '@mui/material';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Slide,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { forwardRef, useContext, useState } from 'react';
 
@@ -50,12 +59,7 @@ const CreateLessonsQuestion = (props) => {
   return (
     <div>
       {inline === true ? (
-        <ListItem
-          button
-          divider
-          onClick={handleOpen}
-          color="primary"
-        >
+        <ListItemButton divider onClick={handleOpen} color="primary">
           <ListItemIcon color="primary">
             <ControlPointOutlined color="primary" />
           </ListItemIcon>
@@ -63,7 +67,7 @@ const CreateLessonsQuestion = (props) => {
             primary={t('Create a new lessons learned question')}
             classes={{ primary: classes.text }}
           />
-        </ListItem>
+        </ListItemButton>
       ) : (
         <IconButton
           classes={{ root: classes.createButton }}

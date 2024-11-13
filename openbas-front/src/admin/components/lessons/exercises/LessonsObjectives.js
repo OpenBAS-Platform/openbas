@@ -1,5 +1,16 @@
 import { FlagOutlined } from '@mui/icons-material';
-import { Box, Grid, LinearProgress, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
+import {
+  Box,
+  Grid,
+  LinearProgress,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+  Paper,
+  Typography,
+} from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
 import Chart from 'react-apexcharts';
@@ -73,10 +84,9 @@ const LessonsObjectives = ({
           {sortedObjectives.length > 0 ? (
             <List style={{ padding: 0 }}>
               {sortedObjectives.map(objective => (
-                <ListItem
+                <ListItemButton
                   key={objective.objective_id}
                   divider
-                  button
                   onClick={() => setSelectedObjective
                     && setSelectedObjective(objective.objective_id)}
                 >
@@ -117,7 +127,7 @@ const LessonsObjectives = ({
                       />
                     </ListItemSecondaryAction>
                   )}
-                </ListItem>
+                </ListItemButton>
               ))}
             </List>
           ) : (

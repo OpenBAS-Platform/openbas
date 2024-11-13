@@ -1,5 +1,5 @@
 import { DescriptionOutlined, RowingOutlined } from '@mui/icons-material';
-import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
@@ -147,7 +147,7 @@ const Documents = () => {
                 fontSize: 12,
               }}
             >
-              &nbsp;
+            &nbsp;
             </span>
           </ListItemIcon>
           <ListItemText
@@ -165,119 +165,123 @@ const Documents = () => {
         {documents.map(document => (
           <ListItem
             key={document.document_id}
-            classes={{ root: classes.item }}
             divider={true}
-            button={true}
-            component="a"
-            href={`/api/documents/${document.document_id}/file`}
-          >
-            <ListItemIcon>
-              <DescriptionOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={(
-                <div className={classes.bodyItems}>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.document_name}
-                  >
-                    {document.document_name}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.document_description}
-                  >
-                    {document.document_description}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.document_exercises}
-                  >
-                    {R.take(3, document.document_exercises).map((e, i) => {
-                      const exercise = exercisesMap[e];
-                      if (exercise === undefined) return <div key={i} />;
-                      return (
-                        <Tooltip
-                          key={i}
-                          title={exercise.exercise_name}
-                        >
-                          <Chip
-                            icon={<RowingOutlined style={{ fontSize: 12 }} />}
-                            classes={{ root: classes.exercise }}
-                            variant="outlined"
-                            label={exercise.exercise_name}
-                            clickable={true}
-                            onClick={
-                              (event) => {
-                                // prevent parent link from triggering
-                                event.stopPropagation();
-                                event.preventDefault();
-                                navigate(`/admin/exercises/${exercise.exercise_id}`);
-                              }
-                            }
-                          />
-                        </Tooltip>
-                      );
-                    })}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.document_scenarios}
-                  >
-                    {R.take(3, document.document_scenarios).map((e, i) => {
-                      const scenario = scenariosMap[e];
-                      if (scenario === undefined) return <div key={i} />;
-                      return (
-                        <Tooltip
-                          key={i}
-                          title={scenario.scenario_name}
-                        >
-                          <Chip
-                            icon={<RowingOutlined style={{ fontSize: 12 }} />}
-                            classes={{ root: classes.scenario }}
-                            variant="outlined"
-                            label={scenario.scenario_name}
-                            clickable={true}
-                            onClick={
-                              (event) => {
-                                // prevent parent link from triggering
-                                event.stopPropagation();
-                                event.preventDefault();
-                                navigate(`/admin/scenarios/${scenario.scenario_id}`);
-                              }
-                            }
-                          />
-                        </Tooltip>
-                      );
-                    })}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.document_type}
-                  >
-                    <DocumentType
-                      type={document.document_type}
-                      variant="list"
-                    />
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.document_tags}
-                  >
-                    <ItemTags variant="list" tags={document.document_tags} />
-                  </div>
-                </div>
-              )}
-            />
-            <ListItemSecondaryAction>
+            secondaryAction={(
               <DocumentPopover
                 document={document}
                 disabled={!userAdmin}
                 onUpdate={result => setDocuments(documents.map(d => (d.document_id !== result.document_id ? d : result)))}
                 onDelete={result => setDocuments(documents.filter(d => (d.document_id !== result)))}
                 scenariosAndExercisesFetched
+                inList
               />
-            </ListItemSecondaryAction>
+            )}
+            disablePadding
+          >
+            <ListItemButton
+              classes={{ root: classes.item }}
+              component="a"
+              href={`/api/documents/${document.document_id}/file`}
+            >
+              <ListItemIcon>
+                <DescriptionOutlined color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={(
+                  <div className={classes.bodyItems}>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.document_name}
+                    >
+                      {document.document_name}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.document_description}
+                    >
+                      {document.document_description}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.document_exercises}
+                    >
+                      {R.take(3, document.document_exercises).map((e, i) => {
+                        const exercise = exercisesMap[e];
+                        if (exercise === undefined) return <div key={i} />;
+                        return (
+                          <Tooltip
+                            key={i}
+                            title={exercise.exercise_name}
+                          >
+                            <Chip
+                              icon={<RowingOutlined style={{ fontSize: 12 }} />}
+                              classes={{ root: classes.exercise }}
+                              variant="outlined"
+                              label={exercise.exercise_name}
+                              clickable={true}
+                              onClick={
+                                (event) => {
+                                  // prevent parent link from triggering
+                                  event.stopPropagation();
+                                  event.preventDefault();
+                                  navigate(`/admin/exercises/${exercise.exercise_id}`);
+                                }
+                              }
+                            />
+                          </Tooltip>
+                        );
+                      })}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.document_scenarios}
+                    >
+                      {R.take(3, document.document_scenarios).map((e, i) => {
+                        const scenario = scenariosMap[e];
+                        if (scenario === undefined) return <div key={i} />;
+                        return (
+                          <Tooltip
+                            key={i}
+                            title={scenario.scenario_name}
+                          >
+                            <Chip
+                              icon={<RowingOutlined style={{ fontSize: 12 }} />}
+                              classes={{ root: classes.scenario }}
+                              variant="outlined"
+                              label={scenario.scenario_name}
+                              clickable={true}
+                              onClick={
+                                (event) => {
+                                  // prevent parent link from triggering
+                                  event.stopPropagation();
+                                  event.preventDefault();
+                                  navigate(`/admin/scenarios/${scenario.scenario_id}`);
+                                }
+                              }
+                            />
+                          </Tooltip>
+                        );
+                      })}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.document_type}
+                    >
+                      <DocumentType
+                        type={document.document_type}
+                        variant="list"
+                      />
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.document_tags}
+                    >
+                      <ItemTags variant="list" tags={document.document_tags} />
+                    </div>
+                  </div>
+                )}
+              />
+            </ListItemButton>
           </ListItem>
         ))}
       </List>

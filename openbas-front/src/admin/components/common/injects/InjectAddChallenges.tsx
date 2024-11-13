@@ -1,5 +1,18 @@
 import { ControlPointOutlined, EmojiEventsOutlined } from '@mui/icons-material';
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import {
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { FunctionComponent, useContext, useState } from 'react';
@@ -131,9 +144,8 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
   )(challenges);
   return (
     <div>
-      <ListItem
+      <ListItemButton
         classes={{ root: classes.item }}
-        button
         divider
         onClick={handleOpen}
         color="primary"
@@ -146,7 +158,7 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
           primary={t('Add challenges')}
           classes={{ primary: classes.text }}
         />
-      </ListItem>
+      </ListItemButton>
       <Dialog
         open={open}
         TransitionComponent={Transition}
@@ -186,22 +198,23 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
                   const disabled = challengesIds.includes(challenge.challenge_id)
                     || injectChallengesIds.includes(challenge.challenge_id);
                   return (
-                    <ListItem
-                      key={challenge.challenge_id}
-                      disabled={disabled}
-                      button
-                      divider
-                      dense
-                      onClick={() => addChallenge(challenge.challenge_id)}
-                    >
-                      <ListItemIcon>
-                        <EmojiEventsOutlined />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={challenge.challenge_name}
-                        secondary={challenge.challenge_category}
-                      />
-                    </ListItem>
+                    (
+                      <ListItemButton
+                        key={challenge.challenge_id}
+                        disabled={disabled}
+                        divider
+                        dense
+                        onClick={() => addChallenge(challenge.challenge_id)}
+                      >
+                        <ListItemIcon>
+                          <EmojiEventsOutlined />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={challenge.challenge_name}
+                          secondary={challenge.challenge_category}
+                        />
+                      </ListItemButton>
+                    )
                   );
                 })}
                 <CreateChallenge

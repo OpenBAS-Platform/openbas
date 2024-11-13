@@ -151,12 +151,14 @@ export default [
         'error', {
           patterns: [
             {
-              group: ['@mui/material/*', '!@mui/material/locale', '!@mui/material/styles', '!@mui/material/colors', '!@mui/material/transitions'],
-              message: 'Please use named import from @mui/material instead.',
-            },
-            {
-              group: ['@mui/styles/*'],
-              message: 'Please use named import from @mui/styles instead.',
+              group: [
+                '@mui/material/*', '!@mui/material/locale', '!@mui/material/styles', '!@mui/material/colors', '!@mui/material/transitions',
+                '@mui/styles/*',
+                '@mui/x-date-pickers/*', '!@mui/x-date-pickers/AdapterDateFnsV3',
+                '@mui/icons-material/*',
+                '@mui/lab/*',
+              ],
+              message: 'Please use named import from @mui/* instead.',
             },
           ],
         },

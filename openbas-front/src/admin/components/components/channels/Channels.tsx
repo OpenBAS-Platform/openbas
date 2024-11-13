@@ -1,5 +1,5 @@
 import { ChevronRightOutlined } from '@mui/icons-material';
-import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
@@ -138,7 +138,7 @@ const Channels = () => {
             <span
               style={{ padding: '0 8px 0 8px', fontWeight: 700, fontSize: 12 }}
             >
-              &nbsp;
+            &nbsp;
             </span>
           </ListItemIcon>
           <ListItemText
@@ -168,12 +168,11 @@ const Channels = () => {
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
         {sortedChannels.map(channel => (
-          <ListItem
+          <ListItemButton
             key={channel.channel_id}
             classes={{ root: classes.item }}
             divider
             component={Link}
-            button
             to={`/admin/components/channels/${channel.channel_id}`}
           >
             <ListItemIcon>
@@ -209,7 +208,7 @@ const Channels = () => {
             <ListItemSecondaryAction>
               <ChevronRightOutlined />
             </ListItemSecondaryAction>
-          </ListItem>
+          </ListItemButton>
         ))}
       </List>
       {userAdmin && <CreateChannel />}

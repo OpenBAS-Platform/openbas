@@ -1,5 +1,17 @@
 import { ControlPointOutlined, DescriptionOutlined } from '@mui/icons-material';
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import {
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useContext, useState } from 'react';
@@ -145,120 +157,122 @@ const ArticleAddDocuments = (props) => {
   const { permissions } = useContext(PermissionsContext);
 
   return (
-    <div>
-      <ListItem
-        classes={{ root: classes.item }}
-        button
-        divider
-        onClick={handleOpen}
-        color="primary"
-        disabled={!permissions.canWrite}
-      >
-        <ListItemIcon color="primary">
-          <ControlPointOutlined color="primary" />
-        </ListItemIcon>
-        <ListItemText
-          primary={t('Add documents')}
-          classes={{ primary: classes.text }}
-        />
-      </ListItem>
-      <Dialog
-        open={open}
-        TransitionComponent={Transition}
-        onClose={handleClose}
-        fullWidth
-        maxWidth="lg"
-        PaperProps={{
-          elevation: 1,
-          sx: {
-            minHeight: 580,
-            maxHeight: 580,
-          },
-        }}
-      >
-        <DialogTitle>{t('Add documents in this media pressure article')}</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={3} style={{ marginTop: -15 }}>
-            <Grid item xs={8}>
-              <Grid container spacing={3}>
-                <Grid item xs={6}>
-                  <SearchFilter
-                    onChange={handleSearchDocuments}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TagsFilter
-                    onAddTag={handleAddTag}
-                    onClearTag={handleClearTag}
-                    currentTags={tags}
-                    fullWidth
-                  />
-                </Grid>
-              </Grid>
-              <List>
-                {finalDocuments.map((document) => {
-                  const disabled = documentsIds.includes(document.document_id)
-                    || articleDocumentsIds.includes(document.document_id);
-                  return (
-                    <ListItem
-                      key={document.document_id}
-                      disabled={disabled}
-                      button
-                      divider
-                      dense
-                      onClick={() => addDocument(document.document_id)}
-                    >
-                      <ListItemIcon>
-                        <DescriptionOutlined />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={document.document_name}
-                        secondary={document.document_description}
-                      />
-                      <ItemTags
-                        variant="list"
-                        tags={document.document_tags}
-                      />
-                    </ListItem>
-                  );
-                })}
-                <CreateDocument
-                  inline
-                  onCreate={onCreate}
-                  filters={filters}
-                />
-              </List>
-            </Grid>
-            <Grid item xs={4}>
-              <Box className={classes.box}>
-                {documentsIds.map((documentId) => {
-                  const document = documents[documentId];
-                  return (
-                    <Chip
-                      key={documentId}
-                      onDelete={() => removeDocument(documentId)}
-                      label={truncate(document.document_name, 22)}
-                      icon={<DescriptionOutlined />}
-                      classes={{ root: classes.chip }}
+    (
+      <div>
+        <ListItemButton
+          classes={{ root: classes.item }}
+          divider
+          onClick={handleOpen}
+          color="primary"
+          disabled={!permissions.canWrite}
+        >
+          <ListItemIcon color="primary">
+            <ControlPointOutlined color="primary" />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('Add documents')}
+            classes={{ primary: classes.text }}
+          />
+        </ListItemButton>
+        <Dialog
+          open={open}
+          TransitionComponent={Transition}
+          onClose={handleClose}
+          fullWidth
+          maxWidth="lg"
+          PaperProps={{
+            elevation: 1,
+            sx: {
+              minHeight: 580,
+              maxHeight: 580,
+            },
+          }}
+        >
+          <DialogTitle>{t('Add documents in this media pressure article')}</DialogTitle>
+          <DialogContent>
+            <Grid container spacing={3} style={{ marginTop: -15 }}>
+              <Grid item xs={8}>
+                <Grid container spacing={3}>
+                  <Grid item xs={6}>
+                    <SearchFilter
+                      onChange={handleSearchDocuments}
+                      fullWidth
                     />
-                  );
-                })}
-              </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TagsFilter
+                      onAddTag={handleAddTag}
+                      onClearTag={handleClearTag}
+                      currentTags={tags}
+                      fullWidth
+                    />
+                  </Grid>
+                </Grid>
+                <List>
+                  {finalDocuments.map((document) => {
+                    const disabled = documentsIds.includes(document.document_id)
+                      || articleDocumentsIds.includes(document.document_id);
+                    return (
+                      (
+                        <ListItemButton
+                          key={document.document_id}
+                          disabled={disabled}
+                          divider
+                          dense
+                          onClick={() => addDocument(document.document_id)}
+                        >
+                          <ListItemIcon>
+                            <DescriptionOutlined />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={document.document_name}
+                            secondary={document.document_description}
+                          />
+                          <ItemTags
+                            variant="list"
+                            tags={document.document_tags}
+                          />
+                        </ListItemButton>
+                      )
+                    );
+                  })}
+                  <CreateDocument
+                    inline
+                    onCreate={onCreate}
+                    filters={filters}
+                  />
+                </List>
+              </Grid>
+              <Grid item xs={4}>
+                <Box className={classes.box}>
+                  {documentsIds.map((documentId) => {
+                    const document = documents[documentId];
+                    return (
+                      <Chip
+                        key={documentId}
+                        onDelete={() => removeDocument(documentId)}
+                        label={truncate(document.document_name, 22)}
+                        icon={<DescriptionOutlined />}
+                        classes={{ root: classes.chip }}
+                      />
+                    );
+                  })}
+                </Box>
+              </Grid>
             </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>{t('Cancel')}</Button>
-          <Button
-            color="secondary"
-            onClick={submitAddDocuments}
-          >
-            {t('Add')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>{t('Cancel')}</Button>
+            <Button
+              color="secondary"
+              onClick={submitAddDocuments}
+            >
+              {t('Add')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    )
   );
 };
 

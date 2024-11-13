@@ -1,5 +1,17 @@
 import { ControlPointOutlined } from '@mui/icons-material';
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import {
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { FunctionComponent, useContext, useState } from 'react';
@@ -116,9 +128,8 @@ const InjectAddArticles: FunctionComponent<Props> = ({
   )(fullArticles);
   return (
     <div>
-      <ListItem
+      <ListItemButton
         classes={{ root: classes.item }}
-        button
         divider
         onClick={handleOpen}
         color="primary"
@@ -131,7 +142,7 @@ const InjectAddArticles: FunctionComponent<Props> = ({
           primary={t('Add media pressure')}
           classes={{ primary: classes.text }}
         />
-      </ListItem>
+      </ListItemButton>
       <Dialog
         open={open}
         TransitionComponent={Transition}
@@ -163,10 +174,9 @@ const InjectAddArticles: FunctionComponent<Props> = ({
                   const disabled = articleIds.includes(article.article_id)
                     || injectArticlesIds.includes(article.article_id);
                   return (
-                    <ListItem
+                    <ListItemButton
                       key={article.article_id}
                       disabled={disabled}
-                      button
                       divider
                       dense
                       onClick={() => addArticle(article.article_id)}
@@ -181,7 +191,7 @@ const InjectAddArticles: FunctionComponent<Props> = ({
                         primary={article.article_name}
                         secondary={article.article_author}
                       />
-                    </ListItem>
+                    </ListItemButton>
                   );
                 })}
                 <CreateArticle

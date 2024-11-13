@@ -1,5 +1,5 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined } from '@mui/icons-material';
-import { Box, Button, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
+import { Box, Button, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
@@ -185,6 +185,7 @@ const ArticleForm = ({
 
   // Rendering
   return (
+
     <Form
       keepDirtyOnReinitialize
       initialValues={formData}
@@ -198,6 +199,7 @@ const ArticleForm = ({
     >
       {({ handleSubmit, submitting, values }) => {
         return (
+
           <form id="articleForm" onSubmit={handleSubmit}>
             <Typography variant="h2" style={{ marginTop: 0 }}>
               {t('Information')}
@@ -303,11 +305,10 @@ const ArticleForm = ({
               {documents.map((documentId) => {
                 const document = documentsMap[documentId] || {};
                 return (
-                  <ListItem
+                  <ListItemButton
                     key={document.document_id}
                     classes={{ root: classes.item }}
                     divider
-                    button
                     component="a"
                     href={`/api/documents/${document.document_id}/file`}
                   >
@@ -352,7 +353,7 @@ const ArticleForm = ({
                         onRemoveDocument={handleRemoveDocument}
                       />
                     </ListItemSecondaryAction>
-                  </ListItem>
+                  </ListItemButton>
                 );
               })}
               {values.article_channel?.type && (

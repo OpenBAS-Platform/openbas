@@ -1,5 +1,5 @@
 import { CheckCircleOutlined, GroupsOutlined } from '@mui/icons-material';
-import { Drawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, useContext, useState } from 'react';
 import * as React from 'react';
@@ -213,11 +213,10 @@ const ContextualTeams: React.FC<Props> = ({ teams }) => {
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
         {sortedTeams.map((team: TeamStoreExtended) => (
-          <ListItem
+          <ListItemButton
             key={team.team_id}
             classes={{ root: classes.item }}
             divider={true}
-            button={true}
             onClick={() => setSelectedTeam(team.team_id)}
           >
             <ListItemIcon>
@@ -269,7 +268,7 @@ const ContextualTeams: React.FC<Props> = ({ teams }) => {
                 openEditOnInit={team.team_id === searchId}
               />
             </ListItemSecondaryAction>
-          </ListItem>
+          </ListItemButton>
         ))}
       </List>
       <Drawer

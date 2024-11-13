@@ -1,5 +1,14 @@
 import { Add, ControlPointOutlined } from '@mui/icons-material';
-import { Dialog, DialogContent, DialogTitle, IconButton, ListItem, ListItemIcon, ListItemText, Theme } from '@mui/material';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Theme,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useContext, useState } from 'react';
 import * as React from 'react';
@@ -46,12 +55,7 @@ const CreateVariable: React.FC<Props> = ({
   return (
     <>
       {inline ? (
-        <ListItem
-          button
-          divider
-          onClick={() => setOpen(true)}
-          color="primary"
-        >
+        <ListItemButton divider onClick={() => setOpen(true)} color="primary">
           <ListItemIcon color="primary">
             <ControlPointOutlined color="primary" />
           </ListItemIcon>
@@ -59,7 +63,7 @@ const CreateVariable: React.FC<Props> = ({
             primary={t('Create a new variable')}
             classes={{ primary: classes.text }}
           />
-        </ListItem>
+        </ListItemButton>
       ) : (
         <IconButton
           color="primary"

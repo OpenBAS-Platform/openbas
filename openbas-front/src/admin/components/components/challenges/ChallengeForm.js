@@ -1,5 +1,5 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, ControlPointOutlined, DeleteOutlined } from '@mui/icons-material';
-import { Button, Grid, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Typography } from '@mui/material';
+import { Button, Grid, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import arrayMutators from 'final-form-arrays';
 import { useState } from 'react';
@@ -254,11 +254,10 @@ const ChallengeForm = (props) => {
             {documents.map((documentId) => {
               const document = documentsMap[documentId] || {};
               return (
-                <ListItem
+                <ListItemButton
                   key={document.document_id}
                   classes={{ root: classes.item }}
                   divider={true}
-                  button={true}
                   component="a"
                   href={`/api/documents/${document.document_id}/file`}
                 >
@@ -302,7 +301,7 @@ const ChallengeForm = (props) => {
                       onRemoveDocument={handleRemoveDocument}
                     />
                   </ListItemSecondaryAction>
-                </ListItem>
+                </ListItemButton>
               );
             })}
             <MultipleFileLoader
