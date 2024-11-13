@@ -1412,6 +1412,7 @@ const i18n = {
       'Add condition': 'Ajouter une condition',
       'is': 'est',
       'undefined': 'non défini',
+      'Mail configuration': 'Configuration email',
     },
     zh: {
       'Email address': 'email地址',
@@ -1439,6 +1440,7 @@ const i18n = {
       'Settings': '设置',
       'Profile': '配置',
       'Logout': '登出',
+      'Mail configuration': '电子邮件配置',
       'Firstname': '名',
       'Lastname': '姓',
       'Organization': '组织',
