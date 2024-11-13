@@ -1,10 +1,7 @@
 package io.openbas.inject_expectation;
 
-import static io.openbas.database.model.InjectStatusExecution.EXECUTION_TYPE_COMMAND;
-
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectationResult;
-import io.openbas.database.model.InjectStatusExecution;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -41,12 +38,5 @@ public class InjectExpectationUtils {
               .build();
       expectation.getResults().add(expectationResult);
     }
-  }
-
-  public static Optional<String> getCommandLine(@NotNull final InjectExpectation expectation) {
-    return expectation.getInject().getStatus().orElseThrow().getTraces().stream()
-        .filter(trace -> trace.getCategory().equals(EXECUTION_TYPE_COMMAND))
-        .findFirst()
-        .map(InjectStatusExecution::getMessage);
   }
 }

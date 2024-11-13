@@ -28,7 +28,7 @@ public class InjectStatusExecution {
   private String category = "standard"; // standard / command_line / ??
 
   @JsonProperty("execution_status")
-  private ExecutionStatus status;
+  private ExecutionTraceStatus status;
 
   @JsonProperty("execution_context_identifiers")
   private List<String> identifiers = new ArrayList<>();
@@ -38,7 +38,7 @@ public class InjectStatusExecution {
   }
 
   public InjectStatusExecution(
-      ExecutionStatus status, List<String> identifiers, String message, String category) {
+      ExecutionTraceStatus status, List<String> identifiers, String message, String category) {
     this.status = status;
     this.identifiers = identifiers;
     this.message = message;
@@ -48,36 +48,40 @@ public class InjectStatusExecution {
 
   public static InjectStatusExecution traceInfo(String message) {
     return new InjectStatusExecution(
-        ExecutionStatus.INFO, List.of(), message, EXECUTION_TYPE_STANDARD);
+        ExecutionTraceStatus.INFO, List.of(), message, EXECUTION_TYPE_STANDARD);
   }
 
   public static InjectStatusExecution traceInfo(String category, String message) {
-    return new InjectStatusExecution(ExecutionStatus.INFO, List.of(), message, category);
+    return new InjectStatusExecution(ExecutionTraceStatus.INFO, List.of(), message, category);
   }
 
   public static InjectStatusExecution traceInfo(String message, List<String> identifiers) {
     return new InjectStatusExecution(
-        ExecutionStatus.INFO, identifiers, message, EXECUTION_TYPE_STANDARD);
+        ExecutionTraceStatus.INFO, identifiers, message, EXECUTION_TYPE_STANDARD);
   }
 
   public static InjectStatusExecution traceSuccess(String message) {
     return new InjectStatusExecution(
-        ExecutionStatus.SUCCESS, List.of(), message, EXECUTION_TYPE_STANDARD);
+        ExecutionTraceStatus.SUCCESS, List.of(), message, EXECUTION_TYPE_STANDARD);
   }
 
   public static InjectStatusExecution traceSuccess(String message, List<String> userIds) {
     return new InjectStatusExecution(
-        ExecutionStatus.SUCCESS, userIds, message, EXECUTION_TYPE_STANDARD);
+        ExecutionTraceStatus.SUCCESS, userIds, message, EXECUTION_TYPE_STANDARD);
   }
 
   public static InjectStatusExecution traceError(String message) {
     return new InjectStatusExecution(
-        ExecutionStatus.ERROR, List.of(), message, EXECUTION_TYPE_STANDARD);
+        ExecutionTraceStatus.ERROR, List.of(), message, EXECUTION_TYPE_STANDARD);
+  }
+
+  public static InjectStatusExecution traceError(ExecutionTraceStatus status, String message) {
+    return new InjectStatusExecution(status, List.of(), message, EXECUTION_TYPE_STANDARD);
   }
 
   public static InjectStatusExecution traceMaybePrevented(String message) {
     return new InjectStatusExecution(
-        ExecutionStatus.MAYBE_PREVENTED, List.of(), message, EXECUTION_TYPE_STANDARD);
+        ExecutionTraceStatus.MAYBE_PREVENTED, List.of(), message, EXECUTION_TYPE_STANDARD);
   }
 
   @Override

@@ -114,7 +114,7 @@ public class InjectApi extends RestBehavior {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
 
     InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
-    ExecutionStatus executionStatus = ExecutionStatus.valueOf(input.getStatus());
+    ExecutionTraceStatus executionStatus = ExecutionTraceStatus.valueOf(input.getStatus());
     InjectStatusExecution execution = new InjectStatusExecution();
     Instant trackingEndDate = now();
     execution.setTime(trackingEndDate);
@@ -122,7 +122,7 @@ public class InjectApi extends RestBehavior {
     execution.setMessage(input.getMessage());
     execution.setIdentifiers(input.getIdentifiers());
     injectStatus.getTraces().add(execution);
-    if (executionStatus.equals(ExecutionStatus.SUCCESS)) {
+    if (executionStatus.equals(ExecutionTraceStatus.SUCCESS)) {
       injectStatus.setTrackingTotalSuccess(injectStatus.getTrackingTotalSuccess() + 1);
     } else {
       injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalSuccess() + 1);
@@ -139,13 +139,14 @@ public class InjectApi extends RestBehavior {
       long errorCounter = 0;
       long maybePreventedCounter = 0;
       for (InjectStatusExecution injectStatusExecution : injectStatus.getTraces()) {
-        ExecutionStatus status = injectStatusExecution.getStatus();
-        if (status == ExecutionStatus.SUCCESS || status == ExecutionStatus.WARNING) {
+        ExecutionTraceStatus status = injectStatusExecution.getStatus();
+        if (status == ExecutionTraceStatus.SUCCESS || status == ExecutionTraceStatus.WARNING) {
           successCounter++;
-        } else if (status == ExecutionStatus.ERROR || status == ExecutionStatus.COMMAND_NOT_FOUND) {
+        } else if (status == ExecutionTraceStatus.ERROR
+            || status == ExecutionTraceStatus.COMMAND_NOT_FOUND) {
           errorCounter++;
-        } else if (status == ExecutionStatus.MAYBE_PREVENTED
-            || status == ExecutionStatus.COMMAND_CANNOT_BE_EXECUTED) {
+        } else if (status == ExecutionTraceStatus.MAYBE_PREVENTED
+            || status == ExecutionTraceStatus.COMMAND_CANNOT_BE_EXECUTED) {
           maybePreventedCounter++;
         }
       }

@@ -90,6 +90,8 @@ public class ExecutionExecutorService {
     Executor executor = asset.getExecutor();
     if (executor == null) {
       log.log(Level.SEVERE, "Cannot find the executor for the asset " + asset.getName());
+    } else if (!asset.getActive()) {
+      throw new RuntimeException("Asset error: " + asset.getName() + " is inactive");
     } else {
       switch (executor.getType()) {
         case "openbas_caldera" -> {

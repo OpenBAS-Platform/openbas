@@ -11,6 +11,7 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionExecutorService;
 import io.openbas.helper.InjectHelper;
 import io.openbas.service.AtomicTestingService;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -213,30 +214,11 @@ public class InjectsExecutionJob implements Job {
             injectorContract -> {
               if (!inject.isReady()) {
                 // Status
-                if (inject.getStatus().isEmpty()) {
-                  InjectStatus status = new InjectStatus();
-                  status
-                      .getTraces()
-                      .add(
-                          InjectStatusExecution.traceError(
-                              "The inject is not ready to be executed (missing mandatory fields)"));
-                  status.setName(ExecutionStatus.ERROR);
-                  status.setTrackingSentDate(Instant.now());
-                  status.setInject(inject);
-                  status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
-                  injectStatusRepository.save(status);
-                } else {
-                  InjectStatus status = inject.getStatus().get();
-                  status
-                      .getTraces()
-                      .add(
-                          InjectStatusExecution.traceError(
-                              "The inject is not ready to be executed (missing mandatory fields)"));
-                  status.setName(ExecutionStatus.ERROR);
-                  status.setTrackingSentDate(Instant.now());
-                  status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
-                  injectStatusRepository.save(status);
-                }
+                initializeInjectStatus(
+                    inject,
+                    ExecutionStatus.ERROR,
+                    InjectStatusExecution.traceError(
+                        "The inject is not ready to be executed (missing mandatory fields)"));
                 return;
               }
 
@@ -248,27 +230,24 @@ public class InjectsExecutionJob implements Job {
               // Executor logics
               ExecutableInject newExecutableInject = executableInject;
               if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
+                // Status
+                InjectStatus statusSaved =
+                    initializeInjectStatus(inject, ExecutionStatus.EXECUTING, null);
                 try {
-                  // Status
-                  if (inject.getStatus().isEmpty()) {
-                    InjectStatus status = new InjectStatus();
-                    status.setName(ExecutionStatus.EXECUTING);
-                    status.setTrackingSentDate(Instant.now());
-                    status.setInject(inject);
-                    status.setCommandsLines(
-                        atomicTestingService.getCommandsLinesFromInject(inject));
-                    injectStatusRepository.save(status);
-                  } else {
-                    InjectStatus status = inject.getStatus().get();
-                    status.setName(ExecutionStatus.EXECUTING);
-                    status.setTrackingSentDate(Instant.now());
-                    status.setCommandsLines(
-                        atomicTestingService.getCommandsLinesFromInject(inject));
-                    injectStatusRepository.save(status);
-                  }
                   newExecutableInject =
                       this.executionExecutorService.launchExecutorContext(executableInject, inject);
-                } catch (InterruptedException e) {
+                } catch (Exception e) {
+                  ExecutionTraceStatus traceStatus =
+                      e.getMessage().startsWith("Asset error")
+                          ? ExecutionTraceStatus.ASSET_INACTIVE
+                          : ExecutionTraceStatus.ERROR;
+
+                  statusSaved
+                      .getTraces()
+                      .add(InjectStatusExecution.traceError(traceStatus, e.getMessage()));
+
+                  statusSaved.setName(ExecutionStatus.ERROR);
+                  injectStatusRepository.save(statusSaved);
                   throw new RuntimeException(e);
                 }
               }
@@ -278,26 +257,32 @@ public class InjectsExecutionJob implements Job {
                 executeInternal(newExecutableInject);
               }
             },
-            () -> setInjectStatusWhenNoInjectorContractExists(inject));
+            () ->
+                initializeInjectStatus(
+                    inject,
+                    ExecutionStatus.ERROR,
+                    InjectStatusExecution.traceError("Inject does not have a contract")));
   }
 
-  private void setInjectStatusWhenNoInjectorContractExists(Inject inject) {
-    if (inject.getStatus().isEmpty()) {
-      InjectStatus status = new InjectStatus();
-      status.getTraces().add(InjectStatusExecution.traceError("Inject does not have a contract"));
-      status.setName(ExecutionStatus.ERROR);
-      status.setTrackingSentDate(Instant.now());
-      status.setInject(inject);
-      status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
-      injectStatusRepository.save(status);
-    } else {
-      InjectStatus status = inject.getStatus().get();
-      status.getTraces().add(InjectStatusExecution.traceError("Inject does not have a contract"));
-      status.setName(ExecutionStatus.ERROR);
-      status.setTrackingSentDate(Instant.now());
-      status.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
-      injectStatusRepository.save(status);
+  private InjectStatus initializeInjectStatus(
+      Inject inject, ExecutionStatus status, @Nullable InjectStatusExecution trace) {
+    InjectStatus injectStatus =
+        inject
+            .getStatus()
+            .orElseGet(
+                () -> {
+                  InjectStatus newStatus = new InjectStatus();
+                  newStatus.setInject(inject);
+                  return newStatus;
+                });
+
+    if (trace != null) {
+      injectStatus.getTraces().add(trace);
     }
+    injectStatus.setName(status);
+    injectStatus.setTrackingSentDate(Instant.now());
+    injectStatus.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
+    return injectStatusRepository.save(injectStatus);
   }
 
   /**
