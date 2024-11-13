@@ -94,6 +94,15 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
 };
 
+const chipSx = {
+  fontSize: 12,
+  height: 20,
+  float: 'left',
+  textTransform: 'uppercase',
+  borderRadius: 1,
+  width: 120,
+};
+
 const Payloads = () => {
   // Standard hooks
   const classes = useStyles();
@@ -167,7 +176,7 @@ const Payloads = () => {
       value: (payload: PayloadStore) => (
         <Chip
           variant="outlined"
-          classes={{ root: classes.chipInList2 }}
+          sx={chipSx}
           color="primary"
           label={t(payload.payload_source ?? 'MANUAL')}
         />
