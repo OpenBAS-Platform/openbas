@@ -443,7 +443,7 @@ export interface Communication {
 
 export interface Condition {
   key: string;
-  operator: "==";
+  operator: "eq";
   value?: boolean;
 }
 
@@ -733,18 +733,6 @@ export interface Exercise {
   listened?: boolean;
 }
 
-export interface ExerciseCreateInput {
-  exercise_category?: string;
-  exercise_description?: string;
-  exercise_main_focus?: string;
-  exercise_name: string;
-  exercise_severity?: string;
-  /** @format date-time */
-  exercise_start_date?: string | null;
-  exercise_subtitle?: string;
-  exercise_tags?: string[];
-}
-
 export interface ExerciseDetails {
   /** @format int64 */
   exercise_all_users_number?: number;
@@ -810,6 +798,22 @@ export interface ExerciseDetails {
   exercise_users_number?: number;
 }
 
+export interface ExerciseInput {
+  exercise_category?: string;
+  exercise_description?: string;
+  exercise_mail_from?: string;
+  exercise_mails_reply_to?: string[];
+  exercise_main_focus?: string;
+  exercise_message_footer?: string;
+  exercise_message_header?: string;
+  exercise_name: string;
+  exercise_severity?: string;
+  /** @format date-time */
+  exercise_start_date?: string | null;
+  exercise_subtitle?: string;
+  exercise_tags?: string[];
+}
+
 export interface ExerciseSimple {
   exercise_category?: string;
   exercise_global_score: ExpectationResultsByType[];
@@ -834,20 +838,6 @@ export interface ExerciseTeamUser {
   exercise_id?: Exercise;
   team_id?: Team;
   user_id?: User;
-}
-
-export interface ExerciseUpdateInput {
-  exercise_category?: string;
-  exercise_description?: string;
-  exercise_mail_from?: string;
-  exercise_mails_reply_to?: string[];
-  exercise_main_focus?: string;
-  exercise_message_footer?: string;
-  exercise_message_header?: string;
-  exercise_name: string;
-  exercise_severity?: string;
-  exercise_subtitle?: string;
-  exercise_tags?: string[];
 }
 
 export interface ExerciseUpdateLogoInput {
@@ -1098,7 +1088,7 @@ export interface InjectDependency {
 
 export interface InjectDependencyCondition {
   conditions?: Condition[];
-  mode: "&&" | "||";
+  mode: "and" | "or";
 }
 
 export interface InjectDependencyId {
@@ -2533,6 +2523,8 @@ export interface PlatformSettings {
   platform_saml2_providers?: OAuthProvider[];
   auth_local_enable?: boolean;
   auth_openid_enable?: boolean;
+  default_mailer?: string;
+  default_reply_to?: string;
   disabled_dev_features?: string[];
   executor_caldera_enable?: boolean;
   executor_caldera_public_url?: string;
