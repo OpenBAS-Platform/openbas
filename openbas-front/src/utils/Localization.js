@@ -2366,7 +2366,7 @@ const i18n = {
       'Targets response': '目标响应',
       'Update the atomic testing': '更新自动测试',
       'Create a new atomic test': '创建新自动测试',
-      'Attack command': '攻击指挥',
+      'Attack commands': '攻击指挥',
       'Mitre Filter': 'Mitre过滤器',
       'techniques': '技术',
       'Unknown Data': '未知数据',
