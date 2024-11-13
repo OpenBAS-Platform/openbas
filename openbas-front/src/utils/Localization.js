@@ -996,6 +996,7 @@ const i18n = {
       'Update the atomic testing': 'Mettre à jour le test atomique',
       'Create a new atomic test': 'Créer un nouveau test atomique',
       'Attack commands': 'Commandes de l\'attaque',
+      'Attack command': 'Commande de l\'attaque',
       'Mitre Filter': 'Filtre Mitre',
       'techniques': 'Techniques',
       'Unknown Data': 'Données inconnues',
@@ -1242,6 +1243,7 @@ const i18n = {
       'Get command': 'Commande d\'obtention',
       'Check command': 'Commande de vérification',
       'Cleanup executor': 'Exécuteur de nettoyage',
+      'Cleanup command': 'Commande de nettoyage',
       'Cleanup commands': 'Commandes de nettoyage',
       'Document': 'Document',
       // Policies
@@ -2367,6 +2369,7 @@ const i18n = {
       'Update the atomic testing': '更新自动测试',
       'Create a new atomic test': '创建新自动测试',
       'Attack commands': '攻击指挥',
+      'Attack command': '攻击命令',
       'Mitre Filter': 'Mitre过滤器',
       'techniques': '技术',
       'Unknown Data': '未知数据',
@@ -2603,6 +2606,7 @@ const i18n = {
       'Check command': '检查命令',
       'Cleanup executor': '清理执行器',
       'Cleanup commands': '清理命令',
+      'Cleanup command': '清理命令',
       'Document': '文档',
       // Policies
       'Platform login message': '平台登录信息',
