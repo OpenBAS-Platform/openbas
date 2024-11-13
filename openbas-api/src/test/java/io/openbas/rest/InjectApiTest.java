@@ -1,36 +1,64 @@
 package io.openbas.rest;
 
+import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.ExerciseStatus.RUNNING;
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 import static io.openbas.rest.inject.InjectApi.INJECT_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
+import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.repository.*;
+import io.openbas.execution.ExecutableInject;
+import io.openbas.execution.Executor;
 import io.openbas.rest.exercise.service.ExerciseService;
+import io.openbas.rest.inject.form.DirectInjectInput;
 import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.fixtures.InjectExpectationFixture;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
+import jakarta.annotation.Resource;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.servlet.ServletException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.ResourceUtils;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
+@ExtendWith(MockitoExtension.class)
 class InjectApiTest extends IntegrationTest {
 
   static Exercise EXERCISE;
@@ -44,6 +72,7 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private ScenarioService scenarioService;
   @Autowired private ExerciseService exerciseService;
   @Autowired private ExerciseRepository exerciseRepository;
+  @SpyBean private Executor executor;
   @Autowired private ScenarioRepository scenarioRepository;
   @Autowired private InjectRepository injectRepository;
   @Autowired private DocumentRepository documentRepository;
@@ -51,6 +80,9 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private InjectExpectationRepository injectExpectationRepository;
   @Autowired private TeamRepository teamRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
+  @Autowired private UserRepository userRepository;
+  @Resource private ObjectMapper objectMapper;
+  @MockBean private JavaMailSender javaMailSender;
 
   @BeforeAll
   void beforeAll() {
@@ -337,6 +369,138 @@ class InjectApiTest extends IntegrationTest {
     // -- ASSERT --
     assertNotNull(response);
     assertEquals(injectTitle, JsonPath.read(response, "$.inject_title"));
+  }
+
+  @DisplayName("Execute an email inject for exercise")
+  @Test
+  @WithMockPlannerUser
+  void executeEmailInjectForExerciseTest() throws Exception {
+    // -- PREPARE --
+    InjectorContract injectorContract =
+        this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
+    Inject inject = getInjectForEmailContract(injectorContract);
+    User user = userRepository.findById(currentUser().getId()).orElseThrow();
+    DirectInjectInput input = new DirectInjectInput();
+    input.setTitle(inject.getTitle());
+    input.setDescription(inject.getDescription());
+    input.setInjectorContract(inject.getInjectorContract().orElseThrow().getId());
+    input.setUserIds(List.of(user.getId()));
+    ObjectNode content = objectMapper.createObjectNode();
+    content.set("subject", objectMapper.convertValue("Subject", JsonNode.class));
+    content.set("body", objectMapper.convertValue("Test body", JsonNode.class));
+    content.set("expectationType", objectMapper.convertValue("none", JsonNode.class));
+    input.setContent(content);
+
+    MockMultipartFile inputJson =
+        new MockMultipartFile(
+            "input", null, "application/json", objectMapper.writeValueAsString(input).getBytes());
+
+    // Getting a test file
+    File testFile = ResourceUtils.getFile("classpath:xls-test-files/test_file_1.xlsx");
+    InputStream in = new FileInputStream(testFile);
+    MockMultipartFile fileJson =
+        new MockMultipartFile("file", "my-awesome-file.xls", "application/xlsx", in.readAllBytes());
+
+    // Mock the behavior of JavaMailSender
+    ArgumentCaptor<MimeMessage> mimeMessageArgumentCaptor =
+        ArgumentCaptor.forClass(MimeMessage.class);
+    doNothing().when(javaMailSender).send(ArgumentMatchers.any(SimpleMailMessage.class));
+    when(javaMailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
+
+    // -- EXECUTE --
+    String response =
+        mvc.perform(
+                multipart(EXERCISE_URI + "/" + EXERCISE.getId() + "/inject")
+                    .file(inputJson)
+                    .file(fileJson))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // -- ASSERT --
+    assertNotNull(response);
+    assertEquals("SUCCESS", JsonPath.read(response, "$.status_name"));
+    ArgumentCaptor<ExecutableInject> executableInjectCaptor =
+        ArgumentCaptor.forClass(ExecutableInject.class);
+    verify(executor).execute(executableInjectCaptor.capture());
+
+    verify(javaMailSender).send(mimeMessageArgumentCaptor.capture());
+    assertEquals("Subject", mimeMessageArgumentCaptor.getValue().getSubject());
+
+    // -- THEN ---
+    userRepository.delete(user);
+  }
+
+  @DisplayName("Execute an email inject for exercise with no team")
+  @Test
+  @WithMockPlannerUser
+  void executeEmailInjectForExerciseWithNoTeam() throws Exception {
+    // -- PREPARE --
+    InjectorContract injectorContract =
+        this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
+    Inject inject = getInjectForEmailContract(injectorContract);
+
+    DirectInjectInput input = new DirectInjectInput();
+    input.setTitle(inject.getTitle());
+    input.setDescription(inject.getDescription());
+    input.setInjectorContract(inject.getInjectorContract().orElseThrow().getId());
+    ObjectNode content = objectMapper.createObjectNode();
+    content.set("subject", objectMapper.convertValue("Subject", JsonNode.class));
+    content.set("body", objectMapper.convertValue("Test body", JsonNode.class));
+    content.set("expectationType", objectMapper.convertValue("none", JsonNode.class));
+    input.setContent(content);
+
+    MockMultipartFile inputJson =
+        new MockMultipartFile(
+            "input", null, "application/json", objectMapper.writeValueAsString(input).getBytes());
+
+    // -- EXECUTE --
+    String response =
+        mvc.perform(multipart(EXERCISE_URI + "/" + EXERCISE.getId() + "/inject").file(inputJson))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // -- ASSERT --
+    assertNotNull(response);
+    assertEquals("ERROR", JsonPath.read(response, "$.status_name"));
+    assertEquals(
+        "Email needs at least one user",
+        JsonPath.read(response, "$.status_traces[0].execution_message"));
+  }
+
+  @DisplayName("Execute an email inject for exercise with no content")
+  @Test
+  @WithMockPlannerUser
+  void executeEmailInjectForExerciseWithNoContentTest() throws Exception {
+    // -- PREPARE --
+    InjectorContract injectorContract =
+        this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
+    Inject inject = getInjectForEmailContract(injectorContract);
+
+    DirectInjectInput input = new DirectInjectInput();
+    input.setTitle(inject.getTitle());
+    input.setDescription(inject.getDescription());
+    input.setInjectorContract(inject.getInjectorContract().orElseThrow().getId());
+
+    MockMultipartFile inputJson =
+        new MockMultipartFile(
+            "input", null, "application/json", objectMapper.writeValueAsString(input).getBytes());
+
+    // -- ASSERT
+    Exception exception =
+        assertThrows(
+            ServletException.class,
+            () ->
+                mvc.perform(
+                    multipart(EXERCISE_URI + "/" + EXERCISE.getId() + "/inject").file(inputJson)));
+
+    String expectedMessage = "Inject is empty";
+    String actualMessage = exception.getMessage();
+
+    assertTrue(actualMessage.contains(expectedMessage));
   }
 
   // -- BULK DELETE --
