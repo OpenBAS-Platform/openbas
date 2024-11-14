@@ -7,6 +7,7 @@ import io.openbas.rest.inject.output.InjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.Data;
 
 @Data
@@ -34,15 +35,19 @@ public class ImportTestSummary {
                     Optional.ofNullable(inject.getExercise()).map(Exercise::getId).orElse(null),
                     Optional.ofNullable(inject.getScenario()).map(Scenario::getId).orElse(null),
                     inject.getDependsDuration(),
-                    inject.getInjectorContract().get(),
+                    inject.getInjectorContract().orElse(null),
                     inject.getTags().stream().map(Tag::getId).toArray(String[]::new),
                     inject.getTeams().stream().map(Team::getId).toArray(String[]::new),
                     inject.getAssets().stream().map(Asset::getId).toArray(String[]::new),
                     inject.getAssetGroups().stream().map(AssetGroup::getId).toArray(String[]::new),
-                    inject.getInjectorContract().get().getInjector().getType(),
+                    inject
+                        .getInjectorContract()
+                        .map(InjectorContract::getInjector)
+                        .map(Injector::getType)
+                        .orElse(null),
                     Optional.ofNullable(inject.getDependsOn())
                         .map(List::stream)
-                        .flatMap(stream -> stream.findAny())
+                        .flatMap(Stream::findAny)
                         .orElse(null)))
         .toList();
   }

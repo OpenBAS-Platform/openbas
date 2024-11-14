@@ -76,7 +76,8 @@ public class ExerciseInjectApi extends RestBehavior {
                 pageable,
                 joinMap),
         searchPaginationInput,
-        Inject.class);
+        Inject.class,
+        joinMap);
   }
 
   @DeleteMapping(EXERCISE_URI + "/{exerciseId}/injects")
