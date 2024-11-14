@@ -30,6 +30,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.AtomicTestingService;
+import io.openbas.service.InjectSearchService;
 import io.openbas.service.InjectService;
 import io.openbas.service.ScenarioService;
 import io.openbas.telemetry.Tracing;
@@ -80,6 +81,7 @@ public class InjectApi extends RestBehavior {
   private final ExecutionContextService executionContextService;
   private final ScenarioService scenarioService;
   private final InjectService injectService;
+  private final InjectSearchService injectSearchService;
   private final AtomicTestingService atomicTestingService;
   private final InjectDuplicateService injectDuplicateService;
 
@@ -223,7 +225,7 @@ public class InjectApi extends RestBehavior {
   public Page<InjectResultOutput> searchExerciseInjects(
       @PathVariable final String exerciseId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    return injectService.getPageOfInjectResults(exerciseId, searchPaginationInput);
+    return injectSearchService.getPageOfInjectResults(exerciseId, searchPaginationInput);
   }
 
   @LogExecutionTime
@@ -232,7 +234,7 @@ public class InjectApi extends RestBehavior {
   @Transactional(readOnly = true)
   @Tracing(name = "Get a list of inject results for an exercise", layer = "api", operation = "GET")
   public List<InjectResultOutput> exerciseInjectsResults(@PathVariable final String exerciseId) {
-    return injectService.getListOfInjectResults(exerciseId);
+    return injectSearchService.getListOfInjectResults(exerciseId);
   }
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")

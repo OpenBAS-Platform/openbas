@@ -9,6 +9,7 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectTestStatus;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.output.InjectOutput;
+import io.openbas.service.InjectSearchService;
 import io.openbas.service.InjectService;
 import io.openbas.service.InjectTestStatusService;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -36,7 +37,7 @@ import org.springframework.web.bind.annotation.*;
 public class ExerciseInjectApi extends RestBehavior {
 
   private final InjectService injectService;
-
+  private final InjectSearchService injectSearchService;
   private final InjectTestStatusService injectTestStatusService;
 
   @Operation(summary = "Retrieved injects for an exercise")
@@ -56,7 +57,7 @@ public class ExerciseInjectApi extends RestBehavior {
   @Transactional(readOnly = true)
   public Iterable<InjectOutput> exerciseInjectsSimple(
       @PathVariable @NotBlank final String exerciseId) {
-    return injectService.injects(fromExercise(exerciseId));
+    return injectSearchService.injects(fromExercise(exerciseId));
   }
 
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/simple")
@@ -70,7 +71,7 @@ public class ExerciseInjectApi extends RestBehavior {
         (Specification<Inject> specification,
             Specification<Inject> specificationCount,
             Pageable pageable) ->
-            this.injectService.injects(
+            this.injectSearchService.injects(
                 fromExercise(exerciseId).and(specification),
                 fromExercise(exerciseId).and(specificationCount),
                 pageable,

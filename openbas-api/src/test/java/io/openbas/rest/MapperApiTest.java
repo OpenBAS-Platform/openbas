@@ -16,6 +16,7 @@ import io.openbas.rest.mapper.form.ImportMapperAddInput;
 import io.openbas.rest.mapper.form.ImportMapperUpdateInput;
 import io.openbas.rest.scenario.form.InjectsImportTestInput;
 import io.openbas.rest.scenario.response.ImportTestSummary;
+import io.openbas.service.InjectImportService;
 import io.openbas.service.InjectService;
 import io.openbas.service.MapperService;
 import io.openbas.utils.fixtures.PaginationFixture;
@@ -55,6 +56,7 @@ public class MapperApiTest {
 
   @Mock private MapperService mapperService;
   @Mock private InjectService injectService;
+  @Mock private InjectImportService injectImportService;
 
   private MapperApi mapperApi;
 
@@ -63,7 +65,8 @@ public class MapperApiTest {
   @BeforeEach
   void before() throws IllegalAccessException, NoSuchFieldException {
     // Injecting mocks into the controller
-    mapperApi = new MapperApi(importMapperRepository, mapperService, injectService);
+    mapperApi =
+        new MapperApi(importMapperRepository, mapperService, injectService, injectImportService);
 
     Field sessionContextField = MapperApi.class.getSuperclass().getDeclaredField("mapper");
     sessionContextField.setAccessible(true);
@@ -251,7 +254,7 @@ public class MapperApiTest {
 
     injectsImportInput.getImportMapper().setName("TEST");
 
-    when(injectService.importInjectIntoScenarioFromXLS(
+    when(injectImportService.importInjectIntoScenarioFromXLS(
             any(), any(), any(), any(), anyInt(), anyBoolean()))
         .thenReturn(new ImportTestSummary());
     when(mapperService.createImportMapper(any())).thenReturn(importMapper);

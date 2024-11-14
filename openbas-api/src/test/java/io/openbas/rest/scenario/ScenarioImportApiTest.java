@@ -10,6 +10,7 @@ import io.openbas.database.model.ImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.rest.scenario.form.InjectsImportInput;
 import io.openbas.rest.scenario.response.ImportTestSummary;
+import io.openbas.service.InjectImportService;
 import io.openbas.service.InjectService;
 import io.openbas.service.ScenarioService;
 import java.util.Optional;
@@ -33,9 +34,8 @@ public class ScenarioImportApiTest {
   private MockMvc mvc;
 
   @Mock private InjectService injectService;
-
+  @Mock private InjectImportService injectImportService;
   @Mock private ImportMapperRepository importMapperRepository;
-
   @Mock private ScenarioService scenarioService;
 
   private ScenarioImportApi scenarioImportApi;
@@ -46,7 +46,8 @@ public class ScenarioImportApiTest {
   public void setUp() {
     // Injecting mocks into the controller
     scenarioImportApi =
-        new ScenarioImportApi(injectService, importMapperRepository, scenarioService);
+        new ScenarioImportApi(
+            injectService, injectImportService, importMapperRepository, scenarioService);
 
     SCENARIO_ID = UUID.randomUUID().toString();
 
@@ -63,7 +64,7 @@ public class ScenarioImportApiTest {
     injectsImportInput.setTimezoneOffset(120);
 
     when(importMapperRepository.findById(any())).thenReturn(Optional.of(new ImportMapper()));
-    when(injectService.importInjectIntoScenarioFromXLS(
+    when(injectImportService.importInjectIntoScenarioFromXLS(
             any(), any(), any(), any(), anyInt(), anyBoolean()))
         .thenReturn(new ImportTestSummary());
 
@@ -96,7 +97,7 @@ public class ScenarioImportApiTest {
     injectsImportInput.setTimezoneOffset(120);
 
     when(importMapperRepository.findById(any())).thenReturn(Optional.of(new ImportMapper()));
-    when(injectService.importInjectIntoScenarioFromXLS(
+    when(injectImportService.importInjectIntoScenarioFromXLS(
             any(), any(), any(), any(), anyInt(), anyBoolean()))
         .thenReturn(new ImportTestSummary());
 

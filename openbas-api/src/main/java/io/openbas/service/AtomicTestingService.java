@@ -58,7 +58,7 @@ public class AtomicTestingService {
   private final DocumentRepository documentRepository;
   private final AssetGroupService assetGroupService;
   private final InjectMapper injectMapper;
-  private final InjectService injectService;
+  private final InjectSearchService injectSearchService;
 
   private static final String PRE_DEFINE_EXPECTATIONS = "predefinedExpectations";
   private static final String EXPECTATIONS = "expectations";
@@ -288,7 +288,7 @@ public class AtomicTestingService {
         (Specification<Inject> specification,
             Specification<Inject> specificationCount,
             Pageable pageable) ->
-            injectService.injectResults(
+            injectSearchService.injectResults(
                 customSpec.and(specification),
                 customSpec.and(specificationCount),
                 pageable,

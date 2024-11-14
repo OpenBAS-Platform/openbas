@@ -9,6 +9,7 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectTestStatus;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.output.InjectOutput;
+import io.openbas.service.InjectSearchService;
 import io.openbas.service.InjectService;
 import io.openbas.service.InjectTestStatusService;
 import io.openbas.telemetry.Tracing;
@@ -32,7 +33,7 @@ import org.springframework.web.bind.annotation.*;
 public class ScenarioInjectApi extends RestBehavior {
 
   private final InjectService injectService;
-
+  private final InjectSearchService injectSearchService;
   private final InjectTestStatusService injectTestStatusService;
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/injects/simple")
@@ -41,7 +42,7 @@ public class ScenarioInjectApi extends RestBehavior {
   @Tracing(name = "Fetch injects for scenario", layer = "api", operation = "GET")
   public Iterable<InjectOutput> scenarioInjectsSimple(
       @PathVariable @NotBlank final String scenarioId) {
-    return injectService.injects(fromScenario(scenarioId));
+    return injectSearchService.injects(fromScenario(scenarioId));
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/simple")
@@ -55,7 +56,7 @@ public class ScenarioInjectApi extends RestBehavior {
         (Specification<Inject> specification,
             Specification<Inject> specificationCount,
             Pageable pageable) ->
-            this.injectService.injects(
+            this.injectSearchService.injects(
                 fromScenario(scenarioId).and(specification),
                 fromScenario(scenarioId).and(specificationCount),
                 pageable,

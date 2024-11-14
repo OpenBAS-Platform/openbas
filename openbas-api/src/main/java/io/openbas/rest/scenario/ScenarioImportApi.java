@@ -10,6 +10,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.scenario.form.InjectsImportInput;
 import io.openbas.rest.scenario.response.ImportTestSummary;
+import io.openbas.service.InjectImportService;
 import io.openbas.service.InjectService;
 import io.openbas.service.ScenarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ScenarioImportApi extends RestBehavior {
 
   private final InjectService injectService;
+  private final InjectImportService injectImportService;
   private final ImportMapperRepository importMapperRepository;
   private final ScenarioService scenarioService;
 
@@ -54,7 +56,7 @@ public class ScenarioImportApi extends RestBehavior {
                         String.format(
                             "The import mapper %s was not found", input.getImportMapperId())));
 
-    return injectService.importInjectIntoScenarioFromXLS(
+    return injectImportService.importInjectIntoScenarioFromXLS(
         scenario, importMapper, importId, input.getName(), input.getTimezoneOffset(), false);
   }
 
@@ -83,7 +85,7 @@ public class ScenarioImportApi extends RestBehavior {
                             "The import mapper %s was not found", input.getImportMapperId())));
 
     ImportTestSummary importTestSummary =
-        injectService.importInjectIntoScenarioFromXLS(
+        injectImportService.importInjectIntoScenarioFromXLS(
             scenario, importMapper, importId, input.getName(), input.getTimezoneOffset(), true);
     scenarioService.updateScenario(scenario);
     return importTestSummary;
