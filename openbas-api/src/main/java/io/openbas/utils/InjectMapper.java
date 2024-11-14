@@ -111,7 +111,7 @@ public class InjectMapper {
                     .trackingAckDate(status.getTrackingAckDate())
                     .trackingEndDate(status.getTrackingEndDate())
                     .trackingTotalExecutionTime(status.getTrackingTotalExecutionTime())
-                    .trackingTotalCount(status.getTrackingTotalCount())
+                    .trackingTotalCount(Optional.ofNullable(status.getTrackingTotalCount()).orElse(0))
                     .trackingTotalError(status.getTrackingTotalError())
                     .trackingTotalSuccess(status.getTrackingTotalSuccess())
                     .build())

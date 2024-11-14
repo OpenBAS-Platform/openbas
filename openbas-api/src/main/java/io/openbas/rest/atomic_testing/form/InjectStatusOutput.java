@@ -9,6 +9,8 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,14 +45,14 @@ public class InjectStatusOutput {
   private Instant trackingEndDate;
 
   @JsonProperty("tracking_total_execution_time")
-  private long trackingTotalExecutionTime;
+  private Long trackingTotalExecutionTime;
 
   @JsonProperty("tracking_total_count")
   private int trackingTotalCount;
 
   @JsonProperty("tracking_total_error")
-  private int trackingTotalError;
+  private Integer trackingTotalError;
 
   @JsonProperty("tracking_total_success")
-  private int trackingTotalSuccess;
+  private Integer trackingTotalSuccess;
 }
