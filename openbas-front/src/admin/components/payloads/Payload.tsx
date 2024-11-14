@@ -244,7 +244,7 @@ const Payload: FunctionComponent<Props> = ({
         >
           {t('Cleanup executor')}
         </Typography>
-        {selectedPayload?.payload_cleanup_executor}
+        {emptyFilled(selectedPayload?.payload_cleanup_executor)}
         <Typography
           variant="h3"
           gutterBottom
