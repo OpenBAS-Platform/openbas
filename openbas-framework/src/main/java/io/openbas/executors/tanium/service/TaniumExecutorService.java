@@ -99,8 +99,8 @@ public class TaniumExecutorService implements Runnable {
   @Override
   public void run() {
     log.info("Running Tanium executor endpoints gathering...");
-    List<NodeEndpoint> nodeEndpoints =
-        this.client.endpoints().getData().getEndpoints().getEdges().stream().toList();
+    List<NodeEndpoint> nodeEndpoints = this.client.endpoints().getData() != null ?
+        this.client.endpoints().getData().getEndpoints().getEdges().stream().toList() : new ArrayList<>();
     List<Endpoint> endpoints = toEndpoint(nodeEndpoints).stream().filter(Asset::getActive).toList();
     log.info("Tanium executor provisioning based on " + endpoints.size() + " assets");
     endpoints.forEach(
