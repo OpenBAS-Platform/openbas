@@ -1,4 +1,4 @@
-import { Chip, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, useMemo, useState } from 'react';
 
@@ -19,15 +19,14 @@ import SortHeadersComponentV2 from '../../../components/common/queryable/sort/So
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
-import ItemCopy from '../../../components/ItemCopy';
 import ItemTags from '../../../components/ItemTags';
 import PayloadIcon from '../../../components/PayloadIcon';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
-import { emptyFilled } from '../../../utils/String';
 import CreatePayload from './CreatePayload';
+import Payload from './Payload';
 import PayloadPopover from './PayloadPopover';
 
 const useStyles = makeStyles(() => ({
@@ -48,6 +47,14 @@ const useStyles = makeStyles(() => ({
     textOverflow: 'ellipsis',
     paddingRight: 10,
     boxSizing: 'content-box',
+  },
+  chip: {
+    fontSize: 12,
+    height: 25,
+    margin: '0 7px 7px 0',
+    textTransform: 'uppercase',
+    borderRadius: 4,
+    width: 180,
   },
   chipInList: {
     fontSize: 12,
@@ -343,86 +350,7 @@ const Payloads = () => {
         handleClose={() => setSelectedPayload(null)}
         title={t('Selected payload')}
       >
-        <Grid container spacing={3}>
-          <Grid item xs={6} style={{ paddingTop: 10 }}>
-            <Typography
-              variant="h3"
-              gutterBottom
-              style={{ marginTop: 20 }}
-            >
-              {t('Name')}
-            </Typography>
-            {selectedPayload?.payload_name}
-            <Typography
-              variant="h3"
-              gutterBottom
-              style={{ marginTop: 20 }}
-            >
-              {t('Platforms')}
-            </Typography>
-            {(selectedPayload?.payload_platforms ?? []).length === 0 ? (
-              <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
-            ) : selectedPayload?.payload_platforms?.map(
-              platform => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
-            )}
-            {(selectedPayload?.executable_arch) && (
-              <>
-                <Typography
-                  variant="h3"
-                  gutterBottom
-                  style={{ marginTop: 20 }}
-                >
-                  {t('Architecture')}
-                </Typography>
-                {selectedPayload?.executable_arch}
-              </>
-            )}
-            <Typography
-              variant="h3"
-              gutterBottom
-              style={{ marginTop: 20 }}
-            >
-              {t('Description')}
-            </Typography>
-            {emptyFilled(selectedPayload?.payload_description)}
-          </Grid>
-          <Grid item xs={6} style={{ paddingTop: 10 }}>
-            <Typography
-              variant="h3"
-              gutterBottom
-              style={{ marginTop: 20 }}
-            >
-              {t('External ID')}
-            </Typography>
-            {selectedPayload?.payload_external_id && selectedPayload?.payload_external_id.length > 0 ? (
-              <pre>
-                <ItemCopy content={selectedPayload?.payload_external_id} />
-              </pre>
-            ) : '-'}
-            <Typography
-              variant="h3"
-              gutterBottom
-              style={{ marginTop: 20 }}
-            >
-              {t('Content')}
-            </Typography>
-            <pre>
-              <ItemCopy content={
-                selectedPayload?.command_content ?? selectedPayload?.dns_resolution_hostname ?? selectedPayload?.file_drop_file ?? selectedPayload?.executable_file ?? ''
-              }
-              />
-            </pre>
-            <Typography
-              variant="h3"
-              gutterBottom
-              style={{ marginTop: 20 }}
-            >
-              {t('Cleanup command')}
-            </Typography>
-            {selectedPayload?.payload_cleanup_command && selectedPayload?.payload_cleanup_command.length > 0
-              ? <pre><ItemCopy content={selectedPayload?.payload_cleanup_command} /></pre> : '-'}
-          </Grid>
-        </Grid>
+        <Payload selectedPayload={selectedPayload} />
       </Drawer>
     </>
   );

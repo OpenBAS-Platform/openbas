@@ -23,13 +23,11 @@ const useStyles = makeStyles<Theme>(theme => ({
   container: {
     position: 'relative',
     paddingRight: 18,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   icon: {
     'position': 'absolute',
     'right': 0,
+    'top': 0,
     'cursor': 'pointer',
     '&:hover': {
       color: theme.palette.primary.main,
