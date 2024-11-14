@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { fetchPlatformParameters } from '../../../../actions/Application';
 import { addExercise } from '../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import type { LoggedHelper } from '../../../../actions/helper';
@@ -11,7 +10,6 @@ import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import type { ExerciseInput, PlatformSettings } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import ExerciseForm from './ExerciseForm';
 
 const ExerciseCreation = () => {
@@ -30,9 +28,6 @@ const ExerciseCreation = () => {
   const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({
     settings: helper.getPlatformSettings(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchPlatformParameters());
-  });
 
   // Form
   const initialValues: ExerciseInput = {
