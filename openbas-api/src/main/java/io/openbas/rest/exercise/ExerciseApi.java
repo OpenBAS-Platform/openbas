@@ -758,7 +758,8 @@ public class ExerciseApi extends RestBehavior {
               Pageable pageable) ->
               this.exerciseService.exercises(specification, specificationCount, pageable, joinMap),
           searchPaginationInput,
-          Exercise.class);
+          Exercise.class,
+          joinMap);
 
     } else {
       return buildPaginationCriteriaBuilder(
@@ -771,7 +772,8 @@ public class ExerciseApi extends RestBehavior {
                   pageable,
                   joinMap),
           searchPaginationInput,
-          Exercise.class);
+          Exercise.class,
+          joinMap);
     }
   }
 

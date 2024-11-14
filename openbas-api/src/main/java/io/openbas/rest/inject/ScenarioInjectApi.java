@@ -61,7 +61,8 @@ public class ScenarioInjectApi extends RestBehavior {
                 pageable,
                 joinMap),
         searchPaginationInput,
-        Inject.class);
+        Inject.class,
+        joinMap);
   }
 
   @DeleteMapping(SCENARIO_URI + "/{scenarioId}/injects")

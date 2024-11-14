@@ -338,7 +338,8 @@ public class InjectService {
                 pageable,
                 joinMap),
         searchPaginationInput,
-        Inject.class);
+        Inject.class,
+        joinMap);
   }
 
   public Page<InjectResultOutput> injectResults(
