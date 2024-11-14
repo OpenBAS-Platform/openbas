@@ -4,7 +4,6 @@ public enum ExecutionStatus {
   SUCCESS,
   ERROR,
   MAYBE_PREVENTED,
-
   DRAFT,
   QUEUING,
   EXECUTING,
