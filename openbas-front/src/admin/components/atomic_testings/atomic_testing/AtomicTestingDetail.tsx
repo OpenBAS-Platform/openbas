@@ -3,14 +3,8 @@ import { makeStyles } from '@mui/styles';
 import { Props } from 'html-react-parser/lib/attributes-to-props';
 import { FunctionComponent, useContext } from 'react';
 
-import { fetchDocuments } from '../../../../actions/Document';
-import type { DocumentHelper } from '../../../../actions/helper';
 import { useFormatter } from '../../../../components/i18n';
 import ItemStatus from '../../../../components/ItemStatus';
-import { useHelper } from '../../../../store';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { InjectResultOverviewOutputContext, InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -34,16 +28,9 @@ const useStyles = makeStyles(() => ({
 const AtomicTestingDetail: FunctionComponent<Props> = () => {
   const classes = useStyles();
   const { t, tPick } = useFormatter();
-  const dispatch = useAppDispatch();
 
   // Fetching data
   const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
-  const { documentMap } = useHelper((helper: DocumentHelper) => ({
-    documentMap: helper.getDocumentsMap(),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchDocuments());
-  });
 
   return (
     <Grid container spacing={2}>
@@ -85,26 +72,6 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
                           -
                         </Typography>
                       )
-                }
-              </div>
-              <div style={{ marginRight: 50 }}>
-                <Typography variant="subtitle1" className={classes.header} gutterBottom>
-                  {t('Documents')}
-                </Typography>
-                {
-                  injectResultOverviewOutput.injects_documents !== undefined && injectResultOverviewOutput.injects_documents.length > 0
-                    ? injectResultOverviewOutput.injects_documents.map((documentId) => {
-                      const document = documentMap[documentId];
-                      return (
-                        <Typography key={documentId} variant="body1">
-                          {document?.document_name ?? '-'}
-                        </Typography>
-                      );
-                    }) : (
-                      <Typography variant="body1" gutterBottom>
-                        -
-                      </Typography>
-                    )
                 }
               </div>
             </div>
