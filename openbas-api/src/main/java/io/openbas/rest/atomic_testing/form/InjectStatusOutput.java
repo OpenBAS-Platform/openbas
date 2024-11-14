@@ -43,14 +43,14 @@ public class InjectStatusOutput {
   private Instant trackingEndDate;
 
   @JsonProperty("tracking_total_execution_time")
-  private Long trackingTotalExecutionTime;
+  private long trackingTotalExecutionTime;
 
   @JsonProperty("tracking_total_count")
-  private Integer trackingTotalCount;
+  private int trackingTotalCount;
 
   @JsonProperty("tracking_total_error")
-  private Integer trackingTotalError;
+  private int trackingTotalError;
 
   @JsonProperty("tracking_total_success")
-  private Integer trackingTotalSuccess;
+  private int trackingTotalSuccess;
 }

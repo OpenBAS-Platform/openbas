@@ -77,7 +77,7 @@ public class InjectResultOverviewOutput {
 
   @Schema(description = "Indicates whether the inject is ready for use")
   @JsonProperty("inject_ready")
-  private Boolean isReady;
+  private boolean isReady;
 
   @Schema(description = "Timestamp when the inject was last updated")
   @JsonProperty("inject_updated_at")
