@@ -432,7 +432,7 @@ public class ExerciseService {
     Set<String> exerciseIds =
         exercises.stream().map(ExerciseSimple::getId).collect(Collectors.toSet());
 
-    if (exerciseIds != null && !exerciseIds.isEmpty()) {
+    if (!exerciseIds.isEmpty()) {
       Map<String, List<Object[]>> teamMap =
           ofNullable(teamRepository.teamsByExerciseIds(exerciseIds)).orElse(emptyList()).stream()
               .filter(row -> 0 < row.length && row[0] != null)

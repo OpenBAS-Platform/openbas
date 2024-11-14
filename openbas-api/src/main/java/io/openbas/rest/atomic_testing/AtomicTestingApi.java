@@ -10,6 +10,7 @@ import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.AtomicTestingService;
+import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -34,6 +35,7 @@ public class AtomicTestingApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping("/search")
   @Transactional(readOnly = true)
+  @Tracing(name = "Get a page of atomic testings", layer = "api", operation = "POST")
   public Page<InjectResultOutput> findAllAtomicTestings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return atomicTestingService.findAllAtomicTestings(searchPaginationInput);
@@ -41,6 +43,7 @@ public class AtomicTestingApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping("/{injectId}")
+  @Tracing(name = "Get a atomic testing", layer = "api", operation = "GET")
   public InjectResultOverviewOutput findAtomicTesting(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId);
   }

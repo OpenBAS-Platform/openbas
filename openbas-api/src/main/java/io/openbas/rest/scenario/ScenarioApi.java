@@ -21,6 +21,7 @@ import io.openbas.rest.scenario.form.*;
 import io.openbas.service.ImportService;
 import io.openbas.service.ScenarioService;
 import io.openbas.service.ScenarioToExerciseService;
+import io.openbas.telemetry.Tracing;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.servlet.http.HttpServletResponse;
@@ -83,6 +84,7 @@ public class ScenarioApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping(SCENARIO_URI + "/search")
+  @Tracing(name = "Get a page of scenarios", layer = "api", operation = "POST")
   public Page<RawPaginationScenario> scenarios(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return this.scenarioService.scenarios(searchPaginationInput);

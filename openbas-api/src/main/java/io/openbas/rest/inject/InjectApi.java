@@ -32,6 +32,7 @@ import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.AtomicTestingService;
 import io.openbas.service.InjectService;
 import io.openbas.service.ScenarioService;
+import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -207,6 +208,7 @@ public class InjectApi extends RestBehavior {
   @LogExecutionTime
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
+  @Tracing(name = "Get an iterable of injects for an exercise", layer = "api", operation = "GET")
   public Iterable<Inject> exerciseInjects(@PathVariable @NotBlank final String exerciseId) {
     return injectRepository.findByExerciseId(exerciseId).stream()
         .sorted(Inject.executionComparator)
@@ -217,6 +219,7 @@ public class InjectApi extends RestBehavior {
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/search")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
+  @Tracing(name = "Get a page of inject result for an exercise", layer = "api", operation = "POST")
   public Page<InjectResultOutput> searchExerciseInjects(
       @PathVariable final String exerciseId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
@@ -227,6 +230,7 @@ public class InjectApi extends RestBehavior {
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/results")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
+  @Tracing(name = "Get a list of inject results for an exercise", layer = "api", operation = "GET")
   public List<InjectResultOutput> exerciseInjectsResults(@PathVariable final String exerciseId) {
     return injectService.getListOfInjectResults(exerciseId);
   }

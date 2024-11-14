@@ -54,6 +54,7 @@ public class AssetGroupApi {
   @LogExecutionTime
   @PostMapping(ASSET_GROUP_URI + "/search")
   @PreAuthorize("isObserver()")
+  @Tracing(name = "Get a page of assetgroups", layer = "api", operation = "POST")
   public Page<AssetGroupOutput> assetGroups(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return this.assetGroupCriteriaBuilderService.assetGroupPagination(searchPaginationInput);

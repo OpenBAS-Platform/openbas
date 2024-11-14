@@ -16,24 +16,30 @@ import lombok.Setter;
 @Getter
 public class InjectResultOutput {
 
+  @Schema(description = "Id of inject")
   @JsonProperty("inject_id")
   @NotBlank
   private String id;
 
+  @Schema(description = "Title of inject")
   @JsonProperty("inject_title")
   @NotBlank
   private String title;
 
+  @Schema(description = "Timestamp when the inject was last updated")
   @JsonProperty("inject_updated_at")
   @NotNull
   private Instant updatedAt;
 
+  @Schema(description = "Type of inject")
   @JsonProperty("inject_type")
-  public String injectType;
+  private String injectType;
 
+  @Schema(description = "Injector contract")
   @JsonProperty("inject_injector_contract")
   private InjectorContractSimple injectorContract;
 
+  @Schema(description = "Status")
   @JsonProperty("inject_status")
   private InjectStatusSimple status;
 

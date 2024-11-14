@@ -10,6 +10,7 @@ import io.openbas.database.model.Base;
 import io.openbas.database.model.Exercise;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.exercise.service.ExerciseService;
+import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.criteria.Join;
 import jakarta.validation.Valid;
@@ -33,6 +34,7 @@ public class ScenarioExerciseApi {
   @LogExecutionTime
   @GetMapping(SCENARIO_URI + "/{scenarioId}/exercises")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
+  @Tracing(name = "Get an iterable of exercises for a scenario", layer = "api", operation = "GET")
   public Iterable<ExerciseSimple> scenarioExercises(
       @PathVariable @NotBlank final String scenarioId) {
     return exerciseService.scenarioExercises(scenarioId);
@@ -41,6 +43,7 @@ public class ScenarioExerciseApi {
   @LogExecutionTime
   @PostMapping(SCENARIO_URI + "/{scenarioId}/exercises/search")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
+  @Tracing(name = "Get an iterable of exercises for an scenario", layer = "api", operation = "POST")
   public Iterable<ExerciseSimple> scenarioExercises(
       @PathVariable @NotBlank final String scenarioId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
