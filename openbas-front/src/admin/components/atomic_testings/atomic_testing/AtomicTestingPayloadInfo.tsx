@@ -20,17 +20,22 @@ const useStyles = makeStyles(() => ({
     overflow: 'hidden',
     height: '100%',
   },
+  chip: {
+    fontSize: 12,
+    height: 25,
+    margin: '0 7px 7px 0',
+    textTransform: 'uppercase',
+    borderRadius: 4,
+    width: 180,
+  },
 }));
 
 const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
   const classes = useStyles();
-  const { t, tPick } = useFormatter();
+  const { t } = useFormatter();
 
   // Fetching data
   const { injectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
-  const { attackPatternsMap } = useHelper((helper: AttackPatternHelper) => ({
-    attackPatternsMap: helper.getAttackPatternsMap(),
-  }));
 
   return (
     <Grid container spacing={3}>
@@ -42,7 +47,7 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
               variant="h2"
               gutterBottom
             >
-              {/* {injectResultDto?.inject_title} */}
+              {injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_name}
             </Typography>
 
             <Typography
@@ -50,68 +55,72 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
               gutterBottom
               style={{ marginTop: 20 }}
             >
-              {/* {emptyFilled(injectResultDto?.inject_description)} */}
+              {emptyFilled(injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_description)}
             </Typography>
-            <Grid item xs={6} style={{ marginBottom: 30 }}>
-              <Typography
-                variant="h3"
-                gutterBottom
-                style={{ marginTop: 20 }}
-              >
-                {t('Platforms')}
-              </Typography>
-              {/* {(selectedPayload?.payload_platforms ?? []).length === 0 ? (
-                <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
-              ) : selectedPayload?.payload_platforms?.map(
-                platform => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
-              )} */}
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6}>
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                  style={{ marginTop: 20 }}
+                >
+                  {t('Platforms')}
+                </Typography>
+                {(injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_platforms ?? []).length === 0 ? (
+                  <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
+                ) : injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_platforms?.map(
+                  platform => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
+                )}
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                  style={{ marginTop: 20 }}
+                >
+                  {t('Attack patterns')}
+                </Typography>
+                {injectResultDto.inject_attack_patterns && injectResultDto.inject_attack_patterns.length === 0 ? '-' : injectResultDto.inject_attack_patterns?.map((attackPattern: AttackPattern) => (
+                  <Tooltip key={attackPattern.attack_pattern_id} title={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}>
+                    <Chip
+                      variant="outlined"
+                      classes={{ root: classes.chip }}
+                      color="primary"
+                      label={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}
+                    />
+                  </Tooltip>
+                ))}
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                  style={{ marginTop: 20 }}
+                >
+                  {t('Tags')}
+                </Typography>
+                <ItemTags
+                  variant="reduced-view"
+                  tags={injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_tags}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                  style={{ marginTop: 20 }}
+                >
+                  {t('External ID')}
+                </Typography>
+                {injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_external_id
+                && injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_external_id.length > 0 ? (
+                      <pre>
+                        <ItemCopy content={injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_external_id} />
+                      </pre>
+                    ) : '-'}
+              </Grid>
             </Grid>
-            <Grid item xs={6} style={{ marginBottom: 30 }}>
-              <Typography
-                variant="h3"
-                gutterBottom
-                style={{ marginTop: 20 }}
-              >
-                {t('Attack patterns')}
-              </Typography>
-              {/* {selectedPayload?.payload_attack_patterns && selectedPayload?.payload_attack_patterns.length === 0 ? '-' : selectedPayload?.payload_attack_patterns?.map((attackPatternId: string) => attackPatternsMap[attackPatternId]).map((attackPattern: AttackPattern) => (
-                <Tooltip key={attackPattern.attack_pattern_id} title={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}>
-                  <Chip
-                    variant="outlined"
-                    classes={{ root: classes.chip }}
-                    color="primary"
-                    label={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}
-                  />
-                </Tooltip>
-              ))} */}
-            </Grid>
-            <Grid item xs={6} style={{ marginBottom: 30 }}>
-              <Typography
-                variant="h3"
-                gutterBottom
-                style={{ marginTop: 20 }}
-              >
-                {t('Tags')}
-              </Typography>
-              {/* <ItemTags
-                variant="reduced-view"
-                tags={selectedPayload?.payload_tags}
-              /> */}
-            </Grid>
-            <Grid item xs={6} style={{ marginBottom: 30 }}>
-              <Typography
-                variant="h3"
-                gutterBottom
-                style={{ marginTop: 20 }}
-              >
-                {t('External ID')}
-              </Typography>
-              {/* {selectedPayload?.payload_external_id && selectedPayload?.payload_external_id.length > 0 ? (
-                <pre>
-            <ItemCopy content={selectedPayload?.payload_external_id} />
-          </pre>
-              ) : '-'} */}
-            </Grid>
+
           </Paper>
         ) : (
           <Paper variant="outlined" classes={{ root: classes.paper }}>
@@ -129,7 +138,7 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
             >
               {t('Command executor')}
             </Typography>
-            {/* {selectedPayload?.command_executor} */}
+            {/* {injectResultDto?.inject_injector_contract?.injector_contract_payload?.} */}
             <Typography
               variant="h3"
               gutterBottom
@@ -139,7 +148,7 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
             </Typography>
             <pre>
               {/* <ItemCopy content={
-                selectedPayload?.command_content ?? selectedPayload?.dns_resolution_hostname ?? selectedPayload?.file_drop_file ?? selectedPayload?.executable_file ?? ''
+                injectResultDto.inject_commands_lines?.content ?? ''
               }
               /> */}
             </pre>
@@ -150,8 +159,8 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
             >
               {t('Arguments')}
             </Typography>
-            {/* {
-              !selectedPayload?.payload_arguments?.length ? '-'
+            {
+              !injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_arguments?.length ? '-'
                 : (
                     <TableContainer component={Paper}>
                       <Table sx={{ minWidth: 650 }}>
@@ -163,7 +172,7 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {selectedPayload?.payload_arguments?.map((argument: PayloadArgument) => {
+                          {injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_arguments?.map((argument: PayloadArgument) => {
                             return (
                               <>
                                 <TableRow
@@ -186,7 +195,7 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
                       </Table>
                     </TableContainer>
                   )
-            } */}
+            }
 
             <Typography
               variant="h3"
@@ -195,8 +204,8 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
             >
               {t('Prerequisites')}
             </Typography>
-            {/* {
-              selectedPayload?.payload_prerequisites && selectedPayload?.payload_prerequisites.length === 0 ? '-'
+            {
+              injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_prerequisites && injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_prerequisites.length === 0 ? '-'
                 : (
                     <TableContainer component={Paper}>
                       <Table sx={{ minWidth: 650 }}>
@@ -208,7 +217,7 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {selectedPayload?.payload_prerequisites?.map((prerequisite: PayloadPrerequisite) => {
+                          {injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_prerequisites?.map((prerequisite: PayloadPrerequisite) => {
                             return (
                               <>
                                 <TableRow
@@ -231,7 +240,7 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
                       </Table>
                     </TableContainer>
                   )
-            } */}
+            }
             <Typography
               variant="h3"
               gutterBottom
@@ -239,7 +248,7 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
             >
               {t('Cleanup executor')}
             </Typography>
-            {/* {emptyFilled(selectedPayload?.payload_cleanup_executor)} */}
+            {emptyFilled(injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_cleanup_executor)}
             <Typography
               variant="h3"
               gutterBottom
@@ -247,8 +256,9 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
             >
               {t('Cleanup commands')}
             </Typography>
-            {/* {selectedPayload?.payload_cleanup_command && selectedPayload?.payload_cleanup_command.length > 0
-              ? <pre><ItemCopy content={selectedPayload?.payload_cleanup_command} /></pre> : '-'} */}
+            {injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_cleanup_command
+            && injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_cleanup_command.length > 0
+              ? <pre><ItemCopy content={injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_cleanup_command} /></pre> : '-'}
           </Paper>
         ) : (
           <Paper variant="outlined" classes={{ root: classes.paper }}>

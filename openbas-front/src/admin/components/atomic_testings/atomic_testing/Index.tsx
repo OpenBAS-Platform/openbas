@@ -107,13 +107,17 @@ const Index = () => {
                 label={t('Execution details')}
                 className={classes.item}
               />
-              <Tab
-                component={Link}
-                to={`/admin/atomic_testings/${injectResultDto.inject_id}/payload_info`}
-                value={`/admin/atomic_testings/${injectResultDto.inject_id}/payload_info`}
-                label={t('Payload info')}
-                className={classes.item}
-              />
+              {
+                injectResultDto.inject_type !== 'openbas_email' && injectResultDto.inject_type !== 'openbas_ovh_sms' && (
+                  <Tab
+                    component={Link}
+                    to={`/admin/atomic_testings/${injectResultDto.inject_id}/payload_info`}
+                    value={`/admin/atomic_testings/${injectResultDto.inject_id}/payload_info`}
+                    label={t('Payload info')}
+                    className={classes.item}
+                  />
+                )
+              }
             </Tabs>
           </Box>
           <Suspense fallback={<Loader />}>
