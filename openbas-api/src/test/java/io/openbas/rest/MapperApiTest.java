@@ -65,8 +65,7 @@ public class MapperApiTest {
   @BeforeEach
   void before() throws IllegalAccessException, NoSuchFieldException {
     // Injecting mocks into the controller
-    mapperApi =
-        new MapperApi(importMapperRepository, mapperService, injectService, injectImportService);
+    mapperApi = new MapperApi(importMapperRepository, mapperService, injectImportService);
 
     Field sessionContextField = MapperApi.class.getSuperclass().getDeclaredField("mapper");
     sessionContextField.setAccessible(true);
