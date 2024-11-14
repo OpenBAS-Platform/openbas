@@ -41,8 +41,8 @@ const ExerciseCreation = () => {
     exercise_start_date: null,
     exercise_mail_from: settings.default_mailer,
     exercise_mails_reply_to: [settings.default_reply_to ? settings.default_reply_to : ''],
-    exercise_message_header: 'SIMULATION HEADER',
-    exercise_message_footer: 'SIMULATION FOOTER',
+    exercise_message_header: t('SIMULATION HEADER'),
+    exercise_message_footer: t('SIMULATION FOOTER'),
   };
 
   return (
