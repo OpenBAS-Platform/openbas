@@ -30,6 +30,7 @@ public class InjectStatusOutput {
     return name != null ? name : ExecutionStatus.DRAFT.name();
   }
 
+  @Builder.Default
   @JsonProperty("status_traces")
   private List<InjectStatusExecution> traces = new ArrayList<>();
 

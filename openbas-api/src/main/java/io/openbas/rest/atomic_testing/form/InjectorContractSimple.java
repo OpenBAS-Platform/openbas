@@ -35,6 +35,7 @@ public class InjectorContractSimple {
   @JsonProperty("injector_contract_payload")
   private PayloadSimple payload;
 
+  @Builder.Default
   @JsonProperty("injector_contract_labels")
   @NotBlank
   private Map<String, String> labels = new HashMap<>();
