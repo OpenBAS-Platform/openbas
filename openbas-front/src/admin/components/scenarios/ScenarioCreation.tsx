@@ -1,7 +1,6 @@
 import { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { fetchPlatformParameters } from '../../../actions/Application';
 import { LoggedHelper } from '../../../actions/helper';
 import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import { addScenario } from '../../../actions/scenarios/scenario-actions';
@@ -11,7 +10,6 @@ import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import type { PlatformSettings, ScenarioInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
 import ScenarioForm from './ScenarioForm';
 
 interface Props {
@@ -46,9 +44,6 @@ const ScenarioCreation: FunctionComponent<Props> = ({
   const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({
     settings: helper.getPlatformSettings(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchPlatformParameters());
-  });
 
   const initialValues: ScenarioInput = {
     scenario_name: '',
@@ -60,8 +55,8 @@ const ScenarioCreation: FunctionComponent<Props> = ({
     scenario_external_reference: '',
     scenario_external_url: '',
     scenario_tags: [],
-    scenario_message_header: 'SIMULATION HEADER',
-    scenario_message_footer: 'SIMULATION FOOTER',
+    scenario_message_header: t('SIMULATION HEADER'),
+    scenario_message_footer: t('SIMULATION FOOTER'),
     scenario_mail_from: settings.default_mailer ? settings.default_mailer : '',
     scenario_mails_reply_to: [settings.default_reply_to ? settings.default_reply_to : ''],
   };
