@@ -13,10 +13,6 @@ const useStyles = makeStyles(() => ({
     overflow: 'hidden',
     height: '100%',
   },
-  flexContainer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-  },
   header: {
     fontWeight: 'bold',
   },
@@ -38,24 +34,24 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
         <Typography variant="h4">{t('Configuration')}</Typography>
         {injectResultOverviewOutput ? (
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <div className={classes.flexContainer}>
-              <div>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={4}>
                 <Typography variant="subtitle1" className={classes.header} gutterBottom>
                   {t('Description')}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
                   {injectResultOverviewOutput?.inject_description || '-'}
                 </Typography>
-              </div>
-              <div>
+              </Grid>
+              <Grid item xs={12} sm={4}>
                 <Typography variant="subtitle1" className={classes.header} gutterBottom>
                   {t('Type')}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
                   {tPick(injectResultOverviewOutput.inject_injector_contract?.injector_contract_labels)}
                 </Typography>
-              </div>
-              <div>
+              </Grid>
+              <Grid item xs={12} sm={4}>
                 <Typography variant="subtitle1" className={classes.header} gutterBottom>
                   {t('Expectations')}
                 </Typography>
@@ -73,8 +69,8 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
                         </Typography>
                       )
                 }
-              </div>
-            </div>
+              </Grid>
+            </Grid>
           </Paper>
         ) : (
           <Paper variant="outlined" classes={{ root: classes.paper }}>
