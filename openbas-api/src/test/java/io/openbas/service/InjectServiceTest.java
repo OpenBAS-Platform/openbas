@@ -17,7 +17,6 @@ import io.openbas.rest.scenario.response.ImportMessage;
 import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
 import io.openbas.utils.CustomMockMultipartFile;
-import io.openbas.utils.InjectMapper;
 import jakarta.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,7 +33,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -46,16 +44,10 @@ import org.springframework.util.ResourceUtils;
 class InjectServiceTest {
 
   @Mock InjectRepository injectRepository;
-  @Mock InjectDocumentRepository injectDocumentRepository;
-  @Mock InjectExpectationRepository injectExpectationRepository;
-  @Mock AssetRepository assetRepository;
-  @Mock AssetGroupRepository assetGroupRepository;
   @Mock TeamRepository teamRepository;
   @Mock ScenarioTeamUserRepository scenarioTeamUserRepository;
   @Mock ExerciseTeamUserRepository exerciseTeamUserRepository;
   @Mock UserRepository userRepository;
-  @Mock InjectMapper injectMapper;
-  @InjectMocks private InjectService injectService;
   @Mock private InjectImportService injectImportService;
 
   private Scenario mockedScenario;
@@ -69,18 +61,13 @@ class InjectServiceTest {
 
   @BeforeEach
   void setUp() {
-    injectService =
-        new InjectService(
+    injectImportService =
+        new InjectImportService(
             injectRepository,
-            injectDocumentRepository,
-            injectExpectationRepository,
-            assetRepository,
-            assetGroupRepository,
             scenarioTeamUserRepository,
             exerciseTeamUserRepository,
             teamRepository,
-            userRepository,
-            injectMapper);
+            userRepository);
 
     mockedScenario = new Scenario();
     mockedExercise = new Exercise();
@@ -124,7 +111,7 @@ class InjectServiceTest {
 
     // -- EXECUTE --
     try {
-      injectService.storeXlsFileForImport(xlsFile);
+      injectImportService.storeXlsFileForImport(xlsFile);
       fail();
     } catch (Exception ex) {
       assertTrue(ex instanceof BadRequestException);
