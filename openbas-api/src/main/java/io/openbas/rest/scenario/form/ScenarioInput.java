@@ -5,11 +5,12 @@ import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Scenario.SEVERITY;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -53,7 +54,6 @@ public class ScenarioInput {
   @NotBlank
   private String from;
 
-  @Column(name = "scenario_reply_to", nullable = false)
   @JsonProperty("scenario_mails_reply_to")
   private List<String> replyTos = new ArrayList<>();
 
