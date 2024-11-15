@@ -6,13 +6,13 @@ import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import { useFormatter } from '../../../../components/i18n';
-import type { InjectResultDTO } from '../../../../utils/api-types';
+import type { InjectResultOutput, InjectResultOverviewOutput } from '../../../../utils/api-types';
 import AtomicTestingUpdate from './AtomicTestingUpdate';
 
 type AtomicTestingActionType = 'Duplicate' | 'Update' | 'Delete';
 
 interface Props {
-  atomic: InjectResultDTO;
+  atomic: InjectResultOutput | InjectResultOverviewOutput;
   actions: AtomicTestingActionType[];
   onDelete?: (result: string) => void;
   inList?: boolean;
@@ -33,7 +33,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   const handleOpenDuplicate = () => setDuplicate(true);
   const handleCloseDuplicate = () => setDuplicate(false);
   const submitDuplicate = async () => {
-    await duplicateAtomicTesting(atomic.inject_id).then((result: { data: InjectResultDTO }) => {
+    await duplicateAtomicTesting(atomic.inject_id).then((result: { data: InjectResultOverviewOutput }) => {
       handleCloseDuplicate();
       navigate(`/admin/atomic_testings/${result.data.inject_id}`);
     });

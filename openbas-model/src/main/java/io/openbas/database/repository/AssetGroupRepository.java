@@ -71,4 +71,23 @@ public interface AssetGroupRepository
   @NotNull
   @EntityGraph(value = "AssetGroup.tags-assets", type = EntityGraph.EntityGraphType.LOAD)
   Page<AssetGroup> findAll(@NotNull Specification<AssetGroup> spec, @NotNull Pageable pageable);
+
+  @Query(
+      value =
+          "SELECT DISTINCT i.inject_exercise, ag.asset_group_id, ag.asset_group_name "
+              + "FROM asset_groups ag "
+              + "INNER JOIN injects_asset_groups iag ON ag.asset_group_id = iag.asset_group_id "
+              + "INNER JOIN injects i ON iag.inject_id = i.inject_id "
+              + "WHERE i.inject_exercise in :exerciseIds",
+      nativeQuery = true)
+  List<Object[]> assetGroupsByExerciseIds(Set<String> exerciseIds);
+
+  @Query(
+      value =
+          "SELECT DISTINCT iag.inject_id, ag.asset_group_id, ag.asset_group_name "
+              + "FROM asset_groups ag "
+              + "INNER JOIN injects_asset_groups iag ON ag.asset_group_id = iag.asset_group_id "
+              + "WHERE iag.inject_id in :injectIds",
+      nativeQuery = true)
+  List<Object[]> assetGroupsByInjectIds(Set<String> injectIds);
 }

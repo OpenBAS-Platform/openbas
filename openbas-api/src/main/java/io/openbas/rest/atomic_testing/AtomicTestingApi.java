@@ -6,10 +6,11 @@ import io.openbas.database.model.InjectExpectation;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
-import io.openbas.rest.atomic_testing.form.InjectResultDTO;
+import io.openbas.rest.atomic_testing.form.InjectResultOutput;
+import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.rest.inject.output.AtomicTestingOutput;
 import io.openbas.service.AtomicTestingService;
+import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -34,31 +35,35 @@ public class AtomicTestingApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping("/search")
   @Transactional(readOnly = true)
-  public Page<AtomicTestingOutput> findAllAtomicTestings(
+  @Tracing(name = "Get a page of atomic testings", layer = "api", operation = "POST")
+  public Page<InjectResultOutput> findAllAtomicTestings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return atomicTestingService.findAllAtomicTestings(searchPaginationInput);
   }
 
   @LogExecutionTime
   @GetMapping("/{injectId}")
-  public InjectResultDTO findAtomicTesting(@PathVariable String injectId) {
+  @Tracing(name = "Get a atomic testing", layer = "api", operation = "GET")
+  public InjectResultOverviewOutput findAtomicTesting(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId);
   }
 
   @PostMapping()
   @Transactional(rollbackFor = Exception.class)
-  public InjectResultDTO createAtomicTesting(@Valid @RequestBody AtomicTestingInput input) {
+  public InjectResultOverviewOutput createAtomicTesting(
+      @Valid @RequestBody AtomicTestingInput input) {
     return this.atomicTestingService.createOrUpdate(input, null);
   }
 
   @PostMapping("/{atomicTestingId}")
-  public InjectResultDTO duplicateAtomicTesting(@PathVariable final String atomicTestingId) {
+  public InjectResultOverviewOutput duplicateAtomicTesting(
+      @PathVariable final String atomicTestingId) {
     return atomicTestingService.getDuplicateAtomicTesting(atomicTestingId);
   }
 
   @PutMapping("/{injectId}")
   @Transactional(rollbackFor = Exception.class)
-  public InjectResultDTO updateAtomicTesting(
+  public InjectResultOverviewOutput updateAtomicTesting(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingInput input) {
     return atomicTestingService.createOrUpdate(input, injectId);
@@ -86,7 +91,7 @@ public class AtomicTestingApi extends RestBehavior {
 
   @PutMapping("/{injectId}/tags")
   @Transactional(rollbackFor = Exception.class)
-  public InjectResultDTO updateAtomicTestingTags(
+  public InjectResultOverviewOutput updateAtomicTestingTags(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingUpdateTagsInput input) {
     return atomicTestingService.updateAtomicTestingTags(injectId, input);

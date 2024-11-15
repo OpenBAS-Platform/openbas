@@ -10,7 +10,7 @@ import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionExecutorService;
 import io.openbas.helper.InjectHelper;
-import io.openbas.service.AtomicTestingService;
+import io.openbas.utils.InjectUtils;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -50,9 +50,9 @@ public class InjectsExecutionJob implements Job {
   private final ExerciseRepository exerciseRepository;
   private final QueueService queueService;
   private final ExecutionExecutorService executionExecutorService;
-  private final AtomicTestingService atomicTestingService;
   private final InjectDependenciesRepository injectDependenciesRepository;
   private final InjectExpectationRepository injectExpectationRepository;
+  private final InjectUtils injectUtils;
 
   private final List<ExecutionStatus> executionStatusesNotReady =
       List.of(
@@ -200,7 +200,7 @@ public class InjectsExecutionJob implements Job {
               errorMsg -> finalStatus.getTraces().add(InjectStatusExecution.traceError(errorMsg)));
       finalStatus.setName(ExecutionStatus.ERROR);
       finalStatus.setTrackingSentDate(Instant.now());
-      finalStatus.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
+      finalStatus.setCommandsLines(injectUtils.getCommandsLinesFromInject(inject));
       injectStatusRepository.save(finalStatus);
     } else {
       setInjectStatusAndExecuteInject(executableInject, inject);
@@ -281,7 +281,7 @@ public class InjectsExecutionJob implements Job {
     }
     injectStatus.setName(status);
     injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setCommandsLines(atomicTestingService.getCommandsLinesFromInject(inject));
+    injectStatus.setCommandsLines(injectUtils.getCommandsLinesFromInject(inject));
     return injectStatusRepository.save(injectStatus);
   }
 

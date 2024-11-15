@@ -4,7 +4,7 @@ import { makeStyles } from '@mui/styles';
 import { SelectGroup } from 'mdi-material-ui';
 import { FunctionComponent } from 'react';
 
-import type { InjectTargetWithResult } from '../utils/api-types';
+import type { TargetSimple } from '../utils/api-types';
 import { getLabelOfRemainingItems, getRemainingItemsCount, getVisibleItems, truncate } from '../utils/String';
 
 const useStyles = makeStyles(() => ({
@@ -21,7 +21,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  targets: InjectTargetWithResult[] | undefined;
+  targets: TargetSimple[] | undefined;
   variant?: string;
 }
 
@@ -38,7 +38,7 @@ const ItemTargets: FunctionComponent<Props> = ({
 
   // Extract the first two targets as visible chips
   const visibleTargets = getVisibleItems(targets, 2);
-  const tooltipLabel = getLabelOfRemainingItems(targets, 2, 'name');
+  const tooltipLabel = getLabelOfRemainingItems(targets, 2, 'target_name');
   const remainingTargetsCount = getRemainingItemsCount(targets, visibleTargets);
 
   if (!targets || targets.length === 0) {
@@ -57,15 +57,15 @@ const ItemTargets: FunctionComponent<Props> = ({
 
   return (
     <div className={classes.inline}>
-      {visibleTargets && visibleTargets.map((target: InjectTargetWithResult, index: number) => (
+      {visibleTargets && visibleTargets.map((target: TargetSimple, index: number) => (
         <span key={index}>
-          <Tooltip title={target.name}>
+          <Tooltip title={target.target_name}>
             <Chip
               variant="outlined"
-              key={target.id}
+              key={target.target_id}
               classes={{ root: classes.target }}
-              icon={getIcon(target.targetType!)}
-              label={truncate(target.name!, truncateLimit)}
+              icon={getIcon(target.target_type!)}
+              label={truncate(target.target_name!, truncateLimit)}
             />
           </Tooltip>
         </span>

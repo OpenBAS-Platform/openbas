@@ -2,7 +2,7 @@ import { SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@m
 import { makeStyles } from '@mui/styles';
 import * as React from 'react';
 
-import type { ExpectationResultsByType, InjectResultDTO } from '../../../../utils/api-types';
+import type { ExpectationResultsByType, InjectResultOutput } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   inline: {
@@ -14,7 +14,7 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   expectations: ExpectationResultsByType[] | undefined;
-  injectId?: InjectResultDTO['inject_id'];
+  injectId?: InjectResultOutput['inject_id'];
 }
 
 const AtomicTestingResult: React.FC<Props> = ({ expectations, injectId }) => {

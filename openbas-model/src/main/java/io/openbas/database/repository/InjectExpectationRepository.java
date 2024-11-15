@@ -64,20 +64,6 @@ public interface InjectExpectationRepository
       @Param("teamIds") List<String> teamIds,
       @Param("articlesIds") List<String> articlesIds);
 
-  // -- PREVENTION --
-
-  @Query(
-      value =
-          "select i from InjectExpectation i where i.type = 'PREVENTION' and i.inject.id = :injectId and i.asset.id = :assetId")
-  InjectExpectation findPreventionExpectationForAsset(
-      @Param("injectId") String injectId, @Param("assetId") String assetId);
-
-  @Query(
-      value =
-          "select i from InjectExpectation i where i.type = 'PREVENTION' and i.inject.id = :injectId and i.assetGroup.id = :assetGroupId")
-  InjectExpectation findPreventionExpectationForAssetGroup(
-      @Param("injectId") String injectId, @Param("assetGroupId") String assetGroupId);
-
   // -- BY TARGET TYPE
 
   @Query(
@@ -106,11 +92,6 @@ public interface InjectExpectationRepository
       final String injectId, final String teamId, final String expectationName);
 
   // -- RETRIEVE EXPECTATIONS FOR TEAM AND NOT FOR PLAYERS
-  @Query(
-      "select ie from InjectExpectation ie where ie.inject.id = :injectId and ie.team.id = :teamId and ie.name = :expectationName and ie.user is null")
-  Optional<InjectExpectation> findByInjectAndTeamAndExpectationNameAndUserIsNull(
-      String injectId, String teamId, String expectationName);
-
   @Query(
       value =
           "select i from InjectExpectation i where i.inject.id = :injectId and i.team.id = :teamId and i.user is null")
@@ -157,11 +138,9 @@ public interface InjectExpectationRepository
               + "i.inject_expectation_expected_score AS inject_expectation_expected_score, "
               + "i.inject_expectation_group AS inject_expectation_group "
               + "FROM injects_expectations i "
-              + "WHERE i.inject_id IN (:injectIds) "
-              + "AND i.user_id is null ;",
-      nativeQuery =
-          true) // We don't include expectations for players, only for the team, if applicable
-  List<RawInjectExpectation> rawForComputeGlobalByIds(@Param("injectIds") Set<String> injectIds);
+              + "WHERE i.inject_id IN (:injectIds) ; ",
+      nativeQuery = true)
+  Set<RawInjectExpectation> rawByInjectIds(@Param("injectIds") final Set<String> injectIds);
 
   @Query(
       value =
@@ -178,7 +157,32 @@ public interface InjectExpectationRepository
               + "i.inject_expectation_expected_score AS inject_expectation_expected_score, "
               + "i.inject_expectation_group AS inject_expectation_group "
               + "FROM injects_expectations i "
-              + "WHERE i.inject_id IN (:injectIds) ; ",
+              + "WHERE i.inject_id IN (:injectIds) "
+              + "AND i.user_id is null ;",
       nativeQuery = true)
-  Set<RawInjectExpectation> rawByInjectId(@Param("injectIds") final Set<String> injectIds);
+  // We don't include expectations for players, only for the team, if applicable
+  List<RawInjectExpectation> rawForComputeGlobalByInjectIds(
+      @Param("injectIds") Set<String> injectIds);
+
+  @Query(
+      value =
+          "SELECT "
+              + "i.inject_expectation_id AS inject_expectation_id, "
+              + "i.inject_id AS inject_id, "
+              + "i.exercise_id AS exercise_id, "
+              + "i.team_id AS team_id, "
+              + "i.asset_id AS asset_id, "
+              + "i.asset_group_id AS asset_group_id, "
+              + "i.inject_expectation_type AS inject_expectation_type, "
+              + "i.user_id AS user_id, "
+              + "i.inject_expectation_score AS inject_expectation_score, "
+              + "i.inject_expectation_expected_score AS inject_expectation_expected_score, "
+              + "i.inject_expectation_group AS inject_expectation_group "
+              + "FROM injects_expectations i "
+              + "WHERE i.exercise_id IN (:exerciseIds) "
+              + "AND i.user_id is null ;",
+      nativeQuery = true)
+  // We don't include expectations for players, only for the team, if applicable
+  List<RawInjectExpectation> rawForComputeGlobalByExerciseIds(
+      @Param("exerciseIds") Set<String> exerciseIds);
 }

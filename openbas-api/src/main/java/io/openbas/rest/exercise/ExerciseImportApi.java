@@ -11,7 +11,7 @@ import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.scenario.form.InjectsImportInput;
 import io.openbas.rest.scenario.response.ImportTestSummary;
-import io.openbas.service.InjectService;
+import io.openbas.service.InjectImportService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Log
 public class ExerciseImportApi extends RestBehavior {
 
-  private final InjectService injectService;
+  private final InjectImportService injectImportService;
   private final ImportMapperRepository importMapperRepository;
   private final ExerciseService exerciseService;
 
@@ -54,7 +54,7 @@ public class ExerciseImportApi extends RestBehavior {
                         String.format(
                             "The import mapper %s was not found", input.getImportMapperId())));
 
-    return this.injectService.importInjectIntoExerciseFromXLS(
+    return this.injectImportService.importInjectIntoExerciseFromXLS(
         exercise, importMapper, importId, input.getName(), input.getTimezoneOffset(), false);
   }
 
@@ -83,7 +83,7 @@ public class ExerciseImportApi extends RestBehavior {
                             "The import mapper %s was not found", input.getImportMapperId())));
 
     ImportTestSummary importTestSummary =
-        injectService.importInjectIntoExerciseFromXLS(
+        injectImportService.importInjectIntoExerciseFromXLS(
             exercise, importMapper, importId, input.getName(), input.getTimezoneOffset(), true);
     this.exerciseService.updateExercise(exercise);
     return importTestSummary;

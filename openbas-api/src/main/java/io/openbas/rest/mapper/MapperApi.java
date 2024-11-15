@@ -19,7 +19,7 @@ import io.openbas.rest.mapper.form.ImportMapperUpdateInput;
 import io.openbas.rest.scenario.form.InjectsImportTestInput;
 import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
-import io.openbas.service.InjectService;
+import io.openbas.service.InjectImportService;
 import io.openbas.service.MapperService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,10 +51,8 @@ import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 public class MapperApi extends RestBehavior {
 
   private final ImportMapperRepository importMapperRepository;
-
   private final MapperService mapperService;
-
-  private final InjectService injectService;
+  private final InjectImportService injectImportService;
 
   // 25mb in byte
   private static final int MAXIMUM_FILE_SIZE_ALLOWED = 25 * 1000 * 1000;
@@ -147,7 +145,7 @@ public class MapperApi extends RestBehavior {
   @Secured(ROLE_USER)
   public ImportPostSummary importXLSFile(@RequestPart("file") @NotNull MultipartFile file) {
     validateUploadedFile(file);
-    return injectService.storeXlsFileForImport(file);
+    return injectImportService.storeXlsFileForImport(file);
   }
 
   @PostMapping("/api/mappers/store/{importId}")
@@ -169,7 +167,7 @@ public class MapperApi extends RestBehavior {
             });
     Scenario scenario = new Scenario();
     scenario.setRecurrenceStart(Instant.now());
-    return injectService.importInjectIntoScenarioFromXLS(
+    return injectImportService.importInjectIntoScenarioFromXLS(
         scenario, importMapper, importId, input.getName(), input.getTimezoneOffset(), false);
   }
 

@@ -167,7 +167,7 @@ public class Payload implements Base {
   private Instant updatedAt = now();
 
   @JsonProperty("payload_collector_type")
-  private String getCollectorType() {
+  public String getCollectorType() {
     return this.collector != null ? this.collector.getType() : null;
   }
 

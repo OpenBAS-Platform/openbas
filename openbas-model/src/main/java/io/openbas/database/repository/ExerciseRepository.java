@@ -301,7 +301,7 @@ public interface ExerciseRepository
               + "WHERE s.scenario_id IN (:scenarioIds) "
               + "GROUP BY ex.exercise_id ;",
       nativeQuery = true)
-  Set<RawExerciseSimple> rawAllByScenarioId(@Param("scenarioIds") List<String> scenarioIds);
+  List<RawExerciseSimple> rawAllByScenarioIds(@Param("scenarioIds") List<String> scenarioIds);
 
   // -- TEAM --
 

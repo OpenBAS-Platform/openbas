@@ -59,7 +59,7 @@ public abstract class BaseInjectStatus implements Base {
   // region count
   @Column(name = "tracking_total_count")
   @JsonProperty("tracking_total_count")
-  private Integer trackingTotalCount;
+  private Integer trackingTotalCount = 0;
 
   @Column(name = "tracking_total_error")
   @JsonProperty("tracking_total_error")

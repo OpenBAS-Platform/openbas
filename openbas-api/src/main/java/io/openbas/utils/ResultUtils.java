@@ -10,7 +10,7 @@ import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
-import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
+import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,17 +30,18 @@ public class ResultUtils {
   private final AssetGroupService assetGroupService;
 
   // -- UTILS --
-  public List<AtomicTestingMapper.ExpectationResultsByType> getResultsByTypes(
-      Set<String> injectIds) {
+  public List<ExpectationResultsByType> getResultsByTypes(Set<String> injectIds) {
+    if (injectIds == null || injectIds.isEmpty()) {
+      return emptyList();
+    }
     return computeGlobalExpectationResults(injectIds);
   }
 
   public List<InjectTargetWithResult> getInjectTargetWithResults(Set<String> injectIds) {
-    if (injectIds != null) {
-      return computeTargetResults(injectIds);
-    } else {
+    if (injectIds == null || injectIds.isEmpty()) {
       return emptyList();
     }
+    return computeTargetResults(injectIds);
   }
 
   public static List<InjectExpectationResultsByAttackPattern> computeInjectExpectationResults(
@@ -71,7 +72,7 @@ public class ResultUtils {
   public List<ExpectationResultsByType> computeGlobalExpectationResults(
       @NotNull Set<String> injectIds) {
     return AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-        injectExpectationRepository.rawForComputeGlobalByIds(injectIds));
+        injectExpectationRepository.rawForComputeGlobalByInjectIds(injectIds));
   }
 
   // -- TARGETS WITH RESULTS --
@@ -79,7 +80,7 @@ public class ResultUtils {
 
     // -- EXPECTATIONS --
     Set<RawInjectExpectation> rawInjectExpectations =
-        injectExpectationRepository.rawByInjectId(injectIds);
+        injectExpectationRepository.rawByInjectIds(injectIds);
     Map<String, List<RawInjectExpectation>> expectationMap =
         rawInjectExpectations.stream()
             .collect(Collectors.groupingBy(RawInjectExpectation::getInject_id));

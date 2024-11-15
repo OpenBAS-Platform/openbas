@@ -6,12 +6,10 @@ import io.openbas.rest.inject.form.InjectDocumentInput;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
-@NoArgsConstructor
 public class AtomicTestingInput {
 
   @JsonProperty("inject_title")
@@ -39,7 +37,7 @@ public class AtomicTestingInput {
   private List<InjectDocumentInput> documents = new ArrayList<>();
 
   @JsonProperty("inject_all_teams")
-  private boolean allTeams = false;
+  private boolean allTeams;
 
   @JsonProperty("inject_tags")
   private List<String> tagIds = new ArrayList<>();

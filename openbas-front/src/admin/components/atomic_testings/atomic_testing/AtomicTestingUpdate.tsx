@@ -2,12 +2,12 @@ import * as R from 'ramda';
 import { FunctionComponent, useContext } from 'react';
 
 import { updateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
-import type { Inject, InjectResultDTO } from '../../../../utils/api-types';
+import type { Inject, InjectResultOutput, InjectResultOverviewOutput } from '../../../../utils/api-types';
 import UpdateInject from '../../common/injects/UpdateInject';
-import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
+import { InjectResultOverviewOutputContext, InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 
 interface Props {
-  atomic: InjectResultDTO;
+  atomic: InjectResultOutput | InjectResultOverviewOutput;
   open: boolean;
   handleClose: () => void;
 }
@@ -17,7 +17,7 @@ const AtomicTestingUpdate: FunctionComponent<Props> = ({
   open,
   handleClose,
 }) => {
-  const { updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
+  const { updateInjectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
   const onUpdateAtomicTesting = async (data: Inject) => {
     const toUpdate = R.pipe(
       R.pick([
@@ -35,8 +35,8 @@ const AtomicTestingUpdate: FunctionComponent<Props> = ({
         'inject_tags',
       ]),
     )(data);
-    updateAtomicTesting(atomic.inject_id, toUpdate).then((result: { data: InjectResultDTO }) => {
-      updateInjectResultDto(result.data);
+    updateAtomicTesting(atomic.inject_id, toUpdate).then((result: { data: InjectResultOverviewOutput }) => {
+      updateInjectResultOverviewOutput(result.data);
     });
   };
 

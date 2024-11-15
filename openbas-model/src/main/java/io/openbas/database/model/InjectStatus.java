@@ -51,12 +51,4 @@ public class InjectStatus extends BaseInjectStatus {
             .getSeconds());
     return injectStatus;
   }
-
-  // -- UTILS --
-
-  public static InjectStatus draftInjectStatus() {
-    InjectStatus draft = new InjectStatus();
-    draft.setName(ExecutionStatus.DRAFT);
-    return draft;
-  }
 }

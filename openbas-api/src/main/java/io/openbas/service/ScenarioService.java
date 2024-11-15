@@ -281,7 +281,7 @@ public class ScenarioService {
             .max(Comparator.comparing(RawExerciseSimple::getExercise_end_date));
 
     return latestEndedExercise
-        .map(exerciseMapper::fromRawExerciseSimple)
+        .map(exerciseMapper::getExerciseSimple)
         .orElseThrow(() -> new ElementNotFoundException("Latest exercise not found"));
   }
 

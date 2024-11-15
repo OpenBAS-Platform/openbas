@@ -40,4 +40,23 @@ public interface AssetRepository
       nativeQuery = true)
   List<RawAsset> rawByIdsOrInjectIds(
       @Param("assetIds") Set<String> assetIds, @Param("injectIds") Set<String> injectIds);
+
+  @Query(
+      value =
+          "SELECT DISTINCT i.inject_exercise, a.asset_id, a.asset_name "
+              + "FROM assets a "
+              + "INNER JOIN injects_assets ia ON a.asset_id = ia.asset_id "
+              + "INNER JOIN injects i ON ia.inject_id = i.inject_id "
+              + "WHERE i.inject_exercise in :exerciseIds",
+      nativeQuery = true)
+  List<Object[]> assetsByExerciseIds(Set<String> exerciseIds);
+
+  @Query(
+      value =
+          "SELECT DISTINCT ia.inject_id, a.asset_id, a.asset_name "
+              + "FROM assets a "
+              + "INNER JOIN injects_assets ia ON a.asset_id = ia.asset_id "
+              + "WHERE ia.inject_id in :injectIds",
+      nativeQuery = true)
+  List<Object[]> assetsByInjectIds(Set<String> injectIds);
 }

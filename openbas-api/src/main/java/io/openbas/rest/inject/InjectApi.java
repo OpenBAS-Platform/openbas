@@ -7,14 +7,13 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
-import static io.openbas.utils.AtomicTestingUtils.getTargets;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.asset.AssetGroupService;
 import io.openbas.asset.AssetService;
 import io.openbas.database.model.*;
@@ -25,15 +24,16 @@ import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
 import io.openbas.injector_contract.ContractType;
-import io.openbas.rest.atomic_testing.form.InjectResultDTO;
+import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.AtomicTestingService;
+import io.openbas.service.InjectSearchService;
 import io.openbas.service.InjectService;
 import io.openbas.service.ScenarioService;
-import io.openbas.utils.AtomicTestingMapper;
+import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -48,9 +48,7 @@ import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,6 +81,7 @@ public class InjectApi extends RestBehavior {
   private final ExecutionContextService executionContextService;
   private final ScenarioService scenarioService;
   private final InjectService injectService;
+  private final InjectSearchService injectSearchService;
   private final AtomicTestingService atomicTestingService;
   private final InjectDuplicateService injectDuplicateService;
 
@@ -208,45 +207,34 @@ public class InjectApi extends RestBehavior {
 
   // -- EXERCISES --
 
+  @LogExecutionTime
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
+  @Tracing(name = "Get an iterable of injects for an exercise", layer = "api", operation = "GET")
   public Iterable<Inject> exerciseInjects(@PathVariable @NotBlank final String exerciseId) {
     return injectRepository.findByExerciseId(exerciseId).stream()
         .sorted(Inject.executionComparator)
         .toList();
   }
 
+  @LogExecutionTime
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/search")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
-  public Page<InjectResultDTO> exerciseInjects(
+  @Tracing(name = "Get a page of inject result for an exercise", layer = "api", operation = "POST")
+  public Page<InjectResultOutput> searchExerciseInjects(
       @PathVariable final String exerciseId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    return buildPaginationJPA(
-            (Specification<Inject> specification, Pageable pageable) ->
-                this.injectRepository.findAll(
-                    InjectSpecification.fromExercise(exerciseId).and(specification), pageable),
-            searchPaginationInput,
-            Inject.class)
-        .map(
-            inject ->
-                AtomicTestingMapper.toDto(
-                    inject,
-                    getTargets(inject.getTeams(), inject.getAssets(), inject.getAssetGroups())));
+    return injectSearchService.getPageOfInjectResults(exerciseId, searchPaginationInput);
   }
 
-  @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/resultdto")
+  @LogExecutionTime
+  @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/results")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
-  public List<InjectResultDTO> exerciseInjectsWithExpectations(
-      @PathVariable final String exerciseId) {
-    return this.injectRepository.findAll(InjectSpecification.fromExercise(exerciseId)).stream()
-        .map(
-            inject ->
-                AtomicTestingMapper.toDto(
-                    inject,
-                    getTargets(inject.getTeams(), inject.getAssets(), inject.getAssetGroups())))
-        .collect(Collectors.toList());
+  @Tracing(name = "Get a list of inject results for an exercise", layer = "api", operation = "GET")
+  public List<InjectResultOutput> exerciseInjectsResults(@PathVariable final String exerciseId) {
+    return injectSearchService.getListOfInjectResults(exerciseId);
   }
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")

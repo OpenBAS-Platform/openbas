@@ -7,17 +7,15 @@ import { useParams } from 'react-router-dom';
 import type { ExerciseStore, InjectExpectationResultsByAttackPatternStore } from '../../../../../actions/exercises/Exercise';
 import { fetchExerciseExpectationResult, fetchExerciseInjectExpectationResults, searchExerciseInjects } from '../../../../../actions/exercises/exercise-action';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import { fetchExerciseInjects } from '../../../../../actions/Inject';
+import { buildEmptyFilter } from '../../../../../components/common/queryable/filter/FilterUtils';
 import { initSorting } from '../../../../../components/common/queryable/Page';
 import { buildSearchPagination } from '../../../../../components/common/queryable/QueryableUtils';
 import { useQueryableWithLocalStorage } from '../../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { useHelper } from '../../../../../store';
-import type { ExpectationResultsByType } from '../../../../../utils/api-types';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import InjectDtoList from '../../../atomic_testings/InjectDtoList';
+import type { ExpectationResultsByType, FilterGroup } from '../../../../../utils/api-types';
+import InjectResultList from '../../../atomic_testings/InjectResultList';
 import ResponsePie from '../../../common/injects/ResponsePie';
 import MitreMatrix from '../../../common/matrix/MitreMatrix';
 import ExerciseMainInformation from '../ExerciseMainInformation';
@@ -42,15 +40,11 @@ const Exercise = () => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: ExerciseStore['exercise_id'] };
   const { exercise } = useHelper((helper: ExercisesHelper) => ({
     exercise: helper.getExercise(exerciseId),
   }));
-  useDataLoader(() => {
-    dispatch(fetchExerciseInjects(exerciseId));
-  });
   const [results, setResults] = useState<ExpectationResultsByType[] | null>(null);
   const [injectResults, setInjectResults] = useState<InjectExpectationResultsByAttackPatternStore[] | null>(null);
   useEffect(() => {
@@ -67,8 +61,17 @@ const Exercise = () => {
     );
   }
 
+  const quickFilter: FilterGroup = {
+    mode: 'and',
+    filters: [
+      buildEmptyFilter('inject_kill_chain_phases', 'contains'),
+      buildEmptyFilter('inject_tags', 'contains'),
+    ],
+  };
+
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('simulation-injects-results', buildSearchPagination({
     sorts: initSorting('inject_updated_at', 'DESC'),
+    filterGroup: quickFilter,
   }));
   return (
     <>
@@ -109,7 +112,7 @@ const Exercise = () => {
               {t('Injects results')}
             </Typography>
             <Paper classes={{ root: classes.paper }} variant="outlined">
-              <InjectDtoList
+              <InjectResultList
                 fetchInjects={input => searchExerciseInjects(exerciseId, input)}
                 goTo={injectId => `/admin/exercises/${exerciseId}/injects/${injectId}`}
                 queryableHelpers={queryableHelpers}

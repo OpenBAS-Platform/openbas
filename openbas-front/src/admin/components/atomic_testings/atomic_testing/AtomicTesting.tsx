@@ -9,12 +9,12 @@ import ItemStatus from '../../../../components/ItemStatus';
 import Loader from '../../../../components/Loader';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import SearchFilter from '../../../../components/SearchFilter';
-import type { AttackPattern, InjectTargetWithResult, KillChainPhase } from '../../../../utils/api-types';
+import type { AttackPatternSimple, InjectTargetWithResult, KillChainPhaseSimple } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { isNotEmptyField } from '../../../../utils/utils';
 import InjectIcon from '../../common/injects/InjectIcon';
 import ResponsePie from '../../common/injects/ResponsePie';
-import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
+import { InjectResultOverviewOutputContext, InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import TargetListItem from './TargetListItem';
 import TargetResultsDetail from './TargetResultsDetail';
 
@@ -48,12 +48,12 @@ const AtomicTesting = () => {
   const filtering = useSearchAnFilter('', 'name', ['name']);
 
   // Fetching data
-  const { injectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
+  const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
   useEffect(() => {
-    setSelectedTarget(selectedTarget || currentParentTarget || injectResultDto?.inject_targets[0]);
-  }, [injectResultDto]);
+    setSelectedTarget(selectedTarget || currentParentTarget || injectResultOverviewOutput?.inject_targets[0]);
+  }, [injectResultOverviewOutput]);
 
-  const sortedTargets: InjectTargetWithResult[] = filtering.filterAndSort(injectResultDto?.inject_targets ?? []);
+  const sortedTargets: InjectTargetWithResult[] = filtering.filterAndSort(injectResultOverviewOutput?.inject_targets ?? []);
 
   // Handles
   const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult) => {
@@ -63,7 +63,7 @@ const AtomicTesting = () => {
     }
   };
 
-  if (!injectResultDto) {
+  if (!injectResultOverviewOutput) {
     return <Loader variant="inElement" />;
   }
 
@@ -88,7 +88,7 @@ const AtomicTesting = () => {
                 {t('Description')}
               </Typography>
               <ExpandableMarkdown
-                source={injectResultDto.inject_description}
+                source={injectResultOverviewOutput.inject_description}
                 limit={300}
               />
             </Grid>
@@ -103,15 +103,15 @@ const AtomicTesting = () => {
               <div style={{ display: 'flex' }}>
                 <InjectIcon
                   variant="inline"
-                  isPayload={isNotEmptyField(injectResultDto.inject_injector_contract?.injector_contract_payload)}
+                  isPayload={isNotEmptyField(injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload)}
                   type={
-                    injectResultDto.inject_injector_contract?.injector_contract_payload
-                      ? injectResultDto.inject_injector_contract.injector_contract_payload?.payload_collector_type
-                      || injectResultDto.inject_injector_contract.injector_contract_payload?.payload_type
-                      : injectResultDto.inject_type
+                    injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
+                      ? injectResultOverviewOutput.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                      || injectResultOverviewOutput.inject_injector_contract.injector_contract_payload?.payload_type
+                      : injectResultOverviewOutput.inject_type
                   }
                 />
-                <Tooltip title={tPick(injectResultDto.inject_injector_contract?.injector_contract_labels)}>
+                <Tooltip title={tPick(injectResultOverviewOutput.inject_injector_contract?.injector_contract_labels)}>
                   <div style={{
                     marginLeft: 10,
                     whiteSpace: 'nowrap',
@@ -119,7 +119,7 @@ const AtomicTesting = () => {
                     textOverflow: 'ellipsis',
                   }}
                   >
-                    {tPick(injectResultDto.inject_injector_contract?.injector_contract_labels)}
+                    {tPick(injectResultOverviewOutput.inject_injector_contract?.injector_contract_labels)}
                   </div>
                 </Tooltip>
               </div>
@@ -133,7 +133,7 @@ const AtomicTesting = () => {
                 {t('Last execution date')}
               </Typography>
               <div style={{ display: 'flex' }}>
-                {fldt(injectResultDto.inject_updated_at)}
+                {fldt(injectResultOverviewOutput.inject_updated_at)}
               </div>
             </Grid>
             <Grid item xs={4} style={{ paddingTop: 10 }}>
@@ -144,7 +144,11 @@ const AtomicTesting = () => {
               >
                 {t('Status')}
               </Typography>
-              <ItemStatus isInject={true} status={injectResultDto.inject_status?.status_name} label={t(injectResultDto.inject_status?.status_name ?? 'Unknown')} />
+              <ItemStatus
+                isInject={true}
+                status={injectResultOverviewOutput.inject_status?.status_name}
+                label={t(injectResultOverviewOutput.inject_status?.status_name ?? 'Unknown')}
+              />
             </Grid>
             <Grid item xs={4} style={{ paddingTop: 10 }}>
               <Typography
@@ -155,7 +159,7 @@ const AtomicTesting = () => {
                 {t('Platforms')}
               </Typography>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {injectResultDto.inject_injector_contract?.injector_contract_platforms?.map((platform: string) => (
+                {injectResultOverviewOutput.inject_injector_contract?.injector_contract_platforms?.map((platform: string) => (
                   <div key={platform} style={{ display: 'flex', marginRight: 15 }}>
                     <PlatformIcon width={20} platform={platform} marginRight={5} />
                     {platform}
@@ -171,8 +175,8 @@ const AtomicTesting = () => {
               >
                 {t('Kill Chain Phases')}
               </Typography>
-              {(injectResultDto.inject_kill_chain_phases ?? []).length === 0 && '-'}
-              {injectResultDto.inject_kill_chain_phases?.map((killChainPhase: KillChainPhase) => (
+              {(injectResultOverviewOutput.inject_kill_chain_phases ?? []).length === 0 && '-'}
+              {injectResultOverviewOutput.inject_kill_chain_phases?.map((killChainPhase: KillChainPhaseSimple) => (
                 <Chip
                   key={killChainPhase.phase_id}
                   variant="outlined"
@@ -190,8 +194,8 @@ const AtomicTesting = () => {
               >
                 {t('Attack Patterns')}
               </Typography>
-              {(injectResultDto.inject_attack_patterns ?? []).length === 0 && '-'}
-              {injectResultDto.inject_attack_patterns?.map((attackPattern: AttackPattern) => (
+              {(injectResultOverviewOutput.inject_attack_patterns ?? []).length === 0 && '-'}
+              {injectResultOverviewOutput.inject_attack_patterns?.map((attackPattern: AttackPatternSimple) => (
                 <Tooltip key={attackPattern.attack_pattern_id} title={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}>
                   <Chip
                     variant="outlined"
@@ -210,7 +214,7 @@ const AtomicTesting = () => {
           {t('Results')}
         </Typography>
         <Paper classes={{ root: classes.paper }} variant="outlined" style={{ display: 'flex', alignItems: 'center' }}>
-          <ResponsePie expectationResultsByTypes={injectResultDto.inject_expectation_results} />
+          <ResponsePie expectationResultsByTypes={injectResultOverviewOutput.inject_expectation_results} />
         </Paper>
       </Grid>
       <Grid item xs={6} style={{ marginTop: 30 }}>
@@ -255,13 +259,13 @@ const AtomicTesting = () => {
           {t('Results by target')}
         </Typography>
         <Paper classes={{ root: classes.paper }} variant="outlined" style={{ marginTop: 18 }}>
-          {selectedTarget && !!injectResultDto.inject_type && (
+          {selectedTarget && !!injectResultOverviewOutput.inject_type && (
             <TargetResultsDetail
-              inject={injectResultDto}
+              inject={injectResultOverviewOutput}
               parentTargetId={currentParentTarget?.id}
               target={selectedTarget}
-              lastExecutionStartDate={injectResultDto.inject_status?.tracking_sent_date || ''}
-              lastExecutionEndDate={injectResultDto.inject_status?.tracking_end_date || ''}
+              lastExecutionStartDate={injectResultOverviewOutput.inject_status?.tracking_sent_date || ''}
+              lastExecutionEndDate={injectResultOverviewOutput.inject_status?.tracking_end_date || ''}
             />
           )}
           {!selectedTarget && (

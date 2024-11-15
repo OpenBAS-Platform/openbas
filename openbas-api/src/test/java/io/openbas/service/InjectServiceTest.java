@@ -33,7 +33,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -45,16 +44,11 @@ import org.springframework.util.ResourceUtils;
 class InjectServiceTest {
 
   @Mock InjectRepository injectRepository;
-  @Mock InjectDocumentRepository injectDocumentRepository;
-  @Mock InjectExpectationRepository injectExpectationRepository;
-  @Mock AssetRepository assetRepository;
-  @Mock AssetGroupRepository assetGroupRepository;
   @Mock TeamRepository teamRepository;
   @Mock ScenarioTeamUserRepository scenarioTeamUserRepository;
   @Mock ExerciseTeamUserRepository exerciseTeamUserRepository;
   @Mock UserRepository userRepository;
-  @Mock ImportMapperRepository importMapperRepository;
-  @InjectMocks private InjectService injectService;
+  @Mock private InjectImportService injectImportService;
 
   private Scenario mockedScenario;
 
@@ -67,13 +61,9 @@ class InjectServiceTest {
 
   @BeforeEach
   void setUp() {
-    injectService =
-        new InjectService(
+    injectImportService =
+        new InjectImportService(
             injectRepository,
-            injectDocumentRepository,
-            injectExpectationRepository,
-            assetRepository,
-            assetGroupRepository,
             scenarioTeamUserRepository,
             exerciseTeamUserRepository,
             teamRepository,
@@ -95,7 +85,7 @@ class InjectServiceTest {
     MockMultipartFile xlsFile =
         new MockMultipartFile("file", "my-awesome-file.xls", "application/xlsx", in.readAllBytes());
 
-    ImportPostSummary response = injectService.storeXlsFileForImport(xlsFile);
+    ImportPostSummary response = injectImportService.storeXlsFileForImport(xlsFile);
 
     // -- ASSERT --
     assertNotNull(response);
@@ -121,7 +111,7 @@ class InjectServiceTest {
 
     // -- EXECUTE --
     try {
-      injectService.storeXlsFileForImport(xlsFile);
+      injectImportService.storeXlsFileForImport(xlsFile);
       fail();
     } catch (Exception ex) {
       assertTrue(ex instanceof BadRequestException);
@@ -150,7 +140,7 @@ class InjectServiceTest {
 
       sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
       ImportTestSummary importTestSummary =
-          injectService.importInjectIntoScenarioFromXLS(
+          injectImportService.importInjectIntoScenarioFromXLS(
               mockedScenario, mockedImportMapper, fileID, "CHECKLIST", 120, false);
 
       verify(teamRepository, times(1)).save(any());
@@ -179,7 +169,7 @@ class InjectServiceTest {
 
       mockedImportMapper = createImportMapper(UUID.randomUUID().toString());
       try {
-        injectService.importInjectIntoScenarioFromXLS(
+        injectImportService.importInjectIntoScenarioFromXLS(
             mockedScenario, mockedImportMapper, fileID, "CHECKLIST", 120, true);
         fail();
       } catch (Exception ex) {
@@ -217,7 +207,7 @@ class InjectServiceTest {
       injectImporterMailCopy.getRuleAttributes().addAll(createRuleAttributeMail());
       mockedImportMapper.getInjectImporters().add(injectImporterMailCopy);
       ImportTestSummary importTestSummary =
-          injectService.importInjectIntoScenarioFromXLS(
+          injectImportService.importInjectIntoScenarioFromXLS(
               mockedScenario, mockedImportMapper, fileID, "CHECKLIST", 120, true);
       assertTrue(
           importTestSummary.getImportMessage().stream()
@@ -274,7 +264,7 @@ class InjectServiceTest {
 
       sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
       ImportTestSummary importTestSummary =
-          injectService.importInjectIntoScenarioFromXLS(
+          injectImportService.importInjectIntoScenarioFromXLS(
               mockedScenario, mockedImportMapper, fileID, "CHECKLIST", 120, true);
 
       assertTrue(
@@ -331,7 +321,7 @@ class InjectServiceTest {
 
       sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
       ImportTestSummary importTestSummary =
-          injectService.importInjectIntoScenarioFromXLS(
+          injectImportService.importInjectIntoScenarioFromXLS(
               mockedScenario, mockedImportMapper, fileID, "CHECKLIST", 120, true);
 
       assertTrue(
@@ -381,7 +371,7 @@ class InjectServiceTest {
 
       sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
       ImportTestSummary importTestSummary =
-          injectService.importInjectIntoScenarioFromXLS(
+          injectImportService.importInjectIntoScenarioFromXLS(
               mockedScenario, mockedImportMapper, fileID, "CHECKLIST", 120, false);
 
       List<Inject> sortedInjects =
@@ -434,7 +424,7 @@ class InjectServiceTest {
 
       sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
       ImportTestSummary importTestSummary =
-          injectService.importInjectIntoScenarioFromXLS(
+          injectImportService.importInjectIntoScenarioFromXLS(
               mockedScenario, mockedImportMapper, fileID, "CHECKLIST", 120, false);
 
       List<Inject> sortedInjects =
@@ -488,7 +478,7 @@ class InjectServiceTest {
 
       sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
       ImportTestSummary importTestSummary =
-          injectService.importInjectIntoScenarioFromXLS(
+          injectImportService.importInjectIntoScenarioFromXLS(
               mockedScenario, mockedImportMapper, fileID, "CHECKLIST", 120, true);
 
       assertTrue(
@@ -527,7 +517,7 @@ class InjectServiceTest {
 
       sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
       ImportTestSummary importTestSummary =
-          injectService.importInjectIntoScenarioFromXLS(
+          injectImportService.importInjectIntoScenarioFromXLS(
               mockedScenario, mockedImportMapper, fileID, "CHECKLIST", 120, false);
 
       List<Inject> sortedInjects =
@@ -580,7 +570,7 @@ class InjectServiceTest {
 
       sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
       ImportTestSummary importTestSummary =
-          injectService.importInjectIntoScenarioFromXLS(
+          injectImportService.importInjectIntoScenarioFromXLS(
               mockedScenario, mockedImportMapper, fileID, "CHECKLIST", 120, false);
 
       assertSame("title", importTestSummary.getInjects().getFirst().getTitle());
@@ -631,7 +621,7 @@ class InjectServiceTest {
 
       sessionHelper.when(SessionHelper::currentUser).thenReturn(new OpenBASOAuth2User(mockedUser));
       ImportTestSummary importTestSummary =
-          injectService.importInjectIntoExerciseFromXLS(
+          injectImportService.importInjectIntoExerciseFromXLS(
               mockedExercise, mockedImportMapper, fileID, "CHECKLIST", 120, true);
 
       assertTrue(

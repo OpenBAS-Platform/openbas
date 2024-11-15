@@ -238,6 +238,7 @@ public class InjectExpectation implements Base {
     return getExercise().isUserHasAccess(user);
   }
 
+  @JsonProperty("target_id")
   public String getTargetId() {
     if (team != null) {
       return team.getId();

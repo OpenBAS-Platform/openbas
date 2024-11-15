@@ -14,7 +14,7 @@ import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
 import ItemTargets from '../../../components/ItemTargets';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
-import type { InjectResultDTO, SearchPaginationInput } from '../../../utils/api-types';
+import type { InjectResultOutput, SearchPaginationInput } from '../../../utils/api-types';
 import { isNotEmptyField } from '../../../utils/utils';
 import InjectIcon from '../common/injects/InjectIcon';
 import InjectorContract from '../common/injects/InjectorContract';
@@ -66,19 +66,18 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  fetchInjects: (input: SearchPaginationInput) => Promise<{ data: Page<InjectResultDTO> }>;
+  fetchInjects: (input: SearchPaginationInput) => Promise<{ data: Page<InjectResultOutput> }>;
   goTo: (injectId: string) => string;
   queryableHelpers: QueryableHelpers;
   searchPaginationInput: SearchPaginationInput;
   availableFilterNames?: string[];
 }
 
-const InjectDtoList: FunctionComponent<Props> = ({
+const InjectResultList: FunctionComponent<Props> = ({
   fetchInjects,
   goTo,
   queryableHelpers,
   searchPaginationInput,
-  availableFilterNames = [],
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -87,7 +86,14 @@ const InjectDtoList: FunctionComponent<Props> = ({
   const [loading, setLoading] = useState<boolean>(true);
 
   // Filter and sort hook
-  const [injects, setInjects] = useState<InjectResultDTO[]>([]);
+  const availableFilterNames = [
+    'inject_kill_chain_phases',
+    'inject_tags',
+    'inject_title',
+    'inject_type',
+    'inject_updated_at',
+  ];
+  const [injects, setInjects] = useState<InjectResultOutput[]>([]);
 
   // Headers
   const headers: Header[] = useMemo(() => [
@@ -95,10 +101,10 @@ const InjectDtoList: FunctionComponent<Props> = ({
       field: 'inject_type',
       label: 'Type',
       isSortable: false,
-      value: (injectDto: InjectResultDTO) => {
-        if (injectDto.inject_injector_contract) {
+      value: (injectResultOutput: InjectResultOutput) => {
+        if (injectResultOutput.inject_injector_contract) {
           return (
-            <InjectorContract variant="list" label={tPick(injectDto.inject_injector_contract?.injector_contract_labels)} />
+            <InjectorContract variant="list" label={tPick(injectResultOutput.inject_injector_contract?.injector_contract_labels)} />
           );
         }
         return <InjectorContract variant="list" label={t('Deleted')} deleted={true} />;
@@ -108,41 +114,41 @@ const InjectDtoList: FunctionComponent<Props> = ({
       field: 'inject_title',
       label: 'Title',
       isSortable: true,
-      value: (injectDto: InjectResultDTO) => {
-        return <>{injectDto.inject_title}</>;
+      value: (injectResultOutput: InjectResultOutput) => {
+        return <>{injectResultOutput.inject_title}</>;
       },
     },
     {
       field: 'inject_status.tracking_sent_date',
       label: 'Execution Date',
       isSortable: false,
-      value: (injectDto: InjectResultDTO) => {
-        return <>{fldt(injectDto.inject_status?.tracking_sent_date)}</>;
+      value: (injectResultOutput: InjectResultOutput) => {
+        return <>{fldt(injectResultOutput.inject_status?.tracking_sent_date)}</>;
       },
     },
     {
       field: 'inject_status',
       label: 'Status',
       isSortable: false,
-      value: (injectDto: InjectResultDTO) => {
-        return (<ItemStatus isInject status={injectDto.inject_status?.status_name} label={t(injectDto.inject_status?.status_name)} variant="inList" />);
+      value: (injectResultOutput: InjectResultOutput) => {
+        return (<ItemStatus isInject status={injectResultOutput.inject_status?.status_name} label={t(injectResultOutput.inject_status?.status_name)} variant="inList" />);
       },
     },
     {
       field: 'inject_targets',
       label: 'Target',
       isSortable: false,
-      value: (injectDto: InjectResultDTO) => {
-        return (<ItemTargets targets={injectDto.inject_targets} />);
+      value: (injectResultOutput: InjectResultOutput) => {
+        return (<ItemTargets targets={injectResultOutput.inject_targets} />);
       },
     },
     {
       field: 'inject_expectations',
       label: 'Global score',
       isSortable: false,
-      value: (injectDto: InjectResultDTO) => {
+      value: (injectResultOutput: InjectResultOutput) => {
         return (
-          <AtomicTestingResult expectations={injectDto.inject_expectation_results} />
+          <AtomicTestingResult expectations={injectResultOutput.inject_expectation_results} />
         );
       },
     },
@@ -150,8 +156,8 @@ const InjectDtoList: FunctionComponent<Props> = ({
       field: 'inject_updated_at',
       label: 'Updated',
       isSortable: true,
-      value: (injectDto: InjectResultDTO) => {
-        return <>{nsdt(injectDto.inject_updated_at)}</>;
+      value: (injectResultOutput: InjectResultOutput) => {
+        return <>{nsdt(injectResultOutput.inject_updated_at)}</>;
       },
     },
   ], []);
@@ -192,15 +198,15 @@ const InjectDtoList: FunctionComponent<Props> = ({
         {
           loading
             ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} />
-            : injects.map((injectDto, index) => {
+            : injects.map((injectResultOutput, index) => {
               return (
                 <ListItem
-                  key={injectDto.inject_id}
+                  key={injectResultOutput.inject_id}
                   classes={{ root: classes.item }}
                   divider={injects.length !== index + 1}
                   secondaryAction={(
                     <AtomicTestingPopover
-                      atomic={injectDto}
+                      atomic={injectResultOutput}
                       actions={['Duplicate', 'Delete']}
                       onDelete={result => setInjects(injects.filter(e => (e.inject_id !== result)))}
                       inList
@@ -210,16 +216,16 @@ const InjectDtoList: FunctionComponent<Props> = ({
                 >
                   <ListItemButton
                     component={Link}
-                    to={goTo(injectDto.inject_id)}
+                    to={goTo(injectResultOutput.inject_id)}
                   >
                     <ListItemIcon>
                       <InjectIcon
-                        isPayload={isNotEmptyField(injectDto.inject_injector_contract?.injector_contract_payload)}
+                        isPayload={isNotEmptyField(injectResultOutput.inject_injector_contract?.injector_contract_payload?.payload_id)}
                         type={
-                          injectDto.inject_injector_contract?.injector_contract_payload
-                            ? injectDto.inject_injector_contract.injector_contract_payload.payload_collector_type
-                            || injectDto.inject_injector_contract.injector_contract_payload.payload_type
-                            : injectDto.inject_type
+                          injectResultOutput.inject_injector_contract?.injector_contract_payload?.payload_id
+                            ? injectResultOutput.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                            || injectResultOutput.inject_injector_contract.injector_contract_payload?.payload_type
+                            : injectResultOutput.inject_type
                         }
                         variant="list"
                       />
@@ -233,7 +239,7 @@ const InjectDtoList: FunctionComponent<Props> = ({
                               className={classes.bodyItem}
                               style={inlineStyles[header.field]}
                             >
-                              {header.value?.(injectDto)}
+                              {header.value?.(injectResultOutput)}
                             </div>
                           ))}
                         </div>
@@ -250,4 +256,4 @@ const InjectDtoList: FunctionComponent<Props> = ({
   );
 };
 
-export default InjectDtoList;
+export default InjectResultList;

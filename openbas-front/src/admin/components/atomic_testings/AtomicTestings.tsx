@@ -12,11 +12,11 @@ import { buildSearchPagination } from '../../../components/common/queryable/Quer
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
-import type { FilterGroup, Inject, InjectResultDTO } from '../../../utils/api-types';
+import type { FilterGroup, Inject, InjectResultOverviewOutput } from '../../../utils/api-types';
 import { TeamContext } from '../common/Context';
 import CreateInject from '../common/injects/CreateInject';
 import teamContextForAtomicTesting from './atomic_testing/context/TeamContextForAtomicTesting';
-import InjectDtoList from './InjectDtoList';
+import InjectResultList from './InjectResultList';
 
 const AtomicTestings = () => {
   // Standard hooks
@@ -41,18 +41,10 @@ const AtomicTestings = () => {
       R.assoc('inject_documents', data.inject_documents),
       R.assoc('inject_teams', data.inject_teams),
     )(data);
-    await createAtomicTesting(toCreate).then((result: { data: InjectResultDTO }) => {
+    await createAtomicTesting(toCreate).then((result: { data: InjectResultOverviewOutput }) => {
       navigate(`/admin/atomic_testings/${result.data.inject_id}`);
     });
   };
-
-  const availableFilterNames = [
-    'inject_kill_chain_phases',
-    'inject_tags',
-    'inject_title',
-    'inject_type',
-    'inject_updated_at',
-  ];
 
   const quickFilter: FilterGroup = {
     mode: 'and',
@@ -69,12 +61,11 @@ const AtomicTestings = () => {
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Atomic testings'), current: true }]} />
-      <InjectDtoList
+      <InjectResultList
         fetchInjects={searchAtomicTestings}
         goTo={injectId => `/admin/atomic_testings/${injectId}`}
         queryableHelpers={queryableHelpers}
         searchPaginationInput={searchPaginationInput}
-        availableFilterNames={availableFilterNames}
       />
       {userAdmin && (
         <>
