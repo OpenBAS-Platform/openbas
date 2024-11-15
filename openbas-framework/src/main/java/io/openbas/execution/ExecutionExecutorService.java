@@ -43,12 +43,7 @@ public class ExecutionExecutorService {
                                 .stream()))
             .toList();
     InjectStatus injectStatus =
-        inject
-            .getStatus()
-            .orElseGet(
-                () -> {
-                  throw new IllegalArgumentException("Status should exists");
-                });
+        inject.getStatus().orElseThrow(() -> new IllegalArgumentException("Status should exists"));
     AtomicBoolean atLeastOneExecution = new AtomicBoolean(false);
     assets.forEach(
         asset -> {
@@ -96,12 +91,10 @@ public class ExecutionExecutorService {
           }
           this.taniumExecutorContextService.launchExecutorSubprocess(inject, asset);
         }
-        case "openbas_agent" -> {
-          this.openBASExecutorContextService.launchExecutorSubprocess(inject, asset);
-        }
-        default -> {
-          throw new RuntimeException("Fatal error: Unsupported executor " + executor.getType());
-        }
+        case "openbas_agent" ->
+            this.openBASExecutorContextService.launchExecutorSubprocess(inject, asset);
+        default ->
+            throw new RuntimeException("Fatal error: Unsupported executor " + executor.getType());
       }
     }
   }

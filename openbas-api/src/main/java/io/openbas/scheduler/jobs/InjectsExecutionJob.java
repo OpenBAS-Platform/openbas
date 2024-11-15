@@ -181,7 +181,7 @@ public class InjectsExecutionJob implements Job {
     Inject inject = executableInject.getInjection().getInject();
 
     // We are now checking if we depend on another inject and if it did not failed
-    Optional<List<String>> errorMessages = null;
+    Optional<List<String>> errorMessages = Optional.empty();
     if (executableInject.getExercise() != null) {
       errorMessages = getErrorMessagesPreExecution(executableInject.getExercise().getId(), inject);
     }
@@ -349,7 +349,9 @@ public class InjectsExecutionJob implements Job {
 
     injectDependencies.forEach(
         injectDependency -> {
-          injectDependency.getInjectDependencyCondition().getConditions().stream()
+          injectDependency
+              .getInjectDependencyCondition()
+              .getConditions()
               .forEach(
                   condition -> {
                     mapCondition.put(condition.getKey(), false);
