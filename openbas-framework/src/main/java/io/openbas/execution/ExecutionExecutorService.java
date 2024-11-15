@@ -1,15 +1,16 @@
 package io.openbas.execution;
 
 import io.openbas.asset.AssetGroupService;
-import io.openbas.database.model.Asset;
+import io.openbas.database.model.*;
 import io.openbas.database.model.Executor;
-import io.openbas.database.model.Inject;
+import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.service.CalderaExecutorContextService;
 import io.openbas.executors.openbas.service.OpenBASExecutorContextService;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.executors.tanium.service.TaniumExecutorContextService;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class ExecutionExecutorService {
   private TaniumExecutorContextService taniumExecutorContextService;
 
   private OpenBASExecutorContextService openBASExecutorContextService;
+  private InjectStatusRepository injectStatusRepository;
 
   @Autowired
   public void setOpenBASExecutorContextService(
@@ -79,10 +81,37 @@ public class ExecutionExecutorService {
                                 .assetsFromAssetGroup(assetGroup.getId())
                                 .stream()))
             .toList();
+    InjectStatus injectStatus =
+        inject
+            .getStatus()
+            .orElseGet(
+                () -> {
+                  throw new IllegalArgumentException("Status should exists");
+                });
+    AtomicBoolean atLeastOneExecution = new AtomicBoolean(false);
     assets.forEach(
         asset -> {
-          launchExecutorContextForAsset(inject, asset);
+          try {
+            launchExecutorContextForAsset(inject, asset);
+            atLeastOneExecution.set(true);
+          } catch (RuntimeException e) {
+            ExecutionTraceStatus traceStatus =
+                e.getMessage().startsWith("Asset error")
+                    ? ExecutionTraceStatus.ASSET_INACTIVE
+                    : ExecutionTraceStatus.ERROR;
+
+            injectStatus
+                .getTraces()
+                .add(InjectStatusExecution.traceError(traceStatus, e.getMessage()));
+            injectStatusRepository.save(injectStatus);
+          }
         });
+    // if launchExecutorContextForAsset fail for every assets we throw to manually set injectStatus
+    // to error
+    if (!atLeastOneExecution.get()) {
+      throw new RuntimeException("No asset executed");
+    }
+
     return executableInject;
   }
 
@@ -114,5 +143,10 @@ public class ExecutionExecutorService {
         }
       }
     }
+  }
+
+  @Autowired
+  public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
+    this.injectStatusRepository = injectStatusRepository;
   }
 }
