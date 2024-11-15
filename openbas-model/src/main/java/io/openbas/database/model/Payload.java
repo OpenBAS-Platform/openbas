@@ -41,7 +41,8 @@ public class Payload implements Base {
 
   public enum PAYLOAD_STATUS {
     UNVERIFIED,
-    VERIFIED
+    VERIFIED,
+    DEPRECATED
   }
 
   @Id

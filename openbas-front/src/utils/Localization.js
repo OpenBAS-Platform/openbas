@@ -939,6 +939,7 @@ const i18n = {
       'user_tags': 'Tags',
       'Unverified': 'Non vérifié',
       'Verified': 'Vérifié',
+      'Deprecated': 'Déprécié',
       'Recurrence': 'Récurrence',
       'Does not repeat': 'Ne se répète pas',
       'Daily': 'Quotidien',
@@ -1258,6 +1259,7 @@ const i18n = {
       'FILIGRAN': 'Filigran',
       'VERIFIED': 'Verified',
       'UNVERIFIED': 'Unverified',
+      'DEPRECATED': 'Deprecated',
       // ---Xls mapper
       'Create a xls mapper': 'Créer un mapper xls',
       'Mapper name': 'Nom du mapper',
@@ -2621,6 +2623,7 @@ const i18n = {
       'FILIGRAN': 'Filigran',
       'VERIFIED': '已验证',
       'UNVERIFIED': '未验证',
+      'DEPRECATED': '已弃用',
       // ---Xls mapper
       'Create a xls mapper': '创建xls映射',
       'Mapper name': '映射名称',
@@ -2899,6 +2902,7 @@ const i18n = {
       'FILIGRAN': 'Filigran',
       'VERIFIED': 'Verified',
       'UNVERIFIED': 'Unverified',
+      'DEPRECATED': 'Deprecated',
       // - XLS Mapper
       'Expectation_name': 'Expectation name',
       'Expectation_description': 'Expectation description',

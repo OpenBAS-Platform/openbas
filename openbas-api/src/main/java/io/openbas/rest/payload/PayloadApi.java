@@ -15,6 +15,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
 import io.openbas.rest.payload.form.PayloadUpsertInput;
+import io.openbas.rest.payload.form.PayloadsDeprecateInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -379,5 +380,14 @@ public class PayloadApi extends RestBehavior {
   @DeleteMapping("/api/payloads/{payloadId}")
   public void deletePayload(@PathVariable String payloadId) {
     payloadRepository.deleteById(payloadId);
+  }
+
+  @PostMapping(PAYLOAD_URI + "/deprecate")
+  @Secured(ROLE_ADMIN)
+  @Transactional(rollbackOn = Exception.class)
+  public void deprecateNonProcessedPayloadsByCollector(
+      @Valid @RequestBody PayloadsDeprecateInput input) {
+    this.payloadService.deprecateNonProcessedPayloadsByCollector(
+        input.collectorId(), input.processedPayloadExternalIds());
   }
 }

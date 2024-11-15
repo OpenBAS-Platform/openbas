@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -20,4 +21,18 @@ public interface PayloadRepository
   List<Payload> findByType(@Param("types") final List<String> types);
 
   Optional<Payload> findByExternalId(@NotNull String externalId);
+
+  @Query(
+      value = "SELECT payload_external_id FROM payloads WHERE payload_collector = :collectorId",
+      nativeQuery = true)
+  List<String> findAllExternalIdsByCollectorId(@NotNull @Param("collectorId") String collectorId);
+
+  @Modifying
+  @Query(
+      value =
+          "UPDATE payloads SET payload_status = :payloadStatus WHERE payload_external_id IN :payloadExternalIds",
+      nativeQuery = true)
+  void setPayloadStatusByExternalIds(
+      @Param("payloadStatus") String payloadStatus,
+      @Param("payloadExternalIds") List<String> payloadExternalIds);
 }

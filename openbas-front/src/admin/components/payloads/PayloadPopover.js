@@ -11,7 +11,7 @@ import { useFormatter } from '../../../components/i18n';
 import { documentOptions, platformOptions } from '../../../utils/Option';
 import PayloadForm from './PayloadForm';
 
-const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate, disabled }) => {
+const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate, disableUpdate, disableDelete }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openDuplicate, setOpenDuplicate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -107,8 +107,8 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
         onClose={handlePopoverClose}
       >
         <MenuItem onClick={handleOpenDuplicate}>{t('Duplicate')}</MenuItem>
-        <MenuItem onClick={handleOpenEdit} disabled={disabled}>{t('Update')}</MenuItem>
-        <MenuItem onClick={handleOpenDelete} disabled={disabled}>{t('Delete')}</MenuItem>
+        <MenuItem onClick={handleOpenEdit} disabled={disableUpdate}>{t('Update')}</MenuItem>
+        <MenuItem onClick={handleOpenDelete} disabled={disableDelete}>{t('Delete')}</MenuItem>
       </Menu>
       <Dialog
         open={openDelete}
