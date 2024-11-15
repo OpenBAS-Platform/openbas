@@ -241,9 +241,6 @@ public class InjectsExecutionJob implements Job {
                       inject
                           .getStatus()
                           .orElseThrow(() -> new IllegalArgumentException("Status should exists"));
-                              () -> {
-                                throw new IllegalArgumentException("Status should exists");
-                              });
                   injectStatus.setName(ExecutionStatus.ERROR);
                   injectStatusRepository.save(injectStatus);
                   return;

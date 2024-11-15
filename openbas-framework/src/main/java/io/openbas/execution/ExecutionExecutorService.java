@@ -15,58 +15,19 @@ import java.util.logging.Level;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 @Log
 public class ExecutionExecutorService {
-  private AssetGroupService assetGroupService;
-
-  private CalderaExecutorConfig calderaExecutorConfig;
-
-  private CalderaExecutorContextService calderaExecutorContextService;
-
-  private TaniumExecutorConfig taniumExecutorConfig;
-
-  private TaniumExecutorContextService taniumExecutorContextService;
-
-  private OpenBASExecutorContextService openBASExecutorContextService;
-  private InjectStatusRepository injectStatusRepository;
-
-  @Autowired
-  public void setOpenBASExecutorContextService(
-      OpenBASExecutorContextService openBASExecutorContextService) {
-    this.openBASExecutorContextService = openBASExecutorContextService;
-  }
-
-  @Autowired
-  public void setAssetGroupService(AssetGroupService assetGroupService) {
-    this.assetGroupService = assetGroupService;
-  }
-
-  @Autowired
-  public void setCalderaExecutorConfig(CalderaExecutorConfig calderaExecutorConfig) {
-    this.calderaExecutorConfig = calderaExecutorConfig;
-  }
-
-  @Autowired
-  public void setCalderaExecutorContextService(
-      CalderaExecutorContextService calderaExecutorContextService) {
-    this.calderaExecutorContextService = calderaExecutorContextService;
-  }
-
-  @Autowired
-  public void setTaniumExecutorConfig(TaniumExecutorConfig taniumExecutorConfig) {
-    this.taniumExecutorConfig = taniumExecutorConfig;
-  }
-
-  @Autowired
-  public void setTaniumExecutorContextService(
-      TaniumExecutorContextService taniumExecutorContextService) {
-    this.taniumExecutorContextService = taniumExecutorContextService;
-  }
+  private final AssetGroupService assetGroupService;
+  private final CalderaExecutorConfig calderaExecutorConfig;
+  private final CalderaExecutorContextService calderaExecutorContextService;
+  private final TaniumExecutorConfig taniumExecutorConfig;
+  private final TaniumExecutorContextService taniumExecutorContextService;
+  private final OpenBASExecutorContextService openBASExecutorContextService;
+  private final InjectStatusRepository injectStatusRepository;
 
   public ExecutableInject launchExecutorContext(ExecutableInject executableInject, Inject inject)
       throws InterruptedException {
@@ -103,13 +64,13 @@ public class ExecutionExecutorService {
             injectStatus
                 .getTraces()
                 .add(InjectStatusExecution.traceError(traceStatus, e.getMessage()));
-            injectStatusRepository.save(injectStatus);
+            this.injectStatusRepository.save(injectStatus);
           }
         });
     // if launchExecutorContextForAsset fail for every assets we throw to manually set injectStatus
     // to error
     if (!atLeastOneExecution.get()) {
-      throw new RuntimeException("No asset executed");
+      throw new ExecutionExecutorException("No asset executed");
     }
 
     return executableInject;
@@ -143,10 +104,5 @@ public class ExecutionExecutorService {
         }
       }
     }
-  }
-
-  @Autowired
-  public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
-    this.injectStatusRepository = injectStatusRepository;
   }
 }
