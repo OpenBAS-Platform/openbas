@@ -3,10 +3,13 @@ package io.openbas.utils;
 import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.*;
 import io.openbas.rest.atomic_testing.form.*;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +39,7 @@ public class InjectMapper {
         .type(injectorContract.map(contract -> contract.getInjector().getType()).orElse(null))
         .tagIds(inject.getTags().stream().map(Tag::getId).toList())
         .documentIds(documentIds)
-        .injectorContract(toInjectorContractSimple(injectorContract))
+        .injectorContract(toInjectorContractOutput(injectorContract))
         .status(toInjectStatusOutput(inject.getStatus()))
         .expectations(toInjectExpectationSimples(inject.getExpectations()))
         .killChainPhases(toKillChainPhasesSimples(inject.getKillChainPhases()))
@@ -67,7 +70,7 @@ public class InjectMapper {
   }
 
   // -- INJECTORCONTRACT to INJECTORCONTRACT SIMPLE --
-  public InjectorContractSimple toInjectorContractSimple(
+  public InjectorContractSimple toInjectorContractOutput(
       Optional<InjectorContract> injectorContract) {
     return injectorContract
         .map(
@@ -77,20 +80,30 @@ public class InjectMapper {
                     .content(contract.getContent())
                     .convertedContent(contract.getConvertedContent())
                     .platforms(contract.getPlatforms())
-                    .payload(toPayloadSimple(Optional.ofNullable(contract.getPayload())))
+                    .payload(toPayloadOutput(Optional.ofNullable(contract.getPayload())))
                     .labels(contract.getLabels())
                     .build())
         .orElse(null);
   }
 
-  private PayloadSimple toPayloadSimple(Optional<Payload> payload) {
+  private PayloadOutput toPayloadOutput(Optional<Payload> payload) {
     return payload
         .map(
-            payloadToSimple ->
-                PayloadSimple.builder()
-                    .id(payloadToSimple.getId())
-                    .type(payloadToSimple.getType())
-                    .collectorType(payloadToSimple.getCollectorType())
+            payloadToOutput ->
+                PayloadOutput.builder()
+                    .id(payloadToOutput.getId())
+                    .type(payloadToOutput.getType())
+                    .collectorType(payloadToOutput.getCollectorType())
+                    .name(payloadToOutput.getName())
+                    .description(payloadToOutput.getDescription())
+                    .platforms(payloadToOutput.getPlatforms())
+                    .attackPatterns(toAttackPatternSimples(payloadToOutput.getAttackPatterns()))
+                    .cleanupExecutor(payloadToOutput.getCleanupExecutor())
+                    .cleanupCommand(payloadToOutput.getCleanupCommand())
+                    .arguments(payloadToOutput.getArguments())
+                    .prerequisites(payloadToOutput.getPrerequisites())
+                    .externalId(payloadToOutput.getExternalId())
+                    .tags(payloadToOutput.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
                     .build())
         .orElse(null);
   }
