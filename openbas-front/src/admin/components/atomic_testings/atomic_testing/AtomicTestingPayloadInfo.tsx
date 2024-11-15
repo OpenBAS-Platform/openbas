@@ -3,12 +3,10 @@ import { makeStyles } from '@mui/styles';
 import { Props } from 'html-react-parser/lib/attributes-to-props';
 import { FunctionComponent, useContext } from 'react';
 
-import { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
 import { useFormatter } from '../../../../components/i18n';
 import ItemCopy from '../../../../components/ItemCopy';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import { useHelper } from '../../../../store';
 import { AttackPattern, PayloadArgument, PayloadPrerequisite } from '../../../../utils/api-types';
 import { emptyFilled } from '../../../../utils/String';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
@@ -132,26 +130,134 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
         <Typography variant="h4">{t('Commands')}</Typography>
         {injectResultDto ? (
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <Typography
-              variant="h3"
-              gutterBottom
-            >
-              {t('Command executor')}
-            </Typography>
-            {/* {injectResultDto?.inject_injector_contract?.injector_contract_payload?.} */}
-            <Typography
-              variant="h3"
-              gutterBottom
-              style={{ marginTop: 20 }}
-            >
-              {t('Attack commands')}
-            </Typography>
-            <pre>
-              {/* <ItemCopy content={
-                injectResultDto.inject_commands_lines?.content ?? ''
-              }
-              /> */}
-            </pre>
+            {injectResultDto?.inject_injector_contract?.injector_contract_payload?.payload_type === 'Command' && (
+              <>
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                >
+                  {t('Command executor')}
+                </Typography>
+                {injectResultDto?.inject_injector_contract?.injector_contract_payload?.command_executor}
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                  style={{ marginTop: 20 }}
+                >
+                  {t('Attack commands')}
+                </Typography>
+                <pre>
+                  <ItemCopy content={
+                    injectResultDto?.inject_injector_contract?.injector_contract_payload?.command_content ?? ''
+                  }
+                  />
+                </pre>
+              </>
+            )}
+            {injectResultDto?.inject_injector_contract?.injector_contract_payload?.payload_type === 'Executable' && (
+              <>
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                >
+                  {t('Executable files')}
+                </Typography>
+                {
+                  injectResultDto?.inject_injector_contract?.injector_contract_payload?.executable_file !== undefined
+                    ? (
+                        <Typography variant="body1">
+                          {injectResultDto?.inject_injector_contract?.injector_contract_payload?.executable_file?.document_name ?? '-'}
+                        </Typography>
+                      )
+                    : (
+                        <Typography variant="body1" gutterBottom>
+                          -
+                        </Typography>
+                      )
+                }
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                  style={{ marginTop: 20 }}
+                >
+                  {t('Architecture')}
+                </Typography>
+                {injectResultDto?.inject_injector_contract?.injector_contract_payload?.executable_arch}
+              </>
+            )}
+            {injectResultDto?.inject_injector_contract?.injector_contract_payload?.payload_type === 'File' && (
+              <>
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                >
+                  {t('File drop file')}
+                </Typography>
+                {
+                  injectResultDto?.inject_injector_contract?.injector_contract_payload?.file_drop_file !== undefined
+                    ? (
+                        <Typography variant="body1">
+                          {injectResultDto?.inject_injector_contract?.injector_contract_payload?.file_drop_file?.document_name ?? '-'}
+                        </Typography>
+                      )
+                    : (
+                        <Typography variant="body1" gutterBottom>
+                          -
+                        </Typography>
+                      )
+                }
+              </>
+            )}
+            {injectResultDto?.inject_injector_contract?.injector_contract_payload?.payload_type === 'Dns' && (
+              <>
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                >
+                  {t('Dns resolution hostname')}
+                </Typography>
+                {injectResultDto?.inject_injector_contract?.injector_contract_payload?.dns_resolution_hostname}
+              </>
+            )}
+            {injectResultDto?.inject_injector_contract?.injector_contract_payload?.payload_type === 'Network' && (
+              <>
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                >
+                  {t('Network traffic ip destination')}
+                </Typography>
+                {injectResultDto?.inject_injector_contract?.injector_contract_payload?.network_traffic_ip_dst}
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                >
+                  {t('Network traffic port destination')}
+                </Typography>
+                {injectResultDto?.inject_injector_contract?.injector_contract_payload?.network_traffic_port_dst}
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                >
+                  {t('Network traffic ip source')}
+                </Typography>
+                {injectResultDto?.inject_injector_contract?.injector_contract_payload?.network_traffic_ip_src}
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                >
+                  {t('Network traffic port source')}
+                </Typography>
+                {injectResultDto?.inject_injector_contract?.injector_contract_payload?.network_traffic_port_src}
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                >
+                  {t('Network traffic protocol')}
+                </Typography>
+                {injectResultDto?.inject_injector_contract?.injector_contract_payload?.network_traffic_protocol}
+              </>
+            )}
             <Typography
               variant="h3"
               gutterBottom
