@@ -5,6 +5,7 @@ import { FunctionComponent, useContext } from 'react';
 
 import { useFormatter } from '../../../../components/i18n';
 import ItemStatus from '../../../../components/ItemStatus';
+import { InjectResultOverviewOutputContext, InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -23,7 +24,7 @@ const useStyles = makeStyles(() => ({
 
 const AtomicTestingDetail: FunctionComponent<Props> = () => {
   const classes = useStyles();
-  const { t, tPick } = useFormatter();
+  const { t } = useFormatter();
 
   // Fetching data
   const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
@@ -31,95 +32,6 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
   return (
     <Grid container spacing={2}>
       <Grid item xs={12} style={{ marginBottom: 30 }}>
-        <Typography variant="h4">{t('Configuration')}</Typography>
-        {injectResultOverviewOutput ? (
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={4}>
-                <Typography variant="subtitle1" className={classes.header} gutterBottom>
-                  {t('Description')}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  {injectResultOverviewOutput?.inject_description || '-'}
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Typography variant="subtitle1" className={classes.header} gutterBottom>
-                  {t('Type')}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  {tPick(injectResultOverviewOutput.inject_injector_contract?.injector_contract_labels)}
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Typography variant="subtitle1" className={classes.header} gutterBottom>
-                  {t('Expectations')}
-                </Typography>
-                {
-                  injectResultOverviewOutput.inject_expectations !== undefined && injectResultOverviewOutput.inject_expectations.length > 0
-                    ? Array.from(new Set(injectResultOverviewOutput.inject_expectations.map(expectation => expectation.inject_expectation_name)))
-                      .map((name, index) => (
-                        <Typography key={index} variant="body1">
-                          {name}
-                        </Typography>
-                      ))
-                    : (
-                        <Typography variant="body1" gutterBottom>
-                          -
-                        </Typography>
-                      )
-                }
-              </Grid>
-            </Grid>
-          </Paper>
-        ) : (
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <Typography variant="body1">{t('No data available')}</Typography>
-          </Paper>
-        )}
-      </Grid>
-      {injectResultOverviewOutput?.inject_commands_lines && (
-        <Grid item xs={6} style={{ marginBottom: 30 }}>
-          <Typography variant="h4">{t('Command Lines')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <Typography variant="subtitle1" className={classes.header} gutterBottom>
-              {t('Attack command')}
-            </Typography>
-            {(injectResultOverviewOutput.inject_commands_lines?.content?.length ?? 0) > 0 ? (
-              <pre>
-                <Typography variant="body1" gutterBottom>
-                  {injectResultOverviewOutput.inject_commands_lines?.content?.map((content, index) => (
-                    <li key={index}>{content}</li>
-                  ))}
-                </Typography>
-              </pre>
-            ) : '-'}
-            <Typography variant="subtitle1" className={classes.header} gutterBottom>
-              {t('Cleanup command')}
-            </Typography>
-            {(injectResultOverviewOutput.inject_commands_lines?.cleanup_command?.length ?? 0) > 0 ? (
-              <pre>
-                <Typography variant="body1" gutterBottom>
-                  {injectResultOverviewOutput.inject_commands_lines?.cleanup_command?.map((content, index) => (
-                    <li key={index}>{content}</li>
-                  ))}
-                </Typography>
-              </pre>
-            ) : '-'}
-            <Typography variant="subtitle1" className={classes.header} gutterBottom>
-              {t('External ID')}
-            </Typography>
-            {injectResultOverviewOutput.inject_commands_lines?.external_id ? (
-              <pre>
-                <Typography variant="body1" gutterBottom>
-                  {injectResultOverviewOutput.inject_commands_lines?.external_id}
-                </Typography>
-              </pre>
-            ) : '-'}
-          </Paper>
-        </Grid>
-      )}
-      <Grid item xs={injectResultOverviewOutput?.inject_commands_lines ? 6 : 12} style={{ marginBottom: 30 }}>
         <Typography variant="h4">{t('Execution logs')}</Typography>
         {injectResultOverviewOutput ? (
           <Paper variant="outlined" classes={{ root: classes.paper }}>
