@@ -221,7 +221,9 @@ const Payload: FunctionComponent<Props> = ({
                                 {prerequisite.executor}
                               </TableCell>
                               <TableCell>
-                                {prerequisite.get_command}
+                                <pre>
+                                  <ItemCopy content={prerequisite.get_command} />
+                                </pre>
                               </TableCell>
                               <TableCell>
                                 {prerequisite.check_command !== undefined
