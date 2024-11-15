@@ -240,7 +240,7 @@ public class InjectsExecutionJob implements Job {
                   InjectStatus injectStatus =
                       inject
                           .getStatus()
-                          .orElseGet(
+                          .orElseThrow(() -> new IllegalArgumentException("Status should exists"));
                               () -> {
                                 throw new IllegalArgumentException("Status should exists");
                               });
